@@ -1,118 +1,237 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import {
   Zap,
-  Server,
-  Route as RouteIcon,
-  Shield,
-  Waves,
+  BookOpen,
+  Code2,
+  Trophy,
+  Target,
   Sparkles,
-} from 'lucide-react'
+  ArrowRight,
+  CheckCircle,
+} from 'lucide-react';
 
-export const Route = createFileRoute('/')({ component: App })
+export const Route = createFileRoute('/')({ component: HomePage });
 
-function App() {
+function HomePage() {
   const features = [
     {
-      icon: <Zap className="w-12 h-12 text-cyan-400" />,
-      title: 'Powerful Server Functions',
+      icon: <BookOpen className="w-10 h-10 text-primary" />,
+      title: 'Interactive Tutorials',
       description:
-        'Write server-side code that seamlessly integrates with your client components. Type-safe, secure, and simple.',
+        'Learn testing concepts step-by-step with beautifully rendered markdown content and code examples.',
     },
     {
-      icon: <Server className="w-12 h-12 text-cyan-400" />,
-      title: 'Flexible Server Side Rendering',
+      icon: <Code2 className="w-10 h-10 text-primary" />,
+      title: 'Playwright Challenges',
       description:
-        'Full-document SSR, streaming, and progressive enhancement out of the box. Control exactly what renders where.',
+        'Write real Playwright-style code in our Monaco editor. Get instant feedback on your solutions.',
     },
     {
-      icon: <RouteIcon className="w-12 h-12 text-cyan-400" />,
-      title: 'API Routes',
+      icon: <Target className="w-10 h-10 text-primary" />,
+      title: 'Selector Challenges',
       description:
-        'Build type-safe API endpoints alongside your application. No separate backend needed.',
+        'Master CSS and XPath selectors with visual feedback. See elements highlight as you type.',
     },
     {
-      icon: <Shield className="w-12 h-12 text-cyan-400" />,
-      title: 'Strongly Typed Everything',
+      icon: <Trophy className="w-10 h-10 text-primary" />,
+      title: 'Gamification',
       description:
-        'End-to-end type safety from server to client. Catch errors before they reach production.',
+        'Earn XP, level up, unlock achievements, and compete on the leaderboard. Learning made fun!',
     },
     {
-      icon: <Waves className="w-12 h-12 text-cyan-400" />,
-      title: 'Full Streaming Support',
+      icon: <Zap className="w-10 h-10 text-primary" />,
+      title: 'Instant Execution',
       description:
-        'Stream data from server to client progressively. Perfect for AI applications and real-time updates.',
+        'Your code runs instantly in the browser. No setup required, no waiting for servers.',
     },
     {
-      icon: <Sparkles className="w-12 h-12 text-cyan-400" />,
-      title: 'Next Generation Ready',
+      icon: <Sparkles className="w-10 h-10 text-primary" />,
+      title: 'Track Progress',
       description:
-        'Built from the ground up for modern web applications. Deploy anywhere JavaScript runs.',
+        'See your progress across tutorials and challenges. Never lose track of where you left off.',
     },
-  ]
+  ];
+
+  const stats = [
+    { value: '50+', label: 'Challenges' },
+    { value: '20+', label: 'Tutorials' },
+    { value: '25+', label: 'Achievements' },
+    { value: '∞', label: 'Learning' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen">
+      {/* Hero Section */}
       <section className="relative py-20 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-purple-500/10"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
+
         <div className="relative max-w-5xl mx-auto">
-          <div className="flex items-center justify-center gap-6 mb-6">
+          {/* Logo */}
+          <div className="flex items-center justify-center gap-4 mb-8">
             <img
-              src="/tanstack-circle-logo.png"
-              alt="TanStack Logo"
-              className="w-24 h-24 md:w-32 md:h-32"
+              src="/favicon.jpg"
+              alt="TestingWithEkki Logo"
+              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30"
             />
-            <h1 className="text-6xl md:text-7xl font-black text-white [letter-spacing:-0.08em]">
-              <span className="text-gray-300">TANSTACK</span>{' '}
-              <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                START
-              </span>
-            </h1>
           </div>
-          <p className="text-2xl md:text-3xl text-gray-300 mb-4 font-light">
-            The framework for next generation AI applications
+
+          {/* Title */}
+          <h1 className="text-5xl md:text-7xl font-bold mb-6">
+            <span className="gradient-text">TestingWithEkki</span>
+          </h1>
+
+          {/* Tagline */}
+          <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-3xl mx-auto">
+            Master QA testing skills through interactive challenges
           </p>
-          <p className="text-lg text-gray-400 max-w-3xl mx-auto mb-8">
-            Full-stack framework powered by TanStack Router for React and Solid.
-            Build modern applications with server functions, streaming, and type
-            safety.
+          <p className="text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-10">
+            Learn Playwright, CSS selectors, XPath, and more with hands-on coding challenges.
+            Earn XP, unlock achievements, and become a testing expert.
           </p>
-          <div className="flex flex-col items-center gap-4">
-            <a
-              href="https://tanstack.com/start"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-semibold rounded-lg transition-colors shadow-lg shadow-cyan-500/50"
-            >
-              Documentation
-            </a>
-            <p className="text-gray-400 text-sm mt-2">
-              Begin your TanStack Start journey by editing{' '}
-              <code className="px-2 py-1 bg-slate-700 rounded text-cyan-400">
-                /src/routes/index.tsx
-              </code>
-            </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+            <Link to="/challenges">
+              <Button size="lg" className="text-lg px-8 py-6">
+                Start Learning
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Button>
+            </Link>
+            <Link to="/tutorials">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+                Browse Tutorials
+              </Button>
+            </Link>
+          </div>
+
+          {/* Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center">
+                <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-muted-foreground">{stat.label}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="py-16 px-6 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {features.map((feature, index) => (
-            <div
-              key={index}
-              className="bg-slate-800/50 backdrop-blur-sm border border-slate-700 rounded-xl p-6 hover:border-cyan-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/10"
-            >
-              <div className="mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-white mb-3">
-                {feature.title}
-              </h3>
-              <p className="text-gray-400 leading-relaxed">
-                {feature.description}
-              </p>
+      {/* Features Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Everything You Need to <span className="gradient-text">Learn Testing</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              A complete platform designed to take you from beginner to expert
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map((feature, index) => (
+              <Card
+                key={index}
+                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10"
+              >
+                <CardContent className="p-6">
+                  <div className="mb-4 p-3 bg-primary/10 rounded-lg w-fit">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-muted-foreground">{feature.description}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-20 px-6 bg-muted/30">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              How It <span className="gradient-text">Works</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                step: '1',
+                title: 'Choose a Challenge',
+                description: 'Pick from Playwright, CSS selectors, or JavaScript challenges.',
+              },
+              {
+                step: '2',
+                title: 'Write Your Code',
+                description: 'Use our Monaco editor with syntax highlighting and auto-completion.',
+              },
+              {
+                step: '3',
+                title: 'Get Instant Feedback',
+                description: 'Run your code and see results immediately. Earn XP when you pass!',
+              },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-primary">{item.step}</span>
+                </div>
+                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                <p className="text-muted-foreground">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="glass-card p-12 rounded-2xl">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Ready to Start Your Journey?
+            </h2>
+            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
+              Join TestingWithEkki today and level up your QA testing skills.
+              It's free to get started!
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link to="/login">
+                <Button size="lg" className="text-lg px-8">
+                  Create Free Account
+                </Button>
+              </Link>
+              <Link to="/leaderboard">
+                <Button variant="outline" size="lg" className="text-lg px-8">
+                  View Leaderboard
+                </Button>
+              </Link>
             </div>
-          ))}
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+              <span className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-400" />
+                Free to use
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-400" />
+                No credit card required
+              </span>
+              <span className="flex items-center gap-2">
+                <CheckCircle className="h-4 w-4 text-green-400" />
+                Learn at your own pace
+              </span>
+            </div>
+          </div>
         </div>
       </section>
     </div>
-  )
+  );
 }
