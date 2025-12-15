@@ -1,0 +1,8 @@
+node_modules
+dist
+.output
+build
+.vinxi
+bun.lock
+package-lock.json
+pnpm-lock.yaml
