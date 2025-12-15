@@ -1,7 +1,18 @@
 import { useState } from 'react';
 import { signIn } from '@/lib/auth.client';
 import { signInSchema, type SignInInput } from '@/lib/validations';
-import './auth.css';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -73,61 +84,85 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
     };
 
     return (
-        <form className="auth-form" onSubmit={handleSubmit}>
-            <h2 className="auth-form-title">Welcome Back</h2>
-            <p className="auth-form-subtitle">Sign in to continue your learning journey</p>
+        <Card className="w-full max-w-md glass-card">
+            <CardHeader className="text-center">
+                <CardTitle className="text-2xl font-bold gradient-text">
+                    Welcome Back
+                </CardTitle>
+                <CardDescription>
+                    Sign in to continue your learning journey
+                </CardDescription>
+            </CardHeader>
 
-            {formError && <div className="form-error">{formError}</div>}
+            <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-4">
+                    {formError && (
+                        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                            {formError}
+                        </div>
+                    )}
 
-            <div className="form-group">
-                <label className="form-label" htmlFor="email">
-                    Email
-                </label>
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className={`form-input ${errors.email ? 'error' : ''}`}
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    autoComplete="email"
-                />
-                {errors.email && <p className="field-error">{errors.email}</p>}
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            autoComplete="email"
+                            className={cn(errors.email && 'border-destructive')}
+                        />
+                        {errors.email && (
+                            <p className="text-sm text-destructive">{errors.email}</p>
+                        )}
+                    </div>
 
-            <div className="form-group">
-                <label className="form-label" htmlFor="password">
-                    Password
-                </label>
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    className={`form-input ${errors.password ? 'error' : ''}`}
-                    placeholder="••••••••"
-                    value={formData.password}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    autoComplete="current-password"
-                />
-                {errors.password && <p className="field-error">{errors.password}</p>}
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="••••••••"
+                            value={formData.password}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            autoComplete="current-password"
+                            className={cn(errors.password && 'border-destructive')}
+                        />
+                        {errors.password && (
+                            <p className="text-sm text-destructive">{errors.password}</p>
+                        )}
+                    </div>
+                </CardContent>
 
-            <button type="submit" className="auth-button" disabled={isLoading}>
-                {isLoading ? <span className="spinner" /> : 'Sign In'}
-            </button>
+                <CardFooter className="flex flex-col gap-4">
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? (
+                            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        ) : (
+                            'Sign In'
+                        )}
+                    </Button>
 
-            {onRegisterClick && (
-                <p className="auth-link-section">
-                    Don&apos;t have an account?{' '}
-                    <button type="button" className="auth-link" onClick={onRegisterClick}>
-                        Sign up
-                    </button>
-                </p>
-            )}
-        </form>
+                    {onRegisterClick && (
+                        <p className="text-center text-sm text-muted-foreground">
+                            Don&apos;t have an account?{' '}
+                            <button
+                                type="button"
+                                className="text-primary hover:underline font-medium"
+                                onClick={onRegisterClick}
+                            >
+                                Sign up
+                            </button>
+                        </p>
+                    )}
+                </CardFooter>
+            </form>
+        </Card>
     );
 }
 
