@@ -1,7 +1,18 @@
 import { useState } from 'react';
 import { signUp } from '@/lib/auth.client';
 import { signUpSchema, type SignUpInput } from '@/lib/validations';
-import './auth.css';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 
 interface RegisterFormProps {
     onSuccess?: () => void;
@@ -75,79 +86,103 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
     };
 
     return (
-        <form className="auth-form" onSubmit={handleSubmit}>
-            <h2 className="auth-form-title">Create Account</h2>
-            <p className="auth-form-subtitle">Start your learning journey today</p>
+        <Card className="w-full max-w-md glass-card">
+            <CardHeader className="text-center">
+                <CardTitle className="text-2xl font-bold gradient-text">
+                    Create Account
+                </CardTitle>
+                <CardDescription>
+                    Start your learning journey today
+                </CardDescription>
+            </CardHeader>
 
-            {formError && <div className="form-error">{formError}</div>}
+            <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-4">
+                    {formError && (
+                        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                            {formError}
+                        </div>
+                    )}
 
-            <div className="form-group">
-                <label className="form-label" htmlFor="name">
-                    Name
-                </label>
-                <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    className={`form-input ${errors.name ? 'error' : ''}`}
-                    placeholder="John Doe"
-                    value={formData.name}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    autoComplete="name"
-                />
-                {errors.name && <p className="field-error">{errors.name}</p>}
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="name">Name</Label>
+                        <Input
+                            id="name"
+                            name="name"
+                            type="text"
+                            placeholder="John Doe"
+                            value={formData.name}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            autoComplete="name"
+                            className={cn(errors.name && 'border-destructive')}
+                        />
+                        {errors.name && (
+                            <p className="text-sm text-destructive">{errors.name}</p>
+                        )}
+                    </div>
 
-            <div className="form-group">
-                <label className="form-label" htmlFor="email">
-                    Email
-                </label>
-                <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    className={`form-input ${errors.email ? 'error' : ''}`}
-                    placeholder="you@example.com"
-                    value={formData.email}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    autoComplete="email"
-                />
-                {errors.email && <p className="field-error">{errors.email}</p>}
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                            id="email"
+                            name="email"
+                            type="email"
+                            placeholder="you@example.com"
+                            value={formData.email}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            autoComplete="email"
+                            className={cn(errors.email && 'border-destructive')}
+                        />
+                        {errors.email && (
+                            <p className="text-sm text-destructive">{errors.email}</p>
+                        )}
+                    </div>
 
-            <div className="form-group">
-                <label className="form-label" htmlFor="password">
-                    Password
-                </label>
-                <input
-                    id="password"
-                    name="password"
-                    type="password"
-                    className={`form-input ${errors.password ? 'error' : ''}`}
-                    placeholder="Minimum 8 characters"
-                    value={formData.password}
-                    onChange={handleChange}
-                    disabled={isLoading}
-                    autoComplete="new-password"
-                />
-                {errors.password && <p className="field-error">{errors.password}</p>}
-            </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Minimum 8 characters"
+                            value={formData.password}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            autoComplete="new-password"
+                            className={cn(errors.password && 'border-destructive')}
+                        />
+                        {errors.password && (
+                            <p className="text-sm text-destructive">{errors.password}</p>
+                        )}
+                    </div>
+                </CardContent>
 
-            <button type="submit" className="auth-button" disabled={isLoading}>
-                {isLoading ? <span className="spinner" /> : 'Create Account'}
-            </button>
+                <CardFooter className="flex flex-col gap-4">
+                    <Button type="submit" className="w-full" disabled={isLoading}>
+                        {isLoading ? (
+                            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                        ) : (
+                            'Create Account'
+                        )}
+                    </Button>
 
-            {onLoginClick && (
-                <p className="auth-link-section">
-                    Already have an account?{' '}
-                    <button type="button" className="auth-link" onClick={onLoginClick}>
-                        Sign in
-                    </button>
-                </p>
-            )}
-        </form>
+                    {onLoginClick && (
+                        <p className="text-center text-sm text-muted-foreground">
+                            Already have an account?{' '}
+                            <button
+                                type="button"
+                                className="text-primary hover:underline font-medium"
+                                onClick={onLoginClick}
+                            >
+                                Sign in
+                            </button>
+                        </p>
+                    )}
+                </CardFooter>
+            </form>
+        </Card>
     );
 }
 
