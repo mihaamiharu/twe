@@ -6,10 +6,12 @@ import {
   LogOut,
   Menu,
   Settings,
+  Trophy,
   User,
   X,
   Zap,
 } from 'lucide-react';
+import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -33,6 +35,7 @@ const mockUser = {
 const navLinks = [
   { href: '/tutorials', label: 'Tutorials', icon: BookOpen },
   { href: '/challenges', label: 'Challenges', icon: Code },
+  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
 ];
 
 export function Header() {
@@ -82,7 +85,8 @@ export function Header() {
             </div>
 
             {/* Right side */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
               {user.isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
