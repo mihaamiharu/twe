@@ -1,10 +1,11 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
+import { TanStackDevtools } from '@tanstack/react-devtools';
 
-import Header from '../components/Header'
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
-import appCss from '../styles.css?url'
+import appCss from '../styles.css?url';
 
 export const Route = createRootRoute({
   head: () => ({
@@ -17,10 +18,19 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'TestingWithEkki - Learn Testing Skills',
+      },
+      {
+        name: 'description',
+        content: 'Learn testing skills through interactive tutorials and coding challenges',
       },
     ],
     links: [
+      {
+        rel: 'icon',
+        href: '/favicon.jpg',
+        type: 'image/jpeg',
+      },
       {
         rel: 'stylesheet',
         href: appCss,
@@ -28,17 +38,29 @@ export const Route = createRootRoute({
     ],
   }),
 
+  component: RootComponent,
   shellComponent: RootDocument,
-})
+});
+
+function RootComponent() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Header />
+      <main className="flex-1">
+        <Outlet />
+      </main>
+      <Footer />
+    </div>
+  );
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
-      <body>
-        <Header />
+      <body className="scrollbar-thin">
         {children}
         <TanStackDevtools
           config={{
@@ -54,5 +76,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }
