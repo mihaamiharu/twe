@@ -3,7 +3,7 @@ import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { tutorials, progress } from '@/db/schema';
 import { eq, and, asc, desc, sql } from 'drizzle-orm';
-import { authClient } from '@/lib/auth.client';
+import { auth } from '@/lib/auth.server';
 
 interface TutorialFilters {
   search?: string;
@@ -83,8 +83,8 @@ export const Route = createFileRoute('/api/tutorials/')({
           // Get user progress if authenticated
           let userProgress: Record<string, { isCompleted: boolean; readingProgress: number }> = {};
           try {
-            const session = await authClient.getSession();
-            if (session.data?.user?.id) {
+            const session = await auth.api.getSession({ headers: request.headers });
+            if (session?.user?.id) {
               const progressRecords = await db
                 .select({
                   tutorialId: progress.tutorialId,
@@ -92,7 +92,7 @@ export const Route = createFileRoute('/api/tutorials/')({
                   readingProgress: progress.readingProgress,
                 })
                 .from(progress)
-                .where(eq(progress.userId, session.data.user.id));
+                .where(eq(progress.userId, session.user.id));
 
               userProgress = progressRecords.reduce((acc, p) => {
                 if (p.tutorialId) {
