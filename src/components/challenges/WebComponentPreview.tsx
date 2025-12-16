@@ -1,192 +1,376 @@
 /**
- * WebComponentPreview - Iframe preview for challenge HTML
+ * WebComponentPreview - Visual preview for selector challenges
  * 
  * Features:
- * - Renders challenge HTML in isolated iframe
- * - Highlights target elements on hover/selection
- * - Shows element info on hover
+ * - Renders HTML in sandboxed iframe
+ * - Highlights target element on hover
+ * - Shows element path on click
+ * - Live selector highlighting
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import type { SelectorType } from './SelectorInput';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { ZoomIn, ZoomOut, RotateCcw, MousePointer2, Target, Maximize2 } from 'lucide-react';
 
 export interface WebComponentPreviewProps {
     htmlContent: string;
-    selector?: string;
-    selectorType?: SelectorType;
-    highlightColor?: string;
-    onElementClick?: (element: HTMLElement, selector: string) => void;
+    cssContent?: string;
+    targetElementId?: string;
+    targetSelector?: string;
+    userSelector?: string;
+    selectorType?: 'css' | 'xpath';
+    onElementClick?: (elementPath: string) => void;
+    showControls?: boolean;
+    height?: string | number;
     className?: string;
 }
 
 export function WebComponentPreview({
     htmlContent,
-    selector,
+    cssContent,
+    targetElementId,
+    targetSelector,
+    userSelector,
     selectorType = 'css',
-    highlightColor = '#22d3ee',
     onElementClick,
+    showControls = true,
+    height = 300,
     className,
 }: WebComponentPreviewProps) {
     const iframeRef = useRef<HTMLIFrameElement>(null);
+    const [zoom, setZoom] = useState(100);
+    const [hoveredElement, setHoveredElement] = useState<string | null>(null);
     const [matchCount, setMatchCount] = useState(0);
-    const [error, setError] = useState<string | null>(null);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
-    // Inject HTML and set up event listeners
-    useEffect(() => {
-        const iframe = iframeRef.current;
-        if (!iframe) return;
-
-        const doc = iframe.contentDocument;
-        if (!doc) return;
-
-        // Inject HTML with base styles
-        doc.open();
-        doc.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <style>
-            * { box-sizing: border-box; }
-            body { 
-              font-family: system-ui, sans-serif; 
-              padding: 16px; 
-              margin: 0;
-              background: white;
-              color: #1a1a2e;
+    // Generate the HTML document for the iframe
+    const getIframeContent = useCallback(() => {
+        const highlightStyles = `
+            .twe-target-highlight {
+                outline: 3px solid #22c55e !important;
+                outline-offset: 2px;
+                background-color: rgba(34, 197, 94, 0.1) !important;
             }
-            .twe-highlight {
-              outline: 3px solid ${highlightColor} !important;
-              outline-offset: 2px;
-              background-color: ${highlightColor}20 !important;
+            .twe-user-match {
+                outline: 2px dashed #3b82f6 !important;
+                outline-offset: 1px;
+                background-color: rgba(59, 130, 246, 0.1) !important;
             }
             .twe-hover-highlight {
-              outline: 2px dashed #94a3b8 !important;
-              outline-offset: 1px;
+                outline: 2px solid #f59e0b !important;
+                outline-offset: 1px;
+                cursor: pointer;
             }
-          </style>
-        </head>
-        <body>${htmlContent}</body>
-      </html>
-    `);
-        doc.close();
-
-        // Set up hover highlighting
-        const handleMouseOver = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
-            if (target.tagName !== 'BODY' && target.tagName !== 'HTML') {
-                target.classList.add('twe-hover-highlight');
+            .twe-no-match {
+                outline: 2px solid #ef4444 !important;
             }
-        };
-
-        const handleMouseOut = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
-            target.classList.remove('twe-hover-highlight');
-        };
-
-        const handleClick = (e: MouseEvent) => {
-            const target = e.target as HTMLElement;
-            if (target.tagName !== 'BODY' && target.tagName !== 'HTML' && onElementClick) {
-                e.preventDefault();
-                // Generate a simple CSS selector for the clicked element
-                let generatedSelector = target.tagName.toLowerCase();
-                if (target.id) {
-                    generatedSelector = `#${target.id}`;
-                } else if (target.className) {
-                    generatedSelector = `.${target.className.split(' ').join('.')}`;
-                }
-                onElementClick(target, generatedSelector);
+            * {
+                transition: outline 0.15s ease, background-color 0.15s ease;
             }
-        };
+        `;
 
-        doc.body.addEventListener('mouseover', handleMouseOver);
-        doc.body.addEventListener('mouseout', handleMouseOut);
-        doc.body.addEventListener('click', handleClick);
+        return `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    * {
+                        box-sizing: border-box;
+                    }
+                    body {
+                        margin: 0;
+                        padding: 16px;
+                        font-family: system-ui, -apple-system, sans-serif;
+                        background: #ffffff;
+                        color: #1f2937;
+                        min-height: 100vh;
+                    }
+                    ${highlightStyles}
+                    ${cssContent || ''}
+                </style>
+            </head>
+            <body>
+                ${htmlContent}
+                <script>
+                    // Message parent about element clicks
+                    document.addEventListener('click', (e) => {
+                        const path = getElementPath(e.target);
+                        window.parent.postMessage({ type: 'elementClick', path }, '*');
+                    });
 
-        return () => {
-            doc.body.removeEventListener('mouseover', handleMouseOver);
-            doc.body.removeEventListener('mouseout', handleMouseOut);
-            doc.body.removeEventListener('click', handleClick);
-        };
-    }, [htmlContent, highlightColor, onElementClick]);
+                    // Hover highlighting
+                    document.addEventListener('mouseover', (e) => {
+                        if (e.target !== document.body) {
+                            e.target.classList.add('twe-hover-highlight');
+                            const path = getElementPath(e.target);
+                            window.parent.postMessage({ type: 'elementHover', path }, '*');
+                        }
+                    });
 
-    // Highlight matching elements
+                    document.addEventListener('mouseout', (e) => {
+                        e.target.classList.remove('twe-hover-highlight');
+                        window.parent.postMessage({ type: 'elementHover', path: null }, '*');
+                    });
+
+                    function getElementPath(el) {
+                        const parts = [];
+                        while (el && el !== document.body) {
+                            let selector = el.tagName.toLowerCase();
+                            if (el.id) {
+                                selector += '#' + el.id;
+                            } else if (el.className && typeof el.className === 'string') {
+                                const classes = el.className.trim().split(/\\s+/).filter(c => !c.startsWith('twe-'));
+                                if (classes.length) {
+                                    selector += '.' + classes.join('.');
+                                }
+                            }
+                            parts.unshift(selector);
+                            el = el.parentElement;
+                        }
+                        return parts.join(' > ');
+                    }
+
+                    // Listen for highlight commands from parent
+                    window.addEventListener('message', (e) => {
+                        if (e.data.type === 'highlight') {
+                            highlightElements(e.data.selector, e.data.selectorType, e.data.className);
+                        } else if (e.data.type === 'clearHighlights') {
+                            clearHighlights();
+                        }
+                    });
+
+                    function highlightElements(selector, selectorType, className) {
+                        clearHighlights();
+                        if (!selector) return;
+
+                        try {
+                            let elements = [];
+                            if (selectorType === 'css') {
+                                elements = document.querySelectorAll(selector);
+                            } else {
+                                const result = document.evaluate(
+                                    selector, 
+                                    document, 
+                                    null, 
+                                    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, 
+                                    null
+                                );
+                                for (let i = 0; i < result.snapshotLength; i++) {
+                                    elements.push(result.snapshotItem(i));
+                                }
+                            }
+
+                            elements.forEach(el => {
+                                if (el && el.classList) {
+                                    el.classList.add(className);
+                                }
+                            });
+
+                            window.parent.postMessage({ 
+                                type: 'matchCount', 
+                                count: elements.length 
+                            }, '*');
+                        } catch (err) {
+                            window.parent.postMessage({ 
+                                type: 'matchCount', 
+                                count: 0,
+                                error: err.message 
+                            }, '*');
+                        }
+                    }
+
+                    function clearHighlights() {
+                        document.querySelectorAll('.twe-user-match, .twe-target-highlight')
+                            .forEach(el => {
+                                el.classList.remove('twe-user-match', 'twe-target-highlight');
+                            });
+                    }
+
+                    // Initial highlight of target element
+                    setTimeout(() => {
+                        ${targetElementId ? `
+                            const target = document.getElementById('${targetElementId}');
+                            if (target) target.classList.add('twe-target-highlight');
+                        ` : ''}
+                        ${targetSelector && !targetElementId ? `
+                            highlightElements('${targetSelector}', 'css', 'twe-target-highlight');
+                        ` : ''}
+                    }, 100);
+                </script>
+            </body>
+            </html>
+        `;
+    }, [htmlContent, cssContent, targetElementId, targetSelector]);
+
+    // Update iframe content
     useEffect(() => {
         const iframe = iframeRef.current;
         if (!iframe) return;
 
-        const doc = iframe.contentDocument;
-        if (!doc) return;
-
-        // Remove previous highlights
-        doc.querySelectorAll('.twe-highlight').forEach((el) => {
-            el.classList.remove('twe-highlight');
-        });
-
-        if (!selector) {
-            setMatchCount(0);
-            setError(null);
-            return;
+        const doc = iframe.contentDocument || iframe.contentWindow?.document;
+        if (doc) {
+            doc.open();
+            doc.write(getIframeContent());
+            doc.close();
         }
+    }, [getIframeContent]);
 
-        try {
-            let elements: NodeListOf<Element> | Element[];
-
-            if (selectorType === 'css') {
-                elements = doc.querySelectorAll(selector);
-            } else {
-                // XPath
-                const result = doc.evaluate(
-                    selector,
-                    doc.body,
-                    null,
-                    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
-                    null
-                );
-                elements = [];
-                for (let i = 0; i < result.snapshotLength; i++) {
-                    const node = result.snapshotItem(i);
-                    if (node instanceof Element) {
-                        (elements as Element[]).push(node);
-                    }
-                }
+    // Listen for messages from iframe
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data.type === 'elementClick') {
+                onElementClick?.(event.data.path);
+            } else if (event.data.type === 'elementHover') {
+                setHoveredElement(event.data.path);
+            } else if (event.data.type === 'matchCount') {
+                setMatchCount(event.data.count);
             }
+        };
 
-            // Highlight matching elements
-            const elementArray = Array.from(elements);
-            elementArray.forEach((el) => {
-                el.classList.add('twe-highlight');
-            });
+        window.addEventListener('message', handleMessage);
+        return () => window.removeEventListener('message', handleMessage);
+    }, [onElementClick]);
 
-            setMatchCount(elementArray.length);
-            setError(null);
-        } catch (err) {
-            setMatchCount(0);
-            setError(err instanceof Error ? err.message : 'Invalid selector');
-        }
-    }, [selector, selectorType]);
+    // Highlight user's selector matches
+    useEffect(() => {
+        const iframe = iframeRef.current;
+        if (!iframe?.contentWindow || !userSelector) return;
+
+        iframe.contentWindow.postMessage({
+            type: 'highlight',
+            selector: userSelector,
+            selectorType,
+            className: 'twe-user-match',
+        }, '*');
+
+        return () => {
+            if (iframe?.contentWindow) {
+                iframe.contentWindow.postMessage({ type: 'clearHighlights' }, '*');
+            }
+        };
+    }, [userSelector, selectorType]);
+
+    // Zoom controls
+    const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200));
+    const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 50));
+    const handleZoomReset = () => setZoom(100);
 
     return (
-        <div className={cn('rounded-lg overflow-hidden border border-border bg-white', className)}>
-            <div className="bg-muted/50 px-3 py-2 border-b border-border flex items-center justify-between">
-                <span className="text-sm font-medium text-muted-foreground">Preview</span>
-                {selector && (
-                    <span className="text-xs text-muted-foreground">
-                        {error ? (
-                            <span className="text-red-400">{error}</span>
-                        ) : (
-                            `${matchCount} element${matchCount !== 1 ? 's' : ''} selected`
+        <div className={cn(
+            'border border-border rounded-lg overflow-hidden bg-background',
+            isFullscreen && 'fixed inset-4 z-50 border-2',
+            className
+        )}>
+            {/* Toolbar */}
+            {showControls && (
+                <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/30">
+                    <div className="flex items-center gap-2">
+                        <MousePointer2 className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-sm text-muted-foreground">Preview</span>
+                        {targetElementId && (
+                            <Badge variant="outline" className="gap-1">
+                                <Target className="h-3 w-3" />
+                                Target: #{targetElementId}
+                            </Badge>
                         )}
-                    </span>
-                )}
+                        {userSelector && (
+                            <Badge
+                                variant={matchCount > 0 ? 'default' : 'destructive'}
+                                className="gap-1"
+                            >
+                                {matchCount} match{matchCount !== 1 ? 'es' : ''}
+                            </Badge>
+                        )}
+                    </div>
+
+                    <div className="flex items-center gap-1">
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleZoomOut}
+                            disabled={zoom <= 50}
+                            className="h-7 w-7 p-0"
+                        >
+                            <ZoomOut className="h-4 w-4" />
+                        </Button>
+                        <span className="text-xs text-muted-foreground w-12 text-center">
+                            {zoom}%
+                        </span>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleZoomIn}
+                            disabled={zoom >= 200}
+                            className="h-7 w-7 p-0"
+                        >
+                            <ZoomIn className="h-4 w-4" />
+                        </Button>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleZoomReset}
+                            className="h-7 w-7 p-0"
+                        >
+                            <RotateCcw className="h-4 w-4" />
+                        </Button>
+                        <div className="w-px h-4 bg-border mx-1" />
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setIsFullscreen(!isFullscreen)}
+                            className="h-7 w-7 p-0"
+                        >
+                            <Maximize2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                </div>
+            )}
+
+            {/* Preview Container */}
+            <div
+                className="overflow-auto bg-white"
+                style={{ height: isFullscreen ? 'calc(100% - 45px)' : height }}
+            >
+                <div
+                    style={{
+                        transform: `scale(${zoom / 100})`,
+                        transformOrigin: 'top left',
+                        width: `${10000 / zoom}%`,
+                    }}
+                >
+                    <iframe
+                        ref={iframeRef}
+                        title="Component Preview"
+                        sandbox="allow-scripts"
+                        className="w-full border-0"
+                        style={{
+                            minHeight: typeof height === 'number' ? height : 300,
+                            pointerEvents: 'auto',
+                        }}
+                    />
+                </div>
             </div>
-            <iframe
-                ref={iframeRef}
-                className="w-full h-full bg-white"
-                style={{ minHeight: '200px' }}
-                title="Challenge Preview"
-                sandbox="allow-scripts allow-same-origin"
-            />
+
+            {/* Hovered Element Path */}
+            {hoveredElement && (
+                <div className="px-3 py-1.5 border-t border-border bg-muted/50">
+                    <code className="text-xs text-muted-foreground font-mono">
+                        {hoveredElement}
+                    </code>
+                </div>
+            )}
+
+            {/* Fullscreen overlay close */}
+            {isFullscreen && (
+                <div
+                    className="fixed inset-0 bg-black/50 -z-10"
+                    onClick={() => setIsFullscreen(false)}
+                />
+            )}
         </div>
     );
 }
