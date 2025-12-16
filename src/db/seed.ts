@@ -7,6 +7,7 @@
 
 import { db } from './index';
 import { users, tutorials, challenges, testCases, achievements } from './schema';
+import { eq } from 'drizzle-orm';
 
 async function seed() {
     console.log('🌱 Seeding database...');
@@ -17,7 +18,7 @@ async function seed() {
         // ============================================================================
         console.log('👤 Creating sample user...');
 
-        const [sampleUser] = await db.insert(users).values({
+        let sampleUser = (await db.insert(users).values({
             email: 'demo@testingwithekki.com',
             emailVerified: true,
             name: 'Demo User',
@@ -25,16 +26,23 @@ async function seed() {
             level: 3,
             profileVisibility: 'PUBLIC',
             showOnLeaderboard: true,
-        }).returning();
+        }).onConflictDoNothing().returning())[0];
 
-        console.log(`   Created user: ${sampleUser.name} (${sampleUser.email})`);
+        if (!sampleUser) {
+            console.log('   User already exists, fetching...');
+            [sampleUser] = await db.select().from(users).where(eq(users.email, 'demo@testingwithekki.com'));
+        }
+
+        if (sampleUser) {
+            console.log(`   User: ${sampleUser.name} (${sampleUser.email})`);
+        }
 
         // ============================================================================
         // SEED TUTORIAL
         // ============================================================================
         console.log('📚 Creating sample tutorial...');
 
-        const [cssTutorial] = await db.insert(tutorials).values({
+        let cssTutorial = (await db.insert(tutorials).values({
             slug: 'css-selectors-basics',
             title: 'CSS Selectors Basics',
             description: 'Learn the fundamentals of CSS selectors for web testing and automation.',
@@ -85,9 +93,16 @@ Try the CSS Selector challenges to practice what you've learned!
             tags: ['css', 'selectors', 'basics'],
             isPublished: true,
             viewCount: 0,
-        }).returning();
+        }).onConflictDoNothing().returning())[0];
 
-        console.log(`   Created tutorial: ${cssTutorial.title}`);
+        if (!cssTutorial) {
+            console.log('   Tutorial already exists, fetching...');
+            [cssTutorial] = await db.select().from(tutorials).where(eq(tutorials.slug, 'css-selectors-basics'));
+        }
+
+        if (cssTutorial) {
+            console.log(`   Tutorial: ${cssTutorial.title}`);
+        }
 
         // ============================================================================
         // SEED CHALLENGES
@@ -95,7 +110,7 @@ Try the CSS Selector challenges to practice what you've learned!
         console.log('🎯 Creating sample challenges...');
 
         // 1. CSS Selector Challenge
-        const [cssChallenge] = await db.insert(challenges).values({
+        let cssChallenge = (await db.insert(challenges).values({
             slug: 'select-the-button',
             title: 'Select the Button',
             description: 'Use a CSS selector to target the submit button.',
@@ -129,12 +144,15 @@ Write a selector that uniquely identifies the submit button in the HTML below.
             tags: ['css', 'selector', 'beginner'],
             isPublished: true,
             completionCount: 0,
-        }).returning();
+        }).onConflictDoNothing().returning())[0];
 
-        console.log(`   Created challenge: ${cssChallenge.title} (CSS_SELECTOR)`);
+        if (!cssChallenge) {
+            [cssChallenge] = await db.select().from(challenges).where(eq(challenges.slug, 'select-the-button'));
+        }
+        console.log(`   Challenge: ${cssChallenge.title} (CSS_SELECTOR)`);
 
         // 2. XPath Selector Challenge
-        const [xpathChallenge] = await db.insert(challenges).values({
+        let xpathChallenge = (await db.insert(challenges).values({
             slug: 'xpath-find-link',
             title: 'Find the Link with XPath',
             description: 'Use XPath to locate the navigation link.',
@@ -174,12 +192,15 @@ Write an XPath that uniquely identifies the About link.
             tags: ['xpath', 'selector', 'intermediate'],
             isPublished: true,
             completionCount: 0,
-        }).returning();
+        }).onConflictDoNothing().returning())[0];
 
-        console.log(`   Created challenge: ${xpathChallenge.title} (XPATH_SELECTOR)`);
+        if (!xpathChallenge) {
+            [xpathChallenge] = await db.select().from(challenges).where(eq(challenges.slug, 'xpath-find-link'));
+        }
+        console.log(`   Challenge: ${xpathChallenge.title} (XPATH_SELECTOR)`);
 
         // 3. JavaScript/Playwright Challenge
-        const [jsChallenge] = await db.insert(challenges).values({
+        let jsChallenge = (await db.insert(challenges).values({
             slug: 'click-the-button-playwright',
             title: 'Click the Button',
             description: 'Write Playwright code to click the submit button.',
@@ -226,14 +247,22 @@ await page.getByText('Submit').click();
             tags: ['playwright', 'javascript', 'beginner'],
             isPublished: true,
             completionCount: 0,
-        }).returning();
+        }).onConflictDoNothing().returning())[0];
 
-        console.log(`   Created challenge: ${jsChallenge.title} (PLAYWRIGHT)`);
+        if (!jsChallenge) {
+            [jsChallenge] = await db.select().from(challenges).where(eq(challenges.slug, 'click-the-button-playwright'));
+        }
+        console.log(`   Challenge: ${jsChallenge.title} (PLAYWRIGHT)`);
 
         // ============================================================================
         // SEED TEST CASES
         // ============================================================================
         console.log('✅ Creating test cases...');
+
+        // Delete existing test cases for these challenges to avoid duplicates (simpler than upsert for non-unique items)
+        await db.delete(testCases).where(eq(testCases.challengeId, cssChallenge.id));
+        await db.delete(testCases).where(eq(testCases.challengeId, xpathChallenge.id));
+        await db.delete(testCases).where(eq(testCases.challengeId, jsChallenge.id));
 
         await db.insert(testCases).values([
             {
@@ -262,7 +291,7 @@ await page.getByText('Submit').click();
             },
         ]);
 
-        console.log('   Created 3 test cases');
+        console.log('   Created/Updated 3 test cases');
 
         // ============================================================================
         // SEED ACHIEVEMENTS
@@ -303,19 +332,14 @@ await page.getByText('Submit').click();
                 xpReward: 10,
                 isSecret: false,
             },
-        ]);
+        ]).onConflictDoNothing();
 
-        console.log('   Created 3 achievements');
+        console.log('   Created achievements');
 
         // ============================================================================
         // DONE
         // ============================================================================
         console.log('\n✨ Seeding complete!');
-        console.log('   - 1 user');
-        console.log('   - 1 tutorial');
-        console.log('   - 3 challenges (CSS, XPath, Playwright)');
-        console.log('   - 3 test cases');
-        console.log('   - 3 achievements');
 
     } catch (error) {
         console.error('❌ Seeding failed:', error);

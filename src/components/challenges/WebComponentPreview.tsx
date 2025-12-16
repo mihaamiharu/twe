@@ -345,7 +345,7 @@ export function WebComponentPreview({
                     <iframe
                         ref={iframeRef}
                         title="Component Preview"
-                        sandbox="allow-scripts"
+                        sandbox="allow-scripts allow-same-origin"
                         className="w-full border-0"
                         style={{
                             minHeight: typeof height === 'number' ? height : 300,
