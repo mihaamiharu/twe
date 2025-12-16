@@ -3,23 +3,26 @@ import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { users, progress, challenges, userAchievements, achievements, submissions } from '@/db/schema';
 import { eq, and, desc, sql } from 'drizzle-orm';
-import { authClient } from '@/lib/auth.client';
+import { auth } from '@/lib/auth.server';
 
 export const Route = createFileRoute('/api/users/me')({
   server: {
     handlers: {
-      GET: async () => {
+      GET: async ({ request }) => {
         try {
-          const session = await authClient.getSession();
+          // Get session from request headers (server-side)
+          const session = await auth.api.getSession({
+            headers: request.headers,
+          });
 
-          if (!session.data?.user?.id) {
+          if (!session?.user?.id) {
             return json(
               { success: false, error: 'Unauthorized' },
               { status: 401 }
             );
           }
 
-          const userId = session.data.user.id;
+          const userId = session.user.id;
 
           // Get user data
           const user = await db.query.users.findFirst({
@@ -145,16 +148,19 @@ export const Route = createFileRoute('/api/users/me')({
 
       PATCH: async ({ request }) => {
         try {
-          const session = await authClient.getSession();
+          // Get session from request headers (server-side)
+          const session = await auth.api.getSession({
+            headers: request.headers,
+          });
 
-          if (!session.data?.user?.id) {
+          if (!session?.user?.id) {
             return json(
               { success: false, error: 'Unauthorized' },
               { status: 401 }
             );
           }
 
-          const userId = session.data.user.id;
+          const userId = session.user.id;
           const body = await request.json();
 
           // Validate allowed fields
