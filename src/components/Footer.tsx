@@ -1,22 +1,26 @@
 import { Link } from '@tanstack/react-router';
 import { Github, Twitter, Zap } from 'lucide-react';
 
+interface FooterLink {
+    label: string;
+    href: string;
+    isExternal?: boolean;
+}
+
 const footerLinks = {
     product: [
         { label: 'Tutorials', href: '/tutorials' },
         { label: 'Challenges', href: '/challenges' },
         { label: 'Leaderboard', href: '/leaderboard' },
-    ],
+    ] as FooterLink[],
     resources: [
-        { label: 'Documentation', href: '/docs' },
-        { label: 'API Reference', href: '/api-docs' },
-        { label: 'Blog', href: '/blog' },
-    ],
-    company: [
-        { label: 'About', href: '/about' },
-        { label: 'Contact', href: '/contact' },
-        { label: 'Privacy Policy', href: '/privacy' },
-    ],
+        { label: 'API Docs', href: '/docs/api' },
+    ] as FooterLink[],
+    legal: [
+        { label: 'Terms', href: '#', isExternal: true },
+        { label: 'Privacy', href: '#', isExternal: true },
+        { label: 'Cookies', href: '#', isExternal: true },
+    ] as FooterLink[],
 };
 
 export function Footer() {
@@ -38,7 +42,7 @@ export function Footer() {
                         </p>
                         <div className="flex gap-4">
                             <a
-                                href="https://github.com"
+                                href="https://github.com/mihaamiharu/twe"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-muted-foreground hover:text-foreground transition-colors"
@@ -63,7 +67,7 @@ export function Footer() {
                             {footerLinks.product.map((link) => (
                                 <li key={link.href}>
                                     <Link
-                                        to={link.href}
+                                        to={link.href as '/tutorials' | '/challenges' | '/leaderboard'}
                                         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {link.label}
@@ -78,9 +82,9 @@ export function Footer() {
                         <h3 className="font-semibold mb-4">Resources</h3>
                         <ul className="space-y-3">
                             {footerLinks.resources.map((link) => (
-                                <li key={link.href}>
+                                <li key={link.label}>
                                     <Link
-                                        to={link.href}
+                                        to={link.href as '/docs/api'}
                                         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {link.label}
@@ -90,18 +94,18 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Company Links */}
+                    {/* Legal Links */}
                     <div>
-                        <h3 className="font-semibold mb-4">Company</h3>
+                        <h3 className="font-semibold mb-4">Legal</h3>
                         <ul className="space-y-3">
-                            {footerLinks.company.map((link) => (
-                                <li key={link.href}>
-                                    <Link
-                                        to={link.href}
+                            {footerLinks.legal.map((link) => (
+                                <li key={link.label}>
+                                    <a
+                                        href={link.href}
                                         className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                                     >
                                         {link.label}
-                                    </Link>
+                                    </a>
                                 </li>
                             ))}
                         </ul>
@@ -114,15 +118,15 @@ export function Footer() {
                         © {new Date().getFullYear()} TestingWithEkki. All rights reserved.
                     </p>
                     <div className="flex gap-6 text-sm text-muted-foreground">
-                        <Link to="/terms" className="hover:text-foreground transition-colors">
+                        <a href="#" className="hover:text-foreground transition-colors">
                             Terms
-                        </Link>
-                        <Link to="/privacy" className="hover:text-foreground transition-colors">
+                        </a>
+                        <a href="#" className="hover:text-foreground transition-colors">
                             Privacy
-                        </Link>
-                        <Link to="/cookies" className="hover:text-foreground transition-colors">
+                        </a>
+                        <a href="#" className="hover:text-foreground transition-colors">
                             Cookies
-                        </Link>
+                        </a>
                     </div>
                 </div>
             </div>

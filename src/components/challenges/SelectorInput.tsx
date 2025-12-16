@@ -16,6 +16,16 @@ import { Badge } from '@/components/ui/badge';
 import { Check, Copy, AlertCircle, CheckCircle2, Code2 } from 'lucide-react';
 import { validateSelector, type SelectorType, type ValidationResult } from '@/lib/selector-validator';
 
+// Re-export types for consumers
+export type { SelectorType };
+// SelectorValidationResult supports both ValidationResult format and ChallengePlayground format
+export interface SelectorValidationResult {
+    isValid?: boolean;  // From ValidationResult
+    valid?: boolean;    // For ChallengePlayground
+    error?: string;
+    matchCount?: number;
+}
+
 export interface SelectorInputProps {
     value?: string;
     onChange?: (value: string, type: SelectorType) => void;

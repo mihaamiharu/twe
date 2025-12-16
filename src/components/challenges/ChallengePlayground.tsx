@@ -54,7 +54,7 @@ export interface ChallengePlaygroundProps {
 export function ChallengePlayground({ challenge, onSubmit, className }: ChallengePlaygroundProps) {
     const [code, setCode] = useState(challenge.starterCode);
     const [selector, setSelector] = useState('');
-    const [selectorType, setSelectorType] = useState<SelectorType>(
+    const [selectorType] = useState<SelectorType>(
         challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
     );
     const [selectorValidation, setSelectorValidation] = useState<SelectorValidationResult | undefined>();
@@ -248,7 +248,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                             >
                                 <WebComponentPreview
                                     htmlContent={challenge.htmlContent}
-                                    selector={isSelectorChallenge ? selector : undefined}
+                                    userSelector={isSelectorChallenge ? selector : undefined}
                                     selectorType={selectorType}
                                     className="h-full min-h-[300px]"
                                 />
@@ -282,11 +282,14 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                                 <CardContent className="py-3">
                                     <SelectorInput
                                         value={selector}
-                                        onChange={setSelector}
-                                        selectorType={selectorType}
-                                        onTypeChange={setSelectorType}
-                                        onSubmit={handleValidateSelector}
-                                        validationResult={selectorValidation}
+                                        onChange={(value) => setSelector(value)}
+                                        onValidate={handleValidateSelector}
+                                        defaultType={selectorType}
+                                        showValidation={true}
+                                        validationResult={selectorValidation ? {
+                                            isCorrect: selectorValidation.valid ?? false,
+                                            feedback: selectorValidation.error ?? 'Valid selector'
+                                        } : undefined}
                                     />
                                 </CardContent>
                             </Card>
