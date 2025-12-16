@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -26,6 +27,11 @@ import { Route as ApiUsersMeRouteImport } from './routes/api/users/me'
 import { Route as ApiChallengesSlugRouteImport } from './routes/api/challenges/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
+  '/settings': typeof SettingsRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/profile'
+    | '/settings'
     | '/challenges/$slug'
     | '/docs/api'
     | '/tutorials/$slug'
@@ -187,6 +197,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/profile'
+    | '/settings'
     | '/challenges/$slug'
     | '/docs/api'
     | '/tutorials/$slug'
@@ -205,6 +216,7 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/login'
     | '/profile'
+    | '/settings'
     | '/challenges/$slug'
     | '/docs/api'
     | '/tutorials/$slug'
@@ -224,6 +236,7 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
+  SettingsRoute: typeof SettingsRoute
   ChallengesSlugRoute: typeof ChallengesSlugRoute
   DocsApiRoute: typeof DocsApiRoute
   TutorialsSlugRoute: typeof TutorialsSlugRoute
@@ -240,6 +253,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -360,6 +380,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
+  SettingsRoute: SettingsRoute,
   ChallengesSlugRoute: ChallengesSlugRoute,
   DocsApiRoute: DocsApiRoute,
   TutorialsSlugRoute: TutorialsSlugRoute,
