@@ -1,163 +1,48 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { Leaderboard, type LeaderboardUser } from '@/components/gamification';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Calendar } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
+import { Trophy, Calendar, AlertCircle, Users } from 'lucide-react';
 
 export const Route = createFileRoute('/leaderboard')({
     component: LeaderboardPage,
 });
 
-// Mock leaderboard data - will be replaced with database queries
-const mockUsers: LeaderboardUser[] = [
-    {
-        id: '1',
-        rank: 1,
-        previousRank: 2,
-        username: 'testmaster',
-        displayName: 'Test Master',
-        level: 25,
-        totalXP: 62500,
-        challengesCompleted: 87,
-    },
-    {
-        id: '2',
-        rank: 2,
-        previousRank: 1,
-        username: 'selectorqueen',
-        displayName: 'Selector Queen',
-        level: 22,
-        totalXP: 48400,
-        challengesCompleted: 72,
-    },
-    {
-        id: '3',
-        rank: 3,
-        previousRank: 3,
-        username: 'playwrightpro',
-        displayName: 'Playwright Pro',
-        level: 20,
-        totalXP: 40000,
-        challengesCompleted: 65,
-    },
-    {
-        id: '4',
-        rank: 4,
-        previousRank: 5,
-        username: 'xpathxpert',
-        displayName: 'XPath Expert',
-        level: 18,
-        totalXP: 32400,
-        challengesCompleted: 58,
-    },
-    {
-        id: '5',
-        rank: 5,
-        previousRank: 4,
-        username: 'codeninja',
-        displayName: 'Code Ninja',
-        level: 17,
-        totalXP: 28900,
-        challengesCompleted: 51,
-    },
-    {
-        id: '6',
-        rank: 6,
-        username: 'qawarrior',
-        displayName: 'QA Warrior',
-        level: 15,
-        totalXP: 22500,
-        challengesCompleted: 45,
-    },
-    {
-        id: '7',
-        rank: 7,
-        username: 'bugbuster',
-        displayName: 'Bug Buster',
-        level: 14,
-        totalXP: 19600,
-        challengesCompleted: 42,
-    },
-    {
-        id: '8',
-        rank: 8,
-        username: 'testrunner',
-        displayName: 'Test Runner',
-        level: 12,
-        totalXP: 14400,
-        challengesCompleted: 35,
-    },
-    {
-        id: '9',
-        rank: 9,
-        username: 'elementfinder',
-        displayName: 'Element Finder',
-        level: 10,
-        totalXP: 10000,
-        challengesCompleted: 28,
-    },
-    {
-        id: '10',
-        rank: 10,
-        username: 'webinspector',
-        displayName: 'Web Inspector',
-        level: 8,
-        totalXP: 6400,
-        challengesCompleted: 22,
-    },
-];
-
-// Mock monthly leaderboard (different rankings)
-const mockMonthlyUsers: LeaderboardUser[] = [
-    {
-        id: '5',
-        rank: 1,
-        username: 'codeninja',
-        displayName: 'Code Ninja',
-        level: 17,
-        totalXP: 4500,
-        challengesCompleted: 18,
-    },
-    {
-        id: '3',
-        rank: 2,
-        username: 'playwrightpro',
-        displayName: 'Playwright Pro',
-        level: 20,
-        totalXP: 3800,
-        challengesCompleted: 15,
-    },
-    {
-        id: '1',
-        rank: 3,
-        username: 'testmaster',
-        displayName: 'Test Master',
-        level: 25,
-        totalXP: 3200,
-        challengesCompleted: 12,
-    },
-    {
-        id: '7',
-        rank: 4,
-        username: 'bugbuster',
-        displayName: 'Bug Buster',
-        level: 14,
-        totalXP: 2800,
-        challengesCompleted: 11,
-    },
-    {
-        id: '2',
-        rank: 5,
-        username: 'selectorqueen',
-        displayName: 'Selector Queen',
-        level: 22,
-        totalXP: 2400,
-        challengesCompleted: 9,
-    },
-];
+interface LeaderboardResponse {
+    success: boolean;
+    data: LeaderboardUser[];
+    pagination: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+}
 
 function LeaderboardPage() {
-    // Mock current user ID (would come from auth context)
-    const currentUserId = '5';
+    const { data, isLoading, error } = useQuery<LeaderboardResponse>({
+        queryKey: ['leaderboard'],
+        queryFn: async () => {
+            const res = await fetch('/api/leaderboard');
+            if (!res.ok) throw new Error('Failed to fetch leaderboard');
+            return res.json();
+        },
+    });
+
+    const users = data?.data ?? [];
+
+    // Transform API data to match LeaderboardUser interface
+    const transformedUsers: LeaderboardUser[] = users.map((user, index) => ({
+        id: user.id,
+        rank: index + 1,
+        username: user.username || user.displayName || 'Anonymous',
+        displayName: user.displayName || user.username || 'Anonymous',
+        level: user.level,
+        totalXP: user.totalXP,
+        challengesCompleted: user.challengesCompleted,
+    }));
 
     return (
         <div className="min-h-screen p-6 md:p-10">
@@ -182,21 +67,78 @@ function LeaderboardPage() {
                     </TabsList>
 
                     <TabsContent value="all-time">
-                        <Leaderboard
-                            users={mockUsers}
-                            currentUserId={currentUserId}
-                            title="All-Time Leaderboard"
-                            maxDisplay={10}
-                        />
+                        {/* Loading State */}
+                        {isLoading && (
+                            <Card className="glass-card">
+                                <CardContent className="p-6 space-y-4">
+                                    {[1, 2, 3, 4, 5].map((i) => (
+                                        <div key={i} className="flex items-center gap-4">
+                                            <Skeleton className="h-8 w-8 rounded-full" />
+                                            <Skeleton className="h-10 w-10 rounded-full" />
+                                            <div className="flex-1 space-y-2">
+                                                <Skeleton className="h-4 w-32" />
+                                                <Skeleton className="h-3 w-24" />
+                                            </div>
+                                            <Skeleton className="h-6 w-20" />
+                                        </div>
+                                    ))}
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Error State */}
+                        {error && (
+                            <div className="text-center py-12">
+                                <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                                <h3 className="text-lg font-semibold mb-2">Failed to load leaderboard</h3>
+                                <p className="text-muted-foreground">Please try again later</p>
+                            </div>
+                        )}
+
+                        {/* Empty State */}
+                        {!isLoading && !error && transformedUsers.length === 0 && (
+                            <Card className="glass-card">
+                                <CardContent className="p-8 text-center">
+                                    <Users className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                    <h3 className="text-lg font-semibold mb-2">No rankings yet</h3>
+                                    <p className="text-muted-foreground">
+                                        Complete challenges to appear on the leaderboard!
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Leaderboard */}
+                        {!isLoading && !error && transformedUsers.length > 0 && (
+                            <Leaderboard
+                                users={transformedUsers}
+                                title="All-Time Leaderboard"
+                                maxDisplay={10}
+                            />
+                        )}
                     </TabsContent>
 
                     <TabsContent value="monthly">
-                        <Leaderboard
-                            users={mockMonthlyUsers}
-                            currentUserId={currentUserId}
-                            title="Monthly Leaderboard"
-                            maxDisplay={10}
-                        />
+                        {/* For now, show same data - monthly would need separate API endpoint */}
+                        {!isLoading && !error && transformedUsers.length === 0 && (
+                            <Card className="glass-card">
+                                <CardContent className="p-8 text-center">
+                                    <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                                    <h3 className="text-lg font-semibold mb-2">No monthly rankings yet</h3>
+                                    <p className="text-muted-foreground">
+                                        Be the first to earn XP this month!
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {!isLoading && !error && transformedUsers.length > 0 && (
+                            <Leaderboard
+                                users={transformedUsers}
+                                title="Monthly Leaderboard"
+                                maxDisplay={10}
+                            />
+                        )}
                     </TabsContent>
                 </Tabs>
             </div>
