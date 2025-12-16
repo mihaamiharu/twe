@@ -18,9 +18,20 @@ import { Route as ChallengesIndexRouteImport } from './routes/challenges/index'
 import { Route as TutorialsSlugRouteImport } from './routes/tutorials/$slug'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
 import { Route as ChallengesSlugRouteImport } from './routes/challenges/$slug'
+import { Route as ApiTutorialsIndexRouteImport } from './routes/api/tutorials/index'
+import { Route as ApiSubmissionsIndexRouteImport } from './routes/api/submissions/index'
+import { Route as ApiLeaderboardIndexRouteImport } from './routes/api/leaderboard/index'
+import { Route as ApiChallengesIndexRouteImport } from './routes/api/challenges/index'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
 import { Route as DemoApiNamesRouteImport } from './routes/demo/api.names'
+import { Route as ApiUsersMeRouteImport } from './routes/api/users/me'
+import { Route as ApiChallengesSlugRouteImport } from './routes/api/challenges/$slug'
+import { Route as ApiAuthSignupRouteImport } from './routes/api/auth/signup'
+import { Route as ApiAuthSignoutRouteImport } from './routes/api/auth/signout'
+import { Route as ApiAuthSigninRouteImport } from './routes/api/auth/signin'
+import { Route as ApiAuthSessionRouteImport } from './routes/api/auth/session'
+import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as DemoStartSsrIndexRouteImport } from './routes/demo/start.ssr.index'
 import { Route as DemoStartSsrSpaModeRouteImport } from './routes/demo/start.ssr.spa-mode'
 import { Route as DemoStartSsrFullSsrRouteImport } from './routes/demo/start.ssr.full-ssr'
@@ -71,6 +82,26 @@ const ChallengesSlugRoute = ChallengesSlugRouteImport.update({
   path: '/challenges/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTutorialsIndexRoute = ApiTutorialsIndexRouteImport.update({
+  id: '/api/tutorials/',
+  path: '/api/tutorials/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSubmissionsIndexRoute = ApiSubmissionsIndexRouteImport.update({
+  id: '/api/submissions/',
+  path: '/api/submissions/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiLeaderboardIndexRoute = ApiLeaderboardIndexRouteImport.update({
+  id: '/api/leaderboard/',
+  path: '/api/leaderboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChallengesIndexRoute = ApiChallengesIndexRouteImport.update({
+  id: '/api/challenges/',
+  path: '/api/challenges/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DemoStartServerFuncsRoute = DemoStartServerFuncsRouteImport.update({
   id: '/demo/start/server-funcs',
   path: '/demo/start/server-funcs',
@@ -84,6 +115,41 @@ const DemoStartApiRequestRoute = DemoStartApiRequestRouteImport.update({
 const DemoApiNamesRoute = DemoApiNamesRouteImport.update({
   id: '/demo/api/names',
   path: '/demo/api/names',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiUsersMeRoute = ApiUsersMeRouteImport.update({
+  id: '/api/users/me',
+  path: '/api/users/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiChallengesSlugRoute = ApiChallengesSlugRouteImport.update({
+  id: '/api/challenges/$slug',
+  path: '/api/challenges/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSignupRoute = ApiAuthSignupRouteImport.update({
+  id: '/api/auth/signup',
+  path: '/api/auth/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSignoutRoute = ApiAuthSignoutRouteImport.update({
+  id: '/api/auth/signout',
+  path: '/api/auth/signout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSigninRoute = ApiAuthSigninRouteImport.update({
+  id: '/api/auth/signin',
+  path: '/api/auth/signin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSessionRoute = ApiAuthSessionRouteImport.update({
+  id: '/api/auth/session',
+  path: '/api/auth/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
+  id: '/api/auth/$',
+  path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DemoStartSsrIndexRoute = DemoStartSsrIndexRouteImport.update({
@@ -117,9 +183,20 @@ export interface FileRoutesByFullPath {
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/signin': typeof ApiAuthSigninRoute
+  '/api/auth/signout': typeof ApiAuthSignoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/challenges/$slug': typeof ApiChallengesSlugRoute
+  '/api/users/me': typeof ApiUsersMeRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/api/challenges': typeof ApiChallengesIndexRoute
+  '/api/leaderboard': typeof ApiLeaderboardIndexRoute
+  '/api/submissions': typeof ApiSubmissionsIndexRoute
+  '/api/tutorials': typeof ApiTutorialsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -135,9 +212,20 @@ export interface FileRoutesByTo {
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/signin': typeof ApiAuthSigninRoute
+  '/api/auth/signout': typeof ApiAuthSignoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/challenges/$slug': typeof ApiChallengesSlugRoute
+  '/api/users/me': typeof ApiUsersMeRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/api/challenges': typeof ApiChallengesIndexRoute
+  '/api/leaderboard': typeof ApiLeaderboardIndexRoute
+  '/api/submissions': typeof ApiSubmissionsIndexRoute
+  '/api/tutorials': typeof ApiTutorialsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -154,9 +242,20 @@ export interface FileRoutesById {
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges/': typeof ChallengesIndexRoute
   '/tutorials/': typeof TutorialsIndexRoute
+  '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/session': typeof ApiAuthSessionRoute
+  '/api/auth/signin': typeof ApiAuthSigninRoute
+  '/api/auth/signout': typeof ApiAuthSignoutRoute
+  '/api/auth/signup': typeof ApiAuthSignupRoute
+  '/api/challenges/$slug': typeof ApiChallengesSlugRoute
+  '/api/users/me': typeof ApiUsersMeRoute
   '/demo/api/names': typeof DemoApiNamesRoute
   '/demo/start/api-request': typeof DemoStartApiRequestRoute
   '/demo/start/server-funcs': typeof DemoStartServerFuncsRoute
+  '/api/challenges/': typeof ApiChallengesIndexRoute
+  '/api/leaderboard/': typeof ApiLeaderboardIndexRoute
+  '/api/submissions/': typeof ApiSubmissionsIndexRoute
+  '/api/tutorials/': typeof ApiTutorialsIndexRoute
   '/demo/start/ssr/data-only': typeof DemoStartSsrDataOnlyRoute
   '/demo/start/ssr/full-ssr': typeof DemoStartSsrFullSsrRoute
   '/demo/start/ssr/spa-mode': typeof DemoStartSsrSpaModeRoute
@@ -174,9 +273,20 @@ export interface FileRouteTypes {
     | '/tutorials/$slug'
     | '/challenges'
     | '/tutorials'
+    | '/api/auth/$'
+    | '/api/auth/session'
+    | '/api/auth/signin'
+    | '/api/auth/signout'
+    | '/api/auth/signup'
+    | '/api/challenges/$slug'
+    | '/api/users/me'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/api/challenges'
+    | '/api/leaderboard'
+    | '/api/submissions'
+    | '/api/tutorials'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -192,9 +302,20 @@ export interface FileRouteTypes {
     | '/tutorials/$slug'
     | '/challenges'
     | '/tutorials'
+    | '/api/auth/$'
+    | '/api/auth/session'
+    | '/api/auth/signin'
+    | '/api/auth/signout'
+    | '/api/auth/signup'
+    | '/api/challenges/$slug'
+    | '/api/users/me'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/api/challenges'
+    | '/api/leaderboard'
+    | '/api/submissions'
+    | '/api/tutorials'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -210,9 +331,20 @@ export interface FileRouteTypes {
     | '/tutorials/$slug'
     | '/challenges/'
     | '/tutorials/'
+    | '/api/auth/$'
+    | '/api/auth/session'
+    | '/api/auth/signin'
+    | '/api/auth/signout'
+    | '/api/auth/signup'
+    | '/api/challenges/$slug'
+    | '/api/users/me'
     | '/demo/api/names'
     | '/demo/start/api-request'
     | '/demo/start/server-funcs'
+    | '/api/challenges/'
+    | '/api/leaderboard/'
+    | '/api/submissions/'
+    | '/api/tutorials/'
     | '/demo/start/ssr/data-only'
     | '/demo/start/ssr/full-ssr'
     | '/demo/start/ssr/spa-mode'
@@ -229,9 +361,20 @@ export interface RootRouteChildren {
   TutorialsSlugRoute: typeof TutorialsSlugRoute
   ChallengesIndexRoute: typeof ChallengesIndexRoute
   TutorialsIndexRoute: typeof TutorialsIndexRoute
+  ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiAuthSessionRoute: typeof ApiAuthSessionRoute
+  ApiAuthSigninRoute: typeof ApiAuthSigninRoute
+  ApiAuthSignoutRoute: typeof ApiAuthSignoutRoute
+  ApiAuthSignupRoute: typeof ApiAuthSignupRoute
+  ApiChallengesSlugRoute: typeof ApiChallengesSlugRoute
+  ApiUsersMeRoute: typeof ApiUsersMeRoute
   DemoApiNamesRoute: typeof DemoApiNamesRoute
   DemoStartApiRequestRoute: typeof DemoStartApiRequestRoute
   DemoStartServerFuncsRoute: typeof DemoStartServerFuncsRoute
+  ApiChallengesIndexRoute: typeof ApiChallengesIndexRoute
+  ApiLeaderboardIndexRoute: typeof ApiLeaderboardIndexRoute
+  ApiSubmissionsIndexRoute: typeof ApiSubmissionsIndexRoute
+  ApiTutorialsIndexRoute: typeof ApiTutorialsIndexRoute
   DemoStartSsrDataOnlyRoute: typeof DemoStartSsrDataOnlyRoute
   DemoStartSsrFullSsrRoute: typeof DemoStartSsrFullSsrRoute
   DemoStartSsrSpaModeRoute: typeof DemoStartSsrSpaModeRoute
@@ -303,6 +446,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChallengesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tutorials/': {
+      id: '/api/tutorials/'
+      path: '/api/tutorials'
+      fullPath: '/api/tutorials'
+      preLoaderRoute: typeof ApiTutorialsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/submissions/': {
+      id: '/api/submissions/'
+      path: '/api/submissions'
+      fullPath: '/api/submissions'
+      preLoaderRoute: typeof ApiSubmissionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/leaderboard/': {
+      id: '/api/leaderboard/'
+      path: '/api/leaderboard'
+      fullPath: '/api/leaderboard'
+      preLoaderRoute: typeof ApiLeaderboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/challenges/': {
+      id: '/api/challenges/'
+      path: '/api/challenges'
+      fullPath: '/api/challenges'
+      preLoaderRoute: typeof ApiChallengesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/demo/start/server-funcs': {
       id: '/demo/start/server-funcs'
       path: '/demo/start/server-funcs'
@@ -322,6 +493,55 @@ declare module '@tanstack/react-router' {
       path: '/demo/api/names'
       fullPath: '/demo/api/names'
       preLoaderRoute: typeof DemoApiNamesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/users/me': {
+      id: '/api/users/me'
+      path: '/api/users/me'
+      fullPath: '/api/users/me'
+      preLoaderRoute: typeof ApiUsersMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/challenges/$slug': {
+      id: '/api/challenges/$slug'
+      path: '/api/challenges/$slug'
+      fullPath: '/api/challenges/$slug'
+      preLoaderRoute: typeof ApiChallengesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signup': {
+      id: '/api/auth/signup'
+      path: '/api/auth/signup'
+      fullPath: '/api/auth/signup'
+      preLoaderRoute: typeof ApiAuthSignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signout': {
+      id: '/api/auth/signout'
+      path: '/api/auth/signout'
+      fullPath: '/api/auth/signout'
+      preLoaderRoute: typeof ApiAuthSignoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/signin': {
+      id: '/api/auth/signin'
+      path: '/api/auth/signin'
+      fullPath: '/api/auth/signin'
+      preLoaderRoute: typeof ApiAuthSigninRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/session': {
+      id: '/api/auth/session'
+      path: '/api/auth/session'
+      fullPath: '/api/auth/session'
+      preLoaderRoute: typeof ApiAuthSessionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/$': {
+      id: '/api/auth/$'
+      path: '/api/auth/$'
+      fullPath: '/api/auth/$'
+      preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/demo/start/ssr/': {
@@ -365,9 +585,20 @@ const rootRouteChildren: RootRouteChildren = {
   TutorialsSlugRoute: TutorialsSlugRoute,
   ChallengesIndexRoute: ChallengesIndexRoute,
   TutorialsIndexRoute: TutorialsIndexRoute,
+  ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiAuthSessionRoute: ApiAuthSessionRoute,
+  ApiAuthSigninRoute: ApiAuthSigninRoute,
+  ApiAuthSignoutRoute: ApiAuthSignoutRoute,
+  ApiAuthSignupRoute: ApiAuthSignupRoute,
+  ApiChallengesSlugRoute: ApiChallengesSlugRoute,
+  ApiUsersMeRoute: ApiUsersMeRoute,
   DemoApiNamesRoute: DemoApiNamesRoute,
   DemoStartApiRequestRoute: DemoStartApiRequestRoute,
   DemoStartServerFuncsRoute: DemoStartServerFuncsRoute,
+  ApiChallengesIndexRoute: ApiChallengesIndexRoute,
+  ApiLeaderboardIndexRoute: ApiLeaderboardIndexRoute,
+  ApiSubmissionsIndexRoute: ApiSubmissionsIndexRoute,
+  ApiTutorialsIndexRoute: ApiTutorialsIndexRoute,
   DemoStartSsrDataOnlyRoute: DemoStartSsrDataOnlyRoute,
   DemoStartSsrFullSsrRoute: DemoStartSsrFullSsrRoute,
   DemoStartSsrSpaModeRoute: DemoStartSsrSpaModeRoute,

@@ -29,7 +29,7 @@ export const Route = createRootRoute({
     links: [
       {
         rel: 'icon',
-        href: '/favicon.jpg',
+        href: '/logo.jpg',
         type: 'image/jpeg',
       },
       {
