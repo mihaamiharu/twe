@@ -107,6 +107,8 @@ export const Route = createFileRoute('/api/submissions/')({
                                 })
                                 .where(eq(users.id, userId));
 
+                            console.log(`[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP. New Total: ${user.xp + xpEarned}, Level: ${levelUpInfo.newLevel}`);
+
                             // Increment challenge completion count
                             await db
                                 .update(challenges)
@@ -115,6 +117,8 @@ export const Route = createFileRoute('/api/submissions/')({
                                 })
                                 .where(eq(challenges.id, challengeId));
                         }
+                    } else {
+                        console.log(`[Submission] Challenge ${challengeId} passed but not first completion. No XP awarded.`);
                     }
 
                     // Create submission record
