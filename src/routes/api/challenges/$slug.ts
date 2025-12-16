@@ -3,12 +3,12 @@ import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { challenges, testCases, progress, submissions } from '@/db/schema';
 import { eq, and, asc } from 'drizzle-orm';
-import { authClient } from '@/lib/auth.client';
+import { auth } from '@/lib/auth.server';
 
 export const Route = createFileRoute('/api/challenges/$slug')({
   server: {
     handlers: {
-      GET: async ({ params }) => {
+      GET: async ({ params, request }) => {
         try {
           const { slug } = params;
 
@@ -68,9 +68,9 @@ export const Route = createFileRoute('/api/challenges/$slug')({
           let bestSubmission = null;
 
           try {
-            const session = await authClient.getSession();
-            if (session.data?.user?.id) {
-              const userId = session.data.user.id;
+            const session = await auth.api.getSession({ headers: request.headers });
+            if (session?.user?.id) {
+              const userId = session.user.id;
 
               // Get progress
               const progressRecord = await db.query.progress.findFirst({

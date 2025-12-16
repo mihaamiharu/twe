@@ -3,7 +3,7 @@ import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { challenges, progress } from '@/db/schema';
 import { eq, and, asc, desc, sql } from 'drizzle-orm';
-import { authClient } from '@/lib/auth.client';
+import { auth } from '@/lib/auth.server';
 
 interface ChallengeFilters {
   type?: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
@@ -91,15 +91,15 @@ export const Route = createFileRoute('/api/challenges/')({
           // Get user progress if authenticated
           let userProgress: Record<string, boolean> = {};
           try {
-            const session = await authClient.getSession();
-            if (session.data?.user?.id) {
+            const session = await auth.api.getSession({ headers: request.headers });
+            if (session?.user?.id) {
               const progressRecords = await db
                 .select({
                   challengeId: progress.challengeId,
                   isCompleted: progress.isCompleted,
                 })
                 .from(progress)
-                .where(eq(progress.userId, session.data.user.id));
+                .where(eq(progress.userId, session.user.id));
 
               userProgress = progressRecords.reduce((acc, p) => {
                 if (p.challengeId) {
