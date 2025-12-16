@@ -8,6 +8,7 @@ import { auth } from '@/lib/auth.server';
 interface ChallengeFilters {
   type?: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
   difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
+  category?: string;
   search?: string;
   page?: number;
   limit?: number;
@@ -24,9 +25,10 @@ export const Route = createFileRoute('/api/challenges/')({
           const filters: ChallengeFilters = {
             type: url.searchParams.get('type') as ChallengeFilters['type'] || undefined,
             difficulty: url.searchParams.get('difficulty') as ChallengeFilters['difficulty'] || undefined,
+            category: url.searchParams.get('category') || undefined,
             search: url.searchParams.get('search') || undefined,
             page: parseInt(url.searchParams.get('page') || '1'),
-            limit: Math.min(parseInt(url.searchParams.get('limit') || '20'), 50),
+            limit: Math.min(parseInt(url.searchParams.get('limit') || '50'), 100),
             sortBy: url.searchParams.get('sortBy') as ChallengeFilters['sortBy'] || 'order',
             sortOrder: url.searchParams.get('sortOrder') as ChallengeFilters['sortOrder'] || 'asc',
           };
@@ -40,6 +42,10 @@ export const Route = createFileRoute('/api/challenges/')({
 
           if (filters.difficulty) {
             conditions.push(eq(challenges.difficulty, filters.difficulty));
+          }
+
+          if (filters.category) {
+            conditions.push(eq(challenges.category, filters.category));
           }
 
           if (filters.search) {
@@ -67,7 +73,7 @@ export const Route = createFileRoute('/api/challenges/')({
           const orderFn = filters.sortOrder === 'desc' ? desc : asc;
 
           // Get challenges with pagination
-          const offset = ((filters.page || 1) - 1) * (filters.limit || 20);
+          const offset = ((filters.page || 1) - 1) * (filters.limit || 50);
 
           const challengeList = await db
             .select({
@@ -77,6 +83,7 @@ export const Route = createFileRoute('/api/challenges/')({
               description: challenges.description,
               type: challenges.type,
               difficulty: challenges.difficulty,
+              category: challenges.category,
               xpReward: challenges.xpReward,
               order: challenges.order,
               tags: challenges.tags,
@@ -85,8 +92,9 @@ export const Route = createFileRoute('/api/challenges/')({
             .from(challenges)
             .where(and(...conditions))
             .orderBy(orderFn(sortColumn))
-            .limit(filters.limit || 20)
+            .limit(filters.limit || 50)
             .offset(offset);
+
 
           // Get user progress if authenticated
           let userProgress: Record<string, boolean> = {};
