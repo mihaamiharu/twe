@@ -8,6 +8,13 @@
       "when": 1765795689208,
       "tag": "0000_lonely_shadowcat",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765900929833,
+      "tag": "0001_add_category_to_challenges",
+      "breakpoints": true
     }
   ]
 }

@@ -14,7 +14,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:seed": "bun run src/db/seed.ts"
+    "db:seed": "bun run src/db/seed.ts",
+    "db:seed:basic": "bun run src/db/seed-basic-challenges.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
