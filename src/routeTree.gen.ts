@@ -25,8 +25,11 @@ import { Route as ApiSubmissionsIndexRouteImport } from './routes/api/submission
 import { Route as ApiLeaderboardIndexRouteImport } from './routes/api/leaderboard/index'
 import { Route as ApiChallengesIndexRouteImport } from './routes/api/challenges/index'
 import { Route as ApiUsersMeRouteImport } from './routes/api/users/me'
+import { Route as ApiTutorialsSlugRouteImport } from './routes/api/tutorials/$slug'
 import { Route as ApiChallengesSlugRouteImport } from './routes/api/challenges/$slug'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as ApiTutorialsSlugProgressRouteImport } from './routes/api/tutorials/$slug/progress'
+import { Route as ApiTutorialsSlugCompleteRouteImport } from './routes/api/tutorials/$slug/complete'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -108,6 +111,11 @@ const ApiUsersMeRoute = ApiUsersMeRouteImport.update({
   path: '/api/users/me',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTutorialsSlugRoute = ApiTutorialsSlugRouteImport.update({
+  id: '/api/tutorials/$slug',
+  path: '/api/tutorials/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiChallengesSlugRoute = ApiChallengesSlugRouteImport.update({
   id: '/api/challenges/$slug',
   path: '/api/challenges/$slug',
@@ -118,6 +126,18 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiTutorialsSlugProgressRoute =
+  ApiTutorialsSlugProgressRouteImport.update({
+    id: '/progress',
+    path: '/progress',
+    getParentRoute: () => ApiTutorialsSlugRoute,
+  } as any)
+const ApiTutorialsSlugCompleteRoute =
+  ApiTutorialsSlugCompleteRouteImport.update({
+    id: '/complete',
+    path: '/complete',
+    getParentRoute: () => ApiTutorialsSlugRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -133,11 +153,14 @@ export interface FileRoutesByFullPath {
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
+  '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
   '/api/submissions': typeof ApiSubmissionsIndexRoute
   '/api/tutorials': typeof ApiTutorialsIndexRoute
+  '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
+  '/api/tutorials/$slug/progress': typeof ApiTutorialsSlugProgressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -153,11 +176,14 @@ export interface FileRoutesByTo {
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
+  '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
   '/api/submissions': typeof ApiSubmissionsIndexRoute
   '/api/tutorials': typeof ApiTutorialsIndexRoute
+  '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
+  '/api/tutorials/$slug/progress': typeof ApiTutorialsSlugProgressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -174,11 +200,14 @@ export interface FileRoutesById {
   '/tutorials/': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
+  '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
   '/api/challenges/': typeof ApiChallengesIndexRoute
   '/api/leaderboard/': typeof ApiLeaderboardIndexRoute
   '/api/submissions/': typeof ApiSubmissionsIndexRoute
   '/api/tutorials/': typeof ApiTutorialsIndexRoute
+  '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
+  '/api/tutorials/$slug/progress': typeof ApiTutorialsSlugProgressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -196,11 +225,14 @@ export interface FileRouteTypes {
     | '/tutorials'
     | '/api/auth/$'
     | '/api/challenges/$slug'
+    | '/api/tutorials/$slug'
     | '/api/users/me'
     | '/api/challenges'
     | '/api/leaderboard'
     | '/api/submissions'
     | '/api/tutorials'
+    | '/api/tutorials/$slug/complete'
+    | '/api/tutorials/$slug/progress'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -216,11 +248,14 @@ export interface FileRouteTypes {
     | '/tutorials'
     | '/api/auth/$'
     | '/api/challenges/$slug'
+    | '/api/tutorials/$slug'
     | '/api/users/me'
     | '/api/challenges'
     | '/api/leaderboard'
     | '/api/submissions'
     | '/api/tutorials'
+    | '/api/tutorials/$slug/complete'
+    | '/api/tutorials/$slug/progress'
   id:
     | '__root__'
     | '/'
@@ -236,11 +271,14 @@ export interface FileRouteTypes {
     | '/tutorials/'
     | '/api/auth/$'
     | '/api/challenges/$slug'
+    | '/api/tutorials/$slug'
     | '/api/users/me'
     | '/api/challenges/'
     | '/api/leaderboard/'
     | '/api/submissions/'
     | '/api/tutorials/'
+    | '/api/tutorials/$slug/complete'
+    | '/api/tutorials/$slug/progress'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -257,6 +295,7 @@ export interface RootRouteChildren {
   TutorialsIndexRoute: typeof TutorialsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiChallengesSlugRoute: typeof ApiChallengesSlugRoute
+  ApiTutorialsSlugRoute: typeof ApiTutorialsSlugRouteWithChildren
   ApiUsersMeRoute: typeof ApiUsersMeRoute
   ApiChallengesIndexRoute: typeof ApiChallengesIndexRoute
   ApiLeaderboardIndexRoute: typeof ApiLeaderboardIndexRoute
@@ -378,6 +417,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiUsersMeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tutorials/$slug': {
+      id: '/api/tutorials/$slug'
+      path: '/api/tutorials/$slug'
+      fullPath: '/api/tutorials/$slug'
+      preLoaderRoute: typeof ApiTutorialsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/challenges/$slug': {
       id: '/api/challenges/$slug'
       path: '/api/challenges/$slug'
@@ -392,8 +438,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/tutorials/$slug/progress': {
+      id: '/api/tutorials/$slug/progress'
+      path: '/progress'
+      fullPath: '/api/tutorials/$slug/progress'
+      preLoaderRoute: typeof ApiTutorialsSlugProgressRouteImport
+      parentRoute: typeof ApiTutorialsSlugRoute
+    }
+    '/api/tutorials/$slug/complete': {
+      id: '/api/tutorials/$slug/complete'
+      path: '/complete'
+      fullPath: '/api/tutorials/$slug/complete'
+      preLoaderRoute: typeof ApiTutorialsSlugCompleteRouteImport
+      parentRoute: typeof ApiTutorialsSlugRoute
+    }
   }
 }
+
+interface ApiTutorialsSlugRouteChildren {
+  ApiTutorialsSlugCompleteRoute: typeof ApiTutorialsSlugCompleteRoute
+  ApiTutorialsSlugProgressRoute: typeof ApiTutorialsSlugProgressRoute
+}
+
+const ApiTutorialsSlugRouteChildren: ApiTutorialsSlugRouteChildren = {
+  ApiTutorialsSlugCompleteRoute: ApiTutorialsSlugCompleteRoute,
+  ApiTutorialsSlugProgressRoute: ApiTutorialsSlugProgressRoute,
+}
+
+const ApiTutorialsSlugRouteWithChildren =
+  ApiTutorialsSlugRoute._addFileChildren(ApiTutorialsSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -409,6 +482,7 @@ const rootRouteChildren: RootRouteChildren = {
   TutorialsIndexRoute: TutorialsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiChallengesSlugRoute: ApiChallengesSlugRoute,
+  ApiTutorialsSlugRoute: ApiTutorialsSlugRouteWithChildren,
   ApiUsersMeRoute: ApiUsersMeRoute,
   ApiChallengesIndexRoute: ApiChallengesIndexRoute,
   ApiLeaderboardIndexRoute: ApiLeaderboardIndexRoute,
