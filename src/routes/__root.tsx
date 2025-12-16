@@ -7,6 +7,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ThemeProvider } from '../components/theme-provider';
 import { Toaster } from 'sonner';
+import { NotFound } from '../components/NotFound';
 
 import appCss from '../styles.css?url';
 
@@ -52,6 +53,7 @@ export const Route = createRootRoute({
 
   component: RootComponent,
   shellComponent: RootDocument,
+  notFoundComponent: NotFound,
 });
 
 function RootComponent() {
