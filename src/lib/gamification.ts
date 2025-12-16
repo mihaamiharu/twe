@@ -164,7 +164,8 @@ export function calculateBonusXP(
 /**
  * Format XP for display
  */
-export function formatXP(xp: number): string {
+export function formatXP(xp: number | null | undefined): string {
+    if (xp == null) return '0';
     if (xp >= 1000000) {
         return `${(xp / 1000000).toFixed(1)}M`;
     }
@@ -177,7 +178,8 @@ export function formatXP(xp: number): string {
 /**
  * Get level title based on level number
  */
-export function getLevelTitle(level: number): string {
+export function getLevelTitle(level: number | null | undefined): string {
+    const effectiveLevel = level ?? 1;
     const titles: Record<number, string> = {
         1: 'Novice',
         5: 'Apprentice',
@@ -192,7 +194,7 @@ export function getLevelTitle(level: number): string {
 
     let title = 'Novice';
     for (const [minLevel, levelTitle] of Object.entries(titles)) {
-        if (level >= parseInt(minLevel)) {
+        if (effectiveLevel >= parseInt(minLevel)) {
             title = levelTitle;
         }
     }
