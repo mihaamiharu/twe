@@ -3,7 +3,7 @@ import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { submissions, challenges, progress, users, testCases } from '@/db/schema';
 import { eq, and, sql, desc } from 'drizzle-orm';
-import { authClient } from '@/lib/auth.client';
+import { auth } from '@/lib/auth.server';
 import { z } from 'zod';
 import { checkLevelUp } from '@/lib/gamification';
 import { checkAchievements, type UserStats } from '@/lib/achievements';
@@ -26,16 +26,16 @@ export const Route = createFileRoute('/api/submissions/')({
         handlers: {
             POST: async ({ request }) => {
                 try {
-                    const session = await authClient.getSession();
+                    const session = await auth.api.getSession({ headers: request.headers });
 
-                    if (!session.data?.user?.id) {
+                    if (!session?.user?.id) {
                         return json(
                             { success: false, error: 'Unauthorized' },
                             { status: 401 }
                         );
                     }
 
-                    const userId = session.data.user.id;
+                    const userId = session.user.id;
                     const body = await request.json();
 
                     // Validate input
@@ -212,16 +212,16 @@ export const Route = createFileRoute('/api/submissions/')({
 
             GET: async ({ request }) => {
                 try {
-                    const session = await authClient.getSession();
+                    const session = await auth.api.getSession({ headers: request.headers });
 
-                    if (!session.data?.user?.id) {
+                    if (!session?.user?.id) {
                         return json(
                             { success: false, error: 'Unauthorized' },
                             { status: 401 }
                         );
                     }
 
-                    const userId = session.data.user.id;
+                    const userId = session.user.id;
                     const url = new URL(request.url);
                     const challengeId = url.searchParams.get('challengeId');
                     const page = parseInt(url.searchParams.get('page') || '1');
