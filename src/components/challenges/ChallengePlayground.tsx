@@ -47,7 +47,12 @@ export interface Challenge {
 
 export interface ChallengePlaygroundProps {
     challenge: Challenge;
-    onSubmit: (code: string, passed: boolean) => void;
+    onSubmit: (data: {
+        code: string;
+        passed: boolean;
+        testResults: TestResult[];
+        executionTime?: number
+    }) => void;
     className?: string;
 }
 
@@ -160,8 +165,15 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
     // Submit solution
     const handleSubmit = useCallback(() => {
         const submissionCode = isCodeChallenge ? code : selector;
-        onSubmit(submissionCode, hasPassed);
-    }, [code, selector, hasPassed, onSubmit, isCodeChallenge]);
+        const totalExecutionTime = testResults.reduce((acc, r) => acc + (r.executionTime || 0), 0);
+
+        onSubmit({
+            code: submissionCode,
+            passed: hasPassed,
+            testResults,
+            executionTime: totalExecutionTime
+        });
+    }, [code, selector, hasPassed, onSubmit, isCodeChallenge, testResults]);
 
     return (
         <div className={cn('flex flex-col h-full', className)}>
