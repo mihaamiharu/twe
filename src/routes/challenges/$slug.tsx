@@ -1,9 +1,13 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
+import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { type TestResult } from '@/components/challenges/TestResults';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -38,6 +42,13 @@ interface APIChallenge {
 
 function ChallengeDetailPage() {
     const { slug } = useParams({ from: '/challenges/$slug' });
+    const queryClient = useQueryClient();
+    const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [lastSubmissionResult, setLastSubmissionResult] = useState<{
+        xpEarned: number;
+        achievements: string[];
+        levelUp?: { newLevel: number; title: string };
+    } | null>(null);
 
     const { data, isLoading, error } = useQuery({
         queryKey: ['challenge', slug],
@@ -75,13 +86,82 @@ function ChallengeDetailPage() {
         })) || [],
     } : null;
 
-    const handleSubmit = useCallback((code: string, passed: boolean) => {
-        if (passed) {
-            console.log('Challenge passed! Code:', code);
-            // TODO: Submit to API, award XP, etc.
-            alert(`🎉 Congratulations! You earned ${challenge?.xp || 0} XP!`);
+
+
+    const submitMutation = useMutation({
+        mutationFn: async (data: {
+            challengeId: string;
+            code: string;
+            testResults: {
+                testCaseId?: string;
+                passed: boolean;
+                output?: any;
+                error?: string;
+            }[];
+            executionTime?: number;
+        }) => {
+            const response = await fetch('/api/submissions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to submit solution');
+            }
+
+            return await response.json();
+        },
+        onSuccess: (response) => {
+            if (response.success && response.data) {
+                setLastSubmissionResult({
+                    xpEarned: response.data.xpEarned,
+                    achievements: response.data.newAchievements || [],
+                    levelUp: response.data.levelUp,
+                });
+                setShowSuccessDialog(true);
+                // Invalidate queries to refresh progress
+                queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
+                queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+            }
+        },
+        onError: (error: Error) => {
+            toast.error(error.message);
+        },
+    });
+
+    const handleSubmit = useCallback((data: {
+        code: string;
+        passed: boolean;
+        testResults: TestResult[];
+        executionTime?: number;
+    }) => {
+        if (!challenge) return;
+
+        if (!data.passed) {
+            toast.error('Your solution did not pass all tests. Keep trying!');
+            return;
         }
-    }, [challenge?.xp]);
+
+        const submissionData = {
+            challengeId: challenge.id,
+            code: data.code,
+            testResults: data.testResults.map(tr => ({
+                testCaseId: tr.id !== 'main' && tr.id !== 'selector' ? tr.id : undefined,
+                passed: tr.passed,
+                output: tr.output,
+                error: tr.error,
+            })),
+            executionTime: data.executionTime,
+        };
+
+        toast.promise(submitMutation.mutateAsync(submissionData), {
+            loading: 'Submitting solution...',
+            success: 'Solution submitted successfully!',
+            error: 'Failed to submit solution',
+        });
+    }, [challenge, submitMutation]);
 
     if (isLoading) {
         return (
@@ -121,6 +201,18 @@ function ChallengeDetailPage() {
     return (
         <div className="h-[calc(100vh-4rem)]">
             <ChallengePlayground challenge={challenge} onSubmit={handleSubmit} />
+
+            {lastSubmissionResult && (
+                <ChallengeSuccessDialog
+                    open={showSuccessDialog}
+                    onClose={() => setShowSuccessDialog(false)}
+                    xpEarned={lastSubmissionResult.xpEarned}
+                    achievements={lastSubmissionResult.achievements}
+                    levelUp={lastSubmissionResult.levelUp}
+                    onRetry={() => setShowSuccessDialog(false)}
+                // onNextChallenge would go here if we implemented next logic
+                />
+            )}
         </div>
     );
 }
