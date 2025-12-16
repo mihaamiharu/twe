@@ -1,345 +1,325 @@
-import { createFileRoute, Link, useParams } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { createFileRoute } from '@tanstack/react-router';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { ArrowLeft, BookOpen, CheckCircle, Circle, Clock, Star } from 'lucide-react';
+import { AlertCircle, Clock, ArrowLeft, CheckCircle2 } from 'lucide-react';
+
+import { Link } from '@tanstack/react-router';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 export const Route = createFileRoute('/tutorials/$slug')({
     component: TutorialDetailPage,
 });
 
-// Mock tutorial data with full markdown content
-const tutorialData: Record<string, {
+interface Tutorial {
+    id: string;
+    slug: string;
     title: string;
     description: string;
-    difficulty: string;
-    duration: string;
-    xp: number;
-    sections: { id: string; title: string; completed: boolean }[];
     content: string;
-}> = {
-    'introduction-to-playwright': {
-        title: 'Introduction to Playwright',
-        description: 'Learn the basics of browser automation with Playwright',
-        difficulty: 'Beginner',
-        duration: '30 min',
-        xp: 100,
-        sections: [
-            { id: 'what-is', title: 'What is Playwright?', completed: false },
-            { id: 'setup', title: 'Setting Up Your Environment', completed: false },
-            { id: 'first-test', title: 'Your First Test', completed: false },
-            { id: 'locators', title: 'Locators and Selectors', completed: false },
-            { id: 'assertions', title: 'Actions and Assertions', completed: false },
-        ],
-        content: `# Introduction to Playwright
+    estimatedMinutes: number;
+    tags?: string[];
+    viewCount: number;
+    createdAt: string;
+    updatedAt: string;
+    userProgress?: {
+        isCompleted: boolean;
+        readingProgress: number | null;
+        lastAccessedAt: string;
+    };
+}
 
-Playwright is a powerful end-to-end testing framework that enables reliable browser automation across all modern browsers.
-
-## What is Playwright?
-
-Playwright is an open-source automation library developed by Microsoft. It provides a high-level API to control Chromium, Firefox, and WebKit browsers.
-
-### Key Features
-
-- **Cross-browser testing** - Test on Chrome, Firefox, Safari, and Edge
-- **Auto-wait** - Playwright waits for elements before performing actions
-- **Mobile emulation** - Test responsive designs with device emulation
-- **Network interception** - Mock API responses for isolated testing
-
-## Setting Up Your Environment
-
-First, let's install Playwright in your project:
-
-\`\`\`bash
-npm init playwright@latest
-\`\`\`
-
-This will create the following structure:
-
-\`\`\`
-├── playwright.config.ts
-├── package.json
-├── tests/
-│   └── example.spec.ts
-└── tests-examples/
-\`\`\`
-
-## Your First Test
-
-Here's a simple test that navigates to a page and checks the title:
-
-\`\`\`typescript
-import { test, expect } from '@playwright/test';
-
-test('has title', async ({ page }) => {
-  await page.goto('https://example.com');
-  
-  // Expect a title to contain a substring
-  await expect(page).toHaveTitle(/Example Domain/);
-});
-\`\`\`
-
-> **Tip:** Playwright automatically waits for elements to be ready before interacting with them!
-
-## Locators and Selectors
-
-Playwright provides several ways to locate elements:
-
-| Method | Example | Description |
-|--------|---------|-------------|
-| \`getByRole\` | \`page.getByRole('button')\` | Find by ARIA role |
-| \`getByText\` | \`page.getByText('Submit')\` | Find by text content |
-| \`getByLabel\` | \`page.getByLabel('Email')\` | Find form inputs by label |
-| \`locator\` | \`page.locator('.my-class')\` | CSS/XPath selectors |
-
-### Best Practice: Use Role-Based Selectors
-
-\`\`\`typescript
-// ✅ Recommended - resilient to changes
-await page.getByRole('button', { name: 'Submit' }).click();
-
-// ❌ Avoid - brittle selector
-await page.locator('#submit-btn-v2').click();
-\`\`\`
-
-## Actions and Assertions
-
-Common actions in Playwright:
-
-\`\`\`typescript
-// Click an element
-await page.getByRole('button').click();
-
-// Fill input fields
-await page.getByLabel('Email').fill('test@example.com');
-
-// Select dropdown option
-await page.getByLabel('Country').selectOption('USA');
-
-// Check a checkbox
-await page.getByLabel('Agree to terms').check();
-\`\`\`
-
-### Assertions
-
-\`\`\`typescript
-// Check visibility
-await expect(page.getByText('Success')).toBeVisible();
-
-// Check text content
-await expect(page.getByRole('heading')).toHaveText('Welcome');
-
-// Check URL
-await expect(page).toHaveURL(/dashboard/);
-\`\`\`
-
----
-
-## Next Steps
-
-Now that you understand the basics, try the practice challenges:
-
-1. **Click the Button** - Write a test to click a button
-2. **Form Submission** - Fill and submit a form
-3. **Navigation Test** - Test page navigation
-`,
-    },
-    'css-selectors-mastery': {
-        title: 'CSS Selectors Mastery',
-        description: 'Master CSS selectors for reliable element selection',
-        difficulty: 'Intermediate',
-        duration: '45 min',
-        xp: 150,
-        sections: [
-            { id: 'basics', title: 'Selector Basics', completed: false },
-            { id: 'combinators', title: 'Combinators', completed: false },
-            { id: 'pseudo', title: 'Pseudo-classes', completed: false },
-            { id: 'attributes', title: 'Attribute Selectors', completed: false },
-        ],
-        content: `# CSS Selectors Mastery
-
-Master the art of selecting DOM elements with CSS selectors.
-
-## Selector Basics
-
-CSS selectors are patterns used to select elements in the DOM.
-
-\`\`\`css
-/* Element selector */
-button { }
-
-/* Class selector */
-.btn { }
-
-/* ID selector */
-#submit { }
-
-/* Combining selectors */
-button.btn#submit { }
-\`\`\`
-
-## Combinators
-
-Combinators allow you to select elements based on relationships.
-
-\`\`\`css
-/* Descendant (space) */
-.form input { }
-
-/* Child (>) */
-.form > input { }
-
-/* Adjacent sibling (+) */
-label + input { }
-
-/* General sibling (~) */
-h2 ~ p { }
-\`\`\`
-
-## Practice
-
-Try these selectors in the challenge playground!
-`,
-    },
-};
+interface TutorialResponse {
+    success: boolean;
+    data: Tutorial;
+}
 
 function TutorialDetailPage() {
-    const { slug } = useParams({ from: '/tutorials/$slug' });
-    const [scrollProgress, setScrollProgress] = useState(0);
+    const { slug } = Route.useParams();
+    const queryClient = useQueryClient();
+    const [readingProgress, setReadingProgress] = useState(0);
 
-    const tutorial = tutorialData[slug] || {
-        title: 'Tutorial Not Found',
-        description: '',
-        difficulty: '',
-        duration: '',
-        xp: 0,
-        sections: [],
-        content: '# Tutorial Not Found\n\nThe requested tutorial could not be found.',
+    const { data, isLoading, error } = useQuery<TutorialResponse>({
+        queryKey: ['tutorial', slug],
+        queryFn: async () => {
+            const res = await fetch(`/api/tutorials/${slug}`);
+            if (!res.ok) {
+                if (res.status === 404) {
+                    throw new Error('Tutorial not found');
+                }
+                throw new Error('Failed to fetch tutorial');
+            }
+            return res.json();
+        },
+    });
+
+    const tutorial = data?.data;
+
+    // Mark as complete mutation
+    const markCompleteMutation = useMutation({
+        mutationFn: async () => {
+            const res = await fetch(`/api/tutorials/${slug}/complete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ readingProgress: 100 }),
+            });
+            if (!res.ok) throw new Error('Failed to mark as complete');
+            return res.json();
+        },
+        onSuccess: () => {
+            toast.success('Tutorial completed! 🎉');
+            queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
+            queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+        },
+        onError: () => {
+            toast.error('Failed to mark as complete');
+        },
+    });
+
+    // Update progress mutation
+    const updateProgressMutation = useMutation({
+        mutationFn: async (progress: number) => {
+            const res = await fetch(`/api/tutorials/${slug}/progress`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ readingProgress: progress }),
+            });
+            if (!res.ok) throw new Error('Failed to update progress');
+            return res.json();
+        },
+    });
+
+    // Calculate reading progress based on scroll
+    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        const element = e.currentTarget;
+        const scrollTop = element.scrollTop;
+        const scrollHeight = element.scrollHeight - element.clientHeight;
+        const progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
+
+        if (progress !== readingProgress) {
+            setReadingProgress(progress);
+            // Update progress in DB (debounced)
+            if (progress % 10 === 0) {
+                updateProgressMutation.mutate(progress);
+            }
+        }
     };
 
-    // Track scroll progress for reading indicator
-    useEffect(() => {
-        const handleScroll = () => {
-            const windowHeight = window.innerHeight;
-            const documentHeight = document.documentElement.scrollHeight - windowHeight;
-            const scrollTop = window.scrollY;
-            const progress = (scrollTop / documentHeight) * 100;
-            setScrollProgress(Math.min(100, Math.max(0, progress)));
-        };
-
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    const completedCount = tutorial.sections.filter((s) => s.completed).length;
-    const sectionProgress = tutorial.sections.length > 0
-        ? (completedCount / tutorial.sections.length) * 100
-        : 0;
-
-    return (
-        <>
-            {/* Reading Progress Bar */}
-            <div className="fixed top-16 left-0 right-0 z-30 h-1 bg-muted">
-                <div
-                    className="h-full bg-primary transition-all duration-150"
-                    style={{ width: `${scrollProgress}%` }}
-                />
-            </div>
-
+    // Loading state
+    if (isLoading) {
+        return (
             <div className="min-h-screen p-6 md:p-10">
-                <div className="max-w-6xl mx-auto">
-                    {/* Back navigation */}
-                    <Link
-                        to="/tutorials"
-                        className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6"
-                    >
-                        <ArrowLeft className="h-4 w-4" />
-                        Back to Tutorials
-                    </Link>
-
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                        {/* Sidebar */}
-                        <div className="lg:col-span-1 order-2 lg:order-1">
-                            <Card className="glass-card sticky top-24">
-                                <CardHeader>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <BookOpen className="h-5 w-5 text-primary" />
-                                        <Badge variant="secondary">{tutorial.difficulty}</Badge>
-                                    </div>
-                                    <CardTitle className="text-lg">{tutorial.title}</CardTitle>
-                                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                        <span className="flex items-center gap-1">
-                                            <Clock className="h-4 w-4" />
-                                            {tutorial.duration}
-                                        </span>
-                                        <span className="flex items-center gap-1 text-accent">
-                                            <Star className="h-4 w-4" />
-                                            {tutorial.xp} XP
-                                        </span>
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    {/* Section Progress */}
-                                    <div>
-                                        <div className="flex justify-between text-sm mb-2">
-                                            <span className="text-muted-foreground">Progress</span>
-                                            <span className="font-medium">{sectionProgress.toFixed(0)}%</span>
-                                        </div>
-                                        <Progress value={sectionProgress} className="h-2" />
-                                    </div>
-
-                                    {/* Section List */}
-                                    <div className="space-y-2">
-                                        <h4 className="text-sm font-medium mb-3">Sections</h4>
-                                        {tutorial.sections.map((section, index) => (
-                                            <a
-                                                key={section.id}
-                                                href={`#${section.id}`}
-                                                className="flex items-center gap-2 text-sm py-1 hover:text-primary transition-colors"
-                                            >
-                                                {section.completed ? (
-                                                    <CheckCircle className="h-4 w-4 text-accent" />
-                                                ) : (
-                                                    <Circle className="h-4 w-4 text-muted-foreground" />
-                                                )}
-                                                <span
-                                                    className={
-                                                        section.completed
-                                                            ? 'text-muted-foreground line-through'
-                                                            : ''
-                                                    }
-                                                >
-                                                    {index + 1}. {section.title}
-                                                </span>
-                                            </a>
-                                        ))}
-                                    </div>
-
-                                    {/* Actions */}
-                                    <div className="pt-4 space-y-2">
-                                        <Button className="w-full">Mark as Complete</Button>
-                                        <Button variant="outline" className="w-full">
-                                            Start Challenge
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-
-                        {/* Content */}
-                        <div className="lg:col-span-3 order-1 lg:order-2">
-                            <Card className="glass-card">
-                                <CardContent className="p-6 md:p-10">
-                                    <MarkdownRenderer content={tutorial.content} />
-                                </CardContent>
-                            </Card>
-                        </div>
+                <div className="max-w-4xl mx-auto">
+                    <Skeleton className="h-8 w-32 mb-8" />
+                    <Skeleton className="h-12 w-3/4 mb-4" />
+                    <Skeleton className="h-6 w-full mb-2" />
+                    <Skeleton className="h-6 w-5/6 mb-8" />
+                    <div className="space-y-4">
+                        <Skeleton className="h-32 w-full" />
+                        <Skeleton className="h-32 w-full" />
+                        <Skeleton className="h-32 w-full" />
                     </div>
                 </div>
             </div>
-        </>
+        );
+    }
+
+    // Error state
+    if (error || !tutorial) {
+        return (
+            <div className="min-h-screen p-6 md:p-10">
+                <div className="max-w-4xl mx-auto">
+                    <Link to="/tutorials">
+                        <Button variant="ghost" className="mb-8">
+                            <ArrowLeft className="h-4 w-4 mr-2" />
+                            Back to Tutorials
+                        </Button>
+                    </Link>
+                    <div className="text-center py-12">
+                        <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Tutorial not found</h3>
+                        <p className="text-muted-foreground mb-6">
+                            {error?.message || 'The tutorial you are looking for does not exist'}
+                        </p>
+                        <Link to="/tutorials">
+                            <Button>Browse All Tutorials</Button>
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    const isCompleted = tutorial.userProgress?.isCompleted || false;
+    const currentProgress = tutorial.userProgress?.readingProgress || readingProgress;
+
+    return (
+        <div className="min-h-screen p-6 md:p-10">
+            <div className="max-w-6xl mx-auto">
+                {/* Back button - larger icon */}
+                <Link to="/tutorials">
+                    <Button variant="ghost" className="mb-8">
+                        <ArrowLeft className="h-5 w-5 mr-2" />
+                        Back to Tutorials
+                    </Button>
+                </Link>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Main Content - No card wrapper, let it breathe */}
+                    <div className="lg:col-span-2 space-y-6">
+                        {/* Streamlined Header - Only once, with gradient */}
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                {tutorial.tags?.map((tag) => (
+                                    <Badge key={tag} variant="secondary">
+                                        {tag}
+                                    </Badge>
+                                ))}
+                            </div>
+                            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+                                {tutorial.title}
+                            </h1>
+                            <p className="text-xl text-muted-foreground">
+                                {tutorial.description}
+                            </p>
+                        </div>
+
+                        {/* Content - Direct on page, no card container */}
+                        <div
+                            className="prose prose-lg dark:prose-invert max-w-none max-h-[70vh] overflow-y-auto pr-4 scroll-smooth"
+                            style={{
+                                lineHeight: '1.7',
+                                scrollbarWidth: 'thin',
+                                scrollbarColor: 'hsl(var(--primary) / 0.3) transparent'
+                            }}
+                            onScroll={handleScroll}
+                        >
+                            <MarkdownRenderer content={tutorial.content} />
+                        </div>
+                    </div>
+
+                    {/* Progress Sidebar - Consistent card styling */}
+                    <div className="space-y-6">
+                        {/* Progress Card */}
+                        <Card className="glass-card shadow-lg">
+                            <CardHeader>
+                                <CardTitle className="text-base flex items-center gap-2">
+                                    <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+                                    Your Progress
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                {/* Progress Bar */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-muted-foreground">Reading</span>
+                                        <span className="font-semibold text-primary">{currentProgress}%</span>
+                                    </div>
+                                    <Progress value={currentProgress} className="h-3" />
+                                </div>
+
+                                {/* Mark as Complete Button */}
+                                {!isCompleted ? (
+                                    <Button
+                                        className="w-full shadow-md hover:shadow-lg transition-shadow"
+                                        onClick={() => markCompleteMutation.mutate()}
+                                        disabled={markCompleteMutation.isPending}
+                                    >
+                                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                                        {markCompleteMutation.isPending ? 'Saving...' : 'Complete & Continue'}
+                                    </Button>
+                                ) : (
+                                    <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
+                                        <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                        <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
+                                    </div>
+                                )}
+
+                                {/* Stats - Consolidated here only */}
+                                <div className="pt-4 border-t space-y-3">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Clock className="h-4 w-4" />
+                                            <span>Duration</span>
+                                        </div>
+                                        <span className="font-medium">{tutorial.estimatedMinutes} min</span>
+                                    </div>
+                                    {isCompleted && (
+                                        <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                                            <CheckCircle2 className="h-4 w-4" />
+                                            <span className="font-medium">Completed</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Practice CTA Card - Matching visual weight */}
+                        <Card className="glass-card shadow-lg border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+                            <CardHeader>
+                                <CardTitle className="text-base">Ready to Practice?</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    Put your knowledge to the test with hands-on challenges.
+                                </p>
+                                <Link to="/challenges">
+                                    <Button className="w-full shadow-md hover:shadow-lg transition-shadow">
+                                        Browse Challenges
+                                        <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
+                                    </Button>
+                                </Link>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            </div>
+
+            {/* Custom styles for better code snippet readability */}
+            <style>{`
+                .prose code {
+                    background-color: hsl(var(--muted));
+                    color: hsl(var(--foreground));
+                    padding: 0.2em 0.4em;
+                    border-radius: 0.25rem;
+                    font-weight: 600;
+                    font-size: 0.9em;
+                }
+                
+                .prose pre {
+                    background-color: hsl(var(--muted));
+                    border: 1px solid hsl(var(--border));
+                }
+                
+                .prose pre code {
+                    background-color: transparent;
+                    padding: 0;
+                    font-weight: 400;
+                }
+                
+                /* Smooth scrollbar */
+                .prose::-webkit-scrollbar {
+                    width: 8px;
+                }
+                
+                .prose::-webkit-scrollbar-track {
+                    background: transparent;
+                }
+                
+                .prose::-webkit-scrollbar-thumb {
+                    background: hsl(var(--primary) / 0.3);
+                    border-radius: 4px;
+                }
+                
+                .prose::-webkit-scrollbar-thumb:hover {
+                    background: hsl(var(--primary) / 0.5);
+                }
+            `}</style>
+        </div>
     );
 }
