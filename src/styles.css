@@ -4,9 +4,9 @@
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
 
-/* Theme configuration for Tailwind v4 */
+/* Theme configuration for Tailwind v4 - Dark Mode (default) */
 @theme {
-  /* Colors */
+  /* Colors - Dark Mode */
   --color-background: hsl(240 10% 3.9%);
   --color-foreground: hsl(0 0% 95%);
   --color-card: hsl(240 6% 10%);
@@ -44,6 +44,39 @@
 /* CSS Variables for JS access */
 :root {
   --radius: 0.625rem;
+}
+
+/* Light Mode Overrides */
+.light {
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(240 10% 3.9%);
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(240 10% 3.9%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(240 10% 3.9%);
+  --color-primary: hsl(263 70% 50%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-secondary: hsl(240 4.8% 95.9%);
+  --color-secondary-foreground: hsl(240 5.9% 10%);
+  --color-muted: hsl(240 4.8% 95.9%);
+  --color-muted-foreground: hsl(240 3.8% 46.1%);
+  --color-accent: hsl(172 66% 45%);
+  --color-accent-foreground: hsl(0 0% 100%);
+  --color-destructive: hsl(0 84.2% 60.2%);
+  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-border: hsl(240 5.9% 90%);
+  --color-input: hsl(240 5.9% 90%);
+  --color-ring: hsl(263 70% 50%);
+}
+
+.light body {
+  background-color: hsl(0 0% 100%);
+  color: hsl(240 10% 3.9%);
+}
+
+.light .glass-card {
+  background-color: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 html {
