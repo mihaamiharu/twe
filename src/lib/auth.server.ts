@@ -56,6 +56,14 @@ export const auth = betterAuth({
     // Base URL
     baseURL: process.env.BETTER_AUTH_URL,
     secret: process.env.BETTER_AUTH_SECRET,
+
+    // Advanced options
+    advanced: {
+        database: {
+            // Generate UUIDs for IDs (our schema uses uuid type)
+            generateId: () => crypto.randomUUID(),
+        },
+    },
 });
 
 // Export types for client
