@@ -52,7 +52,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
         const result = signUpSchema.safeParse(formData);
         if (!result.success) {
             const fieldErrors: Record<string, string> = {};
-            for (const error of result.error.errors) {
+            for (const error of result.error.issues) {
                 const path = error.path.join('.');
                 if (!fieldErrors[path]) {
                     fieldErrors[path] = error.message;
