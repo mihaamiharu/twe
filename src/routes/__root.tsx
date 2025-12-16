@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 import { ThemeProvider } from '../components/theme-provider';
 import { Toaster } from 'sonner';
 import { NotFound } from '../components/NotFound';
+import { GoogleAnalytics } from '../components/analytics/GoogleAnalytics';
 
 import appCss from '../styles.css?url';
 
@@ -60,6 +61,7 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
+        <GoogleAnalytics />
         <div className="flex flex-col min-h-screen">
           <Header />
           <main className="flex-1">
@@ -93,7 +95,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           }}
         />
       </head>
-      <body className="scrollbar-thin">
+      <body className="scrollbar-thin" suppressHydrationWarning>
         {children}
         <TanStackDevtools
           config={{
