@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
-import { useState, useCallback } from 'react';
+import { useCallback } from 'react';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ArrowLeft } from 'lucide-react';
 

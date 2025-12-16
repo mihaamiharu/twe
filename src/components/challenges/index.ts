@@ -8,7 +8,7 @@ export { CodeEditor } from './CodeEditor';
 export type { CodeEditorProps } from './CodeEditor';
 
 export { SelectorInput } from './SelectorInput';
-export type { SelectorInputProps } from './SelectorInput';
+export type { SelectorInputProps, SelectorType, SelectorValidationResult } from './SelectorInput';
 
 export { WebComponentPreview } from './WebComponentPreview';
 export type { WebComponentPreviewProps } from './WebComponentPreview';
@@ -21,3 +21,9 @@ export type { ChallengeCardProps, ChallengeType, Difficulty } from './ChallengeC
 
 export { HintSystem } from './HintSystem';
 export type { Hint, HintSystemProps } from './HintSystem';
+
+export { ChallengePlayground } from './ChallengePlayground';
+export type { Challenge, ChallengePlaygroundProps } from './ChallengePlayground';
+
+export { Hints } from './Hints';
+export type { HintsProps } from './Hints';
