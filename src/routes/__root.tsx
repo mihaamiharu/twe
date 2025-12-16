@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { ThemeProvider } from '../components/theme-provider';
+import { Toaster } from 'sonner';
 
 import appCss from '../styles.css?url';
 
@@ -63,6 +64,7 @@ function RootComponent() {
             <Outlet />
           </main>
           <Footer />
+          <Toaster position="bottom-right" theme="system" />
         </div>
       </ThemeProvider>
     </QueryClientProvider>
