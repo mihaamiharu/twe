@@ -10,10 +10,9 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Check, Copy, AlertCircle, CheckCircle2, Code2 } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Check, Copy, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { validateSelector, type SelectorType, type ValidationResult } from '@/lib/selector-validator';
 
 // Re-export types for consumers
@@ -133,32 +132,36 @@ export function SelectorInput({
         <div className={cn('space-y-3', className)}>
             {/* Type Toggle */}
             {allowTypeChange && (
-                <div className="flex items-center gap-2">
-                    <span className="text-sm text-muted-foreground">Type:</span>
-                    <div className="flex gap-1">
-                        <Button
-                            variant={selectorType === 'css' ? 'default' : 'outline'}
-                            size="sm"
+                <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-muted-foreground">Selector Type</span>
+                    <div className="flex bg-muted p-1 rounded-md">
+                        <button
+                            type="button"
                             onClick={() => handleTypeToggle('css')}
                             disabled={disabled}
-                            className="h-7 px-3"
+                            className={cn(
+                                "text-xs font-medium px-3 py-1 rounded transition-all",
+                                selectorType === 'css'
+                                    ? "bg-background text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
+                            )}
                         >
                             CSS
-                        </Button>
-                        <Button
-                            variant={selectorType === 'xpath' ? 'default' : 'outline'}
-                            size="sm"
+                        </button>
+                        <button
+                            type="button"
                             onClick={() => handleTypeToggle('xpath')}
                             disabled={disabled}
-                            className="h-7 px-3"
+                            className={cn(
+                                "text-xs font-medium px-3 py-1 rounded transition-all",
+                                selectorType === 'xpath'
+                                    ? "bg-background text-foreground shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground"
+                            )}
                         >
                             XPath
-                        </Button>
+                        </button>
                     </div>
-                    <Badge variant="secondary" className="ml-2">
-                        <Code2 className="h-3 w-3 mr-1" />
-                        {selectorType.toUpperCase()}
-                    </Badge>
                 </div>
             )}
 
@@ -183,27 +186,18 @@ export function SelectorInput({
                         type="button"
                         onClick={handleCopy}
                         disabled={!value || disabled}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition-colors mr-1"
                         title="Copy selector"
                     >
                         {copied ? (
                             <Check className="h-4 w-4 text-green-500" />
                         ) : (
-                            <Copy className="h-4 w-4 text-muted-foreground" />
+                            <Copy className="h-4 w-4" />
                         )}
                     </button>
                 </div>
 
-                {/* Validate Button */}
-                {onValidate && (
-                    <Button
-                        onClick={handleValidate}
-                        disabled={disabled || !value.trim() || Boolean(syntaxValidation && !syntaxValidation.isValid)}
-                        className="shrink-0"
-                    >
-                        Validate
-                    </Button>
-                )}
+
             </div>
 
             {/* Syntax Validation Feedback */}
