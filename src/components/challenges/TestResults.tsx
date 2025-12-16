@@ -91,8 +91,14 @@ export function TestResults({
 
     if (results.length === 0) {
         return (
-            <div className={cn('p-4 rounded-lg border border-border bg-card text-muted-foreground', className)}>
-                No test results yet. Run your code to see results.
+            <div className={cn('p-8 rounded-lg border border-border bg-muted/10 border-dashed text-center flex flex-col items-center justify-center h-full min-h-[120px]', className)}>
+                <div className="bg-primary/5 p-3 rounded-full mb-3">
+                    <Clock className="h-6 w-6 text-muted-foreground/50" />
+                </div>
+                <h3 className="text-sm font-medium text-foreground mb-1">Ready to Validate</h3>
+                <p className="text-xs text-muted-foreground max-w-[200px]">
+                    Run your solution to see test results and validation details here.
+                </p>
             </div>
         );
     }

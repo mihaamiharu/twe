@@ -12,14 +12,14 @@
  */
 
 import { useState, useCallback } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { cn } from '@/lib/utils';
 import { executePlaywrightCode } from '@/lib/challenge-executor';
-import { Play, Send, RotateCcw, Zap, Loader2 } from 'lucide-react';
+import { Play, Send, RotateCcw, Zap, Loader2, Target } from 'lucide-react';
 
 import { CodeEditor } from './CodeEditor';
 import { WebComponentPreview } from './WebComponentPreview';
@@ -59,7 +59,8 @@ export interface ChallengePlaygroundProps {
 export function ChallengePlayground({ challenge, onSubmit, className }: ChallengePlaygroundProps) {
     const [code, setCode] = useState(challenge.starterCode);
     const [selector, setSelector] = useState('');
-    const [selectorType] = useState<SelectorType>(
+
+    const [selectorType, setSelectorType] = useState<SelectorType>(
         challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
     );
     const [selectorValidation, setSelectorValidation] = useState<SelectorValidationResult | undefined>();
@@ -67,10 +68,14 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
     const [revealedHints, setRevealedHints] = useState<Set<string>>(new Set());
     const [isRunning, setIsRunning] = useState(false);
     const [hasPassed, setHasPassed] = useState(false);
+
     const [activeTab, setActiveTab] = useState('instructions');
 
     const isCodeChallenge = challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
     const isSelectorChallenge = challenge.type === 'CSS_SELECTOR' || challenge.type === 'XPATH_SELECTOR';
+
+    // State to store real-time validation result from preview
+    const [previewValidation, setPreviewValidation] = useState<{ isValid: boolean; matchCount: number } | null>(null);
 
     // Run code for Playwright/JS challenges
     const handleRunCode = useCallback(async () => {
@@ -109,20 +114,37 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
         }
     }, [code, challenge.htmlContent, isCodeChallenge]);
 
+    // Handle real-time validation updates from preview
+    const handlePreviewValidation = useCallback((result: { isValid: boolean; matchCount: number }) => {
+        setPreviewValidation(result);
+
+        // Optional: Update UI validation state in real-time if desired, 
+        // but for now we stick to "Test Selector" button workflow
+    }, []);
+
     // Validate selector for CSS/XPath challenges
     const handleValidateSelector = useCallback(() => {
         if (!isSelectorChallenge || !challenge.targetSelector) return;
 
-        const targetSelectors = Array.isArray(challenge.targetSelector)
-            ? challenge.targetSelector
-            : [challenge.targetSelector];
+        // Use the DOM-based validation result if available
+        let isValid = false;
+        let matchCount = 0;
 
-        // Check if user's selector matches any valid selector
-        const isValid = targetSelectors.includes(selector);
+        if (previewValidation) {
+            isValid = previewValidation.isValid;
+            matchCount = previewValidation.matchCount;
+        } else {
+            // Fallback to string comparison (legacy behavior)
+            const targetSelectors = Array.isArray(challenge.targetSelector)
+                ? challenge.targetSelector
+                : [challenge.targetSelector];
+            isValid = targetSelectors.includes(selector);
+            matchCount = isValid ? 1 : 0;
+        }
 
         setSelectorValidation({
             valid: isValid,
-            matchCount: isValid ? 1 : 0,
+            matchCount: matchCount,
             error: isValid ? undefined : 'Selector does not match the target element',
         });
 
@@ -146,7 +168,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                 },
             ]);
         }
-    }, [selector, challenge.targetSelector, isSelectorChallenge]);
+    }, [selector, challenge.targetSelector, isSelectorChallenge, previewValidation]);
 
     // Reset to starter code
     const handleReset = useCallback(() => {
@@ -155,6 +177,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
         setSelectorValidation(undefined);
         setTestResults([]);
         setHasPassed(false);
+        setPreviewValidation(null);
     }, [challenge.starterCode]);
 
     // Reveal a hint
@@ -175,75 +198,94 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
         });
     }, [code, selector, hasPassed, onSubmit, isCodeChallenge, testResults]);
 
+    // Handle selector changes
+    const handleSelectorChange = useCallback((value: string, type: SelectorType) => {
+        setSelector(value);
+        setSelectorType(type);
+    }, []);
+
     return (
-        <div className={cn('flex flex-col h-full', className)}>
+        <div className={cn('flex flex-col h-full bg-background', className)}>
             {/* Header */}
-            <div className="border-b border-border p-4 flex items-center justify-between">
-                <div>
-                    <h1 className="font-semibold text-lg">{challenge.title}</h1>
-                    <div className="flex items-center gap-2 text-sm mt-1">
-                        <Badge variant="secondary">{challenge.difficulty}</Badge>
-                        <Badge variant="outline">{challenge.type.replace('_', ' ')}</Badge>
-                        <span className="text-accent flex items-center gap-1">
-                            <Zap className="h-3 w-3" />
-                            {challenge.xp} XP
-                        </span>
+            <div className="border-b border-border bg-card/50 px-4 py-3 flex items-center justify-between shrink-0">
+                <div className="flex items-center gap-4">
+                    <div>
+                        <h1 className="font-semibold text-lg leading-none">{challenge.title}</h1>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1.5">
+                            <Badge variant="secondary" className="font-normal">{challenge.difficulty}</Badge>
+                            <Badge variant="outline" className="font-normal">{challenge.type.replace('_', ' ')}</Badge>
+                            <span className="text-accent flex items-center gap-1 font-medium">
+                                <Zap className="h-3 w-3" />
+                                {challenge.xp} XP
+                            </span>
+                        </div>
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" onClick={handleReset}>
+                    <Button variant="ghost" size="sm" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Reset
                     </Button>
                     <Button
-                        variant="outline"
                         size="sm"
-                        onClick={isCodeChallenge ? handleRunCode : handleValidateSelector}
-                        disabled={isRunning}
-                    >
-                        {isRunning ? (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                            <Play className="h-4 w-4 mr-2" />
+                        onClick={handleSubmit}
+                        disabled={!hasPassed}
+                        className={cn(
+                            "shadow-md transition-all",
+                            hasPassed
+                                ? "bg-green-600 hover:bg-green-700 text-white"
+                                : "opacity-50 cursor-not-allowed"
                         )}
-                        {isCodeChallenge ? 'Run' : 'Validate'}
-                    </Button>
-                    <Button size="sm" onClick={handleSubmit} disabled={!hasPassed}>
+                    >
                         <Send className="h-4 w-4 mr-2" />
-                        Submit
+                        Submit Solution
                     </Button>
+                </div>
+            </div>
+
+            {/* Persistent Goal Bar */}
+            <div className="bg-muted/30 border-b border-border px-4 py-3 shrink-0">
+                <div className="flex items-start gap-3 max-w-4xl">
+                    <div className="bg-primary/20 p-1.5 rounded-md mt-0.5 shadow-sm">
+                        <Target className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                        <span className="text-xs font-bold text-primary uppercase tracking-wider block mb-1">Goal</span>
+                        <p className="text-sm font-medium text-foreground/90 leading-snug">{challenge.description}</p>
+                    </div>
                 </div>
             </div>
 
             {/* Main content - Split layout */}
             <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border overflow-hidden">
                 {/* Left Panel - Instructions & Preview */}
-                <div className="flex flex-col overflow-hidden">
+                <div className="flex flex-col overflow-hidden bg-muted/5">
                     <Tabs
                         value={activeTab}
                         onValueChange={setActiveTab}
-                        className="flex-1 flex flex-col"
+                        className="flex-1 flex flex-col min-h-0"
                     >
-                        <TabsList className="mx-4 mt-4">
-                            <TabsTrigger value="instructions">Instructions</TabsTrigger>
-                            {challenge.htmlContent && (
-                                <TabsTrigger value="preview">Preview</TabsTrigger>
-                            )}
-                        </TabsList>
+                        <div className="px-4 pt-3 shrink-0">
+                            <TabsList className="w-full justify-start h-9 bg-muted/50 p-1">
+                                <TabsTrigger value="instructions" className="flex-1">Instructions</TabsTrigger>
+                                {challenge.htmlContent && (
+                                    <TabsTrigger value="preview" className="flex-1">Target Preview</TabsTrigger>
+                                )}
+                            </TabsList>
+                        </div>
 
                         <TabsContent
                             value="instructions"
-                            className="flex-1 overflow-auto p-4 mt-0"
+                            className="flex-1 overflow-auto p-4 focus-visible:ring-0"
                         >
-                            <Card className="glass-card">
-                                <CardContent className="p-6">
-                                    <MarkdownRenderer content={challenge.instructions} />
-                                </CardContent>
-                            </Card>
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                                <MarkdownRenderer content={challenge.instructions} />
+                            </div>
 
                             {/* Hints */}
                             {challenge.hints.length > 0 && (
-                                <div className="mt-4">
+                                <div className="mt-8 pt-6 border-t border-border">
+                                    <h3 className="text-sm font-semibold mb-3">Need Help?</h3>
                                     <Hints
                                         hints={challenge.hints}
                                         revealedHints={revealedHints}
@@ -256,13 +298,18 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                         {challenge.htmlContent && (
                             <TabsContent
                                 value="preview"
-                                className="flex-1 overflow-auto p-4 mt-0"
+                                className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col"
                             >
                                 <WebComponentPreview
                                     htmlContent={challenge.htmlContent}
                                     userSelector={isSelectorChallenge ? selector : undefined}
                                     selectorType={selectorType}
-                                    className="h-full min-h-[300px]"
+                                    targetSelector={challenge.targetSelector as string}
+                                    targetSelectorType={challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'}
+                                    onValidationChange={handlePreviewValidation}
+                                    className="flex-1 shadow-sm"
+                                    showControls={true}
+                                    height="100%"
                                 />
                             </TabsContent>
                         )}
@@ -270,45 +317,94 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                 </div>
 
                 {/* Right Panel - Editor & Results */}
-                <div className="flex flex-col overflow-hidden">
-                    <div className="flex-1 p-4 overflow-auto">
-                        {/* Code Editor for code challenges */}
-                        {isCodeChallenge && (
-                            <CodeEditor
-                                initialCode={challenge.starterCode}
-                                language="javascript"
-                                onChange={setCode}
-                                onRun={handleRunCode}
-                                storageKey={`challenge-${challenge.id}`}
-                                height="300px"
-                                className="mb-4"
-                            />
-                        )}
-
+                <div className="flex flex-col overflow-hidden bg-background">
+                    <div className="flex-1 p-4 overflow-auto flex flex-col gap-6">
                         {/* Selector Input for selector challenges */}
                         {isSelectorChallenge && (
-                            <Card className="glass-card mb-4">
-                                <CardHeader className="py-3">
-                                    <CardTitle className="text-sm">Enter Selector</CardTitle>
-                                </CardHeader>
-                                <CardContent className="py-3">
-                                    <SelectorInput
-                                        value={selector}
-                                        onChange={(value) => setSelector(value)}
-                                        onValidate={handleValidateSelector}
-                                        defaultType={selectorType}
-                                        showValidation={true}
-                                        validationResult={selectorValidation ? {
-                                            isCorrect: selectorValidation.valid ?? false,
-                                            feedback: selectorValidation.error ?? 'Valid selector'
-                                        } : undefined}
+                            <div className="space-y-4">
+                                <div className="space-y-1.5">
+                                    <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
+                                        <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">1</div>
+                                        Enter Selector
+                                    </h3>
+                                    <Card className="border-border shadow-sm">
+                                        <CardContent className="p-4 space-y-4">
+                                            <SelectorInput
+                                                value={selector}
+                                                onChange={handleSelectorChange}
+                                                onValidate={handleValidateSelector}
+                                                defaultType={selectorType}
+                                                allowTypeChange={true}
+                                            />
+                                            <div className="flex justify-end">
+                                                <Button
+                                                    variant="default"
+                                                    size="sm"
+                                                    onClick={handleValidateSelector}
+                                                    disabled={isRunning || !selector}
+                                                    className="w-full sm:w-auto"
+                                                >
+                                                    {isRunning ? (
+                                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                    ) : (
+                                                        <Play className="h-4 w-4 mr-2" />
+                                                    )}
+                                                    Test Selector
+                                                </Button>
+                                            </div>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Code Editor for code challenges */}
+                        {isCodeChallenge && (
+                            <div className="flex-1 flex flex-col gap-2 min-h-[300px]">
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
+                                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">1</div>
+                                    Solution Code
+                                </h3>
+                                <div className="flex-1 flex flex-col gap-4">
+                                    <CodeEditor
+                                        initialCode={challenge.starterCode}
+                                        language="javascript"
+                                        onChange={setCode}
+                                        onRun={handleRunCode}
+                                        storageKey={`challenge-${challenge.id}`}
+                                        height="100%"
+                                        className="flex-1 border rounded-md overflow-hidden shadow-sm"
                                     />
-                                </CardContent>
-                            </Card>
+                                    <div className="flex justify-end">
+                                        <Button
+                                            variant="default"
+                                            size="sm"
+                                            onClick={handleRunCode}
+                                            disabled={isRunning}
+                                            className="w-full sm:w-auto"
+                                        >
+                                            {isRunning ? (
+                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                            ) : (
+                                                <Play className="h-4 w-4 mr-2" />
+                                            )}
+                                            Run Code
+                                        </Button>
+                                    </div>
+                                </div>
+                            </div>
                         )}
 
                         {/* Test Results */}
-                        <TestResults results={testResults} isRunning={isRunning} />
+                        <div className={cn("flex flex-col gap-2", !isCodeChallenge && "flex-1")}>
+                            <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
+                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">2</div>
+                                Live Results
+                            </h3>
+                            <div className="flex-1">
+                                <TestResults results={testResults} isRunning={isRunning} />
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
