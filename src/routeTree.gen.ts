@@ -16,6 +16,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TutorialsIndexRouteImport } from './routes/tutorials/index'
 import { Route as ChallengesIndexRouteImport } from './routes/challenges/index'
 import { Route as TutorialsSlugRouteImport } from './routes/tutorials/$slug'
+import { Route as DocsApiRouteImport } from './routes/docs/api'
 import { Route as ChallengesSlugRouteImport } from './routes/challenges/$slug'
 import { Route as DemoStartServerFuncsRouteImport } from './routes/demo/start.server-funcs'
 import { Route as DemoStartApiRequestRouteImport } from './routes/demo/start.api-request'
@@ -58,6 +59,11 @@ const ChallengesIndexRoute = ChallengesIndexRouteImport.update({
 const TutorialsSlugRoute = TutorialsSlugRouteImport.update({
   id: '/tutorials/$slug',
   path: '/tutorials/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsApiRoute = DocsApiRouteImport.update({
+  id: '/docs/api',
+  path: '/docs/api',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChallengesSlugRoute = ChallengesSlugRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
+  '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
+  '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/profile': typeof ProfileRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
+  '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges/': typeof ChallengesIndexRoute
   '/tutorials/': typeof TutorialsIndexRoute
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/profile'
     | '/challenges/$slug'
+    | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges'
     | '/tutorials'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/profile'
     | '/challenges/$slug'
+    | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges'
     | '/tutorials'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/profile'
     | '/challenges/$slug'
+    | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges/'
     | '/tutorials/'
@@ -213,6 +225,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ProfileRoute: typeof ProfileRoute
   ChallengesSlugRoute: typeof ChallengesSlugRoute
+  DocsApiRoute: typeof DocsApiRoute
   TutorialsSlugRoute: typeof TutorialsSlugRoute
   ChallengesIndexRoute: typeof ChallengesIndexRoute
   TutorialsIndexRoute: typeof TutorialsIndexRoute
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       path: '/tutorials/$slug'
       fullPath: '/tutorials/$slug'
       preLoaderRoute: typeof TutorialsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/api': {
+      id: '/docs/api'
+      path: '/docs/api'
+      fullPath: '/docs/api'
+      preLoaderRoute: typeof DocsApiRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/challenges/$slug': {
@@ -341,6 +361,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ProfileRoute: ProfileRoute,
   ChallengesSlugRoute: ChallengesSlugRoute,
+  DocsApiRoute: DocsApiRoute,
   TutorialsSlugRoute: TutorialsSlugRoute,
   ChallengesIndexRoute: ChallengesIndexRoute,
   TutorialsIndexRoute: TutorialsIndexRoute,
