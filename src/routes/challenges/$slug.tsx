@@ -78,7 +78,13 @@ function ChallengeDetailPage() {
         instructions: data.instructions,
         htmlContent: data.htmlContent || '',
         starterCode: data.starterCode || '',
-        targetSelector: '', // Will be determined by test cases
+        targetSelector: (() => {
+            if (!data.testCases?.length) return '';
+
+            // Try to find selector in the first test case input
+            const firstTestInput = data.testCases[0].input as { selector?: string; xpath?: string };
+            return firstTestInput?.selector || firstTestInput?.xpath || '';
+        })(),
         hints: data.hints?.map((hint, index) => ({
             id: String(index + 1),
             content: hint,
