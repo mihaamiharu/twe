@@ -151,20 +151,6 @@ export function CodeEditor({
         }
     }, [code, onRun]);
 
-    // Reset to initial code
-    const resetCode = useCallback(() => {
-        setCode(initialCode);
-        onChange?.(initialCode);
-        if (storageKey) {
-            localStorage.removeItem(storageKey);
-        }
-    }, [initialCode, onChange, storageKey]);
-
-    // Get current code
-    const getCode = useCallback(() => {
-        return code;
-    }, [code]);
-
     return (
         <div className={cn('rounded-lg overflow-hidden border border-border', className)}>
             <Editor
