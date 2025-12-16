@@ -73,6 +73,7 @@ export const Route = createFileRoute('/api/users/me')({
               description: achievements.description,
               icon: achievements.icon,
               category: achievements.category,
+              xpReward: achievements.xpReward,
               unlockedAt: userAchievements.unlockedAt,
             })
             .from(userAchievements)
@@ -105,6 +106,39 @@ export const Route = createFileRoute('/api/users/me')({
           const xpProgress = currentXP - xpForCurrentLevel;
           const xpNeeded = xpForNextLevel - xpForCurrentLevel;
 
+          // Construct recent activity
+          const activity = [
+            // Map submissions to activity
+            ...recentSubmissions
+              .filter(s => s.isPassed) // Only show passed submissions in activity? Or all? Usually passed.
+              .map(s => ({
+                type: 'challenge' as const,
+                title: s.challengeTitle,
+                xp: s.xpEarned,
+                date: s.createdAt,
+                timestamp: s.createdAt.getTime(),
+              })),
+            // Map achievements to activity
+            ...userAchievementsList.map(a => ({
+              type: 'achievement' as const,
+              title: a.name,
+              xp: a.xpReward,
+              date: a.unlockedAt,
+              timestamp: a.unlockedAt.getTime(),
+            })),
+          ]
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .slice(0, 10) // Limit to 10 items
+            .map(({ timestamp, date, ...rest }) => ({
+              ...rest,
+              date: new Intl.DateTimeFormat('en-US', {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+              }).format(date),
+            }));
+
           return json({
             success: true,
             data: {
@@ -135,6 +169,7 @@ export const Route = createFileRoute('/api/users/me')({
               // Details
               achievements: userAchievementsList,
               recentSubmissions,
+              recentActivity: activity,
             },
           });
         } catch (error) {

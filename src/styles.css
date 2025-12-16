@@ -197,6 +197,21 @@ code {
   }
 }
 
+/* Terminal scanline animation for 404 page */
+.animate-scan {
+  animation: scan 2s linear infinite;
+}
+
+@keyframes scan {
+  from {
+    transform: translateY(-100%);
+  }
+
+  to {
+    transform: translateY(100%);
+  }
+}
+
 /* Focus ring utility */
 .focus-ring:focus {
   outline: none;
