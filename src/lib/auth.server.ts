@@ -1,6 +1,7 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/db';
+import * as schema from '@/db/schema';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
@@ -22,6 +23,11 @@ export const auth = betterAuth({
     // Database configuration with Drizzle adapter
     database: drizzleAdapter(db, {
         provider: 'pg', // PostgreSQL
+        schema: {
+            user: schema.users,
+            session: schema.sessions,
+            account: schema.accounts,
+        },
     }),
 
     // Email/Password authentication
