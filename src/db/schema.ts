@@ -118,6 +118,7 @@ export const challenges = pgTable('challenges', {
     hints: jsonb('hints').$type<string[]>(), // Array of hints
 
     // Metadata
+    category: text('category'), // e.g., 'css-basics', 'xpath-basics', 'css-advanced'
     tags: text('tags').array(),
     isPublished: boolean('is_published').notNull().default(false),
     completionCount: integer('completion_count').notNull().default(0),
@@ -125,6 +126,7 @@ export const challenges = pgTable('challenges', {
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
+
 
 export const testCases = pgTable('test_cases', {
     id: uuid('id').defaultRandom().primaryKey(),
