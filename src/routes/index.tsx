@@ -72,7 +72,7 @@ function HomePage() {
           {/* Logo */}
           <div className="flex items-center justify-center gap-4 mb-8">
             <img
-              src="/favicon.jpg"
+              src="/logo.jpg"
               alt="TestingWithEkki Logo"
               className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30"
             />
