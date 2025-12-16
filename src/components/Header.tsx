@@ -9,7 +9,6 @@ import {
   Trophy,
   User,
   X,
-  Zap,
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
@@ -59,7 +58,7 @@ export function Header() {
             {/* Logo */}
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-2">
-                <Zap className="h-8 w-8 text-primary" />
+                <img src="/logo.jpg" alt="Logo" className="h-8 w-8 rounded-lg" />
                 <span className="text-xl font-bold gradient-text">
                   TestingWithEkki
                 </span>
