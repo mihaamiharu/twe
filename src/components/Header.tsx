@@ -21,15 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { signOut } from '@/lib/auth.client';
-
-// Mock user - will be replaced with actual auth
-const mockUser = {
-  name: 'Test User',
-  email: 'test@example.com',
-  image: null,
-  isAuthenticated: true,
-};
+import { useSession, signOut } from '@/lib/auth.client';
 
 const navLinks = [
   { href: '/tutorials', label: 'Tutorials', icon: BookOpen },
@@ -39,12 +31,20 @@ const navLinks = [
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const user = mockUser; // Replace with useSession() when auth is connected
+  const { data: session, isPending } = useSession();
+
+  const user = session?.user;
+  const isAuthenticated = !!user;
 
   const handleSignOut = async () => {
     try {
-      await signOut();
-      window.location.href = '/';
+      await signOut({
+        fetchOptions: {
+          onSuccess: () => {
+            window.location.href = '/';
+          },
+        },
+      });
     } catch (error) {
       console.error('Sign out error:', error);
     }
@@ -86,7 +86,9 @@ export function Header() {
             {/* Right side */}
             <div className="flex items-center gap-2">
               <ThemeToggle />
-              {user.isAuthenticated ? (
+              {isPending ? (
+                <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+              ) : isAuthenticated && user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -96,7 +98,7 @@ export function Header() {
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.image || undefined} />
                         <AvatarFallback className="bg-primary/20 text-primary">
-                          {user.name.charAt(0).toUpperCase()}
+                          {(user.name || user.email || 'U').charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -105,7 +107,7 @@ export function Header() {
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <p className="text-sm font-medium leading-none">
-                          {user.name}
+                          {user.name || 'User'}
                         </p>
                         <p className="text-xs leading-none text-muted-foreground">
                           {user.email}
@@ -195,7 +197,7 @@ export function Header() {
 
               <div className="h-px bg-border my-4" />
 
-              {user.isAuthenticated ? (
+              {isAuthenticated && user ? (
                 <>
                   <Link
                     to="/profile"
