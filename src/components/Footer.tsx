@@ -26,8 +26,8 @@ const footerLinks = {
 export function Footer() {
     return (
         <footer className="border-t border-border bg-muted/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
                     {/* Brand */}
                     <div className="col-span-2 md:col-span-1">
                         <Link to="/" className="flex items-center gap-2 mb-4">
@@ -93,27 +93,10 @@ export function Footer() {
                             ))}
                         </ul>
                     </div>
-
-                    {/* Legal Links */}
-                    <div>
-                        <h3 className="font-semibold mb-4">Legal</h3>
-                        <ul className="space-y-3">
-                            {footerLinks.legal.map((link) => (
-                                <li key={link.label}>
-                                    <a
-                                        href={link.href}
-                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                                    >
-                                        {link.label}
-                                    </a>
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
                 </div>
 
-                {/* Bottom */}
-                <div className="border-t border-border mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                {/* Bottom - Keep legal links here only */}
+                <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
                     <p className="text-sm text-muted-foreground">
                         © {new Date().getFullYear()} TestingWithEkki. All rights reserved.
                     </p>
@@ -133,5 +116,6 @@ export function Footer() {
         </footer>
     );
 }
+
 
 export default Footer;
