@@ -10,7 +10,7 @@ import { AlertCircle, Clock, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export const Route = createFileRoute('/tutorials/$slug')({
     component: TutorialDetailPage,
@@ -43,6 +43,7 @@ function TutorialDetailPage() {
     const { slug } = Route.useParams();
     const queryClient = useQueryClient();
     const [readingProgress, setReadingProgress] = useState(0);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const { data, isLoading, error } = useQuery<TutorialResponse>({
         queryKey: ['tutorial', slug],
@@ -95,31 +96,65 @@ function TutorialDetailPage() {
     });
 
     // Calculate reading progress based on scroll
+    // Skip tracking if tutorial already completed
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        // Don't update progress if tutorial is already completed
+        if (tutorial?.userProgress?.isCompleted) {
+            return;
+        }
+
         const element = e.currentTarget;
         const scrollTop = element.scrollTop;
         const scrollHeight = element.scrollHeight - element.clientHeight;
 
         // Ensure we can reach 100% - account for small rounding errors
         let progress = 0;
-        if (scrollHeight <= 0) {
-            progress = 100; // Content fits without scrolling
+        if (scrollHeight <= 10) {
+            // Content fits without scrolling or very minimal scroll needed
+            progress = 100;
         } else {
             progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
             // If user is at or very near bottom, force 100%
-            if (scrollHeight - scrollTop < 10) {
+            if (scrollHeight - scrollTop < 20) {
                 progress = 100;
             }
         }
 
         if (progress !== readingProgress) {
             setReadingProgress(progress);
-            // Update progress in DB (debounced)
-            if (progress % 10 === 0 || progress === 100) {
+            // Update progress in DB (debounced) - only if not already completed
+            if ((progress % 10 === 0 || progress === 100) && !tutorial?.userProgress?.isCompleted) {
                 updateProgressMutation.mutate(progress);
             }
         }
     };
+
+    // For short tutorials that don't need scrolling, auto-detect on mount
+    useEffect(() => {
+        if (!tutorial || tutorial.userProgress?.isCompleted) {
+            return;
+        }
+
+        // Check if content needs scrolling after render
+        const checkContentHeight = () => {
+            if (contentRef.current) {
+                const element = contentRef.current;
+                const scrollHeight = element.scrollHeight - element.clientHeight;
+
+                // If content doesn't need scrolling, set progress to 100%
+                if (scrollHeight <= 10) {
+                    setReadingProgress(100);
+                }
+            }
+        };
+
+        // Small delay to ensure content is rendered
+        const timer = setTimeout(checkContentHeight, 100);
+        return () => clearTimeout(timer);
+    }, [tutorial]);
+
+    // Get display progress - always 100% for completed tutorials
+    const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : readingProgress || tutorial?.userProgress?.readingProgress || 0;
 
     // Loading state
     if (isLoading) {
@@ -202,6 +237,7 @@ function TutorialDetailPage() {
 
                         {/* Content - Direct on page, no card container */}
                         <div
+                            ref={contentRef}
                             className="prose prose-lg dark:prose-invert max-w-none max-h-[70vh] overflow-y-auto pr-4 scroll-smooth"
                             style={{
                                 lineHeight: '1.7',
@@ -229,9 +265,9 @@ function TutorialDetailPage() {
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Reading</span>
-                                        <span className="font-semibold text-primary">{currentProgress}%</span>
+                                        <span className="font-semibold text-primary">{displayProgress}%</span>
                                     </div>
-                                    <Progress value={currentProgress} className="h-3" />
+                                    <Progress value={displayProgress} className="h-3" />
                                 </div>
 
                                 {/* Mark as Complete Button */}
