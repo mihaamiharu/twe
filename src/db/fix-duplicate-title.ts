@@ -1,13 +1,13 @@
 /**
- * Fix duplicate H2 title in "Introduction to Web Selectors" tutorial
+ * PROPERLY fix duplicate H2 title in "Introduction to Web Selectors" tutorial
  */
 
 import { db } from './index';
 import { tutorials } from './schema';
 import { eq } from 'drizzle-orm';
 
-async function fixDuplicateTitle() {
-    console.log('\n🔧 Fixing duplicate title in Introduction to Web Selectors...\n');
+async function fixDuplicateTitleProperly() {
+    console.log('\n🔧 Fixing duplicate title in Introduction to Web Selectors (PROPERLY)...\n');
 
     try {
         // Get the tutorial
@@ -22,13 +22,29 @@ async function fixDuplicateTitle() {
         }
 
         console.log('✓ Found tutorial');
+        console.log('Current content preview:');
+        console.log(tutorial.content.substring(0, 500));
+        console.log('\n--- Looking for patterns ---\n');
 
-        // Remove the duplicate H2 title
-        const updatedContent = tutorial.content
-            .replace(/## Introduction to Web Selectors\n\n/, '')  // Remove duplicate H2
+        // Try multiple patterns to catch the duplicate H2
+        let updatedContent = tutorial.content;
+
+        // Pattern 1: Exact match
+        if (updatedContent.includes('## Introduction to Web Selectors')) {
+            updatedContent = updatedContent.replace('## Introduction to Web Selectors\n\n', '');
+            console.log('✓ Removed pattern 1: "## Introduction to Web Selectors"');
+        }
+
+        // Pattern 2: With extra line breaks
+        if (updatedContent.includes('## Introduction to Web Selectors')) {
+            updatedContent = updatedContent.replace(/##\s*Introduction to Web Selectors\s*\n+/g, '');
+            console.log('✓ Removed pattern 2: with regex');
+        }
 
         if (updatedContent === tutorial.content) {
-            console.log('✓ No duplicate title found - already clean!');
+            console.log('⚠️  No changes made - pattern not found');
+            console.log('\nShowing first 600 chars:');
+            console.log(tutorial.content.substring(0, 600));
             return;
         }
 
@@ -41,15 +57,16 @@ async function fixDuplicateTitle() {
             })
             .where(eq(tutorials.slug, 'introduction-to-web-selectors'));
 
-        console.log('✨ Fixed duplicate title!');
-        console.log('   Removed: "## Introduction to Web Selectors"');
+        console.log('\n✨ Updated content!');
+        console.log('\nNew content preview:');
+        console.log(updatedContent.substring(0, 500));
     } catch (error) {
         console.error('❌ Error:', error);
         throw error;
     }
 }
 
-fixDuplicateTitle()
+fixDuplicateTitleProperly()
     .then(() => {
         console.log('\n✅ Fix complete!\n');
         process.exit(0);
