@@ -1213,15 +1213,345 @@ const result = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0) + (hasSidebar ? 1 : 0);
 ];
 
 // ============================================================================
+// ASYNC/AWAIT BASICS CHALLENGES (5)
+// ============================================================================
+
+const asyncChallenges = [
+    {
+        slug: 'async-understanding-promises',
+        title: 'Understanding Promises',
+        description: 'Learn what Promises are and how they represent future values.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'EASY' as const,
+        category: 'async-await-basics',
+        xpReward: 35,
+        order: 301,
+        instructions: `# Understanding Promises
+
+Promises represent a value that may not be available yet.
+
+## Promise States
+- **Pending**: Initial state, not yet fulfilled or rejected
+- **Fulfilled**: Operation completed successfully
+- **Rejected**: Operation failed
+
+## Creating a Promise
+
+\`\`\`javascript
+const promise = new Promise((resolve, reject) => {
+    // Async operation
+    if (success) {
+        resolve(value);  // Fulfilled
+    } else {
+        reject(error);   // Rejected
+    }
+});
+\`\`\`
+
+## Using .then() and .catch()
+
+\`\`\`javascript
+promise
+    .then(value => console.log(value))
+    .catch(error => console.log(error));
+\`\`\`
+
+## Your Task
+Create a Promise that resolves with the value 42 after execution.
+Store the resolved value in result.
+`,
+        htmlContent: `<div class="promise-demo">
+  <h3>Promise Demo</h3>
+</div>`,
+        starterCode: `// Create a promise that resolves with 42
+const myPromise = new Promise((resolve, reject) => {
+    resolve(42);
+});
+
+// Get the value from the promise
+let result;
+myPromise.then(value => {
+    result = value;
+});`,
+        expectedOutput: '42',
+        hints: ['Use resolve(42) inside the Promise', '.then() receives the resolved value'],
+        tags: ['javascript', 'async', 'promises', 'beginner'],
+    },
+    {
+        slug: 'async-await-basics',
+        title: 'Async/Await Basics',
+        description: 'Write cleaner async code using async/await syntax.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'EASY' as const,
+        category: 'async-await-basics',
+        xpReward: 40,
+        order: 302,
+        instructions: `# Async/Await Basics
+
+async/await makes async code look synchronous!
+
+## Async Function
+
+\`\`\`javascript
+async function fetchData() {
+    const data = await somePromise;
+    return data;
+}
+\`\`\`
+
+## Key Rules
+- **async** keyword before function makes it return a Promise
+- **await** pauses execution until Promise resolves
+- Can only use await inside async functions
+
+## Arrow Function Syntax
+
+\`\`\`javascript
+const fetchData = async () => {
+    const data = await somePromise;
+    return data;
+};
+\`\`\`
+
+## Your Task
+Create an async function that awaits a promise and returns double the value.
+`,
+        htmlContent: `<div class="async-demo">
+  <h3>Async/Await</h3>
+</div>`,
+        starterCode: `// Helper: returns a promise that resolves to 21
+const getValue = () => Promise.resolve(21);
+
+// Create async function that returns double the value
+async function doubleValue() {
+    const value = await getValue();
+    return value * 2;
+}
+
+// Call the function and get result
+const result = await doubleValue();`,
+        expectedOutput: '42',
+        hints: ['await pauses until Promise resolves', 'Return the doubled value from the function'],
+        tags: ['javascript', 'async', 'await', 'beginner'],
+    },
+    {
+        slug: 'async-error-handling',
+        title: 'Async Error Handling',
+        description: 'Handle errors in async code with try/catch.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'EASY' as const,
+        category: 'async-await-basics',
+        xpReward: 45,
+        order: 303,
+        instructions: `# Async Error Handling
+
+Always handle errors in async code!
+
+## Try/Catch with Async/Await
+
+\`\`\`javascript
+async function fetchData() {
+    try {
+        const data = await riskyOperation();
+        return data;
+    } catch (error) {
+        console.log('Error:', error.message);
+        return null;
+    }
+}
+\`\`\`
+
+## Promise Rejection
+
+\`\`\`javascript
+// This promise will reject
+const failingPromise = Promise.reject(new Error('Failed!'));
+
+// Handle with catch
+failingPromise.catch(err => console.log(err.message));
+\`\`\`
+
+## Your Task
+Create a function that handles a rejected promise and returns a fallback value.
+`,
+        htmlContent: `<div class="error-demo">
+  <h3>Error Handling</h3>
+</div>`,
+        starterCode: `// This promise rejects with an error
+const riskyOperation = () => Promise.reject(new Error('Network failed'));
+
+// Handle the error and return 'fallback' instead
+async function safeOperation() {
+    try {
+        const data = await riskyOperation();
+        return data;
+    } catch (error) {
+        return 'fallback';
+    }
+}
+
+const result = await safeOperation();`,
+        expectedOutput: 'fallback',
+        hints: ['Use try/catch around await', 'Return fallback value in catch block'],
+        tags: ['javascript', 'async', 'error-handling', 'beginner'],
+    },
+    {
+        slug: 'async-parallel-execution',
+        title: 'Parallel Async Operations',
+        description: 'Run multiple async operations in parallel with Promise.all.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'EASY' as const,
+        category: 'async-await-basics',
+        xpReward: 50,
+        order: 304,
+        instructions: `# Parallel Async Operations
+
+Run multiple operations at once for better performance!
+
+## Promise.all()
+
+Waits for ALL promises to resolve:
+
+\`\`\`javascript
+const [a, b, c] = await Promise.all([
+    fetchA(),
+    fetchB(),
+    fetchC()
+]);
+\`\`\`
+
+## Promise.race()
+
+Returns first promise to settle:
+
+\`\`\`javascript
+const fastest = await Promise.race([
+    slowOperation(),
+    fastOperation()
+]);
+\`\`\`
+
+## Sequential vs Parallel
+
+\`\`\`javascript
+// Sequential (slow) - 3 seconds total
+const a = await fetch1();  // 1 sec
+const b = await fetch2();  // 1 sec
+const c = await fetch3();  // 1 sec
+
+// Parallel (fast) - 1 second total
+const [a, b, c] = await Promise.all([
+    fetch1(), fetch2(), fetch3()
+]);
+\`\`\`
+
+## Your Task
+Sum the results of three parallel async operations.
+`,
+        htmlContent: `<div class="parallel-demo">
+  <h3>Parallel Execution</h3>
+</div>`,
+        starterCode: `// Three async operations returning numbers
+const getA = () => Promise.resolve(10);
+const getB = () => Promise.resolve(20);
+const getC = () => Promise.resolve(12);
+
+// Run all in parallel and sum the results
+const [a, b, c] = await Promise.all([getA(), getB(), getC()]);
+const result = a + b + c;`,
+        expectedOutput: '42',
+        hints: ['Promise.all takes an array of promises', 'Destructure the results array'],
+        tags: ['javascript', 'async', 'parallel', 'promise-all', 'beginner'],
+    },
+    {
+        slug: 'async-testing-patterns',
+        title: 'Async Testing Patterns',
+        description: 'Apply async/await in common test automation scenarios.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'EASY' as const,
+        category: 'async-await-basics',
+        xpReward: 55,
+        order: 305,
+        instructions: `# Async Testing Patterns
+
+Common patterns used in test automation!
+
+## Waiting for Element
+
+\`\`\`javascript
+async function waitForElement(selector, timeout = 5000) {
+    const start = Date.now();
+    while (Date.now() - start < timeout) {
+        const el = document.querySelector(selector);
+        if (el) return el;
+        await delay(100);
+    }
+    throw new Error('Element not found');
+}
+\`\`\`
+
+## Retry Pattern
+
+\`\`\`javascript
+async function retry(fn, attempts = 3) {
+    for (let i = 0; i < attempts; i++) {
+        try {
+            return await fn();
+        } catch (e) {
+            if (i === attempts - 1) throw e;
+        }
+    }
+}
+\`\`\`
+
+## Your Task
+Create a retry function that attempts an operation 3 times before giving up.
+Count how many attempts were made.
+`,
+        htmlContent: `<div class="patterns-demo">
+  <h3>Testing Patterns</h3>
+</div>`,
+        starterCode: `let attempts = 0;
+
+// Simulates a flaky operation (fails first 2 times)
+const flakyOperation = () => {
+    attempts++;
+    if (attempts < 3) {
+        return Promise.reject(new Error('Flaky!'));
+    }
+    return Promise.resolve('success');
+};
+
+// Retry logic
+async function retry(fn, maxAttempts = 3) {
+    for (let i = 0; i < maxAttempts; i++) {
+        try {
+            return await fn();
+        } catch (e) {
+            if (i === maxAttempts - 1) throw e;
+        }
+    }
+}
+
+await retry(flakyOperation);
+const result = attempts;`,
+        expectedOutput: '3',
+        hints: ['Loop through attempts', 'Try each attempt, catch errors', 'Return on success, throw on final failure'],
+        tags: ['javascript', 'async', 'testing', 'retry', 'beginner'],
+    },
+];
+
+// ============================================================================
 // MAIN SEED FUNCTION
 // ============================================================================
+
 
 async function seedBeginnerChallenges() {
     console.log('🌱 Seeding Beginner tier challenges...\n');
 
     try {
         // Combine all challenges
-        const allChallenges = [...jsFundamentalsChallenges, ...domChallenges];
+        const allChallenges = [...jsFundamentalsChallenges, ...domChallenges, ...asyncChallenges];
 
         console.log('🔍 Checking for existing challenges...');
         const slugs = allChallenges.map(c => c.slug);
@@ -1305,8 +1635,41 @@ async function seedBeginnerChallenges() {
             console.log(`   ✅ ${challenge.order - 200}. ${challenge.title} (${challenge.xpReward} XP)`);
         }
 
+        console.log('\n⏳ Creating Async/Await challenges...');
+        for (const challenge of asyncChallenges) {
+            const [inserted] = await db.insert(challenges).values({
+                slug: challenge.slug,
+                title: challenge.title,
+                description: challenge.description,
+                type: challenge.type,
+                difficulty: challenge.difficulty,
+                category: challenge.category,
+                xpReward: challenge.xpReward,
+                order: challenge.order,
+                instructions: challenge.instructions,
+                htmlContent: challenge.htmlContent,
+                starterCode: challenge.starterCode,
+                hints: challenge.hints,
+                tags: challenge.tags,
+                isPublished: true,
+                completionCount: 0,
+            }).returning();
+
+            await db.insert(testCases).values({
+                challengeId: inserted.id,
+                description: 'Code should produce the expected output',
+                input: { code: challenge.starterCode },
+                expectedOutput: { value: challenge.expectedOutput },
+                isHidden: false,
+                order: 1,
+            });
+
+            console.log(`   ✅ ${challenge.order - 300}. ${challenge.title} (${challenge.xpReward} XP)`);
+        }
+
         const jsXP = jsFundamentalsChallenges.reduce((sum, c) => sum + c.xpReward, 0);
         const domXP = domChallenges.reduce((sum, c) => sum + c.xpReward, 0);
+        const asyncXP = asyncChallenges.reduce((sum, c) => sum + c.xpReward, 0);
 
         console.log('\n' + '='.repeat(50));
         console.log('✨ Beginner tier seeding complete!');
@@ -1314,7 +1677,8 @@ async function seedBeginnerChallenges() {
         console.log('📊 Summary:');
         console.log(`   • JavaScript Fundamentals: ${jsFundamentalsChallenges.length} challenges (${jsXP} XP)`);
         console.log(`   • DOM Understanding: ${domChallenges.length} challenges (${domXP} XP)`);
-        console.log(`   • Total: ${allChallenges.length} challenges (${jsXP + domXP} XP)`);
+        console.log(`   • Async/Await Basics: ${asyncChallenges.length} challenges (${asyncXP} XP)`);
+        console.log(`   • Total: ${allChallenges.length} challenges (${jsXP + domXP + asyncXP} XP)`);
         console.log('='.repeat(50));
 
     } catch (error) {
