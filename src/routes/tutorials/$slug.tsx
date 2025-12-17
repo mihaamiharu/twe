@@ -327,6 +327,26 @@ function TutorialDetailPage() {
                 .prose tbody td {
                     border-bottom: 1px solid hsl(var(--border));
                 }
+                
+                /* Pro Tip / Blockquote - Distinctive styling */
+                .prose blockquote {
+                    background-color: hsl(var(--primary) / 0.05);
+                    border-left: 4px solid hsl(var(--primary));
+                    padding: 1rem 1.5rem;
+                    margin: 1.5rem 0;
+                    border-radius: 0.5rem;
+                    font-style: normal;
+                }
+                
+                .prose blockquote p {
+                    margin: 0;
+                    color: hsl(var(--foreground) / 0.9);
+                }
+                
+                .prose blockquote strong {
+                    color: hsl(var(--primary));
+                    font-weight: 700;
+                }
 
                 /* Smooth scrollbar */
                 .prose::-webkit-scrollbar {
