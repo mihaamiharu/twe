@@ -99,12 +99,23 @@ function TutorialDetailPage() {
         const element = e.currentTarget;
         const scrollTop = element.scrollTop;
         const scrollHeight = element.scrollHeight - element.clientHeight;
-        const progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
+
+        // Ensure we can reach 100% - account for small rounding errors
+        let progress = 0;
+        if (scrollHeight <= 0) {
+            progress = 100; // Content fits without scrolling
+        } else {
+            progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
+            // If user is at or very near bottom, force 100%
+            if (scrollHeight - scrollTop < 10) {
+                progress = 100;
+            }
+        }
 
         if (progress !== readingProgress) {
             setReadingProgress(progress);
             // Update progress in DB (debounced)
-            if (progress % 10 === 0) {
+            if (progress % 10 === 0 || progress === 100) {
                 updateProgressMutation.mutate(progress);
             }
         }
@@ -203,8 +214,8 @@ function TutorialDetailPage() {
                         </div>
                     </div>
 
-                    {/* Progress Sidebar - Consistent card styling */}
-                    <div className="space-y-6">
+                    {/* Progress Sidebar - Sticky positioning */}
+                    <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
                         {/* Progress Card */}
                         <Card className="glass-card shadow-lg">
                             <CardHeader>
