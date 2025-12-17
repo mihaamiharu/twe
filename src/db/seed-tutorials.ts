@@ -68,6 +68,15 @@ async function seedTutorials() {
             contentFile: 'dom-manipulation-for-testing.md',
             order: 21,
         },
+        {
+            slug: 'async-await-basics',
+            title: 'Async/Await Basics for Testing',
+            description: 'Master asynchronous JavaScript for test automation.',
+            estimatedMinutes: 12,
+            tags: ['javascript', 'async', 'await', 'promises', 'beginner'],
+            contentFile: 'async-await-basics.md',
+            order: 22,
+        },
     ];
 
     try {
@@ -113,7 +122,7 @@ async function seedTutorials() {
         console.log(`📊 Summary:`);
         console.log(`   - Total tutorials: ${tutorialsData.length}`);
         console.log(`   - Basic tier (Selectors): 4`);
-        console.log(`   - Beginner tier (JS/DOM): 2`);
+        console.log(`   - Beginner tier (JS/DOM/Async): 3`);
         console.log('='.repeat(60));
     } catch (error) {
         console.error('❌ Seeding failed:', error);
