@@ -10,7 +10,7 @@ import { AlertCircle, Clock, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 import { Link } from '@tanstack/react-router';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 export const Route = createFileRoute('/tutorials/$slug')({
     component: TutorialDetailPage,
@@ -43,6 +43,7 @@ function TutorialDetailPage() {
     const { slug } = Route.useParams();
     const queryClient = useQueryClient();
     const [readingProgress, setReadingProgress] = useState(0);
+    const contentRef = useRef<HTMLDivElement>(null);
 
     const { data, isLoading, error } = useQuery<TutorialResponse>({
         queryKey: ['tutorial', slug],
@@ -95,20 +96,65 @@ function TutorialDetailPage() {
     });
 
     // Calculate reading progress based on scroll
+    // Skip tracking if tutorial already completed
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+        // Don't update progress if tutorial is already completed
+        if (tutorial?.userProgress?.isCompleted) {
+            return;
+        }
+
         const element = e.currentTarget;
         const scrollTop = element.scrollTop;
         const scrollHeight = element.scrollHeight - element.clientHeight;
-        const progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
+
+        // Ensure we can reach 100% - account for small rounding errors
+        let progress = 0;
+        if (scrollHeight <= 10) {
+            // Content fits without scrolling or very minimal scroll needed
+            progress = 100;
+        } else {
+            progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
+            // If user is at or very near bottom, force 100%
+            if (scrollHeight - scrollTop < 20) {
+                progress = 100;
+            }
+        }
 
         if (progress !== readingProgress) {
             setReadingProgress(progress);
-            // Update progress in DB (debounced)
-            if (progress % 10 === 0) {
+            // Update progress in DB (debounced) - only if not already completed
+            if ((progress % 10 === 0 || progress === 100) && !tutorial?.userProgress?.isCompleted) {
                 updateProgressMutation.mutate(progress);
             }
         }
     };
+
+    // For short tutorials that don't need scrolling, auto-detect on mount
+    useEffect(() => {
+        if (!tutorial || tutorial.userProgress?.isCompleted) {
+            return;
+        }
+
+        // Check if content needs scrolling after render
+        const checkContentHeight = () => {
+            if (contentRef.current) {
+                const element = contentRef.current;
+                const scrollHeight = element.scrollHeight - element.clientHeight;
+
+                // If content doesn't need scrolling, set progress to 100%
+                if (scrollHeight <= 10) {
+                    setReadingProgress(100);
+                }
+            }
+        };
+
+        // Small delay to ensure content is rendered
+        const timer = setTimeout(checkContentHeight, 100);
+        return () => clearTimeout(timer);
+    }, [tutorial]);
+
+    // Get display progress - always 100% for completed tutorials
+    const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : readingProgress || tutorial?.userProgress?.readingProgress || 0;
 
     // Loading state
     if (isLoading) {
@@ -191,6 +237,7 @@ function TutorialDetailPage() {
 
                         {/* Content - Direct on page, no card container */}
                         <div
+                            ref={contentRef}
                             className="prose prose-lg dark:prose-invert max-w-none max-h-[70vh] overflow-y-auto pr-4 scroll-smooth"
                             style={{
                                 lineHeight: '1.7',
@@ -203,8 +250,8 @@ function TutorialDetailPage() {
                         </div>
                     </div>
 
-                    {/* Progress Sidebar - Consistent card styling */}
-                    <div className="space-y-6">
+                    {/* Progress Sidebar - Sticky positioning */}
+                    <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
                         {/* Progress Card */}
                         <Card className="glass-card shadow-lg">
                             <CardHeader>
@@ -218,9 +265,9 @@ function TutorialDetailPage() {
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
                                         <span className="text-muted-foreground">Reading</span>
-                                        <span className="font-semibold text-primary">{currentProgress}%</span>
+                                        <span className="font-semibold text-primary">{displayProgress}%</span>
                                     </div>
-                                    <Progress value={currentProgress} className="h-3" />
+                                    <Progress value={displayProgress} className="h-3" />
                                 </div>
 
                                 {/* Mark as Complete Button */}
@@ -282,6 +329,20 @@ function TutorialDetailPage() {
 
             {/* Custom styles for better code snippet readability */}
             <style>{`
+                /* Hide H1 in markdown since we show title separately */
+                .prose h1 {
+                    display: none;
+                }
+                
+                /* Better text contrast for dark mode */
+                .prose {
+                    color: hsl(var(--foreground) / 0.95);
+                }
+                
+                .prose p {
+                    color: hsl(var(--foreground) / 0.85);
+                }
+
                 .prose code {
                     background-color: hsl(var(--muted));
                     color: hsl(var(--foreground));
@@ -290,23 +351,65 @@ function TutorialDetailPage() {
                     font-weight: 600;
                     font-size: 0.9em;
                 }
-                
+
                 .prose pre {
                     background-color: hsl(var(--muted));
                     border: 1px solid hsl(var(--border));
                 }
-                
+
                 .prose pre code {
                     background-color: transparent;
                     padding: 0;
                     font-weight: 400;
                 }
+
+                /* Table headers - Bold and dark for contrast */
+                .prose thead th {
+                    font-weight: 700;
+                    color: hsl(var(--foreground));
+                    background-color: hsl(var(--muted));
+                    border-bottom: 2px solid hsl(var(--border));
+                }
+
+                .prose tbody td {
+                    border-bottom: 1px solid hsl(var(--border));
+                }
                 
+                /* Pro Tip / Blockquote - Distinctive dark mode styling */
+                .dark .prose blockquote {
+                    background-color: rgb(124 58 237 / 0.2);
+                    border-left: 4px solid hsl(var(--primary));
+                    padding: 1rem 1.5rem;
+                    margin: 1.5rem 0;
+                    border-radius: 0.5rem;
+                    border: 1px solid rgb(124 58 237 / 0.3);
+                }
+                
+                /* Pro Tip / Blockquote - Distinctive styling */
+                .prose blockquote {
+                    background-color: hsl(var(--primary) / 0.05);
+                    border-left: 4px solid hsl(var(--primary));
+                    padding: 1rem 1.5rem;
+                    margin: 1.5rem 0;
+                    border-radius: 0.5rem;
+                    font-style: normal;
+                }
+                
+                .prose blockquote p {
+                    margin: 0;
+                    color: hsl(var(--foreground) / 0.95);
+                }
+                
+                .prose blockquote strong {
+                    color: hsl(var(--primary));
+                    font-weight: 700;
+                }
+
                 /* Smooth scrollbar */
                 .prose::-webkit-scrollbar {
                     width: 8px;
                 }
-                
+
                 .prose::-webkit-scrollbar-track {
                     background: transparent;
                 }
