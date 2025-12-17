@@ -1,5 +1,5 @@
 /**
- * Seed database with 4 new tutorials supporting Basic tier challenges
+ * Seed database with tutorials supporting Basic and Beginner tier challenges
  */
 
 import { db } from './index';
@@ -49,6 +49,25 @@ async function seedTutorials() {
             contentFile: 'selector-decision-framework.md',
             order: 13,
         },
+        // Beginner tier (JavaScript) tutorials
+        {
+            slug: 'javascript-fundamentals-for-qa',
+            title: 'JavaScript Fundamentals for QA',
+            description: 'Master the JavaScript essentials you need for test automation.',
+            estimatedMinutes: 20,
+            tags: ['javascript', 'fundamentals', 'qa', 'automation', 'beginner'],
+            contentFile: 'javascript-fundamentals-for-qa.md',
+            order: 20,
+        },
+        {
+            slug: 'dom-manipulation-for-testing',
+            title: 'DOM Manipulation for Testing',
+            description: 'Learn to find and interact with DOM elements for test automation.',
+            estimatedMinutes: 15,
+            tags: ['javascript', 'dom', 'testing', 'automation', 'beginner'],
+            contentFile: 'dom-manipulation-for-testing.md',
+            order: 21,
+        },
     ];
 
     try {
@@ -93,9 +112,8 @@ async function seedTutorials() {
         console.log('='.repeat(60));
         console.log(`📊 Summary:`);
         console.log(`   - Total tutorials: ${tutorialsData.length}`);
-        console.log(`   - CSS-focused: 1`);
-        console.log(`   - XPath-focused: 1`);
-        console.log(`   - Best Practices: 2`);
+        console.log(`   - Basic tier (Selectors): 4`);
+        console.log(`   - Beginner tier (JS/DOM): 2`);
         console.log('='.repeat(60));
     } catch (error) {
         console.error('❌ Seeding failed:', error);
