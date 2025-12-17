@@ -201,6 +201,20 @@ function TutorialDetailPage() {
                         >
                             <MarkdownRenderer content={tutorial.content} />
                         </div>
+
+                        {/* Primary CTA after content */}
+                        <div className="mt-12 p-8 rounded-xl border-2 border-primary/20 bg-gradient-to-br from-primary/10 to-accent/10">
+                            <h2 className="text-2xl font-bold mb-3">Ready to Practice?</h2>
+                            <p className="text-muted-foreground mb-6">
+                                Put your knowledge to the test with hands-on challenges. Apply what you've learned and master these concepts through practice.
+                            </p>
+                            <Link to="/challenges">
+                                <Button size="lg" className="shadow-lg hover:shadow-xl transition-all">
+                                    Browse Challenges
+                                    <ArrowLeft className="h-5 w-5 ml-2 rotate-180" />
+                                </Button>
+                            </Link>
+                        </div>
                     </div>
 
                     {/* Progress Sidebar - Consistent card styling */}
@@ -290,23 +304,35 @@ function TutorialDetailPage() {
                     font-weight: 600;
                     font-size: 0.9em;
                 }
-                
+
                 .prose pre {
                     background-color: hsl(var(--muted));
                     border: 1px solid hsl(var(--border));
                 }
-                
+
                 .prose pre code {
                     background-color: transparent;
                     padding: 0;
                     font-weight: 400;
                 }
-                
+
+                /* Table headers - Bold and dark for contrast */
+                .prose thead th {
+                    font-weight: 700;
+                    color: hsl(var(--foreground));
+                    background-color: hsl(var(--muted));
+                    border-bottom: 2px solid hsl(var(--border));
+                }
+
+                .prose tbody td {
+                    border-bottom: 1px solid hsl(var(--border));
+                }
+
                 /* Smooth scrollbar */
                 .prose::-webkit-scrollbar {
                     width: 8px;
                 }
-                
+
                 .prose::-webkit-scrollbar-track {
                     background: transparent;
                 }
