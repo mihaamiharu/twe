@@ -135,7 +135,7 @@ function ProfilePage() {
     const levelProgress = neededXp > 0 ? (progressXp / neededXp) * 100 : 100;
 
     return (
-        <div className="min-h-screen p-6 md:p-10">
+        <div className="min-h-screen p-6 md:p-10 page-transition">
             <div className="max-w-6xl mx-auto">
                 {/* Profile Header */}
                 <Card className="glass-card mb-8">
@@ -174,28 +174,28 @@ function ProfilePage() {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                    <Card className="glass-card">
+                    <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <BookOpen className="h-8 w-8 text-primary mx-auto mb-2" />
                             <div className="text-2xl font-bold">{user.stats?.tutorialsCompleted ?? 0}</div>
                             <div className="text-sm text-muted-foreground">Tutorials</div>
                         </CardContent>
                     </Card>
-                    <Card className="glass-card">
+                    <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Code className="h-8 w-8 text-primary mx-auto mb-2" />
                             <div className="text-2xl font-bold">{user.stats?.challengesCompleted ?? 0}</div>
                             <div className="text-sm text-muted-foreground">Challenges</div>
                         </CardContent>
                     </Card>
-                    <Card className="glass-card">
+                    <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Zap className="h-8 w-8 text-accent mx-auto mb-2" />
                             <div className="text-2xl font-bold">{(user.stats?.totalXp ?? user.xp).toLocaleString()}</div>
                             <div className="text-sm text-muted-foreground">Total XP</div>
                         </CardContent>
                     </Card>
-                    <Card className="glass-card">
+                    <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
                             <div className="text-2xl font-bold">{user.stats?.currentStreak ?? 0}</div>
@@ -342,9 +342,9 @@ function ProfilePage() {
                         ) : (
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {user.recentAchievements.map((achievement, index) => (
-                                    <Card key={index} className="glass-card">
+                                    <Card key={index} className="glass-card card-hover">
                                         <CardContent className="p-6 text-center">
-                                            <div className="text-4xl mb-3">{achievement.icon}</div>
+                                            <div className="text-4xl mb-3 animate-scale-in" style={{ animationDelay: `${index * 100}ms` }}>{achievement.icon}</div>
                                             <h3 className="font-semibold mb-1">{achievement.name}</h3>
                                             <p className="text-sm text-muted-foreground">{achievement.description}</p>
                                         </CardContent>

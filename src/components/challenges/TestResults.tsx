@@ -104,7 +104,7 @@ export function TestResults({
     }
 
     return (
-        <div className={cn('rounded-lg border border-border bg-card overflow-hidden', className)}>
+        <div className={cn('rounded-lg border border-border bg-card overflow-hidden animate-fade-in', className)}>
             {/* Header with Summary */}
             <div className={cn(
                 'px-4 py-3 border-b border-border flex items-center justify-between',
