@@ -34,12 +34,46 @@ const typeConfig: Record<string, { color: string; icon: React.ReactNode; label: 
     },
 };
 
-// Category labels
+// Category labels - expanded for all tiers
 const categoryLabels: Record<string, string> = {
+    // Tier 1: Basic (Selectors)
     'css-basics': '📘 CSS Basics',
     'xpath-basics': '📙 XPath Basics',
     'selector-comparison': '📗 CSS vs XPath',
+    // Tier 2: Beginner (JavaScript)
+    'javascript': '📒 JavaScript Fundamentals',
+    'dom': '📓 DOM Understanding',
+    'async-await': '📔 Async/Await',
+    // Tier 3: Intermediate (Playwright Basics)
+    'playwright-navigation': '🎭 Navigation & Actions',
+    'playwright-locators': '🔍 Locators',
+    'playwright-assertions': '✅ Assertions',
+    'playwright-waits': '⏳ Wait Strategies',
+    // Tier 4: Expert (Advanced)
+    'playwright-pom': '🏗️ Page Object Model',
+    'playwright-data-driven': '📊 Data-Driven Testing',
+    'playwright-advanced': '🚀 Advanced Patterns',
 };
+
+// Tier labels
+const tierLabels: Record<string, { name: string; color: string }> = {
+    basic: { name: '🟢 Basic', color: 'text-green-400' },
+    beginner: { name: '🟡 Beginner', color: 'text-yellow-400' },
+    intermediate: { name: '🟠 Intermediate', color: 'text-orange-400' },
+    expert: { name: '🔴 Expert', color: 'text-red-400' },
+};
+
+// Get tier from category
+function getTierFromCategory(category?: string): string {
+    if (!category) return 'basic';
+    if (category.startsWith('css-') || category.startsWith('xpath-') || category.startsWith('selector')) return 'basic';
+    if (category === 'javascript' || category === 'dom' || category === 'async-await') return 'beginner';
+    if (category.startsWith('playwright-navigation') || category.startsWith('playwright-locators') ||
+        category.startsWith('playwright-assertions') || category.startsWith('playwright-waits')) return 'intermediate';
+    if (category.startsWith('playwright-pom') || category.startsWith('playwright-data') ||
+        category.startsWith('playwright-advanced')) return 'expert';
+    return 'basic';
+}
 
 // Difficulty colors
 const difficultyColors: Record<string, string> = {
@@ -75,6 +109,8 @@ interface ChallengesResponse {
 
 function ChallengesPage() {
     const [filterType, setFilterType] = useState<string>('all');
+    const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
+    const [filterTier, setFilterTier] = useState<string>('all');
 
     const { data, isLoading, error } = useQuery<ChallengesResponse>({
         queryKey: ['challenges'],
@@ -87,11 +123,15 @@ function ChallengesPage() {
 
     const challenges = data?.data ?? [];
 
-    // Filter challenges by type
+    // Filter challenges by type, difficulty, and tier
     const filteredChallenges = useMemo(() => {
-        if (filterType === 'all') return challenges;
-        return challenges.filter(c => c.type === filterType);
-    }, [challenges, filterType]);
+        return challenges.filter(c => {
+            if (filterType !== 'all' && c.type !== filterType) return false;
+            if (filterDifficulty !== 'all' && c.difficulty !== filterDifficulty) return false;
+            if (filterTier !== 'all' && getTierFromCategory(c.category) !== filterTier) return false;
+            return true;
+        });
+    }, [challenges, filterType, filterDifficulty, filterTier]);
 
     // Group challenges by category
     const challengesByCategory = useMemo(() => {
@@ -133,7 +173,7 @@ function ChallengesPage() {
                 {totalChallenges > 0 && (
                     <div className="mb-8 p-4 rounded-lg bg-card border border-border">
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium">Basic Tier Progress</span>
+                            <span className="text-sm font-medium">Overall Progress</span>
                             <span className="text-sm text-muted-foreground">
                                 {completedChallenges} / {totalChallenges} completed ({progressPercent}%)
                             </span>
@@ -148,28 +188,85 @@ function ChallengesPage() {
                 )}
 
                 {/* Filters */}
-                <div className="flex flex-wrap gap-2 mb-8">
-                    <Badge
-                        variant="outline"
-                        className={`cursor-pointer transition-all ${filterType === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/20'}`}
-                        onClick={() => setFilterType('all')}
-                    >
-                        All ({challenges.length})
-                    </Badge>
-                    {Object.entries(typeConfig).map(([type, config]) => {
-                        const count = challenges.filter(c => c.type === type).length;
-                        if (count === 0) return null;
-                        return (
-                            <Badge
-                                key={type}
-                                variant="outline"
-                                className={`cursor-pointer transition-all ${filterType === type ? config.color : 'hover:bg-primary/20'}`}
-                                onClick={() => setFilterType(type)}
-                            >
-                                {config.label} ({count})
-                            </Badge>
-                        );
-                    })}
+                <div className="space-y-4 mb-8">
+                    {/* Type Filter */}
+                    <div className="flex flex-wrap gap-2">
+                        <span className="text-sm text-muted-foreground self-center mr-2">Type:</span>
+                        <Badge
+                            variant="outline"
+                            className={`cursor-pointer transition-all ${filterType === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/20'}`}
+                            onClick={() => setFilterType('all')}
+                        >
+                            All
+                        </Badge>
+                        {Object.entries(typeConfig).map(([type, config]) => {
+                            const count = challenges.filter(c => c.type === type).length;
+                            if (count === 0) return null;
+                            return (
+                                <Badge
+                                    key={type}
+                                    variant="outline"
+                                    className={`cursor-pointer transition-all ${filterType === type ? config.color : 'hover:bg-primary/20'}`}
+                                    onClick={() => setFilterType(type)}
+                                >
+                                    {config.icon}
+                                    <span className="ml-1">{config.label} ({count})</span>
+                                </Badge>
+                            );
+                        })}
+                    </div>
+
+                    {/* Difficulty Filter */}
+                    <div className="flex flex-wrap gap-2">
+                        <span className="text-sm text-muted-foreground self-center mr-2">Difficulty:</span>
+                        <Badge
+                            variant="outline"
+                            className={`cursor-pointer transition-all ${filterDifficulty === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/20'}`}
+                            onClick={() => setFilterDifficulty('all')}
+                        >
+                            All
+                        </Badge>
+                        {['EASY', 'MEDIUM', 'HARD'].map(diff => {
+                            const count = challenges.filter(c => c.difficulty === diff).length;
+                            if (count === 0) return null;
+                            return (
+                                <Badge
+                                    key={diff}
+                                    variant="outline"
+                                    className={`cursor-pointer transition-all ${filterDifficulty === diff ? difficultyColors[diff] : 'hover:bg-primary/20'}`}
+                                    onClick={() => setFilterDifficulty(diff)}
+                                >
+                                    {diff} ({count})
+                                </Badge>
+                            );
+                        })}
+                    </div>
+
+                    {/* Tier Filter */}
+                    <div className="flex flex-wrap gap-2">
+                        <span className="text-sm text-muted-foreground self-center mr-2">Tier:</span>
+                        <Badge
+                            variant="outline"
+                            className={`cursor-pointer transition-all ${filterTier === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/20'}`}
+                            onClick={() => setFilterTier('all')}
+                        >
+                            All Tiers
+                        </Badge>
+                        {Object.entries(tierLabels).map(([tier, { name, color }]) => {
+                            const count = challenges.filter(c => getTierFromCategory(c.category) === tier).length;
+                            if (count === 0) return null;
+                            return (
+                                <Badge
+                                    key={tier}
+                                    variant="outline"
+                                    className={`cursor-pointer transition-all ${filterTier === tier ? `bg-${tier === 'basic' ? 'green' : tier === 'beginner' ? 'yellow' : tier === 'intermediate' ? 'orange' : 'red'}-500/20 ${color}` : 'hover:bg-primary/20'}`}
+                                    onClick={() => setFilterTier(tier)}
+                                >
+                                    {name} ({count})
+                                </Badge>
+                            );
+                        })}
+                    </div>
                 </div>
 
                 {/* Loading State */}
@@ -235,8 +332,8 @@ function ChallengesPage() {
                                                 className="group"
                                             >
                                                 <Card className={`h-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 ${challenge.isCompleted
-                                                        ? 'border-green-500/30 bg-green-500/5'
-                                                        : 'glass-card hover:border-primary/50'
+                                                    ? 'border-green-500/30 bg-green-500/5'
+                                                    : 'glass-card hover:border-primary/50'
                                                     }`}>
                                                     <CardHeader className="pb-2">
                                                         <div className="flex items-start justify-between gap-2">
