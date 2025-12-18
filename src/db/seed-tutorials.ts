@@ -77,6 +77,42 @@ async function seedTutorials() {
             contentFile: 'async-await-basics.md',
             order: 22,
         },
+        {
+            slug: 'playwright-navigation-actions',
+            title: 'Playwright Navigation & Actions',
+            description: 'Master page navigation and user interactions with Playwright.',
+            estimatedMinutes: 15,
+            tags: ['playwright', 'navigation', 'actions', 'intermediate'],
+            contentFile: 'playwright-navigation-actions.md',
+            order: 30,
+        },
+        {
+            slug: 'playwright-locators',
+            title: 'Playwright Locators',
+            description: 'Master the art of finding elements with Playwright locator API.',
+            estimatedMinutes: 12,
+            tags: ['playwright', 'locators', 'selectors', 'intermediate'],
+            contentFile: 'playwright-locators.md',
+            order: 31,
+        },
+        {
+            slug: 'playwright-assertions',
+            title: 'Playwright Assertions',
+            description: 'Verify your test expectations with Playwright assertions.',
+            estimatedMinutes: 10,
+            tags: ['playwright', 'assertions', 'expect', 'intermediate'],
+            contentFile: 'playwright-assertions.md',
+            order: 32,
+        },
+        {
+            slug: 'playwright-waits',
+            title: 'Playwright Wait Strategies',
+            description: 'Master timing and synchronization in Playwright tests.',
+            estimatedMinutes: 10,
+            tags: ['playwright', 'waits', 'async', 'intermediate'],
+            contentFile: 'playwright-waits.md',
+            order: 33,
+        },
     ];
 
     try {

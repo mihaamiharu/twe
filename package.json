@@ -17,7 +17,8 @@
     "db:seed": "bun run src/db/seed.ts",
     "db:seed:basic": "bun run src/db/seed-basic-challenges.ts",
     "db:seed:tutorials": "bun run src/db/seed-tutorials.ts",
-    "db:seed:beginner": "bun run src/db/seed-beginner-challenges.ts"
+    "db:seed:beginner": "bun run src/db/seed-beginner-challenges.ts",
+    "db:seed:intermediate": "bun run src/db/seed-intermediate-challenges.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.2.8",
