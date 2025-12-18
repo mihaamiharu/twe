@@ -205,11 +205,89 @@ function ProfilePage() {
                 </div>
 
                 {/* Tabs */}
-                <Tabs defaultValue="activity">
+                <Tabs defaultValue="progress">
                     <TabsList>
+                        <TabsTrigger value="progress">Tier Progress</TabsTrigger>
                         <TabsTrigger value="activity">Recent Activity</TabsTrigger>
                         <TabsTrigger value="achievements">Achievements</TabsTrigger>
                     </TabsList>
+
+                    <TabsContent value="progress" className="mt-6">
+                        <Card className="glass-card">
+                            <CardHeader>
+                                <CardTitle>Tier Progress</CardTitle>
+                                <CardDescription>Your progress across all learning tiers</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-6">
+                                {/* Tier: Basic */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xl">🟢</span>
+                                            <span className="font-medium">Basic (Selectors)</span>
+                                        </div>
+                                        <Badge variant="secondary">15 challenges</Badge>
+                                    </div>
+                                    <Progress value={Math.min((user.stats?.challengesCompleted ?? 0) / 15 * 100, 100)} className="h-2" />
+                                </div>
+
+                                {/* Tier: Beginner */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xl">🟡</span>
+                                            <span className="font-medium">Beginner (JavaScript)</span>
+                                        </div>
+                                        <Badge variant="secondary">23 challenges</Badge>
+                                    </div>
+                                    <Progress value={Math.min(Math.max((user.stats?.challengesCompleted ?? 0) - 15, 0) / 23 * 100, 100)} className="h-2" />
+                                </div>
+
+                                {/* Tier: Intermediate */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xl">🟠</span>
+                                            <span className="font-medium">Intermediate (Playwright)</span>
+                                        </div>
+                                        <Badge variant="secondary">32 challenges</Badge>
+                                    </div>
+                                    <Progress value={Math.min(Math.max((user.stats?.challengesCompleted ?? 0) - 38, 0) / 32 * 100, 100)} className="h-2" />
+                                </div>
+
+                                {/* Tier: Expert */}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xl">🔴</span>
+                                            <span className="font-medium">Expert (Advanced)</span>
+                                        </div>
+                                        <Badge variant="secondary">18 challenges</Badge>
+                                    </div>
+                                    <Progress value={Math.min(Math.max((user.stats?.challengesCompleted ?? 0) - 70, 0) / 18 * 100, 100)} className="h-2" />
+                                </div>
+
+                                {/* XP Milestones */}
+                                <div className="mt-8 pt-6 border-t border-border">
+                                    <h4 className="font-medium mb-4 flex items-center gap-2">
+                                        <Zap className="h-4 w-4 text-accent" />
+                                        XP Milestones
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {[100, 500, 1000, 2500, 5000].map(milestone => (
+                                            <Badge
+                                                key={milestone}
+                                                variant={(user.xp ?? 0) >= milestone ? "default" : "outline"}
+                                                className={(user.xp ?? 0) >= milestone ? "bg-accent text-accent-foreground" : "opacity-50"}
+                                            >
+                                                {(user.xp ?? 0) >= milestone ? "✓" : ""} {milestone.toLocaleString()} XP
+                                            </Badge>
+                                        ))}
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
 
                     <TabsContent value="activity" className="mt-6">
                         <Card className="glass-card">
@@ -258,6 +336,7 @@ function ProfilePage() {
                                 <CardContent className="p-8 text-center text-muted-foreground">
                                     <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />
                                     <p>No achievements yet. Complete challenges to earn badges!</p>
+                                    <p className="text-sm mt-2">15 badges available to unlock</p>
                                 </CardContent>
                             </Card>
                         ) : (
