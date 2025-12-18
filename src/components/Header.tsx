@@ -57,7 +57,7 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-8">
-              <Link to="/" className="flex items-center gap-2">
+              <Link to="/" className="flex items-center gap-2 btn-animate">
                 <img src="/logo.jpg" alt="Logo" className="h-8 w-8 rounded-lg" />
                 <span className="text-xl font-bold gradient-text">
                   TestingWithEkki
@@ -70,10 +70,10 @@ export function Header() {
                   <Link
                     key={link.href}
                     to={link.href}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all btn-animate"
                     activeProps={{
                       className:
-                        'flex items-center gap-2 px-4 py-2 rounded-lg text-primary bg-primary/10 font-medium',
+                        'flex items-center gap-2 px-4 py-2 rounded-lg text-primary bg-primary/10 font-medium scale-[1.02]',
                     }}
                   >
                     <link.icon className="h-4 w-4" />
@@ -184,10 +184,10 @@ export function Header() {
                   key={link.href}
                   to={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors btn-animate"
                   activeProps={{
                     className:
-                      'flex items-center gap-3 p-3 rounded-lg text-primary bg-primary/10 font-medium',
+                      'flex items-center gap-3 p-3 rounded-lg text-primary bg-primary/10 font-medium pl-4 border-l-2 border-primary',
                   }}
                 >
                   <link.icon className="h-5 w-5" />

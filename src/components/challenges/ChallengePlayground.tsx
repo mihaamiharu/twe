@@ -215,7 +215,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
     }, []);
 
     return (
-        <div className={cn('flex flex-col h-full bg-background', className)}>
+        <div className={cn('flex flex-col h-full bg-background animate-fade-in', className)}>
             {/* Header */}
             <div className="border-b border-border bg-card/50 px-4 py-3 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
@@ -232,7 +232,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={handleReset} className="text-muted-foreground hover:text-foreground">
+                    <Button variant="ghost" size="sm" onClick={handleReset} className="text-muted-foreground hover:text-foreground btn-animate">
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Reset
                     </Button>
@@ -241,7 +241,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                         onClick={handleSubmit}
                         disabled={!hasPassed}
                         className={cn(
-                            "shadow-md transition-all",
+                            "shadow-md transition-all btn-animate",
                             hasPassed
                                 ? "bg-green-600 hover:bg-green-700 text-white"
                                 : "opacity-50 cursor-not-allowed"
@@ -353,7 +353,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                                                     size="sm"
                                                     onClick={handleValidateSelector}
                                                     disabled={isRunning || !selector}
-                                                    className="w-full sm:w-auto"
+                                                    className="w-full sm:w-auto btn-animate"
                                                 >
                                                     {isRunning ? (
                                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -392,7 +392,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                                             size="sm"
                                             onClick={handleRunCode}
                                             disabled={isRunning}
-                                            className="w-full sm:w-auto"
+                                            className="w-full sm:w-auto btn-animate"
                                         >
                                             {isRunning ? (
                                                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -418,8 +418,8 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 
