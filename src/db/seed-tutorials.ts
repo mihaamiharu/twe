@@ -1,5 +1,5 @@
 /**
- * Seed database with 4 new tutorials supporting Basic tier challenges
+ * Seed database with tutorials supporting Basic and Beginner tier challenges
  */
 
 import { db } from './index';
@@ -49,6 +49,70 @@ async function seedTutorials() {
             contentFile: 'selector-decision-framework.md',
             order: 13,
         },
+        // Beginner tier (JavaScript) tutorials
+        {
+            slug: 'javascript-fundamentals-for-qa',
+            title: 'JavaScript Fundamentals for QA',
+            description: 'Master the JavaScript essentials you need for test automation.',
+            estimatedMinutes: 20,
+            tags: ['javascript', 'fundamentals', 'qa', 'automation', 'beginner'],
+            contentFile: 'javascript-fundamentals-for-qa.md',
+            order: 20,
+        },
+        {
+            slug: 'dom-manipulation-for-testing',
+            title: 'DOM Manipulation for Testing',
+            description: 'Learn to find and interact with DOM elements for test automation.',
+            estimatedMinutes: 15,
+            tags: ['javascript', 'dom', 'testing', 'automation', 'beginner'],
+            contentFile: 'dom-manipulation-for-testing.md',
+            order: 21,
+        },
+        {
+            slug: 'async-await-basics',
+            title: 'Async/Await Basics for Testing',
+            description: 'Master asynchronous JavaScript for test automation.',
+            estimatedMinutes: 12,
+            tags: ['javascript', 'async', 'await', 'promises', 'beginner'],
+            contentFile: 'async-await-basics.md',
+            order: 22,
+        },
+        {
+            slug: 'playwright-navigation-actions',
+            title: 'Playwright Navigation & Actions',
+            description: 'Master page navigation and user interactions with Playwright.',
+            estimatedMinutes: 15,
+            tags: ['playwright', 'navigation', 'actions', 'intermediate'],
+            contentFile: 'playwright-navigation-actions.md',
+            order: 30,
+        },
+        {
+            slug: 'playwright-locators',
+            title: 'Playwright Locators',
+            description: 'Master the art of finding elements with Playwright locator API.',
+            estimatedMinutes: 12,
+            tags: ['playwright', 'locators', 'selectors', 'intermediate'],
+            contentFile: 'playwright-locators.md',
+            order: 31,
+        },
+        {
+            slug: 'playwright-assertions',
+            title: 'Playwright Assertions',
+            description: 'Verify your test expectations with Playwright assertions.',
+            estimatedMinutes: 10,
+            tags: ['playwright', 'assertions', 'expect', 'intermediate'],
+            contentFile: 'playwright-assertions.md',
+            order: 32,
+        },
+        {
+            slug: 'playwright-waits',
+            title: 'Playwright Wait Strategies',
+            description: 'Master timing and synchronization in Playwright tests.',
+            estimatedMinutes: 10,
+            tags: ['playwright', 'waits', 'async', 'intermediate'],
+            contentFile: 'playwright-waits.md',
+            order: 33,
+        },
     ];
 
     try {
@@ -93,9 +157,8 @@ async function seedTutorials() {
         console.log('='.repeat(60));
         console.log(`📊 Summary:`);
         console.log(`   - Total tutorials: ${tutorialsData.length}`);
-        console.log(`   - CSS-focused: 1`);
-        console.log(`   - XPath-focused: 1`);
-        console.log(`   - Best Practices: 2`);
+        console.log(`   - Basic tier (Selectors): 4`);
+        console.log(`   - Beginner tier (JS/DOM/Async): 3`);
         console.log('='.repeat(60));
     } catch (error) {
         console.error('❌ Seeding failed:', error);
