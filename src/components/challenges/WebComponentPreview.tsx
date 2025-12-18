@@ -28,6 +28,8 @@ export interface WebComponentPreviewProps {
     showControls?: boolean;
     height?: string | number;
     className?: string;
+    /** Expose iframe ref for external access (e.g., for code execution) */
+    iframeRef?: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export function WebComponentPreview({
@@ -42,9 +44,11 @@ export function WebComponentPreview({
     showControls = true,
     height = 300,
     className,
+    iframeRef: externalIframeRef,
     ...props
 }: WebComponentPreviewProps) {
-    const iframeRef = useRef<HTMLIFrameElement>(null);
+    const internalIframeRef = useRef<HTMLIFrameElement>(null);
+    const iframeRef = externalIframeRef || internalIframeRef;
     const [zoom, setZoom] = useState(100);
     const [hoveredElement, setHoveredElement] = useState<string | null>(null);
     const [isFullscreen, setIsFullscreen] = useState(false);

@@ -34,30 +34,39 @@ export interface TestCaseResult {
 
 /**
  * Execute user code in an isolated iframe environment
+ * If existingIframe is provided, use it instead of creating a new one
  */
 export async function executePlaywrightCode(
     code: string,
     htmlContent: string,
-    options?: ExecuteOptions
+    options?: ExecuteOptions & { existingIframe?: HTMLIFrameElement }
 ): Promise<ExecutionResult> {
     const timeout = options?.timeout || 10000;
     const startTime = Date.now();
+    const useExistingIframe = !!options?.existingIframe;
 
     return new Promise((resolve) => {
-        // Create isolated iframe
-        const iframe = document.createElement('iframe');
-        iframe.style.cssText = `
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      width: 400px;
-      height: 300px;
-      border: 1px solid #333;
-      background: white;
-      z-index: 9999;
-    `;
-        iframe.sandbox.add('allow-scripts', 'allow-same-origin');
-        document.body.appendChild(iframe);
+        let iframe: HTMLIFrameElement;
+
+        if (useExistingIframe && options?.existingIframe) {
+            // Use existing iframe - re-inject HTML content
+            iframe = options.existingIframe;
+        } else {
+            // Create isolated iframe (fallback behavior)
+            iframe = document.createElement('iframe');
+            iframe.style.cssText = `
+                position: fixed;
+                bottom: 0;
+                right: 0;
+                width: 400px;
+                height: 300px;
+                border: 1px solid #333;
+                background: white;
+                z-index: 9999;
+            `;
+            iframe.sandbox.add('allow-scripts', 'allow-same-origin');
+            document.body.appendChild(iframe);
+        }
 
         // Timeout handler
         const timeoutId = setTimeout(() => {
@@ -72,14 +81,14 @@ export async function executePlaywrightCode(
 
         const cleanup = () => {
             clearTimeout(timeoutId);
-            if (iframe.parentNode) {
+            // Only remove if we created it
+            if (!useExistingIframe && iframe.parentNode) {
                 document.body.removeChild(iframe);
             }
         };
 
         try {
-            // Wait for iframe to be ready
-            iframe.onload = async () => {
+            const executeCode = async () => {
                 try {
                     // Inject HTML into iframe
                     const iframeDoc = iframe.contentDocument;
@@ -90,24 +99,24 @@ export async function executePlaywrightCode(
                     // Set up the HTML content
                     iframeDoc.open();
                     iframeDoc.write(`
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="utf-8">
-                <style>
-                  * { box-sizing: border-box; }
-                  body { 
-                    font-family: system-ui, sans-serif; 
-                    padding: 16px;
-                    margin: 0;
-                  }
-                </style>
-              </head>
-              <body>
-                ${htmlContent}
-              </body>
-            </html>
-          `);
+                        <!DOCTYPE html>
+                        <html>
+                          <head>
+                            <meta charset="utf-8">
+                            <style>
+                              * { box-sizing: border-box; }
+                              body { 
+                                font-family: system-ui, sans-serif; 
+                                padding: 16px;
+                                margin: 0;
+                              }
+                            </style>
+                          </head>
+                          <body>
+                            ${htmlContent}
+                          </body>
+                        </html>
+                    `);
                     iframeDoc.close();
 
                     // Create mocked page object
@@ -118,10 +127,10 @@ export async function executePlaywrightCode(
                         'page',
                         'expect',
                         `
-            return (async () => {
-              ${code}
-            })();
-          `
+                            return (async () => {
+                              ${code}
+                            })();
+                        `
                     );
 
                     // Simple expect function
@@ -151,8 +160,15 @@ export async function executePlaywrightCode(
                 }
             };
 
-            // Trigger load event by setting src
-            iframe.src = 'about:blank';
+            if (useExistingIframe) {
+                // Execute immediately for existing iframe
+                executeCode();
+            } else {
+                // Wait for iframe to be ready
+                iframe.onload = executeCode;
+                // Trigger load event by setting src
+                iframe.src = 'about:blank';
+            }
         } catch (error) {
             const executionTime = Date.now() - startTime;
             cleanup();

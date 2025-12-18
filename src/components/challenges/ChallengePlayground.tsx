@@ -11,7 +11,7 @@
  * - Responsive tabs on mobile
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,16 +77,26 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
     // State to store real-time validation result from preview
     const [previewValidation, setPreviewValidation] = useState<{ isValid: boolean; matchCount: number } | null>(null);
 
-    // Run code for Playwright/JS challenges
+    // Ref for the preview iframe (used for in-tab code execution)
+    const previewIframeRef = useRef<HTMLIFrameElement>(null);
+
+    // Run code for Playwright/JS challenges - now executes in the preview tab
     const handleRunCode = useCallback(async () => {
         if (!isCodeChallenge || !challenge.htmlContent) return;
+
+        // Switch to preview tab to show execution
+        setActiveTab('preview');
 
         setIsRunning(true);
         setTestResults([]);
 
+        // Small delay to ensure tab switch completes
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         try {
             const result = await executePlaywrightCode(code, challenge.htmlContent, {
                 timeout: 10000,
+                existingIframe: previewIframeRef.current || undefined,
             });
 
             const testResult: TestResult = {
@@ -310,6 +320,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                                     className="flex-1 shadow-sm"
                                     showControls={true}
                                     height="100%"
+                                    iframeRef={previewIframeRef}
                                 />
                             </TabsContent>
                         )}
