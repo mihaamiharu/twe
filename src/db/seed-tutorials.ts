@@ -113,6 +113,33 @@ async function seedTutorials() {
             contentFile: 'playwright-waits.md',
             order: 33,
         },
+        {
+            slug: 'playwright-pom',
+            title: 'Page Object Model',
+            description: 'Design pattern for maintainable test automation.',
+            estimatedMinutes: 12,
+            tags: ['playwright', 'pom', 'patterns', 'expert'],
+            contentFile: 'playwright-pom.md',
+            order: 40,
+        },
+        {
+            slug: 'playwright-data-driven',
+            title: 'Data-Driven Testing',
+            description: 'Run tests with external data for comprehensive coverage.',
+            estimatedMinutes: 10,
+            tags: ['playwright', 'data-driven', 'parameterized', 'expert'],
+            contentFile: 'playwright-data-driven.md',
+            order: 41,
+        },
+        {
+            slug: 'playwright-advanced-patterns',
+            title: 'Advanced Playwright Patterns',
+            description: 'Production-ready testing patterns for expert automation.',
+            estimatedMinutes: 15,
+            tags: ['playwright', 'advanced', 'patterns', 'expert'],
+            contentFile: 'playwright-advanced-patterns.md',
+            order: 42,
+        },
     ];
 
     try {
