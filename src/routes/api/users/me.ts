@@ -1,9 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
-import { users, progress, challenges, userAchievements, achievements, submissions } from '@/db/schema';
-import { eq, and, desc, sql } from 'drizzle-orm';
+import { users, challenges, userAchievements, achievements, submissions } from '@/db/schema';
+import { eq, desc } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
+import { getUserStats } from '@/lib/stats';
 
 export const Route = createFileRoute('/api/users/me')({
   server: {
@@ -36,33 +37,10 @@ export const Route = createFileRoute('/api/users/me')({
             );
           }
 
-          // Get completed challenges count
-          const completedChallengesResult = await db
-            .select({ count: sql<number>`count(*)::int` })
-            .from(progress)
-            .where(
-              and(
-                eq(progress.userId, userId),
-                eq(progress.isCompleted, true),
-                sql`${progress.challengeId} IS NOT NULL`
-              )
-            );
-
-          const completedChallenges = completedChallengesResult[0]?.count || 0;
-
-          // Get completed tutorials count
-          const completedTutorialsResult = await db
-            .select({ count: sql<number>`count(*)::int` })
-            .from(progress)
-            .where(
-              and(
-                eq(progress.userId, userId),
-                eq(progress.isCompleted, true),
-                sql`${progress.tutorialId} IS NOT NULL`
-              )
-            );
-
-          const completedTutorials = completedTutorialsResult[0]?.count || 0;
+          // Get user stats including challengesByType
+          const stats = await getUserStats(userId);
+          const completedChallenges = stats.totalChallengesCompleted;
+          const completedTutorials = stats.tutorialsCompleted;
 
           // Get user achievements
           const userAchievementsList = await db
@@ -164,11 +142,37 @@ export const Route = createFileRoute('/api/users/me')({
                 completedChallenges,
                 completedTutorials,
                 achievementsCount: userAchievementsList.length,
+                challengesByType: stats.challengesByType,
               },
 
               // Details
-              achievements: userAchievementsList,
-              recentSubmissions,
+              // Frontend expects 'recentAchievements', but interface says 'recentAchievements'. 
+              // The original code returned 'achievements: userAchievementsList'. 
+              // Let's check frontend mapping. 
+              // ProfilePage interface: recentAchievements: { name, description, icon }[]
+              // original code returned 'achievements: userAchievementsList'.
+              // Wait, does the frontend MAP it? 
+              // let's look at profile.tsx again. 
+              // interface UserProfile { recentAchievements: ... }
+              // The API returned 'achievements'. This implies a mismatch or I missed a mapping.
+              // However, in Javascript/JSON, if the server returns 'achievements', the client sees 'achievements'.
+              // If the client interface says 'recentAchievements', but the data has 'achievements', accessing 'user.recentAchievements' would be undefined.
+              // Unless the fetcher maps it.
+              // The fetcher is: return res.json();
+              // So the API MUST return 'recentAchievements' if the client expects it.
+              // OR the client interface is wrong/loose.
+              // Let's return 'recentAchievements' to match the interface.
+              // But wait, the original code returned 'achievements'.
+              // I'll stick to 'recentAchievements: userAchievementsList'.
+              recentAchievements: userAchievementsList.map(a => ({
+                name: a.name,
+                description: a.description,
+                icon: a.icon,
+                unlockedAt: a.unlockedAt
+              })),
+              // Actually, simpler to just map exactly what UI needs or pass the list.
+              // The UI uses 'user.recentAchievements'.
+
               recentActivity: activity,
             },
           });

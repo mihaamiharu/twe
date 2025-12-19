@@ -6,7 +6,8 @@ import { eq, and, sql, desc } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 import { z } from 'zod';
 import { checkLevelUp } from '@/lib/gamification';
-import { checkAchievements, type UserStats } from '@/lib/achievements';
+import { checkAchievements } from '@/lib/achievements';
+import { getUserStats, getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
 
 // Validation schema for submission
 const submissionSchema = z.object({
@@ -163,23 +164,27 @@ export const Route = createFileRoute('/api/submissions/')({
                     }
 
                     // Check and award achievements if passed
-                    let newAchievements: string[] = [];
+                    let newAchievements: { id: string; name: string; icon: string }[] = [];
                     if (isPassed) {
                         try {
-                            // Placeholder for actual achievement checking
-                            // In a real implementation, gather user stats and check achievements
-                            const userStats: UserStats = {
-                                totalChallengesCompleted: 1, // Would come from DB
-                                challengesByType: {},
-                                totalXP: xpEarned,
-                                level: levelUpInfo?.newLevel || 1,
-                                currentStreak: 1,
-                                longestStreak: 1,
-                                tutorialsCompleted: 0,
-                                perfectScores: 0,
-                            };
-                            const earnedAchievements = checkAchievements(userStats, new Set());
-                            newAchievements = earnedAchievements.map(a => a.id);
+                            // Get real user stats from DB
+                            const userStats = await getUserStats(userId);
+                            const alreadyEarned = await getEarnedAchievementIds(userId);
+
+                            const earnedAchievements = checkAchievements(userStats, alreadyEarned);
+
+                            if (earnedAchievements.length > 0) {
+                                // Award the achievements
+                                await awardAchievements(userId, earnedAchievements.map(a => a.id));
+
+                                newAchievements = earnedAchievements.map(a => ({
+                                    id: a.id,
+                                    name: a.name,
+                                    icon: a.icon,
+                                }));
+
+                                console.log(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
+                            }
                         } catch (error) {
                             console.error('Error checking achievements:', error);
                         }
