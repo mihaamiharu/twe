@@ -8,6 +8,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
+import { useSession } from '@/lib/auth.client';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -66,6 +67,9 @@ function ChallengeDetailPage() {
         enabled: !!slug,
     });
 
+    const { data: sessionData } = useSession();
+    const userId = sessionData?.user?.id;
+
     // Transform API response to Challenge type expected by ChallengePlayground
     const challenge: Challenge | null = data ? {
         id: data.id,
@@ -90,9 +94,13 @@ function ChallengeDetailPage() {
             content: hint,
             xpCost: (index + 1) * 5,
         })) || [],
+        testCases: data.testCases?.map(tc => ({
+            id: tc.id,
+            name: tc.description,
+            input: tc.input,
+            expectedOutput: tc.expectedOutput
+        })) || []
     } : null;
-
-
 
     const submitMutation = useMutation({
         mutationFn: async (data: {
@@ -207,7 +215,11 @@ function ChallengeDetailPage() {
 
     return (
         <div className="h-[calc(100vh-4rem)]">
-            <ChallengePlayground challenge={challenge} onSubmit={handleSubmit} />
+            <ChallengePlayground
+                challenge={challenge}
+                onSubmit={handleSubmit}
+                userId={userId}
+            />
 
             {lastSubmissionResult && (
                 <ChallengeSuccessDialog

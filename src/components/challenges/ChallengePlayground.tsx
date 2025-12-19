@@ -11,7 +11,7 @@
  * - Responsive tabs on mobile
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -42,7 +42,7 @@ export interface Challenge {
     htmlContent?: string;
     targetSelector?: string | string[];
     hints: Hint[];
-    testCases?: { id: string; name: string }[];
+    testCases?: { id: string; name: string; input?: unknown; expectedOutput?: unknown }[];
 }
 
 export interface ChallengePlaygroundProps {
@@ -53,10 +53,11 @@ export interface ChallengePlaygroundProps {
         testResults: TestResult[];
         executionTime?: number
     }) => void;
+    userId?: string;
     className?: string;
 }
 
-export function ChallengePlayground({ challenge, onSubmit, className }: ChallengePlaygroundProps) {
+export function ChallengePlayground({ challenge, onSubmit, userId, className }: ChallengePlaygroundProps) {
     const [code, setCode] = useState(challenge.starterCode);
     const [selector, setSelector] = useState('');
 
@@ -82,10 +83,15 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
 
     // Run code for Playwright/JS challenges - now executes in the preview tab
     const handleRunCode = useCallback(async () => {
-        if (!isCodeChallenge || !challenge.htmlContent) return;
+        // Validation for JS challenges that just need logical execution
+        const needsHtmlRun = challenge.htmlContent && challenge.type !== 'JAVASCRIPT';
 
-        // Switch to preview tab to show execution
-        setActiveTab('preview');
+        if (!isCodeChallenge) return;
+
+        // Switch to preview tab to show execution ONLY if needed (e.g. Playwright)
+        if (needsHtmlRun) {
+            setActiveTab('preview');
+        }
 
         setIsRunning(true);
         setTestResults([]);
@@ -94,21 +100,52 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
         await new Promise(resolve => setTimeout(resolve, 100));
 
         try {
-            const result = await executePlaywrightCode(code, challenge.htmlContent, {
+            // Modify code to return result if it's a JS challenge
+            let codeToRun = code;
+            if (challenge.type === 'JAVASCRIPT' && !code.includes('return ')) {
+                codeToRun += '\nlet __result__; try { __result__ = result; } catch(e) {}; return __result__;';
+            }
+
+            const result = await executePlaywrightCode(codeToRun, challenge.htmlContent || '<div></div>', {
                 timeout: 10000,
                 existingIframe: previewIframeRef.current || undefined,
             });
 
+            // If we have test cases (especially for JS fundamentals), allow validation against return value
+            let validationPassed = result.status === 'PASSED';
+            let outputMessage = result.output;
+
+            if (challenge.type === 'JAVASCRIPT' && challenge.testCases?.length && result.status === 'PASSED') {
+                const expected = challenge.testCases[0].expectedOutput;
+                const actual = result.returnValue;
+
+                // Normalize expected output (handle {value: "1"} vs "1")
+                let expectedValue = expected;
+                if (expected && typeof expected === 'object' && 'value' in expected) {
+                    expectedValue = (expected as { value: unknown }).value;
+                }
+
+                // Loose equality check for convenience (string '1' == number 1)
+                // eslint-disable-next-line eqeqeq
+                if (actual != expectedValue && String(actual) !== String(expectedValue)) {
+                    validationPassed = false;
+                    outputMessage = `Expected: ${JSON.stringify(expectedValue)}, Got: ${JSON.stringify(actual)}`;
+                    result.status = 'FAILED';
+                } else {
+                    outputMessage = `Correct! Result is ${actual}`;
+                }
+            }
+
             const testResult: TestResult = {
                 id: 'main',
                 name: 'Code Execution',
-                passed: result.status === 'PASSED',
-                error: result.error,
+                passed: validationPassed,
+                error: !validationPassed ? (result.error || outputMessage) : undefined,
                 executionTime: result.executionTime,
             };
 
             setTestResults([testResult]);
-            setHasPassed(result.status === 'PASSED');
+            setHasPassed(validationPassed);
         } catch (error) {
             setTestResults([
                 {
@@ -122,7 +159,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
         } finally {
             setIsRunning(false);
         }
-    }, [code, challenge.htmlContent, isCodeChallenge]);
+    }, [code, challenge.htmlContent, isCodeChallenge, challenge.type, challenge.testCases]);
 
     // Handle real-time validation updates from preview
     const handlePreviewValidation = useCallback((result: { isValid: boolean; matchCount: number }) => {
@@ -382,7 +419,7 @@ export function ChallengePlayground({ challenge, onSubmit, className }: Challeng
                                         language="javascript"
                                         onChange={setCode}
                                         onRun={handleRunCode}
-                                        storageKey={`challenge-${challenge.id}`}
+                                        storageKey={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                                         height="100%"
                                         className="flex-1 border rounded-md overflow-hidden shadow-sm"
                                     />
