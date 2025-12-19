@@ -3,7 +3,9 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Code, Trophy, Zap, AlertCircle, CheckCircle2, Palette, Route as RouteIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Code, Trophy, Zap, AlertCircle, CheckCircle2, Palette, Route as RouteIcon, LayoutGrid, List } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
 export const Route = createFileRoute('/challenges/')({
@@ -158,6 +160,9 @@ function ChallengesPage() {
     const completedChallenges = challenges.filter(c => c.isCompleted).length;
     const progressPercent = totalChallenges > 0 ? Math.round((completedChallenges / totalChallenges) * 100) : 0;
 
+    // State for view mode
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
     return (
         <div className="min-h-screen p-6 md:p-10">
             <div className="max-w-6xl mx-auto">
@@ -187,33 +192,57 @@ function ChallengesPage() {
                     </div>
                 )}
 
-                {/* Filters */}
-                <div className="space-y-4 mb-8">
-                    {/* Type Filter */}
-                    <div className="flex flex-wrap gap-2">
-                        <span className="text-sm text-muted-foreground self-center mr-2">Type:</span>
-                        <Badge
-                            variant="outline"
-                            className={`cursor-pointer transition-all ${filterType === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/20'}`}
-                            onClick={() => setFilterType('all')}
-                        >
-                            All
-                        </Badge>
-                        {Object.entries(typeConfig).map(([type, config]) => {
-                            const count = challenges.filter(c => c.type === type).length;
-                            if (count === 0) return null;
-                            return (
-                                <Badge
-                                    key={type}
-                                    variant="outline"
-                                    className={`cursor-pointer transition-all ${filterType === type ? config.color : 'hover:bg-primary/20'}`}
-                                    onClick={() => setFilterType(type)}
-                                >
-                                    {config.icon}
-                                    <span className="ml-1">{config.label} ({count})</span>
-                                </Badge>
-                            );
-                        })}
+                {/* Filters and View Toggle */}
+                <div className="flex flex-col gap-6 mb-8">
+                    <div className="flex items-start justify-between">
+                        {/* Type Filter */}
+                        <div className="flex flex-wrap gap-2 flex-1">
+                            <span className="text-sm text-muted-foreground self-center mr-2">Type:</span>
+                            <Badge
+                                variant="outline"
+                                className={`cursor-pointer transition-all ${filterType === 'all' ? 'bg-primary text-primary-foreground' : 'hover:bg-primary/20'}`}
+                                onClick={() => setFilterType('all')}
+                            >
+                                All
+                            </Badge>
+                            {Object.entries(typeConfig).map(([type, config]) => {
+                                const count = challenges.filter(c => c.type === type).length;
+                                if (count === 0) return null;
+                                return (
+                                    <Badge
+                                        key={type}
+                                        variant="outline"
+                                        className={`cursor-pointer transition-all ${filterType === type ? config.color : 'hover:bg-primary/20'}`}
+                                        onClick={() => setFilterType(type)}
+                                    >
+                                        {config.icon}
+                                        <span className="ml-1">{config.label} ({count})</span>
+                                    </Badge>
+                                );
+                            })}
+                        </div>
+
+                        {/* View Toggle */}
+                        <div className="flex items-center gap-2 bg-muted/50 p-1 rounded-lg border border-border shrink-0 ml-4">
+                            <Button
+                                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('grid')}
+                                className="h-8 w-8 p-0"
+                                title="Grid View"
+                            >
+                                <LayoutGrid className="h-4 w-4" />
+                            </Button>
+                            <Button
+                                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setViewMode('list')}
+                                className="h-8 w-8 p-0"
+                                title="List View"
+                            >
+                                <List className="h-4 w-4" />
+                            </Button>
+                        </div>
                     </div>
 
                     {/* Difficulty Filter */}
@@ -305,7 +334,7 @@ function ChallengesPage() {
                     </div>
                 )}
 
-                {/* Challenges by Category */}
+                {/* Challenges Content */}
                 {!isLoading && !error && Object.keys(challengesByCategory).length > 0 && (
                     <div className="space-y-10">
                         {Object.entries(challengesByCategory).map(([category, categoryChallenges]) => (
@@ -320,68 +349,135 @@ function ChallengesPage() {
                                     </Badge>
                                 </div>
 
-                                {/* Challenges Grid */}
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {categoryChallenges.map((challenge, index) => {
-                                        const config = typeConfig[challenge.type] || typeConfig.JAVASCRIPT;
-                                        return (
-                                            <Link
-                                                key={challenge.slug}
-                                                to="/challenges/$slug"
-                                                params={{ slug: challenge.slug }}
-                                                className="group"
-                                            >
-                                                <Card className={`h-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 ${challenge.isCompleted
-                                                    ? 'border-green-500/30 bg-green-500/5'
-                                                    : 'glass-card hover:border-primary/50'
-                                                    }`}>
-                                                    <CardHeader className="pb-2">
-                                                        <div className="flex items-start justify-between gap-2">
-                                                            <div className="flex items-center gap-2">
-                                                                <span className="text-xs font-mono text-muted-foreground">
+                                {viewMode === 'grid' ? (
+                                    /* Grid View */
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                        {categoryChallenges.map((challenge, index) => {
+                                            const config = typeConfig[challenge.type] || typeConfig.JAVASCRIPT;
+                                            return (
+                                                <Link
+                                                    key={challenge.slug}
+                                                    to="/challenges/$slug"
+                                                    params={{ slug: challenge.slug }}
+                                                    className="group"
+                                                >
+                                                    <Card className={`h-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 hover:-translate-y-1 ${challenge.isCompleted
+                                                        ? 'border-green-500/30 bg-green-500/5'
+                                                        : 'glass-card hover:border-primary/50'
+                                                        }`}>
+                                                        <CardHeader className="pb-2">
+                                                            <div className="flex items-start justify-between gap-2">
+                                                                <div className="flex items-center gap-2">
+                                                                    <span className="text-xs font-mono text-muted-foreground">
+                                                                        #{index + 1}
+                                                                    </span>
+                                                                    <Badge className={config.color} variant="outline">
+                                                                        {config.icon}
+                                                                        <span className="ml-1">{config.label}</span>
+                                                                    </Badge>
+                                                                </div>
+                                                                {challenge.isCompleted && (
+                                                                    <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
+                                                                )}
+                                                            </div>
+                                                            <CardTitle className="text-base mt-2 group-hover:text-primary transition-colors line-clamp-1">
+                                                                {challenge.title}
+                                                            </CardTitle>
+                                                            <CardDescription className="line-clamp-2 text-sm">
+                                                                {challenge.description}
+                                                            </CardDescription>
+                                                        </CardHeader>
+                                                        <CardContent className="pt-0">
+                                                            <div className="flex items-center justify-between text-sm">
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className={difficultyColors[challenge.difficulty] || ''}
+                                                                >
+                                                                    {challenge.difficulty}
+                                                                </Badge>
+                                                                <div className="flex items-center gap-3">
+                                                                    <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                                                                        <Trophy className="h-3 w-3" />
+                                                                        {challenge.completionCount}
+                                                                    </span>
+                                                                    <span className="flex items-center gap-1 text-amber-500 font-medium">
+                                                                        <Zap className="h-3 w-3" />
+                                                                        {challenge.xpReward} XP
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </CardContent>
+                                                    </Card>
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    /* List View */
+                                    <div className="rounded-md border bg-card">
+                                        <Table>
+                                            <TableHeader>
+                                                <TableRow>
+                                                    <TableHead className="w-[80px]">#</TableHead>
+                                                    <TableHead className="w-[300px]">Challenge</TableHead>
+                                                    <TableHead>Type</TableHead>
+                                                    <TableHead>Difficulty</TableHead>
+                                                    <TableHead className="text-right">Stats</TableHead>
+                                                    <TableHead className="w-[100px] text-right">XP</TableHead>
+                                                </TableRow>
+                                            </TableHeader>
+                                            <TableBody>
+                                                {categoryChallenges.map((challenge, index) => {
+                                                    const config = typeConfig[challenge.type] || typeConfig.JAVASCRIPT;
+                                                    return (
+                                                        <TableRow key={challenge.slug} className={`group cursor-pointer ${challenge.isCompleted ? 'bg-green-500/5' : ''}`}>
+                                                            <TableCell className="font-mono text-muted-foreground">
+                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block h-full w-full flex items-center gap-2">
                                                                     #{index + 1}
-                                                                </span>
-                                                                <Badge className={config.color} variant="outline">
+                                                                    {challenge.isCompleted && (
+                                                                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                                                                    )}
+                                                                </Link>
+                                                            </TableCell>
+                                                            <TableCell className="font-medium group-hover:text-primary transition-colors">
+                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block">
+                                                                    <div className="font-bold">{challenge.title}</div>
+                                                                    <div className="text-xs text-muted-foreground line-clamp-1">{challenge.description}</div>
+                                                                </Link>
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Badge className={`${config.color} whitespace-nowrap`} variant="outline">
                                                                     {config.icon}
                                                                     <span className="ml-1">{config.label}</span>
                                                                 </Badge>
-                                                            </div>
-                                                            {challenge.isCompleted && (
-                                                                <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
-                                                            )}
-                                                        </div>
-                                                        <CardTitle className="text-base mt-2 group-hover:text-primary transition-colors line-clamp-1">
-                                                            {challenge.title}
-                                                        </CardTitle>
-                                                        <CardDescription className="line-clamp-2 text-sm">
-                                                            {challenge.description}
-                                                        </CardDescription>
-                                                    </CardHeader>
-                                                    <CardContent className="pt-0">
-                                                        <div className="flex items-center justify-between text-sm">
-                                                            <Badge
-                                                                variant="secondary"
-                                                                className={difficultyColors[challenge.difficulty] || ''}
-                                                            >
-                                                                {challenge.difficulty}
-                                                            </Badge>
-                                                            <div className="flex items-center gap-3">
-                                                                <span className="flex items-center gap-1 text-muted-foreground text-xs">
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                <Badge
+                                                                    variant="secondary"
+                                                                    className={difficultyColors[challenge.difficulty] || ''}
+                                                                >
+                                                                    {challenge.difficulty}
+                                                                </Badge>
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                <div className="flex items-center justify-end gap-1 text-muted-foreground text-xs">
                                                                     <Trophy className="h-3 w-3" />
-                                                                    {challenge.completionCount}
-                                                                </span>
-                                                                <span className="flex items-center gap-1 text-amber-500 font-medium">
+                                                                    {challenge.completionCount} completed
+                                                                </div>
+                                                            </TableCell>
+                                                            <TableCell className="text-right">
+                                                                <span className="flex items-center justify-end gap-1 text-amber-500 font-medium">
                                                                     <Zap className="h-3 w-3" />
-                                                                    {challenge.xpReward} XP
+                                                                    {challenge.xpReward}
                                                                 </span>
-                                                            </div>
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            </Link>
-                                        );
-                                    })}
-                                </div>
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </div>

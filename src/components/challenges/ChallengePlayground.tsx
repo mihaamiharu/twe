@@ -11,7 +11,7 @@
  * - Responsive tabs on mobile
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,7 @@ import { CodeEditor } from './CodeEditor';
 import { WebComponentPreview } from './WebComponentPreview';
 import { TestResults, type TestResult } from './TestResults';
 import { Hints, type Hint } from './Hints';
-import { SelectorInput, type SelectorType, type SelectorValidationResult } from './SelectorInput';
+import { SelectorInput, type SelectorType } from './SelectorInput';
 
 export type ChallengeType = 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
 
@@ -64,7 +64,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
     const [selectorType, setSelectorType] = useState<SelectorType>(
         challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
     );
-    const [selectorValidation, setSelectorValidation] = useState<SelectorValidationResult | undefined>();
+
     const [testResults, setTestResults] = useState<TestResult[]>([]);
     const [revealedHints, setRevealedHints] = useState<Set<string>>(new Set());
     const [isRunning, setIsRunning] = useState(false);
@@ -175,25 +175,17 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
         // Use the DOM-based validation result if available
         let isValid = false;
-        let matchCount = 0;
-
         if (previewValidation) {
             isValid = previewValidation.isValid;
-            matchCount = previewValidation.matchCount;
         } else {
             // Fallback to string comparison (legacy behavior)
             const targetSelectors = Array.isArray(challenge.targetSelector)
                 ? challenge.targetSelector
                 : [challenge.targetSelector];
             isValid = targetSelectors.includes(selector);
-            matchCount = isValid ? 1 : 0;
         }
 
-        setSelectorValidation({
-            valid: isValid,
-            matchCount: matchCount,
-            error: isValid ? undefined : 'Selector does not match the target element',
-        });
+
 
         setHasPassed(isValid);
 
@@ -221,7 +213,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
     const handleReset = useCallback(() => {
         setCode(challenge.starterCode);
         setSelector('');
-        setSelectorValidation(undefined);
+
         setTestResults([]);
         setHasPassed(false);
         setPreviewValidation(null);

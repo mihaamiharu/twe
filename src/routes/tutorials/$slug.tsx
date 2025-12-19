@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,9 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { AlertCircle, Clock, ArrowLeft, CheckCircle2 } from 'lucide-react';
-
-import { Link } from '@tanstack/react-router';
+import { AlertCircle, Clock, ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useRef, useEffect } from 'react';
 
@@ -32,6 +30,10 @@ interface Tutorial {
         readingProgress: number | null;
         lastAccessedAt: string;
     };
+    nextTutorial?: {
+        slug: string;
+        title: string;
+    } | null;
 }
 
 interface TutorialResponse {
@@ -40,7 +42,8 @@ interface TutorialResponse {
 }
 
 function TutorialDetailPage() {
-    const { slug } = Route.useParams();
+    const { slug } = useParams({ from: '/tutorials/$slug' });
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [readingProgress, setReadingProgress] = useState(0);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -64,6 +67,7 @@ function TutorialDetailPage() {
     // Mark as complete mutation
     const markCompleteMutation = useMutation({
         mutationFn: async () => {
+            // Force progress to 100 on completion
             const res = await fetch(`/api/tutorials/${slug}/complete`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -75,6 +79,7 @@ function TutorialDetailPage() {
         onSuccess: () => {
             toast.success('Tutorial completed! 🎉');
             queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
+            queryClient.invalidateQueries({ queryKey: ['tutorials'] });
             queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
             queryClient.invalidateQueries({ queryKey: ['profile'] });
             queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
@@ -146,14 +151,24 @@ function TutorialDetailPage() {
                 // If content doesn't need scrolling, set progress to 100%
                 if (scrollHeight <= 10) {
                     setReadingProgress(100);
+                    // Also trigger mutation for consistency
+                    updateProgressMutation.mutate(100);
                 }
             }
         };
 
         // Small delay to ensure content is rendered
-        const timer = setTimeout(checkContentHeight, 100);
+        const timer = setTimeout(checkContentHeight, 500);
         return () => clearTimeout(timer);
-    }, [tutorial]);
+    }, [tutorial?.id]); // Only run when tutorial ID changes
+
+    // Reset progress and scroll to top when slug changes
+    useEffect(() => {
+        setReadingProgress(0);
+        if (contentRef.current) {
+            contentRef.current.scrollTop = 0;
+        }
+    }, [slug]);
 
     // Get display progress - always 100% for completed tutorials
     const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : readingProgress || tutorial?.userProgress?.readingProgress || 0;
@@ -204,7 +219,6 @@ function TutorialDetailPage() {
     }
 
     const isCompleted = tutorial.userProgress?.isCompleted || false;
-    const currentProgress = tutorial.userProgress?.readingProgress || readingProgress;
 
     return (
         <div className="min-h-screen p-6 md:p-10">
@@ -277,15 +291,26 @@ function TutorialDetailPage() {
                                     <Button
                                         className="w-full shadow-md hover:shadow-lg transition-shadow"
                                         onClick={() => markCompleteMutation.mutate()}
-                                        disabled={markCompleteMutation.isPending}
+                                        disabled={markCompleteMutation.isPending || displayProgress < 100}
                                     >
                                         <CheckCircle2 className="h-4 w-4 mr-2" />
-                                        {markCompleteMutation.isPending ? 'Saving...' : 'Complete & Continue'}
+                                        {markCompleteMutation.isPending ? 'Saving...' : displayProgress < 100 ? 'Read to Complete' : 'Complete & Continue'}
                                     </Button>
                                 ) : (
-                                    <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
-                                        <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                        <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
+                                            <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                            <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
+                                        </div>
+                                        {data.data.nextTutorial && (
+                                            <Button
+                                                className="w-full"
+                                                onClick={() => navigate({ to: '/tutorials/$slug', params: { slug: data.data.nextTutorial!.slug } })}
+                                            >
+                                                Next: {data.data.nextTutorial.title}
+                                                <ArrowRight className="h-4 w-4 ml-2" />
+                                            </Button>
+                                        )}
                                     </div>
                                 )}
 
@@ -331,100 +356,100 @@ function TutorialDetailPage() {
 
             {/* Custom styles for better code snippet readability */}
             <style>{`
-                /* Hide H1 in markdown since we show title separately */
-                .prose h1 {
-                    display: none;
-                }
-                
-                /* Better text contrast for dark mode */
-                .prose {
-                    color: hsl(var(--foreground) / 0.95);
-                }
-                
-                .prose p {
-                    color: hsl(var(--foreground) / 0.85);
-                }
+                    /* Hide H1 in markdown since we show title separately */
+                    .prose h1 {
+                        display: none;
+                    }
+                    
+                    /* Better text contrast for dark mode */
+                    .prose {
+                        color: hsl(var(--foreground) / 0.95);
+                    }
+                    
+                    .prose p {
+                        color: hsl(var(--foreground) / 0.85);
+                    }
 
-                .prose code {
-                    background-color: hsl(var(--muted));
-                    color: hsl(var(--foreground));
-                    padding: 0.2em 0.4em;
-                    border-radius: 0.25rem;
-                    font-weight: 600;
-                    font-size: 0.9em;
-                }
+                    .prose code {
+                        background-color: hsl(var(--muted));
+                        color: hsl(var(--foreground));
+                        padding: 0.2em 0.4em;
+                        border-radius: 0.25rem;
+                        font-weight: 600;
+                        font-size: 0.9em;
+                    }
 
-                .prose pre {
-                    background-color: hsl(var(--muted));
-                    border: 1px solid hsl(var(--border));
-                }
+                    .prose pre {
+                        background-color: hsl(var(--muted));
+                        border: 1px solid hsl(var(--border));
+                    }
 
-                .prose pre code {
-                    background-color: transparent;
-                    padding: 0;
-                    font-weight: 400;
-                }
+                    .prose pre code {
+                        background-color: transparent;
+                        padding: 0;
+                        font-weight: 400;
+                    }
 
-                /* Table headers - Bold and dark for contrast */
-                .prose thead th {
-                    font-weight: 700;
-                    color: hsl(var(--foreground));
-                    background-color: hsl(var(--muted));
-                    border-bottom: 2px solid hsl(var(--border));
-                }
+                    /* Table headers - Bold and dark for contrast */
+                    .prose thead th {
+                        font-weight: 700;
+                        color: hsl(var(--foreground));
+                        background-color: hsl(var(--muted));
+                        border-bottom: 2px solid hsl(var(--border));
+                    }
 
-                .prose tbody td {
-                    border-bottom: 1px solid hsl(var(--border));
-                }
-                
-                /* Pro Tip / Blockquote - Distinctive dark mode styling */
-                .dark .prose blockquote {
-                    background-color: rgb(124 58 237 / 0.2);
-                    border-left: 4px solid hsl(var(--primary));
-                    padding: 1rem 1.5rem;
-                    margin: 1.5rem 0;
-                    border-radius: 0.5rem;
-                    border: 1px solid rgb(124 58 237 / 0.3);
-                }
-                
-                /* Pro Tip / Blockquote - Distinctive styling */
-                .prose blockquote {
-                    background-color: hsl(var(--primary) / 0.05);
-                    border-left: 4px solid hsl(var(--primary));
-                    padding: 1rem 1.5rem;
-                    margin: 1.5rem 0;
-                    border-radius: 0.5rem;
-                    font-style: normal;
-                }
-                
-                .prose blockquote p {
-                    margin: 0;
-                    color: hsl(var(--foreground) / 0.95);
-                }
-                
-                .prose blockquote strong {
-                    color: hsl(var(--primary));
-                    font-weight: 700;
-                }
+                    .prose tbody td {
+                        border-bottom: 1px solid hsl(var(--border));
+                    }
+                    
+                    /* Pro Tip / Blockquote - Distinctive dark mode styling */
+                    .dark .prose blockquote {
+                        background-color: rgb(124 58 237 / 0.2);
+                        border-left: 4px solid hsl(var(--primary));
+                        padding: 1rem 1.5rem;
+                        margin: 1.5rem 0;
+                        border-radius: 0.5rem;
+                        border: 1px solid rgb(124 58 237 / 0.3);
+                    }
+                    
+                    /* Pro Tip / Blockquote - Distinctive styling */
+                    .prose blockquote {
+                        background-color: hsl(var(--primary) / 0.05);
+                        border-left: 4px solid hsl(var(--primary));
+                        padding: 1rem 1.5rem;
+                        margin: 1.5rem 0;
+                        border-radius: 0.5rem;
+                        font-style: normal;
+                    }
+                    
+                    .prose blockquote p {
+                        margin: 0;
+                        color: hsl(var(--foreground) / 0.95);
+                    }
+                    
+                    .prose blockquote strong {
+                        color: hsl(var(--primary));
+                        font-weight: 700;
+                    }
 
-                /* Smooth scrollbar */
-                .prose::-webkit-scrollbar {
-                    width: 8px;
-                }
+                    /* Smooth scrollbar */
+                    .prose::-webkit-scrollbar {
+                        width: 8px;
+                    }
 
-                .prose::-webkit-scrollbar-track {
-                    background: transparent;
-                }
-                
-                .prose::-webkit-scrollbar-thumb {
-                    background: hsl(var(--primary) / 0.3);
-                    border-radius: 4px;
-                }
-                
-                .prose::-webkit-scrollbar-thumb:hover {
-                    background: hsl(var(--primary) / 0.5);
-                }
-            `}</style>
+                    .prose::-webkit-scrollbar-track {
+                        background: transparent;
+                    }
+                    
+                    .prose::-webkit-scrollbar-thumb {
+                        background: hsl(var(--primary) / 0.3);
+                        border-radius: 4px;
+                    }
+                    
+                    .prose::-webkit-scrollbar-thumb:hover {
+                        background: hsl(var(--primary) / 0.5);
+                    }
+                `}</style>
         </div>
     );
 }
