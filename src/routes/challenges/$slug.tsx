@@ -46,7 +46,7 @@ function ChallengeDetailPage() {
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const [lastSubmissionResult, setLastSubmissionResult] = useState<{
         xpEarned: number;
-        achievements: string[];
+        achievements: { id: string; name: string; icon: string }[];
         levelUp?: { newLevel: number; title: string };
     } | null>(null);
 
@@ -122,14 +122,15 @@ function ChallengeDetailPage() {
         onSuccess: (response) => {
             if (response.success && response.data) {
                 setLastSubmissionResult({
-                    xpEarned: response.data.xpEarned,
+                    xpEarned: response.data.submission.xpEarned,
                     achievements: response.data.newAchievements || [],
                     levelUp: response.data.levelUp,
                 });
                 setShowSuccessDialog(true);
                 // Invalidate queries to refresh progress
                 queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
-                queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+                queryClient.invalidateQueries({ queryKey: ['profile'] });
+                queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
             }
         },
         onError: (error: Error) => {

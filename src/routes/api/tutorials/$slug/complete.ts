@@ -1,9 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
-import { tutorials, progress, users } from '@/db/schema';
+import { tutorials, progress } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
+import { checkAchievements } from '@/lib/achievements';
+import { getUserStats, getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
 
 export const Route = createFileRoute('/api/tutorials/$slug/complete')({
   server: {
@@ -66,9 +68,33 @@ export const Route = createFileRoute('/api/tutorials/$slug/complete')({
             });
           }
 
+          // Check and award achievements
+          let newAchievements: { id: string; name: string; icon: string }[] = [];
+          try {
+            const userStats = await getUserStats(userId);
+            const alreadyEarned = await getEarnedAchievementIds(userId);
+
+            const earnedAchievements = checkAchievements(userStats, alreadyEarned);
+
+            if (earnedAchievements.length > 0) {
+              await awardAchievements(userId, earnedAchievements.map(a => a.id));
+
+              newAchievements = earnedAchievements.map(a => ({
+                id: a.id,
+                name: a.name,
+                icon: a.icon,
+              }));
+
+              console.log(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
+            }
+          } catch (error) {
+            console.error('Error checking achievements:', error);
+          }
+
           return json({
             success: true,
             message: 'Tutorial marked as complete',
+            newAchievements,
           });
         } catch (error) {
           console.error('Error marking tutorial as complete:', error);

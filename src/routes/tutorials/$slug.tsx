@@ -76,6 +76,8 @@ function TutorialDetailPage() {
             toast.success('Tutorial completed! 🎉');
             queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
             queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+            queryClient.invalidateQueries({ queryKey: ['profile'] });
+            queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
         },
         onError: () => {
             toast.error('Failed to mark as complete');
