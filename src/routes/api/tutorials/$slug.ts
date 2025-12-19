@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { tutorials, progress } from '@/db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, gt, asc } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 
 export const Route = createFileRoute('/api/tutorials/$slug')({
@@ -58,11 +58,29 @@ export const Route = createFileRoute('/api/tutorials/$slug')({
                         // User not authenticated, continue without progress
                     }
 
+                    // Get next tutorial
+                    const nextTutorial = await db.query.tutorials.findFirst({
+                        where: and(
+                            eq(tutorials.isPublished, true),
+                            // Use order > current order
+                            tutorial.order !== null ? gt(tutorials.order, tutorial.order) : undefined
+                        ),
+                        orderBy: asc(tutorials.order),
+                        columns: {
+                            slug: true,
+                            title: true,
+                        },
+                    });
+
                     return json({
                         success: true,
                         data: {
                             ...tutorial,
                             userProgress,
+                            nextTutorial: nextTutorial ? {
+                                slug: nextTutorial.slug,
+                                title: nextTutorial.title
+                            } : null,
                         },
                     });
                 } catch (error) {
