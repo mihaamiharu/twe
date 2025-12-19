@@ -13,7 +13,7 @@ import { eq, inArray } from 'drizzle-orm';
 // PAGE OBJECT MODEL CHALLENGES (5)
 // ============================================================================
 
-const pomChallenges = [
+export const pomChallenges = [
     {
         slug: 'pw-first-page-object',
         title: 'First Page Object',
@@ -465,7 +465,7 @@ const result = await productPage.getPageTitle();`,
 // DATA-DRIVEN TESTING CHALLENGES (5)
 // ============================================================================
 
-const dataDrivenChallenges = [
+export const dataDrivenChallenges = [
     {
         slug: 'pw-parameterized-tests',
         title: 'Parameterized Tests',
@@ -804,7 +804,7 @@ const result = await page.locator('#status').textContent();`,
 // ADVANCED PATTERNS CHALLENGES (8)
 // ============================================================================
 
-const advancedPatternsChallenges = [
+export const advancedPatternsChallenges = [
     {
         slug: 'pw-api-ui-testing',
         title: 'API + UI Testing',
@@ -1426,12 +1426,15 @@ async function seedExpertChallenges() {
     }
 }
 
-seedExpertChallenges()
-    .then(() => {
-        console.log('\n🎉 Database seeded successfully!');
-        process.exit(0);
-    })
-    .catch((error) => {
-        console.error('Failed to seed database:', error);
-        process.exit(1);
-    });
+// Run the seed function if executed directly
+if (import.meta.main) {
+    seedExpertChallenges()
+        .then(() => {
+            console.log('\n🎉 Database seeded successfully!');
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error('Failed to seed database:', error);
+            process.exit(1);
+        });
+}

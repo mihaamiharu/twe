@@ -13,18 +13,22 @@ import { eq, inArray } from 'drizzle-orm';
 // CSS SELECTOR CHALLENGES (10)
 // ============================================================================
 
-const cssChallenges = [
-    // Challenge 1: Selector 101 - ID & Class
-    {
-        slug: 'css-selector-101-id-class',
-        title: 'Selector 101: ID & Class',
-        description: 'Learn to select elements using ID (#) and class (.) selectors.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 10,
-        order: 1,
-        instructions: `# Selector 101: ID & Class
+// ============================================================================
+// CSS SELECTOR CHALLENGES (10)
+// ============================================================================
+
+export const cssChallenges = [
+  // Challenge 1: Selector 101 - ID & Class
+  {
+    slug: 'css-selector-101-id-class',
+    title: 'Selector 101: ID & Class',
+    description: 'Learn to select elements using ID (#) and class (.) selectors.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 10,
+    order: 1,
+    instructions: `# Selector 101: ID & Class
 
 The two most fundamental CSS selectors are **ID** and **class** selectors.
 
@@ -43,7 +47,7 @@ Select the **login button** using its ID.
 
 > **Hint:** Look for the element's \`id\` attribute in the HTML preview.
 `,
-        htmlContent: `<div class="login-page">
+    htmlContent: `<div class="login-page">
   <h1>Welcome Back</h1>
   <form class="login-form">
     <input type="text" id="username" placeholder="Username" class="input-field" />
@@ -52,27 +56,27 @@ Select the **login button** using its ID.
     <button type="button" class="btn btn-link">Forgot Password?</button>
   </form>
 </div>`,
-        starterCode: '',
-        hints: [
-            'Look at the button element that says "Login"',
-            'The button has an id attribute - use # to select by ID',
-            'The answer is #login-btn'
-        ],
-        tags: ['css', 'selector', 'id', 'class', 'basic'],
-        targetSelector: '#login-btn',
-    },
+    starterCode: '',
+    hints: [
+      'Look at the button element that says "Login"',
+      'The button has an id attribute - use # to select by ID',
+      'The answer is #login-btn'
+    ],
+    tags: ['css', 'selector', 'id', 'class', 'basic'],
+    targetSelector: '#login-btn',
+  },
 
-    // Challenge 2: Tag Selectors
-    {
-        slug: 'css-tag-selectors',
-        title: 'Tag Selectors',
-        description: 'Select elements by their HTML tag name.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 10,
-        order: 2,
-        instructions: `# Tag Selectors
+  // Challenge 2: Tag Selectors
+  {
+    slug: 'css-tag-selectors',
+    title: 'Tag Selectors',
+    description: 'Select elements by their HTML tag name.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 10,
+    order: 2,
+    instructions: `# Tag Selectors
 
 The simplest CSS selector targets elements by their **tag name**.
 
@@ -93,7 +97,7 @@ Select the **paragraph** element that contains the welcome message.
 
 > **Note:** Tag selectors can match multiple elements!
 `,
-        htmlContent: `<div class="welcome-section">
+    htmlContent: `<div class="welcome-section">
   <h1>Welcome to Our App</h1>
   <p>Thank you for joining us. We're excited to have you here!</p>
   <div class="actions">
@@ -101,27 +105,27 @@ Select the **paragraph** element that contains the welcome message.
     <a href="/learn">Learn More</a>
   </div>
 </div>`,
-        starterCode: '',
-        hints: [
-            'Look for the <p> tag in the HTML',
-            'Tag selectors are just the element name without any prefix',
-            'The answer is: p'
-        ],
-        tags: ['css', 'selector', 'tag', 'basic'],
-        targetSelector: 'p',
-    },
+    starterCode: '',
+    hints: [
+      'Look for the <p> tag in the HTML',
+      'Tag selectors are just the element name without any prefix',
+      'The answer is: p'
+    ],
+    tags: ['css', 'selector', 'tag', 'basic'],
+    targetSelector: 'p',
+  },
 
-    // Challenge 3: Child & Descendant
-    {
-        slug: 'css-child-descendant',
-        title: 'Child & Descendant',
-        description: 'Learn the difference between child (>) and descendant selectors.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 15,
-        order: 3,
-        instructions: `# Child & Descendant Selectors
+  // Challenge 3: Child & Descendant
+  {
+    slug: 'css-child-descendant',
+    title: 'Child & Descendant',
+    description: 'Learn the difference between child (>) and descendant selectors.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 15,
+    order: 3,
+    instructions: `# Child & Descendant Selectors
 
 These selectors target elements based on their relationship to other elements.
 
@@ -150,7 +154,7 @@ Select the **list items** that are direct children of the navigation \`<ul>\`.
 
 > **Hint:** Use the child combinator \`>\`
 `,
-        htmlContent: `<nav class="main-nav">
+    htmlContent: `<nav class="main-nav">
   <ul class="nav-menu">
     <li class="nav-item">Home</li>
     <li class="nav-item">Products
@@ -162,27 +166,27 @@ Select the **list items** that are direct children of the navigation \`<ul>\`.
     <li class="nav-item">Contact</li>
   </ul>
 </nav>`,
-        starterCode: '',
-        hints: [
-            'You want to select <li> elements that are direct children of .nav-menu',
-            'Use the > combinator for direct children',
-            'The answer is: .nav-menu > li or ul.nav-menu > li'
-        ],
-        tags: ['css', 'selector', 'child', 'descendant', 'basic'],
-        targetSelector: '.nav-menu > li',
-    },
+    starterCode: '',
+    hints: [
+      'You want to select <li> elements that are direct children of .nav-menu',
+      'Use the > combinator for direct children',
+      'The answer is: .nav-menu > li or ul.nav-menu > li'
+    ],
+    tags: ['css', 'selector', 'child', 'descendant', 'basic'],
+    targetSelector: '.nav-menu > li',
+  },
 
-    // Challenge 4: Attribute Selectors
-    {
-        slug: 'css-attribute-selectors',
-        title: 'Attribute Selectors',
-        description: 'Target elements by their HTML attributes.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 20,
-        order: 4,
-        instructions: `# Attribute Selectors
+  // Challenge 4: Attribute Selectors
+  {
+    slug: 'css-attribute-selectors',
+    title: 'Attribute Selectors',
+    description: 'Target elements by their HTML attributes.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 20,
+    order: 4,
+    instructions: `# Attribute Selectors
 
 Attribute selectors let you target elements based on their attributes.
 
@@ -208,7 +212,7 @@ Select the **email input** field using an attribute selector.
 
 > **Tip:** \`data-*\` attributes are great for test automation!
 `,
-        htmlContent: `<form class="signup-form">
+    htmlContent: `<form class="signup-form">
   <div class="form-group">
     <label>Name</label>
     <input type="text" name="name" data-testid="name-input" placeholder="Your name" />
@@ -223,27 +227,27 @@ Select the **email input** field using an attribute selector.
   </div>
   <button type="submit">Sign Up</button>
 </form>`,
-        starterCode: '',
-        hints: [
-            'Look at the input with type="email"',
-            'You can use [type="email"] or [data-testid="email-input"]',
-            'The answer is: [type="email"] or input[type="email"]'
-        ],
-        tags: ['css', 'selector', 'attribute', 'basic'],
-        targetSelector: '[type="email"]',
-    },
+    starterCode: '',
+    hints: [
+      'Look at the input with type="email"',
+      'You can use [type="email"] or [data-testid="email-input"]',
+      'The answer is: [type="email"] or input[type="email"]'
+    ],
+    tags: ['css', 'selector', 'attribute', 'basic'],
+    targetSelector: '[type="email"]',
+  },
 
-    // Challenge 5: Nth-child Magic
-    {
-        slug: 'css-nth-child',
-        title: 'Nth-child Magic',
-        description: 'Select elements by their position using :nth-child().',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 25,
-        order: 5,
-        instructions: `# Nth-child Selector
+  // Challenge 5: Nth-child Magic
+  {
+    slug: 'css-nth-child',
+    title: 'Nth-child Magic',
+    description: 'Select elements by their position using :nth-child().',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 25,
+    order: 5,
+    instructions: `# Nth-child Selector
 
 The \`:nth-child()\` pseudo-class selects elements by their position.
 
@@ -267,7 +271,7 @@ div:last-child      /* Last div in parent */
 ## Your Task
 Select the **third item** in the todo list.
 `,
-        htmlContent: `<div class="todo-app">
+    htmlContent: `<div class="todo-app">
   <h2>My Tasks</h2>
   <ul class="todo-list">
     <li class="todo-item">Buy groceries</li>
@@ -277,27 +281,27 @@ Select the **third item** in the todo list.
     <li class="todo-item">Read book</li>
   </ul>
 </div>`,
-        starterCode: '',
-        hints: [
-            'Use :nth-child() to select by position',
-            'The third item is at position 3',
-            'The answer is: .todo-item:nth-child(3) or li:nth-child(3)'
-        ],
-        tags: ['css', 'selector', 'nth-child', 'pseudo-class', 'basic'],
-        targetSelector: 'li:nth-child(3)',
-    },
+    starterCode: '',
+    hints: [
+      'Use :nth-child() to select by position',
+      'The third item is at position 3',
+      'The answer is: .todo-item:nth-child(3) or li:nth-child(3)'
+    ],
+    tags: ['css', 'selector', 'nth-child', 'pseudo-class', 'basic'],
+    targetSelector: 'li:nth-child(3)',
+  },
 
-    // Challenge 6: Sibling Selectors
-    {
-        slug: 'css-sibling-selectors',
-        title: 'Sibling Selectors',
-        description: 'Select elements based on their siblings.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 25,
-        order: 6,
-        instructions: `# Sibling Selectors
+  // Challenge 6: Sibling Selectors
+  {
+    slug: 'css-sibling-selectors',
+    title: 'Sibling Selectors',
+    description: 'Select elements based on their siblings.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 25,
+    order: 6,
+    instructions: `# Sibling Selectors
 
 Sibling selectors target elements that share the same parent.
 
@@ -323,34 +327,34 @@ Sibling selectors target elements that share the same parent.
 ## Your Task
 Select the **paragraph immediately after** the main heading.
 `,
-        htmlContent: `<article>
+    htmlContent: `<article>
   <h1 class="title">Breaking News</h1>
   <p class="lead">This is the lead paragraph with important info.</p>
   <p>More details about the story...</p>
   <p>Even more content here...</p>
   <footer>Published today</footer>
 </article>`,
-        starterCode: '',
-        hints: [
-            'You need the paragraph directly after h1',
-            'Use the adjacent sibling combinator +',
-            'The answer is: h1 + p'
-        ],
-        tags: ['css', 'selector', 'sibling', 'basic'],
-        targetSelector: 'h1 + p',
-    },
+    starterCode: '',
+    hints: [
+      'You need the paragraph directly after h1',
+      'Use the adjacent sibling combinator +',
+      'The answer is: h1 + p'
+    ],
+    tags: ['css', 'selector', 'sibling', 'basic'],
+    targetSelector: 'h1 + p',
+  },
 
-    // Challenge 7: Pseudo-classes
-    {
-        slug: 'css-pseudo-classes',
-        title: 'Pseudo-classes',
-        description: 'Select elements based on their state.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 30,
-        order: 7,
-        instructions: `# Pseudo-classes
+  // Challenge 7: Pseudo-classes
+  {
+    slug: 'css-pseudo-classes',
+    title: 'Pseudo-classes',
+    description: 'Select elements based on their state.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 30,
+    order: 7,
+    instructions: `# Pseudo-classes
 
 Pseudo-classes select elements based on their **state** or **position**.
 
@@ -375,7 +379,7 @@ Select the **disabled input** field.
 
 > **Note:** In automation, \`:disabled\` helps verify form states!
 `,
-        htmlContent: `<form class="settings-form">
+    htmlContent: `<form class="settings-form">
   <div class="form-group">
     <label>Username (locked)</label>
     <input type="text" value="john_doe" disabled />
@@ -390,27 +394,27 @@ Select the **disabled input** field.
   </div>
   <button type="submit">Save Changes</button>
 </form>`,
-        starterCode: '',
-        hints: [
-            'Look for the input that has the disabled attribute',
-            'Use the :disabled pseudo-class',
-            'The answer is: input:disabled'
-        ],
-        tags: ['css', 'selector', 'pseudo-class', 'state', 'basic'],
-        targetSelector: 'input:disabled',
-    },
+    starterCode: '',
+    hints: [
+      'Look for the input that has the disabled attribute',
+      'Use the :disabled pseudo-class',
+      'The answer is: input:disabled'
+    ],
+    tags: ['css', 'selector', 'pseudo-class', 'state', 'basic'],
+    targetSelector: 'input:disabled',
+  },
 
-    // Challenge 8: Combining Selectors
-    {
-        slug: 'css-combining-selectors',
-        title: 'Combining Selectors',
-        description: 'Chain multiple selectors for precise targeting.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 35,
-        order: 8,
-        instructions: `# Combining Selectors
+  // Challenge 8: Combining Selectors
+  {
+    slug: 'css-combining-selectors',
+    title: 'Combining Selectors',
+    description: 'Chain multiple selectors for precise targeting.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 35,
+    order: 8,
+    instructions: `# Combining Selectors
 
 You can chain selectors to be more specific and precise.
 
@@ -432,7 +436,7 @@ div.container > p.lead  /* Direct child with class */
 ## Your Task
 Select the **primary action button** (it has both "btn" and "primary" classes).
 `,
-        htmlContent: `<div class="card">
+    htmlContent: `<div class="card">
   <h3>Upgrade to Pro</h3>
   <p>Get access to premium features!</p>
   <div class="card-actions">
@@ -443,27 +447,27 @@ Select the **primary action button** (it has both "btn" and "primary" classes).
 <div class="footer">
   <button class="btn text">Cancel</button>
 </div>`,
-        starterCode: '',
-        hints: [
-            'The button has two classes: "btn" and "primary"',
-            'Chain them together without space',
-            'The answer is: .btn.primary or button.btn.primary'
-        ],
-        tags: ['css', 'selector', 'combining', 'chaining', 'basic'],
-        targetSelector: '.btn.primary',
-    },
+    starterCode: '',
+    hints: [
+      'The button has two classes: "btn" and "primary"',
+      'Chain them together without space',
+      'The answer is: .btn.primary or button.btn.primary'
+    ],
+    tags: ['css', 'selector', 'combining', 'chaining', 'basic'],
+    targetSelector: '.btn.primary',
+  },
 
-    // Challenge 9: Real Form Challenge
-    {
-        slug: 'css-real-form',
-        title: 'Real Form Challenge',
-        description: 'Apply your skills to a realistic form layout.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 40,
-        order: 9,
-        instructions: `# Real Form Challenge
+  // Challenge 9: Real Form Challenge
+  {
+    slug: 'css-real-form',
+    title: 'Real Form Challenge',
+    description: 'Apply your skills to a realistic form layout.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 40,
+    order: 9,
+    instructions: `# Real Form Challenge
 
 Let's put your skills together on a realistic form!
 
@@ -480,7 +484,7 @@ Select the **credit card number input** field.
 
 > **Real-world tip:** In test automation, prefer \`data-testid\` attributes when available!
 `,
-        htmlContent: `<div class="checkout-form">
+    htmlContent: `<div class="checkout-form">
   <h2>Payment Details</h2>
   
   <div class="form-section">
@@ -509,27 +513,27 @@ Select the **credit card number input** field.
   
   <button type="submit" class="btn primary">Pay Now</button>
 </div>`,
-        starterCode: '',
-        hints: [
-            'Look for the card number input - it has multiple unique identifiers',
-            'You can use #card-number or [data-testid="card-input"]',
-            'The answer is: #card-number or [data-testid="card-input"]'
-        ],
-        tags: ['css', 'selector', 'form', 'practical', 'basic'],
-        targetSelector: '#card-number',
-    },
+    starterCode: '',
+    hints: [
+      'Look for the card number input - it has multiple unique identifiers',
+      'You can use #card-number or [data-testid="card-input"]',
+      'The answer is: #card-number or [data-testid="card-input"]'
+    ],
+    tags: ['css', 'selector', 'form', 'practical', 'basic'],
+    targetSelector: '#card-number',
+  },
 
-    // Challenge 10: Dynamic Elements
-    {
-        slug: 'css-dynamic-elements',
-        title: 'Dynamic Elements',
-        description: 'Handle elements without stable IDs or classes.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'css-basics',
-        xpReward: 50,
-        order: 10,
-        instructions: `# Dynamic Elements
+  // Challenge 10: Dynamic Elements
+  {
+    slug: 'css-dynamic-elements',
+    title: 'Dynamic Elements',
+    description: 'Handle elements without stable IDs or classes.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 50,
+    order: 10,
+    instructions: `# Dynamic Elements
 
 Sometimes elements don't have stable IDs or unique classes. Here's how to handle them.
 
@@ -552,7 +556,7 @@ Select the **delete button** for the second item. The buttons don't have unique 
 
 > **Tip:** Combine position with class for precision.
 `,
-        htmlContent: `<ul class="item-list">
+    htmlContent: `<ul class="item-list">
   <li class="item" data-id="item-1">
     <span class="item-name">First Item</span>
     <div class="item-actions">
@@ -575,33 +579,33 @@ Select the **delete button** for the second item. The buttons don't have unique 
     </div>
   </li>
 </ul>`,
-        starterCode: '',
-        hints: [
-            'You need the delete button in the second list item',
-            'Use :nth-child(2) to select the second item',
-            'The answer is: .item:nth-child(2) .btn-delete or li:nth-child(2) .btn-delete'
-        ],
-        tags: ['css', 'selector', 'dynamic', 'practical', 'basic'],
-        targetSelector: '.item:nth-child(2) .btn-delete',
-    },
+    starterCode: '',
+    hints: [
+      'You need the delete button in the second list item',
+      'Use :nth-child(2) to select the second item',
+      'The answer is: .item:nth-child(2) .btn-delete or li:nth-child(2) .btn-delete'
+    ],
+    tags: ['css', 'selector', 'dynamic', 'practical', 'basic'],
+    targetSelector: '.item:nth-child(2) .btn-delete',
+  },
 ];
 
 // ============================================================================
 // XPATH CHALLENGES (10)
 // ============================================================================
 
-const xpathChallenges = [
-    // Challenge 1: XPath Basics
-    {
-        slug: 'xpath-basics-101',
-        title: 'XPath Basics',
-        description: 'Learn the fundamentals: absolute vs relative paths.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 10,
-        order: 11,
-        instructions: `# XPath Basics
+export const xpathChallenges = [
+  // Challenge 1: XPath Basics
+  {
+    slug: 'xpath-basics-101',
+    title: 'XPath Basics',
+    description: 'Learn the fundamentals: absolute vs relative paths.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 10,
+    order: 11,
+    instructions: `# XPath Basics
 
 XPath (XML Path Language) is a query language for selecting nodes from an HTML/XML document.
 
@@ -624,7 +628,7 @@ Select the **submit button** using a relative XPath.
 
 > **Best Practice:** Always prefer relative XPath for test automation!
 `,
-        htmlContent: `<div class="contact-page">
+    htmlContent: `<div class="contact-page">
   <h1>Contact Us</h1>
   <form id="contact-form">
     <input type="text" name="name" placeholder="Your Name" />
@@ -633,27 +637,27 @@ Select the **submit button** using a relative XPath.
     <button type="submit">Send Message</button>
   </form>
 </div>`,
-        starterCode: '',
-        hints: [
-            'Use // at the start for a relative XPath',
-            'Select by element name: //button',
-            'The answer is: //button'
-        ],
-        tags: ['xpath', 'selector', 'basics', 'basic'],
-        targetSelector: '//button',
-    },
+    starterCode: '',
+    hints: [
+      'Use // at the start for a relative XPath',
+      'Select by element name: //button',
+      'The answer is: //button'
+    ],
+    tags: ['xpath', 'selector', 'basics', 'basic'],
+    targetSelector: '//button',
+  },
 
-    // Challenge 2: Attribute Matching
-    {
-        slug: 'xpath-attribute-matching',
-        title: 'Attribute Matching',
-        description: 'Select elements using attribute conditions.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 15,
-        order: 12,
-        instructions: `# XPath Attribute Matching
+  // Challenge 2: Attribute Matching
+  {
+    slug: 'xpath-attribute-matching',
+    title: 'Attribute Matching',
+    description: 'Select elements using attribute conditions.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 15,
+    order: 12,
+    instructions: `# XPath Attribute Matching
 
 XPath uses \`@\` to reference attributes within predicates \`[]\`.
 
@@ -673,7 +677,7 @@ XPath uses \`@\` to reference attributes within predicates \`[]\`.
 ## Your Task
 Select the **password input** field using its type attribute.
 `,
-        htmlContent: `<div class="login-container">
+    htmlContent: `<div class="login-container">
   <h2>Sign In</h2>
   <form>
     <div class="field">
@@ -689,27 +693,27 @@ Select the **password input** field using its type attribute.
     <button type="submit">Login</button>
   </form>
 </div>`,
-        starterCode: '',
-        hints: [
-            'Look for input with type="password"',
-            'Use @ to reference the type attribute',
-            'The answer is: //input[@type="password"]'
-        ],
-        tags: ['xpath', 'selector', 'attribute', 'basic'],
-        targetSelector: '//input[@type="password"]',
-    },
+    starterCode: '',
+    hints: [
+      'Look for input with type="password"',
+      'Use @ to reference the type attribute',
+      'The answer is: //input[@type="password"]'
+    ],
+    tags: ['xpath', 'selector', 'attribute', 'basic'],
+    targetSelector: '//input[@type="password"]',
+  },
 
-    // Challenge 3: Text Content
-    {
-        slug: 'xpath-text-content',
-        title: 'Text Content',
-        description: 'Select elements by their text content.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 20,
-        order: 13,
-        instructions: `# XPath Text Content
+  // Challenge 3: Text Content
+  {
+    slug: 'xpath-text-content',
+    title: 'Text Content',
+    description: 'Select elements by their text content.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 20,
+    order: 13,
+    instructions: `# XPath Text Content
 
 XPath can select elements based on their text content using \`text()\`.
 
@@ -730,7 +734,7 @@ XPath can select elements based on their text content using \`text()\`.
 ## Your Task
 Select the **"Add to Cart"** button using its text.
 `,
-        htmlContent: `<div class="product-card">
+    htmlContent: `<div class="product-card">
   <img src="/product.jpg" alt="Wireless Headphones" />
   <h3>Wireless Headphones</h3>
   <p class="price">$99.99</p>
@@ -739,27 +743,27 @@ Select the **"Add to Cart"** button using its text.
     <button class="btn primary">Add to Cart</button>
   </div>
 </div>`,
-        starterCode: '',
-        hints: [
-            'Use text() to match button text',
-            'The exact text is "Add to Cart"',
-            'The answer is: //button[text()="Add to Cart"]'
-        ],
-        tags: ['xpath', 'selector', 'text', 'basic'],
-        targetSelector: '//button[text()="Add to Cart"]',
-    },
+    starterCode: '',
+    hints: [
+      'Use text() to match button text',
+      'The exact text is "Add to Cart"',
+      'The answer is: //button[text()="Add to Cart"]'
+    ],
+    tags: ['xpath', 'selector', 'text', 'basic'],
+    targetSelector: '//button[text()="Add to Cart"]',
+  },
 
-    // Challenge 4: Contains & Starts-with
-    {
-        slug: 'xpath-contains-starts-with',
-        title: 'Contains & Starts-with',
-        description: 'Use partial matching for flexible selections.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 25,
-        order: 14,
-        instructions: `# Contains & Starts-with
+  // Challenge 4: Contains & Starts-with
+  {
+    slug: 'xpath-contains-starts-with',
+    title: 'Contains & Starts-with',
+    description: 'Use partial matching for flexible selections.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 25,
+    order: 14,
+    instructions: `# Contains & Starts-with
 
 When exact matching is too rigid, use partial match functions.
 
@@ -785,7 +789,7 @@ When exact matching is too rigid, use partial match functions.
 ## Your Task
 Select the **error message** div (has a class containing "error").
 `,
-        htmlContent: `<form class="registration-form">
+    htmlContent: `<form class="registration-form">
   <div class="form-group">
     <input type="email" class="input" placeholder="Email" />
     <div class="message error-message">Please enter a valid email address</div>
@@ -800,27 +804,27 @@ Select the **error message** div (has a class containing "error").
   </div>
   <button type="submit">Register</button>
 </form>`,
-        starterCode: '',
-        hints: [
-            'Look for a div with class containing "error"',
-            'Use contains() function for partial matching',
-            'The answer is: //div[contains(@class, "error")]'
-        ],
-        tags: ['xpath', 'selector', 'contains', 'starts-with', 'basic'],
-        targetSelector: '//div[contains(@class, "error")]',
-    },
+    starterCode: '',
+    hints: [
+      'Look for a div with class containing "error"',
+      'Use contains() function for partial matching',
+      'The answer is: //div[contains(@class, "error")]'
+    ],
+    tags: ['xpath', 'selector', 'contains', 'starts-with', 'basic'],
+    targetSelector: '//div[contains(@class, "error")]',
+  },
 
-    // Challenge 5: Parent/Ancestor
-    {
-        slug: 'xpath-parent-ancestor',
-        title: 'Parent/Ancestor',
-        description: 'Navigate UP the DOM tree.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 30,
-        order: 15,
-        instructions: `# Parent & Ancestor Axes
+  // Challenge 5: Parent/Ancestor
+  {
+    slug: 'xpath-parent-ancestor',
+    title: 'Parent/Ancestor',
+    description: 'Navigate UP the DOM tree.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 30,
+    order: 15,
+    instructions: `# Parent & Ancestor Axes
 
 XPath can navigate UP the DOM tree - something CSS cannot do!
 
@@ -846,7 +850,7 @@ XPath can navigate UP the DOM tree - something CSS cannot do!
 ## Your Task  
 Find the **list item (li)** that contains the "Settings" link.
 `,
-        htmlContent: `<nav class="sidebar">
+    htmlContent: `<nav class="sidebar">
   <ul class="menu">
     <li class="menu-item">
       <a href="/dashboard">Dashboard</a>
@@ -862,27 +866,27 @@ Find the **list item (li)** that contains the "Settings" link.
     </li>
   </ul>
 </nav>`,
-        starterCode: '',
-        hints: [
-            'First find the link with text "Settings"',
-            'Then navigate up to its parent li',
-            'The answer is: //a[text()="Settings"]/parent::li or //a[text()="Settings"]/..'
-        ],
-        tags: ['xpath', 'selector', 'parent', 'ancestor', 'basic'],
-        targetSelector: '//a[text()="Settings"]/parent::li',
-    },
+    starterCode: '',
+    hints: [
+      'First find the link with text "Settings"',
+      'Then navigate up to its parent li',
+      'The answer is: //a[text()="Settings"]/parent::li or //a[text()="Settings"]/..'
+    ],
+    tags: ['xpath', 'selector', 'parent', 'ancestor', 'basic'],
+    targetSelector: '//a[text()="Settings"]/parent::li',
+  },
 
-    // Challenge 6: Following-sibling
-    {
-        slug: 'xpath-following-sibling',
-        title: 'Following-sibling',
-        description: 'Navigate to elements that come after.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 35,
-        order: 16,
-        instructions: `# Following-sibling Axis
+  // Challenge 6: Following-sibling
+  {
+    slug: 'xpath-following-sibling',
+    title: 'Following-sibling',
+    description: 'Navigate to elements that come after.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 35,
+    order: 16,
+    instructions: `# Following-sibling Axis
 
 Navigate to siblings that come AFTER the current element.
 
@@ -907,7 +911,7 @@ Navigate to siblings that come AFTER the current element.
 ## Your Task
 Select the **input** field that follows the "Username" label.
 `,
-        htmlContent: `<form class="user-form">
+    htmlContent: `<form class="user-form">
   <div class="field-row">
     <label>Full Name</label>
     <input type="text" name="fullname" placeholder="John Doe" />
@@ -921,27 +925,27 @@ Select the **input** field that follows the "Username" label.
     <input type="tel" name="phone" placeholder="+1 234 567 890" />
   </div>
 </form>`,
-        starterCode: '',
-        hints: [
-            'Find the label with text "Username" first',
-            'Then use following-sibling to get the next input',
-            'The answer is: //label[text()="Username"]/following-sibling::input'
-        ],
-        tags: ['xpath', 'selector', 'following-sibling', 'basic'],
-        targetSelector: '//label[text()="Username"]/following-sibling::input',
-    },
+    starterCode: '',
+    hints: [
+      'Find the label with text "Username" first',
+      'Then use following-sibling to get the next input',
+      'The answer is: //label[text()="Username"]/following-sibling::input'
+    ],
+    tags: ['xpath', 'selector', 'following-sibling', 'basic'],
+    targetSelector: '//label[text()="Username"]/following-sibling::input',
+  },
 
-    // Challenge 7: Multiple Conditions
-    {
-        slug: 'xpath-multiple-conditions',
-        title: 'Multiple Conditions',
-        description: 'Combine conditions with and/or operators.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 35,
-        order: 17,
-        instructions: `# Multiple Conditions
+  // Challenge 7: Multiple Conditions
+  {
+    slug: 'xpath-multiple-conditions',
+    title: 'Multiple Conditions',
+    description: 'Combine conditions with and/or operators.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 35,
+    order: 17,
+    instructions: `# Multiple Conditions
 
 Combine multiple conditions using logical operators.
 
@@ -963,7 +967,7 @@ Combine multiple conditions using logical operators.
 ## Your Task
 Select the button that is both **type="submit"** AND has the **"primary"** class.
 `,
-        htmlContent: `<div class="dialog">
+    htmlContent: `<div class="dialog">
   <h2>Confirm Action</h2>
   <p>Are you sure you want to proceed?</p>
   <div class="dialog-actions">
@@ -972,27 +976,27 @@ Select the button that is both **type="submit"** AND has the **"primary"** class
     <button type="submit" class="btn primary">Confirm</button>
   </div>
 </div>`,
-        starterCode: '',
-        hints: [
-            'You need both type="submit" AND class containing "primary"',
-            'Use the "and" operator to combine conditions',
-            'The answer is: //button[@type="submit" and contains(@class, "primary")]'
-        ],
-        tags: ['xpath', 'selector', 'and', 'or', 'conditions', 'basic'],
-        targetSelector: '//button[@type="submit" and contains(@class, "primary")]',
-    },
+    starterCode: '',
+    hints: [
+      'You need both type="submit" AND class containing "primary"',
+      'Use the "and" operator to combine conditions',
+      'The answer is: //button[@type="submit" and contains(@class, "primary")]'
+    ],
+    tags: ['xpath', 'selector', 'and', 'or', 'conditions', 'basic'],
+    targetSelector: '//button[@type="submit" and contains(@class, "primary")]',
+  },
 
-    // Challenge 8: Position & Indexing
-    {
-        slug: 'xpath-position-indexing',
-        title: 'Position & Indexing',
-        description: 'Select elements by their position.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 40,
-        order: 18,
-        instructions: `# Position & Indexing
+  // Challenge 8: Position & Indexing
+  {
+    slug: 'xpath-position-indexing',
+    title: 'Position & Indexing',
+    description: 'Select elements by their position.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 40,
+    order: 18,
+    instructions: `# Position & Indexing
 
 XPath uses 1-based indexing to select elements by position.
 
@@ -1020,7 +1024,7 @@ XPath uses 1-based indexing to select elements by position.
 ## Your Task
 Select the **last item** in the navigation menu.
 `,
-        htmlContent: `<nav class="top-nav">
+    htmlContent: `<nav class="top-nav">
   <ul class="nav-list">
     <li><a href="/">Home</a></li>
     <li><a href="/products">Products</a></li>
@@ -1029,27 +1033,27 @@ Select the **last item** in the navigation menu.
     <li><a href="/contact">Contact</a></li>
   </ul>
 </nav>`,
-        starterCode: '',
-        hints: [
-            'Use last() to get the final element',
-            'Select the li elements within nav',
-            'The answer is: //nav//li[last()] or //ul/li[last()]'
-        ],
-        tags: ['xpath', 'selector', 'position', 'indexing', 'basic'],
-        targetSelector: '//ul/li[last()]',
-    },
+    starterCode: '',
+    hints: [
+      'Use last() to get the final element',
+      'Select the li elements within nav',
+      'The answer is: //nav//li[last()] or //ul/li[last()]'
+    ],
+    tags: ['xpath', 'selector', 'position', 'indexing', 'basic'],
+    targetSelector: '//ul/li[last()]',
+  },
 
-    // Challenge 9: Normalize-space
-    {
-        slug: 'xpath-normalize-space',
-        title: 'Normalize-space',
-        description: 'Handle whitespace in text content.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 45,
-        order: 19,
-        instructions: `# Normalize-space
+  // Challenge 9: Normalize-space
+  {
+    slug: 'xpath-normalize-space',
+    title: 'Normalize-space',
+    description: 'Handle whitespace in text content.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 45,
+    order: 19,
+    instructions: `# Normalize-space
 
 Real HTML often has inconsistent whitespace. \`normalize-space()\` handles this.
 
@@ -1080,7 +1084,7 @@ Real HTML often has inconsistent whitespace. \`normalize-space()\` handles this.
 ## Your Task
 Select the button with text "   Save Changes   " (has extra whitespace).
 `,
-        htmlContent: `<div class="form-actions">
+    htmlContent: `<div class="form-actions">
   <button type="button" class="btn">
     Cancel
   </button>
@@ -1091,27 +1095,27 @@ Select the button with text "   Save Changes   " (has extra whitespace).
     Save Changes
   </button>
 </div>`,
-        starterCode: '',
-        hints: [
-            'The button text has whitespace that text()= won\'t match',
-            'Use normalize-space() to handle the whitespace',
-            'The answer is: //button[normalize-space()="Save Changes"]'
-        ],
-        tags: ['xpath', 'selector', 'normalize-space', 'whitespace', 'basic'],
-        targetSelector: '//button[normalize-space()="Save Changes"]',
-    },
+    starterCode: '',
+    hints: [
+      'The button text has whitespace that text()= won\'t match',
+      'Use normalize-space() to handle the whitespace',
+      'The answer is: //button[normalize-space()="Save Changes"]'
+    ],
+    tags: ['xpath', 'selector', 'normalize-space', 'whitespace', 'basic'],
+    targetSelector: '//button[normalize-space()="Save Changes"]',
+  },
 
-    // Challenge 10: Complex XPath
-    {
-        slug: 'xpath-complex-table',
-        title: 'Complex XPath: Tables',
-        description: 'Navigate complex table structures.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'xpath-basics',
-        xpReward: 50,
-        order: 20,
-        instructions: `# Complex XPath: Tables
+  // Challenge 10: Complex XPath
+  {
+    slug: 'xpath-complex-table',
+    title: 'Complex XPath: Tables',
+    description: 'Navigate complex table structures.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 50,
+    order: 20,
+    instructions: `# Complex XPath: Tables
 
 Tables are common in web apps. Let's master navigating them!
 
@@ -1144,7 +1148,7 @@ Select the **status cell** for the order with ID "ORD-002".
 
 > **Hint:** First find the row with that order ID, then get the status column.
 `,
-        htmlContent: `<table class="orders-table">
+    htmlContent: `<table class="orders-table">
   <thead>
     <tr>
       <th>Order ID</th>
@@ -1174,33 +1178,33 @@ Select the **status cell** for the order with ID "ORD-002".
     </tr>
   </tbody>
 </table>`,
-        starterCode: '',
-        hints: [
-            'Find the row that contains "ORD-002"',
-            'Then select the td with class "status" or the 4th td',
-            'The answer is: //tr[td[text()="ORD-002"]]/td[4] or //td[text()="ORD-002"]/following-sibling::td[@class="status pending"]'
-        ],
-        tags: ['xpath', 'selector', 'table', 'complex', 'basic'],
-        targetSelector: '//tr[td[text()="ORD-002"]]/td[4]',
-    },
+    starterCode: '',
+    hints: [
+      'Find the row that contains "ORD-002"',
+      'Then select the td with class "status" or the 4th td',
+      'The answer is: //tr[td[text()="ORD-002"]]/td[4] or //td[text()="ORD-002"]/following-sibling::td[@class="status pending"]'
+    ],
+    tags: ['xpath', 'selector', 'table', 'complex', 'basic'],
+    targetSelector: '//tr[td[text()="ORD-002"]]/td[4]',
+  },
 ];
 
 // ============================================================================
 // CSS vs XPATH COMPARISON CHALLENGES (3)
 // ============================================================================
 
-const comparisonChallenges = [
-    // Challenge 1: Same Element, Two Ways
-    {
-        slug: 'selector-comparison-same-element',
-        title: 'Same Element, Two Ways',
-        description: 'Write both CSS and XPath for the same element.',
-        type: 'CSS_SELECTOR' as const, // Start with CSS
-        difficulty: 'EASY' as const,
-        category: 'selector-comparison',
-        xpReward: 30,
-        order: 21,
-        instructions: `# Same Element, Two Ways
+export const comparisonChallenges = [
+  // Challenge 1: Same Element, Two Ways
+  {
+    slug: 'selector-comparison-same-element',
+    title: 'Same Element, Two Ways',
+    description: 'Write both CSS and XPath for the same element.',
+    type: 'CSS_SELECTOR' as const, // Start with CSS
+    difficulty: 'EASY' as const,
+    category: 'selector-comparison',
+    xpReward: 30,
+    order: 21,
+    instructions: `# Same Element, Two Ways
 
 Often you can select the same element with either CSS or XPath. Let's compare!
 
@@ -1226,7 +1230,7 @@ Write a CSS selector to select the search button.
 
 > **Note:** Toggle to XPath to try the same element with XPath!
 `,
-        htmlContent: `<header class="main-header">
+    htmlContent: `<header class="main-header">
   <div class="logo">MySite</div>
   <form class="search-form">
     <input type="text" placeholder="Search..." class="search-input" />
@@ -1236,27 +1240,27 @@ Write a CSS selector to select the search button.
     <button class="btn">Login</button>
   </nav>
 </header>`,
-        starterCode: '',
-        hints: [
-            'The button has an ID: search-btn',
-            'In CSS, use # for ID selectors',
-            'The answer is: #search-btn'
-        ],
-        tags: ['css', 'xpath', 'comparison', 'basic'],
-        targetSelector: '#search-btn',
-    },
+    starterCode: '',
+    hints: [
+      'The button has an ID: search-btn',
+      'In CSS, use # for ID selectors',
+      'The answer is: #search-btn'
+    ],
+    tags: ['css', 'xpath', 'comparison', 'basic'],
+    targetSelector: '#search-btn',
+  },
 
-    // Challenge 2: When XPath Wins
-    {
-        slug: 'selector-when-xpath-wins',
-        title: 'When XPath Wins',
-        description: 'A scenario where XPath can do what CSS cannot.',
-        type: 'XPATH_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'selector-comparison',
-        xpReward: 35,
-        order: 22,
-        instructions: `# When XPath Wins
+  // Challenge 2: When XPath Wins
+  {
+    slug: 'selector-when-xpath-wins',
+    title: 'When XPath Wins',
+    description: 'A scenario where XPath can do what CSS cannot.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'selector-comparison',
+    xpReward: 35,
+    order: 22,
+    instructions: `# When XPath Wins
 
 There are things XPath can do that CSS **cannot**:
 
@@ -1276,7 +1280,7 @@ Write an XPath to select the product card containing "Out of Stock".
 
 > **Tip:** Use \`contains()\` to check for text within children.
 `,
-        htmlContent: `<div class="products-grid">
+    htmlContent: `<div class="products-grid">
   <div class="product-card">
     <h3>Wireless Mouse</h3>
     <p class="price">$29.99</p>
@@ -1296,27 +1300,27 @@ Write an XPath to select the product card containing "Out of Stock".
     <button class="btn">Add to Cart</button>
   </div>
 </div>`,
-        starterCode: '',
-        hints: [
-            'You need to find a div that contains "Out of Stock" text',
-            'Use contains() or .// to check descendant text',
-            'The answer is: //div[@class="product-card" and .//span[contains(text(), "Out of Stock")]]'
-        ],
-        tags: ['xpath', 'comparison', 'text', 'parent', 'basic'],
-        targetSelector: '//div[contains(@class, "product-card") and .//text()[contains(., "Out of Stock")]]',
-    },
+    starterCode: '',
+    hints: [
+      'You need to find a div that contains "Out of Stock" text',
+      'Use contains() or .// to check descendant text',
+      'The answer is: //div[@class="product-card" and .//span[contains(text(), "Out of Stock")]]'
+    ],
+    tags: ['xpath', 'comparison', 'text', 'parent', 'basic'],
+    targetSelector: '//div[contains(@class, "product-card") and .//text()[contains(., "Out of Stock")]]',
+  },
 
-    // Challenge 3: The Faster Selector
-    {
-        slug: 'selector-performance',
-        title: 'The Faster Selector',
-        description: 'Understand selector performance implications.',
-        type: 'CSS_SELECTOR' as const,
-        difficulty: 'EASY' as const,
-        category: 'selector-comparison',
-        xpReward: 40,
-        order: 23,
-        instructions: `# Selector Performance
+  // Challenge 3: The Faster Selector
+  {
+    slug: 'selector-performance',
+    title: 'The Faster Selector',
+    description: 'Understand selector performance implications.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'selector-comparison',
+    xpReward: 40,
+    order: 23,
+    instructions: `# Selector Performance
 
 In general, **CSS selectors are faster** than XPath in modern browsers.
 
@@ -1338,7 +1342,7 @@ Select the submit button using the **most performant** selector.
 
 > **Hint:** ID is the fastest!
 `,
-        htmlContent: `<form id="contact-form" class="form contact-form modern-design">
+    htmlContent: `<form id="contact-form" class="form contact-form modern-design">
   <div class="form-group">
     <input type="text" id="name-field" data-testid="name" class="input" placeholder="Name" />
   </div>
@@ -1353,15 +1357,15 @@ Select the submit button using the **most performant** selector.
     <button type="submit" id="submit-btn" data-testid="submit" class="btn primary">Send Message</button>
   </div>
 </form>`,
-        starterCode: '',
-        hints: [
-            'ID selectors are the fastest',
-            'The submit button has id="submit-btn"',
-            'The answer is: #submit-btn'
-        ],
-        tags: ['css', 'performance', 'best-practices', 'basic'],
-        targetSelector: '#submit-btn',
-    },
+    starterCode: '',
+    hints: [
+      'ID selectors are the fastest',
+      'The submit button has id="submit-btn"',
+      'The answer is: #submit-btn'
+    ],
+    tags: ['css', 'performance', 'best-practices', 'basic'],
+    targetSelector: '#submit-btn',
+  },
 ];
 
 // ============================================================================
@@ -1369,167 +1373,170 @@ Select the submit button using the **most performant** selector.
 // ============================================================================
 
 async function seedBasicChallenges() {
-    console.log('🌱 Seeding Basic tier challenges...\n');
+  console.log('🌱 Seeding Basic tier challenges...\n');
 
-    try {
-        // ====================================================================
-        // STEP 1: Clear existing challenges (except keep test cases temporarily)
-        // ====================================================================
-        console.log('🧹 Cleaning up existing challenges...');
+  try {
+    // ====================================================================
+    // STEP 1: Clear existing challenges (except keep test cases temporarily)
+    // ====================================================================
+    console.log('🧹 Cleaning up existing challenges...');
 
-        // Get existing challenge IDs
-        const existingChallenges = await db.select({ id: challenges.id }).from(challenges);
-        const existingIds = existingChallenges.map(c => c.id);
+    // Get existing challenge IDs
+    const existingChallenges = await db.select({ id: challenges.id }).from(challenges);
+    const existingIds = existingChallenges.map(c => c.id);
 
-        if (existingIds.length > 0) {
-            // Delete test cases for existing challenges
-            await db.delete(testCases).where(inArray(testCases.challengeId, existingIds));
-            console.log(`   Deleted test cases for ${existingIds.length} challenges`);
+    if (existingIds.length > 0) {
+      // Delete test cases for existing challenges
+      await db.delete(testCases).where(inArray(testCases.challengeId, existingIds));
+      console.log(`   Deleted test cases for ${existingIds.length} challenges`);
 
-            // Delete existing challenges
-            await db.delete(challenges);
-            console.log(`   Deleted ${existingIds.length} existing challenges`);
-        }
-
-        // ====================================================================
-        // STEP 2: Insert CSS Selector Challenges
-        // ====================================================================
-        console.log('\n📘 Creating CSS Selector challenges...');
-
-        for (const challenge of cssChallenges) {
-            const [inserted] = await db.insert(challenges).values({
-                slug: challenge.slug,
-                title: challenge.title,
-                description: challenge.description,
-                type: challenge.type,
-                difficulty: challenge.difficulty,
-                category: challenge.category,
-                xpReward: challenge.xpReward,
-                order: challenge.order,
-                instructions: challenge.instructions,
-                htmlContent: challenge.htmlContent,
-                starterCode: challenge.starterCode,
-                hints: challenge.hints,
-                tags: challenge.tags,
-                isPublished: true,
-                completionCount: 0,
-            }).returning();
-
-            // Add test case for selector validation
-            await db.insert(testCases).values({
-                challengeId: inserted.id,
-                description: `Selector should correctly match the target element`,
-                input: { selector: challenge.targetSelector },
-                expectedOutput: { matchCount: 1 },
-                isHidden: false,
-                order: 1,
-            });
-
-            console.log(`   ✅ ${challenge.order}. ${challenge.title}`);
-        }
-
-        // ====================================================================
-        // STEP 3: Insert XPath Challenges
-        // ====================================================================
-        console.log('\n📙 Creating XPath challenges...');
-
-        for (const challenge of xpathChallenges) {
-            const [inserted] = await db.insert(challenges).values({
-                slug: challenge.slug,
-                title: challenge.title,
-                description: challenge.description,
-                type: challenge.type,
-                difficulty: challenge.difficulty,
-                category: challenge.category,
-                xpReward: challenge.xpReward,
-                order: challenge.order,
-                instructions: challenge.instructions,
-                htmlContent: challenge.htmlContent,
-                starterCode: challenge.starterCode,
-                hints: challenge.hints,
-                tags: challenge.tags,
-                isPublished: true,
-                completionCount: 0,
-            }).returning();
-
-            // Add test case
-            await db.insert(testCases).values({
-                challengeId: inserted.id,
-                description: `XPath should correctly match the target element`,
-                input: { xpath: challenge.targetSelector },
-                expectedOutput: { matchCount: 1 },
-                isHidden: false,
-                order: 1,
-            });
-
-            console.log(`   ✅ ${challenge.order}. ${challenge.title}`);
-        }
-
-        // ====================================================================
-        // STEP 4: Insert Comparison Challenges
-        // ====================================================================
-        console.log('\n📗 Creating CSS vs XPath comparison challenges...');
-
-        for (const challenge of comparisonChallenges) {
-            const [inserted] = await db.insert(challenges).values({
-                slug: challenge.slug,
-                title: challenge.title,
-                description: challenge.description,
-                type: challenge.type,
-                difficulty: challenge.difficulty,
-                category: challenge.category,
-                xpReward: challenge.xpReward,
-                order: challenge.order,
-                instructions: challenge.instructions,
-                htmlContent: challenge.htmlContent,
-                starterCode: challenge.starterCode,
-                hints: challenge.hints,
-                tags: challenge.tags,
-                isPublished: true,
-                completionCount: 0,
-            }).returning();
-
-            // Add test case
-            await db.insert(testCases).values({
-                challengeId: inserted.id,
-                description: `Selector should correctly match the target element`,
-                input: { selector: challenge.targetSelector },
-                expectedOutput: { matchCount: 1 },
-                isHidden: false,
-                order: 1,
-            });
-
-            console.log(`   ✅ ${challenge.order}. ${challenge.title}`);
-        }
-
-        // ====================================================================
-        // SUMMARY
-        // ====================================================================
-        const totalChallenges = cssChallenges.length + xpathChallenges.length + comparisonChallenges.length;
-
-        console.log('\n' + '='.repeat(50));
-        console.log('✨ Basic tier seeding complete!');
-        console.log('='.repeat(50));
-        console.log(`📊 Summary:`);
-        console.log(`   • CSS Selector challenges: ${cssChallenges.length}`);
-        console.log(`   • XPath challenges: ${xpathChallenges.length}`);
-        console.log(`   • Comparison challenges: ${comparisonChallenges.length}`);
-        console.log(`   • Total: ${totalChallenges} challenges`);
-        console.log('='.repeat(50));
-
-    } catch (error) {
-        console.error('❌ Seeding failed:', error);
-        throw error;
+      // Delete existing challenges
+      await db.delete(challenges);
+      console.log(`   Deleted ${existingIds.length} existing challenges`);
     }
+
+    // ====================================================================
+    // STEP 2: Insert CSS Selector Challenges
+    // ====================================================================
+    console.log('\n📘 Creating CSS Selector challenges...');
+
+    for (const challenge of cssChallenges) {
+      const [inserted] = await db.insert(challenges).values({
+        slug: challenge.slug,
+        title: challenge.title,
+        description: challenge.description,
+        type: challenge.type,
+        difficulty: challenge.difficulty,
+        category: challenge.category,
+        xpReward: challenge.xpReward,
+        order: challenge.order,
+        instructions: challenge.instructions,
+        htmlContent: challenge.htmlContent,
+        starterCode: challenge.starterCode,
+        hints: challenge.hints,
+        tags: challenge.tags,
+        isPublished: true,
+        completionCount: 0,
+      }).returning();
+
+      // Add test case for selector validation
+      await db.insert(testCases).values({
+        challengeId: inserted.id,
+        description: `Selector should correctly match the target element`,
+        input: { selector: challenge.targetSelector },
+        expectedOutput: { matchCount: 1 },
+        isHidden: false,
+        order: 1,
+      });
+
+      console.log(`   ✅ ${challenge.order}. ${challenge.title}`);
+    }
+
+    // ====================================================================
+    // STEP 3: Insert XPath Challenges
+    // ====================================================================
+    console.log('\n📙 Creating XPath challenges...');
+
+    for (const challenge of xpathChallenges) {
+      const [inserted] = await db.insert(challenges).values({
+        slug: challenge.slug,
+        title: challenge.title,
+        description: challenge.description,
+        type: challenge.type,
+        difficulty: challenge.difficulty,
+        category: challenge.category,
+        xpReward: challenge.xpReward,
+        order: challenge.order,
+        instructions: challenge.instructions,
+        htmlContent: challenge.htmlContent,
+        starterCode: challenge.starterCode,
+        hints: challenge.hints,
+        tags: challenge.tags,
+        isPublished: true,
+        completionCount: 0,
+      }).returning();
+
+      // Add test case
+      await db.insert(testCases).values({
+        challengeId: inserted.id,
+        description: `XPath should correctly match the target element`,
+        input: { xpath: challenge.targetSelector },
+        expectedOutput: { matchCount: 1 },
+        isHidden: false,
+        order: 1,
+      });
+
+      console.log(`   ✅ ${challenge.order}. ${challenge.title}`);
+    }
+
+    // ====================================================================
+    // STEP 4: Insert Comparison Challenges
+    // ====================================================================
+    console.log('\n📗 Creating CSS vs XPath comparison challenges...');
+
+    for (const challenge of comparisonChallenges) {
+      const [inserted] = await db.insert(challenges).values({
+        slug: challenge.slug,
+        title: challenge.title,
+        description: challenge.description,
+        type: challenge.type,
+        difficulty: challenge.difficulty,
+        category: challenge.category,
+        xpReward: challenge.xpReward,
+        order: challenge.order,
+        instructions: challenge.instructions,
+        htmlContent: challenge.htmlContent,
+        starterCode: challenge.starterCode,
+        hints: challenge.hints,
+        tags: challenge.tags,
+        isPublished: true,
+        completionCount: 0,
+      }).returning();
+
+      // Add test case
+      await db.insert(testCases).values({
+        challengeId: inserted.id,
+        description: `Selector should correctly match the target element`,
+        input: { selector: challenge.targetSelector },
+        expectedOutput: { matchCount: 1 },
+        isHidden: false,
+        order: 1,
+      });
+
+      console.log(`   ✅ ${challenge.order}. ${challenge.title}`);
+    }
+
+    // ====================================================================
+    // SUMMARY
+    // ====================================================================
+    const totalChallenges = cssChallenges.length + xpathChallenges.length + comparisonChallenges.length;
+
+    console.log('\n' + '='.repeat(50));
+    console.log('✨ Basic tier seeding complete!');
+    console.log('='.repeat(50));
+    console.log(`📊 Summary:`);
+    console.log(`   • CSS Selector challenges: ${cssChallenges.length}`);
+    console.log(`   • XPath challenges: ${xpathChallenges.length}`);
+    console.log(`   • Comparison challenges: ${comparisonChallenges.length}`);
+    console.log(`   • Total: ${totalChallenges} challenges`);
+    console.log('='.repeat(50));
+
+  } catch (error) {
+    console.error('❌ Seeding failed:', error);
+    throw error;
+  }
 }
 
 // Run the seed function
-seedBasicChallenges()
+// Run the seed function if executed directly
+if (import.meta.main) {
+  seedBasicChallenges()
     .then(() => {
-        console.log('\n🎉 Database seeded successfully!');
-        process.exit(0);
+      console.log('\n🎉 Database seeded successfully!');
+      process.exit(0);
     })
     .catch((error) => {
-        console.error('Failed to seed database:', error);
-        process.exit(1);
+      console.error('Failed to seed database:', error);
+      process.exit(1);
     });
+}
