@@ -77,6 +77,21 @@ export function CodeEditor({
         return initialCode;
     });
 
+    // Load code when storageKey changes
+    useEffect(() => {
+        if (storageKey && typeof window !== 'undefined') {
+            const saved = localStorage.getItem(storageKey);
+            if (saved) {
+                setCode(saved);
+                onChange?.(saved);
+            } else if (initialCode) {
+                // If no saved code for this new key, revert to initial
+                setCode(initialCode);
+                onChange?.(initialCode);
+            }
+        }
+    }, [storageKey, initialCode, onChange]);
+
     // Auto-save to localStorage
     useEffect(() => {
         if (storageKey && typeof window !== 'undefined') {

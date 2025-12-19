@@ -12,6 +12,7 @@ export interface ExecutionResult {
     output: string;
     executionTime: number;
     error?: string;
+    returnValue?: unknown;
 }
 
 export interface ExecuteOptions {
@@ -54,16 +55,7 @@ export async function executePlaywrightCode(
         } else {
             // Create isolated iframe (fallback behavior)
             iframe = document.createElement('iframe');
-            iframe.style.cssText = `
-                position: fixed;
-                bottom: 0;
-                right: 0;
-                width: 400px;
-                height: 300px;
-                border: 1px solid #333;
-                background: white;
-                z-index: 9999;
-            `;
+            iframe.style.cssText = 'display: none;';
             iframe.sandbox.add('allow-scripts', 'allow-same-origin');
             document.body.appendChild(iframe);
         }
@@ -123,6 +115,7 @@ export async function executePlaywrightCode(
                     const page = new MockedPlaywrightPage(iframeDoc, { timeout });
 
                     // Execute user code
+
                     const userFunction = new Function(
                         'page',
                         'expect',
@@ -136,7 +129,7 @@ export async function executePlaywrightCode(
                     // Simple expect function
                     const expect = createExpect();
 
-                    await userFunction(page, expect);
+                    const returnValue = await userFunction(page, expect);
 
                     const executionTime = Date.now() - startTime;
                     cleanup();
@@ -145,6 +138,7 @@ export async function executePlaywrightCode(
                         status: 'PASSED',
                         output: 'All steps completed successfully',
                         executionTime,
+                        returnValue,
                     });
                 } catch (error) {
                     const executionTime = Date.now() - startTime;
