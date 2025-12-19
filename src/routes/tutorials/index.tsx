@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BookOpen, Clock, Search, AlertCircle } from 'lucide-react';
+import { BookOpen, Clock, Search, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export const Route = createFileRoute('/tutorials/')({
     component: TutorialsPage,
@@ -50,15 +50,20 @@ function TutorialsPage() {
 
     const tutorials = data?.data ?? [];
 
-    // Filter tutorials based on search
+    // Filter tutorials based on search and difficulty
     const filteredTutorials = useMemo(() => {
         return tutorials.filter((tutorial) => {
             const matchesSearch =
                 tutorial.title.toLowerCase().includes(search.toLowerCase()) ||
                 tutorial.description.toLowerCase().includes(search.toLowerCase());
-            return matchesSearch;
+
+            const matchesDifficulty =
+                selectedDifficulty === 'All' ||
+                tutorial.tags?.some(tag => tag.toLowerCase() === selectedDifficulty.toLowerCase());
+
+            return matchesSearch && matchesDifficulty;
         });
-    }, [tutorials, search]);
+    }, [tutorials, search, selectedDifficulty]);
 
     return (
         <div className="min-h-screen p-6 md:p-10">
@@ -143,7 +148,16 @@ function TutorialsPage() {
                                 params={{ slug: tutorial.slug }}
                                 className="group"
                             >
-                                <Card className="h-full glass-card hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/10">
+                                <Card className="h-full glass-card hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/10 relative overflow-hidden">
+                                    {/* Completed Badge */}
+                                    {tutorial.isCompleted && (
+                                        <div className="absolute top-0 right-0 p-2 bg-green-500/10 rounded-bl-lg border-l border-b border-green-500/20">
+                                            <div className="flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400">
+                                                <CheckCircle2 className="h-3.5 w-3.5" />
+                                                Done
+                                            </div>
+                                        </div>
+                                    )}
                                     <CardHeader>
                                         <div className="flex items-center gap-2 mb-2">
                                             <BookOpen className="h-5 w-5 text-primary" />

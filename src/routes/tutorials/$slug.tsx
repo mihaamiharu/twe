@@ -75,6 +75,7 @@ function TutorialDetailPage() {
         onSuccess: () => {
             toast.success('Tutorial completed! 🎉');
             queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
+            queryClient.invalidateQueries({ queryKey: ['tutorials'] });
             queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
             queryClient.invalidateQueries({ queryKey: ['profile'] });
             queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
@@ -277,10 +278,10 @@ function TutorialDetailPage() {
                                     <Button
                                         className="w-full shadow-md hover:shadow-lg transition-shadow"
                                         onClick={() => markCompleteMutation.mutate()}
-                                        disabled={markCompleteMutation.isPending}
+                                        disabled={markCompleteMutation.isPending || displayProgress < 100}
                                     >
                                         <CheckCircle2 className="h-4 w-4 mr-2" />
-                                        {markCompleteMutation.isPending ? 'Saving...' : 'Complete & Continue'}
+                                        {markCompleteMutation.isPending ? 'Saving...' : displayProgress < 100 ? 'Read to Complete' : 'Complete & Continue'}
                                     </Button>
                                 ) : (
                                     <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
