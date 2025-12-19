@@ -4,11 +4,17 @@ import { Trophy, Star, ArrowRight, RotateCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Link } from '@tanstack/react-router';
 
+export interface Achievement {
+    id: string;
+    name: string;
+    icon: string;
+}
+
 export interface ChallengeSuccessDialogProps {
     open: boolean;
     onClose: () => void;
     xpEarned: number;
-    achievements?: string[];
+    achievements?: Achievement[];
     levelUp?: {
         newLevel: number;
         title: string;
@@ -65,8 +71,8 @@ export function ChallengeSuccessDialog({
                             <div className="flex flex-wrap justify-center gap-2">
                                 {achievements.map((achievement, i) => (
                                     <Badge key={i} variant="secondary" className="px-3 py-1 flex gap-1 items-center bg-accent/10 border-accent/20 text-accent-foreground">
-                                        <Trophy className="h-3 w-3" />
-                                        {achievement}
+                                        <span className="text-base">{achievement.icon}</span>
+                                        <span>{achievement.name}</span>
                                     </Badge>
                                 ))}
                             </div>
