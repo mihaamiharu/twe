@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { challenges, testCases, progress, submissions } from '@/db/schema';
-import { eq, and, asc } from 'drizzle-orm';
+import { eq, and, asc, gt } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 
 export const Route = createFileRoute('/api/challenges/$slug')({
@@ -110,6 +110,37 @@ export const Route = createFileRoute('/api/challenges/$slug')({
             // User not authenticated, continue without progress
           }
 
+          // Get next challenge
+          const nextChallenge = await db.query.challenges.findFirst({
+            where: and(
+              eq(challenges.isPublished, true),
+              eq(challenges.category, challenge.category || ''), // Prefer same category
+              // Use order > current order
+              challenge.order !== null ? gt(challenges.order, challenge.order) : undefined
+            ),
+            orderBy: asc(challenges.order),
+            columns: {
+              slug: true,
+              title: true,
+            },
+          });
+
+          // Fallback: If no next challenge in category, find first of next category (by order)
+          let finalNextChallenge = nextChallenge;
+          if (!finalNextChallenge) {
+            finalNextChallenge = await db.query.challenges.findFirst({
+              where: and(
+                eq(challenges.isPublished, true),
+                challenge.order !== null ? gt(challenges.order, challenge.order) : undefined
+              ),
+              orderBy: asc(challenges.order),
+              columns: {
+                slug: true,
+                title: true,
+              }
+            });
+          }
+
           return json({
             success: true,
             data: {
@@ -130,6 +161,10 @@ export const Route = createFileRoute('/api/challenges/$slug')({
               hiddenTestCaseCount: hiddenTestCases.length,
               userProgress,
               bestSubmission,
+              nextChallenge: finalNextChallenge ? {
+                slug: finalNextChallenge.slug,
+                title: finalNextChallenge.title
+              } : null,
             },
           });
         } catch (error) {

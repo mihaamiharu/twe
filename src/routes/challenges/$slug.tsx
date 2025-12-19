@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from '@tanstack/react-router';
+import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
 import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
@@ -39,10 +39,15 @@ interface APIChallenge {
         attempts: number;
         lastAccessedAt: string;
     };
+    nextChallenge?: {
+        slug: string;
+        title: string;
+    } | null;
 }
 
 function ChallengeDetailPage() {
     const { slug } = useParams({ from: '/challenges/$slug' });
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
     const [lastSubmissionResult, setLastSubmissionResult] = useState<{
@@ -229,7 +234,10 @@ function ChallengeDetailPage() {
                     achievements={lastSubmissionResult.achievements}
                     levelUp={lastSubmissionResult.levelUp}
                     onRetry={() => setShowSuccessDialog(false)}
-                // onNextChallenge would go here if we implemented next logic
+                    onNextChallenge={data?.nextChallenge ? () => {
+                        setShowSuccessDialog(false);
+                        navigate({ to: '/challenges/$slug', params: { slug: data.nextChallenge!.slug } });
+                    } : undefined}
                 />
             )}
         </div>

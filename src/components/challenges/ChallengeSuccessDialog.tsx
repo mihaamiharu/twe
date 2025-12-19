@@ -80,23 +80,24 @@ export function ChallengeSuccessDialog({
                     )}
                 </div>
 
-                <DialogFooter className="flex-col sm:flex-row gap-2 sm:gap-0">
-                    <Button variant="outline" onClick={onRetry} className="w-full sm:w-auto">
-                        <RotateCw className="w-4 h-4 mr-2" />
-                        Practice Again
-                    </Button>
-                    <div className="flex gap-2 w-full sm:w-auto">
-                        <Button variant="secondary" asChild className="flex-1 sm:flex-none">
+                <DialogFooter className="flex flex-col gap-3 sm:flex-col sm:gap-3">
+                    {onNextChallenge && (
+                        <Button onClick={onNextChallenge} className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-md">
+                            Next Challenge
+                            <ArrowRight className="w-4 h-4 ml-2 animate-bounce-x" />
+                        </Button>
+                    )}
+
+                    <div className="flex flex-row gap-3 w-full">
+                        <Button variant="outline" onClick={onRetry} className="flex-1">
+                            <RotateCw className="w-4 h-4 mr-2" />
+                            Again
+                        </Button>
+                        <Button variant="secondary" asChild className="flex-1">
                             <Link to="/challenges">
-                                Browse Challenges
+                                Browse List
                             </Link>
                         </Button>
-                        {onNextChallenge && (
-                            <Button onClick={onNextChallenge} className="flex-1 sm:flex-none">
-                                Next Challenge
-                                <ArrowRight className="w-4 h-4 ml-2" />
-                            </Button>
-                        )}
                     </div>
                 </DialogFooter>
             </DialogContent>
