@@ -13,7 +13,7 @@ import { eq, inArray } from 'drizzle-orm';
 // NAVIGATION & ACTIONS CHALLENGES (10)
 // ============================================================================
 
-const navigationChallenges = [
+export const navigationChallenges = [
   {
     slug: 'pw-page-navigation',
     title: 'Page Navigation',
@@ -557,7 +557,7 @@ const result = await frame.locator('#frame-content').textContent();`,
 // ADVANCED LOCATORS CHALLENGES (8)
 // ============================================================================
 
-const locatorChallenges = [
+export const locatorChallenges = [
   {
     slug: 'pw-get-by-role',
     title: 'getByRole',
@@ -972,7 +972,7 @@ const result = String(count);`,
 // ASSERTIONS CHALLENGES (8)
 // ============================================================================
 
-const assertionChallenges = [
+export const assertionChallenges = [
   {
     slug: 'pw-to-be-visible',
     title: 'toBeVisible & toBeHidden',
@@ -1372,7 +1372,7 @@ const result = 'passed';`,
 // WAIT STRATEGIES CHALLENGES (6)
 // ============================================================================
 
-const waitChallenges = [
+export const waitChallenges = [
   {
     slug: 'pw-auto-wait',
     title: 'Auto-Wait Understanding',
@@ -1904,12 +1904,15 @@ async function seedIntermediateChallenges() {
   }
 }
 
-seedIntermediateChallenges()
-  .then(() => {
-    console.log('\n🎉 Database seeded successfully!');
-    process.exit(0);
-  })
-  .catch((error) => {
-    console.error('Failed to seed database:', error);
-    process.exit(1);
-  });
+// Run the seed function if executed directly
+if (import.meta.main) {
+  seedIntermediateChallenges()
+    .then(() => {
+      console.log('\n🎉 Database seeded successfully!');
+      process.exit(0);
+    })
+    .catch((error) => {
+      console.error('Failed to seed database:', error);
+      process.exit(1);
+    });
+}

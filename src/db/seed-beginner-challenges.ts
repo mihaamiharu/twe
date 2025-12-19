@@ -13,7 +13,7 @@ import { eq, inArray } from 'drizzle-orm';
 // JAVASCRIPT FUNDAMENTALS CHALLENGES (10)
 // ============================================================================
 
-const jsFundamentalsChallenges = [
+export const jsFundamentalsChallenges = [
     // Challenge 1: Variables & Types
     {
         slug: 'js-variables-types',
@@ -922,7 +922,7 @@ const result = status === "passed" ? duration : 0;`,
 // DOM UNDERSTANDING CHALLENGES (8)
 // ============================================================================
 
-const domChallenges = [
+export const domChallenges = [
     {
         slug: 'dom-queryselector-vs-all',
         title: 'querySelector vs querySelectorAll',
@@ -1216,7 +1216,7 @@ const result = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0) + (hasSidebar ? 1 : 0);
 // ASYNC/AWAIT BASICS CHALLENGES (5)
 // ============================================================================
 
-const asyncChallenges = [
+export const asyncChallenges = [
     {
         slug: 'async-understanding-promises',
         title: 'Understanding Promises',
@@ -1687,12 +1687,15 @@ async function seedBeginnerChallenges() {
     }
 }
 
-seedBeginnerChallenges()
-    .then(() => {
-        console.log('\n🎉 Database seeded successfully!');
-        process.exit(0);
-    })
-    .catch((error) => {
-        console.error('Failed to seed database:', error);
-        process.exit(1);
-    });
+// Run the seed function if executed directly
+if (import.meta.main) {
+    seedBeginnerChallenges()
+        .then(() => {
+            console.log('\n🎉 Database seeded successfully!');
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error('Failed to seed database:', error);
+            process.exit(1);
+        });
+}

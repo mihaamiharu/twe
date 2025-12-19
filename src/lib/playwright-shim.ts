@@ -11,7 +11,11 @@ export interface Locator {
     click(): Promise<void>;
     fill(value: string): Promise<void>;
     textContent(): Promise<string | null>;
+    inputValue(): Promise<string>;
     isVisible(): Promise<boolean>;
+    isChecked(): Promise<boolean>;
+    isDisabled(): Promise<boolean>;
+    isEditable(): Promise<boolean>;
     check(): Promise<void>;
     uncheck(): Promise<void>;
     selectOption(value: string | string[]): Promise<void>;
@@ -50,21 +54,12 @@ export class MockedPlaywrightPage {
     // Core Actions
     // ============================================
 
-    /**
-     * Click an element matching the selector
-     */
     async click(selector: string): Promise<void> {
-        await this.delay(50); // Simulate async behavior
+        // Auto-wait for element to be visible
+        await this.waitForSelector(selector, { state: 'visible' });
+
         const element = this.targetDocument.querySelector(selector) as HTMLElement;
-
-        if (!element) {
-            throw new Error(`Element not found: ${selector}`);
-        }
-
-        if (!this.isVisible(element)) {
-            throw new Error(`Element is not visible: ${selector}`);
-        }
-
+        if (!element) throw new Error(`Element not found: ${selector}`);
         element.click();
     }
 
@@ -72,13 +67,12 @@ export class MockedPlaywrightPage {
      * Fill an input or textarea with text
      */
     async fill(selector: string, value: string): Promise<void> {
-        await this.delay(50);
+        // Auto-wait for element to be visible
+        await this.waitForSelector(selector, { state: 'visible' });
+
         const element = this.targetDocument.querySelector(selector) as HTMLInputElement | HTMLTextAreaElement;
 
-        if (!element) {
-            throw new Error(`Element not found: ${selector}`);
-        }
-
+        if (!element) throw new Error(`Element not found: ${selector}`);
         if (!('value' in element)) {
             throw new Error(`Element is not an input or textarea: ${selector}`);
         }
@@ -87,6 +81,42 @@ export class MockedPlaywrightPage {
         element.value = value;
         element.dispatchEvent(new Event('input', { bubbles: true }));
         element.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    /**
+     * Check a checkbox or radio button
+     */
+    async check(selector: string): Promise<void> {
+        await this.waitForSelector(selector, { state: 'visible' });
+        const element = this.targetDocument.querySelector(selector) as HTMLInputElement;
+
+        if (!element) throw new Error(`Element not found: ${selector}`);
+        if (element.type !== 'checkbox' && element.type !== 'radio') {
+            throw new Error(`Element is not a checkbox or radio: ${selector}`);
+        }
+
+        if (!element.checked) {
+            element.click();
+            // Ensure checked if click didn't do it (e.g. strict mode issues?)
+            // element.checked = true; // Playwright relies on click usually
+        }
+    }
+
+    /**
+     * Uncheck a checkbox
+     */
+    async uncheck(selector: string): Promise<void> {
+        await this.waitForSelector(selector, { state: 'visible' });
+        const element = this.targetDocument.querySelector(selector) as HTMLInputElement;
+
+        if (!element) throw new Error(`Element not found: ${selector}`);
+        if (element.type !== 'checkbox') {
+            throw new Error(`Element is not a checkbox: ${selector}`);
+        }
+
+        if (element.checked) {
+            element.click();
+        }
     }
 
     /**
@@ -129,6 +159,13 @@ export class MockedPlaywrightPage {
         }
 
         throw new Error(`Timeout ${timeout}ms waiting for selector: ${selector} (state: ${state})`);
+    }
+
+    /**
+     * Get page title
+     */
+    async title(): Promise<string> {
+        return this.targetDocument.title;
     }
 
     // ============================================
@@ -372,9 +409,33 @@ export class MockedPlaywrightPage {
                 return el?.textContent || null;
             },
 
+            async inputValue(): Promise<string> {
+                const el = getElement() as HTMLInputElement;
+                if (!el) throw new Error('Element not found');
+                return el.value;
+            },
+
             async isVisible(): Promise<boolean> {
                 const el = getElement();
                 return el ? self.isVisible(el) : false;
+            },
+
+            async isChecked(): Promise<boolean> {
+                const el = getElement() as HTMLInputElement;
+                if (!el) return false;
+                return el.checked;
+            },
+
+            async isDisabled(): Promise<boolean> {
+                const el = getElement() as HTMLButtonElement | HTMLInputElement;
+                if (!el) return false;
+                return el.disabled;
+            },
+
+            async isEditable(): Promise<boolean> {
+                const el = getElement() as HTMLInputElement;
+                if (!el) return false;
+                return !el.readOnly && !el.disabled;
             },
 
             async check(): Promise<void> {

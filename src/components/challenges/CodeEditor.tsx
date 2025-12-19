@@ -4,7 +4,7 @@
  * Features:
  * - JavaScript/TypeScript syntax highlighting
  * - Dark theme matching app design
- * - Auto-save to localStorage
+ * - Auto-save to IndexedDB (scalable storage)
  * - Cmd/Ctrl+Enter to run
  * - Line numbers and minimap
  */
@@ -13,6 +13,8 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import Editor, { OnMount, OnChange, Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { cn } from '@/lib/utils';
+import { storage } from '@/lib/storage-adapter';
+import { Loader2 } from 'lucide-react';
 
 export interface CodeEditorProps {
     initialCode?: string;
@@ -68,39 +70,62 @@ export function CodeEditor({
 }: CodeEditorProps) {
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
     const monacoRef = useRef<Monaco | null>(null);
-    const [code, setCode] = useState<string>(() => {
-        // Load from localStorage if key provided
-        if (storageKey && typeof window !== 'undefined') {
-            const saved = localStorage.getItem(storageKey);
-            if (saved) return saved;
-        }
-        return initialCode;
-    });
+    const [code, setCode] = useState<string>(initialCode);
 
-    // Load code when storageKey changes
+    // Loading state for async storage fetch
+    const [isStorageLoaded, setIsStorageLoaded] = useState(!storageKey);
+
+    // Load code from IndexedDB
     useEffect(() => {
-        if (storageKey && typeof window !== 'undefined') {
-            const saved = localStorage.getItem(storageKey);
-            if (saved) {
-                setCode(saved);
-                onChange?.(saved);
-            } else if (initialCode) {
-                // If no saved code for this new key, revert to initial
-                setCode(initialCode);
-                onChange?.(initialCode);
+        let mounted = true;
+
+        const loadCode = async () => {
+            if (!storageKey) {
+                setIsStorageLoaded(true);
+                return;
             }
-        }
-    }, [storageKey, initialCode, onChange]);
 
-    // Auto-save to localStorage
+            try {
+                // If the key changes, we might want to temporarily show loading?
+                // For now, we just update the code when it arrives.
+                const saved = await storage.getItem(storageKey);
+                if (mounted) {
+                    if (saved !== null) {
+                        setCode(saved);
+                        onChange?.(saved);
+                    } else if (initialCode) {
+                        // If no saved code (null), fallback to initial
+                        setCode(initialCode);
+                        onChange?.(initialCode);
+                    }
+                    setIsStorageLoaded(true);
+                }
+            } catch (err) {
+                console.warn('Failed to load code from storage:', err);
+                if (mounted) setIsStorageLoaded(true);
+            }
+        };
+
+        if (storageKey) {
+            setIsStorageLoaded(false); // Start loading
+            loadCode();
+        } else {
+            setIsStorageLoaded(true);
+        }
+
+        return () => { mounted = false; };
+    }, [storageKey, initialCode]); // We intentionally omit onChange to avoid re-triggering loop
+
+    // Auto-save to IndexedDB
     useEffect(() => {
-        if (storageKey && typeof window !== 'undefined') {
+        // Only save if we are loaded and have a key and code
+        if (storageKey && isStorageLoaded) {
             const debounceTimer = setTimeout(() => {
-                localStorage.setItem(storageKey, code);
+                storage.setItem(storageKey, code);
             }, 500);
             return () => clearTimeout(debounceTimer);
         }
-    }, [code, storageKey]);
+    }, [code, storageKey, isStorageLoaded]);
 
     // Handle code changes
     const handleChange: OnChange = useCallback(
@@ -128,19 +153,18 @@ export function CodeEditor({
                 label: 'Run Code',
                 keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
                 run: () => {
-                    onRun?.(code);
+                    onRun?.(editor.getValue());
                 },
             });
 
-            // Add Cmd/Ctrl+S to save (prevent default)
+            // Add Cmd/Ctrl+S to save (Just triggers save manually, also autosaved)
             editor.addAction({
                 id: 'save-code',
                 label: 'Save Code',
                 keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
                 run: () => {
-                    // Auto-save handled by effect, just prevent default
                     if (storageKey) {
-                        localStorage.setItem(storageKey, code);
+                        storage.setItem(storageKey, editor.getValue());
                     }
                 },
             });
@@ -148,13 +172,12 @@ export function CodeEditor({
             // Focus editor
             editor.focus();
         },
-        [code, onRun, storageKey]
+        [onRun, storageKey]
     );
 
-    // Update editor when onRun changes (to capture latest code)
+    // Update editor when onRun changes
     useEffect(() => {
         if (editorRef.current && monacoRef.current) {
-            // Update the run action with latest code
             editorRef.current.addAction({
                 id: 'run-code',
                 label: 'Run Code',
@@ -165,6 +188,20 @@ export function CodeEditor({
             });
         }
     }, [code, onRun]);
+
+    if (!isStorageLoaded && storageKey) {
+        return (
+            <div className={cn(
+                'rounded-lg border border-border bg-slate-900 flex items-center justify-center text-muted-foreground',
+                className
+            )} style={{ height }}>
+                <div className="flex flex-col items-center gap-2">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                    <span className="text-xs">Loading saved code...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={cn('rounded-lg overflow-hidden border border-border', className)}>
@@ -202,6 +239,7 @@ export function CodeEditor({
                 }}
                 loading={
                     <div className="flex items-center justify-center h-full bg-slate-900 text-muted-foreground">
+                        <Loader2 className="h-5 w-5 animate-spin mr-2" />
                         Loading editor...
                     </div>
                 }
