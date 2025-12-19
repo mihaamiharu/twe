@@ -10,9 +10,20 @@ export const Route = createFileRoute('/leaderboard')({
     component: LeaderboardPage,
 });
 
+// Define API user shape matching what backend returns
+interface APIUser {
+    id: string;
+    name: string | null;
+    image: string | null;
+    xp: number;
+    level: number;
+    createdAt: string;
+    challengesCompleted: number;
+}
+
 interface LeaderboardResponse {
     success: boolean;
-    data: LeaderboardUser[];
+    data: APIUser[];
     pagination: {
         page: number;
         limit: number;
@@ -37,11 +48,11 @@ function LeaderboardPage() {
     const transformedUsers: LeaderboardUser[] = users.map((user, index) => ({
         id: user.id,
         rank: index + 1,
-        username: user.username || user.displayName || 'Anonymous',
-        displayName: user.displayName || user.username || 'Anonymous',
+        username: user.name || 'Anonymous',
+        displayName: user.name || 'Anonymous',
         level: user.level,
-        totalXP: user.totalXP,
-        challengesCompleted: user.challengesCompleted,
+        totalXP: user.xp,
+        challengesCompleted: user.challengesCompleted || 0,
     }));
 
     return (

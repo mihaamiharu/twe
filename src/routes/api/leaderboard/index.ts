@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
-import { users } from '@/db/schema';
+import { users, progress } from '@/db/schema';
 import { desc, eq, and, sql } from 'drizzle-orm';
 
 interface LeaderboardFilters {
@@ -47,6 +47,13 @@ export const Route = createFileRoute('/api/leaderboard/')({
               xp: users.xp,
               level: users.level,
               createdAt: users.createdAt,
+              challengesCompleted: sql<number>`(
+                SELECT count(*)::int
+                FROM ${progress}
+                WHERE ${progress.userId} = ${users.id}
+                AND ${progress.isCompleted} = true
+                AND ${progress.challengeId} IS NOT NULL
+              )`,
             })
             .from(users)
             .where(and(...conditions))

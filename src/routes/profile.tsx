@@ -27,6 +27,7 @@ interface UserProfile {
         challengesCompleted: number;
         totalXp: number;
         currentStreak: number;
+        challengesByType: Record<string, number>;
     };
     recentAchievements: {
         name: string;
@@ -134,6 +135,11 @@ function ProfilePage() {
     const neededXp = xpToNext - currentLevelXp;
     const levelProgress = neededXp > 0 ? (progressXp / neededXp) * 100 : 100;
 
+    // Counts for tiers
+    const selectorCount = (user.stats.challengesByType?.['CSS_SELECTOR'] ?? 0) + (user.stats.challengesByType?.['XPATH_SELECTOR'] ?? 0);
+    const jsCount = user.stats.challengesByType?.['JAVASCRIPT'] ?? 0;
+    const playwrightCount = user.stats.challengesByType?.['PLAYWRIGHT'] ?? 0;
+
     return (
         <div className="min-h-screen p-6 md:p-10 page-transition">
             <div className="max-w-6xl mx-auto">
@@ -228,7 +234,7 @@ function ProfilePage() {
                                         </div>
                                         <Badge variant="secondary">15 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min((user.stats?.challengesCompleted ?? 0) / 15 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(selectorCount / 15 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* Tier: Beginner */}
@@ -240,7 +246,7 @@ function ProfilePage() {
                                         </div>
                                         <Badge variant="secondary">23 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(Math.max((user.stats?.challengesCompleted ?? 0) - 15, 0) / 23 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(jsCount / 23 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* Tier: Intermediate */}
@@ -252,7 +258,7 @@ function ProfilePage() {
                                         </div>
                                         <Badge variant="secondary">32 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(Math.max((user.stats?.challengesCompleted ?? 0) - 38, 0) / 32 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(playwrightCount / 32 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* Tier: Expert */}
@@ -264,7 +270,7 @@ function ProfilePage() {
                                         </div>
                                         <Badge variant="secondary">18 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(Math.max((user.stats?.challengesCompleted ?? 0) - 70, 0) / 18 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(Math.max(playwrightCount - 32, 0) / 18 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* XP Milestones */}
