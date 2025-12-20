@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { signUp } from '@/lib/auth.client';
 import { signUpSchema, type SignUpInput } from '@/lib/validations';
 import { Button } from '@/components/ui/button';
@@ -13,7 +13,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Mail, CheckCircle } from 'lucide-react';
+import { Mail, CheckCircle, RefreshCw } from 'lucide-react';
 
 interface RegisterFormProps {
     onSuccess?: () => void;
@@ -30,6 +30,58 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [formError, setFormError] = useState('');
     const [registrationComplete, setRegistrationComplete] = useState(false);
+
+    // Resend verification state
+    const [isResending, setIsResending] = useState(false);
+    const [resendCooldown, setResendCooldown] = useState(0);
+    const [resendStatus, setResendStatus] = useState<'idle' | 'success' | 'error'>('idle');
+    const [resendError, setResendError] = useState('');
+
+    // Cooldown timer
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+
+        const timer = setTimeout(() => {
+            setResendCooldown((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [resendCooldown]);
+
+    // Resend verification email handler
+    const handleResendEmail = useCallback(async () => {
+        if (isResending || resendCooldown > 0) return;
+
+        setIsResending(true);
+        setResendStatus('idle');
+        setResendError('');
+
+        try {
+            const response = await fetch('/api/auth/resend-verification', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                setResendStatus('error');
+                setResendError(data.error || 'Failed to resend email');
+                if (data.cooldownRemaining) {
+                    setResendCooldown(data.cooldownRemaining);
+                }
+            } else {
+                setResendStatus('success');
+                setResendCooldown(60); // Start 60 second cooldown
+            }
+        } catch (err) {
+            setResendStatus('error');
+            setResendError('An error occurred. Please try again.');
+        } finally {
+            setIsResending(false);
+        }
+    }, [formData.email, isResending, resendCooldown]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -123,6 +175,35 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                             <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
                             <span>Check your spam folder if you don't see it</span>
                         </div>
+                    </div>
+
+                    {/* Resend Email Section */}
+                    <div className="pt-2 border-t border-border">
+                        {resendStatus === 'success' ? (
+                            <p className="text-sm text-green-500 flex items-center justify-center gap-1">
+                                <CheckCircle className="h-4 w-4" />
+                                Verification email sent!
+                            </p>
+                        ) : resendStatus === 'error' ? (
+                            <p className="text-sm text-destructive">{resendError}</p>
+                        ) : null}
+
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleResendEmail}
+                            disabled={isResending || resendCooldown > 0}
+                            className="mt-2 text-muted-foreground hover:text-foreground"
+                        >
+                            {isResending ? (
+                                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                            ) : (
+                                <RefreshCw className="h-4 w-4 mr-2" />
+                            )}
+                            {resendCooldown > 0
+                                ? `Resend in ${resendCooldown}s`
+                                : "Didn't receive it? Resend email"}
+                        </Button>
                     </div>
                 </CardContent>
 
