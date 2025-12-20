@@ -4,35 +4,58 @@
 @import "@fontsource/inter/600.css";
 @import "@fontsource/inter/700.css";
 
-/* Theme configuration for Tailwind v4 - Dark Mode (default) */
+/* Theme configuration for Tailwind v4 - Dark Mode (default - Emerald Slate V2) */
 @theme {
-  /* Colors - Dark Mode */
-  --color-background: hsl(240 10% 3.9%);
-  --color-foreground: hsl(0 0% 95%);
-  --color-card: hsl(240 6% 10%);
-  --color-card-foreground: hsl(0 0% 95%);
-  --color-popover: hsl(240 6% 10%);
-  --color-popover-foreground: hsl(0 0% 95%);
-  --color-primary: hsl(263 70% 55%);
-  --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(240 4% 16%);
-  --color-secondary-foreground: hsl(0 0% 95%);
-  --color-muted: hsl(240 5% 15%);
-  --color-muted-foreground: hsl(240 5% 60%);
-  --color-accent: hsl(172 66% 50%);
-  --color-accent-foreground: hsl(0 0% 100%);
-  --color-destructive: hsl(0 62.8% 50.6%);
+  /* Colors - Dark Mode: Deep Slate & Teal-Emerald */
+  --color-background: hsl(220 25% 12%);
+  /* Deep Slate */
+  --color-foreground: hsl(210 40% 98%);
+  /* Off-white */
+
+  --color-card: hsl(220 25% 16%);
+  /* Surface-1: Lighter Slate */
+  --color-card-foreground: hsl(210 40% 98%);
+
+  --color-popover: hsl(220 25% 20%);
+  /* Surface-2: Elevated Slate (Modals/Popovers) */
+  --color-popover-foreground: hsl(210 40% 98%);
+
+  --color-primary: hsl(168 85% 52%);
+  /* Teal-Emerald - Distinct from Success Green */
+  --color-primary-foreground: hsl(220 25% 12%);
+  /* Dark text on bright teal */
+
+  --color-secondary: hsl(220 15% 25%);
+  /* Slate */
+  --color-secondary-foreground: hsl(210 40% 98%);
+
+  --color-muted: hsl(220 15% 25%);
+  --color-muted-foreground: hsl(220 15% 65%);
+  /* Grey Blue - Readable metadata */
+
+  --color-accent: hsl(180 50% 50%);
+  /* Cyan accent for varied actions */
+  --color-accent-foreground: hsl(220 25% 12%);
+
+  --color-destructive: hsl(0 84% 60%);
   --color-destructive-foreground: hsl(0 0% 100%);
-  --color-border: hsl(240 4% 18%);
-  --color-input: hsl(240 4% 18%);
-  --color-ring: hsl(263 70% 55%);
+
+  --color-border: hsl(220 15% 25%);
+  --color-input: hsl(220 15% 25%);
+  --color-ring: hsl(168 85% 52%);
+  /* Match primary */
 
   /* Chart colors */
-  --color-chart-1: hsl(263 70% 50%);
-  --color-chart-2: hsl(172 66% 50%);
-  --color-chart-3: hsl(43 96% 56%);
-  --color-chart-4: hsl(291 47% 51%);
-  --color-chart-5: hsl(12 76% 61%);
+  --color-chart-1: hsl(168 85% 52%);
+  /* Teal-Emerald */
+  --color-chart-2: hsl(142 70% 50%);
+  /* Success Green */
+  --color-chart-3: hsl(220 96% 56%);
+  /* Blue */
+  --color-chart-4: hsl(280 47% 51%);
+  /* Purple */
+  --color-chart-5: hsl(340 76% 61%);
+  /* Pink */
 
   /* Border radius */
   --radius-sm: 0.5rem;
@@ -46,27 +69,40 @@
   --radius: 0.625rem;
 }
 
-/* Light Mode Overrides */
+/* Light Mode Overrides (Emerald Slate V2 - High Contrast) */
 .light {
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(240 10% 3.9%);
+  --color-background: hsl(210 40% 98%);
+  /* Ice White */
+  --color-foreground: hsl(220 25% 12%);
+  /* Deep Slate Text */
+
   --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(240 10% 3.9%);
+  /* Pure White */
+  --color-card-foreground: hsl(220 25% 12%);
+
   --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(240 10% 3.9%);
-  --color-primary: hsl(263 70% 50%);
+  --color-popover-foreground: hsl(220 25% 12%);
+
+  --color-primary: hsl(168 100% 35%);
+  /* Deep Teal-Emerald - Accessible Contrast (AA+) */
   --color-primary-foreground: hsl(0 0% 100%);
-  --color-secondary: hsl(240 4.8% 95.9%);
-  --color-secondary-foreground: hsl(240 5.9% 10%);
-  --color-muted: hsl(240 4.8% 95.9%);
-  --color-muted-foreground: hsl(240 3.8% 46.1%);
-  --color-accent: hsl(172 66% 45%);
+
+  --color-secondary: hsl(220 15% 90%);
+  --color-secondary-foreground: hsl(220 25% 12%);
+
+  --color-muted: hsl(220 15% 90%);
+  --color-muted-foreground: hsl(220 10% 46%);
+
+  --color-accent: hsl(180 60% 45%);
+  /* Darker Cyan for text visibility on white */
   --color-accent-foreground: hsl(0 0% 100%);
+
   --color-destructive: hsl(0 84.2% 60.2%);
   --color-destructive-foreground: hsl(0 0% 100%);
-  --color-border: hsl(240 5.9% 90%);
-  --color-input: hsl(240 5.9% 90%);
-  --color-ring: hsl(263 70% 50%);
+
+  --color-border: hsl(220 15% 85%);
+  --color-input: hsl(220 15% 85%);
+  --color-ring: hsl(168 100% 35%);
 }
 
 .light body {
@@ -259,6 +295,7 @@ code {
     opacity: 0;
     transform: translateY(8px) scale(0.99);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -267,17 +304,20 @@ code {
 
 /* Shimmer Effect for Loading/Skeleton */
 .animate-shimmer {
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      transparent 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite linear;
 }
 
 @keyframes shimmer {
-  from { background-position: 200% 0; }
-  to { background-position: -200% 0; }
+  from {
+    background-position: 200% 0;
+  }
+
+  to {
+    background-position: -200% 0;
+  }
 }
