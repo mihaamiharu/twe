@@ -26,7 +26,7 @@ interface APIChallenge {
     instructions: string;
     htmlContent?: string;
     starterCode?: string;
-    hints?: string[];
+
     tags?: string[];
     testCases?: Array<{
         id: string;
@@ -95,11 +95,7 @@ function ChallengeDetailPage() {
             const firstTestInput = data.testCases[0].input as { selector?: string; xpath?: string };
             return firstTestInput?.selector || firstTestInput?.xpath || '';
         })(),
-        hints: data.hints?.map((hint, index) => ({
-            id: String(index + 1),
-            content: hint,
-            xpCost: (index + 1) * 5,
-        })) || [],
+
         testCases: data.testCases?.map(tc => ({
             id: tc.id,
             name: tc.description,

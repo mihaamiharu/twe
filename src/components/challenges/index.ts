@@ -19,11 +19,6 @@ export type { TestResult, TestResultsProps } from './TestResults';
 export { ChallengeCard } from './ChallengeCard';
 export type { ChallengeCardProps, ChallengeType, Difficulty } from './ChallengeCard';
 
-export { HintSystem } from './HintSystem';
-export type { Hint, HintSystemProps } from './HintSystem';
-
 export { ChallengePlayground } from './ChallengePlayground';
 export type { Challenge, ChallengePlaygroundProps } from './ChallengePlayground';
 
-export { Hints } from './Hints';
-export type { HintsProps } from './Hints';

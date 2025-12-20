@@ -140,7 +140,6 @@ Write a selector that uniquely identifies the submit button in the HTML below.
   </form>
 </div>`,
             starterCode: '',
-            hints: ['Look at the button element', 'The button has an id attribute', 'Try using #submit-btn'],
             tags: ['css', 'selector', 'beginner'],
             isPublished: true,
             completionCount: 0,
@@ -188,7 +187,6 @@ Write an XPath that uniquely identifies the About link.
   </nav>
 </header>`,
             starterCode: '',
-            hints: ['Look for the anchor element with "About" text', 'Try //a[@id="about-link"]', 'You can also use //a[text()="About"]'],
             tags: ['xpath', 'selector', 'intermediate'],
             isPublished: true,
             completionCount: 0,
@@ -243,7 +241,6 @@ await page.getByText('Submit').click();
 // Use page.click() to click the submit button
 
 `,
-            hints: ['Use page.click() with a selector', 'The button has id="submit-btn"', 'Try: await page.click("#submit-btn")'],
             tags: ['playwright', 'javascript', 'beginner'],
             isPublished: true,
             completionCount: 0,
