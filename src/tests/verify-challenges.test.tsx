@@ -1,4 +1,11 @@
 import { describe, test, expect, beforeAll } from 'bun:test';
+import { GlobalRegistrator } from '@happy-dom/global-registrator';
+
+// Ensure DOM exists
+if (typeof document === 'undefined') {
+    GlobalRegistrator.register();
+}
+
 import { cssChallenges, xpathChallenges, comparisonChallenges } from '../db/seed-basic-challenges';
 import { jsFundamentalsChallenges, domChallenges, asyncChallenges } from '../db/seed-beginner-challenges';
 import { navigationChallenges, locatorChallenges, assertionChallenges, waitChallenges } from '../db/seed-intermediate-challenges';
@@ -78,6 +85,11 @@ describe('Challenge Verification', () => {
 
                 if (result.status !== 'PASSED') {
                     console.error(`Challenge ${challenge.slug} failed: ${result.error}`);
+                    if (result.logs && result.logs.length > 0) {
+                        console.log('--- Iframe Logs ---');
+                        result.logs.forEach(log => console.log(`[${log.type}] ${log.message}`));
+                        console.log('-------------------');
+                    }
                 }
 
                 expect(result.status).toBe('PASSED');
