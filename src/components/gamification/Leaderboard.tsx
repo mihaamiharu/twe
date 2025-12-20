@@ -8,7 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatXP, getLevelTitle } from '@/lib/gamification';
-import { Trophy, Medal, Award, Star, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Trophy, Star, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 export interface LeaderboardUser {
     id: string;
@@ -30,11 +30,7 @@ export interface LeaderboardProps {
     className?: string;
 }
 
-const rankIcons: Record<number, React.ReactNode> = {
-    1: <Trophy className="h-5 w-5 text-yellow-400" />,
-    2: <Medal className="h-5 w-5 text-gray-400" />,
-    3: <Award className="h-5 w-5 text-amber-600" />,
-};
+// rankIcons removed: using inline rendering for better flexibility
 
 function getRankChange(current: number, previous?: number) {
     if (!previous) return null;
@@ -76,23 +72,26 @@ export function Leaderboard({
                                 className={cn(
                                     'flex items-center gap-4 px-4 py-3 transition-colors',
                                     isCurrentUser && 'bg-primary/5 border-l-2 border-primary'
-                                )}
-                            >
+                                )}>
                                 {/* Rank */}
-                                <div className="flex items-center justify-center w-8">
-                                    {rankIcons[user.rank] || (
-                                        <span className="text-sm font-medium text-muted-foreground">
-                                            {user.rank}
-                                        </span>
-                                    )}
+                                <div className="flex items-center justify-center w-8 shrink-0">
+                                    <span className={cn(
+                                        "font-bold",
+                                        user.rank === 1 && "text-yellow-400 text-lg",
+                                        user.rank === 2 && "text-gray-400 text-lg",
+                                        user.rank === 3 && "text-amber-600 text-lg",
+                                        user.rank > 3 && "text-sm text-muted-foreground font-medium"
+                                    )}>
+                                        {user.rank}
+                                    </span>
                                 </div>
 
                                 {/* Rank change indicator */}
-                                <div className="w-6 flex items-center justify-center">
+                                <div className="w-6 flex items-center justify-center shrink-0">
                                     {rankChange && (
                                         <>
                                             {rankChange.direction === 'up' && (
-                                                <span className="flex items-center text-green-400">
+                                                <span className="flex items-center text-emerald-400">
                                                     <TrendingUp className="h-3 w-3" />
                                                 </span>
                                             )}
@@ -154,7 +153,7 @@ export function Leaderboard({
                     </div>
                 )}
             </CardContent>
-        </Card>
+        </Card >
     );
 }
 
