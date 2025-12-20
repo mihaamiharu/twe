@@ -16,6 +16,7 @@ import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TutorialsIndexRouteImport } from './routes/tutorials/index'
+import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as ChallengesIndexRouteImport } from './routes/challenges/index'
 import { Route as TutorialsSlugRouteImport } from './routes/tutorials/$slug'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
@@ -66,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
 const TutorialsIndexRoute = TutorialsIndexRouteImport.update({
   id: '/tutorials/',
   path: '/tutorials/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChallengesIndexRoute = ChallengesIndexRouteImport.update({
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
@@ -214,6 +222,7 @@ export interface FileRoutesById {
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges/': typeof ChallengesIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/tutorials/': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
@@ -241,6 +250,7 @@ export interface FileRouteTypes {
     | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges'
+    | '/docs'
     | '/tutorials'
     | '/api/auth/$'
     | '/api/auth/resend-verification'
@@ -266,6 +276,7 @@ export interface FileRouteTypes {
     | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges'
+    | '/docs'
     | '/tutorials'
     | '/api/auth/$'
     | '/api/auth/resend-verification'
@@ -291,6 +302,7 @@ export interface FileRouteTypes {
     | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges/'
+    | '/docs/'
     | '/tutorials/'
     | '/api/auth/$'
     | '/api/auth/resend-verification'
@@ -317,6 +329,7 @@ export interface RootRouteChildren {
   DocsApiRoute: typeof DocsApiRoute
   TutorialsSlugRoute: typeof TutorialsSlugRoute
   ChallengesIndexRoute: typeof ChallengesIndexRoute
+  DocsIndexRoute: typeof DocsIndexRoute
   TutorialsIndexRoute: typeof TutorialsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthResendVerificationRoute: typeof ApiAuthResendVerificationRoute
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       path: '/tutorials'
       fullPath: '/tutorials'
       preLoaderRoute: typeof TutorialsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/': {
+      id: '/docs/'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/challenges/': {
@@ -520,6 +540,7 @@ const rootRouteChildren: RootRouteChildren = {
   DocsApiRoute: DocsApiRoute,
   TutorialsSlugRoute: TutorialsSlugRoute,
   ChallengesIndexRoute: ChallengesIndexRoute,
+  DocsIndexRoute: DocsIndexRoute,
   TutorialsIndexRoute: TutorialsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthResendVerificationRoute: ApiAuthResendVerificationRoute,

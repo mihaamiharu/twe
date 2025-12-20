@@ -12,7 +12,8 @@ A gamified platform for learning QA testing skills through interactive tutorials
 - 🎮 **Challenge Playground** - Write Playwright-style code in Monaco Editor with real-time execution
 - 🎯 **CSS/XPath Selectors** - Practice DOM element selection with visual feedback
 - 🏆 **Gamification** - Earn XP, level up, unlock achievements, and compete on leaderboards
-- 🔐 **Authentication** - Secure login with Email/Password or Google OAuth
+- 🔐 **Authentication** - Secure login with Email/Password (with verification) or Google OAuth
+- 🐛 **Bug Reporting** - Report issues with QA-style structured forms
 
 ## 🚀 Quick Start
 
@@ -49,6 +50,12 @@ BETTER_AUTH_URL=http://localhost:3000
 # Google OAuth (optional)
 GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Email (for verification emails)
+SMTP_HOST=smtp.example.com
+SMTP_PORT=587
+SMTP_USER=your-email@example.com
+SMTP_PASS=your-email-password
 ```
 
 ### 3. Start Database
@@ -118,6 +125,14 @@ bun run start      # Start production server
 bun run test       # Run tests (Vitest)
 bun run db:migrate # Run database migrations
 bun run db:studio  # Open Drizzle Studio
+
+# Seed scripts (ordered by difficulty)
+bun run db:seed:tutorials     # Seed tutorials
+bun run db:seed:basic         # Basic challenges (selectors)
+bun run db:seed:beginner      # Beginner challenges (JS/DOM)
+bun run db:seed:intermediate  # Intermediate (Playwright)
+bun run db:seed:expert        # Expert challenges
+bun run db:seed:achievements  # Seed achievements
 ```
 
 ## 🎮 Challenge Types
@@ -149,6 +164,17 @@ expect(text).toContain('Success');
 - **Levels**: Level up using formula `100 × level²`
 - **Achievements**: 20+ achievements across categories (Challenges, Streak, XP, Special)
 - **Leaderboard**: Compete with others (opt-in privacy)
+
+## 📊 Challenge Library
+
+The platform includes **96 challenges** across 4 progressive tiers:
+
+| Tier | Count | Focus Areas |
+|------|-------|-------------|
+| Basic | 23 | CSS Selectors, XPath, Comparison |
+| Beginner | 23 | JavaScript Fundamentals, DOM, Async |
+| Intermediate | 29 | Playwright Actions, Locators, Assertions |
+| Expert | 21 | Page Object Model, Data-Driven Testing |
 
 ## 📄 Documentation
 
