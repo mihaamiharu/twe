@@ -13,3 +13,5 @@ count.txt
 todos.json
 init.sql
 .archive/
+test-results.xml
+test-results/
