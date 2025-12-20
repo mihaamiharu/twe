@@ -132,6 +132,11 @@ export const challenges = pgTable('challenges', {
     htmlContent: text('html_content'), // For selector challenges
     starterCode: text('starter_code'), // For JavaScript/Playwright challenges
 
+    // Relations
+    tutorialId: uuid('tutorial_id').references(() => tutorials.id, {
+        onDelete: 'set null',
+    }),
+
     // Metadata
     category: text('category'), // e.g., 'css-basics', 'xpath-basics', 'css-advanced'
     tags: text('tags').array(),
@@ -301,10 +306,14 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
     }),
 }));
 
-export const challengesRelations = relations(challenges, ({ many }) => ({
+export const challengesRelations = relations(challenges, ({ many, one }) => ({
     testCases: many(testCases),
     submissions: many(submissions),
     progress: many(progress),
+    tutorial: one(tutorials, {
+        fields: [challenges.tutorialId],
+        references: [tutorials.id],
+    }),
 }));
 
 export const testCasesRelations = relations(testCases, ({ one }) => ({
@@ -364,6 +373,7 @@ export const userAchievementsRelations = relations(
 
 export const tutorialsRelations = relations(tutorials, ({ many }) => ({
     progress: many(progress),
+    challenges: many(challenges),
 }));
 
 export const bugReportsRelations = relations(bugReports, ({ one }) => ({

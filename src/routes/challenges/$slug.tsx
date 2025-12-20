@@ -3,8 +3,9 @@ import { useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
@@ -41,6 +42,10 @@ interface APIChallenge {
         lastAccessedAt: string;
     };
     nextChallenge?: {
+        slug: string;
+        title: string;
+    } | null;
+    tutorial?: {
         slug: string;
         title: string;
     } | null;
@@ -229,13 +234,25 @@ function ChallengeDetailPage() {
                             <p className="text-muted-foreground mb-6">
                                 {error?.message || 'The requested challenge could not be found.'}
                             </p>
-                            <Link
-                                to="/challenges"
-                                className="inline-flex items-center gap-2 text-primary hover:underline"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                Back to Challenges
-                            </Link>
+                            <div className="flex items-center gap-4 mb-6 justify-center">
+                                <Link to="/challenges">
+                                    <Button variant="ghost" size="sm">
+                                        <ArrowLeft className="h-4 w-4 mr-2" />
+                                        Back to Challenges
+                                    </Button>
+                                </Link>
+                                {data?.tutorial && (
+                                    <>
+                                        <div className="h-4 w-px bg-border" />
+                                        <Link to="/tutorials/$slug" params={{ slug: data.tutorial.slug }}>
+                                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/10">
+                                                <BookOpen className="h-4 w-4 mr-2" />
+                                                Review Tutorial: {data.tutorial.title}
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
