@@ -28,6 +28,7 @@ import { Route as ApiBugReportsIndexRouteImport } from './routes/api/bug-reports
 import { Route as ApiUsersMeRouteImport } from './routes/api/users/me'
 import { Route as ApiTutorialsSlugRouteImport } from './routes/api/tutorials/$slug'
 import { Route as ApiChallengesSlugRouteImport } from './routes/api/challenges/$slug'
+import { Route as ApiAuthResendVerificationRouteImport } from './routes/api/auth/resend-verification'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiTutorialsSlugProgressRouteImport } from './routes/api/tutorials/$slug/progress'
 import { Route as ApiTutorialsSlugCompleteRouteImport } from './routes/api/tutorials/$slug/complete'
@@ -127,6 +128,12 @@ const ApiChallengesSlugRoute = ApiChallengesSlugRouteImport.update({
   path: '/api/challenges/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthResendVerificationRoute =
+  ApiAuthResendVerificationRouteImport.update({
+    id: '/api/auth/resend-verification',
+    path: '/api/auth/resend-verification',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -158,6 +165,7 @@ export interface FileRoutesByFullPath {
   '/challenges': typeof ChallengesIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
@@ -182,6 +190,7 @@ export interface FileRoutesByTo {
   '/challenges': typeof ChallengesIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
@@ -207,6 +216,7 @@ export interface FileRoutesById {
   '/challenges/': typeof ChallengesIndexRoute
   '/tutorials/': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/challenges'
     | '/tutorials'
     | '/api/auth/$'
+    | '/api/auth/resend-verification'
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
     | '/api/users/me'
@@ -257,6 +268,7 @@ export interface FileRouteTypes {
     | '/challenges'
     | '/tutorials'
     | '/api/auth/$'
+    | '/api/auth/resend-verification'
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
     | '/api/users/me'
@@ -281,6 +293,7 @@ export interface FileRouteTypes {
     | '/challenges/'
     | '/tutorials/'
     | '/api/auth/$'
+    | '/api/auth/resend-verification'
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
     | '/api/users/me'
@@ -306,6 +319,7 @@ export interface RootRouteChildren {
   ChallengesIndexRoute: typeof ChallengesIndexRoute
   TutorialsIndexRoute: typeof TutorialsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiAuthResendVerificationRoute: typeof ApiAuthResendVerificationRoute
   ApiChallengesSlugRoute: typeof ApiChallengesSlugRoute
   ApiTutorialsSlugRoute: typeof ApiTutorialsSlugRouteWithChildren
   ApiUsersMeRoute: typeof ApiUsersMeRoute
@@ -451,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChallengesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/resend-verification': {
+      id: '/api/auth/resend-verification'
+      path: '/api/auth/resend-verification'
+      fullPath: '/api/auth/resend-verification'
+      preLoaderRoute: typeof ApiAuthResendVerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -501,6 +522,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChallengesIndexRoute: ChallengesIndexRoute,
   TutorialsIndexRoute: TutorialsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiAuthResendVerificationRoute: ApiAuthResendVerificationRoute,
   ApiChallengesSlugRoute: ApiChallengesSlugRoute,
   ApiTutorialsSlugRoute: ApiTutorialsSlugRouteWithChildren,
   ApiUsersMeRoute: ApiUsersMeRoute,
