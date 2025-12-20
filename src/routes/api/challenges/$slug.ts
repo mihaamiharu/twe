@@ -25,6 +25,14 @@ export const Route = createFileRoute('/api/challenges/$slug')({
               eq(challenges.slug, slug),
               eq(challenges.isPublished, true)
             ),
+            with: {
+              tutorial: {
+                columns: {
+                  slug: true,
+                  title: true,
+                },
+              },
+            },
           });
 
           if (!challenge) {

@@ -34,6 +34,14 @@ interface Tutorial {
         slug: string;
         title: string;
     } | null;
+    challenges?: Array<{
+        slug: string;
+        title: string;
+        difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+        type: string;
+        xpReward: number;
+        category: string;
+    }>;
 }
 
 interface TutorialResponse {
@@ -330,26 +338,55 @@ function TutorialDetailPage() {
                                         </div>
                                     )}
                                 </div>
+
                             </CardContent>
                         </Card>
 
-                        {/* Practice CTA Card - Matching visual weight */}
-                        <Card className="glass-card shadow-lg border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
-                            <CardHeader>
-                                <CardTitle className="text-base">Ready to Practice?</CardTitle>
-                            </CardHeader>
-                            <CardContent className="space-y-3">
-                                <p className="text-sm text-muted-foreground leading-relaxed">
-                                    Put your knowledge to the test with hands-on challenges.
-                                </p>
-                                <Link to="/challenges">
-                                    <Button className="w-full shadow-md hover:shadow-lg transition-shadow">
-                                        Browse Challenges
-                                        <ArrowLeft className="h-4 w-4 ml-2 rotate-180" />
-                                    </Button>
-                                </Link>
-                            </CardContent>
-                        </Card>
+                        {/* Linked Challenges List */}
+                        {tutorial.challenges && tutorial.challenges.length > 0 && (
+                            <Card className="glass-card shadow-lg border-primary/20">
+                                <CardHeader>
+                                    <CardTitle className="text-base flex items-center gap-2">
+                                        <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                                        Practice Challenges
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <p className="text-sm text-muted-foreground">
+                                        Reinforce what you've learned with these related challenges.
+                                    </p>
+                                    <div className="space-y-3">
+                                        {tutorial.challenges.map(challenge => (
+                                            <Link
+                                                key={challenge.slug}
+                                                to="/challenges/$slug"
+                                                params={{ slug: challenge.slug }}
+                                                className="block p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
+                                            >
+                                                <div className="flex items-center justify-between mb-1">
+                                                    <span className="font-medium group-hover:text-primary transition-colors">
+                                                        {challenge.title}
+                                                    </span>
+                                                    <Badge variant={
+                                                        challenge.difficulty === 'EASY' ? 'secondary' :
+                                                            challenge.difficulty === 'MEDIUM' ? 'default' : 'destructive'
+                                                    } className="text-[10px] h-5 px-1.5">
+                                                        {challenge.difficulty}
+                                                    </Badge>
+                                                </div>
+                                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                                    <span className="flex items-center gap-1">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                                                        {challenge.type.replace('_', ' ')}
+                                                    </span>
+                                                    <span>{challenge.xpReward} XP</span>
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>

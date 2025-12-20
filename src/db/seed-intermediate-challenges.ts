@@ -6,8 +6,14 @@
  */
 
 import { db } from './index';
-import { challenges, testCases } from './schema';
+import { challenges, testCases, tutorials } from './schema';
 import { eq, inArray } from 'drizzle-orm';
+
+// Helper to get tutorial ID
+async function getTutorialId(slug: string) {
+  const result = await db.select({ id: tutorials.id }).from(tutorials).where(eq(tutorials.slug, slug));
+  return result[0]?.id || null;
+}
 
 // ============================================================================
 // NAVIGATION & ACTIONS CHALLENGES (10)
@@ -1734,6 +1740,18 @@ async function seedIntermediateChallenges() {
   console.log('🌱 Seeding Intermediate tier (Playwright Basics) challenges...\n');
 
   try {
+    // Fetch Tutorial IDs
+    const navTutorialId = await getTutorialId('playwright-navigation-actions');
+    const locatorsTutorialId = await getTutorialId('playwright-locators');
+    const assertionsTutorialId = await getTutorialId('playwright-assertions');
+    const waitsTutorialId = await getTutorialId('playwright-waits');
+
+    console.log('   🔗 Linking to tutorials:');
+    console.log(`      - Navigation: ${navTutorialId ? '✅ Found' : '❌ Not Found'}`);
+    console.log(`      - Locators: ${locatorsTutorialId ? '✅ Found' : '❌ Not Found'}`);
+    console.log(`      - Assertions: ${assertionsTutorialId ? '✅ Found' : '❌ Not Found'}`);
+    console.log(`      - Waits: ${waitsTutorialId ? '✅ Found' : '❌ Not Found'}`);
+
     const allChallenges = [...navigationChallenges, ...locatorChallenges, ...assertionChallenges, ...waitChallenges];
 
     console.log('🔍 Checking for existing challenges...');
@@ -1771,6 +1789,7 @@ async function seedIntermediateChallenges() {
         tags: challenge.tags,
         isPublished: true,
         completionCount: 0,
+        tutorialId: navTutorialId,
       }).returning();
 
       await db.insert(testCases).values({
@@ -1802,6 +1821,7 @@ async function seedIntermediateChallenges() {
         tags: challenge.tags,
         isPublished: true,
         completionCount: 0,
+        tutorialId: locatorsTutorialId,
       }).returning();
 
       await db.insert(testCases).values({
@@ -1833,6 +1853,7 @@ async function seedIntermediateChallenges() {
         tags: challenge.tags,
         isPublished: true,
         completionCount: 0,
+        tutorialId: assertionsTutorialId,
       }).returning();
 
       await db.insert(testCases).values({
@@ -1864,6 +1885,7 @@ async function seedIntermediateChallenges() {
         tags: challenge.tags,
         isPublished: true,
         completionCount: 0,
+        tutorialId: waitsTutorialId,
       }).returning();
 
       await db.insert(testCases).values({

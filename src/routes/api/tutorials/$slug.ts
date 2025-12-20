@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
-import { tutorials, progress } from '@/db/schema';
+import { tutorials, progress, challenges } from '@/db/schema';
 import { eq, and, gt, asc } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 
@@ -25,6 +25,20 @@ export const Route = createFileRoute('/api/tutorials/$slug')({
                             eq(tutorials.slug, slug),
                             eq(tutorials.isPublished, true)
                         ),
+                        with: {
+                            challenges: {
+                                columns: {
+                                    slug: true,
+                                    title: true,
+                                    difficulty: true,
+                                    type: true,
+                                    xpReward: true,
+                                    category: true,
+                                },
+                                where: eq(challenges.isPublished, true),
+                                orderBy: asc(challenges.order),
+                            },
+                        },
                     });
 
                     if (!tutorial) {

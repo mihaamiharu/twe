@@ -6,8 +6,14 @@
  */
 
 import { db } from './index';
-import { challenges, testCases } from './schema';
+import { challenges, testCases, tutorials } from './schema';
 import { eq, inArray } from 'drizzle-orm';
+
+// Helper to get tutorial ID
+async function getTutorialId(slug: string) {
+    const result = await db.select({ id: tutorials.id }).from(tutorials).where(eq(tutorials.slug, slug));
+    return result[0]?.id || null;
+}
 
 // ============================================================================
 // PAGE OBJECT MODEL CHALLENGES (5)
@@ -1290,6 +1296,16 @@ async function seedExpertChallenges() {
     console.log('🌱 Seeding Expert tier (Real-World Patterns) challenges...\n');
 
     try {
+        // Fetch Tutorial IDs
+        const pomTutorialId = await getTutorialId('playwright-pom');
+        const dataTutorialId = await getTutorialId('playwright-data-driven');
+        const advancedTutorialId = await getTutorialId('playwright-advanced-patterns');
+
+        console.log('   🔗 Linking to tutorials:');
+        console.log(`      - POM: ${pomTutorialId ? '✅ Found' : '❌ Not Found'}`);
+        console.log(`      - Data Driven: ${dataTutorialId ? '✅ Found' : '❌ Not Found'}`);
+        console.log(`      - Advanced: ${advancedTutorialId ? '✅ Found' : '❌ Not Found'}`);
+
         const allChallenges = [...pomChallenges, ...dataDrivenChallenges, ...advancedPatternsChallenges];
 
         console.log('🔍 Checking for existing challenges...');
@@ -1327,6 +1343,7 @@ async function seedExpertChallenges() {
                 tags: challenge.tags,
                 isPublished: true,
                 completionCount: 0,
+                tutorialId: pomTutorialId,
             }).returning();
 
             await db.insert(testCases).values({
@@ -1358,6 +1375,7 @@ async function seedExpertChallenges() {
                 tags: challenge.tags,
                 isPublished: true,
                 completionCount: 0,
+                tutorialId: dataTutorialId,
             }).returning();
 
             await db.insert(testCases).values({
@@ -1389,6 +1407,7 @@ async function seedExpertChallenges() {
                 tags: challenge.tags,
                 isPublished: true,
                 completionCount: 0,
+                tutorialId: advancedTutorialId,
             }).returning();
 
             await db.insert(testCases).values({
