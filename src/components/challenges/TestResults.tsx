@@ -127,9 +127,11 @@ export function TestResults({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={expandAll} className="h-7 text-xs">
-                        Expand Failed
-                    </Button>
+                    {results.some(r => !r.passed && r.error) && (
+                        <Button variant="ghost" size="sm" onClick={expandAll} className="h-7 text-xs">
+                            Expand Failed
+                        </Button>
+                    )}
                     <Button variant="ghost" size="sm" onClick={collapseAll} className="h-7 text-xs">
                         Collapse All
                     </Button>

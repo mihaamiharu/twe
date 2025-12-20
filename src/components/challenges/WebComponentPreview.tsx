@@ -378,32 +378,30 @@ export function WebComponentPreview({
                         </div>
                     </div>
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-2 w-[60px] justify-end">
-                        {viewMode === 'preview' && (
-                            <div className="flex items-center gap-1">
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7"
-                                    onClick={handleZoomOut}
-                                    title="Zoom Out"
-                                >
-                                    <Minus className="h-3.5 w-3.5" />
-                                </Button>
-                                <span className="text-xs w-8 text-center tabular-nums text-muted-foreground">{zoom}%</span>
-                                <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-7 w-7"
-                                    onClick={handleZoomIn}
-                                    title="Zoom In"
-                                >
-                                    <Plus className="h-3.5 w-3.5" />
-                                </Button>
-                            </div>
-                        )}
-                    </div>
+                    {/* Right Actions - Zoom Controls */}
+                    {viewMode === 'preview' && (
+                        <div className="flex items-center gap-1 shrink-0">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={handleZoomOut}
+                                title="Zoom Out"
+                            >
+                                <Minus className="h-3.5 w-3.5" />
+                            </Button>
+                            <span className="text-xs w-8 text-center tabular-nums text-muted-foreground">{zoom}%</span>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7"
+                                onClick={handleZoomIn}
+                                title="Zoom In"
+                            >
+                                <Plus className="h-3.5 w-3.5" />
+                            </Button>
+                        </div>
+                    )}
                 </div>
 
                 {/* Content Area */}
