@@ -205,21 +205,19 @@ graph TB
 
 ```mermaid
 graph LR
-    UserCode[User Code Submission] --> Queue[Submission Queue]
-    Queue --> Validator[Input Validator]
-    Validator --> Sandbox[VM2 Sandbox]
+    UserCode[User Code Submission] --> Validator[Input Validator]
+    Validator --> Iframe[Iframe Sandbox]
     
-    Sandbox --> Layer1[Layer 1: No require/import]
-    Layer1 --> Layer2[Layer 2: No process/fs access]
+    Iframe --> Layer1[Layer 1: Isolated DOM]
+    Layer1 --> Layer2[Layer 2: No Network Access]
     Layer2 --> Layer3[Layer 3: 10s Timeout]
-    Layer3 --> Layer4[Layer 4: Memory Limit]
-    Layer4 --> Execution[Safe Execution]
+    Layer3 --> Execution[Safe Execution]
     
     Execution --> TestRunner[Run Test Cases]
     TestRunner --> Results[Capture Results]
     Results --> Response[Return to User]
     
-    style Sandbox fill:#ff6b6b
+    style Iframe fill:#ff6b6b
     style Execution fill:#51cf66
 ```
 
@@ -355,6 +353,54 @@ graph TB
 
 ---
 
+## 11. Bug Reporting Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Dialog
+    participant API
+    participant Database
+
+    User->>Dialog: Click "Report Bug" button
+    Dialog->>Dialog: Auto-capture page URL, browser info
+    User->>Dialog: Fill bug report form
+    Note over Dialog: Title, Severity, Steps,<br/>Expected/Actual Behavior
+    Dialog->>API: POST /api/bug-reports
+    API->>Database: Insert bug report
+    Database-->>API: Report ID
+    API-->>Dialog: Success response
+    Dialog-->>User: Show success toast
+```
+
+---
+
+## 12. Email Verification Flow
+
+```mermaid
+graph TB
+    Register[User Registers] --> CreateUser[Create User Account]
+    CreateUser --> SendEmail[Send Verification Email]
+    SendEmail --> WaitVerify{Email Verified?}
+    
+    WaitVerify -->|No| ShowBanner[Show "Verify Email" Banner]
+    ShowBanner --> ResendOption[User Clicks Resend]
+    ResendOption --> SendEmail
+    
+    WaitVerify -->|Yes| FullAccess[Full Platform Access]
+    
+    ShowBanner --> ClickLink[User Clicks Email Link]
+    ClickLink --> VerifyToken{Valid Token?}
+    VerifyToken -->|Yes| MarkVerified[Mark Email Verified]
+    MarkVerified --> FullAccess
+    VerifyToken -->|No| ExpiredError[Show Expired/Invalid Error]
+    ExpiredError --> ResendOption
+```
+
+---
+
 ## Notes
 
 These diagrams illustrate the core flows and architecture of the TestingWithEkki platform. They should be referenced during implementation to ensure consistency with the planned design.
+
+**Last Updated:** December 20, 2025
