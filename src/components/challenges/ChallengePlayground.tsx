@@ -405,7 +405,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                     <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">1</div>
                                     Solution Code
                                 </h3>
-                                <div className="flex-1 flex flex-col gap-4">
+                                <div className="flex-1 min-h-0">
                                     <CodeEditor
                                         initialCode={challenge.starterCode}
                                         language="javascript"
@@ -413,34 +413,36 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         onRun={handleRunCode}
                                         storageKey={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                                         height="100%"
-                                        className="flex-1 border rounded-md overflow-hidden shadow-sm"
+                                        className="h-full border rounded-md overflow-hidden shadow-sm"
                                     />
-                                    <div className="flex justify-end">
-                                        <Button
-                                            variant="default"
-                                            size="sm"
-                                            onClick={handleRunCode}
-                                            disabled={isRunning}
-                                            className="w-full sm:w-auto btn-animate"
-                                        >
-                                            {isRunning ? (
-                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                            ) : (
-                                                <Play className="h-4 w-4 mr-2" />
-                                            )}
-                                            Run Code
-                                        </Button>
-                                    </div>
                                 </div>
                             </div>
                         )}
 
                         {/* Test Results */}
                         <div className={cn("flex flex-col gap-2", !isCodeChallenge && "flex-1")}>
-                            <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
-                                <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">2</div>
-                                Live Results
-                            </h3>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
+                                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">2</div>
+                                    Live Results
+                                </h3>
+                                {isCodeChallenge && (
+                                    <Button
+                                        variant="default"
+                                        size="sm"
+                                        onClick={handleRunCode}
+                                        disabled={isRunning}
+                                        className="btn-animate relative z-10"
+                                    >
+                                        {isRunning ? (
+                                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                        ) : (
+                                            <Play className="h-4 w-4 mr-2" />
+                                        )}
+                                        Run Code
+                                    </Button>
+                                )}
+                            </div>
                             <div className="flex-1">
                                 <TestResults results={testResults} isRunning={isRunning} />
                             </div>
