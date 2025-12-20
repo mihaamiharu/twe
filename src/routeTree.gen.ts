@@ -24,6 +24,7 @@ import { Route as ApiTutorialsIndexRouteImport } from './routes/api/tutorials/in
 import { Route as ApiSubmissionsIndexRouteImport } from './routes/api/submissions/index'
 import { Route as ApiLeaderboardIndexRouteImport } from './routes/api/leaderboard/index'
 import { Route as ApiChallengesIndexRouteImport } from './routes/api/challenges/index'
+import { Route as ApiBugReportsIndexRouteImport } from './routes/api/bug-reports/index'
 import { Route as ApiUsersMeRouteImport } from './routes/api/users/me'
 import { Route as ApiTutorialsSlugRouteImport } from './routes/api/tutorials/$slug'
 import { Route as ApiChallengesSlugRouteImport } from './routes/api/challenges/$slug'
@@ -106,6 +107,11 @@ const ApiChallengesIndexRoute = ApiChallengesIndexRouteImport.update({
   path: '/api/challenges/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiBugReportsIndexRoute = ApiBugReportsIndexRouteImport.update({
+  id: '/api/bug-reports/',
+  path: '/api/bug-reports/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiUsersMeRoute = ApiUsersMeRouteImport.update({
   id: '/api/users/me',
   path: '/api/users/me',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
+  '/api/bug-reports': typeof ApiBugReportsIndexRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
   '/api/submissions': typeof ApiSubmissionsIndexRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
+  '/api/bug-reports': typeof ApiBugReportsIndexRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
   '/api/submissions': typeof ApiSubmissionsIndexRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
   '/api/users/me': typeof ApiUsersMeRoute
+  '/api/bug-reports/': typeof ApiBugReportsIndexRoute
   '/api/challenges/': typeof ApiChallengesIndexRoute
   '/api/leaderboard/': typeof ApiLeaderboardIndexRoute
   '/api/submissions/': typeof ApiSubmissionsIndexRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
     | '/api/users/me'
+    | '/api/bug-reports'
     | '/api/challenges'
     | '/api/leaderboard'
     | '/api/submissions'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
     | '/api/users/me'
+    | '/api/bug-reports'
     | '/api/challenges'
     | '/api/leaderboard'
     | '/api/submissions'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
     | '/api/users/me'
+    | '/api/bug-reports/'
     | '/api/challenges/'
     | '/api/leaderboard/'
     | '/api/submissions/'
@@ -297,6 +309,7 @@ export interface RootRouteChildren {
   ApiChallengesSlugRoute: typeof ApiChallengesSlugRoute
   ApiTutorialsSlugRoute: typeof ApiTutorialsSlugRouteWithChildren
   ApiUsersMeRoute: typeof ApiUsersMeRoute
+  ApiBugReportsIndexRoute: typeof ApiBugReportsIndexRoute
   ApiChallengesIndexRoute: typeof ApiChallengesIndexRoute
   ApiLeaderboardIndexRoute: typeof ApiLeaderboardIndexRoute
   ApiSubmissionsIndexRoute: typeof ApiSubmissionsIndexRoute
@@ -410,6 +423,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiChallengesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/bug-reports/': {
+      id: '/api/bug-reports/'
+      path: '/api/bug-reports'
+      fullPath: '/api/bug-reports'
+      preLoaderRoute: typeof ApiBugReportsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/users/me': {
       id: '/api/users/me'
       path: '/api/users/me'
@@ -484,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiChallengesSlugRoute: ApiChallengesSlugRoute,
   ApiTutorialsSlugRoute: ApiTutorialsSlugRouteWithChildren,
   ApiUsersMeRoute: ApiUsersMeRoute,
+  ApiBugReportsIndexRoute: ApiBugReportsIndexRoute,
   ApiChallengesIndexRoute: ApiChallengesIndexRoute,
   ApiLeaderboardIndexRoute: ApiLeaderboardIndexRoute,
   ApiSubmissionsIndexRoute: ApiSubmissionsIndexRoute,

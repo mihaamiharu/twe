@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
-import { Github, Twitter, Zap } from 'lucide-react';
+import { Github, Twitter, Zap, Bug } from 'lucide-react';
+import { BugReportDialog } from '@/components/BugReportDialog';
 
 interface FooterLink {
     label: string;
@@ -100,7 +101,16 @@ export function Footer() {
                     <p className="text-sm text-muted-foreground">
                         © {new Date().getFullYear()} TestingWithEkki. All rights reserved.
                     </p>
-                    <div className="flex gap-6 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <BugReportDialog
+                            trigger={
+                                <button className="flex items-center gap-1 hover:text-foreground transition-colors">
+                                    <Bug className="h-4 w-4" />
+                                    Report Bug
+                                </button>
+                            }
+                        />
+                        <span className="text-border">|</span>
                         <a href="#" className="hover:text-foreground transition-colors">
                             Terms
                         </a>

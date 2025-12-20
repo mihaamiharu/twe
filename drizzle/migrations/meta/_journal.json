@@ -15,6 +15,13 @@
       "when": 1765900929833,
       "tag": "0001_add_category_to_challenges",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1766195248060,
+      "tag": "0002_amused_lily_hollister",
+      "breakpoints": true
     }
   ]
 }
