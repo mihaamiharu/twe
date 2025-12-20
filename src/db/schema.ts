@@ -28,6 +28,22 @@ export const profileVisibilityEnum = pgEnum('profile_visibility', [
     'PRIVATE',
 ]);
 
+// Bug reporting enums
+export const bugSeverityEnum = pgEnum('bug_severity', [
+    'CRITICAL',
+    'HIGH',
+    'MEDIUM',
+    'LOW',
+]);
+
+export const bugReportStatusEnum = pgEnum('bug_report_status', [
+    'NEW',
+    'IN_PROGRESS',
+    'RESOLVED',
+    'WONT_FIX',
+    'CLOSED',
+]);
+
 // ============================================================================
 // AUTHENTICATION TABLES (BetterAuth Integration)
 // ============================================================================
@@ -230,6 +246,36 @@ export const userAchievements = pgTable('user_achievements', {
 });
 
 // ============================================================================
+// BUG REPORTING
+// ============================================================================
+
+export const bugReports = pgTable('bug_reports', {
+    id: uuid('id').defaultRandom().primaryKey(),
+
+    // Reporter info
+    userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+    reporterEmail: text('reporter_email'), // For anonymous reports
+
+    // Bug details (QA-style)
+    title: text('title').notNull(),
+    severity: bugSeverityEnum('severity').notNull().default('MEDIUM'),
+    stepsToReproduce: text('steps_to_reproduce').notNull(),
+    expectedBehavior: text('expected_behavior').notNull(),
+    actualBehavior: text('actual_behavior').notNull(),
+
+    // Context
+    pageUrl: text('page_url'),
+    browserInfo: text('browser_info'),
+
+    // Status tracking
+    status: bugReportStatusEnum('status').notNull().default('NEW'),
+    adminNotes: text('admin_notes'),
+
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// ============================================================================
 // RELATIONS
 // ============================================================================
 
@@ -239,6 +285,7 @@ export const usersRelations = relations(users, ({ many }) => ({
     submissions: many(submissions),
     progress: many(progress),
     achievements: many(userAchievements),
+    bugReports: many(bugReports),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -318,4 +365,11 @@ export const userAchievementsRelations = relations(
 
 export const tutorialsRelations = relations(tutorials, ({ many }) => ({
     progress: many(progress),
+}));
+
+export const bugReportsRelations = relations(bugReports, ({ one }) => ({
+    user: one(users, {
+        fields: [bugReports.userId],
+        references: [users.id],
+    }),
 }));

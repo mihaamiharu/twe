@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
 import { useSession } from '@/lib/auth.client';
+import { trackEvent } from '@/lib/analytics';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -140,6 +141,34 @@ function ChallengeDetailPage() {
                     levelUp: response.data.levelUp,
                 });
                 setShowSuccessDialog(true);
+
+                // Track analytics events
+                if (data) {
+                    trackEvent('challenge_completed', {
+                        slug: data.slug,
+                        difficulty: data.difficulty,
+                        xp: response.data.submission.xpEarned,
+                    });
+                }
+
+                // Track level-up if it occurred
+                if (response.data.levelUp) {
+                    trackEvent('level_up', {
+                        newLevel: response.data.levelUp.newLevel,
+                        totalXP: response.data.submission.xpEarned, // Note: This is XP earned, not total
+                    });
+                }
+
+                // Track new achievements
+                if (response.data.newAchievements?.length) {
+                    for (const achievement of response.data.newAchievements) {
+                        trackEvent('achievement_unlocked', {
+                            slug: achievement.id,
+                            name: achievement.name,
+                        });
+                    }
+                }
+
                 // Invalidate queries to refresh progress
                 queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
                 queryClient.invalidateQueries({ queryKey: ['profile'] });

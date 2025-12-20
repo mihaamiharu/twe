@@ -3,6 +3,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import * as dotenv from 'dotenv';
+import { sendVerificationEmail } from '@/lib/email.server';
 
 dotenv.config();
 
@@ -30,22 +31,36 @@ export const auth = betterAuth({
         },
     }),
 
-    // Email/Password authentication
+    // Email/Password authentication with email verification
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: false, // Can enable later
-    },
-
-    // Social OAuth providers
-    socialProviders: {
-        google: {
-            clientId: process.env.GOOGLE_CLIENT_ID || '',
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-            enabled: !!(
-                process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-            ),
+        requireEmailVerification: true,
+        sendResetPassword: async ({ user, url }) => {
+            // TODO: Implement password reset email
+            console.log(`[Auth] Password reset requested for ${user.email}: ${url}`);
         },
     },
+
+    // Email verification configuration
+    emailVerification: {
+        sendOnSignUp: true,
+        autoSignInAfterVerification: true,
+        sendVerificationEmail: async ({ user, url }) => {
+            await sendVerificationEmail(user.email, url, user.name || undefined);
+        },
+    },
+
+    // Google OAuth removed - using email verification only
+    // To re-enable, uncomment and set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
+    // socialProviders: {
+    //     google: {
+    //         clientId: process.env.GOOGLE_CLIENT_ID || '',
+    //         clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+    //         enabled: !!(
+    //             process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+    //         ),
+    //     },
+    // },
 
     // Session configuration
     session: {
@@ -68,3 +83,4 @@ export const auth = betterAuth({
 
 // Export types for client
 export type Auth = typeof auth;
+
