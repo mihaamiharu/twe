@@ -154,7 +154,6 @@ export const Route = createFileRoute('/api/challenges/$slug')({
               instructions: challenge.instructions,
               htmlContent: challenge.htmlContent,
               starterCode: challenge.starterCode,
-              hints: challenge.hints,
               tags: challenge.tags,
               completionCount: challenge.completionCount,
               testCases: visibleTestCases,

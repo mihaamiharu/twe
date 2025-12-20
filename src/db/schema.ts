@@ -131,7 +131,6 @@ export const challenges = pgTable('challenges', {
     instructions: text('instructions').notNull(), // Detailed instructions
     htmlContent: text('html_content'), // For selector challenges
     starterCode: text('starter_code'), // For JavaScript/Playwright challenges
-    hints: jsonb('hints').$type<string[]>(), // Array of hints
 
     // Metadata
     category: text('category'), // e.g., 'css-basics', 'xpath-basics', 'css-advanced'

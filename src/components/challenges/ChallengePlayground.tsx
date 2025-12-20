@@ -6,7 +6,6 @@
  * - Challenge description and instructions
  * - Code editor with Monaco
  * - Test results display
- * - Hints system
  * - Run/Submit buttons
  * - Responsive tabs on mobile
  */
@@ -24,7 +23,7 @@ import { Play, Send, RotateCcw, Zap, Loader2, Target } from 'lucide-react';
 import { CodeEditor } from './CodeEditor';
 import { WebComponentPreview } from './WebComponentPreview';
 import { TestResults, type TestResult } from './TestResults';
-import { Hints, type Hint } from './Hints';
+
 import { SelectorInput, type SelectorType } from './SelectorInput';
 
 export type ChallengeType = 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
@@ -41,7 +40,7 @@ export interface Challenge {
     starterCode: string;
     htmlContent?: string;
     targetSelector?: string | string[];
-    hints: Hint[];
+
     testCases?: { id: string; name: string; input?: unknown; expectedOutput?: unknown }[];
 }
 
@@ -66,7 +65,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
     );
 
     const [testResults, setTestResults] = useState<TestResult[]>([]);
-    const [revealedHints, setRevealedHints] = useState<Set<string>>(new Set());
+
     const [isRunning, setIsRunning] = useState(false);
     const [hasPassed, setHasPassed] = useState(false);
 
@@ -219,10 +218,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         setPreviewValidation(null);
     }, [challenge.starterCode]);
 
-    // Reveal a hint
-    const handleRevealHint = useCallback((hintId: string) => {
-        setRevealedHints((prev) => new Set([...prev, hintId]));
-    }, []);
+
 
     // Submit solution
     const handleSubmit = useCallback(() => {
@@ -321,17 +317,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                 <MarkdownRenderer content={challenge.instructions} />
                             </div>
 
-                            {/* Hints */}
-                            {challenge.hints.length > 0 && (
-                                <div className="mt-8 pt-6 border-t border-border">
-                                    <h3 className="text-sm font-semibold mb-3">Need Help?</h3>
-                                    <Hints
-                                        hints={challenge.hints}
-                                        revealedHints={revealedHints}
-                                        onRevealHint={handleRevealHint}
-                                    />
-                                </div>
-                            )}
+
                         </TabsContent>
 
                         {challenge.htmlContent && (
