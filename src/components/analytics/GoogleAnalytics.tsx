@@ -52,3 +52,6 @@ export function GoogleAnalytics() {
 
     return null;
 }
+
+// Re-export trackEvent for convenience
+export { trackEvent, type AnalyticsEvent } from '@/lib/analytics';

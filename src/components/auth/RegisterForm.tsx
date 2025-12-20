@@ -13,6 +13,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Mail, CheckCircle } from 'lucide-react';
 
 interface RegisterFormProps {
     onSuccess?: () => void;
@@ -28,6 +29,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
     const [errors, setErrors] = useState<Record<string, string>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [formError, setFormError] = useState('');
+    const [registrationComplete, setRegistrationComplete] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -76,6 +78,8 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                 return;
             }
 
+            // Show email verification message
+            setRegistrationComplete(true);
             onSuccess?.();
         } catch (err) {
             setFormError('An unexpected error occurred. Please try again.');
@@ -84,6 +88,58 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             setIsLoading(false);
         }
     };
+
+    // Show success message after registration
+    if (registrationComplete) {
+        return (
+            <Card className="w-full max-w-md glass-card">
+                <CardHeader className="text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+                        <Mail className="h-8 w-8 text-primary" />
+                    </div>
+                    <CardTitle className="text-2xl font-bold gradient-text">
+                        Check Your Email
+                    </CardTitle>
+                    <CardDescription className="text-base">
+                        We've sent a verification link to
+                    </CardDescription>
+                </CardHeader>
+
+                <CardContent className="text-center space-y-4">
+                    <p className="font-medium text-lg break-all">
+                        {formData.email}
+                    </p>
+
+                    <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
+                        <div className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                            <span>Click the link in the email to verify your account</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                            <span>The link expires in 24 hours</span>
+                        </div>
+                        <div className="flex items-start gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+                            <span>Check your spam folder if you don't see it</span>
+                        </div>
+                    </div>
+                </CardContent>
+
+                <CardFooter className="flex flex-col gap-4">
+                    {onLoginClick && (
+                        <Button
+                            variant="outline"
+                            className="w-full"
+                            onClick={onLoginClick}
+                        >
+                            Back to Sign In
+                        </Button>
+                    )}
+                </CardFooter>
+            </Card>
+        );
+    }
 
     return (
         <Card className="w-full max-w-md glass-card">
@@ -187,3 +243,4 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
 }
 
 export default RegisterForm;
+

@@ -191,9 +191,21 @@ export async function executePlaywrightCode(
                     scripts.forEach((script) => {
                         if (script.textContent) {
                             try {
-                                const win = iframe.contentWindow;
+                                const win = iframe.contentWindow as any;
                                 const doc = iframe.contentDocument;
                                 if (!win || !doc) return;
+
+                                // Convert function declarations to window assignments
+                                // e.g. "function runTask(n) {...}" -> "window.runTask = function(n) {...}"
+                                // This ensures functions are accessible from onclick handlers
+                                let scriptCode = script.textContent;
+
+                                // Extract function names and assign them to window
+                                const funcMatches = scriptCode.matchAll(/function\s+(\w+)\s*\(/g);
+                                const funcNames: string[] = [];
+                                for (const match of funcMatches) {
+                                    funcNames.push(match[1]);
+                                }
 
                                 // Wrap code in a closure that shadows window and document
                                 // This allows us to run the code in the MAIN window context (where timers work)
@@ -201,7 +213,9 @@ export async function executePlaywrightCode(
                                 const code = `
                                     return (function(window, document) {
                                         try {
-                                            ${script.textContent}
+                                            ${scriptCode}
+                                            // Assign declared functions to window for onclick access
+                                            ${funcNames.map(name => `if (typeof ${name} === 'function') window.${name} = ${name};`).join('\n')}
                                         } catch(err) {
                                             console.error('Error in injected script:', err);
                                         }
@@ -224,12 +238,22 @@ export async function executePlaywrightCode(
                         const handlerCode = el.getAttribute('onclick');
                         if (handlerCode) {
                             try {
-                                const win = iframe.contentWindow;
+                                const win = iframe.contentWindow as any;
                                 const doc = iframe.contentDocument;
                                 if (!win || !doc) return;
 
+                                // Extract function names from window that were defined in script tags
+                                // and create local references for them
+                                const windowFuncs = Object.keys(win).filter(
+                                    key => typeof win[key] === 'function' && !['fetch', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'].includes(key)
+                                );
+                                const funcDestructure = windowFuncs.length > 0
+                                    ? `const { ${windowFuncs.join(', ')} } = window;`
+                                    : '';
+
                                 const code = `
                                     const fetch = window.fetch;
+                                    ${funcDestructure}
                                     return (function(window, document, event) {
                                         try {
                                             ${handlerCode}
