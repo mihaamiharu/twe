@@ -273,7 +273,7 @@ const result = await dashboard.getStatus();`,
         tags: ['playwright', 'pom', 'components', 'expert'],
     },
     {
-        slug: 'pw-page-navigation',
+        slug: 'pw-fluent-navigation',
         title: 'Page Navigation Pattern',
         description: 'Implement method chaining between pages.',
         type: 'PLAYWRIGHT' as const,

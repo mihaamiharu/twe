@@ -13,6 +13,7 @@ export interface ExecutionResult {
     executionTime: number;
     error?: string;
     returnValue?: unknown;
+    logs?: Array<{ type: string; message: string }>;
 }
 
 export interface ExecuteOptions {
@@ -45,6 +46,15 @@ export async function executePlaywrightCode(
     const timeout = options?.timeout || 10000;
     const startTime = Date.now();
     const useExistingIframe = !!options?.existingIframe;
+    const logs: Array<{ type: string; message: string }> = [];
+
+
+    // Patch HTML content for specific challenges where happy-dom needs checking
+    // e.g. pw-wait-for-response uses relative fetch which fails in happy-dom
+    let finalHtml = htmlContent;
+    if (htmlContent.includes("fetch('/api/data')")) {
+        finalHtml = htmlContent.replace("fetch('/api/data')", "fetch('http://localhost/api/data')");
+    }
 
     return new Promise((resolve) => {
         let iframe: HTMLIFrameElement;
@@ -68,6 +78,7 @@ export async function executePlaywrightCode(
                 output: `Execution timed out after ${timeout}ms`,
                 executionTime: timeout,
                 error: 'Timeout',
+                logs,
             });
         }, timeout);
 
@@ -90,11 +101,34 @@ export async function executePlaywrightCode(
 
                     // Set up the HTML content
                     iframeDoc.open();
+
+                    // Intercept console logs
+                    const win = iframe.contentWindow as any;
+                    if (win) {
+                        const originalLog = win.console.log;
+                        const originalError = win.console.error;
+                        const originalWarn = win.console.warn;
+
+                        win.console.log = (...args: any[]) => {
+                            logs.push({ type: 'log', message: args.map(a => String(a)).join(' ') });
+                            originalLog.apply(win.console, args);
+                        };
+                        win.console.error = (...args: any[]) => {
+                            logs.push({ type: 'error', message: args.map(a => String(a)).join(' ') });
+                            originalError.apply(win.console, args);
+                        };
+                        win.console.warn = (...args: any[]) => {
+                            logs.push({ type: 'warn', message: args.map(a => String(a)).join(' ') });
+                            originalWarn.apply(win.console, args);
+                        };
+                    }
+
                     iframeDoc.write(`
                         <!DOCTYPE html>
                         <html>
                           <head>
                             <meta charset="utf-8">
+                            <base href="http://localhost/" />
                             <style>
                               * { box-sizing: border-box; }
                               body { 
@@ -103,9 +137,48 @@ export async function executePlaywrightCode(
                                 margin: 0;
                               }
                             </style>
+                            <script>
+                                // Polyfill fetch to handle relative URLs if base tag doesn't work
+                                // Polyfill fetch to handle relative URLs and MOCK requests
+                                const originalFetch = window.fetch;
+                                window.fetch = function(input, init) {
+                                    let url = input;
+                                    if (typeof input === 'string') {
+                                        if (input.startsWith('/')) {
+                                            url = 'http://localhost' + input;
+                                        } else if (input.startsWith('http')) {
+                                            url = input;
+                                        }
+                                    }
+
+                                    // Mock /api/data
+                                    if (typeof url === 'string' && url.includes('/api/data')) {
+                                        console.log('Mocking fetch to ' + url);
+                                        return Promise.resolve({
+                                            ok: true,
+                                            status: 200,
+                                            json: () => Promise.resolve({ success: true, count: 5 }),
+                                            text: () => Promise.resolve('{"success":true}'),
+                                            headers: new Headers({'content-type': 'application/json'})
+                                        });
+                                    }
+                                    
+                                    // For other requests, try to fetch (or fail)
+                                    // But usually we should mock everything in tests
+                                    // return originalFetch(url, init);
+                                    
+                                    // Default mock for anything else to avoid connection refused
+                                    return Promise.resolve({
+                                        ok: true,
+                                        status: 404,
+                                        json: () => Promise.resolve({}),
+                                        text: () => Promise.resolve('Not Found')
+                                    });
+                                };
+                            </script>
                           </head>
                           <body>
-                            ${htmlContent}
+                            ${finalHtml}
                           </body>
                         </html>
                     `);
@@ -156,6 +229,7 @@ export async function executePlaywrightCode(
                                 if (!win || !doc) return;
 
                                 const code = `
+                                    const fetch = window.fetch;
                                     return (function(window, document, event) {
                                         try {
                                             ${handlerCode}
@@ -182,11 +256,13 @@ export async function executePlaywrightCode(
                     const page = new MockedPlaywrightPage(iframeDoc, { timeout });
 
                     // Execute user code
-
                     const userFunction = new Function(
                         'page',
                         'expect',
+                        'window',
+                        'document',
                         `
+                            const fetch = window.fetch;
                             return (async () => {
                               ${code}
                             })();
@@ -196,7 +272,7 @@ export async function executePlaywrightCode(
                     // Simple expect function
                     const expect = createExpect();
 
-                    const returnValue = await userFunction(page, expect);
+                    const returnValue = await userFunction(page, expect, iframe.contentWindow, iframe.contentDocument);
 
                     const executionTime = Date.now() - startTime;
                     cleanup();
@@ -206,6 +282,7 @@ export async function executePlaywrightCode(
                         output: 'All steps completed successfully',
                         executionTime,
                         returnValue,
+                        logs,
                     });
                 } catch (error) {
                     const executionTime = Date.now() - startTime;
@@ -217,6 +294,7 @@ export async function executePlaywrightCode(
                         output: errorMessage,
                         executionTime,
                         error: errorMessage,
+                        logs,
                     });
                 }
             };
@@ -240,6 +318,7 @@ export async function executePlaywrightCode(
                 output: `Execution error: ${errorMessage}`,
                 executionTime,
                 error: errorMessage,
+                logs,
             });
         }
     });
