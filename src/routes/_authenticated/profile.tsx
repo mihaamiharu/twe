@@ -7,10 +7,10 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Award, BookOpen, Code, Settings, Star, Zap, AlertCircle, LogIn } from 'lucide-react';
+import { Award, BookOpen, Code, Settings, Star, Zap, AlertCircle } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
 
-export const Route = createFileRoute('/profile')({
+export const Route = createFileRoute('/_authenticated/profile')({
     component: ProfilePage,
 });
 
@@ -49,17 +49,14 @@ interface ProfileResponse {
 }
 
 function ProfilePage() {
+    // Auth is guaranteed by _authenticated parent route
     const { data, isLoading, error } = useQuery<ProfileResponse>({
         queryKey: ['profile'],
         queryFn: async () => {
             const res = await fetch('/api/users/me');
-            if (res.status === 401) {
-                throw new Error('Not authenticated');
-            }
             if (!res.ok) throw new Error('Failed to fetch profile');
             return res.json();
         },
-        retry: false,
     });
 
     // Loading state
@@ -91,26 +88,6 @@ function ProfilePage() {
                         ))}
                     </div>
                 </div>
-            </div>
-        );
-    }
-
-    // Not authenticated state
-    if (error?.message === 'Not authenticated') {
-        return (
-            <div className="min-h-screen p-6 md:p-10 flex items-center justify-center">
-                <Card className="glass-card max-w-md w-full">
-                    <CardContent className="p-8 text-center">
-                        <LogIn className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h2 className="text-xl font-semibold mb-2">Sign in to view your profile</h2>
-                        <p className="text-muted-foreground mb-6">
-                            Track your progress, view achievements, and see your stats.
-                        </p>
-                        <Link to="/login">
-                            <Button>Sign In</Button>
-                        </Link>
-                    </CardContent>
-                </Card>
             </div>
         );
     }
@@ -170,10 +147,12 @@ function ProfilePage() {
                                 </div>
                             </div>
 
-                            <Button variant="outline">
-                                <Settings className="h-4 w-4 mr-2" />
-                                Settings
-                            </Button>
+                            <Link to="/settings">
+                                <Button variant="outline">
+                                    <Settings className="h-4 w-4 mr-2" />
+                                    Settings
+                                </Button>
+                            </Link>
                         </div>
                     </CardContent>
                 </Card>
