@@ -1,6 +1,7 @@
-import { AlertCircle, ArrowRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { AlertCircle, ArrowRight, X } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 interface TierSkipTipProps {
     currentTier: string;
@@ -11,27 +12,36 @@ interface TierSkipTipProps {
 }
 
 export function TierSkipTip({ currentTier, missingPrerequisites }: TierSkipTipProps) {
-    if (missingPrerequisites.length === 0) return null;
+    const [isVisible, setIsVisible] = useState(true);
+
+    if (!isVisible || missingPrerequisites.length === 0) return null;
 
     const mainMissing = missingPrerequisites[0];
 
     return (
-        <Card className="mb-6 border-amber-500/50 bg-amber-500/5 text-amber-600 dark:text-amber-400">
-            <CardHeader className="p-4 pb-0">
-                <CardTitle className="text-sm font-bold flex items-center gap-2">
-                    <AlertCircle className="h-4 w-4" />
-                    Expert Tip: Check the Fundamentals
-                </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-2 text-sm">
-                This {currentTier} challenge uses concepts covered in the <span className="font-semibold">{mainMissing.name}</span> tier.
-                If you get stuck, we recommend trying those first to build a solid foundation!
-                <div className="mt-2 text-xs">
-                    <Link to="/challenges" search={{ tier: mainMissing.tier }} className="inline-flex items-center gap-1 font-semibold underline hover:text-amber-500 font-mono">
-                        View {mainMissing.name} Challenges <ArrowRight className="h-3 w-3" />
+        <div className="group relative flex items-center justify-between gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-amber-700 dark:text-amber-300">
+            <div className="flex items-center gap-2 text-xs">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0 text-amber-500" />
+                <p>
+                    <span className="font-semibold">Recommendation:</span> This {currentTier.toLowerCase()} challenge uses concepts from the <span className="font-semibold">{mainMissing.name}</span> tier.
+                    <Link
+                        to="/challenges"
+                        search={{ tier: mainMissing.tier }}
+                        className="ml-2 inline-flex items-center gap-0.5 font-semibold underline decoration-amber-500/30 underline-offset-2 hover:text-amber-500 hover:decoration-amber-500"
+                    >
+                        Try {mainMissing.name} first <ArrowRight className="h-3 w-3" />
                     </Link>
-                </div>
-            </CardContent>
-        </Card>
+                </p>
+            </div>
+            <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6 shrink-0 rounded-full text-amber-500/50 hover:bg-amber-500/10 hover:text-amber-500"
+                onClick={() => setIsVisible(false)}
+            >
+                <X className="h-3.5 w-3.5" />
+                <span className="sr-only">Dismiss</span>
+            </Button>
+        </div>
     );
 }
