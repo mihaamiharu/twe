@@ -11,6 +11,7 @@ import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
 import { useSession } from '@/lib/auth.client';
 import { trackEvent } from '@/lib/analytics';
+import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -56,6 +57,7 @@ function ChallengeDetailPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [showAuthGuard, setShowAuthGuard] = useState(false);
     const [lastSubmissionResult, setLastSubmissionResult] = useState<{
         xpEarned: number;
         achievements: { id: string; name: string; icon: string }[];
@@ -189,6 +191,12 @@ function ChallengeDetailPage() {
     }) => {
         if (!challenge) return;
 
+        // Auth Guard: Check if user is logged in
+        if (!sessionData?.user) {
+            setShowAuthGuard(true);
+            return;
+        }
+
         if (!data.passed) {
             toast.error('Your solution did not pass all tests. Keep trying!');
             return;
@@ -211,7 +219,7 @@ function ChallengeDetailPage() {
             success: 'Solution submitted successfully!',
             error: 'Failed to submit solution',
         });
-    }, [challenge, submitMutation]);
+    }, [challenge, submitMutation, sessionData]);
 
     if (isLoading) {
         return (
@@ -282,6 +290,13 @@ function ChallengeDetailPage() {
                     } : undefined}
                 />
             )}
+
+            <AuthGuardDialog
+                open={showAuthGuard}
+                onOpenChange={setShowAuthGuard}
+                title="Sign in to Submit"
+                description="You need to be signed in to save your solution, earn XP, and track your progress. Your code will be preserved."
+            />
         </div>
     );
 }
