@@ -5,10 +5,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Loader2, ArrowLeft, User, Shield, Bell } from 'lucide-react';
+import { Loader2, ArrowLeft, User, Shield, Bell, AlertCircle } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-export const Route = createFileRoute('/settings')({
+export const Route = createFileRoute('/_authenticated/settings')({
     component: SettingsPage,
 });
 
@@ -22,14 +22,12 @@ interface UserData {
 }
 
 function SettingsPage() {
+    // Auth is guaranteed by _authenticated parent route
     const { data, isLoading, error } = useQuery({
         queryKey: ['user', 'settings'],
         queryFn: async () => {
             const response = await fetch('/api/users/me');
             if (!response.ok) {
-                if (response.status === 401) {
-                    throw new Error('Unauthorized');
-                }
                 throw new Error('Failed to fetch settings');
             }
             const json = await response.json();
@@ -52,24 +50,16 @@ function SettingsPage() {
     }
 
     if (error) {
-        const isUnauthorized = error.message === 'Unauthorized';
         return (
             <div className="min-h-screen p-6 md:p-10">
                 <div className="max-w-2xl mx-auto">
                     <Card className="glass-card">
                         <CardContent className="py-12 text-center">
-                            <h1 className="text-2xl font-bold mb-4">
-                                {isUnauthorized ? 'Sign in Required' : 'Error'}
-                            </h1>
-                            <p className="text-muted-foreground mb-6">
-                                {isUnauthorized
-                                    ? 'Please sign in to access your settings.'
-                                    : error.message}
-                            </p>
+                            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+                            <h1 className="text-2xl font-bold mb-4">Error</h1>
+                            <p className="text-muted-foreground mb-6">{error.message}</p>
                             <Button asChild>
-                                <Link to={isUnauthorized ? '/login' : '/'}>
-                                    {isUnauthorized ? 'Sign In' : 'Go Home'}
-                                </Link>
+                                <Link to="/">Go Home</Link>
                             </Button>
                         </CardContent>
                     </Card>

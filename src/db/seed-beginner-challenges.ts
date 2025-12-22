@@ -6,8 +6,14 @@
  */
 
 import { db } from './index';
-import { challenges, testCases } from './schema';
+import { challenges, testCases, tutorials } from './schema';
 import { eq, inArray } from 'drizzle-orm';
+
+// Helper to get tutorial ID
+async function getTutorialId(slug: string) {
+    const result = await db.select({ id: tutorials.id }).from(tutorials).where(eq(tutorials.slug, slug));
+    return result[0]?.id || null;
+}
 
 // ============================================================================
 // JAVASCRIPT FUNDAMENTALS CHALLENGES (10)
@@ -1550,6 +1556,16 @@ async function seedBeginnerChallenges() {
     console.log('🌱 Seeding Beginner tier challenges...\n');
 
     try {
+        // Fetch Tutorial IDs
+        const jsTutorialId = await getTutorialId('javascript-fundamentals-for-qa');
+        const domTutorialId = await getTutorialId('dom-manipulation-for-testing');
+        const asyncTutorialId = await getTutorialId('async-await-basics');
+
+        console.log('   🔗 Linking to tutorials:');
+        console.log(`      - JS Fundamentals: ${jsTutorialId ? '✅ Found' : '❌ Not Found'}`);
+        console.log(`      - DOM Manipulation: ${domTutorialId ? '✅ Found' : '❌ Not Found'}`);
+        console.log(`      - Async/Await: ${asyncTutorialId ? '✅ Found' : '❌ Not Found'}`);
+
         // Combine all challenges
         const allChallenges = [...jsFundamentalsChallenges, ...domChallenges, ...asyncChallenges];
 
@@ -1588,6 +1604,7 @@ async function seedBeginnerChallenges() {
                 tags: challenge.tags,
                 isPublished: true,
                 completionCount: 0,
+                tutorialId: jsTutorialId,
             }).returning();
 
             await db.insert(testCases).values({
@@ -1619,6 +1636,7 @@ async function seedBeginnerChallenges() {
                 tags: challenge.tags,
                 isPublished: true,
                 completionCount: 0,
+                tutorialId: domTutorialId,
             }).returning();
 
             await db.insert(testCases).values({
@@ -1650,6 +1668,7 @@ async function seedBeginnerChallenges() {
                 tags: challenge.tags,
                 isPublished: true,
                 completionCount: 0,
+                tutorialId: asyncTutorialId,
             }).returning();
 
             await db.insert(testCases).values({

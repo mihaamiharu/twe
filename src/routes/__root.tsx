@@ -1,4 +1,5 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import { getServerSession, type AuthSession } from '@/lib/auth.fn';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -21,7 +22,16 @@ const queryClient = new QueryClient({
   },
 });
 
+// Export context type for child routes
+export interface RootContext {
+  auth: AuthSession;
+}
+
 export const Route = createRootRoute({
+  beforeLoad: async () => {
+    const auth = await getServerSession();
+    return { auth };
+  },
   head: () => ({
     meta: [
       {

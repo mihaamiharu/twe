@@ -18,7 +18,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { cn } from '@/lib/utils';
 import { executePlaywrightCode } from '@/lib/challenge-executor';
-import { Play, Send, RotateCcw, Zap, Loader2, Target } from 'lucide-react';
+import { Play, Send, RotateCcw, Zap, Loader2, Target, BookOpen } from 'lucide-react';
+import { Link } from '@tanstack/react-router';
 
 import { CodeEditor } from './CodeEditor';
 import { WebComponentPreview } from './WebComponentPreview';
@@ -42,6 +43,10 @@ export interface Challenge {
     targetSelector?: string | string[];
 
     testCases?: { id: string; name: string; input?: unknown; expectedOutput?: unknown }[];
+    tutorial?: {
+        slug: string;
+        title: string;
+    };
 }
 
 export interface ChallengePlaygroundProps {
@@ -257,6 +262,14 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
+                    {challenge.tutorial && (
+                        <Link to="/tutorials/$slug" params={{ slug: challenge.tutorial.slug }}>
+                            <Button variant="ghost" size="sm" className="flex text-muted-foreground hover:text-foreground btn-animate">
+                                <BookOpen className="h-4 w-4 mr-2" />
+                                Tutorial
+                            </Button>
+                        </Link>
+                    )}
                     <Button variant="ghost" size="sm" onClick={handleReset} className="text-muted-foreground hover:text-foreground btn-animate">
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Reset

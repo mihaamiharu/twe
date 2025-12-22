@@ -1,15 +1,20 @@
 import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
 import { useSession } from '@/lib/auth.client';
 import { trackEvent } from '@/lib/analytics';
+import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
+import { TierSkipTip } from '@/components/challenges/TierSkipTip';
+import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
+import { ChallengesResponse } from './index';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -22,6 +27,7 @@ interface APIChallenge {
     description: string;
     type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
     difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+    category?: string;
     xpReward: number;
     instructions: string;
     htmlContent?: string;
@@ -44,6 +50,10 @@ interface APIChallenge {
         slug: string;
         title: string;
     } | null;
+    tutorial?: {
+        slug: string;
+        title: string;
+    } | null;
 }
 
 function ChallengeDetailPage() {
@@ -51,6 +61,7 @@ function ChallengeDetailPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+    const [showAuthGuard, setShowAuthGuard] = useState(false);
     const [lastSubmissionResult, setLastSubmissionResult] = useState<{
         xpEarned: number;
         achievements: { id: string; name: string; icon: string }[];
@@ -72,6 +83,40 @@ function ChallengeDetailPage() {
         },
         enabled: !!slug,
     });
+
+    const { data: allChallengesData } = useQuery<ChallengesResponse>({
+        queryKey: ['challenges'],
+        queryFn: async () => {
+            const res = await fetch('/api/challenges?limit=100');
+            if (!res.ok) throw new Error('Failed to fetch challenges');
+            return res.json();
+        },
+    });
+
+    const missingPrerequisites = useMemo(() => {
+        if (!data || !allChallengesData) return [];
+
+        const currentTier = getTierFromCategory(data.category);
+        const currentTierIndex = TIER_ORDER.indexOf(currentTier);
+
+        if (currentTierIndex <= 0) return []; // Basic tier has no prerequisites
+
+        const missing = [];
+        for (let i = 0; i < currentTierIndex; i++) {
+            const prereqTier = TIER_ORDER[i];
+            const tierChallenges = allChallengesData.data.filter((c: any) => getTierFromCategory(c.category) === prereqTier);
+            const completedInTier = tierChallenges.filter((c: any) => c.isCompleted).length;
+
+            if (tierChallenges.length > 0 && completedInTier < tierChallenges.length) {
+                missing.push({
+                    tier: prereqTier,
+                    name: tierLabels[prereqTier].name
+                });
+            }
+        }
+
+        return missing;
+    }, [data, allChallengesData]);
 
     const { data: sessionData } = useSession();
     const userId = sessionData?.user?.id;
@@ -184,6 +229,12 @@ function ChallengeDetailPage() {
     }) => {
         if (!challenge) return;
 
+        // Auth Guard: Check if user is logged in
+        if (!sessionData?.user) {
+            setShowAuthGuard(true);
+            return;
+        }
+
         if (!data.passed) {
             toast.error('Your solution did not pass all tests. Keep trying!');
             return;
@@ -206,7 +257,7 @@ function ChallengeDetailPage() {
             success: 'Solution submitted successfully!',
             error: 'Failed to submit solution',
         });
-    }, [challenge, submitMutation]);
+    }, [challenge, submitMutation, sessionData]);
 
     if (isLoading) {
         return (
@@ -229,13 +280,25 @@ function ChallengeDetailPage() {
                             <p className="text-muted-foreground mb-6">
                                 {error?.message || 'The requested challenge could not be found.'}
                             </p>
-                            <Link
-                                to="/challenges"
-                                className="inline-flex items-center gap-2 text-primary hover:underline"
-                            >
-                                <ArrowLeft className="h-4 w-4" />
-                                Back to Challenges
-                            </Link>
+                            <div className="flex items-center gap-4 mb-6 justify-center">
+                                <Link to="/challenges">
+                                    <Button variant="ghost" size="sm">
+                                        <ArrowLeft className="h-4 w-4 mr-2" />
+                                        Back to Challenges
+                                    </Button>
+                                </Link>
+                                {data?.tutorial && (
+                                    <>
+                                        <div className="h-4 w-px bg-border" />
+                                        <Link to="/tutorials/$slug" params={{ slug: data.tutorial.slug }}>
+                                            <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/10">
+                                                <BookOpen className="h-4 w-4 mr-2" />
+                                                Review Tutorial: {data.tutorial.title}
+                                            </Button>
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -244,12 +307,22 @@ function ChallengeDetailPage() {
     }
 
     return (
-        <div className="h-[calc(100vh-4rem)]">
-            <ChallengePlayground
-                challenge={challenge}
-                onSubmit={handleSubmit}
-                userId={userId}
-            />
+        <div className="h-[calc(100vh-4rem)] flex flex-col">
+            {missingPrerequisites.length > 0 && (
+                <div className="px-6 pt-4">
+                    <TierSkipTip
+                        currentTier={tierLabels[getTierFromCategory(data?.category)].name}
+                        missingPrerequisites={missingPrerequisites}
+                    />
+                </div>
+            )}
+            <div className="flex-1 min-h-0">
+                <ChallengePlayground
+                    challenge={challenge}
+                    onSubmit={handleSubmit}
+                    userId={userId}
+                />
+            </div>
 
             {lastSubmissionResult && (
                 <ChallengeSuccessDialog
@@ -265,6 +338,13 @@ function ChallengeDetailPage() {
                     } : undefined}
                 />
             )}
+
+            <AuthGuardDialog
+                open={showAuthGuard}
+                onOpenChange={setShowAuthGuard}
+                title="Sign in to Submit"
+                description="You need to be signed in to save your solution, earn XP, and track your progress. Your code will be preserved."
+            />
         </div>
     );
 }
