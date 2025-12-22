@@ -10,8 +10,15 @@ function LoginPage() {
     const [mode, setMode] = useState<'login' | 'register'>('login');
 
     const handleLoginSuccess = () => {
-        // Redirect to home after successful login
-        window.location.href = '/';
+        // Redirect to original path if available, otherwise home
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirectUrl = searchParams.get('redirect');
+
+        if (redirectUrl) {
+            window.location.href = redirectUrl;
+        } else {
+            window.location.href = '/';
+        }
     };
 
     // For registration, we don't redirect - RegisterForm shows "Check Your Email" message

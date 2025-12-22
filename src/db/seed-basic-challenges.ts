@@ -6,7 +6,7 @@
  */
 
 import { db } from './index';
-import { challenges, testCases } from './schema';
+import { challenges, testCases, tutorials } from './schema';
 import { eq, inArray } from 'drizzle-orm';
 
 // ============================================================================
@@ -16,6 +16,14 @@ import { eq, inArray } from 'drizzle-orm';
 // ============================================================================
 // CSS SELECTOR CHALLENGES (10)
 // ============================================================================
+
+// Helper to get tutorial ID by slug
+async function getTutorialId(slug: string) {
+  const tutorial = await db.query.tutorials.findFirst({
+    where: eq(tutorials.slug, slug),
+  });
+  return tutorial?.id;
+}
 
 export const cssChallenges = [
   // Challenge 1: Selector 101 - ID & Class
@@ -1377,23 +1385,40 @@ async function seedBasicChallenges() {
 
   try {
     // ====================================================================
-    // STEP 1: Clear existing challenges (except keep test cases temporarily)
+    // STEP 1: Clear existing challenges (only for this seed)
     // ====================================================================
     console.log('🧹 Cleaning up existing challenges...');
 
-    // Get existing challenge IDs
-    const existingChallenges = await db.select({ id: challenges.id }).from(challenges);
-    const existingIds = existingChallenges.map(c => c.id);
+    // Combine all challenges in this seed
+    const allChallenges = [...cssChallenges, ...xpathChallenges, ...comparisonChallenges];
+    const slugs = allChallenges.map(c => c.slug);
 
-    if (existingIds.length > 0) {
-      // Delete test cases for existing challenges
-      await db.delete(testCases).where(inArray(testCases.challengeId, existingIds));
-      console.log(`   Deleted test cases for ${existingIds.length} challenges`);
+    // Find existing challenges with these slugs
+    const existing = await db.select({ slug: challenges.slug })
+      .from(challenges)
+      .where(inArray(challenges.slug, slugs));
 
-      // Delete existing challenges
-      await db.delete(challenges);
-      console.log(`   Deleted ${existingIds.length} existing challenges`);
+    if (existing.length > 0) {
+      console.log(`   Found ${existing.length} existing challenges, updating...`);
+
+      for (const slug of existing.map(e => e.slug)) {
+        const challenge = await db.select().from(challenges).where(eq(challenges.slug, slug));
+        if (challenge[0]) {
+          await db.delete(testCases).where(eq(testCases.challengeId, challenge[0].id));
+        }
+      }
+      await db.delete(challenges).where(inArray(challenges.slug, slugs));
     }
+
+
+
+    // Get Tutorial IDs
+    const cssTutorialId = await getTutorialId('css-selectors-for-qa');
+    const xpathTutorialId = await getTutorialId('xpath-for-test-automation');
+
+    console.log('🔗 Linking to tutorials:');
+    console.log(`   - CSS: ${cssTutorialId ? '✅ Found' : '❌ Not Found'}`);
+    console.log(`   - XPath: ${xpathTutorialId ? '✅ Found' : '❌ Not Found'}`);
 
     // ====================================================================
     // STEP 2: Insert CSS Selector Challenges
@@ -1414,6 +1439,7 @@ async function seedBasicChallenges() {
         htmlContent: challenge.htmlContent,
         starterCode: challenge.starterCode,
         tags: challenge.tags,
+        tutorialId: cssTutorialId,
         isPublished: true,
         completionCount: 0,
       }).returning();
@@ -1450,6 +1476,7 @@ async function seedBasicChallenges() {
         htmlContent: challenge.htmlContent,
         starterCode: challenge.starterCode,
         tags: challenge.tags,
+        tutorialId: xpathTutorialId,
         isPublished: true,
         completionCount: 0,
       }).returning();

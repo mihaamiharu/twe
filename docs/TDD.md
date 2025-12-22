@@ -1,8 +1,8 @@
 # Technical Design Document (TDD)
 ## TestingWithEkki - Gamified QA Portfolio & Learning Platform
 
-**Version:** 1.0  
-**Date:** December 15, 2025  
+**Version:** 2.0  
+**Date:** December 20, 2025  
 **Author:** Ekki
 
 ---
@@ -71,7 +71,7 @@ graph TB
 | State Management | **Zustand** | Lightweight, simple API |
 | Server State | **TanStack Query** | React Query for data fetching and caching |
 | UI Components | **Custom + Radix UI** | Accessible primitives, full control |
-| Styling | **CSS Modules + CSS Variables** | Scoped styles, themeable |
+| Styling | **Tailwind CSS v4** | Utility-first, rapid development |
 | Code Editor | **Monaco Editor** | VSCode editor, feature-rich |
 | Markdown Rendering | **React Markdown + remark** | Extensible, supports GFM |
 | HTTP Client | **fetch** (native) | Built-in, works with TanStack Query |
@@ -94,8 +94,7 @@ graph TB
 | Component | Technology | Justification |
 |-----------|-----------|---------------|
 | Primary Database | **PostgreSQL 15** | ACID, powerful, open-source |
-| Cache | **Redis 7** | Fast key-value store, sessions |
-| Object Storage | **MinIO** (local) / **S3** (prod) | File uploads, avatars |
+| Object Storage | Local file system / **S3** (prod) | File uploads, avatars |
 
 ### 2.4 DevOps & Infrastructure
 
@@ -174,10 +173,9 @@ erDiagram
         enum difficulty
         int xpReward
         string starterCode
-        string solution
-        string[] hints
         string htmlContent
-        string targetSelector
+        string category
+        uuid tutorialId FK
         timestamp createdAt
     }
     
@@ -267,6 +265,17 @@ Tracks user progress on challenges and tutorials.
 - Polymorphic: links to either challenge or tutorial
 - `status`: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
 
+#### Bug Reports Table
+QA-style bug reporting from users.
+- `severity`: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
+- `status`: 'NEW' | 'IN_PROGRESS' | 'RESOLVED' | 'WONT_FIX' | 'CLOSED'
+- Auto-captures page URL and browser info
+- Links to user (optional for anonymous reports)
+
+#### Tutorial ↔ Challenge Relationship
+- Challenges can be linked to tutorials via `tutorialId` FK
+- Enables "Try Related Challenge" flow after reading tutorials
+
 ---
 
 ## 4. API Design
@@ -343,6 +352,20 @@ GET    /leaderboard            - Get global leaderboard
 GET    /leaderboard/monthly    - Get monthly leaderboard
 GET    /achievements           - List all achievements
 GET    /users/me/progress      - Get my progress
+```
+
+#### Bug Report Endpoints
+
+```
+POST   /bug-reports            - Submit a bug report
+GET    /bug-reports            - List bug reports (admin)
+PATCH  /bug-reports/:id        - Update bug report status (admin)
+```
+
+#### Email Verification Endpoints
+
+```
+POST   /auth/send-verification-email  - Resend verification email
 ```
 
 ### 4.3 Sample API Request/Response
@@ -845,27 +868,14 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
   
-  redis:
-    image: redis:7
-    command: redis-server --requirepass dev_password
-  
-  backend:
-    build: ./backend
+  app:
+    build: .
     ports:
       - "3000:3000"
     depends_on:
       - postgres
-      - redis
     environment:
       DATABASE_URL: postgresql://ekki:dev_password@postgres:5432/testingwithekki
-      REDIS_URL: redis://:dev_password@redis:6379
-  
-  frontend:
-    build: ./frontend
-    ports:
-      - "5173:5173"
-    depends_on:
-      - backend
 ```
 
 ### 8.2 Production Deployment
@@ -873,10 +883,8 @@ services:
 **Option A: Single VPS (DigitalOcean Droplet)**
 ```
 Nginx (Reverse Proxy + SSL)
-├── Frontend (Static files)
-├── Backend API (PM2)
-├── PostgreSQL
-└── Redis
+├── TanStack Start App (PM2)
+└── PostgreSQL
 ```
 
 **Option B: Railway/Render (Managed)**

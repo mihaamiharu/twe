@@ -9,17 +9,19 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TutorialsIndexRouteImport } from './routes/tutorials/index'
+import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as ChallengesIndexRouteImport } from './routes/challenges/index'
 import { Route as TutorialsSlugRouteImport } from './routes/tutorials/$slug'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
 import { Route as ChallengesSlugRouteImport } from './routes/challenges/$slug'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as ApiTutorialsIndexRouteImport } from './routes/api/tutorials/index'
 import { Route as ApiSubmissionsIndexRouteImport } from './routes/api/submissions/index'
 import { Route as ApiLeaderboardIndexRouteImport } from './routes/api/leaderboard/index'
@@ -33,16 +35,6 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as ApiTutorialsSlugProgressRouteImport } from './routes/api/tutorials/$slug/progress'
 import { Route as ApiTutorialsSlugCompleteRouteImport } from './routes/api/tutorials/$slug/complete'
 
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProfileRoute = ProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -51,6 +43,10 @@ const LoginRoute = LoginRouteImport.update({
 const LeaderboardRoute = LeaderboardRouteImport.update({
   id: '/leaderboard',
   path: '/leaderboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SplatRoute = SplatRouteImport.update({
@@ -66,6 +62,11 @@ const IndexRoute = IndexRouteImport.update({
 const TutorialsIndexRoute = TutorialsIndexRouteImport.update({
   id: '/tutorials/',
   path: '/tutorials/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocsIndexRoute = DocsIndexRouteImport.update({
+  id: '/docs/',
+  path: '/docs/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChallengesIndexRoute = ChallengesIndexRouteImport.update({
@@ -87,6 +88,16 @@ const ChallengesSlugRoute = ChallengesSlugRouteImport.update({
   id: '/challenges/$slug',
   path: '/challenges/$slug',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const ApiTutorialsIndexRoute = ApiTutorialsIndexRouteImport.update({
   id: '/api/tutorials/',
@@ -157,12 +168,13 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/settings': typeof SettingsRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
@@ -182,12 +194,13 @@ export interface FileRoutesByTo {
   '/$': typeof SplatRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/settings': typeof SettingsRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/settings': typeof AuthenticatedSettingsRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges': typeof ChallengesIndexRoute
+  '/docs': typeof DocsIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
@@ -206,14 +219,16 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
-  '/profile': typeof ProfileRoute
-  '/settings': typeof SettingsRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
   '/tutorials/$slug': typeof TutorialsSlugRoute
   '/challenges/': typeof ChallengesIndexRoute
+  '/docs/': typeof DocsIndexRoute
   '/tutorials/': typeof TutorialsIndexRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
@@ -241,6 +256,7 @@ export interface FileRouteTypes {
     | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges'
+    | '/docs'
     | '/tutorials'
     | '/api/auth/$'
     | '/api/auth/resend-verification'
@@ -266,6 +282,7 @@ export interface FileRouteTypes {
     | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges'
+    | '/docs'
     | '/tutorials'
     | '/api/auth/$'
     | '/api/auth/resend-verification'
@@ -283,14 +300,16 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/$'
+    | '/_authenticated'
     | '/leaderboard'
     | '/login'
-    | '/profile'
-    | '/settings'
+    | '/_authenticated/profile'
+    | '/_authenticated/settings'
     | '/challenges/$slug'
     | '/docs/api'
     | '/tutorials/$slug'
     | '/challenges/'
+    | '/docs/'
     | '/tutorials/'
     | '/api/auth/$'
     | '/api/auth/resend-verification'
@@ -309,14 +328,14 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
-  ProfileRoute: typeof ProfileRoute
-  SettingsRoute: typeof SettingsRoute
   ChallengesSlugRoute: typeof ChallengesSlugRoute
   DocsApiRoute: typeof DocsApiRoute
   TutorialsSlugRoute: typeof TutorialsSlugRoute
   ChallengesIndexRoute: typeof ChallengesIndexRoute
+  DocsIndexRoute: typeof DocsIndexRoute
   TutorialsIndexRoute: typeof TutorialsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiAuthResendVerificationRoute: typeof ApiAuthResendVerificationRoute
@@ -332,20 +351,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile': {
-      id: '/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -358,6 +363,13 @@ declare module '@tanstack/react-router' {
       path: '/leaderboard'
       fullPath: '/leaderboard'
       preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$': {
@@ -379,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/tutorials'
       fullPath: '/tutorials'
       preLoaderRoute: typeof TutorialsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/docs/': {
+      id: '/docs/'
+      path: '/docs'
+      fullPath: '/docs'
+      preLoaderRoute: typeof DocsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/challenges/': {
@@ -408,6 +427,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/challenges/$slug'
       preLoaderRoute: typeof ChallengesSlugRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/api/tutorials/': {
       id: '/api/tutorials/'
@@ -496,6 +529,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 interface ApiTutorialsSlugRouteChildren {
   ApiTutorialsSlugCompleteRoute: typeof ApiTutorialsSlugCompleteRoute
   ApiTutorialsSlugProgressRoute: typeof ApiTutorialsSlugProgressRoute
@@ -512,14 +559,14 @@ const ApiTutorialsSlugRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
-  ProfileRoute: ProfileRoute,
-  SettingsRoute: SettingsRoute,
   ChallengesSlugRoute: ChallengesSlugRoute,
   DocsApiRoute: DocsApiRoute,
   TutorialsSlugRoute: TutorialsSlugRoute,
   ChallengesIndexRoute: ChallengesIndexRoute,
+  DocsIndexRoute: DocsIndexRoute,
   TutorialsIndexRoute: TutorialsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiAuthResendVerificationRoute: ApiAuthResendVerificationRoute,

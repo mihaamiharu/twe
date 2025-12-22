@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 ## TestingWithEkki - Gamified QA Portfolio & Learning Platform
 
-**Version:** 1.0  
-**Date:** December 15, 2025  
+**Version:** 2.0  
+**Date:** December 20, 2025  
 **Author:** Ekki
 
 ---
@@ -98,8 +98,16 @@ Create a unique learning ecosystem where QA professionals can:
 - **Iframe Execution:** User code executes in isolated iframe (client-side)
 - **Real-time Feedback:** Instant test results with detailed output
 - **Visual Challenges:** CSS/XPath selector challenges with component preview
-- **Hints System:** Progressive hints for stuck users
-- **Solution Viewing:** View solutions after completion (unlockable)
+
+#### Challenge Library
+The platform includes **96 challenges** organized into 4 progressive tiers:
+
+| Tier | Count | Focus Areas | XP Range |
+|------|-------|-------------|----------|
+| Basic | 23 | CSS Selectors, XPath, Comparison | 10-50 |
+| Beginner | 23 | JavaScript Fundamentals, DOM, Async | 15-55 |
+| Intermediate | 29 | Playwright Actions, Locators, Assertions, Waits | 40-85 |
+| Expert | 21 | Page Object Model, Data-Driven, Advanced Patterns | 75-120 |
 
 ### 3.3 Gamification System
 
@@ -129,11 +137,22 @@ Create a unique learning ecosystem where QA professionals can:
 - Shareable profile URL
 
 ### 3.4 User Authentication & Management
-- Email/password authentication
+- Email/password authentication with **email verification**
+- **Resend verification email** option
 - OAuth (Google)
 - Profile customization (avatar, bio, links)
+- **Privacy settings** (profile visibility, leaderboard opt-out)
 - Progress persistence
 - Account settings
+
+### 3.5 Bug Reporting System
+
+Users can report bugs directly from the platform:
+- **QA-style bug reports** with severity levels (Critical, High, Medium, Low)
+- **Structured format:** Steps to Reproduce, Expected/Actual Behavior
+- **Auto-capture:** Page URL, browser info, user context
+- Works for both logged-in and anonymous users
+- Email field for follow-up on anonymous reports
 
 ---
 
@@ -156,7 +175,7 @@ Read & Learn → Try Related Challenge → Bookmark/Share
 Browse Challenges → Select Challenge → Read Description → 
 Write Code in Editor → Run Tests → View Results → 
 (If Passed) Get XP + Achievement → Next Challenge
-(If Failed) Read Hints → Retry → View Solution (optional)
+(If Failed) Retry → Improve Code → View Solution (optional)
 ```
 
 ### 4.4 Content Creation Flow (Admin)

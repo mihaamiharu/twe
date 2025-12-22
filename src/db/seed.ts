@@ -141,6 +141,7 @@ Write a selector that uniquely identifies the submit button in the HTML below.
 </div>`,
             starterCode: '',
             tags: ['css', 'selector', 'beginner'],
+            tutorialId: cssTutorial.id,
             isPublished: true,
             completionCount: 0,
         }).onConflictDoNothing().returning())[0];
