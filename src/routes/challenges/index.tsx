@@ -7,6 +7,14 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Code, Trophy, Zap, AlertCircle, CheckCircle2, Palette, Route as RouteIcon, LayoutGrid, List } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { ChallengeTierProgress } from '@/components/challenges/ChallengeTierProgress';
+import {
+    tierLabels,
+    categoryLabels,
+    difficultyColors,
+    getTierFromCategory,
+    TIER_ORDER
+} from '@/lib/constants';
 
 export const Route = createFileRoute('/challenges/')({
     component: ChallengesPage,
@@ -36,55 +44,7 @@ const typeConfig: Record<string, { color: string; icon: React.ReactNode; label: 
     },
 };
 
-// Category labels - expanded for all tiers
-const categoryLabels: Record<string, string> = {
-    // Tier 1: Basic (Selectors)
-    'css-basics': '📘 CSS Basics',
-    'xpath-basics': '📙 XPath Basics',
-    'selector-comparison': '📗 CSS vs XPath',
-    // Tier 2: Beginner (JavaScript)
-    'javascript': '📒 JavaScript Fundamentals',
-    'dom': '📓 DOM Understanding',
-    'async-await': '📔 Async/Await',
-    // Tier 3: Intermediate (Playwright Basics)
-    'playwright-navigation': '🎭 Navigation & Actions',
-    'playwright-locators': '🔍 Locators',
-    'playwright-assertions': '✅ Assertions',
-    'playwright-waits': '⏳ Wait Strategies',
-    // Tier 4: Expert (Advanced)
-    'playwright-pom': '🏗️ Page Object Model',
-    'playwright-data-driven': '📊 Data-Driven Testing',
-    'playwright-advanced': '🚀 Advanced Patterns',
-};
-
-// Tier labels
-const tierLabels: Record<string, { name: string; color: string }> = {
-    basic: { name: '🟢 Basic', color: 'text-green-400' },
-    beginner: { name: '🟡 Beginner', color: 'text-yellow-400' },
-    intermediate: { name: '🟠 Intermediate', color: 'text-orange-400' },
-    expert: { name: '🔴 Expert', color: 'text-red-400' },
-};
-
-// Get tier from category
-function getTierFromCategory(category?: string): string {
-    if (!category) return 'basic';
-    if (category.startsWith('css-') || category.startsWith('xpath-') || category.startsWith('selector')) return 'basic';
-    if (category === 'javascript' || category === 'dom' || category === 'async-await') return 'beginner';
-    if (category.startsWith('playwright-navigation') || category.startsWith('playwright-locators') ||
-        category.startsWith('playwright-assertions') || category.startsWith('playwright-waits')) return 'intermediate';
-    if (category.startsWith('playwright-pom') || category.startsWith('playwright-data') ||
-        category.startsWith('playwright-advanced')) return 'expert';
-    return 'basic';
-}
-
-// Difficulty colors
-const difficultyColors: Record<string, string> = {
-    EASY: 'bg-green-500/20 text-green-400',
-    MEDIUM: 'bg-yellow-500/20 text-yellow-400',
-    HARD: 'bg-red-500/20 text-red-400',
-};
-
-interface Challenge {
+export interface Challenge {
     id: string;
     slug: string;
     title: string;
@@ -93,12 +53,13 @@ interface Challenge {
     difficulty: string;
     category?: string;
     xpReward: number;
+    order: number;
     completionCount: number;
     isCompleted?: boolean;
     tags?: string[];
 }
 
-interface ChallengesResponse {
+export interface ChallengesResponse {
     success: boolean;
     data: Challenge[];
     pagination: {
@@ -127,7 +88,7 @@ function ChallengesPage() {
 
     // Filter challenges by type, difficulty, and tier
     const filteredChallenges = useMemo(() => {
-        return challenges.filter(c => {
+        return challenges.filter((c: Challenge) => {
             if (filterType !== 'all' && c.type !== filterType) return false;
             if (filterDifficulty !== 'all' && c.difficulty !== filterDifficulty) return false;
             if (filterTier !== 'all' && getTierFromCategory(c.category) !== filterTier) return false;
@@ -160,6 +121,49 @@ function ChallengesPage() {
     const completedChallenges = challenges.filter(c => c.isCompleted).length;
     const progressPercent = totalChallenges > 0 ? Math.round((completedChallenges / totalChallenges) * 100) : 0;
 
+    // Calculate tier progress
+    const tierProgress = useMemo(() => {
+        const tiers: Record<string, { completed: number; total: number }> = {
+            basic: { completed: 0, total: 0 },
+            beginner: { completed: 0, total: 0 },
+            intermediate: { completed: 0, total: 0 },
+            expert: { completed: 0, total: 0 },
+        };
+
+        challenges.forEach(c => {
+            const tier = getTierFromCategory(c.category);
+            if (tiers[tier]) {
+                tiers[tier].total++;
+                if (c.isCompleted) {
+                    tiers[tier].completed++;
+                }
+            }
+        });
+
+        return TIER_ORDER.map(tier => ({
+            tier,
+            name: tierLabels[tier].name,
+            color: tierLabels[tier].color,
+            completed: tiers[tier].completed,
+            total: tiers[tier].total,
+        }));
+    }, [challenges]);
+
+    // Sort categories pedagogically
+    const sortedChallengesByCategory = useMemo(() => {
+        return Object.entries(challengesByCategory).sort(([catA], [catB]) => {
+            const tierA = getTierFromCategory(catA);
+            const tierB = getTierFromCategory(catB);
+            const tierOrderA = TIER_ORDER.indexOf(tierA);
+            const tierOrderB = TIER_ORDER.indexOf(tierB);
+
+            if (tierOrderA !== tierOrderB) {
+                return tierOrderA - tierOrderB;
+            }
+            return catA.localeCompare(catB);
+        });
+    }, [challengesByCategory]);
+
     // State for view mode
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
@@ -174,23 +178,27 @@ function ChallengesPage() {
                     </p>
                 </div>
 
-                {/* Progress Bar */}
-                {totalChallenges > 0 && (
-                    <div className="mb-8 p-4 rounded-lg bg-card border border-border">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium">Overall Progress</span>
-                            <span className="text-sm text-muted-foreground">
-                                {completedChallenges} / {totalChallenges} completed ({progressPercent}%)
-                            </span>
+                {/* Progress Group */}
+                <div className="space-y-6 mb-8">
+                    {totalChallenges > 0 && (
+                        <div className="p-4 rounded-lg bg-card border border-border">
+                            <div className="flex items-center justify-between mb-2">
+                                <span className="text-sm font-medium">Overall Progress</span>
+                                <span className="text-sm text-muted-foreground">
+                                    {completedChallenges} / {totalChallenges} completed ({progressPercent}%)
+                                </span>
+                            </div>
+                            <div className="h-2 bg-muted rounded-full overflow-hidden">
+                                <div
+                                    className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
+                                    style={{ width: `${progressPercent}%` }}
+                                />
+                            </div>
                         </div>
-                        <div className="h-2 bg-muted rounded-full overflow-hidden">
-                            <div
-                                className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
-                                style={{ width: `${progressPercent}%` }}
-                            />
-                        </div>
-                    </div>
-                )}
+                    )}
+
+                    <ChallengeTierProgress progress={tierProgress} />
+                </div>
 
                 {/* Filters and View Toggle */}
                 <div className="flex flex-col gap-6 mb-8">
@@ -256,7 +264,7 @@ function ChallengesPage() {
                             All
                         </Badge>
                         {['EASY', 'MEDIUM', 'HARD'].map(diff => {
-                            const count = challenges.filter(c => c.difficulty === diff).length;
+                            const count = challenges.filter((c: Challenge) => c.difficulty === diff).length;
                             if (count === 0) return null;
                             return (
                                 <Badge
@@ -282,7 +290,7 @@ function ChallengesPage() {
                             All Tiers
                         </Badge>
                         {Object.entries(tierLabels).map(([tier, { name, color }]) => {
-                            const count = challenges.filter(c => getTierFromCategory(c.category) === tier).length;
+                            const count = challenges.filter((c: Challenge) => getTierFromCategory(c.category) === tier).length;
                             if (count === 0) return null;
                             return (
                                 <Badge
@@ -335,9 +343,9 @@ function ChallengesPage() {
                 )}
 
                 {/* Challenges Content */}
-                {!isLoading && !error && Object.keys(challengesByCategory).length > 0 && (
+                {!isLoading && !error && sortedChallengesByCategory.length > 0 && (
                     <div className="space-y-10">
-                        {Object.entries(challengesByCategory).map(([category, categoryChallenges]) => (
+                        {sortedChallengesByCategory.map(([category, categoryChallenges]) => (
                             <div key={category}>
                                 {/* Category Header */}
                                 <div className="flex items-center gap-3 mb-4">

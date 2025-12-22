@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
@@ -12,6 +12,9 @@ import { type TestResult } from '@/components/challenges/TestResults';
 import { useSession } from '@/lib/auth.client';
 import { trackEvent } from '@/lib/analytics';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
+import { TierSkipTip } from '@/components/challenges/TierSkipTip';
+import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
+import { ChallengesResponse } from './index';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -24,6 +27,7 @@ interface APIChallenge {
     description: string;
     type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
     difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+    category?: string;
     xpReward: number;
     instructions: string;
     htmlContent?: string;
@@ -79,6 +83,40 @@ function ChallengeDetailPage() {
         },
         enabled: !!slug,
     });
+
+    const { data: allChallengesData } = useQuery<ChallengesResponse>({
+        queryKey: ['challenges'],
+        queryFn: async () => {
+            const res = await fetch('/api/challenges?limit=100');
+            if (!res.ok) throw new Error('Failed to fetch challenges');
+            return res.json();
+        },
+    });
+
+    const missingPrerequisites = useMemo(() => {
+        if (!data || !allChallengesData) return [];
+
+        const currentTier = getTierFromCategory(data.category);
+        const currentTierIndex = TIER_ORDER.indexOf(currentTier);
+
+        if (currentTierIndex <= 0) return []; // Basic tier has no prerequisites
+
+        const missing = [];
+        for (let i = 0; i < currentTierIndex; i++) {
+            const prereqTier = TIER_ORDER[i];
+            const tierChallenges = allChallengesData.data.filter((c: any) => getTierFromCategory(c.category) === prereqTier);
+            const completedInTier = tierChallenges.filter((c: any) => c.isCompleted).length;
+
+            if (tierChallenges.length > 0 && completedInTier < tierChallenges.length) {
+                missing.push({
+                    tier: prereqTier,
+                    name: tierLabels[prereqTier].name
+                });
+            }
+        }
+
+        return missing;
+    }, [data, allChallengesData]);
 
     const { data: sessionData } = useSession();
     const userId = sessionData?.user?.id;
@@ -269,12 +307,22 @@ function ChallengeDetailPage() {
     }
 
     return (
-        <div className="h-[calc(100vh-4rem)]">
-            <ChallengePlayground
-                challenge={challenge}
-                onSubmit={handleSubmit}
-                userId={userId}
-            />
+        <div className="h-[calc(100vh-4rem)] flex flex-col">
+            {missingPrerequisites.length > 0 && (
+                <div className="px-6 pt-4">
+                    <TierSkipTip
+                        currentTier={tierLabels[getTierFromCategory(data?.category)].name}
+                        missingPrerequisites={missingPrerequisites}
+                    />
+                </div>
+            )}
+            <div className="flex-1 min-h-0">
+                <ChallengePlayground
+                    challenge={challenge}
+                    onSubmit={handleSubmit}
+                    userId={userId}
+                />
+            </div>
 
             {lastSubmissionResult && (
                 <ChallengeSuccessDialog
