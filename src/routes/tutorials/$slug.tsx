@@ -9,6 +9,8 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { AlertCircle, Clock, ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useRef, useEffect } from 'react';
+import { useSession } from '@/lib/auth.client';
+import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 
 export const Route = createFileRoute('/tutorials/$slug')({
     component: TutorialDetailPage,
@@ -54,7 +56,9 @@ function TutorialDetailPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [readingProgress, setReadingProgress] = useState(0);
+    const [showAuthGuard, setShowAuthGuard] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
+    const { data: sessionData } = useSession();
 
     const { data, isLoading, error } = useQuery<TutorialResponse>({
         queryKey: ['tutorial', slug],
@@ -117,6 +121,14 @@ function TutorialDetailPage() {
         if (tutorial?.userProgress?.isCompleted) {
             return;
         }
+
+        // Auth Guard: Don't track scrolling progress if not logged in (optional, but good for saving API calls)
+        // But for "Lazy Registration", we might want to let them read fully, then prompt at the end?
+        // Let's stick to prompt only on "Mark Complete" button for now.
+        // Scroll progress doesn't need auth guard, but API call will fail (401)
+        // We should check session before mutating.
+
+        if (!sessionData?.user) return;
 
         const element = e.currentTarget;
         const scrollTop = element.scrollTop;
@@ -298,7 +310,13 @@ function TutorialDetailPage() {
                                 {!isCompleted ? (
                                     <Button
                                         className="w-full shadow-md hover:shadow-lg transition-shadow"
-                                        onClick={() => markCompleteMutation.mutate()}
+                                        onClick={() => {
+                                            if (!sessionData?.user) {
+                                                setShowAuthGuard(true);
+                                                return;
+                                            }
+                                            markCompleteMutation.mutate();
+                                        }}
                                         disabled={markCompleteMutation.isPending || displayProgress < 100}
                                     >
                                         <CheckCircle2 className="h-4 w-4 mr-2" />
@@ -487,6 +505,13 @@ function TutorialDetailPage() {
                         background: hsl(var(--primary) / 0.5);
                     }
                 `}</style>
+
+            <AuthGuardDialog
+                open={showAuthGuard}
+                onOpenChange={setShowAuthGuard}
+                title="Sign to Save Progress"
+                description="You need to be signed in to mark tutorials as complete and track your learning journey."
+            />
         </div>
     );
 }
