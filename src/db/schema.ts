@@ -98,6 +98,16 @@ export const accounts = pgTable('accounts', {
     updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
+// Verification table for password reset and email verification tokens
+export const verification = pgTable('verification', {
+    id: uuid('id').defaultRandom().primaryKey(),
+    identifier: text('identifier').notNull(), // email or user id
+    value: text('value').notNull(), // token value
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
 // ============================================================================
 // CONTENT TABLES
 // ============================================================================

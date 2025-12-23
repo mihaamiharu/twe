@@ -309,7 +309,6 @@ Create the main challenge solving interface with split layout.
 - [ ] Challenge description rendering
 - [ ] Run Code button
 - [ ] Test results display component
-- [ ] Hints system (collapsible)
 - [ ] Submit button (enabled only after passing)
 - [ ] Responsive design (tabs on mobile)
 - [ ] Loading states and animations

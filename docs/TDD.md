@@ -743,7 +743,6 @@ interface CodeEditorProps {
 ```tsx
 // Split layout: Description | Editor | Output
 // Test case display
-// Hint system
 // Submit button with loading state
 ```
 
