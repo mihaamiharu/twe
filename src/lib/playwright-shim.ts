@@ -317,6 +317,10 @@ export class MockedPlaywrightPage {
         };
     }
 
+    async waitForTimeout(ms: number): Promise<void> {
+        await this.delay(ms);
+    }
+
     async screenshot(options?: any): Promise<Buffer> {
         console.log('Mocking screenshot');
         return Buffer.from('');
