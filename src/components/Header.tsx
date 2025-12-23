@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import {
   BookOpen,
+  Bug,
   Code,
   LogOut,
   Menu,
@@ -22,6 +23,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useSession, signOut } from '@/lib/auth.client';
+import { BugReportDialog } from '@/components/BugReportDialog';
 
 const navLinks = [
   { href: '/tutorials', label: 'Tutorials', icon: BookOpen },
@@ -127,6 +129,18 @@ export function Header() {
                         Settings
                       </Link>
                     </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
+                      <div className="w-full cursor-pointer">
+                        <BugReportDialog
+                          trigger={
+                            <div className="flex items-center w-full gap-2">
+                              <Bug className="mr-2 h-4 w-4" />
+                              Report Bug
+                            </div>
+                          }
+                        />
+                      </div>
+                    </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={handleSignOut}
@@ -195,7 +209,7 @@ export function Header() {
                 </Link>
               ))}
 
-              <div className="h-px bg-border my-4" />
+              {/* Bug Report - Removed from top level mobile menu */}
 
               {isAuthenticated && user ? (
                 <>
@@ -207,6 +221,16 @@ export function Header() {
                     <User className="h-5 w-5" />
                     Profile
                   </Link>
+                  <div className="px-3">
+                    <BugReportDialog
+                      trigger={
+                        <button className="flex items-center gap-3 w-full py-3 text-muted-foreground hover:text-foreground transition-colors">
+                          <Bug className="h-5 w-5" />
+                          Report Bug
+                        </button>
+                      }
+                    />
+                  </div>
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
