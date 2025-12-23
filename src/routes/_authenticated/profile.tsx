@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Award, BookOpen, Code, Settings, Star, Zap, AlertCircle } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
+import { ActivityHeatmap } from '@/components/gamification/ActivityHeatmap';
 
 export const Route = createFileRoute('/_authenticated/profile')({
     component: ProfilePage,
@@ -39,6 +40,10 @@ interface UserProfile {
         title: string;
         xp: number;
         date: string;
+    }[];
+    heatmapData: {
+        date: string;
+        count: number;
     }[];
 }
 
@@ -281,6 +286,12 @@ function ProfilePage() {
                                 <CardDescription>Your latest learning progress</CardDescription>
                             </CardHeader>
                             <CardContent>
+                                <div className="mb-8">
+                                    <h3 className="text-sm font-medium mb-4">Submission Activity</h3>
+                                    <ActivityHeatmap data={user.heatmapData || []} className="mx-auto" />
+                                </div>
+
+                                <h3 className="text-sm font-medium mb-4">Timeline</h3>
                                 {(!user.recentActivity || user.recentActivity.length === 0) ? (
                                     <div className="text-center py-8 text-muted-foreground">
                                         <Code className="h-8 w-8 mx-auto mb-2 opacity-50" />

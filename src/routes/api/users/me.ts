@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { users, challenges, userAchievements, achievements, submissions } from '@/db/schema';
-import { eq, desc } from 'drizzle-orm';
+import { eq, desc, and, gte } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 import { getUserStats } from '@/lib/stats';
 
@@ -75,6 +75,35 @@ export const Route = createFileRoute('/api/users/me')({
             .where(eq(submissions.userId, userId))
             .orderBy(desc(submissions.createdAt))
             .limit(5);
+
+          // Get submissions for heatmap (last 365 days)
+          const oneYearAgo = new Date();
+          oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+          const heatmapSubmissions = await db
+            .select({
+              createdAt: submissions.createdAt,
+            })
+            .from(submissions)
+            .where(
+              and(
+                eq(submissions.userId, userId),
+                gte(submissions.createdAt, oneYearAgo),
+                eq(submissions.isPassed, true)
+              )
+            );
+
+          // Aggregate by date (YYYY-MM-DD)
+          const heatmapMap = new Map<string, number>();
+          heatmapSubmissions.forEach(sub => {
+            const dateStr = sub.createdAt.toISOString().split('T')[0];
+            heatmapMap.set(dateStr, (heatmapMap.get(dateStr) || 0) + 1);
+          });
+
+          const heatmapData = Array.from(heatmapMap.entries()).map(([date, count]) => ({
+            date,
+            count
+          })).sort((a, b) => a.date.localeCompare(b.date));
 
           // Calculate XP progress to next level
           const currentLevel = user.level;
@@ -172,6 +201,10 @@ export const Route = createFileRoute('/api/users/me')({
               })),
               // Actually, simpler to just map exactly what UI needs or pass the list.
               // The UI uses 'user.recentAchievements'.
+
+              // The UI uses 'user.recentAchievements'.
+
+              heatmapData, // { date: string, count: number }[]
 
               recentActivity: activity,
             },
