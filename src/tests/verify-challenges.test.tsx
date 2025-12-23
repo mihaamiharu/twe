@@ -45,10 +45,6 @@ describe('Challenge Verification', () => {
             if (challenge.targetSelector) {
                 const element = document.querySelector(challenge.targetSelector);
                 expect(element).not.toBeNull();
-
-                // Optional: Verify integrity of hints
-                expect(challenge.hints).toBeDefined();
-                expect(challenge.hints?.length).toBeGreaterThan(0);
             }
         });
     });

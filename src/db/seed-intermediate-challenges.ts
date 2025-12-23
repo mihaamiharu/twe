@@ -68,7 +68,6 @@ await page.goto('/login');
 // Get the page title
 const result = await page.title();`,
     expectedOutput: 'Login Page',
-    hints: ['Use page.goto() to navigate', 'page.title() returns the document title'],
     tags: ['playwright', 'navigation', 'intermediate'],
   },
   {
@@ -115,7 +114,6 @@ await page.click('#increment');
 // Get the counter value
 const result = await page.locator('#count').textContent();`,
     expectedOutput: '3',
-    hints: ['Use page.click() with a selector', 'Call click multiple times for multiple clicks'],
     tags: ['playwright', 'click', 'actions', 'intermediate'],
   },
   {
@@ -167,7 +165,6 @@ await page.fill('#password', 'secret123');
 // Get the email value
 const result = await page.locator('#email').inputValue();`,
     expectedOutput: 'qa@test.com',
-    hints: ['Use fill() to set input values', 'Use inputValue() to read input values'],
     tags: ['playwright', 'fill', 'type', 'forms', 'intermediate'],
   },
   {
@@ -220,7 +217,6 @@ await page.selectOption('#language', 'javascript');
 // Get the selected value
 const result = await page.locator('#language').inputValue();`,
     expectedOutput: 'javascript',
-    hints: ['selectOption takes the value attribute', 'Use inputValue() to get selected option'],
     tags: ['playwright', 'select', 'dropdown', 'intermediate'],
   },
   {
@@ -276,7 +272,6 @@ await page.check('#terms');
 // Verify it's checked
 const result = await page.isChecked('#terms');`,
     expectedOutput: 'true',
-    hints: ['Use check() to check a checkbox', 'isChecked() returns boolean'],
     tags: ['playwright', 'checkbox', 'radio', 'intermediate'],
   },
   {
@@ -336,7 +331,6 @@ await page.press('#search', 'Enter');
 // Get search results
 const result = await page.locator('#results').textContent();`,
     expectedOutput: 'Results for: Playwright',
-    hints: ['Use press() for keyboard events', 'Enter key triggers the search'],
     tags: ['playwright', 'keyboard', 'press', 'intermediate'],
   },
   {
@@ -391,7 +385,6 @@ await page.hover('#menu-btn');
 // Get dropdown text
 const result = await page.locator('#dropdown').textContent();`,
     expectedOutput: 'Dropdown Content',
-    hints: ['hover() triggers mouseenter event', 'Dropdown becomes visible on hover'],
     tags: ['playwright', 'hover', 'focus', 'intermediate'],
   },
   {
@@ -451,7 +444,6 @@ await page.locator('#file-input').setInputFiles({
 // Get the displayed filename
 const result = await page.locator('#filename').textContent();`,
     expectedOutput: 'test-report.pdf',
-    hints: ['setInputFiles accepts file objects', 'The change event updates the display'],
     tags: ['playwright', 'upload', 'files', 'intermediate'],
   },
   {
@@ -506,7 +498,6 @@ await page.locator('#item-a').dragTo(page.locator('#dropzone'));
 // Verify drop
 const result = await page.locator('#dropzone').textContent();`,
     expectedOutput: 'Dropped: Item A',
-    hints: ['dragTo() handles the full drag operation', 'The drop event updates the text'],
     tags: ['playwright', 'drag', 'drop', 'intermediate'],
   },
   {
@@ -554,7 +545,6 @@ const frames = page.frames();
 const frame = page.frameLocator('#embed');
 const result = await frame.locator('#frame-content').textContent();`,
     expectedOutput: 'Hello from iframe!',
-    hints: ['frameLocator creates a locator scoped to iframe', 'Then use normal locator methods'],
     tags: ['playwright', 'iframe', 'frames', 'intermediate'],
   },
 ];
@@ -609,7 +599,6 @@ await signUpBtn.click();
 // Get result
 const result = await page.locator('#result').textContent();`,
     expectedOutput: 'Signed up!',
-    hints: ['getByRole uses ARIA roles', 'name matches accessible name'],
     tags: ['playwright', 'locators', 'accessibility', 'intermediate'],
   },
   {
@@ -659,7 +648,6 @@ await element.click();
 // Get output
 const result = await page.locator('#output').textContent();`,
     expectedOutput: 'Clicked!',
-    hints: ['getByText searches visible text', 'Use exact: false for partial match'],
     tags: ['playwright', 'locators', 'text', 'intermediate'],
   },
   {
@@ -707,7 +695,6 @@ await page.getByLabel('Password').fill('secret123');
 // Get username value
 const result = await page.getByLabel('Username').inputValue();`,
     expectedOutput: 'testuser',
-    hints: ['getByLabel matches label text', 'Works with for/id association'],
     tags: ['playwright', 'locators', 'forms', 'accessibility', 'intermediate'],
   },
   {
@@ -749,7 +736,6 @@ await page.getByPlaceholder('Search...').fill('Playwright testing');
 // Get value
 const result = await page.getByPlaceholder('Search...').inputValue();`,
     expectedOutput: 'Playwright testing',
-    hints: ['Matches placeholder attribute exactly', 'Use for inputs without labels'],
     tags: ['playwright', 'locators', 'placeholder', 'intermediate'],
   },
   {
@@ -802,7 +788,6 @@ await page.getByTestId('add-to-cart').click();
 // Get cart count
 const result = await page.locator('#cart-count').textContent();`,
     expectedOutput: '1',
-    hints: ['getByTestId matches data-testid by default', 'Configure custom attribute if needed'],
     tags: ['playwright', 'locators', 'testid', 'intermediate'],
   },
   {
@@ -856,7 +841,6 @@ page.locator('.list')
 const secondItem = page.locator('.menu li').nth(1);
 const result = await secondItem.textContent();`,
     expectedOutput: 'Products',
-    hints: ['nth() is 0-indexed', 'Use filter() to narrow down matches'],
     tags: ['playwright', 'locators', 'chaining', 'intermediate'],
   },
   {
@@ -910,7 +894,6 @@ await frame.locator('button').click();
 // Get iframe content
 const result = await frame.locator('body').textContent();`,
     expectedOutput: 'Button clicked!',
-    hints: ['frameLocator returns a locator scoped to iframe', 'Chain with regular locator methods'],
     tags: ['playwright', 'locators', 'iframe', 'intermediate'],
   },
   {
@@ -969,7 +952,6 @@ const items = page.locator('.todo-list li');
 const count = await items.count();
 const result = String(count);`,
     expectedOutput: '5',
-    hints: ['count() returns number of matched elements', 'Convert to string for output'],
     tags: ['playwright', 'locators', 'lists', 'multiple', 'intermediate'],
   },
 ];
@@ -1021,7 +1003,6 @@ await page.click('#show');
 await expect(page.locator('#modal')).toBeVisible();
 const result = 'visible';`,
     expectedOutput: 'visible',
-    hints: ['expect().toBeVisible() checks visibility', 'Element must be in DOM and visible'],
     tags: ['playwright', 'assertions', 'visibility', 'intermediate'],
   },
   {
@@ -1070,7 +1051,6 @@ await expect(page.locator('h1')).toHaveText('Hello World');
 await expect(page.locator('p')).toContainText('Playwright');
 const result = 'passed';`,
     expectedOutput: 'passed',
-    hints: ['toHaveText checks exact match', 'toContainText checks substring'],
     tags: ['playwright', 'assertions', 'text', 'intermediate'],
   },
   {
@@ -1118,7 +1098,6 @@ await page.fill('#email', 'qa@test.com');
 await expect(page.locator('#email')).toHaveValue('qa@test.com');
 const result = 'passed';`,
     expectedOutput: 'passed',
-    hints: ['toHaveValue checks input value', 'Works with text inputs, textareas, select'],
     tags: ['playwright', 'assertions', 'forms', 'intermediate'],
   },
   {
@@ -1171,7 +1150,6 @@ await expect(page.locator('#terms')).toBeChecked();
 await expect(page.locator('#submit')).toBeEnabled();
 const result = 'passed';`,
     expectedOutput: 'passed',
-    hints: ['toBeChecked for checkboxes/radios', 'toBeEnabled/toBeDisabled for buttons'],
     tags: ['playwright', 'assertions', 'state', 'intermediate'],
   },
   {
@@ -1220,7 +1198,6 @@ await expect(page.locator('a')).toHaveAttribute('href', '/about');
 await expect(page.locator('img')).toHaveAttribute('alt', 'Company Logo');
 const result = 'passed';`,
     expectedOutput: 'passed',
-    hints: ['toHaveAttribute(name, value)', 'Second arg is optional to just check existence'],
     tags: ['playwright', 'assertions', 'attributes', 'intermediate'],
   },
   {
@@ -1272,7 +1249,6 @@ await page.click('#add');
 await expect(page.locator('#list li')).toHaveCount(5);
 const result = 'passed';`,
     expectedOutput: 'passed',
-    hints: ['toHaveCount checks exact count', 'Auto-retries until count matches'],
     tags: ['playwright', 'assertions', 'count', 'intermediate'],
   },
   {
@@ -1316,7 +1292,6 @@ await expect(page).toHaveTitle(/Dashboard/);
 await expect(page).toHaveTitle('Test Page');
 const result = 'passed';`,
     expectedOutput: 'passed',
-    hints: ['toHaveTitle works on page object', 'Can use string or regex'],
     tags: ['playwright', 'assertions', 'url', 'title', 'intermediate'],
   },
   {
@@ -1369,7 +1344,6 @@ await expect.soft(page.locator('#email-status')).toContainText('valid');
 await expect.soft(page.locator('#pass-status')).toContainText('valid');
 const result = 'passed';`,
     expectedOutput: 'passed',
-    hints: ['expect.soft continues after failure', 'Collect all errors at end'],
     tags: ['playwright', 'assertions', 'soft', 'intermediate'],
   },
 ];
@@ -1437,7 +1411,6 @@ await page.click('#delayed-btn');
 // Get the button text
 const result = await page.locator('#delayed-btn').textContent();`,
     expectedOutput: 'Clicked!',
-    hints: ['Playwright auto-waits up to 30 seconds', 'No need for explicit waits'],
     tags: ['playwright', 'waits', 'auto-wait', 'intermediate'],
   },
   {
@@ -1495,7 +1468,6 @@ await page.waitForSelector('#spinner', { state: 'hidden' });
 // Get result
 const result = await page.locator('#result').textContent();`,
     expectedOutput: 'Data loaded!',
-    hints: ['state: hidden waits for element to be hidden', 'Useful for loading indicators'],
     tags: ['playwright', 'waits', 'selector', 'intermediate'],
   },
   {
@@ -1547,7 +1519,6 @@ await page.waitForLoadState('domcontentloaded');
 // Get page title
 const result = await page.title();`,
     expectedOutput: 'Dashboard',
-    hints: ['domcontentloaded is faster than load', 'networkidle waits for no network activity'],
     tags: ['playwright', 'waits', 'load', 'intermediate'],
   },
   {
@@ -1605,7 +1576,6 @@ const [response] = await Promise.all([
 // Get status text
 const result = await page.locator('#status').textContent();`,
     expectedOutput: 'API Success',
-    hints: ['Use Promise.all to wait and trigger together', 'waitForResponse returns Response object'],
     tags: ['playwright', 'waits', 'api', 'response', 'intermediate'],
   },
   {
@@ -1669,7 +1639,6 @@ await page.waitForFunction(() => {
 // Get counter value
 const result = await page.locator('#counter').textContent();`,
     expectedOutput: '3',
-    hints: ['waitForFunction runs in page context', 'Return true when condition is met'],
     tags: ['playwright', 'waits', 'function', 'custom', 'intermediate'],
   },
   {
@@ -1727,7 +1696,6 @@ await page.click('#fast-btn', { timeout: 1000 });
 // Get button text
 const result = await page.locator('#fast-btn').textContent();`,
     expectedOutput: 'Done!',
-    hints: ['Timeout is in milliseconds', 'Default timeout is 30000ms'],
     tags: ['playwright', 'waits', 'timeout', 'config', 'intermediate'],
   },
 ];

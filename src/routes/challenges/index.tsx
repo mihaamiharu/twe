@@ -5,8 +5,10 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Code, Trophy, Zap, AlertCircle, CheckCircle2, Palette, Route as RouteIcon, LayoutGrid, List } from 'lucide-react';
+import { Code, Trophy, Zap, AlertCircle, CheckCircle2, Palette, Route as RouteIcon, LayoutGrid, List, Search } from 'lucide-react';
 import { useState, useMemo } from 'react';
+import { Input } from '@/components/ui/input';
+import { useDebounce } from '@/lib/useDebounce';
 import { ChallengeTierProgress } from '@/components/challenges/ChallengeTierProgress';
 import {
     tierLabels,
@@ -74,6 +76,8 @@ function ChallengesPage() {
     const [filterType, setFilterType] = useState<string>('all');
     const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
     const [filterTier, setFilterTier] = useState<string>('all');
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
     const { data, isLoading, error } = useQuery<ChallengesResponse>({
         queryKey: ['challenges'],
@@ -86,15 +90,23 @@ function ChallengesPage() {
 
     const challenges = data?.data ?? [];
 
-    // Filter challenges by type, difficulty, and tier
+    // Filter challenges by search query, type, difficulty, and tier
     const filteredChallenges = useMemo(() => {
         return challenges.filter((c: Challenge) => {
+            // Text search on title and description
+            if (debouncedSearchQuery) {
+                const query = debouncedSearchQuery.toLowerCase();
+                const matchesTitle = c.title.toLowerCase().includes(query);
+                const matchesDescription = c.description.toLowerCase().includes(query);
+                const matchesTags = c.tags?.some(tag => tag.toLowerCase().includes(query));
+                if (!matchesTitle && !matchesDescription && !matchesTags) return false;
+            }
             if (filterType !== 'all' && c.type !== filterType) return false;
             if (filterDifficulty !== 'all' && c.difficulty !== filterDifficulty) return false;
             if (filterTier !== 'all' && getTierFromCategory(c.category) !== filterTier) return false;
             return true;
         });
-    }, [challenges, filterType, filterDifficulty, filterTier]);
+    }, [challenges, debouncedSearchQuery, filterType, filterDifficulty, filterTier]);
 
     // Group challenges by category
     const challengesByCategory = useMemo(() => {
@@ -176,6 +188,26 @@ function ChallengesPage() {
                     <p className="text-muted-foreground text-lg">
                         Master CSS and XPath selectors with hands-on challenges
                     </p>
+                </div>
+
+                {/* Search Input */}
+                <div className="relative mb-6">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="text"
+                        placeholder="Search challenges by title, description, or tags..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10 bg-card border-border"
+                    />
+                    {searchQuery && (
+                        <button
+                            onClick={() => setSearchQuery('')}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
+                        >
+                            Clear
+                        </button>
+                    )}
                 </div>
 
                 {/* Progress Group */}
