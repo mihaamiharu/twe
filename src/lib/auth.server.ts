@@ -3,7 +3,7 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import * as dotenv from 'dotenv';
-import { sendVerificationEmail } from '@/lib/email.server';
+import { sendVerificationEmail, sendPasswordResetEmail } from '@/lib/email.server';
 
 dotenv.config();
 
@@ -28,6 +28,7 @@ export const auth = betterAuth({
             user: schema.users,
             session: schema.sessions,
             account: schema.accounts,
+            verification: schema.verification,
         },
     }),
 
@@ -36,8 +37,7 @@ export const auth = betterAuth({
         enabled: true,
         requireEmailVerification: true,
         sendResetPassword: async ({ user, url }) => {
-            // TODO: Implement password reset email
-            console.log(`[Auth] Password reset requested for ${user.email}: ${url}`);
+            await sendPasswordResetEmail(user.email, url, user.name || undefined);
         },
     },
 

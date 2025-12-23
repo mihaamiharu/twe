@@ -48,7 +48,6 @@ This implementation follows the PRD and TDD specifications created in the planni
 > - Visual preview of the web component (iframe or screenshot)
 > - Input field for CSS selector or XPath
 > - Validation against the correct selector
-> - Hints system to help users learn selector strategies
 > 
 > **Domain:** www.testingwithekki.com
 > **Hosting:** Your own server
@@ -300,7 +299,6 @@ Challenge solving interface:
 - Split layout (description | code editor | output)
 - Run tests button
 - Submit button
-- Hints system
 - Real-time feedback
 - Playwright shim execution
 
@@ -749,7 +747,7 @@ The implementation will follow this order:
 7. **Content Creation & Deployment** (Week 6-7)
    - Create seed data (initial tutorials)
    - Create starter challenges (5-10 for each type)
-   - Write challenge solutions and hints
+   - Write challenge solutions
    - Set up production environment variables
    - Deploy to your own server
    - Configure domain (www.testingwithekki.com)
