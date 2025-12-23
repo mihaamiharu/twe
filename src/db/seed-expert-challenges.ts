@@ -97,7 +97,6 @@ await loginPage.login('test@qa.com', 'password123');
 // Get result
 const result = await page.locator('#message').textContent();`,
         expectedOutput: 'Welcome, test@qa.com!',
-        hints: ['Page Object encapsulates locators', 'Methods represent user actions'],
         tags: ['playwright', 'pom', 'page-object', 'expert'],
     },
     {
@@ -180,7 +179,6 @@ await cartPage.addItem();
 // Get result
 const result = await cartPage.getTotal();`,
         expectedOutput: 'Total: $20',
-        hints: ['Each method should represent one user action', 'Return values make assertions easier'],
         tags: ['playwright', 'pom', 'actions', 'expert'],
     },
     {
@@ -275,7 +273,6 @@ await dashboard.header.logout();
 
 const result = await dashboard.getStatus();`,
         expectedOutput: 'Logged out!',
-        hints: ['Components can be reused across pages', 'Compose pages from smaller components'],
         tags: ['playwright', 'pom', 'components', 'expert'],
     },
     {
@@ -369,7 +366,6 @@ const loginPage = new LoginPage(page);
 const homePage = await loginPage.login('test@qa.com', 'pass');
 const result = await homePage.getWelcomeMessage();`,
         expectedOutput: 'Welcome back!',
-        hints: ['Return new page object after navigation', 'Enables fluent test writing'],
         tags: ['playwright', 'pom', 'navigation', 'fluent', 'expert'],
     },
     {
@@ -462,7 +458,6 @@ class ProductPage extends BasePage {
 const productPage = new ProductPage(page);
 const result = await productPage.getPageTitle();`,
         expectedOutput: 'Product Details',
-        hints: ['super(page) calls parent constructor', 'Inherited methods are available to child'],
         tags: ['playwright', 'pom', 'inheritance', 'base-class', 'expert'],
     },
 ];
@@ -533,7 +528,6 @@ for (const { a, b, expected } of testCases) {
 
 const result = String(passed);`,
         expectedOutput: '3',
-        hints: ['Loop through test data array', 'Compare actual vs expected'],
         tags: ['playwright', 'data-driven', 'parameterized', 'expert'],
     },
     {
@@ -596,7 +590,6 @@ await page.click('#greet');
 
 const result = await page.locator('#greeting').textContent();`,
         expectedOutput: 'Hello, Charlie!',
-        hints: ['JSON data keeps tests clean', 'Access array elements by index'],
         tags: ['playwright', 'data-driven', 'json', 'expert'],
     },
     {
@@ -662,7 +655,6 @@ await page.click('#welcome');
 
 const result = await page.locator('#message').textContent();`,
         expectedOutput: 'Welcome Bob',
-        hints: ['Split by newline then comma', 'Skip the header row'],
         tags: ['playwright', 'data-driven', 'csv', 'expert'],
     },
     {
@@ -734,7 +726,6 @@ await page.click('#signup');
 const text = await page.locator('#confirm').textContent();
 const result = text.startsWith('Registered: ') ? 'success' : 'failed';`,
         expectedOutput: 'success',
-        hints: ['Generate unique data each run', 'Random values help find edge cases'],
         tags: ['playwright', 'data-driven', 'faker', 'dynamic', 'expert'],
     },
     {
@@ -801,7 +792,6 @@ await page.click('#login');
 
 const result = await page.locator('#status').textContent();`,
         expectedOutput: 'Logged into staging',
-        hints: ['Use config objects for each env', 'Select config based on env variable'],
         tags: ['playwright', 'data-driven', 'environment', 'config', 'expert'],
     },
 ];
@@ -863,7 +853,6 @@ await page.click('#create-api');
 const userName = await page.locator('#user-name').textContent();
 const result = userName === 'API User' ? 'hybrid-success' : 'failed';`,
         expectedOutput: 'hybrid-success',
-        hints: ['Use API for setup, UI for verification', 'Faster than pure UI tests'],
         tags: ['playwright', 'api', 'hybrid', 'expert'],
     },
     {
@@ -921,7 +910,6 @@ await page.click('#set-auth');
 // Access protected content
 const result = await page.locator('#message').textContent();`,
         expectedOutput: 'Welcome, authenticated user!',
-        hints: ['API setup is faster than UI', 'Use for prerequisites, not what you are testing'],
         tags: ['playwright', 'api', 'setup', 'expert'],
     },
     {
@@ -975,7 +963,6 @@ await page.click('#action');
 // Simulated screenshot capture
 const result = await page.locator('#result').textContent();`,
         expectedOutput: 'Screenshot: captured',
-        hints: ['Screenshots help debug failures', 'Use fullPage for full page capture'],
         tags: ['playwright', 'screenshot', 'debugging', 'expert'],
     },
     {
@@ -1036,7 +1023,6 @@ await page.click('#stop');
 
 const result = await page.locator('#status').textContent();`,
         expectedOutput: 'Video: saved',
-        hints: ['Videos help understand test failures', 'Use on-first-retry for efficiency'],
         tags: ['playwright', 'video', 'recording', 'expert'],
     },
     {
@@ -1098,7 +1084,6 @@ if (result.includes('Failed')) {
     result = await page.locator('#result').textContent();
 }`,
         expectedOutput: 'Success on retry',
-        hints: ['Retries handle intermittent failures', 'Use strategically, not to mask bugs'],
         tags: ['playwright', 'retry', 'flaky', 'expert'],
     },
     {
@@ -1159,7 +1144,6 @@ await Promise.all([
 
 const result = await page.locator('#results').textContent();`,
         expectedOutput: 'Completed: 3/3',
-        hints: ['Parallel tests need isolation', 'Use Promise.all for concurrent actions'],
         tags: ['playwright', 'parallel', 'performance', 'expert'],
     },
     {
@@ -1224,7 +1208,6 @@ await page.click('#test');
 
 const result = await page.locator('#result').textContent();`,
         expectedOutput: 'Tested on: chromium',
-        hints: ['Test on all target browsers', 'Use projects for browser matrix'],
         tags: ['playwright', 'cross-browser', 'compatibility', 'expert'],
     },
     {
@@ -1283,7 +1266,6 @@ await page.click('#apply');
 
 const result = await page.locator('#layout').textContent();`,
         expectedOutput: 'Layout: mobile',
-        hints: ['Test all target viewports', 'Use devices preset for common devices'],
         tags: ['playwright', 'mobile', 'responsive', 'viewport', 'expert'],
     },
 ];

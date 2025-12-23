@@ -118,6 +118,98 @@ ${appName}
 }
 
 /**
+ * Send password reset email to user
+ */
+export async function sendPasswordResetEmail(
+    to: string,
+    resetUrl: string,
+    userName?: string
+): Promise<void> {
+    const transporter = createTransporter();
+
+    const appName = 'TestingWithEkki';
+    const subject = `Reset your ${appName} password`;
+
+    const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #ef4444, #f97316); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header h1 { color: white; margin: 0; font-size: 24px; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+        .button { display: inline-block; background: #ef4444; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+        .button:hover { background: #dc2626; }
+        .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+        .url { word-break: break-all; color: #ef4444; font-size: 12px; }
+        .warning { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; margin: 16px 0; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔐 Password Reset</h1>
+        </div>
+        <div class="content">
+            <h2>Hello${userName ? `, ${userName}` : ''}!</h2>
+            <p>We received a request to reset your password for your ${appName} account.</p>
+            
+            <div style="text-align: center;">
+                <a href="${resetUrl}" class="button">Reset Password</a>
+            </div>
+            
+            <p>Or copy and paste this link into your browser:</p>
+            <p class="url">${resetUrl}</p>
+            
+            <div class="warning">
+                ⏰ This link will expire in 1 hour for security reasons.
+            </div>
+            
+            <p>If you didn't request a password reset, you can safely ignore this email. Your password won't be changed.</p>
+        </div>
+        <div class="footer">
+            <p>© ${new Date().getFullYear()} ${appName}. All rights reserved.</p>
+            <p>Learn testing skills through interactive tutorials and challenges.</p>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+
+    const text = `
+Hello${userName ? ', ' + userName : ''}!
+
+We received a request to reset your password for your ${appName} account.
+
+Click this link to reset your password:
+${resetUrl}
+
+This link will expire in 1 hour for security reasons.
+
+If you didn't request a password reset, you can safely ignore this email. Your password won't be changed.
+
+---
+${appName}
+    `;
+
+    try {
+        await transporter.sendMail({
+            from: getFromAddress(),
+            to,
+            subject,
+            text,
+            html,
+        });
+        console.log(`[Email] Password reset email sent to ${to}`);
+    } catch (error) {
+        console.error('[Email] Failed to send password reset email:', error);
+        throw new Error('Failed to send password reset email');
+    }
+}
+
+/**
  * Send bug report notification to admin
  */
 export async function sendBugReportNotification(report: {
