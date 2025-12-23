@@ -7,9 +7,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "test": "bun test",
-    "test:unit": "bun test src/tests/unit",
+    "test:unit": "bun test --preload ./src/tests/bun-preload.ts src/tests/unit",
     "test:integration": "TEST_DATABASE_URL=postgresql://twe_test:twe_password@localhost:5433/twe_test bun test src/tests/integration",
-    "test:ci": "docker compose up -d postgres_test && (bun run test:unit && bun run test:integration); EXIT_CODE=$?; docker compose stop postgres_test; exit $EXIT_CODE",
+    "test:ci": "podman compose up -d postgres_test && (bun run test:unit && bun run test:integration); EXIT_CODE=$?; podman compose stop postgres_test; exit $EXIT_CODE",
     "test:legacy": "bun test src/tests/verify-challenges.test.tsx --preload ./src/tests/setup.ts --dom",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -44,7 +44,6 @@
     "@tanstack/react-devtools": "^0.7.0",
     "@tanstack/react-router": "^1.132.0",
     "@tanstack/react-router-devtools": "^1.132.0",
-    "@tanstack/react-router-ssr-query": "^1.131.7",
     "@tanstack/react-start": "^1.132.0",
     "@tanstack/router-plugin": "^1.132.0",
     "better-auth": "^1.4.7",
@@ -80,7 +79,6 @@
     "@types/eslint": "^9.6.1",
     "@types/node": "^22.10.2",
     "@types/nodemailer": "^7.0.4",
-    "@types/pg": "^8.16.0",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^5.0.4",
@@ -88,12 +86,9 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "happy-dom": "^20.0.11",
-    "jsdom": "^27.0.0",
     "prettier": "^3.7.4",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.49.0",
-    "vite": "^7.1.7",
-    "vitest": "^3.0.5",
-    "web-vitals": "^5.1.0"
+    "vite": "^7.1.7"
   }
 }

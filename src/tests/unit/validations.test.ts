@@ -1,9 +1,9 @@
-import { describe, test, expect } from 'bun:test';
+import { describe, it, expect } from 'bun:test';
 import { signUpSchema, signInSchema, validateInput } from '../../lib/validations';
 
 describe('Validations', () => {
     describe('signUpSchema', () => {
-        test('should validate correct input', () => {
+        it('should validate correct input', () => {
             const result = signUpSchema.safeParse({
                 email: 'test@example.com',
                 password: 'password123',
@@ -12,7 +12,7 @@ describe('Validations', () => {
             expect(result.success).toBe(true);
         });
 
-        test('should fail on invalid email', () => {
+        it('should fail on invalid email', () => {
             const result = signUpSchema.safeParse({
                 email: 'invalid-email',
                 password: 'password123',
@@ -24,7 +24,7 @@ describe('Validations', () => {
             }
         });
 
-        test('should fail on short password', () => {
+        it('should fail on short password', () => {
             const result = signUpSchema.safeParse({
                 email: 'test@example.com',
                 password: 'short',
@@ -36,7 +36,7 @@ describe('Validations', () => {
             }
         });
 
-        test('should fail on short name', () => {
+        it('should fail on short name', () => {
             const result = signUpSchema.safeParse({
                 email: 'test@example.com',
                 password: 'password123',
@@ -50,7 +50,7 @@ describe('Validations', () => {
     });
 
     describe('signInSchema', () => {
-        test('should validate correct input', () => {
+        it('should validate correct input', () => {
             const result = signInSchema.safeParse({
                 email: 'test@example.com',
                 password: 'password123'
@@ -58,7 +58,7 @@ describe('Validations', () => {
             expect(result.success).toBe(true);
         });
 
-        test('should fail on empty fields', () => {
+        it('should fail on empty fields', () => {
             const result = signInSchema.safeParse({
                 email: '',
                 password: ''
@@ -68,7 +68,7 @@ describe('Validations', () => {
     });
 
     describe('validateInput helper', () => {
-        test('should return formatted errors', () => {
+        it('should return formatted errors', () => {
             const result = validateInput(signUpSchema, {
                 email: 'bad',
                 password: '123',
@@ -83,7 +83,7 @@ describe('Validations', () => {
             }
         });
 
-        test('should return data on success', () => {
+        it('should return data on success', () => {
             const data = {
                 email: 'test@example.com',
                 password: 'password123',

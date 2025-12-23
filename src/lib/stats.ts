@@ -115,9 +115,6 @@ function calculateStreak(completionDates: Date[]): { currentStreak: number; long
         }
     }
 
-    if (dayDates.length === 0) {
-        return { currentStreak: 0, longestStreak: 0 };
-    }
 
     // Calculate current streak (starting from today or yesterday)
     const today = new Date();

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
-import { db, users, challenges, progress } from '../../db';
-import { getUserStats } from '../../lib/stats';
+import { db, users, challenges, progress, achievements } from '../../db';
+import { getUserStats, getEarnedAchievementIds, awardAchievements } from '../../lib/stats';
 import { setupTestDb, truncateTables } from './setup';
 import { eq } from 'drizzle-orm';
 
@@ -102,9 +102,81 @@ describe('Stats Integration', () => {
         const stats = await getUserStats(testUserId);
         expect(stats.totalChallengesCompleted).toBe(0);
         expect(stats.currentStreak).toBe(0);
+        expect(stats.longestStreak).toBe(0);
+        expect(stats.tutorialsCompleted).toBe(0);
     });
 
     test('should throw error if user not found', async () => {
         expect(getUserStats('00000000-0000-0000-0000-000000000404')).rejects.toThrow('User not found');
+    });
+
+    test('should return empty set if no achievements earned', async () => {
+        const earned = await getEarnedAchievementIds(testUserId);
+        expect(earned.size).toBe(0);
+    });
+
+    test('should award achievements and XP', async () => {
+        // First, seed an achievement
+        const achievementId = '00000000-0000-0000-0000-000000000201';
+        await db.insert(achievements).values({
+            id: achievementId,
+            slug: 'first-challenge',
+            name: 'First Challenge',
+            description: 'Completed your first challenge',
+            icon: '🏆',
+            category: 'challenges',
+            requirementType: 'challenge_count',
+            requirementValue: 1,
+            xpReward: 100,
+        });
+
+        await awardAchievements(testUserId, ['first-challenge']);
+
+        const earned = await getEarnedAchievementIds(testUserId);
+        expect(earned.has('first-challenge')).toBe(true);
+
+        const user = await db.query.users.findFirst({
+            where: eq(users.id, testUserId),
+        });
+        expect(user?.xp).toBe(200); // 100 (initial) + 100 (reward)
+    });
+
+    test('should correctly calculate longest streak with gaps', async () => {
+        const now = new Date();
+        const oneDayAgo = new Date(now);
+        oneDayAgo.setDate(oneDayAgo.getDate() - 1);
+        const twoDaysAgo = new Date(now);
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+        const fourDaysAgo = new Date(now);
+        fourDaysAgo.setDate(fourDaysAgo.getDate() - 4);
+
+        // Streak of 2 (1 & 2 days ago), then a gap, then 4 days ago.
+        await db.insert(progress).values([
+            {
+                userId: testUserId,
+                challengeId: '00000000-0000-0000-0000-000000000101',
+                isCompleted: true,
+                completedAt: oneDayAgo,
+                attempts: 1
+            },
+            {
+                userId: testUserId,
+                challengeId: '00000000-0000-0000-0000-000000000102',
+                isCompleted: true,
+                completedAt: twoDaysAgo,
+                attempts: 1
+            },
+            {
+                userId: testUserId,
+                challengeId: '00000000-0000-0000-0000-000000000103',
+                isCompleted: true,
+                completedAt: fourDaysAgo,
+                attempts: 1
+            }
+        ]);
+
+        const stats = await getUserStats(testUserId);
+        expect(stats.currentStreak).toBe(2);
+        expect(stats.longestStreak).toBe(2);
     });
 });
