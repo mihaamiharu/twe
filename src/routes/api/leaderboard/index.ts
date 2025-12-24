@@ -41,7 +41,6 @@ export const Route = createFileRoute('/api/leaderboard/')({
 
           const leaderboard = await db
             .select({
-              id: users.id,
               name: users.name,
               image: users.image,
               xp: users.xp,

@@ -152,7 +152,6 @@ export const Route = createFileRoute('/api/challenges/$slug')({
           return json({
             success: true,
             data: {
-              id: challenge.id,
               slug: challenge.slug,
               title: challenge.title,
               description: challenge.description,

@@ -11,7 +11,7 @@ import { getUserStats, getEarnedAchievementIds, awardAchievements } from '@/lib/
 
 // Validation schema for submission
 const submissionSchema = z.object({
-    challengeId: z.string().uuid(),
+    challengeSlug: z.string().min(1, 'Challenge slug is required'),
     code: z.string().min(1, 'Code is required'),
     testResults: z.array(z.object({
         testCaseId: z.string().uuid().optional(),
@@ -48,11 +48,11 @@ export const Route = createFileRoute('/api/submissions/')({
                         );
                     }
 
-                    const { challengeId, code, testResults, executionTime } = validation.data;
+                    const { challengeSlug, code, testResults, executionTime } = validation.data;
 
-                    // Get challenge
+                    // Get challenge by slug
                     const challenge = await db.query.challenges.findFirst({
-                        where: eq(challenges.id, challengeId),
+                        where: eq(challenges.slug, challengeSlug),
                     });
 
                     if (!challenge) {
@@ -66,7 +66,7 @@ export const Route = createFileRoute('/api/submissions/')({
                     const allTestCases = await db
                         .select({ id: testCases.id })
                         .from(testCases)
-                        .where(eq(testCases.challengeId, challengeId));
+                        .where(eq(testCases.challengeId, challenge.id));
 
                     const testsTotal = allTestCases.length;
                     const testsPassed = testResults.filter(r => r.passed).length;
