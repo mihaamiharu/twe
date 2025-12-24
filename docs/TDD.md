@@ -1,4 +1,5 @@
 # Technical Design Document (TDD)
+
 ## TestingWithEkki - Gamified QA Portfolio & Learning Platform
 
 **Version:** 2.0  
@@ -231,22 +232,30 @@ erDiagram
 ### 3.2 Key Tables Description
 
 #### Users Table
+
 Stores user authentication and profile information.
+
 - BetterAuth manages password hashing automatically
 - XP and leveling tracked here for quick access
 - OAuth users linked via `accounts` table
 
 #### Sessions Table
+
 Managed by BetterAuth for session tracking.
+
 - Supports both email/password and OAuth sessions
 - Automatic cleanup of expired sessions
 
 #### Accounts Table
+
 OAuth provider account linkage (Google, GitHub, etc.).
+
 - Multiple providers can be linked to one user
 
 #### Challenges Table
+
 Core content for the playground.
+
 - `type`: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR'
 - `difficulty`: 'EASY' | 'MEDIUM' | 'HARD'
 - `starterCode`: Pre-filled code in editor (for code challenges)
@@ -255,24 +264,31 @@ Core content for the playground.
 - `targetSelector`: Correct selector(s) for validation (JSON array)
 
 #### Submissions Table
+
 Tracks every code submission.
+
 - `status`: 'PENDING' | 'RUNNING' | 'PASSED' | 'FAILED' | 'ERROR'
 - Stores execution output for debugging
 - Retention policy: Keep for 30 days
 
 #### Progress Table
+
 Tracks user progress on challenges and tutorials.
+
 - Polymorphic: links to either challenge or tutorial
 - `status`: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
 
 #### Bug Reports Table
+
 QA-style bug reporting from users.
+
 - `severity`: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW'
 - `status`: 'NEW' | 'IN_PROGRESS' | 'RESOLVED' | 'WONT_FIX' | 'CLOSED'
 - Auto-captures page URL and browser info
 - Links to user (optional for anonymous reports)
 
 #### Tutorial ↔ Challenge Relationship
+
 - Challenges can be linked to tutorials via `tutorialId` FK
 - Enables "Try Related Challenge" flow after reading tutorials
 
@@ -285,6 +301,7 @@ QA-style bug reporting from users.
 **Base URL:** `https://api.testingwithekki.com/v1`
 
 **Standards:**
+
 - RESTful conventions
 - JSON request/response
 - JWT bearer token authentication
@@ -370,55 +387,60 @@ POST   /auth/send-verification-email  - Resend verification email
 
 ### 4.3 Sample API Request/Response
 
-#### POST /submissions
+#### POST /api/submissions
 
 **Request:**
+
 ```json
 {
-  "challengeId": "uuid-here",
-  "code": "function solution(input) { return input.toUpperCase(); }"
+  "challengeSlug": "click-the-button",
+  "code": "await page.click('#submit-btn');",
+  "testResults": [
+    { "passed": true }
+  ],
+  "executionTime": 150
 }
 ```
 
 **Response (Success):**
+
 ```json
 {
-  "id": "submission-uuid",
-  "status": "PASSED",
-  "testResults": [
-    {
-      "testCaseId": "tc-1",
-      "passed": true,
-      "input": "hello",
-      "expectedOutput": "HELLO",
-      "actualOutput": "HELLO",
-      "executionTime": 12
-    }
-  ],
-  "xpEarned": 50,
-  "newAchievements": ["first-challenge-completed"],
-  "totalXp": 150,
-  "level": 2
+  "success": true,
+  "data": {
+    "submission": {
+      "isPassed": true,
+      "testsPassed": 3,
+      "testsTotal": 3,
+      "xpEarned": 50,
+      "executionTime": 150
+    },
+    "isFirstCompletion": true,
+    "levelUp": null,
+    "newAchievements": [
+      { "id": "...", "name": "First Steps", "icon": "🎯" }
+    ]
+  }
 }
 ```
 
 **Response (Failed):**
+
 ```json
 {
-  "id": "submission-uuid",
-  "status": "FAILED",
-  "testResults": [
-    {
-      "testCaseId": "tc-1",
-      "passed": false,
-      "input": "hello",
-      "expectedOutput": "HELLO",
-      "actualOutput": "hello",
-      "executionTime": 8
-    }
-  ],
-  "failedCount": 1,
-  "message": "1 test case failed"
+  "success": true,
+  "data": {
+    "submission": {
+      "isPassed": false,
+      "testsPassed": 1,
+      "testsTotal": 3,
+      "xpEarned": 0,
+      "executionTime": 120
+    },
+    "isFirstCompletion": false,
+    "levelUp": null,
+    "newAchievements": []
+  }
 }
 ```
 
@@ -429,6 +451,7 @@ POST   /auth/send-verification-email  - Resend verification email
 ### 5.1 Authentication Service (BetterAuth)
 
 **Responsibilities:**
+
 - User registration and login (email/password)
 - OAuth integration (Google, GitHub)
 - Session management
@@ -436,6 +459,7 @@ POST   /auth/send-verification-email  - Resend verification email
 - Token generation and validation
 
 **BetterAuth Configuration:**
+
 ```typescript
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -468,6 +492,7 @@ export type Session = typeof auth.$Infer.Session;
 ```
 
 **Security Measures:**
+
 - Automatic password hashing with modern algorithms
 - Secure session management with httpOnly cookies
 - CSRF protection built-in
@@ -479,6 +504,7 @@ export type Session = typeof auth.$Infer.Session;
 **Architecture Decision:** Instead of server-side sandboxing (VM2/Docker), we use a client-side compatibility layer that mimics Playwright's API.
 
 **Why This Approach:**
+
 - ✅ No server-side code execution security risks
 - ✅ Instant feedback (no network round trip)
 - ✅ Users learn real Playwright syntax
@@ -601,6 +627,7 @@ export function executePlaywrightCode(code: string, htmlContent: string): Promis
 ```
 
 **Example User Code:**
+
 ```javascript
 // User writes real Playwright syntax
 await page.click('#submit-button');
@@ -610,6 +637,7 @@ const text = await page.textContent('.success-message');
 ```
 
 **Limitations & Future:**
+
 - Phase 1: Basic DOM manipulation only
 - Phase 2: Add more Playwright methods (screenshot as canvas, network mocking)
 - Phase 3: Consider iframe-based Puppeteer for more realism
@@ -617,12 +645,14 @@ const text = await page.textContent('.success-message');
 ### 5.3 Gamification Engine
 
 **Responsibilities:**
+
 - Calculate XP and levels
 - Award achievements
 - Update leaderboards
 - Track user progress
 
 **Key Functions:**
+
 ```typescript
 class GamificationEngine {
   awardXP(userId: string, xp: number): Promise<LevelUp?>
@@ -633,6 +663,7 @@ class GamificationEngine {
 ```
 
 **XP & Leveling Formula:**
+
 ```
 XP to reach level N = 100 * N * N
 Level 1: 100 XP
@@ -642,11 +673,13 @@ Level 3: 900 XP
 ```
 
 **Challenge XP Rewards:**
+
 - Easy: 10-30 XP
 - Medium: 40-70 XP
 - Hard: 80-150 XP
 
 **Achievement Examples:**
+
 ```json
 {
   "key": "first-challenge",
@@ -659,6 +692,7 @@ Level 3: 900 XP
 ### 5.4 Content Management
 
 **Admin Panel Features:**
+
 - WYSIWYG markdown editor
 - Challenge test case manager
 - Preview before publish
@@ -666,6 +700,7 @@ Level 3: 900 XP
 - User management
 
 **Content Storage:**
+
 - Tutorials: Markdown in DB, media in object storage
 - Challenges: Structured data in DB
 - User uploads: Object storage with CDN
@@ -721,6 +756,7 @@ backend/
 │   ├── middleware/
 │   └── server.ts
 └── drizzle.config.ts         # Drizzle Kit config
+
 ```
 
 ### 6.2 Key Frontend Components
@@ -740,6 +776,7 @@ interface CodeEditorProps {
 ```
 
 #### ChallengeView Component
+
 ```tsx
 // Split layout: Description | Editor | Output
 // Test case display
@@ -747,6 +784,7 @@ interface CodeEditorProps {
 ```
 
 #### ProgressBar Component
+
 ```tsx
 // Animated XP progress
 // Level-up animations
@@ -785,6 +823,7 @@ interface ChallengeStore {
 ### 7.1 Authentication & Authorization
 
 **JWT Structure:**
+
 ```json
 {
   "sub": "user-id",
@@ -796,22 +835,26 @@ interface ChallengeStore {
 ```
 
 **Role-Based Access Control:**
+
 - `USER`: Standard users
 - `ADMIN`: Full access (Ekki)
 
 **Protected Routes:**
+
 - Middleware validates JWT on protected endpoints
 - Admin routes check for admin role
 
 ### 7.2 Code Execution Security
 
 **Sandboxing Layers:**
+
 1. **VM-level:** No access to Node.js APIs
 2. **Resource limits:** CPU, memory, execution time
 3. **Network isolation:** No external requests
 4. **File system:** Read-only, no write access
 
 **Malicious Code Prevention:**
+
 ```javascript
 // Blocked patterns
 - require() / import
@@ -823,6 +866,7 @@ interface ChallengeStore {
 ### 7.3 Input Validation
 
 **All inputs validated with Zod:**
+
 ```typescript
 const registerSchema = z.object({
   email: z.string().email(),
@@ -856,6 +900,7 @@ const corsOptions = {
 ### 8.1 Development Environment
 
 **Docker Compose Setup:**
+
 ```yaml
 services:
   postgres:
@@ -880,6 +925,7 @@ services:
 ### 8.2 Production Deployment
 
 **Option A: Single VPS (DigitalOcean Droplet)**
+
 ```
 Nginx (Reverse Proxy + SSL)
 ├── TanStack Start App (PM2)
@@ -887,6 +933,7 @@ Nginx (Reverse Proxy + SSL)
 ```
 
 **Option B: Railway/Render (Managed)**
+
 - Frontend: Static hosting
 - Backend: Container deployment
 - Database: Managed PostgreSQL
@@ -935,7 +982,7 @@ jobs:
 
 ### 9.2 Backend Optimizations
 
-- **Database Indexing:** 
+- **Database Indexing:**
   - Index on `users.email`, `users.username`
   - Index on `challenges.slug`, `tutorials.slug`
   - Composite index on `submissions(userId, challengeId)`
@@ -949,6 +996,7 @@ jobs:
 ### 9.3 Database Optimization
 
 **Prisma Configuration:**
+
 ```prisma
 generator client {
   provider = "prisma-client-js"
@@ -962,6 +1010,7 @@ datasource db {
 ```
 
 **Connection Pooling:**
+
 ```
 Max connections: 10 (for solo dev load)
 ```
@@ -973,6 +1022,7 @@ Max connections: 10 (for solo dev load)
 ### 10.1 Error Tracking
 
 **Sentry Integration:**
+
 - Frontend errors
 - Backend exceptions
 - Performance monitoring
@@ -980,6 +1030,7 @@ Max connections: 10 (for solo dev load)
 ### 10.2 Analytics
 
 **Plausible (Privacy-friendly):**
+
 - Page views
 - User flows
 - Event tracking (challenge completions, sign-ups)
@@ -987,6 +1038,7 @@ Max connections: 10 (for solo dev load)
 ### 10.3 Logs
 
 **Winston Logger:**
+
 - Structured JSON logs
 - Log levels: error, warn, info, debug
 - Separate log files for errors
@@ -1006,11 +1058,13 @@ Response: { status: "ok", uptime: 12345, version: "1.0.0" }
 ### 11.1 Backend Testing
 
 **Unit Tests (Vitest):**
+
 - Service layer logic
 - Helper functions
 - Gamification calculations
 
 **Integration Tests (Supertest):**
+
 - API endpoint testing
 - Database operations
 - Authentication flows
@@ -1020,11 +1074,13 @@ Response: { status: "ok", uptime: 12345, version: "1.0.0" }
 ### 11.2 Frontend Testing
 
 **Unit Tests (Vitest + React Testing Library):**
+
 - Component rendering
 - User interactions
 - Store logic
 
 **E2E Tests (Playwright):**
+
 - Critical user flows
 - Challenge completion flow
 - Registration and login
@@ -1043,6 +1099,7 @@ Response: { status: "ok", uptime: 12345, version: "1.0.0" }
 ### 12.1 Database Migrations
 
 **Prisma Migrate:**
+
 ```bash
 # Create migration
 npx prisma migrate dev --name add_achievements_table
@@ -1052,6 +1109,7 @@ npx prisma migrate deploy
 ```
 
 **Rollback Plan:**
+
 - Keep migration history
 - Database backups before major migrations
 - Ability to revert schema changes
@@ -1069,6 +1127,7 @@ npx prisma migrate deploy
 ### 13.1 Git Workflow
 
 **Branching Strategy:**
+
 ```
 main (production)
 └── develop (staging)
@@ -1078,6 +1137,7 @@ main (production)
 ```
 
 **Commit Convention:**
+
 ```
 feat: Add OAuth login
 fix: Fix XP calculation bug
@@ -1103,10 +1163,12 @@ test: Add playground security tests
 ## 14. Cost Estimation (Monthly)
 
 ### Development Phase
+
 - **Local Development:** $0
 - **GitHub:** Free tier
 
 ### Production (Initial Launch)
+
 - **VPS (DigitalOcean):** $12-24/month (2GB RAM droplet)
 - **Domain:** $12/year (~$1/month)
 - **Object Storage:** $5/month (50GB)
@@ -1117,6 +1179,7 @@ test: Add playground security tests
 **Total: ~$20-30/month**
 
 ### Scaling Costs (100+ active users)
+
 - **Larger VPS:** $40-60/month
 - **CDN (Cloudflare):** Free tier
 - **Managed Database:** $15/month
@@ -1130,11 +1193,13 @@ test: Add playground security tests
 ### 15.1 Scalability
 
 **When to scale:**
+
 - \>1000 concurrent users
 - Database queries slowing down
 - Code execution queue backing up
 
 **Horizontal Scaling:**
+
 - Load balancer (Nginx)
 - Multiple backend instances
 - Dedicated code execution workers
@@ -1143,6 +1208,7 @@ test: Add playground security tests
 ### 15.2 Multi-language Support
 
 **Execution Engine Extensions:**
+
 - Python sandbox (for Selenium/pytest)
 - Java execution (for REST Assured)
 - Separate Docker containers per language
@@ -1150,6 +1216,7 @@ test: Add playground security tests
 ### 15.3 Real-time Features
 
 **WebSocket Integration:**
+
 - Live leaderboard updates
 - Real-time code collaboration
 - Notifications
@@ -1185,6 +1252,7 @@ test: Add playground security tests
 ## Appendix A: Tech Stack Alternatives
 
 If starting over or scaling:
+
 - **Next.js** instead of React + Vite (SSR, better SEO)
 - **tRPC** instead of REST API (type-safe API)
 - **Turborepo** for monorepo management
