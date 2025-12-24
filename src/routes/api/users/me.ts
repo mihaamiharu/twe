@@ -261,18 +261,22 @@ export const Route = createFileRoute('/api/users/me')({
           }
 
           // Update user
-          const updatedUser = await db
+          const [updatedUser] = await db
             .update(users)
             .set({
               ...updates,
               updatedAt: new Date(),
             })
             .where(eq(users.id, userId))
-            .returning();
+            .returning({
+              name: users.name,
+              profileVisibility: users.profileVisibility,
+              showOnLeaderboard: users.showOnLeaderboard,
+            });
 
           return json({
             success: true,
-            data: updatedUser[0],
+            data: updatedUser,
           });
         } catch (error) {
           console.error('Error updating user profile:', error);

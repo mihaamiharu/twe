@@ -244,7 +244,7 @@ function ChallengeDetailPage() {
         }
 
         const submissionData = {
-            challengeId: challenge.id,
+            challengeSlug: challenge.slug,
             code: data.code,
             testResults: data.testResults.map(tr => ({
                 testCaseId: tr.id !== 'main' && tr.id !== 'selector' ? tr.id : undefined,
