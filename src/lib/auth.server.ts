@@ -33,9 +33,10 @@ export const auth = betterAuth({
     }),
 
     // Email/Password authentication with email verification
+    // Disable email verification in development/staging for easier testing
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: true,
+        requireEmailVerification: process.env.NODE_ENV === 'production',
         sendResetPassword: async ({ user, url }) => {
             await sendPasswordResetEmail(user.email, url, user.name || undefined);
         },
@@ -43,7 +44,7 @@ export const auth = betterAuth({
 
     // Email verification configuration
     emailVerification: {
-        sendOnSignUp: true,
+        sendOnSignUp: process.env.NODE_ENV === 'production',
         autoSignInAfterVerification: true,
         sendVerificationEmail: async ({ user, url }) => {
             await sendVerificationEmail(user.email, url, user.name || undefined);

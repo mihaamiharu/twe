@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { useState, useRef, useEffect } from 'react';
 import { useSession } from '@/lib/auth.client';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
+import { showAchievementToasts } from '@/lib/achievement-toast';
 
 export const Route = createFileRoute('/tutorials/$slug')({
     component: TutorialDetailPage,
@@ -88,13 +89,18 @@ function TutorialDetailPage() {
             if (!res.ok) throw new Error('Failed to mark as complete');
             return res.json();
         },
-        onSuccess: () => {
+        onSuccess: (response) => {
             toast.success('Tutorial completed! 🎉');
             queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
             queryClient.invalidateQueries({ queryKey: ['tutorials'] });
             queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
             queryClient.invalidateQueries({ queryKey: ['profile'] });
             queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+
+            // Show toast notifications for new achievements
+            if (response?.newAchievements?.length) {
+                showAchievementToasts(response.newAchievements);
+            }
         },
         onError: () => {
             toast.error('Failed to mark as complete');

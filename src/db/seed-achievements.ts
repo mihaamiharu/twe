@@ -80,6 +80,52 @@ const achievementData = [
         isSecret: false,
     },
 
+    // === Streak Milestones ===
+    {
+        slug: 'streak-3',
+        name: 'On Fire',
+        description: 'Maintain a 3-day streak',
+        icon: '🔥',
+        category: 'streaks',
+        requirementType: 'streak',
+        requirementValue: 3,
+        xpReward: 50,
+        isSecret: false,
+    },
+    {
+        slug: 'streak-7',
+        name: 'Week Warrior',
+        description: 'Maintain a 7-day streak',
+        icon: '⚡',
+        category: 'streaks',
+        requirementType: 'streak',
+        requirementValue: 7,
+        xpReward: 100,
+        isSecret: false,
+    },
+    {
+        slug: 'streak-14',
+        name: 'Two Week Champion',
+        description: 'Maintain a 14-day streak',
+        icon: '💪',
+        category: 'streaks',
+        requirementType: 'streak',
+        requirementValue: 14,
+        xpReward: 200,
+        isSecret: false,
+    },
+    {
+        slug: 'streak-30',
+        name: 'Monthly Master',
+        description: 'Maintain a 30-day streak',
+        icon: '🏆',
+        category: 'streaks',
+        requirementType: 'streak',
+        requirementValue: 30,
+        xpReward: 500,
+        isSecret: false,
+    },
+
     // === XP Milestones ===
     {
         slug: 'xp-100',
