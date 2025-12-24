@@ -124,25 +124,25 @@ function HomePage() {
 
   const featuredChallenges = [
     {
-      title: 'Your First Selector',
+      title: 'CSS Selector 101',
       difficulty: 'EASY',
       type: 'CSS Selector',
       xp: 15,
-      slug: 'first-selector',
+      slug: 'css-selector-101-id-class',
     },
     {
       title: 'Click Actions',
       difficulty: 'MEDIUM',
       type: 'Playwright',
       xp: 45,
-      slug: 'click-actions',
+      slug: 'pw-click-actions',
     },
     {
       title: 'Page Object Model',
       difficulty: 'HARD',
       type: 'Expert',
       xp: 80,
-      slug: 'first-page-object',
+      slug: 'pw-first-page-object',
     },
   ];
 
