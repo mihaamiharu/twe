@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   Zap,
   BookOpen,
@@ -10,11 +13,41 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle,
+  Award,
 } from 'lucide-react';
+import { AnimatedCounter } from '@/components/AnimatedCounter';
 
 export const Route = createFileRoute('/')({ component: HomePage });
 
+interface StatsResponse {
+  success: boolean;
+  data: {
+    challenges: number;
+    tutorials: number;
+    achievements: number;
+    tiers: {
+      basic: number;
+      beginner: number;
+      intermediate: number;
+      expert: number;
+    };
+  };
+}
+
 function HomePage() {
+  // Fetch real stats from API
+  const { data: statsData, isLoading: statsLoading } = useQuery<StatsResponse>({
+    queryKey: ['homepage-stats'],
+    queryFn: async () => {
+      const res = await fetch('/api/stats');
+      if (!res.ok) throw new Error('Failed to fetch stats');
+      return res.json();
+    },
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+  });
+
+  const stats = statsData?.data;
+
   const features = [
     {
       icon: <BookOpen className="w-10 h-10 text-primary" />,
@@ -54,19 +87,71 @@ function HomePage() {
     },
   ];
 
-  const stats = [
-    { value: '50+', label: 'Challenges' },
-    { value: '20+', label: 'Tutorials' },
-    { value: '25+', label: 'Achievements' },
-    { value: '∞', label: 'Learning' },
+  const learningPath = [
+    {
+      tier: 'Basic',
+      emoji: '🟢',
+      title: 'Selectors',
+      description: 'Master CSS and XPath selectors - the foundation of web testing',
+      skills: ['CSS Selectors', 'XPath Queries', 'Element Targeting'],
+      count: stats?.tiers.basic || 23,
+    },
+    {
+      tier: 'Beginner',
+      emoji: '🟡',
+      title: 'JavaScript',
+      description: 'Learn JavaScript fundamentals for test automation',
+      skills: ['Variables & Types', 'DOM Manipulation', 'Async/Await'],
+      count: stats?.tiers.beginner || 23,
+    },
+    {
+      tier: 'Intermediate',
+      emoji: '🟠',
+      title: 'Playwright',
+      description: 'Build real automated tests with Playwright',
+      skills: ['Navigation', 'Locators', 'Assertions', 'Waits'],
+      count: stats?.tiers.intermediate || 32,
+    },
+    {
+      tier: 'Expert',
+      emoji: '🔴',
+      title: 'Advanced',
+      description: 'Professional patterns for production testing',
+      skills: ['Page Objects', 'Data-Driven', 'CI/CD'],
+      count: stats?.tiers.expert || 18,
+    },
+  ];
+
+  const featuredChallenges = [
+    {
+      title: 'Your First Selector',
+      difficulty: 'EASY',
+      type: 'CSS Selector',
+      xp: 15,
+      slug: 'first-selector',
+    },
+    {
+      title: 'Click Actions',
+      difficulty: 'MEDIUM',
+      type: 'Playwright',
+      xp: 45,
+      slug: 'click-actions',
+    },
+    {
+      title: 'Page Object Model',
+      difficulty: 'HARD',
+      type: 'Expert',
+      xp: 80,
+      slug: 'first-page-object',
+    },
   ];
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
+      {/* Hero Section with animated gradient */}
       <section className="relative py-20 px-6 text-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent animate-pulse"></div>
 
         <div className="relative max-w-5xl mx-auto">
           {/* Logo */}
@@ -74,7 +159,7 @@ function HomePage() {
             <img
               src="/logo.jpg"
               alt="TestingWithEkki Logo"
-              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30"
+              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
             />
           </div>
 
@@ -95,7 +180,7 @@ function HomePage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link to="/challenges">
-              <Button size="lg" className="text-lg px-8 py-6">
+              <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow">
                 Start Learning
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
@@ -107,22 +192,149 @@ function HomePage() {
             </Link>
           </div>
 
-          {/* Stats */}
+          {/* Dynamic Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-16 mx-auto" />
+                ) : (
+                  <AnimatedCounter value={stats?.challenges || 0} suffix="+" />
+                )}
               </div>
+              <div className="text-sm text-muted-foreground">Challenges</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-12 mx-auto" />
+                ) : (
+                  <AnimatedCounter value={stats?.tutorials || 0} />
+                )}
+              </div>
+              <div className="text-sm text-muted-foreground">Tutorials</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                {statsLoading ? (
+                  <Skeleton className="h-10 w-12 mx-auto" />
+                ) : (
+                  <AnimatedCounter value={stats?.achievements || 0} />
+                )}
+              </div>
+              <div className="text-sm text-muted-foreground">Achievements</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">∞</div>
+              <div className="text-sm text-muted-foreground">Learning</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Learning Path Section */}
+      <section className="py-20 px-6 bg-muted/30">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Your <span className="gradient-text">Learning Path</span>
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Progress through four tiers, from selector basics to advanced automation patterns
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {learningPath.map((tier, index) => (
+              <Card
+                key={tier.tier}
+                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 relative overflow-hidden group"
+              >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-3xl">{tier.emoji}</span>
+                    <div>
+                      <div className="text-sm text-muted-foreground">Tier {index + 1}</div>
+                      <h3 className="text-xl font-semibold">{tier.title}</h3>
+                    </div>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4">{tier.description}</p>
+                  <div className="flex flex-wrap gap-1 mb-4">
+                    {tier.skills.map(skill => (
+                      <Badge key={skill} variant="secondary" className="text-xs">
+                        {skill}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="text-sm font-medium text-primary">
+                    {tier.count} challenges
+                  </div>
+                </CardContent>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Featured Challenges */}
       <section className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Try a <span className="gradient-text">Challenge</span>
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Jump in and see what learning looks like
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {featuredChallenges.map((challenge) => (
+              <Link
+                key={challenge.slug}
+                to="/challenges/$slug"
+                params={{ slug: challenge.slug }}
+              >
+                <Card className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <Badge
+                        variant={
+                          challenge.difficulty === 'EASY'
+                            ? 'secondary'
+                            : challenge.difficulty === 'MEDIUM'
+                              ? 'default'
+                              : 'destructive'
+                        }
+                      >
+                        {challenge.difficulty}
+                      </Badge>
+                      <span className="text-sm text-primary font-medium">
+                        +{challenge.xp} XP
+                      </span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">{challenge.title}</h3>
+                    <p className="text-sm text-muted-foreground">{challenge.type}</p>
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link to="/challenges">
+              <Button variant="outline" size="lg">
+                View All Challenges
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Section */}
+      <section className="py-20 px-6 bg-muted/30">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -153,7 +365,7 @@ function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 px-6 bg-muted/30">
+      <section className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">

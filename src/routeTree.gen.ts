@@ -26,6 +26,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as ApiTutorialsIndexRouteImport } from './routes/api/tutorials/index'
 import { Route as ApiSubmissionsIndexRouteImport } from './routes/api/submissions/index'
+import { Route as ApiStatsIndexRouteImport } from './routes/api/stats/index'
 import { Route as ApiLeaderboardIndexRouteImport } from './routes/api/leaderboard/index'
 import { Route as ApiChallengesIndexRouteImport } from './routes/api/challenges/index'
 import { Route as ApiBugReportsIndexRouteImport } from './routes/api/bug-reports/index'
@@ -121,6 +122,11 @@ const ApiSubmissionsIndexRoute = ApiSubmissionsIndexRouteImport.update({
   path: '/api/submissions/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiStatsIndexRoute = ApiStatsIndexRouteImport.update({
+  id: '/api/stats/',
+  path: '/api/stats/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiLeaderboardIndexRoute = ApiLeaderboardIndexRouteImport.update({
   id: '/api/leaderboard/',
   path: '/api/leaderboard/',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/api/bug-reports': typeof ApiBugReportsIndexRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
+  '/api/stats': typeof ApiStatsIndexRoute
   '/api/submissions': typeof ApiSubmissionsIndexRoute
   '/api/tutorials': typeof ApiTutorialsIndexRoute
   '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
@@ -226,6 +233,7 @@ export interface FileRoutesByTo {
   '/api/bug-reports': typeof ApiBugReportsIndexRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
+  '/api/stats': typeof ApiStatsIndexRoute
   '/api/submissions': typeof ApiSubmissionsIndexRoute
   '/api/tutorials': typeof ApiTutorialsIndexRoute
   '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/api/bug-reports/': typeof ApiBugReportsIndexRoute
   '/api/challenges/': typeof ApiChallengesIndexRoute
   '/api/leaderboard/': typeof ApiLeaderboardIndexRoute
+  '/api/stats/': typeof ApiStatsIndexRoute
   '/api/submissions/': typeof ApiSubmissionsIndexRoute
   '/api/tutorials/': typeof ApiTutorialsIndexRoute
   '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
@@ -286,6 +295,7 @@ export interface FileRouteTypes {
     | '/api/bug-reports'
     | '/api/challenges'
     | '/api/leaderboard'
+    | '/api/stats'
     | '/api/submissions'
     | '/api/tutorials'
     | '/api/tutorials/$slug/complete'
@@ -314,6 +324,7 @@ export interface FileRouteTypes {
     | '/api/bug-reports'
     | '/api/challenges'
     | '/api/leaderboard'
+    | '/api/stats'
     | '/api/submissions'
     | '/api/tutorials'
     | '/api/tutorials/$slug/complete'
@@ -343,6 +354,7 @@ export interface FileRouteTypes {
     | '/api/bug-reports/'
     | '/api/challenges/'
     | '/api/leaderboard/'
+    | '/api/stats/'
     | '/api/submissions/'
     | '/api/tutorials/'
     | '/api/tutorials/$slug/complete'
@@ -371,6 +383,7 @@ export interface RootRouteChildren {
   ApiBugReportsIndexRoute: typeof ApiBugReportsIndexRoute
   ApiChallengesIndexRoute: typeof ApiChallengesIndexRoute
   ApiLeaderboardIndexRoute: typeof ApiLeaderboardIndexRoute
+  ApiStatsIndexRoute: typeof ApiStatsIndexRoute
   ApiSubmissionsIndexRoute: typeof ApiSubmissionsIndexRoute
   ApiTutorialsIndexRoute: typeof ApiTutorialsIndexRoute
 }
@@ -496,6 +509,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiSubmissionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/stats/': {
+      id: '/api/stats/'
+      path: '/api/stats'
+      fullPath: '/api/stats'
+      preLoaderRoute: typeof ApiStatsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/leaderboard/': {
       id: '/api/leaderboard/'
       path: '/api/leaderboard'
@@ -618,6 +638,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiBugReportsIndexRoute: ApiBugReportsIndexRoute,
   ApiChallengesIndexRoute: ApiChallengesIndexRoute,
   ApiLeaderboardIndexRoute: ApiLeaderboardIndexRoute,
+  ApiStatsIndexRoute: ApiStatsIndexRoute,
   ApiSubmissionsIndexRoute: ApiSubmissionsIndexRoute,
   ApiTutorialsIndexRoute: ApiTutorialsIndexRoute,
 }
