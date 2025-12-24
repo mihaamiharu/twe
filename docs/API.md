@@ -46,7 +46,7 @@ After successful login, a session cookie (`better_auth.session`) is set automati
 |--------|----------|-------------|
 | GET | `/api/challenges` | List all challenges |
 | GET | `/api/challenges/:slug` | Get challenge details |
-| POST | `/api/challenges/:id/submit` | Submit solution |
+| POST | `/api/submissions` | Submit solution |
 
 ### Users
 
@@ -90,6 +90,7 @@ The API returns standard HTTP status codes:
 ## Rate Limiting
 
 API requests are rate limited to:
+
 - **100 requests/minute** for authenticated users
 - **20 requests/minute** for unauthenticated users
 
@@ -116,11 +117,14 @@ curl http://localhost:3000/api/challenges?type=PLAYWRIGHT&difficulty=EASY
 ### Submit a solution
 
 ```bash
-curl -X POST http://localhost:3000/api/challenges/click-the-button/submit \
+curl -X POST http://localhost:3000/api/submissions \
   -H "Content-Type: application/json" \
   -H "Cookie: better_auth.session=..." \
   -d '{
-    "code": "await page.click(\"#submit-btn\");"
+    "challengeSlug": "click-the-button",
+    "code": "await page.click(\"#submit-btn\");",
+    "testResults": [{"passed": true}],
+    "executionTime": 150
   }'
 ```
 
