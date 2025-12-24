@@ -100,6 +100,48 @@ export const ACHIEVEMENTS: Achievement[] = [
         criteria: { type: 'count', target: 88 },
     },
 
+    // Streak Milestones
+    {
+        id: 'streak-3',
+        key: 'streak-3',
+        name: 'On Fire',
+        description: 'Maintain a 3-day streak',
+        icon: '🔥',
+        category: 'STREAK',
+        xpReward: 50,
+        criteria: { type: 'streak', target: 3 },
+    },
+    {
+        id: 'streak-7',
+        key: 'streak-7',
+        name: 'Week Warrior',
+        description: 'Maintain a 7-day streak',
+        icon: '⚡',
+        category: 'STREAK',
+        xpReward: 100,
+        criteria: { type: 'streak', target: 7 },
+    },
+    {
+        id: 'streak-14',
+        key: 'streak-14',
+        name: 'Two Week Champion',
+        description: 'Maintain a 14-day streak',
+        icon: '💪',
+        category: 'STREAK',
+        xpReward: 200,
+        criteria: { type: 'streak', target: 14 },
+    },
+    {
+        id: 'streak-30',
+        key: 'streak-30',
+        name: 'Monthly Master',
+        description: 'Maintain a 30-day streak',
+        icon: '🏆',
+        category: 'STREAK',
+        xpReward: 500,
+        criteria: { type: 'streak', target: 30 },
+    },
+
     // XP Milestones (aligned with seed)
     {
         id: 'xp-100',
