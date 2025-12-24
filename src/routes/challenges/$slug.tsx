@@ -15,6 +15,7 @@ import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 import { TierSkipTip } from '@/components/challenges/TierSkipTip';
 import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
 import { ChallengesResponse } from './index';
+import { showAchievementToasts } from '@/lib/achievement-toast';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -208,6 +209,8 @@ function ChallengeDetailPage() {
                             name: achievement.name,
                         });
                     }
+                    // Show toast notifications for new achievements
+                    showAchievementToasts(response.data.newAchievements);
                 }
 
                 // Invalidate queries to refresh progress
