@@ -28,7 +28,7 @@ export const Route = createFileRoute('/api/challenges/')({
             category: url.searchParams.get('category') || undefined,
             search: url.searchParams.get('search') || undefined,
             page: parseInt(url.searchParams.get('page') || '1'),
-            limit: Math.min(parseInt(url.searchParams.get('limit') || '50'), 100),
+            limit: Math.min(parseInt(url.searchParams.get('limit') || '50'), 500),
             sortBy: url.searchParams.get('sortBy') as ChallengeFilters['sortBy'] || 'order',
             sortOrder: url.searchParams.get('sortOrder') as ChallengeFilters['sortOrder'] || 'asc',
           };

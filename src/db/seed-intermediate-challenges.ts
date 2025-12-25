@@ -677,19 +677,11 @@ Chain all the actions together and return the confirmation message.
   }
 </script>`,
     starterCode: `// 1. Add product to cart
-await page.click('#add-btn');
-
-// 2. Update quantity
-await page.fill('#qty', '3');
-
-// 3. Check express shipping
-await page.check('#express');
-
-// 4. Complete checkout
-await page.click('#checkout-btn');
-
-// 5. Get confirmation
-const result = await page.locator('#confirmation').textContent();`,
+    // 2. Update quantity
+    // 3. Check express shipping
+    // 4. Complete checkout
+    // 5. Get confirmation
+    const result = "";`,
     expectedOutput: 'Order confirmed: 3 items (Express)',
     tags: ['playwright', 'scenario', 'boss', 'checkout', 'intermediate'],
   },
@@ -1147,15 +1139,13 @@ Use locator chaining, filtering, and sibling navigation to find the right elemen
 </div>
 <div id="msg"></div>`,
     starterCode: `// Find product card containing "Pro" AND "In Stock"
-const productCard = page.locator('.product')
-  .filter({ hasText: 'Pro' })
-  .filter({ hasText: 'In Stock' });
+// Tip: Use .filter() chaining
+const productCard = page.locator('.product'); 
 
 // Click its Add to Cart button
-await productCard.locator('button').click();
 
 // Get confirmation
-const result = await page.locator('#msg').textContent();`,
+const result = "";`,
     expectedOutput: 'Added Widget Pro!',
     tags: ['playwright', 'locators', 'scenario', 'boss', 'intermediate'],
   },
@@ -1603,16 +1593,13 @@ Use multiple assertion types to verify the complete form state!
   }
 </script>`,
     starterCode: `// Verify initial error state
-await expect(page.locator('#email-error')).toBeVisible();
-await expect(page.locator('#submit')).toBeDisabled();
+// ...
 
 // Fix the form
-await page.fill('#email', 'user@example.com');
-await page.fill('#password', 'password123');
+// ...
 
 // Verify valid state
-await expect(page.locator('#email-error')).toBeHidden();
-await expect(page.locator('#submit')).toBeEnabled();
+// ...
 
 const result = 'all assertions passed';`,
     expectedOutput: 'all assertions passed',
@@ -2012,14 +1999,13 @@ Wait for each state transition and return the final data value.
   }, 200);
 </script>`,
     starterCode: `// Wait for connection
-await page.waitForSelector('#status:has-text("Connected")');
+// ...
 
 // Wait for data
-await page.waitForSelector('#data:has-text("Data received")');
+// ...
 
 // Extract the value
-const dataText = await page.locator('#data').textContent();
-const result = dataText.split(': ')[1];`,
+const result = "";`,
     expectedOutput: '42',
     tags: ['playwright', 'waits', 'scenario', 'boss', 'intermediate'],
   },
