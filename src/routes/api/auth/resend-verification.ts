@@ -80,9 +80,9 @@ export const Route = createFileRoute('/api/auth/resend-verification')({
                         message: 'Verification email sent! Please check your inbox.',
                     });
                 } catch (error) {
-                    console.error('Error resending verification email:', error);
+                    logger.error('Error resending verification email:', error);
                     return json(
-                        { success: false, error: 'Failed to send verification email' },
+                        { success: false, error: 'Failed to resend verification email' },
                         { status: 500 }
                     );
                 }

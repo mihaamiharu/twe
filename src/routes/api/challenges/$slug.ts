@@ -1,4 +1,8 @@
-import { createFileRoute } from '@tanstack/react-router';
+      },
+    },
+  },
+});
+import { logger } from '@/lib/logger';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { challenges, testCases, progress, submissions } from '@/db/schema';
@@ -152,6 +156,7 @@ export const Route = createFileRoute('/api/challenges/$slug')({
           return json({
             success: true,
             data: {
+              id: challenge.id,
               slug: challenge.slug,
               title: challenge.title,
               description: challenge.description,
@@ -175,7 +180,7 @@ export const Route = createFileRoute('/api/challenges/$slug')({
             },
           });
         } catch (error) {
-          console.error('Error fetching challenge:', error);
+          logger.error('Error fetching challenge:', error);
           return json(
             { success: false, error: 'Failed to fetch challenge' },
             { status: 500 }

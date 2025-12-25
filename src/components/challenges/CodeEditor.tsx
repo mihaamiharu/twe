@@ -233,8 +233,14 @@ export function CodeEditor({
                     bracketPairColorization: { enabled: true },
                     autoClosingBrackets: 'always',
                     autoClosingQuotes: 'always',
-                    suggestOnTriggerCharacters: true,
-                    quickSuggestions: true,
+
+                    // Disable "smart" suggestions as requested
+                    suggestOnTriggerCharacters: false,
+                    quickSuggestions: false,
+                    snippetSuggestions: 'none',
+                    parameterHints: { enabled: false },
+                    hover: { enabled: true }, // Keep hover for types/docs if they hover explicitly, but no auto-popups
+
                     contextmenu: true,
                 }}
                 loading={

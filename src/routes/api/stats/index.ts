@@ -1,7 +1,10 @@
+```typescript
 import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { challenges, tutorials, achievements } from '@/db/schema';
+import { getUserRank } from '@/lib/stats';
+import { logger } from '@/lib/logger';
 import { sql } from 'drizzle-orm';
 
 // In-memory cache for stats (refreshed every 24 hours)
@@ -26,22 +29,22 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 async function fetchStats() {
     // Get counts from database
     const [challengeCount] = await db
-        .select({ count: sql<number>`count(*)::int` })
+        .select({ count: sql<number>`count(*):: int` })
         .from(challenges);
 
     const [tutorialCount] = await db
-        .select({ count: sql<number>`count(*)::int` })
+        .select({ count: sql<number>`count(*):: int` })
         .from(tutorials);
 
     const [achievementCount] = await db
-        .select({ count: sql<number>`count(*)::int` })
+        .select({ count: sql<number>`count(*):: int` })
         .from(achievements);
 
     // Get tier breakdown
     const tierCounts = await db
         .select({
             category: challenges.category,
-            count: sql<number>`count(*)::int`,
+            count: sql<number>`count(*):: int`,
         })
         .from(challenges)
         .groupBy(challenges.category);
@@ -83,7 +86,7 @@ export const Route = createFileRoute('/api/stats/')({
                     // Check if we have valid cached data
                     const now = Date.now();
                     if (cachedStats && (now - cachedStats.timestamp) < CACHE_TTL_MS) {
-                        console.log('[Stats Cache] Returning cached data');
+                        logger.debug('[Stats Cache] Returning cached data');
                         return json(
                             { success: true, data: cachedStats.data },
                             {
@@ -95,7 +98,7 @@ export const Route = createFileRoute('/api/stats/')({
                     }
 
                     // Fetch fresh data
-                    console.log('[Stats Cache] Fetching fresh data from database');
+                    logger.debug('[Stats Cache] Fetching fresh data from database');
                     const data = await fetchStats();
 
                     // Update cache
@@ -113,7 +116,7 @@ export const Route = createFileRoute('/api/stats/')({
                         }
                     );
                 } catch (error) {
-                    console.error('Error fetching stats:', error);
+                    logger.error('Error fetching stats:', error);
                     return json(
                         { success: false, error: 'Failed to fetch stats' },
                         { status: 500 }
