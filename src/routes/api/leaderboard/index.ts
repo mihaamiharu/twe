@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { users, progress } from '@/db/schema';
+import { logger } from '@/lib/logger';
 import { desc, eq, and, sql } from 'drizzle-orm';
 
 interface LeaderboardFilters {
@@ -88,4 +89,4 @@ export const Route = createFileRoute('/api/leaderboard/')({
     },
   },
 });
-import { logger } from '@/lib/logger';
+
