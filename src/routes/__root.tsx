@@ -5,7 +5,13 @@ import { TanStackDevtools } from '@tanstack/react-devtools';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
 import { logger } from '@/lib/logger';
 
-// ... other imports
+import { NotFound } from '@/components/NotFound';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
+import { ThemeProvider } from '@/components/theme-provider';
+import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
+import { Toaster } from 'sonner';
+import appCss from '@/styles.css?url';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
