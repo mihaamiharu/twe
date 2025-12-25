@@ -106,7 +106,7 @@ export class MockedPlaywrightPage {
 
     constructor(iframeDocument: Document, options?: { timeout?: number }) {
         this.targetDocument = iframeDocument;
-        this.defaultTimeout = options?.timeout || 5000;
+        this.defaultTimeout = options?.timeout || 2500;
         this.request = this._createAPIRequestContext();
         this._context = this._createBrowserContext();
     }

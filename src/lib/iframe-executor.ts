@@ -75,7 +75,7 @@ export async function executePlaywrightCode(
             cleanup();
             resolve({
                 status: 'TIMEOUT',
-                output: `Execution timed out after ${timeout}ms`,
+                output: `Execution timed out. Please check your code for infinite loops or ensure you are not waiting for elements that do not exist.`,
                 executionTime: timeout,
                 error: 'Timeout',
                 logs,
