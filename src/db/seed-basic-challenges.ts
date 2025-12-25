@@ -1120,6 +1120,70 @@ Select the **error message** div (has a class containing "error").
     targetSelector: '//div[contains(@class, "error")]',
   },
 
+  // Challenge 4b: Fundamentals Boss (NEW - Unit 1 Boss Fight)
+  {
+    slug: 'xpath-fundamentals-boss',
+    title: 'Scenario: Legacy Login',
+    description: 'Combine all fundamental XPath skills to locate elements in a legacy app.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'HARD' as const,
+    category: 'xpath-basics',
+    xpReward: 55,
+    order: 15,
+    instructions: `# Scenario: Legacy Login Form
+
+You're automating tests for a legacy application. The HTML is messy:
+- IDs are dynamically generated (useless!)
+- Classes are generic and reused everywhere
+- But the **text content** is stable
+
+## The Challenge
+Find the **"Sign In"** button. It's buried in the form, and there are multiple buttons on the page.
+
+## What You Know
+1. The button contains the text "Sign In"
+2. It's inside a form with class containing "login"
+3. There's also a "Sign Up" button elsewhere (don't select that!)
+
+## Your Mission
+Write an XPath that finds the exact "Sign In" button inside the login form.
+
+> **Tip:** Combine \`contains()\` for the class AND \`text()\` for the button text!
+`,
+    htmlContent: `<div class="page-wrapper">
+  <header>
+    <nav class="main-nav">
+      <button id="nav-btn-12345" class="btn nav-btn">Menu</button>
+      <button id="nav-btn-67890" class="btn nav-btn">Sign Up</button>
+    </nav>
+  </header>
+  
+  <main class="content">
+    <form id="form-abc123" class="form login-form">
+      <h2>Welcome Back</h2>
+      <div class="field">
+        <input type="email" id="input-xyz789" class="input" placeholder="Email" />
+      </div>
+      <div class="field">
+        <input type="password" id="input-xyz790" class="input" placeholder="Password" />
+      </div>
+      <div class="actions">
+        <button type="button" class="btn secondary">Forgot Password</button>
+        <button type="submit" class="btn primary">Sign In</button>
+      </div>
+    </form>
+  </main>
+</div>`,
+    starterCode: '',
+    hints: [
+      'First, scope to the login form: //form[contains(@class, "login")]',
+      'Then find the button with text: //button[text()="Sign In"]',
+      'Combine them: //form[contains(@class, "login")]//button[text()="Sign In"]'
+    ],
+    tags: ['xpath', 'selector', 'scenario', 'fundamentals'],
+    targetSelector: '//form[contains(@class, "login")]//button[text()="Sign In"]',
+  },
+
   // Challenge 5: Parent/Ancestor
   {
     slug: 'xpath-parent-ancestor',
@@ -1129,7 +1193,7 @@ Select the **error message** div (has a class containing "error").
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 30,
-    order: 15,
+    order: 16,
     instructions: `# Parent & Ancestor Axes
 
 XPath can navigate UP the DOM tree - something CSS cannot do!
@@ -1191,7 +1255,7 @@ Find the **list item (li)** that contains the "Settings" link.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 35,
-    order: 16,
+    order: 17,
     instructions: `# Following-sibling Axis
 
 Navigate to siblings that come AFTER the current element.
@@ -1241,6 +1305,123 @@ Select the **input** field that follows the "Username" label.
     targetSelector: '//label[text()="Username"]/following-sibling::input',
   },
 
+  // Challenge 6b: Preceding-sibling (NEW - Unit 2 Drill)
+  {
+    slug: 'xpath-preceding-sibling',
+    title: 'Preceding-sibling',
+    description: 'Navigate to elements that come before.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'xpath-basics',
+    xpReward: 35,
+    order: 18,
+    instructions: `# Preceding-sibling Axis
+
+Navigate to siblings that come BEFORE the current element.
+
+## The Reverse Direction
+| Axis | Description |
+|------|-------------|
+| \`following-sibling::\` | Elements AFTER |
+| \`preceding-sibling::\` | Elements BEFORE |
+
+## Use Cases
+- Find the **label** for a specific **error message**
+- Get the **header** above a content section
+- Navigate BACKWARDS from a known element
+
+## Examples
+\`\`\`xpath
+//span[@class="error"]/preceding-sibling::label
+//div[@class="content"]/preceding-sibling::h2
+\`\`\`
+
+## Your Task
+An error message appeared! Find the **label** that comes before the error message.
+`,
+    htmlContent: `<form class="registration-form">
+  <div class="field-group">
+    <label>Email Address</label>
+    <input type="email" name="email" />
+    <span class="hint">We'll never share your email</span>
+  </div>
+  <div class="field-group">
+    <label>Password</label>
+    <input type="password" name="password" />
+    <span class="error">Password must be at least 8 characters</span>
+  </div>
+  <div class="field-group">
+    <label>Confirm Password</label>
+    <input type="password" name="confirm" />
+  </div>
+</form>`,
+    starterCode: '',
+    hints: [
+      'First find the error message: //span[@class="error"]',
+      'Then navigate backwards to the label',
+      'The answer is: //span[@class="error"]/preceding-sibling::label'
+    ],
+    tags: ['xpath', 'selector', 'preceding-sibling', 'basic'],
+    targetSelector: '//span[@class="error"]/preceding-sibling::label',
+  },
+
+  // Challenge 6c: Traversal Boss (NEW - Unit 2 Boss Fight)
+  {
+    slug: 'xpath-traversal-boss',
+    title: 'Scenario: Error Recovery',
+    description: 'Navigate from an error to fix the input that caused it.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'HARD' as const,
+    category: 'xpath-basics',
+    xpReward: 60,
+    order: 19,
+    instructions: `# Scenario: Error Recovery
+
+You're building an error handler. When a validation error appears, you need to focus the input that caused it.
+
+## The Challenge
+The page shows an error message: **"Invalid email format"**
+
+Your task: Find the **input field** that is associated with this error.
+
+## Navigation Strategy
+1. Find the error message by its text
+2. Navigate UP to the parent container
+3. Find the INPUT within that container
+
+## Your Mission
+Select the **input** element that belongs to the field showing "Invalid email format".
+
+> **Hint:** Combine \`ancestor::\` and descendant navigation!
+`,
+    htmlContent: `<form class="checkout-form">
+  <div class="form-field">
+    <label>Full Name</label>
+    <input type="text" name="name" value="John Doe" />
+    <span class="validation valid">✓ Looks good</span>
+  </div>
+  <div class="form-field has-error">
+    <label>Email</label>
+    <input type="email" name="email" value="invalid-email" />
+    <span class="validation error">Invalid email format</span>
+  </div>
+  <div class="form-field">
+    <label>Phone</label>
+    <input type="tel" name="phone" value="+1234567890" />
+    <span class="validation valid">✓ Valid number</span>
+  </div>
+</form>`,
+    starterCode: '',
+    hints: [
+      'Find the error span: //span[text()="Invalid email format"]',
+      'Go up to parent container: /ancestor::div',
+      'Then find the input: //input',
+      'The answer is: //span[text()="Invalid email format"]/ancestor::div[@class="form-field has-error"]//input'
+    ],
+    tags: ['xpath', 'selector', 'ancestor', 'traversal', 'scenario'],
+    targetSelector: '//span[text()="Invalid email format"]/ancestor::div//input',
+  },
+
   // Challenge 7: Multiple Conditions
   {
     slug: 'xpath-multiple-conditions',
@@ -1250,7 +1431,7 @@ Select the **input** field that follows the "Username" label.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 35,
-    order: 17,
+    order: 20,
     instructions: `# Multiple Conditions
 
 Combine multiple conditions using logical operators.
@@ -1301,7 +1482,7 @@ Select the button that is both **type="submit"** AND has the **"primary"** class
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 40,
-    order: 18,
+    order: 21,
     instructions: `# Position & Indexing
 
 XPath uses 1-based indexing to select elements by position.
@@ -1358,7 +1539,7 @@ Select the **last item** in the navigation menu.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 45,
-    order: 19,
+    order: 22,
     instructions: `# Normalize-space
 
 Real HTML often has inconsistent whitespace. \`normalize-space()\` handles this.
@@ -1420,7 +1601,7 @@ Select the button with text "   Save Changes   " (has extra whitespace).
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 50,
-    order: 20,
+    order: 23,
     instructions: `# Complex XPath: Tables
 
 Tables are common in web apps. Let's master navigating them!
@@ -1562,6 +1743,102 @@ Find the **"Edit" button** that appears after "Product A".
     ],
     tags: ['xpath', 'selector', 'axes', 'advanced'],
     targetSelector: '//h3[text()="Product A"]/following::button[text()="Edit"][1]',
+  },
+
+  // Challenge 12: Advanced Boss (NEW - Unit 3 Boss Fight)
+  {
+    slug: 'xpath-advanced-boss',
+    title: 'Scenario: Admin User Management',
+    description: 'Master advanced XPath to navigate a complex admin table.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'HARD' as const,
+    category: 'xpath-advanced',
+    xpReward: 80,
+    order: 202,
+    instructions: `# Scenario: Admin User Management
+
+You're automating an admin dashboard. The user table is complex:
+- Multiple columns with different data types
+- Action buttons in each row
+- You need to find a specific button for a specific user
+
+## The Challenge
+Find the **"Delete"** button for the user named **"John Doe"** who has the role **"Admin"**.
+
+## Why This Is Hard
+- There are multiple "John Doe" users (one is Admin, one is Editor)
+- There are multiple "Delete" buttons
+- You must use ALL conditions to find the right one
+
+## Your Mission
+Write an XPath that:
+1. Finds the row containing BOTH "John Doe" AND "Admin"
+2. Selects the Delete button in that row
+
+> **Tip:** Use \`and\` to combine multiple cell conditions in a single row predicate!
+`,
+    htmlContent: `<table class="admin-users-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Role</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alice Smith</td>
+      <td>alice@example.com</td>
+      <td>Admin</td>
+      <td class="status active">Active</td>
+      <td class="actions">
+        <button class="btn edit">Edit</button>
+        <button class="btn delete">Delete</button>
+      </td>
+    </tr>
+    <tr>
+      <td>John Doe</td>
+      <td>john.editor@example.com</td>
+      <td>Editor</td>
+      <td class="status active">Active</td>
+      <td class="actions">
+        <button class="btn edit">Edit</button>
+        <button class="btn delete">Delete</button>
+      </td>
+    </tr>
+    <tr>
+      <td>John Doe</td>
+      <td>john.admin@example.com</td>
+      <td>Admin</td>
+      <td class="status active">Active</td>
+      <td class="actions">
+        <button class="btn edit">Edit</button>
+        <button class="btn delete">Delete</button>
+      </td>
+    </tr>
+    <tr>
+      <td>Bob Wilson</td>
+      <td>bob@example.com</td>
+      <td>Viewer</td>
+      <td class="status inactive">Inactive</td>
+      <td class="actions">
+        <button class="btn edit">Edit</button>
+        <button class="btn delete">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>`,
+    starterCode: '',
+    hints: [
+      'Find a row that has BOTH conditions: td with "John Doe" AND td with "Admin"',
+      'Pattern: //tr[td[text()="X"] and td[text()="Y"]]',
+      'Then find the delete button: //button[text()="Delete"]',
+      'Answer: //tr[td[text()="John Doe"] and td[text()="Admin"]]//button[text()="Delete"]'
+    ],
+    tags: ['xpath', 'selector', 'advanced', 'table', 'scenario'],
+    targetSelector: '//tr[td[text()="John Doe"] and td[text()="Admin"]]//button[text()="Delete"]',
   },
 ];
 
@@ -1741,6 +2018,86 @@ Select the submit button using the **most performant** selector.
     ],
     tags: ['css', 'performance', 'best-practices', 'basic'],
     targetSelector: '#submit-btn',
+  },
+
+  // Challenge 4: Comparison Boss (NEW - Unit 4 Boss Fight)
+  {
+    slug: 'selector-comparison-boss',
+    title: 'Scenario: Choose Your Weapon',
+    description: 'Analyze a real scenario and pick the optimal selector strategy.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'HARD' as const,
+    category: 'selector-comparison',
+    xpReward: 70,
+    order: 24,
+    instructions: `# Scenario: Choose Your Weapon
+
+You're writing tests for a shopping cart. You need to find a specific element, but you must choose wisely.
+
+## The Challenge
+Find the **"Remove"** button for the product named **"Wireless Mouse"**.
+
+## The Trade-offs
+| Approach | Selector | Pros | Cons |
+|----------|----------|------|------|
+| **CSS** | Complex chaining | Fast execution | Can't use text |
+| **XPath** | Text-based | Human readable | Slightly slower |
+
+## Decision Criteria
+- If the element has a **stable ID or data-testid**: Use CSS
+- If you need to find by **text content**: Use XPath
+- If you need to navigate **UP** the DOM: Use XPath
+
+## Your Mission
+Look at the HTML. The product name "Wireless Mouse" is visible, but we want the button.
+
+**For THIS scenario**, write a **CSS selector** that works.
+
+> **Hint:** Look for data attributes or class patterns that uniquely identify the product row!
+`,
+    htmlContent: `<div class="shopping-cart">
+  <h2>Your Cart (2 items)</h2>
+  
+  <div class="cart-item" data-product-id="prod-101">
+    <img src="/mouse.jpg" alt="Wireless Mouse" />
+    <div class="item-details">
+      <h3 class="product-name">Wireless Mouse</h3>
+      <span class="price">$29.99</span>
+      <span class="quantity">Qty: 1</span>
+    </div>
+    <div class="item-actions">
+      <button class="btn update">Update</button>
+      <button class="btn remove">Remove</button>
+    </div>
+  </div>
+  
+  <div class="cart-item" data-product-id="prod-202">
+    <img src="/keyboard.jpg" alt="Mechanical Keyboard" />
+    <div class="item-details">
+      <h3 class="product-name">Mechanical Keyboard</h3>
+      <span class="price">$89.99</span>
+      <span class="quantity">Qty: 1</span>
+    </div>
+    <div class="item-actions">
+      <button class="btn update">Update</button>
+      <button class="btn remove">Remove</button>
+    </div>
+  </div>
+  
+  <div class="cart-summary">
+    <span class="total">Total: $119.98</span>
+    <button class="btn checkout">Checkout</button>
+  </div>
+</div>`,
+    starterCode: '',
+    hints: [
+      'Notice each cart-item has a data-product-id attribute',
+      'The Wireless Mouse has data-product-id="prod-101"',
+      'Use attribute selector: [data-product-id="prod-101"]',
+      'Answer: [data-product-id="prod-101"] .remove'
+    ],
+    tags: ['css', 'xpath', 'comparison', 'scenario', 'decision'],
+    targetSelector: '[data-product-id="prod-101"] .remove',
   },
 ];
 
