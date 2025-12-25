@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { tutorials, progress } from '@/db/schema';
 import { eq, and, asc, desc, sql } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
+import { logger } from '@/lib/logger';
 
 interface TutorialFilters {
   search?: string;
@@ -137,7 +138,7 @@ export const Route = createFileRoute('/api/tutorials/')({
             },
           });
         } catch (error) {
-          console.error('Error fetching tutorials:', error);
+          logger.error('Error fetching tutorials:', error);
           return json(
             { success: false, error: 'Failed to fetch tutorials' },
             { status: 500 }

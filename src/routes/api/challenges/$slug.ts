@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { challenges, testCases, progress, submissions } from '@/db/schema';
 import { eq, and, asc, gt } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
+import { logger } from '@/lib/logger';
 
 export const Route = createFileRoute('/api/challenges/$slug')({
   server: {
@@ -176,7 +177,7 @@ export const Route = createFileRoute('/api/challenges/$slug')({
             },
           });
         } catch (error) {
-          console.error('Error fetching challenge:', error);
+          logger.error('Error fetching challenge:', error);
           return json(
             { success: false, error: 'Failed to fetch challenge' },
             { status: 500 }

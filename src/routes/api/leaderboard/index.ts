@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { users, progress } from '@/db/schema';
+import { logger } from '@/lib/logger';
 import { desc, eq, and, sql } from 'drizzle-orm';
 
 interface LeaderboardFilters {
@@ -41,7 +42,6 @@ export const Route = createFileRoute('/api/leaderboard/')({
 
           const leaderboard = await db
             .select({
-              id: users.id,
               name: users.name,
               image: users.image,
               xp: users.xp,
@@ -79,7 +79,7 @@ export const Route = createFileRoute('/api/leaderboard/')({
             },
           });
         } catch (error) {
-          console.error('Error fetching leaderboard:', error);
+          logger.error('Error fetching leaderboard:', error);
           return json(
             { success: false, error: 'Failed to fetch leaderboard' },
             { status: 500 }
@@ -89,3 +89,4 @@ export const Route = createFileRoute('/api/leaderboard/')({
     },
   },
 });
+

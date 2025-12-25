@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { sendVerificationEmail } from '@/lib/email.server';
+import { logger } from '@/lib/logger';
 
 // Simple in-memory rate limiting (per email, 60 second cooldown)
 const rateLimitMap = new Map<string, number>();
@@ -80,9 +81,9 @@ export const Route = createFileRoute('/api/auth/resend-verification')({
                         message: 'Verification email sent! Please check your inbox.',
                     });
                 } catch (error) {
-                    console.error('Error resending verification email:', error);
+                    logger.error('Error resending verification email:', error);
                     return json(
-                        { success: false, error: 'Failed to send verification email' },
+                        { success: false, error: 'Failed to resend verification email' },
                         { status: 500 }
                     );
                 }

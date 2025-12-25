@@ -5,6 +5,7 @@ import { users, challenges, userAchievements, achievements, submissions } from '
 import { eq, desc, and, gte } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 import { getUserStats } from '@/lib/stats';
+import { logger } from '@/lib/logger';
 
 export const Route = createFileRoute('/api/users/me')({
   server: {
@@ -210,7 +211,7 @@ export const Route = createFileRoute('/api/users/me')({
             },
           });
         } catch (error) {
-          console.error('Error fetching user profile:', error);
+          logger.error('Error fetching user profile:', error);
           return json(
             { success: false, error: 'Failed to fetch user profile' },
             { status: 500 }
@@ -261,21 +262,25 @@ export const Route = createFileRoute('/api/users/me')({
           }
 
           // Update user
-          const updatedUser = await db
+          const [updatedUser] = await db
             .update(users)
             .set({
               ...updates,
               updatedAt: new Date(),
             })
             .where(eq(users.id, userId))
-            .returning();
+            .returning({
+              name: users.name,
+              profileVisibility: users.profileVisibility,
+              showOnLeaderboard: users.showOnLeaderboard,
+            });
 
           return json({
             success: true,
-            data: updatedUser[0],
+            data: updatedUser,
           });
         } catch (error) {
-          console.error('Error updating user profile:', error);
+          logger.error('Error updating user profile:', error);
           return json(
             { success: false, error: 'Failed to update user profile' },
             { status: 500 }

@@ -8,10 +8,11 @@ import { z } from 'zod';
 import { checkLevelUp } from '@/lib/gamification';
 import { checkAchievements } from '@/lib/achievements';
 import { getUserStats, getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
+import { logger } from '@/lib/logger';
 
 // Validation schema for submission
 const submissionSchema = z.object({
-    challengeId: z.string().uuid(),
+    challengeSlug: z.string().min(1, 'Challenge slug is required'),
     code: z.string().min(1, 'Code is required'),
     testResults: z.array(z.object({
         testCaseId: z.string().uuid().optional(),
@@ -48,11 +49,11 @@ export const Route = createFileRoute('/api/submissions/')({
                         );
                     }
 
-                    const { challengeId, code, testResults, executionTime } = validation.data;
+                    const { challengeSlug, code, testResults, executionTime } = validation.data;
 
-                    // Get challenge
+                    // Get challenge by slug
                     const challenge = await db.query.challenges.findFirst({
-                        where: eq(challenges.id, challengeId),
+                        where: eq(challenges.slug, challengeSlug),
                     });
 
                     if (!challenge) {
@@ -66,7 +67,7 @@ export const Route = createFileRoute('/api/submissions/')({
                     const allTestCases = await db
                         .select({ id: testCases.id })
                         .from(testCases)
-                        .where(eq(testCases.challengeId, challengeId));
+                        .where(eq(testCases.challengeId, challenge.id));
 
                     const testsTotal = allTestCases.length;
                     const testsPassed = testResults.filter(r => r.passed).length;
@@ -108,7 +109,7 @@ export const Route = createFileRoute('/api/submissions/')({
                                 })
                                 .where(eq(users.id, userId));
 
-                            console.log(`[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP. New Total: ${user.xp + xpEarned}, Level: ${levelUpInfo.newLevel}`);
+                            logger.info(`[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP. New Total: ${user.xp + xpEarned}, Level: ${levelUpInfo.newLevel}`);
 
                             // Increment challenge completion count
                             await db
@@ -119,7 +120,7 @@ export const Route = createFileRoute('/api/submissions/')({
                                 .where(eq(challenges.id, challengeId));
                         }
                     } else {
-                        console.log(`[Submission] Challenge ${challengeId} passed but not first completion. No XP awarded.`);
+                        logger.info(`[Submission] Challenge ${challengeId} passed but not first completion. No XP awarded.`);
                     }
 
                     // Create submission record
@@ -183,10 +184,10 @@ export const Route = createFileRoute('/api/submissions/')({
                                     icon: a.icon,
                                 }));
 
-                                console.log(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
+                                logger.info(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
                             }
                         } catch (error) {
-                            console.error('Error checking achievements:', error);
+                            logger.error('Error checking achievements:', error);
                         }
                     }
 
@@ -211,7 +212,7 @@ export const Route = createFileRoute('/api/submissions/')({
                         },
                     });
                 } catch (error) {
-                    console.error('Error submitting solution:', error);
+                    logger.error('Error submitting solution:', error);
                     return json(
                         { success: false, error: 'Failed to submit solution' },
                         { status: 500 }
@@ -285,7 +286,7 @@ export const Route = createFileRoute('/api/submissions/')({
                         },
                     });
                 } catch (error) {
-                    console.error('Error fetching submissions:', error);
+                    logger.error('Error fetching submissions:', error);
                     return json(
                         { success: false, error: 'Failed to fetch submissions' },
                         { status: 500 }
