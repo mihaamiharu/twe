@@ -18,8 +18,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { cn } from '@/lib/utils';
 import { executePlaywrightCode } from '@/lib/challenge-executor';
-import { Play, Send, RotateCcw, Zap, Loader2, Target, BookOpen } from 'lucide-react';
+import { Play, Send, RotateCcw, Zap, Loader2, Target, BookOpen, AlertCircle } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { storage } from '@/lib/storage-adapter';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 
 import { CodeEditor } from './CodeEditor';
 import { WebComponentPreview } from './WebComponentPreview';
@@ -64,6 +73,8 @@ export interface ChallengePlaygroundProps {
 export function ChallengePlayground({ challenge, onSubmit, userId, className }: ChallengePlaygroundProps) {
     const [code, setCode] = useState(challenge.starterCode);
     const [selector, setSelector] = useState('');
+    const [resetCount, setResetCount] = useState(0);
+    const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
     const [selectorType, setSelectorType] = useState<SelectorType>(
         challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
@@ -225,15 +236,31 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         }
     }, [selector, challenge.targetSelector, isSelectorChallenge, previewValidation]);
 
-    // Reset to starter code
+    // Reset to starter code - show confirmation first
     const handleReset = useCallback(() => {
+        setIsResetConfirmOpen(true);
+    }, []);
+
+    // Perform the actual reset
+    const confirmReset = useCallback(async () => {
+        const storageKey = userId
+            ? `challenge-${challenge.id}-${userId}`
+            : `challenge-${challenge.id}`;
+
+        // Clear persistence
+        await storage.removeItem(storageKey);
+
+        // Reset state
         setCode(challenge.starterCode);
         setSelector('');
-
         setTestResults([]);
         setHasPassed(false);
         setPreviewValidation(null);
-    }, [challenge.starterCode]);
+
+        // Force re-mount of code editor to pick up reset code
+        setResetCount(prev => prev + 1);
+        setIsResetConfirmOpen(false);
+    }, [challenge.id, challenge.starterCode, userId]);
 
 
 
@@ -424,9 +451,8 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         onRun={handleRunCode}
                                         storageKey={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                                         height="100%"
-                                        height="100%"
                                         className="h-full border rounded-md overflow-hidden shadow-sm"
-                                        key={challenge.id} // Force re-mount on challenge change to reset internal state
+                                        key={`${challenge.id}-${resetCount}`} // Force re-mount on change or reset
                                     />
                                 </div>
                             </div>
@@ -463,6 +489,39 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     </div>
                 </div>
             </div >
+
+            {/* Reset Confirmation Dialog */}
+            <Dialog open={isResetConfirmOpen} onOpenChange={setIsResetConfirmOpen}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="bg-destructive/10 p-2 rounded-full">
+                                <AlertCircle className="h-5 w-5 text-destructive" />
+                            </div>
+                            <DialogTitle>Reset Solution?</DialogTitle>
+                        </div>
+                        <DialogDescription>
+                            This will permanently delete your current progress and restore the challenge to its original state. This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="mt-4 sm:justify-end gap-2">
+                        <Button
+                            variant="ghost"
+                            onClick={() => setIsResetConfirmOpen(false)}
+                            className="hover:bg-accent"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            variant="destructive"
+                            onClick={confirmReset}
+                            className="shadow-sm"
+                        >
+                            Yes, Reset Code
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div >
     );
 }
