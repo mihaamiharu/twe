@@ -2,9 +2,10 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 import { cn } from '@/lib/utils';
+import { useTheme } from '@/components/theme-provider';
 
-// Import highlight.js theme (dark mode)
-import 'highlight.js/styles/github-dark.css';
+// Import custom theme-aware highlight.js styles
+import '@/styles/highlight-github.css';
 
 interface MarkdownRendererProps {
     content: string;
@@ -12,8 +13,14 @@ interface MarkdownRendererProps {
 }
 
 export function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
+    const { resolvedTheme } = useTheme();
+
     return (
-        <div className={cn('prose prose-invert max-w-none', className)}>
+        <div className={cn(
+            'prose max-w-none',
+            resolvedTheme === 'dark' && 'prose-invert',
+            className
+        )}>
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
                 rehypePlugins={[rehypeHighlight]}
