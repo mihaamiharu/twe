@@ -922,6 +922,71 @@ const result = status === "passed" ? duration : 0;`,
         ],
         tags: ['javascript', 'destructuring', 'modern', 'beginner'],
     },
+
+    // Challenge 11: JavaScript Fundamentals Boss
+    {
+        slug: 'js-fundamentals-boss',
+        title: 'Scenario: Test Data Generator',
+        description: 'Combine all JS skills to build a test data generator.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'HARD' as const,
+        category: 'javascript-fundamentals',
+        xpReward: 60,
+        order: 111,
+        instructions: `# Scenario: Test Data Generator
+
+You're building a utility to generate test data for your automation suite.
+
+## The Challenge
+
+Create a function that:
+1. Takes an array of user objects
+2. Filters to only "active" users
+3. Maps to extract just their emails
+4. Returns the count of active user emails
+
+## Given Data
+
+\`\`\`javascript
+const users = [
+    { name: "Alice", email: "alice@test.com", status: "active" },
+    { name: "Bob", email: "bob@test.com", status: "inactive" },
+    { name: "Carol", email: "carol@test.com", status: "active" },
+    { name: "Dave", email: "dave@test.com", status: "active" }
+];
+\`\`\`
+
+## Your Mission
+
+Use **filter**, **map**, and **array methods** to solve this elegantly!
+
+> **Tip:** Chain the array methods: \`.filter().map().length\`
+`,
+        htmlContent: `<div class="test-generator">
+  <h3>Test Data Generator</h3>
+  <div id="output"></div>
+</div>`,
+        starterCode: `const users = [
+    { name: "Alice", email: "alice@test.com", status: "active" },
+    { name: "Bob", email: "bob@test.com", status: "inactive" },
+    { name: "Carol", email: "carol@test.com", status: "active" },
+    { name: "Dave", email: "dave@test.com", status: "active" }
+];
+
+// Filter active users, map to emails, count them
+const activeEmails = users
+    .filter(user => user.status === "active")
+    .map(user => user.email);
+
+const result = activeEmails.length;`,
+        expectedOutput: '3',
+        hints: [
+            'Use .filter() to keep only active users',
+            'Use .map() to extract emails',
+            'Use .length to count',
+        ],
+        tags: ['javascript', 'scenario', 'boss', 'beginner'],
+    },
 ];
 
 // ============================================================================
@@ -1215,6 +1280,81 @@ const result = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0) + (hasSidebar ? 1 : 0);
         expectedOutput: '2',
         hints: ['querySelector returns null if not found', 'Header and footer exist, sidebar does not'],
         tags: ['javascript', 'dom', 'existence', 'beginner'],
+    },
+
+    // Challenge 9: DOM Boss
+    {
+        slug: 'dom-boss',
+        title: 'Scenario: Dashboard Scraper',
+        description: 'Extract and summarize data from a complex dashboard UI.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'HARD' as const,
+        category: 'dom-understanding',
+        xpReward: 65,
+        order: 209,
+        instructions: `# Scenario: Dashboard Scraper
+
+You're building a test that verifies a dashboard displays correct summary data.
+
+## The Challenge
+
+The dashboard shows:
+- A stats section with multiple cards
+- Each card has a label and a value
+
+Your test needs to:
+1. Find all stat cards
+2. Extract the value from the "Total Sales" card
+3. Return that value as a number
+
+## Your Mission
+
+Navigate the DOM to find the correct card and extract its value.
+
+> **Tip:** Use querySelector to find elements, then navigate with parent/child relationships!
+`,
+        htmlContent: `<div class="dashboard">
+  <h1>Sales Dashboard</h1>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="label">Active Users</span>
+      <span class="value">1,234</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">Total Sales</span>
+      <span class="value">5,678</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">Pending Orders</span>
+      <span class="value">42</span>
+    </div>
+    <div class="stat-card">
+      <span class="label">Revenue</span>
+      <span class="value">$98,765</span>
+    </div>
+  </div>
+</div>`,
+        starterCode: `// Find all stat cards
+const cards = document.querySelectorAll('.stat-card');
+
+// Find the card with "Total Sales" label
+let totalSalesValue = 0;
+for (const card of cards) {
+    const label = card.querySelector('.label').textContent;
+    if (label === 'Total Sales') {
+        const valueText = card.querySelector('.value').textContent;
+        totalSalesValue = Number(valueText.replace(',', ''));
+    }
+}
+
+const result = totalSalesValue;`,
+        expectedOutput: '5678',
+        hints: [
+            'Loop through all cards',
+            'Check each label text',
+            'Extract value and remove comma for Number conversion',
+        ],
+        tags: ['javascript', 'dom', 'scenario', 'boss', 'beginner'],
     },
 ];
 
@@ -1544,6 +1684,72 @@ const result = attempts;`,
         expectedOutput: '3',
         hints: ['Loop through attempts', 'Try each attempt, catch errors', 'Return on success, throw on final failure'],
         tags: ['javascript', 'async', 'testing', 'retry', 'beginner'],
+    },
+
+    // Challenge 6: Async Boss
+    {
+        slug: 'async-boss',
+        title: 'Scenario: API Data Aggregator',
+        description: 'Combine multiple async API calls into a single result.',
+        type: 'JAVASCRIPT' as const,
+        difficulty: 'HARD' as const,
+        category: 'async-await-basics',
+        xpReward: 70,
+        order: 306,
+        instructions: `# Scenario: API Data Aggregator
+
+You're building a test that verifies data from multiple API endpoints.
+
+## The Challenge
+
+You have 3 async functions that simulate API calls:
+- \`getUsers()\` → returns array of user IDs
+- \`getOrders()\` → returns array of order IDs  
+- \`getProducts()\` → returns array of product IDs
+
+Your task:
+1. Call all 3 APIs **in parallel** (for speed!)
+2. Sum up the **total count** of all items
+3. Handle any potential errors gracefully
+
+## Your Mission
+
+Use Promise.all to fetch all data simultaneously and aggregate the results.
+
+> **Tip:** Destructure the Promise.all result: \`const [users, orders, products] = await Promise.all([...])\`
+`,
+        htmlContent: `<div class="api-aggregator">
+  <h3>API Data Aggregator</h3>
+  <div id="output"></div>
+</div>`,
+        starterCode: `// Simulated API calls
+const getUsers = () => Promise.resolve([1, 2, 3, 4, 5]);
+const getOrders = () => Promise.resolve([101, 102, 103]);
+const getProducts = () => Promise.resolve([201, 202, 203, 204]);
+
+// Fetch all data in parallel and count total items
+async function aggregateData() {
+    try {
+        const [users, orders, products] = await Promise.all([
+            getUsers(),
+            getOrders(),
+            getProducts()
+        ]);
+        
+        return users.length + orders.length + products.length;
+    } catch (error) {
+        return 0;
+    }
+}
+
+const result = await aggregateData();`,
+        expectedOutput: '12',
+        hints: [
+            'Use Promise.all with an array of promises',
+            'Destructure the results',
+            'Sum all .length values',
+        ],
+        tags: ['javascript', 'async', 'scenario', 'boss', 'beginner'],
     },
 ];
 

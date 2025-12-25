@@ -460,6 +460,101 @@ const result = await productPage.getPageTitle();`,
         expectedOutput: 'Product Details',
         tags: ['playwright', 'pom', 'inheritance', 'base-class', 'expert'],
     },
+
+    // Challenge 6: POM Boss
+    {
+        slug: 'pw-pom-boss',
+        title: 'Scenario: Full E2E with Multi-Page POM',
+        description: 'Build a complete Page Object system for an e-commerce flow.',
+        type: 'PLAYWRIGHT' as const,
+        difficulty: 'HARD' as const,
+        category: 'playwright-pom',
+        xpReward: 120,
+        order: 806,
+        instructions: `# Scenario: Full E2E with Multi-Page POM
+
+Build a complete Page Object architecture for an e-commerce checkout flow.
+
+## The Challenge
+
+Create POMs for:
+1. **ProductPage** - Add item to cart
+2. **CartPage** - View cart, proceed to checkout
+3. **CheckoutPage** - Complete order
+
+Navigate through all pages using fluent patterns and return the order confirmation.
+
+## Your Mission
+
+Chain all page objects together in a realistic e-commerce flow!
+
+> **Tip:** Each page should return the next page for fluent navigation!
+`,
+        htmlContent: `<div id="app">
+  <div id="product-page">
+    <h1>Widget Pro</h1>
+    <button id="add-to-cart" onclick="showCart()">Add to Cart</button>
+  </div>
+  <div id="cart-page" style="display:none;">
+    <h2>Your Cart</h2>
+    <p>Widget Pro x1</p>
+    <button id="checkout" onclick="showCheckout()">Checkout</button>
+  </div>
+  <div id="checkout-page" style="display:none;">
+    <h2>Checkout</h2>
+    <button id="place-order" onclick="showConfirmation()">Place Order</button>
+  </div>
+  <div id="confirmation" style="display:none;">
+    <h2>Order #12345 Confirmed!</h2>
+  </div>
+</div>
+<script>
+  function showCart() {
+    document.getElementById('product-page').style.display = 'none';
+    document.getElementById('cart-page').style.display = 'block';
+  }
+  function showCheckout() {
+    document.getElementById('cart-page').style.display = 'none';
+    document.getElementById('checkout-page').style.display = 'block';
+  }
+  function showConfirmation() {
+    document.getElementById('checkout-page').style.display = 'none';
+    document.getElementById('confirmation').style.display = 'block';
+  }
+</script>`,
+        starterCode: `// Page Objects
+class ProductPage {
+    constructor(page) { this.page = page; }
+    async addToCart() {
+        await this.page.click('#add-to-cart');
+        return new CartPage(this.page);
+    }
+}
+
+class CartPage {
+    constructor(page) { this.page = page; }
+    async checkout() {
+        await this.page.click('#checkout');
+        return new CheckoutPage(this.page);
+    }
+}
+
+class CheckoutPage {
+    constructor(page) { this.page = page; }
+    async placeOrder() {
+        await this.page.click('#place-order');
+        return await this.page.locator('#confirmation h2').textContent();
+    }
+}
+
+// E2E Flow
+const productPage = new ProductPage(page);
+const cartPage = await productPage.addToCart();
+const checkoutPage = await cartPage.checkout();
+const result = await checkoutPage.placeOrder();`,
+        expectedOutput: 'Order #12345 Confirmed!',
+        tags: ['playwright', 'pom', 'e2e', 'scenario', 'boss', 'expert'],
+    },
 ];
 
 // ============================================================================
@@ -793,6 +888,78 @@ await page.click('#login');
 const result = await page.locator('#status').textContent();`,
         expectedOutput: 'Logged into staging',
         tags: ['playwright', 'data-driven', 'environment', 'config', 'expert'],
+    },
+
+    // Challenge 6: Data-Driven Boss
+    {
+        slug: 'pw-data-driven-boss',
+        title: 'Scenario: Cross-Browser Data Suite',
+        description: 'Run comprehensive data-driven tests across multiple scenarios.',
+        type: 'PLAYWRIGHT' as const,
+        difficulty: 'HARD' as const,
+        category: 'playwright-data-driven',
+        xpReward: 110,
+        order: 906,
+        instructions: `# Scenario: Cross-Browser Data Suite
+
+Build a comprehensive test suite that combines multiple data sources.
+
+## The Challenge
+
+1. Load user credentials from JSON-like data
+2. Load test scenarios from CSV-like data
+3. Run all combinations and count passing tests
+4. All 4 tests should pass
+
+## Your Mission
+
+Combine parameterized testing with external data to create a robust test suite!
+
+> **Tip:** Nested loops for user × scenario combinations!
+`,
+        htmlContent: `<div class="login-app">
+  <input id="email" placeholder="Email" />
+  <input id="password" type="password" placeholder="Password" />
+  <button id="login" onclick="tryLogin()">Login</button>
+  <div id="result"></div>
+</div>
+<script>
+  const validUsers = ['alice@test.com', 'bob@test.com'];
+  function tryLogin() {
+    const email = document.getElementById('email').value;
+    const isValid = validUsers.includes(email);
+    document.getElementById('result').textContent = isValid ? 'Success' : 'Failed';
+  }
+</script>`,
+        starterCode: `// User data (JSON-like)
+const users = [
+    { email: 'alice@test.com', password: 'pass1' },
+    { email: 'bob@test.com', password: 'pass2' }
+];
+
+// Test scenarios (CSV-like)
+const scenarios = ['login', 'verify'];
+
+let passed = 0;
+
+// Run data-driven tests
+for (const user of users) {
+    for (const scenario of scenarios) {
+        await page.fill('#email', user.email);
+        await page.fill('#password', user.password);
+        await page.click('#login');
+        
+        const result = await page.locator('#result').textContent();
+        if (result === 'Success') passed++;
+        
+        // Reset for next test
+        await page.fill('#email', '');
+    }
+}
+
+const result = String(passed);`,
+        expectedOutput: '4',
+        tags: ['playwright', 'data-driven', 'scenario', 'boss', 'expert'],
     },
 ];
 
@@ -1362,6 +1529,146 @@ await expect(msg).toBeVisible({ timeout: 5000 });
 const result = await page.locator('#status-area').textContent();`,
         expectedOutput: 'Export CompleteDownload Result Report', // textContent includes children
         tags: ['playwright', 'upload', 'workflow', 'csv', 'advanced'],
+    },
+
+    // Challenge 10: Test Infrastructure Boss
+    {
+        slug: 'pw-infrastructure-boss',
+        title: 'Scenario: Self-Healing Test Suite',
+        description: 'Build robust test infrastructure with retry, screenshot, and reporting.',
+        type: 'PLAYWRIGHT' as const,
+        difficulty: 'HARD' as const,
+        category: 'playwright-advanced',
+        xpReward: 115,
+        order: 1010,
+        instructions: `# Scenario: Self-Healing Test Suite
+
+Build test infrastructure that handles flaky tests gracefully.
+
+## The Challenge
+
+Create a test helper that:
+1. Retries failed actions up to 3 times
+2. Takes a screenshot on final failure
+3. Returns the test result status
+
+## Your Mission
+
+Implement robust retry logic that makes your tests more reliable!
+
+> **Tip:** Use try/catch and a retry loop!
+`,
+        htmlContent: `<div class="flaky-app">
+  <button id="action" onclick="flakyClick()">Click Me</button>
+  <div id="result"></div>
+  <div id="screenshot-area"></div>
+</div>
+<script>
+  let attempts = 0;
+  function flakyClick() {
+    attempts++;
+    // Succeeds on 3rd attempt
+    if (attempts >= 3) {
+      document.getElementById('result').textContent = 'Success after ' + attempts + ' attempts';
+    } else {
+      document.getElementById('result').textContent = 'Failed - attempt ' + attempts;
+    }
+  }
+</script>`,
+        starterCode: `// Retry helper with screenshot on failure
+async function retryWithScreenshot(action, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            await action();
+            const result = await page.locator('#result').textContent();
+            if (result.includes('Success')) {
+                return 'passed';
+            }
+        } catch (e) {
+            // Continue to retry
+        }
+    }
+    // Would take screenshot here in real test
+    return 'failed-with-screenshot';
+}
+
+// Use the retry helper
+const result = await retryWithScreenshot(async () => {
+    await page.click('#action');
+});`,
+        expectedOutput: 'passed',
+        tags: ['playwright', 'infrastructure', 'retry', 'scenario', 'boss', 'expert'],
+    },
+
+    // Challenge 11: Integration Patterns Boss
+    {
+        slug: 'pw-integration-boss',
+        title: 'Scenario: E2E Pipeline Integration',
+        description: 'Build a test that combines API setup, UI verification, and cleanup.',
+        type: 'PLAYWRIGHT' as const,
+        difficulty: 'HARD' as const,
+        category: 'playwright-advanced',
+        xpReward: 125,
+        order: 1011,
+        instructions: `# Scenario: E2E Pipeline Integration
+
+Create a complete integration test with setup, test, and teardown phases.
+
+## The Challenge
+
+Build a test that:
+1. **Setup**: Create test data via "API"
+2. **Test**: Verify data in UI
+3. **Verify**: Check all assertions
+4. **Teardown**: Clean up test data
+
+## Your Mission
+
+Implement all phases and return the final verification status!
+
+> **Tip:** Structure your test with clear setup/test/teardown phases!
+`,
+        htmlContent: `<div id="app">
+  <button id="setup" onclick="setupData()">Setup Data</button>
+  <div id="data-display" style="display:none;">
+    <h2 id="user-name"></h2>
+    <p id="user-email"></p>
+  </div>
+  <button id="cleanup" onclick="cleanup()" style="display:none;">Cleanup</button>
+  <div id="status"></div>
+</div>
+<script>
+  function setupData() {
+    document.getElementById('user-name').textContent = 'Test User';
+    document.getElementById('user-email').textContent = 'test@example.com';
+    document.getElementById('data-display').style.display = 'block';
+    document.getElementById('cleanup').style.display = 'block';
+    document.getElementById('status').textContent = 'Setup complete';
+  }
+  function cleanup() {
+    document.getElementById('data-display').style.display = 'none';
+    document.getElementById('status').textContent = 'Cleanup complete';
+  }
+</script>`,
+        starterCode: `// 1. Setup Phase - Create test data
+await page.click('#setup');
+await page.waitForSelector('#data-display:not([style*="none"])');
+
+// 2. Test Phase - Verify UI
+const userName = await page.locator('#user-name').textContent();
+const userEmail = await page.locator('#user-email').textContent();
+
+// 3. Assertion Phase
+const setupValid = userName === 'Test User' && userEmail === 'test@example.com';
+
+// 4. Teardown Phase - Cleanup
+await page.click('#cleanup');
+const cleanupStatus = await page.locator('#status').textContent();
+
+// Return integration result
+const result = setupValid && cleanupStatus === 'Cleanup complete' ? 'integration-passed' : 'integration-failed';`,
+        expectedOutput: 'integration-passed',
+        tags: ['playwright', 'integration', 'e2e', 'pipeline', 'scenario', 'boss', 'expert'],
     },
 ];
 

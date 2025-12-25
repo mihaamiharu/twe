@@ -621,6 +621,78 @@ const result = await page.locator('tbody tr:first-child td:nth-child(2)').textCo
     expectedOutput: 'Active',
     tags: ['playwright', 'table', 'dynamic', 'sorting', 'intermediate'],
   },
+
+  // Challenge 12: Navigation & Actions Boss
+  {
+    slug: 'pw-actions-boss',
+    title: 'Scenario: E-Commerce Checkout',
+    description: 'Complete a full checkout flow using all navigation skills.',
+    type: 'PLAYWRIGHT' as const,
+    difficulty: 'HARD' as const,
+    category: 'playwright-navigation',
+    xpReward: 100,
+    order: 412,
+    instructions: `# Scenario: E-Commerce Checkout
+
+You're testing a checkout flow that requires multiple actions in sequence.
+
+## The Challenge
+
+Complete a purchase by:
+1. Adding a product to cart (click button)
+2. Updating quantity in the cart (fill input)
+3. Checking "Express Shipping" (checkbox)
+4. Clicking "Checkout" button
+5. Verifying order confirmation
+
+## Your Mission
+
+Chain all the actions together and return the confirmation message.
+
+> **Tip:** Each action depends on the previous one completing!
+`,
+    htmlContent: `<div class="shop">
+  <div class="product">
+    <h3>Widget Pro</h3>
+    <button id="add-btn" onclick="addToCart()">Add to Cart</button>
+  </div>
+  <div class="cart" style="display:none;">
+    <input type="number" id="qty" value="1" />
+    <label><input type="checkbox" id="express" /> Express Shipping</label>
+    <button id="checkout-btn" onclick="checkout()">Checkout</button>
+  </div>
+  <div id="confirmation" style="display:none;"></div>
+</div>
+<script>
+  function addToCart() {
+    document.querySelector('.cart').style.display = 'block';
+    document.getElementById('add-btn').textContent = 'Added!';
+  }
+  function checkout() {
+    const qty = document.getElementById('qty').value;
+    const express = document.getElementById('express').checked;
+    document.getElementById('confirmation').style.display = 'block';
+    document.getElementById('confirmation').textContent = 
+      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');
+  }
+</script>`,
+    starterCode: `// 1. Add product to cart
+await page.click('#add-btn');
+
+// 2. Update quantity
+await page.fill('#qty', '3');
+
+// 3. Check express shipping
+await page.check('#express');
+
+// 4. Complete checkout
+await page.click('#checkout-btn');
+
+// 5. Get confirmation
+const result = await page.locator('#confirmation').textContent();`,
+    expectedOutput: 'Order confirmed: 3 items (Express)',
+    tags: ['playwright', 'scenario', 'boss', 'checkout', 'intermediate'],
+  },
 ];
 
 // ============================================================================
@@ -1028,6 +1100,65 @@ const result = String(count);`,
     expectedOutput: '5',
     tags: ['playwright', 'locators', 'lists', 'multiple', 'intermediate'],
   },
+
+  // Challenge 9: Locators Boss
+  {
+    slug: 'pw-locators-boss',
+    title: 'Scenario: Dynamic Product Grid',
+    description: 'Use advanced locators to find products in a complex grid.',
+    type: 'PLAYWRIGHT' as const,
+    difficulty: 'HARD' as const,
+    category: 'playwright-locators',
+    xpReward: 90,
+    order: 509,
+    instructions: `# Scenario: Dynamic Product Grid
+
+You're testing a product catalog with filtering and dynamic content.
+
+## The Challenge
+
+Find and click the "Add to Cart" button for a specific product:
+1. Product name contains "Pro"
+2. Product is in stock (has "In Stock" badge)
+3. Get the confirmation message
+
+## Your Mission
+
+Use locator chaining, filtering, and sibling navigation to find the right element!
+
+> **Tip:** Chain filter() to narrow down, then use locator() to find the button!
+`,
+    htmlContent: `<div class="products">
+  <div class="product" data-testid="product-1">
+    <h3>Widget Basic</h3>
+    <span class="badge out-of-stock">Out of Stock</span>
+    <button disabled>Add to Cart</button>
+  </div>
+  <div class="product" data-testid="product-2">
+    <h3>Widget Pro</h3>
+    <span class="badge in-stock">In Stock</span>
+    <button onclick="document.getElementById('msg').textContent='Added Widget Pro!'">Add to Cart</button>
+  </div>
+  <div class="product" data-testid="product-3">
+    <h3>Widget Pro Max</h3>
+    <span class="badge out-of-stock">Out of Stock</span>
+    <button disabled>Add to Cart</button>
+  </div>
+</div>
+<div id="msg"></div>`,
+    starterCode: `// Find product card containing "Pro" AND "In Stock"
+const productCard = page.locator('.product')
+  .filter({ hasText: 'Pro' })
+  .filter({ hasText: 'In Stock' });
+
+// Click its Add to Cart button
+await productCard.locator('button').click();
+
+// Get confirmation
+const result = await page.locator('#msg').textContent();`,
+    expectedOutput: 'Added Widget Pro!',
+    tags: ['playwright', 'locators', 'scenario', 'boss', 'intermediate'],
+  },
 ];
 
 // ============================================================================
@@ -1420,6 +1551,73 @@ const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'soft', 'intermediate'],
   },
+
+  // Challenge 9: Assertions Boss
+  {
+    slug: 'pw-assertions-boss',
+    title: 'Scenario: Form Validation Suite',
+    description: 'Verify all aspects of a complex form validation.',
+    type: 'PLAYWRIGHT' as const,
+    difficulty: 'HARD' as const,
+    category: 'playwright-assertions',
+    xpReward: 85,
+    order: 609,
+    instructions: `# Scenario: Form Validation Suite
+
+You're testing a registration form with multiple validation states.
+
+## The Challenge
+
+Verify ALL of these assertions pass:
+1. Email field shows error when invalid
+2. Password field shows requirements
+3. Submit button is disabled until form is valid
+4. After fixing, submit button becomes enabled
+
+## Your Mission
+
+Use multiple assertion types to verify the complete form state!
+
+> **Tip:** Use expect() for each verification, and chain them together!
+`,
+    htmlContent: `<form id="signup">
+  <div class="field">
+    <input type="email" id="email" value="bad-email" />
+    <span class="error" id="email-error">Invalid email format</span>
+  </div>
+  <div class="field">
+    <input type="password" id="password" placeholder="8+ characters" />
+    <span class="hint">Must be 8+ characters</span>
+  </div>
+  <button id="submit" disabled>Register</button>
+</form>
+<script>
+  document.getElementById('email').addEventListener('input', validate);
+  document.getElementById('password').addEventListener('input', validate);
+  function validate() {
+    const email = document.getElementById('email').value;
+    const pass = document.getElementById('password').value;
+    const valid = email.includes('@') && pass.length >= 8;
+    document.getElementById('submit').disabled = !valid;
+    document.getElementById('email-error').style.display = email.includes('@') ? 'none' : 'block';
+  }
+</script>`,
+    starterCode: `// Verify initial error state
+await expect(page.locator('#email-error')).toBeVisible();
+await expect(page.locator('#submit')).toBeDisabled();
+
+// Fix the form
+await page.fill('#email', 'user@example.com');
+await page.fill('#password', 'password123');
+
+// Verify valid state
+await expect(page.locator('#email-error')).toBeHidden();
+await expect(page.locator('#submit')).toBeEnabled();
+
+const result = 'all assertions passed';`,
+    expectedOutput: 'all assertions passed',
+    tags: ['playwright', 'assertions', 'scenario', 'boss', 'intermediate'],
+  },
 ];
 
 // ============================================================================
@@ -1771,6 +1969,59 @@ await page.click('#fast-btn', { timeout: 1000 });
 const result = await page.locator('#fast-btn').textContent();`,
     expectedOutput: 'Done!',
     tags: ['playwright', 'waits', 'timeout', 'config', 'intermediate'],
+  },
+
+  // Challenge 7: Waits Boss
+  {
+    slug: 'pw-waits-boss',
+    title: 'Scenario: Polling Dashboard',
+    description: 'Handle async updates with proper wait strategies.',
+    type: 'PLAYWRIGHT' as const,
+    difficulty: 'HARD' as const,
+    category: 'playwright-waits',
+    xpReward: 95,
+    order: 707,
+    instructions: `# Scenario: Polling Dashboard
+
+You're testing a dashboard that polls for real-time updates.
+
+## The Challenge
+
+The dashboard:
+1. Shows "Loading..." initially
+2. After delay, shows "Connected"
+3. Then starts polling for data
+4. Eventually shows "Data received: 42"
+
+## Your Mission
+
+Wait for each state transition and return the final data value.
+
+> **Tip:** Use waitForSelector or waitForFunction to handle the async states!
+`,
+    htmlContent: `<div class="dashboard">
+  <div id="status">Loading...</div>
+  <div id="data"></div>
+</div>
+<script>
+  setTimeout(() => {
+    document.getElementById('status').textContent = 'Connected';
+    setTimeout(() => {
+      document.getElementById('data').textContent = 'Data received: 42';
+    }, 300);
+  }, 200);
+</script>`,
+    starterCode: `// Wait for connection
+await page.waitForSelector('#status:has-text("Connected")');
+
+// Wait for data
+await page.waitForSelector('#data:has-text("Data received")');
+
+// Extract the value
+const dataText = await page.locator('#data').textContent();
+const result = dataText.split(': ')[1];`,
+    expectedOutput: '42',
+    tags: ['playwright', 'waits', 'scenario', 'boss', 'intermediate'],
   },
 ];
 
