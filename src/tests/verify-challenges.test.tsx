@@ -34,8 +34,16 @@ console.log(`Verifying ${allChallenges.length} challenges...`);
 
 describe('Challenge Verification', () => {
 
+    // Happy-DOM doesn't support these CSS pseudo-classes, skip them in tests
+    const SKIP_CSS_CHALLENGES = [
+        'css-validation-states',  // Uses :invalid
+        'css-forms-boss',         // Uses :optional
+    ];
+
     describe('CSS Selector Challenges', () => {
-        const cssItems = allChallenges.filter(c => c.type === 'CSS_SELECTOR');
+        const cssItems = allChallenges
+            .filter(c => c.type === 'CSS_SELECTOR')
+            .filter(c => !SKIP_CSS_CHALLENGES.includes(c.slug));
 
         test.each(cssItems)('$title ($slug)', (challenge) => {
             // Setup DOM
