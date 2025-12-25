@@ -596,6 +596,176 @@ Select the **delete button** for the second item. The buttons don't have unique 
     tags: ['css', 'selector', 'dynamic', 'practical', 'basic'],
     targetSelector: '.item:nth-child(2) .btn-delete',
   },
+
+  // Challenge 11: Functional Pseudo-classes
+  {
+    slug: 'css-functional-pseudo',
+    title: 'Functional Pseudo-classes',
+    description: 'Master powerful modern selectors like :is() and :not().',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'css-advanced',
+    xpReward: 60,
+    order: 101, // Starting advanced series
+    instructions: `# Functional Pseudo-classes
+
+Modern CSS introduces powerful "functional" pseudo-classes that take selectors as arguments.
+
+## Negation: :not()
+Selects elements that do **not** match the selector.
+\`\`\`css
+/* Selects buttons that do NOT have the 'disabled' class */
+button:not(.disabled)
+\`\`\`
+
+## Matches: :is()
+Matches any element that matches any of the arguments. Great for grouping!
+\`\`\`css
+/* Selects headers inside article or section */
+:is(article, section) h1
+\`\`\`
+
+## Your Task
+Select the user card that is **active** but **not suspended**.
+
+> **Syntax:** \`.class1:not(.class2)\`
+`,
+    htmlContent: `<div class="user-grid">
+  <div class="user-card active suspended">
+    <h3>Suspended User</h3>
+    <span class="status">Active (Suspended)</span>
+  </div>
+  <div class="user-card active">
+    <h3>Valid User</h3>
+    <span class="status">Active</span>
+  </div>
+  <div class="user-card inactive">
+    <h3>Inactive User</h3>
+    <span class="status">Inactive</span>
+  </div>
+</div>`,
+    starterCode: '',
+    hints: [
+      'You want elements with class "user-card" and "active"',
+      'But they must NOT have class "suspended"',
+      'The answer is: .user-card.active:not(.suspended)'
+    ],
+    tags: ['css', 'selector', 'pseudo-class', 'not', 'advanced'],
+    targetSelector: '.user-card.active:not(.suspended)',
+  },
+
+  // Challenge 12: Form Validation States
+  {
+    slug: 'css-validation-states',
+    title: 'Form Validation States',
+    description: 'Select elements based on their validation state.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'css-advanced',
+    xpReward: 60,
+    order: 102,
+    instructions: `# Form Validation Selectors
+
+CSS can select form elements based on whether their data is valid. This is crucial for **testing error states**.
+
+## Validation Pseudo-classes
+| Selector | Meaning |
+|---|---|
+| \`:invalid\` | Value doesn't meet requirements |
+| \`:valid\` | Value meets requirements |
+| \`:required\` | Input has \`required\` attribute |
+| \`:optional\` | Input typically has no requirement |
+
+## Examples
+\`\`\`css
+input:invalid      /* Selects email input with "not-an-email" text */
+input:required     /* Selects mandatory fields */
+form:invalid button /* Submit button inside an invalid form */
+\`\`\`
+
+## Your Task
+Select the **email input** that currently has an **invalid** value.
+`,
+    htmlContent: `<form class="signup-form">
+  <div class="field">
+    <label>Username (Valid)</label>
+    <input type="text" value="johndoe" required pattern="[a-z]+" />
+  </div>
+  <div class="field">
+    <label>Email (Invalid)</label>
+    <input type="email" value="not-an-email" required />
+    <span class="error">Please enter a valid email</span>
+  </div>
+  <button>Submit</button>
+</form>`,
+    starterCode: '',
+    hints: [
+      'The second input has type="email" but the value is just text',
+      'The browser marks this as :invalid',
+      'The answer is: input:invalid'
+    ],
+    tags: ['css', 'selector', 'validation', 'form', 'advanced'],
+    targetSelector: 'input:invalid',
+  },
+
+  // Challenge 13: Type vs Child
+  {
+    slug: 'css-nth-type-vs-child',
+    title: 'Nth-of-type vs Nth-child',
+    description: 'Understand the subtle but critical difference.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'css-advanced',
+    xpReward: 65,
+    order: 103,
+    instructions: `# Nth-child vs Nth-of-type
+
+This is the most common point of confusion in CSS selectors!
+
+## :nth-child(n)
+1. Looks at **ALL** siblings.
+2. Counts to position \`n\`.
+3. Checks if the element at that position matches the tag.
+
+## :nth-of-type(n)
+1. Looks ONLY at siblings of the **same tag type**.
+2. Counts to the \`n\`th one of that type.
+
+## Visual Example
+\`\`\`html
+<article>
+  <h1>Header</h1>    <!-- element 1, h1:nth-of-type(1) -->
+  <p>Intro</p>       <!-- element 2, p:nth-of-type(1) -->
+  <p>Detail</p>      <!-- element 3, p:nth-of-type(2) -->
+</article>
+\`\`\`
+
+- \`p:nth-child(2)\` matches "Intro" (it is the 2nd child AND it is a p).
+- \`p:nth-child(1)\` matches NOTHING (the 1st child is h1, not p).
+- \`p:nth-of-type(1)\` matches "Intro" (it is the 1st paragraph).
+
+## Your Task
+Select the **second paragraph**. Note that it is the **third child** overall!
+
+> **Challenge:** Try using \`:nth-of-type\` to solve this robustly.
+`,
+    htmlContent: `<section class="content">
+  <h2>Article Title</h2>
+  <img src="banner.jpg" alt="Banner" />
+  <p class="intro">This is the introduction.</p>
+  <p class="body">This is the main body paragraph. Select me!</p>
+  <div class="ads">Ad Content</div>
+</section>`,
+    starterCode: '',
+    hints: [
+      'The target is the second <p> tag',
+      'It is the 4th element overall (h2, img, p, p)',
+      'nth-of-type counts only the <p> tags',
+      'The answer is: p:nth-of-type(2)'
+    ],
+    tags: ['css', 'selector', 'nth-of-type', 'structural', 'advanced'],
+    targetSelector: 'p:nth-of-type(2)',
+  },
 ];
 
 // ============================================================================
@@ -1194,6 +1364,76 @@ Select the **status cell** for the order with ID "ORD-002".
     ],
     tags: ['xpath', 'selector', 'table', 'complex', 'basic'],
     targetSelector: '//tr[td[text()="ORD-002"]]/td[4]',
+  },
+
+  // Challenge 11: Axes Master
+  {
+    slug: 'xpath-axes-master',
+    title: 'Axes Master',
+    description: 'Navigate freely with preceding and following axes.',
+    type: 'XPATH_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'xpath-advanced',
+    xpReward: 65,
+    order: 201, // Starting advanced series
+    instructions: `# XPath Axes: Preceding & Following
+
+Standard navigation usually goes DOWN (child) or SIDEWAYS (siblings).
+Axes let you jump comfortably anywhere in the document flow.
+
+## The "Everything Else" Axes
+| Axis | Description |
+|---|---|
+| \`following::\` | EVERYTHING after the closing tag of current node |
+| \`preceding::\` | EVERYTHING before the opening tag of current node |
+
+These differ from \`following-sibling::\` because they **ignore nesting**. They just scroll down (or up) the HTML source code.
+
+## Scenario
+You found a User Header ("Alice") and need to click the "Edit" button that appears physically after it in a completely different container.
+
+\`\`\`xpath
+//h3[text()="Alice"]/following::button[1]
+\`\`\`
+This grabs the *very next button* in the DOM after Alice's header, regardless of <div> nesting.
+
+## Your Task
+Find the **"Edit" button** that appears after "Product A".
+
+> **Warning:** Don't confuse with \`following-sibling\`. The button is NOT a sibling, it's in a different container!
+`,
+    htmlContent: `<div class="product-list">
+  <div class="header-section">
+    <h3>Product A</h3>
+    <span class="badge">New</span>
+  </div>
+  <div class="details-section">
+    <p>Price: $10</p>
+  </div>
+  <div class="actions-section">
+    <button class="btn">View</button>
+    <button class="btn">Edit</button>
+  </div>
+  
+  <hr>
+
+  <div class="header-section">
+    <h3>Product B</h3>
+  </div>
+  <div class="actions-section">
+    <button class="btn">View</button>
+    <button class="btn">Edit</button>
+  </div>
+</div>`,
+    starterCode: '',
+    hints: [
+      'The "Edit" button is seemingly unrelated in structure',
+      'But it appears AFTER "Product B" in the source order',
+      'Use the following:: axis',
+      'The answer is: //h3[text()="Product A"]/following::button[text()="Edit"][1]'
+    ],
+    tags: ['xpath', 'selector', 'axes', 'advanced'],
+    targetSelector: '//h3[text()="Product A"]/following::button[text()="Edit"][1]',
   },
 ];
 
