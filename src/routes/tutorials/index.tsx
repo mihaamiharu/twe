@@ -119,7 +119,7 @@ function TutorialsPage() {
                                 key={difficulty}
                                 variant={selectedDifficulty === difficulty ? 'default' : 'outline'}
                                 className="cursor-pointer"
-                                onClick={() => setSelectedDifficulty(difficulty)}
+                                onClick={() => setSelectedDifficulty(selectedDifficulty === difficulty ? 'All' : difficulty)}
                             >
                                 {difficulty}
                             </Badge>
