@@ -15,7 +15,8 @@ import {
     categoryLabels,
     difficultyColors,
     getTierFromCategory,
-    TIER_ORDER
+    TIER_ORDER,
+    CATEGORY_ORDER
 } from '@/lib/constants';
 
 export const Route = createFileRoute('/challenges/')({
@@ -172,7 +173,10 @@ function ChallengesPage() {
             if (tierOrderA !== tierOrderB) {
                 return tierOrderA - tierOrderB;
             }
-            return catA.localeCompare(catB);
+            // Within same tier, use CATEGORY_ORDER
+            const catOrderA = CATEGORY_ORDER[catA] ?? 999;
+            const catOrderB = CATEGORY_ORDER[catB] ?? 999;
+            return catOrderA - catOrderB;
         });
     }, [challengesByCategory]);
 

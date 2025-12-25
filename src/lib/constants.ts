@@ -45,3 +45,25 @@ export function getTierFromCategory(category?: string): string {
 
 export const TIER_ORDER = ['basic', 'beginner', 'intermediate', 'expert'];
 export const DIFFICULTY_ORDER = { EASY: 1, MEDIUM: 2, HARD: 3 };
+
+// Define display order for categories within each tier
+export const CATEGORY_ORDER: Record<string, number> = {
+    // Basic Tier (in desired display order)
+    'css-basics': 1,
+    'xpath-basics': 2,
+    'xpath-advanced': 3,
+    'selector-comparison': 4,
+    // Beginner Tier
+    'javascript': 1,
+    'dom': 2,
+    'async-await': 3,
+    // Intermediate Tier
+    'playwright-navigation': 1,
+    'playwright-locators': 2,
+    'playwright-assertions': 3,
+    'playwright-waits': 4,
+    // Expert Tier
+    'playwright-pom': 1,
+    'playwright-data-driven': 2,
+    'playwright-advanced': 3,
+};
