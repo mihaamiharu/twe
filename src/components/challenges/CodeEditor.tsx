@@ -9,12 +9,13 @@
  * - Line numbers and minimap
  */
 
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import Editor, { OnMount, OnChange, Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { cn } from '@/lib/utils';
 import { storage } from '@/lib/storage-adapter';
 import { Loader2 } from 'lucide-react';
+import { useTheme } from '@/components/theme-provider';
 
 export interface CodeEditorProps {
     initialCode?: string;
@@ -57,6 +58,35 @@ const CUSTOM_DARK_THEME: editor.IStandaloneThemeData = {
     },
 };
 
+// Custom light theme matching app design
+const CUSTOM_LIGHT_THEME: editor.IStandaloneThemeData = {
+    base: 'vs',
+    inherit: true,
+    rules: [
+        { token: 'comment', foreground: '9ca3af', fontStyle: 'italic' },
+        { token: 'keyword', foreground: '7c3aed' }, // violet-600
+        { token: 'string', foreground: '059669' }, // emerald-600
+        { token: 'number', foreground: 'd97706' }, // amber-600
+        { token: 'function', foreground: '2563eb' }, // blue-600
+        { token: 'variable', foreground: '1f2937' }, // gray-800
+        { token: 'type', foreground: '0891b2' }, // cyan-600
+    ],
+    colors: {
+        'editor.background': '#ffffff',
+        'editor.foreground': '#1f2937',
+        'editor.lineHighlightBackground': '#f3f4f6', // gray-100
+        'editor.selectionBackground': '#e5e7eb', // gray-200
+        'editorCursor.foreground': '#0891b2',
+        'editor.inactiveSelectionBackground': '#f3f4f6',
+        'editorLineNumber.foreground': '#9ca3af',
+        'editorLineNumber.activeForeground': '#4b5563',
+        'editorIndentGuide.background1': '#e5e7eb',
+        'editorGutter.background': '#ffffff',
+        'scrollbarSlider.background': '#e5e7eb',
+        'scrollbarSlider.hoverBackground': '#d1d5db',
+    },
+};
+
 export function CodeEditor({
     initialCode = '',
     language = 'javascript',
@@ -68,12 +98,23 @@ export function CodeEditor({
     showMinimap = true,
     className,
 }: CodeEditorProps) {
+    const { resolvedTheme } = useTheme();
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
     const monacoRef = useRef<Monaco | null>(null);
     const [code, setCode] = useState<string>(initialCode);
 
+    // Dynamic theme name
+    const monacoTheme = useMemo(() => resolvedTheme === 'dark' ? 'customDark' : 'customLight', [resolvedTheme]);
+
     // Loading state for async storage fetch
     const [isStorageLoaded, setIsStorageLoaded] = useState(!storageKey);
+
+    // Apply theme change without re-mounting if possible
+    useEffect(() => {
+        if (monacoRef.current) {
+            monacoRef.current.editor.setTheme(monacoTheme);
+        }
+    }, [monacoTheme]);
 
     // Load code from IndexedDB
     useEffect(() => {
@@ -143,9 +184,12 @@ export function CodeEditor({
             editorRef.current = editor;
             monacoRef.current = monaco;
 
-            // Define custom theme
+            // Define custom themes
             monaco.editor.defineTheme('customDark', CUSTOM_DARK_THEME);
-            monaco.editor.setTheme('customDark');
+            monaco.editor.defineTheme('customLight', CUSTOM_LIGHT_THEME);
+
+            // Set initial theme
+            monaco.editor.setTheme(monacoTheme);
 
             // Add Cmd/Ctrl+Enter keyboard shortcut
             editor.addAction({
