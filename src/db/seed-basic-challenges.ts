@@ -25,150 +25,249 @@ async function getTutorialId(slug: string) {
   return tutorial?.id;
 }
 
+// ============================================================================
+// CSS SELECTOR CHALLENGES
+// ============================================================================
+
 export const cssChallenges = [
-  // Challenge 1: Selector 101 - ID & Class
+  // ==========================================================================
+  // MODULE 1: THE FOUNDATIONS
+  // ==========================================================================
+
+  // 1.1 ID & Class
   {
     slug: 'css-selector-101-id-class',
-    title: 'Selector 101: ID & Class',
-    description: 'Learn to select elements using ID (#) and class (.) selectors.',
+    title: 'ID & Class Selectors', // Removed "1.1 Concept:"
+    description: 'Master the two most fundamental building blocks of CSS selection.',
     type: 'CSS_SELECTOR' as const,
     difficulty: 'EASY' as const,
     category: 'css-basics',
     xpReward: 10,
     order: 1,
-    instructions: `# Selector 101: ID & Class
+    instructions: `# The Fundamentals: ID & Class
+    
+In the world of web automation and testing, **reliability is king**. The most robust tests rely on stable identifiers.
 
-The two most fundamental CSS selectors are **ID** and **class** selectors.
+## 1. The ID Selector (\`#\`)
+An ID is unique—it acts like a fingerprint for an element. If an element has an ID, it is almost always the best way to select it.
+- **Syntax:** \`#elementId\`
+- **Example:** \`#submit-btn\` targets \`<button id="submit-btn">\`
 
-## ID Selector (\`#\`)
-- Targets a **single unique element**
-- Syntax: \`#elementId\`
-- Example: \`#submit-btn\` selects \`<button id="submit-btn">\`
+## 2. The Class Selector (\`.\`)
+Classes are reusable. They identify a *type* of element rather than a specific instance.
+- **Syntax:** \`.className\`
+- **Example:** \`.primary-btn\` targets all buttons with that style.
 
-## Class Selector (\`.\`)
-- Targets **all elements** with that class
-- Syntax: \`.className\`
-- Example: \`.btn\` selects all elements with \`class="btn"\`
-
-## Your Task
-Select the **login button** using its ID.
-
-> **Hint:** Look for the element's \`id\` attribute in the HTML preview.
+## Your Mission
+You need to click the **Login** button.
+Since this is a critical action, the developers have given it a unique ID. Use it!
 `,
-    htmlContent: `<div class="login-page">
-  <h1>Welcome Back</h1>
+    htmlContent: `<div class="login-wrapper">
+  <h1>System Login</h1>
   <form class="login-form">
-    <input type="text" id="username" placeholder="Username" class="input-field" />
-    <input type="password" id="password" placeholder="Password" class="input-field" />
-    <button type="submit" id="login-btn" class="btn btn-primary">Login</button>
-    <button type="button" class="btn btn-link">Forgot Password?</button>
+    <div class="input-group">
+      <input type="text" id="username" placeholder="Username" />
+    </div>
+    <div class="input-group">
+      <input type="password" id="password" placeholder="Password" />
+    </div>
+    <div class="actions">
+      <button type="submit" id="login-btn" class="btn btn-primary">Login</button>
+      <a href="#" class="forgot-link">Forgot Password?</a>
+    </div>
   </form>
 </div>`,
     starterCode: '',
     hints: [
-      'Look at the button element that says "Login"',
-      'The button has an id attribute - use # to select by ID',
-      'The answer is #login-btn'
+      'The login button has a unique id="login-btn"',
+      'In CSS, we use the hash symbol (#) to target an ID',
+      'Try: #login-btn'
     ],
-    tags: ['css', 'selector', 'id', 'class', 'basic'],
+    tags: ['css', 'basics', 'id', 'class'],
     targetSelector: '#login-btn',
   },
 
-  // Challenge 2: Tag Selectors
+  // 1.2 Tag Selectors
   {
     slug: 'css-tag-selectors',
-    title: 'Tag Selectors',
-    description: 'Select elements by their HTML tag name.',
+    title: 'Tag Name Selectors', // Removed "Drill"
+    description: 'Select elements purely by their HTML tag type.',
     type: 'CSS_SELECTOR' as const,
     difficulty: 'EASY' as const,
     category: 'css-basics',
     xpReward: 10,
     order: 2,
-    instructions: `# Tag Selectors
+    instructions: `# Tag Selection
 
-The simplest CSS selector targets elements by their **tag name**.
+Sometimes you want to target broad categories of elements rather than specific ones. **Tag selectors** allow you to do just that.
 
-## Tag Selector
-- Syntax: \`tagname\`
-- Selects **all elements** of that type
-- Example: \`button\` selects all \`<button>\` elements
+## How it works
+You simply use the name of the HTML tag.
+- \`p\` targets all **paragraphs**.
+- \`div\` targets all **containers**.
+- \`a\` targets all **links**.
 
-## Common Tags
-- \`div\`, \`span\`, \`p\` - Container/text elements
-- \`a\` - Links
-- \`button\`, \`input\` - Form elements
-- \`h1\`, \`h2\`, \`h3\` - Headings
-- \`ul\`, \`li\` - Lists
+> **Pro Tip:** In real automation, tag selectors are rare because they are too generic. However, they are powerful when combined with other selectors (e.g., "get me the \`span\` inside this button").
 
-## Your Task
-Select the **paragraph** element that contains the welcome message.
-
-> **Note:** Tag selectors can match multiple elements!
+## Your Mission
+Select the main **paragraph** of text in the welcome card.
 `,
-    htmlContent: `<div class="welcome-section">
-  <h1>Welcome to Our App</h1>
-  <p>Thank you for joining us. We're excited to have you here!</p>
-  <div class="actions">
-    <button class="btn">Get Started</button>
-    <a href="/learn">Learn More</a>
+    htmlContent: `<div class="welcome-card">
+  <h2>Welcome Aboard</h2>
+  <p>Thank you for joining our platform. We are excited to see what you build!</p>
+  <button class="btn">Get Started</button>
+</div>`,
+    starterCode: '',
+    hints: ['The text is inside a <p> tag', 'Use the tag name directly', 'Answer: p'],
+    tags: ['css', 'basics', 'tag'],
+    targetSelector: 'p',
+  },
+
+  // 1.3 Combining Basics
+  {
+    slug: 'css-combining-basics',
+    title: 'Combining Selectors', // Removed "Drill"
+    description: 'Increase specificity by chaining tags and classes together.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 20,
+    order: 3,
+    instructions: `# Specificity through Combination
+
+A single class name isn't always enough using a generic class like \`.error\`? It might be applied to a label, a div, or a span.
+
+To be more precise, you can **chain** selectors.
+
+## The Pattern
+\`tag.className\`
+
+This tells the browser: "Find me a \`<tag>\` that ALSO has this \`.class\`".
+
+### Examples
+- \`div.sidebar\` -> Only divs with the sidebar class.
+- \`button.primary\` -> Only buttons with the primary class.
+
+## Your Mission
+There are multiple "error" styles on the page. Your goal is to select only the **Error Message Banner**, which is a \`div\`. Do not select the error label inside the span.
+`,
+    htmlContent: `<div class="notification-area">
+  <div class="msg success">Update successful</div>
+  
+  <!-- Target -->
+  <div class="msg error">Connection failed</div>
+  
+  <form>
+    <label>Username <span class="error">*</span></label>
+    <input type="text" />
+  </form>
+</div>`,
+    starterCode: '',
+    hints: [
+      'We want the element that is a <div> AND has class "error"',
+      'Do not put spaces between the tag and class',
+      'Answer: div.error'
+    ],
+    tags: ['css', 'basics', 'combining'],
+    targetSelector: 'div.error',
+  },
+
+  // 1.4 The Legacy Page
+  {
+    slug: 'css-foundations-boss',
+    title: 'Scenario: Legacy App Testing',
+    description: 'Use selector chaining to identify a specific button in a messy layout.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'css-basics',
+    xpReward: 50,
+    order: 4,
+    instructions: `# Scenario: Legacy App Testing
+
+You've just joined a new project. The code is old ("legacy") and messy. 
+- There are **no IDs** to be found. 
+- The class names like \`.btn\` and \`.primary\` are reused everywhere.
+- You cannot change the HTML code.
+
+## Your Mission
+You need to write a stable selector for the **"Sign Up"** button in the Hero section.
+
+## Strategy
+To identify this specific needle in the haystack, you must be hyper-specific. Identify every trait it has:
+1. It is a \`button\` tag.
+2. It has the \`btn\` class.
+3. It has the \`primary\` class.
+4. It has the \`large\` class.
+
+Chain these together to create a selector that helps ensure you don't accidentally click the wrong button.
+`,
+    htmlContent: `<div class="legacy-wrapper">
+  <div class="top-bar">
+    <button class="btn small">Login</button>
+    <button class="btn primary small">Stats</button>
+  </div>
+  
+  <section class="hero-section">
+    <h1>Start your journey</h1>
+    <!-- This is your target -->
+    <button class="btn primary large">Sign Up</button>
+  </section>
+  
+  <div class="footer">
+    <button class="btn large text-only">Back to Top</button>
   </div>
 </div>`,
     starterCode: '',
     hints: [
-      'Look for the <p> tag in the HTML',
-      'Tag selectors are just the element name without any prefix',
-      'The answer is: p'
+      'Combine the tag and all 3 classes',
+      'Format: tag.class1.class2.class3',
+      'Answer: button.btn.primary.large'
     ],
-    tags: ['css', 'selector', 'tag', 'basic'],
-    targetSelector: 'p',
+    tags: ['css', 'basics', 'scenario'],
+    targetSelector: 'button.btn.primary.large',
   },
 
-  // Challenge 3: Child & Descendant
+  // ==========================================================================
+  // MODULE 2: RELATIVE SELECTION
+  // ==========================================================================
+
+  // 2.1 Child vs Descendant
   {
     slug: 'css-child-descendant',
-    title: 'Child & Descendant',
-    description: 'Learn the difference between child (>) and descendant selectors.',
+    title: 'Child vs Descendant',
+    description: 'Understand how to traverse down the DOM tree.',
     type: 'CSS_SELECTOR' as const,
     difficulty: 'EASY' as const,
     category: 'css-basics',
     xpReward: 15,
-    order: 3,
-    instructions: `# Child & Descendant Selectors
+    order: 5,
+    instructions: `# Hierarchy: Child vs Descendant
 
-These selectors target elements based on their relationship to other elements.
+Web pages are trees. Elements live inside other elements. Understanding how to drill down is crucial.
 
-## Descendant Selector (space)
-- Syntax: \`parent descendant\`
-- Selects **all matching elements** inside the parent (any depth)
-- Example: \`div p\` selects all \`<p>\` inside any \`<div>\`
+## 1. The Descendant Selector (Space)
+\`parent child\`
+This is a "fuzzy" search. It finds elements deeply nested anywhere inside the parent.
+*   \`div p\` matches a paragraph inside a div, even if it's 10 levels deep.
 
-## Child Selector (\`>\`)
-- Syntax: \`parent > child\`
-- Selects only **direct children**
-- Example: \`div > p\` selects \`<p>\` that are immediate children of \`<div>\`
+## 2. The Direct Child Selector (\`>\`)
+\`parent > child\`
+This is a "strict" search. It only finds elements that are **direct children** (immediate nesting).
 
-## Visual Example
-\`\`\`html
-<div>
-  <p>Direct child ✓ (matched by div > p)</p>
-  <section>
-    <p>Nested child ✓ (only matched by div p)</p>
-  </section>
-</div>
-\`\`\`
-
-## Your Task
-Select the **list items** that are direct children of the navigation \`<ul>\`.
-
-> **Hint:** Use the child combinator \`>\`
+## Your Mission
+Select only the top-level **menu items** in the navigation bar. 
+Do **not** select the items inside the dropdown submenu. Use the direct child selector to ensure precision.
 `,
     htmlContent: `<nav class="main-nav">
   <ul class="nav-menu">
+    <!-- These are direct children -->
     <li class="nav-item">Home</li>
-    <li class="nav-item">Products
-      <ul class="dropdown">
-        <li>Product 1</li>
-        <li>Product 2</li>
+    <li class="nav-item">
+      Products
+      <!-- Nested Dropdown -->
+      <ul class="submenu">
+        <li>Electronics (Do not select)</li>
+        <li>Books (Do not select)</li>
       </ul>
     </li>
     <li class="nav-item">Contact</li>
@@ -176,595 +275,624 @@ Select the **list items** that are direct children of the navigation \`<ul>\`.
 </nav>`,
     starterCode: '',
     hints: [
-      'You want to select <li> elements that are direct children of .nav-menu',
-      'Use the > combinator for direct children',
-      'The answer is: .nav-menu > li or ul.nav-menu > li'
+      'The menu container is .nav-menu',
+      'The items are <li> tags',
+      'Use > to stop it from going into the submenu',
+      'Answer: .nav-menu > li'
     ],
-    tags: ['css', 'selector', 'child', 'descendant', 'basic'],
+    tags: ['css', 'relationships', 'child'],
     targetSelector: '.nav-menu > li',
   },
 
-  // Challenge 4: Attribute Selectors
-  {
-    slug: 'css-attribute-selectors',
-    title: 'Attribute Selectors',
-    description: 'Target elements by their HTML attributes.',
-    type: 'CSS_SELECTOR' as const,
-    difficulty: 'EASY' as const,
-    category: 'css-basics',
-    xpReward: 20,
-    order: 4,
-    instructions: `# Attribute Selectors
-
-Attribute selectors let you target elements based on their attributes.
-
-## Basic Attribute Selectors
-| Selector | Description |
-|----------|-------------|
-| \`[attr]\` | Has the attribute |
-| \`[attr="value"]\` | Exact match |
-| \`[attr^="value"]\` | Starts with |
-| \`[attr$="value"]\` | Ends with |
-| \`[attr*="value"]\` | Contains |
-
-## Examples
-\`\`\`css
-[type="email"]        /* Input with type="email" */
-[data-testid="login"] /* Element with data-testid */
-[href^="https"]       /* Links starting with https */
-[class*="btn"]        /* Class contains "btn" */
-\`\`\`
-
-## Your Task
-Select the **email input** field using an attribute selector.
-
-> **Tip:** \`data-*\` attributes are great for test automation!
-`,
-    htmlContent: `<form class="signup-form">
-  <div class="form-group">
-    <label>Name</label>
-    <input type="text" name="name" data-testid="name-input" placeholder="Your name" />
-  </div>
-  <div class="form-group">
-    <label>Email</label>
-    <input type="email" name="email" data-testid="email-input" placeholder="your@email.com" />
-  </div>
-  <div class="form-group">
-    <label>Password</label>
-    <input type="password" name="password" data-testid="password-input" placeholder="••••••••" />
-  </div>
-  <button type="submit">Sign Up</button>
-</form>`,
-    starterCode: '',
-    hints: [
-      'Look at the input with type="email"',
-      'You can use [type="email"] or [data-testid="email-input"]',
-      'The answer is: [type="email"] or input[type="email"]'
-    ],
-    tags: ['css', 'selector', 'attribute', 'basic'],
-    targetSelector: '[type="email"]',
-  },
-
-  // Challenge 5: Nth-child Magic
-  {
-    slug: 'css-nth-child',
-    title: 'Nth-child Magic',
-    description: 'Select elements by their position using :nth-child().',
-    type: 'CSS_SELECTOR' as const,
-    difficulty: 'EASY' as const,
-    category: 'css-basics',
-    xpReward: 25,
-    order: 5,
-    instructions: `# Nth-child Selector
-
-The \`:nth-child()\` pseudo-class selects elements by their position.
-
-## Syntax Options
-| Selector | Description |
-|----------|-------------|
-| \`:nth-child(2)\` | Second element |
-| \`:nth-child(odd)\` | Odd positions (1, 3, 5...) |
-| \`:nth-child(even)\` | Even positions (2, 4, 6...) |
-| \`:nth-child(3n)\` | Every 3rd element |
-| \`:first-child\` | First element |
-| \`:last-child\` | Last element |
-
-## Examples
-\`\`\`css
-li:nth-child(2)     /* Second list item */
-tr:nth-child(odd)   /* Odd table rows */
-div:last-child      /* Last div in parent */
-\`\`\`
-
-## Your Task
-Select the **third item** in the todo list.
-`,
-    htmlContent: `<div class="todo-app">
-  <h2>My Tasks</h2>
-  <ul class="todo-list">
-    <li class="todo-item">Buy groceries</li>
-    <li class="todo-item">Call mom</li>
-    <li class="todo-item">Finish project</li>
-    <li class="todo-item">Go to gym</li>
-    <li class="todo-item">Read book</li>
-  </ul>
-</div>`,
-    starterCode: '',
-    hints: [
-      'Use :nth-child() to select by position',
-      'The third item is at position 3',
-      'The answer is: .todo-item:nth-child(3) or li:nth-child(3)'
-    ],
-    tags: ['css', 'selector', 'nth-child', 'pseudo-class', 'basic'],
-    targetSelector: 'li:nth-child(3)',
-  },
-
-  // Challenge 6: Sibling Selectors
+  // 2.2 Siblings
   {
     slug: 'css-sibling-selectors',
     title: 'Sibling Selectors',
-    description: 'Select elements based on their siblings.',
+    description: 'Select elements based on what comes before them.',
     type: 'CSS_SELECTOR' as const,
     difficulty: 'EASY' as const,
     category: 'css-basics',
     xpReward: 25,
     order: 6,
-    instructions: `# Sibling Selectors
+    instructions: `# Sibling Relationships
 
-Sibling selectors target elements that share the same parent.
+Sometimes an element is hard to identify, but it lives **right next** to something easy to identify.
 
-## Adjacent Sibling (\`+\`)
-- Syntax: \`element + sibling\`
-- Selects the **immediately following** sibling
-- Example: \`h1 + p\` selects a \`<p>\` right after \`<h1>\`
+## The Adjacent Sibling (\`+\`)
+\`element + sibling\`
+This selects the element that comes **immediately after**.
 
-## General Sibling (\`~\`)
-- Syntax: \`element ~ sibling\`
-- Selects **all following** siblings
-- Example: \`h1 ~ p\` selects all \`<p>\` after \`<h1>\`
+### Use Case
+"I need the error message that appears right after the email input."
+-> \`input[type="email"] + .error-msg\`
 
-## Visual Example
-\`\`\`html
-<div>
-  <h1>Title</h1>
-  <p>First paragraph ✓ (h1 + p)</p>
-  <p>Second paragraph ✓ (h1 ~ p only)</p>
-</div>
-\`\`\`
-
-## Your Task
-Select the **paragraph immediately after** the main heading.
+## Your Mission
+Select the **subtitle paragraph** that appears immediately after the main **Heading 1**.
 `,
-    htmlContent: `<article>
-  <h1 class="title">Breaking News</h1>
-  <p class="lead">This is the lead paragraph with important info.</p>
-  <p>More details about the story...</p>
-  <p>Even more content here...</p>
-  <footer>Published today</footer>
+    htmlContent: `<article class="blog-post">
+  <h1 class="post-title">The Future of Web Testing</h1>
+  
+  <!-- Target -->
+  <p class="subtitle">Why selectors specificy matters more than ever.</p>
+  
+  <p class="content">Web testing has evolved significantly...</p>
 </article>`,
     starterCode: '',
     hints: [
-      'You need the paragraph directly after h1',
-      'Use the adjacent sibling combinator +',
-      'The answer is: h1 + p'
+      'Find the h1',
+      'Use the + symbol to get the next element',
+      'Answer: h1 + p'
     ],
-    tags: ['css', 'selector', 'sibling', 'basic'],
+    tags: ['css', 'relationships', 'siblings'],
     targetSelector: 'h1 + p',
   },
 
-  // Challenge 7: Pseudo-classes
+  // 2.3 Deep Nesting
   {
-    slug: 'css-pseudo-classes',
-    title: 'Pseudo-classes',
-    description: 'Select elements based on their state.',
+    slug: 'css-family-drill',
+    title: 'Deep Nesting Strategy',
+    description: 'Drill down a specific path to distinguish identical elements.',
     type: 'CSS_SELECTOR' as const,
-    difficulty: 'EASY' as const,
+    difficulty: 'MEDIUM' as const,
     category: 'css-basics',
     xpReward: 30,
     order: 7,
-    instructions: `# Pseudo-classes
+    instructions: `# Precision through Pathing
 
-Pseudo-classes select elements based on their **state** or **position**.
+When a page has multiple identical components (like multiple "Cards"), you need to specify **which one** you are talking about by describing its ancestors.
 
-## State Pseudo-classes
-| Selector | Description |
-|----------|-------------|
-| \`:hover\` | Mouse is over element |
-| \`:focus\` | Element has focus |
-| \`:active\` | Being clicked |
-| \`:disabled\` | Disabled inputs |
-| \`:checked\` | Checked checkboxes/radios |
+## The Scenario
+We have a User Profile card and a Footer area. Both contain a \`<span>\`.
+You need to select the span inside the **Profile Card content**.
 
-## Structural Pseudo-classes
-| Selector | Description |
-|----------|-------------|
-| \`:first-child\` | First child of parent |
-| \`:last-child\` | Last child of parent |
-| \`:empty\` | No children |
+## Your Mission
+Construct a "path" selector that walks down the tree:
+1. Start at the \`.profile-card\`
+2. Go into the \`.card-content\`
+3. Select the \`span\`
 
-## Your Task
-Select the **disabled input** field.
-
-> **Note:** In automation, \`:disabled\` helps verify form states!
+\`Card -> Content -> Span\`
 `,
-    htmlContent: `<form class="settings-form">
-  <div class="form-group">
-    <label>Username (locked)</label>
-    <input type="text" value="john_doe" disabled />
+    htmlContent: `<div class="layout">
+  <div class="profile-card">
+    <div class="card-header">
+      <h3>User Profile</h3>
+    </div>
+    <div class="card-content">
+      <!-- Target -->
+      <span>Premium Member</span>
+    </div>
   </div>
-  <div class="form-group">
-    <label>Display Name</label>
-    <input type="text" value="John Doe" placeholder="Your display name" />
+  
+  <div class="footer">
+    <div class="footer-content">
+      <span>Copyright 2024</span>
+    </div>
   </div>
-  <div class="form-group">
-    <label>Email</label>
-    <input type="email" value="john@example.com" />
+</div>`,
+    starterCode: '',
+    hints: [
+      'Chain the classes with spaces for descendant selection',
+      'Pattern: .parent .child .grandchild',
+      'Answer: .profile-card .card-content span'
+    ],
+    tags: ['css', 'relationships', 'drill'],
+    targetSelector: '.profile-card .card-content span',
+  },
+
+  // 2.4 Mega Menu
+  {
+    slug: 'css-navigation-boss',
+    title: 'Scenario: Nested Navigation',
+    description: 'Navigate a deeply nested menu structure to find a hidden link.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'HARD' as const,
+    category: 'css-basics',
+    xpReward: 60,
+    order: 8,
+    instructions: `# Scenario: Nested Navigation
+
+Navigations can be widely complex structures of nested lists. 
+
+## The Scenario
+You are automating a test for a user's account settings. You need to click the **"Logout"** button.
+However, the text "Logout" might change based on language settings, so you shouldn't rely on text. You should rely on its **structural location**.
+
+## Your Mission
+Select the link (\`a\`) that lives inside the **Action Item** of the **Profile Dropdown**.
+
+## Structure Map
+1.  Top level item: \`#user-menu\`
+2.  Dropdown container: \`.dropdown-list\`
+3.  List item: \`.action-item\`
+4.  Link: \`a\`
+`,
+    htmlContent: `<nav class="navbar">
+  <ul class="nav-root">
+    <li>Home</li>
+    <li id="user-menu">
+      My Account
+      <ul class="dropdown-list">
+        <li>Settings</li>
+        <li>Billing</li>
+        <li class="action-item">
+          <!-- Target -->
+          <a href="/logout">Logout</a>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav>`,
+    starterCode: '',
+    hints: [
+      'Start with the ID: #user-menu',
+      'Descend into .dropdown-list',
+      'Find the .action-item',
+      'Target the link inside',
+      'Answer: #user-menu .dropdown-list .action-item a'
+    ],
+    tags: ['css', 'relationships', 'scenario'],
+    targetSelector: '#user-menu .dropdown-list .action-item a',
+  },
+
+  // ==========================================================================
+  // MODULE 3: ATTRIBUTES & STATES
+  // ==========================================================================
+
+  // 3.1 Attributes
+  {
+    slug: 'css-attribute-selectors',
+    title: 'Attribute Selectors',
+    description: 'Target elements by any HTML attribute for maximum robustness.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'EASY' as const,
+    category: 'css-basics',
+    xpReward: 20,
+    order: 9,
+    instructions: `# The Power of Attributes
+
+Classes are for styling. IDs are for uniqueness. But sometimes, the most semantic way to find an element is by **what it does** or **what data it holds**.
+
+CSS allows you to select by *any* HTML attribute.
+
+## Common Patterns
+- **Input Types:** \`[type="email"]\`, \`[type="checkbox"]\`
+- **Test IDs:** \`[data-testid="submit-btn"]\` (The gold standard for testing!)
+- **Links:** \`[href="/home"]\`
+
+## Your Mission
+Select the **email input**. Use its \`type\` attribute to distinguish it from the name input.
+`,
+    htmlContent: `<form class="contact-form">
+  <div class="row">
+    <label>Full Name</label>
+    <input type="text" name="fullname" />
   </div>
-  <button type="submit">Save Changes</button>
+  <div class="row">
+    <label>Email Address</label>
+    <input type="email" name="email" />
+  </div>
+  <button>Send</button>
 </form>`,
     starterCode: '',
     hints: [
-      'Look for the input that has the disabled attribute',
-      'Use the :disabled pseudo-class',
-      'The answer is: input:disabled'
+      'The syntax is [attribute="value"]',
+      'Target the input with type="email"',
+      'Answer: [type="email"]'
     ],
-    tags: ['css', 'selector', 'pseudo-class', 'state', 'basic'],
-    targetSelector: 'input:disabled',
+    tags: ['css', 'attributes'],
+    targetSelector: '[type="email"]',
   },
 
-  // Challenge 8: Combining Selectors
+  // 3.2 Validation States
   {
-    slug: 'css-combining-selectors',
-    title: 'Combining Selectors',
-    description: 'Chain multiple selectors for precise targeting.',
+    slug: 'css-validation-states',
+    title: 'Form Validation States',
+    description: 'Select elements based on their validity state (:invalid, :required).',
     type: 'CSS_SELECTOR' as const,
-    difficulty: 'EASY' as const,
+    difficulty: 'MEDIUM' as const,
     category: 'css-basics',
-    xpReward: 35,
-    order: 8,
-    instructions: `# Combining Selectors
+    xpReward: 30,
+    order: 10,
+    instructions: `# Testing Form Logic
 
-You can chain selectors to be more specific and precise.
+When testing forms, you often need to verify that validation is working. "Does the form look red when I type a bad email?"
 
-## Chaining Techniques
-| Pattern | Meaning |
-|---------|---------|
-| \`div.class\` | div with class |
-| \`.class1.class2\` | Has both classes |
-| \`#id.class\` | ID and class |
-| \`element[attr]\` | Tag with attribute |
+CSS provides pseudo-classes to detect these states dynamically.
 
-## Examples
-\`\`\`css
-button.btn.primary      /* <button class="btn primary"> */
-input[type="text"].form-control
-div.container > p.lead  /* Direct child with class */
-\`\`\`
+## Key State Selectors
+*   \`:required\` - The input *must* be filled out.
+*   \`:invalid\` - The current value is wrong (e.g., "abc" in an email field).
+*   \`:valid\` - The current value is correct.
 
-## Your Task
-Select the **primary action button** (it has both "btn" and "primary" classes).
+## Your Mission
+Select the **email input** that is currently **invalid**. 
+(In the background, we've pre-filled it with "not-an-email" to trigger this state.)
 `,
-    htmlContent: `<div class="card">
-  <h3>Upgrade to Pro</h3>
-  <p>Get access to premium features!</p>
-  <div class="card-actions">
-    <button class="btn secondary">Learn More</button>
-    <button class="btn primary">Upgrade Now</button>
+    htmlContent: `<form class="login-form">
+  <div class="form-group">
+    <label>Email</label>
+    <input type="email" value="not-an-email" required /> <!-- This is invalid -->
+    <span class="error-text">Please enter a valid email</span>
   </div>
-</div>
-<div class="footer">
-  <button class="btn text">Cancel</button>
-</div>`,
+  <div class="form-group">
+    <label>Password</label>
+    <input type="password" value="secret123" required /> <!-- This is valid -->
+  </div>
+</form>`,
     starterCode: '',
     hints: [
-      'The button has two classes: "btn" and "primary"',
-      'Chain them together without space',
-      'The answer is: .btn.primary or button.btn.primary'
+      'You are looking for an input tag',
+      'It should specifically be in the :invalid state',
+      'Answer: input:invalid'
     ],
-    tags: ['css', 'selector', 'combining', 'chaining', 'basic'],
-    targetSelector: '.btn.primary',
+    tags: ['css', 'states', 'validation'],
+    targetSelector: 'input:invalid',
   },
 
-  // Challenge 9: Real Form Challenge
+  // 3.3 Functional Pseudos
   {
-    slug: 'css-real-form',
-    title: 'Real Form Challenge',
-    description: 'Apply your skills to a realistic form layout.',
+    slug: 'css-functional-pseudo',
+    title: 'Advanced Filtering (:not & :is)',
+    description: 'Power moves: Exclude elements or match groups.',
     type: 'CSS_SELECTOR' as const,
-    difficulty: 'EASY' as const,
+    difficulty: 'MEDIUM' as const,
     category: 'css-basics',
     xpReward: 40,
-    order: 9,
-    instructions: `# Real Form Challenge
+    order: 11,
+    instructions: `# Advanced Filtering
 
-Let's put your skills together on a realistic form!
+Modern CSS selectors give you logic gates. The most useful one for testing is **Negation**.
 
-## Scenario
-You're automating tests for a checkout form. You need to select the **credit card number input**.
+## The \`:not()\` Selector
+"Select everything that is X, but NOT Y."
 
-## Tips for Finding Elements
-1. **Start with unique attributes** - IDs are most reliable
-2. **Use data attributes** - \`data-testid\` is test-friendly
-3. **Combine when needed** - Be specific but not fragile
+### Use Case
+"Select all active user cards, but ignore the ones that are suspended."
 
-## Your Task
-Select the **credit card number input** field.
-
-> **Real-world tip:** In test automation, prefer \`data-testid\` attributes when available!
+## Your Mission
+Select the user card that has the class \`.active\`, but does **not** have the class \`.suspended\`.
 `,
-    htmlContent: `<div class="checkout-form">
-  <h2>Payment Details</h2>
-  
-  <div class="form-section">
-    <h3>Card Information</h3>
-    <div class="form-row">
-      <label>Card Number</label>
-      <input type="text" id="card-number" data-testid="card-input" placeholder="1234 5678 9012 3456" />
-    </div>
-    <div class="form-row split">
-      <div>
-        <label>Expiry Date</label>
-        <input type="text" id="expiry" placeholder="MM/YY" />
-      </div>
-      <div>
-        <label>CVV</label>
-        <input type="text" id="cvv" placeholder="123" />
-      </div>
-    </div>
+    htmlContent: `<div class="user-list">
+  <!-- This one is active AND suspended. Ignore it. -->
+  <div class="user-card active suspended">
+    <h3>Bad Actor</h3>
+    <span class="badge">Suspended</span>
   </div>
-  
-  <div class="form-section">
-    <h3>Billing Address</h3>
-    <input type="text" id="address" placeholder="Street address" />
-    <input type="text" id="city" placeholder="City" />
+
+  <!-- This is your target. Active, healthy user. -->
+  <div class="user-card active">
+    <h3>Good User</h3>
+    <span class="badge">Active</span>
   </div>
-  
-  <button type="submit" class="btn primary">Pay Now</button>
+
+  <div class="user-card inactive">
+    <h3>Old User</h3>
+  </div>
 </div>`,
     starterCode: '',
     hints: [
-      'Look for the card number input - it has multiple unique identifiers',
-      'You can use #card-number or [data-testid="card-input"]',
-      'The answer is: #card-number or [data-testid="card-input"]'
+      'Base selector: .user-card.active',
+      'Filter: :not(.suspended)',
+      'Combine them',
+      'Answer: .user-card.active:not(.suspended)'
     ],
-    tags: ['css', 'selector', 'form', 'practical', 'basic'],
-    targetSelector: '#card-number',
+    tags: ['css', 'states', 'functional'],
+    targetSelector: '.user-card.active:not(.suspended)',
   },
 
-  // Challenge 10: Dynamic Elements
+  // 3.4 Unfriendly Form
   {
-    slug: 'css-dynamic-elements',
-    title: 'Dynamic Elements',
-    description: 'Handle elements without stable IDs or classes.',
+    slug: 'css-forms-boss',
+    title: 'Scenario: Dynamic Forms',
+    description: 'Select a highly specific input based on what it is NOT.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'HARD' as const,
+    category: 'css-basics',
+    xpReward: 60,
+    order: 12,
+    instructions: `# Scenario: Dynamic Forms
+
+You're testing a dynamic form where fields appear and disappear, or change states. You can't rely on simple classes. You need to select an element by its **properties**.
+
+## Your Mission
+Select the **Phone Number** input.
+
+## Constraints
+To ensure you have the right one, your selector must enforce these rules:
+1.  Type is **tel**.
+2.  It is **optional** (not required).
+3.  It is **enabled** (not disabled).
+4.  It is **not focused** (the user hasn't clicked it yet).
+
+Synthesize all your knowledge of attributes and pseudo-classes.
+`,
+    htmlContent: `<form class="complex-form">
+  <div class="row">
+    <input type="text" placeholder="Name" required />
+  </div>
+  
+  <div class="row">
+    <!-- Target -->
+    <input type="tel" placeholder="Phone (Optional)" />
+  </div>
+  
+  <div class="row">
+    <input type="tel" placeholder="Fax (Disabled)" disabled />
+  </div>
+  
+  <div class="row">
+    <input type="email" placeholder="Email" required class="focus" />
+  </div>
+</form>`,
+    starterCode: '',
+    hints: [
+      'Attribute: [type="tel"]',
+      'State: :optional',
+      'Negation: :not(:disabled)',
+      'Negation: :not(:focus)',
+      'Answer: input[type="tel"]:optional:not(:disabled)'
+    ],
+    tags: ['css', 'states', 'scenario'],
+    targetSelector: 'input[type="tel"]:optional:not(:disabled)',
+  },
+
+  // ==========================================================================
+  // MODULE 4: STRUCTURAL PRECISION
+  // ==========================================================================
+
+  // 4.1 Nth-Child
+  {
+    slug: 'css-nth-child',
+    title: 'Position Indexing (Nth-Child)',
+    description: 'Select elements by their exact numerical position.',
     type: 'CSS_SELECTOR' as const,
     difficulty: 'EASY' as const,
     category: 'css-basics',
-    xpReward: 50,
-    order: 10,
-    instructions: `# Dynamic Elements
+    xpReward: 20,
+    order: 13,
+    instructions: `# Selecting by Index
 
-Sometimes elements don't have stable IDs or unique classes. Here's how to handle them.
+Sometimes elements are identical (like a list of items), and the only way to distinguish them is **position**.
 
-## Strategies for Dynamic Elements
-1. **Use data attributes** - \`[data-*]\` selectors
-2. **Use attribute contains** - \`[class*="partial"]\`
-3. **Use structural selectors** - \`:nth-child()\`, \`:first-of-type\`
-4. **Combine with parent** - Navigate from stable element
+## The \`:nth-child(n)\` Selector
+This selects the element that is the **n-th child** of its parent.
 
-## Example: Element with Dynamic ID
-\`\`\`html
-<button id="btn-a7x9z">Submit</button>  <!-- ID changes! -->
-<button data-action="submit">Submit</button>  <!-- Stable! -->
-\`\`\`
+- \`:nth-child(1)\`: First item.
+- \`:nth-child(3)\`: Third item.
+- \`:last-child\`: The end of the list.
 
-Better selector: \`[data-action="submit"]\`
-
-## Your Task
-Select the **delete button** for the second item. The buttons don't have unique IDs!
-
-> **Tip:** Combine position with class for precision.
+## Your Mission
+Select the **3rd** item in the feature list.
 `,
-    htmlContent: `<ul class="item-list">
-  <li class="item" data-id="item-1">
-    <span class="item-name">First Item</span>
-    <div class="item-actions">
-      <button class="btn-edit">Edit</button>
-      <button class="btn-delete">Delete</button>
-    </div>
+    htmlContent: `<ul class="features">
+  <li>Fast Performance</li>
+  <li>Secure by Default</li>
+  <!-- Target -->
+  <li>Cloud Sync</li>
+  <li>Offline Mode</li>
+</ul>`,
+    starterCode: '',
+    hints: [
+      'Use :nth-child(3)',
+      'Answer: li:nth-child(3)'
+    ],
+    tags: ['css', 'structure'],
+    targetSelector: 'li:nth-child(3)',
+  },
+
+  // 4.2 Type vs Child
+  {
+    slug: 'css-nth-type-vs-child',
+    title: 'Nth-Type vs Nth-Child',
+    description: 'Resolve the confusion between counting children and counting types.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'css-basics',
+    xpReward: 30,
+    order: 14,
+    instructions: `# The "Indices" Trap
+
+One of the most common mistakes in CSS selectors is confusing \`:nth-child\` with \`:nth-of-type\`.
+
+## The Difference
+*   **\`:nth-child(2)\`**: "Am I the **2nd element overall** in this container?"
+*   **\`:nth-of-type(2)\`**: "Am I the **2nd element of my specific tag type**?"
+
+If you have a \`<h1>\` followed by two \`<p>\` tags:
+*   The first \`<p>\` is \`nth-child(2)\` (because h1 is #1).
+*   The first \`<p>\` is \`nth-of-type(1)\` (because it's the first paragraph).
+
+## Your Mission
+Select the **second paragraph** in the article.
+Note that it is **not** the second child element!
+`,
+    htmlContent: `<article>
+  <h1>The News</h1>
+  <img src="banner.jpg" />
+  
+  <p>Introductory paragraph.</p>
+  
+  <!-- Target -->
+  <p>The main details of the story.</p>
+  
+  <div class="ad">Advertisement</div>
+</article>`,
+    starterCode: '',
+    hints: [
+      'Use :nth-of-type to count only the <p> tags',
+      'Answer: p:nth-of-type(2)'
+    ],
+    tags: ['css', 'structure'],
+    targetSelector: 'p:nth-of-type(2)',
+  },
+
+  // 4.3 Table Cell Targeting
+  {
+    slug: 'css-table-drill',
+    title: 'Table Cell Targeting',
+    description: 'Navigate table structure to select specific cells by row and column.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'css-basics',
+    xpReward: 35,
+    order: 15,
+    instructions: `# Precision Table Navigation
+
+Tables have a predictable structure: \`table > tbody > tr > td\`.
+Each row resets the child counter, so you can target specific cells.
+
+## The Pattern
+- **Row selection:** \`tr:nth-child(n)\` targets the nth row
+- **Column selection:** \`td:nth-child(n)\` targets the nth cell in a row
+- **Combined:** \`tr:nth-child(2) > td:nth-child(3)\` = Row 2, Column 3
+
+## Your Mission
+Select the **Status** cell (3rd column) from the **2nd data row**.
+
+## Tip
+The \`tbody\` contains only data rows. The header is in \`thead\`.
+`,
+    htmlContent: `<table class="user-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alice Johnson</td>
+      <td>alice@example.com</td>
+      <td>Active</td>
+    </tr>
+    <tr>
+      <td>Bob Smith</td>
+      <td>bob@example.com</td>
+      <!-- Target -->
+      <td>Pending</td>
+    </tr>
+    <tr>
+      <td>Carol White</td>
+      <td>carol@example.com</td>
+      <td>Active</td>
+    </tr>
+  </tbody>
+</table>`,
+    starterCode: '',
+    hints: [
+      'Start with tbody to scope to data rows only',
+      'Target the 2nd row: tr:nth-child(2)',
+      'Target the 3rd column: td:nth-child(3)',
+      'Answer: tbody tr:nth-child(2) td:nth-child(3)'
+    ],
+    tags: ['css', 'structure', 'table', 'drill'],
+    targetSelector: 'tbody tr:nth-child(2) td:nth-child(3)',
+  },
+
+  // 4.4 Striped Grid
+  {
+    slug: 'css-table-boss',
+    title: 'Scenario: Admin Grid',
+    description: 'Master advanced structural patterns in data tables.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'HARD' as const,
+    category: 'css-basics',
+    xpReward: 70,
+    order: 16,
+    instructions: `# Scenario: Admin Grid
+
+Data grids (tables) are common in admin panels. You often need to interact with a specific button in a specific row.
+
+## The Pattern
+We have a table where every **Odd Row** (1, 3, 5...) is a "Data Row" that contains an **Edit Button**.
+(The even rows might be details or spacers).
+
+## Your Mission
+Write a selector that targets the **Edit Button** in the **Last Column** of every **Odd Row**.
+
+## Breakdown
+1.  Target rows: \`tr\` that are odd.
+2.  Target cell: \`td\` that is the last one in that row.
+3.  Target content: The \`button\` inside that cell.
+`,
+    htmlContent: `<table class="data-grid">
+  <tbody>
+    <!-- Row 1 (Odd) -->
+    <tr>
+      <td>User 1</td>
+      <td>2024-01-01</td>
+      <td class="actions"><button>Edit</button></td>
+    </tr>
+    <!-- Row 2 (Even) -->
+    <tr class="spacer">
+      <td colspan="3">Details...</td>
+    </tr>
+    <!-- Row 3 (Odd) -->
+    <tr>
+      <td>User 2</td>
+      <td>2024-01-02</td>
+      <td class="actions"><button>Edit</button></td>
+    </tr>
+  </tbody>
+</table>`,
+    starterCode: '',
+    hints: [
+      'Odd rows: tr:nth-child(odd)',
+      'Last cell: td:last-child',
+      'Button inside: button',
+      'Answer: tr:nth-child(odd) td:last-child button'
+    ],
+    tags: ['css', 'structure', 'scenario', 'table'],
+    targetSelector: 'tr:nth-child(odd) td:last-child button',
+  },
+
+  // Extra
+  {
+    slug: 'css-dynamic-elements',
+    title: 'Handling Dynamic Elements',
+    description: 'Select elements when IDs are unstable or random.',
+    type: 'CSS_SELECTOR' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'css-basics',
+    xpReward: 40,
+    order: 17,
+    instructions: `# Challenge: Unstable IDs
+
+Modern React/Vue/Angular apps often generate random IDs like \`#input-23423\`. These change every time you reload the page. **You cannot rely on them.**
+
+## Strategy
+If the ID is useless, use structure. 
+"I want the Delete button that lives inside the Second Item in the list."
+
+## Your Mission
+Select the **Delete** button for the **Second List Item**.
+Ignore the ID tokens.
+`,
+    htmlContent: `<ul class="items">
+  <li>
+    <span>Item A</span>
+    <button class="del">Delete</button>
   </li>
-  <li class="item" data-id="item-2">
-    <span class="item-name">Second Item</span>
-    <div class="item-actions">
-      <button class="btn-edit">Edit</button>
-      <button class="btn-delete">Delete</button>
-    </div>
+  <li>
+    <span>Item B</span>
+    <!-- Target -->
+    <button class="del">Delete</button>
   </li>
-  <li class="item" data-id="item-3">
-    <span class="item-name">Third Item</span>
-    <div class="item-actions">
-      <button class="btn-edit">Edit</button>
-      <button class="btn-delete">Delete</button>
-    </div>
+  <li>
+    <span>Item C</span>
+    <button class="del">Delete</button>
   </li>
 </ul>`,
     starterCode: '',
     hints: [
-      'You need the delete button in the second list item',
-      'Use :nth-child(2) to select the second item',
-      'The answer is: .item:nth-child(2) .btn-delete or li:nth-child(2) .btn-delete'
+      'Target the 2nd list item: li:nth-child(2)',
+      'Target the delete button inside: .del',
+      'Answer: li:nth-child(2) .del'
     ],
-    tags: ['css', 'selector', 'dynamic', 'practical', 'basic'],
-    targetSelector: '.item:nth-child(2) .btn-delete',
-  },
-
-  // Challenge 11: Functional Pseudo-classes
-  {
-    slug: 'css-functional-pseudo',
-    title: 'Functional Pseudo-classes',
-    description: 'Master powerful modern selectors like :is() and :not().',
-    type: 'CSS_SELECTOR' as const,
-    difficulty: 'MEDIUM' as const,
-    category: 'css-advanced',
-    xpReward: 60,
-    order: 101, // Starting advanced series
-    instructions: `# Functional Pseudo-classes
-
-Modern CSS introduces powerful "functional" pseudo-classes that take selectors as arguments.
-
-## Negation: :not()
-Selects elements that do **not** match the selector.
-\`\`\`css
-/* Selects buttons that do NOT have the 'disabled' class */
-button:not(.disabled)
-\`\`\`
-
-## Matches: :is()
-Matches any element that matches any of the arguments. Great for grouping!
-\`\`\`css
-/* Selects headers inside article or section */
-:is(article, section) h1
-\`\`\`
-
-## Your Task
-Select the user card that is **active** but **not suspended**.
-
-> **Syntax:** \`.class1:not(.class2)\`
-`,
-    htmlContent: `<div class="user-grid">
-  <div class="user-card active suspended">
-    <h3>Suspended User</h3>
-    <span class="status">Active (Suspended)</span>
-  </div>
-  <div class="user-card active">
-    <h3>Valid User</h3>
-    <span class="status">Active</span>
-  </div>
-  <div class="user-card inactive">
-    <h3>Inactive User</h3>
-    <span class="status">Inactive</span>
-  </div>
-</div>`,
-    starterCode: '',
-    hints: [
-      'You want elements with class "user-card" and "active"',
-      'But they must NOT have class "suspended"',
-      'The answer is: .user-card.active:not(.suspended)'
-    ],
-    tags: ['css', 'selector', 'pseudo-class', 'not', 'advanced'],
-    targetSelector: '.user-card.active:not(.suspended)',
-  },
-
-  // Challenge 12: Form Validation States
-  {
-    slug: 'css-validation-states',
-    title: 'Form Validation States',
-    description: 'Select elements based on their validation state.',
-    type: 'CSS_SELECTOR' as const,
-    difficulty: 'MEDIUM' as const,
-    category: 'css-advanced',
-    xpReward: 60,
-    order: 102,
-    instructions: `# Form Validation Selectors
-
-CSS can select form elements based on whether their data is valid. This is crucial for **testing error states**.
-
-## Validation Pseudo-classes
-| Selector | Meaning |
-|---|---|
-| \`:invalid\` | Value doesn't meet requirements |
-| \`:valid\` | Value meets requirements |
-| \`:required\` | Input has \`required\` attribute |
-| \`:optional\` | Input typically has no requirement |
-
-## Examples
-\`\`\`css
-input:invalid      /* Selects email input with "not-an-email" text */
-input:required     /* Selects mandatory fields */
-form:invalid button /* Submit button inside an invalid form */
-\`\`\`
-
-## Your Task
-Select the **email input** that currently has an **invalid** value.
-`,
-    htmlContent: `<form class="signup-form">
-  <div class="field">
-    <label>Username (Valid)</label>
-    <input type="text" value="johndoe" required pattern="[a-z]+" />
-  </div>
-  <div class="field">
-    <label>Email (Invalid)</label>
-    <input type="email" value="not-an-email" required />
-    <span class="error">Please enter a valid email</span>
-  </div>
-  <button>Submit</button>
-</form>`,
-    starterCode: '',
-    hints: [
-      'The second input has type="email" but the value is just text',
-      'The browser marks this as :invalid',
-      'The answer is: input:invalid'
-    ],
-    tags: ['css', 'selector', 'validation', 'form', 'advanced'],
-    targetSelector: 'input:invalid',
-  },
-
-  // Challenge 13: Type vs Child
-  {
-    slug: 'css-nth-type-vs-child',
-    title: 'Nth-of-type vs Nth-child',
-    description: 'Understand the subtle but critical difference.',
-    type: 'CSS_SELECTOR' as const,
-    difficulty: 'MEDIUM' as const,
-    category: 'css-advanced',
-    xpReward: 65,
-    order: 103,
-    instructions: `# Nth-child vs Nth-of-type
-
-This is the most common point of confusion in CSS selectors!
-
-## :nth-child(n)
-1. Looks at **ALL** siblings.
-2. Counts to position \`n\`.
-3. Checks if the element at that position matches the tag.
-
-## :nth-of-type(n)
-1. Looks ONLY at siblings of the **same tag type**.
-2. Counts to the \`n\`th one of that type.
-
-## Visual Example
-\`\`\`html
-<article>
-  <h1>Header</h1>    <!-- element 1, h1:nth-of-type(1) -->
-  <p>Intro</p>       <!-- element 2, p:nth-of-type(1) -->
-  <p>Detail</p>      <!-- element 3, p:nth-of-type(2) -->
-</article>
-\`\`\`
-
-- \`p:nth-child(2)\` matches "Intro" (it is the 2nd child AND it is a p).
-- \`p:nth-child(1)\` matches NOTHING (the 1st child is h1, not p).
-- \`p:nth-of-type(1)\` matches "Intro" (it is the 1st paragraph).
-
-## Your Task
-Select the **second paragraph**. Note that it is the **third child** overall!
-
-> **Challenge:** Try using \`:nth-of-type\` to solve this robustly.
-`,
-    htmlContent: `<section class="content">
-  <h2>Article Title</h2>
-  <img src="banner.jpg" alt="Banner" />
-  <p class="intro">This is the introduction.</p>
-  <p class="body">This is the main body paragraph. Select me!</p>
-  <div class="ads">Ad Content</div>
-</section>`,
-    starterCode: '',
-    hints: [
-      'The target is the second <p> tag',
-      'It is the 4th element overall (h2, img, p, p)',
-      'nth-of-type counts only the <p> tags',
-      'The answer is: p:nth-of-type(2)'
-    ],
-    tags: ['css', 'selector', 'nth-of-type', 'structural', 'advanced'],
-    targetSelector: 'p:nth-of-type(2)',
+    tags: ['css', 'dynamic'],
+    targetSelector: 'li:nth-child(2) .del',
   },
 ];
 

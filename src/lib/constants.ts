@@ -14,7 +14,8 @@ export const difficultyColors: Record<string, string> = {
 export const categoryLabels: Record<string, string> = {
     // Tier 1: Basic (Selectors)
     'css-basics': '📘 CSS Basics',
-    'xpath-basics': '📙 XPath Basics',
+    'xpath-basics': '📒 XPath Basics',
+    'xpath-advanced': '🚀 XPath Advanced',
     'selector-comparison': '📗 CSS vs XPath',
     // Tier 2: Beginner (JavaScript)
     'javascript': '📒 JavaScript Fundamentals',
