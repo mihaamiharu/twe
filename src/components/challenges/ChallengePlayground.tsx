@@ -10,7 +10,7 @@
  * - Responsive tabs on mobile
  */
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -68,6 +68,18 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
     const [selectorType, setSelectorType] = useState<SelectorType>(
         challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
     );
+
+    // Reset state when challenge changes
+    useEffect(() => {
+        setCode(challenge.starterCode);
+        setSelector('');
+        setSelectorType(challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css');
+        setTestResults([]);
+        setHasPassed(false);
+        setIsRunning(false);
+        setActiveTab('instructions');
+        setPreviewValidation(null);
+    }, [challenge.id, challenge.starterCode, challenge.type]);
 
     const [testResults, setTestResults] = useState<TestResult[]>([]);
 
@@ -412,7 +424,9 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         onRun={handleRunCode}
                                         storageKey={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                                         height="100%"
+                                        height="100%"
                                         className="h-full border rounded-md overflow-hidden shadow-sm"
+                                        key={challenge.id} // Force re-mount on challenge change to reset internal state
                                     />
                                 </div>
                             </div>

@@ -78,7 +78,7 @@ export const Route = createFileRoute('/api/leaderboard/')({
             },
           });
         } catch (error) {
-          console.error('Error fetching leaderboard:', error);
+          logger.error('Error fetching leaderboard:', error);
           return json(
             { success: false, error: 'Failed to fetch leaderboard' },
             { status: 500 }
@@ -88,3 +88,4 @@ export const Route = createFileRoute('/api/leaderboard/')({
     },
   },
 });
+import { logger } from '@/lib/logger';

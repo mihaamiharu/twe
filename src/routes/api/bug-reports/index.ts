@@ -3,6 +3,7 @@ import { json } from '@tanstack/react-start';
 import { db } from '@/db';
 import { bugReports } from '@/db/schema';
 import { auth } from '@/lib/auth.server';
+import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { sendBugReportNotification } from '@/lib/email.server';
 
@@ -80,7 +81,7 @@ export const Route = createFileRoute('/api/bug-reports/')({
                         })
                         .returning();
 
-                    console.log(`[BugReport] New bug report created: ${report[0].id} - "${title}" (${severity})`);
+                    logger.info(`[BugReport] New bug report created: ${report[0].id} - "${title}" (${severity})`);
 
                     // Send email notification to admin (non-blocking)
                     sendBugReportNotification({
@@ -94,7 +95,7 @@ export const Route = createFileRoute('/api/bug-reports/')({
                         browserInfo: report[0].browserInfo,
                         reporterEmail: report[0].reporterEmail,
                     }).catch((err) => {
-                        console.error('[BugReport] Failed to send admin notification:', err);
+                        logger.error('[BugReport] Failed to send admin notification:', err);
                     });
 
                     return json({
@@ -109,7 +110,7 @@ export const Route = createFileRoute('/api/bug-reports/')({
                         message: 'Bug report submitted successfully. Thank you for your feedback!',
                     });
                 } catch (error) {
-                    console.error('Error creating bug report:', error);
+                    logger.error('Error creating bug report:', error);
                     return json(
                         { success: false, error: 'Failed to submit bug report' },
                         { status: 500 }

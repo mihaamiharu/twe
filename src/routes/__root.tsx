@@ -2,18 +2,22 @@ import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-r
 import { getServerSession, type AuthSession } from '@/lib/auth.fn';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
+import { logger } from '@/lib/logger';
 
-import Header from '../components/Header';
-import Footer from '../components/Footer';
-import { ThemeProvider } from '../components/theme-provider';
-import { Toaster } from 'sonner';
-import { NotFound } from '../components/NotFound';
-import { GoogleAnalytics } from '../components/analytics/GoogleAnalytics';
-
-import appCss from '../styles.css?url';
+// ... other imports
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      logger.error(`Query Error: ${query.queryKey}`, error);
+    },
+  }),
+  mutationCache: new MutationCache({
+    onError: (error, _variables, _context, mutation) => {
+      logger.error(`Mutation Error:`, error);
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: 1000 * 60 * 5, // 5 minutes
