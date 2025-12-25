@@ -974,11 +974,9 @@ Use **filter**, **map**, and **array methods** to solve this elegantly!
 ];
 
 // Filter active users, map to emails, count them
-const activeEmails = users
-    .filter(user => user.status === "active")
-    .map(user => user.email);
-
-const result = activeEmails.length;`,
+let result = 0;
+// Your code here...
+`,
         expectedOutput: '3',
         hints: [
             'Use .filter() to keep only active users',
@@ -1339,13 +1337,8 @@ const cards = document.querySelectorAll('.stat-card');
 
 // Find the card with "Total Sales" label
 let totalSalesValue = 0;
-for (const card of cards) {
-    const label = card.querySelector('.label').textContent;
-    if (label === 'Total Sales') {
-        const valueText = card.querySelector('.value').textContent;
-        totalSalesValue = Number(valueText.replace(',', ''));
-    }
-}
+
+// Your code here...
 
 const result = totalSalesValue;`,
         expectedOutput: '5678',
@@ -1730,13 +1723,10 @@ const getProducts = () => Promise.resolve([201, 202, 203, 204]);
 // Fetch all data in parallel and count total items
 async function aggregateData() {
     try {
-        const [users, orders, products] = await Promise.all([
-            getUsers(),
-            getOrders(),
-            getProducts()
-        ]);
+        // Your code here...
+        // Use Promise.all to call getUsers(), getOrders(), getProducts()
         
-        return users.length + orders.length + products.length;
+        return 0;
     } catch (error) {
         return 0;
     }

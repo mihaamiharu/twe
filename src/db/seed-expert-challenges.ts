@@ -525,33 +525,25 @@ Chain all page objects together in a realistic e-commerce flow!
         starterCode: `// Page Objects
 class ProductPage {
     constructor(page) { this.page = page; }
-    async addToCart() {
-        await this.page.click('#add-to-cart');
-        return new CartPage(this.page);
-    }
+    // Implement addToCart...
 }
 
 class CartPage {
     constructor(page) { this.page = page; }
-    async checkout() {
-        await this.page.click('#checkout');
-        return new CheckoutPage(this.page);
-    }
+    // Implement checkout...
 }
 
 class CheckoutPage {
     constructor(page) { this.page = page; }
-    async placeOrder() {
-        await this.page.click('#place-order');
-        return await this.page.locator('#confirmation h2').textContent();
-    }
+    // Implement placeOrder...
 }
 
 // E2E Flow
 const productPage = new ProductPage(page);
-const cartPage = await productPage.addToCart();
-const checkoutPage = await cartPage.checkout();
-const result = await checkoutPage.placeOrder();`,
+
+// Chain the flow...
+
+const result = "";`,
         expectedOutput: 'Order #12345 Confirmed!',
         tags: ['playwright', 'pom', 'e2e', 'scenario', 'boss', 'expert'],
     },
@@ -943,19 +935,7 @@ const scenarios = ['login', 'verify'];
 let passed = 0;
 
 // Run data-driven tests
-for (const user of users) {
-    for (const scenario of scenarios) {
-        await page.fill('#email', user.email);
-        await page.fill('#password', user.password);
-        await page.click('#login');
-        
-        const result = await page.locator('#result').textContent();
-        if (result === 'Success') passed++;
-        
-        // Reset for next test
-        await page.fill('#email', '');
-    }
-}
+// Tip: Use nested loops
 
 const result = String(passed);`,
         expectedOutput: '4',
@@ -1577,18 +1557,8 @@ Implement robust retry logic that makes your tests more reliable!
 </script>`,
         starterCode: `// Retry helper with screenshot on failure
 async function retryWithScreenshot(action, maxRetries = 3) {
-    for (let i = 0; i < maxRetries; i++) {
-        try {
-            await action();
-            const result = await page.locator('#result').textContent();
-            if (result.includes('Success')) {
-                return 'passed';
-            }
-        } catch (e) {
-            // Continue to retry
-        }
-    }
-    // Would take screenshot here in real test
+    // Implement retry logic here using try/catch loop
+    
     return 'failed-with-screenshot';
 }
 
@@ -1651,22 +1621,19 @@ Implement all phases and return the final verification status!
   }
 </script>`,
         starterCode: `// 1. Setup Phase - Create test data
-await page.click('#setup');
-await page.waitForSelector('#data-display:not([style*="none"])');
+// ...
 
 // 2. Test Phase - Verify UI
-const userName = await page.locator('#user-name').textContent();
-const userEmail = await page.locator('#user-email').textContent();
+// ...
 
 // 3. Assertion Phase
-const setupValid = userName === 'Test User' && userEmail === 'test@example.com';
+// ...
 
 // 4. Teardown Phase - Cleanup
-await page.click('#cleanup');
-const cleanupStatus = await page.locator('#status').textContent();
+// ...
 
 // Return integration result
-const result = setupValid && cleanupStatus === 'Cleanup complete' ? 'integration-passed' : 'integration-failed';`,
+const result = "";`,
         expectedOutput: 'integration-passed',
         tags: ['playwright', 'integration', 'e2e', 'pipeline', 'scenario', 'boss', 'expert'],
     },

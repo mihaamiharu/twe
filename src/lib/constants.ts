@@ -1,14 +1,14 @@
 export const tierLabels: Record<string, { name: string; color: string; tier: string }> = {
-    basic: { name: '🟢 Basic', color: 'text-green-400', tier: 'basic' },
-    beginner: { name: '🟡 Beginner', color: 'text-yellow-400', tier: 'beginner' },
-    intermediate: { name: '🟠 Intermediate', color: 'text-orange-400', tier: 'intermediate' },
-    expert: { name: '🔴 Expert', color: 'text-red-400', tier: 'expert' },
+    basic: { name: '🟢 Basic', color: 'text-emerald-400', tier: 'basic' },
+    beginner: { name: '🟡 Beginner', color: 'text-yellow-400/90', tier: 'beginner' },
+    intermediate: { name: '🟠 Intermediate', color: 'text-orange-400/90', tier: 'intermediate' },
+    expert: { name: '🔴 Expert', color: 'text-red-400/90', tier: 'expert' },
 };
 
 export const difficultyColors: Record<string, string> = {
-    EASY: 'bg-green-500/20 text-green-400',
-    MEDIUM: 'bg-yellow-500/20 text-yellow-400',
-    HARD: 'bg-red-500/20 text-red-400',
+    EASY: 'bg-green-500/10 text-green-300 border border-green-500/20',
+    MEDIUM: 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20',
+    HARD: 'bg-red-500/10 text-red-300 border border-red-500/20',
 };
 
 export const categoryLabels: Record<string, string> = {
