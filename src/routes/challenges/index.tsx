@@ -15,7 +15,8 @@ import {
     categoryLabels,
     difficultyColors,
     getTierFromCategory,
-    TIER_ORDER
+    TIER_ORDER,
+    CATEGORY_ORDER
 } from '@/lib/constants';
 
 export const Route = createFileRoute('/challenges/')({
@@ -172,7 +173,10 @@ function ChallengesPage() {
             if (tierOrderA !== tierOrderB) {
                 return tierOrderA - tierOrderB;
             }
-            return catA.localeCompare(catB);
+            // Within same tier, use CATEGORY_ORDER
+            const catOrderA = CATEGORY_ORDER[catA] ?? 999;
+            const catOrderB = CATEGORY_ORDER[catB] ?? 999;
+            return catOrderA - catOrderB;
         });
     }, [challengesByCategory]);
 
@@ -253,7 +257,7 @@ function ChallengesPage() {
                                         key={type}
                                         variant="outline"
                                         className={`cursor-pointer transition-all ${filterType === type ? config.color : 'hover:bg-primary/20'}`}
-                                        onClick={() => setFilterType(type)}
+                                        onClick={() => setFilterType(filterType === type ? 'all' : type)}
                                     >
                                         {config.icon}
                                         <span className="ml-1">{config.label} ({count})</span>
@@ -303,7 +307,7 @@ function ChallengesPage() {
                                     key={diff}
                                     variant="outline"
                                     className={`cursor-pointer transition-all ${filterDifficulty === diff ? difficultyColors[diff] : 'hover:bg-primary/20'}`}
-                                    onClick={() => setFilterDifficulty(diff)}
+                                    onClick={() => setFilterDifficulty(filterDifficulty === diff ? 'all' : diff)}
                                 >
                                     {diff} ({count})
                                 </Badge>
@@ -329,7 +333,7 @@ function ChallengesPage() {
                                     key={tier}
                                     variant="outline"
                                     className={`cursor-pointer transition-all ${filterTier === tier ? `bg-${tier === 'basic' ? 'green' : tier === 'beginner' ? 'yellow' : tier === 'intermediate' ? 'orange' : 'red'}-500/20 ${color}` : 'hover:bg-primary/20'}`}
-                                    onClick={() => setFilterTier(tier)}
+                                    onClick={() => setFilterTier(filterTier === tier ? 'all' : tier)}
                                 >
                                     {name} ({count})
                                 </Badge>
