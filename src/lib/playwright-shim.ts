@@ -268,7 +268,7 @@ export class MockedPlaywrightPage {
             await this.delay(100);
         }
 
-        throw new Error(`Timeout ${timeout}ms waiting for selector: ${selector} (state: ${state})`);
+        throw new Error(`Unable to locate ${selector}. Please verify the element exists.`);
     }
 
     /**
