@@ -4,6 +4,7 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { sendVerificationEmail } from '@/lib/email.server';
+import { logger } from '@/lib/logger';
 
 // Simple in-memory rate limiting (per email, 60 second cooldown)
 const rateLimitMap = new Map<string, number>();

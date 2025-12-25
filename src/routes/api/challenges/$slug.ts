@@ -1,9 +1,10 @@
-      },
-    },
-  },
-});
-import { logger } from '@/lib/logger';
+import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
+import { db } from '@/db';
+import { challenges, testCases, progress, submissions } from '@/db/schema';
+import { eq, and, asc, gt } from 'drizzle-orm';
+import { auth } from '@/lib/auth.server';
+import { logger } from '@/lib/logger';
 import { db } from '@/db';
 import { challenges, testCases, progress, submissions } from '@/db/schema';
 import { eq, and, asc, gt } from 'drizzle-orm';
