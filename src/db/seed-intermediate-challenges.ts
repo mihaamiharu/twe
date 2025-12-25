@@ -547,6 +547,80 @@ const result = await frame.locator('#frame-content').textContent();`,
     expectedOutput: 'Hello from iframe!',
     tags: ['playwright', 'iframe', 'frames', 'intermediate'],
   },
+  {
+    slug: 'pw-dynamic-table',
+    title: 'Dynamic Table Sorting',
+    description: 'Handle dynamic content updates and sort verification.',
+    type: 'PLAYWRIGHT' as const,
+    difficulty: 'MEDIUM' as const,
+    category: 'playwright-navigation', // Using simple category for now
+    xpReward: 90,
+    order: 411,
+    instructions: `# Dynamic Table Sorting
+
+Tables often re-render when sorted. We need to handle this dynamism!
+
+## Verification Strategy
+1. **Initial State:** Verify order before action
+2. **Action:** Click sort header
+3. **Wait:** Ensure update happens (wait for specific first row text/attribute)
+4. **Verify:** Check new order
+
+## Common Pitfall
+Checking text immediately after click might return the *old* data before the re-render completes!
+
+## Your Task
+1. Sort the table by "Status" (Click "Status" header)
+2. Verify the **first row** contains "Active" in the status column.
+`,
+    htmlContent: `<div class="table-container">
+  <table id="users">
+    <thead>
+      <tr>
+        <th onclick="sortTable(0)">Name</th>
+        <th onclick="sortTable(1)">Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>Alice</td><td>Pending</td></tr>
+      <tr><td>Bob</td><td>Active</td></tr>
+      <tr><td>Charlie</td><td>Suspended</td></tr>
+    </tbody>
+  </table>
+</div>
+<script>
+  function sortTable(n) {
+    // Simulate network delay
+    document.querySelector('tbody').style.opacity = '0.5';
+    setTimeout(() => {
+        const table = document.getElementById("users");
+        // Simple mock sort for demo: just hardcode the sorted state
+        // In reality, this would be dynamic.
+        // If sorting by Status (index 1), put Active first.
+        if (n === 1) {
+            table.querySelector('tbody').innerHTML = \`
+              <tr><td>Bob</td><td>Active</td></tr>
+              <tr><td>Alice</td><td>Pending</td></tr>
+              <tr><td>Charlie</td><td>Suspended</td></tr>
+            \`;
+        }
+        document.querySelector('tbody').style.opacity = '1';
+    }, 500);
+  }
+</script>`,
+    starterCode: `// Click the "Status" header to sort
+await page.click('th:has-text("Status")');
+
+// Wait for the table to update
+// (We know the first row should be "Bob" / "Active" after sort)
+// waitForFunction or waitForSelector with text can be used.
+await page.waitForSelector('tbody tr:first-child td:nth-child(2):has-text("Active")');
+
+// Get the text of the status cell in the first row
+const result = await page.locator('tbody tr:first-child td:nth-child(2)').textContent();`,
+    expectedOutput: 'Active',
+    tags: ['playwright', 'table', 'dynamic', 'sorting', 'intermediate'],
+  },
 ];
 
 // ============================================================================

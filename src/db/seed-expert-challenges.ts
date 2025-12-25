@@ -1268,6 +1268,101 @@ const result = await page.locator('#layout').textContent();`,
         expectedOutput: 'Layout: mobile',
         tags: ['playwright', 'mobile', 'responsive', 'viewport', 'expert'],
     },
+    // Challenge 8: CSV Workflow
+    {
+        slug: 'pw-csv-workflow',
+        title: 'CSV Processing Workflow',
+        description: 'Upload CSV, process data, and verify export.',
+        type: 'PLAYWRIGHT' as const,
+        difficulty: 'HARD' as const,
+        category: 'playwright-advanced-patterns',
+        xpReward: 100,
+        order: 1008,
+        instructions: `# CSV Workflow
+
+Simulate a realistic business flow: Upload -> Process -> Download.
+
+## Workflows
+1. **Upload:** Use \`setInputFiles\`
+2. **Process:** Wait for button enablement
+3. **Download:** Since we are in a customized environment, we verify the **UI Feedback** representing the download or the link generation.
+
+## Your Task
+1. Upload a file named "users.csv"
+2. Wait for the "Process" button to become enabled
+3. Click "Process"
+4. Wait for and return the success message text ("Export Complete")
+
+> **Note:** The "Export Complete" message appears after a simulated backend process.
+`,
+        htmlContent: `<div class="csv-tool">
+  <h3>Bulk User Import</h3>
+  <input type="file" id="upload" accept=".csv" />
+  <div id="preview" style="margin: 10px 0; min-height: 50px; border: 1px solid #ddd; padding: 10px;">
+    No file selected used.
+  </div>
+  <button id="process-btn" disabled>Process Import</button>
+  <div id="status-area" style="margin-top: 10px; font-weight: bold; color: green;"></div>
+</div>
+<script>
+  const upload = document.getElementById('upload');
+  const preview = document.getElementById('preview');
+  const btn = document.getElementById('process-btn');
+  const status = document.getElementById('status-area');
+
+  upload.addEventListener('change', (e) => {
+    if (e.target.files.length > 0) {
+        preview.textContent = "Preview: 3 users found (Alice, Bob, Charlie)";
+        preview.style.backgroundColor = "#f9f9f9";
+        // Enable button after "parsing" delay
+        setTimeout(() => {
+            btn.disabled = false;
+        }, 500);
+    }
+  });
+
+  btn.addEventListener('click', () => {
+    btn.textContent = "Processing...";
+    btn.disabled = true;
+    
+    // Simulate backend work
+    setTimeout(() => {
+        btn.textContent = "Process Import";
+        status.textContent = "Export Complete";
+        
+        // Add a download link
+        const link = document.createElement('a');
+        link.href = "#";
+        link.textContent = "Download Result Report";
+        status.appendChild(document.createElement('br'));
+        status.appendChild(link);
+    }, 1500);
+  });
+</script>`,
+        starterCode: `// 1. Upload the file
+await page.setInputFiles('#upload', {
+    name: 'users.csv',
+    mimeType: 'text/csv',
+    buffer: Buffer.from('name,role\\nAlice,Admin\\nBob,User')
+});
+
+// 2. Wait for Process button to be enabled (state: 'visible' implies present, but we check enabled)
+const btn = page.locator('#process-btn');
+await expect(btn).toBeEnabled({ timeout: 2000 });
+
+// 3. Click Process
+await btn.click();
+
+// 4. Wait for success message
+// Using getByText for partial content match is robust here
+const msg = page.getByText('Export Complete');
+await expect(msg).toBeVisible({ timeout: 5000 });
+
+// Return the text for validation
+const result = await page.locator('#status-area').textContent();`,
+        expectedOutput: 'Export CompleteDownload Result Report', // textContent includes children
+        tags: ['playwright', 'upload', 'workflow', 'csv', 'advanced'],
+    },
 ];
 
 // ============================================================================
