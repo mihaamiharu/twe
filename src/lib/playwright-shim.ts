@@ -7,6 +7,8 @@
  * Based on: docs/TDD.md Section 5.2
  */
 
+import { logger } from '@/lib/logger';
+
 export interface Locator {
     click(): Promise<void>;
     fill(value: string): Promise<void>;
@@ -104,7 +106,7 @@ export class MockedPlaywrightPage {
 
     constructor(iframeDocument: Document, options?: { timeout?: number }) {
         this.targetDocument = iframeDocument;
-        this.defaultTimeout = options?.timeout || 5000;
+        this.defaultTimeout = options?.timeout || 2500;
         this.request = this._createAPIRequestContext();
         this._context = this._createBrowserContext();
     }
@@ -119,7 +121,7 @@ export class MockedPlaywrightPage {
         // Here we can just pretend or update history if needed
         // For now, doing nothing is often enough for "happy path" checks as long as we don't assert URL immediately differently
         // But some assertions check title.
-        console.log(`Navigating to ${url}`);
+        logger.debug(`Navigating to ${url}`);
     }
 
     async click(selector: string): Promise<void> {
@@ -266,7 +268,7 @@ export class MockedPlaywrightPage {
             await this.delay(100);
         }
 
-        throw new Error(`Timeout ${timeout}ms waiting for selector: ${selector} (state: ${state})`);
+        throw new Error(`Unable to locate ${selector}. Please verify the element exists.`);
     }
 
     /**
@@ -322,7 +324,7 @@ export class MockedPlaywrightPage {
     }
 
     async screenshot(options?: any): Promise<Buffer> {
-        console.log('Mocking screenshot');
+        logger.debug('Mocking screenshot');
         return Buffer.from('');
     }
 
@@ -656,8 +658,8 @@ export class MockedPlaywrightPage {
     private _createBrowserContext(): BrowserContext {
         return {
             tracing: {
-                start: async () => console.log('Tracing started'),
-                stop: async () => console.log('Tracing stopped')
+                start: async () => logger.debug('Tracing started'),
+                stop: async () => logger.debug('Tracing stopped')
             },
             cookies: async () => [],
             addCookies: async () => { },
