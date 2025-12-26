@@ -27,7 +27,7 @@ export const jsFundamentalsChallenges = [
         description: 'Learn to declare variables with let and const, and understand JavaScript data types.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 15,
         order: 101,
         instructions: `# Variables & Types
@@ -78,16 +78,17 @@ attempts = attempts + 1; // OK
   <p>Running tests...</p>
 </div>`,
         starterCode: `// 1. Create a constant called testName with value "Login Test"
-
+// Your code here
 
 // 2. Create a variable called passCount with value 0
-
+// Your code here
 
 // 3. Increment passCount by 1
+// Your code here
 
-
-// 4. Assign passCount to result (don't change this line)
-const result = passCount;`,
+// 4. Assign passCount to result
+// Your code here
+// const result = passCount; // Uncomment this line after your code`,
         expectedOutput: '1',
         hints: [
             'Use const for testName since it won\'t change',
@@ -104,7 +105,7 @@ const result = passCount;`,
         description: 'Create and manipulate arrays to store test data.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 20,
         order: 102,
         instructions: `# Arrays for Test Data
@@ -159,13 +160,13 @@ browsers.push("Edge");
   <ul id="credentials-list"></ul>
 </div>`,
         starterCode: `// 1. Create an array with 3 usernames: "admin", "user", "guest"
-const testCredentials = 
+// Your code here
 
 // 2. Add "superadmin" to the end
-
+// Your code here
 
 // 3. Store the array length in result
-const result = `,
+// Your code here `,
         expectedOutput: '4',
         hints: [
             'Create array with: ["admin", "user", "guest"]',
@@ -182,7 +183,7 @@ const result = `,
         description: 'Use objects to structure test case data with properties.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 25,
         order: 103,
         instructions: `# Objects for Tests
@@ -250,15 +251,13 @@ apiTest.headers["Content-Type"]; // "application/json"
   <div id="user-info"></div>
 </div>`,
         starterCode: `// 1. Create a testUser object with email, isActive, and loginCount
-const testUser = {
-    
-};
+// Your code here
 
 // 2. Increment loginCount by 1
-
+// Your code here
 
 // 3. Store the loginCount in result
-const result = `,
+// Your code here `,
         expectedOutput: '6',
         hints: [
             'Object properties use key: value syntax, separated by commas',
@@ -275,7 +274,7 @@ const result = `,
         description: 'Use conditional statements to create dynamic test flows.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 25,
         order: 104,
         instructions: `# If-Else Logic
@@ -351,16 +350,11 @@ The variables \`passCount\` and \`totalTests\` are provided.
 const passCount = 5;
 const totalTests = 10;
 
-// Write your if-else logic here
-let result;
+// Write your if-else logic here.
+// Define 'result' and assign "ALL_PASSED", "PARTIAL", or "ALL_FAILED"
 
-if () {
-    result = "ALL_PASSED";
-} else if () {
-    result = "PARTIAL";
-} else {
-    result = "ALL_FAILED";
-}`,
+// Your code here
+`,
         expectedOutput: 'PARTIAL',
         hints: [
             'First condition: passCount === totalTests',
@@ -377,7 +371,7 @@ if () {
         description: 'Iterate over test data using for and for...of loops.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 30,
         order: 105,
         instructions: `# Loops in Testing
@@ -443,10 +437,8 @@ const scores = [95, 72, 88, 65, 91, 78, 83, 69];
 // Count how many scores are 80 or above
 let result = 0;
 
-for (const score of scores) {
-    // Your code here
-    
-}`,
+// Write your loop here
+`,
         expectedOutput: '4',
         hints: [
             'Loop through each score with for...of',
@@ -463,7 +455,7 @@ for (const score of scores) {
         description: 'Create reusable test helper functions.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 35,
         order: 106,
         instructions: `# Functions Basics
@@ -529,13 +521,10 @@ Create a function \`calculatePassRate\` that:
   <div id="rate-display"></div>
 </div>`,
         starterCode: `// Create the calculatePassRate function
-function calculatePassRate(passed, total) {
-    // Return the percentage
-    
-}
+// Your code here
 
 // Call the function with 7 passed out of 10 total
-const result = `,
+// Your code here `,
         expectedOutput: '70',
         hints: [
             'Formula: (passed / total) * 100',
@@ -552,7 +541,7 @@ const result = `,
         description: 'Master the modern arrow function syntax for callbacks.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 35,
         order: 107,
         instructions: `# Arrow Functions
@@ -619,13 +608,13 @@ const passed = results.filter(r => r.status === 'passed');
   <h3>Arrow Functions</h3>
 </div>`,
         starterCode: `// 1. Create isPositive arrow function (returns true if n > 0)
-const isPositive = 
+// Your code here
 
 // 2. Create square arrow function (returns n * n)
-const square = 
+// Your code here
 
 // 3. Use square on 8
-const result = `,
+// Your code here `,
         expectedOutput: '64',
         hints: [
             'isPositive: n => n > 0',
@@ -642,7 +631,7 @@ const result = `,
         description: 'Use map, filter, and find for powerful test data manipulation.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 40,
         order: 108,
         instructions: `# Array Methods
@@ -716,11 +705,8 @@ Given an array of test results, use array methods to:
 ];
 
 // Filter to get only passed tests, then get the count
-const passedTests = testResults.filter(
-
-);
-
-const result = passedTests.length;`,
+// Your code here
+`,
         expectedOutput: '3',
         hints: [
             'Filter callback: test => test.status === "passed"',
@@ -737,7 +723,7 @@ const result = passedTests.length;`,
         description: 'Use includes, trim, and split for text assertions.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 40,
         order: 109,
         instructions: `# String Methods
@@ -810,11 +796,12 @@ Given an error message with extra whitespace:
         starterCode: `const rawMessage = "   Error: AUTH_FAILED   ";
 
 // 1. Trim the message
-const trimmed = 
+// Your code here
 
 // 2 & 3. Split by ": " and get the second part (error code)
-const parts = trimmed.split(": ");
-const result = parts[1];`,
+// Your code here
+
+// const result = parts[1]; // Store result here`,
         expectedOutput: 'AUTH_FAILED',
         hints: [
             'Use .trim() to remove whitespace',
@@ -831,7 +818,7 @@ const result = parts[1];`,
         description: 'Extract values from objects and arrays cleanly.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 45,
         order: 110,
         instructions: `# Destructuring
@@ -910,10 +897,10 @@ Given a test result object, use destructuring to:
 };
 
 // Destructure testName, duration, and status
-const {  } = testResult;
+// Your code here
 
 // Calculate result: duration if passed, 0 if failed
-const result = status === "passed" ? duration : 0;`,
+// Your code here`,
         expectedOutput: '250',
         hints: [
             'Destructure with: const { testName, duration, status } = testResult',
@@ -930,7 +917,7 @@ const result = status === "passed" ? duration : 0;`,
         description: 'Combine all JS skills to build a test data generator.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'HARD' as const,
-        category: 'javascript-fundamentals',
+        category: 'js-fundamentals',
         xpReward: 60,
         order: 111,
         instructions: `# Scenario: Test Data Generator
@@ -998,7 +985,7 @@ export const domChallenges = [
         description: 'Learn the difference between selecting one element vs multiple elements.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 20,
         order: 201,
         instructions: `# querySelector vs querySelectorAll
@@ -1026,13 +1013,13 @@ Returns a **NodeList** of all matches.
   </ul>
 </div>`,
         starterCode: `// 1. Get the title element by ID
-const titleElement = document.querySelector('#title');
+// Your code here
 
 // 2. Get all items by class
-const items = document.querySelectorAll('.item');
+// Your code here
 
 // 3. Store the count of items
-const result = items.length;`,
+// Your code here`,
         expectedOutput: '4',
         hints: ['querySelector uses "#title" for ID', 'querySelectorAll uses ".item" for class', '.length gives the count'],
         tags: ['javascript', 'dom', 'querySelector', 'beginner'],
@@ -1043,7 +1030,7 @@ const result = items.length;`,
         description: 'Extract text, values, and attributes from DOM elements.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 25,
         order: 202,
         instructions: `# Get Element Properties
@@ -1064,9 +1051,14 @@ Once you find an element, you need to get its data for assertions!
   <span class="price">25</span>
   <label>Quantity: <input type="number" id="quantity" value="4" /></label>
 </div>`,
-        starterCode: `const priceText = document.querySelector('.price').textContent;
-const quantity = document.querySelector('#quantity').value;
-const result = Number(priceText) * Number(quantity);`,
+        starterCode: `// 1. Get the text content of the element with class "price"
+// Your code here
+
+// 2. Get the value from the input with id "quantity"
+// Your code here
+
+// 3. Multiply price x quantity and store in result
+// Your code here`,
         expectedOutput: '100',
         hints: ['.textContent returns a string', '.value also returns a string', 'Use Number() to convert'],
         tags: ['javascript', 'dom', 'properties', 'beginner'],
@@ -1077,7 +1069,7 @@ const result = Number(priceText) * Number(quantity);`,
         description: 'Verify if elements are disabled, checked, or hidden.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 30,
         order: 203,
         instructions: `# Check Element State
@@ -1096,13 +1088,9 @@ Count how many checkboxes are checked and store in result.
   <label><input type="checkbox" name="push" checked /> Push</label>
   <label><input type="checkbox" name="newsletter" checked /> Newsletter</label>
 </form>`,
-        starterCode: `const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-let result = 0;
-for (const checkbox of checkboxes) {
-    if (checkbox.checked) {
-        result++;
-    }
-}`,
+        starterCode: `// Loop through checkboxes and count checked ones
+// Your code here
+`,
         expectedOutput: '3',
         hints: ['.checked is a boolean property', 'Loop through and count checked ones'],
         tags: ['javascript', 'dom', 'state', 'forms', 'beginner'],
@@ -1113,7 +1101,7 @@ for (const checkbox of checkboxes) {
         description: 'Traverse the DOM tree using parent, child, and sibling properties.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 35,
         order: 204,
         instructions: `# Parent/Child Navigation
@@ -1135,9 +1123,14 @@ Navigate the DOM tree to find related elements!
   <button class="tab">About</button>
   <button class="tab">Contact</button>
 </nav>`,
-        starterCode: `const activeTab = document.querySelector('.active');
-const parent = activeTab.parentElement;
-const result = parent.children.length;`,
+        starterCode: `// 1. Find the element with class "active"
+// Your code here
+
+// 2. Get its parent element
+// Your code here
+
+// 3. Count how many children the parent has
+// Your code here`,
         expectedOutput: '4',
         hints: ['.parentElement goes up one level', '.children returns all child elements'],
         tags: ['javascript', 'dom', 'traversal', 'beginner'],
@@ -1148,7 +1141,7 @@ const result = parent.children.length;`,
         description: 'Understanding click, input, and other DOM events.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 40,
         order: 205,
         instructions: `# Event Listeners
@@ -1165,11 +1158,11 @@ You can simulate clicks programmatically with .click()
   <span id="count">0</span>
   <button id="increment" onclick="document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1">+1</button>
 </div>`,
-        starterCode: `const button = document.querySelector('#increment');
-button.click();
-button.click();
-button.click();
-const result = Number(document.querySelector('#count').textContent);`,
+        starterCode: `// Use .click() 3 times
+// Your code here
+
+// Get the counter value and store in result
+// Your code here`,
         expectedOutput: '3',
         hints: ['.click() triggers a click event', 'Call it multiple times'],
         tags: ['javascript', 'dom', 'events', 'beginner'],
@@ -1180,7 +1173,7 @@ const result = Number(document.querySelector('#count').textContent);`,
         description: 'Get and set form values programmatically.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 45,
         order: 206,
         instructions: `# Form Interaction
@@ -1200,12 +1193,17 @@ Working with forms is essential for testing!
   <input type="password" id="password" placeholder="Password" />
   <label><input type="checkbox" id="remember" /> Remember me</label>
 </form>`,
-        starterCode: `document.querySelector('#username').value = 'testuser';
-document.querySelector('#password').value = 'secret123';
-document.querySelector('#remember').checked = true;
-const username = document.querySelector('#username').value;
-const password = document.querySelector('#password').value;
-const result = username + ':' + password;`,
+        starterCode: `// 1. Set username to "testuser"
+// Your code here
+
+// 2. Set password to "secret123"
+// Your code here
+
+// 3. Set remember to checked
+// Your code here
+
+// 4. Concatenate username + ":" + password into result
+// Your code here`,
         expectedOutput: 'testuser:secret123',
         hints: ['Set .value for text inputs', 'Set .checked for checkboxes'],
         tags: ['javascript', 'dom', 'forms', 'beginner'],
@@ -1216,7 +1214,7 @@ const result = username + ':' + password;`,
         description: 'Extract and parse data from HTML tables.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 50,
         order: 207,
         instructions: `# Table Data Extraction
@@ -1238,12 +1236,8 @@ Sum up the "Amount" column (column index 2) and store in result.
     <tr><td>004</td><td>Dave</td><td>125</td></tr>
   </tbody>
 </table>`,
-        starterCode: `const tbody = document.querySelector('tbody');
-let result = 0;
-for (const row of tbody.rows) {
-    const amount = Number(row.cells[2].textContent);
-    result += amount;
-}`,
+        starterCode: `// Loop through rows and sum up the Amount column (index 2)
+// Your code here`,
         expectedOutput: '550',
         hints: ['row.cells[2] is the Amount column', 'Convert to Number for math'],
         tags: ['javascript', 'dom', 'tables', 'beginner'],
@@ -1254,7 +1248,7 @@ for (const row of tbody.rows) {
         description: 'Check if elements exist or are visible in the DOM.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 55,
         order: 208,
         instructions: `# Wait for Element
@@ -1271,10 +1265,11 @@ Check if header, footer, and sidebar exist. Count how many exist and store in re
   <main id="content">Main Content</main>
   <footer id="footer">Footer Content</footer>
 </div>`,
-        starterCode: `const hasHeader = document.querySelector('#header') !== null;
-const hasFooter = document.querySelector('#footer') !== null;
-const hasSidebar = document.querySelector('#sidebar') !== null;
-const result = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0) + (hasSidebar ? 1 : 0);`,
+        starterCode: `// Check if header, footer, and sidebar exist
+// Your code here
+
+// Count how many exist (true = 1, false = 0) and store in result
+// Your code here`,
         expectedOutput: '2',
         hints: ['querySelector returns null if not found', 'Header and footer exist, sidebar does not'],
         tags: ['javascript', 'dom', 'existence', 'beginner'],
@@ -1287,7 +1282,7 @@ const result = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0) + (hasSidebar ? 1 : 0);
         description: 'Extract and summarize data from a complex dashboard UI.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'HARD' as const,
-        category: 'dom-understanding',
+        category: 'js-dom',
         xpReward: 65,
         order: 209,
         instructions: `# Scenario: Dashboard Scraper
@@ -1333,14 +1328,12 @@ Navigate the DOM to find the correct card and extract its value.
   </div>
 </div>`,
         starterCode: `// Find all stat cards
-const cards = document.querySelectorAll('.stat-card');
+// Your code here
 
-// Find the card with "Total Sales" label
-let totalSalesValue = 0;
+// Find the card with "Total Sales" label and extract value
+// Your code here
 
-// Your code here...
-
-const result = totalSalesValue;`,
+// const result = totalSalesValue; // Uncomment this line after your code`,
         expectedOutput: '5678',
         hints: [
             'Loop through all cards',
@@ -1362,7 +1355,7 @@ export const asyncChallenges = [
         description: 'Learn what Promises are and how they represent future values.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'async-await-basics',
+        category: 'js-async',
         xpReward: 35,
         order: 301,
         instructions: `# Understanding Promises
@@ -1403,15 +1396,10 @@ Store the resolved value in result.
   <h3>Promise Demo</h3>
 </div>`,
         starterCode: `// Create a promise that resolves with 42
-const myPromise = new Promise((resolve, reject) => {
-    resolve(42);
-});
+// Your code here
 
 // Get the value from the promise
-let result;
-myPromise.then(value => {
-    result = value;
-});`,
+// Your code here`,
         expectedOutput: '42',
         hints: ['Use resolve(42) inside the Promise', '.then() receives the resolved value'],
         tags: ['javascript', 'async', 'promises', 'beginner'],
@@ -1422,7 +1410,7 @@ myPromise.then(value => {
         description: 'Write cleaner async code using async/await syntax.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'async-await-basics',
+        category: 'js-async',
         xpReward: 40,
         order: 302,
         instructions: `# Async/Await Basics
@@ -1462,13 +1450,10 @@ Create an async function that awaits a promise and returns double the value.
 const getValue = () => Promise.resolve(21);
 
 // Create async function that returns double the value
-async function doubleValue() {
-    const value = await getValue();
-    return value * 2;
-}
+// Your code here
 
 // Call the function and get result
-const result = await doubleValue();`,
+// Your code here`,
         expectedOutput: '42',
         hints: ['await pauses until Promise resolves', 'Return the doubled value from the function'],
         tags: ['javascript', 'async', 'await', 'beginner'],
@@ -1479,7 +1464,7 @@ const result = await doubleValue();`,
         description: 'Handle errors in async code with try/catch.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'async-await-basics',
+        category: 'js-async',
         xpReward: 45,
         order: 303,
         instructions: `# Async Error Handling
@@ -1520,16 +1505,9 @@ Create a function that handles a rejected promise and returns a fallback value.
 const riskyOperation = () => Promise.reject(new Error('Network failed'));
 
 // Handle the error and return 'fallback' instead
-async function safeOperation() {
-    try {
-        const data = await riskyOperation();
-        return data;
-    } catch (error) {
-        return 'fallback';
-    }
-}
+// Your code here
 
-const result = await safeOperation();`,
+// const result = await safeOperation();`,
         expectedOutput: 'fallback',
         hints: ['Use try/catch around await', 'Return fallback value in catch block'],
         tags: ['javascript', 'async', 'error-handling', 'beginner'],
@@ -1540,7 +1518,7 @@ const result = await safeOperation();`,
         description: 'Run multiple async operations in parallel with Promise.all.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'async-await-basics',
+        category: 'js-async',
         xpReward: 50,
         order: 304,
         instructions: `# Parallel Async Operations
@@ -1591,13 +1569,10 @@ Sum the results of three parallel async operations.
   <h3>Parallel Execution</h3>
 </div>`,
         starterCode: `// Three async operations returning numbers
-const getA = () => Promise.resolve(10);
-const getB = () => Promise.resolve(20);
-const getC = () => Promise.resolve(12);
+// Your code here
 
 // Run all in parallel and sum the results
-const [a, b, c] = await Promise.all([getA(), getB(), getC()]);
-const result = a + b + c;`,
+// Your code here`,
         expectedOutput: '42',
         hints: ['Promise.all takes an array of promises', 'Destructure the results array'],
         tags: ['javascript', 'async', 'parallel', 'promise-all', 'beginner'],
@@ -1608,7 +1583,7 @@ const result = a + b + c;`,
         description: 'Apply async/await in common test automation scenarios.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'EASY' as const,
-        category: 'async-await-basics',
+        category: 'js-async',
         xpReward: 55,
         order: 305,
         instructions: `# Async Testing Patterns
@@ -1650,30 +1625,14 @@ Count how many attempts were made.
         htmlContent: `<div class="patterns-demo">
   <h3>Testing Patterns</h3>
 </div>`,
-        starterCode: `let attempts = 0;
+        starterCode: `// Simulates a flaky operation (fails first 2 times)
+// Your code here
 
-// Simulates a flaky operation (fails first 2 times)
-const flakyOperation = () => {
-    attempts++;
-    if (attempts < 3) {
-        return Promise.reject(new Error('Flaky!'));
-    }
-    return Promise.resolve('success');
-};
+// Retry logic: create a function that retries maxAttempts times
+// Your code here
 
-// Retry logic
-async function retry(fn, maxAttempts = 3) {
-    for (let i = 0; i < maxAttempts; i++) {
-        try {
-            return await fn();
-        } catch (e) {
-            if (i === maxAttempts - 1) throw e;
-        }
-    }
-}
-
-await retry(flakyOperation);
-const result = attempts;`,
+// await retry(flakyOperation);
+// const result = attempts;`,
         expectedOutput: '3',
         hints: ['Loop through attempts', 'Try each attempt, catch errors', 'Return on success, throw on final failure'],
         tags: ['javascript', 'async', 'testing', 'retry', 'beginner'],
@@ -1686,7 +1645,7 @@ const result = attempts;`,
         description: 'Combine multiple async API calls into a single result.',
         type: 'JAVASCRIPT' as const,
         difficulty: 'HARD' as const,
-        category: 'async-await-basics',
+        category: 'js-async',
         xpReward: 70,
         order: 306,
         instructions: `# Scenario: API Data Aggregator
@@ -1716,23 +1675,13 @@ Use Promise.all to fetch all data simultaneously and aggregate the results.
   <div id="output"></div>
 </div>`,
         starterCode: `// Simulated API calls
-const getUsers = () => Promise.resolve([1, 2, 3, 4, 5]);
-const getOrders = () => Promise.resolve([101, 102, 103]);
-const getProducts = () => Promise.resolve([201, 202, 203, 204]);
+// Your code here
 
 // Fetch all data in parallel and count total items
-async function aggregateData() {
-    try {
-        // Your code here...
-        // Use Promise.all to call getUsers(), getOrders(), getProducts()
-        
-        return 0;
-    } catch (error) {
-        return 0;
-    }
-}
+// Your code here
+// async function aggregateData() ...
 
-const result = await aggregateData();`,
+// const result = await aggregateData();`,
         expectedOutput: '12',
         hints: [
             'Use Promise.all with an array of promises',

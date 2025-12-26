@@ -63,7 +63,7 @@ await page.goto('/login', {
   </form>
 </div>`,
     starterCode: `// Navigate to login page
-await page.goto('/login');
+// Your code here
 
 // Get the page title
 const result = await page.title();`,
@@ -107,9 +107,7 @@ await page.click('#link', { force: true });      // Force click
   <button id="increment" onclick="document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1">+</button>
 </div>`,
     starterCode: `// Click the button 3 times
-await page.click('#increment');
-await page.click('#increment');
-await page.click('#increment');
+// Your code here
 
 // Get the counter value
 const result = await page.locator('#count').textContent();`,
@@ -159,8 +157,7 @@ await page.locator('#input').fill('new value');
   <button type="submit">Login</button>
 </form>`,
     starterCode: `// Fill the form fields
-await page.fill('#email', 'qa@test.com');
-await page.fill('#password', 'secret123');
+// Your code here
 
 // Get the email value
 const result = await page.locator('#email').inputValue();`,
@@ -212,7 +209,7 @@ await page.selectOption('#colors', ['red', 'blue']);
   </select>
 </form>`,
     starterCode: `// Select JavaScript from dropdown
-await page.selectOption('#language', 'javascript');
+// Your code here
 
 // Get the selected value
 const result = await page.locator('#language').inputValue();`,
@@ -267,7 +264,7 @@ const checked = await page.locator('#option').isChecked();
   </label>
 </form>`,
     starterCode: `// Check the terms checkbox
-await page.check('#terms');
+// Your code here
 
 // Verify it's checked
 const result = await page.isChecked('#terms');`,
@@ -325,8 +322,7 @@ await page.type('#search', 'playwright', { delay: 50 });
   });
 </script>`,
     starterCode: `// Type in search and press Enter
-await page.fill('#search', 'Playwright');
-await page.press('#search', 'Enter');
+// Your code here
 
 // Get search results
 const result = await page.locator('#results').textContent();`,
@@ -380,7 +376,7 @@ await page.locator('#input').blur();
   });
 </script>`,
     starterCode: `// Hover to show dropdown
-await page.hover('#menu-btn');
+// Your code here
 
 // Get dropdown text
 const result = await page.locator('#dropdown').textContent();`,
@@ -435,11 +431,7 @@ await page.setInputFiles('#upload', []);
   });
 </script>`,
     starterCode: `// Upload a file (simulated in sandbox)
-await page.locator('#file-input').setInputFiles({
-    name: 'test-report.pdf',
-    mimeType: 'application/pdf',
-    buffer: Buffer.from('test content')
-});
+// Your code here
 
 // Get the displayed filename
 const result = await page.locator('#filename').textContent();`,
@@ -493,7 +485,7 @@ await page.mouse.up();
   });
 </script>`,
     starterCode: `// Drag item to drop zone
-await page.locator('#item-a').dragTo(page.locator('#dropzone'));
+// Your code here
 
 // Verify drop
 const result = await page.locator('#dropzone').textContent();`,
@@ -542,8 +534,9 @@ const frames = page.frames();
   <iframe id="embed" srcdoc="<div id='frame-content'>Hello from iframe!</div>"></iframe>
 </div>`,
     starterCode: `// Access iframe content using frameLocator
-const frame = page.frameLocator('#embed');
-const result = await frame.locator('#frame-content').textContent();`,
+// Your code here
+
+const result = ""; // Return the iframe content text`,
     expectedOutput: 'Hello from iframe!',
     tags: ['playwright', 'iframe', 'frames', 'intermediate'],
   },
@@ -609,12 +602,10 @@ Checking text immediately after click might return the *old* data before the re-
   }
 </script>`,
     starterCode: `// Click the "Status" header to sort
-await page.click('th:has-text("Status")');
+// Your code here
 
 // Wait for the table to update
-// (We know the first row should be "Bob" / "Active" after sort)
-// waitForFunction or waitForSelector with text can be used.
-await page.waitForSelector('tbody tr:first-child td:nth-child(2):has-text("Active")');
+// Your code here
 
 // Get the text of the status cell in the first row
 const result = await page.locator('tbody tr:first-child td:nth-child(2)').textContent();`,
@@ -731,8 +722,7 @@ page.getByRole('heading', { level: 1 });
   <div id="result"></div>
 </div>`,
     starterCode: `// Find button by role
-const signUpBtn = page.getByRole('button', { name: 'Sign Up' });
-await signUpBtn.click();
+// Your code here
 
 // Get result
 const result = await page.locator('#result').textContent();`,
@@ -780,8 +770,7 @@ page.getByText(/welcome/i);  // Case insensitive
   <div id="output"></div>
 </div>`,
     starterCode: `// Find by text (substring match)
-const element = page.getByText('Click me');
-await element.click();
+// Your code here
 
 // Get output
 const result = await page.locator('#output').textContent();`,
@@ -827,8 +816,7 @@ page.getByLabel('Email');
   <input type="password" id="pass" />
 </form>`,
     starterCode: `// Fill by label
-await page.getByLabel('Username').fill('testuser');
-await page.getByLabel('Password').fill('secret123');
+// Your code here
 
 // Get username value
 const result = await page.getByLabel('Username').inputValue();`,
@@ -869,7 +857,7 @@ page.getByPlaceholder('Search...');
   <input type="text" placeholder="Search..." />
 </div>`,
     starterCode: `// Find by placeholder
-await page.getByPlaceholder('Search...').fill('Playwright testing');
+// Your code here
 
 // Get value
 const result = await page.getByPlaceholder('Search...').inputValue();`,
@@ -921,7 +909,7 @@ use: {
   <span id="cart-count">0</span>
 </div>`,
     starterCode: `// Click by test ID
-await page.getByTestId('add-to-cart').click();
+// Your code here
 
 // Get cart count
 const result = await page.locator('#cart-count').textContent();`,
@@ -976,8 +964,9 @@ page.locator('.list')
   <li>Contact</li>
 </ul>`,
     starterCode: `// Get second item using nth (0-indexed)
-const secondItem = page.locator('.menu li').nth(1);
-const result = await secondItem.textContent();`,
+// Your code here
+
+const result = ""; // Return the text content`,
     expectedOutput: 'Products',
     tags: ['playwright', 'locators', 'chaining', 'intermediate'],
   },
@@ -1026,11 +1015,10 @@ page.frameLocator('#outer')
   <iframe id="widget" srcdoc="<button onclick='this.parentNode.innerHTML=&quot;Button clicked!&quot;'>Click Inside</button>"></iframe>
 </div>`,
     starterCode: `// Access iframe and click button
-const frame = page.frameLocator('#widget');
-await frame.locator('button').click();
+// Your code here
 
 // Get iframe content
-const result = await frame.locator('body').textContent();`,
+const result = ""; // Return body text content`,
     expectedOutput: 'Button clicked!',
     tags: ['playwright', 'locators', 'iframe', 'intermediate'],
   },
@@ -1086,9 +1074,9 @@ const allTexts = await page.locator('li').allInnerTexts();
   <li>Deploy app</li>
 </ul>`,
     starterCode: `// Count list items
-const items = page.locator('.todo-list li');
-const count = await items.count();
-const result = String(count);`,
+// Your code here
+
+const result = ""; // Return count as String`,
     expectedOutput: '5',
     tags: ['playwright', 'locators', 'lists', 'multiple', 'intermediate'],
   },
@@ -1192,10 +1180,11 @@ await expect(page.locator('.menu')).not.toBeVisible();
   <div id="modal" style="display: none;">Modal Content</div>
 </div>`,
     starterCode: `// Show the modal
-await page.click('#show');
+// Your code here
 
 // Assert modal is visible
-await expect(page.locator('#modal')).toBeVisible();
+// Your code here
+
 const result = 'visible';`,
     expectedOutput: 'visible',
     tags: ['playwright', 'assertions', 'visibility', 'intermediate'],
@@ -1240,10 +1229,11 @@ await expect(page.locator('.status')).toHaveText(/success/i);
   <p>Welcome to Playwright testing framework!</p>
 </div>`,
     starterCode: `// Assert heading text
-await expect(page.locator('h1')).toHaveText('Hello World');
+// Your code here
 
 // Assert paragraph contains text
-await expect(page.locator('p')).toContainText('Playwright');
+// Your code here
+
 const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'text', 'intermediate'],
@@ -1287,10 +1277,11 @@ await expect(page.locator('#phone')).toHaveValue(/\\d{3}-\\d{4}/);
   <input type="email" id="email" placeholder="Enter email" />
 </form>`,
     starterCode: `// Fill the input
-await page.fill('#email', 'qa@test.com');
+// Your code here
 
 // Assert value
-await expect(page.locator('#email')).toHaveValue('qa@test.com');
+// Your code here
+
 const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'forms', 'intermediate'],
@@ -1338,11 +1329,11 @@ await expect(page.locator('#notes')).toBeEditable();
   <button id="submit">Submit</button>
 </form>`,
     starterCode: `// Check the checkbox
-await page.check('#terms');
+// Your code here
 
 // Assert state
-await expect(page.locator('#terms')).toBeChecked();
-await expect(page.locator('#submit')).toBeEnabled();
+// Your code here
+
 const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'state', 'intermediate'],
@@ -1387,10 +1378,11 @@ await expect(page.locator('img')).toHaveAttribute('src', /\\.jpg$/);
   <img src="logo.png" alt="Company Logo" />
 </nav>`,
     starterCode: `// Assert href attribute
-await expect(page.locator('a')).toHaveAttribute('href', '/about');
+// Your code here
 
 // Assert alt attribute exists
-await expect(page.locator('img')).toHaveAttribute('alt', 'Company Logo');
+// Your code here
+
 const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'attributes', 'intermediate'],
@@ -1435,13 +1427,14 @@ await expect(page.locator('li')).toHaveCount(4);
 </ul>
 <button id="add" onclick="document.getElementById('list').innerHTML += '<li>New Item</li>'">Add Item</button>`,
     starterCode: `// Initial count
-await expect(page.locator('#list li')).toHaveCount(4);
+// Your code here
 
 // Add item
-await page.click('#add');
+// Your code here
 
 // Assert new count
-await expect(page.locator('#list li')).toHaveCount(5);
+// Your code here
+
 const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'count', 'intermediate'],
@@ -1484,7 +1477,8 @@ await expect(page).toHaveTitle(/Dashboard/);
   </body>
 </html>`,
     starterCode: `// Assert page title
-await expect(page).toHaveTitle('Test Page');
+// Your code here
+
 const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'url', 'title', 'intermediate'],
@@ -1534,9 +1528,8 @@ const errors = expect.soft.errors;
   <div id="pass-status" class="valid">✓ Password valid</div>
 </div>`,
     starterCode: `// Use soft assertions to check all statuses
-await expect.soft(page.locator('#name-status')).toContainText('valid');
-await expect.soft(page.locator('#email-status')).toContainText('valid');
-await expect.soft(page.locator('#pass-status')).toContainText('valid');
+// Your code here
+
 const result = 'passed';`,
     expectedOutput: 'passed',
     tags: ['playwright', 'assertions', 'soft', 'intermediate'],
