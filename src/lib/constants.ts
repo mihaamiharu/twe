@@ -18,28 +18,30 @@ export const categoryLabels: Record<string, string> = {
     'xpath-advanced': '🚀 XPath Advanced',
     'selector-comparison': '📗 CSS vs XPath',
     // Tier 2: Beginner (JavaScript)
-    'javascript': '📒 JavaScript Fundamentals',
-    'dom': '📓 DOM Understanding',
-    'async-await': '📔 Async/Await',
+    'js-fundamentals': '📒 JavaScript Fundamentals',
+    'js-dom': '📓 DOM Basics',
+    'js-async': '📔 Async Basics',
     // Tier 3: Intermediate (Playwright Basics)
     'playwright-navigation': '🎭 Navigation & Actions',
     'playwright-locators': '🔍 Locators',
     'playwright-assertions': '✅ Assertions',
     'playwright-waits': '⏳ Wait Strategies',
     // Tier 4: Expert (Advanced)
+    // Tier 4: Expert (Advanced)
     'playwright-pom': '🏗️ Page Object Model',
     'playwright-data-driven': '📊 Data-Driven Testing',
-    'playwright-advanced': '🚀 Advanced Patterns',
+    'playwright-infrastructure': '🔧 Test Infrastructure',
+    'playwright-integration-patterns': '🔄 Integration Patterns',
 };
 
 export function getTierFromCategory(category?: string): string {
     if (!category) return 'basic';
     if (category.startsWith('css-') || category.startsWith('xpath-') || category.startsWith('selector')) return 'basic';
-    if (category.startsWith('javascript') || category.startsWith('dom') || category.startsWith('async-await')) return 'beginner';
+    if (category.startsWith('js-')) return 'beginner';
     if (category.startsWith('playwright-navigation') || category.startsWith('playwright-locators') ||
         category.startsWith('playwright-assertions') || category.startsWith('playwright-waits')) return 'intermediate';
     if (category.startsWith('playwright-pom') || category.startsWith('playwright-data') ||
-        category.startsWith('playwright-advanced')) return 'expert';
+        category.startsWith('playwright-infrastructure') || category.startsWith('playwright-integration')) return 'expert';
     return 'basic';
 }
 
@@ -54,9 +56,9 @@ export const CATEGORY_ORDER: Record<string, number> = {
     'xpath-advanced': 3,
     'selector-comparison': 4,
     // Beginner Tier
-    'javascript': 1,
-    'dom': 2,
-    'async-await': 3,
+    'js-fundamentals': 1,
+    'js-dom': 2,
+    'js-async': 3,
     // Intermediate Tier
     'playwright-navigation': 1,
     'playwright-locators': 2,
@@ -65,5 +67,6 @@ export const CATEGORY_ORDER: Record<string, number> = {
     // Expert Tier
     'playwright-pom': 1,
     'playwright-data-driven': 2,
-    'playwright-advanced': 3,
+    'playwright-infrastructure': 3,
+    'playwright-integration-patterns': 4,
 };
