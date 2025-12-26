@@ -113,21 +113,37 @@ function LeaderboardPage() {
                         ) : (
                             <>
                                 {/* Top 3 Podium */}
+                                {/* Top 3 Podium - Centering logic */}
                                 {TopThree.length > 0 && (
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 items-end">
-                                        {/* 2nd Place */}
-                                        {TopThree[1] && <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />}
-                                        {/* 1st Place */}
-                                        {TopThree[0] && <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />}
-                                        {/* 3rd Place */}
-                                        {TopThree[2] && <PodiumCard user={TopThree[2]} rank={3} isAuthenticated={isAuthenticated} />}
+                                    <div className={cn(
+                                        "grid gap-6 mb-12 items-end",
+                                        TopThree.length === 1 ? "grid-cols-1 max-w-sm mx-auto" :
+                                            TopThree.length === 2 ? "grid-cols-2 max-w-2xl mx-auto" :
+                                                "grid-cols-1 md:grid-cols-3"
+                                    )}>
+                                        {/* Logic for 2 users: Show Rank 2 then Rank 1. Logic for 3: Rank 2, Rank 1, Rank 3 */}
+                                        {TopThree.length === 2 ? (
+                                            <>
+                                                <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />
+                                                <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />
+                                            </>
+                                        ) : TopThree.length === 1 ? (
+                                            <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />
+                                        ) : (
+                                            <>
+                                                {/* Standard 3-column Layout: 2nd, 1st, 3rd */}
+                                                <div className="order-2 md:order-1">{TopThree[1] && <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />}</div>
+                                                <div className="order-1 md:order-2">{TopThree[0] && <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />}</div>
+                                                <div className="order-3 md:order-3">{TopThree[2] && <PodiumCard user={TopThree[2]} rank={3} isAuthenticated={isAuthenticated} />}</div>
+                                            </>
+                                        )}
                                     </div>
                                 )}
 
-                                {/* Rest of Leaderboard - Only show if authenticated */}
-                                <Card className="glass-card border-none shadow-2xl bg-card/40 backdrop-blur-md overflow-hidden relative">
-                                    <CardContent className="p-0">
-                                        <div className="overflow-x-auto">
+                                {/* Rest of Leaderboard */}
+                                <Card className="glass-card border-none shadow-2xl bg-card/40 backdrop-blur-md overflow-hidden relative min-h-[400px] flex flex-col">
+                                    <CardContent className="p-0 flex-1 flex flex-col">
+                                        <div className="overflow-x-auto flex-1">
                                             <table className="w-full">
                                                 <thead className="bg-muted/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                                                     <tr>
@@ -139,12 +155,11 @@ function LeaderboardPage() {
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-border/30">
-                                                    {RestUsers.map((user, index) => (
+                                                    {RestUsers.length > 0 ? RestUsers.map((user, index) => (
                                                         <tr
                                                             key={user.id}
                                                             className={cn(
                                                                 "group transition-colors hover:bg-muted/20",
-                                                                // Blur everything for guests in the list view
                                                                 !isAuthenticated ? "blur-sm select-none opacity-50 pointer-events-none" : ""
                                                             )}
                                                         >
@@ -180,12 +195,19 @@ function LeaderboardPage() {
                                                                 </div>
                                                             </td>
                                                         </tr>
-                                                    ))}
+                                                    )) : (
+                                                        /* Empty State Row to keep table structure if needed, or just let min-h handle it */
+                                                        <tr className="h-32">
+                                                            <td colSpan={5} className="text-center text-muted-foreground">
+                                                                {isAuthenticated ? "No other runners yet. Invite your friends!" : ""}
+                                                            </td>
+                                                        </tr>
+                                                    )}
                                                 </tbody>
                                             </table>
                                         </div>
 
-                                        {/* Gating Overlay - Always visible for guests over the table area */}
+                                        {/* Gating Overlay for Guests */}
                                         {!isAuthenticated && (
                                             <div className="absolute inset-0 top-[0px] bg-gradient-to-b from-transparent via-background/60 to-background flex flex-col items-center justify-center p-6 text-center z-10 backdrop-blur-[2px]">
                                                 <Shield className="h-16 w-16 text-primary mb-4" />
