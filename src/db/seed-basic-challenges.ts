@@ -330,7 +330,7 @@ Select the **subtitle paragraph** that appears immediately after the main **Head
   // 2.3 Deep Nesting
   {
     slug: 'css-family-drill',
-    title: 'Deep Nesting Strategy',
+    title: 'Drill: Deep Nesting',
     description: 'Drill down a specific path to distinguish identical elements.',
     type: 'CSS_SELECTOR' as const,
     difficulty: 'MEDIUM' as const,

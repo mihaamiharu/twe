@@ -935,7 +935,7 @@ export const advancedPatternsChallenges = [
     difficulty: 'HARD' as const,
     category: 'playwright-integration-patterns',
     xpReward: 100,
-    order: 1001,
+    order: 1101,
     instructions: `# API + UI Testing
 
 Hybrid testing for efficiency!
@@ -990,7 +990,7 @@ const result = ""; // Set result based on verification`,
     difficulty: 'HARD' as const,
     category: 'playwright-integration-patterns',
     xpReward: 110,
-    order: 1002,
+    order: 1102,
     instructions: `# State Setup via API
 
 Skip slow UI flows for setup!
@@ -1047,7 +1047,7 @@ const result = await page.locator('#message').textContent();`,
     difficulty: 'HARD' as const,
     category: 'playwright-infrastructure',
     xpReward: 90,
-    order: 1003,
+    order: 1001,
     instructions: `# Screenshot on Failure
 
 Capture evidence for debugging!
@@ -1101,7 +1101,7 @@ const result = await page.locator('#result').textContent();`,
     difficulty: 'HARD' as const,
     category: 'playwright-infrastructure',
     xpReward: 95,
-    order: 1004,
+    order: 1002,
     instructions: `# Video Recording
 
 Record tests for review!
@@ -1161,7 +1161,7 @@ const result = await page.locator('#status').textContent();`,
     difficulty: 'HARD' as const,
     category: 'playwright-infrastructure',
     xpReward: 100,
-    order: 1005,
+    order: 1003,
     instructions: `# Retry Logic
 
 Handle flaky tests!
@@ -1219,7 +1219,7 @@ let result = await page.locator('#result').textContent();
     difficulty: 'HARD' as const,
     category: 'playwright-infrastructure',
     xpReward: 120,
-    order: 1006,
+    order: 1004,
     instructions: `# Parallel Execution
 
 Speed up test runs!
@@ -1276,7 +1276,7 @@ const result = await page.locator('#results').textContent();`,
     difficulty: 'HARD' as const,
     category: 'playwright-integration-patterns',
     xpReward: 110,
-    order: 1007,
+    order: 1103,
     instructions: `# Cross-browser Testing
 
 Test on Chromium, Firefox, WebKit!
@@ -1340,7 +1340,7 @@ const result = await page.locator('#result').textContent();`,
     difficulty: 'HARD' as const,
     category: 'playwright-integration-patterns',
     xpReward: 100,
-    order: 1008,
+    order: 1104,
     instructions: `# Mobile Viewport Testing
 
 Test responsive layouts!
@@ -1398,7 +1398,7 @@ const result = await page.locator('#layout').textContent();`,
     difficulty: 'HARD' as const,
     category: 'playwright-integration-patterns',
     xpReward: 100,
-    order: 1009,
+    order: 1105,
     instructions: `# CSV Workflow
 
 Simulate a realistic business flow: Upload -> Process -> Download.
@@ -1488,7 +1488,7 @@ const result = await page.locator('#status-area').textContent();`,
     difficulty: 'HARD' as const,
     category: 'playwright-infrastructure',
     xpReward: 115,
-    order: 1010,
+    order: 1005,
     instructions: `# Scenario: Self-Healing Test Suite
 
 Build test infrastructure that handles flaky tests gracefully.
@@ -1547,7 +1547,7 @@ const result = await retryWithScreenshot(async () => {
     difficulty: 'HARD' as const,
     category: 'playwright-integration-patterns',
     xpReward: 125,
-    order: 1011,
+    order: 1106,
     instructions: `# Scenario: E2E Pipeline Integration
 
 Create a complete integration test with setup, test, and teardown phases.
