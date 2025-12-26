@@ -1,137 +1,168 @@
 # Page Object Model (POM)
 
-Design pattern for maintainable test automation.
+Stop writing fragile scripts. Start building a maintainable test framework.
+
+## The Mental Model: The Dictionary
+
+Imagine reading a foreign book.
+
+* **The Text**: `#login-button`, `.auth-form input[type="email"]`, `div.alert-success`.
+* **The Meaning**: "Submit Login", "Email Field", "Success Message".
+
+Without POM, your test files are written in the raw foreign language (HTML Selectors).
+**Page Objects acts as the Dictionary.**
+It translates "Human Intent" (Login) into "Technical Implementation" (Click `#btn-789`).
+
+* **Test File**: Describes *What* happens. ("User logs in").
+* **Page Object File**: Describes *How* it happens. ("Find input A, type B, click C").
 
 ---
 
-## What is POM?
+## The Strategy: The "No Selectors in Tests" Rule
 
-Separates page structure from test logic:
+To achieve true maintainability, follow this strict rule:
+**Your test files (`.spec.ts`) should NEVER contain CSS or XPath selectors.**
+
+* ❌ **Bad Test**:
+
+    ```javascript
+    await page.fill('#username', 'alice');
+    await page.click('.btn-primary');
+    ```
+
+* ✅ **Good Test**:
+
+    ```javascript
+    const loginPage = new LoginPage(page);
+    await loginPage.login('alice');
+    ```
+
+**Why?**
+If valid selectors exist in your test files, you have leaked implementation details into your business logic. When the implementation changes, you have to edit the business logic files. That is an anti-pattern.
+
+---
+
+## The Real World Case: The Login Rebranding
+
+**The Scenario**:
+Your company rebrands. The dev team updates the "Login" button.
+
+* **Old ID**: `#login-btn`
+* **New ID**: `#sign-in-action`
+
+**The Nightmare (Without POM)**:
+You have 50 different test files that start with logging in.
+You have to `Find & Replace` across 50 files. You miss one. The build breaks.
+
+**The Dream (With POM)**:
+You open `LoginPage.js`. You change **one line**.
 
 ```javascript
+// Old
+this.submitBtn = page.locator('#login-btn');
+// New
+this.submitBtn = page.locator('#sign-in-action');
+```
+
+All 50 tests instantly work again because they were just asking for `loginPage.submit()`.
+
+---
+
+## The Code Structure
+
+### 1. The Page Class
+
+```javascript
+// pages/LoginPage.js
 class LoginPage {
     constructor(page) {
         this.page = page;
-        this.emailInput = page.locator('#email');
-        this.passwordInput = page.locator('#password');
-        this.submitButton = page.locator('#submit');
+        // Locators are defined in the constructor
+        this.username = page.getByLabel('Username');
+        this.password = page.getByLabel('Password');
+        this.submitBtn = page.getByRole('button', { name: 'Sign In' });
     }
 
-    async login(email, password) {
-        await this.emailInput.fill(email);
-        await this.passwordInput.fill(password);
-        await this.submitButton.click();
-    }
-}
-```
-
----
-
-## Benefits
-
-| Benefit | Description |
-|---------|-------------|
-| **Reusability** | Use same page in multiple tests |
-| **Maintainability** | Change selector in one place |
-| **Readability** | Tests read like user stories |
-
----
-
-## Action Methods
-
-```javascript
-class CartPage {
-    async addItem() {
-        await this.addButton.click();
-    }
-
-    async getTotal() {
-        return await this.totalLabel.textContent();
-    }
-
-    async checkout() {
-        await this.checkoutButton.click();
-        return new CheckoutPage(this.page);
+    // Actions act as a high-level API
+    async login(user, pass) {
+        await this.username.fill(user);
+        await this.password.fill(pass);
+        await this.submitBtn.click();
     }
 }
 ```
 
----
-
-## Components
-
-Extract reusable UI parts:
+### 2. The Test
 
 ```javascript
-class HeaderComponent {
-    constructor(page) {
-        this.container = page.locator('.header');
-        this.logoutButton = this.container.locator('#logout');
-    }
+// tests/login.spec.js
+test('User can login', async ({ page }) => {
+    const loginPage = new LoginPage(page);
+    await loginPage.goto();
+    await loginPage.login('alice', 'secret');
+    
+    // Assert on the next page
+    const dashboard = new DashboardPage(page);
+    await expect(dashboard.welcomeMessage).toBeVisible();
+});
+```
 
-    async logout() {
-        await this.logoutButton.click();
-    }
-}
+---
 
-class DashboardPage {
+## The Traps
+
+### Trap #1: The God Object
+
+**The Code**: putting Header, Footer, Login, Settings, and Profile logic all inside `HomePage`.
+**The Problem**: The file becomes 2000 lines long and unmanageable.
+**The Fix**: Use **Components**.
+
+```javascript
+class HomePage {
     constructor(page) {
         this.header = new HeaderComponent(page);
+        this.footer = new FooterComponent(page);
     }
 }
 ```
 
----
+### Trap #2: The Assertion Leak
 
-## Page Navigation
-
-Return next page from methods:
+**The Code**: Putting `expect()` inside your Page Object methods.
 
 ```javascript
-class LoginPage {
-    async login(email, password) {
-        await this.emailInput.fill(email);
-        await this.passwordInput.fill(password);
-        await this.submitButton.click();
-        return new HomePage(this.page);
-    }
+async verifySuccess() {
+    await expect(this.msg).toBeVisible(); // ❌ Don't do this
 }
-
-// Fluent usage
-const home = await loginPage.login('user', 'pass');
-const message = await home.getWelcome();
 ```
 
----
-
-## Base Class
-
-Share common functionality:
+**The Problem**: It couples your *automation lib* (Page Object) with your *test runner* (Expect). It makes the method hard to reuse if you want to check for "Not Visible".
+**The Fix**: Page Objects *return* state. Tests *assert* state.
 
 ```javascript
-class BasePage {
-    constructor(page) {
-        this.page = page;
-    }
+// Page
+getSuccessMessage() { return this.msg; }
 
-    async getTitle() {
-        return await this.page.title();
-    }
-}
-
-class ProductPage extends BasePage {
-    async getPrice() {
-        return await this.priceLabel.textContent();
-    }
-}
+// Test
+await expect(page.getSuccessMessage()).toBeVisible();
 ```
 
 ---
 
-## Practice Challenges
+## Quick Reference
 
-1. [First Page Object](/challenges/pw-first-page-object)
-2. [Encapsulate Actions](/challenges/pw-encapsulate-actions)
-3. [Page Components](/challenges/pw-page-components)
-4. [Page Navigation Pattern](/challenges/pw-page-navigation)
-5. [Base Page Class](/challenges/pw-base-page-class)
+| Component | Responsibility | Example |
+| :--- | :--- | :--- |
+| **Constructor** | Define Locators | `this.btn = page.locator(...)` |
+| **Methods** | Perform Actions | `async submit() { ... }` |
+| **Test** | Orchestrate & Assert | `await page.submit(); expect(...)` |
+
+---
+
+## Ready to Practice?
+
+Build your dictionary:
+
+1. [First Page Object](/challenges/pw-first-page-object) - The Basics.
+2. [Atomic Actions](/challenges/pw-encapsulate-actions) - Creating reusable methods.
+3. [Page Components](/challenges/pw-page-components) - Breaking up the God Object.
