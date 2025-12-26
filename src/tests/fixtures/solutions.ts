@@ -680,4 +680,165 @@ await page.selectOption('#viewport', 'mobile');
 await page.click('#apply');
 const result = await page.locator('#layout').textContent();
 `,
+
+    // Beginner Bosses
+    'js-fundamentals-boss': `
+const users = [
+    { name: "Alice", email: "alice@test.com", status: "active" },
+    { name: "Bob", email: "bob@test.com", status: "inactive" },
+    { name: "Carol", email: "carol@test.com", status: "active" },
+    { name: "Dave", email: "dave@test.com", status: "active" }
+];
+const activeEmails = users
+    .filter(user => user.status === "active")
+    .map(user => user.email);
+const result = activeEmails.length;
+`,
+    'dom-boss': `
+const cards = document.querySelectorAll('.stat-card');
+let totalSalesValue = 0;
+for (const card of cards) {
+    const label = card.querySelector('.label').textContent;
+    if (label === 'Total Sales') {
+        const valueText = card.querySelector('.value').textContent;
+        totalSalesValue = Number(valueText.replace(',', ''));
+    }
+}
+const result = totalSalesValue;
+`,
+    'async-boss': `
+const getUsers = () => Promise.resolve([1, 2, 3, 4, 5]);
+const getOrders = () => Promise.resolve([101, 102, 103]);
+const getProducts = () => Promise.resolve([201, 202, 203, 204]);
+
+async function aggregateData() {
+    try {
+        const [users, orders, products] = await Promise.all([
+            getUsers(),
+            getOrders(),
+            getProducts()
+        ]);
+        return users.length + orders.length + products.length;
+    } catch (error) {
+        return 0;
+    }
+}
+const result = await aggregateData();
+`,
+
+    // Intermediate Bosses
+    'pw-actions-boss': `
+await page.click('#add-btn');
+await page.fill('#qty', '3');
+await page.check('#express');
+await page.click('#checkout-btn');
+const result = await page.locator('#confirmation').textContent();
+`,
+    'pw-locators-boss': `
+// Filter is not supported in shim, use nth(1) to target second product (Pro)
+const productCard = page.locator('.product').nth(1);
+await productCard.locator('button').click();
+const result = await page.locator('#msg').textContent();
+`,
+    'pw-assertions-boss': `
+// Trigger input to ensure validation logic runs
+await page.fill('#email', '');
+await expect(page.locator('#email-error')).toBeVisible();
+await expect(page.locator('#submit')).toBeDisabled();
+await page.fill('#email', 'user@example.com');
+await page.fill('#password', 'password123');
+// toBeHidden is not supported by the shim, so we check manually
+const visible = await page.locator('#email-error').isVisible();
+if (visible) throw new Error('Expected email error to be hidden');
+await expect(page.locator('#submit')).toBeEnabled();
+const result = 'all assertions passed';
+`,
+    'pw-waits-boss': `
+// Use waitForFunction because :has-text selector is not supported by shim
+await page.waitForFunction(() => {
+    const el = document.getElementById('status');
+    return el && el.textContent.includes('Connected');
+});
+await page.waitForFunction(() => {
+    const el = document.getElementById('data');
+    return el && el.textContent.includes('Data received');
+});
+const dataText = await page.locator('#data').textContent();
+const result = dataText.split(': ')[1];
+`,
+
+    // Expert Bosses
+    'pw-pom-boss': `
+class ProductPage {
+    constructor(page) { this.page = page; }
+    async addToCart() {
+        await this.page.click('#add-to-cart');
+        return new CartPage(this.page);
+    }
+}
+class CartPage {
+    constructor(page) { this.page = page; }
+    async checkout() {
+        await this.page.click('#checkout');
+        return new CheckoutPage(this.page);
+    }
+}
+class CheckoutPage {
+    constructor(page) { this.page = page; }
+    async placeOrder() {
+        await this.page.click('#place-order');
+        return await this.page.locator('#confirmation h2').textContent();
+    }
+}
+const productPage = new ProductPage(page);
+const cartPage = await productPage.addToCart();
+const checkoutPage = await cartPage.checkout();
+const result = await checkoutPage.placeOrder();
+`,
+    'pw-data-driven-boss': `
+const users = [
+    { email: 'alice@test.com', password: 'pass1' },
+    { email: 'bob@test.com', password: 'pass2' }
+];
+const scenarios = ['login', 'verify'];
+let passed = 0;
+for (const user of users) {
+    for (const scenario of scenarios) {
+        await page.fill('#email', user.email);
+        await page.fill('#password', user.password);
+        await page.click('#login');
+        const result = await page.locator('#result').textContent();
+        if (result === 'Success') passed++;
+        await page.fill('#email', '');
+    }
+}
+const result = String(passed);
+`,
+    'pw-infrastructure-boss': `
+async function retryWithScreenshot(action, maxRetries = 3) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            await action();
+            const result = await page.locator('#result').textContent();
+            if (result.includes('Success')) {
+                return 'passed';
+            }
+        } catch (e) { }
+    }
+    return 'failed-with-screenshot';
+}
+const result = await retryWithScreenshot(async () => {
+    await page.click('#action');
+});
+`,
+    'pw-integration-boss': `
+await page.click('#setup');
+await page.waitForSelector('#data-display:not([style*="none"])');
+const userName = await page.locator('#user-name').textContent();
+const userEmail = await page.locator('#user-email').textContent();
+const setupValid = userName === 'Test User' && userEmail === 'test@example.com';
+await page.click('#cleanup');
+const cleanupStatus = await page.locator('#status').textContent();
+const result = setupValid && cleanupStatus === 'Cleanup complete' ? 'integration-passed' : 'integration-failed';
+`,
 };

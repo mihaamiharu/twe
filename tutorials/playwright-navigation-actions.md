@@ -2,182 +2,124 @@
 
 Master page navigation and user interactions with Playwright.
 
+## The Mental Model: The User vs The Driver
+
+In older tools (like Selenium), the script acted like a **Robot Driver**. It would blindly send a "Click" signal to an element, even if that element was invisible, covered by a popup, or animating across the screen.
+
+Playwright acts like a **Human User**.
+Before it clicks, it asks:
+
+1. Is it visible?
+2. Is it stable (not moving)?
+3. Is it enabled?
+4. Is it covered by anything?
+
+If the answer is "No", Playwright **waits** (Auto-waiting). It simulates how a real human behaves.
+
 ---
 
-## Page Navigation
+## The Strategy: The Actionability Checklist
+
+When your test fails with a "Timeout", don't panic. It usually means the **Actionability Checklist** failed.
+
+Playwright performs these checks for you automatically:
+
+* **Attached**: Is the element in the DOM?
+* **Visible**: Is it `display: none` or `visibility: hidden`?
+* **Stable**: Is the animation finished?
+* **Receives Events**: Is another element (like a sticky header) covering it?
+* **Enabled**: Is the `disabled` attribute present?
+
+**The Strategy**: Trust the wait. If Playwright isn't clicking, there is usually a real UX reason why.
+
+---
+
+## The Real World Case: The Floating Footer
+
+**The Scenario**:
+You have a specific "Save" button at the bottom of a long form.
+The site also has a "Accept Cookies" banner fixed to the bottom of the viewport.
+
+**The Action**:
 
 ```javascript
-// Navigate to URL
-await page.goto('https://example.com');
-await page.goto('/login');  // Relative path
+await page.locator('#save-btn').click();
+```
 
-// Get page info
-const url = page.url();
-const title = await page.title();
+**The Flake**:
+Playwright looks for `#save-btn`. It finds it. It tries to click center.
+**BUT** the Cookie banner is covering the center.
+Playwright throws an error: `"Element is intercepted by <div class='cookie-banner'>"`
 
-// Navigation options
-await page.goto('/page', { 
-    waitUntil: 'networkidle',
-    timeout: 30000
-});
+**The Fix**:
+Think like a user. A user would dismiss the banner or scroll until the button is clear.
+
+```javascript
+// 1. Dismiss interference
+await page.locator('#accept-cookies').click();
+
+// 2. Then act
+await page.locator('#save-btn').click();
 ```
 
 ---
 
-## Click Actions
+## The Traps
+
+### Trap #1: The Forced Click
+
+**The Crime**: `await page.click('#btn', { force: true });`
+**The Reality**: You are telling Playwright "I don't care if it's covered, click it anyway."
+**The Risk**: You might be clicking the "Cancel" button hidden *behind* the "Save" button. Or clicking a button that a real user literally cannot reach.
+**The Fix**: Never use `force: true` unless you are testing a CSS hack. Fix the visibility issue instead.
+
+### Trap #2: The Hover Phantom
+
+**The Crime**: Relying on `page.hover()` to show menus.
+**The Reality**: There is no "hover" on mobile. If your test relies on hover, your mobile responsive tests will fail.
+**The Fix**: Ensure your UI works with "Click to open" or ensure your test covers mobile scenarios explicitly.
+
+---
+
+## Core Actions Quick Reference
+
+### Navigation
 
 ```javascript
-// Basic click
-await page.click('#submit-btn');
-await page.locator('.menu-item').click();
+await page.goto('/dashboard');
+await page.waitForURL('**/login'); // Verify navigation happened
+```
 
-// Click variations
-await page.dblclick('#item');                    // Double-click
-await page.click('#menu', { button: 'right' });  // Right-click
-await page.click('#link', { force: true });      // Force click
-await page.click('#btn', { clickCount: 3 });     // Triple-click
+### Inputs
+
+```javascript
+// Smart Fill (Checks checks actionability)
+await page.locator('#email').fill('user@example.com');
+
+// Human Type (Simulates key presses - use sparingly)
+await page.locator('#search').pressSequentially('Hello', { delay: 100 });
+```
+
+### Clicks
+
+```javascript
+await page.locator('button').click();
+await page.locator('text=Save').dblclick();
+```
+
+### Selects
+
+```javascript
+await page.locator('select').selectOption('blue');
 ```
 
 ---
 
-## Form Inputs
+## Ready to Practice?
 
-### Fill vs Type
-
-```javascript
-// fill() - Replaces entire value (fast)
-await page.fill('#email', 'test@example.com');
-
-// type() - Types character by character
-await page.type('#search', 'hello', { delay: 100 });
-
-// Clear and fill
-await page.locator('#input').clear();
-await page.locator('#input').fill('new value');
-
-// Get value
-const value = await page.locator('#input').inputValue();
-```
-
-### Dropdowns
-
-```javascript
-// By value
-await page.selectOption('#country', 'usa');
-
-// By label
-await page.selectOption('#size', { label: 'Large' });
-
-// Multiple selection
-await page.selectOption('#colors', ['red', 'blue']);
-```
-
-### Checkboxes & Radio
-
-```javascript
-await page.check('#agree');
-await page.uncheck('#newsletter');
-
-const isChecked = await page.isChecked('#terms');
-```
-
----
-
-## Keyboard Actions
-
-```javascript
-// Press single key
-await page.press('#input', 'Enter');
-await page.press('body', 'Escape');
-
-// Key combinations
-await page.press('#editor', 'Control+a');
-await page.press('#editor', 'Control+c');
-
-// Type with delay
-await page.type('#search', 'text', { delay: 50 });
-```
-
----
-
-## Mouse Actions
-
-```javascript
-// Hover
-await page.hover('#menu-item');
-await page.locator('.dropdown').hover();
-
-// Focus/Blur
-await page.focus('#email');
-await page.locator('#input').blur();
-
-// Drag and Drop
-await page.locator('#source').dragTo(page.locator('#target'));
-```
-
----
-
-## File Upload
-
-```javascript
-// Single file
-await page.setInputFiles('#upload', 'path/to/file.pdf');
-
-// Multiple files
-await page.setInputFiles('#upload', ['file1.jpg', 'file2.jpg']);
-
-// Clear files
-await page.setInputFiles('#upload', []);
-```
-
----
-
-## Working with iFrames
-
-```javascript
-// Access iframe content
-const frame = page.frameLocator('#embed');
-await frame.locator('button').click();
-
-// By name or URL
-const frame = page.frame({ name: 'my-frame' });
-const frame = page.frame({ url: /embed/ });
-```
-
----
-
-## Quick Reference
-
-| Action | Code |
-|--------|------|
-| Navigate | `page.goto('/path')` |
-| Click | `page.click('#btn')` |
-| Fill input | `page.fill('#input', 'text')` |
-| Select option | `page.selectOption('#sel', 'val')` |
-| Check box | `page.check('#cb')` |
-| Press key | `page.press('#el', 'Enter')` |
-| Hover | `page.hover('#el')` |
-| Upload | `page.setInputFiles('#f', 'file')` |
-| Drag/Drop | `locator.dragTo(target)` |
-| iFrame | `page.frameLocator('#frame')` |
-
----
-
-## Practice Challenges
+Test your interactions:
 
 1. [Page Navigation](/challenges/pw-page-navigation)
 2. [Click Actions](/challenges/pw-click-actions)
 3. [Fill & Type](/challenges/pw-fill-type)
-4. [Select Dropdowns](/challenges/pw-select-dropdowns)
-5. [Checkbox & Radio](/challenges/pw-checkbox-radio)
-6. [Keyboard Actions](/challenges/pw-keyboard-actions)
-7. [Hover & Focus](/challenges/pw-hover-focus)
-8. [File Upload](/challenges/pw-file-upload)
-9. [Drag & Drop](/challenges/pw-drag-drop)
-10. [Working with iFrames](/challenges/pw-iframes)
-
----
-
-## Next Steps
-
-Continue with [Playwright Locators](/tutorials/playwright-locators) to master advanced element selection.
+4. [Checkbox & Radio](/challenges/pw-checkbox-radio)

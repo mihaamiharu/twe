@@ -283,6 +283,34 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         setSelectorType(type);
     }, []);
 
+    // Keyboard Shortcuts
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // Run Code: Cmd/Ctrl + Enter
+            if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === 'Enter') {
+                e.preventDefault();
+                if (isCodeChallenge && !isRunning) {
+                    handleRunCode();
+                } else if (isSelectorChallenge && selector) {
+                    handleValidateSelector();
+                }
+            }
+
+            // Submit: Cmd/Ctrl + Shift + Enter
+            if ((e.metaKey || e.ctrlKey) && e.shiftKey && e.key === 'Enter') {
+                e.preventDefault();
+                if (hasPassed) {
+                    handleSubmit();
+                }
+            }
+
+
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [handleRunCode, handleValidateSelector, handleSubmit, handleReset, isCodeChallenge, isSelectorChallenge, isRunning, selector, hasPassed]);
+
     return (
         <div className={cn('flex flex-col h-full bg-background animate-fade-in', className)}>
             {/* Header */}
@@ -323,6 +351,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                 ? "bg-green-600 hover:bg-green-700 text-white"
                                 : "opacity-50 cursor-not-allowed"
                         )}
+                        title="Submit Solution (Cmd/Ctrl + Shift + Enter)"
                     >
                         <Send className="h-4 w-4 mr-2" />
                         Submit Solution
@@ -442,6 +471,15 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                 <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
                                     <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">1</div>
                                     Solution Code
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-6 w-6 ml-auto text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                        onClick={handleReset}
+                                        title="Reset to starter code"
+                                    >
+                                        <RotateCcw className="h-3 w-3" />
+                                    </Button>
                                 </h3>
                                 <div className="flex-1 min-h-0">
                                     <CodeEditor
@@ -472,6 +510,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         onClick={handleRunCode}
                                         disabled={isRunning}
                                         className="btn-animate relative z-10"
+                                        title="Run Code (Cmd/Ctrl + Enter)"
                                     >
                                         {isRunning ? (
                                             <Loader2 className="h-4 w-4 mr-2 animate-spin" />

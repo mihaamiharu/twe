@@ -17,3 +17,5 @@ test-results.xml
 test-results/
 lint-results.json
 lint-results.json
+
+playwright-report/

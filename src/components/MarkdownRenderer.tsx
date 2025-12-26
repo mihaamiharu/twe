@@ -1,3 +1,4 @@
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
@@ -71,16 +72,16 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                     },
                     // Lists
                     ul: ({ children }) => (
-                        <ul className="list-disc list-inside space-y-2 mb-4 text-muted-foreground">
+                        <ul className="list-disc list-outside ml-6 space-y-2 mb-4 text-muted-foreground">
                             {children}
                         </ul>
                     ),
                     ol: ({ children }) => (
-                        <ol className="list-decimal list-inside space-y-2 mb-4 text-muted-foreground">
+                        <ol className="list-decimal list-outside ml-6 space-y-2 mb-4 text-muted-foreground">
                             {children}
                         </ol>
                     ),
-                    li: ({ children }) => <li className="pl-2">{children}</li>,
+                    li: ({ children }) => <li className="pl-1">{children}</li>,
                     // Links
                     a: ({ href, children }) => (
                         <a
@@ -92,12 +93,79 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                             {children}
                         </a>
                     ),
-                    // Blockquotes
-                    blockquote: ({ children }) => (
-                        <blockquote className="border-l-4 border-primary pl-4 italic text-muted-foreground my-4">
-                            {children}
-                        </blockquote>
-                    ),
+                    // Blockquotes with GitHub Alert support
+                    blockquote: ({ children }) => {
+                        // Check if it's an alert
+                        let alertType: 'note' | 'tip' | 'important' | 'warning' | 'caution' | null = null;
+                        let content = children;
+
+                        // React-markdown usually wraps text in a p tag
+                        const firstChild = React.Children.toArray(children)[0] as any;
+                        if (firstChild && firstChild.props && firstChild.props.node && firstChild.props.node.tagName === 'p') {
+                            const text = firstChild.props.children[0];
+                            if (typeof text === 'string') {
+                                const match = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+                                if (match) {
+                                    alertType = match[1].toLowerCase() as any;
+                                    // Remove the alert tag from the first paragraph
+                                    const cleanText = text.replace(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i, '').trim();
+
+                                    // We need to clone the children structure but replace the first text node
+                                    // This is a bit hacky in simple React, but for basic usage:
+                                    const newP = React.cloneElement(firstChild, {
+                                        ...firstChild.props,
+                                        children: [cleanText, ...firstChild.props.children.slice(1)]
+                                    });
+                                    content = [newP, ...React.Children.toArray(children).slice(1)];
+                                }
+                            }
+                        }
+
+                        if (alertType) {
+                            const styles = {
+                                note: 'bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-300',
+                                tip: 'bg-green-500/10 border-green-500 text-green-700 dark:text-green-300',
+                                important: 'bg-purple-500/10 border-purple-500 text-purple-700 dark:text-purple-300',
+                                warning: 'bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-300',
+                                caution: 'bg-red-500/10 border-red-500 text-red-700 dark:text-red-300',
+                            };
+
+                            const titles = {
+                                note: 'Mental Model', // Custom mapping for our "Mental Model"
+                                tip: 'Pro Tip',
+                                important: 'Key Concept',
+                                warning: 'Watch Out',
+                                caution: 'The Trap', // Custom mapping for "The Trap"
+                            };
+
+                            const icons = {
+                                note: '🧠',
+                                tip: '💡',
+                                important: '🔑',
+                                warning: '⚠️',
+                                caution: '🪤',
+                            };
+
+                            return (
+                                <div className={cn("my-6 p-4 rounded-lg border-l-4", styles[alertType])}>
+                                    <div className="font-bold flex items-center gap-2 mb-2">
+                                        <span>{icons[alertType]}</span>
+                                        {titles[alertType]}
+                                    </div>
+                                    <div className="text-muted-foreground/90 space-y-2">
+                                        {content}
+                                    </div>
+                                </div>
+                            );
+                        }
+
+                        // Standard blockquote
+                        return (
+                            <blockquote className="border-l-4 border-primary/50 pl-4 py-1 italic text-muted-foreground my-6 bg-muted/20 rounded-r-lg">
+                                {children}
+                            </blockquote>
+                        );
+                    },
                     // Tables
                     table: ({ children }) => (
                         <div className="overflow-x-auto my-4">

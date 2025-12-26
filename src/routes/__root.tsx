@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
 import { getServerSession, type AuthSession } from '@/lib/auth.fn';
+import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
@@ -39,7 +40,8 @@ export interface RootContext {
 
 export const Route = createRootRoute({
   beforeLoad: async () => {
-    const auth = await getServerSession();
+    // Optimization: Check cache first to avoid blocking every navigation
+    const auth = await queryClient.ensureQueryData(authQueryOptions);
     return { auth };
   },
   head: () => ({
@@ -79,19 +81,17 @@ export const Route = createRootRoute({
 
 function RootComponent() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <ThemeProvider>
-        <GoogleAnalytics />
-        <div className="flex flex-col min-h-screen">
-          <Header />
-          <main className="flex-1">
-            <Outlet />
-          </main>
-          <Footer />
-          <Toaster position="bottom-right" theme="system" />
-        </div>
-      </ThemeProvider>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <GoogleAnalytics />
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <Footer />
+        <Toaster position="bottom-right" theme="system" />
+      </div>
+    </ThemeProvider>
   );
 }
 
@@ -116,18 +116,20 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
       </head>
       <body className="scrollbar-thin" suppressHydrationWarning>
-        {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
+        <QueryClientProvider client={queryClient}>
+          {children}
+          <TanStackDevtools
+            config={{
+              position: 'bottom-right',
+            }}
+            plugins={[
+              {
+                name: 'Tanstack Router',
+                render: <TanStackRouterDevtoolsPanel />,
+              },
+            ]}
+          />
+        </QueryClientProvider>
         <Scripts />
       </body>
     </html>
