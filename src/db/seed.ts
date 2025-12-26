@@ -48,45 +48,63 @@ async function seed() {
             description: 'Learn the fundamentals of CSS selectors for web testing and automation.',
             content: `# CSS Selectors Basics
 
-CSS selectors are patterns used to select and target HTML elements. They're essential for web testing and automation.
+> [!NOTE]
+> **The Mental Model**: Think of CSS Selectors like a **Mailing Address**.
+> *   **Tag**: "Deliver to every House" (Broad)
+> *   **Class**: "Deliver to every Blue House" (Specific Group)
+> *   **ID**: "Deliver to 123 Maple Street" (Unique Location)
 
-## Types of Selectors
+CSS selectors are the GPS coordinates of the web. In automation, we use them to tell our bots exactly which element to interact with.
 
-### 1. Element Selector
-Selects all elements of a given type.
+## 1. The Big Three
+
+### Element Selector (The "City")
+Selects generally by type. Good for lists, bad for specific buttons.
 \`\`\`css
-p { color: blue; }
+button { color: blue; } /* Grabs EVERY button */
 \`\`\`
 
-### 2. Class Selector
-Selects elements with a specific class (prefixed with \`.\`).
+### Class Selector (The "Neighborhood")
+Selects a group of elements.
 \`\`\`css
-.highlight { background: yellow; }
+.btn-primary { background: blue; } /* Grabs all primary buttons */
 \`\`\`
 
-### 3. ID Selector
-Selects an element with a specific ID (prefixed with \`#\`).
+> [!TIP]
+> **Strategy**: Use classes when you want to test a *type* of component (e.g., "All primary buttons should be blue").
+
+### ID Selector (The "Exact Address")
+Selects a single, unique element.
 \`\`\`css
-#header { font-size: 24px; }
+#submit-login { width: 100%; }
 \`\`\`
 
-### 4. Attribute Selector
-Selects elements based on attributes.
+> [!IMPORTANT]
+> **Best Practice**: IDs are the Gold Standard for automation because they are (supposed to be) unique. If an element has an ID, use it!
+
+## 2. Advanced Targeting
+
+### Attribute Selectors
+When you don't have a clean ID or Class, look for attributes.
 \`\`\`css
-[type="submit"] { cursor: pointer; }
+[type="submit"]       /* The submit button */
+[data-testid="login"] /* A custom test attribute (The Holy Grail!) */
 \`\`\`
 
-## Combining Selectors
+### Combinators (The Directions)
+Sometimes you need to say "The input *inside* the login form".
+\`\`\`css
+.login-form input  /* Space = Descendant (any level deep) */
+.login-form > div  /* > = Direct Child (immediate level only) */
+\`\`\`
 
-You can combine selectors for more specific targeting:
+> [!CAUTION]
+> **The Trap**: Avoid overly strict chains like \`div > div > ul > li > span\`.
+> This is "Brittle". If a developer adds one extra \`div\` wrapper, your test breaks.
+> **Fix**: Use specific attributes or shorter chains like \`.card .title\`.
 
-- \`div.container\` - div with class "container"
-- \`#form input\` - input inside element with id "form"
-- \`.btn.primary\` - element with both "btn" and "primary" classes
-
-## Practice
-
-Try the CSS Selector challenges to practice what you've learned!
+## 3. Practice
+Ready to try? The challenges below will ask you to find elements using these exact patterns.
 `,
             order: 1,
             estimatedMinutes: 10,
@@ -102,6 +120,156 @@ Try the CSS Selector challenges to practice what you've learned!
 
         if (cssTutorial) {
             console.log(`   Tutorial: ${cssTutorial.title}`);
+        }
+
+        const xpathContent = `# XPath Selectors Basics
+
+> [!NOTE]
+> **The Mental Model**: Think of XPath like **File System Paths**.
+> *   \`/html/body/div\`: Absolute Path (Fragile). Like \`C:/Users/Docs/File.txt\`.
+> *   \`//div[@id="main"]\`: Relative Search (Robust). Like "Search whole drive for folder named 'main'".
+
+When CSS selectors hit a wall (like "Parent of this button"), XPath is your heavy lifter.
+
+## 1. The Syntax
+
+### Absolute vs Relative
+\`\`\`xpath
+/html/body/div/p  /* Absolute: Starts from root (Don't use this!) */
+//p              /* Relative: Finds 'p' anywhere */
+\`\`\`
+
+> [!CAUTION]
+> **The Trap**: Copying XPath from Chrome/Firefox often gives you \`/html/body/...\`.
+> **Fix**: Always write your own relative XPaths using attributes.
+
+## 2. The Power Moves
+
+### Text Matching (The Superpower)
+CSS can't do this. XPath can.
+\`\`\`xpath
+//button[text()="Submit"]
+//div[contains(text(), "Welcome")]
+\`\`\`
+> [!TIP]
+> **Strategy**: Use this for buttons with dynamic IDs but stable text (e.g., "Save", "Cancel").
+
+### Attributes
+Just like CSS, but slightly more verbose.
+\`\`\`xpath
+//input[@id="username"]
+//a[@href="/login"]
+\`\`\`
+
+### Traversal (Going Up!)
+CSS only goes down. XPath goes both ways.
+\`\`\`xpath
+//span[text()="Price"]/parent::div  /* Finds the div containing the Price span */
+\`\`\`
+
+## 3. Practice
+Use the challenges below to master these pathfinding skills.
+`;
+
+
+        let xpathTutorial = (await db.insert(tutorials).values({
+            slug: 'xpath-selectors-basics',
+            title: 'XPath Selectors Basics',
+            description: 'Master the power of XPath for complex DOM navigation.',
+            content: xpathContent,
+            order: 2,
+            estimatedMinutes: 15,
+            tags: ['xpath', 'selectors', 'intermediate'],
+            isPublished: true,
+            viewCount: 0,
+        }).onConflictDoUpdate({
+            target: tutorials.slug,
+            set: {
+                content: xpathContent,
+                title: 'XPath Selectors Basics',
+                description: 'Master the power of XPath for complex DOM navigation.',
+                estimatedMinutes: 15,
+                tags: ['xpath', 'selectors', 'intermediate'],
+                isPublished: true,
+                order: 2
+            }
+        }).returning())[0];
+
+        if (!xpathTutorial) {
+            console.log('   Tutorial already exists, fetching...');
+            [xpathTutorial] = await db.select().from(tutorials).where(eq(tutorials.slug, 'xpath-selectors-basics'));
+        }
+
+        if (xpathTutorial) {
+            console.log(`   Tutorial: ${xpathTutorial.title}`);
+        }
+
+        let playwrightTutorial = (await db.insert(tutorials).values({
+            slug: 'playwright-basics',
+            title: 'Playwright Basics',
+            description: 'Start automating with the modern, reliable browser automation tool.',
+            content: `# Playwright Basics
+
+> [!NOTE]
+> **The Mental Model**: Think of Playwright like a **Universal Remote Control**.
+> *   **Browser**: The TV.
+> *   **Playwright Script**: The buttons you press.
+> *   **You**: The one holding the remote (writing the script).
+
+You aren't "in" the browser. You are sending signals to it.
+
+## 1. The Superpower: Auto-Waiting
+In older tools (Selenium), you had to say "Wait for button... is it there?... okay click".
+Playwright is smart. When you say \`click\`, it automatically:
+1.  Checks if element exists.
+2.  Checks if it's visible.
+3.  Checks if it's stable (not moving).
+4.  Checks if it's not covered by something else.
+5.  CLICKS!
+
+> [!TIP]
+> **Strategy**: Trust the auto-wait. Don't add random \`sleep(5000)\` commands. That's flimsy.
+
+## 2. Basic Actions
+
+### Navigation
+Go to a website.
+\`\`\`javascript
+await page.goto('https://example.com');
+\`\`\`
+
+### Interaction
+Clicking and Typing.
+\`\`\`javascript
+await page.click('#submit-btn');
+await page.fill('#email', 'demo@test.com');
+\`\`\`
+
+> [!CAUTION]
+> **The Trap**: Racing the Browser.
+> Even with auto-waiting, if your page loads data *after* a click, you might need to wait for that specific data.
+> **Fix**: Use \`await expect(locator).toBeVisible()\` to be sure.
+
+## 3. Assertions (The Test)
+An automation script without assertions is just a robot clicking things.
+\`\`\`javascript
+await expect(page.locator('#success')).toContainText('Welcome!');
+\`\`\`
+`,
+            order: 3,
+            estimatedMinutes: 20,
+            tags: ['playwright', 'javascript', 'automation'],
+            isPublished: true,
+            viewCount: 0,
+        }).onConflictDoNothing().returning())[0];
+
+        if (!playwrightTutorial) {
+            console.log('   Tutorial already exists, fetching...');
+            [playwrightTutorial] = await db.select().from(tutorials).where(eq(tutorials.slug, 'playwright-basics'));
+        }
+
+        if (playwrightTutorial) {
+            console.log(`   Tutorial: ${playwrightTutorial.title}`);
         }
 
         // ============================================================================
@@ -126,7 +294,7 @@ Your task is to write a CSS selector that targets the submit button.
 Write a selector that uniquely identifies the submit button in the HTML below.
 
 ## Tips
-- Look for unique attributes like \`id\`, \`class\`, or \`type\`
+        - Look for unique attributes like \`id\`, \`class\`, or \`type\`
 - You can use element selectors combined with attributes
 - Keep your selector as simple as possible
 `,
@@ -189,6 +357,7 @@ Write an XPath that uniquely identifies the About link.
 </header>`,
             starterCode: '',
             tags: ['xpath', 'selector', 'intermediate'],
+            tutorialId: xpathTutorial.id,
             isPublished: true,
             completionCount: 0,
         }).onConflictDoNothing().returning())[0];
@@ -243,6 +412,7 @@ await page.getByText('Submit').click();
 
 `,
             tags: ['playwright', 'javascript', 'beginner'],
+            tutorialId: playwrightTutorial.id,
             isPublished: true,
             completionCount: 0,
         }).onConflictDoNothing().returning())[0];
@@ -250,6 +420,14 @@ await page.getByText('Submit').click();
         if (!jsChallenge) {
             [jsChallenge] = await db.select().from(challenges).where(eq(challenges.slug, 'click-the-button-playwright'));
         }
+
+        // Force update the tutorial link (in case it existed but was orphaned)
+        if (jsChallenge && playwrightTutorial) {
+            await db.update(challenges)
+                .set({ tutorialId: playwrightTutorial.id })
+                .where(eq(challenges.id, jsChallenge.id));
+        }
+
         console.log(`   Challenge: ${jsChallenge.title} (PLAYWRIGHT)`);
 
         // ============================================================================

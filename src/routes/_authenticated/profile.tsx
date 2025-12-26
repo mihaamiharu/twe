@@ -228,9 +228,9 @@ function ProfilePage() {
                                             <span className="text-xl">🟡</span>
                                             <span className="font-medium">Beginner (JavaScript)</span>
                                         </div>
-                                        <Badge variant="secondary">23 challenges</Badge>
+                                        <Badge variant="secondary">26 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(jsCount / 23 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(jsCount / 26 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* Tier: Intermediate */}
@@ -240,9 +240,9 @@ function ProfilePage() {
                                             <span className="text-xl">🟠</span>
                                             <span className="font-medium">Intermediate (Playwright)</span>
                                         </div>
-                                        <Badge variant="secondary">32 challenges</Badge>
+                                        <Badge variant="secondary">37 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(playwrightCount / 32 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(playwrightCount / 37 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* Tier: Expert */}
@@ -252,9 +252,9 @@ function ProfilePage() {
                                             <span className="text-xl">🔴</span>
                                             <span className="font-medium">Expert (Advanced)</span>
                                         </div>
-                                        <Badge variant="secondary">18 challenges</Badge>
+                                        <Badge variant="secondary">23 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(Math.max(playwrightCount - 32, 0) / 18 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(Math.max(playwrightCount - 37, 0) / 23 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* XP Milestones */}
@@ -332,7 +332,7 @@ function ProfilePage() {
                                 <CardContent className="p-8 text-center text-muted-foreground">
                                     <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />
                                     <p>No achievements yet. Complete challenges to earn badges!</p>
-                                    <p className="text-sm mt-2">15 badges available to unlock</p>
+                                    <p className="text-sm mt-2">30 badges available to unlock</p>
                                 </CardContent>
                             </Card>
                         ) : (

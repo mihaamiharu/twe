@@ -2,150 +2,111 @@
 
 Verify your test expectations with Playwright's rich assertion library.
 
+## The Mental Model: The Verdict
+
+Navigation and clicks are just "Evidence Gathering".
+**Assertions are the Verdict.**
+
+If your test clicks 50 buttons but contains no assertions, **it is not a test**. It's just a joyride script. It will pass even if the page crashes (as long as the crash doesn't throw a JS error).
+
+Assertions act as **Guard Rails**. They freeze the test and say: "I will not proceed to Step 2 until Step 1 is visibly correct."
+
 ---
 
-## Auto-Retrying Assertions
+## The Strategy: The "Retry-ability" Rule
 
-Playwright assertions automatically retry until the condition is met or timeout:
+This is the most critical concept in Playwright.
+
+**The Bad Pattern (Static)**:
 
 ```javascript
-// Will retry for up to 5 seconds (default)
+// ❌ WRONG
+const text = await page.locator('.status').innerText();
+expect(text).toBe('Success');
+```
+
+* *Why it fails*: It grabs the text at millisecond 0. If the text changes to "Success" at millisecond 10, the test failed for no good reason.
+
+**The Good Pattern (Auto-Retrying)**:
+
+```javascript
+// ✅ RIGHT
+await expect(page.locator('.status')).toHaveText('Success');
+```
+
+* *Why it wins*: Playwright sees the text isn't "Success" yet. It waits. It checks again. It keeps checking for 5 seconds (default). It only fails if it *never* becomes "Success".
+
+**The Rule**: Always use `expect(locator)` matchers (Web-First). Avoid `expect(value)` matchers (Generic) for UI elements.
+
+---
+
+## The Real World Case: The Spinning Loader
+
+**The Scenario**:
+You click "Save". A spinner appears for 2 seconds, then disappears.
+You want to verify the save occurred.
+
+**The Flake**:
+
+```javascript
+// Flaky! might pass before spinner even appears
+await expect(page.locator('.spinner')).toBeHidden();
+```
+
+**The Reality**:
+Playwright runs extremely fast. It might check for `.spinner` visibility *before* the React state updates to show it. "It's hidden! Test passed!"... then the spinner appears.
+
+**The Fix**:
+Assert the *presence* of the transition, then the *absence*.
+
+```javascript
+// 1. Wait for it to start working
+await expect(page.locator('.spinner')).toBeVisible();
+
+// 2. Wait for it to finish working
 await expect(page.locator('.spinner')).toBeHidden();
 ```
 
 ---
 
-## Visibility
+## The Traps
 
-```javascript
-// Check visibility
-await expect(page.locator('#modal')).toBeVisible();
-await expect(page.locator('.loader')).toBeHidden();
-await expect(page.locator('.error')).not.toBeVisible();
-```
+### Trap #1: The Zombie Assertion
 
----
+**The Crime**: `expect(await locator.isVisible()).toBe(true);`
+**The Reality**: You are `await`ing the boolean value. You get `false`. You assert that `false` is `true`.
+**The Verdict**: Failed test. No retry.
+**The Fix**: `await expect(locator).toBeVisible();`
 
-## Text Content
+### Trap #2: The Negative Truth
 
-```javascript
-// Exact match
-await expect(page.locator('h1')).toHaveText('Welcome');
+**The Crime**: `expect(locator).not.toBeVisible()` vs `expect(locator).toBeHidden()`
+**The Reality**: They are technically the same, but `toBeHidden()` reads like a specific state (The element exists but is `display:none` OR the element does not exist).
+**The Fix**: Prefer **readable methods**.
 
-// Partial match
-await expect(page.locator('p')).toContainText('hello');
-
-// Regex
-await expect(page.locator('.status')).toHaveText(/success/i);
-```
-
----
-
-## Input Values
-
-```javascript
-await expect(page.locator('#email')).toHaveValue('test@example.com');
-await expect(page.locator('#search')).toHaveValue('');  // Empty
-```
-
----
-
-## State Assertions
-
-```javascript
-// Checked state
-await expect(page.locator('#terms')).toBeChecked();
-await expect(page.locator('#opt-out')).not.toBeChecked();
-
-// Disabled/Enabled
-await expect(page.locator('#submit')).toBeDisabled();
-await expect(page.locator('#next')).toBeEnabled();
-
-// Editable
-await expect(page.locator('#notes')).toBeEditable();
-```
-
----
-
-## Attributes
-
-```javascript
-await expect(page.locator('a')).toHaveAttribute('href', '/home');
-await expect(page.locator('img')).toHaveAttribute('src', /\.jpg$/);
-```
-
----
-
-## Element Count
-
-```javascript
-await expect(page.locator('.item')).toHaveCount(5);
-await expect(page.locator('.error')).toHaveCount(0);
-```
-
----
-
-## Page Assertions
-
-```javascript
-// URL
-await expect(page).toHaveURL('https://example.com/login');
-await expect(page).toHaveURL(/\/dashboard$/);
-
-// Title
-await expect(page).toHaveTitle('Welcome');
-await expect(page).toHaveTitle(/Dashboard/);
-```
-
----
-
-## Soft Assertions
-
-Continue after failures:
-
-```javascript
-// Regular - stops on failure
-await expect(locator).toHaveText('A');
-
-// Soft - continues on failure
-await expect.soft(locator).toHaveText('A');
-await expect.soft(locator).toHaveText('B');
-// Failures collected, test continues
-```
+* `toBeEnabled()`
+* `toBeDisabled()` (Better than `not.toBeEnabled()`)
 
 ---
 
 ## Quick Reference
 
-| Assertion | Description |
-|-----------|-------------|
-| `toBeVisible()` | Element visible |
-| `toBeHidden()` | Element hidden |
-| `toHaveText()` | Exact text match |
-| `toContainText()` | Contains text |
-| `toHaveValue()` | Input value |
-| `toBeChecked()` | Checkbox checked |
-| `toBeEnabled()` | Not disabled |
-| `toHaveAttribute()` | Has attribute |
-| `toHaveCount()` | Element count |
-| `toHaveURL()` | Page URL |
-| `toHaveTitle()` | Page title |
+| Method | Check |
+| :--- | :--- |
+| `toBeVisible()` | Visible to user (opacity > 0) |
+| `toBeHidden()` | Not in DOM or `display: none` |
+| `toHaveText()` | String match (retries) |
+| `toHaveValue()` | Input value (retries) |
+| `toHaveURL()` | Current URL regex |
+| `toHaveTitle()` | Page title regex |
+| `toBeChecked()` | Checkbox state |
 
 ---
 
-## Practice Challenges
+## Ready to Practice?
 
-1. [toBeVisible & toBeHidden](/challenges/pw-to-be-visible)
-2. [toHaveText](/challenges/pw-to-have-text)
-3. [toHaveValue](/challenges/pw-to-have-value)
-4. [State Assertions](/challenges/pw-state-assertions)
-5. [toHaveAttribute](/challenges/pw-to-have-attribute)
-6. [toHaveCount](/challenges/pw-to-have-count)
-7. [Page Assertions](/challenges/pw-page-assertions)
-8. [Soft Assertions](/challenges/pw-soft-assertions)
+Judge your code:
 
----
-
-## Next Steps
-
-Continue with [Playwright Wait Strategies](/tutorials/playwright-waits) to handle async operations.
+1. [Visibility Checks](/challenges/pw-to-be-visible) - The Spinner problem.
+2. [Text Verification](/challenges/pw-to-have-text) - Handling dynamic text.
+3. [State assertions](/challenges/pw-state-assertions) - Disabled, Checked, Editable.

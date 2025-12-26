@@ -1,86 +1,126 @@
 # Advanced Playwright Patterns
 
-Production-ready testing patterns for expert automation.
+Move beyond basic scripting. Build a high-performance, expert-level framework.
+
+## The Mental Model: The Factory Line
+
+* **Manual Testing**: An artisan hand-crafting a single car. Slow, precise, unique.
+* **Expert Automation**: A high-speed factory line.
+  * Robots (API calls) handle the heavy lifting (Setup).
+  * Specialists (UI Tests) only touch the final screws.
+  * Everything runs in parallel.
+
+If your "Factory" takes 1 hour to build one "Car" (Test Run), you are doing it wrong. It should take 5 minutes.
 
 ---
 
-## API + UI Hybrid
+## The Strategy: The UI Bypass
+
+The #1 rule of flexible architecture:
+**Only test the UI if you are effectively testing the UI.**
+
+If you are testing the "Checkout" flow, you **should not** manually click through "Registration" and "Login" forms. That is a waste of time and stability.
+
+**The Bypass Pattern**:
+
+1. Use API Request to create a user.
+2. Use API Request to get a session token.
+3. Inject the token into the browser context.
+4. Jump straight to `/checkout`.
+
+---
+
+## The Real World Case: The 8-Minute Tax
+
+**The Scenario**:
+You have 100 tests. Each test requires a logged-in user.
+The Login UI (fill form, click submit, wait for redirect) takes **5 seconds**.
+
+**The Math**:
+
+* 100 tests * 5 seconds = 500 seconds.
+* That is **8.3 minutes** of *just logging in* per build.
+
+**The Fix (API Login)**:
+
+* API Login takes **0.2 seconds**.
+* 100 * 0.2 = 20 seconds.
+* **Savings**: You just saved 8 minutes per run. On a team with 10 devs running tests 5 times a day, you saved **7 hours of developer time per day**.
 
 ```javascript
-// Setup via API (fast)
-await request.post('/api/users', { data: user });
+test.beforeEach(async ({ page, request }) => {
+  // 1. API Login (Fast)
+  const response = await request.post('/api/login', {
+    data: { user: 'alice', pass: 'secret' }
+  });
+  const { token } = await response.json();
 
-// Verify via UI
-await page.goto('/users');
-await expect(page.locator('h1')).toHaveText(user.name);
+  // 2. Inject State
+  await page.addInitScript(value => {
+    window.localStorage.setItem('token', value);
+  }, token);
+});
+// 3. Start Test
 ```
 
 ---
 
-## State Setup via API
+## The Traps
 
-```javascript
-// Skip login UI, set auth directly
-const token = await login.getToken(credentials);
-await page.evaluate(t => localStorage.setItem('token', t), token);
-await page.goto('/dashboard');
-```
+### Trap #1: The Shared User
 
----
+**The crime**: Using the *same* static user account (`admin@test.com`) for all 4 parallel workers.
+**The result**:
 
-## Screenshots & Video
+* Worker 1: Changes "Admin Name" to "Bob".
+* Worker 2: Asserts "Admin Name" is "Alice". -> **FAIL**.
+**The Fix**: Use **Dynamic Data** (Faker) to create a unique user for *every single test*, or use Worker-indexed users (`admin-1@test.com`, `admin-2@test.com`).
+
+### Trap #2: The Video Hoarder
+
+**The crime**: Recording video for *every* test.
+**The result**: Your CI artifacts are 5GB large. The pipeline crashes on upload.
+**The Fix**:
 
 ```javascript
 // playwright.config.ts
 use: {
-    screenshot: 'only-on-failure',
-    video: 'on-first-retry',
+  video: 'on-first-retry', // Only record if it fails and retries
+  trace: 'retain-on-failure', // The ultimate debugger
 }
-
-// Manual
-await page.screenshot({ path: 'debug.png', fullPage: true });
 ```
 
 ---
 
-## Retry Logic
+## Quick Reference
+
+### Sharding (CI)
+
+Split your 100 tests across 5 machines to run in 1/5th the time.
+
+```bash
+npx playwright test --shard=1/5
+npx playwright test --shard=2/5
+...
+```
+
+### Visual Regression
+
+Compare pixel-perfect screenshots.
 
 ```javascript
-// playwright.config.ts
-retries: process.env.CI ? 2 : 0,
+await expect(page).toHaveScreenshot('home-page.png', {
+  maxDiffPixels: 100 // Allow minor rendering noise
+});
 ```
 
 ---
 
-## Parallel Execution
+## Ready to Practice?
 
-```javascript
-// playwright.config.ts
-workers: process.env.CI ? 4 : undefined,
-fullyParallel: true,
-```
+Optimize your factory:
 
----
-
-## Cross-browser & Mobile
-
-```javascript
-projects: [
-    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
-    { name: 'Mobile', use: { ...devices['iPhone 12'] } },
-]
-```
-
----
-
-## Practice Challenges
-
-1. [API + UI Testing](/challenges/pw-api-ui-testing)
-2. [State Setup via API](/challenges/pw-state-setup-api)
-3. [Screenshot on Failure](/challenges/pw-screenshot-failure)
-4. [Video Recording](/challenges/pw-video-recording)
-5. [Retry Logic](/challenges/pw-retry-logic)
-6. [Parallel Execution](/challenges/pw-parallel-execution)
-7. [Cross-browser Testing](/challenges/pw-cross-browser)
-8. [Mobile Viewport Testing](/challenges/pw-mobile-viewport)
+1. [API + UI Hybrid](/challenges/pw-api-ui-testing) - The "Bypass" pattern.
+2. [State Setup](/challenges/pw-state-setup-api) - Injecting cookies/storage.
+3. [Visual Testing](/challenges/pw-screenshot-failure) - Pixel comparison.
+4. [Parallelism](/challenges/pw-parallel-execution) - Handling workers.

@@ -2,176 +2,131 @@
 
 Master the art of finding elements with Playwright's powerful locator API.
 
----
+## The Mental Model: The Finger
 
-## Recommended Locators
+Think of a locator as **your finger pointing at the screen**.
 
-Playwright recommends using semantic locators in this order:
+* **Bad Pointer**: "Click the 3rd blue widget in the 2nd row." (CSS/XPath)
+  * *Problem*: If the design shifts, you point at empty space.
+* **Good Pointer**: "Click the 'Submit' button." (Semantic)
+  * *Result*: Even if the button moves to the top of the page, your finger follows it.
 
-1. **getByRole** - Accessibility-first (best)
-2. **getByText** - For visible text
-3. **getByLabel** - For form fields
-4. **getByPlaceholder** - For inputs
-5. **getByTestId** - For test-specific IDs
-6. **locator()** - CSS/XPath fallback
+Playwright Locators are **auto-waiting**, **retry-able** pointers. They don't just find the element once; they keep pointing until the element is ready.
 
 ---
 
-## getByRole
+## The Strategy: The Hierarchy of Trust
 
-Find elements by their ARIA role:
+When choosing *how* to point, follow this priority list. Start at the top; only go down if you must.
+
+1. **Tested By User (Best)**: `getByRole`, `getByLabel`, `getByPlaceholder`.
+    * *Why*: This ensures your app is accessible. If you can't click "Submit", a screen reader user can't either.
+2. **Tested By Content (Good)**: `getByText`.
+    * *Why*: Good for static content, but fragile if marketing changes copy frequently.
+3. **Tested By Contract (Reliable)**: `getByTestId` (`data-testid`).
+    * *Why*: The "Backdoor". Use this when an element has no semantic role or text (e.g., a dynamic graph or icon).
+4. **Tested By Structure (Last Resort)**: `locator('div > span')` (CSS/XPath).
+    * *Why*: Heavily tied to implementation details.
+
+---
+
+## The Real World Case: The "Agile" Layout
+
+**The Scenario**:
+Marketing is A/B testing a new layout.
+
+* **Version A**: The "Buy" button is in a sidebar.
+* **Version B**: The "Buy" button is in a sticky footer.
+
+**The CSS Fail**:
 
 ```javascript
-page.getByRole('button', { name: 'Submit' });
-page.getByRole('link', { name: 'Home' });
-page.getByRole('textbox', { name: 'Email' });
-page.getByRole('checkbox', { name: 'Agree' });
-page.getByRole('heading', { level: 1 });
-page.getByRole('listitem');
+// Works in A, fails in B because the container changed
+page.locator('.sidebar .buy-btn').click();
+```
+
+**The Text Fail**:
+Marketing changes "Buy Now" into "Purchase" halfway through the sprint.
+
+```javascript
+// Fails when text changes
+page.getByText('Buy Now').click();
+```
+
+**The Robust Fix**:
+Use a **Test ID** (The Contract).
+This requires developer buy-in, but it is the *only* way to survive rapid UI/text changes without rewriting tests daily.
+
+```javascript
+// Robust in both Layouts AND Text changes
+// Requires developer to add: <button data-testid="purchase-action">...</button>
+page.getByTestId('purchase-action').click();
 ```
 
 ---
 
-## getByText
+## Advanced Technique: Locator Chaining
 
-Find by visible text content:
+Sometimes a page has 50 "Delete" buttons. How do you click the specific one for "John Doe"?
+**Don't write a complex XPath.** Chain your locators logically.
 
 ```javascript
-// Exact match
-page.getByText('Hello World');
+// 1. Find the specific row for 'John Doe'
+const userRow = page.getByRole('row').filter({ hasText: 'John Doe' });
 
-// Substring match
-page.getByText('Hello', { exact: false });
-
-// Regex
-page.getByText(/welcome/i);
+// 2. Find the button INSIDE that row
+await userRow.getByRole('button', { name: 'Delete' }).click();
 ```
+
+**Why this wins**:
+
+* It reads like English.
+* It is resilient. If the row content changes order, it still works.
 
 ---
 
-## getByLabel
+## The Traps
 
-Find form inputs by label:
+### Trap #1: Strict Mode Panic
 
-```javascript
-page.getByLabel('Email');
-page.getByLabel('Password');
-page.getByLabel('Remember me');
-```
+**The Error**: `Error: strict mode violation. 2 elements resolved to locator...`
+**The Cause**: You said `getByRole('button')` but there are two buttons.
+**The Fix**:
 
----
+1. Make it specific: `getByRole('button', { name: 'Save' })`
+2. Filter it: `.filter({ hasText: 'Modal' })`
+3. *Avoid* `.first()` unless you truly don't care which one you click.
 
-## getByPlaceholder
+### Trap #2: The Hidden Text
 
-Find by placeholder text:
-
-```javascript
-page.getByPlaceholder('Search...');
-page.getByPlaceholder('Enter email');
-```
-
----
-
-## getByTestId
-
-Find by test ID attribute:
+**The Code**: `getByText('Welcome')`
+**The Problem**: Playwright defaults to strict matching. If the text is "Welcome!", it fails.
+**The Fix**: Use `exact: false` or Regex.
 
 ```javascript
-// Default: data-testid
-page.getByTestId('submit-button');
-page.getByTestId('user-avatar');
-```
-
----
-
-## Locator Chaining
-
-Refine selections with chaining:
-
-```javascript
-// filter()
-page.locator('.item').filter({ hasText: 'Active' });
-page.locator('.row').filter({ has: page.locator('.icon') });
-
-// Positional
-page.locator('li').first();
-page.locator('li').last();
-page.locator('li').nth(2);  // Third (0-indexed)
-
-// Chain multiple
-page.locator('.list')
-    .locator('.item')
-    .filter({ hasText: 'Active' })
-    .first();
-```
-
----
-
-## Frame Locators
-
-Access iframe content:
-
-```javascript
-const frame = page.frameLocator('#my-iframe');
-await frame.locator('button').click();
-
-// Nested frames
-page.frameLocator('#outer')
-    .frameLocator('#inner')
-    .locator('div');
-```
-
----
-
-## Working with Lists
-
-Handle multiple elements:
-
-```javascript
-// Count
-const count = await page.locator('.item').count();
-
-// Get all text
-const texts = await page.locator('li').allTextContents();
-
-// Iterate
-const items = page.locator('.item');
-for (let i = 0; i < await items.count(); i++) {
-    await items.nth(i).click();
-}
+page.getByText('Welcome', { exact: false }); // Matches "Welcome!"
+page.getByText(/welcome/i); // Matches "WELCOME"
 ```
 
 ---
 
 ## Quick Reference
 
-| Method | Example |
-|--------|---------|
-| getByRole | `getByRole('button', {name: 'X'})` |
-| getByText | `getByText('Hello')` |
-| getByLabel | `getByLabel('Email')` |
-| getByPlaceholder | `getByPlaceholder('Search')` |
-| getByTestId | `getByTestId('id')` |
-| filter | `.filter({hasText: 'x'})` |
-| nth | `.nth(0)`, `.first()`, `.last()` |
-| frameLocator | `frameLocator('#f')` |
-| count | `.count()` |
+| Method | Use Case | Example |
+| :--- | :--- | :--- |
+| `getByRole` | Interactive elements | `getByRole('button', {name: 'Save'})` |
+| `getByLabel` | Forms | `getByLabel('Email')` |
+| `getByPlaceholder` | Search/Input | `getByPlaceholder('Search...')` |
+| `getByText` | Static content | `getByText('Success')` |
+| `getByTestId` | Hard-to-select, Dynamic | `getByTestId('graph-canvas')` |
+| `.filter()` | Narrowing down | `.filter({ hasText: 'Active' })` |
 
 ---
 
-## Practice Challenges
+## Ready to Practice?
 
-1. [getByRole](/challenges/pw-get-by-role)
-2. [getByText](/challenges/pw-get-by-text)
-3. [getByLabel](/challenges/pw-get-by-label)
-4. [getByPlaceholder](/challenges/pw-get-by-placeholder)
-5. [getByTestId](/challenges/pw-get-by-testid)
-6. [Locator Chaining](/challenges/pw-locator-chaining)
-7. [Frame Locators](/challenges/pw-frame-locators)
-8. [List & Items](/challenges/pw-list-items)
+Train your pointing finger:
 
----
-
-## Next Steps
-
-Continue with [Playwright Assertions](/tutorials/playwright-assertions) to validate your test expectations.
+1. [Role vs Text](/challenges/pw-get-by-role) - The accessibility check.
+2. [The TestID Contract](/challenges/pw-get-by-testid) - Safe selection.
+3. [Chaining and Filtering](/challenges/pw-locator-chaining) - Handling lists.

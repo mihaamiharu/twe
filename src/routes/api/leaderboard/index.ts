@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { json } from '@tanstack/react-start';
 import { db } from '@/db';
-import { users, progress } from '@/db/schema';
+import { users, progress, achievements, userAchievements } from '@/db/schema';
 import { logger } from '@/lib/logger';
-import { desc, eq, and, sql } from 'drizzle-orm';
+import { desc, eq, and, sql, inArray, like } from 'drizzle-orm';
 
 interface LeaderboardFilters {
   period?: 'all' | 'monthly' | 'weekly';
@@ -42,6 +42,7 @@ export const Route = createFileRoute('/api/leaderboard/')({
 
           const leaderboard = await db
             .select({
+              id: users.id,
               name: users.name,
               image: users.image,
               xp: users.xp,
@@ -59,13 +60,46 @@ export const Route = createFileRoute('/api/leaderboard/')({
             .where(and(...conditions))
             .orderBy(desc(users.xp), desc(users.level))
             .limit(filters.limit || 50)
+            .limit(filters.limit || 50)
             .offset(offset);
 
-          // Add rank to each user
+          // Fetch Boss achievements for these users
+          const userIds = leaderboard.map(u => u.id);
+
+          const userBadgesMap = new Map<string, Array<{ name: string; icon: string; slug: string }>>();
+
+          if (userIds.length > 0) {
+            const badges = await db
+              .select({
+                userId: userAchievements.userId,
+                name: achievements.name,
+                icon: achievements.icon,
+                slug: achievements.slug,
+              })
+              .from(userAchievements)
+              .innerJoin(achievements, eq(userAchievements.achievementId, achievements.id))
+              .where(
+                and(
+                  inArray(userAchievements.userId, userIds),
+                  // Filter for Boss achievements (assuming slugs contain 'boss')
+                  like(achievements.slug, '%boss%')
+                )
+              );
+
+            badges.forEach(badge => {
+              if (!userBadgesMap.has(badge.userId)) {
+                userBadgesMap.set(badge.userId, []);
+              }
+              userBadgesMap.get(badge.userId)?.push(badge);
+            });
+          }
+
+          // Add rank and badges to each user
           const leaderboardWithRank = leaderboard.map((user, index) => ({
             ...user,
             rank: offset + index + 1,
             displayName: user.name || 'Anonymous',
+            badges: userBadgesMap.get(user.id) || [],
           }));
 
           return json({
