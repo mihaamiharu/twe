@@ -140,6 +140,15 @@ async function seedTutorials() {
             contentFile: 'playwright-advanced-patterns.md',
             order: 42,
         },
+        {
+            slug: 'playwright-fixtures',
+            title: 'Playwright Fixtures',
+            description: 'Stop repeating yourself. Let the framework handle the setup with powerful dependency injection.',
+            estimatedMinutes: 20,
+            tags: ['playwright', 'fixtures', 'patterns', 'expert'],
+            contentFile: 'playwright-fixtures.md',
+            order: 43,
+        },
     ];
 
     try {

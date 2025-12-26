@@ -72,16 +72,16 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                     },
                     // Lists
                     ul: ({ children }) => (
-                        <ul className="list-disc list-inside space-y-2 mb-4 text-muted-foreground">
+                        <ul className="list-disc list-outside ml-6 space-y-2 mb-4 text-muted-foreground">
                             {children}
                         </ul>
                     ),
                     ol: ({ children }) => (
-                        <ol className="list-decimal list-inside space-y-2 mb-4 text-muted-foreground">
+                        <ol className="list-decimal list-outside ml-6 space-y-2 mb-4 text-muted-foreground">
                             {children}
                         </ol>
                     ),
-                    li: ({ children }) => <li className="pl-2">{children}</li>,
+                    li: ({ children }) => <li className="pl-1">{children}</li>,
                     // Links
                     a: ({ href, children }) => (
                         <a
