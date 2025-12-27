@@ -3,6 +3,7 @@ import { useCallback, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
+import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, Loader2, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -141,6 +142,27 @@ function ChallengeDetailPage() {
     const { data: sessionData } = useSession();
     const userId = sessionData?.user?.id;
 
+    // Deobfuscate inputs if needed (for selector challenges)
+    const testCases = useMemo(() => {
+        if (!data?.testCases) return [];
+        return data.testCases.map(tc => {
+            const input = tc.input as { selector?: string; xpath?: string };
+            const processedInput = { ...input };
+
+            if (processedInput.selector) {
+                processedInput.selector = deobfuscate(processedInput.selector);
+            }
+            if (processedInput.xpath) {
+                processedInput.xpath = deobfuscate(processedInput.xpath);
+            }
+
+            return {
+                ...tc,
+                input: processedInput
+            };
+        });
+    }, [data?.testCases]);
+
     // Transform API response to Challenge type expected by ChallengePlayground
     const challenge: Challenge | null = data ? {
         id: data.id,
@@ -154,19 +176,19 @@ function ChallengeDetailPage() {
         htmlContent: data.htmlContent || '',
         starterCode: data.starterCode || '',
         targetSelector: (() => {
-            if (!data.testCases?.length) return '';
+            if (!testCases.length) return '';
 
             // Try to find selector in the first test case input
-            const firstTestInput = data.testCases[0].input as { selector?: string; xpath?: string };
+            const firstTestInput = testCases[0].input as { selector?: string; xpath?: string };
             return firstTestInput?.selector || firstTestInput?.xpath || '';
         })(),
 
-        testCases: data.testCases?.map(tc => ({
+        testCases: testCases.map(tc => ({
             id: tc.id,
             name: tc.description,
             input: tc.input,
             expectedOutput: tc.expectedOutput
-        })) || []
+        }))
     } : null;
 
     const submitMutation = useMutation({
