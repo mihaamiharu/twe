@@ -163,16 +163,16 @@ code {
 
 /* Glass morphism utilities */
 .glass {
-  background-color: color-mix(in srgb, var(--color-background) 70%, transparent);
+  background-color: color-mix(in srgb, var(--color-background) 80%, transparent);
   backdrop-filter: blur(12px);
   border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
 }
 
 .glass-card {
-  background-color: color-mix(in srgb, var(--color-card) 50%, transparent);
+  background-color: color-mix(in srgb, var(--color-card) 60%, transparent);
   backdrop-filter: blur(16px);
   border: 1px solid color-mix(in srgb, var(--color-border) 30%, transparent);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 /* Gradient utilities */
