@@ -53,13 +53,13 @@ function HomePage() {
       icon: <BookOpen className="w-10 h-10 text-primary" />,
       title: 'Interactive Tutorials',
       description:
-        'Learn testing concepts step-by-step with beautifully rendered markdown content and code examples.',
+        'Learn testing concepts step-by-step. I\'ve broken down the tricky parts so you don\'t have to struggle.',
     },
     {
       icon: <Code2 className="w-10 h-10 text-primary" />,
       title: 'Playwright Challenges',
       description:
-        'Write real Playwright-style code in our Monaco editor. Get instant feedback on your solutions.',
+        'Practice with real scenarios. It\'s like having a sandbox to try things without breaking production.',
     },
     {
       icon: <Target className="w-10 h-10 text-primary" />,
@@ -75,9 +75,9 @@ function HomePage() {
     },
     {
       icon: <Zap className="w-10 h-10 text-primary" />,
-      title: 'Instant Execution',
+      title: 'Instant Feedback',
       description:
-        'Your code runs instantly in the browser. No setup required, no waiting for servers.',
+        'Get results immediately. Like a friend sitting next to you pointing out what needs fixing.',
     },
     {
       icon: <Sparkles className="w-10 h-10 text-primary" />,
@@ -172,16 +172,18 @@ function HomePage() {
 
           {/* Title */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="gradient-text">TestingWithEkki</span>
+            <span className="gradient-text">Learn QA Automation</span>
+            <br />
+            with Practical Challenges
           </h1>
 
           {/* Tagline */}
           <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-3xl mx-auto">
-            Master QA testing skills through interactive challenges
+            Build real-world skills, not just theory.
           </p>
           <p className="text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-10">
-            Learn Playwright, CSS selectors, XPath, and more with hands-on coding challenges.
-            Earn XP, unlock achievements, and become a testing expert.
+            I'm sharing the <strong>practical skills I accumulated from supportive mentors and real-world problem solving</strong>,
+            helping you build confidence step-by-step.
           </p>
 
           {/* CTA Buttons */}
@@ -244,10 +246,10 @@ function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Your <span className="gradient-text">Learning Path</span>
+              Your <span className="gradient-text">Career Path</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Progress through four tiers, from selector basics to advanced automation patterns
+              From selector basics to advanced automation architectures.
             </p>
           </div>
 
@@ -289,10 +291,10 @@ function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Try a <span className="gradient-text">Challenge</span>
+              Solve a <span className="gradient-text">Real Problem</span>
             </h2>
             <p className="text-lg text-muted-foreground">
-              Jump in and see what learning looks like
+              Start coding immediately. No setup required.
             </p>
           </div>
 
@@ -408,23 +410,68 @@ function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+
+      </section >
+
+      {/* Mission Section */}
+      < section className="py-20 px-6 bg-muted/30" >
+        <div className="max-w-4xl mx-auto text-center">
+          <div className="mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Why I <span className="gradient-text">Built This</span>
+            </h2>
+          </div>
+
+          <div className="glass-card p-8 md:p-12 rounded-2xl text-left relative overflow-hidden">
+            {/* Decorative quote mark */}
+            <div className="absolute top-4 right-8 text-9xl text-primary/10 font-serif leading-none select-none">
+              &rdquo;
+            </div>
+
+            <div className="relative z-10 space-y-6 text-lg text-muted-foreground leading-relaxed">
+              <p>
+                When I started my career, I had zero QA experience. I was fortunate to have seniors who patiently guided me, explaining concepts I struggled with and showing me the ropes.
+              </p>
+              <p>
+                <strong className="text-foreground">But I know not everyone has that senior who patiently guides them.</strong>
+              </p>
+              <p>
+                I created this platform to try and be that one for you, passing knowledge forward and breaking down complex concepts into hands-on lessons.
+              </p>
+              <p className="italic text-foreground font-medium">
+                It's the kind of guidance I wish I knew when I started.
+              </p>
+            </div>
+
+            <div className="mt-8 pt-8 border-t border-border/50 flex items-center gap-4">
+              {/* Placeholder for Avatar if user wants to add one later, or just name */}
+              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-xl">
+                E
+              </div>
+              <div>
+                <div className="font-bold text-foreground">Ekki</div>
+                <div className="text-sm text-muted-foreground">Creator of TestingWithEkki</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section >
 
       {/* CTA Section */}
-      <section className="py-20 px-6">
+      < section className="py-20 px-6" >
         <div className="max-w-4xl mx-auto text-center">
           <div className="glass-card p-12 rounded-2xl">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Start Your Journey?
+              Start Your Quality Engineering Career
             </h2>
             <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Join TestingWithEkki today and level up your QA testing skills.
-              It's free to get started!
+              Join thousands of testers mastering standard industry tools.
+              Free forever for individuals.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/login">
                 <Button size="lg" className="text-lg px-8">
-                  Create Free Account
+                  Get Started for Free
                 </Button>
               </Link>
               <Link to="/leaderboard">
@@ -450,7 +497,7 @@ function HomePage() {
             </div>
           </div>
         </div>
-      </section>
-    </div>
+      </section >
+    </div >
   );
 }
