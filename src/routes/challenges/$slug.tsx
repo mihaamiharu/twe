@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
@@ -74,6 +74,9 @@ function ChallengeDetailPage() {
         queryFn: async () => {
             const response = await fetch(`/api/challenges/${slug}`);
             if (!response.ok) {
+                if (response.status === 403) {
+                    throw new Error('COMING_SOON');
+                }
                 throw new Error('Failed to fetch challenge');
             }
             const json = await response.json();
@@ -83,7 +86,23 @@ function ChallengeDetailPage() {
             return json.data as APIChallenge;
         },
         enabled: !!slug,
+        retry: (failureCount, error) => {
+            // Don't retry if it's a 403/COMING_SOON error
+            if (error.message === 'COMING_SOON') return false;
+            return failureCount < 3;
+        }
     });
+
+    // Handle Coming Soon redirect
+    useEffect(() => {
+        if (error?.message === 'COMING_SOON') {
+            toast.info('This challenge is coming soon!', {
+                description: 'Stay tuned for updates on our roadmap.',
+                duration: 4000
+            });
+            navigate({ to: '/challenges' });
+        }
+    }, [error, navigate]);
 
     const { data: allChallengesData } = useQuery<ChallengesResponse>({
         queryKey: ['challenges'],

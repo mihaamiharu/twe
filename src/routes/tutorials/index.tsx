@@ -75,7 +75,7 @@ function TutorialsPage() {
                 <div className="mb-10">
                     <h1 className="text-4xl font-bold gradient-text mb-3">Tutorials</h1>
                     <p className="text-muted-foreground text-lg">
-                        Learn QA testing concepts with step-by-step guides
+                        Walk through core concepts with me, step-by-step.
                     </p>
                 </div>
 

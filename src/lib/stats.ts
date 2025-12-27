@@ -8,6 +8,7 @@ import { db } from '@/db';
 import { progress, users, challenges, userAchievements, achievements } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import type { UserStats } from './achievements';
+import { logger } from '@/lib/logger';
 
 /**
  * Get user stats for achievement checking
@@ -240,7 +241,7 @@ export async function awardAchievements(
                 })
                 .where(eq(users.id, userId));
 
-            console.log(`[Achievements] Awarded ${totalXpReward} XP to user ${userId}`);
+            logger.info(`[Achievements] Awarded ${totalXpReward} XP to user ${userId}`);
         }
     }
 }
