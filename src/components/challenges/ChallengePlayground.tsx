@@ -56,6 +56,7 @@ export interface Challenge {
         slug: string;
         title: string;
     };
+    isCompleted?: boolean;
 }
 
 export interface ChallengePlaygroundProps {
@@ -313,6 +314,13 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
     return (
         <div className={cn('flex flex-col h-full bg-background animate-fade-in', className)}>
+            {/* Completion Banner */}
+            {challenge.isCompleted && (
+                <div className="bg-green-500/10 border-b border-green-500/20 px-4 py-2 flex items-center justify-center gap-2 text-green-600 text-sm font-medium animate-in slide-in-from-top-2">
+                    <Zap className="h-4 w-4 fill-current" />
+                    You have already completed this challenge! Feel free to practice again.
+                </div>
+            )}
             {/* Header */}
             <div className="border-b border-border bg-card/50 px-4 py-3 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">

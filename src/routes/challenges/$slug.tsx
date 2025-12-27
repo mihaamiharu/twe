@@ -188,7 +188,8 @@ function ChallengeDetailPage() {
             name: tc.description,
             input: tc.input,
             expectedOutput: tc.expectedOutput
-        }))
+        })),
+        isCompleted: data.userProgress?.isCompleted || false
     } : null;
 
     const submitMutation = useMutation({

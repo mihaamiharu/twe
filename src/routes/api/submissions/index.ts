@@ -77,7 +77,7 @@ export const Route = createFileRoute('/api/submissions/')({
                     const existingProgress = await db.query.progress.findFirst({
                         where: and(
                             eq(progress.userId, userId),
-                            eq(progress.challengeId, challengeId)
+                            eq(progress.challengeId, challenge.id)
                         ),
                     });
 
@@ -117,10 +117,10 @@ export const Route = createFileRoute('/api/submissions/')({
                                 .set({
                                     completionCount: challenge.completionCount + 1,
                                 })
-                                .where(eq(challenges.id, challengeId));
+                                .where(eq(challenges.id, challenge.id));
                         }
                     } else {
-                        logger.info(`[Submission] Challenge ${challengeId} passed but not first completion. No XP awarded.`);
+                        logger.info(`[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`);
                     }
 
                     // Create submission record
@@ -128,7 +128,7 @@ export const Route = createFileRoute('/api/submissions/')({
                         .insert(submissions)
                         .values({
                             userId,
-                            challengeId,
+                            challengeId: challenge.id,
                             code,
                             isPassed,
                             xpEarned,
@@ -155,7 +155,7 @@ export const Route = createFileRoute('/api/submissions/')({
                     } else {
                         await db.insert(progress).values({
                             userId,
-                            challengeId,
+                            challengeId: challenge.id,
                             isCompleted: isPassed,
                             completedAt: isPassed ? new Date() : null,
                             attempts: 1,
