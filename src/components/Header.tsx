@@ -60,7 +60,10 @@ export function Header() {
             {/* Logo */}
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-2 btn-animate">
-                <img src="/logo.jpg" alt="Logo" className="h-8 w-8 rounded-lg" />
+                {/* Dark Mode Logo */}
+                <img src="/logo-dark.png" alt="Logo" className="h-8 w-8 rounded-lg hidden dark:block" />
+                {/* Light Mode Logo */}
+                <img src="/logo-light.png" alt="Logo" className="h-8 w-8 rounded-lg block dark:hidden" />
                 <span className="text-xl font-bold gradient-text">
                   TestingWithEkki
                 </span>
