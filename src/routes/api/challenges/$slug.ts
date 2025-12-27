@@ -43,6 +43,14 @@ export const Route = createFileRoute('/api/challenges/$slug')({
             );
           }
 
+          // Security Check: Prevent access to "Coming Soon" challenges
+          if (challenge.tags?.includes('coming-soon')) {
+            return json(
+              { success: false, error: 'This challenge is coming soon!' },
+              { status: 403 }
+            );
+          }
+
           // Get visible test cases (non-hidden)
           const visibleTestCases = await db
             .select({

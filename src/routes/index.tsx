@@ -392,7 +392,7 @@ function HomePage() {
               {
                 step: '2',
                 title: 'Write Your Code',
-                description: 'Use our Monaco editor with syntax highlighting and auto-completion.',
+                description: 'Use our embedded code editor to write and test your automation scripts.',
               },
               {
                 step: '3',
