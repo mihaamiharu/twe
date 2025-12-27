@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Leaderboard, type LeaderboardUser } from '@/components/gamification';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -86,7 +87,7 @@ function LeaderboardPage() {
                             Hall of Fame
                         </span>
                     </h1>
-                    <p className="text-muted-foreground text-xl max-w-2xl mx-auto">
+                    <p className="text-muted-foreground text-xl max-w-2xl mx-auto flex items-center justify-center gap-2">
                         The elite testers mastering the art of automation.
                     </p>
                 </div>
