@@ -156,10 +156,17 @@ function HomePage() {
         <div className="relative max-w-5xl mx-auto">
           {/* Logo */}
           <div className="flex items-center justify-center gap-4 mb-8">
+            {/* Dark Mode Logo */}
             <img
-              src="/logo.jpg"
+              src="/logo-dark.png"
               alt="TestingWithEkki Logo"
-              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform"
+              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform hidden dark:block"
+            />
+            {/* Light Mode Logo */}
+            <img
+              src="/logo-light.png"
+              alt="TestingWithEkki Logo"
+              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform block dark:hidden"
             />
           </div>
 
