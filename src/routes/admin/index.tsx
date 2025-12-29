@@ -9,8 +9,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
   loader: async ({ context }) => {
-    // Basic check, simpler than full auth integration for now to prevent flicker
-    // Real protection is on the API side
+    const session = context.auth;
+    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+      throw redirect({
+        to: '/',
+      });
+    }
   }
 });
 

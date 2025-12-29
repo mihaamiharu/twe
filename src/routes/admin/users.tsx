@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useState, useMemo } from 'react';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 import {
     Tooltip,
     TooltipContent,
@@ -17,11 +20,20 @@ import {
 } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute('/admin/users')({
+    loader: async ({ context }) => {
+        const session = context.auth;
+        if (!session?.user || (session.user as any).role !== 'ADMIN') {
+            throw redirect({
+                to: '/',
+            });
+        }
+    },
     component: UserManager,
 });
 
 function UserManager() {
     const queryClient = useQueryClient();
+    const [searchQuery, setSearchQuery] = useState('');
 
     const { data: users, isLoading } = useQuery({
         queryKey: ['admin-users'],
@@ -32,6 +44,17 @@ function UserManager() {
             return json.data;
         },
     });
+
+    const filteredUsers = useMemo(() => {
+        if (!users) return [];
+        const query = searchQuery.toLowerCase().trim();
+        if (!query) return users;
+        return users.filter((user: any) =>
+            user.name?.toLowerCase().includes(query) ||
+            user.email?.toLowerCase().includes(query) ||
+            user.id?.toLowerCase().includes(query)
+        );
+    }, [users, searchQuery]);
 
     const toggleBanMutation = useMutation({
         mutationFn: async ({ id, showOnLeaderboard }: { id: string; showOnLeaderboard: boolean }) => {
@@ -77,6 +100,16 @@ function UserManager() {
                 </div>
             </div>
 
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    placeholder="Search users by name, email, or ID..."
+                    className="pl-10 max-w-md"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -90,14 +123,14 @@ function UserManager() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {users?.length === 0 ? (
+                            {filteredUsers.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
-                                        No users found.
+                                        {searchQuery ? `No users matching "${searchQuery}"` : "No users found."}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                users?.map((user: any) => (
+                                filteredUsers.map((user: any) => (
                                     <UserRow
                                         key={user.id}
                                         user={user}
