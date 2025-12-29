@@ -8,8 +8,11 @@ import {
   Menu,
   Settings,
   Trophy,
+  Trophy,
   User,
   X,
+  ShieldCheck,
+  LayoutDashboard,
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
@@ -37,6 +40,7 @@ export function Header() {
 
   const user = session?.user;
   const isAuthenticated = !!user;
+  const isAdmin = (user as any)?.role === 'ADMIN';
 
   const handleSignOut = async () => {
     try {
@@ -117,15 +121,28 @@ export function Header() {
                         <p className="text-xs leading-none text-muted-foreground">
                           {user.email}
                         </p>
+                        {isAdmin && (
+                          <Badge variant="outline" className="mt-1 w-fit bg-purple-500/10 text-purple-600 border-purple-500/20 text-[10px] h-4">
+                            Admin
+                          </Badge>
+                        )}
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/profile" className="cursor-pointer">
+                      <Link to="/profile" className="cursor-pointer font-medium">
                         <User className="mr-2 h-4 w-4" />
                         Profile
                       </Link>
                     </DropdownMenuItem>
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link to="/admin" className="cursor-pointer font-medium text-purple-600 focus:text-purple-600">
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          Admin Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <Link to="/settings" className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
@@ -224,6 +241,16 @@ export function Header() {
                     <User className="h-5 w-5" />
                     Profile
                   </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
+                    >
+                      <LayoutDashboard className="h-5 w-5" />
+                      Admin Dashboard
+                    </Link>
+                  )}
                   <div className="px-3">
                     <BugReportDialog
                       trigger={
