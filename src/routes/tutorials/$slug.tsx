@@ -282,7 +282,8 @@ function TutorialDetailPage() {
                             ref={contentRef}
                             className="prose prose-lg dark:prose-invert max-w-none max-h-[70vh] overflow-y-auto pr-4 scroll-smooth"
                             style={{
-                                lineHeight: '1.7',
+                                fontFamily: 'var(--font-reading)',
+                                lineHeight: '1.8',
                                 scrollbarWidth: 'thin',
                                 scrollbarColor: 'hsl(var(--primary) / 0.3) transparent'
                             }}
