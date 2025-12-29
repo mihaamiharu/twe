@@ -8,7 +8,6 @@ import {
   Menu,
   Settings,
   Trophy,
-  Trophy,
   User,
   X,
   ShieldCheck,
