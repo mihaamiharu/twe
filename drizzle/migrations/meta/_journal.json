@@ -20,7 +20,14 @@
       "idx": 2,
       "version": "7",
       "when": 1766195248060,
-      "tag": "0002_amused_lily_hollister",
+      "tag": "0002_add_bug_reports",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1766850764567,
+      "tag": "0003_add_user_roles_and_verification",
       "breakpoints": true
     }
   ]

@@ -6,6 +6,8 @@ import { eq, and, asc, gt } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 import { logger } from '@/lib/logger';
 
+import { obfuscate } from '@/lib/obfuscator';
+
 export const Route = createFileRoute('/api/challenges/$slug')({
   server: {
     handlers: {
@@ -43,8 +45,16 @@ export const Route = createFileRoute('/api/challenges/$slug')({
             );
           }
 
+          // Security Check: Prevent access to "Coming Soon" challenges
+          if (challenge.tags?.includes('coming-soon')) {
+            return json(
+              { success: false, error: 'This challenge is coming soon!' },
+              { status: 403 }
+            );
+          }
+
           // Get visible test cases (non-hidden)
-          const visibleTestCases = await db
+          let visibleTestCases = await db
             .select({
               id: testCases.id,
               description: testCases.description,
@@ -60,6 +70,20 @@ export const Route = createFileRoute('/api/challenges/$slug')({
               )
             )
             .orderBy(asc(testCases.order));
+
+          // Obfuscate sensitive inputs for Selector challenges
+          if (challenge.type === 'CSS_SELECTOR' || challenge.type === 'XPATH_SELECTOR') {
+            visibleTestCases = visibleTestCases.map(tc => {
+              const input = tc.input as { selector?: string; xpath?: string };
+              if (input?.selector) {
+                return { ...tc, input: { ...input, selector: obfuscate(input.selector) } };
+              }
+              if (input?.xpath) {
+                return { ...tc, input: { ...input, xpath: obfuscate(input.xpath) } };
+              }
+              return tc;
+            });
+          }
 
           // Get hidden test case count (for display purposes)
           const hiddenTestCases = await db
