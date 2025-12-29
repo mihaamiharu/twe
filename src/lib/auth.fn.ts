@@ -10,6 +10,7 @@ export type SessionUser = {
     name: string | null;
     image: string | null;
     emailVerified: boolean;
+    role: string | null;
 };
 
 export type AuthSession = {
@@ -35,6 +36,7 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
                         name: session.user.name || null,
                         image: session.user.image || null,
                         emailVerified: session.user.emailVerified || false,
+                        role: (session.user as any).role || 'USER',
                     },
                     isAuthenticated: true,
                 };

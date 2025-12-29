@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -8,13 +8,25 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
+import { useState, useMemo } from 'react';
+import { Search } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 export const Route = createFileRoute('/admin/challenges')({
+    loader: async ({ context }) => {
+        const session = context.auth;
+        if (!session?.user || (session.user as any).role !== 'ADMIN') {
+            throw redirect({
+                to: '/',
+            });
+        }
+    },
     component: ChallengeManager,
 });
 
 function ChallengeManager() {
     const queryClient = useQueryClient();
+    const [searchQuery, setSearchQuery] = useState('');
 
     const { data: challenges, isLoading } = useQuery({
         queryKey: ['admin-challenges'],
@@ -25,6 +37,16 @@ function ChallengeManager() {
             return json.data;
         },
     });
+
+    const filteredChallenges = useMemo(() => {
+        if (!challenges) return [];
+        const query = searchQuery.toLowerCase().trim();
+        if (!query) return challenges;
+        return challenges.filter((c: any) =>
+            c.title?.toLowerCase().includes(query) ||
+            c.slug?.toLowerCase().includes(query)
+        );
+    }, [challenges, searchQuery]);
 
     const updateMutation = useMutation({
         mutationFn: async (data: { id: string; isPublished?: boolean; isComingSoon?: boolean }) => {
@@ -61,6 +83,16 @@ function ChallengeManager() {
                 </div>
             </div>
 
+            <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                    placeholder="Search challenges by title or slug..."
+                    className="pl-10 max-w-md"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                />
+            </div>
+
             <Card>
                 <CardContent className="p-0">
                     <Table>
@@ -74,14 +106,14 @@ function ChallengeManager() {
                             </TableRow>
                         </TableHeader>
                         <TableBody>
-                            {challenges?.length === 0 ? (
+                            {filteredChallenges.length === 0 ? (
                                 <TableRow>
                                     <TableCell colSpan={5} className="text-center h-24 text-muted-foreground">
-                                        No challenges found.
+                                        {searchQuery ? `No challenges matching "${searchQuery}"` : "No challenges found."}
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                challenges?.map((challenge: any) => {
+                                filteredChallenges.map((challenge: any) => {
                                     const isComingSoon = challenge.tags?.includes('coming-soon');
                                     return (
                                         <TableRow key={challenge.id}>
