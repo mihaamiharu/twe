@@ -2,7 +2,7 @@ import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, FileCode, TrendingUp, Trophy, AlertCircle, Activity, ArrowRight, Zap } from 'lucide-react';
+import { Users, FileCode, TrendingUp, Trophy, AlertCircle, Activity, ArrowRight, Zap, Layout } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
