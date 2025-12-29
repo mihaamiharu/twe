@@ -269,7 +269,7 @@ function TutorialDetailPage() {
                                     </Badge>
                                 ))}
                             </div>
-                            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+                            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                                 {tutorial.title}
                             </h1>
                             <p className="text-xl text-muted-foreground">

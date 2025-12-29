@@ -1,121 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
 @import "tailwindcss";
+
 @custom-variant dark (&:where(.dark, .dark *));
-@import "@fontsource/inter/400.css";
-@import "@fontsource/inter/500.css";
-@import "@fontsource/inter/600.css";
-@import "@fontsource/inter/700.css";
 
-/* Theme configuration for Tailwind v4 - Dark Mode (default - Emerald Slate V2) */
+/* Font: Outfit (Friendly/Geometric) */
+
 @theme {
-  /* Colors - Dark Mode: Deep Slate & Teal-Emerald */
-  --color-background: hsl(220 25% 12%);
-  /* Deep Slate */
-  --color-foreground: hsl(210 40% 98%);
-  /* Off-white */
+  /* Colors - Semantic implementation for Theme Switching */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
 
-  --color-card: hsl(220 25% 16%);
-  /* Surface-1: Lighter Slate */
-  --color-card-foreground: hsl(210 40% 98%);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
 
-  --color-popover: hsl(220 25% 20%);
-  /* Surface-2: Elevated Slate (Modals/Popovers) */
-  --color-popover-foreground: hsl(210 40% 98%);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
 
-  --color-primary: hsl(168 85% 52%);
-  /* Teal-Emerald - Distinct from Success Green */
-  --color-primary-foreground: hsl(220 25% 12%);
-  /* Dark text on bright teal */
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 
-  --color-secondary: hsl(220 15% 25%);
-  /* Slate */
-  --color-secondary-foreground: hsl(210 40% 98%);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
 
-  --color-muted: hsl(220 15% 25%);
-  --color-muted-foreground: hsl(220 15% 65%);
-  /* Grey Blue - Readable metadata */
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
 
-  --color-accent: hsl(180 50% 50%);
-  /* Cyan accent for varied actions */
-  --color-accent-foreground: hsl(220 25% 12%);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
 
-  --color-destructive: hsl(0 84% 60%);
-  --color-destructive-foreground: hsl(0 0% 100%);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
-  --color-border: hsl(220 15% 25%);
-  --color-input: hsl(220 15% 25%);
-  --color-ring: hsl(168 85% 52%);
-  /* Match primary */
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
 
-  /* Chart colors */
-  --color-chart-1: hsl(168 85% 52%);
-  /* Teal-Emerald */
-  --color-chart-2: hsl(142 70% 50%);
-  /* Success Green */
-  --color-chart-3: hsl(220 96% 56%);
-  /* Blue */
-  --color-chart-4: hsl(280 47% 51%);
-  /* Purple */
-  --color-chart-5: hsl(340 76% 61%);
-  /* Pink */
+  /* Radius - Semantic */
+  --radius-sm: calc(var(--radius) - 2px);
+  --radius-md: calc(var(--radius) - 1px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
 
-  /* Border radius */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.625rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
+  /* Fonts */
+  --font-sans: "Outfit", system-ui, sans-serif;
+  --font-mono: "Fira Code", monospace;
 }
 
-/* CSS Variables for JS access */
+/* Base Variables - Light Mode */
 :root {
-  --radius: 0.625rem;
+  --radius: 0.75rem;
+  /* Friendly */
+  --font-sans: "Outfit", system-ui, sans-serif;
+
+  /* Light Mode Colors (Neo-Brutalist Light) */
+  --background: hsl(0 0% 100%);
+  /* White */
+  --foreground: hsl(0 0% 0%);
+  /* Black */
+
+  --card: hsl(0 0% 100%);
+  --card-foreground: hsl(0 0% 0%);
+
+  --popover: hsl(0 0% 100%);
+  --popover-foreground: hsl(0 0% 0%);
+
+  --primary: hsl(0 0% 0%);
+  /* Black Primary */
+  --primary-foreground: hsl(0 0% 100%);
+  /* White Text */
+
+  --secondary: hsl(210 20% 90%);
+  /* Light Grey */
+  --secondary-foreground: hsl(0 0% 0%);
+
+  --muted: hsl(210 20% 96%);
+  /* Very Light Grey */
+  --muted-foreground: hsl(215 16% 47%);
+
+  --accent: hsl(168 85% 52%);
+  /* Brand Teal */
+  --accent-foreground: hsl(0 0% 100%);
+
+  --destructive: hsl(0 100% 50%);
+  --destructive-foreground: hsl(0 0% 100%);
+
+  --border: hsl(0 0% 0%);
+  /* Hard Black Borders */
+  --input: hsl(0 0% 0%);
+  --ring: hsl(0 0% 0%);
+
+  /* Custom Variables */
+  --shadow-strength: 4px;
 }
 
-/* Light Mode Overrides (Emerald Slate V2 - High Contrast) */
-.light {
-  --color-background: hsl(210 40% 98%);
-  /* Ice White */
-  --color-foreground: hsl(220 25% 12%);
-  /* Deep Slate Text */
+/* Dark Mode Overrides */
+.dark {
+  /* Dark Mode Colors (Neo-Brutalist Dark) */
+  --background: hsl(222 47% 11%);
+  /* Deep Blue/Black */
+  --foreground: hsl(210 40% 98%);
+  /* White */
 
-  --color-card: hsl(0 0% 100%);
-  /* Pure White */
-  --color-card-foreground: hsl(220 25% 12%);
+  --card: hsl(222 47% 11%);
+  /* Same as bg for clean borders */
+  --card-foreground: hsl(210 40% 98%);
 
-  --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(220 25% 12%);
+  --popover: hsl(222 47% 11%);
+  --popover-foreground: hsl(210 40% 98%);
 
-  --color-primary: hsl(168 100% 35%);
-  /* Deep Teal-Emerald - Accessible Contrast (AA+) */
-  --color-primary-foreground: hsl(0 0% 100%);
+  --primary: hsl(210 40% 98%);
+  /* White Primary */
+  --primary-foreground: hsl(222 47% 11%);
+  /* Dark Text */
 
-  --color-secondary: hsl(220 15% 90%);
-  --color-secondary-foreground: hsl(220 25% 12%);
+  --secondary: hsl(217 19% 27%);
+  --secondary-foreground: hsl(210 40% 98%);
 
-  --color-muted: hsl(220 15% 90%);
-  --color-muted-foreground: hsl(220 10% 46%);
+  --muted: hsl(217 19% 27%);
+  --muted-foreground: hsl(215 20% 65%);
 
-  --color-accent: hsl(180 60% 45%);
-  /* Darker Cyan for text visibility on white */
-  --color-accent-foreground: hsl(0 0% 100%);
+  --accent: hsl(168 85% 52%);
+  /* Brand Teal */
+  --accent-foreground: hsl(0 0% 100%);
 
-  --color-destructive: hsl(0 84.2% 45%);
-  --color-destructive-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 62% 30%);
+  --destructive-foreground: hsl(210 40% 98%);
 
-  --color-border: hsl(220 15% 85%);
-  --color-input: hsl(220 15% 85%);
-  --color-ring: hsl(168 100% 35%);
+  --border: hsl(210 40% 98%);
+  /* White Borders */
+  --input: hsl(210 40% 98%);
+  --ring: hsl(212 100% 85%);
+
+  --shadow-strength: 0px;
+  /* No heavy shadows in dark mode typically, or just glow? Let's hide hard shadows in dark mode for cleaner look */
 }
 
-.light body {
-  background-color: hsl(0 0% 100%);
-  color: hsl(240 10% 3.9%);
-}
-
-.light .glass-card {
-  background-color: rgba(255, 255, 255, 0.7);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
+/* Base Styles */
 html {
   scroll-behavior: smooth;
 }
@@ -123,97 +144,56 @@ html {
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
-  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
-    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-    "Helvetica Neue", sans-serif;
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+/* Utilities */
+.hard-shadow {
+  box-shadow: var(--shadow-strength) var(--shadow-strength) 0px var(--color-border);
 }
 
-/* Custom Scrollbar - Dark Theme */
+.hard-shadow-sm {
+  box-shadow: 2px 2px 0px var(--color-border);
+}
+
+.hard-shadow-hover:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: calc(var(--shadow-strength) + 2px) calc(var(--shadow-strength) + 2px) 0px var(--color-border);
+}
+
+/* Smooth Physics for "Soft" feel */
+.animate-physics {
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Scrollbar */
 .scrollbar-thin {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-muted) transparent;
+  scrollbar-color: var(--color-muted-foreground) transparent;
 }
 
-.scrollbar-thin::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+
+/* Focus */
+.focus-ring:focus {
+  outline: none;
 }
 
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
+.focus-ring:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+  background-color: #ffff00;
+  /* High viz focus */
+  color: #000000;
 }
 
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background-color: var(--color-muted);
-  border-radius: 4px;
-}
-
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-muted-foreground);
-}
-
-/* Glass morphism utilities */
-.glass {
-  background-color: color-mix(in srgb, var(--color-background) 80%, transparent);
-  backdrop-filter: blur(12px);
-  border: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
-}
-
-.glass-card {
-  background-color: color-mix(in srgb, var(--color-card) 60%, transparent);
-  backdrop-filter: blur(16px);
-  border: 1px solid color-mix(in srgb, var(--color-border) 30%, transparent);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-/* Gradient utilities */
-.gradient-primary {
-  background: linear-gradient(to right, var(--color-primary), var(--color-accent));
-}
-
-.gradient-text {
-  background: linear-gradient(to right, var(--color-primary), var(--color-accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Animation utilities */
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
-}
-
-.animate-slide-up {
-  animation: slide-up 0.3s ease-out;
-}
-
-.animate-scale-in {
-  animation: scale-in 0.2s ease-out;
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
+/* Animation overrides */
 @keyframes slide-up {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
 
   to {
@@ -222,103 +202,6 @@ code {
   }
 }
 
-@keyframes scale-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Terminal scanline animation for 404 page */
-.animate-scan {
-  animation: scan 2s linear infinite;
-}
-
-@keyframes scan {
-  from {
-    transform: translateY(-100%);
-  }
-
-  to {
-    transform: translateY(100%);
-  }
-}
-
-/* Focus ring utility */
-.focus-ring:focus {
-  outline: none;
-}
-
-
-.focus-ring:focus-visible {
-  outline: 2px solid var(--color-ring);
-  outline-offset: 2px;
-}
-
-/* Button Animations */
-.btn-animate {
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-animate:hover {
-  transform: translateY(-1px);
-  filter: brightness(110%);
-}
-
-.btn-animate:active {
-  transform: translateY(0) scale(0.98);
-  filter: brightness(90%);
-}
-
-/* Card Hover Effects */
-.card-hover {
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px -8px rgba(0, 0, 0, 0.4);
-  border-color: color-mix(in srgb, var(--color-primary) 30%, transparent);
-}
-
-/* Page Transitions */
-.page-transition {
-  animation: page-enter 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes page-enter {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.99);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-/* Shimmer Effect for Loading/Skeleton */
-.animate-shimmer {
-  background: linear-gradient(90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      transparent 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite linear;
-}
-
-@keyframes shimmer {
-  from {
-    background-position: 200% 0;
-  }
-
-  to {
-    background-position: -200% 0;
-  }
+.animate-slide-up {
+  animation: slide-up 0.4s cubic-bezier(0.12, 0.57, 0.63, 0.21);
 }
