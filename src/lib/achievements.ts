@@ -236,16 +236,6 @@ export const ACHIEVEMENTS: Achievement[] = [
         criteria: { type: 'count', target: 18, challengeType: 'PLAYWRIGHT' },
     },
 
-    // Streaks (not in seed, but keeping as they are game logic handled by stats)
-    // NOTE: If these are not in DB, they won't save correctly unless added to seed.
-    // Assuming they MIGHT be missing from seed but desired. 
-    // Wait, if they are not in DB, `awardAchievements` will fail lookup.
-    // I should only keep what is in the DB.
-    // Seed has 'milestones', 'challenges', 'xp', 'tiers'. No 'streak'.
-    // Removing streaks to avoid errors until they are seeded.
-    // Or I should add them to seed. User didn't report streak bugs, but better safe.
-    // Actually, I'll comment them out or remove them to match DB strictly.
-
     // Tutorials
     {
         id: 'first-tutorial', // Was first-tutorial in seed

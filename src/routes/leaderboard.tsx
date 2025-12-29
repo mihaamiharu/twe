@@ -142,7 +142,7 @@ function LeaderboardPage() {
                                 )}
 
                                 {/* Rest of Leaderboard */}
-                                <Card className="glass-card border-none shadow-2xl bg-card/40 backdrop-blur-md overflow-hidden relative min-h-[400px] flex flex-col">
+                                <Card className="glass-card overflow-hidden relative min-h-[400px] flex flex-col">
                                     <CardContent className="p-0 flex-1 flex flex-col">
                                         <div className="overflow-x-auto flex-1">
                                             <table className="w-full">
@@ -252,7 +252,7 @@ function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: {
 
     return (
         <div className={cn(
-            "relative flex flex-col items-center p-6 rounded-2xl glass-card border transition-all hover:-translate-y-2 duration-300",
+            "relative flex flex-col items-center p-6 rounded-2xl glass-card transition-all hover:-translate-y-2 duration-300",
             borderColor, bgColor,
             isCenter ? "h-[320px] shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] z-10" : "h-[280px] opacity-90 hover:opacity-100"
         )}>
@@ -314,7 +314,7 @@ function LeaderboardSkeleton() {
 
 function LeaderboardError() {
     return (
-        <Card className="glass-card border-destructive/20 bg-destructive/5 backdrop-blur-md">
+        <Card className="glass-card border-destructive/20 bg-destructive/5">
             <CardContent className="p-12 text-center">
                 <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
                     <AlertCircle className="h-8 w-8 text-destructive" />

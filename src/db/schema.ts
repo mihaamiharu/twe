@@ -21,6 +21,8 @@ export const challengeTypeEnum = pgEnum('challenge_type', [
     'XPATH_SELECTOR',
 ]);
 
+export const userRoleEnum = pgEnum('user_role', ['USER', 'ADMIN']);
+
 export const difficultyEnum = pgEnum('difficulty', ['EASY', 'MEDIUM', 'HARD']);
 
 export const profileVisibilityEnum = pgEnum('profile_visibility', [
@@ -60,6 +62,7 @@ export const users = pgTable('users', {
     // Gamification fields
     xp: integer('xp').notNull().default(0),
     level: integer('level').notNull().default(1),
+    role: userRoleEnum('role').notNull().default('USER'),
 
     // Privacy settings
     profileVisibility: profileVisibilityEnum('profile_visibility')

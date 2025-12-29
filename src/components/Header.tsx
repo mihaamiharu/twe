@@ -54,7 +54,7 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-lg">
+      <header className="sticky top-0 z-40 w-full border-b border-border/40 glass">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
@@ -102,7 +102,7 @@ export function Header() {
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.image || undefined} />
-                        <AvatarFallback className="bg-primary/20 text-primary">
+                        <AvatarFallback className="bg-primary/10 text-primary">
                           {(user.name || user.email || 'U').charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>

@@ -8,6 +8,7 @@
  */
 
 import nodemailer from 'nodemailer';
+import { logger } from '@/lib/logger';
 
 
 // Create reusable transporter
@@ -110,9 +111,9 @@ ${appName}
             text,
             html,
         });
-        console.log(`[Email] Verification email sent to ${to}`);
+        logger.info(`[Email] Verification email sent to ${to}`);
     } catch (error) {
-        console.error('[Email] Failed to send verification email:', error);
+        logger.error('[Email] Failed to send verification email:', error);
         throw new Error('Failed to send verification email');
     }
 }
@@ -202,9 +203,9 @@ ${appName}
             text,
             html,
         });
-        console.log(`[Email] Password reset email sent to ${to}`);
+        logger.info(`[Email] Password reset email sent to ${to}`);
     } catch (error) {
-        console.error('[Email] Failed to send password reset email:', error);
+        logger.error('[Email] Failed to send password reset email:', error);
         throw new Error('Failed to send password reset email');
     }
 }
@@ -226,7 +227,7 @@ export async function sendBugReportNotification(report: {
     const adminEmail = process.env.ADMIN_EMAIL;
 
     if (!adminEmail) {
-        console.log('[Email] No ADMIN_EMAIL configured, skipping bug report notification');
+        logger.info('[Email] No ADMIN_EMAIL configured, skipping bug report notification');
         return;
     }
 
@@ -307,9 +308,9 @@ export async function sendBugReportNotification(report: {
             subject,
             html,
         });
-        console.log(`[Email] Bug report notification sent to admin: ${report.id}`);
+        logger.info(`[Email] Bug report notification sent to admin: ${report.id}`);
     } catch (error) {
-        console.error('[Email] Failed to send bug report notification:', error);
+        logger.error('[Email] Failed to send bug report notification:', error);
         // Don't throw - this is a notification, not critical
     }
 }

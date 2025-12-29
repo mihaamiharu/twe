@@ -5,7 +5,8 @@ import { tutorials, progress } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { auth } from '@/lib/auth.server';
 import { checkAchievements } from '@/lib/achievements';
-import { getUserStats, getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
+import { getClassStats, getUserStats, getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
+import { logger } from '@/lib/logger';
 
 export const Route = createFileRoute('/api/tutorials/$slug/complete')({
   server: {
@@ -85,10 +86,12 @@ export const Route = createFileRoute('/api/tutorials/$slug/complete')({
                 icon: a.icon,
               }));
 
-              console.log(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
+
+
+              logger.info(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
             }
           } catch (error) {
-            console.error('Error checking achievements:', error);
+            logger.error('Error checking achievements:', error);
           }
 
           return json({
@@ -97,7 +100,7 @@ export const Route = createFileRoute('/api/tutorials/$slug/complete')({
             newAchievements,
           });
         } catch (error) {
-          console.error('Error marking tutorial as complete:', error);
+          logger.error('Error marking tutorial as complete:', error);
           return json(
             { success: false, error: 'Failed to mark tutorial as complete' },
             { status: 500 }
