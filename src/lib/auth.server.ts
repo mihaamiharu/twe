@@ -32,6 +32,14 @@ export const auth = betterAuth({
         },
     }),
 
+    user: {
+        additionalFields: {
+            role: {
+                type: "string",
+            },
+        },
+    },
+
     // Email/Password authentication with email verification
     // Disable email verification in development/staging for easier testing
     emailAndPassword: {
