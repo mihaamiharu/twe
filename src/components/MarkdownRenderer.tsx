@@ -2,6 +2,12 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+// Explicitly import languages that might not be in the common set
+import xpath from 'highlight.js/lib/languages/xpath';
+import bash from 'highlight.js/lib/languages/bash'; // Often good for CLI commands
+import json from 'highlight.js/lib/languages/json';
+import typescript from 'highlight.js/lib/languages/typescript';
+
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
 
@@ -24,7 +30,17 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
         )}>
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight]}
+                rehypePlugins={[
+                    [rehypeHighlight, {
+                        languages: {
+                            xpath,
+                            bash,
+                            json,
+                            typescript
+                        },
+                        detect: true
+                    }]
+                ]}
                 components={{
                     // Custom heading styles
                     h1: ({ children }) => (
