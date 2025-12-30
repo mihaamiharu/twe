@@ -23,6 +23,17 @@ import {
 
 export const Route = createFileRoute('/challenges/')({
     component: ChallengesPage,
+    head: () => ({
+        meta: [
+            {
+                title: 'Coding Challenges | TestingWithEkki',
+            },
+            {
+                name: 'description',
+                content: 'Practice your Playwright, Selenium, and Cypress skills with real-world coding challenges. Master selectors, automation authentication, and more.',
+            }
+        ]
+    })
 });
 
 // Challenge type colors and icons
