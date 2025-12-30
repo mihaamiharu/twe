@@ -437,7 +437,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                             <div className="space-y-4">
                                 <div className="space-y-2">
                                     <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
-                                        <div className="h-6 w-6 rounded-full bg-brand-teal/20 flex items-center justify-center text-xs font-bold text-black border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">1</div>
+                                        <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">1</div>
                                         Step 1: Capture the Element
                                     </h3>
                                     <Card className="border-2 border-black rounded-xl hard-shadow-sm overflow-hidden bg-muted/5">
@@ -455,7 +455,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                                     size="sm"
                                                     onClick={handleValidateSelector}
                                                     disabled={isRunning || !selector}
-                                                    className="w-full sm:w-auto font-bold border-2 border-black hard-shadow-sm bg-brand-teal hover:bg-brand-teal/90 text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                                                    className="w-full sm:w-auto font-bold border-2 border-border hard-shadow-sm bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                                                 >
                                                     {isRunning ? (
                                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -508,7 +508,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         <div className={cn("flex flex-col gap-3", !isCodeChallenge && "flex-1")}>
                             <div className="flex items-center justify-between">
                                 <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
-                                    <div className="h-6 w-6 rounded-full bg-brand-teal/20 flex items-center justify-center text-xs font-bold text-black border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">2</div>
+                                    <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">2</div>
                                     Step 2: Execution & Feedback
                                 </h3>
                                 {isCodeChallenge && (
@@ -517,7 +517,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         size="sm"
                                         onClick={handleRunCode}
                                         disabled={isRunning}
-                                        className="font-bold border-2 border-black hard-shadow-sm bg-brand-teal hover:bg-brand-teal/90 text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
+                                        className="font-bold border-2 border-border hard-shadow-sm bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                                         title="Run Code (Cmd/Ctrl + Enter)"
                                     >
                                         {isRunning ? (
