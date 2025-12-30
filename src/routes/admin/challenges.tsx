@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getAdminChallenges, updateChallengeStatus } from '@/lib/admin.fn';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, BookOpen, Clock, Layout, Zap, Eye, EyeOff } from 'lucide-react';
@@ -31,10 +32,9 @@ function ChallengeManager() {
     const { data: challenges, isLoading } = useQuery({
         queryKey: ['admin-challenges'],
         queryFn: async () => {
-            const res = await fetch('/api/admin/challenges');
-            if (!res.ok) throw new Error('Failed to fetch challenges');
-            const json = await res.json();
-            return json.data;
+            const res = await getAdminChallenges();
+            if (!res.success) throw new Error(res.error || 'Failed to fetch challenges');
+            return res.data;
         },
     });
 
@@ -50,13 +50,9 @@ function ChallengeManager() {
 
     const updateMutation = useMutation({
         mutationFn: async (data: { id: string; isPublished?: boolean; isComingSoon?: boolean }) => {
-            const res = await fetch('/api/admin/challenges', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
-            if (!res.ok) throw new Error('Failed to update challenge');
-            return res.json();
+            const res = await updateChallengeStatus({ data });
+            if (!res.success) throw new Error(res.error || 'Failed to update challenge');
+            return res;
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['admin-challenges'] });

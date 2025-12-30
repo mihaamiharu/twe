@@ -1,5 +1,6 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { getAdminStats } from '@/lib/admin.fn';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, FileCode, TrendingUp, Trophy, AlertCircle, Activity, ArrowRight, Zap, Layout } from 'lucide-react';
@@ -22,15 +23,11 @@ function AdminDashboard() {
   const { data: stats, isLoading, error } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
-      const res = await fetch('/api/admin/stats');
-      if (res.status === 403) {
-        // Redirect if unauthorized
-        window.location.href = '/';
-        return null;
+      const res = await getAdminStats();
+      if (!res.success) {
+        throw new Error(res.error || 'Failed to fetch stats');
       }
-      if (!res.ok) throw new Error('Failed to fetch stats');
-      const json = await res.json();
-      return json.data;
+      return res.data;
     }
   });
 

@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getAdminUsers, updateUserStatus } from '@/lib/admin.fn';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Ban, CheckCircle2, Shield, ShieldAlert, UserIcon, Info } from 'lucide-react';
@@ -38,10 +39,9 @@ function UserManager() {
     const { data: users, isLoading } = useQuery({
         queryKey: ['admin-users'],
         queryFn: async () => {
-            const res = await fetch('/api/admin/users');
-            if (!res.ok) throw new Error('Failed to fetch users');
-            const json = await res.json();
-            return json.data;
+            const res = await getAdminUsers();
+            if (!res.success) throw new Error(res.error || 'Failed to fetch users');
+            return res.data;
         },
     });
 
@@ -59,13 +59,9 @@ function UserManager() {
     const toggleBanMutation = useMutation({
         mutationFn: async ({ id, showOnLeaderboard }: { id: string; showOnLeaderboard: boolean }) => {
             console.log('Mutating user:', id, 'Show:', showOnLeaderboard);
-            const res = await fetch('/api/admin/users', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ id, showOnLeaderboard }),
-            });
-            if (!res.ok) throw new Error('Failed to update user');
-            return res.json();
+            const res = await updateUserStatus({ data: { id, showOnLeaderboard } });
+            if (!res.success) throw new Error(res.error || 'Failed to update user');
+            return res;
         },
         onSuccess: (data, variables) => {
             queryClient.setQueryData(['admin-users'], (oldData: any[]) => {

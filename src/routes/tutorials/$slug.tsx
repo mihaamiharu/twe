@@ -1,5 +1,6 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTutorial } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -61,21 +62,22 @@ function TutorialDetailPage() {
     const contentRef = useRef<HTMLDivElement>(null);
     const { data: sessionData } = useSession();
 
-    const { data, isLoading, error } = useQuery<TutorialResponse>({
+    const { data: tutorialData, isLoading, error } = useQuery({
         queryKey: ['tutorial', slug],
         queryFn: async () => {
-            const res = await fetch(`/api/tutorials/${slug}`);
-            if (!res.ok) {
-                if (res.status === 404) {
-                    throw new Error('Tutorial not found');
-                }
-                throw new Error('Failed to fetch tutorial');
-            }
-            return res.json();
+            if (!slug) throw new Error('Tutorial slug is required');
+            const result = await getTutorial({ data: { slug } });
+            if (!result.success) throw new Error(result.error);
+            return result.data as Tutorial;
         },
     });
 
-    const tutorial = data?.data;
+    // Rename for compatibility
+    const tutorial = tutorialData;
+    const data = { data: tutorial }; // Mock wrapper for compatibility with existing code structure if needed, or better yet, refactor usages.
+    // Actually, let's keep `tutorial` as the primary data source and remove the wrapper usage in the rest of the component.
+
+
 
     // Mark as complete mutation
     const markCompleteMutation = useMutation({
@@ -334,12 +336,16 @@ function TutorialDetailPage() {
                                             <CheckCircle2 className="h-5 w-5 text-green-500" />
                                             <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
                                         </div>
-                                        {data.data.nextTutorial && (
+                                        <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
+                                            <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                            <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
+                                        </div>
+                                        {tutorial.nextTutorial && (
                                             <Button
                                                 className="w-full"
-                                                onClick={() => navigate({ to: '/tutorials/$slug', params: { slug: data.data.nextTutorial!.slug } })}
+                                                onClick={() => navigate({ to: '/tutorials/$slug', params: { slug: tutorial.nextTutorial!.slug } })}
                                             >
-                                                Next: {data.data.nextTutorial.title}
+                                                Next: {tutorial.nextTutorial.title}
                                                 <ArrowRight className="h-4 w-4 ml-2" />
                                             </Button>
                                         )}

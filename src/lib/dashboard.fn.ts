@@ -1,9 +1,6 @@
-
-import { createFileRoute } from '@tanstack/react-router';
-import { json } from '@tanstack/react-start';
+import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
 import { challenges, tutorials, achievements } from '@/db/schema';
-import { getUserRank } from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { sql } from 'drizzle-orm';
 
@@ -78,51 +75,33 @@ async function fetchStats() {
     };
 }
 
-export const Route = createFileRoute('/api/stats/')({
-    server: {
-        handlers: {
-            GET: async () => {
-                try {
-                    // Check if we have valid cached data
-                    const now = Date.now();
-                    if (cachedStats && (now - cachedStats.timestamp) < CACHE_TTL_MS) {
-                        logger.debug('[Stats Cache] Returning cached data');
-                        return json(
-                            { success: true, data: cachedStats.data },
-                            {
-                                headers: {
-                                    'Cache-Control': 'public, max-age=86400', // 24h browser cache
-                                },
-                            }
-                        );
-                    }
+export const getDashboardStats = createServerFn({ method: 'GET' }).handler(
+    async (): Promise<{ success: boolean; data?: StatsCache['data']; error?: string }> => {
+        try {
+            // Check if we have valid cached data
+            const now = Date.now();
+            if (cachedStats && (now - cachedStats.timestamp) < CACHE_TTL_MS) {
+                logger.debug('[Stats Cache] Returning cached data');
+                return { success: true, data: cachedStats.data };
+            }
 
-                    // Fetch fresh data
-                    logger.debug('[Stats Cache] Fetching fresh data from database');
-                    const data = await fetchStats();
+            // Fetch fresh data
+            logger.debug('[Stats Cache] Fetching fresh data from database');
+            const data = await fetchStats();
 
-                    // Update cache
-                    cachedStats = {
-                        data,
-                        timestamp: now,
-                    };
+            // Update cache
+            cachedStats = {
+                data,
+                timestamp: now,
+            };
 
-                    return json(
-                        { success: true, data },
-                        {
-                            headers: {
-                                'Cache-Control': 'public, max-age=86400', // 24h browser cache
-                            },
-                        }
-                    );
-                } catch (error) {
-                    logger.error('Error fetching stats:', error);
-                    return json(
-                        { success: false, error: 'Failed to fetch stats' },
-                        { status: 500 }
-                    );
-                }
-            },
-        },
-    },
-});
+            return { success: true, data };
+        } catch (error) {
+            logger.error('Error fetching dashboard stats:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
+        }
+    }
+);

@@ -48,3 +48,84 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
         return { user: null, isAuthenticated: false };
     }
 );
+
+// Simple in-memory rate limiting (per email, 60 second cooldown)
+// Note: This resets on server restart/redeploy
+const rateLimitMap = new Map<string, number>();
+const COOLDOWN_MS = 60 * 1000;
+
+export const resendVerification = createServerFn({ method: "POST" })
+    .inputValidator((data: { email: string }) => data)
+    .handler(async ({ data }) => {
+        try {
+            const { email } = data;
+
+            if (!email || typeof email !== 'string') {
+                return { success: false, error: 'Email is required' };
+            }
+
+            const normalizedEmail = email.toLowerCase().trim();
+
+            // Rate limiting check
+            const lastSent = rateLimitMap.get(normalizedEmail);
+            const now = Date.now();
+
+            if (lastSent && now - lastSent < COOLDOWN_MS) {
+                const remainingSeconds = Math.ceil((COOLDOWN_MS - (now - lastSent)) / 1000);
+                return {
+                    success: false,
+                    error: `Please wait ${remainingSeconds} seconds before requesting another email`,
+                    cooldownRemaining: remainingSeconds,
+                };
+            }
+
+            // Dynamically import server dependencies
+            const { db } = await import('@/db');
+            const { users } = await import('@/db/schema');
+            const { eq } = await import('drizzle-orm');
+            const { sendVerificationEmail } = await import('@/lib/email.server');
+            const { logger } = await import('@/lib/logger');
+
+            // Find user by email
+            const user = await db.query.users.findFirst({
+                where: eq(users.email, normalizedEmail),
+            });
+
+            if (!user) {
+                // Don't reveal if email exists - return success anyway
+                return {
+                    success: true,
+                    message: 'If an account with that email exists, a verification email has been sent.',
+                };
+            }
+
+            // Check if already verified
+            if (user.emailVerified) {
+                return {
+                    success: true,
+                    message: 'Your email is already verified. You can sign in.',
+                    alreadyVerified: true,
+                };
+            }
+
+            // Generate verification URL
+            const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
+            const token = crypto.randomUUID();
+            const verificationUrl = `${baseUrl}/api/auth/verify-email?token=${token}&callbackURL=/login`;
+
+            // Send the verification email
+            await sendVerificationEmail(user.email, verificationUrl, user.name || undefined);
+
+            // Update rate limit
+            rateLimitMap.set(normalizedEmail, now);
+            logger.info(`[Auth] Resent verification email to ${normalizedEmail}`);
+
+            return {
+                success: true,
+                message: 'Verification email sent! Please check your inbox.',
+            };
+        } catch (error) {
+            console.error('Error resending verification email:', error);
+            return { success: false, error: 'Failed to resend verification email' };
+        }
+    });
