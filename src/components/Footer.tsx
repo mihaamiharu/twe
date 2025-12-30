@@ -15,38 +15,33 @@ const footerLinks = {
         { label: 'Leaderboard', href: '/leaderboard' },
     ] as FooterLink[],
     resources: [
-        { label: 'API Docs', href: '/docs/api' },
-    ] as FooterLink[],
-    legal: [
-        { label: 'Terms', href: '#', isExternal: true },
-        { label: 'Privacy', href: '#', isExternal: true },
-        { label: 'Cookies', href: '#', isExternal: true },
+        { label: 'Privacy Policy', href: '/privacy' },
+        { label: 'Terms of Service', href: '/terms' },
     ] as FooterLink[],
 };
 
 export function Footer() {
     return (
-        <footer className="border-t border-border bg-muted/30">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
-                    {/* Brand */}
-                    <div className="col-span-2 md:col-span-1">
-                        <Link to="/" className="flex items-center gap-2 mb-4">
-                            <Zap className="h-6 w-6 text-primary" />
-                            <span className="text-lg font-bold gradient-text">
+        <footer className="border-t border-border/40 bg-zinc-50/50 dark:bg-zinc-950/50 backdrop-blur-xl">
+            <div className="max-w-7xl mx-auto px-6 py-12 lg:px-8 lg:py-16">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8">
+                    {/* Brand Section - Takes 2 columns on medium+ screens */}
+                    <div className="md:col-span-2 space-y-6">
+                        <Link to="/" className="flex items-center gap-2">
+                            <Zap className="h-6 w-6 text-primary fill-primary/20" />
+                            <span className="text-xl font-bold tracking-tight">
                                 TestingWithEkki
                             </span>
                         </Link>
-                        <p className="text-sm text-muted-foreground mb-4">
-                            Learn testing skills through interactive tutorials and coding
-                            challenges.
+                        <p className="text-sm leading-6 text-muted-foreground max-w-sm">
+                            Master the art of software testing through interactive tutorials and real-world coding challenges. Built for developers, by developers.
                         </p>
-                        <div className="flex gap-4">
+                        <div className="flex gap-5">
                             <a
                                 href="https://github.com/mihaamiharu/twe"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-muted-foreground hover:text-foreground transition-colors"
+                                className="text-muted-foreground hover:text-primary transition-colors"
                             >
                                 <Github className="h-5 w-5" />
                             </a>
@@ -54,7 +49,7 @@ export function Footer() {
                                 href="https://twitter.com"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-muted-foreground hover:text-foreground transition-colors"
+                                className="text-muted-foreground hover:text-primary transition-colors"
                             >
                                 <Twitter className="h-5 w-5" />
                             </a>
@@ -62,14 +57,14 @@ export function Footer() {
                     </div>
 
                     {/* Product Links */}
-                    <div>
-                        <h3 className="font-semibold mb-4">Product</h3>
-                        <ul className="space-y-3">
+                    <div className="md:pt-1">
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/80">Product</h3>
+                        <ul className="mt-6 space-y-4">
                             {footerLinks.product.map((link) => (
-                                <li key={link.href}>
+                                <li key={link.label}>
                                     <Link
-                                        to={link.href as '/tutorials' | '/challenges' | '/leaderboard'}
-                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                        to={link.href}
+                                        className="text-sm text-muted-foreground hover:text-primary transition-colors"
                                     >
                                         {link.label}
                                     </Link>
@@ -79,14 +74,14 @@ export function Footer() {
                     </div>
 
                     {/* Resources Links */}
-                    <div>
-                        <h3 className="font-semibold mb-4">Resources</h3>
-                        <ul className="space-y-3">
+                    <div className="md:pt-1">
+                        <h3 className="text-xs font-semibold uppercase tracking-wider text-foreground/80">Resources</h3>
+                        <ul className="mt-6 space-y-4">
                             {footerLinks.resources.map((link) => (
                                 <li key={link.label}>
                                     <Link
-                                        to={link.href as '/docs/api'}
-                                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                                        to={link.href}
+                                        className="text-sm text-muted-foreground hover:text-primary transition-colors"
                                     >
                                         {link.label}
                                     </Link>
@@ -96,36 +91,25 @@ export function Footer() {
                     </div>
                 </div>
 
-                {/* Bottom - Keep legal links here only */}
-                <div className="border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-sm text-muted-foreground">
+                {/* Bottom Bar */}
+                <div className="mt-16 border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <p className="text-xs text-muted-foreground">
                         © {new Date().getFullYear()} TestingWithEkki. All rights reserved.
                     </p>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex items-center">
                         <BugReportDialog
                             trigger={
-                                <button className="flex items-center gap-1 hover:text-foreground transition-colors">
-                                    <Bug className="h-4 w-4" />
-                                    Report Bug
+                                <button className="flex items-center gap-2 text-xs font-medium text-muted-foreground hover:text-destructive transition-colors px-2 py-1">
+                                    <Bug className="h-3.5 w-3.5" />
+                                    Report a Bug
                                 </button>
                             }
                         />
-                        <span className="text-border">|</span>
-                        <a href="#" className="hover:text-foreground transition-colors">
-                            Terms
-                        </a>
-                        <a href="#" className="hover:text-foreground transition-colors">
-                            Privacy
-                        </a>
-                        <a href="#" className="hover:text-foreground transition-colors">
-                            Cookies
-                        </a>
                     </div>
                 </div>
             </div>
         </footer>
     );
 }
-
 
 export default Footer;
