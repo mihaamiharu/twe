@@ -34,7 +34,6 @@ import { Route as ApiStatsIndexRouteImport } from './routes/api/stats/index'
 import { Route as ApiLeaderboardIndexRouteImport } from './routes/api/leaderboard/index'
 import { Route as ApiChallengesIndexRouteImport } from './routes/api/challenges/index'
 import { Route as ApiBugReportsIndexRouteImport } from './routes/api/bug-reports/index'
-import { Route as ApiUsersMeRouteImport } from './routes/api/users/me'
 import { Route as ApiTutorialsSlugRouteImport } from './routes/api/tutorials/$slug'
 import { Route as ApiChallengesSlugRouteImport } from './routes/api/challenges/$slug'
 import { Route as ApiAuthResendVerificationRouteImport } from './routes/api/auth/resend-verification'
@@ -170,11 +169,6 @@ const ApiBugReportsIndexRoute = ApiBugReportsIndexRouteImport.update({
   path: '/api/bug-reports/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiUsersMeRoute = ApiUsersMeRouteImport.update({
-  id: '/api/users/me',
-  path: '/api/users/me',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiTutorialsSlugRoute = ApiTutorialsSlugRouteImport.update({
   id: '/api/tutorials/$slug',
   path: '/api/tutorials/$slug',
@@ -256,7 +250,6 @@ export interface FileRoutesByFullPath {
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeRoute
   '/api/bug-reports': typeof ApiBugReportsIndexRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
@@ -293,7 +286,6 @@ export interface FileRoutesByTo {
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeRoute
   '/api/bug-reports': typeof ApiBugReportsIndexRoute
   '/api/challenges': typeof ApiChallengesIndexRoute
   '/api/leaderboard': typeof ApiLeaderboardIndexRoute
@@ -332,7 +324,6 @@ export interface FileRoutesById {
   '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
   '/api/challenges/$slug': typeof ApiChallengesSlugRoute
   '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeRoute
   '/api/bug-reports/': typeof ApiBugReportsIndexRoute
   '/api/challenges/': typeof ApiChallengesIndexRoute
   '/api/leaderboard/': typeof ApiLeaderboardIndexRoute
@@ -371,7 +362,6 @@ export interface FileRouteTypes {
     | '/api/auth/resend-verification'
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
-    | '/api/users/me'
     | '/api/bug-reports'
     | '/api/challenges'
     | '/api/leaderboard'
@@ -408,7 +398,6 @@ export interface FileRouteTypes {
     | '/api/auth/resend-verification'
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
-    | '/api/users/me'
     | '/api/bug-reports'
     | '/api/challenges'
     | '/api/leaderboard'
@@ -446,7 +435,6 @@ export interface FileRouteTypes {
     | '/api/auth/resend-verification'
     | '/api/challenges/$slug'
     | '/api/tutorials/$slug'
-    | '/api/users/me'
     | '/api/bug-reports/'
     | '/api/challenges/'
     | '/api/leaderboard/'
@@ -483,7 +471,6 @@ export interface RootRouteChildren {
   ApiAuthResendVerificationRoute: typeof ApiAuthResendVerificationRoute
   ApiChallengesSlugRoute: typeof ApiChallengesSlugRoute
   ApiTutorialsSlugRoute: typeof ApiTutorialsSlugRouteWithChildren
-  ApiUsersMeRoute: typeof ApiUsersMeRoute
   ApiBugReportsIndexRoute: typeof ApiBugReportsIndexRoute
   ApiChallengesIndexRoute: typeof ApiChallengesIndexRoute
   ApiLeaderboardIndexRoute: typeof ApiLeaderboardIndexRoute
@@ -669,13 +656,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiBugReportsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/users/me': {
-      id: '/api/users/me'
-      path: '/api/users/me'
-      fullPath: '/api/users/me'
-      preLoaderRoute: typeof ApiUsersMeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/tutorials/$slug': {
       id: '/api/tutorials/$slug'
       path: '/api/tutorials/$slug'
@@ -802,7 +782,6 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAuthResendVerificationRoute: ApiAuthResendVerificationRoute,
   ApiChallengesSlugRoute: ApiChallengesSlugRoute,
   ApiTutorialsSlugRoute: ApiTutorialsSlugRouteWithChildren,
-  ApiUsersMeRoute: ApiUsersMeRoute,
   ApiBugReportsIndexRoute: ApiBugReportsIndexRoute,
   ApiChallengesIndexRoute: ApiChallengesIndexRoute,
   ApiLeaderboardIndexRoute: ApiLeaderboardIndexRoute,

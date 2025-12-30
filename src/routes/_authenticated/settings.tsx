@@ -7,19 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
+import { getUserSettings, updateUserProfile } from '@/lib/user.fn';
 
 export const Route = createFileRoute('/_authenticated/settings')({
     component: SettingsPage,
 });
-
-interface UserData {
-    id: string;
-    email: string;
-    name: string;
-    image?: string;
-    profileVisibility: 'PUBLIC' | 'PRIVATE';
-    showOnLeaderboard: boolean;
-}
 
 function SettingsPage() {
     const queryClient = useQueryClient();
@@ -29,15 +21,11 @@ function SettingsPage() {
     const { data, isLoading, error } = useQuery({
         queryKey: ['user', 'settings'],
         queryFn: async () => {
-            const response = await fetch('/api/users/me');
-            if (!response.ok) {
-                throw new Error('Failed to fetch settings');
+            const result = await getUserSettings();
+            if (!result.success || !result.data) {
+                throw new Error(result.error || 'Failed to fetch settings');
             }
-            const json = await response.json();
-            if (!json.success) {
-                throw new Error(json.error || 'Failed to fetch settings');
-            }
-            return json.data as UserData;
+            return result.data;
         },
     });
 
@@ -50,18 +38,11 @@ function SettingsPage() {
 
     const updateProfileMutation = useMutation({
         mutationFn: async (newName: string) => {
-            const response = await fetch('/api/users/me', {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: newName }),
-            });
-
-            if (!response.ok) {
-                const json = await response.json();
-                throw new Error(json.error || 'Failed to update profile');
+            const result = await updateUserProfile({ data: { name: newName } });
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to update profile');
             }
-
-            return response.json();
+            return result.data;
         },
         onSuccess: () => {
             toast.success('Settings updated', {
