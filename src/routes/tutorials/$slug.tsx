@@ -1,5 +1,6 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getTutorial, completeTutorial, updateTutorialProgress } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -61,33 +62,25 @@ function TutorialDetailPage() {
     const contentRef = useRef<HTMLDivElement>(null);
     const { data: sessionData } = useSession();
 
-    const { data, isLoading, error } = useQuery<TutorialResponse>({
+    const { data: tutorialData, isLoading, error } = useQuery({
         queryKey: ['tutorial', slug],
         queryFn: async () => {
-            const res = await fetch(`/api/tutorials/${slug}`);
-            if (!res.ok) {
-                if (res.status === 404) {
-                    throw new Error('Tutorial not found');
-                }
-                throw new Error('Failed to fetch tutorial');
-            }
-            return res.json();
+            if (!slug) throw new Error('Tutorial slug is required');
+            const result = await getTutorial({ data: { slug } });
+            if (!result.success) throw new Error(result.error);
+            return result.data as Tutorial;
         },
     });
 
-    const tutorial = data?.data;
+    // Rename for compatibility
+    const tutorial = tutorialData;
 
     // Mark as complete mutation
     const markCompleteMutation = useMutation({
         mutationFn: async () => {
-            // Force progress to 100 on completion
-            const res = await fetch(`/api/tutorials/${slug}/complete`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ readingProgress: 100 }),
-            });
-            if (!res.ok) throw new Error('Failed to mark as complete');
-            return res.json();
+            const result = await completeTutorial({ data: { slug } });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
         onSuccess: (response) => {
             toast.success('Tutorial completed! 🎉');
@@ -110,94 +103,120 @@ function TutorialDetailPage() {
     // Update progress mutation
     const updateProgressMutation = useMutation({
         mutationFn: async (progress: number) => {
-            const res = await fetch(`/api/tutorials/${slug}/progress`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ readingProgress: progress }),
-            });
-            if (!res.ok) throw new Error('Failed to update progress');
-            return res.json();
+            const result = await updateTutorialProgress({ data: { slug, readingProgress: progress } });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
     });
 
-    // Calculate reading progress based on scroll
-    // Skip tracking if tutorial already completed
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        // Don't update progress if tutorial is already completed
-        if (tutorial?.userProgress?.isCompleted) {
+    // Use a ref to track progress for the event listener without re-binding
+    const progressRef = useRef(readingProgress);
+    // Track if user has actively scrolled (to prevent premature progress on page load)
+    const hasScrolledRef = useRef(false);
+    // Track initial scroll position to detect real user scrolling
+    const initialScrollRef = useRef(0);
+
+    // Sync ref with state
+    useEffect(() => {
+        progressRef.current = readingProgress;
+    }, [readingProgress]);
+
+    // Track window scroll for reading progress
+    useEffect(() => {
+        // Don't update progress if tutorial is already completed or user not logged in
+        if (tutorial?.userProgress?.isCompleted || !sessionData?.user) {
             return;
         }
 
-        // Auth Guard: Don't track scrolling progress if not logged in (optional, but good for saving API calls)
-        // But for "Lazy Registration", we might want to let them read fully, then prompt at the end?
-        // Let's stick to prompt only on "Mark Complete" button for now.
-        // Scroll progress doesn't need auth guard, but API call will fail (401)
-        // We should check session before mutating.
+        let scrollListenerAttached = false;
+        let attachTimeout: ReturnType<typeof setTimeout>;
 
-        if (!sessionData?.user) return;
+        const handleWindowScroll = () => {
+            if (!contentRef.current) return;
 
-        const element = e.currentTarget;
-        const scrollTop = element.scrollTop;
-        const scrollHeight = element.scrollHeight - element.clientHeight;
+            // Extra safety: if scroll position is inherited from previous page, ignore
+            // This handles the race condition during SPA navigation
+            if (!hasScrolledRef.current) {
+                // Only start tracking after user has scrolled at least 50px from 0
+                if (window.scrollY > 50) {
+                    hasScrolledRef.current = true;
+                } else {
+                    return; // Don't calculate progress yet - user hasn't scrolled
+                }
+            }
 
-        // Ensure we can reach 100% - account for small rounding errors
-        let progress = 0;
-        if (scrollHeight <= 10) {
-            // Content fits without scrolling or very minimal scroll needed
-            progress = 100;
-        } else {
-            progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
-            // If user is at or very near bottom, force 100%
-            if (scrollHeight - scrollTop < 20) {
+            const element = contentRef.current;
+            const rect = element.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
+
+            // Calculate distance from top of content to bottom of viewport
+            const totalHeight = element.offsetHeight;
+            const scrolled = Math.max(0, windowHeight - (rect.top + 100));
+
+            let progress = Math.min(100, Math.round((scrolled / (totalHeight)) * 100));
+
+            // Force 100% if we've reached the bottom of the content
+            if (rect.bottom <= windowHeight + 100) {
                 progress = 100;
             }
-        }
 
-        if (progress !== readingProgress) {
-            setReadingProgress(progress);
-            // Update progress in DB (debounced) - only if not already completed
-            if ((progress % 10 === 0 || progress === 100) && !tutorial?.userProgress?.isCompleted) {
-                updateProgressMutation.mutate(progress);
-            }
-        }
-    };
-
-    // For short tutorials that don't need scrolling, auto-detect on mount
-    useEffect(() => {
-        if (!tutorial || tutorial.userProgress?.isCompleted) {
-            return;
-        }
-
-        // Check if content needs scrolling after render
-        const checkContentHeight = () => {
-            if (contentRef.current) {
-                const element = contentRef.current;
-                const scrollHeight = element.scrollHeight - element.clientHeight;
-
-                // If content doesn't need scrolling, set progress to 100%
-                if (scrollHeight <= 10) {
-                    setReadingProgress(100);
-                    // Also trigger mutation for consistency
-                    updateProgressMutation.mutate(100);
+            // Only update if progress is genuinely increasing
+            if (progress > progressRef.current) {
+                setReadingProgress(progress);
+                // Update progress in DB - only on significant milestones or 100%
+                if ((progress % 20 === 0 || progress === 100)) {
+                    updateProgressMutation.mutate(progress);
                 }
             }
         };
 
-        // Small delay to ensure content is rendered
-        const timer = setTimeout(checkContentHeight, 500);
-        return () => clearTimeout(timer);
-    }, [tutorial?.id]); // Only run when tutorial ID changes
+        // Delay attaching the scroll listener to let the page settle after SPA navigation
+        // This prevents the listener from firing with stale scrollY from the previous page
+        attachTimeout = setTimeout(() => {
+            // Only attach if we're at the top of the page (scroll reset completed)
+            if (window.scrollY === 0) {
+                hasScrolledRef.current = false;
+                window.addEventListener('scroll', handleWindowScroll);
+                scrollListenerAttached = true;
+            } else {
+                // If still not at top, try again shortly
+                const retryTimeout = setTimeout(() => {
+                    hasScrolledRef.current = false;
+                    window.addEventListener('scroll', handleWindowScroll);
+                    scrollListenerAttached = true;
+                }, 200);
+                // Store for cleanup
+                (attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> }).retry = retryTimeout;
+            }
+        }, 300);
+
+        return () => {
+            clearTimeout(attachTimeout);
+            if ((attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> }).retry) {
+                clearTimeout((attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> }).retry);
+            }
+            if (scrollListenerAttached) {
+                window.removeEventListener('scroll', handleWindowScroll);
+            }
+        };
+    }, [tutorial?.id, sessionData?.user, tutorial?.userProgress?.isCompleted]);
+
+
 
     // Reset progress and scroll to top when slug changes
     useEffect(() => {
         setReadingProgress(0);
+        progressRef.current = 0; // Also reset the ref immediately
+        hasScrolledRef.current = false; // Reset scroll tracking
+        window.scrollTo(0, 0); // Force scroll to top
         if (contentRef.current) {
             contentRef.current.scrollTop = 0;
         }
     }, [slug]);
 
     // Get display progress - always 100% for completed tutorials
-    const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : readingProgress || tutorial?.userProgress?.readingProgress || 0;
+    // Use nullish coalescing (??) so that 0 is not treated as falsy
+    const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : (readingProgress ?? tutorial?.userProgress?.readingProgress ?? 0);
 
     // Loading state
     if (isLoading) {
@@ -269,7 +288,7 @@ function TutorialDetailPage() {
                                     </Badge>
                                 ))}
                             </div>
-                            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary via-purple-500 to-accent bg-clip-text text-transparent">
+                            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
                                 {tutorial.title}
                             </h1>
                             <p className="text-xl text-muted-foreground">
@@ -280,20 +299,18 @@ function TutorialDetailPage() {
                         {/* Content - Direct on page, no card container */}
                         <div
                             ref={contentRef}
-                            className="prose prose-lg dark:prose-invert max-w-none max-h-[70vh] overflow-y-auto pr-4 scroll-smooth"
+                            className="prose prose-lg dark:prose-invert max-w-none scroll-smooth"
                             style={{
-                                lineHeight: '1.7',
-                                scrollbarWidth: 'thin',
-                                scrollbarColor: 'hsl(var(--primary) / 0.3) transparent'
+                                fontFamily: 'var(--font-reading)',
+                                lineHeight: '1.8',
                             }}
-                            onScroll={handleScroll}
                         >
                             <MarkdownRenderer content={tutorial.content} />
                         </div>
                     </div>
 
-                    {/* Progress Sidebar - Sticky positioning */}
-                    <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+                    {/* Progress Sidebar - Sticky positioning with top offset for header */}
+                    <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
                         {/* Progress Card */}
                         <Card className="glass-card shadow-lg">
                             <CardHeader>
@@ -334,12 +351,12 @@ function TutorialDetailPage() {
                                             <CheckCircle2 className="h-5 w-5 text-green-500" />
                                             <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
                                         </div>
-                                        {data.data.nextTutorial && (
+                                        {tutorial.nextTutorial && (
                                             <Button
                                                 className="w-full"
-                                                onClick={() => navigate({ to: '/tutorials/$slug', params: { slug: data.data.nextTutorial!.slug } })}
+                                                onClick={() => navigate({ to: '/tutorials/$slug', params: { slug: tutorial.nextTutorial!.slug } })}
                                             >
-                                                Next: {data.data.nextTutorial.title}
+                                                Next: {tutorial.nextTutorial.title}
                                                 <ArrowRight className="h-4 w-4 ml-2" />
                                             </Button>
                                         )}
@@ -379,7 +396,13 @@ function TutorialDetailPage() {
                                     <p className="text-sm text-muted-foreground">
                                         Reinforce what you've learned with these related challenges.
                                     </p>
-                                    <div className="space-y-3">
+                                    <div
+                                        className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"
+                                        style={{
+                                            maskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)',
+                                            WebkitMaskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)'
+                                        }}
+                                    >
                                         {tutorial.challenges.map(challenge => (
                                             <Link
                                                 key={challenge.slug}
@@ -463,22 +486,22 @@ function TutorialDetailPage() {
                         border-bottom: 1px solid hsl(var(--border));
                     }
                     
-                    /* Smooth scrollbar */
-                    .prose::-webkit-scrollbar {
-                        width: 8px;
+                    /* Smooth scrollbar for sidebar */
+                    .custom-scrollbar::-webkit-scrollbar {
+                        width: 4px;
                     }
 
-                    .prose::-webkit-scrollbar-track {
+                    .custom-scrollbar::-webkit-scrollbar-track {
                         background: transparent;
                     }
                     
-                    .prose::-webkit-scrollbar-thumb {
-                        background: hsl(var(--primary) / 0.3);
+                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: hsl(var(--primary) / 0.1);
                         border-radius: 4px;
                     }
                     
-                    .prose::-webkit-scrollbar-thumb:hover {
-                        background: hsl(var(--primary) / 0.5);
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: hsl(var(--primary) / 0.3);
                     }
                 `}</style>
 

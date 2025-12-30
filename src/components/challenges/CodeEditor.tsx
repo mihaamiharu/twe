@@ -248,7 +248,7 @@ export function CodeEditor({
     }
 
     return (
-        <div className={cn('rounded-lg overflow-hidden border border-border', className)}>
+        <div className={cn('h-full w-full', className)}>
             <Editor
                 height={height}
                 language={language}

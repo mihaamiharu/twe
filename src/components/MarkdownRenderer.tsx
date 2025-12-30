@@ -2,6 +2,12 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
+// Explicitly import languages that might not be in the common set
+import xquery from 'highlight.js/lib/languages/xquery';
+import bash from 'highlight.js/lib/languages/bash'; // Often good for CLI commands
+import json from 'highlight.js/lib/languages/json';
+import typescript from 'highlight.js/lib/languages/typescript';
+
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
 
@@ -18,13 +24,23 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
 
     return (
         <div className={cn(
-            'prose max-w-none',
+            'prose prose-lg max-w-none',
             resolvedTheme === 'dark' && 'prose-invert',
             className
         )}>
             <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[rehypeHighlight]}
+                rehypePlugins={[
+                    [rehypeHighlight, {
+                        languages: {
+                            xpath: xquery,
+                            bash,
+                            json,
+                            typescript
+                        },
+                        detect: true
+                    }]
+                ]}
                 components={{
                     // Custom heading styles
                     h1: ({ children }) => (
@@ -48,7 +64,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                     ),
                     // Code blocks
                     pre: ({ children }) => (
-                        <pre className="bg-muted/50 rounded-lg p-4 overflow-x-auto my-4 border border-border">
+                        <pre className="bg-muted rounded-lg p-4 overflow-x-auto my-4 border-2 border-border">
                             {children}
                         </pre>
                     ),
@@ -57,7 +73,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                         if (isInline) {
                             return (
                                 <code
-                                    className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono"
+                                    className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-border/50"
                                     {...props}
                                 >
                                     {children}
@@ -94,34 +110,80 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                         </a>
                     ),
                     // Blockquotes with GitHub Alert support
+                    // Blockquotes with GitHub Alert support
                     blockquote: ({ children }) => {
-                        // Check if it's an alert
-                        let alertType: 'note' | 'tip' | 'important' | 'warning' | 'caution' | null = null;
-                        let content = children;
-
-                        // React-markdown usually wraps text in a p tag
-                        const firstChild = React.Children.toArray(children)[0] as any;
-                        if (firstChild && firstChild.props && firstChild.props.node && firstChild.props.node.tagName === 'p') {
-                            const text = firstChild.props.children[0];
-                            if (typeof text === 'string') {
-                                const match = text.match(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
-                                if (match) {
-                                    alertType = match[1].toLowerCase() as any;
-                                    // Remove the alert tag from the first paragraph
-                                    const cleanText = text.replace(/^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i, '').trim();
-
-                                    // We need to clone the children structure but replace the first text node
-                                    // This is a bit hacky in simple React, but for basic usage:
-                                    const newP = React.cloneElement(firstChild, {
-                                        ...firstChild.props,
-                                        children: [cleanText, ...firstChild.props.children.slice(1)]
-                                    });
-                                    content = [newP, ...React.Children.toArray(children).slice(1)];
+                        // Helper to find the first text node deeply, ignoring whitespace
+                        const findFirstTextNode = (nodes: React.ReactNode): { text: string; location: number[] } | null => {
+                            const nodeArray = React.Children.toArray(nodes);
+                            for (let i = 0; i < nodeArray.length; i++) {
+                                const node = nodeArray[i];
+                                if (typeof node === 'string') {
+                                    // Skip whitespace-only strings
+                                    if (node.trim().length > 0) {
+                                        return { text: node, location: [i] };
+                                    }
+                                    continue;
+                                }
+                                if (React.isValidElement(node) && node.props.children) {
+                                    const result = findFirstTextNode(node.props.children);
+                                    if (result) {
+                                        return { text: result.text, location: [i, ...result.location] };
+                                    }
                                 }
                             }
-                        }
+                            return null;
+                        };
 
-                        if (alertType) {
+                        const result = findFirstTextNode(children);
+
+                        // Check if it matches alert pattern. 
+                        // Note: We don't use ^ anchor because the string might have leading newlines from markdown parsing
+                        const alertMatch = result?.text.match(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i);
+
+                        if (alertMatch) {
+                            const alertType = alertMatch[1].toLowerCase() as 'note' | 'tip' | 'important' | 'warning' | 'caution';
+
+                            // Recursive function to clone the tree and strip the alert text
+                            const cloneAndStrip = (nodes: React.ReactNode, path: number[]): React.ReactNode => {
+                                if (path.length === 0) return nodes;
+
+                                const nodeArray = React.Children.toArray(nodes);
+                                const index = path[0];
+                                const node = nodeArray[index];
+
+                                if (path.length === 1) {
+                                    // Base case: we found the node containing the text
+                                    if (typeof node === 'string') {
+                                        const newText = node.replace(/^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i, '').trim();
+                                        // Replace the node with the striped text
+                                        // If removing it leaves it empty, we might want to return nothing, but returning empty string is safer
+                                        nodeArray[index] = newText;
+                                        return nodeArray;
+                                    }
+                                }
+
+                                // Recursive step
+                                if (React.isValidElement(node)) {
+                                    const newChildren = cloneAndStrip(node.props.children, path.slice(1));
+                                    nodeArray[index] = React.cloneElement(node, {
+                                        ...node.props,
+                                        children: newChildren
+                                    });
+                                }
+
+                                return nodeArray;
+                            };
+
+                            // We need to pass the location we found earlier
+                            // result.location is the path to the text node
+                            let content = children;
+                            if (result) {
+                                // Since React.Children.toArray flattens fragments, the path logic above is simplified.
+                                // However, finding the node logic matches pure React.Children iteration.
+                                // So we can re-use the path found by findFirstTextNode
+                                content = cloneAndStrip(children, result.location);
+                            }
+
                             const styles = {
                                 note: 'bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-300',
                                 tip: 'bg-green-500/10 border-green-500 text-green-700 dark:text-green-300',
@@ -131,11 +193,11 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                             };
 
                             const titles = {
-                                note: 'Mental Model', // Custom mapping for our "Mental Model"
+                                note: 'Mental Model',
                                 tip: 'Pro Tip',
                                 important: 'Key Concept',
                                 warning: 'Watch Out',
-                                caution: 'The Trap', // Custom mapping for "The Trap"
+                                caution: 'The Trap',
                             };
 
                             const icons = {
@@ -148,8 +210,8 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
 
                             return (
                                 <div className={cn("my-6 p-4 rounded-lg border-l-4", styles[alertType])}>
-                                    <div className="font-bold flex items-center gap-2 mb-2">
-                                        <span>{icons[alertType]}</span>
+                                    <div className="font-bold flex items-center gap-2 mb-2 select-none">
+                                        <span className="text-xl">{icons[alertType]}</span>
                                         {titles[alertType]}
                                     </div>
                                     <div className="text-muted-foreground/90 space-y-2">
@@ -168,19 +230,19 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                     },
                     // Tables
                     table: ({ children }) => (
-                        <div className="overflow-x-auto my-4">
-                            <table className="w-full border-collapse border border-border">
+                        <div className="overflow-x-auto my-6 rounded-xl border-2 border-border">
+                            <table className="w-full border-collapse">
                                 {children}
                             </table>
                         </div>
                     ),
                     th: ({ children }) => (
-                        <th className="border border-border bg-muted px-4 py-2 text-left font-semibold">
+                        <th className="border border-border/50 bg-muted/50 px-6 py-3 text-left font-semibold">
                             {children}
                         </th>
                     ),
                     td: ({ children }) => (
-                        <td className="border border-border px-4 py-2">{children}</td>
+                        <td className="border border-border/50 px-6 py-3">{children}</td>
                     ),
                     // Horizontal rule
                     hr: () => <hr className="border-border my-8" />,

@@ -95,10 +95,13 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                 </CardDescription>
             </CardHeader>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} method="post">
                 <CardContent className="space-y-4">
                     {formError && (
-                        <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+                        <div
+                            role="alert"
+                            className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
+                        >
                             {formError}
                         </div>
                     )}

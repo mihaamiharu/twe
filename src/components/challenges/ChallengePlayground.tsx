@@ -322,30 +322,30 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 </div>
             )}
             {/* Header */}
-            <div className="border-b border-border bg-card/50 px-4 py-3 flex items-center justify-between shrink-0">
+            <div className="border-b-2 border-black bg-card px-4 py-3 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-4">
                     <div>
-                        <h1 className="font-semibold text-lg leading-none">{challenge.title}</h1>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1.5">
-                            <Badge variant="secondary" className="font-normal">{challenge.difficulty}</Badge>
-                            <Badge variant="outline" className="font-normal">{challenge.type.replace('_', ' ')}</Badge>
-                            <span className="text-accent flex items-center gap-1 font-medium">
-                                <Zap className="h-3 w-3" />
+                        <h1 className="font-bold text-xl tracking-tight text-foreground">{challenge.title}</h1>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <Badge variant="secondary" className="font-bold border border-black/10">{challenge.difficulty}</Badge>
+                            <Badge variant="outline" className="font-bold border-black/20">{challenge.type.replace('_', ' ')}</Badge>
+                            <span className="text-accent flex items-center gap-1 font-bold">
+                                <Zap className="h-3 w-3 fill-current" />
                                 {challenge.xp} XP
                             </span>
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     {challenge.tutorial && (
                         <Link to="/tutorials/$slug" params={{ slug: challenge.tutorial.slug }}>
-                            <Button variant="ghost" size="sm" className="flex text-muted-foreground hover:text-foreground btn-animate">
+                            <Button variant="ghost" size="sm" className="hidden md:flex font-bold text-muted-foreground hover:text-foreground">
                                 <BookOpen className="h-4 w-4 mr-2" />
                                 Tutorial
                             </Button>
                         </Link>
                     )}
-                    <Button variant="ghost" size="sm" onClick={handleReset} className="text-muted-foreground hover:text-foreground btn-animate">
+                    <Button variant="ghost" size="sm" onClick={handleReset} className="font-bold text-muted-foreground hover:text-destructive">
                         <RotateCcw className="h-4 w-4 mr-2" />
                         Reset
                     </Button>
@@ -354,34 +354,34 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         onClick={handleSubmit}
                         disabled={!hasPassed}
                         className={cn(
-                            "shadow-md transition-all btn-animate",
+                            "font-bold border-2 border-black hard-shadow-sm transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                             hasPassed
-                                ? "bg-green-600 hover:bg-green-700 text-white"
-                                : "opacity-50 cursor-not-allowed"
+                                ? "bg-green-500 hover:bg-green-600 text-black"
+                                : "bg-muted opacity-50 cursor-not-allowed"
                         )}
                         title="Submit Solution (Cmd/Ctrl + Shift + Enter)"
                     >
                         <Send className="h-4 w-4 mr-2" />
-                        Submit Solution
+                        Submit
                     </Button>
                 </div>
             </div>
 
-            {/* Persistent Goal Bar */}
-            <div className="bg-muted/30 border-b border-border px-4 py-3 shrink-0">
-                <div className="flex items-start gap-3 max-w-4xl">
-                    <div className="bg-primary/20 p-1.5 rounded-md mt-0.5 shadow-sm">
-                        <Target className="h-4 w-4 text-primary" />
+            {/* Persistent Goal Bar - Compact */}
+            <div className="bg-brand-teal/5 border-b-2 border-black px-4 py-2 shrink-0">
+                <div className="flex items-center gap-3 max-w-5xl mx-auto">
+                    <div className="bg-brand-teal/20 p-1 rounded-md shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] border border-black">
+                        <Target className="h-3.5 w-3.5 text-black" />
                     </div>
-                    <div>
-                        <span className="text-xs font-bold text-primary uppercase tracking-wider block mb-1">Goal</span>
-                        <p className="text-sm font-medium text-foreground/90 leading-snug">{challenge.description}</p>
-                    </div>
+                    <p className="text-sm font-bold text-foreground/90 leading-tight">
+                        <span className="text-brand-teal mr-2">GOAL:</span>
+                        {challenge.description}
+                    </p>
                 </div>
             </div>
 
             {/* Main content - Split layout */}
-            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-border overflow-hidden">
+            <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 divide-y-2 lg:divide-y-0 lg:divide-x-2 divide-black overflow-hidden">
                 {/* Left Panel - Instructions & Preview */}
                 <div className="flex flex-col overflow-hidden bg-muted/5">
                     <Tabs
@@ -390,23 +390,21 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         className="flex-1 flex flex-col min-h-0"
                     >
                         <div className="px-4 pt-3 shrink-0">
-                            <TabsList className="w-full justify-start h-9 bg-muted/50 p-1">
-                                <TabsTrigger value="instructions" className="flex-1">Instructions</TabsTrigger>
+                            <TabsList className="w-full justify-start h-10 bg-muted/50 p-1 border-2 border-black rounded-lg">
+                                <TabsTrigger value="instructions" className="flex-1 font-bold data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-sm transition-all">Instructions</TabsTrigger>
                                 {challenge.htmlContent && (
-                                    <TabsTrigger value="preview" className="flex-1">Target Preview</TabsTrigger>
+                                    <TabsTrigger value="preview" className="flex-1 font-bold data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-sm transition-all">Target Preview</TabsTrigger>
                                 )}
                             </TabsList>
                         </div>
 
                         <TabsContent
                             value="instructions"
-                            className="flex-1 overflow-auto p-4 focus-visible:ring-0"
+                            className="flex-1 overflow-auto p-6 focus-visible:ring-0"
                         >
-                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                            <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:border-2 prose-pre:border-black prose-pre:hard-shadow-sm">
                                 <MarkdownRenderer content={challenge.instructions} />
                             </div>
-
-
                         </TabsContent>
 
                         {challenge.htmlContent && (
@@ -421,7 +419,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                     targetSelector={challenge.targetSelector as string}
                                     targetSelectorType={challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'}
                                     onValidationChange={handlePreviewValidation}
-                                    className="flex-1 shadow-sm"
+                                    className="flex-1 border-2 border-black rounded-xl hard-shadow-sm bg-white"
                                     showControls={true}
                                     height="100%"
                                     iframeRef={previewIframeRef}
@@ -432,17 +430,17 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 </div>
 
                 {/* Right Panel - Editor & Results */}
-                <div className="flex flex-col overflow-hidden bg-background">
-                    <div className="flex-1 p-4 overflow-auto flex flex-col gap-6">
+                <div className="flex flex-col overflow-hidden bg-white dark:bg-slate-950">
+                    <div className="flex-1 p-6 overflow-auto flex flex-col gap-8">
                         {/* Selector Input for selector challenges */}
                         {isSelectorChallenge && (
                             <div className="space-y-4">
-                                <div className="space-y-1.5">
-                                    <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
-                                        <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">1</div>
-                                        Enter Selector
+                                <div className="space-y-2">
+                                    <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
+                                        <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">1</div>
+                                        Step 1: Capture the Element
                                     </h3>
-                                    <Card className="border-border shadow-sm">
+                                    <Card className="border-2 border-black rounded-xl hard-shadow-sm overflow-hidden bg-muted/5">
                                         <CardContent className="p-4 space-y-4">
                                             <SelectorInput
                                                 value={selector}
@@ -451,13 +449,13 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                                 defaultType={selectorType}
                                                 allowTypeChange={true}
                                             />
-                                            <div className="flex justify-end">
+                                            <div className="flex justify-end pt-2 border-t border-black/5">
                                                 <Button
                                                     variant="default"
                                                     size="sm"
                                                     onClick={handleValidateSelector}
                                                     disabled={isRunning || !selector}
-                                                    className="w-full sm:w-auto btn-animate"
+                                                    className="w-full sm:w-auto font-bold border-2 border-border hard-shadow-sm bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                                                 >
                                                     {isRunning ? (
                                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -475,21 +473,23 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
                         {/* Code Editor for code challenges */}
                         {isCodeChallenge && (
-                            <div className="flex-1 flex flex-col gap-2 min-h-[300px]">
-                                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
-                                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">1</div>
-                                    Solution Code
+                            <div className="flex-1 flex flex-col gap-3 min-h-[350px]">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
+                                        <div className="h-6 w-6 rounded-full bg-brand-teal/20 flex items-center justify-center text-xs font-bold text-black border border-black shadow-[1px_1px_0px_0px_rgba(0,0,0,1)]">1</div>
+                                        Step 1: Write your Strategy
+                                    </h3>
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="h-6 w-6 ml-auto text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+                                        className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors rounded-full border border-transparent hover:border-destructive/20"
                                         onClick={handleReset}
                                         title="Reset to starter code"
                                     >
-                                        <RotateCcw className="h-3 w-3" />
+                                        <RotateCcw className="h-3.5 w-3.5" />
                                     </Button>
-                                </h3>
-                                <div className="flex-1 min-h-0">
+                                </div>
+                                <div className="flex-1 min-h-0 border-2 border-black rounded-xl hard-shadow-sm overflow-hidden bg-slate-900">
                                     <CodeEditor
                                         initialCode={challenge.starterCode}
                                         language="javascript"
@@ -497,7 +497,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         onRun={handleRunCode}
                                         storageKey={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                                         height="100%"
-                                        className="h-full border rounded-md overflow-hidden shadow-sm"
+                                        className="h-full border-0 rounded-none shadow-none"
                                         key={`${challenge.id}-${resetCount}`} // Force re-mount on change or reset
                                     />
                                 </div>
@@ -505,11 +505,11 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         )}
 
                         {/* Test Results */}
-                        <div className={cn("flex flex-col gap-2", !isCodeChallenge && "flex-1")}>
+                        <div className={cn("flex flex-col gap-3", !isCodeChallenge && "flex-1")}>
                             <div className="flex items-center justify-between">
-                                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
-                                    <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold text-primary ring-1 ring-primary/20">2</div>
-                                    Live Results
+                                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
+                                    <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">2</div>
+                                    Step 2: Execution & Feedback
                                 </h3>
                                 {isCodeChallenge && (
                                     <Button
@@ -517,7 +517,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         size="sm"
                                         onClick={handleRunCode}
                                         disabled={isRunning}
-                                        className="btn-animate relative z-10"
+                                        className="font-bold border-2 border-border hard-shadow-sm bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                                         title="Run Code (Cmd/Ctrl + Enter)"
                                     >
                                         {isRunning ? (
@@ -525,17 +525,17 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         ) : (
                                             <Play className="h-4 w-4 mr-2" />
                                         )}
-                                        Run Code
+                                        Run Logic
                                     </Button>
                                 )}
                             </div>
                             <div className="flex-1">
-                                <TestResults results={testResults} isRunning={isRunning} />
+                                <TestResults results={testResults} isRunning={isRunning} className="border-2 border-black rounded-xl hard-shadow-sm" />
                             </div>
                         </div>
                     </div>
                 </div>
-            </div >
+            </div>
 
             {/* Reset Confirmation Dialog */}
             <Dialog open={isResetConfirmOpen} onOpenChange={setIsResetConfirmOpen}>

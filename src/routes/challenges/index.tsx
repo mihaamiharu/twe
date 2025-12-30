@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { getChallenges } from '@/lib/challenges.fn';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,6 +23,17 @@ import {
 
 export const Route = createFileRoute('/challenges/')({
     component: ChallengesPage,
+    head: () => ({
+        meta: [
+            {
+                title: 'Coding Challenges | TestingWithEkki',
+            },
+            {
+                name: 'description',
+                content: 'Practice your Playwright, Selenium, and Cypress skills with real-world coding challenges. Master selectors, automation authentication, and more.',
+            }
+        ]
+    })
 });
 
 // Challenge type colors and icons
@@ -81,34 +93,32 @@ function ChallengesPage() {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
-    const { data, isLoading, error } = useQuery<ChallengesResponse>({
-        queryKey: ['challenges'],
+    const { data: challengesResponse, isLoading, error } = useQuery({
+        queryKey: ['challenges', filterType, filterDifficulty, debouncedSearchQuery],
         queryFn: async () => {
-            const res = await fetch('/api/challenges?limit=500');
-            if (!res.ok) throw new Error('Failed to fetch challenges');
-            return res.json();
+            const result = await getChallenges({
+                data: {
+                    limit: 500,
+                    type: filterType === 'all' ? undefined : filterType as any,
+                    difficulty: filterDifficulty === 'all' ? undefined : filterDifficulty as any,
+                    search: debouncedSearchQuery || undefined,
+                }
+            });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
     });
 
-    const challenges = data?.data ?? [];
+    const challenges = challengesResponse?.data ?? [];
 
-    // Filter challenges by search query, type, difficulty, and tier
+    // Filter by tier locally since it's a derived property
     const filteredChallenges = useMemo(() => {
+        if (!challenges) return [];
         return challenges.filter((c: Challenge) => {
-            // Text search on title and description
-            if (debouncedSearchQuery) {
-                const query = debouncedSearchQuery.toLowerCase();
-                const matchesTitle = c.title.toLowerCase().includes(query);
-                const matchesDescription = c.description.toLowerCase().includes(query);
-                const matchesTags = c.tags?.some(tag => tag.toLowerCase().includes(query));
-                if (!matchesTitle && !matchesDescription && !matchesTags) return false;
-            }
-            if (filterType !== 'all' && c.type !== filterType) return false;
-            if (filterDifficulty !== 'all' && c.difficulty !== filterDifficulty) return false;
             if (filterTier !== 'all' && getTierFromCategory(c.category) !== filterTier) return false;
             return true;
         });
-    }, [challenges, debouncedSearchQuery, filterType, filterDifficulty, filterTier]);
+    }, [challenges, filterTier]);
 
     // Group challenges by category
     const challengesByCategory = useMemo(() => {

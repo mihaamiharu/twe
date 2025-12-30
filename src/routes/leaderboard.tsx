@@ -1,76 +1,33 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Leaderboard, type LeaderboardUser } from '@/components/gamification';
-
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Trophy, Calendar, AlertCircle, Users, Lock, Crown, Shield } from 'lucide-react';
+import { Trophy, Calendar, AlertCircle, Crown, Shield } from 'lucide-react';
 import { useSession } from '@/lib/auth.client';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { getLeaderboard } from '@/lib/leaderboard.fn';
 
 export const Route = createFileRoute('/leaderboard')({
     component: LeaderboardPage,
 });
 
-// Define API user shape matching what backend returns
-interface APIUser {
-    id: string;
-    name: string | null;
-    image: string | null;
-    xp: number;
-    level: number;
-    createdAt: string;
-    challengesCompleted: number;
-    badges: Array<{ name: string; icon: string; slug: string }>;
-}
-
-interface LeaderboardResponse {
-    success: boolean;
-    data: APIUser[];
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-    };
-}
-
 function LeaderboardPage() {
     const { data: session } = useSession();
     const isAuthenticated = !!session;
 
-    const { data, isLoading, error } = useQuery<LeaderboardResponse>({
+    const { data: leaderboardData, isLoading, error } = useQuery({
         queryKey: ['leaderboard'],
         queryFn: async () => {
-            const res = await fetch('/api/leaderboard');
-            if (!res.ok) throw new Error('Failed to fetch leaderboard');
-            return res.json();
+            const result = await getLeaderboard({ data: { page: 1, limit: 50, period: 'all' } });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
     });
 
-    const users = data?.data ?? [];
-
-    // Transform API data to match LeaderboardUser interface
-    const transformedUsers: LeaderboardUser[] = users.map((user, index) => ({
-        id: user.id,
-        rank: index + 1,
-        username: user.name || 'Anonymous',
-        displayName: user.name || 'Anonymous',
-        level: user.level,
-        totalXP: user.xp,
-        challengesCompleted: user.challengesCompleted || 0,
-        // Helper to render custom badge elements if needed, but Leaderboard component might need update if it doesn't support custom content
-        // For now, we'll pass it and might need to update the Leaderboard component itself or render it here if we replace the component
-    }));
-
-    // Function to render custom row content (Badges) if the Leaderboard component supports it
-    // Since we are using a pre-built Leaderboard component, let's verify if we need to update IT as well.
-    // Assuming we want to replace the usage of the imported Leaderboard component with a custom one or update the existing one.
-    // For this task, I'll inline a more polished table here to support the specific features (Badges + Gating) or check if I can modify the component.
-    // Given the task is "Polish UI", creating a local polished version is safer than modifying shared components blindly.
+    const users = leaderboardData?.data ?? [];
 
     const TopThree = users.slice(0, 3);
     const RestUsers = users.slice(3);
@@ -94,13 +51,13 @@ function LeaderboardPage() {
 
                 <Tabs defaultValue="all-time" className="space-y-8">
                     <div className="flex justify-center">
-                        <TabsList className="bg-muted/50 p-1 h-12">
-                            <TabsTrigger value="all-time" className="px-6 h-10 text-base">
-                                <Trophy className="h-4 w-4 mr-2" />
+                        <TabsList className="bg-muted/50 p-1 h-14 rounded-2xl border-2 border-border/50">
+                            <TabsTrigger value="all-time" className="px-8 h-12 text-base rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/20">
+                                <Trophy className="h-5 w-5 mr-2 text-yellow-500" />
                                 All Time
                             </TabsTrigger>
-                            <TabsTrigger value="monthly" className="px-6 h-10 text-base">
-                                <Calendar className="h-4 w-4 mr-2" />
+                            <TabsTrigger value="monthly" className="px-8 h-12 text-base rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/20">
+                                <Calendar className="h-5 w-5 mr-2 text-primary" />
                                 This Month
                             </TabsTrigger>
                         </TabsList>
@@ -114,7 +71,6 @@ function LeaderboardPage() {
                         ) : (
                             <>
                                 {/* Top 3 Podium */}
-                                {/* Top 3 Podium - Centering logic */}
                                 {TopThree.length > 0 && (
                                     <div className={cn(
                                         "grid gap-6 mb-12 items-end",
@@ -122,7 +78,6 @@ function LeaderboardPage() {
                                             TopThree.length === 2 ? "grid-cols-2 max-w-2xl mx-auto" :
                                                 "grid-cols-1 md:grid-cols-3"
                                     )}>
-                                        {/* Logic for 2 users: Show Rank 2 then Rank 1. Logic for 3: Rank 2, Rank 1, Rank 3 */}
                                         {TopThree.length === 2 ? (
                                             <>
                                                 <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />
@@ -132,7 +87,6 @@ function LeaderboardPage() {
                                             <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />
                                         ) : (
                                             <>
-                                                {/* Standard 3-column Layout: 2nd, 1st, 3rd */}
                                                 <div className="order-2 md:order-1">{TopThree[1] && <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />}</div>
                                                 <div className="order-1 md:order-2">{TopThree[0] && <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />}</div>
                                                 <div className="order-3 md:order-3">{TopThree[2] && <PodiumCard user={TopThree[2]} rank={3} isAuthenticated={isAuthenticated} />}</div>
@@ -142,54 +96,56 @@ function LeaderboardPage() {
                                 )}
 
                                 {/* Rest of Leaderboard */}
-                                <Card className="glass-card overflow-hidden relative min-h-[400px] flex flex-col">
+                                <Card className="glass-card overflow-hidden relative min-h-[400px] flex flex-col border-2 border-primary/20 bg-background/50 backdrop-blur-xl">
                                     <CardContent className="p-0 flex-1 flex flex-col">
                                         <div className="overflow-x-auto flex-1">
                                             <table className="w-full">
-                                                <thead className="bg-muted/30 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                                <thead className="bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                                                     <tr>
-                                                        <th className="px-6 py-4 text-left w-20">Rank</th>
+                                                        <th className="px-6 py-4 text-left w-24">Rank</th>
                                                         <th className="px-6 py-4 text-left">User</th>
                                                         <th className="px-6 py-4 text-center">Level</th>
                                                         <th className="px-6 py-4 text-right">XP</th>
                                                         <th className="px-6 py-4 text-right hidden sm:table-cell">Badges</th>
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-y divide-border/30">
+                                                <tbody className="divide-y divide-border/50">
                                                     {RestUsers.length > 0 ? RestUsers.map((user, index) => (
                                                         <tr
                                                             key={user.id}
                                                             className={cn(
-                                                                "group transition-colors hover:bg-muted/20",
+                                                                "group transition-all hover:bg-primary/5",
                                                                 !isAuthenticated ? "blur-sm select-none opacity-50 pointer-events-none" : ""
                                                             )}
                                                         >
-                                                            <td className="px-6 py-4 font-mono font-bold text-muted-foreground">
-                                                                #{index + 4}
+                                                            <td className="px-6 py-4">
+                                                                <div className="h-8 w-8 rounded-lg bg-muted flex items-center justify-center font-black text-muted-foreground text-sm border-2 border-border/50">
+                                                                    #{index + 4}
+                                                                </div>
                                                             </td>
                                                             <td className="px-6 py-4">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="h-10 w-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-sm font-bold ring-2 ring-background group-hover:ring-primary/50 transition-all">
+                                                                <div className="flex items-center gap-4">
+                                                                    <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-sm font-bold border-2 border-primary/20 group-hover:border-primary/50 transition-all overflow-hidden">
                                                                         {isAuthenticated ? (
-                                                                            user.image ? <img src={user.image} alt={user.name || ''} className="h-full w-full rounded-full object-cover" /> : (user.name || 'A')[0].toUpperCase()
+                                                                            user.image ? <img src={user.image} alt={user.name || ''} className="h-full w-full object-cover" /> : (user.name || 'A')[0].toUpperCase()
                                                                         ) : '?'}
                                                                     </div>
                                                                     <div>
-                                                                        <div className="font-semibold">{isAuthenticated ? (user.name || 'Anonymous') : 'Hidden User'}</div>
-                                                                        <div className="text-xs text-muted-foreground">{user.challengesCompleted} challenges</div>
+                                                                        <div className="font-bold text-base">{isAuthenticated ? (user.name || 'Anonymous') : 'Hidden User'}</div>
+                                                                        <div className="text-xs text-muted-foreground font-medium">{user.challengesCompleted} challenges</div>
                                                                     </div>
                                                                 </div>
                                                             </td>
                                                             <td className="px-6 py-4 text-center">
-                                                                <Badge variant="secondary" className="font-mono">Lvl {user.level}</Badge>
+                                                                <Badge variant="secondary" className="font-bold border border-border/50">Lvl {user.level}</Badge>
                                                             </td>
-                                                            <td className="px-6 py-4 text-right font-bold text-primary">
+                                                            <td className="px-6 py-4 text-right font-black text-primary text-lg">
                                                                 {user.xp.toLocaleString()}
                                                             </td>
                                                             <td className="px-6 py-4 text-right hidden sm:table-cell">
                                                                 <div className="flex justify-end gap-[-8px]">
                                                                     {user.badges.slice(0, 3).map((badge, i) => (
-                                                                        <div key={i} className="h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center text-lg -ml-2 first:ml-0 z-10 hover:z-20 hover:scale-110 transition-transform" title={badge.name}>
+                                                                        <div key={i} className="h-8 w-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-lg -ml-2 first:ml-0 z-10 hover:z-20 hover:scale-125 transition-transform cursor-help" title={badge.name}>
                                                                             {badge.icon}
                                                                         </div>
                                                                     ))}
@@ -197,9 +153,8 @@ function LeaderboardPage() {
                                                             </td>
                                                         </tr>
                                                     )) : (
-                                                        /* Empty State Row to keep table structure if needed, or just let min-h handle it */
                                                         <tr className="h-32">
-                                                            <td colSpan={5} className="text-center text-muted-foreground">
+                                                            <td colSpan={5} className="text-center text-muted-foreground font-medium">
                                                                 {isAuthenticated ? "No other runners yet. Invite your friends!" : ""}
                                                             </td>
                                                         </tr>
@@ -210,14 +165,16 @@ function LeaderboardPage() {
 
                                         {/* Gating Overlay for Guests */}
                                         {!isAuthenticated && (
-                                            <div className="absolute inset-0 top-[0px] bg-gradient-to-b from-transparent via-background/60 to-background flex flex-col items-center justify-center p-6 text-center z-10 backdrop-blur-[2px]">
-                                                <Shield className="h-16 w-16 text-primary mb-4" />
-                                                <h3 className="text-2xl font-bold mb-2">Join the Elite</h3>
-                                                <p className="text-muted-foreground mb-6 max-w-md">
+                                            <div className="absolute inset-0 top-[0px] bg-gradient-to-b from-transparent via-background/80 to-background flex flex-col items-center justify-center p-6 text-center z-10 backdrop-blur-[2px]">
+                                                <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border-2 border-primary/20 animate-pulse">
+                                                    <Shield className="h-10 w-10 text-primary" />
+                                                </div>
+                                                <h3 className="text-3xl font-black mb-3">Join the Elite</h3>
+                                                <p className="text-muted-foreground mb-8 max-w-md text-lg font-medium">
                                                     Sign in to see full rankings, track your own progress, and earn unique badges.
                                                 </p>
                                                 <Link to="/login" search={{ redirect: '/leaderboard' }}>
-                                                    <Button size="lg" className="px-8 shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all">
+                                                    <Button size="lg" className="px-8 py-6 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all border-2 border-primary-foreground/20">
                                                         Sign In to Compete
                                                     </Button>
                                                 </Link>
@@ -230,9 +187,9 @@ function LeaderboardPage() {
                     </TabsContent>
                     <TabsContent value="monthly" className="text-center py-20">
                         <div className="opacity-50">
-                            <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-                            <h3 className="text-xl font-bold mb-2">Monthly Rankings Coming Soon</h3>
-                            <p>Compete for the monthly crown in the next season update!</p>
+                            <Calendar className="h-20 w-20 mx-auto mb-6 text-muted-foreground" />
+                            <h3 className="text-2xl font-black mb-2">Monthly Rankings Coming Soon</h3>
+                            <p className="text-lg text-muted-foreground">Compete for the monthly crown in the next season update!</p>
                         </div>
                     </TabsContent>
                 </Tabs>
@@ -241,57 +198,56 @@ function LeaderboardPage() {
     );
 }
 
-function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: { user: APIUser; rank: number; isCenter?: boolean; isAuthenticated?: boolean }) {
+function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: { user: any; rank: number; isCenter?: boolean; isAuthenticated?: boolean }) {
     const borderColor = rank === 1 ? 'border-yellow-500/50' : rank === 2 ? 'border-slate-400/50' : 'border-amber-700/50';
     const bgColor = rank === 1 ? 'bg-yellow-500/10' : rank === 2 ? 'bg-slate-400/10' : 'bg-amber-700/10';
-    const iconColor = rank === 1 ? 'text-yellow-500' : rank === 2 ? 'text-slate-400' : 'text-amber-700';
+    const ringColor = rank === 1 ? 'ring-yellow-500/30' : rank === 2 ? 'ring-slate-400/30' : 'ring-amber-700/30';
 
-    // Privacy Logic: If not authenticated, blur name/avatar but show XP
     const displayName = isAuthenticated ? (user.name || 'Anonymous') : 'Hidden User';
     const displayAvatar = isAuthenticated ? user.image : null;
 
     return (
         <div className={cn(
-            "relative flex flex-col items-center p-6 rounded-2xl glass-card transition-all hover:-translate-y-2 duration-300",
+            "relative flex flex-col items-center p-6 rounded-3xl glass-card transition-all hover:-translate-y-2 duration-300 border-2",
             borderColor, bgColor,
-            isCenter ? "h-[320px] shadow-[0_0_40px_-10px_rgba(234,179,8,0.3)] z-10" : "h-[280px] opacity-90 hover:opacity-100"
+            isCenter ? "h-[360px] shadow-[0_0_50px_-10px_rgba(234,179,8,0.2)] z-10" : "h-[300px] opacity-90 hover:opacity-100"
         )}>
             {rank === 1 && (
-                <div className="absolute -top-6 animate-bounce">
-                    <Crown className="h-12 w-12 text-yellow-400 drop-shadow-lg" />
+                <div className="absolute -top-8 animate-bounce">
+                    <Crown className="h-14 w-14 text-yellow-400 drop-shadow-[0_0_10px_rgba(250,204,21,0.5)]" />
                 </div>
             )}
             <div className={cn(
-                "font-black text-6xl mb-4 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/10",
+                "font-black text-8xl mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/5",
                 rank === 1 ? "scale-110" : ""
             )}>
                 {rank}
             </div>
 
             <div className={cn(
-                "h-20 w-20 rounded-full border-4 mb-4 overflow-hidden shadow-xl",
-                borderColor,
-                rank === 1 ? "ring-4 ring-yellow-500/20" : ""
+                "h-24 w-24 rounded-2xl border-4 mb-4 overflow-hidden shadow-xl ring-4",
+                borderColor, ringColor,
+                rank === 1 ? "ring-offset-2 ring-offset-background" : ""
             )}>
                 {displayAvatar ? (
                     <img src={displayAvatar} alt={displayName} className="h-full w-full object-cover" />
                 ) : (
-                    <div className="h-full w-full bg-muted flex items-center justify-center text-3xl font-bold">
+                    <div className="h-full w-full bg-muted flex items-center justify-center text-4xl font-black">
                         {isAuthenticated ? (displayName[0] ?? '?') : '?'}
                     </div>
                 )}
             </div>
 
-            <div className="text-center">
-                <div className={cn("font-bold text-lg mb-1 truncate max-w-[150px]", !isAuthenticated && "blur-sm")}>
+            <div className="text-center w-full">
+                <div className={cn("font-bold text-xl mb-1 truncate px-2", !isAuthenticated && "blur-sm")}>
                     {displayName}
                 </div>
-                <div className="text-muted-foreground text-sm font-mono mb-3">{user.xp.toLocaleString()} XP</div>
+                <div className="text-primary font-black text-lg mb-4">{user.xp.toLocaleString()} XP</div>
 
-                {/* Boss Badges Row */}
+                {/* Badges Row */}
                 <div className="flex justify-center -space-x-2">
-                    {user.badges.slice(0, 3).map((badge, i) => (
-                        <div key={i} className="h-8 w-8 rounded-full bg-background border border-border flex items-center justify-center text-sm shadow-sm" title={badge.name}>
+                    {user.badges.slice(0, 3).map((badge: any, i: number) => (
+                        <div key={i} className="h-8 w-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-sm shadow-sm hover:scale-125 transition-transform z-10 hover:z-20" title={badge.name}>
                             {badge.icon}
                         </div>
                     ))}
@@ -305,23 +261,23 @@ function LeaderboardSkeleton() {
     return (
         <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[300px] items-end">
-                {[1, 2, 3].map(i => <Skeleton key={i} className="h-full w-full opacity-30 rounded-2xl" />)}
+                {[1, 2, 3].map(i => <Skeleton key={i} className="h-full w-full opacity-30 rounded-3xl" />)}
             </div>
-            <Card className="glass-card"><CardContent className="p-6"><Skeleton className="h-[400px] w-full" /></CardContent></Card>
+            <Card className="glass-card rounded-3xl border-2"><CardContent className="p-6"><Skeleton className="h-[400px] w-full" /></CardContent></Card>
         </div>
     );
 }
 
 function LeaderboardError() {
     return (
-        <Card className="glass-card border-destructive/20 bg-destructive/5">
+        <Card className="glass-card border-2 border-destructive/20 bg-destructive/5">
             <CardContent className="p-12 text-center">
-                <div className="mx-auto mb-4 h-16 w-16 rounded-full bg-destructive/10 flex items-center justify-center">
+                <div className="mx-auto mb-4 h-16 w-16 rounded-2xl bg-destructive/10 flex items-center justify-center border-2 border-destructive/20">
                     <AlertCircle className="h-8 w-8 text-destructive" />
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">Unavailable</h3>
-                <p className="text-muted-foreground mb-6">Unable to load the leaderboard at this time.</p>
-                <Button variant="outline" className="btn-animate" onClick={() => window.location.reload()}>
+                <h3 className="text-2xl font-bold text-foreground mb-2">Unavailable</h3>
+                <p className="text-muted-foreground mb-6 text-lg">Unable to load the leaderboard at this time.</p>
+                <Button variant="outline" size="lg" className="rounded-xl border-2 hover:bg-background" onClick={() => window.location.reload()}>
                     Refresh Page
                 </Button>
             </CardContent>
