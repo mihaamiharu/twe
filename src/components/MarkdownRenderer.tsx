@@ -24,7 +24,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
 
     return (
         <div className={cn(
-            'prose max-w-none',
+            'prose prose-lg max-w-none',
             resolvedTheme === 'dark' && 'prose-invert',
             className
         )}>
@@ -64,7 +64,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                     ),
                     // Code blocks
                     pre: ({ children }) => (
-                        <pre className="bg-muted/50 rounded-lg p-4 overflow-x-auto my-4 border border-border">
+                        <pre className="bg-muted rounded-lg p-4 overflow-x-auto my-4 border-2 border-border">
                             {children}
                         </pre>
                     ),
@@ -73,7 +73,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                         if (isInline) {
                             return (
                                 <code
-                                    className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono"
+                                    className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-border/50"
                                     {...props}
                                 >
                                     {children}
@@ -230,19 +230,19 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                     },
                     // Tables
                     table: ({ children }) => (
-                        <div className="overflow-x-auto my-4">
-                            <table className="w-full border-collapse border border-border">
+                        <div className="overflow-x-auto my-6 rounded-xl border-2 border-border">
+                            <table className="w-full border-collapse">
                                 {children}
                             </table>
                         </div>
                     ),
                     th: ({ children }) => (
-                        <th className="border border-border bg-muted px-4 py-2 text-left font-semibold">
+                        <th className="border border-border/50 bg-muted/50 px-6 py-3 text-left font-semibold">
                             {children}
                         </th>
                     ),
                     td: ({ children }) => (
-                        <td className="border border-border px-4 py-2">{children}</td>
+                        <td className="border border-border/50 px-6 py-3">{children}</td>
                     ),
                     // Horizontal rule
                     hr: () => <hr className="border-border my-8" />,

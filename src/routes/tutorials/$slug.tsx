@@ -120,47 +120,49 @@ function TutorialDetailPage() {
         },
     });
 
-    // Calculate reading progress based on scroll
-    // Skip tracking if tutorial already completed
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        // Don't update progress if tutorial is already completed
-        if (tutorial?.userProgress?.isCompleted) {
+    // Track window scroll for reading progress
+    useEffect(() => {
+        // Don't update progress if tutorial is already completed or user not logged in
+        if (tutorial?.userProgress?.isCompleted || !sessionData?.user) {
             return;
         }
 
-        // Auth Guard: Don't track scrolling progress if not logged in (optional, but good for saving API calls)
-        // But for "Lazy Registration", we might want to let them read fully, then prompt at the end?
-        // Let's stick to prompt only on "Mark Complete" button for now.
-        // Scroll progress doesn't need auth guard, but API call will fail (401)
-        // We should check session before mutating.
+        const handleWindowScroll = () => {
+            if (!contentRef.current) return;
 
-        if (!sessionData?.user) return;
+            const element = contentRef.current;
+            const rect = element.getBoundingClientRect();
+            const windowHeight = window.innerHeight;
 
-        const element = e.currentTarget;
-        const scrollTop = element.scrollTop;
-        const scrollHeight = element.scrollHeight - element.clientHeight;
+            // Calculate distance from top of content to bottom of viewport
+            const totalHeight = element.offsetHeight;
+            const scrolled = Math.max(0, windowHeight - (rect.top + 100)); // offset for the header/top padding
 
-        // Ensure we can reach 100% - account for small rounding errors
-        let progress = 0;
-        if (scrollHeight <= 10) {
-            // Content fits without scrolling or very minimal scroll needed
-            progress = 100;
-        } else {
-            progress = Math.min(100, Math.round((scrollTop / scrollHeight) * 100));
-            // If user is at or very near bottom, force 100%
-            if (scrollHeight - scrollTop < 20) {
+            let progress = Math.min(100, Math.round((scrolled / (totalHeight)) * 100));
+
+            // Force 100% if we've reached the bottom of the content
+            if (rect.bottom <= windowHeight + 100) {
                 progress = 100;
             }
-        }
 
-        if (progress !== readingProgress) {
-            setReadingProgress(progress);
-            // Update progress in DB (debounced) - only if not already completed
-            if ((progress % 10 === 0 || progress === 100) && !tutorial?.userProgress?.isCompleted) {
-                updateProgressMutation.mutate(progress);
+            if (progress > readingProgress) {
+                setReadingProgress(progress);
+                // Update progress in DB - only on significant milestones or 100%
+                if ((progress % 20 === 0 || progress === 100)) {
+                    updateProgressMutation.mutate(progress);
+                }
             }
-        }
-    };
+        };
+
+        window.addEventListener('scroll', handleWindowScroll);
+        // Give it a moment for content to settle then check once
+        const timer = setTimeout(handleWindowScroll, 500);
+
+        return () => {
+            window.removeEventListener('scroll', handleWindowScroll);
+            clearTimeout(timer);
+        };
+    }, [tutorial?.id, sessionData?.user, readingProgress, tutorial?.userProgress?.isCompleted]);
 
     // For short tutorials that don't need scrolling, auto-detect on mount
     useEffect(() => {
@@ -280,21 +282,18 @@ function TutorialDetailPage() {
                         {/* Content - Direct on page, no card container */}
                         <div
                             ref={contentRef}
-                            className="prose prose-lg dark:prose-invert max-w-none max-h-[70vh] overflow-y-auto pr-4 scroll-smooth"
+                            className="prose prose-lg dark:prose-invert max-w-none scroll-smooth"
                             style={{
                                 fontFamily: 'var(--font-reading)',
                                 lineHeight: '1.8',
-                                scrollbarWidth: 'thin',
-                                scrollbarColor: 'hsl(var(--primary) / 0.3) transparent'
                             }}
-                            onScroll={handleScroll}
                         >
                             <MarkdownRenderer content={tutorial.content} />
                         </div>
                     </div>
 
-                    {/* Progress Sidebar - Sticky positioning */}
-                    <div className="space-y-6 lg:sticky lg:top-6 lg:self-start">
+                    {/* Progress Sidebar - Sticky positioning with top offset for header */}
+                    <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
                         {/* Progress Card */}
                         <Card className="glass-card shadow-lg">
                             <CardHeader>
@@ -380,7 +379,13 @@ function TutorialDetailPage() {
                                     <p className="text-sm text-muted-foreground">
                                         Reinforce what you've learned with these related challenges.
                                     </p>
-                                    <div className="space-y-3">
+                                    <div
+                                        className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"
+                                        style={{
+                                            maskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)',
+                                            WebkitMaskImage: 'linear-gradient(to bottom, black 90%, transparent 100%)'
+                                        }}
+                                    >
                                         {tutorial.challenges.map(challenge => (
                                             <Link
                                                 key={challenge.slug}
@@ -464,22 +469,22 @@ function TutorialDetailPage() {
                         border-bottom: 1px solid hsl(var(--border));
                     }
                     
-                    /* Smooth scrollbar */
-                    .prose::-webkit-scrollbar {
-                        width: 8px;
+                    /* Smooth scrollbar for sidebar */
+                    .custom-scrollbar::-webkit-scrollbar {
+                        width: 4px;
                     }
 
-                    .prose::-webkit-scrollbar-track {
+                    .custom-scrollbar::-webkit-scrollbar-track {
                         background: transparent;
                     }
                     
-                    .prose::-webkit-scrollbar-thumb {
-                        background: hsl(var(--primary) / 0.3);
+                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: hsl(var(--primary) / 0.1);
                         border-radius: 4px;
                     }
                     
-                    .prose::-webkit-scrollbar-thumb:hover {
-                        background: hsl(var(--primary) / 0.5);
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: hsl(var(--primary) / 0.3);
                     }
                 `}</style>
 
