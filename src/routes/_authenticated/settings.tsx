@@ -1,12 +1,12 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Switch } from '@/components/ui/switch';
-import { Loader2, ArrowLeft, User, Shield, Bell, AlertCircle } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
+import { toast } from 'sonner';
+import { useState, useEffect } from 'react';
 
 export const Route = createFileRoute('/_authenticated/settings')({
     component: SettingsPage,
@@ -22,6 +22,9 @@ interface UserData {
 }
 
 function SettingsPage() {
+    const queryClient = useQueryClient();
+    const [name, setName] = useState('');
+
     // Auth is guaranteed by _authenticated parent route
     const { data, isLoading, error } = useQuery({
         queryKey: ['user', 'settings'],
@@ -37,6 +40,49 @@ function SettingsPage() {
             return json.data as UserData;
         },
     });
+
+    // Update form when data is loaded
+    useEffect(() => {
+        if (data?.name) {
+            setName(data.name);
+        }
+    }, [data]);
+
+    const updateProfileMutation = useMutation({
+        mutationFn: async (newName: string) => {
+            const response = await fetch('/api/users/me', {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: newName }),
+            });
+
+            if (!response.ok) {
+                const json = await response.json();
+                throw new Error(json.error || 'Failed to update profile');
+            }
+
+            return response.json();
+        },
+        onSuccess: () => {
+            toast.success('Settings updated', {
+                description: 'Your profile information has been saved.',
+            });
+            queryClient.invalidateQueries({ queryKey: ['user'] });
+        },
+        onError: (error: Error) => {
+            toast.error('Update failed', {
+                description: error.message,
+            });
+        },
+    });
+
+    const handleSave = () => {
+        if (!name.trim()) {
+            toast.error('Name cannot be empty');
+            return;
+        }
+        updateProfileMutation.mutate(name);
+    };
 
     if (isLoading) {
         return (
@@ -86,136 +132,50 @@ function SettingsPage() {
                     </p>
                 </div>
 
-                <Tabs defaultValue="profile" className="space-y-6">
-                    <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="profile" className="gap-2">
-                            <User className="h-4 w-4" />
-                            Profile
-                        </TabsTrigger>
-                        <TabsTrigger value="privacy" className="gap-2">
-                            <Shield className="h-4 w-4" />
-                            Privacy
-                        </TabsTrigger>
-                        <TabsTrigger value="notifications" className="gap-2">
-                            <Bell className="h-4 w-4" />
-                            Notifications
-                        </TabsTrigger>
-                    </TabsList>
-
+                <div className="space-y-6">
                     {/* Profile Settings */}
-                    <TabsContent value="profile">
-                        <Card className="glass-card">
-                            <CardHeader>
-                                <CardTitle>Profile Information</CardTitle>
-                                <CardDescription>
-                                    Update your public profile information
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Display Name</Label>
-                                    <Input
-                                        id="name"
-                                        defaultValue={data?.name || ''}
-                                        placeholder="Your display name"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="email">Email</Label>
-                                    <Input
-                                        id="email"
-                                        defaultValue={data?.email || ''}
-                                        disabled
-                                        className="bg-muted"
-                                    />
-                                    <p className="text-xs text-muted-foreground">
-                                        Email cannot be changed
-                                    </p>
-                                </div>
-                                <Button className="mt-4">Save Changes</Button>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    {/* Privacy Settings */}
-                    <TabsContent value="privacy">
-                        <Card className="glass-card">
-                            <CardHeader>
-                                <CardTitle>Privacy Settings</CardTitle>
-                                <CardDescription>
-                                    Control who can see your profile and activity
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <Label>Public Profile</Label>
-                                        <p className="text-sm text-muted-foreground">
-                                            Allow others to see your profile
-                                        </p>
-                                    </div>
-                                    <Switch
-                                        checked={data?.profileVisibility === 'PUBLIC'}
-                                    />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <Label>Show on Leaderboard</Label>
-                                        <p className="text-sm text-muted-foreground">
-                                            Appear in public leaderboards
-                                        </p>
-                                    </div>
-                                    <Switch
-                                        checked={data?.showOnLeaderboard}
-                                    />
-                                </div>
-                                <Button className="mt-4">Save Privacy Settings</Button>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-
-                    {/* Notifications */}
-                    <TabsContent value="notifications">
-                        <Card className="glass-card">
-                            <CardHeader>
-                                <CardTitle>Notification Preferences</CardTitle>
-                                <CardDescription>
-                                    Choose what notifications you receive
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <Label>Achievement Notifications</Label>
-                                        <p className="text-sm text-muted-foreground">
-                                            Get notified when you unlock achievements
-                                        </p>
-                                    </div>
-                                    <Switch defaultChecked />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <Label>New Challenges</Label>
-                                        <p className="text-sm text-muted-foreground">
-                                            Get notified about new challenges
-                                        </p>
-                                    </div>
-                                    <Switch defaultChecked />
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <Label>Weekly Digest</Label>
-                                        <p className="text-sm text-muted-foreground">
-                                            Receive a weekly summary of your progress
-                                        </p>
-                                    </div>
-                                    <Switch />
-                                </div>
-                                <Button className="mt-4">Save Notification Settings</Button>
-                            </CardContent>
-                        </Card>
-                    </TabsContent>
-                </Tabs>
+                    <Card className="glass-card">
+                        <CardHeader>
+                            <CardTitle>Profile Information</CardTitle>
+                            <CardDescription>
+                                Update your public profile information
+                            </CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="name">Display Name</Label>
+                                <Input
+                                    id="name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Your display name"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Email</Label>
+                                <Input
+                                    id="email"
+                                    defaultValue={data?.email || ''}
+                                    disabled
+                                    className="opacity-60 cursor-not-allowed bg-muted/20"
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    Email cannot be changed
+                                </p>
+                            </div>
+                            <Button
+                                className="mt-4"
+                                onClick={handleSave}
+                                disabled={updateProfileMutation.isPending}
+                            >
+                                {updateProfileMutation.isPending && (
+                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                )}
+                                Save Changes
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         </div>
     );
