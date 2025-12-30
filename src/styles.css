@@ -46,6 +46,9 @@
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-reading: "Lora", Georgia, "Times New Roman", serif;
   --font-mono: "Fira Code", monospace;
+  /* Custom Brand Colors */
+  --color-brand-teal: #14b8a6; /* teal-600 */
+  --color-brand-teal-light: #99f6e4; /* teal-200 */
 }
 
 /* Base Variables - Light Mode */
