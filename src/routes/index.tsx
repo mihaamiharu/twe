@@ -422,38 +422,39 @@ function HomePage() {
             </h2>
           </div>
 
-          <div className="glass-card p-8 md:p-12 rounded-2xl text-left relative overflow-hidden">
-            {/* Decorative quote mark */}
-            <div className="absolute top-4 right-8 text-9xl text-primary/10 font-serif leading-none select-none">
-              &rdquo;
-            </div>
-
-            <div className="relative z-10 space-y-6 text-lg text-muted-foreground leading-relaxed">
-              <p>
-                When I started my career, I had zero QA experience. I was fortunate to have seniors who patiently guided me, explaining concepts I struggled with and showing me the ropes.
-              </p>
-              <p>
-                <strong className="text-foreground">But I know not everyone has that senior who patiently guides them.</strong>
-              </p>
-              <p>
-                I created this platform to try and be that one for you, passing knowledge forward and breaking down complex concepts into hands-on lessons.
-              </p>
-              <p className="italic text-foreground font-medium">
-                It's the kind of guidance I wish I knew when I started.
-              </p>
-            </div>
-
-            <div className="mt-8 pt-8 border-t border-border/50 flex items-center gap-4">
-              {/* Placeholder for Avatar if user wants to add one later, or just name */}
-              <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-xl">
-                E
+          <Card className="relative overflow-hidden border-2 border-border shadow-md bg-card">
+            <CardContent className="p-8 md:p-12 relative z-10">
+              {/* Decorative quote mark */}
+              <div className="absolute top-4 right-8 text-9xl text-primary/10 font-serif leading-none select-none pointer-events-none">
+                &rdquo;
               </div>
-              <div>
-                <div className="font-bold text-foreground">Ekki</div>
-                <div className="text-sm text-muted-foreground">Creator of TestingWithEkki</div>
+
+              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed font-reading">
+                <p>
+                  When I started my career, I had zero QA experience. I was fortunate to have seniors who patiently guided me, explaining concepts I struggled with and showing me the ropes.
+                </p>
+                <p>
+                  <strong className="text-foreground font-medium">But I know not everyone has that senior who patiently guides them.</strong>
+                </p>
+                <p>
+                  I created this platform to try and be that one for you, passing knowledge forward and breaking down complex concepts into hands-on lessons.
+                </p>
+                <p className="italic text-foreground font-medium">
+                  It's the kind of guidance I wish I knew when I started.
+                </p>
               </div>
-            </div>
-          </div>
+
+              <div className="mt-8 pt-8 border-t border-border/50 flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-xl shadow-sm">
+                  E
+                </div>
+                <div>
+                  <div className="font-bold text-foreground">Ekki</div>
+                  <div className="text-sm text-muted-foreground">Creator of TestingWithEkki</div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </section >
 
