@@ -1,6 +1,5 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
-import { useState } from 'react';
-import { LoginForm, RegisterForm } from '@/components/auth';
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { LoginForm } from '@/components/auth';
 
 export const Route = createFileRoute('/login')({
     beforeLoad: ({ context }) => {
@@ -14,7 +13,7 @@ export const Route = createFileRoute('/login')({
 });
 
 function LoginPage() {
-    const [mode, setMode] = useState<'login' | 'register'>('login');
+    const navigate = useNavigate();
 
     const handleLoginSuccess = () => {
         // Redirect to original path if available, otherwise home
@@ -22,29 +21,19 @@ function LoginPage() {
         const redirectUrl = searchParams.get('redirect');
 
         if (redirectUrl) {
-            window.location.href = redirectUrl;
+            navigate({ to: redirectUrl });
         } else {
-            window.location.href = '/';
+            navigate({ to: '/' });
         }
     };
-
-    // For registration, we don't redirect - RegisterForm shows "Check Your Email" message
-    // The user will be redirected after clicking the verification link
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6">
             <div className="w-full max-w-md space-y-6 animate-fade-in">
-                {mode === 'login' ? (
-                    <LoginForm
-                        onSuccess={handleLoginSuccess}
-                        onRegisterClick={() => setMode('register')}
-                    />
-                ) : (
-                    <RegisterForm
-                        onLoginClick={() => setMode('login')}
-                    // No onSuccess - RegisterForm will show "Check Your Email" message
-                    />
-                )}
+                <LoginForm
+                    onSuccess={handleLoginSuccess}
+                    onRegisterClick={() => navigate({ to: '/register' })}
+                />
             </div>
         </div>
     );

@@ -357,7 +357,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                             "font-bold border-2 border-black hard-shadow-sm transition-all active:translate-x-[1px] active:translate-y-[1px] active:shadow-none",
                             hasPassed
                                 ? "bg-green-500 hover:bg-green-600 text-black"
-                                : "bg-muted opacity-50 cursor-not-allowed"
+                                : "bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed"
                         )}
                         title="Submit Solution (Cmd/Ctrl + Shift + Enter)"
                     >
@@ -369,7 +369,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
             {/* Persistent Goal Bar - Compact */}
             <div className="bg-brand-teal/5 border-b-2 border-black px-4 py-2 shrink-0">
-                <div className="flex items-center gap-3 max-w-5xl mx-auto">
+                <div className="flex items-center gap-3">
                     <div className="bg-brand-teal/20 p-1 rounded-md shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] border border-black">
                         <Target className="h-3.5 w-3.5 text-black" />
                     </div>
@@ -391,9 +391,9 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     >
                         <div className="px-4 pt-3 shrink-0">
                             <TabsList className="w-full justify-start h-10 bg-muted/50 p-1 border-2 border-black rounded-lg">
-                                <TabsTrigger value="instructions" className="flex-1 font-bold data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-sm transition-all">Instructions</TabsTrigger>
+                                <TabsTrigger value="instructions" className="flex-1 font-bold data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-sm transition-all">Instructions</TabsTrigger>
                                 {challenge.htmlContent && (
-                                    <TabsTrigger value="preview" className="flex-1 font-bold data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-sm transition-all">Target Preview</TabsTrigger>
+                                    <TabsTrigger value="preview" className="flex-1 font-bold data-[state=active]:bg-white data-[state=active]:text-black dark:data-[state=active]:text-black data-[state=active]:border-2 data-[state=active]:border-black data-[state=active]:shadow-sm transition-all">Target Preview</TabsTrigger>
                                 )}
                             </TabsList>
                         </div>

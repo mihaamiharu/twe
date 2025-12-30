@@ -136,8 +136,8 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                     </Button>
                 )}
             </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-                <DialogHeader>
+            <DialogContent className="max-w-2xl max-h-[90vh] flex flex-col p-0 gap-0 overflow-hidden">
+                <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle className="flex items-center gap-2">
                         <Bug className="h-5 w-5 text-destructive" />
                         Report a Bug
@@ -147,142 +147,143 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                     </DialogDescription>
                 </DialogHeader>
 
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-4">
-                    {/* Title */}
-                    <div className="space-y-2">
-                        <Label htmlFor="title">Bug Title *</Label>
-                        <Input
-                            id="title"
-                            placeholder="Brief description of the issue"
-                            {...form.register('title')}
-                        />
-                        {form.formState.errors.title && (
-                            <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
-                        )}
-                    </div>
-
-                    {/* Severity */}
-                    <div className="space-y-2">
-                        <Label>Severity *</Label>
-                        <Select
-                            value={form.watch('severity')}
-                            onValueChange={(value: Severity) => form.setValue('severity', value)}
-                        >
-                            <SelectTrigger>
-                                <SelectValue placeholder="Select severity">
-                                    <div className="flex items-center gap-2">
-                                        <SeverityIcon className="h-4 w-4" />
-                                        <span>{severityConfig[selectedSeverity]?.label}</span>
-                                    </div>
-                                </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                {Object.entries(severityConfig).map(([key, config]) => {
-                                    const Icon = config.icon;
-                                    return (
-                                        <SelectItem key={key} value={key}>
-                                            <div className="flex items-center gap-2">
-                                                <Badge variant="outline" className={cn('border', config.color)}>
-                                                    <Icon className="h-3 w-3 mr-1" />
-                                                    {config.label}
-                                                </Badge>
-                                            </div>
-                                        </SelectItem>
-                                    );
-                                })}
-                            </SelectContent>
-                        </Select>
-
-                        {/* Severity Guide */}
-                        <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3 space-y-1">
-                            <p><strong>Critical:</strong> App is unusable, data loss, security issue</p>
-                            <p><strong>High:</strong> Major feature broken, no workaround</p>
-                            <p><strong>Medium:</strong> Feature works but with issues</p>
-                            <p><strong>Low:</strong> Minor issue, cosmetic problem</p>
+                <div className="flex-1 overflow-y-auto p-6 pt-2">
+                    <form id="bug-report-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                        {/* Title */}
+                        <div className="space-y-2">
+                            <Label htmlFor="title">Bug Title *</Label>
+                            <Input
+                                id="title"
+                                placeholder="Brief description of the issue"
+                                {...form.register('title')}
+                            />
+                            {form.formState.errors.title && (
+                                <p className="text-sm text-destructive">{form.formState.errors.title.message}</p>
+                            )}
                         </div>
-                    </div>
 
-                    {/* Steps to Reproduce */}
-                    <div className="space-y-2">
-                        <Label htmlFor="stepsToReproduce">Steps to Reproduce *</Label>
-                        <Textarea
-                            id="stepsToReproduce"
-                            placeholder={`1. Go to the page "..."
+                        {/* Severity */}
+                        <div className="space-y-2">
+                            <Label>Severity *</Label>
+                            <Select
+                                value={form.watch('severity')}
+                                onValueChange={(value: Severity) => form.setValue('severity', value)}
+                            >
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select severity" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {Object.entries(severityConfig).map(([key, config]) => {
+                                        const Icon = config.icon;
+                                        return (
+                                            <SelectItem key={key} value={key}>
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="outline" className={cn('border', config.color)}>
+                                                        <Icon className="h-3 w-3 mr-1 text-current" />
+                                                        {config.label}
+                                                    </Badge>
+                                                </div>
+                                            </SelectItem>
+                                        );
+                                    })}
+                                </SelectContent>
+                            </Select>
+
+                            {/* Severity Guide */}
+                            <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3 space-y-1">
+                                <p><strong>Critical:</strong> App is unusable, data loss, security issue</p>
+                                <p><strong>High:</strong> Major feature broken, no workaround</p>
+                                <p><strong>Medium:</strong> Feature works but with issues</p>
+                                <p><strong>Low:</strong> Minor issue, cosmetic problem</p>
+                            </div>
+                        </div>
+
+                        {/* Steps to Reproduce */}
+                        <div className="space-y-2">
+                            <Label htmlFor="stepsToReproduce">Steps to Reproduce *</Label>
+                            <Textarea
+                                id="stepsToReproduce"
+                                placeholder={`1. Go to the page "..."
 2. Click on "..."
 3. Enter "..." in the field
 4. Observe the error`}
-                            rows={5}
-                            {...form.register('stepsToReproduce')}
-                        />
-                        {form.formState.errors.stepsToReproduce && (
-                            <p className="text-sm text-destructive">{form.formState.errors.stepsToReproduce.message}</p>
+                                rows={5}
+                                {...form.register('stepsToReproduce')}
+                            />
+                            {form.formState.errors.stepsToReproduce && (
+                                <p className="text-sm text-destructive">{form.formState.errors.stepsToReproduce.message}</p>
+                            )}
+                        </div>
+
+                        {/* Expected vs Actual Behavior */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="expectedBehavior">Expected Behavior *</Label>
+                                <Textarea
+                                    id="expectedBehavior"
+                                    placeholder="What should happen?"
+                                    rows={4}
+                                    {...form.register('expectedBehavior')}
+                                />
+                                {form.formState.errors.expectedBehavior && (
+                                    <p className="text-sm text-destructive">{form.formState.errors.expectedBehavior.message}</p>
+                                )}
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="actualBehavior">Actual Behavior *</Label>
+                                <Textarea
+                                    id="actualBehavior"
+                                    placeholder="What actually happened?"
+                                    rows={4}
+                                    {...form.register('actualBehavior')}
+                                />
+                                {form.formState.errors.actualBehavior && (
+                                    <p className="text-sm text-destructive">{form.formState.errors.actualBehavior.message}</p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Email (only for anonymous users) */}
+                        {!isLoggedIn && (
+                            <div className="space-y-2">
+                                <Label htmlFor="email">Your Email (optional)</Label>
+                                <Input
+                                    id="email"
+                                    type="email"
+                                    placeholder="For follow-up questions"
+                                    {...form.register('email')}
+                                />
+                                <p className="text-xs text-muted-foreground">
+                                    We may contact you if we need more information.
+                                </p>
+                                {form.formState.errors.email && (
+                                    <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
+                                )}
+                            </div>
                         )}
-                    </div>
 
-                    {/* Expected vs Actual Behavior */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="expectedBehavior">Expected Behavior *</Label>
-                            <Textarea
-                                id="expectedBehavior"
-                                placeholder="What should happen?"
-                                rows={4}
-                                {...form.register('expectedBehavior')}
-                            />
-                            {form.formState.errors.expectedBehavior && (
-                                <p className="text-sm text-destructive">{form.formState.errors.expectedBehavior.message}</p>
-                            )}
+                        {/* Auto-captured info notice */}
+                        <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3">
+                            <p className="font-medium mb-1">Auto-captured information:</p>
+                            <p>• Current page URL</p>
+                            <p>• Browser information</p>
+                            {isLoggedIn && <p>• Your user account</p>}
                         </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="actualBehavior">Actual Behavior *</Label>
-                            <Textarea
-                                id="actualBehavior"
-                                placeholder="What actually happened?"
-                                rows={4}
-                                {...form.register('actualBehavior')}
-                            />
-                            {form.formState.errors.actualBehavior && (
-                                <p className="text-sm text-destructive">{form.formState.errors.actualBehavior.message}</p>
-                            )}
-                        </div>
-                    </div>
 
-                    {/* Email (only for anonymous users) */}
-                    {!isLoggedIn && (
-                        <div className="space-y-2">
-                            <Label htmlFor="email">Your Email (optional)</Label>
-                            <Input
-                                id="email"
-                                type="email"
-                                placeholder="For follow-up questions"
-                                {...form.register('email')}
-                            />
-                            <p className="text-xs text-muted-foreground">
-                                We may contact you if we need more information.
-                            </p>
-                            {form.formState.errors.email && (
-                                <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
-                            )}
-                        </div>
-                    )}
+                        {/* Submit Button */}
+                    </form>
+                </div>
 
-                    {/* Auto-captured info notice */}
-                    <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3">
-                        <p className="font-medium mb-1">Auto-captured information:</p>
-                        <p>• Current page URL</p>
-                        <p>• Browser information</p>
-                        {isLoggedIn && <p>• Your user account</p>}
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="flex justify-end gap-3 pt-4 border-t">
+                <div className="p-6 pt-2 border-t mt-auto shrink-0 bg-background">
+                    <div className="flex justify-end gap-3">
                         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
                             Cancel
                         </Button>
                         <Button
                             type="submit"
+                            form="bug-report-form"
                             disabled={submitMutation.isPending}
-                            className="bg-destructive hover:bg-destructive/90"
+                            variant="destructive"
                         >
                             {submitMutation.isPending ? (
                                 <>
@@ -297,7 +298,7 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                             )}
                         </Button>
                     </div>
-                </form>
+                </div>
             </DialogContent>
         </Dialog>
     );
