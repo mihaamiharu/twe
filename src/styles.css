@@ -206,3 +206,10 @@ body {
 .animate-slide-up {
   animation: slide-up 0.4s cubic-bezier(0.12, 0.57, 0.63, 0.21);
 }
+
+/* Glassmorphism */
+.glass {
+  background: color-mix(in srgb, var(--color-background) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
