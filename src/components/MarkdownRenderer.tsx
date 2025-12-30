@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
 // Explicitly import languages that might not be in the common set
-import xpath from 'highlight.js/lib/languages/xpath';
+import xquery from 'highlight.js/lib/languages/xquery';
 import bash from 'highlight.js/lib/languages/bash'; // Often good for CLI commands
 import json from 'highlight.js/lib/languages/json';
 import typescript from 'highlight.js/lib/languages/typescript';
@@ -33,7 +33,7 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                 rehypePlugins={[
                     [rehypeHighlight, {
                         languages: {
-                            xpath,
+                            xpath: xquery,
                             bash,
                             json,
                             typescript
