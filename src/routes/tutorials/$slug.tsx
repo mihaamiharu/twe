@@ -1,6 +1,6 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTutorial } from '@/lib/tutorials.fn';
+import { getTutorial, completeTutorial, updateTutorialProgress } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -74,22 +74,13 @@ function TutorialDetailPage() {
 
     // Rename for compatibility
     const tutorial = tutorialData;
-    const data = { data: tutorial }; // Mock wrapper for compatibility with existing code structure if needed, or better yet, refactor usages.
-    // Actually, let's keep `tutorial` as the primary data source and remove the wrapper usage in the rest of the component.
-
-
 
     // Mark as complete mutation
     const markCompleteMutation = useMutation({
         mutationFn: async () => {
-            // Force progress to 100 on completion
-            const res = await fetch(`/api/tutorials/${slug}/complete`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ readingProgress: 100 }),
-            });
-            if (!res.ok) throw new Error('Failed to mark as complete');
-            return res.json();
+            const result = await completeTutorial({ data: { slug } });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
         onSuccess: (response) => {
             toast.success('Tutorial completed! 🎉');
@@ -112,15 +103,23 @@ function TutorialDetailPage() {
     // Update progress mutation
     const updateProgressMutation = useMutation({
         mutationFn: async (progress: number) => {
-            const res = await fetch(`/api/tutorials/${slug}/progress`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ readingProgress: progress }),
-            });
-            if (!res.ok) throw new Error('Failed to update progress');
-            return res.json();
+            const result = await updateTutorialProgress({ data: { slug, readingProgress: progress } });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
     });
+
+    // Use a ref to track progress for the event listener without re-binding
+    const progressRef = useRef(readingProgress);
+    // Track if user has actively scrolled (to prevent premature progress on page load)
+    const hasScrolledRef = useRef(false);
+    // Track initial scroll position to detect real user scrolling
+    const initialScrollRef = useRef(0);
+
+    // Sync ref with state
+    useEffect(() => {
+        progressRef.current = readingProgress;
+    }, [readingProgress]);
 
     // Track window scroll for reading progress
     useEffect(() => {
@@ -129,8 +128,22 @@ function TutorialDetailPage() {
             return;
         }
 
+        let scrollListenerAttached = false;
+        let attachTimeout: ReturnType<typeof setTimeout>;
+
         const handleWindowScroll = () => {
             if (!contentRef.current) return;
+
+            // Extra safety: if scroll position is inherited from previous page, ignore
+            // This handles the race condition during SPA navigation
+            if (!hasScrolledRef.current) {
+                // Only start tracking after user has scrolled at least 50px from 0
+                if (window.scrollY > 50) {
+                    hasScrolledRef.current = true;
+                } else {
+                    return; // Don't calculate progress yet - user hasn't scrolled
+                }
+            }
 
             const element = contentRef.current;
             const rect = element.getBoundingClientRect();
@@ -138,7 +151,7 @@ function TutorialDetailPage() {
 
             // Calculate distance from top of content to bottom of viewport
             const totalHeight = element.offsetHeight;
-            const scrolled = Math.max(0, windowHeight - (rect.top + 100)); // offset for the header/top padding
+            const scrolled = Math.max(0, windowHeight - (rect.top + 100));
 
             let progress = Math.min(100, Math.round((scrolled / (totalHeight)) * 100));
 
@@ -147,7 +160,8 @@ function TutorialDetailPage() {
                 progress = 100;
             }
 
-            if (progress > readingProgress) {
+            // Only update if progress is genuinely increasing
+            if (progress > progressRef.current) {
                 setReadingProgress(progress);
                 // Update progress in DB - only on significant milestones or 100%
                 if ((progress % 20 === 0 || progress === 100)) {
@@ -156,52 +170,53 @@ function TutorialDetailPage() {
             }
         };
 
-        window.addEventListener('scroll', handleWindowScroll);
-        // Give it a moment for content to settle then check once
-        const timer = setTimeout(handleWindowScroll, 500);
+        // Delay attaching the scroll listener to let the page settle after SPA navigation
+        // This prevents the listener from firing with stale scrollY from the previous page
+        attachTimeout = setTimeout(() => {
+            // Only attach if we're at the top of the page (scroll reset completed)
+            if (window.scrollY === 0) {
+                hasScrolledRef.current = false;
+                window.addEventListener('scroll', handleWindowScroll);
+                scrollListenerAttached = true;
+            } else {
+                // If still not at top, try again shortly
+                const retryTimeout = setTimeout(() => {
+                    hasScrolledRef.current = false;
+                    window.addEventListener('scroll', handleWindowScroll);
+                    scrollListenerAttached = true;
+                }, 200);
+                // Store for cleanup
+                (attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> }).retry = retryTimeout;
+            }
+        }, 300);
 
         return () => {
-            window.removeEventListener('scroll', handleWindowScroll);
-            clearTimeout(timer);
-        };
-    }, [tutorial?.id, sessionData?.user, readingProgress, tutorial?.userProgress?.isCompleted]);
-
-    // For short tutorials that don't need scrolling, auto-detect on mount
-    useEffect(() => {
-        if (!tutorial || tutorial.userProgress?.isCompleted) {
-            return;
-        }
-
-        // Check if content needs scrolling after render
-        const checkContentHeight = () => {
-            if (contentRef.current) {
-                const element = contentRef.current;
-                const scrollHeight = element.scrollHeight - element.clientHeight;
-
-                // If content doesn't need scrolling, set progress to 100%
-                if (scrollHeight <= 10) {
-                    setReadingProgress(100);
-                    // Also trigger mutation for consistency
-                    updateProgressMutation.mutate(100);
-                }
+            clearTimeout(attachTimeout);
+            if ((attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> }).retry) {
+                clearTimeout((attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> }).retry);
+            }
+            if (scrollListenerAttached) {
+                window.removeEventListener('scroll', handleWindowScroll);
             }
         };
+    }, [tutorial?.id, sessionData?.user, tutorial?.userProgress?.isCompleted]);
 
-        // Small delay to ensure content is rendered
-        const timer = setTimeout(checkContentHeight, 500);
-        return () => clearTimeout(timer);
-    }, [tutorial?.id]); // Only run when tutorial ID changes
+
 
     // Reset progress and scroll to top when slug changes
     useEffect(() => {
         setReadingProgress(0);
+        progressRef.current = 0; // Also reset the ref immediately
+        hasScrolledRef.current = false; // Reset scroll tracking
+        window.scrollTo(0, 0); // Force scroll to top
         if (contentRef.current) {
             contentRef.current.scrollTop = 0;
         }
     }, [slug]);
 
     // Get display progress - always 100% for completed tutorials
-    const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : readingProgress || tutorial?.userProgress?.readingProgress || 0;
+    // Use nullish coalescing (??) so that 0 is not treated as falsy
+    const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : (readingProgress ?? tutorial?.userProgress?.readingProgress ?? 0);
 
     // Loading state
     if (isLoading) {
@@ -332,10 +347,6 @@ function TutorialDetailPage() {
                                     </Button>
                                 ) : (
                                     <div className="space-y-4">
-                                        <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
-                                            <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                            <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
-                                        </div>
                                         <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
                                             <CheckCircle2 className="h-5 w-5 text-green-500" />
                                             <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>

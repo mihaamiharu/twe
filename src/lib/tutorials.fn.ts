@@ -247,3 +247,189 @@ export const getTutorial = createServerFn({ method: 'GET' })
             };
         }
     });
+
+// ----------------------------------------------------------------------------
+// UPDATE TUTORIAL PROGRESS
+// ----------------------------------------------------------------------------
+
+const UpdateTutorialProgressSchema = z.object({
+    slug: z.string(),
+    readingProgress: z.number().min(0).max(100),
+});
+
+export const updateTutorialProgress = createServerFn({ method: "POST" })
+    .inputValidator((data: unknown) => UpdateTutorialProgressSchema.parse(data))
+    .handler(async ({ data: input }) => {
+        try {
+            const { getRequestHeaders } = await import('@tanstack/react-start/server');
+            const { auth } = await import('./auth.server');
+            const { db } = await import('@/db');
+            const { tutorials, progress } = await import('@/db/schema');
+            const { eq, and } = await import('drizzle-orm');
+
+            const headers = getRequestHeaders();
+            const session = await auth.api.getSession({ headers });
+
+            if (!session?.user?.id) {
+                return { success: false, error: 'Unauthorized' };
+            }
+
+            const userId = session.user.id;
+            const { slug, readingProgress: newProgress } = input;
+
+            // Get tutorial id
+            const tutorial = await db.query.tutorials.findFirst({
+                where: eq(tutorials.slug, slug),
+                columns: { id: true },
+            });
+
+            if (!tutorial) {
+                return { success: false, error: 'Tutorial not found' };
+            }
+
+            // Check existing progress
+            const existingProgress = await db.query.progress.findFirst({
+                where: and(
+                    eq(progress.userId, userId),
+                    eq(progress.tutorialId, tutorial.id)
+                ),
+            });
+
+            if (existingProgress) {
+                // Only update if not completed or just reading progress
+                await db
+                    .update(progress)
+                    .set({
+                        readingProgress: newProgress,
+                        lastAccessedAt: new Date(),
+                        updatedAt: new Date(),
+                    })
+                    .where(eq(progress.id, existingProgress.id));
+            } else {
+                await db.insert(progress).values({
+                    userId,
+                    tutorialId: tutorial.id,
+                    readingProgress: newProgress,
+                    isCompleted: false,
+                    lastAccessedAt: new Date(),
+                });
+            }
+
+            return { success: true };
+        } catch (error) {
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
+        }
+    });
+
+
+// ----------------------------------------------------------------------------
+// COMPLETE TUTORIAL
+// ----------------------------------------------------------------------------
+
+const CompleteTutorialSchema = z.object({
+    slug: z.string(),
+});
+
+export const completeTutorial = createServerFn({ method: "POST" })
+    .inputValidator((data: unknown) => CompleteTutorialSchema.parse(data))
+    .handler(async ({ data: { slug } }) => {
+        try {
+            const { getRequestHeaders } = await import('@tanstack/react-start/server');
+            const { auth } = await import('./auth.server');
+            const { db } = await import('@/db');
+            const { tutorials, progress } = await import('@/db/schema');
+            const { eq, and } = await import('drizzle-orm');
+            const { logger } = await import('@/lib/logger');
+            const { checkAchievements } = await import('@/lib/achievements');
+            const { getUserStats, getEarnedAchievementIds, awardAchievements } = await import('@/lib/stats');
+
+            const headers = getRequestHeaders();
+            const session = await auth.api.getSession({ headers });
+
+            if (!session?.user?.id) {
+                return { success: false, error: 'Unauthorized' };
+            }
+
+            const userId = session.user.id;
+
+            // Get tutorial id
+            const tutorial = await db.query.tutorials.findFirst({
+                where: eq(tutorials.slug, slug),
+                columns: { id: true, title: true },
+            });
+
+            if (!tutorial) {
+                return { success: false, error: 'Tutorial not found' };
+            }
+
+            // Upsert progress
+            const existingProgress = await db.query.progress.findFirst({
+                where: and(
+                    eq(progress.userId, userId),
+                    eq(progress.tutorialId, tutorial.id)
+                ),
+            });
+
+            const isFirstCompletion = !existingProgress || !existingProgress.isCompleted;
+
+            if (existingProgress) {
+                await db
+                    .update(progress)
+                    .set({
+                        isCompleted: true,
+                        readingProgress: 100,
+                        completedAt: existingProgress.isCompleted ? existingProgress.completedAt : new Date(),
+                        lastAccessedAt: new Date(),
+                        updatedAt: new Date(),
+                    })
+                    .where(eq(progress.id, existingProgress.id));
+            } else {
+                await db.insert(progress).values({
+                    userId,
+                    tutorialId: tutorial.id,
+                    isCompleted: true,
+                    readingProgress: 100,
+                    completedAt: new Date(),
+                    lastAccessedAt: new Date(),
+                });
+            }
+
+            // Check achievements if first completion
+            let newAchievements: { id: string; name: string; icon: string }[] = [];
+
+            if (isFirstCompletion) {
+                try {
+                    const userStats = await getUserStats(userId);
+                    const alreadyEarned = await getEarnedAchievementIds(userId);
+                    const earnedAchievements = checkAchievements(userStats, alreadyEarned);
+
+                    if (earnedAchievements.length > 0) {
+                        await awardAchievements(userId, earnedAchievements.map(a => a.id));
+                        newAchievements = earnedAchievements.map(a => ({
+                            id: a.id,
+                            name: a.name,
+                            icon: a.icon,
+                        }));
+                        logger.info(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
+                    }
+                } catch (error) {
+                    logger.error('Error checking achievements:', error);
+                }
+            }
+
+            return {
+                success: true,
+                newAchievements,
+            };
+
+        } catch (error) {
+            logger.error('Error completing tutorial:', error);
+            return {
+                success: false,
+                error: error instanceof Error ? error.message : 'Unknown error',
+            };
+        }
+    });
