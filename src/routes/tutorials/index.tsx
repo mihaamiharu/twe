@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useSearch, useNavigate } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { getTutorials } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -11,6 +12,17 @@ import { BookOpen, Clock, Search, AlertCircle, CheckCircle2, LayoutGrid, List } 
 
 export const Route = createFileRoute('/tutorials/')({
     component: TutorialsPage,
+    head: () => ({
+        meta: [
+            {
+                title: 'Testing Tutorials | TestingWithEkki',
+            },
+            {
+                name: 'description',
+                content: 'Step-by-step guides for mastering software testing. Learn Playwright, end-to-end testing strategies, and best practices.',
+            }
+        ]
+    })
 });
 
 interface Tutorial {
@@ -40,34 +52,31 @@ const difficulties = ['All', 'Beginner', 'Intermediate', 'Advanced'];
 function TutorialsPage() {
     const [search, setSearch] = useState('');
     const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
-    const { data, isLoading, error } = useQuery<TutorialsResponse>({
-        queryKey: ['tutorials'],
+    const { data: tutorialsResponse, isLoading, error } = useQuery({
+        queryKey: ['tutorials', search],
         queryFn: async () => {
-            const res = await fetch('/api/tutorials');
-            if (!res.ok) throw new Error('Failed to fetch tutorials');
-            return res.json();
+            const result = await getTutorials({
+                data: {
+                    search: search || undefined,
+                    limit: 50,
+                }
+            });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
     });
 
-    const tutorials = data?.data ?? [];
+    const tutorials = tutorialsResponse?.data ?? [];
 
-    // Filter tutorials based on search and difficulty
     const filteredTutorials = useMemo(() => {
-        return tutorials.filter((tutorial) => {
-            const matchesSearch =
-                tutorial.title.toLowerCase().includes(search.toLowerCase()) ||
-                tutorial.description.toLowerCase().includes(search.toLowerCase());
+        if (selectedDifficulty === 'All') return tutorials;
+        // Map UI difficulty to tags roughly
+        return tutorials.filter(t => t.tags?.some(tag => tag.toLowerCase() === selectedDifficulty.toLowerCase()));
+    }, [tutorials, selectedDifficulty]);
 
-            const matchesDifficulty =
-                selectedDifficulty === 'All' ||
-                tutorial.tags?.some(tag => tag.toLowerCase() === selectedDifficulty.toLowerCase());
 
-            return matchesSearch && matchesDifficulty;
-        });
-    }, [tutorials, search, selectedDifficulty]);
-
-    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     return (
         <div className="min-h-screen p-6 md:p-10">

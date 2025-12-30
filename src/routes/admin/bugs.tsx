@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getAdminBugs, updateBugStatus } from '@/lib/admin.fn';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, CheckCircle2, Circle, Clock, MessageSquare, AlertTriangle } from 'lucide-react';
@@ -49,22 +50,17 @@ function BugManager() {
   const { data: bugs, isLoading } = useQuery({
     queryKey: ['admin-bugs'],
     queryFn: async () => {
-      const res = await fetch('/api/admin/bugs');
-      if (!res.ok) throw new Error('Failed to fetch bugs');
-      const json = await res.json();
-      return json.data;
+      const res = await getAdminBugs();
+      if (!res.success) throw new Error(res.error || 'Failed to fetch bugs');
+      return res.data;
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { id: string; status?: string; adminNotes?: string }) => {
-      const res = await fetch('/api/admin/bugs', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!res.ok) throw new Error('Failed to update bug');
-      return res.json();
+    mutationFn: async (data: { id: string; status?: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED"; adminNotes?: string }) => {
+      const res = await updateBugStatus({ data });
+      if (!res.success) throw new Error(res.error || 'Failed to update bug');
+      return res;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-bugs'] });

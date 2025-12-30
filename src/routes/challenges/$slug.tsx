@@ -1,6 +1,8 @@
 import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
+import { createServerFn } from '@tanstack/react-start';
 import { useCallback, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getChallenge, getChallenges } from '@/lib/challenges.fn';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { deobfuscate } from '@/lib/obfuscator';
@@ -10,6 +12,9 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
+import { createSubmission } from '@/lib/submissions.fn';
+import { getTutorial } from '@/lib/tutorials.fn';
+import { useChallengeWorkspaceStore } from '@/lib/store/challenge-workspace-store';
 import { useSession } from '@/lib/auth.client';
 import { trackEvent } from '@/lib/analytics';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
@@ -70,21 +75,18 @@ function ChallengeDetailPage() {
         levelUp?: { newLevel: number; title: string };
     } | null>(null);
 
-    const { data, isLoading, error } = useQuery({
+    const { data: challengeData, isLoading, error } = useQuery({
         queryKey: ['challenge', slug],
         queryFn: async () => {
-            const response = await fetch(`/api/challenges/${slug}`);
-            if (!response.ok) {
-                if (response.status === 403) {
-                    throw new Error('COMING_SOON');
+            if (!slug) throw new Error('Slug is required');
+            const result = await getChallenge({ data: { slug } });
+            if (!result.success) {
+                if (result.error === 'This challenge is coming soon!') {
+                    throw new Error('COMING_SOON'); // Match existing error handling
                 }
-                throw new Error('Failed to fetch challenge');
+                throw new Error(result.error);
             }
-            const json = await response.json();
-            if (!json.success) {
-                throw new Error(json.error || 'Failed to fetch challenge');
-            }
-            return json.data as APIChallenge;
+            return result.data as APIChallenge;
         },
         enabled: !!slug,
         retry: (failureCount, error) => {
@@ -93,6 +95,9 @@ function ChallengeDetailPage() {
             return failureCount < 3;
         }
     });
+
+    // Rename for compatibility with existing code
+    const data = challengeData;
 
     // Handle Coming Soon redirect
     useEffect(() => {
@@ -105,14 +110,17 @@ function ChallengeDetailPage() {
         }
     }, [error, navigate]);
 
-    const { data: allChallengesData } = useQuery<ChallengesResponse>({
-        queryKey: ['challenges'],
+    const { data: allChallengesResponse } = useQuery({
+        queryKey: ['challenges', 'prerequisites'], // Different key from main list
         queryFn: async () => {
-            const res = await fetch('/api/challenges?limit=100');
-            if (!res.ok) throw new Error('Failed to fetch challenges');
-            return res.json();
+            const result = await getChallenges({ data: { limit: 100 } });
+            if (!result.success) throw new Error(result.error);
+            return result;
         },
     });
+
+    // Alias for compatibility
+    const allChallengesData = allChallengesResponse;
 
     const missingPrerequisites = useMemo(() => {
         if (!data || !allChallengesData) return [];
@@ -193,8 +201,8 @@ function ChallengeDetailPage() {
     } : null;
 
     const submitMutation = useMutation({
-        mutationFn: async (data: {
-            challengeId: string;
+        mutationFn: async (submissionData: {
+            challengeSlug: string;
             code: string;
             testResults: {
                 testCaseId?: string;
@@ -204,18 +212,13 @@ function ChallengeDetailPage() {
             }[];
             executionTime?: number;
         }) => {
-            const response = await fetch('/api/submissions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data),
-            });
+            const response = await createSubmission({ data: submissionData });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || 'Failed to submit solution');
+            if (!response.success) {
+                throw new Error(response.error || 'Failed to submit solution');
             }
 
-            return await response.json();
+            return response;
         },
         onSuccess: (response) => {
             if (response.success && response.data) {

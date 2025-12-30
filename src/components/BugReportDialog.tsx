@@ -39,6 +39,7 @@ import { Bug, Loader2, AlertTriangle, AlertCircle, Info, CheckCircle } from 'luc
 import { cn } from '@/lib/utils';
 import { useSession } from '@/lib/auth.client';
 import { trackEvent } from '@/lib/analytics';
+import { createBugReport } from '@/lib/bug-reports.fn';
 
 // Form validation schema
 const bugReportFormSchema = z.object({
@@ -86,22 +87,19 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
 
     const submitMutation = useMutation({
         mutationFn: async (data: BugReportFormData) => {
-            const response = await fetch('/api/bug-reports', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+            const response = await createBugReport({
+                data: {
                     ...data,
                     pageUrl: window.location.href,
                     browserInfo: navigator.userAgent,
-                }),
+                }
             });
 
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Failed to submit bug report');
+            if (!response.success) {
+                throw new Error(response.error || 'Failed to submit bug report');
             }
 
-            return response.json();
+            return response.data;
         },
         onSuccess: () => {
             toast.success('Bug report submitted!', {

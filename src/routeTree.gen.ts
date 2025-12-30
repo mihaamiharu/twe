@@ -28,23 +28,7 @@ import { Route as AdminChallengesRouteImport } from './routes/admin/challenges'
 import { Route as AdminBugsRouteImport } from './routes/admin/bugs'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
-import { Route as ApiTutorialsIndexRouteImport } from './routes/api/tutorials/index'
-import { Route as ApiSubmissionsIndexRouteImport } from './routes/api/submissions/index'
-import { Route as ApiStatsIndexRouteImport } from './routes/api/stats/index'
-import { Route as ApiLeaderboardIndexRouteImport } from './routes/api/leaderboard/index'
-import { Route as ApiChallengesIndexRouteImport } from './routes/api/challenges/index'
-import { Route as ApiBugReportsIndexRouteImport } from './routes/api/bug-reports/index'
-import { Route as ApiUsersMeRouteImport } from './routes/api/users/me'
-import { Route as ApiTutorialsSlugRouteImport } from './routes/api/tutorials/$slug'
-import { Route as ApiChallengesSlugRouteImport } from './routes/api/challenges/$slug'
-import { Route as ApiAuthResendVerificationRouteImport } from './routes/api/auth/resend-verification'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiAdminUsersRouteImport } from './routes/api/admin/users'
-import { Route as ApiAdminStatsRouteImport } from './routes/api/admin/stats'
-import { Route as ApiAdminChallengesRouteImport } from './routes/api/admin/challenges'
-import { Route as ApiAdminBugsRouteImport } from './routes/api/admin/bugs'
-import { Route as ApiTutorialsSlugProgressRouteImport } from './routes/api/tutorials/$slug/progress'
-import { Route as ApiTutorialsSlugCompleteRouteImport } from './routes/api/tutorials/$slug/complete'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -140,94 +124,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const ApiTutorialsIndexRoute = ApiTutorialsIndexRouteImport.update({
-  id: '/api/tutorials/',
-  path: '/api/tutorials/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSubmissionsIndexRoute = ApiSubmissionsIndexRouteImport.update({
-  id: '/api/submissions/',
-  path: '/api/submissions/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiStatsIndexRoute = ApiStatsIndexRouteImport.update({
-  id: '/api/stats/',
-  path: '/api/stats/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiLeaderboardIndexRoute = ApiLeaderboardIndexRouteImport.update({
-  id: '/api/leaderboard/',
-  path: '/api/leaderboard/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiChallengesIndexRoute = ApiChallengesIndexRouteImport.update({
-  id: '/api/challenges/',
-  path: '/api/challenges/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiBugReportsIndexRoute = ApiBugReportsIndexRouteImport.update({
-  id: '/api/bug-reports/',
-  path: '/api/bug-reports/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiUsersMeRoute = ApiUsersMeRouteImport.update({
-  id: '/api/users/me',
-  path: '/api/users/me',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTutorialsSlugRoute = ApiTutorialsSlugRouteImport.update({
-  id: '/api/tutorials/$slug',
-  path: '/api/tutorials/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiChallengesSlugRoute = ApiChallengesSlugRouteImport.update({
-  id: '/api/challenges/$slug',
-  path: '/api/challenges/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAuthResendVerificationRoute =
-  ApiAuthResendVerificationRouteImport.update({
-    id: '/api/auth/resend-verification',
-    path: '/api/auth/resend-verification',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAdminUsersRoute = ApiAdminUsersRouteImport.update({
-  id: '/api/admin/users',
-  path: '/api/admin/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminStatsRoute = ApiAdminStatsRouteImport.update({
-  id: '/api/admin/stats',
-  path: '/api/admin/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminChallengesRoute = ApiAdminChallengesRouteImport.update({
-  id: '/api/admin/challenges',
-  path: '/api/admin/challenges',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminBugsRoute = ApiAdminBugsRouteImport.update({
-  id: '/api/admin/bugs',
-  path: '/api/admin/bugs',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTutorialsSlugProgressRoute =
-  ApiTutorialsSlugProgressRouteImport.update({
-    id: '/progress',
-    path: '/progress',
-    getParentRoute: () => ApiTutorialsSlugRoute,
-  } as any)
-const ApiTutorialsSlugCompleteRoute =
-  ApiTutorialsSlugCompleteRouteImport.update({
-    id: '/complete',
-    path: '/complete',
-    getParentRoute: () => ApiTutorialsSlugRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -248,23 +149,7 @@ export interface FileRoutesByFullPath {
   '/challenges': typeof ChallengesIndexRoute
   '/docs': typeof DocsIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
-  '/api/admin/bugs': typeof ApiAdminBugsRoute
-  '/api/admin/challenges': typeof ApiAdminChallengesRoute
-  '/api/admin/stats': typeof ApiAdminStatsRoute
-  '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
-  '/api/challenges/$slug': typeof ApiChallengesSlugRoute
-  '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeRoute
-  '/api/bug-reports': typeof ApiBugReportsIndexRoute
-  '/api/challenges': typeof ApiChallengesIndexRoute
-  '/api/leaderboard': typeof ApiLeaderboardIndexRoute
-  '/api/stats': typeof ApiStatsIndexRoute
-  '/api/submissions': typeof ApiSubmissionsIndexRoute
-  '/api/tutorials': typeof ApiTutorialsIndexRoute
-  '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
-  '/api/tutorials/$slug/progress': typeof ApiTutorialsSlugProgressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -285,23 +170,7 @@ export interface FileRoutesByTo {
   '/challenges': typeof ChallengesIndexRoute
   '/docs': typeof DocsIndexRoute
   '/tutorials': typeof TutorialsIndexRoute
-  '/api/admin/bugs': typeof ApiAdminBugsRoute
-  '/api/admin/challenges': typeof ApiAdminChallengesRoute
-  '/api/admin/stats': typeof ApiAdminStatsRoute
-  '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
-  '/api/challenges/$slug': typeof ApiChallengesSlugRoute
-  '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeRoute
-  '/api/bug-reports': typeof ApiBugReportsIndexRoute
-  '/api/challenges': typeof ApiChallengesIndexRoute
-  '/api/leaderboard': typeof ApiLeaderboardIndexRoute
-  '/api/stats': typeof ApiStatsIndexRoute
-  '/api/submissions': typeof ApiSubmissionsIndexRoute
-  '/api/tutorials': typeof ApiTutorialsIndexRoute
-  '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
-  '/api/tutorials/$slug/progress': typeof ApiTutorialsSlugProgressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -324,23 +193,7 @@ export interface FileRoutesById {
   '/challenges/': typeof ChallengesIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/tutorials/': typeof TutorialsIndexRoute
-  '/api/admin/bugs': typeof ApiAdminBugsRoute
-  '/api/admin/challenges': typeof ApiAdminChallengesRoute
-  '/api/admin/stats': typeof ApiAdminStatsRoute
-  '/api/admin/users': typeof ApiAdminUsersRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/auth/resend-verification': typeof ApiAuthResendVerificationRoute
-  '/api/challenges/$slug': typeof ApiChallengesSlugRoute
-  '/api/tutorials/$slug': typeof ApiTutorialsSlugRouteWithChildren
-  '/api/users/me': typeof ApiUsersMeRoute
-  '/api/bug-reports/': typeof ApiBugReportsIndexRoute
-  '/api/challenges/': typeof ApiChallengesIndexRoute
-  '/api/leaderboard/': typeof ApiLeaderboardIndexRoute
-  '/api/stats/': typeof ApiStatsIndexRoute
-  '/api/submissions/': typeof ApiSubmissionsIndexRoute
-  '/api/tutorials/': typeof ApiTutorialsIndexRoute
-  '/api/tutorials/$slug/complete': typeof ApiTutorialsSlugCompleteRoute
-  '/api/tutorials/$slug/progress': typeof ApiTutorialsSlugProgressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -363,23 +216,7 @@ export interface FileRouteTypes {
     | '/challenges'
     | '/docs'
     | '/tutorials'
-    | '/api/admin/bugs'
-    | '/api/admin/challenges'
-    | '/api/admin/stats'
-    | '/api/admin/users'
     | '/api/auth/$'
-    | '/api/auth/resend-verification'
-    | '/api/challenges/$slug'
-    | '/api/tutorials/$slug'
-    | '/api/users/me'
-    | '/api/bug-reports'
-    | '/api/challenges'
-    | '/api/leaderboard'
-    | '/api/stats'
-    | '/api/submissions'
-    | '/api/tutorials'
-    | '/api/tutorials/$slug/complete'
-    | '/api/tutorials/$slug/progress'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -400,23 +237,7 @@ export interface FileRouteTypes {
     | '/challenges'
     | '/docs'
     | '/tutorials'
-    | '/api/admin/bugs'
-    | '/api/admin/challenges'
-    | '/api/admin/stats'
-    | '/api/admin/users'
     | '/api/auth/$'
-    | '/api/auth/resend-verification'
-    | '/api/challenges/$slug'
-    | '/api/tutorials/$slug'
-    | '/api/users/me'
-    | '/api/bug-reports'
-    | '/api/challenges'
-    | '/api/leaderboard'
-    | '/api/stats'
-    | '/api/submissions'
-    | '/api/tutorials'
-    | '/api/tutorials/$slug/complete'
-    | '/api/tutorials/$slug/progress'
   id:
     | '__root__'
     | '/'
@@ -438,23 +259,7 @@ export interface FileRouteTypes {
     | '/challenges/'
     | '/docs/'
     | '/tutorials/'
-    | '/api/admin/bugs'
-    | '/api/admin/challenges'
-    | '/api/admin/stats'
-    | '/api/admin/users'
     | '/api/auth/$'
-    | '/api/auth/resend-verification'
-    | '/api/challenges/$slug'
-    | '/api/tutorials/$slug'
-    | '/api/users/me'
-    | '/api/bug-reports/'
-    | '/api/challenges/'
-    | '/api/leaderboard/'
-    | '/api/stats/'
-    | '/api/submissions/'
-    | '/api/tutorials/'
-    | '/api/tutorials/$slug/complete'
-    | '/api/tutorials/$slug/progress'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -475,21 +280,7 @@ export interface RootRouteChildren {
   ChallengesIndexRoute: typeof ChallengesIndexRoute
   DocsIndexRoute: typeof DocsIndexRoute
   TutorialsIndexRoute: typeof TutorialsIndexRoute
-  ApiAdminBugsRoute: typeof ApiAdminBugsRoute
-  ApiAdminChallengesRoute: typeof ApiAdminChallengesRoute
-  ApiAdminStatsRoute: typeof ApiAdminStatsRoute
-  ApiAdminUsersRoute: typeof ApiAdminUsersRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiAuthResendVerificationRoute: typeof ApiAuthResendVerificationRoute
-  ApiChallengesSlugRoute: typeof ApiChallengesSlugRoute
-  ApiTutorialsSlugRoute: typeof ApiTutorialsSlugRouteWithChildren
-  ApiUsersMeRoute: typeof ApiUsersMeRoute
-  ApiBugReportsIndexRoute: typeof ApiBugReportsIndexRoute
-  ApiChallengesIndexRoute: typeof ApiChallengesIndexRoute
-  ApiLeaderboardIndexRoute: typeof ApiLeaderboardIndexRoute
-  ApiStatsIndexRoute: typeof ApiStatsIndexRoute
-  ApiSubmissionsIndexRoute: typeof ApiSubmissionsIndexRoute
-  ApiTutorialsIndexRoute: typeof ApiTutorialsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -627,124 +418,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/api/tutorials/': {
-      id: '/api/tutorials/'
-      path: '/api/tutorials'
-      fullPath: '/api/tutorials'
-      preLoaderRoute: typeof ApiTutorialsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/submissions/': {
-      id: '/api/submissions/'
-      path: '/api/submissions'
-      fullPath: '/api/submissions'
-      preLoaderRoute: typeof ApiSubmissionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/stats/': {
-      id: '/api/stats/'
-      path: '/api/stats'
-      fullPath: '/api/stats'
-      preLoaderRoute: typeof ApiStatsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/leaderboard/': {
-      id: '/api/leaderboard/'
-      path: '/api/leaderboard'
-      fullPath: '/api/leaderboard'
-      preLoaderRoute: typeof ApiLeaderboardIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/challenges/': {
-      id: '/api/challenges/'
-      path: '/api/challenges'
-      fullPath: '/api/challenges'
-      preLoaderRoute: typeof ApiChallengesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/bug-reports/': {
-      id: '/api/bug-reports/'
-      path: '/api/bug-reports'
-      fullPath: '/api/bug-reports'
-      preLoaderRoute: typeof ApiBugReportsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/users/me': {
-      id: '/api/users/me'
-      path: '/api/users/me'
-      fullPath: '/api/users/me'
-      preLoaderRoute: typeof ApiUsersMeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/tutorials/$slug': {
-      id: '/api/tutorials/$slug'
-      path: '/api/tutorials/$slug'
-      fullPath: '/api/tutorials/$slug'
-      preLoaderRoute: typeof ApiTutorialsSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/challenges/$slug': {
-      id: '/api/challenges/$slug'
-      path: '/api/challenges/$slug'
-      fullPath: '/api/challenges/$slug'
-      preLoaderRoute: typeof ApiChallengesSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/auth/resend-verification': {
-      id: '/api/auth/resend-verification'
-      path: '/api/auth/resend-verification'
-      fullPath: '/api/auth/resend-verification'
-      preLoaderRoute: typeof ApiAuthResendVerificationRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/users': {
-      id: '/api/admin/users'
-      path: '/api/admin/users'
-      fullPath: '/api/admin/users'
-      preLoaderRoute: typeof ApiAdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/stats': {
-      id: '/api/admin/stats'
-      path: '/api/admin/stats'
-      fullPath: '/api/admin/stats'
-      preLoaderRoute: typeof ApiAdminStatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/challenges': {
-      id: '/api/admin/challenges'
-      path: '/api/admin/challenges'
-      fullPath: '/api/admin/challenges'
-      preLoaderRoute: typeof ApiAdminChallengesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/bugs': {
-      id: '/api/admin/bugs'
-      path: '/api/admin/bugs'
-      fullPath: '/api/admin/bugs'
-      preLoaderRoute: typeof ApiAdminBugsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/tutorials/$slug/progress': {
-      id: '/api/tutorials/$slug/progress'
-      path: '/progress'
-      fullPath: '/api/tutorials/$slug/progress'
-      preLoaderRoute: typeof ApiTutorialsSlugProgressRouteImport
-      parentRoute: typeof ApiTutorialsSlugRoute
-    }
-    '/api/tutorials/$slug/complete': {
-      id: '/api/tutorials/$slug/complete'
-      path: '/complete'
-      fullPath: '/api/tutorials/$slug/complete'
-      preLoaderRoute: typeof ApiTutorialsSlugCompleteRouteImport
-      parentRoute: typeof ApiTutorialsSlugRoute
     }
   }
 }
@@ -762,19 +441,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
-
-interface ApiTutorialsSlugRouteChildren {
-  ApiTutorialsSlugCompleteRoute: typeof ApiTutorialsSlugCompleteRoute
-  ApiTutorialsSlugProgressRoute: typeof ApiTutorialsSlugProgressRoute
-}
-
-const ApiTutorialsSlugRouteChildren: ApiTutorialsSlugRouteChildren = {
-  ApiTutorialsSlugCompleteRoute: ApiTutorialsSlugCompleteRoute,
-  ApiTutorialsSlugProgressRoute: ApiTutorialsSlugProgressRoute,
-}
-
-const ApiTutorialsSlugRouteWithChildren =
-  ApiTutorialsSlugRoute._addFileChildren(ApiTutorialsSlugRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -794,21 +460,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChallengesIndexRoute: ChallengesIndexRoute,
   DocsIndexRoute: DocsIndexRoute,
   TutorialsIndexRoute: TutorialsIndexRoute,
-  ApiAdminBugsRoute: ApiAdminBugsRoute,
-  ApiAdminChallengesRoute: ApiAdminChallengesRoute,
-  ApiAdminStatsRoute: ApiAdminStatsRoute,
-  ApiAdminUsersRoute: ApiAdminUsersRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiAuthResendVerificationRoute: ApiAuthResendVerificationRoute,
-  ApiChallengesSlugRoute: ApiChallengesSlugRoute,
-  ApiTutorialsSlugRoute: ApiTutorialsSlugRouteWithChildren,
-  ApiUsersMeRoute: ApiUsersMeRoute,
-  ApiBugReportsIndexRoute: ApiBugReportsIndexRoute,
-  ApiChallengesIndexRoute: ApiChallengesIndexRoute,
-  ApiLeaderboardIndexRoute: ApiLeaderboardIndexRoute,
-  ApiStatsIndexRoute: ApiStatsIndexRoute,
-  ApiSubmissionsIndexRoute: ApiSubmissionsIndexRoute,
-  ApiTutorialsIndexRoute: ApiTutorialsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

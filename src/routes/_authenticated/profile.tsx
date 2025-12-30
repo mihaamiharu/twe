@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Award, BookOpen, Code, Settings, Star, Zap, AlertCircle } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
 import { ActivityHeatmap } from '@/components/gamification/ActivityHeatmap';
+import { getUserSettings } from '@/lib/user.fn';
 
 export const Route = createFileRoute('/_authenticated/profile')({
     component: ProfilePage,
@@ -58,9 +59,16 @@ function ProfilePage() {
     const { data, isLoading, error } = useQuery<ProfileResponse>({
         queryKey: ['profile'],
         queryFn: async () => {
-            const res = await fetch('/api/users/me');
-            if (!res.ok) throw new Error('Failed to fetch profile');
-            return res.json();
+            const result = await getUserSettings();
+            if (!result.success || !result.data) {
+                throw new Error(result.error || 'Failed to fetch profile');
+            }
+            // Transform server function shape (result.data) to expected shape (UserProfile)
+            // The shapes are identical based on the refactor, just need to ensure the return type matches
+            return {
+                success: true,
+                data: result.data
+            };
         },
     });
 

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { signUp } from '@/lib/auth.client';
+import { resendVerification } from '@/lib/auth.fn';
 import { signUpSchema, type SignUpInput } from '@/lib/validations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,19 +58,15 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
         setResendError('');
 
         try {
-            const response = await fetch('/api/auth/resend-verification', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: formData.email }),
+            const response = await resendVerification({
+                data: { email: formData.email }
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
+            if (!response.success) {
                 setResendStatus('error');
-                setResendError(data.error || 'Failed to resend email');
-                if (data.cooldownRemaining) {
-                    setResendCooldown(data.cooldownRemaining);
+                setResendError(response.error || 'Failed to resend email');
+                if ((response as any).cooldownRemaining) {
+                    setResendCooldown((response as any).cooldownRemaining);
                 }
             } else {
                 setResendStatus('success');
