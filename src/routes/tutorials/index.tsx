@@ -12,6 +12,17 @@ import { BookOpen, Clock, Search, AlertCircle, CheckCircle2, LayoutGrid, List } 
 
 export const Route = createFileRoute('/tutorials/')({
     component: TutorialsPage,
+    head: () => ({
+        meta: [
+            {
+                title: 'Testing Tutorials | TestingWithEkki',
+            },
+            {
+                name: 'description',
+                content: 'Step-by-step guides for mastering software testing. Learn Playwright, end-to-end testing strategies, and best practices.',
+            }
+        ]
+    })
 });
 
 interface Tutorial {
