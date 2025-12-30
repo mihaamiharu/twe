@@ -12,8 +12,18 @@ export const Route = createFileRoute('/login')({
     component: LoginPage,
 });
 
+import { useSession } from '@/lib/auth.client';
+import { useEffect } from 'react';
+
 function LoginPage() {
     const navigate = useNavigate();
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        if (session?.user) {
+            navigate({ to: '/' });
+        }
+    }, [session, navigate]);
 
     const handleLoginSuccess = () => {
         // Redirect to original path if available, otherwise home

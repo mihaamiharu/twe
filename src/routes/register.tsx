@@ -12,8 +12,18 @@ export const Route = createFileRoute('/register')({
     component: RegisterPage,
 });
 
+import { useSession } from '@/lib/auth.client';
+import { useEffect } from 'react';
+
 function RegisterPage() {
     const navigate = useNavigate();
+    const { data: session } = useSession();
+
+    useEffect(() => {
+        if (session?.user) {
+            navigate({ to: '/' });
+        }
+    }, [session, navigate]);
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
