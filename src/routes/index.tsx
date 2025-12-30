@@ -13,40 +13,27 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle,
-  Award,
 } from 'lucide-react';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
+import { getDashboardStats } from '@/lib/dashboard.fn';
 
 export const Route = createFileRoute('/')({ component: HomePage });
 
-interface StatsResponse {
-  success: boolean;
-  data: {
-    challenges: number;
-    tutorials: number;
-    achievements: number;
-    tiers: {
-      basic: number;
-      beginner: number;
-      intermediate: number;
-      expert: number;
-    };
-  };
-}
-
 function HomePage() {
-  // Fetch real stats from API
-  const { data: statsData, isLoading: statsLoading } = useQuery<StatsResponse>({
+  // Fetch real stats from Server Function
+  const { data: statsData, isLoading: statsLoading } = useQuery({
     queryKey: ['homepage-stats'],
     queryFn: async () => {
-      const res = await fetch('/api/stats');
-      if (!res.ok) throw new Error('Failed to fetch stats');
-      return res.json();
+      const result = await getDashboardStats();
+      if (!result.success || !result.data) {
+        throw new Error(result.error || 'Failed to fetch stats');
+      }
+      return result.data;
     },
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 
-  const stats = statsData?.data;
+  const stats = statsData;
 
   const features = [
     {
@@ -189,13 +176,13 @@ function HomePage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link to="/challenges">
-              <Button size="lg" className="text-lg px-8 py-6 shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow">
+              <Button size="lg" className="text-lg px-8 py-6 rounded-xl border-2 border-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow">
                 Start Learning
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link to="/tutorials">
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6">
+              <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-muted">
                 Browse Tutorials
               </Button>
             </Link>
@@ -211,7 +198,7 @@ function HomePage() {
                   <AnimatedCounter value={stats?.challenges || 0} suffix="+" />
                 )}
               </div>
-              <div className="text-sm text-muted-foreground">Challenges</div>
+              <div className="text-sm text-muted-foreground font-medium">Challenges</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
@@ -221,7 +208,7 @@ function HomePage() {
                   <AnimatedCounter value={stats?.tutorials || 0} />
                 )}
               </div>
-              <div className="text-sm text-muted-foreground">Tutorials</div>
+              <div className="text-sm text-muted-foreground font-medium">Tutorials</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
@@ -231,11 +218,11 @@ function HomePage() {
                   <AnimatedCounter value={stats?.achievements || 0} />
                 )}
               </div>
-              <div className="text-sm text-muted-foreground">Achievements</div>
+              <div className="text-sm text-muted-foreground font-medium">Achievements</div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">∞</div>
-              <div className="text-sm text-muted-foreground">Learning</div>
+              <div className="text-sm text-muted-foreground font-medium">Learning</div>
             </div>
           </div>
         </div>
@@ -264,19 +251,19 @@ function HomePage() {
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-3xl">{tier.emoji}</span>
                     <div>
-                      <div className="text-sm text-muted-foreground">Tier {index + 1}</div>
-                      <h3 className="text-xl font-semibold">{tier.title}</h3>
+                      <div className="text-sm text-muted-foreground font-bold">Tier {index + 1}</div>
+                      <h3 className="text-xl font-bold">{tier.title}</h3>
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground mb-4">{tier.description}</p>
                   <div className="flex flex-wrap gap-1 mb-4">
                     {tier.skills.map(skill => (
-                      <Badge key={skill} variant="secondary" className="text-xs">
+                      <Badge key={skill} variant="secondary" className="text-xs font-medium border border-border">
                         {skill}
                       </Badge>
                     ))}
                   </div>
-                  <div className="text-sm font-medium text-primary">
+                  <div className="text-sm font-bold text-primary">
                     {tier.count} challenges
                   </div>
                 </CardContent>
@@ -309,6 +296,7 @@ function HomePage() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between mb-3">
                       <Badge
+                        className="font-bold border-2"
                         variant={
                           challenge.difficulty === 'EASY'
                             ? 'secondary'
@@ -319,12 +307,12 @@ function HomePage() {
                       >
                         {challenge.difficulty}
                       </Badge>
-                      <span className="text-sm text-primary font-medium">
+                      <span className="text-sm text-primary font-bold">
                         +{challenge.xp} XP
                       </span>
                     </div>
-                    <h3 className="text-lg font-semibold mb-2">{challenge.title}</h3>
-                    <p className="text-sm text-muted-foreground">{challenge.type}</p>
+                    <h3 className="text-xl font-bold mb-2">{challenge.title}</h3>
+                    <p className="text-sm text-muted-foreground font-medium">{challenge.type}</p>
                   </CardContent>
                 </Card>
               </Link>
@@ -333,7 +321,7 @@ function HomePage() {
 
           <div className="text-center mt-8">
             <Link to="/challenges">
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" className="rounded-xl border-2">
                 View All Challenges
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -361,10 +349,10 @@ function HomePage() {
                 className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10"
               >
                 <CardContent className="p-6">
-                  <div className="mb-4 p-3 bg-primary/10 rounded-lg w-fit">
+                  <div className="mb-4 p-3 bg-primary/10 rounded-xl w-fit border-2 border-primary/20">
                     {feature.icon}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
@@ -400,11 +388,11 @@ function HomePage() {
                 description: 'Run your code and see results immediately. Earn XP when you pass!',
               },
             ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center mx-auto mb-4">
+              <div key={item.step} className="text-center group">
+                <div className="w-16 h-16 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
                   <span className="text-2xl font-bold text-primary">{item.step}</span>
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{item.title}</h3>
+                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                 <p className="text-muted-foreground">{item.description}</p>
               </div>
             ))}
@@ -422,7 +410,7 @@ function HomePage() {
             </h2>
           </div>
 
-          <Card className="relative overflow-hidden border-2 border-border shadow-md bg-card">
+          <Card className="glass-card relative overflow-hidden">
             <CardContent className="p-8 md:p-12 relative z-10">
               {/* Decorative quote mark */}
               <div className="absolute top-4 right-8 text-9xl text-primary/10 font-serif leading-none select-none pointer-events-none">
@@ -445,7 +433,7 @@ function HomePage() {
               </div>
 
               <div className="mt-8 pt-8 border-t border-border/50 flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-xl shadow-sm">
+                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-xl shadow-sm border-2 border-primary">
                   E
                 </div>
                 <div>
@@ -461,7 +449,7 @@ function HomePage() {
       {/* CTA Section */}
       < section className="py-20 px-6" >
         <div className="max-w-4xl mx-auto text-center">
-          <div className="glass-card p-12 rounded-2xl">
+          <div className="glass-card p-12 rounded-3xl border-2 border-primary/20">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Start Your Quality Engineering Career
             </h2>
@@ -471,28 +459,28 @@ function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/login">
-                <Button size="lg" className="text-lg px-8">
+                <Button size="lg" className="text-lg px-8 rounded-xl border-2 border-primary shadow-lg shadow-primary/20">
                   Get Started for Free
                 </Button>
               </Link>
               <Link to="/leaderboard">
-                <Button variant="outline" size="lg" className="text-lg px-8">
+                <Button variant="outline" size="lg" className="text-lg px-8 rounded-xl border-2">
                   View Leaderboard
                 </Button>
               </Link>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground font-medium">
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-4 w-4 text-green-500" />
                 Free to use
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-4 w-4 text-green-500" />
                 No credit card required
               </span>
               <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-400" />
+                <CheckCircle className="h-4 w-4 text-green-500" />
                 Learn at your own pace
               </span>
             </div>
