@@ -47,8 +47,10 @@
   --font-reading: "Lora", Georgia, "Times New Roman", serif;
   --font-mono: "Fira Code", monospace;
   /* Custom Brand Colors */
-  --color-brand-teal: #14b8a6; /* teal-600 */
-  --color-brand-teal-light: #99f6e4; /* teal-200 */
+  --color-brand-teal: #14b8a6;
+  /* teal-600 */
+  --color-brand-teal-light: #99f6e4;
+  /* teal-200 */
 }
 
 /* Base Variables - Light Mode */
@@ -138,6 +140,22 @@
 
   --shadow-strength: 0px;
   /* No heavy shadows in dark mode typically, or just glow? Let's hide hard shadows in dark mode for cleaner look */
+}
+
+/* Glassmorphism Refined for Soft Brutalism */
+.glass-card {
+  background: color-mix(in srgb, var(--background) 40%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid var(--border);
+  box-shadow: 4px 4px 0px var(--border);
+  @apply rounded-xl;
+}
+
+.dark .glass-card {
+  background: color-mix(in srgb, var(--background) 60%, transparent);
+  box-shadow: none;
+  /* Cleaner in dark mode */
 }
 
 /* Base Styles */
