@@ -3,9 +3,40 @@ import { useQuery } from '@tanstack/react-query';
 import { getAdminStats } from '@/lib/admin.fn';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, FileCode, TrendingUp, Trophy, AlertCircle, Activity, ArrowRight, Zap, Layout } from 'lucide-react';
+import { Users, FileCode, Trophy, AlertCircle, Activity, ArrowRight, Layout } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+
+interface PopularChallenge {
+  id: string;
+  title: string;
+  slug: string;
+  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+  completionCount: number;
+}
+
+interface RecentSubmission {
+  id: string;
+  isPassed: boolean;
+  createdAt: Date;
+  userId: string;
+  challengeId: string;
+  code: string;
+  xpEarned: number;
+  executionTime: number | null;
+  testsPassed: number;
+  testsTotal: number;
+  errorMessage: string | null;
+  user: {
+    name: string | null;
+    image: string | null;
+    email: string;
+  };
+  challenge: {
+    title: string;
+    slug: string;
+  };
+}
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
@@ -163,7 +194,7 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {stats.popularChallenges.map((challenge: any) => (
+              {stats.popularChallenges.map((challenge: PopularChallenge) => (
                 <div key={challenge.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
                   <div className="space-y-1">
                     <p className="text-sm font-medium leading-none">{challenge.title}</p>
@@ -199,7 +230,7 @@ function AdminDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {stats.recentActivity.map((submission: any, i: number) => (
+              {stats.recentActivity.map((submission: RecentSubmission, i: number) => (
                 <TableRow key={i}>
                   <TableCell className="font-medium">
                     <div className="flex items-center gap-2">

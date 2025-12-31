@@ -1,9 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminUsers, updateUserStatus } from '@/lib/admin.fn';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Ban, CheckCircle2, Shield, ShieldAlert, UserIcon, Info } from 'lucide-react';
+import { ArrowLeft, Shield, ShieldAlert, Search } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,6 @@ import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useState, useMemo } from 'react';
-import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
     Tooltip,
@@ -19,6 +18,17 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+
+interface AdminUser {
+    id: string;
+    name: string | null;
+    email: string;
+    image: string | null;
+    role: 'USER' | 'ADMIN';
+    showOnLeaderboard: boolean;
+    submissionCount: number;
+    createdAt: Date;
+}
 
 export const Route = createFileRoute('/admin/users')({
     loader: async ({ context }) => {
@@ -49,7 +59,7 @@ function UserManager() {
         if (!users) return [];
         const query = searchQuery.toLowerCase().trim();
         if (!query) return users;
-        return users.filter((user: any) =>
+        return users.filter((user: AdminUser) =>
             user.name?.toLowerCase().includes(query) ||
             user.email?.toLowerCase().includes(query) ||
             user.id?.toLowerCase().includes(query)
@@ -63,8 +73,8 @@ function UserManager() {
             if (!res.success) throw new Error(res.error || 'Failed to update user');
             return res;
         },
-        onSuccess: (data, variables) => {
-            queryClient.setQueryData(['admin-users'], (oldData: any[]) => {
+        onSuccess: (_data, variables) => {
+            queryClient.setQueryData(['admin-users'], (oldData: AdminUser[] | undefined) => {
                 return oldData?.map((user) =>
                     user.id === variables.id
                         ? { ...user, showOnLeaderboard: variables.showOnLeaderboard }
@@ -126,7 +136,7 @@ function UserManager() {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredUsers.map((user: any) => (
+                                filteredUsers.map((user: AdminUser) => (
                                     <UserRow
                                         key={user.id}
                                         user={user}
@@ -155,7 +165,7 @@ function UserManager() {
     );
 }
 
-function UserRow({ user, onToggle, isPending }: { user: any, onToggle: (c: boolean) => void, isPending: boolean }) {
+function UserRow({ user, onToggle, isPending }: { user: AdminUser, onToggle: (c: boolean) => void, isPending: boolean }) {
     const isAdmin = user.role === 'ADMIN';
 
     return (
@@ -163,7 +173,7 @@ function UserRow({ user, onToggle, isPending }: { user: any, onToggle: (c: boole
             <TableCell>
                 <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
-                        <AvatarImage src={user.image} alt={user.name} />
+                        <AvatarImage src={user.image ?? undefined} alt={user.name ?? undefined} />
                         <AvatarFallback className="bg-primary/10 text-primary">
                             {user.name?.substring(0, 2).toUpperCase() || 'AN'}
                         </AvatarFallback>

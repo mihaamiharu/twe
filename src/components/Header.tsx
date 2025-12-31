@@ -10,7 +10,6 @@ import {
   Trophy,
   User,
   X,
-  ShieldCheck,
   LayoutDashboard,
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';

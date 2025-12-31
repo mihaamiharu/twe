@@ -124,8 +124,8 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                                     }
                                     continue;
                                 }
-                                if (React.isValidElement(node) && node.props.children) {
-                                    const result = findFirstTextNode(node.props.children);
+                                if (React.isValidElement(node) && (node.props as { children?: React.ReactNode }).children) {
+                                    const result = findFirstTextNode((node.props as { children?: React.ReactNode }).children);
                                     if (result) {
                                         return { text: result.text, location: [i, ...result.location] };
                                     }
@@ -164,11 +164,12 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
 
                                 // Recursive step
                                 if (React.isValidElement(node)) {
-                                    const newChildren = cloneAndStrip(node.props.children, path.slice(1));
+                                    const nodeProps = node.props as { children?: React.ReactNode };
+                                    const newChildren = cloneAndStrip(nodeProps.children, path.slice(1));
                                     nodeArray[index] = React.cloneElement(node, {
-                                        ...node.props,
+                                        ...nodeProps,
                                         children: newChildren
-                                    });
+                                    } as React.Attributes & { children?: React.ReactNode });
                                 }
 
                                 return nodeArray;

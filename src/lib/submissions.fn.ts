@@ -201,7 +201,7 @@ export const createSubmission = createServerFn({ method: "POST" })
             };
 
         } catch (error) {
-            logger.error('Error submitting solution:', error);
+            console.error('Error submitting solution:', error);
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error',
@@ -230,7 +230,6 @@ export const getSubmissions = createServerFn({ method: "GET" })
             const { db } = await import('@/db');
             const { submissions, challenges } = await import('@/db/schema');
             const { eq, and, desc, sql } = await import('drizzle-orm');
-            const { logger } = await import('@/lib/logger');
 
             const headers = getRequestHeaders();
             const session = await auth.api.getSession({ headers });
@@ -291,7 +290,7 @@ export const getSubmissions = createServerFn({ method: "GET" })
                 },
             };
         } catch (error) {
-            logger.error('Error fetching submissions:', error);
+            console.error('Error fetching submissions:', error);
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error',

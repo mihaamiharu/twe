@@ -12,7 +12,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
             const { auth } = await import('./auth.server');
             const { db } = await import('@/db');
             const { users, submissions, challenges } = await import('@/db/schema');
-            const { count, desc, eq, sql, gte } = await import('drizzle-orm');
+            const { count, desc, sql, gte } = await import('drizzle-orm');
 
             const headers = getRequestHeaders();
             const session = await auth.api.getSession({ headers });
@@ -183,7 +183,7 @@ export const getAdminBugs = createServerFn({ method: "GET" })
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
             const { db } = await import('@/db');
-            const { bugReports } = await import('@/db/schema');
+            const { bugReports: _bugReports } = await import('@/db/schema');
 
             const headers = getRequestHeaders();
             const session = await auth.api.getSession({ headers });
@@ -235,12 +235,25 @@ export const updateBugStatus = createServerFn({ method: "POST" })
                 return { success: false, error: 'Unauthorized' };
             }
 
+            type BugReportUpdate = {
+                status?: typeof input.status;
+                adminNotes?: string;
+                updatedAt: Date;
+            };
+
+            const updateData: BugReportUpdate = {
+                updatedAt: new Date()
+            };
+
+            if (input.status) {
+                updateData.status = input.status;
+            }
+            if (input.adminNotes !== undefined) {
+                updateData.adminNotes = input.adminNotes;
+            }
+
             await db.update(bugReports)
-                .set({
-                    ...(input.status ? { status: input.status } : {}),
-                    ...(input.adminNotes !== undefined ? { adminNotes: input.adminNotes } : {}),
-                    updatedAt: new Date()
-                })
+                .set(updateData as typeof bugReports.$inferInsert)
                 .where(eq(bugReports.id, input.id));
 
             return { success: true, message: 'Bug report updated' };

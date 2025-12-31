@@ -39,7 +39,7 @@ async function cleanupLegacyChallenges() {
         });
 
         // Delete them
-        const result = await db
+        await db
             .delete(challenges)
             .where(inArray(challenges.slug, legacySlugs));
 

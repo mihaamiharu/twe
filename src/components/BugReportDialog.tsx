@@ -123,8 +123,6 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
         submitMutation.mutate(data);
     };
 
-    const selectedSeverity = form.watch('severity');
-    const SeverityIcon = severityConfig[selectedSeverity]?.icon || Info;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>

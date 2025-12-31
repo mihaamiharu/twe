@@ -10,7 +10,7 @@ import {
     calculateBonusXP,
     formatXP,
     getLevelTitle,
-    type Difficulty
+
 } from '../../lib/gamification';
 
 describe('gamification', () => {

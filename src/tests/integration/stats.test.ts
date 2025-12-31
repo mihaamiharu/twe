@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
+import { describe, test, expect, beforeAll, beforeEach } from 'bun:test';
 import { db, users, challenges, progress, achievements } from '../../db';
 import { getUserStats, getEarnedAchievementIds, awardAchievements } from '../../lib/stats';
 import { setupTestDb, truncateTables } from './setup';

@@ -1,7 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
-import { challenges, progress, testCases, submissions, tutorials } from '@/db/schema';
-import { eq, and, asc, desc, sql, gt, like, or } from 'drizzle-orm';
+import { challenges, progress, testCases, submissions } from '@/db/schema';
+import { eq, and, asc, desc, sql, gt, or } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { obfuscate } from '@/lib/obfuscator';
@@ -38,7 +38,7 @@ export const getChallenges = createServerFn({ method: 'GET' })
                         or(
                             eq(challenges.type, 'CSS_SELECTOR'),
                             eq(challenges.type, 'XPATH_SELECTOR')
-                        )
+                        )!
                     );
                 } else {
                     conditions.push(eq(challenges.type, filters.type));
@@ -55,13 +55,13 @@ export const getChallenges = createServerFn({ method: 'GET' })
                     or(
                         sql`${challenges.title} ILIKE ${`%${filters.search}%`}`,
                         sql`${challenges.description} ILIKE ${`%${filters.search}%`}`
-                    )
+                    )!
                 );
             }
 
             // Get total count
             const [countResult] = await db
-                .select({ count: sql<number>`count(*)::int` })
+                .select({ count: sql<number>`count(*):: int` })
                 .from(challenges)
                 .where(and(...conditions));
 
@@ -158,6 +158,7 @@ const ChallengeDetailSchema = z.object({
 
 export const getChallenge = createServerFn({ method: 'GET' })
     .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
+    // @ts-expect-error TanStack Start type inference issue with complex handler return types
     .handler(async ({ data: { slug } }) => {
         try {
             // Dynamically import server-only modules
@@ -223,7 +224,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
 
             // Count hidden test cases
             const hiddenTestCasesCountResult = await db
-                .select({ count: sql<number>`count(*)::int` })
+                .select({ count: sql<number>`count(*):: int` })
                 .from(testCases)
                 .where(
                     and(

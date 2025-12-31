@@ -89,12 +89,12 @@ export interface Challenge {
     description: string;
     type: string;
     difficulty: string;
-    category?: string;
+    category: string | null;
     xpReward: number;
     order: number;
     completionCount: number;
-    isCompleted?: boolean;
-    tags?: string[];
+    isCompleted: boolean;
+    tags: string[] | null;
 }
 
 export interface ChallengesResponse {
@@ -137,7 +137,7 @@ function ChallengesPage() {
     const filteredChallenges = useMemo(() => {
         if (!challenges) return [];
         return challenges.filter((c: Challenge) => {
-            if (filterTier !== 'all' && getTierFromCategory(c.category) !== filterTier) return false;
+            if (filterTier !== 'all' && getTierFromCategory(c.category ?? undefined) !== filterTier) return false;
             return true;
         });
     }, [challenges, filterTier]);
@@ -158,7 +158,7 @@ function ChallengesPage() {
 
         // Sort by order within each category
         for (const category in groups) {
-            groups[category].sort((a, b) => (a as any).order - (b as any).order);
+            groups[category].sort((a, b) => a.order - b.order);
         }
 
         return groups;
@@ -179,7 +179,7 @@ function ChallengesPage() {
         };
 
         challenges.forEach(c => {
-            const tier = getTierFromCategory(c.category);
+            const tier = getTierFromCategory(c.category ?? undefined);
             if (tiers[tier]) {
                 tiers[tier].total++;
                 if (c.isCompleted) {
