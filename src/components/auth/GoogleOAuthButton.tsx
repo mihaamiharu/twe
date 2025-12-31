@@ -32,7 +32,7 @@ export function GoogleOAuthButton({
             type="button"
             variant="outline"
             className="w-full gap-3"
-            onClick={handleClick}
+            onClick={() => void handleClick()}
             disabled={isLoading}
         >
             {isLoading ? (

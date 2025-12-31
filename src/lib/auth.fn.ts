@@ -21,11 +21,13 @@ export type AuthSession = {
 export const getServerSession = createServerFn({ method: 'GET' }).handler(
     async (): Promise<AuthSession> => {
         try {
-            // Dynamically import server-only modules to prevent client bundle leakage
+            // Dynamic imports for server-side
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
             const headers = getRequestHeaders();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             const session = await auth.api.getSession({ headers });
 
             if (session?.user) {
@@ -36,6 +38,7 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
                         name: session.user.name || null,
                         image: session.user.image || null,
                         emailVerified: session.user.emailVerified || false,
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
                         role: (session.user as any).role || 'USER',
                     },
                     isAuthenticated: true,

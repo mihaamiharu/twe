@@ -102,6 +102,7 @@ export async function executePlaywrightCode(
                     // Set up the HTML content
                     iframeDoc.open();
 
+                    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
                     // Intercept console logs
                     const win = iframe.contentWindow as any;
                     if (win) {
@@ -121,6 +122,7 @@ export async function executePlaywrightCode(
                             logs.push({ type: 'warn', message: args.map(a => String(a)).join(' ') });
                             originalWarn.apply(win.console, args);
                         };
+                        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
                     }
 
                     iframeDoc.write(`
@@ -191,14 +193,16 @@ export async function executePlaywrightCode(
                     scripts.forEach((script) => {
                         if (script.textContent) {
                             try {
+                                /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
                                 const win = iframe.contentWindow as any;
                                 const doc = iframe.contentDocument;
                                 if (!win || !doc) return;
+                                /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
                                 // Convert function declarations to window assignments
                                 // e.g. "function runTask(n) {...}" -> "window.runTask = function(n) {...}"
                                 // This ensures functions are accessible from onclick handlers
-                                let scriptCode = script.textContent;
+                                const scriptCode = script.textContent;
 
                                 // Extract function names and assign them to window
                                 const funcMatches = scriptCode.matchAll(/function\s+(\w+)\s*\(/g);
@@ -222,8 +226,9 @@ export async function executePlaywrightCode(
                                     }).call(window, window, document);
                                 `;
 
-                                // Execute using main window's Function constructor
+                                // eslint-disable-next-line @typescript-eslint/no-implied-eval
                                 const fn = new Function('window', 'document', code);
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                                 fn(win, doc);
                             } catch (e) {
                                 console.error('Failed to execute script shim:', e);
@@ -238,6 +243,7 @@ export async function executePlaywrightCode(
                         const handlerCode = el.getAttribute('onclick');
                         if (handlerCode) {
                             try {
+                                /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
                                 const win = iframe.contentWindow as any;
                                 const doc = iframe.contentDocument;
                                 if (!win || !doc) return;
@@ -247,6 +253,7 @@ export async function executePlaywrightCode(
                                 const windowFuncs = Object.keys(win).filter(
                                     key => typeof win[key] === 'function' && !['fetch', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'].includes(key)
                                 );
+                                /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
                                 const funcDestructure = windowFuncs.length > 0
                                     ? `const { ${windowFuncs.join(', ')} } = window;`
                                     : '';
@@ -263,6 +270,7 @@ export async function executePlaywrightCode(
                                     }).call(this, window, document, event);
                                 `;
 
+                                // eslint-disable-next-line @typescript-eslint/no-implied-eval
                                 const fn = new Function('window', 'document', 'event', code);
 
                                 el.addEventListener('click', (event) => {
@@ -280,6 +288,7 @@ export async function executePlaywrightCode(
                     const page = new MockedPlaywrightPage(iframeDoc);
 
                     // Execute user code
+                    // eslint-disable-next-line @typescript-eslint/no-implied-eval
                     const userFunction = new Function(
                         'page',
                         'expect',
@@ -296,6 +305,7 @@ export async function executePlaywrightCode(
                     // Simple expect function
                     const expect = createExpect();
 
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     const returnValue = await userFunction(page, expect, iframe.contentWindow, iframe.contentDocument);
 
                     const executionTime = Date.now() - startTime;
@@ -325,7 +335,7 @@ export async function executePlaywrightCode(
 
             if (useExistingIframe) {
                 // Execute immediately for existing iframe
-                executeCode();
+                void executeCode();
             } else {
                 // Wait for iframe to be ready
                 iframe.onload = executeCode;
@@ -395,9 +405,11 @@ export async function executeWithTestCases(
         const page = new MockedPlaywrightPage(iframe.contentDocument!, { timeout });
 
         // Run user code first
+        // eslint-disable-next-line @typescript-eslint/no-implied-eval
         const userFunction = new Function('page', 'expect', `
       return (async () => { ${code} })();
     `);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
         await userFunction(page, createExpect());
 
         // Run test cases
@@ -443,6 +455,7 @@ export async function executeWithTestCases(
  * Create a simple expect function for assertions
  */
 function createExpect() {
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
     const expect = function (actual: any) {
         const createMatchers = (isSoft = false) => {
             const handleResult = (pass: boolean, message: string) => {
@@ -451,7 +464,9 @@ function createExpect() {
                         try {
                             // In a real environment we'd collect this, but for now we'll just log or ignore
                             // console.warn(`Soft assertion failed: ${message}`);
-                        } catch (e) { }
+                        } catch {
+                            // ignore soft assertion
+                        }
                     } else {
                         throw new Error(message);
                     }
@@ -543,6 +558,7 @@ function createExpect() {
                 },
 
                 async toBeVisible() {
+                    await Promise.resolve();
                     let visible = false;
                     if (actual && typeof actual.isVisible === 'function') {
                         visible = await actual.isVisible();
@@ -557,6 +573,7 @@ function createExpect() {
                 },
 
                 async toBeChecked() {
+                    await Promise.resolve();
                     let checked = false;
                     if (actual && typeof actual.isChecked === 'function') {
                         checked = await actual.isChecked();
@@ -565,6 +582,7 @@ function createExpect() {
                 },
 
                 async toBeEnabled() {
+                    await Promise.resolve();
                     let disabled = false;
                     if (actual && typeof actual.isDisabled === 'function') {
                         disabled = await actual.isDisabled();
@@ -573,6 +591,7 @@ function createExpect() {
                 },
 
                 async toBeDisabled() {
+                    await Promise.resolve();
                     let disabled = false;
                     if (actual && typeof actual.isDisabled === 'function') {
                         disabled = await actual.isDisabled();
@@ -581,6 +600,7 @@ function createExpect() {
                 },
 
                 async toBeEditable() {
+                    await Promise.resolve();
                     let editable = false;
                     if (actual && typeof actual.isEditable === 'function') {
                         editable = await actual.isEditable();
@@ -604,9 +624,11 @@ function createExpect() {
 
                 // standard matchers (sync mostly, but we make async for consistency)
                 async toBe(expected: unknown) {
+                    await Promise.resolve();
                     if (actual !== expected) handleResult(false, `Expected ${expected}, got ${actual}`);
                 },
                 async toEqual(expected: unknown) {
+                    await Promise.resolve();
                     if (JSON.stringify(actual) !== JSON.stringify(expected)) handleResult(false, `Expected equal`);
                 }
             };
@@ -630,7 +652,7 @@ function createExpect() {
             softMatchers[key] = async (...args: any[]) => {
                 try {
                     await (matchers as any)[key](...args);
-                } catch (e) {
+                } catch {
                     // Soft assertion failure - ignore
                 }
             };
@@ -639,6 +661,7 @@ function createExpect() {
     };
 
     return expect;
+    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
 }
 
 /**

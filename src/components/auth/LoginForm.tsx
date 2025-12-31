@@ -101,7 +101,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                 </CardDescription>
             </CardHeader>
 
-            <form onSubmit={handleSubmit} method="post">
+            <form onSubmit={(e) => void handleSubmit(e)} method="post">
                 <CardContent className="space-y-6">
                     {formError && (
                         <div

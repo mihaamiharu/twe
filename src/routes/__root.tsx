@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
     },
   }),
   mutationCache: new MutationCache({
-    onError: (error, _variables, _context, _mutation) => {
+    onError: (error) => {
       logger.error(`Mutation Error:`, error);
     },
   }),

@@ -23,6 +23,7 @@ export default tseslint.config(
     ignores: [
       'node_modules/**',
       'dist/**',
+      '.archive/**',
       '.output/**',
       'build/**',
       '.vinxi/**',

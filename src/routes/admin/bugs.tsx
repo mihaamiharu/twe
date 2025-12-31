@@ -53,7 +53,7 @@ function BugManager() {
     queryFn: async () => {
       const res = await getAdminBugs();
       if (!res.success) throw new Error(res.error || 'Failed to fetch bugs');
-      return res.data!;
+      return res.data;
     },
   });
 

@@ -36,7 +36,7 @@ export function validateCSSSelector(selector: string): ValidationResult {
             // Simple regex validation for server-side
             // This catches obvious errors but isn't comprehensive
             const invalidPatterns = [
-                /^[^a-zA-Z#.\[:*]/, // Must start with valid character
+                /^[^a-zA-Z#.[*]/, // Must start with valid character
                 /\[\s*$/, // Unclosed bracket
                 /\(\s*$/, // Unclosed parenthesis
                 /^##/, // Double hash

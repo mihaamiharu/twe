@@ -41,7 +41,7 @@ export function Header() {
 
   const user = session?.user;
   const isAuthenticated = !!user;
-  const isAdmin = (user as any)?.role === 'ADMIN';
+  const isAdmin = (user as { role?: string })?.role === 'ADMIN';
 
   const handleSignOut = async () => {
     try {
@@ -164,7 +164,7 @@ export function Header() {
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
-                      onClick={handleSignOut}
+                      onClick={() => void handleSignOut()}
                       className="cursor-pointer text-destructive focus:text-destructive"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
@@ -267,7 +267,7 @@ export function Header() {
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
-                      handleSignOut();
+                      void handleSignOut();
                     }}
                     className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
                   >
