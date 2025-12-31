@@ -81,7 +81,7 @@ function HomePage() {
       title: 'Selectors',
       description: 'Master CSS and XPath selectors - the foundation of web testing',
       skills: ['CSS Selectors', 'XPath Queries', 'Element Targeting'],
-      count: stats?.tiers.basic || 23,
+      count: (stats?.tiers.basic || 0),
     },
     {
       tier: 'Beginner',
@@ -89,7 +89,7 @@ function HomePage() {
       title: 'JavaScript',
       description: 'Learn JavaScript fundamentals for test automation',
       skills: ['Variables & Types', 'DOM Manipulation', 'Async/Await'],
-      count: stats?.tiers.beginner || 23,
+      count: (stats?.tiers.beginner || 0),
     },
     {
       tier: 'Intermediate',
@@ -97,7 +97,7 @@ function HomePage() {
       title: 'Playwright',
       description: 'Build real automated tests with Playwright',
       skills: ['Navigation', 'Locators', 'Assertions', 'Waits'],
-      count: stats?.tiers.intermediate || 32,
+      count: (stats?.tiers.intermediate || 0),
     },
     {
       tier: 'Expert',
@@ -105,7 +105,7 @@ function HomePage() {
       title: 'Advanced',
       description: 'Professional patterns for production testing',
       skills: ['Page Objects', 'Data-Driven', 'CI/CD'],
-      count: stats?.tiers.expert || 18,
+      count: (stats?.tiers.expert || 0),
     },
   ];
 

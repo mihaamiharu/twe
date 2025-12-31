@@ -11,7 +11,7 @@ import { obfuscate } from '@/lib/obfuscator';
 // ----------------------------------------------------------------------------
 
 const ChallengeFiltersSchema = z.object({
-    type: z.enum(['JAVASCRIPT', 'PLAYWRIGHT', 'CSS_SELECTOR', 'XPATH_SELECTOR']).optional(),
+    type: z.enum(['JAVASCRIPT', 'PLAYWRIGHT', 'CSS_SELECTOR', 'XPATH_SELECTOR', 'SELECTOR']).optional(),
     difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
     category: z.string().optional(),
     search: z.string().optional(),
@@ -33,7 +33,16 @@ export const getChallenges = createServerFn({ method: 'GET' })
             const conditions = [eq(challenges.isPublished, true)];
 
             if (filters.type) {
-                conditions.push(eq(challenges.type, filters.type));
+                if (filters.type === 'SELECTOR') {
+                    conditions.push(
+                        or(
+                            eq(challenges.type, 'CSS_SELECTOR'),
+                            eq(challenges.type, 'XPATH_SELECTOR')
+                        )
+                    );
+                } else {
+                    conditions.push(eq(challenges.type, filters.type));
+                }
             }
             if (filters.difficulty) {
                 conditions.push(eq(challenges.difficulty, filters.difficulty));

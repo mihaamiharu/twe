@@ -56,9 +56,9 @@ async function fetchStats() {
 
     for (const tier of tierCounts) {
         const category = tier.category?.toLowerCase() || '';
-        if (category.includes('basic') || category.includes('selector')) {
+        if (category.includes('basic') || category.includes('selector') || category.includes('xpath')) {
             tiers.basic += tier.count;
-        } else if (category.includes('beginner') || category.includes('javascript')) {
+        } else if (category.includes('beginner') || category.includes('javascript') || category.startsWith('js-')) {
             tiers.beginner += tier.count;
         } else if (category.includes('intermediate') || category.includes('playwright')) {
             tiers.intermediate += tier.count;
