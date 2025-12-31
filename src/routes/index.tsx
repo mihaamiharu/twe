@@ -81,7 +81,7 @@ function HomePage() {
       title: 'Selectors',
       description: 'Master CSS and XPath selectors - the foundation of web testing',
       skills: ['CSS Selectors', 'XPath Queries', 'Element Targeting'],
-      count: stats?.tiers.basic || 23,
+      count: (stats?.tiers.basic || 0),
     },
     {
       tier: 'Beginner',
@@ -89,7 +89,7 @@ function HomePage() {
       title: 'JavaScript',
       description: 'Learn JavaScript fundamentals for test automation',
       skills: ['Variables & Types', 'DOM Manipulation', 'Async/Await'],
-      count: stats?.tiers.beginner || 23,
+      count: (stats?.tiers.beginner || 0),
     },
     {
       tier: 'Intermediate',
@@ -97,7 +97,7 @@ function HomePage() {
       title: 'Playwright',
       description: 'Build real automated tests with Playwright',
       skills: ['Navigation', 'Locators', 'Assertions', 'Waits'],
-      count: stats?.tiers.intermediate || 32,
+      count: (stats?.tiers.intermediate || 0),
     },
     {
       tier: 'Expert',
@@ -105,7 +105,7 @@ function HomePage() {
       title: 'Advanced',
       description: 'Professional patterns for production testing',
       skills: ['Page Objects', 'Data-Driven', 'CI/CD'],
-      count: stats?.tiers.expert || 18,
+      count: (stats?.tiers.expert || 0),
     },
   ];
 
@@ -419,16 +419,13 @@ function HomePage() {
 
               <div className="space-y-6 text-lg text-muted-foreground leading-relaxed font-reading">
                 <p>
-                  When I started my career, I had zero QA experience. I was fortunate to have seniors who patiently guided me, explaining concepts I struggled with and showing me the ropes.
+                  I started my career with zero QA experience. I survived those early days thanks to patient seniors who coached me through the hard parts.
                 </p>
                 <p>
-                  <strong className="text-foreground font-medium">But I know not everyone has that senior who patiently guides them.</strong>
+                  <strong className="text-foreground font-medium">TestingWithEkki is my way of passing that forward.</strong>
                 </p>
                 <p>
-                  I created this platform to try and be that one for you, passing knowledge forward and breaking down complex concepts into hands-on lessons.
-                </p>
-                <p className="italic text-foreground font-medium">
-                  It's the kind of guidance I wish I knew when I started.
+                  Not everyone has a mentor to guide them, so I’m building the resource I wish I had: practical, hands-on lessons that actually make sense.
                 </p>
               </div>
 

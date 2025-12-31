@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useLocation } from '@tanstack/react-router';
 import { useState } from 'react';
 import {
   BookOpen,
@@ -36,6 +36,8 @@ const navLinks = [
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const location = useLocation();
+  const isAuthPage = location.pathname.startsWith('/login') || location.pathname.startsWith('/register');
   const { data: session, isPending } = useSession();
 
   const user = session?.user;
@@ -172,14 +174,16 @@ export function Header() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="hidden md:flex items-center gap-2">
-                  <Button variant="ghost" asChild>
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                  <Button asChild>
-                    <Link to="/login">Get Started</Link>
-                  </Button>
-                </div>
+                !isAuthPage && (
+                  <div className="hidden md:flex items-center gap-2">
+                    <Button variant="ghost" asChild>
+                      <Link to="/login">Sign In</Link>
+                    </Button>
+                    <Button asChild>
+                      <Link to="/register">Get Started</Link>
+                    </Button>
+                  </div>
+                )
               )}
 
               {/* Mobile menu button */}
@@ -273,23 +277,25 @@ export function Header() {
                   </button>
                 </>
               ) : (
-                <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    className="w-full"
-                    asChild
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Link to="/login">Sign In</Link>
-                  </Button>
-                  <Button
-                    className="w-full"
-                    asChild
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Link to="/login">Get Started</Link>
-                  </Button>
-                </div>
+                !isAuthPage && (
+                  <div className="space-y-2">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      asChild
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Link to="/login">Sign In</Link>
+                    </Button>
+                    <Button
+                      className="w-full"
+                      asChild
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Link to="/register">Get Started</Link>
+                    </Button>
+                  </div>
+                )
               )}
             </div>
           </nav>

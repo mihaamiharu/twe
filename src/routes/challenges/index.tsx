@@ -36,8 +36,30 @@ export const Route = createFileRoute('/challenges/')({
     })
 });
 
-// Challenge type colors and icons
-const typeConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
+// Main tech pillars for filtering
+const filterConfig: Record<string, { color: string; icon: React.ReactNode; label: string; types: string[] }> = {
+    SELECTOR: {
+        color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+        icon: <Palette className="h-4 w-4" />,
+        label: 'Selectors',
+        types: ['CSS_SELECTOR', 'XPATH_SELECTOR'],
+    },
+    JAVASCRIPT: {
+        color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
+        icon: <Code className="h-4 w-4" />,
+        label: 'JavaScript',
+        types: ['JAVASCRIPT'],
+    },
+    PLAYWRIGHT: {
+        color: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+        icon: <Code className="h-4 w-4" />,
+        label: 'Playwright',
+        types: ['PLAYWRIGHT'],
+    }
+};
+
+// Detailed badge config for challenge cards
+const challengeTypeConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
     JAVASCRIPT: {
         color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
         icon: <Code className="h-4 w-4" />,
@@ -298,8 +320,8 @@ function ChallengesPage() {
                         >
                             All Types
                         </Badge>
-                        {Object.entries(typeConfig).map(([type, config]) => {
-                            const count = challenges.filter(c => c.type === type).length;
+                        {Object.entries(filterConfig).map(([type, config]) => {
+                            const count = challenges.filter(c => config.types.includes(c.type)).length;
                             if (count === 0) return null;
                             const isSelected = filterType === type;
                             return (
@@ -373,7 +395,7 @@ function ChallengesPage() {
                                     /* Grid View */
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {categoryChallenges.map((challenge, index) => {
-                                            const config = typeConfig[challenge.type] || typeConfig.JAVASCRIPT;
+                                            const config = challengeTypeConfig[challenge.type] || challengeTypeConfig.JAVASCRIPT;
                                             const isComingSoon = challenge.tags?.includes('coming-soon');
 
                                             const ChallengeCard = (
@@ -470,7 +492,7 @@ function ChallengesPage() {
                                             </TableHeader>
                                             <TableBody>
                                                 {categoryChallenges.map((challenge, index) => {
-                                                    const config = typeConfig[challenge.type] || typeConfig.JAVASCRIPT;
+                                                    const config = challengeTypeConfig[challenge.type] || challengeTypeConfig.JAVASCRIPT;
                                                     const isComingSoon = challenge.tags?.includes('coming-soon');
 
                                                     if (isComingSoon) {
