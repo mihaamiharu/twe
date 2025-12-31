@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { signIn } from '@/lib/auth.client';
 import { signInSchema, type SignInInput } from '@/lib/validations';
 import { Button } from '@/components/ui/button';
@@ -43,6 +44,8 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
         }
     };
 
+    const queryClient = useQueryClient();
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setFormError('');
@@ -75,6 +78,9 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                 return;
             }
 
+            // Invalidate auth query to trigger router re-check
+            await queryClient.invalidateQueries({ queryKey: ['auth', 'session'] });
+
             onSuccess?.();
         } catch (err) {
             setFormError('An unexpected error occurred. Please try again.');
@@ -96,7 +102,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
             </CardHeader>
 
             <form onSubmit={handleSubmit} method="post">
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6">
                     {formError && (
                         <div
                             role="alert"
@@ -151,7 +157,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                     </div>
                 </CardContent>
 
-                <CardFooter className="flex flex-col gap-4">
+                <CardFooter className="flex flex-col gap-4 pt-4">
                     <Button type="submit" className="w-full" disabled={isLoading}>
                         {isLoading ? (
                             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
