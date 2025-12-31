@@ -17,7 +17,7 @@ import appCss from '@/styles.css?url';
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
-      logger.error(`Query Error: ${query.queryKey}`, error);
+      logger.error(`Query Error: ${JSON.stringify(query.queryKey)}`, error);
     },
   }),
   mutationCache: new MutationCache({

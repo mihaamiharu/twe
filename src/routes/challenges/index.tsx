@@ -121,8 +121,8 @@ function ChallengesPage() {
             const result = await getChallenges({
                 data: {
                     limit: 500,
-                    type: filterType === 'all' ? undefined : filterType as any,
-                    difficulty: filterDifficulty === 'all' ? undefined : filterDifficulty as any,
+                    type: filterType === 'all' ? undefined : filterType as 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR',
+                    difficulty: filterDifficulty === 'all' ? undefined : filterDifficulty as 'EASY' | 'MEDIUM' | 'HARD',
                     search: debouncedSearchQuery || undefined,
                 }
             });

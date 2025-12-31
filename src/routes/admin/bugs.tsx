@@ -30,9 +30,9 @@ import {
 type BugStatus = 'NEW' | 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'WONT_FIX';
 
 export const Route = createFileRoute('/admin/bugs')({
-  loader: async ({ context }) => {
+  loader: ({ context }) => {
     const session = context.auth;
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
       throw redirect({
         to: '/',
       });
@@ -65,8 +65,8 @@ function BugManager() {
       if (!res.success) throw new Error(res.error || 'Failed to update bug');
       return res;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-bugs'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['admin-bugs'] });
       toast.success('Bug report updated successfully');
       setIsOpen(false);
     },

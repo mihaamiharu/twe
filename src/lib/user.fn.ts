@@ -50,7 +50,7 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
@@ -249,7 +249,7 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {

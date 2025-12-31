@@ -3,80 +3,84 @@ import { useEffect, useRef } from 'react';
 import { useTheme } from '@/components/theme-provider';
 
 export const Route = createFileRoute('/docs/api')({
-    component: ApiDocsPage,
+  component: ApiDocsPage,
 });
 
 function ApiDocsPage() {
-    const containerRef = useRef<HTMLDivElement>(null);
-    const initializedRef = useRef(false);
-    const { resolvedTheme } = useTheme();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const initializedRef = useRef(false);
+  const { resolvedTheme } = useTheme();
 
-    useEffect(() => {
-        if (initializedRef.current) return;
-        initializedRef.current = true;
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
 
-        // Dynamically load Swagger UI
-        const loadSwaggerUI = async () => {
-            // Load CSS
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css';
-            document.head.appendChild(link);
+    // Dynamically load Swagger UI
+    const loadSwaggerUI = () => {
+      // Load CSS
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css';
+      document.head.appendChild(link);
 
-            // Load standalone preset first
-            const presetScript = document.createElement('script');
-            presetScript.src = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js';
-            document.body.appendChild(presetScript);
+      // Load standalone preset first
+      const presetScript = document.createElement('script');
+      presetScript.src = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js';
+      document.body.appendChild(presetScript);
 
-            // Load main bundle
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js';
-            script.onload = () => {
-                // Wait a bit for standalone preset to be available
-                setTimeout(() => {
-                    // @ts-expect-error - SwaggerUIBundle is loaded from CDN
-                    if (window.SwaggerUIBundle && containerRef.current) {
-                        // @ts-expect-error - SwaggerUIBundle is loaded from CDN
-                        window.SwaggerUIBundle({
-                            url: '/openapi.json',
-                            dom_id: '#swagger-ui',
-                            deepLinking: true,
-                            presets: [
-                                // @ts-expect-error - SwaggerUIBundle is loaded from CDN
-                                window.SwaggerUIBundle.presets.apis,
-                            ],
-                            plugins: [
-                                // @ts-expect-error - SwaggerUIBundle is loaded from CDN
-                                window.SwaggerUIBundle.plugins.DownloadUrl,
-                            ],
-                            defaultModelsExpandDepth: 1,
-                            defaultModelExpandDepth: 1,
-                            docExpansion: 'list',
-                            filter: true,
-                            showExtensions: true,
-                            showCommonExtensions: true,
-                        });
-                    }
-                }, 100);
+      // Load main bundle
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js';
+      script.onload = () => {
+        // Wait a bit for standalone preset to be available
+        setTimeout(() => {
+          // Define types for SwaggerUI on window
+          const win = window as unknown as {
+            SwaggerUIBundle: ((config: unknown) => void) & {
+              presets: { apis: unknown };
+              plugins: { DownloadUrl: unknown };
             };
-            document.body.appendChild(script);
-        };
+          } & Window;
 
-        loadSwaggerUI();
-    }, []);
+          if (win.SwaggerUIBundle && containerRef.current) {
+            win.SwaggerUIBundle({
+              url: '/openapi.json',
+              dom_id: '#swagger-ui',
+              deepLinking: true,
+              presets: [
+                win.SwaggerUIBundle.presets.apis,
+              ],
+              plugins: [
+                win.SwaggerUIBundle.plugins.DownloadUrl,
+              ],
+              defaultModelsExpandDepth: 1,
+              defaultModelExpandDepth: 1,
+              docExpansion: 'list',
+              filter: true,
+              showExtensions: true,
+              showCommonExtensions: true,
+            });
+          }
+        }, 100);
+      };
+      document.body.appendChild(script);
+    };
 
-    const isDark = resolvedTheme === 'dark';
+    loadSwaggerUI();
+  }, []);
 
-    return (
-        <div className={`min-h-screen ${isDark ? 'swagger-dark' : ''}`}>
-            <div className="max-w-7xl mx-auto py-4 px-4">
-                <div
-                    id="swagger-ui"
-                    ref={containerRef}
-                    className="swagger-ui-container"
-                />
-            </div>
-            <style>{`
+  const isDark = resolvedTheme === 'dark';
+
+  return (
+    <div className={`min-h-screen ${isDark ? 'swagger-dark' : ''}`}>
+      <div className="max-w-7xl mx-auto py-4 px-4">
+        <div
+          id="swagger-ui"
+          ref={containerRef}
+          className="swagger-ui-container"
+        />
+      </div>
+      <style>{`
         /* Light mode styles */
         .swagger-ui .topbar { display: none; }
         .swagger-ui .info { margin: 20px 0; }
@@ -189,6 +193,6 @@ function ApiDocsPage() {
           background: transparent !important;
         }
       `}</style>
-        </div>
-    );
+    </div>
+  );
 }

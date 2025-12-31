@@ -42,13 +42,13 @@ function SettingsPage() {
             if (!result.success) {
                 throw new Error(result.error || 'Failed to update profile');
             }
-            return result.data;
+            return result.data as { name?: string; email?: string;[key: string]: unknown };
         },
-        onSuccess: () => {
+        onSuccess: async () => {
             toast.success('Settings updated', {
                 description: 'Your profile information has been saved.',
             });
-            queryClient.invalidateQueries({ queryKey: ['user'] });
+            await queryClient.invalidateQueries({ queryKey: ['user'] });
         },
         onError: (error: Error) => {
             toast.error('Update failed', {
