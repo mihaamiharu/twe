@@ -25,32 +25,30 @@ interface Tutorial {
     description: string;
     content: string;
     estimatedMinutes: number;
-    tags?: string[];
+    tags: string[] | null;
     viewCount: number;
-    createdAt: string;
-    updatedAt: string;
-    userProgress?: {
+    createdAt: Date;
+    updatedAt: Date;
+    isPublished: boolean;
+    order: number;
+    difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+    userProgress: {
         isCompleted: boolean;
         readingProgress: number | null;
-        lastAccessedAt: string;
-    };
-    nextTutorial?: {
+        lastAccessedAt: Date;
+    } | null;
+    nextTutorial: {
         slug: string;
         title: string;
     } | null;
-    challenges?: Array<{
+    challenges: Array<{
         slug: string;
         title: string;
         difficulty: 'EASY' | 'MEDIUM' | 'HARD';
         type: string;
         xpReward: number;
-        category: string;
+        category: string | null;
     }>;
-}
-
-interface TutorialResponse {
-    success: boolean;
-    data: Tutorial;
 }
 
 function TutorialDetailPage() {
@@ -113,8 +111,6 @@ function TutorialDetailPage() {
     const progressRef = useRef(readingProgress);
     // Track if user has actively scrolled (to prevent premature progress on page load)
     const hasScrolledRef = useRef(false);
-    // Track initial scroll position to detect real user scrolling
-    const initialScrollRef = useRef(0);
 
     // Sync ref with state
     useEffect(() => {

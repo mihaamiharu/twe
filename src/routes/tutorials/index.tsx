@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { createFileRoute, Link, useSearch, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { getTutorials } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,28 +24,6 @@ export const Route = createFileRoute('/tutorials/')({
         ]
     })
 });
-
-interface Tutorial {
-    id: string;
-    slug: string;
-    title: string;
-    description: string;
-    estimatedMinutes: number;
-    tags?: string[];
-    isCompleted?: boolean;
-    viewCount: number;
-}
-
-interface TutorialsResponse {
-    success: boolean;
-    data: Tutorial[];
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-        totalPages: number;
-    };
-}
 
 const difficulties = ['All', 'Beginner', 'Intermediate', 'Advanced'];
 

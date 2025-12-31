@@ -281,7 +281,7 @@ export class MockedPlaywrightPage {
         return this.targetDocument.title;
     }
 
-    async waitForLoadState(state?: string): Promise<void> {
+    async waitForLoadState(_state?: string): Promise<void> {
         await this.delay(100);
     }
 
@@ -323,7 +323,7 @@ export class MockedPlaywrightPage {
         await this.delay(ms);
     }
 
-    async screenshot(options?: any): Promise<Buffer> {
+    async screenshot(_options?: unknown): Promise<Buffer> {
         logger.debug('Mocking screenshot');
         return Buffer.from('');
     }
@@ -361,7 +361,6 @@ export class MockedPlaywrightPage {
     }
 
     frameLocator(selector: string): FrameLocator {
-        const frameElement = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
         const self = this;
 
         return {
@@ -425,7 +424,7 @@ export class MockedPlaywrightPage {
             },
             first() { return this; },
             last() { return this; },
-            nth(i) { return this; }
+            nth(_i) { return this; }
         };
     }
 
@@ -633,11 +632,11 @@ export class MockedPlaywrightPage {
 
     private _createAPIRequestContext(): APIRequestContext {
         return {
-            get: async (url) => this._mockResponse(),
-            post: async (url) => this._mockResponse(),
-            put: async (url) => this._mockResponse(),
-            delete: async (url) => this._mockResponse(),
-            fetch: async (url) => this._mockResponse(),
+            get: async (_url) => this._mockResponse(),
+            post: async (_url) => this._mockResponse(),
+            put: async (_url) => this._mockResponse(),
+            delete: async (_url) => this._mockResponse(),
+            fetch: async (_url) => this._mockResponse(),
             storageState: async () => ({ cookies: [], origins: [] }),
             newContext: async () => this._createAPIRequestContext()
         };
@@ -816,7 +815,7 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new Event('input', { bubbles: true }));
             },
 
-            async dragTo(target: Locator): Promise<void> {
+            async dragTo(_target: Locator): Promise<void> {
                 const sourceEl = getElement();
                 if (!sourceEl) throw new Error('Source element not found');
                 sourceEl.dispatchEvent(new DragEvent('dragstart', { bubbles: true }));

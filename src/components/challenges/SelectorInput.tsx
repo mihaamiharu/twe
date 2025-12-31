@@ -11,7 +11,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
 import { Check, Copy, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { validateSelector, type SelectorType, type ValidationResult } from '@/lib/selector-validator';
 

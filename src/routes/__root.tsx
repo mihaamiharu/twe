@@ -1,5 +1,5 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
-import { getServerSession, type AuthSession } from '@/lib/auth.fn';
+import { type AuthSession } from '@/lib/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
@@ -21,7 +21,7 @@ const queryClient = new QueryClient({
     },
   }),
   mutationCache: new MutationCache({
-    onError: (error, _variables, _context, mutation) => {
+    onError: (error, _variables, _context, _mutation) => {
       logger.error(`Mutation Error:`, error);
     },
   }),

@@ -1,17 +1,28 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminChallenges, updateChallengeStatus } from '@/lib/admin.fn';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, BookOpen, Clock, Layout, Zap, Eye, EyeOff } from 'lucide-react';
+import { ArrowLeft, Clock, Layout, Eye, EyeOff, Search } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { useState, useMemo } from 'react';
-import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+
+interface AdminChallenge {
+    id: string;
+    title: string;
+    slug: string;
+    type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
+    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+    xpReward: number;
+    order: number;
+    isPublished: boolean;
+    tags: string[] | null;
+}
 
 export const Route = createFileRoute('/admin/challenges')({
     loader: async ({ context }) => {
@@ -42,7 +53,7 @@ function ChallengeManager() {
         if (!challenges) return [];
         const query = searchQuery.toLowerCase().trim();
         if (!query) return challenges;
-        return challenges.filter((c: any) =>
+        return challenges.filter((c: AdminChallenge) =>
             c.title?.toLowerCase().includes(query) ||
             c.slug?.toLowerCase().includes(query)
         );
@@ -109,7 +120,7 @@ function ChallengeManager() {
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                filteredChallenges.map((challenge: any) => {
+                                filteredChallenges.map((challenge: AdminChallenge) => {
                                     const isComingSoon = challenge.tags?.includes('coming-soon');
                                     return (
                                         <TableRow key={challenge.id}>

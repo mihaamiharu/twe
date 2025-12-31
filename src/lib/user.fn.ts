@@ -9,7 +9,7 @@ import { z } from 'zod';
 export type UserData = {
     id: string;
     email: string;
-    name: string;
+    name: string | null;
     image?: string;
     createdAt: Date;
     xp: number;
@@ -40,7 +40,6 @@ export type UserData = {
         title: string;
         xp: number;
         date: string;
-        timestamp: number;
     }[];
 };
 
