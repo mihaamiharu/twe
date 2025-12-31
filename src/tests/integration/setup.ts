@@ -22,7 +22,7 @@ export async function truncateTables() {
     for (const table of tables) {
         try {
             await db.execute(sql.raw(`TRUNCATE TABLE "${table}" CASCADE`));
-        } catch (e) {
+        } catch {
             // Table might not exist yet if migrations haven't run
         }
     }

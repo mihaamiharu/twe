@@ -84,7 +84,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
             // Get user progress
             let userProgress: Record<string, { isCompleted: boolean; readingProgress: number }> = {};
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (session?.user?.id) {
@@ -193,7 +193,7 @@ export const getTutorial = createServerFn({ method: 'GET' })
             // User progress
             let userProgressData = null;
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (session?.user?.id) {
@@ -266,7 +266,7 @@ export const updateTutorialProgress = createServerFn({ method: "POST" })
             const { tutorials, progress } = await import('@/db/schema');
             const { eq, and } = await import('drizzle-orm');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
@@ -345,7 +345,7 @@ export const completeTutorial = createServerFn({ method: "POST" })
             const { checkAchievements } = await import('@/lib/achievements');
             const { getUserStats, getEarnedAchievementIds, awardAchievements } = await import('@/lib/stats');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {

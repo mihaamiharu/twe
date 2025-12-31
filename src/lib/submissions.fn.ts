@@ -32,7 +32,7 @@ export const createSubmission = createServerFn({ method: "POST" })
             const { getUserStats, getEarnedAchievementIds, awardAchievements } = await import('@/lib/stats');
             const { logger } = await import('@/lib/logger');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
@@ -231,7 +231,7 @@ export const getSubmissions = createServerFn({ method: "GET" })
             const { submissions, challenges } = await import('@/db/schema');
             const { eq, and, desc, sql } = await import('drizzle-orm');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {

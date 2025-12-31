@@ -40,9 +40,9 @@ interface RecentSubmission {
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
-  loader: async ({ context }) => {
+  loader: ({ context }) => {
     const session = context.auth;
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
       throw redirect({
         to: '/',
       });

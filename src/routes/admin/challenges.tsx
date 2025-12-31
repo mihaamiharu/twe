@@ -25,9 +25,9 @@ interface AdminChallenge {
 }
 
 export const Route = createFileRoute('/admin/challenges')({
-    loader: async ({ context }) => {
+    loader: ({ context }) => {
         const session = context.auth;
-        if (!session?.user || (session.user as any).role !== 'ADMIN') {
+        if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
             throw redirect({
                 to: '/',
             });
@@ -65,8 +65,8 @@ function ChallengeManager() {
             if (!res.success) throw new Error(res.error || 'Failed to update challenge');
             return res;
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-challenges'] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ['admin-challenges'] });
             toast.success('Challenge updated successfully');
         },
         onError: () => {
