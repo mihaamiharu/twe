@@ -173,7 +173,7 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
             ]
                 .sort((a, b) => b.timestamp - a.timestamp)
                 .slice(0, 10) // Limit to 10 items
-                .map(({ timestamp, date, ...rest }) => ({
+                .map(({ date, ...rest }) => ({
                     ...rest,
                     date: new Intl.DateTimeFormat('en-US', {
                         month: 'short',

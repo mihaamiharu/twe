@@ -51,10 +51,11 @@ class Logger {
         if (isProd && !config.enableInProd && level !== 'error') {
             return false;
         }
+        // eslint-disable-next-line security/detect-object-injection
         return LOG_LEVELS[level] >= LOG_LEVELS[config.level];
     }
 
-    private formatMessage(level: LogLevel, message: string): any[] {
+    private formatMessage(level: LogLevel, message: string): unknown[] {
         const timestamp = new Date().toISOString();
         const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
 
@@ -64,35 +65,36 @@ class Logger {
         }
 
         // Client-side (Browser formatting)
-        const styles = {
+        const styles: Record<string, string> = {
             debug: 'color: #9ca3af', // gray-400
             info: 'color: #60a5fa',  // blue-400
             warn: 'color: #f59e0b',  // amber-500
             error: 'color: #ef4444; font-weight: bold', // red-500
         };
 
+        // eslint-disable-next-line security/detect-object-injection
         return [`%c${prefix}`, styles[level], message];
     }
 
-    debug(message: string, ...args: any[]) {
+    debug(message: string, ...args: unknown[]) {
         if (this.shouldLog('debug')) {
             console.debug(...this.formatMessage('debug', message), ...args);
         }
     }
 
-    info(message: string, ...args: any[]) {
+    info(message: string, ...args: unknown[]) {
         if (this.shouldLog('info')) {
             console.info(...this.formatMessage('info', message), ...args);
         }
     }
 
-    warn(message: string, ...args: any[]) {
+    warn(message: string, ...args: unknown[]) {
         if (this.shouldLog('warn')) {
             console.warn(...this.formatMessage('warn', message), ...args);
         }
     }
 
-    error(message: string, ...args: any[]) {
+    error(message: string, ...args: unknown[]) {
         if (this.shouldLog('error')) {
             console.error(...this.formatMessage('error', message), ...args);
         }

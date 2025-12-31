@@ -77,7 +77,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
                 })
                 .from(tutorials)
                 .where(and(...conditions))
-                .orderBy(orderFn(sortColumn!))
+                .orderBy(orderFn(sortColumn))
                 .limit(filters.limit)
                 .offset(offset);
 

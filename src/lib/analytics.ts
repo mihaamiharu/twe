@@ -28,6 +28,7 @@ export function trackEvent<T extends AnalyticsEvent['name']>(
     // Check if gtag is available (only in browser with GA loaded)
     if (typeof window === 'undefined') return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const gtag = (window as any).gtag;
     if (typeof gtag !== 'function') {
         // GA not loaded, skip tracking
@@ -37,6 +38,7 @@ export function trackEvent<T extends AnalyticsEvent['name']>(
         return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     gtag('event', eventName, params);
 }
 
@@ -46,9 +48,11 @@ export function trackEvent<T extends AnalyticsEvent['name']>(
 export function trackPageView(path: string, title: string): void {
     if (typeof window === 'undefined') return;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
     const gtag = (window as any).gtag;
     if (typeof gtag !== 'function') return;
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     gtag('event', 'page_view', {
         page_path: path,
         page_title: title,

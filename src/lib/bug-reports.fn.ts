@@ -24,11 +24,13 @@ export const createBugReport = createServerFn({ method: "POST" })
             const { logger } = await import('@/lib/logger');
             const { sendBugReportNotification } = await import('@/lib/email.server');
 
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const headers = getRequestHeaders();
             let userId: string | null = null;
             let userEmail: string | null = null;
 
             try {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 const session = await auth.api.getSession({ headers });
                 userId = session?.user?.id || null;
                 userEmail = session?.user?.email || null;
@@ -95,7 +97,8 @@ export const createBugReport = createServerFn({ method: "POST" })
                 message: 'Bug report submitted successfully. Thank you for your feedback!',
             };
 
-        } catch (error) {
+        } catch (ignored) {
+            const error = ignored as Error;
             console.error('Error creating bug report:', error);
             // Don't expose internal errors
             return {

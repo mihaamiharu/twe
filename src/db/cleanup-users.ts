@@ -57,4 +57,4 @@ async function cleanupUsers() {
     process.exit(0);
 }
 
-cleanupUsers();
+await cleanupUsers();
