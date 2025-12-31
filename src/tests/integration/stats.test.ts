@@ -106,7 +106,7 @@ describe('Stats Integration', () => {
         expect(stats.tutorialsCompleted).toBe(0);
     });
 
-    test('should throw error if user not found', async () => {
+    test('should throw error if user not found', () => {
         expect(getUserStats('00000000-0000-0000-0000-000000000404')).rejects.toThrow('User not found');
     });
 

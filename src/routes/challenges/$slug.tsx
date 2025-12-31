@@ -102,7 +102,7 @@ function ChallengeDetailPage() {
                 description: 'Stay tuned for updates on our roadmap.',
                 duration: 4000
             });
-            navigate({ to: '/challenges' });
+            void navigate({ to: '/challenges' });
         }
     }, [error, navigate]);
 
@@ -216,7 +216,7 @@ function ChallengeDetailPage() {
 
             return response;
         },
-        onSuccess: (response) => {
+        onSuccess: async (response) => {
             if (response.success && response.data) {
                 setLastSubmissionResult({
                     xpEarned: response.data.submission.xpEarned,
@@ -255,9 +255,9 @@ function ChallengeDetailPage() {
                 }
 
                 // Invalidate queries to refresh progress
-                queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
-                queryClient.invalidateQueries({ queryKey: ['profile'] });
-                queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+                await queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
+                await queryClient.invalidateQueries({ queryKey: ['profile'] });
+                await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
             }
         },
         onError: (error: Error) => {
@@ -378,7 +378,7 @@ function ChallengeDetailPage() {
                     onRetry={() => setShowSuccessDialog(false)}
                     onNextChallenge={data?.nextChallenge ? () => {
                         setShowSuccessDialog(false);
-                        navigate({ to: '/challenges/$slug', params: { slug: data.nextChallenge!.slug } });
+                        void navigate({ to: '/challenges/$slug', params: { slug: data.nextChallenge!.slug } });
                     } : undefined}
                 />
             )}
