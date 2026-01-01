@@ -33,7 +33,7 @@ export function AuthGuardDialog({
             search: {
                 redirect: location.pathname,
             },
-        });
+        }).catch(console.error);
     };
 
     return (

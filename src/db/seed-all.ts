@@ -18,7 +18,7 @@ const seedScripts = [
     'src/db/seed-achievements.ts',
 ];
 
-async function runAllSeeds() {
+function runAllSeeds() {
     console.log('🌱 Running all seed scripts for staging environment...\n');
 
     for (const script of seedScripts) {
@@ -27,7 +27,7 @@ async function runAllSeeds() {
 
         try {
             execSync(`bun run ${script}`, { stdio: 'inherit' });
-        } catch (error) {
+        } catch {
             console.error(`\n❌ Failed to run ${script}`);
             process.exit(1);
         }

@@ -25,32 +25,30 @@ interface Tutorial {
     description: string;
     content: string;
     estimatedMinutes: number;
-    tags?: string[];
+    tags: string[] | null;
     viewCount: number;
-    createdAt: string;
-    updatedAt: string;
-    userProgress?: {
+    createdAt: Date;
+    updatedAt: Date;
+    isPublished: boolean;
+    order: number;
+    difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+    userProgress: {
         isCompleted: boolean;
         readingProgress: number | null;
-        lastAccessedAt: string;
-    };
-    nextTutorial?: {
+        lastAccessedAt: Date;
+    } | null;
+    nextTutorial: {
         slug: string;
         title: string;
     } | null;
-    challenges?: Array<{
+    challenges: Array<{
         slug: string;
         title: string;
         difficulty: 'EASY' | 'MEDIUM' | 'HARD';
         type: string;
         xpReward: number;
-        category: string;
+        category: string | null;
     }>;
-}
-
-interface TutorialResponse {
-    success: boolean;
-    data: Tutorial;
 }
 
 function TutorialDetailPage() {
@@ -82,13 +80,13 @@ function TutorialDetailPage() {
             if (!result.success) throw new Error(result.error);
             return result;
         },
-        onSuccess: (response) => {
+        onSuccess: async (response) => {
             toast.success('Tutorial completed! 🎉');
-            queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
-            queryClient.invalidateQueries({ queryKey: ['tutorials'] });
-            queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
-            queryClient.invalidateQueries({ queryKey: ['profile'] });
-            queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+            await queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
+            await queryClient.invalidateQueries({ queryKey: ['tutorials'] });
+            await queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
+            await queryClient.invalidateQueries({ queryKey: ['profile'] });
+            await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
 
             // Show toast notifications for new achievements
             if (response?.newAchievements?.length) {
@@ -113,8 +111,6 @@ function TutorialDetailPage() {
     const progressRef = useRef(readingProgress);
     // Track if user has actively scrolled (to prevent premature progress on page load)
     const hasScrolledRef = useRef(false);
-    // Track initial scroll position to detect real user scrolling
-    const initialScrollRef = useRef(0);
 
     // Sync ref with state
     useEffect(() => {
@@ -129,7 +125,6 @@ function TutorialDetailPage() {
         }
 
         let scrollListenerAttached = false;
-        let attachTimeout: ReturnType<typeof setTimeout>;
 
         const handleWindowScroll = () => {
             if (!contentRef.current) return;
@@ -172,7 +167,7 @@ function TutorialDetailPage() {
 
         // Delay attaching the scroll listener to let the page settle after SPA navigation
         // This prevents the listener from firing with stale scrollY from the previous page
-        attachTimeout = setTimeout(() => {
+        const attachTimeout = setTimeout(() => {
             // Only attach if we're at the top of the page (scroll reset completed)
             if (window.scrollY === 0) {
                 hasScrolledRef.current = false;
@@ -354,7 +349,7 @@ function TutorialDetailPage() {
                                         {tutorial.nextTutorial && (
                                             <Button
                                                 className="w-full"
-                                                onClick={() => navigate({ to: '/tutorials/$slug', params: { slug: tutorial.nextTutorial!.slug } })}
+                                                onClick={() => { void navigate({ to: '/tutorials/$slug', params: { slug: tutorial.nextTutorial!.slug } }) }}
                                             >
                                                 Next: {tutorial.nextTutorial.title}
                                                 <ArrowRight className="h-4 w-4 ml-2" />

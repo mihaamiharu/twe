@@ -25,18 +25,18 @@ export const getTutorials = createServerFn({ method: 'GET' })
             const { db } = await import('@/db');
             const { tutorials, progress } = await import('@/db/schema');
             const { eq, and, asc, desc, sql, or } = await import('drizzle-orm');
-            const { logger } = await import('@/lib/logger');
 
             // Build conditions
             const conditions = [eq(tutorials.isPublished, true)];
 
             if (filters.search) {
-                conditions.push(
-                    or(
-                        sql`${tutorials.title} ILIKE ${`%${filters.search}%`}`,
-                        sql`${tutorials.description} ILIKE ${`%${filters.search}%`}`
-                    )
+                const searchCondition = or(
+                    sql`${tutorials.title} ILIKE ${`%${filters.search}%`}`,
+                    sql`${tutorials.description} ILIKE ${`%${filters.search}%`}`
                 );
+                if (searchCondition) {
+                    conditions.push(searchCondition);
+                }
             }
 
             if (filters.tag) {
@@ -77,14 +77,14 @@ export const getTutorials = createServerFn({ method: 'GET' })
                 })
                 .from(tutorials)
                 .where(and(...conditions))
-                .orderBy(orderFn(sortColumn!))
+                .orderBy(orderFn(sortColumn))
                 .limit(filters.limit)
                 .offset(offset);
 
             // Get user progress
             let userProgress: Record<string, { isCompleted: boolean; readingProgress: number }> = {};
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (session?.user?.id) {
@@ -136,7 +136,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
                 },
             };
         } catch (error) {
-            logger.error('Error fetching tutorials:', error);
+            console.error('Error fetching tutorials:', error);
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error',
@@ -163,7 +163,6 @@ export const getTutorial = createServerFn({ method: 'GET' })
             const { db } = await import('@/db');
             const { tutorials, progress, challenges } = await import('@/db/schema');
             const { eq, and, asc, gt } = await import('drizzle-orm');
-            const { logger } = await import('@/lib/logger');
 
             // Fetch tutorial
             const tutorial = await db.query.tutorials.findFirst({
@@ -194,7 +193,7 @@ export const getTutorial = createServerFn({ method: 'GET' })
             // User progress
             let userProgressData = null;
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (session?.user?.id) {
@@ -240,7 +239,7 @@ export const getTutorial = createServerFn({ method: 'GET' })
             };
 
         } catch (error) {
-            logger.error('Error fetching tutorial detail:', error);
+            console.error('Error fetching tutorial detail:', error);
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error',
@@ -267,7 +266,7 @@ export const updateTutorialProgress = createServerFn({ method: "POST" })
             const { tutorials, progress } = await import('@/db/schema');
             const { eq, and } = await import('drizzle-orm');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
@@ -346,7 +345,7 @@ export const completeTutorial = createServerFn({ method: "POST" })
             const { checkAchievements } = await import('@/lib/achievements');
             const { getUserStats, getEarnedAchievementIds, awardAchievements } = await import('@/lib/stats');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
@@ -426,7 +425,7 @@ export const completeTutorial = createServerFn({ method: "POST" })
             };
 
         } catch (error) {
-            logger.error('Error completing tutorial:', error);
+            console.error('Error completing tutorial:', error);
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error',

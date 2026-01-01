@@ -3,7 +3,7 @@ import {
     validateCSSSelector,
     validateXPath,
     testCSSSelector,
-    testXPath,
+
     testSelectorAgainstTarget,
     generateSelectorHint
 } from '../../lib/selector-validator';

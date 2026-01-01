@@ -9,6 +9,13 @@
 
 import { logger } from '@/lib/logger';
 
+export interface FilePayload {
+    name: string;
+    mimeType: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    buffer: any;
+}
+
 export interface Locator {
     click(): Promise<void>;
     fill(value: string): Promise<void>;
@@ -27,7 +34,7 @@ export interface Locator {
     first(): Locator;
     last(): Locator;
     nth(index: number): Locator;
-    setInputFiles(files: any): Promise<void>;
+    setInputFiles(files: FilePayload | FilePayload[]): Promise<void>;
     dragTo(target: Locator): Promise<void>;
     press(key: string): Promise<void>;
     locator(selector: string): Locator;
@@ -39,13 +46,13 @@ export interface LocatorOptions {
 }
 
 export interface APIRequestContext {
-    get(url: string, options?: any): Promise<APIResponse>;
-    post(url: string, options?: any): Promise<APIResponse>;
-    put(url: string, options?: any): Promise<APIResponse>;
-    delete(url: string, options?: any): Promise<APIResponse>;
-    fetch(url: string, options?: any): Promise<APIResponse>;
-    storageState(options?: any): Promise<any>;
-    newContext(options?: any): Promise<APIRequestContext>;
+    get(url: string, options?: unknown): Promise<APIResponse>;
+    post(url: string, options?: unknown): Promise<APIResponse>;
+    put(url: string, options?: unknown): Promise<APIResponse>;
+    delete(url: string, options?: unknown): Promise<APIResponse>;
+    fetch(url: string, options?: unknown): Promise<APIResponse>;
+    storageState(options?: unknown): Promise<{ cookies: unknown[]; origins: unknown[] }>;
+    newContext(options?: unknown): Promise<APIRequestContext>;
 }
 
 export interface APIResponse {
@@ -53,18 +60,18 @@ export interface APIResponse {
     status(): number;
     statusText(): string;
     headers(): Record<string, string>;
-    json(): Promise<any>;
+    json(): Promise<unknown>;
     text(): Promise<string>;
     body(): Promise<Buffer>;
 }
 
 export interface BrowserContext {
     tracing: {
-        start(options?: any): Promise<void>;
-        stop(options?: any): Promise<void>;
+        start(options?: unknown): Promise<void>;
+        stop(options?: unknown): Promise<void>;
     };
-    cookies(): Promise<any[]>;
-    addCookies(cookies: any[]): Promise<void>;
+    cookies(): Promise<unknown[]>;
+    addCookies(cookies: unknown[]): Promise<void>;
     clearCookies(): Promise<void>;
     newPage(): Promise<MockedPlaywrightPage>;
     close(): Promise<void>;
@@ -72,7 +79,7 @@ export interface BrowserContext {
 }
 
 export interface Browser {
-    newContext(options?: any): Promise<BrowserContext>;
+    newContext(options?: unknown): Promise<BrowserContext>;
     close(): Promise<void>;
     version(): string;
 }
@@ -115,13 +122,10 @@ export class MockedPlaywrightPage {
     // Core Actions
     // ============================================
 
-    async goto(url: string): Promise<void> {
+    goto(url: string): Promise<void> {
         // Mock navigation
-        // In a real browser this would change the URL
-        // Here we can just pretend or update history if needed
-        // For now, doing nothing is often enough for "happy path" checks as long as we don't assert URL immediately differently
-        // But some assertions check title.
         logger.debug(`Navigating to ${url}`);
+        return Promise.resolve();
     }
 
     async click(selector: string): Promise<void> {
@@ -173,42 +177,42 @@ export class MockedPlaywrightPage {
     /**
      * Check if a checkbox is checked
      */
-    async isChecked(selector: string): Promise<boolean> {
+    isChecked(selector: string): Promise<boolean> {
         return this.locator(selector).isChecked();
     }
 
     /**
      * Check if element is disabled
      */
-    async isDisabled(selector: string): Promise<boolean> {
+    isDisabled(selector: string): Promise<boolean> {
         return this.locator(selector).isDisabled();
     }
 
     /**
      * Check if element is editable
      */
-    async isEditable(selector: string): Promise<boolean> {
+    isEditable(selector: string): Promise<boolean> {
         return this.locator(selector).isEditable();
     }
 
     /**
      * Get input value
      */
-    async inputValue(selector: string): Promise<string> {
+    inputValue(selector: string): Promise<string> {
         return this.locator(selector).inputValue();
     }
 
     /**
      * Get element attribute
      */
-    async getAttribute(selector: string, name: string): Promise<string | null> {
+    getAttribute(selector: string, name: string): Promise<string | null> {
         return this.locator(selector).getAttribute(name);
     }
 
     /**
      * Select option
      */
-    async selectOption(selector: string, value: string | string[]): Promise<void> {
+    selectOption(selector: string, value: string | string[]): Promise<void> {
         return this.locator(selector).selectOption(value);
     }
 
@@ -274,23 +278,20 @@ export class MockedPlaywrightPage {
     /**
      * Get page title
      */
-    /**
-     * Get page title
-     */
-    async title(): Promise<string> {
-        return this.targetDocument.title;
+    title(): Promise<string> {
+        return Promise.resolve(this.targetDocument.title);
     }
 
-    async waitForLoadState(state?: string): Promise<void> {
+    async waitForLoadState(): Promise<void> {
         await this.delay(100);
     }
 
-    async waitForFunction(pageFunction: Function | string, arg?: any, options?: any): Promise<void> {
+    async waitForFunction(pageFunction: (...args: unknown[]) => unknown, arg?: unknown, options?: { timeout?: number }): Promise<void> {
         const timeout = options?.timeout || this.defaultTimeout;
         const startTime = Date.now();
 
         while (Date.now() - startTime < timeout) {
-            let result: any;
+            let result: unknown;
             try {
                 if (typeof pageFunction === 'function') {
                     result = await pageFunction(arg);
@@ -298,7 +299,7 @@ export class MockedPlaywrightPage {
                     // Basic support for string evaluation if needed, though strictly we should avoid eval
                     // For now, assume function is passed as per strict TS usage in tests
                 }
-            } catch (e) {
+            } catch {
                 // Ignore errors while waiting
             }
 
@@ -308,13 +309,13 @@ export class MockedPlaywrightPage {
         throw new Error('Timeout waiting for function');
     }
 
-    async waitForResponse(urlOrPredicate: string | RegExp | ((resp: any) => boolean)): Promise<any> {
+    async waitForResponse(urlOrPredicate: string | RegExp | ((resp: unknown) => boolean)): Promise<unknown> {
         await this.delay(500);
         return {
             ok: true,
             status: () => 200,
-            json: async () => ({}),
-            text: async () => '',
+            json: () => Promise.resolve({}),
+            text: () => Promise.resolve(''),
             url: () => typeof urlOrPredicate === 'string' ? urlOrPredicate : '',
         };
     }
@@ -323,14 +324,14 @@ export class MockedPlaywrightPage {
         await this.delay(ms);
     }
 
-    async screenshot(options?: any): Promise<Buffer> {
+    screenshot(): Promise<Buffer> {
         logger.debug('Mocking screenshot');
-        return Buffer.from('');
+        return Promise.resolve(Buffer.from(''));
     }
 
     video(): { path(): Promise<string>; delete(): Promise<void>; saveAs(path: string): Promise<void>; } | null {
         return {
-            path: async () => '/tmp/video.mp4',
+            path: () => Promise.resolve('/tmp/video.mp4'),
             delete: async () => { },
             saveAs: async () => { }
         };
@@ -361,13 +362,10 @@ export class MockedPlaywrightPage {
     }
 
     frameLocator(selector: string): FrameLocator {
-        const frameElement = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-        const self = this;
-
         return {
-            locator(itemSelector: string): Locator {
+            locator: (itemSelector: string): Locator => {
                 const getDoc = () => {
-                    const frame = self.targetDocument.querySelector(selector) as HTMLIFrameElement;
+                    const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
                     if (!frame) throw new Error(`Frame not found: ${selector}`);
                     return frame.contentDocument || frame.contentWindow?.document;
                 };
@@ -379,53 +377,56 @@ export class MockedPlaywrightPage {
                 };
 
                 const proxyHandler = {
-                    get(_target: any, prop: string | symbol) {
+                    get: (_target: unknown, prop: string | symbol) => {
                         const page = createFramePage();
                         const locator = page.locator(itemSelector);
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
                         const value = (locator as any)[prop];
                         if (typeof value === 'function') {
-                            return function (...args: any[]) {
-                                return value.apply(locator, args);
+                            return (...args: unknown[]) => {
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-function-type
+                                return (value as Function).apply(locator, args);
                             };
                         }
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                         return value;
                     }
                 };
                 return new Proxy({}, proxyHandler) as Locator;
             },
-            getByRole(r, o) {
-                const frame = self.targetDocument.querySelector(selector) as HTMLIFrameElement;
+            getByRole: (r, o) => {
+                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
                 const doc = frame?.contentDocument;
                 if (!doc) throw new Error('Frame document not found');
                 return new MockedPlaywrightPage(doc).getByRole(r, o);
             },
-            getByText(t, o) {
-                const frame = self.targetDocument.querySelector(selector) as HTMLIFrameElement;
+            getByText: (t, o) => {
+                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
                 const doc = frame?.contentDocument;
                 if (!doc) throw new Error('Frame document not found');
                 return new MockedPlaywrightPage(doc).getByText(t, o);
             },
-            getByLabel(t, o) {
-                const frame = self.targetDocument.querySelector(selector) as HTMLIFrameElement;
+            getByLabel: (t, o) => {
+                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
                 const doc = frame?.contentDocument;
                 if (!doc) throw new Error('Frame document not found');
                 return new MockedPlaywrightPage(doc).getByLabel(t, o);
             },
-            getByPlaceholder(t, o) {
-                const frame = self.targetDocument.querySelector(selector) as HTMLIFrameElement;
+            getByPlaceholder: (t, o) => {
+                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
                 const doc = frame?.contentDocument;
                 if (!doc) throw new Error('Frame document not found');
                 return new MockedPlaywrightPage(doc).getByPlaceholder(t, o);
             },
-            getByTestId(id) {
-                const frame = self.targetDocument.querySelector(selector) as HTMLIFrameElement;
+            getByTestId: (id) => {
+                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
                 const doc = frame?.contentDocument;
                 if (!doc) throw new Error('Frame document not found');
                 return new MockedPlaywrightPage(doc).getByTestId(id);
             },
             first() { return this; },
             last() { return this; },
-            nth(i) { return this; }
+            nth() { return this; }
         };
     }
 
@@ -528,7 +529,7 @@ export class MockedPlaywrightPage {
                     const forId = label.getAttribute('for');
                     if (forId) {
                         const input = this.targetDocument.getElementById(forId);
-                        if (input) matchingElements.push(input as HTMLElement);
+                        if (input) matchingElements.push(input);
                     } else {
                         // Input might be inside label
                         const input = label.querySelector('input, textarea, select');
@@ -576,7 +577,7 @@ export class MockedPlaywrightPage {
      */
     locator(selector: string): Locator {
         return this.createLocator(() => {
-            return Array.from(this.targetDocument.querySelectorAll(selector)) as HTMLElement[];
+            return Array.from(this.targetDocument.querySelectorAll(selector));
         });
     }
 
@@ -587,27 +588,27 @@ export class MockedPlaywrightPage {
     /**
      * Get inner HTML of any element
      */
-    async innerHTML(selector: string): Promise<string> {
+    innerHTML(selector: string): Promise<string> {
         const element = this.targetDocument.querySelector(selector);
         if (!element) {
-            throw new Error(`Element not found: ${selector}`);
+            return Promise.reject(new Error(`Element not found: ${selector}`));
         }
-        return element.innerHTML;
+        return Promise.resolve(element.innerHTML);
     }
 
     /**
      * Check if element is visible
      */
-    async isElementVisible(selector: string): Promise<boolean> {
+    isElementVisible(selector: string): Promise<boolean> {
         const element = this.targetDocument.querySelector(selector) as HTMLElement;
-        return element ? this.isVisible(element) : false;
+        return Promise.resolve(element ? this.isVisible(element) : false);
     }
 
     /**
      * Get count of matching elements
      */
-    async count(selector: string): Promise<number> {
-        return this.targetDocument.querySelectorAll(selector).length;
+    count(selector: string): Promise<number> {
+        return Promise.resolve(this.targetDocument.querySelectorAll(selector).length);
     }
 
     // ============================================
@@ -633,13 +634,13 @@ export class MockedPlaywrightPage {
 
     private _createAPIRequestContext(): APIRequestContext {
         return {
-            get: async (url) => this._mockResponse(),
-            post: async (url) => this._mockResponse(),
-            put: async (url) => this._mockResponse(),
-            delete: async (url) => this._mockResponse(),
-            fetch: async (url) => this._mockResponse(),
-            storageState: async () => ({ cookies: [], origins: [] }),
-            newContext: async () => this._createAPIRequestContext()
+            get: () => Promise.resolve(this._mockResponse()),
+            post: () => Promise.resolve(this._mockResponse()),
+            put: () => Promise.resolve(this._mockResponse()),
+            delete: () => Promise.resolve(this._mockResponse()),
+            fetch: () => Promise.resolve(this._mockResponse()),
+            storageState: () => Promise.resolve({ cookies: [], origins: [] }),
+            newContext: () => Promise.resolve(this._createAPIRequestContext())
         };
     }
 
@@ -649,29 +650,34 @@ export class MockedPlaywrightPage {
             status: () => 200,
             statusText: () => 'OK',
             headers: () => ({ 'content-type': 'application/json' }),
-            json: async () => ({ success: true, id: 1 }),
-            text: async () => '{"success":true}',
-            body: async () => Buffer.from('')
+            json: () => Promise.resolve({ success: true, id: 1 }),
+            text: () => Promise.resolve('{"success":true}'),
+            body: () => Promise.resolve(Buffer.from(''))
         };
     }
 
     private _createBrowserContext(): BrowserContext {
         return {
             tracing: {
-                start: async () => logger.debug('Tracing started'),
-                stop: async () => logger.debug('Tracing stopped')
+                start: () => {
+                    logger.debug('Tracing started');
+                    return Promise.resolve();
+                },
+                stop: () => {
+                    logger.debug('Tracing stopped');
+                    return Promise.resolve();
+                }
             },
-            cookies: async () => [],
-            addCookies: async () => { },
-            clearCookies: async () => { },
-            newPage: async () => new MockedPlaywrightPage(this.targetDocument),
-            close: async () => { },
+            cookies: () => Promise.resolve([]),
+            addCookies: () => Promise.resolve(),
+            clearCookies: () => Promise.resolve(),
+            newPage: () => Promise.resolve(new MockedPlaywrightPage(this.targetDocument)),
+            close: () => Promise.resolve(),
             request: this._createAPIRequestContext()
         };
     }
 
     private createLocator(finder: () => HTMLElement[]): Locator {
-        const self = this;
         let filterIndex: number | null = null;
         let filterType: 'first' | 'last' | 'nth' | null = null;
 
@@ -687,16 +693,16 @@ export class MockedPlaywrightPage {
         };
 
         const locator: Locator = {
-            async click(): Promise<void> {
-                await self.delay(50);
+            click: async () => {
+                await this.delay(50);
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
-                if (!self.isVisible(el)) throw new Error('Element is not visible');
+                if (!this.isVisible(el)) throw new Error('Element is not visible');
                 el.click();
             },
 
-            async fill(value: string): Promise<void> {
-                await self.delay(50);
+            fill: async (value: string) => {
+                await this.delay(50);
                 const el = getElement() as HTMLInputElement | HTMLTextAreaElement;
                 if (!el) throw new Error('Element not found');
                 el.focus();
@@ -705,41 +711,42 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             },
 
-            async textContent(): Promise<string | null> {
+            textContent: () => {
                 const el = getElement();
-                return el?.textContent || null;
+                return Promise.resolve(el?.textContent || null);
             },
 
-            async inputValue(): Promise<string> {
+            inputValue: () => {
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
-                return el.value;
+                return Promise.resolve(el.value);
             },
 
-            async isVisible(): Promise<boolean> {
+            isVisible: () => {
                 const el = getElement();
-                return el ? self.isVisible(el) : false;
+                return Promise.resolve(el ? this.isVisible(el) : false);
             },
 
-            async isChecked(): Promise<boolean> {
+            isChecked: () => {
                 const el = getElement() as HTMLInputElement;
-                if (!el) return false;
-                return el.checked;
+                if (!el) return Promise.resolve(false);
+                return Promise.resolve(el.checked);
             },
 
-            async isDisabled(): Promise<boolean> {
+            isDisabled: () => {
                 const el = getElement() as HTMLButtonElement | HTMLInputElement;
-                if (!el) return false;
-                return el.disabled;
+                if (!el) return Promise.resolve(false);
+                return Promise.resolve(el.disabled);
             },
 
-            async isEditable(): Promise<boolean> {
+            isEditable: () => {
                 const el = getElement() as HTMLInputElement;
-                if (!el) return false;
-                return !el.readOnly && !el.disabled;
+                if (!el) return Promise.resolve(false);
+                return Promise.resolve(!el.readOnly && !el.disabled);
             },
 
-            async check(): Promise<void> {
+            check: async () => {
+                await this.delay(50);
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'checkbox' && el.type !== 'radio') {
@@ -748,14 +755,16 @@ export class MockedPlaywrightPage {
                 if (!el.checked) el.click();
             },
 
-            async uncheck(): Promise<void> {
+            uncheck: async () => {
+                await this.delay(50);
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'checkbox') throw new Error('Element is not a checkbox');
                 if (el.checked) el.click();
             },
 
-            async selectOption(value: string | string[]): Promise<void> {
+            selectOption: async (value: string | string[]) => {
+                await this.delay(50);
                 const el = getElement() as HTMLSelectElement;
                 if (!el) throw new Error('Element not found');
                 if (el.tagName !== 'SELECT') throw new Error('Element is not a select');
@@ -767,38 +776,38 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             },
 
-            async getAttribute(name: string): Promise<string | null> {
+            getAttribute: (name: string) => {
                 const el = getElement();
-                return el?.getAttribute(name) || null;
+                return Promise.resolve(el?.getAttribute(name) || null);
             },
 
-            async innerHTML(): Promise<string> {
+            innerHTML: () => {
                 const el = getElement();
-                return el?.innerHTML || '';
+                return Promise.resolve(el?.innerHTML || '');
             },
 
-            async count(): Promise<number> {
-                return finder().length;
+            count: () => {
+                return Promise.resolve(finder().length);
             },
 
-            first(): Locator {
+            first: () => {
                 filterType = 'first';
                 return locator;
             },
 
-            last(): Locator {
+            last: () => {
                 filterType = 'last';
                 return locator;
             },
 
-            nth(index: number): Locator {
+            nth: (index: number) => {
                 filterType = 'nth';
                 filterIndex = index;
                 return locator;
             },
 
-            async setInputFiles(files: any): Promise<void> {
-                await self.delay(50);
+            setInputFiles: async (files: FilePayload | FilePayload[]) => {
+                await this.delay(50);
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'file') throw new Error('Element is not a file input');
@@ -816,14 +825,17 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new Event('input', { bubbles: true }));
             },
 
-            async dragTo(target: Locator): Promise<void> {
+            dragTo: async (_target: Locator) => {
+                await this.delay(50);
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const _ = _target;
                 const sourceEl = getElement();
                 if (!sourceEl) throw new Error('Source element not found');
                 sourceEl.dispatchEvent(new DragEvent('dragstart', { bubbles: true }));
             },
 
-            async press(key: string): Promise<void> {
-                await self.delay(50);
+            press: async (key: string) => {
+                await this.delay(50);
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 el.focus();
@@ -831,13 +843,13 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
             },
 
-            locator(subSelector: string): Locator {
-                return self.createLocator(() => {
+            locator: (subSelector: string) => {
+                return this.createLocator(() => {
                     const parents = finder();
                     const children: HTMLElement[] = [];
                     for (const parent of parents) {
-                        const matches = Array.from(parent.querySelectorAll(subSelector)) as HTMLElement[];
-                        children.push(...matches);
+                        const matches = Array.from(parent.querySelectorAll(subSelector));
+                        children.push(...matches as HTMLElement[]);
                     }
                     return children;
                 });

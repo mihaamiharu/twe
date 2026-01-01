@@ -10,7 +10,7 @@
  */
 
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import Editor, { OnMount, OnChange, Monaco } from '@monaco-editor/react';
+import Editor, { type OnMount, type OnChange, type Monaco } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { cn } from '@/lib/utils';
 import { storage } from '@/lib/storage-adapter';
@@ -100,6 +100,7 @@ export function CodeEditor({
 }: CodeEditorProps) {
     const { resolvedTheme } = useTheme();
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+    // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
     const monacoRef = useRef<Monaco | null>(null);
     const [code, setCode] = useState<string>(initialCode);
 
@@ -112,6 +113,7 @@ export function CodeEditor({
     // Apply theme change without re-mounting if possible
     useEffect(() => {
         if (monacoRef.current) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             monacoRef.current.editor.setTheme(monacoTheme);
         }
     }, [monacoTheme]);
@@ -149,7 +151,7 @@ export function CodeEditor({
 
         if (storageKey) {
             setIsStorageLoaded(false); // Start loading
-            loadCode();
+            void loadCode();
         } else {
             setIsStorageLoaded(true);
         }
@@ -162,7 +164,7 @@ export function CodeEditor({
         // Only save if we are loaded and have a key and code
         if (storageKey && isStorageLoaded) {
             const debounceTimer = setTimeout(() => {
-                storage.setItem(storageKey, code);
+                void storage.setItem(storageKey, code);
             }, 500);
             return () => clearTimeout(debounceTimer);
         }
@@ -182,19 +184,24 @@ export function CodeEditor({
     const handleEditorMount: OnMount = useCallback(
         (editor, monaco) => {
             editorRef.current = editor;
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             monacoRef.current = monaco;
 
             // Define custom themes
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             monaco.editor.defineTheme('customDark', CUSTOM_DARK_THEME);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             monaco.editor.defineTheme('customLight', CUSTOM_LIGHT_THEME);
 
             // Set initial theme
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             monaco.editor.setTheme(monacoTheme);
 
             // Add Cmd/Ctrl+Enter keyboard shortcut
             editor.addAction({
                 id: 'run-code',
                 label: 'Run Code',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
                 run: () => {
                     onRun?.(editor.getValue());
@@ -205,10 +212,11 @@ export function CodeEditor({
             editor.addAction({
                 id: 'save-code',
                 label: 'Save Code',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
                 run: () => {
                     if (storageKey) {
-                        storage.setItem(storageKey, editor.getValue());
+                        void storage.setItem(storageKey, editor.getValue());
                     }
                 },
             });
@@ -225,6 +233,7 @@ export function CodeEditor({
             editorRef.current.addAction({
                 id: 'run-code',
                 label: 'Run Code',
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 keybindings: [monacoRef.current.KeyMod.CtrlCmd | monacoRef.current.KeyCode.Enter],
                 run: () => {
                     onRun?.(code);

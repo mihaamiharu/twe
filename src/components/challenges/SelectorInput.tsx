@@ -11,7 +11,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
-import { Card } from '@/components/ui/card';
 import { Check, Copy, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { validateSelector, type SelectorType, type ValidationResult } from '@/lib/selector-validator';
 
@@ -184,7 +183,7 @@ export function SelectorInput({
                     {/* Copy button inside input */}
                     <button
                         type="button"
-                        onClick={handleCopy}
+                        onClick={() => void handleCopy()}
                         disabled={!value || disabled}
                         className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-muted-foreground hover:text-foreground transition-colors mr-1"
                         title="Copy selector"

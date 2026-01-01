@@ -21,7 +21,7 @@ function LoginPage() {
 
     useEffect(() => {
         if (session?.user) {
-            navigate({ to: '/' });
+            void navigate({ to: '/' });
         }
     }, [session, navigate]);
 
@@ -31,9 +31,9 @@ function LoginPage() {
         const redirectUrl = searchParams.get('redirect');
 
         if (redirectUrl) {
-            navigate({ to: redirectUrl });
+            void navigate({ to: redirectUrl });
         } else {
-            navigate({ to: '/' });
+            void navigate({ to: '/' });
         }
     };
 
@@ -42,7 +42,7 @@ function LoginPage() {
             <div className="w-full max-w-md space-y-6 animate-fade-in">
                 <LoginForm
                     onSuccess={handleLoginSuccess}
-                    onRegisterClick={() => navigate({ to: '/register' })}
+                    onRegisterClick={() => { void navigate({ to: '/register' }) }}
                 />
             </div>
         </div>

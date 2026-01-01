@@ -15,11 +15,15 @@ export default tseslint.config(
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    rules: {
+      '@typescript-eslint/only-throw-error': 'off',
+    },
   },
   {
     ignores: [
       'node_modules/**',
       'dist/**',
+      '.archive/**',
       '.output/**',
       'build/**',
       '.vinxi/**',

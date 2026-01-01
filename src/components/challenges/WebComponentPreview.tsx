@@ -42,7 +42,7 @@ export function WebComponentPreview({
     onElementClick,
     onValidationChange,
     showControls = true,
-    height = 300,
+    // height prop is reserved for future use
     className,
     iframeRef: externalIframeRef,
     ...props
@@ -275,14 +275,24 @@ export function WebComponentPreview({
     // Listen for messages from iframe
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
-            if (event.data.type === 'elementClick') {
-                onElementClick?.(event.data.path);
-            } else if (event.data.type === 'elementHover') {
-                setHoveredElement(event.data.path);
-            } else if (event.data.type === 'validationResult') {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+            const data = event.data;
+
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            if (data?.type === 'elementClick') {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+                onElementClick?.(data.path);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            } else if (data?.type === 'elementHover') {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+                setHoveredElement(data.path);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            } else if (data?.type === 'validationResult') {
                 onValidationChange?.({
-                    isValid: event.data.isValid,
-                    matchCount: event.data.matchCount
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+                    isValid: data.isValid,
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+                    matchCount: data.matchCount
                 });
             }
         };

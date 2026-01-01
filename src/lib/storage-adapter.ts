@@ -18,7 +18,7 @@ function getDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open(DB_NAME, DB_VERSION);
 
-        request.onerror = () => reject(request.error);
+        request.onerror = () => reject(request.error || new Error('Unknown IndexedDB open error'));
         request.onsuccess = () => resolve(request.result);
 
         request.onupgradeneeded = (event) => {
@@ -44,7 +44,7 @@ async function withStore<T>(
         const request = callback(store);
 
         transaction.oncomplete = () => resolve(request.result as T);
-        transaction.onerror = () => reject(transaction.error);
+        transaction.onerror = () => reject(transaction.error || new Error('Unknown IndexedDB transaction error'));
     });
 }
 

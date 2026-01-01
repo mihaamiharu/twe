@@ -65,14 +65,14 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             if (!response.success) {
                 setResendStatus('error');
                 setResendError(response.error || 'Failed to resend email');
-                if ((response as any).cooldownRemaining) {
-                    setResendCooldown((response as any).cooldownRemaining);
+                if ((response as { cooldownRemaining?: number }).cooldownRemaining) {
+                    setResendCooldown((response as { cooldownRemaining?: number }).cooldownRemaining!);
                 }
             } else {
                 setResendStatus('success');
                 setResendCooldown(60); // Start 60 second cooldown
             }
-        } catch (err) {
+        } catch {
             setResendStatus('error');
             setResendError('An error occurred. Please try again.');
         } finally {
@@ -188,7 +188,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                         <Button
                             variant="ghost"
                             size="sm"
-                            onClick={handleResendEmail}
+                            onClick={() => void handleResendEmail()}
                             disabled={isResending || resendCooldown > 0}
                             className="mt-2 text-muted-foreground hover:text-foreground"
                         >
@@ -230,7 +230,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                 </CardDescription>
             </CardHeader>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => void handleSubmit(e)}>
                 <CardContent className="space-y-4">
                     {formError && (
                         <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">

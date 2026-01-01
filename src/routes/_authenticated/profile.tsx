@@ -7,7 +7,7 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Award, BookOpen, Code, Settings, Star, Zap, AlertCircle } from 'lucide-react';
+import { Award, BookOpen, Code, Settings, Zap, AlertCircle } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
 import { ActivityHeatmap } from '@/components/gamification/ActivityHeatmap';
 import { getUserSettings } from '@/lib/user.fn';
@@ -20,24 +20,29 @@ interface UserProfile {
     id: string;
     name: string | null;
     email: string;
-    image: string | null;
+    image?: string;
+    createdAt: Date;
     xp: number;
     level: number;
-    createdAt: string;
+    xpProgress: number;
+    xpNeeded: number;
+    xpProgressPercentage: number;
+    profileVisibility: 'PUBLIC' | 'PRIVATE';
+    showOnLeaderboard: boolean;
     stats: {
-        tutorialsCompleted: number;
-        challengesCompleted: number;
-        totalXp: number;
-        currentStreak: number;
+        completedChallenges: number;
+        completedTutorials: number;
+        achievementsCount: number;
         challengesByType: Record<string, number>;
     };
     recentAchievements: {
         name: string;
         description: string;
         icon: string;
+        unlockedAt: Date;
     }[];
     recentActivity: {
-        type: 'challenge' | 'tutorial' | 'achievement';
+        type: 'challenge' | 'achievement';
         title: string;
         xp: number;
         date: string;
@@ -50,24 +55,26 @@ interface UserProfile {
 
 interface ProfileResponse {
     success: boolean;
-    data: UserProfile;
+    data?: UserProfile;
     error?: string;
 }
 
 function ProfilePage() {
     // Auth is guaranteed by _authenticated parent route
-    const { data, isLoading, error } = useQuery<ProfileResponse>({
+    const { data, isLoading, error } = useQuery<ProfileResponse, Error>({
         queryKey: ['profile'],
-        queryFn: async () => {
+        queryFn: async (): Promise<ProfileResponse> => {
             const result = await getUserSettings();
             if (!result.success || !result.data) {
-                throw new Error(result.error || 'Failed to fetch profile');
+                return {
+                    success: false,
+                    error: result.error || 'Failed to fetch profile'
+                };
             }
-            // Transform server function shape (result.data) to expected shape (UserProfile)
-            // The shapes are identical based on the refactor, just need to ensure the return type matches
+            // Cast the result.data to UserProfile
             return {
                 success: true,
-                data: result.data
+                data: result.data as UserProfile
             };
         },
     });
@@ -106,7 +113,7 @@ function ProfilePage() {
     }
 
     // Error state
-    if (error || !data?.success) {
+    if (error || !data?.success || !data?.data) {
         return (
             <div className="min-h-screen p-6 md:p-10 flex items-center justify-center">
                 <div className="text-center">
@@ -175,29 +182,29 @@ function ProfilePage() {
                     <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <BookOpen className="h-8 w-8 text-primary mx-auto mb-2" />
-                            <div className="text-2xl font-bold">{user.stats?.tutorialsCompleted ?? 0}</div>
+                            <div className="text-2xl font-bold">{user.stats.completedTutorials}</div>
                             <div className="text-sm text-muted-foreground">Tutorials</div>
                         </CardContent>
                     </Card>
                     <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Code className="h-8 w-8 text-primary mx-auto mb-2" />
-                            <div className="text-2xl font-bold">{user.stats?.challengesCompleted ?? 0}</div>
+                            <div className="text-2xl font-bold">{user.stats.completedChallenges}</div>
                             <div className="text-sm text-muted-foreground">Challenges</div>
                         </CardContent>
                     </Card>
                     <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Zap className="h-8 w-8 text-accent mx-auto mb-2" />
-                            <div className="text-2xl font-bold">{(user.stats?.totalXp ?? user.xp).toLocaleString()}</div>
+                            <div className="text-2xl font-bold">{user.xp.toLocaleString()}</div>
                             <div className="text-sm text-muted-foreground">Total XP</div>
                         </CardContent>
                     </Card>
                     <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
-                            <Star className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                            <div className="text-2xl font-bold">{user.stats?.currentStreak ?? 0}</div>
-                            <div className="text-sm text-muted-foreground">Day Streak</div>
+                            <Award className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
+                            <div className="text-2xl font-bold">{user.stats.achievementsCount}</div>
+                            <div className="text-sm text-muted-foreground">Achievements</div>
                         </CardContent>
                     </Card>
                 </div>
@@ -315,7 +322,6 @@ function ProfilePage() {
                                                 <div className="flex items-center gap-4">
                                                     <div className="p-2 rounded-lg bg-primary/20">
                                                         {activity.type === 'challenge' && <Code className="h-5 w-5 text-primary" />}
-                                                        {activity.type === 'tutorial' && <BookOpen className="h-5 w-5 text-primary" />}
                                                         {activity.type === 'achievement' && <Award className="h-5 w-5 text-accent" />}
                                                     </div>
                                                     <div>

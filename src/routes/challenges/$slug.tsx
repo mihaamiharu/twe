@@ -1,5 +1,4 @@
 import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
-import { createServerFn } from '@tanstack/react-start';
 import { useCallback, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getChallenge, getChallenges } from '@/lib/challenges.fn';
@@ -13,14 +12,11 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
 import { createSubmission } from '@/lib/submissions.fn';
-import { getTutorial } from '@/lib/tutorials.fn';
-import { useChallengeWorkspaceStore } from '@/lib/store/challenge-workspace-store';
 import { useSession } from '@/lib/auth.client';
 import { trackEvent } from '@/lib/analytics';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 import { TierSkipTip } from '@/components/challenges/TierSkipTip';
 import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
-import { ChallengesResponse } from './index';
 import { showAchievementToasts } from '@/lib/achievement-toast';
 
 export const Route = createFileRoute('/challenges/$slug')({
@@ -79,14 +75,14 @@ function ChallengeDetailPage() {
         queryKey: ['challenge', slug],
         queryFn: async () => {
             if (!slug) throw new Error('Slug is required');
-            const result = await getChallenge({ data: { slug } });
-            if (!result.success) {
+            const result = await getChallenge({ data: { slug } }) as { success: boolean; data?: APIChallenge; error?: string };
+            if (!result.success || !result.data) {
                 if (result.error === 'This challenge is coming soon!') {
                     throw new Error('COMING_SOON'); // Match existing error handling
                 }
-                throw new Error(result.error);
+                throw new Error(result.error || 'Unknown error');
             }
-            return result.data as APIChallenge;
+            return result.data;
         },
         enabled: !!slug,
         retry: (failureCount, error) => {
@@ -106,7 +102,7 @@ function ChallengeDetailPage() {
                 description: 'Stay tuned for updates on our roadmap.',
                 duration: 4000
             });
-            navigate({ to: '/challenges' });
+            void navigate({ to: '/challenges' });
         }
     }, [error, navigate]);
 
@@ -133,8 +129,8 @@ function ChallengeDetailPage() {
         const missing = [];
         for (let i = 0; i < currentTierIndex; i++) {
             const prereqTier = TIER_ORDER[i];
-            const tierChallenges = allChallengesData.data.filter((c: any) => getTierFromCategory(c.category) === prereqTier);
-            const completedInTier = tierChallenges.filter((c: any) => c.isCompleted).length;
+            const tierChallenges = allChallengesData.data.filter((c) => getTierFromCategory(c.category ?? undefined) === prereqTier);
+            const completedInTier = tierChallenges.filter((c) => c.isCompleted).length;
 
             if (tierChallenges.length > 0 && completedInTier < tierChallenges.length) {
                 missing.push({
@@ -207,7 +203,7 @@ function ChallengeDetailPage() {
             testResults: {
                 testCaseId?: string;
                 passed: boolean;
-                output?: any;
+                output?: unknown;
                 error?: string;
             }[];
             executionTime?: number;
@@ -220,12 +216,12 @@ function ChallengeDetailPage() {
 
             return response;
         },
-        onSuccess: (response) => {
+        onSuccess: async (response) => {
             if (response.success && response.data) {
                 setLastSubmissionResult({
                     xpEarned: response.data.submission.xpEarned,
                     achievements: response.data.newAchievements || [],
-                    levelUp: response.data.levelUp,
+                    levelUp: response.data.levelUp ? { newLevel: response.data.levelUp.newLevel, title: `Level ${response.data.levelUp.newLevel}` } : undefined,
                 });
                 setShowSuccessDialog(true);
 
@@ -259,9 +255,9 @@ function ChallengeDetailPage() {
                 }
 
                 // Invalidate queries to refresh progress
-                queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
-                queryClient.invalidateQueries({ queryKey: ['profile'] });
-                queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+                await queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
+                await queryClient.invalidateQueries({ queryKey: ['profile'] });
+                await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
             }
         },
         onError: (error: Error) => {
@@ -382,7 +378,7 @@ function ChallengeDetailPage() {
                     onRetry={() => setShowSuccessDialog(false)}
                     onNextChallenge={data?.nextChallenge ? () => {
                         setShowSuccessDialog(false);
-                        navigate({ to: '/challenges/$slug', params: { slug: data.nextChallenge!.slug } });
+                        void navigate({ to: '/challenges/$slug', params: { slug: data.nextChallenge!.slug } });
                     } : undefined}
                 />
             )}

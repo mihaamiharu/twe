@@ -41,7 +41,7 @@ function ForgotPasswordPage() {
                 redirectTo: '/reset-password',
             });
             setIsSubmitted(true);
-        } catch (err) {
+        } catch {
             // Don't reveal if email exists or not for security
             setIsSubmitted(true);
         } finally {
@@ -104,7 +104,7 @@ function ForgotPasswordPage() {
                     </CardDescription>
                 </CardHeader>
 
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={(e) => { void handleSubmit(e) }}>
                     <CardContent className="space-y-4">
                         {error && (
                             <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
