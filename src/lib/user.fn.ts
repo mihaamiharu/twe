@@ -9,7 +9,7 @@ import { z } from 'zod';
 export type UserData = {
     id: string;
     email: string;
-    name: string;
+    name: string | null;
     image?: string;
     createdAt: Date;
     xp: number;
@@ -40,7 +40,6 @@ export type UserData = {
         title: string;
         xp: number;
         date: string;
-        timestamp: number;
     }[];
 };
 
@@ -51,7 +50,7 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
@@ -174,7 +173,7 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
             ]
                 .sort((a, b) => b.timestamp - a.timestamp)
                 .slice(0, 10) // Limit to 10 items
-                .map(({ timestamp, date, ...rest }) => ({
+                .map(({ date, ...rest }) => ({
                     ...rest,
                     date: new Intl.DateTimeFormat('en-US', {
                         month: 'short',
@@ -250,7 +249,7 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
 
-            const headers = getRequestHeaders();
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {

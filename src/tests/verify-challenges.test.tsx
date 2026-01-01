@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll } from 'bun:test';
+import { describe, test, expect } from 'bun:test';
 import { GlobalRegistrator } from '@happy-dom/global-registrator';
 
 // Ensure DOM exists

@@ -184,7 +184,7 @@ describe('Playwright Shim', () => {
         expect(await page.isElementVisible('#content')).toBe(true);
     });
 
-    test('should handle basic frameLocator', async () => {
+    test('should handle basic frameLocator', () => {
         const iframe = document.createElement('iframe');
         iframe.id = 'my-frame';
         document.body.appendChild(iframe);
@@ -206,7 +206,7 @@ describe('Playwright Shim', () => {
         await page.waitForFunction(() => true);
     });
 
-    test('should throw error when checking non-checkbox', async () => {
+    test('should throw error when checking non-checkbox', () => {
         const div = document.createElement('div');
         div.id = 'not-a-check';
         document.body.appendChild(div);

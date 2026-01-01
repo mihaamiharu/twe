@@ -3,7 +3,9 @@ import { useLocation } from '@tanstack/react-router';
 
 declare global {
     interface Window {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         dataLayer: any[];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         gtag: (...args: any[]) => void;
     }
 }
@@ -21,6 +23,7 @@ export function GoogleAnalytics() {
 
         // Define gtag if it doesn't exist
         if (!window.gtag) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             window.gtag = function (...args: any[]) {
                 window.dataLayer.push(args);
             };

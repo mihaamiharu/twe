@@ -154,13 +154,12 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 }
 
                 // Loose equality check for convenience (string '1' == number 1)
-                // eslint-disable-next-line eqeqeq
                 if (actual != expectedValue && String(actual) !== String(expectedValue)) {
                     validationPassed = false;
                     outputMessage = `Expected: ${JSON.stringify(expectedValue)}, Got: ${JSON.stringify(actual)}`;
                     result.status = 'FAILED';
                 } else {
-                    outputMessage = `Correct! Result is ${actual}`;
+                    outputMessage = `Correct! Result is ${String(actual)}`;
                 }
             }
 
@@ -291,7 +290,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
             if ((e.metaKey || e.ctrlKey) && !e.shiftKey && e.key === 'Enter') {
                 e.preventDefault();
                 if (isCodeChallenge && !isRunning) {
-                    handleRunCode();
+                    void handleRunCode();
                 } else if (isSelectorChallenge && selector) {
                     handleValidateSelector();
                 }
@@ -494,7 +493,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         initialCode={challenge.starterCode}
                                         language="javascript"
                                         onChange={setCode}
-                                        onRun={handleRunCode}
+                                        onRun={() => void handleRunCode()}
                                         storageKey={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                                         height="100%"
                                         className="h-full border-0 rounded-none shadow-none"
@@ -515,7 +514,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                     <Button
                                         variant="default"
                                         size="sm"
-                                        onClick={handleRunCode}
+                                        onClick={() => void handleRunCode()}
                                         disabled={isRunning}
                                         className="font-bold border-2 border-border hard-shadow-sm bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black active:translate-x-[1px] active:translate-y-[1px] active:shadow-none transition-all"
                                         title="Run Code (Cmd/Ctrl + Enter)"
@@ -561,7 +560,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         </Button>
                         <Button
                             variant="destructive"
-                            onClick={confirmReset}
+                            onClick={() => void confirmReset()}
                             className="shadow-sm"
                         >
                             Yes, Reset Code

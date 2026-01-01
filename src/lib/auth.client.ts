@@ -26,6 +26,8 @@ export const forgetPassword = async ({ email, redirectTo }: { email: string; red
         console.error('[Auth] Password reset request failed:', response.status, await response.text());
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return response.json();
 };
 

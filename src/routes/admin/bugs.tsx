@@ -1,9 +1,9 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminBugs, updateBugStatus } from '@/lib/admin.fn';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, CheckCircle2, Circle, Clock, MessageSquare, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -28,10 +27,12 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+type BugStatus = 'NEW' | 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'WONT_FIX';
+
 export const Route = createFileRoute('/admin/bugs')({
-  loader: async ({ context }) => {
+  loader: ({ context }) => {
     const session = context.auth;
-    if (!session?.user || (session.user as any).role !== 'ADMIN') {
+    if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
       throw redirect({
         to: '/',
       });
@@ -42,9 +43,9 @@ export const Route = createFileRoute('/admin/bugs')({
 
 function BugManager() {
   const queryClient = useQueryClient();
-  const [selectedBug, setSelectedBug] = useState<any>(null);
+  const [selectedBug, setSelectedBug] = useState<BugReport | null>(null);
   const [adminNote, setAdminNote] = useState('');
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState<BugStatus>('OPEN');
   const [isOpen, setIsOpen] = useState(false);
 
   const { data: bugs, isLoading } = useQuery({
@@ -56,14 +57,16 @@ function BugManager() {
     },
   });
 
+  type BugReport = NonNullable<typeof bugs>[number];
+
   const updateMutation = useMutation({
-    mutationFn: async (data: { id: string; status?: "OPEN" | "IN_PROGRESS" | "RESOLVED" | "CLOSED"; adminNotes?: string }) => {
+    mutationFn: async (data: { id: string; status?: BugStatus; adminNotes?: string }) => {
       const res = await updateBugStatus({ data });
       if (!res.success) throw new Error(res.error || 'Failed to update bug');
       return res;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-bugs'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['admin-bugs'] });
       toast.success('Bug report updated successfully');
       setIsOpen(false);
     },
@@ -72,7 +75,7 @@ function BugManager() {
     },
   });
 
-  const handleEdit = (bug: any) => {
+  const handleEdit = (bug: BugReport) => {
     setSelectedBug(bug);
     setAdminNote(bug.adminNotes || '');
     setStatus(bug.status);
@@ -125,7 +128,7 @@ function BugManager() {
                   </TableCell>
                 </TableRow>
               ) : (
-                bugs?.map((bug: any) => (
+                bugs?.map((bug) => (
                   <TableRow key={bug.id}>
                     <TableCell>
                       <StatusBadge status={bug.status} />
@@ -178,17 +181,26 @@ function BugManager() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label className="font-semibold">Description</Label>
+                  <Label className="font-semibold">Steps to Reproduce</Label>
                   <div className="border p-2 rounded-md bg-muted/50 text-sm whitespace-pre-wrap">
-                    {selectedBug.description}
+                    {selectedBug.stepsToReproduce}
                   </div>
                 </div>
 
-                {selectedBug.stepsToReproduce && (
+                {selectedBug.expectedBehavior && (
                   <div className="space-y-2">
-                    <Label className="font-semibold">Steps to Reproduce</Label>
+                    <Label className="font-semibold">Expected Behavior</Label>
                     <div className="border p-2 rounded-md bg-muted/50 text-sm whitespace-pre-wrap">
-                      {selectedBug.stepsToReproduce}
+                      {selectedBug.expectedBehavior}
+                    </div>
+                  </div>
+                )}
+
+                {selectedBug.actualBehavior && (
+                  <div className="space-y-2">
+                    <Label className="font-semibold">Actual Behavior</Label>
+                    <div className="border p-2 rounded-md bg-muted/50 text-sm whitespace-pre-wrap">
+                      {selectedBug.actualBehavior}
                     </div>
                   </div>
                 )}
@@ -196,7 +208,7 @@ function BugManager() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Status</Label>
-                    <Select value={status} onValueChange={setStatus}>
+                    <Select value={status} onValueChange={(value) => setStatus(value as BugStatus)}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>

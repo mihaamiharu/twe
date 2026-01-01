@@ -10,6 +10,23 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { getLeaderboard } from '@/lib/leaderboard.fn';
 
+interface LeaderboardEntry {
+    id: string;
+    name: string | null;
+    image: string | null;
+    xp: number;
+    level: number;
+    createdAt: Date | null;
+    challengesCompleted: number;
+    rank: number;
+    displayName: string;
+    badges: {
+        name: string;
+        icon: string;
+        slug: string;
+    }[];
+}
+
 export const Route = createFileRoute('/leaderboard')({
     component: LeaderboardPage,
 });
@@ -27,7 +44,7 @@ function LeaderboardPage() {
         },
     });
 
-    const users = leaderboardData?.data ?? [];
+    const users: LeaderboardEntry[] = leaderboardData?.data ?? [];
 
     const TopThree = users.slice(0, 3);
     const RestUsers = users.slice(3);
@@ -198,7 +215,7 @@ function LeaderboardPage() {
     );
 }
 
-function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: { user: any; rank: number; isCenter?: boolean; isAuthenticated?: boolean }) {
+function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: { user: LeaderboardEntry; rank: number; isCenter?: boolean; isAuthenticated?: boolean }) {
     const borderColor = rank === 1 ? 'border-yellow-500/50' : rank === 2 ? 'border-slate-400/50' : 'border-amber-700/50';
     const bgColor = rank === 1 ? 'bg-yellow-500/10' : rank === 2 ? 'bg-slate-400/10' : 'bg-amber-700/10';
     const ringColor = rank === 1 ? 'ring-yellow-500/30' : rank === 2 ? 'ring-slate-400/30' : 'ring-amber-700/30';
@@ -246,7 +263,7 @@ function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: {
 
                 {/* Badges Row */}
                 <div className="flex justify-center -space-x-2">
-                    {user.badges.slice(0, 3).map((badge: any, i: number) => (
+                    {user.badges.slice(0, 3).map((badge, i: number) => (
                         <div key={i} className="h-8 w-8 rounded-full bg-background border-2 border-border flex items-center justify-center text-sm shadow-sm hover:scale-125 transition-transform z-10 hover:z-20" title={badge.name}>
                             {badge.icon}
                         </div>

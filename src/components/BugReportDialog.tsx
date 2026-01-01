@@ -123,8 +123,6 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
         submitMutation.mutate(data);
     };
 
-    const selectedSeverity = form.watch('severity');
-    const SeverityIcon = severityConfig[selectedSeverity]?.icon || Info;
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
@@ -148,7 +146,7 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                 </DialogHeader>
 
                 <div className="flex-1 overflow-y-auto p-6 pt-2">
-                    <form id="bug-report-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                    <form id="bug-report-form" onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-6">
                         {/* Title */}
                         <div className="space-y-2">
                             <Label htmlFor="title">Bug Title *</Label>

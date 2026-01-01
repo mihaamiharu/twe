@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeAll, afterAll, beforeEach } from 'bun:test';
+import { describe, test, expect, beforeAll, beforeEach } from 'bun:test';
 import { db, users, challenges, progress, achievements } from '../../db';
 import { getUserStats, getEarnedAchievementIds, awardAchievements } from '../../lib/stats';
 import { setupTestDb, truncateTables } from './setup';
@@ -106,7 +106,7 @@ describe('Stats Integration', () => {
         expect(stats.tutorialsCompleted).toBe(0);
     });
 
-    test('should throw error if user not found', async () => {
+    test('should throw error if user not found', () => {
         expect(getUserStats('00000000-0000-0000-0000-000000000404')).rejects.toThrow('User not found');
     });
 
