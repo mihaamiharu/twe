@@ -1,3 +1,4 @@
+
 /**
  * Seed database with tutorials supporting Basic and Beginner tier challenges
  */
@@ -8,7 +9,7 @@ import { readFile } from 'fs/promises';
 import { join } from 'path';
 import { eq } from 'drizzle-orm';
 
-async function seedTutorials() {
+export async function seedTutorials() {
     console.log('\n📚 Seeding Basic tier tutorials...\n');
     console.log('='.repeat(60));
 
@@ -18,7 +19,7 @@ async function seedTutorials() {
             title: 'CSS Selectors for QA Engineers',
             description: 'Master the art of writing robust, maintainable CSS selectors for test automation.',
             estimatedMinutes: 18,
-            tags: ['css', 'selectors', 'qa', 'automation', 'testing'],
+            tags: ['css', 'selectors', 'qa', 'automation', 'testing', 'beginner'],
             contentFile: 'css-selectors-for-qa.md',
             order: 10,
         },
@@ -27,7 +28,7 @@ async function seedTutorials() {
             title: 'XPath for Test Automation',
             description: 'Master XPath selectors to unlock powerful DOM navigation capabilities that CSS cannot provide.',
             estimatedMinutes: 18,
-            tags: ['xpath', 'selectors', 'automation', 'testing', 'advanced'],
+            tags: ['xpath', 'selectors', 'automation', 'testing', 'advanced', 'beginner'],
             contentFile: 'xpath-for-test-automation.md',
             order: 11,
         },
@@ -36,7 +37,7 @@ async function seedTutorials() {
             title: 'Building Robust Test Selectors',
             description: 'Learn to write selectors that withstand UI changes and keep your test suite reliable.',
             estimatedMinutes: 12,
-            tags: ['selectors', 'best-practices', 'testing', 'maintenance', 'qa'],
+            tags: ['selectors', 'best-practices', 'testing', 'maintenance', 'qa', 'beginner'],
             contentFile: 'building-robust-test-selectors.md',
             order: 12,
         },
@@ -45,7 +46,7 @@ async function seedTutorials() {
             title: 'Selector Decision Framework',
             description: 'A practical guide to choosing between CSS and XPath selectors for maximum effectiveness.',
             estimatedMinutes: 10,
-            tags: ['css', 'xpath', 'decision-making', 'best-practices', 'comparison'],
+            tags: ['css', 'xpath', 'decision-making', 'best-practices', 'comparison', 'beginner'],
             contentFile: 'selector-decision-framework.md',
             order: 13,
         },
@@ -167,7 +168,7 @@ async function seedTutorials() {
 
             if (existing.length > 0) {
                 // Update existing
-                console.log(`   📝 Updating: ${tutorialMeta.title}`);
+                console.log(`   📝 Updating: ${tutorialMeta.title} `);
                 await db
                     .update(tutorials)
                     .set({
@@ -178,7 +179,7 @@ async function seedTutorials() {
                     .where(eq(tutorials.slug, tutorialMeta.slug));
             } else {
                 // Insert new
-                console.log(`   ✅ Creating: ${tutorialMeta.title}`);
+                console.log(`   ✅ Creating: ${tutorialMeta.title} `);
                 await db.insert(tutorials).values({
                     ...tutorialMeta,
                     content,
@@ -191,10 +192,10 @@ async function seedTutorials() {
         console.log('\n' + '='.repeat(60));
         console.log('✨ Tutorial seeding complete!');
         console.log('='.repeat(60));
-        console.log(`📊 Summary:`);
-        console.log(`   - Total tutorials: ${tutorialsData.length}`);
-        console.log(`   - Basic tier (Selectors): 4`);
-        console.log(`   - Beginner tier (JS/DOM/Async): 3`);
+        console.log(`📊 Summary: `);
+        console.log(`   - Total tutorials: ${tutorialsData.length} `);
+        console.log(`   - Basic tier(Selectors): 4`);
+        console.log(`   - Beginner tier(JS / DOM / Async): 3`);
         console.log('='.repeat(60));
     } catch (error) {
         console.error('❌ Seeding failed:', error);
@@ -202,12 +203,17 @@ async function seedTutorials() {
     }
 }
 
-seedTutorials()
-    .then(() => {
-        console.log('\n✅ Seeding complete!\n');
-        process.exit(0);
-    })
-    .catch((err) => {
-        console.error('\n❌ Error:', err);
-        process.exit(1);
-    });
+
+
+// Run the seed function if executed directly
+if (import.meta.main) {
+    seedTutorials()
+        .then(() => {
+            console.log('\n✅ Seeding complete!\n');
+            process.exit(0);
+        })
+        .catch((err) => {
+            console.error('\n❌ Error:', err);
+            process.exit(1);
+        });
+}

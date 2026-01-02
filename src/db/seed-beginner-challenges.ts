@@ -1848,6 +1848,8 @@ async function seedBeginnerChallenges() {
     }
 }
 
+export { seedBeginnerChallenges };
+
 // Run the seed function if executed directly
 if (import.meta.main) {
     seedBeginnerChallenges()
