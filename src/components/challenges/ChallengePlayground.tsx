@@ -35,7 +35,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { CodeEditor } from './CodeEditor';
 import { WebComponentPreview } from './WebComponentPreview';
 import { TestResults, type TestResult } from './TestResults';
-import { TestResults, type TestResult } from './TestResults';
+
 
 import { SelectorInput, type SelectorType } from './SelectorInput';
 
