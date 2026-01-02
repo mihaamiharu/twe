@@ -2,8 +2,8 @@
 
 ## TestingWithEkki - Gamified QA Portfolio & Learning Platform
 
-**Version:** 2.0  
-**Date:** December 20, 2025  
+**Version:** 2.1  
+**Date:** January 2, 2026  
 **Author:** Ekki
 
 ---
