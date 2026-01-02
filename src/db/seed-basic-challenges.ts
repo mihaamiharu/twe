@@ -2278,6 +2278,8 @@ async function seedBasicChallenges() {
 
 // Run the seed function
 // Run the seed function if executed directly
+export { seedBasicChallenges };
+
 if (import.meta.main) {
   seedBasicChallenges()
     .then(() => {

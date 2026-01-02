@@ -359,7 +359,7 @@ const achievementData = [
     },
 ];
 
-async function seedAchievements() {
+export async function seedAchievements() {
     console.log('🏆 Seeding Achievement Badges...\n');
 
     try {
@@ -394,12 +394,16 @@ async function seedAchievements() {
     }
 }
 
-seedAchievements()
-    .then(() => {
-        console.log('\n🎉 Achievements seeded successfully!');
-        process.exit(0);
-    })
-    .catch((error) => {
-        console.error('Failed to seed achievements:', error);
-        process.exit(1);
-    });
+
+
+if (import.meta.main) {
+    seedAchievements()
+        .then(() => {
+            console.log('\n🎉 Achievements seeded successfully!');
+            process.exit(0);
+        })
+        .catch((error) => {
+            console.error('Failed to seed achievements:', error);
+            process.exit(1);
+        });
+}

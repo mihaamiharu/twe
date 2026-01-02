@@ -1761,6 +1761,8 @@ async function seedExpertChallenges() {
   }
 }
 
+export { seedExpertChallenges };
+
 // Run the seed function if executed directly
 if (import.meta.main) {
   seedExpertChallenges()
