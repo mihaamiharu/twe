@@ -80,6 +80,25 @@ nav ul { display: flex; gap: 1.5rem; list-style: none; margin: 0; padding: 0; }
 nav a { text-decoration: none; color: #64748b; font-weight: 500; }
 nav a:hover { color: #0f172a; }
 
+/* Message Banners */
+.msg {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  font-weight: 500;
+}
+.msg.error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
+}
+.msg.success {
+  background-color: #f0fdf4;
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
 /* Utils */
 .error, .error-text { color: #ef4444; font-size: 0.875rem; }
 .success { color: #22c55e; }
