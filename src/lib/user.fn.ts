@@ -31,10 +31,7 @@ export type UserData = {
         icon: string;
         unlockedAt: Date;
     }[];
-    heatmapData: {
-        date: string;
-        count: number;
-    }[];
+    // heatmapData removed
     recentActivity: {
         type: 'challenge' | 'achievement';
         title: string;
@@ -111,68 +108,58 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                 .orderBy(desc(submissions.createdAt))
                 .limit(5);
 
-            // Get submissions for heatmap (last 365 days)
-            const oneYearAgo = new Date();
-            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-
-            const heatmapSubmissions = await db
-                .select({
-                    createdAt: submissions.createdAt,
-                })
-                .from(submissions)
-                .where(
-                    and(
-                        eq(submissions.userId, userId),
-                        gte(submissions.createdAt, oneYearAgo),
-                        eq(submissions.isPassed, true)
-                    )
-                );
-
-            // Aggregate by date (YYYY-MM-DD)
-            const heatmapMap = new Map<string, number>();
-            heatmapSubmissions.forEach((sub) => {
-                const dateStr = sub.createdAt.toISOString().split('T')[0];
-                heatmapMap.set(dateStr, (heatmapMap.get(dateStr) || 0) + 1);
-            });
-
-            const heatmapData = Array.from(heatmapMap.entries())
-                .map(([date, count]) => ({
-                    date,
-                    count,
-                }))
-                .sort((a, b) => a.date.localeCompare(b.date));
+            // Heatmap logic removed
+            // Heatmap logic removed
 
             // Calculate XP progress to next level
-            const currentLevel = user.level;
-            const currentXP = user.xp;
+            const currentLevel = user.level || 1;
+            const currentXP = user.xp || 0;
             const xpForCurrentLevel = 100 * Math.pow(currentLevel - 1, 2);
             const xpForNextLevel = 100 * Math.pow(currentLevel, 2);
-            const xpProgress = currentXP - xpForCurrentLevel;
-            const xpNeeded = xpForNextLevel - xpForCurrentLevel;
+
+            const xpProgress = Math.max(0, currentXP - xpForCurrentLevel);
+            const xpNeeded = Math.max(100, xpForNextLevel - xpForCurrentLevel); // Ensure never 0
+
+            const xpProgressPercentage = Math.min(100, Math.max(0, Math.round((xpProgress / xpNeeded) * 100)));
 
             // Construct recent activity
-            const activity = [
-                // Map submissions to activity
-                ...recentSubmissions
-                    .filter((s) => s.isPassed)
-                    .map((s) => ({
-                        type: 'challenge' as const,
+            const activityItems: {
+                type: 'challenge' | 'achievement';
+                title: string;
+                xp: number;
+                date: Date;
+                timestamp: number;
+            }[] = [];
+
+            // Safely add submissions
+            if (recentSubmissions && Array.isArray(recentSubmissions)) {
+                recentSubmissions.filter(s => s.isPassed).forEach(s => {
+                    activityItems.push({
+                        type: 'challenge',
                         title: s.challengeTitle,
                         xp: s.xpEarned,
                         date: s.createdAt,
                         timestamp: s.createdAt.getTime(),
-                    })),
-                // Map achievements to activity
-                ...userAchievementsList.map((a) => ({
-                    type: 'achievement' as const,
-                    title: a.name,
-                    xp: a.xpReward,
-                    date: a.unlockedAt,
-                    timestamp: a.unlockedAt.getTime(),
-                })),
-            ]
-                .sort((a, b) => b.timestamp - a.timestamp)
-                .slice(0, 10) // Limit to 10 items
+                    });
+                });
+            }
+
+            // Safely add achievements
+            if (userAchievementsList && Array.isArray(userAchievementsList)) {
+                userAchievementsList.forEach(a => {
+                    activityItems.push({
+                        type: 'achievement',
+                        title: a.name,
+                        xp: a.xpReward || 0,
+                        date: a.unlockedAt,
+                        timestamp: a.unlockedAt.getTime(),
+                    });
+                });
+            }
+
+            const activity = activityItems
+                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                .slice(0, 10)
                 .map(({ date, ...rest }) => ({
                     ...rest,
                     date: new Intl.DateTimeFormat('en-US', {
@@ -197,7 +184,7 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                     level: user.level,
                     xpProgress,
                     xpNeeded,
-                    xpProgressPercentage: Math.round((xpProgress / xpNeeded) * 100),
+                    xpProgressPercentage,
 
                     // Privacy
                     profileVisibility: user.profileVisibility,
@@ -208,7 +195,7 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                         completedChallenges,
                         completedTutorials,
                         achievementsCount: userAchievementsList.length,
-                        challengesByType: stats.challengesByType,
+                        challengesByType: stats.challengesByType || {},
                     },
 
                     recentAchievements: userAchievementsList.map((a) => ({
@@ -218,7 +205,13 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                         unlockedAt: a.unlockedAt,
                     })),
 
-                    heatmapData,
+                    recentAchievements: userAchievementsList.map((a) => ({
+                        name: a.name,
+                        description: a.description,
+                        icon: a.icon,
+                        unlockedAt: a.unlockedAt,
+                    })),
+
                     recentActivity: activity,
                 },
             };

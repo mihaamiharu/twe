@@ -8,43 +8,100 @@
  */
 
 import { db } from './index';
-import { users } from './schema';
+import {
+    users,
+    sessions,
+    accounts,
+    submissions,
+    progress,
+    userAchievements,
+    bugReports,
+    challenges,
+    testCases
+} from './schema';
 import { eq } from 'drizzle-orm';
+import { auth } from '../lib/auth.server'; // Standard import
 import { seedTutorials } from './seed-tutorials';
 import { seedBasicChallenges } from './seed-basic-challenges';
 import { seedBeginnerChallenges } from './seed-beginner-challenges';
 import { seedIntermediateChallenges } from './seed-intermediate-challenges';
 import { seedExpertChallenges } from './seed-expert-challenges';
 import { seedAchievements } from './seed-achievements';
-// Use dynamic imports or check if files exist for other tiers if they are not strictly required yet
-// keeping it simple for now with the ones we verified exports for.
 
 async function seed() {
     console.log('🌱 Seeding database...');
 
     try {
         // ============================================================================
+        // 0. CLEANUP USERS & DATA
+        // ============================================================================
+        console.log('\n🧹 Cleaning up existing users and data...');
+        await db.delete(userAchievements);
+        await db.delete(progress);
+        await db.delete(submissions);
+        await db.delete(sessions);
+        await db.delete(accounts);
+        await db.delete(bugReports);
+        await db.delete(users);
+        // Added deep cleanup
+        await db.delete(testCases);
+        await db.delete(challenges);
+        console.log('   ✓ User and Content data cleared');
+
+        // ============================================================================
         // 1. SYSTEM SETUP & USERS
         // ============================================================================
-        console.log('\n👤 Creating sample user...');
+        console.log('\n👤 Creating seed users...');
 
-        let sampleUser = (await db.insert(users).values({
-            email: 'demo@testingwithekki.com',
-            emailVerified: true,
-            name: 'Demo User',
-            xp: 250,
-            level: 3,
-            profileVisibility: 'PUBLIC',
-            showOnLeaderboard: true,
-        }).onConflictDoNothing().returning())[0];
+        // 1. Admin User
+        try {
+            const adminRes = await auth.api.signUpEmail({
+                body: {
+                    email: 'admin@twe.com',
+                    password: 'password123',
+                    name: 'Admin User',
+                }
+            });
 
-        if (!sampleUser) {
-            console.log('   User already exists, fetching...');
-            [sampleUser] = await db.select().from(users).where(eq(users.email, 'demo@testingwithekki.com'));
+            if (adminRes && adminRes.user) {
+                // Update to ADMIN role and level
+                await db.update(users)
+                    .set({
+                        role: 'ADMIN',
+                        xp: 1000,
+                        level: 10,
+                        showOnLeaderboard: false
+                    })
+                    .where(eq(users.id, adminRes.user.id));
+                console.log(`   ✓ Created Admin: admin@twe.com (password: password123)`);
+            }
+        } catch (e) {
+            console.error('Failed to create admin:', e);
         }
 
-        if (sampleUser) {
-            console.log(`   User: ${sampleUser.name} (${sampleUser.email})`);
+        // 2. Normal User
+        try {
+            const userRes = await auth.api.signUpEmail({
+                body: {
+                    email: 'user@twe.com',
+                    password: 'password123',
+                    name: 'Normal User',
+                }
+            });
+
+            if (userRes && userRes.user) {
+                await db.update(users)
+                    .set({
+                        role: 'USER',
+                        xp: 100,
+                        level: 1,
+                        showOnLeaderboard: true
+                    })
+                    .where(eq(users.id, userRes.user.id));
+                console.log(`   ✓ Created User: user@twe.com (password: password123)`);
+            }
+        } catch (e) {
+            console.error('Failed to create user:', e);
         }
 
         // ============================================================================
