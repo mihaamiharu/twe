@@ -70,9 +70,9 @@ export function ChallengeSuccessDialog({
                             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider text-xs">Achievements Unlocked</p>
                             <div className="flex flex-wrap justify-center gap-2">
                                 {achievements.map((achievement, i) => (
-                                    <Badge key={i} variant="secondary" className="px-3 py-1 flex gap-1 items-center bg-accent/10 border-accent/20 text-accent-foreground">
+                                    <Badge key={i} variant="outline" className="px-3 py-1 flex gap-1 items-center bg-primary/5 border-primary/20 text-primary shadow-sm">
                                         <span className="text-base">{achievement.icon}</span>
-                                        <span>{achievement.name}</span>
+                                        <span className="font-semibold">{achievement.name}</span>
                                     </Badge>
                                 ))}
                             </div>
