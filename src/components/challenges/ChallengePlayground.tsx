@@ -103,12 +103,8 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         setSelector('');
         setSelectorType(challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css');
         setTestResults([]);
-        setTestResults([]);
-        setHasPassed(false);
         setHasPassed(false);
         setIsRunning(false);
-        setActiveTab('instructions');
-        setPreviewValidation(null);
         setActiveTab('instructions');
         setPreviewValidation(null);
     }, [challenge.id, challenge.starterCode, challenge.type]);
@@ -161,16 +157,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 existingIframe: previewIframeRef.current || undefined,
             });
 
-            // Store logs if available
-            if (result.logs) {
-                // Map to LogEntry
-                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-                setLogs(result.logs.map((l: any) => ({ type: l.type, message: l.message, timestamp: Date.now() })));
 
-                // If we have logs but no explicit error, and user is on results tab, maybe we should show a badge?
-                // Or if it failed, maybe switch to console if it was a syntax error? 
-                // For now, let's just capture them.
-            }
 
             // If we have test cases (especially for JS fundamentals), allow validation against return value
             let validationPassed = result.status === 'PASSED';
@@ -206,11 +193,6 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
             setTestResults([testResult]);
             setHasPassed(validationPassed);
-
-            // Auto switch to Console if there's an error and it's not a validation error (e.g. syntax)
-            if (result.status === 'ERROR') {
-                setRightPanelTab('console');
-            }
 
         } catch (error) {
             setTestResults([
@@ -292,7 +274,6 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         setCode(challenge.starterCode);
         setSelector('');
         setTestResults([]);
-        setLogs([]);
         setHasPassed(false);
         setPreviewValidation(null);
 
@@ -407,10 +388,12 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     )}
                 </div>
 
-                <div className="border-t border-border pt-4">
-                    <h3 className="font-bold mb-2">Test Results</h3>
-                    <TestResults results={testResults} isRunning={isRunning} />
-                </div>
+                {isCodeChallenge && (
+                    <div className="border-t border-border pt-4">
+                        <h3 className="font-bold mb-2">Test Results</h3>
+                        <TestResults results={testResults} isRunning={isRunning} />
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -523,13 +506,13 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                                 defaultType={selectorType}
                                                 allowTypeChange={true}
                                             />
-                                            <div className="flex justify-end pt-2 border-t border-border/50">
+                                            <div className="flex items-center justify-between pt-2 border-t border-border/50">
                                                 <Button
                                                     variant="default"
                                                     size="sm"
                                                     onClick={handleValidateSelector}
                                                     disabled={isRunning || !selector}
-                                                    className="w-full sm:w-auto font-bold border border-border bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black transition-all"
+                                                    className="font-bold border border-border bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black transition-all"
                                                 >
                                                     {isRunning ? (
                                                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -538,6 +521,22 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                                     )}
                                                     Test Selector
                                                 </Button>
+
+                                                {/* Inline validation badge */}
+                                                {testResults.length > 0 && (
+                                                    <div className={cn(
+                                                        "flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all",
+                                                        hasPassed
+                                                            ? "bg-green-500/10 text-green-600 border border-green-500/30"
+                                                            : "bg-red-500/10 text-red-600 border border-red-500/30"
+                                                    )}>
+                                                        {hasPassed ? (
+                                                            <><Zap className="h-4 w-4 fill-current" /> Correct!</>
+                                                        ) : (
+                                                            <><AlertCircle className="h-4 w-4 shrink-0" /> {testResults[0]?.error || 'Selector does not match the target element'}</>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         </CardContent>
                                     </Card>
@@ -547,29 +546,29 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     )}
                 </div>
 
-                {/* Bottom: Results */}
-                <div className="h-[40%] flex flex-col shrink-0 border-t border-border bg-white dark:bg-slate-950">
-                    <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/10 shrink-0">
-                        <h3 className="text-sm font-bold text-muted-foreground">Test Results</h3>
+                {/* Bottom: Results - Only for code challenges */}
+                {isCodeChallenge && (
+                    <div className="h-[40%] flex flex-col shrink-0 border-t border-border bg-white dark:bg-slate-950">
+                        <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/10 shrink-0">
+                            <h3 className="text-sm font-bold text-muted-foreground">Test Results</h3>
 
-                        {isCodeChallenge && (
                             <Button
                                 size="sm"
                                 onClick={() => void handleRunCode()}
                                 disabled={isRunning}
-                                className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90 ml-auto"
+                                className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
                             >
                                 {isRunning ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Play className="h-3 w-3 mr-1" />}
                                 Run
                             </Button>
-                        )}
+                        </div>
+                        <div className="flex-1 overflow-auto p-4 pt-2">
+                            <TestResults results={testResults} isRunning={isRunning} className="border-0 shadow-none bg-transparent" />
+                        </div>
                     </div>
-                    <div className="flex-1 overflow-auto p-4 pt-2">
-                        <TestResults results={testResults} isRunning={isRunning} className="border-0 shadow-none bg-transparent" />
-                    </div>
-                </div>
+                )}
             </Panel>
-        </PanelGroup>
+        </PanelGroup >
     );
 
     return (
@@ -598,6 +597,19 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     </div>
                 </div>
                 <div className="flex items-center gap-3">
+                    {/* Mobile Run Button */}
+                    {isMobile && isCodeChallenge && (
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => void handleRunCode()}
+                            disabled={isRunning}
+                            className="font-bold border-brand-teal text-brand-teal-dark hover:bg-brand-teal/10"
+                        >
+                            {isRunning ? <Loader2 className="h-4 w-4 animate-spin" /> : <Play className="h-4 w-4" />}
+                        </Button>
+                    )}
+
                     {challenge.tutorial && (
                         <Link to="/tutorials/$slug" params={{ slug: challenge.tutorial.slug }}>
                             <Button variant="ghost" size="sm" className="hidden md:flex font-bold text-muted-foreground hover:text-foreground">
