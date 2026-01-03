@@ -106,9 +106,8 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                 .innerJoin(challenges, eq(submissions.challengeId, challenges.id))
                 .where(eq(submissions.userId, userId))
                 .orderBy(desc(submissions.createdAt))
-                .limit(5);
+                .limit(100);
 
-            // Heatmap logic removed
             // Heatmap logic removed
 
             // Calculate XP progress to next level
@@ -131,17 +130,23 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                 timestamp: number;
             }[] = [];
 
-            // Safely add submissions
+            // Safely add submissions (Deduplicated)
             if (recentSubmissions && Array.isArray(recentSubmissions)) {
-                recentSubmissions.filter(s => s.isPassed).forEach(s => {
-                    activityItems.push({
-                        type: 'challenge',
-                        title: s.challengeTitle,
-                        xp: s.xpEarned,
-                        date: s.createdAt,
-                        timestamp: s.createdAt.getTime(),
+                const seenChallenges = new Set<string>();
+                recentSubmissions
+                    .filter(s => s.isPassed)
+                    .forEach(s => {
+                        if (!seenChallenges.has(s.challengeId)) {
+                            seenChallenges.add(s.challengeId);
+                            activityItems.push({
+                                type: 'challenge',
+                                title: s.challengeTitle,
+                                xp: s.xpEarned,
+                                date: s.createdAt,
+                                timestamp: s.createdAt.getTime(),
+                            });
+                        }
                     });
-                });
             }
 
             // Safely add achievements
@@ -197,13 +202,6 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                         achievementsCount: userAchievementsList.length,
                         challengesByType: stats.challengesByType || {},
                     },
-
-                    recentAchievements: userAchievementsList.map((a) => ({
-                        name: a.name,
-                        description: a.description,
-                        icon: a.icon,
-                        unlockedAt: a.unlockedAt,
-                    })),
 
                     recentAchievements: userAchievementsList.map((a) => ({
                         name: a.name,
