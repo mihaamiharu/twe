@@ -322,7 +322,7 @@ export async function executePlaywrightCode(
                     const executionTime = Date.now() - startTime;
                     cleanup();
 
-                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    const errorMessage = formatError(error);
                     resolve({
                         status: 'FAILED',
                         output: errorMessage,
@@ -346,7 +346,7 @@ export async function executePlaywrightCode(
             const executionTime = Date.now() - startTime;
             cleanup();
 
-            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorMessage = formatError(error);
             resolve({
                 status: 'ERROR',
                 output: `Execution error: ${errorMessage}`,
@@ -356,6 +356,29 @@ export async function executePlaywrightCode(
             });
         }
     });
+}
+
+/**
+ * Format error messages to be more user-friendly
+ */
+function formatError(error: unknown): string {
+    const msg = error instanceof Error ? error.message : String(error);
+
+    if (msg.includes('Element not found')) {
+        return `${msg}\n\n💡 Tip: Check if your selector matches the HTML structure in the Preview tab.`;
+    }
+    if (msg.includes('Timeout waiting')) {
+        return `${msg}\n\n💡 Tip: The element might not be visible yet, or the operation took too long.`;
+    }
+    if (msg.includes('is not defined')) {
+        return `${msg}\n\n💡 Tip: You might have a typo in a variable name.`;
+    }
+    if (msg.includes('Expected')) {
+        // Assertion error
+        return `${msg}\n\n💡 Tip: Your assertion failed. Check the Expected vs Actual values.`;
+    }
+
+    return msg;
 }
 
 /**
@@ -619,6 +642,72 @@ function createExpect() {
                     const pass = expected instanceof RegExp ? expected.test(title) : title === expected;
                     if (!pass) {
                         handleResult(false, `Expected title "${title}" to match "${expected}"`);
+                    }
+                },
+
+                async toHaveClass(expected: string | RegExp) {
+                    let className = '';
+                    if (actual && typeof actual.getAttribute === 'function') {
+                        className = (await actual.getAttribute('class')) || '';
+                    } else if (actual instanceof HTMLElement) {
+                        className = actual.className;
+                    }
+
+                    let pass = false;
+                    if (expected instanceof RegExp) {
+                        pass = expected.test(className);
+                    } else {
+                        pass = className === expected;
+                    }
+
+                    if (!pass) {
+                        handleResult(false, `Expected class "${className}" to match "${expected}"`);
+                    }
+                },
+
+                async toBeFocused() {
+                    await Promise.resolve();
+                    let isFocused = false;
+                     
+                    if (actual && typeof actual.evaluate === 'function') {
+                         
+                        isFocused = await actual.evaluate((el: any) => el === el.ownerDocument.activeElement);
+                    } else if (actual instanceof HTMLElement) {
+                        isFocused = actual === actual.ownerDocument.activeElement;
+                    }
+                    if (!isFocused) handleResult(false, 'Expected element to be focused');
+                },
+
+                async toBeEmpty() {
+                    let isEmpty = false;
+                    if (actual && typeof actual.evaluate === 'function') {
+                        isEmpty = await actual.evaluate((el: HTMLElement) => {
+                            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) {
+                                return !(el as HTMLInputElement).value;
+                            }
+                            return !el.textContent;
+                        });
+                    } else if (actual instanceof HTMLElement) {
+                        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(actual.tagName)) {
+                            isEmpty = !(actual as HTMLInputElement).value;
+                        } else {
+                            isEmpty = !actual.textContent;
+                        }
+                    }
+                    if (!isEmpty) handleResult(false, 'Expected element to be empty');
+                },
+
+                async toBeHidden() {
+                    await Promise.resolve();
+                    let visible = false;
+                    if (actual && typeof actual.isVisible === 'function') {
+                        visible = await actual.isVisible();
+                    } else if (actual instanceof HTMLElement) {
+                        visible = actual.style.display !== 'none';
+                    }
+
+                    if (visible) {
+                        handleResult(false, 'Expected element to be hidden');
                     }
                 },
 
