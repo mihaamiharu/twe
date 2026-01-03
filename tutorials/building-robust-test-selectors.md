@@ -110,10 +110,3 @@ When choosing a selector, move down these layers until you find a match. Stop at
 
 ---
 
-## Ready to Practice?
-
-Test your new mental model with these challenges:
-
-1. [Real Form Challenge](/challenges/real-form-challenge) - Fix a brittle form.
-2. [Dynamic Elements](/challenges/dynamic-elements) - Handle elements that move.
-3. [The Faster Selector](/challenges/faster-selector) - Robustness meets performance.

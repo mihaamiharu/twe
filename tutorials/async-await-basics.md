@@ -121,10 +121,3 @@ await Promise.all([
 
 ---
 
-## Ready to Practice?
-
-Sync up your skills:
-
-1. [Understanding Promises](/challenges/async-understanding-promises) - The Ticket Analogy.
-2. [The Await Keyword](/challenges/async-await-basics) - Blocking execution safely.
-3. [Parallel Performance](/challenges/async-parallel-execution) - Speeding up setup.
