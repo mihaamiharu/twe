@@ -104,10 +104,3 @@ await page.click('.result');
 
 ---
 
-## Ready to Practice?
-
-Synchronize your watches:
-
-1. [Auto-Wait Mechanics](/challenges/pw-auto-wait) - Trusting the framework.
-2. [Wait for Response](/challenges/pw-wait-for-response) - Handling network delays.
-3. [Custom Timeouts](/challenges/pw-timeout-config) - Configuring patience.

@@ -116,11 +116,3 @@ await expect(page).toHaveScreenshot('home-page.png', {
 
 ---
 
-## Ready to Practice?
-
-Optimize your factory:
-
-1. [API + UI Hybrid](/challenges/pw-api-ui-testing) - The "Bypass" pattern.
-2. [State Setup](/challenges/pw-state-setup-api) - Injecting cookies/storage.
-3. [Visual Testing](/challenges/pw-screenshot-failure) - Pixel comparison.
-4. [Parallelism](/challenges/pw-parallel-execution) - Handling workers.

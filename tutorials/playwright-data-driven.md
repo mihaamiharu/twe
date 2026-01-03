@@ -136,10 +136,3 @@ for (const record of records) { ... }
 
 ---
 
-## Ready to Practice?
-
-Fire up the factory:
-
-1. [Parameterized Tests](/challenges/pw-parameterized-tests) - The basics.
-2. [JSON Data Loader](/challenges/pw-test-data-json) - Loading complex objects.
-3. [Dynamic Generation](/challenges/pw-dynamic-data) - Using Faker to generate unique data.

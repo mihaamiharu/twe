@@ -7,7 +7,7 @@ import { db } from './index';
 import { tutorials } from './schema';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { eq } from 'drizzle-orm';
+import { eq, not, inArray } from 'drizzle-orm';
 
 export async function seedTutorials() {
     console.log('\n📚 Seeding Basic tier tutorials...\n');
@@ -28,7 +28,7 @@ export async function seedTutorials() {
             title: 'XPath for Test Automation',
             description: 'Master XPath selectors to unlock powerful DOM navigation capabilities that CSS cannot provide.',
             estimatedMinutes: 18,
-            tags: ['xpath', 'selectors', 'automation', 'testing', 'advanced', 'beginner'],
+            tags: ['xpath', 'selectors', 'automation', 'testing', 'beginner'],
             contentFile: 'xpath-for-test-automation.md',
             order: 11,
         },
@@ -119,7 +119,7 @@ export async function seedTutorials() {
             title: 'Page Object Model',
             description: 'Design pattern for maintainable test automation.',
             estimatedMinutes: 12,
-            tags: ['playwright', 'pom', 'patterns', 'expert'],
+            tags: ['playwright', 'pom', 'patterns', 'advanced'],
             contentFile: 'playwright-pom.md',
             order: 40,
         },
@@ -128,7 +128,7 @@ export async function seedTutorials() {
             title: 'Data-Driven Testing',
             description: 'Run tests with external data for comprehensive coverage.',
             estimatedMinutes: 10,
-            tags: ['playwright', 'data-driven', 'parameterized', 'expert'],
+            tags: ['playwright', 'data-driven', 'parameterized', 'advanced'],
             contentFile: 'playwright-data-driven.md',
             order: 41,
         },
@@ -137,7 +137,7 @@ export async function seedTutorials() {
             title: 'Advanced Playwright Patterns',
             description: 'Production-ready testing patterns for expert automation.',
             estimatedMinutes: 15,
-            tags: ['playwright', 'advanced', 'patterns', 'expert'],
+            tags: ['playwright', 'advanced', 'patterns', 'advanced'],
             contentFile: 'playwright-advanced-patterns.md',
             order: 42,
         },
@@ -146,7 +146,7 @@ export async function seedTutorials() {
             title: 'Playwright Fixtures',
             description: 'Stop repeating yourself. Let the framework handle the setup with powerful dependency injection.',
             estimatedMinutes: 20,
-            tags: ['playwright', 'fixtures', 'patterns', 'expert'],
+            tags: ['playwright', 'fixtures', 'patterns', 'advanced'],
             contentFile: 'playwright-fixtures.md',
             order: 43,
         },
@@ -187,6 +187,20 @@ export async function seedTutorials() {
                     viewCount: 0,
                 });
             }
+        }
+
+
+
+        // Cleanup: Remove tutorials that are no longer in the seed list
+        console.log('\n🧹 Cleaning up obsolete tutorials...');
+        const validSlugs = tutorialsData.map(t => t.slug);
+        const deleted = await db.delete(tutorials).where(not(inArray(tutorials.slug, validSlugs))).returning();
+
+        if (deleted.length > 0) {
+            console.log(`   🗑️  Deleted ${deleted.length} obsolete tutorials:`);
+            deleted.forEach(t => console.log(`      - ${t.title} (${t.slug})`));
+        } else {
+            console.log('   ✅ No obsolete tutorials found.');
         }
 
         console.log('\n' + '='.repeat(60));

@@ -83,7 +83,7 @@ Since this is a critical action, the developers have given it a unique ID. Use i
       'In CSS, we use the hash symbol (#) to target an ID',
       'Try: #login-btn'
     ],
-    tags: ['css', 'basics', 'id', 'class'],
+    tags: ['beginner', 'css', 'basics', 'id', 'class'],
     targetSelector: '#login-btn',
   },
 
@@ -119,7 +119,7 @@ Select the main **paragraph** of text in the welcome card.
 </div>`,
     starterCode: '',
     hints: ['The text is inside a <p> tag', 'Use the tag name directly', 'Answer: p'],
-    tags: ['css', 'basics', 'tag'],
+    tags: ['beginner', 'css', 'basics', 'tag'],
     targetSelector: 'p',
   },
 
@@ -168,7 +168,7 @@ There are multiple "error" styles on the page. Your goal is to select only the *
       'Do not put spaces between the tag and class',
       'Answer: div.error'
     ],
-    tags: ['css', 'basics', 'combining'],
+    tags: ['beginner', 'css', 'basics', 'combining'],
     targetSelector: 'div.error',
   },
 
@@ -223,7 +223,7 @@ Chain these together to create a selector that helps ensure you don't accidental
       'Format: tag.class1.class2.class3',
       'Answer: button.btn.primary.large'
     ],
-    tags: ['css', 'basics', 'scenario'],
+    tags: ['beginner', 'css', 'basics', 'scenario'],
     targetSelector: 'button.btn.primary.large',
   },
 
@@ -280,7 +280,7 @@ Do **not** select the items inside the dropdown submenu. Use the direct child se
       'Use > to stop it from going into the submenu',
       'Answer: .nav-menu > li'
     ],
-    tags: ['css', 'relationships', 'child'],
+    tags: ['beginner', 'css', 'relationships', 'child'],
     targetSelector: '.nav-menu > li',
   },
 
@@ -323,7 +323,7 @@ Select the **subtitle paragraph** that appears immediately after the main **Head
       'Use the + symbol to get the next element',
       'Answer: h1 + p'
     ],
-    tags: ['css', 'relationships', 'siblings'],
+    tags: ['beginner', 'css', 'relationships', 'siblings'],
     targetSelector: 'h1 + p',
   },
 
@@ -376,7 +376,7 @@ Construct a "path" selector that walks down the tree:
       'Pattern: .parent .child .grandchild',
       'Answer: .profile-card .card-content span'
     ],
-    tags: ['css', 'relationships', 'drill'],
+    tags: ['beginner', 'css', 'relationships', 'drill'],
     targetSelector: '.profile-card .card-content span',
   },
 
@@ -431,7 +431,7 @@ Select the link (\`a\`) that lives inside the **Action Item** of the **Profile D
       'Target the link inside',
       'Answer: #user-menu .dropdown-list .action-item a'
     ],
-    tags: ['css', 'relationships', 'scenario'],
+    tags: ['beginner', 'css', 'relationships', 'scenario'],
     targetSelector: '#user-menu .dropdown-list .action-item a',
   },
 
@@ -480,7 +480,7 @@ Select the **email input**. Use its \`type\` attribute to distinguish it from th
       'Target the input with type="email"',
       'Answer: [type="email"]'
     ],
-    tags: ['css', 'attributes'],
+    tags: ['beginner', 'css', 'attributes'],
     targetSelector: '[type="email"]',
   },
 
@@ -526,7 +526,7 @@ Select the **email input** that is currently **invalid**.
       'It should specifically be in the :invalid state',
       'Answer: input:invalid'
     ],
-    tags: ['css', 'states', 'validation'],
+    tags: ['beginner', 'css', 'states', 'validation'],
     targetSelector: 'input:invalid',
   },
 
@@ -577,7 +577,7 @@ Select the user card that has the class \`.active\`, but does **not** have the c
       'Combine them',
       'Answer: .user-card.active:not(.suspended)'
     ],
-    tags: ['css', 'states', 'functional'],
+    tags: ['beginner', 'css', 'states', 'functional'],
     targetSelector: '.user-card.active:not(.suspended)',
   },
 
@@ -633,7 +633,7 @@ Synthesize all your knowledge of attributes and pseudo-classes.
       'Negation: :not(:focus)',
       'Answer: input[type="tel"]:optional:not(:disabled)'
     ],
-    tags: ['css', 'states', 'scenario'],
+    tags: ['beginner', 'css', 'states', 'scenario'],
     targetSelector: 'input[type="tel"]:optional:not(:disabled)',
   },
 
@@ -677,7 +677,7 @@ Select the **3rd** item in the feature list.
       'Use :nth-child(3)',
       'Answer: li:nth-child(3)'
     ],
-    tags: ['css', 'structure'],
+    tags: ['beginner', 'css', 'structure'],
     targetSelector: 'li:nth-child(3)',
   },
 
@@ -723,7 +723,7 @@ Note that it is **not** the second child element!
       'Use :nth-of-type to count only the <p> tags',
       'Answer: p:nth-of-type(2)'
     ],
-    tags: ['css', 'structure'],
+    tags: ['beginner', 'css', 'structure'],
     targetSelector: 'p:nth-of-type(2)',
   },
 
@@ -787,7 +787,7 @@ The \`tbody\` contains only data rows. The header is in \`thead\`.
       'Target the 3rd column: td:nth-child(3)',
       'Answer: tbody tr:nth-child(2) td:nth-child(3)'
     ],
-    tags: ['css', 'structure', 'table', 'drill'],
+    tags: ['beginner', 'css', 'structure', 'table', 'drill'],
     targetSelector: 'tbody tr:nth-child(2) td:nth-child(3)',
   },
 
@@ -844,7 +844,7 @@ Write a selector that targets the **Edit Button** in the **Last Column** of ever
       'Button inside: button',
       'Answer: tr:nth-child(odd) td:last-child button'
     ],
-    tags: ['css', 'structure', 'scenario', 'table'],
+    tags: ['beginner', 'css', 'structure', 'scenario', 'table'],
     targetSelector: 'tr:nth-child(odd) td:last-child button',
   },
 
@@ -891,7 +891,7 @@ Ignore the ID tokens.
       'Target the delete button inside: .del',
       'Answer: li:nth-child(2) .del'
     ],
-    tags: ['css', 'dynamic'],
+    tags: ['beginner', 'css', 'dynamic'],
     targetSelector: 'li:nth-child(2) .del',
   },
 ];
@@ -949,7 +949,7 @@ Select the **submit button** using a relative XPath.
       'Select by element name: //button',
       'The answer is: //button'
     ],
-    tags: ['xpath', 'selector', 'basics', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'basics', 'basic'],
     targetSelector: '//button',
   },
 
@@ -1005,7 +1005,7 @@ Select the **password input** field using its type attribute.
       'Use @ to reference the type attribute',
       'The answer is: //input[@type="password"]'
     ],
-    tags: ['xpath', 'selector', 'attribute', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'attribute', 'basic'],
     targetSelector: '//input[@type="password"]',
   },
 
@@ -1055,7 +1055,7 @@ Select the **"Add to Cart"** button using its text.
       'The exact text is "Add to Cart"',
       'The answer is: //button[text()="Add to Cart"]'
     ],
-    tags: ['xpath', 'selector', 'text', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'text', 'basic'],
     targetSelector: '//button[text()="Add to Cart"]',
   },
 
@@ -1116,7 +1116,7 @@ Select the **error message** div (has a class containing "error").
       'Use contains() function for partial matching',
       'The answer is: //div[contains(@class, "error")]'
     ],
-    tags: ['xpath', 'selector', 'contains', 'starts-with', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'contains', 'starts-with', 'basic'],
     targetSelector: '//div[contains(@class, "error")]',
   },
 
@@ -1180,7 +1180,7 @@ Write an XPath that finds the exact "Sign In" button inside the login form.
       'Then find the button with text: //button[text()="Sign In"]',
       'Combine them: //form[contains(@class, "login")]//button[text()="Sign In"]'
     ],
-    tags: ['xpath', 'selector', 'scenario', 'fundamentals'],
+    tags: ['beginner', 'xpath', 'selector', 'scenario', 'fundamentals'],
     targetSelector: '//form[contains(@class, "login")]//button[text()="Sign In"]',
   },
 
@@ -1242,7 +1242,7 @@ Find the **list item (li)** that contains the "Settings" link.
       'Then navigate up to its parent li',
       'The answer is: //a[text()="Settings"]/parent::li or //a[text()="Settings"]/..'
     ],
-    tags: ['xpath', 'selector', 'parent', 'ancestor', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'parent', 'ancestor', 'basic'],
     targetSelector: '//a[text()="Settings"]/parent::li',
   },
 
@@ -1301,7 +1301,7 @@ Select the **input** field that follows the "Username" label.
       'Then use following-sibling to get the next input',
       'The answer is: //label[text()="Username"]/following-sibling::input'
     ],
-    tags: ['xpath', 'selector', 'following-sibling', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'following-sibling', 'basic'],
     targetSelector: '//label[text()="Username"]/following-sibling::input',
   },
 
@@ -1361,7 +1361,7 @@ An error message appeared! Find the **label** that comes before the error messag
       'Then navigate backwards to the label',
       'The answer is: //span[@class="error"]/preceding-sibling::label'
     ],
-    tags: ['xpath', 'selector', 'preceding-sibling', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'preceding-sibling', 'basic'],
     targetSelector: '//span[@class="error"]/preceding-sibling::label',
   },
 
@@ -1418,7 +1418,7 @@ Select the **input** element that belongs to the field showing "Invalid email fo
       'Then find the input: //input',
       'The answer is: //span[text()="Invalid email format"]/ancestor::div[@class="form-field has-error"]//input'
     ],
-    tags: ['xpath', 'selector', 'ancestor', 'traversal', 'scenario'],
+    tags: ['beginner', 'xpath', 'selector', 'ancestor', 'traversal', 'scenario'],
     targetSelector: '//span[text()="Invalid email format"]/ancestor::div//input',
   },
 
@@ -1469,7 +1469,7 @@ Select the button that is both **type="submit"** AND has the **"primary"** class
       'Use the "and" operator to combine conditions',
       'The answer is: //button[@type="submit" and contains(@class, "primary")]'
     ],
-    tags: ['xpath', 'selector', 'and', 'or', 'conditions', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'and', 'or', 'conditions', 'basic'],
     targetSelector: '//button[@type="submit" and contains(@class, "primary")]',
   },
 
@@ -1526,7 +1526,7 @@ Select the **last item** in the navigation menu.
       'Select the li elements within nav',
       'The answer is: //nav//li[last()] or //ul/li[last()]'
     ],
-    tags: ['xpath', 'selector', 'position', 'indexing', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'position', 'indexing', 'basic'],
     targetSelector: '//ul/li[last()]',
   },
 
@@ -1588,7 +1588,7 @@ Select the button with text "   Save Changes   " (has extra whitespace).
       'Use normalize-space() to handle the whitespace',
       'The answer is: //button[normalize-space()="Save Changes"]'
     ],
-    tags: ['xpath', 'selector', 'normalize-space', 'whitespace', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'normalize-space', 'whitespace', 'basic'],
     targetSelector: '//button[normalize-space()="Save Changes"]',
   },
 
@@ -1671,7 +1671,7 @@ Select the **status cell** for the order with ID "ORD-002".
       'Then select the td with class "status" or the 4th td',
       'The answer is: //tr[td[text()="ORD-002"]]/td[4] or //td[text()="ORD-002"]/following-sibling::td[@class="status pending"]'
     ],
-    tags: ['xpath', 'selector', 'table', 'complex', 'basic'],
+    tags: ['beginner', 'xpath', 'selector', 'table', 'complex', 'basic'],
     targetSelector: '//tr[td[text()="ORD-002"]]/td[4]',
   },
 
@@ -1741,7 +1741,7 @@ Find the **"Edit" button** that appears after "Product A".
       'Use the following:: axis',
       'The answer is: //h3[text()="Product A"]/following::button[text()="Edit"][1]'
     ],
-    tags: ['xpath', 'selector', 'axes', 'advanced'],
+    tags: ['beginner', 'xpath', 'selector', 'axes', 'advanced'],
     targetSelector: '//h3[text()="Product A"]/following::button[text()="Edit"][1]',
   },
 
@@ -1837,7 +1837,7 @@ Write an XPath that:
       'Then find the delete button: //button[text()="Delete"]',
       'Answer: //tr[td[text()="John Doe"] and td[text()="Admin"]]//button[text()="Delete"]'
     ],
-    tags: ['xpath', 'selector', 'advanced', 'table', 'scenario'],
+    tags: ['beginner', 'xpath', 'selector', 'advanced', 'table', 'scenario'],
     targetSelector: '//tr[td[text()="John Doe"] and td[text()="Admin"]]//button[text()="Delete"]',
   },
 ];
@@ -1899,7 +1899,7 @@ Write a CSS selector to select the search button.
       'In CSS, use # for ID selectors',
       'The answer is: #search-btn'
     ],
-    tags: ['css', 'xpath', 'comparison', 'basic'],
+    tags: ['beginner', 'css', 'xpath', 'comparison', 'basic'],
     targetSelector: '#search-btn',
   },
 
@@ -1959,7 +1959,7 @@ Write an XPath to select the product card containing "Out of Stock".
       'Use contains() or .// to check descendant text',
       'The answer is: //div[@class="product-card" and .//span[contains(text(), "Out of Stock")]]'
     ],
-    tags: ['xpath', 'comparison', 'text', 'parent', 'basic'],
+    tags: ['beginner', 'xpath', 'comparison', 'text', 'parent', 'basic'],
     targetSelector: '//div[contains(@class, "product-card") and .//text()[contains(., "Out of Stock")]]',
   },
 
@@ -2016,7 +2016,7 @@ Select the submit button using the **most performant** selector.
       'The submit button has id="submit-btn"',
       'The answer is: #submit-btn'
     ],
-    tags: ['css', 'performance', 'best-practices', 'basic'],
+    tags: ['beginner', 'css', 'performance', 'best-practices', 'basic'],
     targetSelector: '#submit-btn',
   },
 
@@ -2096,7 +2096,7 @@ Look at the HTML. The product name "Wireless Mouse" is visible, but we want the 
       'Use attribute selector: [data-product-id="prod-101"]',
       'Answer: [data-product-id="prod-101"] .remove'
     ],
-    tags: ['css', 'xpath', 'comparison', 'scenario', 'decision'],
+    tags: ['beginner', 'css', 'xpath', 'comparison', 'scenario', 'decision'],
     targetSelector: '[data-product-id="prod-101"] .remove',
   },
 ];

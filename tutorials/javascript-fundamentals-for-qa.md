@@ -112,10 +112,3 @@ if (user.role === 'admin') {
 
 ---
 
-## Ready to Practice?
-
-Test your fundamentals:
-
-1. [Variables & Types](/challenges/js-variables-types) - Labels and Evidence.
-2. [Arrays for Test Data](/challenges/js-arrays-test-data) - Managing lists.
-3. [Objects for Tests](/challenges/js-objects-for-tests) - Structuring data.

@@ -115,11 +115,3 @@ await page.locator('select').selectOption('blue');
 
 ---
 
-## Ready to Practice?
-
-Test your interactions:
-
-1. [Page Navigation](/challenges/pw-page-navigation)
-2. [Click Actions](/challenges/pw-click-actions)
-3. [Fill & Type](/challenges/pw-fill-type)
-4. [Checkbox & Radio](/challenges/pw-checkbox-radio)

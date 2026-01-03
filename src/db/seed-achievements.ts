@@ -218,12 +218,12 @@ const achievementData = [
         isSecret: false,
     },
     {
-        slug: 'tier-expert-master',
+        slug: 'tier-advanced-master',
         name: 'Automation Expert',
-        description: 'Complete all Expert tier challenges',
+        description: 'Complete all Advanced tier challenges',
         icon: '🚀',
         category: 'tiers',
-        requirementType: 'tier_expert_complete',
+        requirementType: 'tier_advanced_complete',
         requirementValue: 18,
         xpReward: 400,
         isSecret: false,
@@ -312,7 +312,7 @@ const achievementData = [
         isSecret: true,
     },
 
-    // -- Expert Tier --
+    // -- Advanced Tier --
     {
         slug: 'boss-pom-pilot',
         name: 'POM Pilot',

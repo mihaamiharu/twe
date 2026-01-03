@@ -111,10 +111,3 @@ const row = deleteBtn.closest('tr'); // Found the row!
 
 ---
 
-## Ready to Practice?
-
-Put on your gloves and scrub in:
-
-1. [The Unreachable Button](/challenges/dom-unreachable-button) - Click something covered by a div.
-2. [State Injection](/challenges/dom-state-injection) - Set localized storage.
-3. [The React Bypass](/challenges/dom-react-bypass) - Set values that React notices.
