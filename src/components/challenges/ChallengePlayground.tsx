@@ -176,7 +176,10 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 // Loose equality check for convenience (string '1' == number 1)
                 if (actual != expectedValue && String(actual) !== String(expectedValue)) {
                     validationPassed = false;
-                    outputMessage = `Expected: ${JSON.stringify(expectedValue)}, Got: ${JSON.stringify(actual)}`;
+                    // Don't reveal expected value to prevent cheating
+                    outputMessage = actual === undefined
+                        ? 'Your result is undefined. Make sure you assign a value to `result`.'
+                        : 'Your result doesn\'t match the expected output. Check your logic and try again.';
                     result.status = 'FAILED';
                 } else {
                     outputMessage = `Correct! Result is ${String(actual)}`;
