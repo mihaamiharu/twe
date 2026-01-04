@@ -106,10 +106,3 @@ When writing a selector, apply the **3-Second Rule**:
 
 ---
 
-## Ready to Practice?
-
-Test your decision-making skills:
-
-1. [Same Element, Two Ways](/challenges/same-element-two-ways) - Compare CSS vs XPath.
-2. [When XPath Wins](/challenges/when-xpath-wins) - Scenarios where CSS fails.
-3. [The Faster Selector](/challenges/faster-selector) - Does speed matter?

@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, ArrowRight, RotateCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +41,9 @@ export function ChallengeSuccessDialog({
                     </div>
                     <DialogTitle className="text-2xl font-bold text-center">Challenge Complete!</DialogTitle>
                 </DialogHeader>
+                <DialogDescription className="text-center text-muted-foreground">
+                    Congratulations! You've successfully passed the tests for this challenge.
+                </DialogDescription>
 
                 <div className="space-y-6 py-4">
                     {/* XP Reward */}
@@ -70,9 +73,9 @@ export function ChallengeSuccessDialog({
                             <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider text-xs">Achievements Unlocked</p>
                             <div className="flex flex-wrap justify-center gap-2">
                                 {achievements.map((achievement, i) => (
-                                    <Badge key={i} variant="secondary" className="px-3 py-1 flex gap-1 items-center bg-accent/10 border-accent/20 text-accent-foreground">
+                                    <Badge key={i} variant="outline" className="px-3 py-1 flex gap-1 items-center bg-primary/5 border-primary/20 text-primary shadow-sm">
                                         <span className="text-base">{achievement.icon}</span>
-                                        <span>{achievement.name}</span>
+                                        <span className="font-semibold">{achievement.name}</span>
                                     </Badge>
                                 ))}
                             </div>

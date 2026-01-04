@@ -141,21 +141,7 @@ function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent animate-pulse"></div>
 
         <div className="relative max-w-5xl mx-auto">
-          {/* Logo */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            {/* Dark Mode Logo */}
-            <img
-              src="/logo-dark.png"
-              alt="TestingWithEkki Logo"
-              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform hidden dark:block"
-            />
-            {/* Light Mode Logo */}
-            <img
-              src="/logo-light.png"
-              alt="TestingWithEkki Logo"
-              className="w-20 h-20 rounded-2xl shadow-lg shadow-primary/30 hover:scale-105 transition-transform block dark:hidden"
-            />
-          </div>
+
 
           {/* Title */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6">

@@ -53,96 +53,98 @@
   /* teal-200 */
 }
 
-/* Base Variables - Light Mode */
+/* Base Variables - Light Mode (Refined Industrial Light) */
 :root {
-  --radius: 0.75rem;
+  --radius: 0.5rem;
   /* Friendly */
   --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
-  /* Light Mode Colors (Neo-Brutalist Light) */
+  /* Light Mode Colors (Zinc-based Premium) */
   --background: hsl(0 0% 100%);
   /* White */
-  --foreground: hsl(0 0% 0%);
-  /* Black */
+  --foreground: hsl(240 10% 3.9%);
+  /* Zinc 950 */
 
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(0 0% 0%);
+  --card-foreground: hsl(240 10% 3.9%);
 
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(0 0% 0%);
+  --popover-foreground: hsl(240 10% 3.9%);
 
-  --primary: hsl(0 0% 0%);
-  /* Black Primary */
-  --primary-foreground: hsl(0 0% 100%);
-  /* White Text */
+  --primary: hsl(240 5.9% 10%);
+  /* Zinc 900 */
+  --primary-foreground: hsl(0 0% 98%);
+  /* Zinc 50 */
 
-  --secondary: hsl(210 20% 90%);
-  /* Light Grey */
-  --secondary-foreground: hsl(0 0% 0%);
+  --secondary: hsl(240 4.8% 95.9%);
+  /* Zinc 100 */
+  --secondary-foreground: hsl(240 5.9% 10%);
 
-  --muted: hsl(210 20% 96%);
-  /* Very Light Grey */
-  --muted-foreground: hsl(215 16% 47%);
+  --muted: hsl(240 4.8% 95.9%);
+  --muted-foreground: hsl(240 3.8% 46.1%);
+  /* Zinc 500 */
 
   --accent: hsl(168 85% 52%);
   /* Brand Teal */
   --accent-foreground: hsl(0 0% 100%);
 
-  --destructive: hsl(0 100% 50%);
-  --destructive-foreground: hsl(0 0% 100%);
+  --destructive: hsl(0 84.2% 60.2%);
+  --destructive-foreground: hsl(0 0% 98%);
 
-  --border: hsl(0 0% 0%);
-  /* Hard Black Borders */
-  --input: hsl(0 0% 0%);
-  --ring: hsl(0 0% 0%);
+  --border: hsl(240 5.9% 90%);
+  /* Zinc 200 (Subtle) */
+  --input: hsl(240 5.9% 90%);
+  --ring: hsl(240 10% 3.9%);
 
   /* Custom Variables */
-  --shadow-strength: 4px;
+  --shadow-strength: 0px;
+  /* Clean flat look by default */
 }
 
-/* Dark Mode Overrides */
+/* Dark Mode Overrides (Refined Industrial) */
 .dark {
-  /* Dark Mode Colors (Neo-Brutalist Dark) */
-  --background: hsl(222 47% 11%);
-  /* Deep Blue/Black */
-  --foreground: hsl(210 40% 98%);
-  /* White */
+  /* Dark Mode Colors (Zinc-based Industrial) */
+  --background: hsl(240 10% 3.9%);
+  /* Zinc 950 */
+  --foreground: hsl(0 0% 98%);
+  /* Zinc 50 */
 
-  --card: hsl(222 47% 11%);
-  /* Same as bg for clean borders */
-  --card-foreground: hsl(210 40% 98%);
+  --card: hsl(240 10% 5%);
+  /* Slightly lighter than bg */
+  --card-foreground: hsl(0 0% 98%);
 
-  --popover: hsl(222 47% 11%);
-  --popover-foreground: hsl(210 40% 98%);
+  --popover: hsl(240 10% 3.9%);
+  --popover-foreground: hsl(0 0% 98%);
 
-  --primary: hsl(210 40% 98%);
+  --primary: hsl(0 0% 98%);
   /* White Primary */
-  --primary-foreground: hsl(222 47% 11%);
+  --primary-foreground: hsl(240 5.9% 10%);
   /* Dark Text */
 
-  --secondary: hsl(217 19% 27%);
-  --secondary-foreground: hsl(210 40% 98%);
+  --secondary: hsl(240 3.7% 15.9%);
+  /* Zinc 800 */
+  --secondary-foreground: hsl(0 0% 98%);
 
-  --muted: hsl(217 19% 27%);
-  --muted-foreground: hsl(215 20% 65%);
+  --muted: hsl(240 3.7% 15.9%);
+  --muted-foreground: hsl(240 5% 64.9%);
+  /* Zinc 400 */
 
   --accent: hsl(168 85% 52%);
   /* Brand Teal */
   --accent-foreground: hsl(0 0% 100%);
 
-  --destructive: hsl(0 62% 30%);
-  --destructive-foreground: hsl(210 40% 98%);
+  --destructive: hsl(0 62.8% 30.6%);
+  --destructive-foreground: hsl(0 0% 98%);
 
-  --border: hsl(210 40% 98%);
-  /* White Borders */
-  --input: hsl(210 40% 98%);
-  --ring: hsl(212 100% 85%);
+  --border: hsl(240 3.7% 15.9%);
+  /* Zinc 800 (Subtle) */
+  --input: hsl(240 3.7% 15.9%);
+  --ring: hsl(240 4.9% 83.9%);
 
   --shadow-strength: 0px;
-  /* No heavy shadows in dark mode typically, or just glow? Let's hide hard shadows in dark mode for cleaner look */
 }
 
-/* Glassmorphism Refined for Soft Brutalism */
+/* Glassmorphism Refined */
 .glass-card {
   background: color-mix(in srgb, var(--background) 40%, transparent);
   backdrop-filter: blur(12px);
@@ -154,6 +156,8 @@
 
 .dark .glass-card {
   background: color-mix(in srgb, var(--background) 60%, transparent);
+  border: 1px solid var(--border);
+  /* Thin border */
   box-shadow: none;
   /* Cleaner in dark mode */
 }
@@ -177,13 +181,30 @@ body {
   box-shadow: var(--shadow-strength) var(--shadow-strength) 0px var(--color-border);
 }
 
+/* Only apply hard shadow in light mode or if explicitly wanted */
+.dark .hard-shadow {
+  box-shadow: none;
+  border: 1px solid var(--border);
+}
+
 .hard-shadow-sm {
   box-shadow: 2px 2px 0px var(--color-border);
+}
+
+.dark .hard-shadow-sm {
+  box-shadow: none;
+  border: 1px solid var(--border);
 }
 
 .hard-shadow-hover:hover {
   transform: translate(-2px, -2px);
   box-shadow: calc(var(--shadow-strength) + 2px) calc(var(--shadow-strength) + 2px) 0px var(--color-border);
+}
+
+.dark .hard-shadow-hover:hover {
+  transform: none;
+  box-shadow: none;
+  background-color: var(--secondary);
 }
 
 /* Smooth Physics for "Soft" feel */
@@ -204,11 +225,8 @@ body {
 }
 
 .focus-ring:focus-visible {
-  outline: 2px solid #000000;
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
-  background-color: #ffff00;
-  /* High viz focus */
-  color: #000000;
 }
 
 /* Animation overrides */

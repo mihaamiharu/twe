@@ -1,52 +1,32 @@
-# TestingWithEkki - Documentation
+# Documentation
 
-This folder contains all planning and design documents for the TestingWithEkki platform.
+Welcome to the **TestingWithEkki** project documentation.
 
-## Documents
+## Project Basics
 
-### Core Planning
-- **[PRD.md](./PRD.md)** - Product Requirements Document
-- **[TDD.md](./TDD.md)** - Technical Design Document
-- **[implementation_plan.md](./implementation_plan.md)** - Detailed Implementation Plan
+- [**README.md**](../README.md): Quick start guide and project overview.
+- [**GLOSSARY.md**](./GLOSSARY.md): Definitions of terms used in the project.
+- [**CHANGELOG.md**](./CHANGELOG.md): History of changes and versions.
 
-### Visual Documentation
-- **[app_flows.md](./app_flows.md)** - User Flows and Architecture Diagrams
-- **[walkthrough.md](./walkthrough.md)** - Planning Phase Summary
+## Architecture & Design
 
-### Implementation
-- **[github_issues.md](./github_issues.md)** - GitHub Issues Breakdown (23 issues across 7 epics)
+- [**PRD.md**](./PRD.md): **Product Requirements Document**. The "What" and "Why" of the platform.
+- [**TDD.md**](./TDD.md): **Technical Design Document**. The "How," covering architecture, stack, and systems.
+- [**ERD.md**](./ERD.md): **Entity Relationship Diagram**. Database schema and relationships.
+- [**app_flows.md**](./app_flows.md): Visual diagrams of user journeys and system flows.
+- [**API.md**](./API.md): API reference documentation.
+- [**github_issues.md**](./github_issues.md): Breakdown of tasks and issues.
 
-## Quick Links
+## Architecture Decisions
 
-**Stack:**
-- Full-Stack: TanStack Start + TypeScript
-- Database: PostgreSQL 15 + Drizzle ORM
-- Auth: BetterAuth (Email/Password + Google OAuth)
-- Code Execution: Mocked Playwright (client-side)
+- [**ADR Index**](./adr/README.md): Log of all key architectural decisions.
+  - [ADR-001: TanStack Start Framework](./adr/ADR-001-tanstack-start-framework.md)
+  - [ADR-002: BetterAuth Authentication](./adr/ADR-002-betterauth-authentication.md)
+  - [ADR-003: Client-Side Playwright Shim](./adr/ADR-003-client-side-code-execution.md)
+  - [ADR-004: Drizzle ORM](./adr/ADR-004-drizzle-orm.md)
+  - [ADR-005: PostgreSQL Database](./adr/ADR-005-postgresql-database.md)
+  - [ADR-006: Monaco Editor](./adr/ADR-006-monaco-editor.md)
 
-**Server:**
-- Ubuntu (2 CPU, 2GB RAM, 20GB disk)
-- Domain: www.testingwithekki.com
-- Deployment: Docker + Nginx
+## Security
 
-**Features:**
-- JavaScript/Playwright challenges
-- CSS/XPath selector challenges
-- Gamification (XP, levels, achievements)
-- Private profiles by default
-- Google Analytics tracking
-
-## Timeline
-
-7-week implementation plan broken into phases:
-1. Week 1: Project Setup & Data Layer
-2. Week 1-2: Authentication & User Management
-3. Week 2-3: Frontend Foundation
-4. Week 3-4: Challenge Runner Logic (Playwright Shim)
-5. Week 4-5: Gamification System
-6. Week 5-6: Testing & Quality
-7. Week 6-7: Content Creation & Deployment
-
-## Next Steps
-
-Start with **Issue #1: Initialize TanStack Start Project** from github_issues.md
+- [**SECURITY_TESTING.md**](../SECURITY_TESTING.md): Guide to security testing practices for this app.

@@ -140,10 +140,10 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                         <Bug className="h-5 w-5 text-destructive" />
                         Report a Bug
                     </DialogTitle>
-                    <DialogDescription>
-                        Help us improve by reporting issues you find. Please be as detailed as possible.
-                    </DialogDescription>
                 </DialogHeader>
+                <DialogDescription className="px-6 py-1">
+                    Help us improve by reporting issues you find. Please be as detailed as possible.
+                </DialogDescription>
 
                 <div className="flex-1 overflow-y-auto p-6 pt-2">
                     <form id="bug-report-form" onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-6">

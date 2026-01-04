@@ -26,7 +26,7 @@
     "db:seed:expert": "bun run src/db/seed-expert-challenges.ts",
     "db:seed:achievements": "bun run src/db/seed-achievements.ts",
     "db:seed:all": "bun run src/db/seed-all.ts",
-    "staging:up": "podman compose up -d postgres_staging && sleep 3 && cp .env.staging .env && bunx drizzle-kit push --force && bun run db:seed:all",
+    "staging:up": "podman compose up -d postgres_staging && sleep 3 && cp .env.staging .env && bunx drizzle-kit push --force && bun run db:seed",
     "staging:down": "podman compose stop postgres_staging",
     "staging:reset": "podman compose down postgres_staging -v && npm run staging:up"
   },
@@ -68,6 +68,7 @@
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.68.0",
     "react-markdown": "^10.1.0",
+    "react-resizable-panels": "2.1.7",
     "recharts": "^3.6.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",

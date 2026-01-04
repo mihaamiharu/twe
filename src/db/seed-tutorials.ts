@@ -1,3 +1,4 @@
+
 /**
  * Seed database with tutorials supporting Basic and Beginner tier challenges
  */
@@ -6,9 +7,9 @@ import { db } from './index';
 import { tutorials } from './schema';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { eq } from 'drizzle-orm';
+import { eq, not, inArray } from 'drizzle-orm';
 
-async function seedTutorials() {
+export async function seedTutorials() {
     console.log('\n📚 Seeding Basic tier tutorials...\n');
     console.log('='.repeat(60));
 
@@ -18,7 +19,7 @@ async function seedTutorials() {
             title: 'CSS Selectors for QA Engineers',
             description: 'Master the art of writing robust, maintainable CSS selectors for test automation.',
             estimatedMinutes: 18,
-            tags: ['css', 'selectors', 'qa', 'automation', 'testing'],
+            tags: ['css', 'selectors', 'qa', 'automation', 'testing', 'beginner'],
             contentFile: 'css-selectors-for-qa.md',
             order: 10,
         },
@@ -27,7 +28,7 @@ async function seedTutorials() {
             title: 'XPath for Test Automation',
             description: 'Master XPath selectors to unlock powerful DOM navigation capabilities that CSS cannot provide.',
             estimatedMinutes: 18,
-            tags: ['xpath', 'selectors', 'automation', 'testing', 'advanced'],
+            tags: ['xpath', 'selectors', 'automation', 'testing', 'beginner'],
             contentFile: 'xpath-for-test-automation.md',
             order: 11,
         },
@@ -36,7 +37,7 @@ async function seedTutorials() {
             title: 'Building Robust Test Selectors',
             description: 'Learn to write selectors that withstand UI changes and keep your test suite reliable.',
             estimatedMinutes: 12,
-            tags: ['selectors', 'best-practices', 'testing', 'maintenance', 'qa'],
+            tags: ['selectors', 'best-practices', 'testing', 'maintenance', 'qa', 'beginner'],
             contentFile: 'building-robust-test-selectors.md',
             order: 12,
         },
@@ -45,7 +46,7 @@ async function seedTutorials() {
             title: 'Selector Decision Framework',
             description: 'A practical guide to choosing between CSS and XPath selectors for maximum effectiveness.',
             estimatedMinutes: 10,
-            tags: ['css', 'xpath', 'decision-making', 'best-practices', 'comparison'],
+            tags: ['css', 'xpath', 'decision-making', 'best-practices', 'comparison', 'beginner'],
             contentFile: 'selector-decision-framework.md',
             order: 13,
         },
@@ -118,7 +119,7 @@ async function seedTutorials() {
             title: 'Page Object Model',
             description: 'Design pattern for maintainable test automation.',
             estimatedMinutes: 12,
-            tags: ['playwright', 'pom', 'patterns', 'expert'],
+            tags: ['playwright', 'pom', 'patterns', 'advanced'],
             contentFile: 'playwright-pom.md',
             order: 40,
         },
@@ -127,7 +128,7 @@ async function seedTutorials() {
             title: 'Data-Driven Testing',
             description: 'Run tests with external data for comprehensive coverage.',
             estimatedMinutes: 10,
-            tags: ['playwright', 'data-driven', 'parameterized', 'expert'],
+            tags: ['playwright', 'data-driven', 'parameterized', 'advanced'],
             contentFile: 'playwright-data-driven.md',
             order: 41,
         },
@@ -136,7 +137,7 @@ async function seedTutorials() {
             title: 'Advanced Playwright Patterns',
             description: 'Production-ready testing patterns for expert automation.',
             estimatedMinutes: 15,
-            tags: ['playwright', 'advanced', 'patterns', 'expert'],
+            tags: ['playwright', 'advanced', 'patterns', 'advanced'],
             contentFile: 'playwright-advanced-patterns.md',
             order: 42,
         },
@@ -145,9 +146,19 @@ async function seedTutorials() {
             title: 'Playwright Fixtures',
             description: 'Stop repeating yourself. Let the framework handle the setup with powerful dependency injection.',
             estimatedMinutes: 20,
-            tags: ['playwright', 'fixtures', 'patterns', 'expert'],
+            tags: ['playwright', 'fixtures', 'patterns', 'advanced'],
             contentFile: 'playwright-fixtures.md',
             order: 43,
+        },
+        // What's Next - Final tutorial
+        {
+            slug: 'whats-next',
+            title: "What's Next? Your Automation Journey",
+            description: 'Congratulations on completing the challenges! Here\'s your roadmap for continued growth.',
+            estimatedMinutes: 8,
+            tags: ['career', 'resources', 'next-steps', 'graduation'],
+            contentFile: 'whats-next.md',
+            order: 99,
         },
     ];
 
@@ -167,7 +178,7 @@ async function seedTutorials() {
 
             if (existing.length > 0) {
                 // Update existing
-                console.log(`   📝 Updating: ${tutorialMeta.title}`);
+                console.log(`   📝 Updating: ${tutorialMeta.title} `);
                 await db
                     .update(tutorials)
                     .set({
@@ -178,7 +189,7 @@ async function seedTutorials() {
                     .where(eq(tutorials.slug, tutorialMeta.slug));
             } else {
                 // Insert new
-                console.log(`   ✅ Creating: ${tutorialMeta.title}`);
+                console.log(`   ✅ Creating: ${tutorialMeta.title} `);
                 await db.insert(tutorials).values({
                     ...tutorialMeta,
                     content,
@@ -188,13 +199,27 @@ async function seedTutorials() {
             }
         }
 
+
+
+        // Cleanup: Remove tutorials that are no longer in the seed list
+        console.log('\n🧹 Cleaning up obsolete tutorials...');
+        const validSlugs = tutorialsData.map(t => t.slug);
+        const deleted = await db.delete(tutorials).where(not(inArray(tutorials.slug, validSlugs))).returning();
+
+        if (deleted.length > 0) {
+            console.log(`   🗑️  Deleted ${deleted.length} obsolete tutorials:`);
+            deleted.forEach(t => console.log(`      - ${t.title} (${t.slug})`));
+        } else {
+            console.log('   ✅ No obsolete tutorials found.');
+        }
+
         console.log('\n' + '='.repeat(60));
         console.log('✨ Tutorial seeding complete!');
         console.log('='.repeat(60));
-        console.log(`📊 Summary:`);
-        console.log(`   - Total tutorials: ${tutorialsData.length}`);
-        console.log(`   - Basic tier (Selectors): 4`);
-        console.log(`   - Beginner tier (JS/DOM/Async): 3`);
+        console.log(`📊 Summary: `);
+        console.log(`   - Total tutorials: ${tutorialsData.length} `);
+        console.log(`   - Basic tier(Selectors): 4`);
+        console.log(`   - Beginner tier(JS / DOM / Async): 3`);
         console.log('='.repeat(60));
     } catch (error) {
         console.error('❌ Seeding failed:', error);
@@ -202,12 +227,17 @@ async function seedTutorials() {
     }
 }
 
-seedTutorials()
-    .then(() => {
-        console.log('\n✅ Seeding complete!\n');
-        process.exit(0);
-    })
-    .catch((err) => {
-        console.error('\n❌ Error:', err);
-        process.exit(1);
-    });
+
+
+// Run the seed function if executed directly
+if (import.meta.main) {
+    seedTutorials()
+        .then(() => {
+            console.log('\n✅ Seeding complete!\n');
+            process.exit(0);
+        })
+        .catch((err) => {
+            console.error('\n❌ Error:', err);
+            process.exit(1);
+        });
+}

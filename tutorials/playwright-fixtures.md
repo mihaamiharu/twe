@@ -121,10 +121,3 @@ test('Change password', async ({ settingsPage }) => {
 
 ---
 
-## Ready to Practice?
-
-Build your infrastructure:
-
-1. [Creating a Custom Fixture](/challenges/pw-custom-fixture) - The Basics.
-2. [POM + Fixtures](/challenges/pw-pom-fixture) - The Power Combo.
-3. [Worker-Scoped Fixtures](/challenges/pw-worker-fixtures) - optimizing expensive setups (like Database connections).

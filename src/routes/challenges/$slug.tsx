@@ -256,6 +256,7 @@ function ChallengeDetailPage() {
 
                 // Invalidate queries to refresh progress
                 await queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
+                await queryClient.invalidateQueries({ queryKey: ['challenges'] }); // Refresh challenges list
                 await queryClient.invalidateQueries({ queryKey: ['profile'] });
                 await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
             }

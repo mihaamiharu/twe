@@ -2194,6 +2194,8 @@ async function seedIntermediateChallenges() {
   }
 }
 
+export { seedIntermediateChallenges };
+
 // Run the seed function if executed directly
 if (import.meta.main) {
   seedIntermediateChallenges()

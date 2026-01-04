@@ -159,10 +159,3 @@ await expect(page.getSuccessMessage()).toBeVisible();
 
 ---
 
-## Ready to Practice?
-
-Build your dictionary:
-
-1. [First Page Object](/challenges/pw-first-page-object) - The Basics.
-2. [Atomic Actions](/challenges/pw-encapsulate-actions) - Creating reusable methods.
-3. [Page Components](/challenges/pw-page-components) - Breaking up the God Object.

@@ -1,7 +1,7 @@
 /**
  * Expert Tier Challenges Seed Script
  * 
- * Seeds the database with Expert tier Playwright challenges.
+ * Seeds the database with Advanced tier Playwright challenges.
  * Run with: bun run db:seed:expert
  */
 
@@ -84,9 +84,8 @@ class LoginPage {
     }
 
     async login(email, password) {
-        await this.emailInput.fill(email);
-        await this.passwordInput.fill(password);
-        await this.submitButton.click();
+        // Fill email, fill password, then click submit
+        // Your code here
     }
 }
 
@@ -97,7 +96,7 @@ await loginPage.login('test@qa.com', 'password123');
 // Get result
 const result = await page.locator('#message').textContent();`,
     expectedOutput: 'Welcome, test@qa.com!',
-    tags: ['playwright', 'pom', 'page-object', 'expert'],
+    tags: ['playwright', 'pom', 'page-object', 'advanced'],
   },
   {
     slug: 'pw-encapsulate-actions',
@@ -163,11 +162,13 @@ class CartPage {
     }
 
     async addItem() {
-        await this.addButton.click();
+        // Click the add button
+        // Your code here
     }
 
     async getTotal() {
-        return await this.totalLabel.textContent();
+        // Return the total label text
+        // Your code here
     }
 }
 
@@ -179,7 +180,7 @@ await cartPage.addItem();
 // Get result
 const result = await cartPage.getTotal();`,
     expectedOutput: 'Total: $20',
-    tags: ['playwright', 'pom', 'actions', 'expert'],
+    tags: ['playwright', 'pom', 'actions', 'advanced'],
   },
   {
     slug: 'pw-page-components',
@@ -246,11 +247,13 @@ class HeaderComponent {
     }
 
     async logout() {
-        await this.logoutButton.click();
+        // Click the logout button
+        // Your code here
     }
 
     async getUserName() {
-        return await this.userName.textContent();
+        // Return the user name text
+        // Your code here
     }
 }
 
@@ -263,7 +266,8 @@ class DashboardPage {
     }
 
     async getStatus() {
-        return await this.status.textContent();
+        // Return the status text
+        // Your code here
     }
 }
 
@@ -273,7 +277,7 @@ await dashboard.header.logout();
 
 const result = await dashboard.getStatus();`,
     expectedOutput: 'Logged out!',
-    tags: ['playwright', 'pom', 'components', 'expert'],
+    tags: ['playwright', 'pom', 'components', 'advanced'],
   },
   {
     slug: 'pw-fluent-navigation',
@@ -340,7 +344,8 @@ class HomePage {
     }
 
     async getWelcomeMessage() {
-        return await this.welcomeText.textContent();
+        // Return the welcome text content
+        // Your code here
     }
 }
 
@@ -354,10 +359,8 @@ class LoginPage {
     }
 
     async login(email, password) {
-        await this.emailInput.fill(email);
-        await this.passwordInput.fill(password);
-        await this.loginButton.click();
-        return new HomePage(this.page);
+        // Fill email, password, click login, then return new HomePage
+        // Your code here
     }
 }
 
@@ -366,7 +369,7 @@ const loginPage = new LoginPage(page);
 const homePage = await loginPage.login('test@qa.com', 'pass');
 const result = await homePage.getWelcomeMessage();`,
     expectedOutput: 'Welcome back!',
-    tags: ['playwright', 'pom', 'navigation', 'fluent', 'expert'],
+    tags: ['playwright', 'pom', 'navigation', 'fluent', 'advanced'],
   },
   {
     slug: 'pw-base-page-class',
@@ -432,7 +435,8 @@ class BasePage {
     }
 
     async getPageTitle() {
-        return await this.page.title();
+        // Return the page title
+        // Your code here
     }
 
     async waitForReady() {
@@ -450,7 +454,8 @@ class ProductPage extends BasePage {
     }
 
     async getProductName() {
-        return await this.productName.textContent();
+        // Return the product name text
+        // Your code here
     }
 }
 
@@ -458,7 +463,7 @@ class ProductPage extends BasePage {
 const productPage = new ProductPage(page);
 const result = await productPage.getPageTitle();`,
     expectedOutput: 'Product Details',
-    tags: ['playwright', 'pom', 'inheritance', 'base-class', 'expert'],
+    tags: ['playwright', 'pom', 'inheritance', 'base-class', 'advanced'],
   },
 
   // Challenge 6: POM Boss
@@ -545,7 +550,7 @@ const productPage = new ProductPage(page);
 
 const result = "";`,
     expectedOutput: 'Order #12345 Confirmed!',
-    tags: ['playwright', 'pom', 'e2e', 'scenario', 'boss', 'expert'],
+    tags: ['playwright', 'pom', 'e2e', 'scenario', 'boss', 'advanced'],
   },
 ];
 
@@ -609,7 +614,7 @@ let passed = 0;
 
 const result = String(passed);`,
     expectedOutput: '3',
-    tags: ['playwright', 'data-driven', 'parameterized', 'expert'],
+    tags: ['playwright', 'data-driven', 'parameterized', 'advanced'],
   },
   {
     slug: 'pw-test-data-json',
@@ -669,7 +674,7 @@ const usersData = [
 
 const result = await page.locator('#greeting').textContent();`,
     expectedOutput: 'Hello, Charlie!',
-    tags: ['playwright', 'data-driven', 'json', 'expert'],
+    tags: ['playwright', 'data-driven', 'json', 'advanced'],
   },
   {
     slug: 'pw-csv-test-data',
@@ -728,7 +733,7 @@ Charlie,Viewer,Welcome Charlie\`;
 
 const result = await page.locator('#message').textContent();`,
     expectedOutput: 'Welcome Bob',
-    tags: ['playwright', 'data-driven', 'csv', 'expert'],
+    tags: ['playwright', 'data-driven', 'csv', 'advanced'],
   },
   {
     slug: 'pw-dynamic-data',
@@ -795,7 +800,7 @@ function generateUsername() {
 const text = await page.locator('#confirm').textContent();
 const result = text.startsWith('Registered: ') ? 'success' : 'failed';`,
     expectedOutput: 'success',
-    tags: ['playwright', 'data-driven', 'faker', 'dynamic', 'expert'],
+    tags: ['playwright', 'data-driven', 'faker', 'dynamic', 'advanced'],
   },
   {
     slug: 'pw-environment-data',
@@ -858,7 +863,7 @@ const currentEnv = 'staging';
 
 const result = await page.locator('#status').textContent();`,
     expectedOutput: 'Logged into staging',
-    tags: ['playwright', 'data-driven', 'environment', 'config', 'expert'],
+    tags: ['playwright', 'data-driven', 'environment', 'config', 'advanced'],
   },
 
   // Challenge 6: Data-Driven Boss
@@ -918,7 +923,7 @@ let passed = 0;
 
 const result = String(passed);`,
     expectedOutput: '4',
-    tags: ['playwright', 'data-driven', 'scenario', 'boss', 'expert'],
+    tags: ['playwright', 'data-driven', 'scenario', 'boss', 'advanced'],
   },
 ];
 
@@ -980,7 +985,7 @@ await expect(page.locator('h1')).toHaveText('Test User');
 
 const result = ""; // Set result based on verification`,
     expectedOutput: 'hybrid-success',
-    tags: ['playwright', 'api', 'hybrid', 'expert'],
+    tags: ['playwright', 'api', 'hybrid', 'advanced'],
   },
   {
     slug: 'pw-state-setup-api',
@@ -1037,7 +1042,7 @@ await page.evaluate(token => {
 // Access protected content
 const result = await page.locator('#message').textContent();`,
     expectedOutput: 'Welcome, authenticated user!',
-    tags: ['playwright', 'api', 'setup', 'expert'],
+    tags: ['playwright', 'api', 'setup', 'advanced'],
   },
   {
     slug: 'pw-screenshot-failure',
@@ -1091,7 +1096,7 @@ await element.screenshot({ path: 'element.png' });
 
 const result = await page.locator('#result').textContent();`,
     expectedOutput: 'Screenshot: captured',
-    tags: ['playwright', 'screenshot', 'debugging', 'expert'],
+    tags: ['playwright', 'screenshot', 'debugging', 'advanced'],
   },
   {
     slug: 'pw-video-recording',
@@ -1151,7 +1156,7 @@ await page.video()?.saveAs('test.webm');
 
 const result = await page.locator('#status').textContent();`,
     expectedOutput: 'Video: saved',
-    tags: ['playwright', 'video', 'recording', 'expert'],
+    tags: ['playwright', 'video', 'recording', 'advanced'],
   },
   {
     slug: 'pw-retry-logic',
@@ -1209,7 +1214,7 @@ let result = await page.locator('#result').textContent();
 // Retry logic - Implement retry if failed
 // Your code here`,
     expectedOutput: 'Success on retry',
-    tags: ['playwright', 'retry', 'flaky', 'expert'],
+    tags: ['playwright', 'retry', 'flaky', 'advanced'],
   },
   {
     slug: 'pw-parallel-execution',
@@ -1266,7 +1271,7 @@ Each test gets fresh browser context.
 
 const result = await page.locator('#results').textContent();`,
     expectedOutput: 'Completed: 3/3',
-    tags: ['playwright', 'parallel', 'performance', 'expert'],
+    tags: ['playwright', 'parallel', 'performance', 'advanced'],
   },
   {
     slug: 'pw-cross-browser',
@@ -1330,7 +1335,7 @@ test('safari only', async ({ browserName }) => {
 
 const result = await page.locator('#result').textContent();`,
     expectedOutput: 'Tested on: chromium',
-    tags: ['playwright', 'cross-browser', 'compatibility', 'expert'],
+    tags: ['playwright', 'cross-browser', 'compatibility', 'advanced'],
   },
   {
     slug: 'pw-mobile-viewport',
@@ -1387,7 +1392,7 @@ await page.setViewportSize({ width: 375, height: 667 });
 
 const result = await page.locator('#layout').textContent();`,
     expectedOutput: 'Layout: mobile',
-    tags: ['playwright', 'mobile', 'responsive', 'viewport', 'expert'],
+    tags: ['playwright', 'mobile', 'responsive', 'viewport', 'advanced'],
   },
   // Challenge 8: CSV Workflow
   {
@@ -1535,7 +1540,7 @@ const result = await retryWithScreenshot(async () => {
     await page.click('#action');
 });`,
     expectedOutput: 'passed',
-    tags: ['playwright', 'infrastructure', 'retry', 'scenario', 'boss', 'expert'],
+    tags: ['playwright', 'infrastructure', 'retry', 'scenario', 'boss', 'advanced'],
   },
 
   // Challenge 11: Integration Patterns Boss
@@ -1603,7 +1608,7 @@ Implement all phases and return the final verification status!
 // Return integration result
 const result = "";`,
     expectedOutput: 'integration-passed',
-    tags: ['playwright', 'integration', 'e2e', 'pipeline', 'scenario', 'boss', 'expert'],
+    tags: ['playwright', 'integration', 'e2e', 'pipeline', 'scenario', 'boss', 'advanced'],
   },
 ];
 
@@ -1612,7 +1617,7 @@ const result = "";`,
 // ============================================================================
 
 async function seedExpertChallenges() {
-  console.log('🌱 Seeding Expert tier (Real-World Patterns) challenges...\n');
+  console.log('🌱 Seeding Advanced tier (Real-World Patterns) challenges...\n');
 
   try {
     // Fetch Tutorial IDs
@@ -1746,7 +1751,7 @@ async function seedExpertChallenges() {
     const advXP = advancedPatternsChallenges.reduce((sum, c) => sum + c.xpReward, 0);
 
     console.log('\n' + '='.repeat(50));
-    console.log('✨ Expert tier seeding complete!');
+    console.log('✨ Advanced tier seeding complete!');
     console.log('='.repeat(50));
     console.log('📊 Summary:');
     console.log(`   • Page Object Model: ${pomChallenges.length} challenges (${pomXP} XP)`);
@@ -1760,6 +1765,8 @@ async function seedExpertChallenges() {
     throw error;
   }
 }
+
+export { seedExpertChallenges };
 
 // Run the seed function if executed directly
 if (import.meta.main) {

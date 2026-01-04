@@ -9,11 +9,11 @@ services:
       POSTGRES_USER: twe_user
       POSTGRES_PASSWORD: twe_password
       POSTGRES_DB: twe_db
-      # PostgreSQL optimizations for 2GB RAM server
-      # Using 256MB shared_buffers (recommended: 25% of RAM = 512MB, but conservative for 2GB total)
-      POSTGRES_SHARED_BUFFERS: 256MB
-      POSTGRES_EFFECTIVE_CACHE_SIZE: 1GB
-      POSTGRES_MAINTENANCE_WORK_MEM: 128MB
+      # PostgreSQL optimizations for 4GB RAM server
+      # Using 1GB shared_buffers (25% of RAM) and 3GB effective cache (75% of RAM)
+      POSTGRES_SHARED_BUFFERS: 1GB
+      POSTGRES_EFFECTIVE_CACHE_SIZE: 3GB
+      POSTGRES_MAINTENANCE_WORK_MEM: 256MB
       POSTGRES_WORK_MEM: 16MB
       POSTGRES_WAL_BUFFERS: 8MB
       POSTGRES_MAX_CONNECTIONS: 100
@@ -23,11 +23,11 @@ services:
     command:
       - postgres
       - -c
-      - shared_buffers=256MB
+      - shared_buffers=1GB
       - -c
-      - effective_cache_size=1GB
+      - effective_cache_size=3GB
       - -c
-      - maintenance_work_mem=128MB
+      - maintenance_work_mem=256MB
       - -c
       - work_mem=16MB
       - -c
