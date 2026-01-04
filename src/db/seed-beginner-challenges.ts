@@ -1441,7 +1441,8 @@ const fetchData = async () => {
 \`\`\`
 
 ## Your Task
-Create an async function that awaits a promise and returns double the value.
+Create an async function named \`doubleValue\` that awaits the \`getValue()\` promise and returns double its value.
+Assign the result of calling \`doubleValue()\` to a variable named \`result\`.
 `,
         htmlContent: `<div class="async-demo">
   <h3>Async/Await</h3>
@@ -1449,11 +1450,12 @@ Create an async function that awaits a promise and returns double the value.
         starterCode: `// Helper: returns a promise that resolves to 21
 const getValue = () => Promise.resolve(21);
 
-// Create async function that returns double the value
+// 1. Create an async function named doubleValue
+// 2. Await getValue() and return its value multiplied by 2
 // Your code here
 
-// Call the function and get result
-// Your code here`,
+// 3. Call doubleValue and assign to result
+const result = await doubleValue();`,
         expectedOutput: '42',
         hints: ['await pauses until Promise resolves', 'Return the doubled value from the function'],
         tags: ['javascript', 'async', 'await', 'beginner'],
@@ -1474,29 +1476,20 @@ Always handle errors in async code!
 ## Try/Catch with Async/Await
 
 \`\`\`javascript
-async function fetchData() {
+async function safeOperation() {
     try {
         const data = await riskyOperation();
-        return data;
+        return data; // Success
     } catch (error) {
-        console.log('Error:', error.message);
-        return null;
+        return 'fallback'; // Error handled
     }
 }
 \`\`\`
 
-## Promise Rejection
-
-\`\`\`javascript
-// This promise will reject
-const failingPromise = Promise.reject(new Error('Failed!'));
-
-// Handle with catch
-failingPromise.catch(err => console.log(err.message));
-\`\`\`
-
 ## Your Task
-Create a function that handles a rejected promise and returns a fallback value.
+Create an async function named \`safeOperation\` that handles the \`riskyOperation()\` using a try/catch block.
+If \`riskyOperation\` fails, return the string \`'fallback'\`.
+Assign the result of calling \`safeOperation()\` to a variable named \`result\`.
 `,
         htmlContent: `<div class="error-demo">
   <h3>Error Handling</h3>
@@ -1504,10 +1497,12 @@ Create a function that handles a rejected promise and returns a fallback value.
         starterCode: `// This promise rejects with an error
 const riskyOperation = () => Promise.reject(new Error('Network failed'));
 
-// Handle the error and return 'fallback' instead
+// Create an async function named safeOperation
+// Handle riskyOperation() with try/catch and return 'fallback' on error
 // Your code here
 
-// const result = await safeOperation();`,
+// Call safeOperation and assign to result
+const result = await safeOperation();`,
         expectedOutput: 'fallback',
         hints: ['Use try/catch around await', 'Return fallback value in catch block'],
         tags: ['javascript', 'async', 'error-handling', 'beginner'],
@@ -1563,16 +1558,22 @@ const [a, b, c] = await Promise.all([
 \`\`\`
 
 ## Your Task
-Sum the results of three parallel async operations.
+Sum the results of three parallel async operations using \`Promise.all()\`.
+1. Use the provided \`getA()\`, \`getB()\`, and \`getC()\` helpers.
+2. Run them in parallel and store their results in an array or destructure them.
+3. Calculate the sum and assign it to the variable named \`result\`.
 `,
         htmlContent: `<div class="parallel-demo">
   <h3>Parallel Execution</h3>
 </div>`,
-        starterCode: `// Three async operations returning numbers
-// Your code here
+        starterCode: `// Helpers: return promises resolving to numbers
+const getA = () => Promise.resolve(10);
+const getB = () => Promise.resolve(20);
+const getC = () => Promise.resolve(12);
 
-// Run all in parallel and sum the results
-// Your code here`,
+// Run all in parallel, destructure results, and assign their sum to 'result'
+// Your code here
+`,
         expectedOutput: '42',
         hints: ['Promise.all takes an array of promises', 'Destructure the results array'],
         tags: ['javascript', 'async', 'parallel', 'promise-all', 'beginner'],
