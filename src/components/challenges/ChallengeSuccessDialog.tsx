@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, ArrowRight, RotateCw } from 'lucide-react';
@@ -32,6 +33,16 @@ export function ChallengeSuccessDialog({
     onNextChallenge,
     onRetry,
 }: ChallengeSuccessDialogProps) {
+    useEffect(() => {
+        if (open && levelUp) {
+            const audio = new Audio('/ragnarok_level_up.mp3');
+            audio.volume = 0.4; // Slightly lower volume so it's not too loud
+            audio.play().catch(err => {
+                console.warn('Failed to play level up sound:', err);
+            });
+        }
+    }, [open, levelUp]);
+
     return (
         <Dialog open={open} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md text-center">
@@ -85,7 +96,7 @@ export function ChallengeSuccessDialog({
 
                 <DialogFooter className="flex flex-col gap-3 sm:flex-col sm:gap-3">
                     {onNextChallenge && (
-                        <Button onClick={onNextChallenge} className="w-full bg-gradient-to-r from-primary to-purple-600 hover:from-primary/90 hover:to-purple-600/90 text-white shadow-md">
+                        <Button onClick={onNextChallenge} className="w-full">
                             Next Challenge
                             <ArrowRight className="w-4 h-4 ml-2 animate-bounce-x" />
                         </Button>

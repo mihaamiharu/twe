@@ -565,9 +565,17 @@ const result = await page.locator('#dropdown').textContent();
 #### pw-file-upload
 
 ```javascript
+// Simple way (now supported in our shim):
+await page.setInputFiles('#file-input', 'test-report.pdf');
+
+// Complex way (with metadata):
+/*
 await page.setInputFiles('#file-input', {
-    name: 'test.pdf', mimeType: 'application/pdf', buffer: Buffer.from('test')
+    name: 'test-report.pdf', 
+    mimeType: 'application/pdf', 
+    buffer: Buffer.from('test')
 });
+*/
 const result = await page.locator('#filename').textContent();
 ```
 

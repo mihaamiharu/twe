@@ -45,6 +45,7 @@ export interface Locator {
     press(key: string): Promise<void>;
     evaluate<R, Arg>(pageFunction: (element: HTMLElement, arg: Arg) => R | Promise<R>, arg?: Arg): Promise<R>;
     locator(selector: string): Locator;
+    filter(options: { hasText?: string | RegExp }): Locator;
 }
 
 export interface LocatorOptions {
@@ -116,6 +117,7 @@ export class MockedPlaywrightPage {
     private targetDocument: Document;
     private defaultTimeout: number;
     public request: APIRequestContext;
+    private currentUrl: string = 'about:blank';
     private _context: BrowserContext;
 
     constructor(iframeDocument: Document, options?: { timeout?: number }) {
@@ -129,10 +131,16 @@ export class MockedPlaywrightPage {
     // Core Actions
     // ============================================
 
-    goto(url: string): Promise<void> {
+    async goto(url: string): Promise<void> {
         // Mock navigation
         logger.debug(`Navigating to ${url}`);
+        this.currentUrl = url;
+        await this.delay(50);
         return Promise.resolve();
+    }
+
+    url(): string {
+        return this.currentUrl;
     }
 
     async reload(): Promise<void> {
@@ -269,6 +277,21 @@ export class MockedPlaywrightPage {
      */
     selectOption(selector: string, value: string | string[]): Promise<void> {
         return this.locator(selector).selectOption(value);
+    }
+
+    /**
+     * Set input files
+     */
+    setInputFiles(selector: string, files: string | FilePayload | string[] | FilePayload[]): Promise<void> {
+        // @ts-expect-error Types in shim are simplified
+        return this.locator(selector).setInputFiles(files);
+    }
+
+    /**
+     * Drag and drop
+     */
+    dragAndDrop(source: string, target: string): Promise<void> {
+        return this.locator(source).dragTo(this.locator(target));
     }
 
     /**
@@ -417,74 +440,100 @@ export class MockedPlaywrightPage {
     }
 
     frameLocator(selector: string): FrameLocator {
+        const getFrameDoc = (): Document | null => {
+            const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
+            if (!frame) return null;
+            return frame.contentDocument || frame.contentWindow?.document || null;
+        };
+
         return {
             locator: (itemSelector: string): Locator => {
-                const getDoc = () => {
-                    const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-                    if (!frame) throw new Error(`Frame not found: ${selector}`);
-                    return frame.contentDocument || frame.contentWindow?.document;
-                };
-
-                const createFramePage = () => {
-                    const doc = getDoc();
-                    if (!doc) throw new Error('Frame document not accessible');
-                    return new MockedPlaywrightPage(doc);
-                };
-
-                const proxyHandler = {
-                    get: (_target: unknown, prop: string | symbol) => {
-                        const page = createFramePage();
-                        const locator = page.locator(itemSelector);
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-                        const value = (locator as any)[prop];
-                        if (typeof value === 'function') {
-                            return (...args: unknown[]) => {
-                                // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-function-type
-                                return (value as Function).apply(locator, args);
-                            };
-                        }
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                        return value;
+                return this.createLocator(() => {
+                    const doc = getFrameDoc();
+                    if (!doc) return [];
+                    return Array.from(doc.querySelectorAll(itemSelector)) as HTMLElement[];
+                });
+            },
+            getByRole: (role: string, options?: LocatorOptions) => {
+                return this.createLocator(() => {
+                    const doc = getFrameDoc();
+                    if (!doc) return [];
+                    const page = new MockedPlaywrightPage(doc);
+                    // Use page's internal getByRole logic indirectly via querying
+                    const roleSelector = `[role="${role}"]`;
+                    let elements = Array.from(doc.querySelectorAll(roleSelector)) as HTMLElement[];
+                    if (options?.name) {
+                        elements = elements.filter(el => {
+                            const text = el.textContent || el.getAttribute('aria-label') || '';
+                            return options.name instanceof RegExp ? options.name.test(text) : text.includes(options.name as string);
+                        });
                     }
-                };
-                return new Proxy({}, proxyHandler) as Locator;
+                    return elements;
+                });
             },
-            getByRole: (r, o) => {
-                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-                const doc = frame?.contentDocument;
-                if (!doc) throw new Error('Frame document not found');
-                return new MockedPlaywrightPage(doc).getByRole(r, o);
+            getByText: (text: string | RegExp, options?: { exact?: boolean }) => {
+                return this.createLocator(() => {
+                    const doc = getFrameDoc();
+                    if (!doc) return [];
+                    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+                    const elements: HTMLElement[] = [];
+                    let node: Node | null;
+                    while ((node = walker.nextNode())) {
+                        const content = node.textContent || '';
+                        const matches = text instanceof RegExp
+                            ? text.test(content)
+                            : options?.exact ? content === text : content.includes(text);
+                        if (matches && node.parentElement) {
+                            elements.push(node.parentElement);
+                        }
+                    }
+                    return elements;
+                });
             },
-            getByText: (t, o) => {
-                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-                const doc = frame?.contentDocument;
-                if (!doc) throw new Error('Frame document not found');
-                return new MockedPlaywrightPage(doc).getByText(t, o);
+            getByLabel: (text: string | RegExp, options?: { exact?: boolean }) => {
+                return this.createLocator(() => {
+                    const doc = getFrameDoc();
+                    if (!doc) return [];
+                    const labels = Array.from(doc.querySelectorAll('label'));
+                    const elements: HTMLElement[] = [];
+                    for (const label of labels) {
+                        const labelText = label.textContent || '';
+                        const matches = text instanceof RegExp
+                            ? text.test(labelText)
+                            : options?.exact ? labelText === text : labelText.includes(text);
+                        if (matches) {
+                            const forId = label.getAttribute('for');
+                            if (forId) {
+                                const input = doc.getElementById(forId);
+                                if (input) elements.push(input as HTMLElement);
+                            }
+                        }
+                    }
+                    return elements;
+                });
             },
-            getByLabel: (t, o) => {
-                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-                const doc = frame?.contentDocument;
-                if (!doc) throw new Error('Frame document not found');
-                return new MockedPlaywrightPage(doc).getByLabel(t, o);
+            getByPlaceholder: (text: string | RegExp, options?: { exact?: boolean }) => {
+                return this.createLocator(() => {
+                    const doc = getFrameDoc();
+                    if (!doc) return [];
+                    const inputs = Array.from(doc.querySelectorAll('[placeholder]')) as HTMLElement[];
+                    return inputs.filter(el => {
+                        const placeholder = el.getAttribute('placeholder') || '';
+                        return text instanceof RegExp
+                            ? text.test(placeholder)
+                            : options?.exact ? placeholder === text : placeholder.includes(text);
+                    });
+                });
             },
-            getByPlaceholder: (t, o) => {
-                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-                const doc = frame?.contentDocument;
-                if (!doc) throw new Error('Frame document not found');
-                return new MockedPlaywrightPage(doc).getByPlaceholder(t, o);
-            },
-            getByTestId: (id) => {
-                const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-                const doc = frame?.contentDocument;
-                if (!doc) throw new Error('Frame document not found');
-                return new MockedPlaywrightPage(doc).getByTestId(id);
-            },
-            first() { return this; },
-            last() { return this; },
-            nth() { return this; }
+            getByTestId: (testId: string) => {
+                return this.createLocator(() => {
+                    const doc = getFrameDoc();
+                    if (!doc) return [];
+                    return Array.from(doc.querySelectorAll(`[data-testid="${testId}"]`)) as HTMLElement[];
+                });
+            }
         };
     }
-
 
     // ============================================
     // Role-based Locators (Playwright-style)
@@ -544,6 +593,8 @@ export class MockedPlaywrightPage {
 
             while ((node = walker.nextNode())) {
                 const el = node as HTMLElement;
+                // Only match leaf-ish elements (elements without child elements that match)
+                // This prevents matching containers when we want the actual text element
                 const content = el.textContent || '';
 
                 if (text instanceof RegExp) {
@@ -555,7 +606,19 @@ export class MockedPlaywrightPage {
                 }
             }
 
-            return elements;
+            // Sort by depth (deepest first) so innermost elements come first
+            // This mimics Playwright's behavior of preferring specific elements
+            const getDepth = (el: HTMLElement): number => {
+                let depth = 0;
+                let parent = el.parentElement;
+                while (parent) {
+                    depth++;
+                    parent = parent.parentElement;
+                }
+                return depth;
+            };
+
+            return elements.sort((a, b) => getDepth(b) - getDepth(a));
         });
     }
 
@@ -736,6 +799,19 @@ export class MockedPlaywrightPage {
         let filterIndex: number | null = null;
         let filterType: 'first' | 'last' | 'nth' | null = null;
 
+        // Expose finder for internal cross-locator delegation (e.g. frameLocator)
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (this as any).finder = () => {
+            const elements = finder();
+            if (elements.length === 0) return [];
+
+            if (filterType === 'first') return [elements[0]];
+            if (filterType === 'last') return [elements[elements.length - 1]];
+            if (filterType === 'nth' && filterIndex !== null) return elements[filterIndex] ? [elements[filterIndex]] : [];
+
+            return elements;
+        };
+
         const getElement = (): HTMLElement | null => {
             const elements = finder();
             if (elements.length === 0) return null;
@@ -747,9 +823,37 @@ export class MockedPlaywrightPage {
             return elements[0]; // Default to first
         };
 
+        /**
+         * Strict mode check - throws if multiple elements match without explicit filter
+         */
+        const strictCheck = () => {
+            const elements = finder();
+            if (elements.length > 1 && filterType === null) {
+                throw new Error(
+                    `Strict mode violation: locator resolved to ${elements.length} elements. ` +
+                    `Use .first(), .last(), or .nth() to select a specific element, ` +
+                    `or make your selector more specific.`
+                );
+            }
+        };
+
+        /**
+         * Wait for element to be present and satisfy filter
+         */
+        const waitForElement = async (timeout: number = this.defaultTimeout): Promise<HTMLElement> => {
+            const startTime = Date.now();
+            while (Date.now() - startTime < timeout) {
+                const el = getElement();
+                if (el) return el;
+                await this.delay(100);
+            }
+            throw new Error('Timeout waiting for element to appear');
+        };
+
         const locator: Locator = {
             click: async () => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 if (!this.isVisible(el)) throw new Error('Element is not visible');
@@ -758,6 +862,7 @@ export class MockedPlaywrightPage {
 
             dblclick: async () => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 if (!this.isVisible(el)) throw new Error('Element is not visible');
@@ -766,6 +871,7 @@ export class MockedPlaywrightPage {
 
             fill: async (value: string) => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement() as HTMLInputElement | HTMLTextAreaElement;
                 if (!el) throw new Error('Element not found');
                 el.focus();
@@ -774,15 +880,14 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             },
 
-            textContent: () => {
-                const el = getElement();
-                return Promise.resolve(el?.textContent || null);
+            textContent: async () => {
+                const el = await waitForElement().catch(() => null);
+                return el?.textContent || null;
             },
 
-            inputValue: () => {
-                const el = getElement() as HTMLInputElement;
-                if (!el) throw new Error('Element not found');
-                return Promise.resolve(el.value);
+            inputValue: async () => {
+                const el = await waitForElement();
+                return (el as HTMLInputElement).value;
             },
 
             isVisible: () => {
@@ -810,6 +915,7 @@ export class MockedPlaywrightPage {
 
             check: async () => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'checkbox' && el.type !== 'radio') {
@@ -820,6 +926,7 @@ export class MockedPlaywrightPage {
 
             uncheck: async () => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'checkbox') throw new Error('Element is not a checkbox');
@@ -828,6 +935,7 @@ export class MockedPlaywrightPage {
 
             selectOption: async (value: string | string[]) => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement() as HTMLSelectElement;
                 if (!el) throw new Error('Element not found');
                 if (el.tagName !== 'SELECT') throw new Error('Element is not a select');
@@ -839,14 +947,14 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new Event('change', { bubbles: true }));
             },
 
-            getAttribute: (name: string) => {
-                const el = getElement();
-                return Promise.resolve(el?.getAttribute(name) || null);
+            getAttribute: async (name: string) => {
+                const el = await waitForElement().catch(() => null);
+                return el?.getAttribute(name) || null;
             },
 
-            innerHTML: () => {
-                const el = getElement();
-                return Promise.resolve(el?.innerHTML || '');
+            innerHTML: async () => {
+                const el = await waitForElement().catch(() => null);
+                return el?.innerHTML || '';
             },
 
             count: () => {
@@ -885,6 +993,7 @@ export class MockedPlaywrightPage {
 
             clear: async () => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 el.focus();
@@ -895,13 +1004,15 @@ export class MockedPlaywrightPage {
 
             dispatchEvent: async (type: string, eventInit?: CustomEventInit) => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 el.dispatchEvent(new CustomEvent(type, { bubbles: true, cancelable: true, ...eventInit }));
             },
 
-            setInputFiles: async (files: FilePayload | FilePayload[]) => {
+            setInputFiles: async (files: string | FilePayload | string[] | FilePayload[]) => {
                 await this.delay(50);
+                strictCheck();
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'file') throw new Error('Element is not a file input');
@@ -910,9 +1021,15 @@ export class MockedPlaywrightPage {
                 const fileList = Array.isArray(files) ? files : [files];
 
                 for (const f of fileList) {
-                    const bufferData = f.buffer ? [f.buffer as BlobPart] : [''];
-                    const file = new File(bufferData, f.name, { type: f.mimeType });
-                    dataTransfer.items.add(file);
+                    if (typeof f === 'string') {
+                        // Support string as filename for convenience
+                        const file = new File([''], f, { type: 'application/octet-stream' });
+                        dataTransfer.items.add(file);
+                    } else {
+                        const bufferData = f.buffer ? [f.buffer as BlobPart] : [''];
+                        const file = new File(bufferData, f.name, { type: f.mimeType });
+                        dataTransfer.items.add(file);
+                    }
                 }
 
                 el.files = dataTransfer.files;
@@ -920,14 +1037,43 @@ export class MockedPlaywrightPage {
                 el.dispatchEvent(new Event('input', { bubbles: true }));
             },
 
-            dragTo: async (_target: Locator) => {
+            dragTo: async (target: Locator) => {
                 await this.delay(50);
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                const _ = _target;
                 const sourceEl = getElement();
                 if (!sourceEl) throw new Error('Source element not found');
-                sourceEl.dispatchEvent(new DragEvent('dragstart', { bubbles: true }));
-                // Note: Full drag and drop simulation is complex. This is a partial shim.
+
+                // Get target element via its own evaluate method to handle cross-locator logic
+                await target.evaluate(async (targetEl) => {
+                    const dataTransfer = new DataTransfer();
+
+                    // 1. Start drag
+                    sourceEl.dispatchEvent(new DragEvent('dragstart', {
+                        bubbles: true,
+                        cancelable: true,
+                        dataTransfer
+                    }));
+
+                    // 2. Drag over target
+                    targetEl.dispatchEvent(new DragEvent('dragover', {
+                        bubbles: true,
+                        cancelable: true,
+                        dataTransfer
+                    }));
+
+                    // 3. Drop on target
+                    targetEl.dispatchEvent(new DragEvent('drop', {
+                        bubbles: true,
+                        cancelable: true,
+                        dataTransfer
+                    }));
+
+                    // 4. End drag
+                    sourceEl.dispatchEvent(new DragEvent('dragend', {
+                        bubbles: true,
+                        cancelable: true,
+                        dataTransfer
+                    }));
+                });
             },
 
             dragAndDrop: async (target: Locator) => {
@@ -958,6 +1104,22 @@ export class MockedPlaywrightPage {
                         children.push(...matches as HTMLElement[]);
                     }
                     return children;
+                });
+            },
+
+            filter: (options: { hasText?: string | RegExp }) => {
+                return this.createLocator(() => {
+                    const elements = finder();
+                    return elements.filter(el => {
+                        if (options.hasText) {
+                            const content = el.textContent || '';
+                            if (options.hasText instanceof RegExp) {
+                                return options.hasText.test(content);
+                            }
+                            return content.toLowerCase().includes(options.hasText.toLowerCase());
+                        }
+                        return true;
+                    });
                 });
             },
         };
