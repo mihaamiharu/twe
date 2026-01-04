@@ -219,11 +219,9 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
             // Modify code to return result if it's a JS challenge
             let codeToRun = code;
             if (challenge.type === 'JAVASCRIPT') {
-                // If no explicit return, append a safe conditional return for 'result'
-                // This works with const, let, var or direct assignments without collisions
-                if (!code.includes('return ')) {
-                    codeToRun += '\nif (typeof result !== "undefined") return result;';
-                }
+                // Append a safe conditional return for 'result'
+                // This works even if user has nested return statements in functions
+                codeToRun += '\nif (typeof result !== "undefined") return result;';
             }
 
             const result = await executePlaywrightCode(codeToRun, challenge.htmlContent || '<div></div>', {

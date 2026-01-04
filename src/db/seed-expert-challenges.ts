@@ -84,9 +84,8 @@ class LoginPage {
     }
 
     async login(email, password) {
-        await this.emailInput.fill(email);
-        await this.passwordInput.fill(password);
-        await this.submitButton.click();
+        // Fill email, fill password, then click submit
+        // Your code here
     }
 }
 
@@ -163,11 +162,13 @@ class CartPage {
     }
 
     async addItem() {
-        await this.addButton.click();
+        // Click the add button
+        // Your code here
     }
 
     async getTotal() {
-        return await this.totalLabel.textContent();
+        // Return the total label text
+        // Your code here
     }
 }
 
@@ -246,11 +247,13 @@ class HeaderComponent {
     }
 
     async logout() {
-        await this.logoutButton.click();
+        // Click the logout button
+        // Your code here
     }
 
     async getUserName() {
-        return await this.userName.textContent();
+        // Return the user name text
+        // Your code here
     }
 }
 
@@ -263,7 +266,8 @@ class DashboardPage {
     }
 
     async getStatus() {
-        return await this.status.textContent();
+        // Return the status text
+        // Your code here
     }
 }
 
@@ -340,7 +344,8 @@ class HomePage {
     }
 
     async getWelcomeMessage() {
-        return await this.welcomeText.textContent();
+        // Return the welcome text content
+        // Your code here
     }
 }
 
@@ -354,10 +359,8 @@ class LoginPage {
     }
 
     async login(email, password) {
-        await this.emailInput.fill(email);
-        await this.passwordInput.fill(password);
-        await this.loginButton.click();
-        return new HomePage(this.page);
+        // Fill email, password, click login, then return new HomePage
+        // Your code here
     }
 }
 
@@ -432,7 +435,8 @@ class BasePage {
     }
 
     async getPageTitle() {
-        return await this.page.title();
+        // Return the page title
+        // Your code here
     }
 
     async waitForReady() {
@@ -450,7 +454,8 @@ class ProductPage extends BasePage {
     }
 
     async getProductName() {
-        return await this.productName.textContent();
+        // Return the product name text
+        // Your code here
     }
 }
 
