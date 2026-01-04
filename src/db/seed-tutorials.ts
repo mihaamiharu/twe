@@ -150,6 +150,16 @@ export async function seedTutorials() {
             contentFile: 'playwright-fixtures.md',
             order: 43,
         },
+        // What's Next - Final tutorial
+        {
+            slug: 'whats-next',
+            title: "What's Next? Your Automation Journey",
+            description: 'Congratulations on completing the challenges! Here\'s your roadmap for continued growth.',
+            estimatedMinutes: 8,
+            tags: ['career', 'resources', 'next-steps', 'graduation'],
+            contentFile: 'whats-next.md',
+            order: 99,
+        },
     ];
 
     try {
