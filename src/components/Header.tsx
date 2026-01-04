@@ -66,9 +66,9 @@ export function Header() {
             <div className="flex items-center gap-8">
               <Link to="/" className="flex items-center gap-2 btn-animate">
                 {/* Dark Mode Logo */}
-                <img src="/logo-dark.png" alt="Logo" className="h-8 w-8 rounded-lg hidden dark:block" />
+                <img src="/logo-dark-new.png" alt="Logo" className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen" />
                 {/* Light Mode Logo */}
-                <img src="/logo-light.png" alt="Logo" className="h-8 w-8 rounded-lg block dark:hidden" />
+                <img src="/logo-light-new.png" alt="Logo" className="h-8 w-8 rounded-lg block dark:hidden mix-blend-multiply" />
                 <span className="text-xl font-bold gradient-text">
                   TestingWithEkki
                 </span>

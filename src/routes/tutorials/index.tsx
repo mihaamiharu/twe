@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { BookOpen, Clock, Search, AlertCircle, CheckCircle2, LayoutGrid, List } from 'lucide-react';
+import { BookOpen, Clock, Search, AlertCircle, CheckCircle2, LayoutGrid, List, Layers } from 'lucide-react';
 
 export const Route = createFileRoute('/tutorials/')({
     component: TutorialsPage,
@@ -48,13 +48,35 @@ function TutorialsPage() {
 
     const tutorials = tutorialsResponse?.data ?? [];
 
-    const filteredTutorials = useMemo(() => {
-        if (selectedDifficulty === 'All') return tutorials;
-        // Map UI difficulty to tags roughly
-        return tutorials.filter(t => t.tags?.some(tag => tag.toLowerCase() === selectedDifficulty.toLowerCase()));
+    // Group tutorials for the "All" view (Track view)
+    const groupedTutorials = useMemo(() => {
+        if (selectedDifficulty !== 'All') return null;
+
+        const groups: Record<string, typeof tutorials> = {
+            'Beginner': [],
+            'Intermediate': [],
+            'Advanced': [],
+            'Other': []
+        };
+
+        tutorials.forEach(t => {
+            const tag = t.tags?.find(tag => ['beginner', 'intermediate', 'advanced'].includes(tag.toLowerCase()));
+            if (tag) {
+                const key = tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
+                if (groups[key]) groups[key].push(t);
+                else groups['Other'].push(t);
+            } else {
+                groups['Other'].push(t);
+            }
+        });
+
+        return groups;
     }, [tutorials, selectedDifficulty]);
 
-
+    const filteredTutorials = useMemo(() => {
+        if (selectedDifficulty === 'All') return tutorials;
+        return tutorials.filter(t => t.tags?.some(tag => tag.toLowerCase() === selectedDifficulty.toLowerCase()));
+    }, [tutorials, selectedDifficulty]);
 
     return (
         <div className="min-h-screen p-6 md:p-10">
@@ -105,7 +127,7 @@ function TutorialsPage() {
                             <Badge
                                 key={difficulty}
                                 variant={selectedDifficulty === difficulty ? 'default' : 'outline'}
-                                className="cursor-pointer"
+                                className="cursor-pointer px-3 py-1 text-sm"
                                 onClick={() => setSelectedDifficulty(selectedDifficulty === difficulty ? 'All' : difficulty)}
                             >
                                 {difficulty}
@@ -155,113 +177,98 @@ function TutorialsPage() {
                 {/* Tutorials Content */}
                 {!isLoading && !error && filteredTutorials.length > 0 && (
                     <>
-                        {viewMode === 'grid' ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                {filteredTutorials.map((tutorial) => (
-                                    <Link
-                                        key={tutorial.slug}
-                                        to="/tutorials/$slug"
-                                        params={{ slug: tutorial.slug }}
-                                        className="group"
-                                    >
-                                        <Card className="h-full glass-card hover:border-primary/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-primary/10 relative overflow-hidden">
-                                            {/* Completed Badge */}
-                                            {tutorial.isCompleted && (
-                                                <div className="absolute top-0 right-0 p-2 bg-green-500/10 rounded-bl-lg border-l border-b border-green-500/20">
-                                                    <div className="flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400">
-                                                        <CheckCircle2 className="h-3.5 w-3.5" />
-                                                        Done
-                                                    </div>
+                        {/* Track View (Grouped) - Only in Grid Mode and when 'All' is selected */}
+                        {viewMode === 'grid' && groupedTutorials ? (
+                            <div className="space-y-12">
+                                {(['Beginner', 'Intermediate', 'Advanced', 'Other'] as const).map((level) => {
+                                    const items = groupedTutorials[level];
+                                    if (!items || items.length === 0) return null;
+
+                                    return (
+                                        <div key={level} className="space-y-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="h-8 w-8 rounded-full bg-brand-teal/20 flex items-center justify-center border border-brand-teal/30">
+                                                    <Layers className="h-4 w-4 text-brand-teal-dark" />
                                                 </div>
-                                            )}
-                                            <CardHeader>
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <BookOpen className="h-5 w-5 text-primary" />
-                                                    {tutorial.tags && tutorial.tags.length > 0 && (
-                                                        <Badge variant="secondary">{tutorial.tags[0]}</Badge>
-                                                    )}
-                                                </div>
-                                                <CardTitle className="group-hover:text-primary transition-colors">
-                                                    {tutorial.title}
-                                                </CardTitle>
-                                                <CardDescription className="line-clamp-2">
-                                                    {tutorial.description}
-                                                </CardDescription>
-                                            </CardHeader>
-                                            <CardContent>
-                                                <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                                    <div className="flex items-center gap-1">
-                                                        <Clock className="h-4 w-4" />
-                                                        {tutorial.estimatedMinutes} min
-                                                    </div>
-                                                </div>
-                                            </CardContent>
-                                        </Card>
-                                    </Link>
-                                ))}
+                                                <h2 className="text-2xl font-bold tracking-tight">{level === 'Other' ? 'Additional Tutorials' : `${level} Track`}</h2>
+                                            </div>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pl-4 border-l-2 border-border/50 ml-4">
+                                                {items.map((tutorial) => (
+                                                    <TutorialCard key={tutorial.slug} tutorial={tutorial} />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         ) : (
-                            <div className="rounded-md border bg-card">
-                                <Table>
-                                    <TableHeader>
-                                        <TableRow>
-                                            <TableHead className="w-[50px]"></TableHead>
-                                            <TableHead className="w-[300px]">Title</TableHead>
-                                            <TableHead className="hidden md:table-cell">Description</TableHead>
-                                            <TableHead>Tags</TableHead>
-                                            <TableHead className="text-right">Time</TableHead>
-                                            <TableHead className="w-[100px] text-right">Status</TableHead>
-                                        </TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {filteredTutorials.map((tutorial) => (
-                                            <TableRow key={tutorial.slug} className="group cursor-pointer">
-                                                <TableCell>
-                                                    <Link to="/tutorials/$slug" params={{ slug: tutorial.slug }} className="block h-full w-full flex items-center justify-center text-muted-foreground group-hover:text-primary">
-                                                        <BookOpen className="h-4 w-4" />
-                                                    </Link>
-                                                </TableCell>
-                                                <TableCell className="font-medium group-hover:text-primary transition-colors">
-                                                    <Link to="/tutorials/$slug" params={{ slug: tutorial.slug }} className="block">
-                                                        {tutorial.title}
-                                                    </Link>
-                                                </TableCell>
-                                                <TableCell className="hidden md:table-cell text-muted-foreground max-w-[300px] truncate">
-                                                    {tutorial.description}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {tutorial.tags?.slice(0, 2).map(tag => (
-                                                            <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0">
-                                                                {tag}
-                                                            </Badge>
-                                                        ))}
-                                                        {(tutorial.tags?.length || 0) > 2 && (
-                                                            <span className="text-xs text-muted-foreground">+{tutorial.tags!.length - 2}</span>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex items-center justify-end gap-1 text-muted-foreground">
-                                                        <Clock className="h-3 w-3" />
-                                                        {tutorial.estimatedMinutes}m
-                                                    </div>
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <div className="flex justify-end">
-                                                        {tutorial.isCompleted && (
-                                                            <Badge variant="outline" className="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 gap-1 pr-2">
-                                                                <CheckCircle2 className="h-3 w-3" />
-                                                                Done
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </TableCell>
+                            /* Filtered Grid or List View */
+                            viewMode === 'grid' ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {filteredTutorials.map((tutorial) => (
+                                        <TutorialCard key={tutorial.slug} tutorial={tutorial} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="rounded-md border bg-card">
+                                    <Table>
+                                        <TableHeader>
+                                            <TableRow>
+                                                <TableHead className="w-[50px]"></TableHead>
+                                                <TableHead className="w-[300px]">Title</TableHead>
+                                                <TableHead className="hidden md:table-cell">Description</TableHead>
+                                                <TableHead>Tags</TableHead>
+                                                <TableHead className="text-right">Time</TableHead>
+                                                <TableHead className="w-[100px] text-right">Status</TableHead>
                                             </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </div>
+                                        </TableHeader>
+                                        <TableBody>
+                                            {filteredTutorials.map((tutorial) => (
+                                                <TableRow key={tutorial.slug} className="group cursor-pointer">
+                                                    <TableCell>
+                                                        <Link to="/tutorials/$slug" params={{ slug: tutorial.slug }} className="block h-full w-full flex items-center justify-center text-muted-foreground group-hover:text-primary">
+                                                            <BookOpen className="h-4 w-4" />
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell className="font-medium group-hover:text-primary transition-colors">
+                                                        <Link to="/tutorials/$slug" params={{ slug: tutorial.slug }} className="block">
+                                                            {tutorial.title}
+                                                        </Link>
+                                                    </TableCell>
+                                                    <TableCell className="hidden md:table-cell text-muted-foreground max-w-[300px] truncate">
+                                                        {tutorial.description}
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {tutorial.tags?.slice(0, 2).map(tag => (
+                                                                <Badge key={tag} variant="secondary" className="text-xs px-1.5 py-0 border-border/50">
+                                                                    {tag}
+                                                                </Badge>
+                                                            ))}
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex items-center justify-end gap-1 text-muted-foreground">
+                                                            <Clock className="h-3 w-3" />
+                                                            {tutorial.estimatedMinutes}m
+                                                        </div>
+                                                    </TableCell>
+                                                    <TableCell className="text-right">
+                                                        <div className="flex justify-end">
+                                                            {tutorial.isCompleted && (
+                                                                <Badge variant="outline" className="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 gap-1 pr-2">
+                                                                    <CheckCircle2 className="h-3 w-3" />
+                                                                    Done
+                                                                </Badge>
+                                                            )}
+                                                        </div>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))}
+                                        </TableBody>
+                                    </Table>
+                                </div>
+                            )
                         )}
                     </>
                 )}
@@ -269,3 +276,51 @@ function TutorialsPage() {
         </div>
     );
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function TutorialCard({ tutorial }: { tutorial: any }) {
+    return (
+        <Link
+            to="/tutorials/$slug"
+            params={{ slug: tutorial.slug }}
+            className="group"
+        >
+            <Card className="h-full glass-card hover:border-brand-teal/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-brand-teal/5 relative overflow-hidden border border-border">
+                {/* Completed Badge */}
+                {tutorial.isCompleted && (
+                    <div className="absolute top-0 right-0 p-2 bg-green-500/10 rounded-bl-lg border-l border-b border-green-500/20 z-10">
+                        <div className="flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400">
+                            <CheckCircle2 className="h-3.5 w-3.5" />
+                            Done
+                        </div>
+                    </div>
+                )}
+                <CardHeader>
+                    <div className="flex items-center gap-2 mb-2">
+                        <BookOpen className="h-5 w-5 text-brand-teal" />
+                        {tutorial.tags && tutorial.tags.length > 0 && (
+                            <Badge variant="secondary" className="border-transparent bg-secondary/50 text-secondary-foreground">{tutorial.tags[0]}</Badge>
+                        )}
+                    </div>
+                    <CardTitle className="group-hover:text-brand-teal transition-colors text-lg">
+                        {tutorial.title}
+                    </CardTitle>
+                    <CardDescription className="line-clamp-2">
+                        {/* {tutorial.description} */} {/* Description commented out in original code? No, keeping it. */}
+                        {tutorial.description}
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {tutorial.estimatedMinutes} min
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+        </Link>
+    );
+}
+
+export default TutorialsPage;

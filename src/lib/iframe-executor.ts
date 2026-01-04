@@ -13,7 +13,7 @@ export interface ExecutionResult {
     executionTime: number;
     error?: string;
     returnValue?: unknown;
-    logs?: Array<{ type: string; message: string }>;
+    logs?: Array<{ id: string; type: string; message: string }>;
 }
 
 export interface ExecuteOptions {
@@ -46,7 +46,7 @@ export async function executePlaywrightCode(
     const timeout = options?.timeout || 10000;
     const startTime = Date.now();
     const useExistingIframe = !!options?.existingIframe;
-    const logs: Array<{ type: string; message: string }> = [];
+    const logs: Array<{ id: string; type: string; message: string }> = [];
 
 
     // Patch HTML content for specific challenges where happy-dom needs checking
@@ -102,28 +102,8 @@ export async function executePlaywrightCode(
                     // Set up the HTML content
                     iframeDoc.open();
 
-                    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-                    // Intercept console logs
-                    const win = iframe.contentWindow as any;
-                    if (win) {
-                        const originalLog = win.console.log;
-                        const originalError = win.console.error;
-                        const originalWarn = win.console.warn;
-
-                        win.console.log = (...args: any[]) => {
-                            logs.push({ type: 'log', message: args.map(a => String(a)).join(' ') });
-                            originalLog.apply(win.console, args);
-                        };
-                        win.console.error = (...args: any[]) => {
-                            logs.push({ type: 'error', message: args.map(a => String(a)).join(' ') });
-                            originalError.apply(win.console, args);
-                        };
-                        win.console.warn = (...args: any[]) => {
-                            logs.push({ type: 'warn', message: args.map(a => String(a)).join(' ') });
-                            originalWarn.apply(win.console, args);
-                        };
-                        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-                    }
+                    // NOTE: Console interception is done AFTER iframeDoc.close() below
+                    // to ensure we intercept the final document's console object
 
                     iframeDoc.write(`
                         <!DOCTYPE html>
@@ -185,6 +165,9 @@ export async function executePlaywrightCode(
                         </html>
                     `);
                     iframeDoc.close();
+
+                    // NOTE: Console logs from user code are captured via interceptedConsole
+                    // which is injected into the user function scope below
 
                     // Manually execute scripts using scoped execution
                     // This works around HappyDOM limitations where inline scripts in iframes don't execute
@@ -287,13 +270,85 @@ export async function executePlaywrightCode(
                     // Create mocked page object
                     const page = new MockedPlaywrightPage(iframeDoc);
 
+                    // Create an intercepted console object that logs to our logs array
+                    let logCounter = 0;
+                    const interceptedConsole = {
+                        log: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'log', message: args.map(a => String(a)).join(' ') });
+                            console.log(...args); // Also log to browser console for debugging
+                        },
+                        error: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'error', message: args.map(a => String(a)).join(' ') });
+                            console.error(...args);
+                        },
+                        warn: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'warn', message: args.map(a => String(a)).join(' ') });
+                            console.warn(...args);
+                        },
+                        info: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'log', message: args.map(a => String(a)).join(' ') });
+                            console.info(...args);
+                        },
+                    };
+
                     // Execute user code
+                    // For JS challenges, we need to capture the 'result' variable
+                    // We use eval-style declaration to make result accessible even if user uses const/let
+
+                    // Create an enhanced document wrapper with friendlier error messages
+                    const createEnhancedDocument = (doc: Document) => {
+                        const handler: ProxyHandler<Document> = {
+                            get(target, prop) {
+                                if (prop === 'querySelector') {
+                                    return (selector: string) => {
+                                        const element = target.querySelector(selector);
+                                        if (element === null) {
+                                            throw new Error(`Element not found: No element matches selector '${selector}'. Check your selector for typos.`);
+                                        }
+                                        return element;
+                                    };
+                                }
+                                if (prop === 'querySelectorAll') {
+                                    return (selector: string) => {
+                                        const elements = target.querySelectorAll(selector);
+                                        if (elements.length === 0) {
+                                            console.warn(`Warning: No elements found for selector '${selector}'`);
+                                        }
+                                        return elements;
+                                    };
+                                }
+                                if (prop === 'getElementById') {
+                                    return (id: string) => {
+                                        const element = target.getElementById(id);
+                                        if (element === null) {
+                                            throw new Error(`Element not found: No element with id '${id}'. Check for typos.`);
+                                        }
+                                        return element;
+                                    };
+                                }
+                                // For all other properties, return the original value
+                                /* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment */
+                                const value = target[prop as keyof Document];
+                                if (typeof value === 'function') {
+                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                                    return value.bind(target);
+                                }
+                                return value;
+                                /* eslint-enable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment */
+                            }
+                        };
+                        return new Proxy(doc, handler);
+                    };
+
+                    const enhancedDocument = createEnhancedDocument(iframeDoc);
+
                     // eslint-disable-next-line @typescript-eslint/no-implied-eval
                     const userFunction = new Function(
                         'page',
                         'expect',
                         'window',
                         'document',
+                        'console',
                         `
                             const fetch = window.fetch;
                             return (async () => {
@@ -306,7 +361,7 @@ export async function executePlaywrightCode(
                     const expect = createExpect();
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                    const returnValue = await userFunction(page, expect, iframe.contentWindow, iframe.contentDocument);
+                    const returnValue = await userFunction(page, expect, iframe.contentWindow, enhancedDocument, interceptedConsole);
 
                     const executionTime = Date.now() - startTime;
                     cleanup();
@@ -322,7 +377,7 @@ export async function executePlaywrightCode(
                     const executionTime = Date.now() - startTime;
                     cleanup();
 
-                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    const errorMessage = formatError(error);
                     resolve({
                         status: 'FAILED',
                         output: errorMessage,
@@ -346,7 +401,7 @@ export async function executePlaywrightCode(
             const executionTime = Date.now() - startTime;
             cleanup();
 
-            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorMessage = formatError(error);
             resolve({
                 status: 'ERROR',
                 output: `Execution error: ${errorMessage}`,
@@ -356,6 +411,29 @@ export async function executePlaywrightCode(
             });
         }
     });
+}
+
+/**
+ * Format error messages to be more user-friendly
+ */
+function formatError(error: unknown): string {
+    const msg = error instanceof Error ? error.message : String(error);
+
+    if (msg.includes('Element not found')) {
+        return `${msg}\n\n💡 Tip: Check if your selector matches the HTML structure in the Preview tab.`;
+    }
+    if (msg.includes('Timeout waiting')) {
+        return `${msg}\n\n💡 Tip: The element might not be visible yet, or the operation took too long.`;
+    }
+    if (msg.includes('is not defined')) {
+        return `${msg}\n\n💡 Tip: You might have a typo in a variable name.`;
+    }
+    if (msg.includes('Expected')) {
+        // Assertion error
+        return `${msg}\n\n💡 Tip: Your assertion failed. Check the Expected vs Actual values.`;
+    }
+
+    return msg;
 }
 
 /**
@@ -619,6 +697,72 @@ function createExpect() {
                     const pass = expected instanceof RegExp ? expected.test(title) : title === expected;
                     if (!pass) {
                         handleResult(false, `Expected title "${title}" to match "${expected}"`);
+                    }
+                },
+
+                async toHaveClass(expected: string | RegExp) {
+                    let className = '';
+                    if (actual && typeof actual.getAttribute === 'function') {
+                        className = (await actual.getAttribute('class')) || '';
+                    } else if (actual instanceof HTMLElement) {
+                        className = actual.className;
+                    }
+
+                    let pass = false;
+                    if (expected instanceof RegExp) {
+                        pass = expected.test(className);
+                    } else {
+                        pass = className === expected;
+                    }
+
+                    if (!pass) {
+                        handleResult(false, `Expected class "${className}" to match "${expected}"`);
+                    }
+                },
+
+                async toBeFocused() {
+                    await Promise.resolve();
+                    let isFocused = false;
+
+                    if (actual && typeof actual.evaluate === 'function') {
+
+                        isFocused = await actual.evaluate((el: any) => el === el.ownerDocument.activeElement);
+                    } else if (actual instanceof HTMLElement) {
+                        isFocused = actual === actual.ownerDocument.activeElement;
+                    }
+                    if (!isFocused) handleResult(false, 'Expected element to be focused');
+                },
+
+                async toBeEmpty() {
+                    let isEmpty = false;
+                    if (actual && typeof actual.evaluate === 'function') {
+                        isEmpty = await actual.evaluate((el: HTMLElement) => {
+                            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) {
+                                return !(el as HTMLInputElement).value;
+                            }
+                            return !el.textContent;
+                        });
+                    } else if (actual instanceof HTMLElement) {
+                        if (['INPUT', 'TEXTAREA', 'SELECT'].includes(actual.tagName)) {
+                            isEmpty = !(actual as HTMLInputElement).value;
+                        } else {
+                            isEmpty = !actual.textContent;
+                        }
+                    }
+                    if (!isEmpty) handleResult(false, 'Expected element to be empty');
+                },
+
+                async toBeHidden() {
+                    await Promise.resolve();
+                    let visible = false;
+                    if (actual && typeof actual.isVisible === 'function') {
+                        visible = await actual.isVisible();
+                    } else if (actual instanceof HTMLElement) {
+                        visible = actual.style.display !== 'none';
+                    }
+
+                    if (visible) {
+                        handleResult(false, 'Expected element to be hidden');
                     }
                 },
 

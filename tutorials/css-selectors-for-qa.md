@@ -130,10 +130,3 @@ body > div.container > div.main-content > form > div:nth-child(2) > input.form-c
 
 ---
 
-## Ready to Practice?
-
-Test your new mental model with these challenges:
-
-1. [Selector 101: ID & Class](/challenges/selector-101-id-class) - Start with the basics.
-2. [Attribute Selectors](/challenges/attribute-selectors) - Break away from IDs.
-3. [Child & Descendant](/challenges/child-descendant) - Navigate the tree.

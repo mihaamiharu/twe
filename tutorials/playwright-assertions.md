@@ -103,10 +103,3 @@ await expect(page.locator('.spinner')).toBeHidden();
 
 ---
 
-## Ready to Practice?
-
-Judge your code:
-
-1. [Visibility Checks](/challenges/pw-to-be-visible) - The Spinner problem.
-2. [Text Verification](/challenges/pw-to-have-text) - Handling dynamic text.
-3. [State assertions](/challenges/pw-state-assertions) - Disabled, Checked, Editable.

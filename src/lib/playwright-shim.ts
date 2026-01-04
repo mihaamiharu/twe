@@ -18,6 +18,7 @@ export interface FilePayload {
 
 export interface Locator {
     click(): Promise<void>;
+    dblclick(): Promise<void>;
     fill(value: string): Promise<void>;
     textContent(): Promise<string | null>;
     inputValue(): Promise<string>;
@@ -34,9 +35,15 @@ export interface Locator {
     first(): Locator;
     last(): Locator;
     nth(index: number): Locator;
+    focus(): Promise<void>;
+    blur(): Promise<void>;
+    clear(): Promise<void>;
+    dispatchEvent(type: string, eventInit?: CustomEventInit): Promise<void>;
     setInputFiles(files: FilePayload | FilePayload[]): Promise<void>;
     dragTo(target: Locator): Promise<void>;
+    dragAndDrop(target: Locator): Promise<void>;
     press(key: string): Promise<void>;
+    evaluate<R, Arg>(pageFunction: (element: HTMLElement, arg: Arg) => R | Promise<R>, arg?: Arg): Promise<R>;
     locator(selector: string): Locator;
 }
 
@@ -128,6 +135,33 @@ export class MockedPlaywrightPage {
         return Promise.resolve();
     }
 
+    async reload(): Promise<void> {
+        logger.debug('Reloading page');
+        this.targetDocument.location.reload();
+        await this.delay(100);
+    }
+
+    async goBack(): Promise<void> {
+        logger.debug('Navigating back');
+        this.targetDocument.defaultView?.history.back();
+        await this.delay(100);
+    }
+
+    async goForward(): Promise<void> {
+        logger.debug('Navigating forward');
+        this.targetDocument.defaultView?.history.forward();
+        await this.delay(100);
+    }
+
+    async evaluate<R, Arg>(pageFunction: (arg: Arg) => R | Promise<R>, arg?: Arg): Promise<R> {
+        if (typeof pageFunction === 'function') {
+            return Promise.resolve(pageFunction(arg as Arg));
+        }
+        // If string, we might need eval, but let's avoid it for security/complexity if possible.
+        // Playwright supports string, but mostly people use functions.
+        throw new Error('evaluate only supports functions in this shim');
+    }
+
     async click(selector: string): Promise<void> {
         // Auto-wait for element to be visible
         await this.waitForSelector(selector, { state: 'visible' });
@@ -135,6 +169,27 @@ export class MockedPlaywrightPage {
         const element = this.targetDocument.querySelector(selector) as HTMLElement;
         if (!element) throw new Error(`Element not found: ${selector}`);
         element.click();
+    }
+
+    async dblclick(selector: string): Promise<void> {
+        await this.waitForSelector(selector, { state: 'visible' });
+        const element = this.targetDocument.querySelector(selector) as HTMLElement;
+        if (!element) throw new Error(`Element not found: ${selector}`);
+        element.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true, view: window }));
+    }
+
+    async focus(selector: string): Promise<void> {
+        await this.waitForSelector(selector, { state: 'visible' });
+        const element = this.targetDocument.querySelector(selector) as HTMLElement;
+        if (!element) throw new Error(`Element not found: ${selector}`);
+        element.focus();
+    }
+
+    async dispatchEvent(selector: string, type: string, eventInit?: CustomEventInit): Promise<void> {
+        await this.waitForSelector(selector, { state: 'visible' });
+        const element = this.targetDocument.querySelector(selector) as HTMLElement;
+        if (!element) throw new Error(`Element not found: ${selector}`);
+        element.dispatchEvent(new CustomEvent(type, { bubbles: true, cancelable: true, ...eventInit }));
     }
 
     /**
@@ -384,7 +439,7 @@ export class MockedPlaywrightPage {
                         const value = (locator as any)[prop];
                         if (typeof value === 'function') {
                             return (...args: unknown[]) => {
-                                // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-function-type
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-function-type
                                 return (value as Function).apply(locator, args);
                             };
                         }
@@ -701,6 +756,14 @@ export class MockedPlaywrightPage {
                 el.click();
             },
 
+            dblclick: async () => {
+                await this.delay(50);
+                const el = getElement();
+                if (!el) throw new Error('Element not found');
+                if (!this.isVisible(el)) throw new Error('Element is not visible');
+                el.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true, view: window }));
+            },
+
             fill: async (value: string) => {
                 await this.delay(50);
                 const el = getElement() as HTMLInputElement | HTMLTextAreaElement;
@@ -806,6 +869,37 @@ export class MockedPlaywrightPage {
                 return locator;
             },
 
+            focus: async () => {
+                await this.delay(50);
+                const el = getElement();
+                if (!el) throw new Error('Element not found');
+                el.focus();
+            },
+
+            blur: async () => {
+                await this.delay(50);
+                const el = getElement();
+                if (!el) throw new Error('Element not found');
+                el.blur();
+            },
+
+            clear: async () => {
+                await this.delay(50);
+                const el = getElement() as HTMLInputElement;
+                if (!el) throw new Error('Element not found');
+                el.focus();
+                el.value = '';
+                el.dispatchEvent(new Event('input', { bubbles: true }));
+                el.dispatchEvent(new Event('change', { bubbles: true }));
+            },
+
+            dispatchEvent: async (type: string, eventInit?: CustomEventInit) => {
+                await this.delay(50);
+                const el = getElement();
+                if (!el) throw new Error('Element not found');
+                el.dispatchEvent(new CustomEvent(type, { bubbles: true, cancelable: true, ...eventInit }));
+            },
+
             setInputFiles: async (files: FilePayload | FilePayload[]) => {
                 await this.delay(50);
                 const el = getElement() as HTMLInputElement;
@@ -816,7 +910,8 @@ export class MockedPlaywrightPage {
                 const fileList = Array.isArray(files) ? files : [files];
 
                 for (const f of fileList) {
-                    const file = new File([f.buffer || ''], f.name, { type: f.mimeType });
+                    const bufferData = f.buffer ? [f.buffer as BlobPart] : [''];
+                    const file = new File(bufferData, f.name, { type: f.mimeType });
                     dataTransfer.items.add(file);
                 }
 
@@ -832,6 +927,11 @@ export class MockedPlaywrightPage {
                 const sourceEl = getElement();
                 if (!sourceEl) throw new Error('Source element not found');
                 sourceEl.dispatchEvent(new DragEvent('dragstart', { bubbles: true }));
+                // Note: Full drag and drop simulation is complex. This is a partial shim.
+            },
+
+            dragAndDrop: async (target: Locator) => {
+                return locator.dragTo(target);
             },
 
             press: async (key: string) => {
@@ -841,6 +941,12 @@ export class MockedPlaywrightPage {
                 el.focus();
                 el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
                 el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+            },
+
+            evaluate: async <R, Arg>(fn: (el: HTMLElement, arg: Arg) => R | Promise<R>, arg?: Arg) => {
+                const el = getElement();
+                if (!el) throw new Error('Element not found');
+                return fn(el, arg as Arg);
             },
 
             locator: (subSelector: string) => {

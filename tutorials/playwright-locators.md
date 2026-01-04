@@ -123,10 +123,3 @@ page.getByText(/welcome/i); // Matches "WELCOME"
 
 ---
 
-## Ready to Practice?
-
-Train your pointing finger:
-
-1. [Role vs Text](/challenges/pw-get-by-role) - The accessibility check.
-2. [The TestID Contract](/challenges/pw-get-by-testid) - Safe selection.
-3. [Chaining and Filtering](/challenges/pw-locator-chaining) - Handling lists.

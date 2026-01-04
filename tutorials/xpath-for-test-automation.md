@@ -119,10 +119,3 @@ The text actually contains newlines and spaces.
 
 ---
 
-## Ready to Practice?
-
-Test your new mental model with these challenges:
-
-1. [XPath Basics](/challenges/xpath-basics) - Directories and Files.
-2. [Text Content](/challenges/xpath-text-content) - The Sniper Scope.
-3. [Parent/Ancestor](/challenges/xpath-parent-ancestor) - Climbing the Tree.

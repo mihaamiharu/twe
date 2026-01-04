@@ -231,9 +231,9 @@ function ProfilePage() {
                                             <span className="text-xl">🟢</span>
                                             <span className="font-medium">Basic (Selectors)</span>
                                         </div>
-                                        <Badge variant="secondary">15 challenges</Badge>
+                                        <Badge variant="secondary">36 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(selectorCount / 15 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(selectorCount / 36 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* Tier: Beginner */}
@@ -301,41 +301,43 @@ function ProfilePage() {
                                 <CardDescription>Your latest learning progress</CardDescription>
                             </CardHeader>
                             <CardContent>
-                                <div className="mb-8">
-                                    <h3 className="text-sm font-medium mb-4">Submission Activity</h3>
-                                    <ActivityHeatmap data={user.heatmapData || []} className="mx-auto" />
-                                </div>
-
-                                <h3 className="text-sm font-medium mb-4">Timeline</h3>
-                                {(!user.recentActivity || user.recentActivity.length === 0) ? (
-                                    <div className="text-center py-8 text-muted-foreground">
-                                        <Code className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                        <p>No recent activity yet. Start learning!</p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        {user.recentActivity.map((activity, index) => (
-                                            <div
-                                                key={index}
-                                                className="flex items-center justify-between p-4 rounded-lg bg-muted/30"
-                                            >
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-2 rounded-lg bg-primary/20">
-                                                        {activity.type === 'challenge' && <Code className="h-5 w-5 text-primary" />}
-                                                        {activity.type === 'achievement' && <Award className="h-5 w-5 text-accent" />}
+                                <div className="mt-6 ml-[18px]">
+                                    {(!user.recentActivity || user.recentActivity.length === 0) ? (
+                                        <div className="text-center py-12 text-muted-foreground ml-[-18px]">
+                                            <Code className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                                            <p>No recent activity yet. Start learning!</p>
+                                        </div>
+                                    ) : (
+                                        <div className="border-l-2 border-primary/20 space-y-8 pl-8 pb-2">
+                                            {user.recentActivity.map((activity, index) => (
+                                                <div key={index} className="relative group">
+                                                    {/* Timeline Node */}
+                                                    <div className={
+                                                        "absolute -left-[41px] top-0 h-6 w-6 rounded-full border-4 border-background flex items-center justify-center " +
+                                                        (activity.type === 'challenge' ? "bg-primary text-primary-foreground" : "bg-accent text-accent-foreground")
+                                                    }>
+                                                        {activity.type === 'challenge' ? (
+                                                            <Code className="h-3 w-3" />
+                                                        ) : (
+                                                            <Award className="h-3 w-3" />
+                                                        )}
                                                     </div>
-                                                    <div>
-                                                        <div className="font-medium">{activity.title}</div>
-                                                        <div className="text-sm text-muted-foreground">{activity.date}</div>
+
+                                                    {/* Content Card */}
+                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 rounded-lg bg-card/50 border border-border/50 hover:bg-muted/30 transition-colors">
+                                                        <div className="space-y-1">
+                                                            <h4 className="font-semibold text-sm leading-none">{activity.title}</h4>
+                                                            <p className="text-xs text-muted-foreground">{activity.date}</p>
+                                                        </div>
+                                                        <Badge variant="secondary" className="w-fit font-mono text-xs">
+                                                            +{activity.xp} XP
+                                                        </Badge>
                                                     </div>
                                                 </div>
-                                                <Badge variant="secondary" className="text-accent">
-                                                    +{activity.xp} XP
-                                                </Badge>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
                     </TabsContent>
