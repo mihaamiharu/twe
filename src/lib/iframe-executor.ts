@@ -14,7 +14,9 @@ export interface ExecutionResult {
     error?: string;
     returnValue?: unknown;
     logs?: Array<{ id: string; type: string; message: string }>;
+    assertionCount?: number;
 }
+
 
 export interface ExecuteOptions {
     timeout?: number;
@@ -35,8 +37,7 @@ export interface TestCaseResult {
 }
 
 /**
- * Execute user code in an isolated iframe environment
- * If existingIframe is provided, use it instead of creating a new one
+ * Executes Playwright-style code in a sandboxed iframe
  */
 export async function executePlaywrightCode(
     code: string,
@@ -158,6 +159,7 @@ export async function executePlaywrightCode(
                                     });
                                 };
                             </script>
+                            
                           </head>
                           <body>
                             ${finalHtml}
@@ -188,7 +190,7 @@ export async function executePlaywrightCode(
                                 const scriptCode = script.textContent;
 
                                 // Extract function names and assign them to window
-                                const funcMatches = scriptCode.matchAll(/function\s+(\w+)\s*\(/g);
+                                const funcMatches = Array.from(scriptCode.matchAll(/function\s+(\w+)\s*\(/g));
                                 const funcNames: string[] = [];
                                 for (const match of funcMatches) {
                                     funcNames.push(match[1]);
@@ -299,15 +301,8 @@ export async function executePlaywrightCode(
                     const createEnhancedDocument = (doc: Document) => {
                         const handler: ProxyHandler<Document> = {
                             get(target, prop) {
-                                if (prop === 'querySelector') {
-                                    return (selector: string) => {
-                                        const element = target.querySelector(selector);
-                                        if (element === null) {
-                                            throw new Error(`Element not found: No element matches selector '${selector}'. Check your selector for typos.`);
-                                        }
-                                        return element;
-                                    };
-                                }
+                                // querySelector override removed to allow null returns for existence checks
+
                                 if (prop === 'querySelectorAll') {
                                     return (selector: string) => {
                                         const elements = target.querySelectorAll(selector);
@@ -317,15 +312,8 @@ export async function executePlaywrightCode(
                                         return elements;
                                     };
                                 }
-                                if (prop === 'getElementById') {
-                                    return (id: string) => {
-                                        const element = target.getElementById(id);
-                                        if (element === null) {
-                                            throw new Error(`Element not found: No element with id '${id}'. Check for typos.`);
-                                        }
-                                        return element;
-                                    };
-                                }
+                                // getElementById override removed to allow null returns
+
                                 // For all other properties, return the original value
                                 /* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment */
                                 const value = target[prop as keyof Document];
@@ -352,13 +340,13 @@ export async function executePlaywrightCode(
                         `
                             const fetch = window.fetch;
                             return (async () => {
-                              ${code}
+                              ${code} try { if (typeof result !== "undefined") return result; } catch(e) {}
                             })();
                         `
                     );
 
-                    // Simple expect function
-                    const expect = createExpect();
+                    // Simple expect function with assertion tracking
+                    const { expect, getAssertionCount } = createExpect();
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     const returnValue = await userFunction(page, expect, iframe.contentWindow, enhancedDocument, interceptedConsole);
@@ -372,7 +360,9 @@ export async function executePlaywrightCode(
                         executionTime,
                         returnValue,
                         logs,
+                        assertionCount: getAssertionCount(),
                     });
+
                 } catch (error) {
                     const executionTime = Date.now() - startTime;
                     cleanup();
@@ -531,12 +521,34 @@ export async function executeWithTestCases(
 
 /**
  * Create a simple expect function for assertions
+ * Returns both the expect function and assert count getter
  */
-function createExpect() {
+// Define the return type explicitly to avoid circular reference
+interface ExpectResult {
+    expect: (actual: unknown) => {
+        toBe: (expected: unknown) => void;
+        toBeVisible: () => Promise<void>;
+        toBeHidden: () => Promise<void>;
+        toHaveText: (text: string | RegExp) => Promise<void>;
+        toHaveValue: (value: string) => Promise<void>;
+        toContainText: (text: string) => Promise<void>;
+        toHaveAttribute: (name: string, value?: string | RegExp) => Promise<void>;
+        toHaveCount: (count: number) => Promise<void>;
+    };
+    getAssertionCount: () => number;
+}
+
+function createExpect(): ExpectResult {
+    let assertionCount = 0;
+
+    const incrementCount = () => { assertionCount++; };
+    const getAssertionCount = () => assertionCount;
+
     /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
     const expect = function (actual: any) {
         const createMatchers = (isSoft = false) => {
             const handleResult = (pass: boolean, message: string) => {
+                incrementCount(); // Count every assertion call
                 if (!pass) {
                     if (isSoft) {
                         try {
@@ -567,9 +579,7 @@ function createExpect() {
                         ? expected.test(text)
                         : text === expected; // toHaveText is strict exact match usually, but plays looser if needed. Playwright default is full string match.
 
-                    if (!pass) {
-                        handleResult(false, `Expected text "${text}" to match "${expected}"`);
-                    }
+                    handleResult(pass, `Expected text "${text}" to match "${expected}"`);
                 },
 
                 async toContainText(expected: string) {
@@ -582,9 +592,7 @@ function createExpect() {
                         text = String(actual);
                     }
 
-                    if (!text.includes(expected)) {
-                        handleResult(false, `Expected text "${text}" to contain "${expected}"`);
-                    }
+                    handleResult(text.includes(expected), `Expected text "${text}" to contain "${expected}"`);
                 },
 
                 async toHaveValue(expected: string | RegExp) {
@@ -596,9 +604,7 @@ function createExpect() {
                     }
 
                     const pass = expected instanceof RegExp ? expected.test(value) : value === expected;
-                    if (!pass) {
-                        handleResult(false, `Expected value "${value}" to match "${expected}"`);
-                    }
+                    handleResult(pass, `Expected value "${value}" to match "${expected}"`);
                 },
 
                 async toHaveAttribute(name: string, value?: string | RegExp) {
@@ -616,9 +622,9 @@ function createExpect() {
 
                     if (value !== undefined) {
                         const pass = value instanceof RegExp ? value.test(attrValue) : attrValue === value;
-                        if (!pass) {
-                            handleResult(false, `Expected attribute "${name}" to have value "${value}", got "${attrValue}"`);
-                        }
+                        handleResult(pass, `Expected attribute "${name}" to have value "${value}", got "${attrValue}"`);
+                    } else {
+                        handleResult(true, ''); // Attribute exists
                     }
                 },
 
@@ -630,9 +636,7 @@ function createExpect() {
                         count = actual.length;
                     }
 
-                    if (count !== expected) {
-                        handleResult(false, `Expected count ${expected}, got ${count}`);
-                    }
+                    handleResult(count === expected, `Expected count ${expected}, got ${count}`);
                 },
 
                 async toBeVisible() {
@@ -645,9 +649,7 @@ function createExpect() {
                         visible = actual.style.display !== 'none';
                     }
 
-                    if (!visible) {
-                        handleResult(false, 'Expected element to be visible');
-                    }
+                    handleResult(visible, 'Expected element to be visible');
                 },
 
                 async toBeChecked() {
@@ -656,7 +658,7 @@ function createExpect() {
                     if (actual && typeof actual.isChecked === 'function') {
                         checked = await actual.isChecked();
                     }
-                    if (!checked) handleResult(false, 'Expected element to be checked');
+                    handleResult(checked, 'Expected element to be checked');
                 },
 
                 async toBeEnabled() {
@@ -665,7 +667,7 @@ function createExpect() {
                     if (actual && typeof actual.isDisabled === 'function') {
                         disabled = await actual.isDisabled();
                     }
-                    if (disabled) handleResult(false, 'Expected element to be enabled');
+                    handleResult(!disabled, 'Expected element to be enabled');
                 },
 
                 async toBeDisabled() {
@@ -674,7 +676,7 @@ function createExpect() {
                     if (actual && typeof actual.isDisabled === 'function') {
                         disabled = await actual.isDisabled();
                     }
-                    if (!disabled) handleResult(false, 'Expected element to be disabled');
+                    handleResult(disabled, 'Expected element to be disabled');
                 },
 
                 async toBeEditable() {
@@ -683,21 +685,35 @@ function createExpect() {
                     if (actual && typeof actual.isEditable === 'function') {
                         editable = await actual.isEditable();
                     }
-                    if (!editable) handleResult(false, 'Expected element to be editable');
+                    handleResult(editable, 'Expected element to be editable');
                 },
 
                 async toHaveTitle(expected: string | RegExp) {
+                    await Promise.resolve();
                     let title = '';
                     if (actual && typeof actual.title === 'function') {
                         title = await actual.title();
                     } else if (actual && actual.targetDocument) {
                         title = actual.targetDocument.title;
+                    } else if (typeof actual === 'string') {
+                        title = actual;
                     }
 
                     const pass = expected instanceof RegExp ? expected.test(title) : title === expected;
-                    if (!pass) {
-                        handleResult(false, `Expected title "${title}" to match "${expected}"`);
+                    handleResult(pass, `Expected title "${title}" to match "${expected}"`);
+                },
+
+                async toHaveURL(expected: string | RegExp) {
+                    await Promise.resolve();
+                    let url = '';
+                    if (actual && typeof actual.url === 'function') {
+                        url = actual.url();
+                    } else if (typeof actual === 'string') {
+                        url = actual;
                     }
+
+                    const pass = expected instanceof RegExp ? expected.test(url) : url === expected;
+                    handleResult(pass, `Expected URL "${url}" to match "${expected}"`);
                 },
 
                 async toHaveClass(expected: string | RegExp) {
@@ -708,16 +724,14 @@ function createExpect() {
                         className = actual.className;
                     }
 
-                    let pass = false;
+                    let pass;
                     if (expected instanceof RegExp) {
                         pass = expected.test(className);
                     } else {
                         pass = className === expected;
                     }
 
-                    if (!pass) {
-                        handleResult(false, `Expected class "${className}" to match "${expected}"`);
-                    }
+                    handleResult(pass, `Expected class "${className}" to match "${expected}"`);
                 },
 
                 async toBeFocused() {
@@ -730,7 +744,7 @@ function createExpect() {
                     } else if (actual instanceof HTMLElement) {
                         isFocused = actual === actual.ownerDocument.activeElement;
                     }
-                    if (!isFocused) handleResult(false, 'Expected element to be focused');
+                    handleResult(isFocused, 'Expected element to be focused');
                 },
 
                 async toBeEmpty() {
@@ -749,7 +763,7 @@ function createExpect() {
                             isEmpty = !actual.textContent;
                         }
                     }
-                    if (!isEmpty) handleResult(false, 'Expected element to be empty');
+                    handleResult(isEmpty, 'Expected element to be empty');
                 },
 
                 async toBeHidden() {
@@ -761,19 +775,17 @@ function createExpect() {
                         visible = actual.style.display !== 'none';
                     }
 
-                    if (visible) {
-                        handleResult(false, 'Expected element to be hidden');
-                    }
+                    handleResult(!visible, 'Expected element to be hidden');
                 },
 
                 // standard matchers (sync mostly, but we make async for consistency)
                 async toBe(expected: unknown) {
                     await Promise.resolve();
-                    if (actual !== expected) handleResult(false, `Expected ${expected}, got ${actual}`);
+                    handleResult(actual === expected, `Expected ${expected}, got ${actual}`);
                 },
                 async toEqual(expected: unknown) {
                     await Promise.resolve();
-                    if (JSON.stringify(actual) !== JSON.stringify(expected)) handleResult(false, `Expected equal`);
+                    handleResult(JSON.stringify(actual) === JSON.stringify(expected), `Expected equal`);
                 }
             };
         };
@@ -804,9 +816,15 @@ function createExpect() {
         return softMatchers;
     };
 
-    return expect;
+    return { expect, getAssertionCount };
     /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
 }
+
+// Helper type for createExpect internal use
+function createExpectInternal() {
+    return createExpect().expect;
+}
+
 
 /**
  * Helper to show iframe preview during development

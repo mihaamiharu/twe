@@ -18,6 +18,7 @@ import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 import { TierSkipTip } from '@/components/challenges/TierSkipTip';
 import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
 import { showAchievementToasts } from '@/lib/achievement-toast';
+import { getLevelTitle } from '@/lib/gamification';
 
 export const Route = createFileRoute('/challenges/$slug')({
     component: ChallengeDetailPage,
@@ -193,8 +194,10 @@ function ChallengeDetailPage() {
             input: tc.input,
             expectedOutput: tc.expectedOutput
         })),
+        category: data.category,
         isCompleted: data.userProgress?.isCompleted || false
     } : null;
+
 
     const submitMutation = useMutation({
         mutationFn: async (submissionData: {
@@ -221,7 +224,10 @@ function ChallengeDetailPage() {
                 setLastSubmissionResult({
                     xpEarned: response.data.submission.xpEarned,
                     achievements: response.data.newAchievements || [],
-                    levelUp: response.data.levelUp ? { newLevel: response.data.levelUp.newLevel, title: `Level ${response.data.levelUp.newLevel}` } : undefined,
+                    levelUp: response.data.levelUp ? {
+                        newLevel: response.data.levelUp.newLevel,
+                        title: getLevelTitle(response.data.levelUp.newLevel)
+                    } : undefined,
                 });
                 setShowSuccessDialog(true);
 
