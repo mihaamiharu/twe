@@ -1623,11 +1623,11 @@ await page.click('#btn');  // Auto-waits internally
     document.getElementById('content').innerHTML = '<button id="delayed-btn" onclick="this.textContent=\\'Clicked!\\'">Click Me</button>';
   }, 100);
 </script>`,
-    starterCode: `// Playwright auto-waits for the button to appear
-await page.click('#delayed-btn');
+    starterCode: `// Click the delayed button (Playwright auto-waits!)
+// Your code here
 
-// Get the button text
-const result = await page.locator('#delayed-btn').textContent();`,
+// Get the button text after clicking
+const result = "";`,
     expectedOutput: 'Clicked!',
     tags: ['playwright', 'waits', 'auto-wait', 'intermediate'],
   },
@@ -1680,11 +1680,11 @@ await page.waitForSelector('#popup', { state: 'detached' });
     document.getElementById('result').style.display = 'block';
   }, 100);
 </script>`,
-    starterCode: `// Wait for spinner to hide
-await page.waitForSelector('#spinner', { state: 'hidden' });
+    starterCode: `// Wait for spinner to hide using waitForSelector with state: 'hidden'
+// Your code here
 
-// Get result
-const result = await page.locator('#result').textContent();`,
+// Get the result text
+const result = "";`,
     expectedOutput: 'Data loaded!',
     tags: ['playwright', 'waits', 'selector', 'intermediate'],
   },
@@ -1698,7 +1698,7 @@ const result = await page.locator('#result').textContent();`,
     xpReward: 60,
     order: 703,
     instructions: `# waitForLoadState
-
+    
 Wait for page load states!
 
 ## Load States
@@ -1714,12 +1714,7 @@ await page.waitForLoadState('domcontentloaded');
 await page.waitForLoadState('networkidle');
 \`\`\`
 
-## After Navigation
-
-\`\`\`javascript
-await page.goto('/dashboard');
-await page.waitForLoadState('networkidle');
-\`\`\`
+> **Note:** In this sandbox, pages load almost instantly. In real applications, these commands wait for network activity and parsing to complete.
 
 ## Your Task
 1. Navigate and wait for DOM ready
@@ -1731,11 +1726,11 @@ await page.waitForLoadState('networkidle');
     <h1>Welcome to Dashboard</h1>
   </body>
 </html>`,
-    starterCode: `// Wait for DOM to be ready
-await page.waitForLoadState('domcontentloaded');
+    starterCode: `// Wait for DOM to be ready using waitForLoadState
+// Your code here
 
 // Get page title
-const result = await page.title();`,
+const result = "";`,
     expectedOutput: 'Dashboard',
     tags: ['playwright', 'waits', 'load', 'intermediate'],
   },
@@ -1777,22 +1772,20 @@ const data = await response.json();
 \`\`\`
 
 ## Your Task
-1. Trigger an API call
-2. Wait for the response
-3. Display success message
+1. Click the "Load Data" button (triggers API call)
+2. Wait for the /api/data response using Promise.all
+3. Get the status text from \`#status\` element
 `,
     htmlContent: `<div class="api-demo">
   <button id="load" onclick="fetch('/api/data').then(() => document.getElementById('status').textContent = 'API Success')">Load Data</button>
   <div id="status"></div>
 </div>`,
-    starterCode: `// Wait for API response while clicking
-const [response] = await Promise.all([
-    page.waitForResponse('/api/data'),
-    page.click('#load')
-]);
+    starterCode: `// Click the load button and wait for API response
+// Tip: Use Promise.all with waitForResponse and click
+// Your code here
 
-// Get status text
-const result = await page.locator('#status').textContent();`,
+// Get the status text
+const result = "";`,
     expectedOutput: 'API Success',
     tags: ['playwright', 'waits', 'api', 'response', 'intermediate'],
   },
@@ -1846,16 +1839,14 @@ await page.waitForFunction(() => {
     count++;
     document.getElementById('counter').textContent = count;
     if (count >= 5) clearInterval(interval);
-  }, 50);
+    if (count >= 5) clearInterval(interval);
+  }, 200);
 </script>`,
-    starterCode: `// Wait for counter to reach 3
-await page.waitForFunction(() => {
-    const counter = document.getElementById('counter');
-    return parseInt(counter.textContent) >= 3;
-});
+    starterCode: `// Wait for counter to reach 3 using waitForFunction
+// Your code here
 
 // Get counter value
-const result = await page.locator('#counter').textContent();`,
+const result = "";`,
     expectedOutput: '3',
     tags: ['playwright', 'waits', 'function', 'custom', 'intermediate'],
   },
@@ -1908,11 +1899,11 @@ use: {
     htmlContent: `<div class="timeout-demo">
   <button id="fast-btn" onclick="this.textContent = 'Done!'">Quick Click</button>
 </div>`,
-    starterCode: `// Click with short timeout (element is immediately available)
-await page.click('#fast-btn', { timeout: 1000 });
+    starterCode: `// Click with a custom timeout option
+// Your code here
 
-// Get button text
-const result = await page.locator('#fast-btn').textContent();`,
+// Get button text after click
+const result = "";`,
     expectedOutput: 'Done!',
     tags: ['playwright', 'waits', 'timeout', 'config', 'intermediate'],
   },

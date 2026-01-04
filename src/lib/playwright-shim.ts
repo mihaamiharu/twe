@@ -7,7 +7,7 @@
  * Based on: docs/TDD.md Section 5.2
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from './logger';
 
 export interface FilePayload {
     name: string;
@@ -440,99 +440,111 @@ export class MockedPlaywrightPage {
     }
 
     frameLocator(selector: string): FrameLocator {
-        const getFrameDoc = (): Document | null => {
-            const frame = this.targetDocument.querySelector(selector) as HTMLIFrameElement;
-            if (!frame) return null;
-            return frame.contentDocument || frame.contentWindow?.document || null;
-        };
+        const createFrameLocatorInternal = (frameSelector: string, index: number): FrameLocator => {
+            const getFrameDoc = (): Document | null => {
+                const frames = this.targetDocument.querySelectorAll(frameSelector);
+                let targetIndex = index;
+                if (index < 0) {
+                    targetIndex = frames.length + index; // Handle -1 for last
+                }
+                const frame = frames[targetIndex] as HTMLIFrameElement;
+                if (!frame) return null;
+                return frame.contentDocument || frame.contentWindow?.document || null;
+            };
 
-        return {
-            locator: (itemSelector: string): Locator => {
-                return this.createLocator(() => {
-                    const doc = getFrameDoc();
-                    if (!doc) return [];
-                    return Array.from(doc.querySelectorAll(itemSelector)) as HTMLElement[];
-                });
-            },
-            getByRole: (role: string, options?: LocatorOptions) => {
-                return this.createLocator(() => {
-                    const doc = getFrameDoc();
-                    if (!doc) return [];
-                    const page = new MockedPlaywrightPage(doc);
-                    // Use page's internal getByRole logic indirectly via querying
-                    const roleSelector = `[role="${role}"]`;
-                    let elements = Array.from(doc.querySelectorAll(roleSelector)) as HTMLElement[];
-                    if (options?.name) {
-                        elements = elements.filter(el => {
-                            const text = el.textContent || el.getAttribute('aria-label') || '';
-                            return options.name instanceof RegExp ? options.name.test(text) : text.includes(options.name as string);
-                        });
-                    }
-                    return elements;
-                });
-            },
-            getByText: (text: string | RegExp, options?: { exact?: boolean }) => {
-                return this.createLocator(() => {
-                    const doc = getFrameDoc();
-                    if (!doc) return [];
-                    const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
-                    const elements: HTMLElement[] = [];
-                    let node: Node | null;
-                    while ((node = walker.nextNode())) {
-                        const content = node.textContent || '';
-                        const matches = text instanceof RegExp
-                            ? text.test(content)
-                            : options?.exact ? content === text : content.includes(text);
-                        if (matches && node.parentElement) {
-                            elements.push(node.parentElement);
+            return {
+                locator: (itemSelector: string): Locator => {
+                    return this.createLocator(() => {
+                        const doc = getFrameDoc();
+                        if (!doc) return [];
+                        return Array.from(doc.querySelectorAll(itemSelector)) as HTMLElement[];
+                    });
+                },
+                getByRole: (role: string, options?: LocatorOptions) => {
+                    return this.createLocator(() => {
+                        const doc = getFrameDoc();
+                        if (!doc) return [];
+                        const page = new MockedPlaywrightPage(doc);
+                        // Use page's internal getByRole logic indirectly via querying
+                        const roleSelector = `[role="${role}"]`;
+                        let elements = Array.from(doc.querySelectorAll(roleSelector)) as HTMLElement[];
+                        if (options?.name) {
+                            elements = elements.filter(el => {
+                                const text = el.textContent || el.getAttribute('aria-label') || '';
+                                return options.name instanceof RegExp ? options.name.test(text) : text.includes(options.name as string);
+                            });
                         }
-                    }
-                    return elements;
-                });
-            },
-            getByLabel: (text: string | RegExp, options?: { exact?: boolean }) => {
-                return this.createLocator(() => {
-                    const doc = getFrameDoc();
-                    if (!doc) return [];
-                    const labels = Array.from(doc.querySelectorAll('label'));
-                    const elements: HTMLElement[] = [];
-                    for (const label of labels) {
-                        const labelText = label.textContent || '';
-                        const matches = text instanceof RegExp
-                            ? text.test(labelText)
-                            : options?.exact ? labelText === text : labelText.includes(text);
-                        if (matches) {
-                            const forId = label.getAttribute('for');
-                            if (forId) {
-                                const input = doc.getElementById(forId);
-                                if (input) elements.push(input as HTMLElement);
+                        return elements;
+                    });
+                },
+                getByText: (text: string | RegExp, options?: { exact?: boolean }) => {
+                    return this.createLocator(() => {
+                        const doc = getFrameDoc();
+                        if (!doc) return [];
+                        const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+                        const elements: HTMLElement[] = [];
+                        let node: Node | null;
+                        while ((node = walker.nextNode())) {
+                            const content = node.textContent || '';
+                            const matches = text instanceof RegExp
+                                ? text.test(content)
+                                : options?.exact ? content === text : content.includes(text);
+                            if (matches && node.parentElement) {
+                                elements.push(node.parentElement);
                             }
                         }
-                    }
-                    return elements;
-                });
-            },
-            getByPlaceholder: (text: string | RegExp, options?: { exact?: boolean }) => {
-                return this.createLocator(() => {
-                    const doc = getFrameDoc();
-                    if (!doc) return [];
-                    const inputs = Array.from(doc.querySelectorAll('[placeholder]')) as HTMLElement[];
-                    return inputs.filter(el => {
-                        const placeholder = el.getAttribute('placeholder') || '';
-                        return text instanceof RegExp
-                            ? text.test(placeholder)
-                            : options?.exact ? placeholder === text : placeholder.includes(text);
+                        return elements;
                     });
-                });
-            },
-            getByTestId: (testId: string) => {
-                return this.createLocator(() => {
-                    const doc = getFrameDoc();
-                    if (!doc) return [];
-                    return Array.from(doc.querySelectorAll(`[data-testid="${testId}"]`)) as HTMLElement[];
-                });
-            }
+                },
+                getByLabel: (text: string | RegExp, options?: { exact?: boolean }) => {
+                    return this.createLocator(() => {
+                        const doc = getFrameDoc();
+                        if (!doc) return [];
+                        const labels = Array.from(doc.querySelectorAll('label'));
+                        const elements: HTMLElement[] = [];
+                        for (const label of labels) {
+                            const labelText = label.textContent || '';
+                            const matches = text instanceof RegExp
+                                ? text.test(labelText)
+                                : options?.exact ? labelText === text : labelText.includes(text);
+                            if (matches) {
+                                const forId = label.getAttribute('for');
+                                if (forId) {
+                                    const input = doc.getElementById(forId);
+                                    if (input) elements.push(input as HTMLElement);
+                                }
+                            }
+                        }
+                        return elements;
+                    });
+                },
+                getByPlaceholder: (text: string | RegExp, options?: { exact?: boolean }) => {
+                    return this.createLocator(() => {
+                        const doc = getFrameDoc();
+                        if (!doc) return [];
+                        const inputs = Array.from(doc.querySelectorAll('[placeholder]')) as HTMLElement[];
+                        return inputs.filter(el => {
+                            const placeholder = el.getAttribute('placeholder') || '';
+                            return text instanceof RegExp
+                                ? text.test(placeholder)
+                                : options?.exact ? placeholder === text : placeholder.includes(text);
+                        });
+                    });
+                },
+                getByTestId: (testId: string) => {
+                    return this.createLocator(() => {
+                        const doc = getFrameDoc();
+                        if (!doc) return [];
+                        return Array.from(doc.querySelectorAll(`[data-testid="${testId}"]`)) as HTMLElement[];
+                    });
+                },
+                first: () => createFrameLocatorInternal(frameSelector, 0),
+                last: () => createFrameLocatorInternal(frameSelector, -1),
+                nth: (n: number) => createFrameLocatorInternal(frameSelector, n)
+            };
         };
+
+        return createFrameLocatorInternal(selector, 0);
     }
 
     // ============================================
@@ -941,7 +953,7 @@ export class MockedPlaywrightPage {
                 if (el.tagName !== 'SELECT') throw new Error('Element is not a select');
 
                 const values = Array.isArray(value) ? value : [value];
-                for (const option of el.options) {
+                for (const option of Array.from(el.options)) {
                     option.selected = values.includes(option.value);
                 }
                 el.dispatchEvent(new Event('change', { bubbles: true }));

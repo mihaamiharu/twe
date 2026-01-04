@@ -159,6 +159,7 @@ export async function executePlaywrightCode(
                                     });
                                 };
                             </script>
+                            
                           </head>
                           <body>
                             ${finalHtml}
@@ -189,7 +190,7 @@ export async function executePlaywrightCode(
                                 const scriptCode = script.textContent;
 
                                 // Extract function names and assign them to window
-                                const funcMatches = scriptCode.matchAll(/function\s+(\w+)\s*\(/g);
+                                const funcMatches = Array.from(scriptCode.matchAll(/function\s+(\w+)\s*\(/g));
                                 const funcNames: string[] = [];
                                 for (const match of funcMatches) {
                                     funcNames.push(match[1]);
@@ -339,7 +340,7 @@ export async function executePlaywrightCode(
                         `
                             const fetch = window.fetch;
                             return (async () => {
-                              ${code}
+                              ${code} try { if (typeof result !== "undefined") return result; } catch(e) {}
                             })();
                         `
                     );
@@ -522,7 +523,22 @@ export async function executeWithTestCases(
  * Create a simple expect function for assertions
  * Returns both the expect function and assert count getter
  */
-function createExpect(): { expect: ReturnType<typeof createExpectInternal>; getAssertionCount: () => number } {
+// Define the return type explicitly to avoid circular reference
+interface ExpectResult {
+    expect: (actual: unknown) => {
+        toBe: (expected: unknown) => void;
+        toBeVisible: () => Promise<void>;
+        toBeHidden: () => Promise<void>;
+        toHaveText: (text: string | RegExp) => Promise<void>;
+        toHaveValue: (value: string) => Promise<void>;
+        toContainText: (text: string) => Promise<void>;
+        toHaveAttribute: (name: string, value?: string | RegExp) => Promise<void>;
+        toHaveCount: (count: number) => Promise<void>;
+    };
+    getAssertionCount: () => number;
+}
+
+function createExpect(): ExpectResult {
     let assertionCount = 0;
 
     const incrementCount = () => { assertionCount++; };
