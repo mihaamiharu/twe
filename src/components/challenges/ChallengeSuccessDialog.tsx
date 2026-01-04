@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, ArrowRight, RotateCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -41,6 +41,9 @@ export function ChallengeSuccessDialog({
                     </div>
                     <DialogTitle className="text-2xl font-bold text-center">Challenge Complete!</DialogTitle>
                 </DialogHeader>
+                <DialogDescription className="text-center text-muted-foreground">
+                    Congratulations! You've successfully passed the tests for this challenge.
+                </DialogDescription>
 
                 <div className="space-y-6 py-4">
                     {/* XP Reward */}

@@ -130,23 +130,33 @@ export const getUserSettings = createServerFn({ method: 'GET' }).handler(
                 timestamp: number;
             }[] = [];
 
-            // Safely add submissions (Deduplicated)
+            // Safely add submissions (Deduplicated, preferring highest XP)
             if (recentSubmissions && Array.isArray(recentSubmissions)) {
-                const seenChallenges = new Set<string>();
+                const bestSubmissions = new Map<string, typeof recentSubmissions[0]>();
+
                 recentSubmissions
                     .filter(s => s.isPassed)
                     .forEach(s => {
-                        if (!seenChallenges.has(s.challengeId)) {
-                            seenChallenges.add(s.challengeId);
-                            activityItems.push({
-                                type: 'challenge',
-                                title: s.challengeTitle,
-                                xp: s.xpEarned,
-                                date: s.createdAt,
-                                timestamp: s.createdAt.getTime(),
-                            });
+                        const existing = bestSubmissions.get(s.challengeId);
+
+                        // If we haven't seen this challenge, or if this submission has more XP than the saved one
+                        // or (same XP but this one is older - implying it was the 'first' of the filtered batch? 
+                        // actually, usually we want the one that GAVE the XP. 
+                        // If multiple give 0, latest is fine. If mixed, we want the >0 one.
+                        if (!existing || s.xpEarned > existing.xpEarned) {
+                            bestSubmissions.set(s.challengeId, s);
                         }
                     });
+
+                bestSubmissions.forEach(s => {
+                    activityItems.push({
+                        type: 'challenge',
+                        title: s.challengeTitle,
+                        xp: s.xpEarned,
+                        date: s.createdAt,
+                        timestamp: s.createdAt.getTime(),
+                    });
+                });
             }
 
             // Safely add achievements

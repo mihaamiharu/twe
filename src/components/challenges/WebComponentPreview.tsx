@@ -75,6 +75,40 @@ export function WebComponentPreview({
             .twe-no-match {
                 outline: 2px solid #ef4444 !important;
             }
+            
+            /* Base Styles for Challenges */
+            table {
+                border-collapse: collapse;
+                width: 100%;
+                margin: 1rem 0;
+                font-size: 0.9em;
+            }
+            th, td {
+                border: 1px solid #e5e7eb;
+                padding: 0.5rem 0.75rem;
+                text-align: left;
+            }
+            th {
+                background-color: #f9fafb;
+                font-weight: 600;
+                color: #374151;
+            }
+            /* Dark mode support for tables */
+            @media (prefers-color-scheme: dark) {
+                th, td {
+                    border-color: #374151;
+                }
+                th {
+                    background-color: #1f2937;
+                    color: #f3f4f6;
+                }
+            }
+            
+            .grid {
+                display: grid;
+                gap: 1rem;
+            }
+
             * {
                 transition: outline 0.15s ease, background-color 0.15s ease;
             }

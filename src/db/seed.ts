@@ -93,7 +93,7 @@ async function seed() {
                 await db.update(users)
                     .set({
                         role: 'USER',
-                        xp: 100,
+                        xp: 0,
                         level: 1,
                         showOnLeaderboard: true
                     })
