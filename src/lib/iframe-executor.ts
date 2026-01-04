@@ -294,6 +294,54 @@ export async function executePlaywrightCode(
                     // Execute user code
                     // For JS challenges, we need to capture the 'result' variable
                     // We use eval-style declaration to make result accessible even if user uses const/let
+
+                    // Create an enhanced document wrapper with friendlier error messages
+                    const createEnhancedDocument = (doc: Document) => {
+                        const handler: ProxyHandler<Document> = {
+                            get(target, prop) {
+                                if (prop === 'querySelector') {
+                                    return (selector: string) => {
+                                        const element = target.querySelector(selector);
+                                        if (element === null) {
+                                            throw new Error(`Element not found: No element matches selector '${selector}'. Check your selector for typos.`);
+                                        }
+                                        return element;
+                                    };
+                                }
+                                if (prop === 'querySelectorAll') {
+                                    return (selector: string) => {
+                                        const elements = target.querySelectorAll(selector);
+                                        if (elements.length === 0) {
+                                            console.warn(`Warning: No elements found for selector '${selector}'`);
+                                        }
+                                        return elements;
+                                    };
+                                }
+                                if (prop === 'getElementById') {
+                                    return (id: string) => {
+                                        const element = target.getElementById(id);
+                                        if (element === null) {
+                                            throw new Error(`Element not found: No element with id '${id}'. Check for typos.`);
+                                        }
+                                        return element;
+                                    };
+                                }
+                                // For all other properties, return the original value
+                                /* eslint-disable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment */
+                                const value = target[prop as keyof Document];
+                                if (typeof value === 'function') {
+                                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                                    return value.bind(target);
+                                }
+                                return value;
+                                /* eslint-enable @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-assignment */
+                            }
+                        };
+                        return new Proxy(doc, handler);
+                    };
+
+                    const enhancedDocument = createEnhancedDocument(iframeDoc);
+
                     // eslint-disable-next-line @typescript-eslint/no-implied-eval
                     const userFunction = new Function(
                         'page',
@@ -313,7 +361,7 @@ export async function executePlaywrightCode(
                     const expect = createExpect();
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                    const returnValue = await userFunction(page, expect, iframe.contentWindow, iframe.contentDocument, interceptedConsole);
+                    const returnValue = await userFunction(page, expect, iframe.contentWindow, enhancedDocument, interceptedConsole);
 
                     const executionTime = Date.now() - startTime;
                     cleanup();
