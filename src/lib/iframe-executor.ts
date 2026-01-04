@@ -13,7 +13,7 @@ export interface ExecutionResult {
     executionTime: number;
     error?: string;
     returnValue?: unknown;
-    logs?: Array<{ type: string; message: string }>;
+    logs?: Array<{ id: string; type: string; message: string }>;
 }
 
 export interface ExecuteOptions {
@@ -46,7 +46,7 @@ export async function executePlaywrightCode(
     const timeout = options?.timeout || 10000;
     const startTime = Date.now();
     const useExistingIframe = !!options?.existingIframe;
-    const logs: Array<{ type: string; message: string }> = [];
+    const logs: Array<{ id: string; type: string; message: string }> = [];
 
 
     // Patch HTML content for specific challenges where happy-dom needs checking
@@ -102,28 +102,8 @@ export async function executePlaywrightCode(
                     // Set up the HTML content
                     iframeDoc.open();
 
-                    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-                    // Intercept console logs
-                    const win = iframe.contentWindow as any;
-                    if (win) {
-                        const originalLog = win.console.log;
-                        const originalError = win.console.error;
-                        const originalWarn = win.console.warn;
-
-                        win.console.log = (...args: any[]) => {
-                            logs.push({ type: 'log', message: args.map(a => String(a)).join(' ') });
-                            originalLog.apply(win.console, args);
-                        };
-                        win.console.error = (...args: any[]) => {
-                            logs.push({ type: 'error', message: args.map(a => String(a)).join(' ') });
-                            originalError.apply(win.console, args);
-                        };
-                        win.console.warn = (...args: any[]) => {
-                            logs.push({ type: 'warn', message: args.map(a => String(a)).join(' ') });
-                            originalWarn.apply(win.console, args);
-                        };
-                        /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment */
-                    }
+                    // NOTE: Console interception is done AFTER iframeDoc.close() below
+                    // to ensure we intercept the final document's console object
 
                     iframeDoc.write(`
                         <!DOCTYPE html>
@@ -185,6 +165,9 @@ export async function executePlaywrightCode(
                         </html>
                     `);
                     iframeDoc.close();
+
+                    // NOTE: Console logs from user code are captured via interceptedConsole
+                    // which is injected into the user function scope below
 
                     // Manually execute scripts using scoped execution
                     // This works around HappyDOM limitations where inline scripts in iframes don't execute
@@ -287,6 +270,27 @@ export async function executePlaywrightCode(
                     // Create mocked page object
                     const page = new MockedPlaywrightPage(iframeDoc);
 
+                    // Create an intercepted console object that logs to our logs array
+                    let logCounter = 0;
+                    const interceptedConsole = {
+                        log: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'log', message: args.map(a => String(a)).join(' ') });
+                            console.log(...args); // Also log to browser console for debugging
+                        },
+                        error: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'error', message: args.map(a => String(a)).join(' ') });
+                            console.error(...args);
+                        },
+                        warn: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'warn', message: args.map(a => String(a)).join(' ') });
+                            console.warn(...args);
+                        },
+                        info: (...args: unknown[]) => {
+                            logs.push({ id: `log-${Date.now()}-${logCounter++}`, type: 'log', message: args.map(a => String(a)).join(' ') });
+                            console.info(...args);
+                        },
+                    };
+
                     // Execute user code
                     // For JS challenges, we need to capture the 'result' variable
                     // We use eval-style declaration to make result accessible even if user uses const/let
@@ -296,6 +300,7 @@ export async function executePlaywrightCode(
                         'expect',
                         'window',
                         'document',
+                        'console',
                         `
                             const fetch = window.fetch;
                             return (async () => {
@@ -308,7 +313,7 @@ export async function executePlaywrightCode(
                     const expect = createExpect();
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                    const returnValue = await userFunction(page, expect, iframe.contentWindow, iframe.contentDocument);
+                    const returnValue = await userFunction(page, expect, iframe.contentWindow, iframe.contentDocument, interceptedConsole);
 
                     const executionTime = Date.now() - startTime;
                     cleanup();

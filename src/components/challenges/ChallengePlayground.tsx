@@ -35,6 +35,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { CodeEditor } from './CodeEditor';
 import { WebComponentPreview } from './WebComponentPreview';
 import { TestResults, type TestResult } from './TestResults';
+import { ConsoleOutput, type LogEntry } from './ConsoleOutput';
 
 
 import { SelectorInput, type SelectorType } from './SelectorInput';
@@ -178,6 +179,8 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
     }, [challenge.id, challenge.starterCode, challenge.type]);
 
     const [testResults, setTestResults] = useState<TestResult[]>([]);
+    const [consoleLogs, setConsoleLogs] = useState<LogEntry[]>([]);
+    const [resultsTab, setResultsTab] = useState<'results' | 'console'>('results');
 
     const [isRunning, setIsRunning] = useState(false);
     const [hasPassed, setHasPassed] = useState(false);
@@ -207,8 +210,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
         setIsRunning(true);
         setTestResults([]);
-        setIsRunning(true);
-        setTestResults([]);
+        setConsoleLogs([]);
 
         // Small delay to ensure tab switch completes
         await new Promise(resolve => setTimeout(resolve, 100));
@@ -268,6 +270,14 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
             setTestResults([testResult]);
             setHasPassed(validationPassed);
+
+            // Capture console logs from execution
+            if (result.logs) {
+                setConsoleLogs(result.logs.map(log => ({
+                    type: log.type as 'log' | 'warn' | 'error',
+                    message: log.message,
+                })));
+            }
 
         } catch (error) {
             setTestResults([
@@ -622,11 +632,39 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     )}
                 </div>
 
-                {/* Bottom: Results - Only for code challenges */}
+                {/* Bottom: Results & Console - Only for code challenges */}
                 {isCodeChallenge && (
                     <div className="h-[40%] flex flex-col shrink-0 border-t border-border bg-white dark:bg-slate-950">
                         <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/10 shrink-0">
-                            <h3 className="text-sm font-bold text-muted-foreground">Test Results</h3>
+                            <div className="flex items-center gap-1">
+                                <button
+                                    onClick={() => setResultsTab('results')}
+                                    className={cn(
+                                        "px-3 py-1 text-xs font-bold rounded-md transition-colors",
+                                        resultsTab === 'results'
+                                            ? "bg-brand-teal/20 text-brand-teal-dark"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                    )}
+                                >
+                                    Results
+                                </button>
+                                <button
+                                    onClick={() => setResultsTab('console')}
+                                    className={cn(
+                                        "px-3 py-1 text-xs font-bold rounded-md transition-colors",
+                                        resultsTab === 'console'
+                                            ? "bg-brand-teal/20 text-brand-teal-dark"
+                                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                                    )}
+                                >
+                                    Console
+                                    {consoleLogs.length > 0 && (
+                                        <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-muted rounded-full">
+                                            {consoleLogs.length}
+                                        </span>
+                                    )}
+                                </button>
+                            </div>
 
                             <Button
                                 size="sm"
@@ -638,8 +676,18 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                 Run
                             </Button>
                         </div>
-                        <div className="flex-1 overflow-auto p-4 pt-2">
-                            <TestResults results={testResults} isRunning={isRunning} challengeType={challenge.type} className="border-0 shadow-none bg-transparent" />
+                        <div className="flex-1 overflow-auto">
+                            {resultsTab === 'results' ? (
+                                <div className="p-4 pt-2">
+                                    <TestResults results={testResults} isRunning={isRunning} challengeType={challenge.type} className="border-0 shadow-none bg-transparent" />
+                                </div>
+                            ) : (
+                                <ConsoleOutput
+                                    logs={consoleLogs}
+                                    onClear={() => setConsoleLogs([])}
+                                    className="h-full"
+                                />
+                            )}
                         </div>
                     </div>
                 )}
