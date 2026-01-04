@@ -124,6 +124,7 @@ export interface Challenge {
     targetSelector?: string | string[];
 
     testCases?: { id: string; name: string; input?: unknown; expectedOutput?: unknown }[];
+    category?: string;
     tutorial?: {
         slug: string;
         title: string;
@@ -218,7 +219,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         try {
             // Modify code to return result if it's a JS challenge
             let codeToRun = code;
-            if (challenge.type === 'JAVASCRIPT') {
+            if (challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT') {
                 // Append a safe conditional return for 'result'
                 // This works even if user has nested return statements in functions
                 codeToRun += '\nif (typeof result !== "undefined") return result;';
@@ -235,7 +236,22 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
             let validationPassed = result.status === 'PASSED';
             let outputMessage = result.output;
 
-            if (challenge.type === 'JAVASCRIPT' && challenge.testCases?.length && result.status === 'PASSED') {
+            const isCodeType = challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
+            const isAssertionChallenge = challenge.category === 'playwright-assertions';
+
+            // Special handling for assertion challenges: validate based on assertion success + count
+            if (isAssertionChallenge && result.status === 'PASSED') {
+                const assertionCount = result.assertionCount ?? 0;
+                if (assertionCount === 0) {
+                    validationPassed = false;
+                    outputMessage = 'No assertions were called. Write assertions like: await expect(locator).toHaveText(\'...\');';
+                    result.status = 'FAILED';
+                } else {
+                    outputMessage = `All ${assertionCount} assertion${assertionCount > 1 ? 's' : ''} passed!`;
+                }
+            }
+            // Standard code challenges: compare return value against expected output
+            else if (isCodeType && !isAssertionChallenge && challenge.testCases?.length && result.status === 'PASSED') {
                 const expected = challenge.testCases[0].expectedOutput;
                 const actual = result.returnValue;
 
@@ -257,6 +273,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     outputMessage = `Correct! Result is ${String(actual)}`;
                 }
             }
+
 
             const testResult: TestResult = {
                 id: 'main',
@@ -427,7 +444,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         <MarkdownRenderer content={challenge.instructions} />
                     </div>
                 </TabsContent>
-                <TabsContent value="preview" className="mt-4 h-[400px]">
+                <TabsContent value="preview" className="mt-4 h-[400px] data-[state=inactive]:hidden" forceMount>
                     {challenge.htmlContent && (
                         <WebComponentPreview
                             htmlContent={challenge.htmlContent}
@@ -512,7 +529,8 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     {challenge.htmlContent && (
                         <TabsContent
                             value="preview"
-                            className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col"
+                            className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col data-[state=inactive]:hidden"
+                            forceMount
                         >
                             <WebComponentPreview
                                 htmlContent={challenge.htmlContent}

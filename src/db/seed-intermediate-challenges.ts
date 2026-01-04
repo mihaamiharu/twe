@@ -50,9 +50,11 @@ await page.goto('/login', {
 \`\`\`
 
 ## Your Task
-1. Navigate to the login page
-2. Verify the URL contains "login"
-3. Store the page title in \`result\`
+1. Navigate to the login page (\`/login\`)
+2. Store the page title in \`result\`
+
+> [!NOTE]
+> In this simulated environment, \`page.goto()\` is a mock that updates the internal state. You can "navigate" to any URL to satisfy the logic.
 `,
     htmlContent: `<div class="app">
   <h1>Login Page</h1>
@@ -394,32 +396,21 @@ const result = await page.locator('#dropdown').textContent();`,
     order: 408,
     instructions: `# File Upload
 
-Upload files in your tests!
+Upload files in your tests using \`setInputFiles\`!
 
 ## setInputFiles
 
 \`\`\`javascript
-await page.setInputFiles('#upload', 'path/to/file.pdf');
+// Simple usage (recommended for sandbox)
+await page.setInputFiles('#file-input', 'my-file.pdf');
 \`\`\`
 
-## Multiple Files
-
-\`\`\`javascript
-await page.setInputFiles('#upload', [
-    'file1.jpg',
-    'file2.jpg'
-]);
-\`\`\`
-
-## Clear Files
-
-\`\`\`javascript
-await page.setInputFiles('#upload', []);
-\`\`\`
+> [!NOTE]
+> Since this runs in the browser, Node.js-only APIs like \`Buffer\` are not available. Use simple string names for simulated uploads.
 
 ## Your Task
-1. Upload a test file
-2. Verify the filename is displayed
+1. Upload a file named **'test-report.pdf'** to the \`#file-input\`
+2. Store the displayed filename in \`result\`
 `,
     htmlContent: `<div class="uploader">
   <input type="file" id="file-input" />
@@ -533,10 +524,9 @@ const frames = page.frames();
   <h1>Main Page</h1>
   <iframe id="embed" srcdoc="<div id='frame-content'>Hello from iframe!</div>"></iframe>
 </div>`,
-    starterCode: `// Access iframe content using frameLocator
-// Your code here
-
-const result = ""; // Return the iframe content text`,
+    starterCode: `// Get the iframe content text
+// result = await ...
+let result = "";`,
     expectedOutput: 'Hello from iframe!',
     tags: ['playwright', 'iframe', 'frames', 'intermediate'],
   },
@@ -1232,10 +1222,7 @@ await expect(page.locator('.status')).toHaveText(/success/i);
 // Your code here
 
 // Assert paragraph contains text
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'text', 'intermediate'],
   },
   {
@@ -1280,10 +1267,7 @@ await expect(page.locator('#phone')).toHaveValue(/\\d{3}-\\d{4}/);
 // Your code here
 
 // Assert value
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'forms', 'intermediate'],
   },
   {
@@ -1332,10 +1316,7 @@ await expect(page.locator('#notes')).toBeEditable();
 // Your code here
 
 // Assert state
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'state', 'intermediate'],
   },
   {
@@ -1381,10 +1362,7 @@ await expect(page.locator('img')).toHaveAttribute('src', /\\.jpg$/);
 // Your code here
 
 // Assert alt attribute exists
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'attributes', 'intermediate'],
   },
   {
@@ -1433,10 +1411,7 @@ await expect(page.locator('li')).toHaveCount(4);
 // Your code here
 
 // Assert new count
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'count', 'intermediate'],
   },
   {
@@ -1477,10 +1452,7 @@ await expect(page).toHaveTitle(/Dashboard/);
   </body>
 </html>`,
     starterCode: `// Assert page title
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your assertion here`,
     tags: ['playwright', 'assertions', 'url', 'title', 'intermediate'],
   },
   {
@@ -1528,10 +1500,7 @@ const errors = expect.soft.errors;
   <div id="pass-status" class="valid">✓ Password valid</div>
 </div>`,
     starterCode: `// Use soft assertions to check all statuses
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'soft', 'intermediate'],
   },
 
@@ -1592,10 +1561,7 @@ Use multiple assertion types to verify the complete form state!
 // ...
 
 // Verify valid state
-// ...
-
-const result = 'all assertions passed';`,
-    expectedOutput: 'all assertions passed',
+// ...`,
     tags: ['playwright', 'assertions', 'scenario', 'boss', 'intermediate'],
   },
 ];

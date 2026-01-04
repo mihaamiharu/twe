@@ -41,7 +41,7 @@ export interface TestResult {
 const COPY_CONFIG: Record<ChallengeType | 'DEFAULT', { success: string; failure: string; testName: string }> = {
     CSS_SELECTOR: { success: 'Target Acquired!', failure: 'Target Missed', testName: 'Element Selection' },
     XPATH_SELECTOR: { success: 'XPath Verified!', failure: 'XPath Missed', testName: 'Element Selection' },
-    JAVASCRIPT: { success: 'Code Optimized!', failure: 'Logic Error', testName: 'Logical Verification' },
+    JAVASCRIPT: { success: 'Tests Passed!', failure: 'Logic Error', testName: 'Logical Verification' },
     PLAYWRIGHT: { success: 'Scenario Passed!', failure: 'Scenario Failed', testName: 'Workflow Execution' },
     DEFAULT: { success: 'Mission Accomplished!', failure: 'Refinement Needed', testName: 'Test Case' },
 };
