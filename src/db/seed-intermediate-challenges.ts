@@ -50,9 +50,11 @@ await page.goto('/login', {
 \`\`\`
 
 ## Your Task
-1. Navigate to the login page
-2. Verify the URL contains "login"
-3. Store the page title in \`result\`
+1. Navigate to the login page (\`/login\`)
+2. Store the page title in \`result\`
+
+> [!NOTE]
+> In this simulated environment, \`page.goto()\` is a mock that updates the internal state. You can "navigate" to any URL to satisfy the logic.
 `,
     htmlContent: `<div class="app">
   <h1>Login Page</h1>
@@ -394,32 +396,21 @@ const result = await page.locator('#dropdown').textContent();`,
     order: 408,
     instructions: `# File Upload
 
-Upload files in your tests!
+Upload files in your tests using \`setInputFiles\`!
 
 ## setInputFiles
 
 \`\`\`javascript
-await page.setInputFiles('#upload', 'path/to/file.pdf');
+// Simple usage (recommended for sandbox)
+await page.setInputFiles('#file-input', 'my-file.pdf');
 \`\`\`
 
-## Multiple Files
-
-\`\`\`javascript
-await page.setInputFiles('#upload', [
-    'file1.jpg',
-    'file2.jpg'
-]);
-\`\`\`
-
-## Clear Files
-
-\`\`\`javascript
-await page.setInputFiles('#upload', []);
-\`\`\`
+> [!NOTE]
+> Since this runs in the browser, Node.js-only APIs like \`Buffer\` are not available. Use simple string names for simulated uploads.
 
 ## Your Task
-1. Upload a test file
-2. Verify the filename is displayed
+1. Upload a file named **'test-report.pdf'** to the \`#file-input\`
+2. Store the displayed filename in \`result\`
 `,
     htmlContent: `<div class="uploader">
   <input type="file" id="file-input" />
@@ -533,10 +524,9 @@ const frames = page.frames();
   <h1>Main Page</h1>
   <iframe id="embed" srcdoc="<div id='frame-content'>Hello from iframe!</div>"></iframe>
 </div>`,
-    starterCode: `// Access iframe content using frameLocator
-// Your code here
-
-const result = ""; // Return the iframe content text`,
+    starterCode: `// Get the iframe content text
+// result = await ...
+let result = "";`,
     expectedOutput: 'Hello from iframe!',
     tags: ['playwright', 'iframe', 'frames', 'intermediate'],
   },
@@ -1232,10 +1222,7 @@ await expect(page.locator('.status')).toHaveText(/success/i);
 // Your code here
 
 // Assert paragraph contains text
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'text', 'intermediate'],
   },
   {
@@ -1280,10 +1267,7 @@ await expect(page.locator('#phone')).toHaveValue(/\\d{3}-\\d{4}/);
 // Your code here
 
 // Assert value
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'forms', 'intermediate'],
   },
   {
@@ -1332,10 +1316,7 @@ await expect(page.locator('#notes')).toBeEditable();
 // Your code here
 
 // Assert state
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'state', 'intermediate'],
   },
   {
@@ -1381,10 +1362,7 @@ await expect(page.locator('img')).toHaveAttribute('src', /\\.jpg$/);
 // Your code here
 
 // Assert alt attribute exists
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'attributes', 'intermediate'],
   },
   {
@@ -1433,10 +1411,7 @@ await expect(page.locator('li')).toHaveCount(4);
 // Your code here
 
 // Assert new count
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'count', 'intermediate'],
   },
   {
@@ -1477,10 +1452,7 @@ await expect(page).toHaveTitle(/Dashboard/);
   </body>
 </html>`,
     starterCode: `// Assert page title
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your assertion here`,
     tags: ['playwright', 'assertions', 'url', 'title', 'intermediate'],
   },
   {
@@ -1528,10 +1500,7 @@ const errors = expect.soft.errors;
   <div id="pass-status" class="valid">✓ Password valid</div>
 </div>`,
     starterCode: `// Use soft assertions to check all statuses
-// Your code here
-
-const result = 'passed';`,
-    expectedOutput: 'passed',
+// Your code here`,
     tags: ['playwright', 'assertions', 'soft', 'intermediate'],
   },
 
@@ -1592,10 +1561,7 @@ Use multiple assertion types to verify the complete form state!
 // ...
 
 // Verify valid state
-// ...
-
-const result = 'all assertions passed';`,
-    expectedOutput: 'all assertions passed',
+// ...`,
     tags: ['playwright', 'assertions', 'scenario', 'boss', 'intermediate'],
   },
 ];
@@ -1657,11 +1623,11 @@ await page.click('#btn');  // Auto-waits internally
     document.getElementById('content').innerHTML = '<button id="delayed-btn" onclick="this.textContent=\\'Clicked!\\'">Click Me</button>';
   }, 100);
 </script>`,
-    starterCode: `// Playwright auto-waits for the button to appear
-await page.click('#delayed-btn');
+    starterCode: `// Click the delayed button (Playwright auto-waits!)
+// Your code here
 
-// Get the button text
-const result = await page.locator('#delayed-btn').textContent();`,
+// Get the button text after clicking
+const result = "";`,
     expectedOutput: 'Clicked!',
     tags: ['playwright', 'waits', 'auto-wait', 'intermediate'],
   },
@@ -1714,11 +1680,11 @@ await page.waitForSelector('#popup', { state: 'detached' });
     document.getElementById('result').style.display = 'block';
   }, 100);
 </script>`,
-    starterCode: `// Wait for spinner to hide
-await page.waitForSelector('#spinner', { state: 'hidden' });
+    starterCode: `// Wait for spinner to hide using waitForSelector with state: 'hidden'
+// Your code here
 
-// Get result
-const result = await page.locator('#result').textContent();`,
+// Get the result text
+const result = "";`,
     expectedOutput: 'Data loaded!',
     tags: ['playwright', 'waits', 'selector', 'intermediate'],
   },
@@ -1732,7 +1698,7 @@ const result = await page.locator('#result').textContent();`,
     xpReward: 60,
     order: 703,
     instructions: `# waitForLoadState
-
+    
 Wait for page load states!
 
 ## Load States
@@ -1748,12 +1714,7 @@ await page.waitForLoadState('domcontentloaded');
 await page.waitForLoadState('networkidle');
 \`\`\`
 
-## After Navigation
-
-\`\`\`javascript
-await page.goto('/dashboard');
-await page.waitForLoadState('networkidle');
-\`\`\`
+> **Note:** In this sandbox, pages load almost instantly. In real applications, these commands wait for network activity and parsing to complete.
 
 ## Your Task
 1. Navigate and wait for DOM ready
@@ -1765,11 +1726,11 @@ await page.waitForLoadState('networkidle');
     <h1>Welcome to Dashboard</h1>
   </body>
 </html>`,
-    starterCode: `// Wait for DOM to be ready
-await page.waitForLoadState('domcontentloaded');
+    starterCode: `// Wait for DOM to be ready using waitForLoadState
+// Your code here
 
 // Get page title
-const result = await page.title();`,
+const result = "";`,
     expectedOutput: 'Dashboard',
     tags: ['playwright', 'waits', 'load', 'intermediate'],
   },
@@ -1811,22 +1772,20 @@ const data = await response.json();
 \`\`\`
 
 ## Your Task
-1. Trigger an API call
-2. Wait for the response
-3. Display success message
+1. Click the "Load Data" button (triggers API call)
+2. Wait for the /api/data response using Promise.all
+3. Get the status text from \`#status\` element
 `,
     htmlContent: `<div class="api-demo">
   <button id="load" onclick="fetch('/api/data').then(() => document.getElementById('status').textContent = 'API Success')">Load Data</button>
   <div id="status"></div>
 </div>`,
-    starterCode: `// Wait for API response while clicking
-const [response] = await Promise.all([
-    page.waitForResponse('/api/data'),
-    page.click('#load')
-]);
+    starterCode: `// Click the load button and wait for API response
+// Tip: Use Promise.all with waitForResponse and click
+// Your code here
 
-// Get status text
-const result = await page.locator('#status').textContent();`,
+// Get the status text
+const result = "";`,
     expectedOutput: 'API Success',
     tags: ['playwright', 'waits', 'api', 'response', 'intermediate'],
   },
@@ -1880,16 +1839,14 @@ await page.waitForFunction(() => {
     count++;
     document.getElementById('counter').textContent = count;
     if (count >= 5) clearInterval(interval);
-  }, 50);
+    if (count >= 5) clearInterval(interval);
+  }, 200);
 </script>`,
-    starterCode: `// Wait for counter to reach 3
-await page.waitForFunction(() => {
-    const counter = document.getElementById('counter');
-    return parseInt(counter.textContent) >= 3;
-});
+    starterCode: `// Wait for counter to reach 3 using waitForFunction
+// Your code here
 
 // Get counter value
-const result = await page.locator('#counter').textContent();`,
+const result = "";`,
     expectedOutput: '3',
     tags: ['playwright', 'waits', 'function', 'custom', 'intermediate'],
   },
@@ -1942,11 +1899,11 @@ use: {
     htmlContent: `<div class="timeout-demo">
   <button id="fast-btn" onclick="this.textContent = 'Done!'">Quick Click</button>
 </div>`,
-    starterCode: `// Click with short timeout (element is immediately available)
-await page.click('#fast-btn', { timeout: 1000 });
+    starterCode: `// Click with a custom timeout option
+// Your code here
 
-// Get button text
-const result = await page.locator('#fast-btn').textContent();`,
+// Get button text after click
+const result = "";`,
     expectedOutput: 'Done!',
     tags: ['playwright', 'waits', 'timeout', 'config', 'intermediate'],
   },

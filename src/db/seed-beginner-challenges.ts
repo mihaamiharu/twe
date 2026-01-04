@@ -1626,8 +1626,12 @@ Count how many attempts were made.
         htmlContent: `<div class="patterns-demo">
   <h3>Testing Patterns</h3>
 </div>`,
-        starterCode: `// Simulates a flaky operation (fails first 2 times)
-// Your code here
+        starterCode: `let attempts = 0;
+const flakyOperation = async () => {
+    attempts++;
+    if (attempts < 3) throw new Error("Network failure");
+    return "Success";
+};
 
 // Retry logic: create a function that retries maxAttempts times
 // Your code here
@@ -1676,11 +1680,12 @@ Use Promise.all to fetch all data simultaneously and aggregate the results.
   <div id="output"></div>
 </div>`,
         starterCode: `// Simulated API calls
-// Your code here
+const getUsers = () => Promise.resolve([1, 2, 3]);
+const getOrders = () => Promise.resolve([101, 102, 103, 104]);
+const getProducts = () => Promise.resolve([51, 52, 53, 54, 55]);
 
 // Fetch all data in parallel and count total items
 // Your code here
-// async function aggregateData() ...
 
 // const result = await aggregateData();`,
         expectedOutput: '12',

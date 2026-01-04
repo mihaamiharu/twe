@@ -1684,7 +1684,7 @@ Select the **status cell** for the order with ID "ORD-002".
     difficulty: 'MEDIUM' as const,
     category: 'xpath-advanced',
     xpReward: 65,
-    order: 201, // Starting advanced series
+    order: 31,
     instructions: `# XPath Axes: Preceding & Following
 
 Standard navigation usually goes DOWN (child) or SIDEWAYS (siblings).
@@ -1754,7 +1754,7 @@ Find the **"Edit" button** that appears after "Product A".
     difficulty: 'HARD' as const,
     category: 'xpath-advanced',
     xpReward: 80,
-    order: 202,
+    order: 32,
     instructions: `# Scenario: Admin User Management
 
 You're automating an admin dashboard. The user table is complex:
