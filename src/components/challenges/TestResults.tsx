@@ -21,6 +21,7 @@ import {
     AlertTriangle,
     Loader2,
 } from 'lucide-react';
+import type { ChallengeType } from './ChallengePlayground';
 
 export interface TestResult {
     id: string;
@@ -34,11 +35,23 @@ export interface TestResult {
     isHidden?: boolean;
 }
 
+
+
+// Copy configuration for different challenge types
+const COPY_CONFIG: Record<ChallengeType | 'DEFAULT', { success: string; failure: string; testName: string }> = {
+    CSS_SELECTOR: { success: 'Target Acquired!', failure: 'Target Missed', testName: 'Element Selection' },
+    XPATH_SELECTOR: { success: 'XPath Verified!', failure: 'XPath Missed', testName: 'Element Selection' },
+    JAVASCRIPT: { success: 'Code Optimized!', failure: 'Logic Error', testName: 'Logical Verification' },
+    PLAYWRIGHT: { success: 'Scenario Passed!', failure: 'Scenario Failed', testName: 'Workflow Execution' },
+    DEFAULT: { success: 'Mission Accomplished!', failure: 'Refinement Needed', testName: 'Test Case' },
+};
+
 export interface TestResultsProps {
     results: TestResult[];
     isRunning?: boolean;
     totalHiddenTests?: number;
     hiddenTestsPassed?: number;
+    challengeType?: ChallengeType;
     className?: string;
 }
 
@@ -47,9 +60,14 @@ export function TestResults({
     isRunning = false,
     totalHiddenTests = 0,
     hiddenTestsPassed = 0,
+    challengeType,
     className,
 }: TestResultsProps) {
     const [expandedTests, setExpandedTests] = useState<Set<string>>(new Set());
+
+    // Get copy based on challenge type
+    const copy = COPY_CONFIG[challengeType || 'DEFAULT'] || COPY_CONFIG.DEFAULT;
+    const isSingleTest = results.length === 1 && totalHiddenTests === 0;
 
     // Calculate stats
     const visiblePassed = results.filter((r) => r.passed).length;
@@ -118,7 +136,7 @@ export function TestResults({
                     )}
                     <div>
                         <span className={cn('font-bold text-base', allPassed ? 'text-green-600' : 'text-destructive')}>
-                            {allPassed ? 'Mission Accomplished!' : 'Refinement Needed'}
+                            {allPassed ? copy.success : copy.failure}
                         </span>
                         <span className="text-muted-foreground ml-2 font-bold font-mono">
                             [{totalPassed}/{totalTests}]
@@ -132,9 +150,11 @@ export function TestResults({
                             Expand Failed
                         </Button>
                     )}
-                    <Button variant="ghost" size="sm" onClick={collapseAll} className="h-8 text-xs font-bold border border-black/10 hover:border-black/20">
-                        Collapse All
-                    </Button>
+                    {expandedTests.size > 0 && (
+                        <Button variant="ghost" size="sm" onClick={collapseAll} className="h-8 text-xs font-bold border border-black/10 hover:border-black/20">
+                            Collapse All
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -162,7 +182,7 @@ export function TestResults({
                             <div className="flex-1 min-w-0">
                                 <div className="flex items-center gap-2">
                                     <span className="text-sm font-medium truncate">
-                                        Test {index + 1}: {result.name || result.description || 'Test Case'}
+                                        {isSingleTest ? (result.name || copy.testName) : `Test ${index + 1}: ${result.name || result.description || 'Test Case'}`}
                                     </span>
                                     {result.isHidden && (
                                         <Badge variant="secondary" className="text-xs">

@@ -216,8 +216,12 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         try {
             // Modify code to return result if it's a JS challenge
             let codeToRun = code;
-            if (challenge.type === 'JAVASCRIPT' && !code.includes('return ')) {
-                codeToRun += '\nlet __result__; try { __result__ = result; } catch(e) {}; return __result__;';
+            if (challenge.type === 'JAVASCRIPT') {
+                // If no explicit return, append a safe conditional return for 'result'
+                // This works with const, let, var or direct assignments without collisions
+                if (!code.includes('return ')) {
+                    codeToRun += '\nif (typeof result !== "undefined") return result;';
+                }
             }
 
             const result = await executePlaywrightCode(codeToRun, challenge.htmlContent || '<div></div>', {
@@ -462,7 +466,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 {isCodeChallenge && (
                     <div className="border-t border-border pt-4">
                         <h3 className="font-bold mb-2">Test Results</h3>
-                        <TestResults results={testResults} isRunning={isRunning} />
+                        <TestResults results={testResults} isRunning={isRunning} challengeType={challenge.type} />
                     </div>
                 )}
             </div>
@@ -635,7 +639,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                             </Button>
                         </div>
                         <div className="flex-1 overflow-auto p-4 pt-2">
-                            <TestResults results={testResults} isRunning={isRunning} className="border-0 shadow-none bg-transparent" />
+                            <TestResults results={testResults} isRunning={isRunning} challengeType={challenge.type} className="border-0 shadow-none bg-transparent" />
                         </div>
                     </div>
                 )}
@@ -737,10 +741,10 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                             </div>
                             <DialogTitle>Reset Solution?</DialogTitle>
                         </div>
-                        <DialogDescription>
-                            This will permanently delete your current progress and restore the challenge to its original state. This action cannot be undone.
-                        </DialogDescription>
                     </DialogHeader>
+                    <DialogDescription>
+                        This will permanently delete your current progress and restore the challenge to its original state. This action cannot be undone.
+                    </DialogDescription>
                     <DialogFooter className="mt-4 sm:justify-end gap-2">
                         <Button
                             variant="ghost"

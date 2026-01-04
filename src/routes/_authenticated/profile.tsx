@@ -231,9 +231,9 @@ function ProfilePage() {
                                             <span className="text-xl">🟢</span>
                                             <span className="font-medium">Basic (Selectors)</span>
                                         </div>
-                                        <Badge variant="secondary">15 challenges</Badge>
+                                        <Badge variant="secondary">36 challenges</Badge>
                                     </div>
-                                    <Progress value={Math.min(selectorCount / 15 * 100, 100)} className="h-2" />
+                                    <Progress value={Math.min(selectorCount / 36 * 100, 100)} className="h-2" />
                                 </div>
 
                                 {/* Tier: Beginner */}

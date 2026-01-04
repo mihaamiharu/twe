@@ -910,7 +910,7 @@ export const xpathChallenges = [
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 10,
-    order: 11,
+    order: 18,
     instructions: `# XPath Basics
 
 XPath (XML Path Language) is a query language for selecting nodes from an HTML/XML document.
@@ -962,7 +962,7 @@ Select the **submit button** using a relative XPath.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 15,
-    order: 12,
+    order: 19,
     instructions: `# XPath Attribute Matching
 
 XPath uses \`@\` to reference attributes within predicates \`[]\`.
@@ -1018,7 +1018,7 @@ Select the **password input** field using its type attribute.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 20,
-    order: 13,
+    order: 20,
     instructions: `# XPath Text Content
 
 XPath can select elements based on their text content using \`text()\`.
@@ -1068,7 +1068,7 @@ Select the **"Add to Cart"** button using its text.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 25,
-    order: 14,
+    order: 21,
     instructions: `# Contains & Starts-with
 
 When exact matching is too rigid, use partial match functions.
@@ -1129,7 +1129,7 @@ Select the **error message** div (has a class containing "error").
     difficulty: 'HARD' as const,
     category: 'xpath-basics',
     xpReward: 55,
-    order: 15,
+    order: 22,
     instructions: `# Scenario: Legacy Login Form
 
 You're automating tests for a legacy application. The HTML is messy:
@@ -1193,7 +1193,7 @@ Write an XPath that finds the exact "Sign In" button inside the login form.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 30,
-    order: 16,
+    order: 23,
     instructions: `# Parent & Ancestor Axes
 
 XPath can navigate UP the DOM tree - something CSS cannot do!
@@ -1255,7 +1255,7 @@ Find the **list item (li)** that contains the "Settings" link.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 35,
-    order: 17,
+    order: 24,
     instructions: `# Following-sibling Axis
 
 Navigate to siblings that come AFTER the current element.
@@ -1314,7 +1314,7 @@ Select the **input** field that follows the "Username" label.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 35,
-    order: 18,
+    order: 25,
     instructions: `# Preceding-sibling Axis
 
 Navigate to siblings that come BEFORE the current element.
@@ -1374,7 +1374,7 @@ An error message appeared! Find the **label** that comes before the error messag
     difficulty: 'HARD' as const,
     category: 'xpath-basics',
     xpReward: 60,
-    order: 19,
+    order: 26,
     instructions: `# Scenario: Error Recovery
 
 You're building an error handler. When a validation error appears, you need to focus the input that caused it.
@@ -1431,7 +1431,7 @@ Select the **input** element that belongs to the field showing "Invalid email fo
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 35,
-    order: 20,
+    order: 27,
     instructions: `# Multiple Conditions
 
 Combine multiple conditions using logical operators.
@@ -1482,7 +1482,7 @@ Select the button that is both **type="submit"** AND has the **"primary"** class
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 40,
-    order: 21,
+    order: 28,
     instructions: `# Position & Indexing
 
 XPath uses 1-based indexing to select elements by position.
@@ -1539,7 +1539,7 @@ Select the **last item** in the navigation menu.
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 45,
-    order: 22,
+    order: 29,
     instructions: `# Normalize-space
 
 Real HTML often has inconsistent whitespace. \`normalize-space()\` handles this.
@@ -1601,7 +1601,7 @@ Select the button with text "   Save Changes   " (has extra whitespace).
     difficulty: 'EASY' as const,
     category: 'xpath-basics',
     xpReward: 50,
-    order: 23,
+    order: 30,
     instructions: `# Complex XPath: Tables
 
 Tables are common in web apps. Let's master navigating them!
@@ -1856,7 +1856,7 @@ export const comparisonChallenges = [
     difficulty: 'EASY' as const,
     category: 'selector-comparison',
     xpReward: 30,
-    order: 21,
+    order: 33,
     instructions: `# Same Element, Two Ways
 
 Often you can select the same element with either CSS or XPath. Let's compare!
@@ -1912,7 +1912,7 @@ Write a CSS selector to select the search button.
     difficulty: 'EASY' as const,
     category: 'selector-comparison',
     xpReward: 35,
-    order: 22,
+    order: 34,
     instructions: `# When XPath Wins
 
 There are things XPath can do that CSS **cannot**:
@@ -1972,7 +1972,7 @@ Write an XPath to select the product card containing "Out of Stock".
     difficulty: 'EASY' as const,
     category: 'selector-comparison',
     xpReward: 40,
-    order: 23,
+    order: 35,
     instructions: `# Selector Performance
 
 In general, **CSS selectors are faster** than XPath in modern browsers.
@@ -2029,7 +2029,7 @@ Select the submit button using the **most performant** selector.
     difficulty: 'HARD' as const,
     category: 'selector-comparison',
     xpReward: 70,
-    order: 24,
+    order: 36,
     instructions: `# Scenario: Choose Your Weapon
 
 You're writing tests for a shopping cart. You need to find a specific element, but you must choose wisely.

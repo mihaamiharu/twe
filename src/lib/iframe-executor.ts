@@ -288,6 +288,8 @@ export async function executePlaywrightCode(
                     const page = new MockedPlaywrightPage(iframeDoc);
 
                     // Execute user code
+                    // For JS challenges, we need to capture the 'result' variable
+                    // We use eval-style declaration to make result accessible even if user uses const/let
                     // eslint-disable-next-line @typescript-eslint/no-implied-eval
                     const userFunction = new Function(
                         'page',
@@ -668,9 +670,9 @@ function createExpect() {
                 async toBeFocused() {
                     await Promise.resolve();
                     let isFocused = false;
-                     
+
                     if (actual && typeof actual.evaluate === 'function') {
-                         
+
                         isFocused = await actual.evaluate((el: any) => el === el.ownerDocument.activeElement);
                     } else if (actual instanceof HTMLElement) {
                         isFocused = actual === actual.ownerDocument.activeElement;

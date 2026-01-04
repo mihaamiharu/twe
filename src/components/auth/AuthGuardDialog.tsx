@@ -44,10 +44,10 @@ export function AuthGuardDialog({
                         <LogIn className="h-5 w-5 text-primary" />
                         {title}
                     </DialogTitle>
-                    <DialogDescription>
-                        {description}
-                    </DialogDescription>
                 </DialogHeader>
+                <DialogDescription>
+                    {description}
+                </DialogDescription>
                 <DialogFooter className="gap-2 sm:gap-0">
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
                         Cancel
