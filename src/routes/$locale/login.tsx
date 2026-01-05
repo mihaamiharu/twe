@@ -1,14 +1,15 @@
 import { createFileRoute, redirect, useNavigate, useParams } from '@tanstack/react-router';
 import { LoginForm } from '@/components/auth';
 import type { RootContext } from '../__root';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 export const Route = createFileRoute('/$locale/login')({
     beforeLoad: ({ context, params }) => {
         const { auth } = context as RootContext;
         if (auth.isAuthenticated) {
             throw redirect({
-                to: '/$locale/' as any,
-                params: { locale: params.locale as any }
+                to: LocaleRoutes.home,
+                params: localeParams(params.locale)
             });
         }
     },
@@ -25,7 +26,7 @@ function LoginPage() {
 
     useEffect(() => {
         if (session?.user) {
-            void navigate({ to: '/$locale/' as any, params: { locale: locale as any } });
+            void navigate({ to: LocaleRoutes.home, params: localeParams(locale) });
         }
     }, [session, navigate, locale]);
 
@@ -35,9 +36,9 @@ function LoginPage() {
         const redirectUrl = searchParams.get('redirect');
 
         if (redirectUrl) {
-            void navigate({ to: redirectUrl as any });
+            void navigate({ to: redirectUrl as string });
         } else {
-            void navigate({ to: '/$locale/' as any, params: { locale: locale as any } });
+            void navigate({ to: LocaleRoutes.home, params: localeParams(locale) });
         }
     };
 
@@ -46,7 +47,7 @@ function LoginPage() {
             <div className="w-full max-w-md space-y-6 animate-fade-in">
                 <LoginForm
                     onSuccess={handleLoginSuccess}
-                    onRegisterClick={() => { void navigate({ to: '/$locale/register' as any, params: { locale: locale as any } }) }}
+                    onRegisterClick={() => { void navigate({ to: LocaleRoutes.register, params: localeParams(locale) }) }}
                 />
             </div>
         </div>

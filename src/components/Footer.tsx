@@ -2,6 +2,7 @@ import { Github, Twitter, Zap, Bug } from 'lucide-react';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 interface FooterLink {
     label: string;
@@ -33,7 +34,7 @@ export function Footer() {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-12 lg:gap-8">
                     {/* Brand Section - Takes 2 columns on medium+ screens */}
                     <div className="md:col-span-2 space-y-6">
-                        <Link to="/$locale/" params={{ locale: locale as any }} className="flex items-center gap-2">
+                        <Link to={LocaleRoutes.home} params={localeParams(locale)} className="flex items-center gap-2">
                             <Zap className="h-6 w-6 text-primary fill-primary/20" />
                             <span className="text-xl font-bold tracking-tight">
                                 TestingWithEkki

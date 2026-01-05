@@ -57,5 +57,45 @@
         "nextChallenge": "Next Challenge",
         "retry": "Again",
         "browseList": "Browse List"
+    },
+    "types": {
+        "css_selector": "CSS Selector",
+        "xpath_selector": "XPath",
+        "javascript": "JavaScript",
+        "playwright": "Playwright",
+        "selector": "Selectors"
+    },
+    "tiers": {
+        "basic": "Basic",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "expert": "Expert"
+    },
+    "categories": {
+        "css-basics": "CSS Basics",
+        "xpath-basics": "XPath Basics",
+        "xpath-advanced": "XPath Advanced",
+        "selector-comparison": "CSS vs XPath",
+        "js-fundamentals": "JavaScript Fundamentals",
+        "js-dom": "DOM Basics",
+        "js-async": "Async Basics",
+        "playwright-navigation": "Navigation & Actions",
+        "playwright-locators": "Locators",
+        "playwright-assertions": "Assertions",
+        "playwright-waits": "Wait Strategies",
+        "playwright-pom": "Page Object Model",
+        "playwright-data-driven": "Data-Driven Testing",
+        "playwright-infrastructure": "Test Infrastructure",
+        "playwright-integration-patterns": "Integration Patterns"
+    },
+    "labels": {
+        "allTypes": "All Types",
+        "comingSoon": "Coming Soon",
+        "completed": "completed",
+        "rank": "Rank",
+        "challenge": "Challenge",
+        "stats": "Stats",
+        "creatingNew": "Creating new challenges...",
+        "craftingScenarios": "I'm crafting new scenarios based on real bugs I've found. Check back soon!"
     }
 }

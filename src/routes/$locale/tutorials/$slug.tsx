@@ -66,7 +66,7 @@ function TutorialDetailPage() {
         queryKey: ['tutorial', slug],
         queryFn: async () => {
             if (!slug) throw new Error('Tutorial slug is required');
-            const result = await getTutorial({ data: { slug } });
+            const result = await getTutorial({ data: { slug, locale } });
             if (!result.success) throw new Error(result.error);
             return result.data as Tutorial;
         },
@@ -78,7 +78,7 @@ function TutorialDetailPage() {
     // Mark as complete mutation
     const markCompleteMutation = useMutation({
         mutationFn: async () => {
-            const result = await completeTutorial({ data: { slug } });
+            const result = await completeTutorial({ data: { slug, locale } });
             if (!result.success) throw new Error(result.error);
             return result;
         },

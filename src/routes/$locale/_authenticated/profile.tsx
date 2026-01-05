@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Award, BookOpen, Code, Settings, Zap, AlertCircle } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
 import { getUserSettings } from '@/lib/user.fn';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 export const Route = createFileRoute('/$locale/_authenticated/profile')({
     component: ProfilePage,
@@ -61,12 +62,12 @@ interface ProfileResponse {
 
 function ProfilePage() {
     const { locale } = useParams({ from: '/$locale/_authenticated/profile' });
-    const { t } = useTranslation(['common']);
+    const { t } = useTranslation(['profile', 'leaderboard', 'common']);
     // Auth is guaranteed by _authenticated parent route
     const { data, isLoading, error } = useQuery<ProfileResponse, Error>({
         queryKey: ['profile'],
         queryFn: async (): Promise<ProfileResponse> => {
-            const result = await getUserSettings();
+            const result = await getUserSettings({ data: { locale } });
             if (!result.success || !result.data) {
                 return {
                     success: false,
@@ -156,23 +157,23 @@ function ProfilePage() {
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
                                     <h1 className="text-3xl font-bold">{user.name || t('leaderboard:table.anonymous')}</h1>
-                                    <Badge className="bg-primary/20 text-primary">Level {user.level}</Badge>
+                                    <Badge className="bg-primary/20 text-primary">{t('profile:header.level', { level: user.level })}</Badge>
                                 </div>
                                 <p className="text-muted-foreground mb-4">{user.email}</p>
 
                                 <div className="space-y-2">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-muted-foreground">Progress to Level {user.level + 1}</span>
+                                        <span className="text-muted-foreground">{t('profile:header.progressTo', { level: user.level + 1 })}</span>
                                         <span className="font-medium">{progressXp} / {neededXp} XP</span>
                                     </div>
                                     <Progress value={levelProgress} className="h-2" />
                                 </div>
                             </div>
 
-                            <Link to="/$locale/_authenticated/settings" params={{ locale: locale as any }}>
+                            <Link to={LocaleRoutes.settings} params={localeParams(locale)}>
                                 <Button variant="outline">
                                     <Settings className="h-4 w-4 mr-2" />
-                                    Settings
+                                    {t('profile:header.settings')}
                                 </Button>
                             </Link>
                         </div>
@@ -185,28 +186,28 @@ function ProfilePage() {
                         <CardContent className="p-6 text-center">
                             <BookOpen className="h-8 w-8 text-primary mx-auto mb-2" />
                             <div className="text-2xl font-bold">{user.stats.completedTutorials}</div>
-                            <div className="text-sm text-muted-foreground">Tutorials</div>
+                            <div className="text-sm text-muted-foreground">{t('profile:stats.tutorials')}</div>
                         </CardContent>
                     </Card>
                     <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Code className="h-8 w-8 text-primary mx-auto mb-2" />
                             <div className="text-2xl font-bold">{user.stats.completedChallenges}</div>
-                            <div className="text-sm text-muted-foreground">Challenges</div>
+                            <div className="text-sm text-muted-foreground">{t('profile:stats.challenges')}</div>
                         </CardContent>
                     </Card>
                     <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Zap className="h-8 w-8 text-accent mx-auto mb-2" />
                             <div className="text-2xl font-bold">{user.xp.toLocaleString()}</div>
-                            <div className="text-sm text-muted-foreground">Total XP</div>
+                            <div className="text-sm text-muted-foreground">{t('profile:stats.totalXp')}</div>
                         </CardContent>
                     </Card>
                     <Card className="glass-card card-hover">
                         <CardContent className="p-6 text-center">
                             <Award className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
                             <div className="text-2xl font-bold">{user.stats.achievementsCount}</div>
-                            <div className="text-sm text-muted-foreground">Achievements</div>
+                            <div className="text-sm text-muted-foreground">{t('profile:stats.achievements')}</div>
                         </CardContent>
                     </Card>
                 </div>
@@ -214,16 +215,16 @@ function ProfilePage() {
                 {/* Tabs */}
                 <Tabs defaultValue="progress">
                     <TabsList>
-                        <TabsTrigger value="progress">Tier Progress</TabsTrigger>
-                        <TabsTrigger value="activity">Recent Activity</TabsTrigger>
-                        <TabsTrigger value="achievements">Achievements</TabsTrigger>
+                        <TabsTrigger value="progress">{t('profile:tabs.progress')}</TabsTrigger>
+                        <TabsTrigger value="activity">{t('profile:tabs.activity')}</TabsTrigger>
+                        <TabsTrigger value="achievements">{t('profile:tabs.achievements')}</TabsTrigger>
                     </TabsList>
 
                     <TabsContent value="progress" className="mt-6">
                         <Card className="glass-card">
                             <CardHeader>
-                                <CardTitle>Tier Progress</CardTitle>
-                                <CardDescription>Your progress across all learning tiers</CardDescription>
+                                <CardTitle>{t('profile:tierProgress.title')}</CardTitle>
+                                <CardDescription>{t('profile:tierProgress.description')}</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 {/* Tier: Basic */}
@@ -231,9 +232,9 @@ function ProfilePage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl">🟢</span>
-                                            <span className="font-medium">Basic (Selectors)</span>
+                                            <span className="font-medium">{t('profile:tierProgress.basic')}</span>
                                         </div>
-                                        <Badge variant="secondary">36 challenges</Badge>
+                                        <Badge variant="secondary">{t('profile:tierProgress.challengeCount', { count: 36 })}</Badge>
                                     </div>
                                     <Progress value={Math.min(selectorCount / 36 * 100, 100)} className="h-2" />
                                 </div>
@@ -243,9 +244,9 @@ function ProfilePage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl">🟡</span>
-                                            <span className="font-medium">Beginner (JavaScript)</span>
+                                            <span className="font-medium">{t('profile:tierProgress.beginner')}</span>
                                         </div>
-                                        <Badge variant="secondary">26 challenges</Badge>
+                                        <Badge variant="secondary">{t('profile:tierProgress.challengeCount', { count: 26 })}</Badge>
                                     </div>
                                     <Progress value={Math.min(jsCount / 26 * 100, 100)} className="h-2" />
                                 </div>
@@ -255,9 +256,9 @@ function ProfilePage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl">🟠</span>
-                                            <span className="font-medium">Intermediate (Playwright)</span>
+                                            <span className="font-medium">{t('profile:tierProgress.intermediate')}</span>
                                         </div>
-                                        <Badge variant="secondary">37 challenges</Badge>
+                                        <Badge variant="secondary">{t('profile:tierProgress.challengeCount', { count: 37 })}</Badge>
                                     </div>
                                     <Progress value={Math.min(playwrightCount / 37 * 100, 100)} className="h-2" />
                                 </div>
@@ -267,9 +268,9 @@ function ProfilePage() {
                                     <div className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <span className="text-xl">🔴</span>
-                                            <span className="font-medium">Expert (Advanced)</span>
+                                            <span className="font-medium">{t('profile:tierProgress.expert')}</span>
                                         </div>
-                                        <Badge variant="secondary">23 challenges</Badge>
+                                        <Badge variant="secondary">{t('profile:tierProgress.challengeCount', { count: 23 })}</Badge>
                                     </div>
                                     <Progress value={Math.min(Math.max(playwrightCount - 37, 0) / 23 * 100, 100)} className="h-2" />
                                 </div>
@@ -278,7 +279,7 @@ function ProfilePage() {
                                 <div className="mt-8 pt-6 border-t border-border">
                                     <h4 className="font-medium mb-4 flex items-center gap-2">
                                         <Zap className="h-4 w-4 text-accent" />
-                                        XP Milestones
+                                        {t('profile:milestones.title')}
                                     </h4>
                                     <div className="flex flex-wrap gap-2">
                                         {[100, 500, 1000, 2500, 5000].map(milestone => (
@@ -299,15 +300,15 @@ function ProfilePage() {
                     <TabsContent value="activity" className="mt-6">
                         <Card className="glass-card">
                             <CardHeader>
-                                <CardTitle>Recent Activity</CardTitle>
-                                <CardDescription>Your latest learning progress</CardDescription>
+                                <CardTitle>{t('profile:activity.title')}</CardTitle>
+                                <CardDescription>{t('profile:activity.description')}</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="mt-6 ml-[18px]">
                                     {(!user.recentActivity || user.recentActivity.length === 0) ? (
                                         <div className="text-center py-12 text-muted-foreground ml-[-18px]">
                                             <Code className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                                            <p>No recent activity yet. Start learning!</p>
+                                            <p>{t('profile:activity.empty')}</p>
                                         </div>
                                     ) : (
                                         <div className="border-l-2 border-primary/20 space-y-8 pl-8 pb-2">
@@ -349,8 +350,8 @@ function ProfilePage() {
                             <Card className="glass-card">
                                 <CardContent className="p-8 text-center text-muted-foreground">
                                     <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                                    <p>No achievements yet. Complete challenges to earn badges!</p>
-                                    <p className="text-sm mt-2">30 badges available to unlock</p>
+                                    <p>{t('profile:achievements.empty')}</p>
+                                    <p className="text-sm mt-2">{t('profile:achievements.available', { count: 30 })}</p>
                                 </CardContent>
                             </Card>
                         ) : (

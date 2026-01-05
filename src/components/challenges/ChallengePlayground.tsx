@@ -23,6 +23,7 @@ import { executePlaywrightCode } from '@/lib/challenge-executor';
 import { Play, Send, RotateCcw, Zap, Loader2, Target, BookOpen, AlertCircle, GripVertical } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { storage } from '@/lib/storage-adapter';
+import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 import {
     Dialog,
     DialogContent,
@@ -753,7 +754,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     )}
 
                     {challenge.tutorial && (
-                        <Link to="/$locale/tutorials/$slug" params={{ locale: locale as any, slug: challenge.tutorial.slug }}>
+                        <Link to={LocaleRoutes.tutorialDetail} params={localeSlugParams(locale, challenge.tutorial.slug)}>
                             <Button variant="ghost" size="sm" className="hidden md:flex font-bold text-muted-foreground hover:text-foreground">
                                 <BookOpen className="h-4 w-4 mr-2" />
                                 {t('common:navigation.tutorials')}

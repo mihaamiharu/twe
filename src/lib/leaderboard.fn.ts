@@ -9,6 +9,7 @@ const LeaderboardFilterSchema = z.object({
   page: z.number().default(1),
   limit: z.number().max(100).default(50),
   period: z.enum(['all', 'monthly', 'weekly']).default('all'),
+  locale: z.string().default('en'),
 });
 
 export const getLeaderboard = createServerFn({ method: 'GET' })
@@ -65,7 +66,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         const badges = await db
           .select({
             userId: userAchievements.userId,
-            name: achievements.name,
+            name: sql<string>`COALESCE(${achievements.name}->>${filters.locale}, ${achievements.name}->>'en', '')`,
             icon: achievements.icon,
             slug: achievements.slug,
           })

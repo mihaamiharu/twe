@@ -24,14 +24,14 @@ import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute('/$locale/challenges/')({
     component: ChallengesPage,
-    head: () => ({
+    head: ({ params }) => ({
         meta: [
             {
                 title: 'Coding Challenges | TestingWithEkki',
             },
             {
                 name: 'description',
-                content: 'Practice your Playwright, Selenium, and Cypress skills with real-world coding challenges. Master selectors, automation authentication, and more.',
+                content: 'Practice your Playwright, Selenium, and Cypress skills with real-world coding scenarios. Master selectors, automation authentication, and more.',
             }
         ]
     })
@@ -123,6 +123,7 @@ function ChallengesPage() {
         queryFn: async () => {
             const result = await getChallenges({
                 data: {
+                    locale,
                     limit: 500,
                     type: filterType === 'all' ? undefined : filterType as 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR',
                     difficulty: filterDifficulty === 'all' ? undefined : filterDifficulty as 'EASY' | 'MEDIUM' | 'HARD',
@@ -193,7 +194,7 @@ function ChallengesPage() {
 
         return TIER_ORDER.map(tier => ({
             tier,
-            name: tierLabels[tier].name,
+            name: t(`tiers.${tier}`),
             color: tierLabels[tier].color,
             completed: tiers[tier].completed,
             total: tiers[tier].total,
@@ -321,7 +322,7 @@ function ChallengesPage() {
                             className={`cursor-pointer px-3 py-1.5 h-8 rounded-lg transition-all ${filterType === 'all' ? 'bg-primary text-primary-foreground border-primary' : 'hover:bg-primary/10 hover:border-primary/30'}`}
                             onClick={() => setFilterType('all')}
                         >
-                            All Types
+                            {t('labels.allTypes')}
                         </Badge>
                         {Object.entries(filterConfig).map(([type, config]) => {
                             const count = challenges.filter(c => config.types.includes(c.type)).length;
@@ -331,11 +332,11 @@ function ChallengesPage() {
                                 <Badge
                                     key={type}
                                     variant="outline"
-                                    className={`cursor-pointer px-3 py-1.5 h-8 rounded-lg transition-all ${isSelected ? config.color + ' border-current brightness-110' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                                     onClick={() => setFilterType(isSelected ? 'all' : type)}
+                                    className={`cursor-pointer px-3 py-1.5 h-8 rounded-lg transition-all ${isSelected ? config.color + ' border-current brightness-110' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
                                 >
                                     {config.icon}
-                                    <span className="ml-2">{config.label}</span>
+                                    <span className="ml-2">{t(`types.${type.toLowerCase()}`)}</span>
                                     <span className="ml-1.5 opacity-60 text-[10px]">({count})</span>
                                 </Badge>
                             );
@@ -365,8 +366,8 @@ function ChallengesPage() {
                 {error && (
                     <div className="text-center py-12">
                         <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Failed to load challenges</h3>
-                        <p className="text-muted-foreground">Please try again later</p>
+                        <h3 className="text-lg font-semibold mb-2">{t('common:messages.failedToLoad')}</h3>
+                        <p className="text-muted-foreground">{t('common:messages.retry')}</p>
                     </div>
                 )}
 
@@ -374,8 +375,8 @@ function ChallengesPage() {
                 {!isLoading && !error && challenges.length === 0 && (
                     <div className="text-center py-12">
                         <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Creating new challenges...</h3>
-                        <p className="text-muted-foreground">I'm crafting new scenarios based on real bugs I've found. Check back soon!</p>
+                        <h3 className="text-lg font-semibold mb-2">{t('labels.creatingNew')}</h3>
+                        <p className="text-muted-foreground">{t('labels.craftingScenarios')}</p>
                     </div>
                 )}
 
@@ -387,7 +388,7 @@ function ChallengesPage() {
                                 {/* Category Header */}
                                 <div className="flex items-center gap-3 mb-4">
                                     <h2 className="text-xl font-semibold">
-                                        {categoryLabels[category] || category}
+                                        {t(`categories.${category}`) || category}
                                     </h2>
                                     <Badge variant="secondary" className="text-xs">
                                         {categoryChallenges.filter(c => c.isCompleted).length} / {categoryChallenges.length}
@@ -416,12 +417,12 @@ function ChallengesPage() {
                                                                 </span>
                                                                 <Badge className={isComingSoon ? 'bg-muted-foreground/20 text-muted-foreground border-muted-foreground/30' : config.color} variant="outline">
                                                                     {config.icon}
-                                                                    <span className="ml-1">{config.label}</span>
+                                                                    <span className="ml-1">{t(`types.${challenge.type.toLowerCase()}`)}</span>
                                                                 </Badge>
                                                                 {isComingSoon && (
                                                                     <Badge variant="outline" className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[10px] px-1.5 h-5">
                                                                         <Lock className="h-3 w-3 mr-1" />
-                                                                        Coming Soon
+                                                                        {t('labels.comingSoon')}
                                                                     </Badge>
                                                                 )}
                                                             </div>
@@ -444,7 +445,7 @@ function ChallengesPage() {
                                                                 variant="secondary"
                                                                 className={`${isComingSoon ? 'bg-muted text-muted-foreground' : difficultyColors[challenge.difficulty]} font-medium border-transparent`}
                                                             >
-                                                                {challenge.difficulty}
+                                                                {t(`difficulty.${challenge.difficulty}`)}
                                                             </Badge>
                                                             {!isComingSoon && (
                                                                 <div className="flex items-center gap-3">
@@ -486,11 +487,11 @@ function ChallengesPage() {
                                             <TableHeader>
                                                 <TableRow>
                                                     <TableHead className="w-[80px]">#</TableHead>
-                                                    <TableHead className="w-[300px]">Challenge</TableHead>
-                                                    <TableHead>Type</TableHead>
-                                                    <TableHead>Difficulty</TableHead>
-                                                    <TableHead className="text-right">Stats</TableHead>
-                                                    <TableHead className="w-[100px] text-right">XP</TableHead>
+                                                    <TableHead className="w-[300px]">{t('labels.challenge')}</TableHead>
+                                                    <TableHead>{t('common:labels.type')}</TableHead>
+                                                    <TableHead>{t('common:labels.difficulty')}</TableHead>
+                                                    <TableHead className="text-right">{t('labels.stats')}</TableHead>
+                                                    <TableHead className="w-[100px] text-right">{t('common:labels.xp')}</TableHead>
                                                 </TableRow>
                                             </TableHeader>
                                             <TableBody>
@@ -511,18 +512,18 @@ function ChallengesPage() {
                                                                     <div className="font-bold text-muted-foreground">{challenge.title}</div>
                                                                     <div className="text-xs text-muted-foreground line-clamp-1">{challenge.description}</div>
                                                                     <Badge variant="outline" className="mt-1 text-[10px] px-1 h-5 text-muted-foreground border-dashed">
-                                                                        Coming Soon
+                                                                        {t('labels.comingSoon')}
                                                                     </Badge>
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <Badge className="bg-muted text-muted-foreground border-muted-foreground/20 whitespace-nowrap" variant="outline">
                                                                         {config.icon}
-                                                                        <span className="ml-1">{config.label}</span>
+                                                                        <span className="ml-1">{t(`types.${challenge.type.toLowerCase()}`)}</span>
                                                                     </Badge>
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <Badge variant="secondary" className="bg-muted text-muted-foreground">
-                                                                        {challenge.difficulty}
+                                                                        {t(`difficulty.${challenge.difficulty}`)}
                                                                     </Badge>
                                                                 </TableCell>
                                                                 <TableCell className="text-right text-muted-foreground">
@@ -558,7 +559,7 @@ function ChallengesPage() {
                                                                 <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block h-full w-full">
                                                                     <Badge className={`${config.color} whitespace-nowrap`} variant="outline">
                                                                         {config.icon}
-                                                                        <span className="ml-1">{config.label}</span>
+                                                                        <span className="ml-1">{t(`types.${challenge.type.toLowerCase()}`)}</span>
                                                                     </Badge>
                                                                 </Link>
                                                             </TableCell>
@@ -568,7 +569,7 @@ function ChallengesPage() {
                                                                         variant="secondary"
                                                                         className={difficultyColors[challenge.difficulty] || ''}
                                                                     >
-                                                                        {challenge.difficulty}
+                                                                        {t(`difficulty.${challenge.difficulty}`)}
                                                                     </Badge>
                                                                 </Link>
                                                             </TableCell>
@@ -576,7 +577,7 @@ function ChallengesPage() {
                                                                 <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block h-full w-full">
                                                                     <div className="flex items-center justify-end gap-1 text-muted-foreground text-xs">
                                                                         <Trophy className="h-3 w-3" />
-                                                                        {challenge.completionCount} completed
+                                                                        {challenge.completionCount} {t('labels.completed')}
                                                                     </div>
                                                                 </Link>
                                                             </TableCell>

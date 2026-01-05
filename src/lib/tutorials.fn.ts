@@ -1,5 +1,11 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+
+// Helper for localizable fields
+const getLocalizedValue = (value: any, locale: string): string => {
+    if (!value || typeof value !== 'object') return '';
+    return value[locale] || value['en'] || '';
+};
 // Imports moved inside handler to avoid client-side bundling issues
 
 // ----------------------------------------------------------------------------
@@ -7,6 +13,7 @@ import { z } from 'zod';
 // ----------------------------------------------------------------------------
 
 const TutorialFiltersSchema = z.object({
+    locale: z.string().default('en'),
     search: z.string().optional(),
     tag: z.string().optional(),
     page: z.number().default(1),
@@ -31,8 +38,8 @@ export const getTutorials = createServerFn({ method: 'GET' })
 
             if (filters.search) {
                 const searchCondition = or(
-                    sql`${tutorials.title} ILIKE ${`%${filters.search}%`}`,
-                    sql`${tutorials.description} ILIKE ${`%${filters.search}%`}`
+                    sql`${tutorials.title}->>${filters.locale} ILIKE ${`%${filters.search}%`}`,
+                    sql`${tutorials.description}->>${filters.locale} ILIKE ${`%${filters.search}%`}`
                 );
                 if (searchCondition) {
                     conditions.push(searchCondition);
@@ -52,12 +59,13 @@ export const getTutorials = createServerFn({ method: 'GET' })
             const total = countResult?.count || 0;
 
             // Determine sort
-            const sortColumn = {
+            const sortColumnResult = {
                 order: tutorials.order,
                 estimatedMinutes: tutorials.estimatedMinutes,
                 viewCount: tutorials.viewCount,
                 createdAt: tutorials.createdAt,
             }[filters.sortBy];
+            const sortColumn = sortColumnResult || tutorials.order;
 
             const orderFn = filters.sortOrder === 'desc' ? desc : asc;
 
@@ -68,8 +76,9 @@ export const getTutorials = createServerFn({ method: 'GET' })
                 .select({
                     id: tutorials.id,
                     slug: tutorials.slug,
-                    title: tutorials.title,
-                    description: tutorials.description,
+                    title: sql<string>`COALESCE(${tutorials.title}->>${filters.locale}, ${tutorials.title}->>'en', '')`,
+                    description: sql<string>`COALESCE(${tutorials.description}->>${filters.locale}, ${tutorials.description}->>'en', '')`,
+                    content: sql<string>`COALESCE(${tutorials.content}->>${filters.locale}, ${tutorials.content}->>'en', '')`,
                     estimatedMinutes: tutorials.estimatedMinutes,
                     tags: tutorials.tags,
                     viewCount: tutorials.viewCount,
@@ -151,11 +160,12 @@ export const getTutorials = createServerFn({ method: 'GET' })
 
 const TutorialDetailSchema = z.object({
     slug: z.string(),
+    locale: z.string().default('en'),
 });
 
 export const getTutorial = createServerFn({ method: 'GET' })
     .inputValidator((data: unknown) => TutorialDetailSchema.parse(data))
-    .handler(async ({ data: { slug } }) => {
+    .handler(async ({ data: { slug, locale } }) => {
         try {
             // Dynamically import server-only modules
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
@@ -230,10 +240,17 @@ export const getTutorial = createServerFn({ method: 'GET' })
                 success: true,
                 data: {
                     ...tutorial,
+                    title: getLocalizedValue(tutorial.title, locale),
+                    description: getLocalizedValue(tutorial.description, locale),
+                    content: getLocalizedValue(tutorial.content, locale),
+                    challenges: tutorial.challenges.map(c => ({
+                        ...c,
+                        title: getLocalizedValue(c.title, locale),
+                    })),
                     userProgress: userProgressData,
                     nextTutorial: nextTutorial ? {
                         slug: nextTutorial.slug,
-                        title: nextTutorial.title
+                        title: getLocalizedValue(nextTutorial.title, locale),
                     } : null,
                 },
             };
@@ -330,11 +347,12 @@ export const updateTutorialProgress = createServerFn({ method: "POST" })
 
 const CompleteTutorialSchema = z.object({
     slug: z.string(),
+    locale: z.string().default('en'),
 });
 
 export const completeTutorial = createServerFn({ method: "POST" })
     .inputValidator((data: unknown) => CompleteTutorialSchema.parse(data))
-    .handler(async ({ data: { slug } }) => {
+    .handler(async ({ data: { slug, locale } }) => {
         try {
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
@@ -407,12 +425,18 @@ export const completeTutorial = createServerFn({ method: "POST" })
 
                     if (earnedAchievements.length > 0) {
                         await awardAchievements(userId, earnedAchievements.map(a => a.id));
-                        newAchievements = earnedAchievements.map(a => ({
+
+                        // Get localized names from DB
+                        const dbAwarded = await db.query.achievements.findMany({
+                            where: sql`${achievements.slug} IN ${earnedAchievements.map(a => a.id)}`,
+                        });
+
+                        newAchievements = dbAwarded.map(a => ({
                             id: a.id,
-                            name: a.name,
-                            icon: a.icon,
+                            name: (a.name as any)[locale] || (a.name as any)['en'],
+                            icon: a.icon || '',
                         }));
-                        logger.info(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
+                        logger.info(`[Achievements] User ${userId} earned: ${newAchievements.map(a => a.name).join(', ')}`);
                     }
                 } catch (error) {
                     logger.error('Error checking achievements:', error);

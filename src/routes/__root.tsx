@@ -62,6 +62,30 @@ export const Route = createRootRoute({
         name: 'description',
         content: i18n.t('common:seo.description'),
       },
+      {
+        property: 'og:title',
+        content: i18n.t('common:seo.ogTitle'),
+      },
+      {
+        property: 'og:description',
+        content: i18n.t('common:seo.ogDescription'),
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:title',
+        content: i18n.t('common:seo.ogTitle'),
+      },
+      {
+        name: 'twitter:description',
+        content: i18n.t('common:seo.ogDescription'),
+      },
     ],
     links: [
       {

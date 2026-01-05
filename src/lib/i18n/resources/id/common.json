@@ -2,7 +2,9 @@
     "appName": "TestingWithEkki",
     "seo": {
         "title": "TestingWithEkki - Pelajari Keterampilan Pengujian",
-        "description": "Pelajari keterampilan pengujian melalui tutorial interaktif dan tantangan coding"
+        "description": "Pelajari keterampilan pengujian melalui tutorial interaktif dan tantangan coding",
+        "ogTitle": "TestingWithEkki - Kuasai Seni Otomasi",
+        "ogDescription": "Tutorial interaktif dan tantangan pengkodean untuk meningkatkan keterampilan pengujian perangkat lunak Anda."
     },
     "navigation": {
         "home": "Beranda",
@@ -58,7 +60,9 @@
         "password": "Kata Sandi",
         "newPassword": "Kata Sandi Baru",
         "confirmNewPassword": "Konfirmasi Kata Sandi Baru",
-        "name": "Nama"
+        "name": "Nama",
+        "level": "Level",
+        "anonymous": "Tanpa Nama"
     },
     "messages": {
         "success": "Berhasil!",
@@ -68,7 +72,10 @@
         "saving": "Menyimpan...",
         "submitting": "Mengirim solusi...",
         "loadingChallenge": "Memuat tantangan...",
-        "unavailable": "Tidak tersedia"
+        "unavailable": "Tidak tersedia",
+        "challengeCompleted": "Tantangan selesai!",
+        "tutorialCompleted": "Tutorial selesai!",
+        "achievementUnlocked": "Berhasil dibuka: {{name}}"
     },
     "footer": {
         "description": "Kuasai seni pengujian perangkat lunak melalui tutorial interaktif dan tantangan pengkodean dunia nyata. Dibangun untuk developer, oleh developer.",

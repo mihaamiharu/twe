@@ -29,6 +29,13 @@
       "when": 1766850764567,
       "tag": "0003_add_user_roles_and_verification",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1767582696173,
+      "tag": "0004_broken_wong",
+      "breakpoints": true
     }
   ]
 }

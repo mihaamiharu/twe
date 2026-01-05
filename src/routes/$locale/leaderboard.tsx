@@ -41,7 +41,7 @@ function LeaderboardPage() {
     const { data: leaderboardData, isLoading, error } = useQuery({
         queryKey: ['leaderboard'],
         queryFn: async () => {
-            const result = await getLeaderboard({ data: { page: 1, limit: 50, period: 'all' } });
+            const result = await getLeaderboard({ data: { page: 1, limit: 50, period: 'all', locale } });
             if (!result.success) throw new Error(result.error);
             return result;
         },
@@ -157,10 +157,12 @@ function LeaderboardPage() {
                                                                 </div>
                                                             </td>
                                                             <td className="px-6 py-4 text-center">
-                                                                <Badge variant="secondary" className="font-bold border border-border/50">Lvl {user.level}</Badge>
+                                                                <Badge variant="secondary" className="font-bold border border-border/50">
+                                                                    {t('common:labels.level')} {user.level}
+                                                                </Badge>
                                                             </td>
                                                             <td className="px-6 py-4 text-right font-black text-primary text-lg">
-                                                                {user.xp.toLocaleString()}
+                                                                {user.xp.toLocaleString()} {t('common:labels.xp')}
                                                             </td>
                                                             <td className="px-6 py-4 text-right hidden sm:table-cell">
                                                                 <div className="flex justify-end gap-[-8px]">
@@ -219,11 +221,12 @@ function LeaderboardPage() {
 }
 
 function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: { user: LeaderboardEntry; rank: number; isCenter?: boolean; isAuthenticated?: boolean }) {
+    const { t } = useTranslation(['leaderboard', 'common']);
     const borderColor = rank === 1 ? 'border-yellow-500/50' : rank === 2 ? 'border-slate-400/50' : 'border-amber-700/50';
     const bgColor = rank === 1 ? 'bg-yellow-500/10' : rank === 2 ? 'bg-slate-400/10' : 'bg-amber-700/10';
     const ringColor = rank === 1 ? 'ring-yellow-500/30' : rank === 2 ? 'ring-slate-400/30' : 'ring-amber-700/30';
 
-    const displayName = isAuthenticated ? (user.name || 'Anonymous') : 'Hidden User';
+    const displayName = isAuthenticated ? (user.name || t('leaderboard:table.anonymous')) : t('leaderboard:table.hiddenUser');
     const displayAvatar = isAuthenticated ? user.image : null;
 
     return (
@@ -262,7 +265,7 @@ function PodiumCard({ user, rank, isCenter = false, isAuthenticated = false }: {
                 <div className={cn("font-bold text-xl mb-1 truncate px-2", !isAuthenticated && "blur-sm")}>
                     {displayName}
                 </div>
-                <div className="text-primary font-black text-lg mb-4">{user.xp.toLocaleString()} XP</div>
+                <div className="text-primary font-black text-lg mb-4">{user.xp.toLocaleString()} {t('common:labels.xp')}</div>
 
                 {/* Badges Row */}
                 <div className="flex justify-center -space-x-2">
@@ -289,6 +292,7 @@ function LeaderboardSkeleton() {
 }
 
 function LeaderboardError() {
+    const { t } = useTranslation(['leaderboard', 'common']);
     return (
         <Card className="glass-card border-2 border-destructive/20 bg-destructive/5">
             <CardContent className="p-12 text-center">

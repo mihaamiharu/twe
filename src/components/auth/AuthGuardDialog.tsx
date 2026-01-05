@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { LogIn } from 'lucide-react';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 interface AuthGuardDialogProps {
     open: boolean;
@@ -36,8 +37,8 @@ export function AuthGuardDialog({
     const handleLogin = () => {
         // Redirect to login with return path
         navigate({
-            to: '/$locale/login' as any,
-            params: { locale: locale as any },
+            to: LocaleRoutes.login,
+            params: localeParams(locale),
             search: {
                 redirect: location.pathname,
             },

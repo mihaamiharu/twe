@@ -1,6 +1,7 @@
 import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 const terminalLogs = [
     '> GET /page-content ... 200 OK',
@@ -128,7 +129,7 @@ export function NotFound() {
                 </div>
 
                 {/* Toggle switch CTA */}
-                <Link to="/$locale/" params={{ locale: locale as any }} className="group inline-flex items-center gap-3">
+                <Link to={LocaleRoutes.home} params={localeParams(locale)} className="group inline-flex items-center gap-3">
                     <button
                         onMouseEnter={() => setIsToggled(true)}
                         onMouseLeave={() => setIsToggled(false)}

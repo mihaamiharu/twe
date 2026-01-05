@@ -24,6 +24,7 @@ import {
     Users,
     ArrowRight,
 } from 'lucide-react';
+import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 
 export type ChallengeType = 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
@@ -95,7 +96,7 @@ export function ChallengeCard({
     const diffStyle = difficultyStyles[difficulty];
 
     return (
-        <Link to="/$locale/challenges/$slug" params={{ locale: locale as any, slug }}>
+        <Link to={LocaleRoutes.challengeDetail} params={localeSlugParams(locale, slug)}>
             <Card className={cn(
                 'group relative overflow-hidden transition-all duration-300',
                 'hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5',
