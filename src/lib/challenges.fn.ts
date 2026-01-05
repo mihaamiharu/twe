@@ -6,11 +6,18 @@ import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { obfuscate } from '@/lib/obfuscator';
 
+// Helper for localizable fields
+const getLocalizedValue = (value: any, locale: string): string => {
+    if (!value || typeof value !== 'object') return '';
+    return value[locale] || value['en'] || '';
+};
+
 // ----------------------------------------------------------------------------
 // GET CHALLENGES (LIST)
 // ----------------------------------------------------------------------------
 
 const ChallengeFiltersSchema = z.object({
+    locale: z.string().default('en'),
     type: z.enum(['JAVASCRIPT', 'PLAYWRIGHT', 'CSS_SELECTOR', 'XPATH_SELECTOR', 'SELECTOR']).optional(),
     difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
     category: z.string().optional(),
@@ -54,8 +61,8 @@ export const getChallenges = createServerFn({ method: 'GET' })
             if (filters.search) {
                 conditions.push(
                     or(
-                        sql`${challenges.title} ILIKE ${`%${filters.search}%`}`,
-                        sql`${challenges.description} ILIKE ${`%${filters.search}%`}`
+                        sql`${challenges.title}->>${filters.locale} ILIKE ${`%${filters.search}%`}`,
+                        sql`${challenges.description}->>${filters.locale} ILIKE ${`%${filters.search}%`}`
                     )!
                 );
             }
@@ -69,12 +76,13 @@ export const getChallenges = createServerFn({ method: 'GET' })
             const total = countResult?.count || 0;
 
             // Determine sort
-            const sortColumn = {
+            const sortColumnResult = {
                 order: challenges.order,
                 difficulty: challenges.difficulty,
                 xpReward: challenges.xpReward,
                 completionCount: challenges.completionCount,
             }[filters.sortBy];
+            const sortColumn = sortColumnResult || challenges.order;
 
             const orderFn = filters.sortOrder === 'desc' ? desc : asc;
 
@@ -85,8 +93,9 @@ export const getChallenges = createServerFn({ method: 'GET' })
                 .select({
                     id: challenges.id,
                     slug: challenges.slug,
-                    title: challenges.title,
-                    description: challenges.description,
+                    title: sql<string>`COALESCE(${challenges.title}->>${filters.locale}, ${challenges.title}->>'en', '')`,
+                    description: sql<string>`COALESCE(${challenges.description}->>${filters.locale}, ${challenges.description}->>'en', '')`,
+                    instructions: sql<string>`COALESCE(${challenges.instructions}->>${filters.locale}, ${challenges.instructions}->>'en', '')`,
                     type: challenges.type,
                     difficulty: challenges.difficulty,
                     category: challenges.category,
@@ -105,7 +114,6 @@ export const getChallenges = createServerFn({ method: 'GET' })
             let userProgress: Record<string, boolean> = {};
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const headers = getRequestHeaders();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             const session = await auth.api.getSession({ headers });
 
             if (session?.user?.id) {
@@ -156,17 +164,16 @@ export const getChallenges = createServerFn({ method: 'GET' })
 
 const ChallengeDetailSchema = z.object({
     slug: z.string(),
+    locale: z.string().default('en'),
 });
 
 export const getChallenge = createServerFn({ method: 'GET' })
     .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
     // @ts-expect-error TanStack Start type inference issue with complex handler return types
-    .handler(async ({ data: { slug } }) => {
+    .handler(async ({ data: { slug, locale } }) => {
         try {
             // Dynamically import server-only modules
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { auth } = await import('./auth.server');
 
             // Fetch challenge
@@ -317,13 +324,20 @@ export const getChallenge = createServerFn({ method: 'GET' })
                 success: true,
                 data: {
                     ...challenge,
+                    title: getLocalizedValue(challenge.title, locale),
+                    description: getLocalizedValue(challenge.description, locale),
+                    instructions: getLocalizedValue(challenge.instructions, locale),
+                    tutorial: challenge.tutorial ? {
+                        ...challenge.tutorial,
+                        title: getLocalizedValue(challenge.tutorial.title, locale),
+                    } : null,
                     testCases: visibleTestCases,
                     hiddenTestCaseCount,
                     userProgress: userProgressData,
                     bestSubmission: bestSubmissionData,
                     nextChallenge: finalNextChallenge ? {
                         slug: finalNextChallenge.slug,
-                        title: finalNextChallenge.title
+                        title: getLocalizedValue(finalNextChallenge.title, locale),
                     } : null,
                 },
             };

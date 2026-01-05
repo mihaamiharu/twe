@@ -57,5 +57,45 @@
         "nextChallenge": "Tantangan Berikutnya",
         "retry": "Lagi",
         "browseList": "Lihat Daftar"
+    },
+    "types": {
+        "css_selector": "Pemilih CSS",
+        "xpath_selector": "XPath",
+        "javascript": "JavaScript",
+        "playwright": "Playwright",
+        "selector": "Pemilih"
+    },
+    "tiers": {
+        "basic": "Dasar",
+        "beginner": "Pemula",
+        "intermediate": "Menengah",
+        "expert": "Ahli"
+    },
+    "categories": {
+        "css-basics": "Dasar CSS",
+        "xpath-basics": "Dasar XPath",
+        "xpath-advanced": "XPath Lanjutan",
+        "selector-comparison": "CSS vs XPath",
+        "js-fundamentals": "Dasar JavaScript",
+        "js-dom": "Dasar DOM",
+        "js-async": "Dasar Async",
+        "playwright-navigation": "Navigasi & Aksi",
+        "playwright-locators": "Lokator",
+        "playwright-assertions": "Asersi",
+        "playwright-waits": "Strategi Menunggu",
+        "playwright-pom": "Page Object Model",
+        "playwright-data-driven": "Pengujian Berbasis Data",
+        "playwright-infrastructure": "Infrastruktur Pengujian",
+        "playwright-integration-patterns": "Pola Integrasi"
+    },
+    "labels": {
+        "allTypes": "Semua Tipe",
+        "comingSoon": "Segera Hadir",
+        "completed": "selesai",
+        "rank": "Peringkat",
+        "challenge": "Tantangan",
+        "stats": "Statistik",
+        "creatingNew": "Membuat tantangan baru...",
+        "craftingScenarios": "Saya sedang menyusun skenario baru berdasarkan bug nyata yang saya temukan. Cek kembali segera!"
     }
 }

@@ -28,6 +28,7 @@ import {
 import { useSession, signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 export function Header() {
   const { t } = useTranslation(['common', 'bugs']);
@@ -40,9 +41,9 @@ export function Header() {
 
   // Dynamic nav links based on locale
   const navLinks = [
-    { href: '/$locale/tutorials/' as any, params: { locale: locale as any }, label: t('common:navigation.tutorials'), icon: BookOpen },
-    { href: '/$locale/challenges/' as any, params: { locale: locale as any }, label: t('common:navigation.challenges'), icon: Code },
-    { href: '/$locale/leaderboard' as any, params: { locale: locale as any }, label: t('common:navigation.leaderboard'), icon: Trophy },
+    { to: LocaleRoutes.tutorials, params: localeParams(locale), label: t('common:navigation.tutorials'), icon: BookOpen },
+    { to: LocaleRoutes.challenges, params: localeParams(locale), label: t('common:navigation.challenges'), icon: Code },
+    { to: LocaleRoutes.leaderboard, params: localeParams(locale), label: t('common:navigation.leaderboard'), icon: Trophy },
   ];
 
   const user = session?.user;
@@ -70,7 +71,7 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-8">
-              <Link {...({ to: '/$locale/', params: { locale } } as any)} className="flex items-center gap-2 btn-animate">
+              <Link to={LocaleRoutes.home} params={localeParams(locale)} className="flex items-center gap-2 btn-animate">
                 {/* Dark Mode Logo */}
                 <img src="/logo-dark-new.png" alt="Logo" className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen" />
                 {/* Light Mode Logo */}
@@ -83,8 +84,8 @@ export function Header() {
               <nav className="hidden md:flex items-center gap-1">
                 {navLinks.map((link) => (
                   <Link
-                    key={link.href}
-                    to={link.href}
+                    key={link.to}
+                    to={link.to}
                     params={link.params}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all btn-animate"
                     activeProps={{
@@ -138,7 +139,7 @@ export function Header() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/$locale/_authenticated/profile" params={{ locale: locale as any }} className="cursor-pointer font-medium">
+                      <Link to={LocaleRoutes.profile} params={localeParams(locale)} className="cursor-pointer font-medium">
                         <User className="mr-2 h-4 w-4" />
                         {t('common:navigation.profile')}
                       </Link>
@@ -152,7 +153,7 @@ export function Header() {
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link to="/$locale/_authenticated/settings" params={{ locale: locale as any }} className="cursor-pointer">
+                      <Link to={LocaleRoutes.settings} params={localeParams(locale)} className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
                         {t('common:navigation.settings')}
                       </Link>
@@ -183,10 +184,10 @@ export function Header() {
                 !isAuthPage && (
                   <div className="hidden md:flex items-center gap-2">
                     <Button variant="ghost" asChild>
-                      <Link to="/$locale/login" params={{ locale: locale as any }}>{t('common:navigation.login')}</Link>
+                      <Link to={LocaleRoutes.login} params={localeParams(locale)}>{t('common:navigation.login')}</Link>
                     </Button>
                     <Button asChild>
-                      <Link to="/$locale/register" params={{ locale: locale as any }}>{t('common:actions.startLearning')}</Link>
+                      <Link to={LocaleRoutes.register} params={localeParams(locale)}>{t('common:actions.startLearning')}</Link>
                     </Button>
                   </div>
                 )
@@ -226,8 +227,8 @@ export function Header() {
               <div className="space-y-2">
                 {navLinks.map((link) => (
                   <Link
-                    key={link.href}
-                    to={link.href}
+                    key={link.to}
+                    to={link.to}
                     params={link.params}
                     onClick={() => setIsMobileMenuOpen(false)}
                     className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors btn-animate"
@@ -246,8 +247,8 @@ export function Header() {
                 {isAuthenticated && user ? (
                   <>
                     <Link
-                      to="/$locale/_authenticated/profile"
-                      params={{ locale: locale as any }}
+                      to={LocaleRoutes.profile}
+                      params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
                       className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                     >
@@ -294,14 +295,14 @@ export function Header() {
                         asChild
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        <Link to="/$locale/login" params={{ locale: locale as any }}>{t('common:navigation.login')}</Link>
+                        <Link to={LocaleRoutes.login} params={localeParams(locale)}>{t('common:navigation.login')}</Link>
                       </Button>
                       <Button
                         className="w-full"
                         asChild
                         onClick={() => setIsMobileMenuOpen(false)}
                       >
-                        <Link to="/$locale/register" params={{ locale: locale as any }}>{t('common:actions.startLearning')}</Link>
+                        <Link to={LocaleRoutes.register} params={localeParams(locale)}>{t('common:actions.startLearning')}</Link>
                       </Button>
                     </div>
                   )

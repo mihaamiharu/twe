@@ -1,14 +1,15 @@
 import { createFileRoute, redirect, useNavigate, useParams } from '@tanstack/react-router';
 import { RegisterForm } from '@/components/auth';
 import type { RootContext } from '../__root';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 export const Route = createFileRoute('/$locale/register')({
     beforeLoad: ({ context, params }) => {
         const { auth } = context as RootContext;
         if (auth.isAuthenticated) {
             throw redirect({
-                to: '/$locale/' as any,
-                params: { locale: params.locale as any }
+                to: LocaleRoutes.home,
+                params: localeParams(params.locale)
             });
         }
     },
@@ -25,7 +26,7 @@ function RegisterPage() {
 
     useEffect(() => {
         if (session?.user) {
-            void navigate({ to: '/$locale/' as any, params: { locale: locale as any } });
+            void navigate({ to: LocaleRoutes.home, params: localeParams(locale) });
         }
     }, [session, navigate, locale]);
 
@@ -33,7 +34,7 @@ function RegisterPage() {
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">
             <div className="w-full max-w-md space-y-6 animate-fade-in relative z-10">
                 <RegisterForm
-                    onLoginClick={() => { void navigate({ to: '/$locale/login' as any, params: { locale: locale as any } }) }}
+                    onLoginClick={() => { void navigate({ to: LocaleRoutes.login, params: localeParams(locale) }) }}
                 // No onSuccess needed as RegisterForm handles the "Check Email" state internally
                 />
             </div>

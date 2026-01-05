@@ -78,7 +78,7 @@ function ChallengeDetailPage() {
         queryKey: ['challenge', slug],
         queryFn: async () => {
             if (!slug) throw new Error('Slug is required');
-            const result = await getChallenge({ data: { slug } }) as { success: boolean; data?: APIChallenge; error?: string };
+            const result = await getChallenge({ data: { slug, locale } }) as { success: boolean; data?: APIChallenge; error?: string };
             if (!result.success || !result.data) {
                 if (result.error === 'This challenge is coming soon!') {
                     throw new Error('COMING_SOON'); // Match existing error handling
@@ -88,9 +88,9 @@ function ChallengeDetailPage() {
             return result.data;
         },
         enabled: !!slug,
-        retry: (failureCount, error) => {
+        retry: (failureCount, error: Error) => {
             // Don't retry if it's a 403/COMING_SOON error
-            if (error.message === 'COMING_SOON') return false;
+            if (error?.message === 'COMING_SOON') return false;
             return failureCount < 3;
         }
     });
@@ -112,7 +112,7 @@ function ChallengeDetailPage() {
     const { data: allChallengesResponse } = useQuery({
         queryKey: ['challenges', 'prerequisites'], // Different key from main list
         queryFn: async () => {
-            const result = await getChallenges({ data: { limit: 100 } });
+            const result = await getChallenges({ data: { limit: 100, locale } });
             if (!result.success) throw new Error(result.error);
             return result;
         },
@@ -233,6 +233,10 @@ function ChallengeDetailPage() {
                 });
                 setShowSuccessDialog(true);
 
+                toast.success(t('common:messages.challengeCompleted'), {
+                    description: response.data.newAchievements?.length ? t('common:messages.achievementUnlocked', { name: response.data.newAchievements[0].name }) : undefined,
+                });
+
                 // Track analytics events
                 if (data) {
                     trackEvent('challenge_completed', {
@@ -303,6 +307,7 @@ function ChallengeDetailPage() {
                 error: tr.error,
             })),
             executionTime: data.executionTime,
+            locale,
         };
 
         toast.promise(submitMutation.mutateAsync(submissionData), {
@@ -310,7 +315,7 @@ function ChallengeDetailPage() {
             success: t('challenges:toasts.submittedSuccess'),
             error: t('challenges:toasts.submittedFailed'),
         });
-    }, [challenge, submitMutation, sessionData]);
+    }, [challenge, submitMutation, sessionData, locale, t]);
 
     if (isLoading) {
         return (

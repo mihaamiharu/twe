@@ -2,7 +2,9 @@
     "appName": "TestingWithEkki",
     "seo": {
         "title": "TestingWithEkki - Learn Testing Skills",
-        "description": "Learn testing skills through interactive tutorials and coding challenges"
+        "description": "Learn testing skills through interactive tutorials and coding challenges",
+        "ogTitle": "TestingWithEkki - Master the Art of Automation",
+        "ogDescription": "Interactive tutorials and coding challenges to level up your software testing skills."
     },
     "navigation": {
         "home": "Home",
@@ -58,7 +60,9 @@
         "password": "Password",
         "newPassword": "New Password",
         "confirmNewPassword": "Confirm New Password",
-        "name": "Name"
+        "name": "Name",
+        "level": "Level",
+        "anonymous": "Anonymous"
     },
     "messages": {
         "success": "Success!",
@@ -68,7 +72,10 @@
         "saving": "Saving...",
         "submitting": "Submitting solution...",
         "loadingChallenge": "Loading challenge...",
-        "unavailable": "Unavailable"
+        "unavailable": "Unavailable",
+        "challengeCompleted": "Challenge completed!",
+        "tutorialCompleted": "Tutorial completed!",
+        "achievementUnlocked": "Unlocked: {{name}}"
     },
     "footer": {
         "description": "Master the art of software testing through interactive tutorials and real-world coding challenges. Built for developers, by developers.",

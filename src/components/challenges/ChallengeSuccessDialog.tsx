@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from '@tanstack/react-router';
+import { useParams, Link } from '@tanstack/react-router';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Trophy, Star, ArrowRight, RotateCw } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Link } from '@tanstack/react-router';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 export interface Achievement {
     id: string;
@@ -113,7 +113,7 @@ export function ChallengeSuccessDialog({
                             {t('challenges:success.retry')}
                         </Button>
                         <Button variant="secondary" asChild className="flex-1">
-                            <Link to="/$locale/challenges/" params={{ locale: locale as any }}>
+                            <Link to={LocaleRoutes.challenges} params={localeParams(locale)}>
                                 {t('challenges:success.browseList')}
                             </Link>
                         </Button>

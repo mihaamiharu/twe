@@ -16,6 +16,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 interface LoginFormProps {
     onSuccess?: () => void;
@@ -137,8 +138,8 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                         <div className="flex items-center justify-between">
                             <Label htmlFor="password">{t('common:labels.password')}</Label>
                             <Link
-                                to="/$locale/forgot-password"
-                                params={{ locale: locale as any }}
+                                to={LocaleRoutes.forgotPassword}
+                                params={localeParams(locale)}
                                 className="text-xs text-primary hover:underline"
                             >
                                 {t('auth:login.forgotPassword')}

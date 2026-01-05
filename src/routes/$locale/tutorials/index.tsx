@@ -40,6 +40,7 @@ function TutorialsPage() {
         queryFn: async () => {
             const result = await getTutorials({
                 data: {
+                    locale,
                     search: search || undefined,
                     limit: 50,
                 }
@@ -280,6 +281,7 @@ function TutorialsPage() {
 }
 
 function TutorialCard({ tutorial, locale }: { tutorial: any; locale: string }) {
+    const { t } = useTranslation('tutorials');
     return (
         <Link
             to="/$locale/tutorials/$slug"
