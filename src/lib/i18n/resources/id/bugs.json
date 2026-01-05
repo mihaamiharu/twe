@@ -1,0 +1,70 @@
+{
+    "dialog": {
+        "title": "Laporkan Bug",
+        "trigger": "Laporkan Bug",
+        "description": "Bantu kami meningkatkan kualitas dengan melaporkan masalah yang Anda temukan. Mohon berikan informasi sedetail mungkin."
+    },
+    "form": {
+        "title": {
+            "label": "Judul Bug *",
+            "placeholder": "Deskripsi singkat masalah"
+        },
+        "severity": {
+            "label": "Tingkat Keparahan *",
+            "placeholder": "Pilih tingkat keparahan",
+            "critical": "Kritis",
+            "high": "Tinggi",
+            "medium": "Sedang",
+            "low": "Rendah",
+            "guide": {
+                "critical": "Aplikasi tidak dapat digunakan, kehilangan data, masalah keamanan",
+                "high": "Fitur utama rusak, tidak ada solusi alternatif",
+                "medium": "Fitur berfungsi tetapi ada masalah",
+                "low": "Masalah kecil, hanya tampilan"
+            }
+        },
+        "steps": {
+            "label": "Langkah Reproduksi *",
+            "placeholder": "1. Pergi ke halaman \"...\"\n2. Klik pada \"...\"\n3. Masukkan \"...\" di kolom\n4. Amati kesalahannya"
+        },
+        "expected": {
+            "label": "Perilaku yang Diharapkan *",
+            "placeholder": "Apa yang seharusnya terjadi?"
+        },
+        "actual": {
+            "label": "Perilaku Sebenarnya *",
+            "placeholder": "Apa yang sebenarnya terjadi?"
+        },
+        "email": {
+            "label": "Email Anda (opsional)",
+            "placeholder": "Untuk pertanyaan lanjutan",
+            "description": "Kami mungkin menghubungi Anda jika membutuhkan informasi lebih lanjut."
+        },
+        "autocapture": {
+            "title": "Informasi yang ditangkap otomatis:",
+            "url": "URL halaman saat ini",
+            "browser": "Informasi browser",
+            "user": "Akun pengguna Anda"
+        },
+        "submit": {
+            "button": "Kirim Laporan Bug",
+            "loading": "Mengirim..."
+        }
+    },
+    "toast": {
+        "success": {
+            "title": "Laporan bug dikirim!",
+            "description": "Terima kasih telah membantu kami menjadi lebih baik."
+        },
+        "error": {
+            "title": "Gagal mengirim laporan bug"
+        }
+    },
+    "validation": {
+        "titleTooShort": "Judul minimal 5 karakter",
+        "stepsTooShort": "Mohon berikan langkah detail untuk mereproduksi bug",
+        "expectedTooShort": "Mohon deskripsikan apa yang seharusnya terjadi",
+        "actualTooShort": "Mohon deskripsikan apa yang sebenarnya terjadi",
+        "invalidEmail": "Mohon masukkan email yang valid"
+    }
+}

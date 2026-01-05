@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -9,10 +10,9 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Award, BookOpen, Code, Settings, Zap, AlertCircle } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
-import { ActivityHeatmap } from '@/components/gamification/ActivityHeatmap';
 import { getUserSettings } from '@/lib/user.fn';
 
-export const Route = createFileRoute('/_authenticated/profile')({
+export const Route = createFileRoute('/$locale/_authenticated/profile')({
     component: ProfilePage,
 });
 
@@ -60,6 +60,8 @@ interface ProfileResponse {
 }
 
 function ProfilePage() {
+    const { locale } = useParams({ from: '/$locale/_authenticated/profile' });
+    const { t } = useTranslation(['common']);
     // Auth is guaranteed by _authenticated parent route
     const { data, isLoading, error } = useQuery<ProfileResponse, Error>({
         queryKey: ['profile'],
@@ -118,8 +120,8 @@ function ProfilePage() {
             <div className="min-h-screen p-6 md:p-10 flex items-center justify-center">
                 <div className="text-center">
                     <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Failed to load profile</h3>
-                    <p className="text-muted-foreground">Please try again later</p>
+                    <h3 className="text-lg font-semibold mb-2">{t('common:messages.error')}</h3>
+                    <p className="text-muted-foreground">{t('common:messages.retry')}</p>
                 </div>
             </div>
         );
@@ -153,7 +155,7 @@ function ProfilePage() {
 
                             <div className="flex-1">
                                 <div className="flex items-center gap-3 mb-2">
-                                    <h1 className="text-3xl font-bold">{user.name || 'Anonymous'}</h1>
+                                    <h1 className="text-3xl font-bold">{user.name || t('leaderboard:table.anonymous')}</h1>
                                     <Badge className="bg-primary/20 text-primary">Level {user.level}</Badge>
                                 </div>
                                 <p className="text-muted-foreground mb-4">{user.email}</p>
@@ -167,7 +169,7 @@ function ProfilePage() {
                                 </div>
                             </div>
 
-                            <Link to="/settings">
+                            <Link to="/$locale/_authenticated/settings" params={{ locale: locale as any }}>
                                 <Button variant="outline">
                                     <Settings className="h-4 w-4 mr-2" />
                                     Settings

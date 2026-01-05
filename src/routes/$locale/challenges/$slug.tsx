@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useCallback, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getChallenge, getChallenges } from '@/lib/challenges.fn';
@@ -20,7 +21,7 @@ import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
 import { showAchievementToasts } from '@/lib/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 
-export const Route = createFileRoute('/challenges/$slug')({
+export const Route = createFileRoute('/$locale/challenges/$slug')({
     component: ChallengeDetailPage,
 });
 
@@ -61,7 +62,8 @@ interface APIChallenge {
 }
 
 function ChallengeDetailPage() {
-    const { slug } = useParams({ from: '/challenges/$slug' });
+    const { locale, slug } = useParams({ from: '/$locale/challenges/$slug' });
+    const { t } = useTranslation(['challenges', 'common']);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [showSuccessDialog, setShowSuccessDialog] = useState(false);
@@ -99,11 +101,11 @@ function ChallengeDetailPage() {
     // Handle Coming Soon redirect
     useEffect(() => {
         if (error?.message === 'COMING_SOON') {
-            toast.info('This challenge is coming soon!', {
-                description: 'Stay tuned for updates on our roadmap.',
+            toast.info(t('challenges:toasts.comingSoon'), {
+                description: t('challenges:toasts.comingSoonDescription'),
                 duration: 4000
             });
-            void navigate({ to: '/challenges' });
+            void navigate({ to: '/$locale/challenges', params: { locale } });
         }
     }, [error, navigate]);
 
@@ -287,7 +289,7 @@ function ChallengeDetailPage() {
         }
 
         if (!data.passed) {
-            toast.error('Your solution did not pass all tests. Keep trying!');
+            toast.error(t('challenges:toasts.notPassed'));
             return;
         }
 
@@ -304,9 +306,9 @@ function ChallengeDetailPage() {
         };
 
         toast.promise(submitMutation.mutateAsync(submissionData), {
-            loading: 'Submitting solution...',
-            success: 'Solution submitted successfully!',
-            error: 'Failed to submit solution',
+            loading: t('common:messages.submitting'),
+            success: t('challenges:toasts.submittedSuccess'),
+            error: t('challenges:toasts.submittedFailed'),
         });
     }, [challenge, submitMutation, sessionData]);
 
@@ -315,7 +317,7 @@ function ChallengeDetailPage() {
             <div className="min-h-screen p-6 md:p-10 flex items-center justify-center">
                 <div className="text-center">
                     <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-                    <p className="text-muted-foreground">Loading challenge...</p>
+                    <p className="text-muted-foreground">{t('common:messages.loadingChallenge')}</p>
                 </div>
             </div>
         );
@@ -327,24 +329,24 @@ function ChallengeDetailPage() {
                 <div className="max-w-4xl mx-auto">
                     <Card className="glass-card">
                         <CardContent className="py-12 text-center">
-                            <h1 className="text-2xl font-bold mb-4">Challenge Not Found</h1>
+                            <h1 className="text-2xl font-bold mb-4">{t('challenges:page.notFound')}</h1>
                             <p className="text-muted-foreground mb-6">
-                                {error?.message || 'The requested challenge could not be found.'}
+                                {error?.message || t('challenges:page.notFoundDescription')}
                             </p>
                             <div className="flex items-center gap-4 mb-6 justify-center">
-                                <Link to="/challenges">
+                                <Link to="/$locale/challenges" params={{ locale }}>
                                     <Button variant="ghost" size="sm">
                                         <ArrowLeft className="h-4 w-4 mr-2" />
-                                        Back to Challenges
+                                        {t('common:actions.backToChallenges')}
                                     </Button>
                                 </Link>
                                 {data?.tutorial && (
                                     <>
                                         <div className="h-4 w-px bg-border" />
-                                        <Link to="/tutorials/$slug" params={{ slug: data.tutorial.slug }}>
+                                        <Link to="/$locale/tutorials/$slug" params={{ locale, slug: data.tutorial.slug }}>
                                             <Button variant="ghost" size="sm" className="text-primary hover:text-primary/80 hover:bg-primary/10">
                                                 <BookOpen className="h-4 w-4 mr-2" />
-                                                Review Tutorial: {data.tutorial.title}
+                                                {t('challenges:page.reviewTutorial', { title: data.tutorial.title })}
                                             </Button>
                                         </Link>
                                     </>
@@ -385,7 +387,7 @@ function ChallengeDetailPage() {
                     onRetry={() => setShowSuccessDialog(false)}
                     onNextChallenge={data?.nextChallenge ? () => {
                         setShowSuccessDialog(false);
-                        void navigate({ to: '/challenges/$slug', params: { slug: data.nextChallenge!.slug } });
+                        void navigate({ to: '/$locale/challenges/$slug', params: { locale, slug: data.nextChallenge!.slug } });
                     } : undefined}
                 />
             )}
@@ -393,8 +395,8 @@ function ChallengeDetailPage() {
             <AuthGuardDialog
                 open={showAuthGuard}
                 onOpenChange={setShowAuthGuard}
-                title="Sign in to Submit"
-                description="You need to be signed in to save your solution, earn XP, and track your progress. Your code will be preserved."
+                title={t('common:auth.signInToSubmit')}
+                description={t('common:auth.signInToSubmitDescription')}
             />
         </div>
     );

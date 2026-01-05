@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { forgetPassword } from '@/lib/auth.client';
 import { Button } from '@/components/ui/button';
@@ -14,11 +15,13 @@ import {
 } from '@/components/ui/card';
 import { ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
 
-export const Route = createFileRoute('/forgot-password')({
+export const Route = createFileRoute('/$locale/forgot-password')({
     component: ForgotPasswordPage,
 });
 
 function ForgotPasswordPage() {
+    const { locale } = useParams({ from: '/$locale/forgot-password' });
+    const { t } = useTranslation(['auth', 'common']);
     const [email, setEmail] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
@@ -29,7 +32,7 @@ function ForgotPasswordPage() {
         setError('');
 
         if (!email) {
-            setError('Please enter your email address');
+            setError(t('auth:errors.emailRequired'));
             return;
         }
 
@@ -38,7 +41,7 @@ function ForgotPasswordPage() {
         try {
             await forgetPassword({
                 email,
-                redirectTo: '/reset-password',
+                redirectTo: `${window.location.origin}/${locale}/reset-password`,
             });
             setIsSubmitted(true);
         } catch {
@@ -58,15 +61,15 @@ function ForgotPasswordPage() {
                             <CheckCircle2 className="h-8 w-8 text-green-500" />
                         </div>
                         <CardTitle className="text-2xl font-bold">
-                            Check Your Email
+                            {t('auth:verification.title')}
                         </CardTitle>
                         <CardDescription className="text-base">
-                            If an account exists for <strong>{email}</strong>, we've sent password reset instructions.
+                            {t('auth:forgotPassword.successDescription', { email })}
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <p className="text-sm text-muted-foreground text-center">
-                            Didn't receive the email? Check your spam folder or try again.
+                            {t('auth:forgotPassword.successNote')}
                         </p>
                     </CardContent>
                     <CardFooter className="flex flex-col gap-4">
@@ -75,13 +78,14 @@ function ForgotPasswordPage() {
                             className="w-full"
                             onClick={() => setIsSubmitted(false)}
                         >
-                            Try Another Email
+                            {t('auth:forgotPassword.tryAnother')}
                         </Button>
                         <Link
-                            to="/login"
+                            to="/$locale/login"
+                            params={{ locale }}
                             className="text-sm text-primary hover:underline text-center"
                         >
-                            Back to Sign In
+                            {t('common:actions.backToSignIn')}
                         </Link>
                     </CardFooter>
                 </Card>
@@ -97,10 +101,10 @@ function ForgotPasswordPage() {
                         <Mail className="h-8 w-8 text-primary" />
                     </div>
                     <CardTitle className="text-2xl font-bold gradient-text">
-                        Forgot Password?
+                        {t('auth:forgotPassword.title')}
                     </CardTitle>
                     <CardDescription>
-                        Enter your email address and we'll send you a link to reset your password.
+                        {t('auth:forgotPassword.description')}
                     </CardDescription>
                 </CardHeader>
 
@@ -113,11 +117,11 @@ function ForgotPasswordPage() {
                         )}
 
                         <div className="space-y-2">
-                            <Label htmlFor="email">Email Address</Label>
+                            <Label htmlFor="email">{t('common:labels.emailAddress')}</Label>
                             <Input
                                 id="email"
                                 type="email"
-                                placeholder="you@example.com"
+                                placeholder={t('common:placeholders.email')}
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 disabled={isLoading}
@@ -132,16 +136,17 @@ function ForgotPasswordPage() {
                             {isLoading ? (
                                 <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                             ) : (
-                                'Send Reset Link'
+                                t('auth:forgotPassword.sendButton')
                             )}
                         </Button>
 
                         <Link
-                            to="/login"
+                            to="/$locale/login"
+                            params={{ locale }}
                             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors"
                         >
                             <ArrowLeft className="h-4 w-4" />
-                            Back to Sign In
+                            {t('common:actions.backToSignIn')}
                         </Link>
                     </CardFooter>
                 </form>

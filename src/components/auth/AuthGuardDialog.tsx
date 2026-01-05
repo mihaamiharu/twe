@@ -7,7 +7,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useNavigate, useLocation } from '@tanstack/react-router';
+import { useNavigate, useLocation, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { LogIn } from 'lucide-react';
 
 interface AuthGuardDialogProps {
@@ -20,16 +21,23 @@ interface AuthGuardDialogProps {
 export function AuthGuardDialog({
     open,
     onOpenChange,
-    title = 'Sign in Required',
-    description = 'You need to be signed in to save your progress and earn XP. Don\'t worry, your work will be saved.',
+    title,
+    description,
 }: AuthGuardDialogProps) {
+    const { t } = useTranslation(['auth', 'common']);
     const navigate = useNavigate();
     const location = useLocation();
+    const params = useParams({ strict: false }) as { locale?: string };
+    const locale = params.locale || 'en';
+
+    const displayTitle = title || t('auth:guard.title');
+    const displayDescription = description || t('auth:guard.description');
 
     const handleLogin = () => {
         // Redirect to login with return path
         navigate({
-            to: '/login',
+            to: '/$locale/login' as any,
+            params: { locale: locale as any },
             search: {
                 redirect: location.pathname,
             },
@@ -42,18 +50,18 @@ export function AuthGuardDialog({
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <LogIn className="h-5 w-5 text-primary" />
-                        {title}
+                        {displayTitle}
                     </DialogTitle>
                 </DialogHeader>
                 <DialogDescription>
-                    {description}
+                    {displayDescription}
                 </DialogDescription>
                 <DialogFooter className="gap-2 sm:gap-0">
                     <Button variant="outline" onClick={() => onOpenChange(false)}>
-                        Cancel
+                        {t('common:actions.cancel')}
                     </Button>
                     <Button onClick={handleLogin}>
-                        Sign In / Register
+                        {t('common:actions.signIn')} / {t('common:actions.signUp')}
                     </Button>
                 </DialogFooter>
             </DialogContent>

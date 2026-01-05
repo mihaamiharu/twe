@@ -9,8 +9,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { BookOpen, Clock, Search, AlertCircle, CheckCircle2, LayoutGrid, List, Layers } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
-export const Route = createFileRoute('/tutorials/')({
+export const Route = createFileRoute('/$locale/tutorials/')({
     component: TutorialsPage,
     head: () => ({
         meta: [
@@ -25,11 +26,13 @@ export const Route = createFileRoute('/tutorials/')({
     })
 });
 
-const difficulties = ['All', 'Beginner', 'Intermediate', 'Advanced'];
+const difficulties = ['all', 'beginner', 'intermediate', 'advanced'] as const;
 
 function TutorialsPage() {
+    const { locale } = Route.useParams();
+    const { t } = useTranslation('tutorials');
     const [search, setSearch] = useState('');
-    const [selectedDifficulty, setSelectedDifficulty] = useState('All');
+    const [selectedDifficulty, setSelectedDifficulty] = useState<typeof difficulties[number]>('all');
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
     const { data: tutorialsResponse, isLoading, error } = useQuery({
@@ -50,23 +53,23 @@ function TutorialsPage() {
 
     // Group tutorials for the "All" view (Track view)
     const groupedTutorials = useMemo(() => {
-        if (selectedDifficulty !== 'All') return null;
+        if (selectedDifficulty !== 'all') return null;
 
         const groups: Record<string, typeof tutorials> = {
-            'Beginner': [],
-            'Intermediate': [],
-            'Advanced': [],
-            'Other': []
+            'beginner': [],
+            'intermediate': [],
+            'advanced': [],
+            'other': []
         };
 
         tutorials.forEach(t => {
             const tag = t.tags?.find(tag => ['beginner', 'intermediate', 'advanced'].includes(tag.toLowerCase()));
             if (tag) {
-                const key = tag.charAt(0).toUpperCase() + tag.slice(1).toLowerCase();
+                const key = tag.toLowerCase();
                 if (groups[key]) groups[key].push(t);
-                else groups['Other'].push(t);
+                else groups['other'].push(t);
             } else {
-                groups['Other'].push(t);
+                groups['other'].push(t);
             }
         });
 
@@ -74,7 +77,7 @@ function TutorialsPage() {
     }, [tutorials, selectedDifficulty]);
 
     const filteredTutorials = useMemo(() => {
-        if (selectedDifficulty === 'All') return tutorials;
+        if (selectedDifficulty === 'all') return tutorials;
         return tutorials.filter(t => t.tags?.some(tag => tag.toLowerCase() === selectedDifficulty.toLowerCase()));
     }, [tutorials, selectedDifficulty]);
 
@@ -82,9 +85,9 @@ function TutorialsPage() {
         <div className="min-h-screen p-6 md:p-10">
             <div className="max-w-6xl mx-auto">
                 <div className="mb-10">
-                    <h1 className="text-4xl font-bold gradient-text mb-3">Tutorials</h1>
+                    <h1 className="text-4xl font-bold gradient-text mb-3">{t('page.title')}</h1>
                     <p className="text-muted-foreground text-lg">
-                        Walk through core concepts with me, step-by-step.
+                        {t('page.subtitle')}
                     </p>
                 </div>
 
@@ -94,7 +97,7 @@ function TutorialsPage() {
                         <div className="relative flex-1">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
-                                placeholder="Search tutorials..."
+                                placeholder={t('page.searchPlaceholder')}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-10"
@@ -106,7 +109,7 @@ function TutorialsPage() {
                                 size="sm"
                                 onClick={() => setViewMode('grid')}
                                 className="h-8 w-8 p-0"
-                                title="Grid View"
+                                title={t('view.grid')}
                             >
                                 <LayoutGrid className="h-4 w-4" />
                             </Button>
@@ -115,7 +118,7 @@ function TutorialsPage() {
                                 size="sm"
                                 onClick={() => setViewMode('list')}
                                 className="h-8 w-8 p-0"
-                                title="List View"
+                                title={t('view.list')}
                             >
                                 <List className="h-4 w-4" />
                             </Button>
@@ -128,9 +131,9 @@ function TutorialsPage() {
                                 key={difficulty}
                                 variant={selectedDifficulty === difficulty ? 'default' : 'outline'}
                                 className="cursor-pointer px-3 py-1 text-sm"
-                                onClick={() => setSelectedDifficulty(selectedDifficulty === difficulty ? 'All' : difficulty)}
+                                onClick={() => setSelectedDifficulty(selectedDifficulty === difficulty ? 'all' : difficulty)}
                             >
-                                {difficulty}
+                                {t(`filters.${difficulty}`)}
                             </Badge>
                         ))}
                     </div>
@@ -158,8 +161,8 @@ function TutorialsPage() {
                 {error && (
                     <div className="text-center py-12">
                         <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Failed to load tutorials</h3>
-                        <p className="text-muted-foreground">Please try again later</p>
+                        <h3 className="text-lg font-semibold mb-2">{t('page.failedToLoad')}</h3>
+                        <p className="text-muted-foreground">{t('page.pleaseTryAgain')}</p>
                     </div>
                 )}
 
@@ -167,9 +170,9 @@ function TutorialsPage() {
                 {!isLoading && !error && filteredTutorials.length === 0 && (
                     <div className="text-center py-12">
                         <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">No tutorials found</h3>
+                        <h3 className="text-lg font-semibold mb-2">{t('page.noResults')}</h3>
                         <p className="text-muted-foreground">
-                            {search ? 'Try a different search term' : 'Check back soon for new tutorials!'}
+                            {search ? t('page.tryDifferentSearch') : t('page.checkBackSoon')}
                         </p>
                     </div>
                 )}
@@ -180,7 +183,7 @@ function TutorialsPage() {
                         {/* Track View (Grouped) - Only in Grid Mode and when 'All' is selected */}
                         {viewMode === 'grid' && groupedTutorials ? (
                             <div className="space-y-12">
-                                {(['Beginner', 'Intermediate', 'Advanced', 'Other'] as const).map((level) => {
+                                {(['beginner', 'intermediate', 'advanced', 'other'] as const).map((level) => {
                                     const items = groupedTutorials[level];
                                     if (!items || items.length === 0) return null;
 
@@ -190,12 +193,11 @@ function TutorialsPage() {
                                                 <div className="h-8 w-8 rounded-full bg-brand-teal/20 flex items-center justify-center border border-brand-teal/30">
                                                     <Layers className="h-4 w-4 text-brand-teal-dark" />
                                                 </div>
-                                                <h2 className="text-2xl font-bold tracking-tight">{level === 'Other' ? 'Additional Tutorials' : `${level} Track`}</h2>
+                                                <h2 className="text-2xl font-bold tracking-tight">{t(`tracks.${level}`)}</h2>
                                             </div>
                                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pl-4 border-l-2 border-border/50 ml-4">
-                                                {items.map((tutorial) => (
-                                                    <TutorialCard key={tutorial.slug} tutorial={tutorial} />
-                                                ))}
+                                                {items.map((tutorial) => <TutorialCard key={tutorial.slug} tutorial={tutorial} locale={locale} />
+                                                )}
                                             </div>
                                         </div>
                                     );
@@ -206,7 +208,7 @@ function TutorialsPage() {
                             viewMode === 'grid' ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                                     {filteredTutorials.map((tutorial) => (
-                                        <TutorialCard key={tutorial.slug} tutorial={tutorial} />
+                                        <TutorialCard key={tutorial.slug} tutorial={tutorial} locale={locale} />
                                     ))}
                                 </div>
                             ) : (
@@ -215,23 +217,23 @@ function TutorialsPage() {
                                         <TableHeader>
                                             <TableRow>
                                                 <TableHead className="w-[50px]"></TableHead>
-                                                <TableHead className="w-[300px]">Title</TableHead>
-                                                <TableHead className="hidden md:table-cell">Description</TableHead>
-                                                <TableHead>Tags</TableHead>
-                                                <TableHead className="text-right">Time</TableHead>
-                                                <TableHead className="w-[100px] text-right">Status</TableHead>
+                                                <TableHead className="w-[300px]">{t('table.title')}</TableHead>
+                                                <TableHead className="hidden md:table-cell">{t('table.description')}</TableHead>
+                                                <TableHead>{t('table.tags')}</TableHead>
+                                                <TableHead className="text-right">{t('table.time')}</TableHead>
+                                                <TableHead className="w-[100px] text-right">{t('table.status')}</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
                                             {filteredTutorials.map((tutorial) => (
                                                 <TableRow key={tutorial.slug} className="group cursor-pointer">
                                                     <TableCell>
-                                                        <Link to="/tutorials/$slug" params={{ slug: tutorial.slug }} className="block h-full w-full flex items-center justify-center text-muted-foreground group-hover:text-primary">
+                                                        <Link to="/$locale/tutorials/$slug" params={{ locale, slug: tutorial.slug }} className="block h-full w-full flex items-center justify-center text-muted-foreground group-hover:text-primary">
                                                             <BookOpen className="h-4 w-4" />
                                                         </Link>
                                                     </TableCell>
                                                     <TableCell className="font-medium group-hover:text-primary transition-colors">
-                                                        <Link to="/tutorials/$slug" params={{ slug: tutorial.slug }} className="block">
+                                                        <Link to="/$locale/tutorials/$slug" params={{ locale, slug: tutorial.slug }} className="block">
                                                             {tutorial.title}
                                                         </Link>
                                                     </TableCell>
@@ -258,7 +260,7 @@ function TutorialsPage() {
                                                             {tutorial.isCompleted && (
                                                                 <Badge variant="outline" className="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 gap-1 pr-2">
                                                                     <CheckCircle2 className="h-3 w-3" />
-                                                                    Done
+                                                                    {t('card.completed')}
                                                                 </Badge>
                                                             )}
                                                         </div>
@@ -277,12 +279,11 @@ function TutorialsPage() {
     );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function TutorialCard({ tutorial }: { tutorial: any }) {
+function TutorialCard({ tutorial, locale }: { tutorial: any; locale: string }) {
     return (
         <Link
-            to="/tutorials/$slug"
-            params={{ slug: tutorial.slug }}
+            to="/$locale/tutorials/$slug"
+            params={{ locale, slug: tutorial.slug }}
             className="group"
         >
             <Card className="h-full glass-card hover:border-brand-teal/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-brand-teal/5 relative overflow-hidden border border-border">
@@ -291,7 +292,7 @@ function TutorialCard({ tutorial }: { tutorial: any }) {
                     <div className="absolute top-0 right-0 p-2 bg-green-500/10 rounded-bl-lg border-l border-b border-green-500/20 z-10">
                         <div className="flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400">
                             <CheckCircle2 className="h-3.5 w-3.5" />
-                            Done
+                            {t('card.completed')}
                         </div>
                     </div>
                 )}
@@ -314,7 +315,7 @@ function TutorialCard({ tutorial }: { tutorial: any }) {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
                             <Clock className="h-4 w-4" />
-                            {tutorial.estimatedMinutes} min
+                            {t('card.estimatedTimeShort', { minutes: tutorial.estimatedMinutes })}
                         </div>
                     </div>
                 </CardContent>

@@ -1,11 +1,14 @@
-import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate, useParams } from '@tanstack/react-router';
 import { LoginForm } from '@/components/auth';
+import type { RootContext } from '../__root';
 
-export const Route = createFileRoute('/login')({
-    beforeLoad: ({ context }) => {
-        if (context.auth.isAuthenticated) {
+export const Route = createFileRoute('/$locale/login')({
+    beforeLoad: ({ context, params }) => {
+        const { auth } = context as RootContext;
+        if (auth.isAuthenticated) {
             throw redirect({
-                to: '/',
+                to: '/$locale/' as any,
+                params: { locale: params.locale as any }
             });
         }
     },
@@ -16,14 +19,15 @@ import { useSession } from '@/lib/auth.client';
 import { useEffect } from 'react';
 
 function LoginPage() {
+    const { locale } = useParams({ from: '/$locale/login' });
     const navigate = useNavigate();
     const { data: session } = useSession();
 
     useEffect(() => {
         if (session?.user) {
-            void navigate({ to: '/' });
+            void navigate({ to: '/$locale/' as any, params: { locale: locale as any } });
         }
-    }, [session, navigate]);
+    }, [session, navigate, locale]);
 
     const handleLoginSuccess = () => {
         // Redirect to original path if available, otherwise home
@@ -31,9 +35,9 @@ function LoginPage() {
         const redirectUrl = searchParams.get('redirect');
 
         if (redirectUrl) {
-            void navigate({ to: redirectUrl });
+            void navigate({ to: redirectUrl as any });
         } else {
-            void navigate({ to: '/' });
+            void navigate({ to: '/$locale/' as any, params: { locale: locale as any } });
         }
     };
 
@@ -42,7 +46,7 @@ function LoginPage() {
             <div className="w-full max-w-md space-y-6 animate-fade-in">
                 <LoginForm
                     onSuccess={handleLoginSuccess}
-                    onRegisterClick={() => { void navigate({ to: '/register' }) }}
+                    onRegisterClick={() => { void navigate({ to: '/$locale/register' as any, params: { locale: locale as any } }) }}
                 />
             </div>
         </div>
