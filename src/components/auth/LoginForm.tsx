@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
+import { Link, useNavigate, useParams } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { signIn } from '@/lib/auth.client';
 import { signInSchema, type SignInInput } from '@/lib/validations';
@@ -22,6 +23,9 @@ interface LoginFormProps {
 }
 
 export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
+    const { t } = useTranslation(['auth', 'common']);
+    const { locale } = useParams({ strict: false }) as { locale: string };
+    const queryClient = useQueryClient();
     const [formData, setFormData] = useState<SignInInput>({
         email: '',
         password: '',
@@ -44,7 +48,6 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
         }
     };
 
-    const queryClient = useQueryClient();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -74,7 +77,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
             });
 
             if (response.error) {
-                setFormError(response.error.message || 'Invalid email or password');
+                setFormError(response.error.message || t('auth:errors.invalidCredentials'));
                 return;
             }
 
@@ -83,7 +86,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
 
             onSuccess?.();
         } catch (err) {
-            setFormError('An unexpected error occurred. Please try again.');
+            setFormError(t('common:messages.error'));
             console.error('Login error:', err);
         } finally {
             setIsLoading(false);
@@ -94,10 +97,10 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
         <Card className="w-full max-w-md glass-card">
             <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold gradient-text">
-                    Welcome Back
+                    {t('auth:login.title')}
                 </CardTitle>
                 <CardDescription>
-                    Sign in to continue your learning journey
+                    {t('auth:login.description')}
                 </CardDescription>
             </CardHeader>
 
@@ -113,12 +116,12 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                     )}
 
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t('common:labels.email')}</Label>
                         <Input
                             id="email"
                             name="email"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder={t('common:placeholders.email')}
                             value={formData.email}
                             onChange={handleChange}
                             disabled={isLoading}
@@ -132,19 +135,20 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
 
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                            <Label htmlFor="password">Password</Label>
+                            <Label htmlFor="password">{t('common:labels.password')}</Label>
                             <Link
-                                to="/forgot-password"
+                                to="/$locale/forgot-password"
+                                params={{ locale: locale as any }}
                                 className="text-xs text-primary hover:underline"
                             >
-                                Forgot password?
+                                {t('auth:login.forgotPassword')}
                             </Link>
                         </div>
                         <Input
                             id="password"
                             name="password"
                             type="password"
-                            placeholder="••••••••"
+                            placeholder={t('common:placeholders.password')}
                             value={formData.password}
                             onChange={handleChange}
                             disabled={isLoading}
@@ -162,19 +166,19 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
                         {isLoading ? (
                             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                         ) : (
-                            'Sign In'
+                            t('common:actions.signIn')
                         )}
                     </Button>
 
                     {onRegisterClick && (
                         <p className="text-center text-sm text-muted-foreground">
-                            Don&apos;t have an account?{' '}
+                            {t('auth:login.noAccount')}{' '}
                             <button
                                 type="button"
                                 className="text-primary hover:underline font-medium"
                                 onClick={onRegisterClick}
                             >
-                                Sign up
+                                {t('common:actions.signUp')}
                             </button>
                         </p>
                     )}

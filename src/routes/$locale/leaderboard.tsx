@@ -1,4 +1,5 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -27,11 +28,13 @@ interface LeaderboardEntry {
     }[];
 }
 
-export const Route = createFileRoute('/leaderboard')({
+export const Route = createFileRoute('/$locale/leaderboard')({
     component: LeaderboardPage,
 });
 
 function LeaderboardPage() {
+    const { locale } = useParams({ from: '/$locale/leaderboard' });
+    const { t } = useTranslation(['leaderboard', 'common']);
     const { data: session } = useSession();
     const isAuthenticated = !!session;
 
@@ -58,11 +61,11 @@ function LeaderboardPage() {
                 <div className="mb-12 text-center">
                     <h1 className="text-5xl font-black mb-4 tracking-tight">
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary via-teal-400 to-accent animate-gradient">
-                            Hall of Fame
+                            {t('leaderboard:header.title')}
                         </span>
                     </h1>
                     <p className="text-muted-foreground text-xl max-w-2xl mx-auto flex items-center justify-center gap-2">
-                        The elite testers mastering the art of automation.
+                        {t('leaderboard:header.subtitle')}
                     </p>
                 </div>
 
@@ -71,11 +74,11 @@ function LeaderboardPage() {
                         <TabsList className="bg-muted/50 p-1 h-14 rounded-2xl border-2 border-border/50">
                             <TabsTrigger value="all-time" className="px-8 h-12 text-base rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/20">
                                 <Trophy className="h-5 w-5 mr-2 text-yellow-500" />
-                                All Time
+                                {t('leaderboard:tabs.allTime')}
                             </TabsTrigger>
                             <TabsTrigger value="monthly" className="px-8 h-12 text-base rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-md data-[state=active]:border-2 data-[state=active]:border-primary/20">
                                 <Calendar className="h-5 w-5 mr-2 text-primary" />
-                                This Month
+                                {t('leaderboard:tabs.thisMonth')}
                             </TabsTrigger>
                         </TabsList>
                     </div>
@@ -119,11 +122,11 @@ function LeaderboardPage() {
                                             <table className="w-full">
                                                 <thead className="bg-muted/50 text-xs font-bold uppercase tracking-wider text-muted-foreground">
                                                     <tr>
-                                                        <th className="px-6 py-4 text-left w-24">Rank</th>
-                                                        <th className="px-6 py-4 text-left">User</th>
-                                                        <th className="px-6 py-4 text-center">Level</th>
-                                                        <th className="px-6 py-4 text-right">XP</th>
-                                                        <th className="px-6 py-4 text-right hidden sm:table-cell">Badges</th>
+                                                        <th className="px-6 py-4 text-left w-24">{t('common:labels.rank')}</th>
+                                                        <th className="px-6 py-4 text-left">{t('common:labels.user')}</th>
+                                                        <th className="px-6 py-4 text-center">{t('common:labels.level')}</th>
+                                                        <th className="px-6 py-4 text-right">{t('common:labels.xp')}</th>
+                                                        <th className="px-6 py-4 text-right hidden sm:table-cell">{t('common:labels.badges')}</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="divide-y divide-border/50">
@@ -148,8 +151,8 @@ function LeaderboardPage() {
                                                                         ) : '?'}
                                                                     </div>
                                                                     <div>
-                                                                        <div className="font-bold text-base">{isAuthenticated ? (user.name || 'Anonymous') : 'Hidden User'}</div>
-                                                                        <div className="text-xs text-muted-foreground font-medium">{user.challengesCompleted} challenges</div>
+                                                                        <div className="font-bold text-base">{isAuthenticated ? (user.name || t('leaderboard:table.anonymous')) : t('leaderboard:table.hiddenUser')}</div>
+                                                                        <div className="text-xs text-muted-foreground font-medium">{t('leaderboard:table.challengesCount', { count: user.challengesCompleted })}</div>
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -172,7 +175,7 @@ function LeaderboardPage() {
                                                     )) : (
                                                         <tr className="h-32">
                                                             <td colSpan={5} className="text-center text-muted-foreground font-medium">
-                                                                {isAuthenticated ? "No other runners yet. Invite your friends!" : ""}
+                                                                {isAuthenticated ? t('leaderboard:table.emptyState') : ""}
                                                             </td>
                                                         </tr>
                                                     )}
@@ -186,13 +189,13 @@ function LeaderboardPage() {
                                                 <div className="h-20 w-20 rounded-2xl bg-primary/10 flex items-center justify-center mb-6 border-2 border-primary/20 animate-pulse">
                                                     <Shield className="h-10 w-10 text-primary" />
                                                 </div>
-                                                <h3 className="text-3xl font-black mb-3">Join the Elite</h3>
+                                                <h3 className="text-3xl font-black mb-3">{t('leaderboard:gating.title')}</h3>
                                                 <p className="text-muted-foreground mb-8 max-w-md text-lg font-medium">
-                                                    Sign in to see full rankings, track your own progress, and earn unique badges.
+                                                    {t('leaderboard:gating.description')}
                                                 </p>
-                                                <Link to="/login" search={{ redirect: '/leaderboard' }}>
+                                                <Link to="/$locale/login" params={{ locale }} search={{ redirect: '/leaderboard' }}>
                                                     <Button size="lg" className="px-8 py-6 rounded-xl text-lg font-bold shadow-xl shadow-primary/20 hover:shadow-primary/40 transition-all border-2 border-primary-foreground/20">
-                                                        Sign In to Compete
+                                                        {t('leaderboard:gating.button')}
                                                     </Button>
                                                 </Link>
                                             </div>
@@ -205,8 +208,8 @@ function LeaderboardPage() {
                     <TabsContent value="monthly" className="text-center py-20">
                         <div className="opacity-50">
                             <Calendar className="h-20 w-20 mx-auto mb-6 text-muted-foreground" />
-                            <h3 className="text-2xl font-black mb-2">Monthly Rankings Coming Soon</h3>
-                            <p className="text-lg text-muted-foreground">Compete for the monthly crown in the next season update!</p>
+                            <h3 className="text-2xl font-black mb-2">{t('leaderboard:monthly.comingSoon')}</h3>
+                            <p className="text-lg text-muted-foreground">{t('leaderboard:monthly.description')}</p>
                         </div>
                     </TabsContent>
                 </Tabs>
@@ -292,10 +295,10 @@ function LeaderboardError() {
                 <div className="mx-auto mb-4 h-16 w-16 rounded-2xl bg-destructive/10 flex items-center justify-center border-2 border-destructive/20">
                     <AlertCircle className="h-8 w-8 text-destructive" />
                 </div>
-                <h3 className="text-2xl font-bold text-foreground mb-2">Unavailable</h3>
-                <p className="text-muted-foreground mb-6 text-lg">Unable to load the leaderboard at this time.</p>
+                <h3 className="text-2xl font-bold text-foreground mb-2">{t('common:messages.unavailable')}</h3>
+                <p className="text-muted-foreground mb-6 text-lg">{t('leaderboard:error.description')}</p>
                 <Button variant="outline" size="lg" className="rounded-xl border-2 hover:bg-background" onClick={() => window.location.reload()}>
-                    Refresh Page
+                    {t('common:actions.refresh')}
                 </Button>
             </CardContent>
         </Card>

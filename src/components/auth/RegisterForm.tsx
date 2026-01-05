@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { signUp } from '@/lib/auth.client';
 import { resendVerification } from '@/lib/auth.fn';
 import { signUpSchema, type SignUpInput } from '@/lib/validations';
@@ -22,6 +23,7 @@ interface RegisterFormProps {
 }
 
 export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
+    const { t } = useTranslation(['auth', 'common']);
     const [formData, setFormData] = useState<SignUpInput>({
         email: '',
         password: '',
@@ -64,7 +66,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
 
             if (!response.success) {
                 setResendStatus('error');
-                setResendError(response.error || 'Failed to resend email');
+                setResendError(response.error || t('auth:errors.failedToResend'));
                 if ((response as { cooldownRemaining?: number }).cooldownRemaining) {
                     setResendCooldown((response as { cooldownRemaining?: number }).cooldownRemaining!);
                 }
@@ -74,7 +76,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             }
         } catch {
             setResendStatus('error');
-            setResendError('An error occurred. Please try again.');
+            setResendError(t('common:messages.error'));
         } finally {
             setIsResending(false);
         }
@@ -123,7 +125,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             });
 
             if (response.error) {
-                setFormError(response.error.message || 'Registration failed');
+                setFormError(response.error.message || t('auth:errors.registrationFailed'));
                 return;
             }
 
@@ -131,7 +133,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
             setRegistrationComplete(true);
             onSuccess?.();
         } catch (err) {
-            setFormError('An unexpected error occurred. Please try again.');
+            setFormError(t('common:messages.error'));
             console.error('Registration error:', err);
         } finally {
             setIsLoading(false);
@@ -147,10 +149,10 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                         <Mail className="h-8 w-8 text-primary" />
                     </div>
                     <CardTitle className="text-2xl font-bold gradient-text">
-                        Check Your Email
+                        {t('auth:verification.title')}
                     </CardTitle>
                     <CardDescription className="text-base">
-                        We've sent a verification link to
+                        {t('auth:verification.description')}
                     </CardDescription>
                 </CardHeader>
 
@@ -162,15 +164,15 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                     <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
                         <div className="flex items-start gap-2">
                             <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                            <span>Click the link in the email to verify your account</span>
+                            <span>{t('auth:verification.instruction1')}</span>
                         </div>
                         <div className="flex items-start gap-2">
                             <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                            <span>The link expires in 24 hours</span>
+                            <span>{t('auth:verification.instruction2')}</span>
                         </div>
                         <div className="flex items-start gap-2">
                             <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
-                            <span>Check your spam folder if you don't see it</span>
+                            <span>{t('auth:verification.instruction3')}</span>
                         </div>
                     </div>
 
@@ -179,7 +181,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                         {resendStatus === 'success' ? (
                             <p className="text-sm text-green-500 flex items-center justify-center gap-1">
                                 <CheckCircle className="h-4 w-4" />
-                                Verification email sent!
+                                {t('auth:verification.resentSuccess')}
                             </p>
                         ) : resendStatus === 'error' ? (
                             <p className="text-sm text-destructive">{resendError}</p>
@@ -198,8 +200,8 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                                 <RefreshCw className="h-4 w-4 mr-2" />
                             )}
                             {resendCooldown > 0
-                                ? `Resend in ${resendCooldown}s`
-                                : "Didn't receive it? Resend email"}
+                                ? t('auth:verification.resendCooldown', { seconds: resendCooldown })
+                                : t('auth:verification.resendButton')}
                         </Button>
                     </div>
                 </CardContent>
@@ -211,7 +213,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                             className="w-full"
                             onClick={onLoginClick}
                         >
-                            Back to Sign In
+                            {t('common:actions.backToSignIn')}
                         </Button>
                     )}
                 </CardFooter>
@@ -223,10 +225,10 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
         <Card className="w-full max-w-md glass-card">
             <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold gradient-text">
-                    Create Account
+                    {t('auth:register.title')}
                 </CardTitle>
                 <CardDescription>
-                    Start your learning journey today
+                    {t('auth:register.description')}
                 </CardDescription>
             </CardHeader>
 
@@ -239,12 +241,12 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                     )}
 
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('common:labels.name')}</Label>
                         <Input
                             id="name"
                             name="name"
                             type="text"
-                            placeholder="John Doe"
+                            placeholder={t('common:placeholders.name')}
                             value={formData.name}
                             onChange={handleChange}
                             disabled={isLoading}
@@ -257,12 +259,12 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="email">{t('common:labels.email')}</Label>
                         <Input
                             id="email"
                             name="email"
                             type="email"
-                            placeholder="you@example.com"
+                            placeholder={t('common:placeholders.email')}
                             value={formData.email}
                             onChange={handleChange}
                             disabled={isLoading}
@@ -275,12 +277,12 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="password">Password</Label>
+                        <Label htmlFor="password">{t('common:labels.password')}</Label>
                         <Input
                             id="password"
                             name="password"
                             type="password"
-                            placeholder="Minimum 8 characters"
+                            placeholder={t('common:placeholders.passwordMin')}
                             value={formData.password}
                             onChange={handleChange}
                             disabled={isLoading}
@@ -298,19 +300,19 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
                         {isLoading ? (
                             <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                         ) : (
-                            'Create Account'
+                            t('common:actions.signUp')
                         )}
                     </Button>
 
                     {onLoginClick && (
                         <p className="text-center text-sm text-muted-foreground">
-                            Already have an account?{' '}
+                            {t('auth:register.alreadyHaveAccount')}{' '}
                             <button
                                 type="button"
                                 className="text-primary hover:underline font-medium"
                                 onClick={onLoginClick}
                             >
-                                Sign in
+                                {t('common:actions.signIn')}
                             </button>
                         </p>
                     )}

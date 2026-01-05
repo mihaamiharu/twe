@@ -1,4 +1,5 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTutorial, completeTutorial, updateTutorialProgress } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +15,7 @@ import { useSession } from '@/lib/auth.client';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 import { showAchievementToasts } from '@/lib/achievement-toast';
 
-export const Route = createFileRoute('/tutorials/$slug')({
+export const Route = createFileRoute('/$locale/tutorials/$slug')({
     component: TutorialDetailPage,
 });
 
@@ -52,7 +53,8 @@ interface Tutorial {
 }
 
 function TutorialDetailPage() {
-    const { slug } = useParams({ from: '/tutorials/$slug' });
+    const { locale, slug } = useParams({ from: '/$locale/tutorials/$slug' });
+    const { t } = useTranslation(['tutorials', 'common']);
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [readingProgress, setReadingProgress] = useState(0);
@@ -81,7 +83,7 @@ function TutorialDetailPage() {
             return result;
         },
         onSuccess: async (response) => {
-            toast.success('Tutorial completed! 🎉');
+            toast.success(t('tutorials:toasts.completed'));
             await queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
             await queryClient.invalidateQueries({ queryKey: ['tutorials'] });
             await queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
@@ -94,7 +96,7 @@ function TutorialDetailPage() {
             }
         },
         onError: () => {
-            toast.error('Failed to mark as complete');
+            toast.error(t('tutorials:toasts.failed'));
         },
     });
 
@@ -237,20 +239,20 @@ function TutorialDetailPage() {
         return (
             <div className="min-h-screen p-6 md:p-10">
                 <div className="max-w-4xl mx-auto">
-                    <Link to="/tutorials">
+                    <Link to="/$locale/tutorials" params={{ locale }}>
                         <Button variant="ghost" className="mb-8">
                             <ArrowLeft className="h-4 w-4 mr-2" />
-                            Back to Tutorials
+                            {t('common:actions.backToTutorials')}
                         </Button>
                     </Link>
                     <div className="text-center py-12">
                         <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold mb-2">Tutorial not found</h3>
+                        <h3 className="text-lg font-semibold mb-2">{t('tutorials:page.notFound')}</h3>
                         <p className="text-muted-foreground mb-6">
-                            {error?.message || 'The tutorial you are looking for does not exist'}
+                            {error?.message || t('tutorials:page.notFoundDescription')}
                         </p>
-                        <Link to="/tutorials">
-                            <Button>Browse All Tutorials</Button>
+                        <Link to="/$locale/tutorials" params={{ locale }}>
+                            <Button>{t('common:actions.browseTutorials')}</Button>
                         </Link>
                     </div>
                 </div>
@@ -264,10 +266,10 @@ function TutorialDetailPage() {
         <div className="min-h-screen p-6 md:p-10">
             <div className="max-w-6xl mx-auto">
                 {/* Back button - larger icon */}
-                <Link to="/tutorials">
+                <Link to="/$locale/tutorials" params={{ locale }}>
                     <Button variant="ghost" className="mb-8">
                         <ArrowLeft className="h-5 w-5 mr-2" />
-                        Back to Tutorials
+                        {t('common:actions.backToTutorials')}
                     </Button>
                 </Link>
 
@@ -311,14 +313,14 @@ function TutorialDetailPage() {
                             <CardHeader>
                                 <CardTitle className="text-base flex items-center gap-2">
                                     <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                                    Your Progress
+                                    {t('tutorials:sidebar.progress')}
                                 </CardTitle>
                             </CardHeader>
                             <CardContent className="space-y-4">
                                 {/* Progress Bar */}
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-muted-foreground">Reading</span>
+                                        <span className="text-muted-foreground">{t('tutorials:sidebar.reading')}</span>
                                         <span className="font-semibold text-primary">{displayProgress}%</span>
                                     </div>
                                     <Progress value={displayProgress} className="h-3" />
@@ -338,20 +340,20 @@ function TutorialDetailPage() {
                                         disabled={markCompleteMutation.isPending || displayProgress < 100}
                                     >
                                         <CheckCircle2 className="h-4 w-4 mr-2" />
-                                        {markCompleteMutation.isPending ? 'Saving...' : displayProgress < 100 ? 'Read to Complete' : 'Complete & Continue'}
+                                        {markCompleteMutation.isPending ? t('common:messages.saving') : displayProgress < 100 ? t('tutorials:sidebar.readToComplete') : t('tutorials:sidebar.completeAndContinue')}
                                     </Button>
                                 ) : (
                                     <div className="space-y-4">
                                         <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
                                             <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                            <span className="text-sm font-semibold text-green-500">Completed! 🎉</span>
+                                            <span className="text-sm font-semibold text-green-500">{t('tutorials:sidebar.completedTitle')}</span>
                                         </div>
                                         {tutorial.nextTutorial && (
                                             <Button
                                                 className="w-full"
-                                                onClick={() => { void navigate({ to: '/tutorials/$slug', params: { slug: tutorial.nextTutorial!.slug } }) }}
+                                                onClick={() => { void navigate({ to: '/$locale/tutorials/$slug', params: { locale, slug: tutorial.nextTutorial!.slug } }) }}
                                             >
-                                                Next: {tutorial.nextTutorial.title}
+                                                {t('tutorials:sidebar.nextLabel', { title: tutorial.nextTutorial.title })}
                                                 <ArrowRight className="h-4 w-4 ml-2" />
                                             </Button>
                                         )}
@@ -363,14 +365,14 @@ function TutorialDetailPage() {
                                     <div className="flex items-center justify-between text-sm">
                                         <div className="flex items-center gap-2 text-muted-foreground">
                                             <Clock className="h-4 w-4" />
-                                            <span>Duration</span>
+                                            <span>{t('tutorials:sidebar.duration')}</span>
                                         </div>
-                                        <span className="font-medium">{tutorial.estimatedMinutes} min</span>
+                                        <span className="font-medium">{t('tutorials:card.estimatedTimeShort', { minutes: tutorial.estimatedMinutes })}</span>
                                     </div>
                                     {isCompleted && (
                                         <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
                                             <CheckCircle2 className="h-4 w-4" />
-                                            <span className="font-medium">Completed</span>
+                                            <span className="font-medium">{t('tutorials:sidebar.statusCompleted')}</span>
                                         </div>
                                     )}
                                 </div>
@@ -384,12 +386,12 @@ function TutorialDetailPage() {
                                 <CardHeader>
                                     <CardTitle className="text-base flex items-center gap-2">
                                         <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                                        Practice Challenges
+                                        {t('tutorials:sidebar.challengesTitle')}
                                     </CardTitle>
                                 </CardHeader>
                                 <CardContent className="space-y-4">
                                     <p className="text-sm text-muted-foreground">
-                                        Reinforce what you've learned with these related challenges.
+                                        {t('tutorials:sidebar.challengesDescription')}
                                     </p>
                                     <div
                                         className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"
@@ -401,8 +403,8 @@ function TutorialDetailPage() {
                                         {tutorial.challenges.map(challenge => (
                                             <Link
                                                 key={challenge.slug}
-                                                to="/challenges/$slug"
-                                                params={{ slug: challenge.slug }}
+                                                to="/$locale/challenges/$slug"
+                                                params={{ locale, slug: challenge.slug }}
                                                 className="block p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
                                             >
                                                 <div className="flex items-center justify-between mb-1">

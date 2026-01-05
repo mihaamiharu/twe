@@ -1,0 +1,60 @@
+{
+    "page": {
+        "title": "Tutorials",
+        "subtitle": "Walk through core concepts with me, step-by-step.",
+        "searchPlaceholder": "Search tutorials...",
+        "noResults": "No tutorials found",
+        "tryDifferentSearch": "Try a different search term",
+        "checkBackSoon": "Check back soon for new tutorials!",
+        "failedToLoad": "Failed to load tutorials",
+        "pleaseTryAgain": "Please try again later",
+        "notFound": "Tutorial not found",
+        "notFoundDescription": "The tutorial you are looking for does not exist"
+    },
+    "filters": {
+        "all": "All",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+    },
+    "tracks": {
+        "beginner": "Beginner Track",
+        "intermediate": "Intermediate Track",
+        "advanced": "Advanced Track",
+        "other": "Additional Tutorials"
+    },
+    "table": {
+        "title": "Title",
+        "description": "Description",
+        "tags": "Tags",
+        "time": "Time",
+        "status": "Status"
+    },
+    "card": {
+        "estimatedTime": "{{minutes}} min read",
+        "estimatedTimeShort": "{{minutes}} min",
+        "startTutorial": "Start Tutorial",
+        "continueTutorial": "Continue",
+        "completed": "Done"
+    },
+    "view": {
+        "grid": "Grid View",
+        "list": "List View"
+    },
+    "sidebar": {
+        "progress": "Your Progress",
+        "reading": "Reading",
+        "readToComplete": "Read to Complete",
+        "completeAndContinue": "Complete & Continue",
+        "completedTitle": "Completed! 🎉",
+        "nextLabel": "Next: {{title}}",
+        "duration": "Duration",
+        "statusCompleted": "Completed",
+        "challengesTitle": "Practice Challenges",
+        "challengesDescription": "Reinforce what you've learned with these related challenges."
+    },
+    "toasts": {
+        "completed": "Tutorial completed! 🎉",
+        "failed": "Failed to mark as complete"
+    }
+}

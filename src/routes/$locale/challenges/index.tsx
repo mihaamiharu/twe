@@ -20,8 +20,9 @@ import {
     TIER_ORDER,
     CATEGORY_ORDER
 } from '@/lib/constants';
+import { useTranslation } from 'react-i18next';
 
-export const Route = createFileRoute('/challenges/')({
+export const Route = createFileRoute('/$locale/challenges/')({
     component: ChallengesPage,
     head: () => ({
         meta: [
@@ -109,6 +110,8 @@ export interface ChallengesResponse {
 }
 
 function ChallengesPage() {
+    const { locale } = Route.useParams();
+    const { t } = useTranslation('challenges');
     const [filterType, setFilterType] = useState<string>('all');
     const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
     const [filterTier, setFilterTier] = useState<string>('all');
@@ -224,15 +227,15 @@ function ChallengesPage() {
                 {/* Header & Overall Progress */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
                     <div>
-                        <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Challenges</h1>
+                        <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">{t('page.title')}</h1>
                         <p className="text-muted-foreground text-lg">
-                            Practice your CSS and XPath selectors with real-world scenarios.
+                            {t('page.subtitle')}
                         </p>
                     </div>
                     {totalChallenges > 0 && (
                         <div className="glass-card p-4 min-w-[240px] shadow-sm">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium">Overall Progress</span>
+                                <span className="text-sm font-medium">{t('page.overallProgress')}</span>
                                 <span className="text-sm text-muted-foreground">
                                     {progressPercent}%
                                 </span>
@@ -260,7 +263,7 @@ function ChallengesPage() {
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
                                 type="text"
-                                placeholder="Search challenges..."
+                                placeholder={t('filters.searchPlaceholder')}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="pl-10 h-11 bg-card border-border rounded-xl shadow-sm focus-visible:ring-primary/20"
@@ -270,7 +273,7 @@ function ChallengesPage() {
                                     onClick={() => setSearchQuery('')}
                                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
                                 >
-                                    Clear
+                                    {t('filters.clear')}
                                 </button>
                             )}
                         </div>
@@ -281,10 +284,10 @@ function ChallengesPage() {
                                     <SelectValue placeholder="Difficulty" />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="all">All Difficulties</SelectItem>
-                                    <SelectItem value="EASY">Easy</SelectItem>
-                                    <SelectItem value="MEDIUM">Medium</SelectItem>
-                                    <SelectItem value="HARD">Hard</SelectItem>
+                                    <SelectItem value="all">{t('filters.allDifficulties')}</SelectItem>
+                                    <SelectItem value="EASY">{t('difficulty.EASY')}</SelectItem>
+                                    <SelectItem value="MEDIUM">{t('difficulty.MEDIUM')}</SelectItem>
+                                    <SelectItem value="HARD">{t('difficulty.HARD')}</SelectItem>
                                 </SelectContent>
                             </Select>
 
@@ -467,8 +470,8 @@ function ChallengesPage() {
                                             return (
                                                 <Link
                                                     key={challenge.slug}
-                                                    to="/challenges/$slug"
-                                                    params={{ slug: challenge.slug }}
+                                                    to="/$locale/challenges/$slug"
+                                                    params={{ locale, slug: challenge.slug }}
                                                     className="group"
                                                 >
                                                     {ChallengeCard}
@@ -538,7 +541,7 @@ function ChallengesPage() {
                                                     return (
                                                         <TableRow key={challenge.slug} className={`group cursor-pointer ${challenge.isCompleted ? 'bg-green-500/5' : ''}`}>
                                                             <TableCell className="font-mono text-muted-foreground w-[80px]">
-                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block h-full w-full flex items-center gap-2">
+                                                                <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block h-full w-full flex items-center gap-2">
                                                                     #{index + 1}
                                                                     {challenge.isCompleted && (
                                                                         <CheckCircle2 className="h-4 w-4 text-green-500" />
@@ -546,13 +549,13 @@ function ChallengesPage() {
                                                                 </Link>
                                                             </TableCell>
                                                             <TableCell className="font-medium group-hover:text-primary transition-colors w-[300px]">
-                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block">
+                                                                <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block">
                                                                     <div className="font-bold">{challenge.title}</div>
                                                                     <div className="text-xs text-muted-foreground line-clamp-1">{challenge.description}</div>
                                                                 </Link>
                                                             </TableCell>
                                                             <TableCell>
-                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block h-full w-full">
+                                                                <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block h-full w-full">
                                                                     <Badge className={`${config.color} whitespace-nowrap`} variant="outline">
                                                                         {config.icon}
                                                                         <span className="ml-1">{config.label}</span>
@@ -560,7 +563,7 @@ function ChallengesPage() {
                                                                 </Link>
                                                             </TableCell>
                                                             <TableCell>
-                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block h-full w-full">
+                                                                <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block h-full w-full">
                                                                     <Badge
                                                                         variant="secondary"
                                                                         className={difficultyColors[challenge.difficulty] || ''}
@@ -570,7 +573,7 @@ function ChallengesPage() {
                                                                 </Link>
                                                             </TableCell>
                                                             <TableCell className="text-right">
-                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block h-full w-full">
+                                                                <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block h-full w-full">
                                                                     <div className="flex items-center justify-end gap-1 text-muted-foreground text-xs">
                                                                         <Trophy className="h-3 w-3" />
                                                                         {challenge.completionCount} completed
@@ -578,7 +581,7 @@ function ChallengesPage() {
                                                                 </Link>
                                                             </TableCell>
                                                             <TableCell className="text-right">
-                                                                <Link to="/challenges/$slug" params={{ slug: challenge.slug }} className="block h-full w-full">
+                                                                <Link to="/$locale/challenges/$slug" params={{ locale, slug: challenge.slug }} className="block h-full w-full">
                                                                     <span className="flex items-center justify-end gap-1 text-amber-500 font-medium">
                                                                         <Zap className="h-3 w-3" />
                                                                         {challenge.xpReward}

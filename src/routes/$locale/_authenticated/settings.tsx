@@ -1,4 +1,6 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useParams, redirect } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
+import type { RootContext } from '../../__root';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -9,11 +11,22 @@ import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
 import { getUserSettings, updateUserProfile } from '@/lib/user.fn';
 
-export const Route = createFileRoute('/_authenticated/settings')({
+export const Route = createFileRoute('/$locale/_authenticated/settings')({
+    beforeLoad: ({ context, params }) => {
+        const { auth } = context as RootContext;
+        if (!auth.isAuthenticated) {
+            throw redirect({
+                to: '/$locale/login',
+                params: { locale: params.locale }
+            });
+        }
+    },
     component: SettingsPage,
 });
 
 function SettingsPage() {
+    const { locale } = useParams({ from: '/$locale/_authenticated/settings' });
+    const { t } = useTranslation(['common']);
     const queryClient = useQueryClient();
     const [name, setName] = useState('');
 
@@ -86,7 +99,7 @@ function SettingsPage() {
                             <h1 className="text-2xl font-bold mb-4">Error</h1>
                             <p className="text-muted-foreground mb-6">{error.message}</p>
                             <Button asChild>
-                                <Link to="/">Go Home</Link>
+                                <Link to="/$locale/" params={{ locale }}>Go Home</Link>
                             </Button>
                         </CardContent>
                     </Card>
@@ -101,7 +114,8 @@ function SettingsPage() {
                 {/* Header */}
                 <div className="mb-8">
                     <Link
-                        to="/profile"
+                        to="/$locale/_authenticated/profile"
+                        params={{ locale }}
                         className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-4"
                     >
                         <ArrowLeft className="h-4 w-4" />

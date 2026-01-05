@@ -1,0 +1,97 @@
+{
+    "appName": "TestingWithEkki",
+    "seo": {
+        "title": "TestingWithEkki - Pelajari Keterampilan Pengujian",
+        "description": "Pelajari keterampilan pengujian melalui tutorial interaktif dan tantangan coding"
+    },
+    "navigation": {
+        "home": "Beranda",
+        "challenges": "Tantangan",
+        "tutorials": "Tutorial",
+        "leaderboard": "Papan Peringkat",
+        "login": "Masuk",
+        "register": "Daftar",
+        "profile": "Profil",
+        "logout": "Keluar"
+    },
+    "actions": {
+        "submit": "Kirim",
+        "cancel": "Batal",
+        "save": "Simpan",
+        "runCode": "Jalankan Kode",
+        "reset": "Atur Ulang",
+        "continue": "Lanjutkan",
+        "back": "Kembali",
+        "next": "Berikutnya",
+        "viewAll": "Lihat Semua",
+        "tryAgain": "Coba Lagi",
+        "startLearning": "Mulai Belajar",
+        "backToTutorials": "Kembali ke Tutorial",
+        "browseTutorials": "Lihat Semua Tutorial",
+        "backToChallenges": "Kembali ke Tantangan",
+        "dismiss": "Abaikan",
+        "refresh": "Segarkan Halaman",
+        "signIn": "Masuk",
+        "signUp": "Daftar",
+        "backToSignIn": "Kembali ke Masuk",
+        "signInNow": "Masuk Sekarang",
+        "resetPassword": "Atur Ulang Kata Sandi"
+    },
+    "labels": {
+        "difficulty": "Tingkat Kesulitan",
+        "xp": "XP",
+        "progress": "Progres",
+        "completed": "Selesai",
+        "inProgress": "Sedang Dikerjakan",
+        "notStarted": "Belum Dimulai",
+        "easy": "Mudah",
+        "medium": "Sedang",
+        "hard": "Sulit",
+        "search": "Cari",
+        "filter": "Filter",
+        "all": "Semua",
+        "rank": "Peringkat",
+        "user": "Pengguna",
+        "badges": "Lencana",
+        "email": "Email",
+        "emailAddress": "Alamat Email",
+        "password": "Kata Sandi",
+        "newPassword": "Kata Sandi Baru",
+        "confirmNewPassword": "Konfirmasi Kata Sandi Baru",
+        "name": "Nama"
+    },
+    "messages": {
+        "success": "Berhasil!",
+        "error": "Terjadi kesalahan",
+        "loading": "Memuat...",
+        "noResults": "Tidak ada hasil",
+        "saving": "Menyimpan...",
+        "submitting": "Mengirim solusi...",
+        "loadingChallenge": "Memuat tantangan...",
+        "unavailable": "Tidak tersedia"
+    },
+    "footer": {
+        "description": "Kuasai seni pengujian perangkat lunak melalui tutorial interaktif dan tantangan pengkodean dunia nyata. Dibangun untuk developer, oleh developer.",
+        "product": "Produk",
+        "resources": "Sumber Daya",
+        "copyright": "© {{year}} TestingWithEkki. Hak cipta dilindungi.",
+        "madeWith": "Dibuat dengan ❤️ untuk komunitas QA",
+        "reportBug": "Laporkan Bug"
+    },
+    "notFound": {
+        "title": "Anda berada dalam Mode Headless",
+        "description": "Konten ada di sini, tetapi Anda tidak dapat melihatnya karena viewport Anda disetel ke headless: true. Percayalah, pengujian berjalan di latar belakang.",
+        "backHome": "Beralih ke Mode Headed (Kembali ke Beranda)",
+        "tip": "Tip: Coba jalankan dengan flag --headed lain kali"
+    },
+    "auth": {
+        "signInToSubmit": "Masuk untuk Mengirim",
+        "signInToSubmitDescription": "Anda perlu masuk untuk menyimpan solusi, mendapatkan XP, dan melacak progres Anda. Kode Anda akan tetap tersimpan."
+    },
+    "placeholders": {
+        "email": "kamu@contoh.com",
+        "password": "••••••••",
+        "passwordMin": "Minimal 8 karakter",
+        "name": "Budi Santoso"
+    }
+}

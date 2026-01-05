@@ -1,4 +1,5 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, Link, useNavigate, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { resetPassword } from '@/lib/auth.client';
 import { Button } from '@/components/ui/button';
@@ -15,11 +16,13 @@ import {
 import { KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export const Route = createFileRoute('/reset-password')({
+export const Route = createFileRoute('/$locale/reset-password')({
     component: ResetPasswordPage,
 });
 
 function ResetPasswordPage() {
+    const { locale } = useParams({ from: '/$locale/reset-password' });
+    const { t } = useTranslation(['auth', 'common']);
     const navigate = useNavigate();
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -42,23 +45,24 @@ function ResetPasswordPage() {
                             <AlertCircle className="h-8 w-8 text-destructive" />
                         </div>
                         <CardTitle className="text-2xl font-bold">
-                            Invalid or Expired Link
+                            {t('auth:resetPassword.invalidTitle')}
                         </CardTitle>
                         <CardDescription className="text-base">
-                            This password reset link is invalid or has expired. Please request a new one.
+                            {t('auth:resetPassword.invalidDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardFooter className="flex flex-col gap-4">
-                        <Link to="/forgot-password" className="w-full">
+                        <Link to="/$locale/forgot-password" params={{ locale }} className="w-full">
                             <Button className="w-full">
-                                Request New Link
+                                {t('auth:forgotPassword.requestNew')}
                             </Button>
                         </Link>
                         <Link
-                            to="/login"
+                            to="/$locale/login"
+                            params={{ locale }}
                             className="text-sm text-primary hover:underline text-center"
                         >
-                            Back to Sign In
+                            {t('common:actions.backToSignIn')}
                         </Link>
                     </CardFooter>
                 </Card>
@@ -76,23 +80,24 @@ function ResetPasswordPage() {
                             <AlertCircle className="h-8 w-8 text-destructive" />
                         </div>
                         <CardTitle className="text-2xl font-bold">
-                            Missing Reset Token
+                            {t('auth:resetPassword.missingTitle')}
                         </CardTitle>
                         <CardDescription className="text-base">
-                            No password reset token found. Please use the link from your email.
+                            {t('auth:resetPassword.missingDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardFooter className="flex flex-col gap-4">
-                        <Link to="/forgot-password" className="w-full">
+                        <Link to="/$locale/forgot-password" params={{ locale }} className="w-full">
                             <Button className="w-full">
-                                Request Password Reset
+                                {t('auth:forgotPassword.title')}
                             </Button>
                         </Link>
                         <Link
-                            to="/login"
+                            to="/$locale/login"
+                            params={{ locale }}
                             className="text-sm text-primary hover:underline text-center"
                         >
-                            Back to Sign In
+                            {t('common:actions.backToSignIn')}
                         </Link>
                     </CardFooter>
                 </Card>
@@ -105,17 +110,17 @@ function ResetPasswordPage() {
         setError('');
 
         if (!password || !confirmPassword) {
-            setError('Please fill in all fields');
+            setError(t('auth:errors.registrationFailed')); // General error for missing fields
             return;
         }
 
         if (password.length < 8) {
-            setError('Password must be at least 8 characters');
+            setError(t('auth:errors.passwordMinLength'));
             return;
         }
 
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setError(t('auth:errors.passwordMismatch'));
             return;
         }
 
@@ -128,17 +133,17 @@ function ResetPasswordPage() {
             });
 
             if (result.error) {
-                setError(result.error.message || 'Failed to reset password');
+                setError(result.error.message || t('common:messages.error'));
                 return;
             }
 
             setIsSuccess(true);
             // Redirect to login after 3 seconds
             setTimeout(() => {
-                void navigate({ to: '/login' });
+                void navigate({ to: '/$locale/login', params: { locale } });
             }, 3000);
         } catch {
-            setError('An unexpected error occurred. Please try again.');
+            setError(t('common:messages.error'));
         } finally {
             setIsLoading(false);
         }
@@ -153,16 +158,16 @@ function ResetPasswordPage() {
                             <CheckCircle2 className="h-8 w-8 text-green-500" />
                         </div>
                         <CardTitle className="text-2xl font-bold">
-                            Password Reset Successful!
+                            {t('auth:resetPassword.successTitle')}
                         </CardTitle>
                         <CardDescription className="text-base">
-                            Your password has been updated. Redirecting you to sign in...
+                            {t('auth:resetPassword.successDescription')}
                         </CardDescription>
                     </CardHeader>
                     <CardFooter>
-                        <Link to="/login" className="w-full">
+                        <Link to="/$locale/login" params={{ locale }} className="w-full">
                             <Button className="w-full">
-                                Sign In Now
+                                {t('common:actions.signInNow')}
                             </Button>
                         </Link>
                     </CardFooter>
@@ -179,10 +184,10 @@ function ResetPasswordPage() {
                         <KeyRound className="h-8 w-8 text-primary" />
                     </div>
                     <CardTitle className="text-2xl font-bold gradient-text">
-                        Set New Password
+                        {t('auth:resetPassword.title')}
                     </CardTitle>
                     <CardDescription>
-                        Enter your new password below. Make sure it's at least 8 characters.
+                        {t('auth:resetPassword.description')}
                     </CardDescription>
                 </CardHeader>
 
@@ -195,11 +200,11 @@ function ResetPasswordPage() {
                         )}
 
                         <div className="space-y-2">
-                            <Label htmlFor="password">New Password</Label>
+                            <Label htmlFor="password">{t('common:labels.newPassword')}</Label>
                             <Input
                                 id="password"
                                 type="password"
-                                placeholder="••••••••"
+                                placeholder={t('common:placeholders.password')}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 disabled={isLoading}
@@ -209,17 +214,17 @@ function ResetPasswordPage() {
                             />
                             {password && password.length < 8 && (
                                 <p className="text-xs text-amber-500">
-                                    Password must be at least 8 characters
+                                    {t('auth:errors.passwordMinLength')}
                                 </p>
                             )}
                         </div>
 
                         <div className="space-y-2">
-                            <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                            <Label htmlFor="confirmPassword">{t('common:labels.confirmNewPassword')}</Label>
                             <Input
                                 id="confirmPassword"
                                 type="password"
-                                placeholder="••••••••"
+                                placeholder={t('common:placeholders.password')}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 disabled={isLoading}
@@ -230,7 +235,7 @@ function ResetPasswordPage() {
                             />
                             {confirmPassword && password !== confirmPassword && (
                                 <p className="text-xs text-destructive">
-                                    Passwords do not match
+                                    {t('auth:errors.passwordMismatch')}
                                 </p>
                             )}
                         </div>
@@ -241,7 +246,7 @@ function ResetPasswordPage() {
                             {isLoading ? (
                                 <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                             ) : (
-                                'Reset Password'
+                                t('common:actions.resetPassword')
                             )}
                         </Button>
                     </CardFooter>

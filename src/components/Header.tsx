@@ -1,4 +1,5 @@
-import { Link, useLocation } from '@tanstack/react-router';
+import { Link, useLocation, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import {
   BookOpen,
@@ -26,18 +27,23 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useSession, signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/BugReportDialog';
-
-const navLinks = [
-  { href: '/tutorials', label: 'Tutorials', icon: BookOpen },
-  { href: '/challenges', label: 'Challenges', icon: Code },
-  { href: '/leaderboard', label: 'Leaderboard', icon: Trophy },
-];
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 export function Header() {
+  const { t } = useTranslation(['common', 'bugs']);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const isAuthPage = location.pathname.startsWith('/login') || location.pathname.startsWith('/register');
+  const params = useParams({ strict: false }) as { locale?: string };
+  const locale = params.locale || 'en';
+  const isAuthPage = location.pathname.includes('/login') || location.pathname.includes('/register');
   const { data: session, isPending } = useSession();
+
+  // Dynamic nav links based on locale
+  const navLinks = [
+    { href: '/$locale/tutorials/' as any, params: { locale: locale as any }, label: t('common:navigation.tutorials'), icon: BookOpen },
+    { href: '/$locale/challenges/' as any, params: { locale: locale as any }, label: t('common:navigation.challenges'), icon: Code },
+    { href: '/$locale/leaderboard' as any, params: { locale: locale as any }, label: t('common:navigation.leaderboard'), icon: Trophy },
+  ];
 
   const user = session?.user;
   const isAuthenticated = !!user;
@@ -48,7 +54,7 @@ export function Header() {
       await signOut({
         fetchOptions: {
           onSuccess: () => {
-            window.location.href = '/';
+            window.location.href = `/${locale}/`;
           },
         },
       });
@@ -64,7 +70,7 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-8">
-              <Link to="/" className="flex items-center gap-2 btn-animate">
+              <Link {...({ to: '/$locale/', params: { locale } } as any)} className="flex items-center gap-2 btn-animate">
                 {/* Dark Mode Logo */}
                 <img src="/logo-dark-new.png" alt="Logo" className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen" />
                 {/* Light Mode Logo */}
@@ -74,12 +80,12 @@ export function Header() {
                 </span>
               </Link>
 
-              {/* Desktop Navigation */}
               <nav className="hidden md:flex items-center gap-1">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     to={link.href}
+                    params={link.params}
                     className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all btn-animate"
                     activeProps={{
                       className:
@@ -95,6 +101,7 @@ export function Header() {
 
             {/* Right side */}
             <div className="flex items-center gap-2">
+              <LanguageSwitcher />
               <ThemeToggle />
               {isPending ? (
                 <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
@@ -131,23 +138,23 @@ export function Header() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to="/profile" className="cursor-pointer font-medium">
+                      <Link to="/$locale/_authenticated/profile" params={{ locale: locale as any }} className="cursor-pointer font-medium">
                         <User className="mr-2 h-4 w-4" />
-                        Profile
+                        {t('common:navigation.profile')}
                       </Link>
                     </DropdownMenuItem>
                     {isAdmin && (
                       <DropdownMenuItem asChild>
                         <Link to="/admin" className="cursor-pointer font-medium text-purple-600 focus:text-purple-600">
                           <LayoutDashboard className="mr-2 h-4 w-4" />
-                          Admin Dashboard
+                          {t('common:navigation.admin')}
                         </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link to="/settings" className="cursor-pointer">
+                      <Link to="/$locale/_authenticated/settings" params={{ locale: locale as any }} className="cursor-pointer">
                         <Settings className="mr-2 h-4 w-4" />
-                        Settings
+                        {t('common:navigation.settings')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
@@ -156,7 +163,7 @@ export function Header() {
                           trigger={
                             <div className="flex items-center w-full gap-2">
                               <Bug className="mr-2 h-4 w-4" />
-                              Report Bug
+                              {t('bugs:dialog.trigger')}
                             </div>
                           }
                         />
@@ -168,7 +175,7 @@ export function Header() {
                       className="cursor-pointer text-destructive focus:text-destructive"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
+                      {t('common:navigation.logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -176,10 +183,10 @@ export function Header() {
                 !isAuthPage && (
                   <div className="hidden md:flex items-center gap-2">
                     <Button variant="ghost" asChild>
-                      <Link to="/login">Sign In</Link>
+                      <Link to="/$locale/login" params={{ locale: locale as any }}>{t('common:navigation.login')}</Link>
                     </Button>
                     <Button asChild>
-                      <Link to="/register">Get Started</Link>
+                      <Link to="/$locale/register" params={{ locale: locale as any }}>{t('common:actions.startLearning')}</Link>
                     </Button>
                   </div>
                 )
@@ -202,104 +209,108 @@ export function Header() {
             </div>
           </div>
         </div>
-      </header>
+      </header >
 
       {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-30 md:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
+      {
+        isMobileMenuOpen && (
+          <div className="fixed inset-0 z-30 md:hidden">
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm"
+              onClick={() => setIsMobileMenuOpen(false)}
+            />
 
-          {/* Menu panel */}
-          <nav className="fixed top-16 left-0 right-0 bg-background border-b border-border p-4 animate-slide-up">
-            <div className="space-y-2">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  to={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors btn-animate"
-                  activeProps={{
-                    className:
-                      'flex items-center gap-3 p-3 rounded-lg text-primary bg-primary/10 font-medium pl-4 border-l-2 border-primary',
-                  }}
-                >
-                  <link.icon className="h-5 w-5" />
-                  {link.label}
-                </Link>
-              ))}
-
-              {/* Bug Report - Removed from top level mobile menu */}
-
-              {isAuthenticated && user ? (
-                <>
+            {/* Menu panel */}
+            <nav className="fixed top-16 left-0 right-0 bg-background border-b border-border p-4 animate-slide-up">
+              <div className="space-y-2">
+                {navLinks.map((link) => (
                   <Link
-                    to="/profile"
+                    key={link.href}
+                    to={link.href}
+                    params={link.params}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                  >
-                    <User className="h-5 w-5" />
-                    Profile
-                  </Link>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
-                    >
-                      <LayoutDashboard className="h-5 w-5" />
-                      Admin Dashboard
-                    </Link>
-                  )}
-                  <div className="px-3">
-                    <BugReportDialog
-                      trigger={
-                        <button className="flex items-center gap-3 w-full py-3 text-muted-foreground hover:text-foreground transition-colors">
-                          <Bug className="h-5 w-5" />
-                          Report Bug
-                        </button>
-                      }
-                    />
-                  </div>
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      void handleSignOut();
+                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors btn-animate"
+                    activeProps={{
+                      className:
+                        'flex items-center gap-3 p-3 rounded-lg text-primary bg-primary/10 font-medium pl-4 border-l-2 border-primary',
                     }}
-                    className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
                   >
-                    <LogOut className="h-5 w-5" />
-                    Sign out
-                  </button>
-                </>
-              ) : (
-                !isAuthPage && (
-                  <div className="space-y-2">
-                    <Button
-                      variant="outline"
-                      className="w-full"
-                      asChild
+                    <link.icon className="h-5 w-5" />
+                    {link.label}
+                  </Link>
+                ))}
+
+                {/* Bug Report - Removed from top level mobile menu */}
+
+                {isAuthenticated && user ? (
+                  <>
+                    <Link
+                      to="/$locale/_authenticated/profile"
+                      params={{ locale: locale as any }}
                       onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                     >
-                      <Link to="/login">Sign In</Link>
-                    </Button>
-                    <Button
-                      className="w-full"
-                      asChild
-                      onClick={() => setIsMobileMenuOpen(false)}
+                      <User className="h-5 w-5" />
+                      {t('common:navigation.profile')}
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
+                      >
+                        <LayoutDashboard className="h-5 w-5" />
+                        Admin Dashboard
+                      </Link>
+                    )}
+                    <div className="px-3">
+                      <BugReportDialog
+                        trigger={
+                          <button className="flex items-center gap-3 w-full py-3 text-muted-foreground hover:text-foreground transition-colors">
+                            <Bug className="h-5 w-5" />
+                            {t('bugs:dialog.trigger')}
+                          </button>
+                        }
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        void handleSignOut();
+                      }}
+                      className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
                     >
-                      <Link to="/register">Get Started</Link>
-                    </Button>
-                  </div>
-                )
-              )}
-            </div>
-          </nav>
-        </div>
-      )}
+                      <LogOut className="h-5 w-5" />
+                      {t('common:navigation.logout')}
+                    </button>
+                  </>
+                ) : (
+                  !isAuthPage && (
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        asChild
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Link to="/$locale/login" params={{ locale: locale as any }}>{t('common:navigation.login')}</Link>
+                      </Button>
+                      <Button
+                        className="w-full"
+                        asChild
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Link to="/$locale/register" params={{ locale: locale as any }}>{t('common:actions.startLearning')}</Link>
+                      </Button>
+                    </div>
+                  )
+                )}
+              </div>
+            </nav>
+          </div>
+        )
+      }
     </>
   );
 }
