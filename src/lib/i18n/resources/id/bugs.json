@@ -2,7 +2,7 @@
     "dialog": {
         "title": "Laporkan Bug",
         "trigger": "Laporkan Bug",
-        "description": "Bantu kami meningkatkan kualitas dengan melaporkan masalah yang Anda temukan. Mohon berikan informasi sedetail mungkin."
+        "description": "Bantu kami meningkatkan kualitas dengan melaporkan masalah yang kamu temukan. Mohon berikan informasi sedetail mungkin."
     },
     "form": {
         "title": {
@@ -36,15 +36,15 @@
             "placeholder": "Apa yang sebenarnya terjadi?"
         },
         "email": {
-            "label": "Email Anda (opsional)",
+            "label": "Email kamu (opsional)",
             "placeholder": "Untuk pertanyaan lanjutan",
-            "description": "Kami mungkin menghubungi Anda jika membutuhkan informasi lebih lanjut."
+            "description": "Kami mungkin menghubungi kamu jika membutuhkan informasi lebih lanjut."
         },
         "autocapture": {
             "title": "Informasi yang ditangkap otomatis:",
             "url": "URL halaman saat ini",
             "browser": "Informasi browser",
-            "user": "Akun pengguna Anda"
+            "user": "Akun pengguna kamu"
         },
         "submit": {
             "button": "Kirim Laporan Bug",

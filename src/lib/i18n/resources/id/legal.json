@@ -1,7 +1,7 @@
 {
     "privacy": {
         "title": "Kebijakan Privasi",
-        "placeholder": "Kebijakan Privasi kami akan segera hadir. Kami menghargai privasi Anda dan sedang mengerjakan detailnya."
+        "placeholder": "Kebijakan Privasi kami akan segera hadir. Kami menghargai privasi kamu dan sedang mengerjakan detailnya."
     },
     "terms": {
         "title": "Ketentuan Layanan",
@@ -9,7 +9,7 @@
         "sections": {
             "acceptance": {
                 "title": "1. Penerimaan Ketentuan",
-                "content": "Dengan mengakses atau menggunakan TestingWithEkki, Anda setuju untuk terikat oleh Ketentuan Layanan ini."
+                "content": "Dengan mengakses atau menggunakan TestingWithEkki, kamu setuju untuk terikat oleh Ketentuan Layanan ini."
             },
             "description": {
                 "title": "2. Deskripsi Layanan",
@@ -17,7 +17,7 @@
             },
             "accounts": {
                 "title": "3. Akun Pengguna",
-                "content": "Anda bertanggung jawab untuk menjaga kerahasiaan kredensial akun Anda dan untuk semua aktivitas yang terjadi di bawah akun Anda."
+                "content": "Kamu bertanggung jawab untuk menjaga kerahasiaan kredensial akun kamu dan untuk semua aktivitas yang terjadi di bawah akun kamu."
             },
             "conduct": {
                 "title": "4. Kode Etik",

@@ -2,6 +2,28 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
 // ----------------------------------------------------------------------------
+// HELPERS
+// ----------------------------------------------------------------------------
+
+const getErrorMessage = (key: string, locale: string) => {
+    const errorMap: Record<string, Record<string, string>> = {
+        en: {
+            unauthorized: 'You must be signed in to perform this action',
+            challengeNotFound: 'Challenge not found',
+            slugRequired: 'Challenge slug is required',
+            codeRequired: 'Code is required',
+        },
+        id: {
+            unauthorized: 'Anda harus masuk untuk melakukan tindakan ini',
+            challengeNotFound: 'Tantangan tidak ditemukan',
+            slugRequired: 'Slug tantangan wajib diisi',
+            codeRequired: 'Kode wajib diisi',
+        }
+    };
+    return errorMap[locale]?.[key] || errorMap['en']?.[key] || key;
+};
+
+// ----------------------------------------------------------------------------
 // CREATE SUBMISSION
 // ----------------------------------------------------------------------------
 
@@ -38,7 +60,7 @@ export const createSubmission = createServerFn({ method: "POST" })
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
-                return { success: false, error: 'Unauthorized' };
+                return { success: false, error: getErrorMessage('unauthorized', locale) };
             }
 
             const userId = session.user.id;
@@ -50,7 +72,7 @@ export const createSubmission = createServerFn({ method: "POST" })
             });
 
             if (!challenge) {
-                return { success: false, error: 'Challenge not found' };
+                return { success: false, error: getErrorMessage('challengeNotFound', locale) };
             }
 
             // Get total test cases
@@ -248,7 +270,7 @@ export const getSubmissions = createServerFn({ method: "GET" })
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
-                return { success: false, error: 'Unauthorized' };
+                return { success: false, error: getErrorMessage('unauthorized', locale) };
             }
 
             const userId = session.user.id;

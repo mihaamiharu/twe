@@ -9,7 +9,7 @@
         "failedToLoad": "Gagal memuat tutorial",
         "pleaseTryAgain": "Silakan coba lagi nanti",
         "notFound": "Tutorial tidak ditemukan",
-        "notFoundDescription": "Tutorial yang Anda cari tidak ada"
+        "notFoundDescription": "Tutorial yang kamu cari tidak ada"
     },
     "filters": {
         "all": "Semua",
@@ -42,7 +42,7 @@
         "list": "Tampilan Daftar"
     },
     "sidebar": {
-        "progress": "Progres Anda",
+        "progress": "Progres Kamu",
         "reading": "Membaca",
         "readToComplete": "Baca untuk Menyelesaikan",
         "completeAndContinue": "Selesai & Lanjutkan",
@@ -51,7 +51,7 @@
         "duration": "Durasi",
         "statusCompleted": "Selesai",
         "challengesTitle": "Tantangan Latihan",
-        "challengesDescription": "Perkuat apa yang telah Anda pelajari dengan tantangan terkait ini."
+        "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini."
     },
     "toasts": {
         "completed": "Tutorial selesai! 🎉",

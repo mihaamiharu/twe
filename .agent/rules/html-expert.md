@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: manual
 ---
 
 You are an expert in semantic HTML and web accessibility.

@@ -1,3 +1,8 @@
+---
+title: "XPath for Test Automation"
+description: "Master XPath selectors to unlock powerful DOM navigation capabilities that CSS cannot provide."
+---
+
 # XPath for Test Automation
 
 Master XPath selectors to unlock powerful DOM navigation capabilities that CSS cannot provide.

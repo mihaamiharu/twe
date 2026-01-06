@@ -1,3 +1,8 @@
+---
+title: "Selector Decision Framework"
+description: "A practical guide to choosing between CSS and XPath selectors for maximum effectiveness."
+---
+
 # Selector Decision Framework
 
 A practical guide to choosing between CSS and XPath selectors for maximum effectiveness.

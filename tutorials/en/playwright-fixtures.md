@@ -1,3 +1,8 @@
+---
+title: "Playwright Fixtures"
+description: "Stop repeating yourself. Let the framework handle the setup."
+---
+
 # Playwright Fixtures
 
 Stop repeating yourself. Let the framework handle the setup.

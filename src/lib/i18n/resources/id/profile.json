@@ -1,6 +1,6 @@
 {
     "header": {
-        "title": "Profil Anda",
+        "title": "Profil Kamu",
         "level": "Level {{level}}",
         "progressTo": "Kemajuan ke Level {{level}}",
         "settings": "Pengaturan"
@@ -18,8 +18,8 @@
     },
     "tierProgress": {
         "title": "Progres Tingkat",
-        "description": "Progres Anda di semua tingkat pembelajaran",
-        "basic": "Dasar (Pemilih)",
+        "description": "Progres kamu di semua tingkat pembelajaran",
+        "basic": "Dasar (Selektor)",
         "beginner": "Pemula (JavaScript)",
         "intermediate": "Menengah (Playwright)",
         "expert": "Ahli (Lanjutan)",
@@ -30,7 +30,7 @@
     },
     "activity": {
         "title": "Aktivitas Terbaru",
-        "description": "Kemajuan pembelajaran terbaru Anda",
+        "description": "Kemajuan pembelajaran terbaru kamu",
         "empty": "Belum ada aktivitas terbaru. Mulai belajar!"
     },
     "achievements": {

@@ -138,7 +138,7 @@ function ChallengeDetailPage() {
             if (tierChallenges.length > 0 && completedInTier < tierChallenges.length) {
                 missing.push({
                     tier: prereqTier,
-                    name: tierLabels[prereqTier].name
+                    name: t(`challenges:tiers.${prereqTier}`)
                 });
             }
         }
@@ -400,8 +400,8 @@ function ChallengeDetailPage() {
             <AuthGuardDialog
                 open={showAuthGuard}
                 onOpenChange={setShowAuthGuard}
-                title={t('common:auth.signInToSubmit')}
-                description={t('common:auth.signInToSubmitDescription')}
+                title={t('auth:guard.title')}
+                description={t('auth:guard.description')}
             />
         </div>
     );

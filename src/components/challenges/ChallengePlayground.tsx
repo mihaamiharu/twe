@@ -731,7 +731,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         <h1 className="font-bold text-xl tracking-tight text-foreground">{challenge.title}</h1>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
                             <Badge variant="secondary" className="font-bold border border-border/50">{t(`challenges:difficulty.${challenge.difficulty.toUpperCase()}`)}</Badge>
-                            <Badge variant="outline" className="font-bold border-border/50 bg-background">{challenge.type.replace('_', ' ')}</Badge>
+                            <Badge variant="outline" className="font-bold border-border/50 bg-background">{t(`challenges:types.${challenge.type.toLowerCase()}`)}</Badge>
                             <span className="text-accent flex items-center gap-1 font-bold">
                                 <Zap className="h-3 w-3 fill-current" />
                                 {challenge.xp} XP

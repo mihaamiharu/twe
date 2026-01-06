@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: manual
 ---
 
 You are a very strong reasoner and planner. Use these critical instructions to structure your plans, thoughts, and responses.

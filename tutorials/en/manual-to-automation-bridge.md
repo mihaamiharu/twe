@@ -1,3 +1,8 @@
+---
+title: "From Manual to Automated Testing"
+description: "Bridge the gap between manual testing expertise and automation skills."
+---
+
 # From Manual to Automated Testing
 
 Bridge the gap between manual testing expertise and automation skills.

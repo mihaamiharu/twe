@@ -1,3 +1,8 @@
+---
+title: "JavaScript Fundamentals for QA Engineers"
+description: "Master the JavaScript essentials you need for test automation."
+---
+
 # JavaScript Fundamentals for QA Engineers
 
 Master the JavaScript essentials you need for test automation.

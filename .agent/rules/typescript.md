@@ -1,5 +1,5 @@
 ---
-trigger: model_decision
+trigger: manual
 description: When working on FE or BE that related with typescript
 ---
 

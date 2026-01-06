@@ -1,3 +1,8 @@
+---
+title: "Playwright Wait Strategies"
+description: "Master timing and synchronization to banish flaky tests forever."
+---
+
 # Playwright Wait Strategies
 
 Master timing and synchronization to banish flaky tests forever.

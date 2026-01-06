@@ -1,3 +1,8 @@
+---
+title: "Data-Driven Testing"
+description: "Multiply your test coverage without duplicating your code."
+---
+
 # Data-Driven Testing
 
 Multiply your test coverage without duplicating your code.

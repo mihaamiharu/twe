@@ -1,3 +1,8 @@
+---
+title: "API Testing Fundamentals"
+description: "Learn to test APIs directly with Playwright's request API."
+---
+
 # API Testing Fundamentals
 
 Learn to test APIs directly with Playwright's request API.

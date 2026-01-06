@@ -100,5 +100,24 @@
         "password": "••••••••",
         "passwordMin": "Minimum 8 characters",
         "name": "John Doe"
+    },
+    "levelTitles": {
+        "novice": "Novice",
+        "apprentice": "Apprentice",
+        "practitioner": "Practitioner",
+        "specialist": "Specialist",
+        "expert": "Expert",
+        "master": "Master",
+        "grandmaster": "Grandmaster",
+        "legend": "Legend",
+        "mythic": "Mythic"
+    },
+    "errors": {
+        "validation": {
+            "slugRequired": "Challenge slug is required",
+            "codeRequired": "Code is required",
+            "unauthorized": "You must be signed in to perform this action",
+            "notFound": "Resource not found"
+        }
     }
 }

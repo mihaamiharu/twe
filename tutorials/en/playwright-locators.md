@@ -1,3 +1,8 @@
+---
+title: "Playwright Locators"
+description: "Master the art of finding elements with Playwright's powerful locator API."
+---
+
 # Playwright Locators
 
 Master the art of finding elements with Playwright's powerful locator API.

@@ -1,3 +1,8 @@
+---
+title: "Playwright Navigation & Actions"
+description: "Master page navigation and user interactions with Playwright."
+---
+
 # Playwright Navigation & Actions
 
 Master page navigation and user interactions with Playwright.
