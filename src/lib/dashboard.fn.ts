@@ -1,8 +1,9 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
-import { challenges, tutorials, achievements } from '@/db/schema';
+import { achievements } from '@/db/schema';
 import { logger } from '@/lib/logger';
 import { sql } from 'drizzle-orm';
+import { getChallengeList, getTutorialList } from './content.server';
 
 // In-memory cache for stats (refreshed every 24 hours)
 interface StatsCache {
@@ -24,29 +25,16 @@ let cachedStats: StatsCache | null = null;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
 async function fetchStats() {
-    // Get counts from database
-    const [challengeCount] = await db
-        .select({ count: sql<number>`count(*):: int` })
-        .from(challenges);
+    // Get challenges and tutorials from FILESYSTEM (single source of truth)
+    const allChallenges = await getChallengeList('en');
+    const allTutorials = await getTutorialList('en');
 
-    const [tutorialCount] = await db
-        .select({ count: sql<number>`count(*):: int` })
-        .from(tutorials);
-
+    // Achievements still from DB (can be migrated to JSON later)
     const [achievementCount] = await db
         .select({ count: sql<number>`count(*):: int` })
         .from(achievements);
 
-    // Get tier breakdown
-    const tierCounts = await db
-        .select({
-            category: challenges.category,
-            count: sql<number>`count(*):: int`,
-        })
-        .from(challenges)
-        .groupBy(challenges.category);
-
-    // Map categories to tiers
+    // Calculate tier breakdown from filesystem data
     const tiers = {
         basic: 0,
         beginner: 0,
@@ -54,23 +42,23 @@ async function fetchStats() {
         expert: 0,
     };
 
-    for (const tier of tierCounts) {
-        const category = tier.category?.toLowerCase() || '';
+    for (const challenge of allChallenges) {
+        const category = challenge.category?.toLowerCase() || '';
         if (category.includes('basic') || category.includes('selector') || category.includes('xpath')) {
-            tiers.basic += tier.count;
+            tiers.basic++;
         } else if (category.includes('beginner') || category.includes('javascript') || category.startsWith('js-')) {
-            tiers.beginner += tier.count;
+            tiers.beginner++;
         } else if (category.includes('intermediate') || category.includes('playwright')) {
-            tiers.intermediate += tier.count;
+            tiers.intermediate++;
         } else if (category.includes('expert') || category.includes('advanced')) {
-            tiers.expert += tier.count;
+            tiers.expert++;
         }
     }
 
     return {
-        challenges: challengeCount.count,
-        tutorials: tutorialCount.count,
-        achievements: achievementCount.count,
+        challenges: allChallenges.length,
+        tutorials: allTutorials.length,
+        achievements: achievementCount?.count || 0,
         tiers,
     };
 }
