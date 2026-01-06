@@ -172,6 +172,44 @@ export async function getTutorialList(locale: string): Promise<Omit<Tutorial, 'c
     return tutorials.sort((a, b) => a.order - b.order);
 }
 
+/**
+ * Get the next tutorial for a given slug (efficient O(1) lookup using registry)
+ */
+export async function getNextTutorial(
+    currentSlug: string,
+    locale: string
+): Promise<{ slug: string; title: string } | null> {
+    const registry = await loadRegistry();
+    const current = registry.tutorials.find(t => t.slug === currentSlug);
+
+    if (!current?.nextTutorialSlug) return null;
+
+    const nextEntry = registry.tutorials.find(
+        t => t.slug === current.nextTutorialSlug
+    );
+    if (!nextEntry) return null;
+
+    // Load just the title from frontmatter
+    let title = nextEntry.slug;
+    try {
+        const filePath = join(TUTORIALS_DIR, locale, `${nextEntry.slug}.md`);
+        const content = await readFile(filePath, 'utf-8');
+        const { meta } = parseFrontmatter(content);
+        title = meta.title || nextEntry.slug;
+    } catch {
+        try {
+            const filePath = join(TUTORIALS_DIR, 'en', `${nextEntry.slug}.md`);
+            const content = await readFile(filePath, 'utf-8');
+            const { meta } = parseFrontmatter(content);
+            title = meta.title || nextEntry.slug;
+        } catch {
+            // Use slug as fallback
+        }
+    }
+
+    return { slug: nextEntry.slug, title };
+}
+
 // =============================================================================
 // CHALLENGE LOADING
 // =============================================================================

@@ -27,6 +27,7 @@ export interface TutorialRegistryEntry {
     estimatedMinutes: number;
     tags: string[];
     relatedChallenges?: string[];
+    nextTutorialSlug?: string | null;
 }
 
 /**
