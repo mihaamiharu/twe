@@ -1,7 +1,7 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTutorial, completeTutorial, updateTutorialProgress } from '@/lib/tutorials.fn';
+import { getTutorial, completeTutorial } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -14,7 +14,6 @@ import { useState, useRef, useEffect } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
-import { showAchievementToasts } from '@/lib/achievement-toast';
 import { TableOfContents, type TOCItem } from '@/components/tutorials/TableOfContents';
 
 export const Route = createFileRoute('/$locale/tutorials/$slug')({
@@ -85,7 +84,7 @@ function TutorialDetailPage() {
             if (!result.success) throw new Error(result.error);
             return result;
         },
-        onSuccess: async (response) => {
+        onSuccess: async () => {
             toast.success(t('tutorials:toasts.completed'));
             await queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
             await queryClient.invalidateQueries({ queryKey: ['tutorials'] });
@@ -93,24 +92,15 @@ function TutorialDetailPage() {
             await queryClient.invalidateQueries({ queryKey: ['profile'] });
             await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
 
-            // Show toast notifications for new achievements
-            if (response?.newAchievements?.length) {
-                showAchievementToasts(response.newAchievements);
-            }
+            // Achievement toasts would go here if tutorials awarded achievements
+            // Currently tutorials only award XP
         },
         onError: () => {
             toast.error(t('tutorials:toasts.failed'));
         },
     });
 
-    // Update progress mutation
-    const updateProgressMutation = useMutation({
-        mutationFn: async (progress: number) => {
-            const result = await updateTutorialProgress({ data: { slug, readingProgress: progress } });
-            if (!result.success) throw new Error(result.error);
-            return result;
-        },
-    });
+    // Progress is tracked client-side only, saved to DB only on "Complete" click
 
     // Use a ref to track progress for the event listener without re-binding
     const progressRef = useRef(readingProgress);
@@ -160,13 +150,9 @@ function TutorialDetailPage() {
                 progress = 100;
             }
 
-            // Only update if progress is genuinely increasing
+            // Only update local state if progress is genuinely increasing
             if (progress > progressRef.current) {
                 setReadingProgress(progress);
-                // Update progress in DB - only on significant milestones or 100%
-                if ((progress % 20 === 0 || progress === 100)) {
-                    updateProgressMutation.mutate(progress);
-                }
             }
         };
 

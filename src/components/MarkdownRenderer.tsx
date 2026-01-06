@@ -10,6 +10,7 @@ import typescript from 'highlight.js/lib/languages/typescript';
 
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
+import { CodeBlock } from '@/components/CodeBlock';
 
 // Import custom theme-aware highlight.js styles
 import '@/styles/highlight-github.css';
@@ -48,25 +49,33 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                             {children}
                         </h1>
                     ),
-                    h2: ({ children }) => (
-                        <h2 className="text-2xl font-semibold text-foreground mb-3 mt-6 border-b border-border pb-2">
-                            {children}
-                        </h2>
-                    ),
-                    h3: ({ children }) => (
-                        <h3 className="text-xl font-medium text-foreground mb-2 mt-4">
-                            {children}
-                        </h3>
-                    ),
+                    h2: ({ children }) => {
+                        const text = typeof children === 'string' ? children : String(children);
+                        const id = text.toLowerCase().replace(/[^\w]+/g, '-');
+                        return (
+                            <h2 id={id} className="text-2xl font-semibold text-foreground mb-3 mt-6 border-b border-border pb-2 scroll-mt-24">
+                                {children}
+                            </h2>
+                        );
+                    },
+                    h3: ({ children }) => {
+                        const text = typeof children === 'string' ? children : String(children);
+                        const id = text.toLowerCase().replace(/[^\w]+/g, '-');
+                        return (
+                            <h3 id={id} className="text-xl font-medium text-foreground mb-2 mt-4 scroll-mt-24">
+                                {children}
+                            </h3>
+                        );
+                    },
                     // Paragraph styling
                     p: ({ children }) => (
                         <p className="text-muted-foreground leading-7 mb-4">{children}</p>
                     ),
                     // Code blocks
                     pre: ({ children }) => (
-                        <pre className="bg-muted rounded-lg p-4 overflow-x-auto my-4 border-2 border-border">
+                        <div className="not-prose">
                             {children}
-                        </pre>
+                        </div>
                     ),
                     code: ({ className: codeClassName, children, ...props }) => {
                         const isInline = !codeClassName;
@@ -81,9 +90,9 @@ export function MarkdownRenderer({ content, className }: MarkdownRendererProps) 
                             );
                         }
                         return (
-                            <code className={cn('text-sm font-mono', codeClassName)} {...props}>
+                            <CodeBlock className={codeClassName} {...props}>
                                 {children}
-                            </code>
+                            </CodeBlock>
                         );
                     },
                     // Lists
