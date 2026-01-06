@@ -27,6 +27,7 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
             const headers = getRequestHeaders();
+
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
             const session = await auth.api.getSession({ headers });
 

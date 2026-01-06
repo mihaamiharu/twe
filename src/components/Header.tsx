@@ -29,6 +29,8 @@ import { useSession, signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { authQueryOptions } from '@/lib/auth.query';
 
 export function Header() {
   const { t } = useTranslation(['common', 'bugs']);
@@ -37,7 +39,11 @@ export function Header() {
   const params = useParams({ strict: false }) as { locale?: string };
   const locale = params.locale || 'en';
   const isAuthPage = location.pathname.includes('/login') || location.pathname.includes('/register');
-  const { data: session, isPending } = useSession();
+
+  // Use TanStack Query to get the session (hydrated from server)
+  const { data: auth } = useSuspenseQuery(authQueryOptions);
+  const session = auth; // Alias for compatibility
+  const isPending = false; // Suspense handles loading state
 
   // Dynamic nav links based on locale
   const navLinks = [

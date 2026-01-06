@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import * as dotenv from 'dotenv';
@@ -87,6 +88,9 @@ export const auth = betterAuth({
             generateId: () => crypto.randomUUID(),
         },
     },
+
+    // TanStack Start plugin for proper cookie handling (must be last)
+    plugins: [tanstackStartCookies()],
 });
 
 // Export types for client
