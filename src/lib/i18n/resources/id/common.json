@@ -4,13 +4,13 @@
         "title": "TestingWithEkki - Pelajari Keterampilan Pengujian",
         "description": "Pelajari keterampilan pengujian melalui tutorial interaktif dan tantangan coding",
         "ogTitle": "TestingWithEkki - Kuasai Seni Otomasi",
-        "ogDescription": "Tutorial interaktif dan tantangan pengkodean untuk meningkatkan keterampilan pengujian perangkat lunak Anda."
+        "ogDescription": "Tutorial interaktif dan tantangan pengkodean untuk meningkatkan keterampilan pengujian perangkat lunak kamu."
     },
     "navigation": {
         "home": "Beranda",
         "challenges": "Tantangan",
         "tutorials": "Tutorial",
-        "leaderboard": "Papan Peringkat",
+        "leaderboard": "Leaderboard",
         "login": "Masuk",
         "register": "Daftar",
         "profile": "Profil",
@@ -86,19 +86,38 @@
         "reportBug": "Laporkan Bug"
     },
     "notFound": {
-        "title": "Anda berada dalam Mode Headless",
-        "description": "Konten ada di sini, tetapi Anda tidak dapat melihatnya karena viewport Anda disetel ke headless: true. Percayalah, pengujian berjalan di latar belakang.",
+        "title": "Kamu berada dalam Mode Headless",
+        "description": "Konten ada di sini, tetapi kamu tidak dapat melihatnya karena viewport kamu disetel ke headless: true. Percayalah, pengujian berjalan di latar belakang.",
         "backHome": "Beralih ke Mode Headed (Kembali ke Beranda)",
         "tip": "Tip: Coba jalankan dengan flag --headed lain kali"
     },
     "auth": {
         "signInToSubmit": "Masuk untuk Mengirim",
-        "signInToSubmitDescription": "Anda perlu masuk untuk menyimpan solusi, mendapatkan XP, dan melacak progres Anda. Kode Anda akan tetap tersimpan."
+        "signInToSubmitDescription": "Kamu perlu masuk untuk menyimpan solusi, mendapatkan XP, dan melacak progres kamu. Kode kamu akan tetap tersimpan."
     },
     "placeholders": {
         "email": "kamu@contoh.com",
         "password": "••••••••",
         "passwordMin": "Minimal 8 karakter",
         "name": "Budi Santoso"
+    },
+    "levelTitles": {
+        "novice": "Pemula",
+        "apprentice": "Magang",
+        "practitioner": "Praktisi",
+        "specialist": "Spesialis",
+        "expert": "Ahli",
+        "master": "Master",
+        "grandmaster": "Grandmaster",
+        "legend": "Legenda",
+        "mythic": "Mitos"
+    },
+    "errors": {
+        "validation": {
+            "slugRequired": "Slug tantangan wajib diisi",
+            "codeRequired": "Kode wajib diisi",
+            "unauthorized": "Kamu harus masuk untuk melakukan tindakan ini",
+            "notFound": "Sumber daya tidak ditemukan"
+        }
     }
 }

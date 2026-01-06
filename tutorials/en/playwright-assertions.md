@@ -1,3 +1,8 @@
+---
+title: "Playwright Assertions"
+description: "Verify your test expectations with Playwright's rich assertion library."
+---
+
 # Playwright Assertions
 
 Verify your test expectations with Playwright's rich assertion library.

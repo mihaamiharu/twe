@@ -1,3 +1,8 @@
+---
+title: "DOM Manipulation for Testing"
+description: "Learn when to step outside the standard automation box and perform surgery on the DOM."
+---
+
 # DOM Manipulation for Testing
 
 Learn when to step outside the standard automation box and perform surgery on the DOM.

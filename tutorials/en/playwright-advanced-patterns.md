@@ -1,3 +1,8 @@
+---
+title: "Advanced Playwright Patterns"
+description: "Move beyond basic scripting. Build a high-performance, expert-level framework."
+---
+
 # Advanced Playwright Patterns
 
 Move beyond basic scripting. Build a high-performance, expert-level framework.

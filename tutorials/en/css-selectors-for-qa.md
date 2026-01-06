@@ -1,3 +1,8 @@
+---
+title: "CSS Selectors for QA Engineers"
+description: "Master the art of writing robust, maintainable CSS selectors for test automation."
+---
+
 # CSS Selectors for QA Engineers
 
 Master the art of writing robust, maintainable CSS selectors for test automation.

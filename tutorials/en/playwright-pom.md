@@ -1,3 +1,8 @@
+---
+title: "Page Object Model (POM)"
+description: "Stop writing fragile scripts. Start building a maintainable test framework."
+---
+
 # Page Object Model (POM)
 
 Stop writing fragile scripts. Start building a maintainable test framework.

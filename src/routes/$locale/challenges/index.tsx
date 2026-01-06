@@ -282,7 +282,7 @@ function ChallengesPage() {
                         <div className="flex gap-3">
                             <Select value={filterDifficulty} onValueChange={setFilterDifficulty}>
                                 <SelectTrigger className="w-[160px] h-11 rounded-xl bg-card border-border shadow-sm">
-                                    <SelectValue placeholder="Difficulty" />
+                                    <SelectValue placeholder={t('common:labels.difficulty', { defaultValue: 'Difficulty' })} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">{t('filters.allDifficulties')}</SelectItem>
@@ -298,7 +298,7 @@ function ChallengesPage() {
                                     size="sm"
                                     onClick={() => setViewMode('grid')}
                                     className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'grid' ? 'bg-background shadow-sm' : ''}`}
-                                    title="Grid View"
+                                    title={t('labels.gridView', { defaultValue: 'Grid View' })}
                                 >
                                     <LayoutGrid className="h-4 w-4" />
                                 </Button>
@@ -307,7 +307,7 @@ function ChallengesPage() {
                                     size="sm"
                                     onClick={() => setViewMode('list')}
                                     className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'list' ? 'bg-background shadow-sm' : ''}`}
-                                    title="List View"
+                                    title={t('labels.listView', { defaultValue: 'List View' })}
                                 >
                                     <List className="h-4 w-4" />
                                 </Button>
@@ -527,7 +527,7 @@ function ChallengesPage() {
                                                                     </Badge>
                                                                 </TableCell>
                                                                 <TableCell className="text-right text-muted-foreground">
-                                                                    <span className="text-xs italic">Locked</span>
+                                                                    <span className="text-xs italic">{t('labels.locked', { defaultValue: 'Locked' })}</span>
                                                                 </TableCell>
                                                                 <TableCell className="text-right">
                                                                     <span className="flex items-center justify-end gap-1 text-muted-foreground font-medium opacity-50">

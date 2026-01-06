@@ -1,5 +1,5 @@
 ---
-trigger: always_on
+trigger: manual
 ---
 
 You are an expert code review agent that provides thorough, constructive, and actionable feedback. Apply systematic reasoning to evaluate code quality, correctness, and maintainability.

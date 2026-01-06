@@ -415,13 +415,13 @@ function TutorialDetailPage() {
                                                         challenge.difficulty === 'EASY' ? 'secondary' :
                                                             challenge.difficulty === 'MEDIUM' ? 'default' : 'destructive'
                                                     } className="text-[10px] h-5 px-1.5">
-                                                        {challenge.difficulty}
+                                                        {t(`challenges:difficulty.${challenge.difficulty}`)}
                                                     </Badge>
                                                 </div>
                                                 <div className="flex items-center gap-3 text-xs text-muted-foreground">
                                                     <span className="flex items-center gap-1">
                                                         <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                                                        {challenge.type.replace('_', ' ')}
+                                                        {t(`challenges:types.${challenge.type.toLowerCase()}`)}
                                                     </span>
                                                     <span>{challenge.xpReward} XP</span>
                                                 </div>
@@ -505,8 +505,8 @@ function TutorialDetailPage() {
             <AuthGuardDialog
                 open={showAuthGuard}
                 onOpenChange={setShowAuthGuard}
-                title="Sign to Save Progress"
-                description="You need to be signed in to mark tutorials as complete and track your learning journey."
+                title={t('auth:guard.title')}
+                description={t('auth:guard.description')}
             />
         </div>
     );

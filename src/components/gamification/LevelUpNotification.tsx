@@ -24,8 +24,9 @@ export function LevelUpNotification({
     onClose,
     className,
 }: LevelUpNotificationProps) {
-    const [isVisible, setIsVisible] = useState(false);
-    const newTitle = getLevelTitle(newLevel);
+    const { t } = useTranslation(['common', 'challenges']);
+    const newTitleKey = getLevelTitle(newLevel);
+    const newTitle = t(`common:levelTitles.${newTitleKey}`);
 
     useEffect(() => {
         // Trigger animation
@@ -89,7 +90,7 @@ export function LevelUpNotification({
                     </div>
 
                     <p className="text-lg mb-2">
-                        You are now a <span className="font-semibold text-yellow-400">{newTitle}</span>!
+                        {t('challenges:success.levelUpMessage', { defaultValue: 'You are now a ' })} <span className="font-semibold text-yellow-400">{newTitle}</span>!
                     </p>
 
                     <p className="text-muted-foreground text-sm mb-6">

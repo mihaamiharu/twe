@@ -77,7 +77,7 @@ export function ChallengeSuccessDialog({
                                 <Star className="h-6 w-6 text-yellow-400 fill-yellow-400" />
                                 <div className="text-left">
                                     <h4 className="font-bold text-lg">{t('challenges:success.levelUp')}</h4>
-                                    <p className="text-sm">{t('challenges:success.levelUpDescription', { level: levelUp.newLevel, title: levelUp.title })}</p>
+                                    <p className="text-sm">{t('challenges:success.levelUpDescription', { level: levelUp.newLevel, title: t(`common:levelTitles.${levelUp.title}`) })}</p>
                                 </div>
                             </div>
                         </div>

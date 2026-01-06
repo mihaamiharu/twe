@@ -1,10 +1,10 @@
 {
     "page": {
         "title": "Tantangan",
-        "subtitle": "Latih pemilih CSS dan XPath Anda dengan skenario dunia nyata.",
+        "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
         "overallProgress": "Progres Keseluruhan",
         "notFound": "Tantangan Tidak Ditemukan",
-        "notFoundDescription": "Tantangan yang Anda cari tidak dapat ditemukan.",
+        "notFoundDescription": "Tantangan yang kamu cari tidak dapat ditemukan.",
         "reviewTutorial": "Tinjau Tutorial: {{title}}"
     },
     "filters": {
@@ -20,7 +20,7 @@
     "toasts": {
         "comingSoon": "Tantangan ini akan segera hadir!",
         "comingSoonDescription": "Nantikan pembaruan pada rencana perjalanan kami.",
-        "notPassed": "Solusi Anda tidak lulus semua tes. Terus mencoba!",
+        "notPassed": "Solusi kamu tidak lulus semua tes. Terus mencoba!",
         "submittedSuccess": "Solusi berhasil dikirim!",
         "submittedFailed": "Gagal mengirim solusi"
     },
@@ -31,39 +31,39 @@
         "results": "Hasil",
         "console": "Konsol",
         "resetCode": "Atur Ulang Kode",
-        "testSelector": "Tes Pemilih",
+        "testSelector": "Tes Selektor",
         "correct": "Benar!",
-        "jsUndefined": "Hasil Anda undefined. Pastikan Anda memberikan nilai pada `result`.",
-        "jsMismatch": "Hasil Anda tidak sesuai dengan output yang diharapkan. Periksa logika Anda dan coba lagi.",
-        "noAssertions": "Tidak ada asersi yang dipanggil. Tulis asersi seperti: await expect(locator).toHaveText('...');",
-        "selectorMismatch": "Pemilih tidak cocok dengan elemen target",
+        "jsUndefined": "Hasil kamu undefined. Pastikan kamu memberikan nilai pada `result`.",
+        "jsMismatch": "Hasil kamu tidak sesuai dengan output yang diharapkan. Periksa logika kamu dan coba lagi.",
+        "noAssertions": "Tidak ada assertion yang dipanggil. Tulis assertion seperti: await expect(locator).toHaveText('...');",
+        "selectorMismatch": "Selektor tidak cocok dengan elemen target",
         "executionError": "Kesalahan Eksekusi",
-        "alreadyCompleted": "Anda telah menyelesaikan tantangan ini! Jangan ragu untuk berlatih lagi.",
+        "alreadyCompleted": "Kamu telah menyelesaikan tantangan ini! Jangan ragu untuk berlatih lagi.",
         "step1": "Langkah 1: Tangkap Elemen",
         "goal": "TUJUAN:",
         "resetTitle": "Atur Ulang Tantangan?",
-        "resetDescription": "Ini akan mengatur ulang kode/pemilih Anda ke keadaan awal. Progres sesi Anda saat ini akan hilang.",
+        "resetDescription": "Ini akan mengatur ulang kode/selektor kamu ke keadaan awal. Progres sesi kamu saat ini akan hilang.",
         "recommendation": "Rekomendasi:",
         "recommendationDescription": "Tantangan {{tier}} ini menggunakan konsep dari tingkat {{missingName}}.",
         "tryPrereq": "Coba {{missingName}} terlebih dahulu"
     },
     "success": {
         "title": "Tantangan Selesai!",
-        "description": "Selamat! Anda telah berhasil lulus tes untuk tantangan ini.",
+        "description": "Selamat! Kamu telah berhasil lulus tes untuk tantangan ini.",
         "earnedXP": "Diperoleh dari penyelesaian",
         "levelUp": "Naik Level!",
-        "levelUpDescription": "Anda sekarang level {{level}}: {{title}}",
+        "levelUpDescription": "Kamu sekarang level {{level}}: {{title}}",
         "achievementsUnlocked": "Pencapaian Terbuka",
         "nextChallenge": "Tantangan Berikutnya",
         "retry": "Lagi",
         "browseList": "Lihat Daftar"
     },
     "types": {
-        "css_selector": "Pemilih CSS",
+        "css_selector": "Selektor CSS",
         "xpath_selector": "XPath",
         "javascript": "JavaScript",
         "playwright": "Playwright",
-        "selector": "Pemilih"
+        "selector": "Selektor"
     },
     "tiers": {
         "basic": "Dasar",
@@ -80,8 +80,8 @@
         "js-dom": "Dasar DOM",
         "js-async": "Dasar Async",
         "playwright-navigation": "Navigasi & Aksi",
-        "playwright-locators": "Lokator",
-        "playwright-assertions": "Asersi",
+        "playwright-locators": "Locator",
+        "playwright-assertions": "Assertion",
         "playwright-waits": "Strategi Menunggu",
         "playwright-pom": "Page Object Model",
         "playwright-data-driven": "Pengujian Berbasis Data",
