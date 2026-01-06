@@ -2,6 +2,28 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
 // ----------------------------------------------------------------------------
+// HELPERS
+// ----------------------------------------------------------------------------
+
+const getErrorMessage = (key: string, locale: string) => {
+    const errorMap: Record<string, Record<string, string>> = {
+        en: {
+            unauthorized: 'You must be signed in to perform this action',
+            challengeNotFound: 'Challenge not found',
+            slugRequired: 'Challenge slug is required',
+            codeRequired: 'Code is required',
+        },
+        id: {
+            unauthorized: 'Anda harus masuk untuk melakukan tindakan ini',
+            challengeNotFound: 'Tantangan tidak ditemukan',
+            slugRequired: 'Slug tantangan wajib diisi',
+            codeRequired: 'Kode wajib diisi',
+        }
+    };
+    return errorMap[locale]?.[key] || errorMap['en']?.[key] || key;
+};
+
+// ----------------------------------------------------------------------------
 // CREATE SUBMISSION
 // ----------------------------------------------------------------------------
 
@@ -15,18 +37,20 @@ const CreateSubmissionSchema = z.object({
         error: z.string().optional(),
     })),
     executionTime: z.number().optional(),
+    locale: z.string().default('en'),
 });
 
 export const createSubmission = createServerFn({ method: "POST" })
     .inputValidator((data: unknown) => CreateSubmissionSchema.parse(data))
     .handler(async ({ data: input }) => {
+        const { locale = 'en' } = input;
         try {
             // Dynamically import server-only modules
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
             const { db } = await import('@/db');
-            const { submissions, challenges, progress, users, testCases } = await import('@/db/schema');
-            const { eq, and } = await import('drizzle-orm');
+            const { submissions, challenges, progress, users, testCases, achievements } = await import('@/db/schema');
+            const { eq, and, sql, inArray } = await import('drizzle-orm');
             const { checkLevelUp } = await import('@/lib/gamification');
             const { checkAchievements } = await import('@/lib/achievements');
             const { getUserStats, getEarnedAchievementIds, awardAchievements } = await import('@/lib/stats');
@@ -36,7 +60,7 @@ export const createSubmission = createServerFn({ method: "POST" })
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
-                return { success: false, error: 'Unauthorized' };
+                return { success: false, error: getErrorMessage('unauthorized', locale) };
             }
 
             const userId = session.user.id;
@@ -48,7 +72,7 @@ export const createSubmission = createServerFn({ method: "POST" })
             });
 
             if (!challenge) {
-                return { success: false, error: 'Challenge not found' };
+                return { success: false, error: getErrorMessage('challengeNotFound', locale) };
             }
 
             // Get total test cases
@@ -166,13 +190,23 @@ export const createSubmission = createServerFn({ method: "POST" })
                         // Award the achievements
                         await awardAchievements(userId, earnedAchievements.map(a => a.id));
 
-                        newAchievements = earnedAchievements.map(a => ({
+                        // Get localized names from DB
+                        const dbAwarded = await db
+                            .select({
+                                id: achievements.id,
+                                name: sql`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
+                                icon: achievements.icon,
+                            })
+                            .from(achievements)
+                            .where(inArray(achievements.slug, earnedAchievements.map(a => a.id)));
+
+                        newAchievements = dbAwarded.map(a => ({
                             id: a.id,
-                            name: a.name,
-                            icon: a.icon,
+                            name: a.name as string,
+                            icon: a.icon || '',
                         }));
 
-                        logger.info(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
+                        logger.info(`[Achievements] User ${userId} earned: ${newAchievements.map(a => a.name).join(', ')}`);
                     }
                 } catch (error) {
                     logger.error('Error checking achievements:', error);
@@ -218,6 +252,7 @@ const GetSubmissionsSchema = z.object({
     challengeId: z.string().optional(),
     page: z.number().default(1),
     limit: z.number().max(50).default(10),
+    locale: z.string().default('en'),
 });
 
 export const getSubmissions = createServerFn({ method: "GET" })
@@ -235,11 +270,11 @@ export const getSubmissions = createServerFn({ method: "GET" })
             const session = await auth.api.getSession({ headers });
 
             if (!session?.user?.id) {
-                return { success: false, error: 'Unauthorized' };
+                return { success: false, error: getErrorMessage('unauthorized', locale) };
             }
 
             const userId = session.user.id;
-            const { challengeId, page, limit } = input;
+            const { challengeId, page, limit, locale } = input;
 
             // Build conditions
             const conditions = [eq(submissions.userId, userId)];
@@ -263,7 +298,7 @@ export const getSubmissions = createServerFn({ method: "GET" })
                 .select({
                     id: submissions.id,
                     challengeId: submissions.challengeId,
-                    challengeTitle: challenges.title,
+                    challengeTitle: sql<string>`COALESCE(${challenges.title}->>${locale}, ${challenges.title}->>'en', '')`,
                     challengeSlug: challenges.slug,
                     isPassed: submissions.isPassed,
                     xpEarned: submissions.xpEarned,

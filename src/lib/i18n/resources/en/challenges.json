@@ -1,0 +1,101 @@
+{
+    "page": {
+        "title": "Challenges",
+        "subtitle": "Practice your CSS and XPath selectors with real-world scenarios.",
+        "overallProgress": "Overall Progress",
+        "notFound": "Challenge Not Found",
+        "notFoundDescription": "The requested challenge could not be found.",
+        "reviewTutorial": "Review Tutorial: {{title}}"
+    },
+    "filters": {
+        "allDifficulties": "All Difficulties",
+        "clear": "Clear",
+        "searchPlaceholder": "Search challenges..."
+    },
+    "difficulty": {
+        "EASY": "Easy",
+        "MEDIUM": "Medium",
+        "HARD": "Hard"
+    },
+    "toasts": {
+        "comingSoon": "This challenge is coming soon!",
+        "comingSoonDescription": "Stay tuned for updates on our roadmap.",
+        "notPassed": "Your solution did not pass all tests. Keep trying!",
+        "submittedSuccess": "Solution submitted successfully!",
+        "submittedFailed": "Failed to submit solution"
+    },
+    "playground": {
+        "instructions": "Instructions",
+        "preview": "Target Preview",
+        "editor": "Editor",
+        "results": "Results",
+        "console": "Console",
+        "resetCode": "Reset Code",
+        "testSelector": "Test Selector",
+        "correct": "Correct!",
+        "jsUndefined": "Your result is undefined. Make sure you assign a value to `result`.",
+        "jsMismatch": "Your result doesn't match the expected output. Check your logic and try again.",
+        "noAssertions": "No assertions were called. Write assertions like: await expect(locator).toHaveText('...');",
+        "selectorMismatch": "Selector does not match the target element",
+        "executionError": "Execution Error",
+        "alreadyCompleted": "You have already completed this challenge! Feel free to practice again.",
+        "step1": "Step 1: Capture the Element",
+        "goal": "GOAL:",
+        "resetTitle": "Reset Challenge?",
+        "resetDescription": "This will reset your code/selector to the initial state. Your current progress for this session will be lost.",
+        "recommendation": "Recommendation:",
+        "recommendationDescription": "This {{tier}} challenge uses concepts from the {{missingName}} tier.",
+        "tryPrereq": "Try {{missingName}} first"
+    },
+    "success": {
+        "title": "Challenge Complete!",
+        "description": "Congratulations! You've successfully passed the tests for this challenge.",
+        "earnedXP": "Earned for completion",
+        "levelUp": "Level Up!",
+        "levelUpDescription": "You are now level {{level}}: {{title}}",
+        "achievementsUnlocked": "Achievements Unlocked",
+        "nextChallenge": "Next Challenge",
+        "retry": "Again",
+        "browseList": "Browse List"
+    },
+    "types": {
+        "css_selector": "CSS Selector",
+        "xpath_selector": "XPath",
+        "javascript": "JavaScript",
+        "playwright": "Playwright",
+        "selector": "Selectors"
+    },
+    "tiers": {
+        "basic": "Basic",
+        "beginner": "Beginner",
+        "intermediate": "Intermediate",
+        "expert": "Expert"
+    },
+    "categories": {
+        "css-basics": "CSS Basics",
+        "xpath-basics": "XPath Basics",
+        "xpath-advanced": "XPath Advanced",
+        "selector-comparison": "CSS vs XPath",
+        "js-fundamentals": "JavaScript Fundamentals",
+        "js-dom": "DOM Basics",
+        "js-async": "Async Basics",
+        "playwright-navigation": "Navigation & Actions",
+        "playwright-locators": "Locators",
+        "playwright-assertions": "Assertions",
+        "playwright-waits": "Wait Strategies",
+        "playwright-pom": "Page Object Model",
+        "playwright-data-driven": "Data-Driven Testing",
+        "playwright-infrastructure": "Test Infrastructure",
+        "playwright-integration-patterns": "Integration Patterns"
+    },
+    "labels": {
+        "allTypes": "All Types",
+        "comingSoon": "Coming Soon",
+        "completed": "completed",
+        "rank": "Rank",
+        "challenge": "Challenge",
+        "stats": "Stats",
+        "creatingNew": "Creating new challenges...",
+        "craftingScenarios": "I'm crafting new scenarios based on real bugs I've found. Check back soon!"
+    }
+}

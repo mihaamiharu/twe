@@ -94,6 +94,8 @@ export const accounts = pgTable('accounts', {
     accessToken: text('access_token'),
     refreshToken: text('refresh_token'),
     idToken: text('id_token'),
+    accessTokenExpiresAt: timestamp('access_token_expires_at'),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
     expiresAt: timestamp('expires_at'),
     scope: text('scope'),
     password: text('password'), // For email/password auth
@@ -118,9 +120,9 @@ export const verification = pgTable('verification', {
 export const tutorials = pgTable('tutorials', {
     id: uuid('id').defaultRandom().primaryKey(),
     slug: text('slug').notNull().unique(),
-    title: text('title').notNull(),
-    description: text('description').notNull(),
-    content: text('content').notNull(), // Markdown content
+    title: jsonb('title').notNull(), // { en: string, id: string }
+    description: jsonb('description').notNull(),
+    content: jsonb('content').notNull(), // Markdown content
     order: integer('order').notNull(), // Display order
     estimatedMinutes: integer('estimated_minutes').notNull(),
     tags: text('tags').array(), // Array of tags
@@ -133,15 +135,15 @@ export const tutorials = pgTable('tutorials', {
 export const challenges = pgTable('challenges', {
     id: uuid('id').defaultRandom().primaryKey(),
     slug: text('slug').notNull().unique(),
-    title: text('title').notNull(),
-    description: text('description').notNull(),
+    title: jsonb('title').notNull(),
+    description: jsonb('description').notNull(),
     type: challengeTypeEnum('type').notNull(),
     difficulty: difficultyEnum('difficulty').notNull(),
     xpReward: integer('xp_reward').notNull(),
     order: integer('order').notNull(), // Display order
 
     // Challenge content
-    instructions: text('instructions').notNull(), // Detailed instructions
+    instructions: jsonb('instructions').notNull(), // Detailed instructions
     htmlContent: text('html_content'), // For selector challenges
     starterCode: text('starter_code'), // For JavaScript/Playwright challenges
 
@@ -234,8 +236,8 @@ export const progress = pgTable('progress', {
 export const achievements = pgTable('achievements', {
     id: uuid('id').defaultRandom().primaryKey(),
     slug: text('slug').notNull().unique(),
-    name: text('name').notNull(),
-    description: text('description').notNull(),
+    name: jsonb('name').notNull(),
+    description: jsonb('description').notNull(),
     icon: text('icon').notNull(), // Icon name or emoji
     category: text('category').notNull(), // e.g., "challenges", "tutorials", "social"
 

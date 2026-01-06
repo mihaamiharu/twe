@@ -1,5 +1,6 @@
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import * as dotenv from 'dotenv';
@@ -59,17 +60,16 @@ export const auth = betterAuth({
         },
     },
 
-    // Google OAuth removed - using email verification only
-    // To re-enable, uncomment and set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
-    // socialProviders: {
-    //     google: {
-    //         clientId: process.env.GOOGLE_CLIENT_ID || '',
-    //         clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    //         enabled: !!(
-    //             process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-    //         ),
-    //     },
-    // },
+    // Google OAuth
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID || '',
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+            enabled: !!(
+                process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+            ),
+        },
+    },
 
     // Session configuration
     session: {
@@ -88,6 +88,9 @@ export const auth = betterAuth({
             generateId: () => crypto.randomUUID(),
         },
     },
+
+    // TanStack Start plugin for proper cookie handling (must be last)
+    plugins: [tanstackStartCookies()],
 });
 
 // Export types for client

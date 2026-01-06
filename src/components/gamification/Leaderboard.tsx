@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { formatXP, getLevelTitle } from '@/lib/gamification';
 import { Trophy, Star, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export interface LeaderboardUser {
     id: string;
@@ -42,10 +43,12 @@ function getRankChange(current: number, previous?: number) {
 export function Leaderboard({
     users,
     currentUserId,
-    title = 'Leaderboard',
+    title,
     maxDisplay = 10,
     className,
 }: LeaderboardProps) {
+    const { t } = useTranslation(['common', 'leaderboard']);
+    const displayTitle = title || t('common:navigation.leaderboard');
     const displayUsers = useMemo(() => users.slice(0, maxDisplay), [users, maxDisplay]);
 
     return (
@@ -54,9 +57,9 @@ export function Leaderboard({
                 <div className="flex items-center justify-between">
                     <CardTitle className="flex items-center gap-2">
                         <Trophy className="h-5 w-5 text-yellow-400" />
-                        {title}
+                        {displayTitle}
                     </CardTitle>
-                    <Badge variant="outline">{users.length} users</Badge>
+                    <Badge variant="outline">{users.length} {t('common:labels.user', { count: users.length, defaultValue: 'users' })}</Badge>
                 </div>
             </CardHeader>
             <CardContent className="p-0">
@@ -64,7 +67,8 @@ export function Leaderboard({
                     {displayUsers.map((user) => {
                         const isCurrentUser = user.id === currentUserId;
                         const rankChange = getRankChange(user.rank, user.previousRank);
-                        const levelTitle = getLevelTitle(user.level);
+                        const levelTitleKey = getLevelTitle(user.level);
+                        const levelTitle = t(`common:levelTitles.${levelTitleKey}`);
 
                         return (
                             <div
@@ -122,16 +126,16 @@ export function Leaderboard({
                                             {user.displayName || user.username}
                                         </span>
                                         {isCurrentUser && (
-                                            <Badge variant="secondary" className="text-xs">You</Badge>
+                                            <Badge variant="secondary" className="text-xs">{t('common:labels.userYou', { defaultValue: 'You' })}</Badge>
                                         )}
                                     </div>
                                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                                         <span className="flex items-center gap-1">
                                             <Star className="h-3 w-3" />
-                                            Lv.{user.level} {levelTitle}
+                                            {t('common:labels.level')} {user.level} {levelTitle}
                                         </span>
                                         <span>•</span>
-                                        <span>{user.challengesCompleted} challenges</span>
+                                        <span>{user.challengesCompleted} {t('challenges:labels.challenges')}</span>
                                     </div>
                                 </div>
 
@@ -149,7 +153,7 @@ export function Leaderboard({
 
                 {users.length === 0 && (
                     <div className="p-8 text-center text-muted-foreground">
-                        No users on the leaderboard yet.
+                        {t('common:messages.noResults')}
                     </div>
                 )}
             </CardContent>

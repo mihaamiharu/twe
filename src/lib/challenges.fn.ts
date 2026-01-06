@@ -1,16 +1,24 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
-import { challenges, progress, testCases, submissions } from '@/db/schema';
-import { eq, and, asc, desc, sql, gt, or } from 'drizzle-orm';
+import { challenges, progress, submissions } from '@/db/schema';
+import { eq, and, asc, desc, sql, gt, or, inArray } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
 import { obfuscate } from '@/lib/obfuscator';
 
+// Helper for localizable fields (still needed for DB records)
+const getLocalizedValue = (value: unknown, locale: string): string => {
+    if (!value || typeof value !== 'object') return '';
+    const obj = value as Record<string, string>;
+    return obj[locale] || obj['en'] || '';
+};
+
 // ----------------------------------------------------------------------------
-// GET CHALLENGES (LIST)
+// GET CHALLENGES (LIST) - NOW USING FILESYSTEM
 // ----------------------------------------------------------------------------
 
 const ChallengeFiltersSchema = z.object({
+    locale: z.string().default('en'),
     type: z.enum(['JAVASCRIPT', 'PLAYWRIGHT', 'CSS_SELECTOR', 'XPATH_SELECTOR', 'SELECTOR']).optional(),
     difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
     category: z.string().optional(),
@@ -26,96 +34,82 @@ export const getChallenges = createServerFn({ method: 'GET' })
     .handler(async ({ data: filters }) => {
         try {
             // Dynamically import server-only modules
-            // Dynamically import server-only modules
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
+            const { getChallengeList } = await import('./content.server');
 
-            // Build conditions
-            const conditions = [eq(challenges.isPublished, true)];
+            // Load challenges from filesystem
+            let allChallenges = await getChallengeList(filters.locale, {
+                type: filters.type === 'SELECTOR' ? undefined : filters.type,
+                difficulty: filters.difficulty,
+                category: filters.category,
+                search: filters.search,
+            });
 
-            if (filters.type) {
-                if (filters.type === 'SELECTOR') {
-                    conditions.push(
-                        or(
-                            eq(challenges.type, 'CSS_SELECTOR'),
-                            eq(challenges.type, 'XPATH_SELECTOR')
-                        )!
-                    );
-                } else {
-                    conditions.push(eq(challenges.type, filters.type));
-                }
-            }
-            if (filters.difficulty) {
-                conditions.push(eq(challenges.difficulty, filters.difficulty));
-            }
-            if (filters.category) {
-                conditions.push(eq(challenges.category, filters.category));
-            }
-            if (filters.search) {
-                conditions.push(
-                    or(
-                        sql`${challenges.title} ILIKE ${`%${filters.search}%`}`,
-                        sql`${challenges.description} ILIKE ${`%${filters.search}%`}`
-                    )!
+            // Handle SELECTOR type (both CSS and XPath)
+            if (filters.type === 'SELECTOR') {
+                allChallenges = allChallenges.filter(c =>
+                    c.type === 'CSS_SELECTOR' || c.type === 'XPATH_SELECTOR'
                 );
             }
 
-            // Get total count
-            const [countResult] = await db
-                .select({ count: sql<number>`count(*):: int` })
-                .from(challenges)
-                .where(and(...conditions));
+            // Sort
+            allChallenges.sort((a, b) => {
+                let comparison = 0;
+                switch (filters.sortBy) {
+                    case 'order':
+                        comparison = a.order - b.order;
+                        break;
+                    case 'xpReward':
+                        comparison = a.xpReward - b.xpReward;
+                        break;
+                    case 'difficulty':
+                        const diffOrder = { 'EASY': 1, 'MEDIUM': 2, 'HARD': 3 };
+                        comparison = (diffOrder[a.difficulty as keyof typeof diffOrder] || 0) -
+                            (diffOrder[b.difficulty as keyof typeof diffOrder] || 0);
+                        break;
+                    default:
+                        comparison = a.order - b.order;
+                }
+                return filters.sortOrder === 'desc' ? -comparison : comparison;
+            });
 
-            const total = countResult?.count || 0;
-
-            // Determine sort
-            const sortColumn = {
-                order: challenges.order,
-                difficulty: challenges.difficulty,
-                xpReward: challenges.xpReward,
-                completionCount: challenges.completionCount,
-            }[filters.sortBy];
-
-            const orderFn = filters.sortOrder === 'desc' ? desc : asc;
+            const total = allChallenges.length;
 
             // Pagination
             const offset = (filters.page - 1) * filters.limit;
+            const paginatedChallenges = allChallenges.slice(offset, offset + filters.limit);
 
-            const challengeList = await db
+            // Get DB records for completionCount and IDs
+            const slugs = paginatedChallenges.map(c => c.slug);
+            const dbRecords = slugs.length > 0 ? await db
                 .select({
-                    id: challenges.id,
                     slug: challenges.slug,
-                    title: challenges.title,
-                    description: challenges.description,
-                    type: challenges.type,
-                    difficulty: challenges.difficulty,
-                    category: challenges.category,
-                    xpReward: challenges.xpReward,
-                    order: challenges.order,
-                    tags: challenges.tags,
+                    id: challenges.id,
                     completionCount: challenges.completionCount,
                 })
                 .from(challenges)
-                .where(and(...conditions))
-                .orderBy(orderFn(sortColumn)) // bang ok because default is 'order'
-                .limit(filters.limit)
-                .offset(offset);
+                .where(inArray(challenges.slug, slugs)) : [];
+
+            const dbBySlug = new Map(dbRecords.map(r => [r.slug, r]));
 
             // Get user progress
             let userProgress: Record<string, boolean> = {};
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const headers = getRequestHeaders();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
-            if (session?.user?.id) {
+            if (session?.user?.id && dbRecords.length > 0) {
+                const challengeIds = dbRecords.map(r => r.id);
                 const progressRecords = await db
                     .select({
                         challengeId: progress.challengeId,
                         isCompleted: progress.isCompleted,
                     })
                     .from(progress)
-                    .where(eq(progress.userId, session.user.id));
+                    .where(and(
+                        eq(progress.userId, session.user.id),
+                        inArray(progress.challengeId, challengeIds)
+                    ));
 
                 userProgress = progressRecords.reduce((acc, p) => {
                     if (p.challengeId) {
@@ -125,10 +119,25 @@ export const getChallenges = createServerFn({ method: 'GET' })
                 }, {} as Record<string, boolean>);
             }
 
-            const challengesWithProgress = challengeList.map((challenge) => ({
-                ...challenge,
-                isCompleted: userProgress[challenge.id] || false,
-            }));
+            // Merge filesystem content with DB data
+            const challengesWithProgress = paginatedChallenges.map((challenge) => {
+                const dbRecord = dbBySlug.get(challenge.slug);
+                return {
+                    id: dbRecord?.id || challenge.slug,
+                    slug: challenge.slug,
+                    title: challenge.title,
+                    description: challenge.description,
+                    instructions: challenge.instructions,
+                    type: challenge.type,
+                    difficulty: challenge.difficulty,
+                    category: challenge.category,
+                    xpReward: challenge.xpReward,
+                    order: challenge.order,
+                    tags: challenge.tags,
+                    completionCount: dbRecord?.completionCount || 0,
+                    isCompleted: dbRecord ? (userProgress[dbRecord.id] || false) : false,
+                };
+            });
 
             return {
                 success: true,
@@ -151,110 +160,104 @@ export const getChallenges = createServerFn({ method: 'GET' })
 
 
 // ----------------------------------------------------------------------------
-// GET CHALLENGE (DETAIL)
+// GET CHALLENGE (DETAIL) - NOW USING FILESYSTEM
 // ----------------------------------------------------------------------------
 
 const ChallengeDetailSchema = z.object({
     slug: z.string(),
+    locale: z.string().default('en'),
 });
 
 export const getChallenge = createServerFn({ method: 'GET' })
     .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
     // @ts-expect-error TanStack Start type inference issue with complex handler return types
-    .handler(async ({ data: { slug } }) => {
+    .handler(async ({ data: { slug, locale } }) => {
         try {
             // Dynamically import server-only modules
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const { auth } = await import('./auth.server');
+            const { getChallengeContent, getChallengeList } = await import('./content.server');
 
-            // Fetch challenge
-            const challenge = await db.query.challenges.findFirst({
-                where: and(
-                    eq(challenges.slug, slug),
-                    eq(challenges.isPublished, true)
-                ),
-                with: {
-                    tutorial: {
-                        columns: {
-                            slug: true,
-                            title: true,
-                        },
-                    },
-                },
-            });
+            // Load challenge content from filesystem
+            const challengeContent = await getChallengeContent(slug, locale);
 
-            if (!challenge) {
+            if (!challengeContent) {
                 throw new Error('Challenge not found');
             }
 
             // Security Check
-            if (challenge.tags?.includes('coming-soon')) {
+            if (challengeContent.tags?.includes('coming-soon')) {
                 throw new Error('This challenge is coming soon!');
             }
 
-            // Fetch visible test cases
-            let visibleTestCases = await db
-                .select({
-                    id: testCases.id,
-                    description: testCases.description,
-                    input: testCases.input,
-                    expectedOutput: testCases.expectedOutput,
-                    order: testCases.order,
-                })
-                .from(testCases)
-                .where(
-                    and(
-                        eq(testCases.challengeId, challenge.id),
-                        eq(testCases.isHidden, false)
-                    )
-                )
-                .orderBy(asc(testCases.order));
+            // Get DB record for dynamic data
+            const dbChallenge = await db.query.challenges.findFirst({
+                where: and(
+                    eq(challenges.slug, slug),
+                    eq(challenges.isPublished, true)
+                ),
+                columns: {
+                    id: true,
+                    completionCount: true,
+                },
+            });
 
-            // Obfuscate sensitive inputs
-            if (challenge.type === 'CSS_SELECTOR' || challenge.type === 'XPATH_SELECTOR') {
-                visibleTestCases = visibleTestCases.map(tc => {
-                    const input = tc.input as { selector?: string; xpath?: string };
-                    if (input?.selector) {
-                        return { ...tc, input: { ...input, selector: obfuscate(input.selector) } };
-                    }
-                    if (input?.xpath) {
-                        return { ...tc, input: { ...input, xpath: obfuscate(input.xpath) } };
+            // Prepare test cases from filesystem
+            // Obfuscate sensitive inputs for selector challenges
+            let processedTestCases = challengeContent.testCases.map((tc, index) => ({
+                id: `tc-${index}`,
+                description: tc.description,
+                input: tc.expectedOutput, // For display purposes
+                expectedOutput: tc.expectedOutput,
+                order: index,
+                isHidden: tc.isHidden,
+            }));
+
+            // Filter visible test cases and obfuscate
+            const visibleTestCases = processedTestCases
+                .filter(tc => !tc.isHidden)
+                .map(tc => {
+                    if (challengeContent.type === 'CSS_SELECTOR' || challengeContent.type === 'XPATH_SELECTOR') {
+                        const output = tc.expectedOutput as { selector?: string; xpath?: string };
+                        if (output?.selector) {
+                            return { ...tc, input: { selector: obfuscate(output.selector) } };
+                        }
+                        if (output?.xpath) {
+                            return { ...tc, input: { xpath: obfuscate(output.xpath) } };
+                        }
                     }
                     return tc;
                 });
+
+            const hiddenTestCaseCount = processedTestCases.filter(tc => tc.isHidden).length;
+
+            // Get related tutorial if specified
+            let tutorialData = null;
+            if (challengeContent.tutorialSlug) {
+                const { getTutorialContent } = await import('./content.server');
+                const tutorial = await getTutorialContent(challengeContent.tutorialSlug, locale);
+                if (tutorial) {
+                    tutorialData = {
+                        slug: tutorial.slug,
+                        title: tutorial.title,
+                    };
+                }
             }
-
-            // Count hidden test cases
-            const hiddenTestCasesCountResult = await db
-                .select({ count: sql<number>`count(*):: int` })
-                .from(testCases)
-                .where(
-                    and(
-                        eq(testCases.challengeId, challenge.id),
-                        eq(testCases.isHidden, true)
-                    )
-                );
-            const hiddenTestCaseCount = hiddenTestCasesCountResult[0]?.count || 0;
-
 
             // Get user progress & best submission
             let userProgressData = null;
             let bestSubmissionData = null;
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const headers = getRequestHeaders();
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
-            if (session?.user?.id) {
+            if (session?.user?.id && dbChallenge) {
                 const userId = session.user.id;
 
                 const progressRecord = await db.query.progress.findFirst({
                     where: and(
                         eq(progress.userId, userId),
-                        eq(progress.challengeId, challenge.id)
+                        eq(progress.challengeId, dbChallenge.id)
                     ),
                 });
 
@@ -284,46 +287,48 @@ export const getChallenge = createServerFn({ method: 'GET' })
                 }
             }
 
-            // Next Challenge Logic
-            const nextChallenge = await db.query.challenges.findFirst({
-                where: and(
-                    eq(challenges.isPublished, true),
-                    eq(challenges.category, challenge.category || ''),
-                    challenge.order !== null ? gt(challenges.order, challenge.order) : undefined
-                ),
-                orderBy: asc(challenges.order),
-                columns: {
-                    slug: true,
-                    title: true,
-                },
-            });
+            // Next Challenge Logic (from filesystem)
+            const allChallenges = await getChallengeList(locale);
+            const currentOrder = challengeContent.order;
+            const currentCategory = challengeContent.category;
 
-            let finalNextChallenge = nextChallenge;
-            if (!finalNextChallenge) {
-                finalNextChallenge = await db.query.challenges.findFirst({
-                    where: and(
-                        eq(challenges.isPublished, true),
-                        challenge.order !== null ? gt(challenges.order, challenge.order) : undefined
-                    ),
-                    orderBy: asc(challenges.order),
-                    columns: {
-                        slug: true,
-                        title: true,
-                    }
-                });
+            // Try same category first
+            let nextChallenge = allChallenges
+                .filter(c => c.category === currentCategory && c.order > currentOrder)
+                .sort((a, b) => a.order - b.order)[0];
+
+            // Fallback to any category
+            if (!nextChallenge) {
+                nextChallenge = allChallenges
+                    .filter(c => c.order > currentOrder)
+                    .sort((a, b) => a.order - b.order)[0];
             }
 
             return {
                 success: true,
                 data: {
-                    ...challenge,
+                    id: dbChallenge?.id || slug,
+                    slug: challengeContent.slug,
+                    title: challengeContent.title,
+                    description: challengeContent.description,
+                    instructions: challengeContent.instructions,
+                    type: challengeContent.type,
+                    difficulty: challengeContent.difficulty,
+                    category: challengeContent.category,
+                    xpReward: challengeContent.xpReward,
+                    order: challengeContent.order,
+                    htmlContent: challengeContent.htmlContent,
+                    starterCode: challengeContent.starterCode,
+                    tags: challengeContent.tags,
+                    completionCount: dbChallenge?.completionCount || 0,
+                    tutorial: tutorialData,
                     testCases: visibleTestCases,
                     hiddenTestCaseCount,
                     userProgress: userProgressData,
                     bestSubmission: bestSubmissionData,
-                    nextChallenge: finalNextChallenge ? {
-                        slug: finalNextChallenge.slug,
-                        title: finalNextChallenge.title
+                    nextChallenge: nextChallenge ? {
+                        slug: nextChallenge.slug,
+                        title: nextChallenge.title,
                     } : null,
                 },
             };

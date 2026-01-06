@@ -40,198 +40,204 @@ export type UserData = {
     }[];
 };
 
-export const getUserSettings = createServerFn({ method: 'GET' }).handler(
-    async (): Promise<{ success: boolean; data?: UserData; error?: string }> => {
-        try {
-            // Dynamically import server-only modules
-            const { getRequestHeaders } = await import('@tanstack/react-start/server');
-            const { auth } = await import('./auth.server');
+const GetUserSettingsSchema = z.object({
+    locale: z.string().default('en'),
+});
 
-            const headers = getRequestHeaders() as Headers;
-            const session = await auth.api.getSession({ headers });
+export const getUserSettings = createServerFn({ method: 'GET' })
+    .inputValidator((data: unknown) => GetUserSettingsSchema.parse(data))
+    .handler(
+        async ({ data: { locale } }): Promise<{ success: boolean; data?: UserData; error?: string }> => {
+            try {
+                // Dynamically import server-only modules
+                const { getRequestHeaders } = await import('@tanstack/react-start/server');
+                const { auth } = await import('./auth.server');
 
-            if (!session?.user?.id) {
-                // Return 'Unauthorized'
-                throw new Error('Unauthorized');
-            }
+                const headers = getRequestHeaders() as Headers;
+                const session = await auth.api.getSession({ headers });
 
-            const userId = session.user.id;
+                if (!session?.user?.id) {
+                    // Return 'Unauthorized'
+                    throw new Error('Unauthorized');
+                }
 
-            // Get user data
-            const user = await db.query.users.findFirst({
-                where: eq(users.id, userId),
-            });
+                const userId = session.user.id;
 
-            if (!user) {
-                throw new Error('User not found');
-            }
-
-            // Get user stats including challengesByType
-            const stats = await getUserStats(userId);
-            const completedChallenges = stats.totalChallengesCompleted;
-            const completedTutorials = stats.tutorialsCompleted;
-
-            // Get user achievements
-            const userAchievementsList = await db
-                .select({
-                    id: achievements.id,
-                    slug: achievements.slug,
-                    name: achievements.name,
-                    description: achievements.description,
-                    icon: achievements.icon,
-                    category: achievements.category,
-                    xpReward: achievements.xpReward,
-                    unlockedAt: userAchievements.unlockedAt,
-                })
-                .from(userAchievements)
-                .innerJoin(
-                    achievements,
-                    eq(userAchievements.achievementId, achievements.id)
-                )
-                .where(eq(userAchievements.userId, userId))
-                .orderBy(desc(userAchievements.unlockedAt));
-
-            // Get recent submissions (last 5)
-            const recentSubmissions = await db
-                .select({
-                    id: submissions.id,
-                    challengeId: submissions.challengeId,
-                    challengeTitle: challenges.title,
-                    challengeSlug: challenges.slug,
-                    isPassed: submissions.isPassed,
-                    xpEarned: submissions.xpEarned,
-                    createdAt: submissions.createdAt,
-                })
-                .from(submissions)
-                .innerJoin(challenges, eq(submissions.challengeId, challenges.id))
-                .where(eq(submissions.userId, userId))
-                .orderBy(desc(submissions.createdAt))
-                .limit(100);
-
-            // Heatmap logic removed
-
-            // Calculate XP progress to next level
-            const currentLevel = user.level || 1;
-            const currentXP = user.xp || 0;
-            const xpForCurrentLevel = 100 * Math.pow(currentLevel - 1, 2);
-            const xpForNextLevel = 100 * Math.pow(currentLevel, 2);
-
-            const xpProgress = Math.max(0, currentXP - xpForCurrentLevel);
-            const xpNeeded = Math.max(100, xpForNextLevel - xpForCurrentLevel); // Ensure never 0
-
-            const xpProgressPercentage = Math.min(100, Math.max(0, Math.round((xpProgress / xpNeeded) * 100)));
-
-            // Construct recent activity
-            const activityItems: {
-                type: 'challenge' | 'achievement';
-                title: string;
-                xp: number;
-                date: Date;
-                timestamp: number;
-            }[] = [];
-
-            // Safely add submissions (Deduplicated, preferring highest XP)
-            if (recentSubmissions && Array.isArray(recentSubmissions)) {
-                const bestSubmissions = new Map<string, typeof recentSubmissions[0]>();
-
-                recentSubmissions
-                    .filter(s => s.isPassed)
-                    .forEach(s => {
-                        const existing = bestSubmissions.get(s.challengeId);
-
-                        // If we haven't seen this challenge, or if this submission has more XP than the saved one
-                        // or (same XP but this one is older - implying it was the 'first' of the filtered batch? 
-                        // actually, usually we want the one that GAVE the XP. 
-                        // If multiple give 0, latest is fine. If mixed, we want the >0 one.
-                        if (!existing || s.xpEarned > existing.xpEarned) {
-                            bestSubmissions.set(s.challengeId, s);
-                        }
-                    });
-
-                bestSubmissions.forEach(s => {
-                    activityItems.push({
-                        type: 'challenge',
-                        title: s.challengeTitle,
-                        xp: s.xpEarned,
-                        date: s.createdAt,
-                        timestamp: s.createdAt.getTime(),
-                    });
+                // Get user data
+                const user = await db.query.users.findFirst({
+                    where: eq(users.id, userId),
                 });
-            }
 
-            // Safely add achievements
-            if (userAchievementsList && Array.isArray(userAchievementsList)) {
-                userAchievementsList.forEach(a => {
-                    activityItems.push({
-                        type: 'achievement',
-                        title: a.name,
-                        xp: a.xpReward || 0,
-                        date: a.unlockedAt,
-                        timestamp: a.unlockedAt.getTime(),
+                if (!user) {
+                    throw new Error('User not found');
+                }
+
+                // Get user stats including challengesByType
+                const stats = await getUserStats(userId);
+                const completedChallenges = stats.totalChallengesCompleted;
+                const completedTutorials = stats.tutorialsCompleted;
+
+                // Get user achievements
+                const userAchievementsList = await db
+                    .select({
+                        id: achievements.id,
+                        slug: achievements.slug,
+                        name: sql<string>`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
+                        description: sql<string>`COALESCE(${achievements.description}->>${locale}, ${achievements.description}->>'en', '')`,
+                        icon: achievements.icon,
+                        category: achievements.category,
+                        xpReward: achievements.xpReward,
+                        unlockedAt: userAchievements.unlockedAt,
+                    })
+                    .from(userAchievements)
+                    .innerJoin(
+                        achievements,
+                        eq(userAchievements.achievementId, achievements.id)
+                    )
+                    .where(eq(userAchievements.userId, userId))
+                    .orderBy(desc(userAchievements.unlockedAt));
+
+                // Get recent submissions (last 5)
+                const recentSubmissions = await db
+                    .select({
+                        id: submissions.id,
+                        challengeId: submissions.challengeId,
+                        challengeTitle: sql<string>`COALESCE(${challenges.title}->>${locale}, ${challenges.title}->>'en', '')`,
+                        challengeSlug: challenges.slug,
+                        isPassed: submissions.isPassed,
+                        xpEarned: submissions.xpEarned,
+                        createdAt: submissions.createdAt,
+                    })
+                    .from(submissions)
+                    .innerJoin(challenges, eq(submissions.challengeId, challenges.id))
+                    .where(eq(submissions.userId, userId))
+                    .orderBy(desc(submissions.createdAt))
+                    .limit(100);
+
+                // Heatmap logic removed
+
+                // Calculate XP progress to next level
+                const currentLevel = user.level || 1;
+                const currentXP = user.xp || 0;
+                const xpForCurrentLevel = 100 * Math.pow(currentLevel - 1, 2);
+                const xpForNextLevel = 100 * Math.pow(currentLevel, 2);
+
+                const xpProgress = Math.max(0, currentXP - xpForCurrentLevel);
+                const xpNeeded = Math.max(100, xpForNextLevel - xpForCurrentLevel); // Ensure never 0
+
+                const xpProgressPercentage = Math.min(100, Math.max(0, Math.round((xpProgress / xpNeeded) * 100)));
+
+                // Construct recent activity
+                const activityItems: {
+                    type: 'challenge' | 'achievement';
+                    title: string;
+                    xp: number;
+                    date: Date;
+                    timestamp: number;
+                }[] = [];
+
+                // Safely add submissions (Deduplicated, preferring highest XP)
+                if (recentSubmissions && Array.isArray(recentSubmissions)) {
+                    const bestSubmissions = new Map<string, typeof recentSubmissions[0]>();
+
+                    recentSubmissions
+                        .filter(s => s.isPassed)
+                        .forEach(s => {
+                            const existing = bestSubmissions.get(s.challengeId);
+
+                            // If we haven't seen this challenge, or if this submission has more XP than the saved one
+                            // or (same XP but this one is older - implying it was the 'first' of the filtered batch? 
+                            // actually, usually we want the one that GAVE the XP. 
+                            // If multiple give 0, latest is fine. If mixed, we want the >0 one.
+                            if (!existing || s.xpEarned > existing.xpEarned) {
+                                bestSubmissions.set(s.challengeId, s);
+                            }
+                        });
+
+                    bestSubmissions.forEach(s => {
+                        activityItems.push({
+                            type: 'challenge',
+                            title: s.challengeTitle,
+                            xp: s.xpEarned,
+                            date: s.createdAt,
+                            timestamp: s.createdAt.getTime(),
+                        });
                     });
-                });
-            }
+                }
 
-            const activity = activityItems
-                .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
-                .slice(0, 10)
-                .map(({ date, ...rest }) => ({
-                    ...rest,
-                    date: new Intl.DateTimeFormat('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        hour: 'numeric',
-                        minute: 'numeric',
-                    }).format(date),
-                }));
+                // Safely add achievements
+                if (userAchievementsList && Array.isArray(userAchievementsList)) {
+                    userAchievementsList.forEach(a => {
+                        activityItems.push({
+                            type: 'achievement',
+                            title: a.name,
+                            xp: a.xpReward || 0,
+                            date: a.unlockedAt,
+                            timestamp: a.unlockedAt.getTime(),
+                        });
+                    });
+                }
 
-            return {
-                success: true,
-                data: {
-                    id: user.id,
-                    email: user.email,
-                    name: user.name,
-                    image: user.image || undefined,
-                    createdAt: user.createdAt,
+                const activity = activityItems
+                    .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+                    .slice(0, 10)
+                    .map(({ date, ...rest }) => ({
+                        ...rest,
+                        date: new Intl.DateTimeFormat(locale === 'id' ? 'id-ID' : 'en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: 'numeric',
+                            minute: 'numeric',
+                        }).format(date),
+                    }));
 
-                    // Gamification
-                    xp: user.xp,
-                    level: user.level,
-                    xpProgress,
-                    xpNeeded,
-                    xpProgressPercentage,
+                return {
+                    success: true,
+                    data: {
+                        id: user.id,
+                        email: user.email,
+                        name: user.name,
+                        image: user.image || undefined,
+                        createdAt: user.createdAt,
 
-                    // Privacy
-                    profileVisibility: user.profileVisibility,
-                    showOnLeaderboard: user.showOnLeaderboard,
+                        // Gamification
+                        xp: user.xp,
+                        level: user.level,
+                        xpProgress,
+                        xpNeeded,
+                        xpProgressPercentage,
 
-                    // Stats
-                    stats: {
-                        completedChallenges,
-                        completedTutorials,
-                        achievementsCount: userAchievementsList.length,
-                        challengesByType: stats.challengesByType || {},
+                        // Privacy
+                        profileVisibility: user.profileVisibility,
+                        showOnLeaderboard: user.showOnLeaderboard,
+
+                        // Stats
+                        stats: {
+                            completedChallenges,
+                            completedTutorials,
+                            achievementsCount: userAchievementsList.length,
+                            challengesByType: stats.challengesByType || {},
+                        },
+
+                        recentAchievements: userAchievementsList.map((a) => ({
+                            name: a.name,
+                            description: a.description,
+                            icon: a.icon,
+                            unlockedAt: a.unlockedAt,
+                        })),
+
+                        recentActivity: activity,
                     },
-
-                    recentAchievements: userAchievementsList.map((a) => ({
-                        name: a.name,
-                        description: a.description,
-                        icon: a.icon,
-                        unlockedAt: a.unlockedAt,
-                    })),
-
-                    recentActivity: activity,
-                },
-            };
-        } catch (error) {
-            logger.error('Error fetching user profile:', error);
-            return {
-                success: false,
-                error: error instanceof Error ? error.message : 'Unknown error',
-            };
+                };
+            } catch (error) {
+                logger.error('Error fetching user profile:', error);
+                return {
+                    success: false,
+                    error: error instanceof Error ? error.message : 'Unknown error',
+                };
+            }
         }
-    }
-);
+    );
 
 const updateUserSchema = z.object({
     name: z.string().optional(),

@@ -1,0 +1,28 @@
+{
+    "header": {
+        "title": "Hall of Fame",
+        "subtitle": "Para penguji elit yang menguasai seni otomasi."
+    },
+    "tabs": {
+        "allTime": "Sepanjang Waktu",
+        "thisMonth": "Bulan Ini"
+    },
+    "table": {
+        "hiddenUser": "Pengguna Tersembunyi",
+        "anonymous": "Anonim",
+        "challengesCount": "{{count}} tantangan",
+        "emptyState": "Belum ada pelari lain. Undang temanmu!"
+    },
+    "gating": {
+        "title": "Bergabung dengan Elit",
+        "description": "Masuk untuk melihat peringkat lengkap, melacak progres kamu, dan mendapatkan lencana unik.",
+        "button": "Masuk untuk Bersaing"
+    },
+    "monthly": {
+        "comingSoon": "Peringkat Bulanan Segera Hadir",
+        "description": "Bersainglah untuk mahkota bulanan di pembaruan musim berikutnya!"
+    },
+    "error": {
+        "description": "Tidak dapat memuat papan peringkat saat ini."
+    }
+}

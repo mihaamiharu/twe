@@ -1,5 +1,7 @@
-import { Link } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 const terminalLogs = [
     '> GET /page-content ... 200 OK',
@@ -21,6 +23,9 @@ const terminalLogs = [
 ];
 
 export function NotFound() {
+    const { t } = useTranslation('common');
+    const params = useParams({ strict: false }) as { locale?: string };
+    const locale = params.locale || 'en';
     const [visibleLogs, setVisibleLogs] = useState<string[]>([]);
     const [isToggled, setIsToggled] = useState(false);
 
@@ -75,16 +80,16 @@ export function NotFound() {
 
                 {/* Headline */}
                 <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-                    You are in Headless Mode
+                    {t('notFound.title')}
                 </h1>
 
                 {/* Sub-headline */}
                 <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-                    The content is here, but you can't see it because your viewport is set to{' '}
+                    {t('notFound.description').split('headless: true')[0]}
                     <code className="px-2 py-0.5 bg-gray-800 rounded text-green-400 font-mono text-sm">
                         headless: true
                     </code>
-                    . Trust us, the tests are passing in the background.
+                    {t('notFound.description').split('headless: true')[1]}
                 </p>
 
                 {/* Terminal window */}
@@ -124,7 +129,7 @@ export function NotFound() {
                 </div>
 
                 {/* Toggle switch CTA */}
-                <Link to="/" className="group inline-flex items-center gap-3">
+                <Link to={LocaleRoutes.home} params={localeParams(locale)} className="group inline-flex items-center gap-3">
                     <button
                         onMouseEnter={() => setIsToggled(true)}
                         onMouseLeave={() => setIsToggled(false)}
@@ -137,13 +142,15 @@ export function NotFound() {
                                     }`}
                             />
                         </div>
-                        <span>Switch to Headed Mode (Go Home)</span>
+                        <span>{t('notFound.backHome')}</span>
                     </button>
                 </Link>
 
                 {/* Fun footer note */}
                 <p className="mt-8 text-xs text-gray-600 font-mono">
-                    Tip: Try running with <code className="text-gray-500">--headed</code> flag next time
+                    {t('notFound.tip').split('--headed')[0]}
+                    <code className="text-gray-500">--headed</code>
+                    {t('notFound.tip').split('--headed')[1]}
                 </p>
             </div>
 
