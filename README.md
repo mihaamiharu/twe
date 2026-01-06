@@ -140,20 +140,26 @@ bun run db:seed:achievements  # Seed achievements
 The project includes unit and integration tests. Integration tests run against a dedicated PostgreSQL container.
 
 ### Running Subsets
+
 ```bash
 bun run test:unit         # Only unit tests
 bun run test:integration  # Only integration tests (requires docker)
 ```
 
 ### Local CI/CD (One-Command)
+
 To run everything (Infrastructure + Tests) in one go:
+
 ```bash
 bun run test:ci
 ```
+
 *Starts `postgres_test`, runs all tests, and stops the container cleanup regardless of result.*
 
 ### Manual Database Control
+
 If you want to keep the test database running:
+
 ```bash
 docker compose up -d postgres_test
 bun test
