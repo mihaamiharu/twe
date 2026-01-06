@@ -12,6 +12,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,7 @@ import { executePlaywrightCode } from '@/lib/challenge-executor';
 import { Play, Send, RotateCcw, Zap, Loader2, Target, BookOpen, AlertCircle, GripVertical } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { storage } from '@/lib/storage-adapter';
+import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 import {
     Dialog,
     DialogContent,
@@ -145,6 +147,7 @@ export interface ChallengePlaygroundProps {
 }
 
 export function ChallengePlayground({ challenge, onSubmit, userId, className }: ChallengePlaygroundProps) {
+    const { t } = useTranslation(['challenges', 'common']);
     const [code, setCode] = useState(challenge.starterCode);
     const [selector, setSelector] = useState('');
     const [resetCount, setResetCount] = useState(0);
@@ -247,7 +250,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     outputMessage = 'No assertions were called. Write assertions like: await expect(locator).toHaveText(\'...\');';
                     result.status = 'FAILED';
                 } else {
-                    outputMessage = `All ${assertionCount} assertion${assertionCount > 1 ? 's' : ''} passed!`;
+                    outputMessage = t('challenges:playground.correct');
                 }
             }
             // Standard code challenges: compare return value against expected output
@@ -266,18 +269,18 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     validationPassed = false;
                     // Don't reveal expected value to prevent cheating
                     outputMessage = actual === undefined
-                        ? 'Your result is undefined. Make sure you assign a value to `result`.'
-                        : 'Your result doesn\'t match the expected output. Check your logic and try again.';
+                        ? t('challenges:playground.jsUndefined')
+                        : t('challenges:playground.jsMismatch');
                     result.status = 'FAILED';
                 } else {
-                    outputMessage = `Correct! Result is ${String(actual)}`;
+                    outputMessage = `${t('challenges:playground.correct')} Result is ${String(actual)}`;
                 }
             }
 
 
             const testResult: TestResult = {
                 id: 'main',
-                name: 'Code Execution',
+                name: t('challenges:playground.results'),
                 passed: validationPassed,
                 error: !validationPassed ? (result.error || outputMessage) : undefined,
                 executionTime: result.executionTime,
@@ -298,9 +301,9 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
             setTestResults([
                 {
                     id: 'error',
-                    name: 'Execution Error',
+                    name: t('challenges:playground.executionError'),
                     passed: false,
-                    error: error instanceof Error ? error.message : 'Unknown error',
+                    error: error instanceof Error ? error.message : t('common:messages.error'),
                 },
             ]);
             setHasPassed(false);
@@ -350,7 +353,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     id: 'selector',
                     name: 'Selector Validation',
                     passed: false,
-                    error: 'Your selector does not select the correct element(s)',
+                    error: t('challenges:playground.selectorMismatch'),
                 },
             ]);
         }
@@ -436,8 +439,8 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
         <div className="flex-1 overflow-auto p-4 space-y-8">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                 <TabsList className="w-full">
-                    <TabsTrigger value="instructions" className="flex-1">Instructions</TabsTrigger>
-                    {challenge.htmlContent && <TabsTrigger value="preview" className="flex-1">Preview</TabsTrigger>}
+                    <TabsTrigger value="instructions" className="flex-1">{t('challenges:playground.instructions')}</TabsTrigger>
+                    {challenge.htmlContent && <TabsTrigger value="preview" className="flex-1">{t('challenges:playground.preview')}</TabsTrigger>}
                 </TabsList>
                 <TabsContent value="instructions" className="mt-4">
                     <div className="prose prose-sm dark:prose-invert max-w-none">
@@ -479,18 +482,18 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
 
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                    <h3 className="font-bold">Execution</h3>
+                    <h3 className="font-bold">{t('challenges:playground.results')}</h3>
                     {isCodeChallenge && (
                         <Button size="sm" onClick={() => void handleRunCode()} disabled={isRunning}>
                             {isRunning ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Play className="h-4 w-4 mr-2" />}
-                            Run
+                            {t('common:actions.run')}
                         </Button>
                     )}
                 </div>
 
                 {isCodeChallenge && (
                     <div className="border-t border-border pt-4">
-                        <h3 className="font-bold mb-2">Test Results</h3>
+                        <h3 className="font-bold mb-2">{t('challenges:playground.results')}</h3>
                         <TestResults results={testResults} isRunning={isRunning} challengeType={challenge.type} />
                     </div>
                 )}
@@ -510,9 +513,9 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 >
                     <div className="px-4 pt-4 pb-2 shrink-0">
                         <TabsList className="w-full justify-start h-10 bg-muted/50 p-1 border border-border rounded-lg">
-                            <TabsTrigger value="instructions" className="flex-1">Instructions</TabsTrigger>
+                            <TabsTrigger value="instructions" className="flex-1">{t('challenges:playground.instructions')}</TabsTrigger>
                             {challenge.htmlContent && (
-                                <TabsTrigger value="preview" className="flex-1">Target Preview</TabsTrigger>
+                                <TabsTrigger value="preview" className="flex-1">{t('challenges:playground.preview')}</TabsTrigger>
                             )}
                         </TabsList>
                     </div>
@@ -563,7 +566,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                             <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/5 shrink-0">
                                 <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                                     <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                                    Editor
+                                    {t('challenges:playground.editor')}
                                 </h3>
                                 <div className="flex items-center gap-2">
                                     <Button
@@ -571,7 +574,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                         size="icon"
                                         className="h-6 w-6 text-muted-foreground hover:text-destructive"
                                         onClick={handleReset}
-                                        title="Reset Code"
+                                        title={t('challenges:playground.resetCode')}
                                     >
                                         <RotateCcw className="h-3 w-3" />
                                     </Button>
@@ -597,7 +600,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                 <div className="space-y-2">
                                     <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
                                         <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">1</div>
-                                        Step 1: Capture the Element
+                                        {t('challenges:playground.step1')}
                                     </h3>
                                     <Card className="border border-border rounded-xl shadow-sm overflow-hidden bg-muted/5">
                                         <CardContent className="p-4 space-y-4">
@@ -621,7 +624,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                                     ) : (
                                                         <Play className="h-4 w-4 mr-2" />
                                                     )}
-                                                    Test Selector
+                                                    {t('challenges:playground.testSelector')}
                                                 </Button>
 
                                                 {/* Inline validation badge */}
@@ -633,9 +636,9 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                                             : "bg-red-500/10 text-red-600 border border-red-500/30"
                                                     )}>
                                                         {hasPassed ? (
-                                                            <><Zap className="h-4 w-4 fill-current" /> Correct!</>
+                                                            <><Zap className="h-4 w-4 fill-current" /> {t('challenges:playground.correct')}</>
                                                         ) : (
-                                                            <><AlertCircle className="h-4 w-4 shrink-0" /> {testResults[0]?.error || 'Selector does not match the target element'}</>
+                                                            <><AlertCircle className="h-4 w-4 shrink-0" /> {testResults[0]?.error || t('challenges:playground.selectorMismatch')}</>
                                                         )}
                                                     </div>
                                                 )}
@@ -662,7 +665,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                             : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                                     )}
                                 >
-                                    Results
+                                    {t('challenges:playground.results')}
                                 </button>
                                 <button
                                     onClick={() => setResultsTab('console')}
@@ -673,7 +676,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                             : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                                     )}
                                 >
-                                    Console
+                                    {t('challenges:playground.console')}
                                     {consoleLogs.length > 0 && (
                                         <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-muted rounded-full">
                                             {consoleLogs.length}
@@ -689,7 +692,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                 className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
                             >
                                 {isRunning ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : <Play className="h-3 w-3 mr-1" />}
-                                Run
+                                {t('common:actions.run')}
                             </Button>
                         </div>
                         <div className="flex-1 overflow-auto">
@@ -717,7 +720,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
             {challenge.isCompleted && (
                 <div className="bg-green-500/10 border-b border-green-500/20 px-4 py-2 flex items-center justify-center gap-2 text-green-600 text-sm font-medium animate-in slide-in-from-top-2">
                     <Zap className="h-4 w-4 fill-current" />
-                    You have already completed this challenge! Feel free to practice again.
+                    {t('challenges:playground.alreadyCompleted')}
                 </div>
             )}
 
@@ -727,8 +730,8 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     <div>
                         <h1 className="font-bold text-xl tracking-tight text-foreground">{challenge.title}</h1>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <Badge variant="secondary" className="font-bold border border-border/50">{challenge.difficulty}</Badge>
-                            <Badge variant="outline" className="font-bold border-border/50 bg-background">{challenge.type.replace('_', ' ')}</Badge>
+                            <Badge variant="secondary" className="font-bold border border-border/50">{t(`challenges:difficulty.${challenge.difficulty.toUpperCase()}`)}</Badge>
+                            <Badge variant="outline" className="font-bold border-border/50 bg-background">{t(`challenges:types.${challenge.type.toLowerCase()}`)}</Badge>
                             <span className="text-accent flex items-center gap-1 font-bold">
                                 <Zap className="h-3 w-3 fill-current" />
                                 {challenge.xp} XP
@@ -751,10 +754,10 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                     )}
 
                     {challenge.tutorial && (
-                        <Link to="/tutorials/$slug" params={{ slug: challenge.tutorial.slug }}>
+                        <Link to={LocaleRoutes.tutorialDetail} params={localeSlugParams(locale, challenge.tutorial.slug)}>
                             <Button variant="ghost" size="sm" className="hidden md:flex font-bold text-muted-foreground hover:text-foreground">
                                 <BookOpen className="h-4 w-4 mr-2" />
-                                Tutorial
+                                {t('common:navigation.tutorials')}
                             </Button>
                         </Link>
                     )}
@@ -769,10 +772,10 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                                 ? "bg-green-500 hover:bg-green-600 text-black"
                                 : "bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed"
                         )}
-                        title="Submit Solution (Cmd/Ctrl + Shift + Enter)"
+                        title={t('common:actions.submit')}
                     >
                         <Send className="h-4 w-4 mr-2" />
-                        Submit
+                        {t('common:actions.submit')}
                     </Button>
                 </div>
             </div>
@@ -784,7 +787,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                         <Target className="h-3.5 w-3.5 text-brand-teal-dark" />
                     </div>
                     <p className="text-sm font-bold text-foreground/90 leading-tight">
-                        <span className="text-brand-teal mr-2">GOAL:</span>
+                        <span className="text-brand-teal mr-2">{t('challenges:playground.goal')}</span>
                         {challenge.description}
                     </p>
                 </div>
@@ -803,11 +806,11 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                             <div className="bg-destructive/10 p-2 rounded-full">
                                 <AlertCircle className="h-5 w-5 text-destructive" />
                             </div>
-                            <DialogTitle>Reset Solution?</DialogTitle>
+                            <DialogTitle>{t('challenges:playground.resetTitle')}</DialogTitle>
                         </div>
                     </DialogHeader>
                     <DialogDescription>
-                        This will permanently delete your current progress and restore the challenge to its original state. This action cannot be undone.
+                        {t('challenges:playground.resetDescription')}
                     </DialogDescription>
                     <DialogFooter className="mt-4 sm:justify-end gap-2">
                         <Button
@@ -815,14 +818,14 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                             onClick={() => setIsResetConfirmOpen(false)}
                             className="hover:bg-accent"
                         >
-                            Cancel
+                            {t('common:actions.cancel')}
                         </Button>
                         <Button
                             variant="destructive"
                             onClick={() => void confirmReset()}
                             className="shadow-sm"
                         >
-                            Yes, Reset Code
+                            {t('common:actions.reset')}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

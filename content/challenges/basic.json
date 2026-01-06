@@ -1,0 +1,1438 @@
+{
+  "tier": "basic",
+  "challenges": [
+    {
+      "slug": "css-selector-101-id-class",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "css-basics",
+      "xpReward": 10,
+      "order": 1,
+      "title": {
+        "en": "ID & Class Selectors",
+        "id": "Selector ID & Class"
+      },
+      "description": {
+        "en": "Master the two most fundamental building blocks of CSS selection.",
+        "id": "Kuasai dua blok pembangun paling fundamental dari seleksi CSS."
+      },
+      "instructions": {
+        "en": "# The Fundamentals: ID & Class\n    \nIn the world of web automation and testing, **reliability is king**. The most robust tests rely on stable identifiers.\n\n## 1. The ID Selector (`#`)\nAn ID is unique—it acts like a fingerprint for an element. If an element has an ID, it is almost always the best way to select it.\n- **Syntax:** `#elementId`\n- **Example:** `#submit-btn` targets `<button id=\"submit-btn\">`\n\n## 2. The Class Selector (`.`)\nClasses are reusable. They identify a *type* of element rather than a specific instance.\n- **Syntax:** `.className`\n- **Example:** `.primary-btn` targets all buttons with that style.\n\n## Your Mission\nYou need to click the **Login** button.\nSince this is a critical action, the developers have given it a unique ID. Use it!\n",
+        "id": "# Dasar-Dasar: ID & Class\n    \nDalam dunia *web automation* dan *testing*, **reliability adalah raja**. Tes yang paling *robust* bergantung pada *identifier* yang stabil.\n\n## 1. Selector ID (`#`)\nSebuah ID itu unik—ia bertindak seperti sidik jari untuk sebuah elemen. Jika sebuah elemen punya ID, itu hampir selalu merupakan cara terbaik untuk memilihnya.\n- **Sintaks:** `#elementId`\n- **Contoh:** `#submit-btn` menargetkan `<button id=\"submit-btn\">`\n\n## 2. Selector Class (`.`)\nClass itu bisa dipakai ulang (*reusable*). Mereka mengidentifikasi sebuah *jenis* elemen, bukan instansi spesifik.\n- **Sintaks:** `.className`\n- **Contoh:** `.primary-btn` menargetkan semua tombol dengan gaya tersebut.\n\n## Misi Kamu\nKamu perlu klik tombol **Login**.\nKarena ini aksi kritis, *developer* sudah memberinya ID unik. Gunakan itu!\n"
+      },
+      "htmlContent": "<div class=\"login-wrapper\">\n  <h1>System Login</h1>\n  <form class=\"login-form\">\n    <div class=\"input-group\">\n      <input type=\"text\" id=\"username\" placeholder=\"Username\" />\n    </div>\n    <div class=\"input-group\">\n      <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n    </div>\n    <div class=\"actions\">\n      <button type=\"submit\" id=\"login-btn\" class=\"btn btn-primary\">Login</button>\n      <a href=\"#\" class=\"forgot-link\">Forgot Password?</a>\n    </div>\n  </form>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "#login-btn",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "#login-btn",
+      "tags": [
+        "beginner",
+        "css",
+        "basics",
+        "id",
+        "class"
+      ]
+    },
+    {
+      "slug": "css-tag-selectors",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "css-basics",
+      "xpReward": 10,
+      "order": 2,
+      "title": {
+        "en": "Tag Name Selectors",
+        "id": "Selector Nama Tag"
+      },
+      "description": {
+        "en": "Select elements purely by their HTML tag type.",
+        "id": "Pilih elemen murni berdasarkan tipe tag HTML-nya."
+      },
+      "instructions": {
+        "en": "# Tag Selection\n\nSometimes you want to target broad categories of elements rather than specific ones. **Tag selectors** allow you to do just that.\n\n## How it works\nYou simply use the name of the HTML tag.\n- `p` targets all **paragraphs**.\n- `div` targets all **containers**.\n- `a` targets all **links**.\n\n> **Pro Tip:** In real automation, tag selectors are rare because they are too generic. However, they are powerful when combined with other selectors (e.g., \"get me the `span` inside this button\").\n\n## Your Mission\nSelect the main **paragraph** of text in the welcome card.\n",
+        "id": "# Seleksi Tag\n\nKadang kamu ingin menargetkan kategori elemen yang luas dibanding yang spesifik. **Selector tag** memungkinkan kamu melakukan itu.\n\n## Cara kerjanya\nKamu cukup pakai nama tag HTML-nya.\n- `p` menargetkan semua **paragraf**.\n- `div` menargetkan semua **container**.\n- `a` menargetkan semua **link**.\n\n> **Pro Tip:** Di *automation* nyata, *selector* tag itu jarang dipakai karena terlalu umum. Tapi, mereka sangat kuat jika dikombinasikan dengan *selector* lain (contoh: \"ambilkan saya `span` di dalam tombol ini\").\n\n## Misi Kamu\nPilih **paragraf** teks utama di kartu selamat datang (*welcome card*).\n"
+      },
+      "htmlContent": "<div class=\"welcome-card\">\n  <h2>Welcome Aboard</h2>\n  <p>Thank you for joining our platform. We are excited to see what you build!</p>\n  <button class=\"btn\">Get Started</button>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "p",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "p",
+      "tags": [
+        "beginner",
+        "css",
+        "basics",
+        "tag"
+      ]
+    },
+    {
+      "slug": "css-combining-basics",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "css-basics",
+      "xpReward": 20,
+      "order": 3,
+      "title": {
+        "en": "Combining Selectors",
+        "id": "Mengkombinasikan Selector"
+      },
+      "description": {
+        "en": "Increase specificity by chaining tags and classes together.",
+        "id": "Tingkatkan spesifisitas dengan merangkai tag dan class bersama-sama."
+      },
+      "instructions": {
+        "en": "# Specificity through Combination\n\nA single class name isn't always enough using a generic class like `.error`? It might be applied to a label, a div, or a span.\n\nTo be more precise, you can **chain** selectors.\n\n## The Pattern\n`tag.className`\n\nThis tells the browser: \"Find me a `<tag>` that ALSO has this `.class`\".\n\n### Examples\n- `div.sidebar` -> Only divs with the sidebar class.\n- `button.primary` -> Only buttons with the primary class.\n\n## Your Mission\nThere are multiple \"error\" styles on the page. Your goal is to select only the **Error Message Banner**, which is a `div`. Do not select the error label inside the span.\n",
+        "id": "# Spesifisitas lewat Kombinasi\n\nNama *class* tunggal tidak selalu cukup jika menggunakan *class* umum seperti `.error`. Itu mungkin diterapkan pada label, div, atau span.\n\nUntuk lebih presisi, kamu bisa **merangkai** (*chain*) *selector*.\n\n## Polanya\n`tag.namaClass`\n\nIni memberitahu browser: \"Carikan saya `<tag>` yang JUGA memiliki `.class` ini\".\n\n### Contoh\n- `div.sidebar` -> Hanya div dengan class sidebar.\n- `button.primary` -> Hanya tombol dengan class primary.\n\n## Misi Kamu\nAda banyak gaya \"error\" di halaman ini. Tujuanmu adalah memilih hanya **Banner Pesan Error**, yang merupakan sebuah `div`. Jangan pilih label error di dalam span.\n"
+      },
+      "htmlContent": "<div class=\"notification-area\">\n  <div class=\"msg success\">Update successful</div>\n  \n  <!-- Target -->\n  <div class=\"msg error\">Connection failed</div>\n  \n  <form>\n    <label>Username <span class=\"error\">*</span></label>\n    <input type=\"text\" />\n  </form>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "div.error",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "div.error",
+      "tags": [
+        "beginner",
+        "css",
+        "basics",
+        "combining"
+      ]
+    },
+    {
+      "slug": "css-foundations-boss",
+      "type": "CSS_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "css-basics",
+      "xpReward": 50,
+      "order": 4,
+      "title": {
+        "en": "Scenario: Legacy App Testing",
+        "id": "Skenario: Pengujian Aplikasi Legacy"
+      },
+      "description": {
+        "en": "Use selector chaining to identify a specific button in a messy layout.",
+        "id": "Gunakan perangkaian selector untuk mengidentifikasi tombol spesifik di tata letak yang berantakan."
+      },
+      "instructions": {
+        "en": "# Scenario: Legacy App Testing\n\nYou've just joined a new project. The code is old (\"legacy\") and messy. \n- There are **no IDs** to be found. \n- The class names like `.btn` and `.primary` are reused everywhere.\n- You cannot change the HTML code.\n\n## Your Mission\nYou need to write a stable selector for the **\"Sign Up\"** button in the Hero section.\n\n## Strategy\nTo identify this specific needle in the haystack, you must be hyper-specific. Identify every trait it has:\n1. It is a `button` tag.\n2. It has the `btn` class.\n3. It has the `primary` class.\n4. It has the `large` class.\n\nChain these together to create a selector that helps ensure you don't accidentally click the wrong button.\n",
+        "id": "# Skenario: Pengujian Aplikasi Legacy\n\nKamu baru saja bergabung dengan proyek baru. Kodenya tua (\"legacy\") dan berantakan.\n- **Tidak ada ID** yang bisa ditemukan.\n- Nama class seperti `.btn` dan `.primary` digunakan kembali di mana-mana.\n- Kamu tidak bisa mengubah kode HTML.\n\n## Misi Kamu\nKamu perlu menulis *selector* yang stabil untuk tombol **\"Sign Up\"** di bagian Hero.\n\n## Strategi\nUntuk mengidentifikasi jarum spesifik ini di tumpukan jerami, kamu harus sangat spesifik. Identifikasi setiap ciri yang dimilikinya:\n1. Itu adalah tag `button`.\n2. Memiliki class `btn`.\n3. Memiliki class `primary`.\n4. Memiliki class `large`.\n\nRangkai ini bersama-sama untuk membuat *selector* yang membantu memastikan kamu tidak sengaja mengklik tombol yang salah.\n"
+      },
+      "htmlContent": "<div class=\"legacy-wrapper\">\n  <div class=\"top-bar\">\n    <button class=\"btn small\">Login</button>\n    <button class=\"btn primary small\">Stats</button>\n  </div>\n  \n  <section class=\"hero-section\">\n    <h1>Start your journey</h1>\n    <!-- This is your target -->\n    <button class=\"btn primary large\">Sign Up</button>\n  </section>\n  \n  <div class=\"footer\">\n    <button class=\"btn large text-only\">Back to Top</button>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "button.btn.primary.large",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "button.btn.primary.large",
+      "tags": [
+        "beginner",
+        "css",
+        "basics",
+        "scenario"
+      ]
+    },
+    {
+      "slug": "css-child-descendant",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "css-basics",
+      "xpReward": 15,
+      "order": 5,
+      "title": {
+        "en": "Child vs Descendant",
+        "id": "Anak (Child) vs Keturunan (Descendant)"
+      },
+      "description": {
+        "en": "Understand how to traverse down the DOM tree.",
+        "id": "Pahami cara menelusuri pohon DOM ke bawah."
+      },
+      "instructions": {
+        "en": "# Hierarchy: Child vs Descendant\n\nWeb pages are trees. Elements live inside other elements. Understanding how to drill down is crucial.\n\n## 1. The Descendant Selector (Space)\n`parent child`\nThis is a \"fuzzy\" search. It finds elements deeply nested anywhere inside the parent.\n*   `div p` matches a paragraph inside a div, even if it's 10 levels deep.\n\n## 2. The Direct Child Selector (`>`)\n`parent > child`\nThis is a \"strict\" search. It only finds elements that are **direct children** (immediate nesting).\n\n## Your Mission\nSelect only the top-level **menu items** in the navigation bar. \nDo **not** select the items inside the dropdown submenu. Use the direct child selector to ensure precision.\n",
+        "id": "# Hierarki: Child vs Descendant\n\nHalaman web adalah pohon. Elemen hidup di dalam elemen lain. Memahami cara menelusuri ke dalam sangat penting.\n\n## 1. The Descendant Selector (Spasi)\n`parent child`\nIni adalah pencarian \"samar\". Ini menemukan elemen yang bersarang dalam di mana saja di dalam parent.\n* `div p` cocok dengan paragraf di dalam div, bahkan jika itu berada 10 level di dalam.\n\n## 2. The Direct Child Selector (`>`)\n`parent > child`\nIni adalah pencarian \"ketat\". Ini hanya menemukan elemen yang merupakan **anak langsung** (*direct children*) (bersarang langsung).\n\n## Misi Kamu\nPilih hanya **item menu** tingkat atas di bilah navigasi.\n**Jangan** pilih item di dalam submenu dropdown. Gunakan *direct child selector* untuk memastikan presisi.\n"
+      },
+      "htmlContent": "<nav class=\"main-nav\">\n  <ul class=\"nav-menu\">\n    <!-- These are direct children -->\n    <li class=\"nav-item\">Home</li>\n    <li class=\"nav-item\">\n      Products\n      <!-- Nested Dropdown -->\n      <ul class=\"submenu\">\n        <li>Electronics (Do not select)</li>\n        <li>Books (Do not select)</li>\n      </ul>\n    </li>\n    <li class=\"nav-item\">Contact</li>\n  </ul>\n</nav>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": ".nav-menu > li",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": ".nav-menu > li",
+      "tags": [
+        "beginner",
+        "css",
+        "relationships",
+        "child"
+      ]
+    },
+    {
+      "slug": "css-sibling-selectors",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "css-basics",
+      "xpReward": 25,
+      "order": 6,
+      "title": {
+        "en": "Sibling Selectors",
+        "id": "Selector Saudara (Sibling)"
+      },
+      "description": {
+        "en": "Select elements based on what comes before them.",
+        "id": "Pilih elemen berdasarkan apa yang ada sebelumnya."
+      },
+      "instructions": {
+        "en": "# Sibling Relationships\n\nSometimes an element is hard to identify, but it lives **right next** to something easy to identify.\n\n## The Adjacent Sibling (`+`)\n`element + sibling`\nThis selects the element that comes **immediately after**.\n\n### Use Case\n\"I need the error message that appears right after the email input.\"\n-> `input[type=\"email\"] + .error-msg`\n\n## Your Mission\nSelect the **subtitle paragraph** that appears immediately after the main **Heading 1**.\n",
+        "id": "# Hubungan Saudara (Sibling)\n\nTerkadang sebuah elemen sulit diidentifikasi, tapi ia hidup **tepat di sebelah** sesuatu yang mudah diidentifikasi.\n\n## The Adjacent Sibling (`+`)\n`element + sibling`\nIni memilih elemen yang muncul **segera setelahnya**.\n\n### Kasus Penggunaan\n\"Saya butuh pesan error yang muncul tepat setelah input email.\"\n-> `input[type=\"email\"] + .error-msg`\n\n## Misi Kamu\nPilih **paragraf subtitel** yang muncul segera setelah **Heading 1** utama.\n"
+      },
+      "htmlContent": "<article class=\"blog-post\">\n  <h1 class=\"post-title\">The Future of Web Testing</h1>\n  \n  <!-- Target -->\n  <p class=\"subtitle\">Why selectors specificy matters more than ever.</p>\n  \n  <p class=\"content\">Web testing has evolved significantly...</p>\n</article>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "h1 + p",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "h1 + p",
+      "tags": [
+        "beginner",
+        "css",
+        "relationships",
+        "siblings"
+      ]
+    },
+    {
+      "slug": "css-family-drill",
+      "type": "CSS_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "css-basics",
+      "xpReward": 30,
+      "order": 7,
+      "title": {
+        "en": "Drill: Deep Nesting",
+        "id": "Latihan: Nesting Dalam"
+      },
+      "description": {
+        "en": "Drill down a specific path to distinguish identical elements.",
+        "id": "Telusuri jalur spesifik untuk membedakan elemen identik."
+      },
+      "instructions": {
+        "en": "# Precision through Pathing\n\nWhen a page has multiple identical components (like multiple \"Cards\"), you need to specify **which one** you are talking about by describing its ancestors.\n\n## The Scenario\nWe have a User Profile card and a Footer area. Both contain a `<span>`.\nYou need to select the span inside the **Profile Card content**.\n\n## Your Mission\nConstruct a \"path\" selector that walks down the tree:\n1. Start at the `.profile-card`\n2. Go into the `.card-content`\n3. Select the `span`\n\n`Card -> Content -> Span`\n",
+        "id": "# Presisi melalui Jalur (Pathing)\n\nKetika halaman memiliki banyak komponen identik (seperti banyak \"Kartu\"), kamu perlu menentukan **yang mana** yang kamu bicarakan dengan menjelaskan leluhurnya.\n\n## Skenario\nKami memiliki kartu Profil Pengguna dan area Footer. Keduanya berisi `<span>`.\nKamu perlu memilih span di dalam **konten Kartu Profil**.\n\n## Misi Kamu\nBuat *selector* jalur yang berjalan menuruni pohon:\n1. Mulai di `.profile-card`\n2. Masuk ke `.card-content`\n3. Pilih `span`\n\n`Card -> Content -> Span`\n"
+      },
+      "htmlContent": "<div class=\"layout\">\n  <div class=\"profile-card\">\n    <div class=\"card-header\">\n      <h3>User Profile</h3>\n    </div>\n    <div class=\"card-content\">\n      <!-- Target -->\n      <span>Premium Member</span>\n    </div>\n  </div>\n  \n  <div class=\"footer\">\n    <div class=\"footer-content\">\n      <span>Copyright 2024</span>\n    </div>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": ".profile-card .card-content span",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": ".profile-card .card-content span",
+      "tags": [
+        "beginner",
+        "css",
+        "relationships",
+        "drill"
+      ]
+    },
+    {
+      "slug": "css-navigation-boss",
+      "type": "CSS_SELECTOR",
+      "difficulty": "HARD",
+      "category": "css-basics",
+      "xpReward": 60,
+      "order": 8,
+      "title": {
+        "en": "Scenario: Nested Navigation",
+        "id": "Skenario: Navigasi Bersarang"
+      },
+      "description": {
+        "en": "Navigate a deeply nested menu structure to find a hidden link.",
+        "id": "Navigasi struktur menu yang bersarang dalam untuk menemukan tautan tersembunyi."
+      },
+      "instructions": {
+        "en": "# Scenario: Nested Navigation\n\nNavigations can be widely complex structures of nested lists. \n\n## The Scenario\nYou are automating a test for a user's account settings. You need to click the **\"Logout\"** button.\nHowever, the text \"Logout\" might change based on language settings, so you shouldn't rely on text. You should rely on its **structural location**.\n\n## Your Mission\nSelect the link (`a`) that lives inside the **Action Item** of the **Profile Dropdown**.\n\n## Structure Map\n1.  Top level item: `#user-menu`\n2.  Dropdown container: `.dropdown-list`\n3.  List item: `.action-item`\n4.  Link: `a`\n",
+        "id": "# Skenario: Navigasi Bersarang\n\nNavigasi bisa menjadi struktur daftar bersarang yang sangat kompleks.\n\n## Skenario\nKamu sedang mengotomatisasi tes untuk pengaturan akun pengguna. Kamu perlu mengklik tombol **\"Logout\"**.\nNamun, teks \"Logout\" mungkin berubah berdasarkan pengaturan bahasa, jadi kamu tidak boleh bergantung pada teks. Kamu harus bergantung pada **lokasi strukturalnya**.\n\n## Misi Kamu\nPilih tautan (`a`) yang hidup di dalam **Item Tindakan** dari **Dropdown Profil**.\n\n## Peta Struktur\n1.  Item level atas: `#user-menu`\n2.  Kontainer dropdown: `.dropdown-list`\n3.  Item daftar: `.action-item`\n4.  Tautan: `a`\n"
+      },
+      "htmlContent": "<nav class=\"navbar\">\n  <ul class=\"nav-root\">\n    <li>Home</li>\n    <li id=\"user-menu\">\n      My Account\n      <ul class=\"dropdown-list\">\n        <li>Settings</li>\n        <li>Billing</li>\n        <li class=\"action-item\">\n          <!-- Target -->\n          <a href=\"/logout\">Logout</a>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</nav>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "#user-menu .dropdown-list .action-item a",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "#user-menu .dropdown-list .action-item a",
+      "tags": [
+        "beginner",
+        "css",
+        "relationships",
+        "scenario"
+      ]
+    },
+    {
+      "slug": "css-attribute-selectors",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "css-basics",
+      "xpReward": 20,
+      "order": 9,
+      "title": {
+        "en": "Attribute Selectors",
+        "id": "Selector Atribut"
+      },
+      "description": {
+        "en": "Target elements by any HTML attribute for maximum robustness.",
+        "id": "Targetkan elemen berdasarkan atribut HTML apa pun untuk ketahanan maksimal."
+      },
+      "instructions": {
+        "en": "# The Power of Attributes\n\nClasses are for styling. IDs are for uniqueness. But sometimes, the most semantic way to find an element is by **what it does** or **what data it holds**.\n\nCSS allows you to select by *any* HTML attribute.\n\n## Common Patterns\n- **Input Types:** `[type=\"email\"]`, `[type=\"checkbox\"]`\n- **Test IDs:** `[data-testid=\"submit-btn\"]` (The gold standard for testing!)\n- **Links:** `[href=\"/home\"]`\n\n## Your Mission\nSelect the **email input**. Use its `type` attribute to distinguish it from the name input.\n",
+        "id": "# Kekuatan Atribut\n\nClass untuk gaya. ID untuk keunikan. Tapi terkadang, cara paling semantik untuk menemukan elemen adalah dengan **apa yang dilakukannya** atau **data apa yang dimilikinya**.\n\nCSS memungkinkan kamu memilih berdasarkan atribut HTML *apa pun*.\n\n## Pola Umum\n- **Tipe Input:** `[type=\"email\"]`, `[type=\"checkbox\"]`\n- **Test ID:** `[data-testid=\"submit-btn\"]` (Standar emas untuk pengujian!)\n- **Tautan:** `[href=\"/home\"]`\n\n## Misi Kamu\nPilih **input email**. Gunakan atribut `type`-nya untuk membedakannya dari input nama.\n"
+      },
+      "htmlContent": "<form class=\"contact-form\">\n  <div class=\"row\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"fullname\" />\n  </div>\n  <div class=\"row\">\n    <label>Email Address</label>\n    <input type=\"email\" name=\"email\" />\n  </div>\n  <button>Send</button>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "[type=\"email\"]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "[type=\"email\"]",
+      "tags": [
+        "beginner",
+        "css",
+        "attributes"
+      ]
+    },
+    {
+      "slug": "css-validation-states",
+      "type": "CSS_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "css-basics",
+      "xpReward": 30,
+      "order": 10,
+      "title": {
+        "en": "Form Validation States",
+        "id": "Status Validasi Formulir"
+      },
+      "description": {
+        "en": "Select elements based on their validity state (:invalid, :required).",
+        "id": "Pilih elemen berdasarkan status validitasnya (:invalid, :required)."
+      },
+      "instructions": {
+        "en": "# Testing Form Logic\n\nWhen testing forms, you often need to verify that validation is working. \"Does the form look red when I type a bad email?\"\n\nCSS provides pseudo-classes to detect these states dynamically.\n\n## Key State Selectors\n*   `:required` - The input *must* be filled out.\n*   `:invalid` - The current value is wrong (e.g., \"abc\" in an email field).\n*   `:valid` - The current value is correct.\n\n## Your Mission\nSelect the **email input** that is currently **invalid**. \n(In the background, we've pre-filled it with \"not-an-email\" to trigger this state.)\n",
+        "id": "# Menguji Logika Formulir\n\nSaat menguji formulir, kamu sering perlu memverifikasi bahwa validasi berfungsi. \"Apakah formulir terlihat merah saat saya mengetik email yang buruk?\"\n\nCSS menyediakan *pseudo-classes* untuk mendeteksi status ini secara dinamis.\n\n## Selector Status Kunci\n*   `:required` - Input *harus* diisi.\n*   `:invalid` - Nilai saat ini salah (misal, \"abc\" di kolom email).\n*   `:valid` - Nilai saat ini benar.\n\n## Misi Kamu\nPilih **input email** yang saat ini **tidak valid** (*invalid*).\n(Di latar belakang, kami telah mengisinya dengan \"not-an-email\" untuk memicu status ini.)\n"
+      },
+      "htmlContent": "<form class=\"login-form\">\n  <div class=\"form-group\">\n    <label>Email</label>\n    <input type=\"email\" value=\"not-an-email\" required /> <!-- This is invalid -->\n    <span class=\"error-text\">Please enter a valid email</span>\n  </div>\n  <div class=\"form-group\">\n    <label>Password</label>\n    <input type=\"password\" value=\"secret123\" required /> <!-- This is valid -->\n  </div>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "input:invalid",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "input:invalid",
+      "tags": [
+        "beginner",
+        "css",
+        "states",
+        "validation"
+      ]
+    },
+    {
+      "slug": "css-functional-pseudo",
+      "type": "CSS_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "css-basics",
+      "xpReward": 40,
+      "order": 11,
+      "title": {
+        "en": "Advanced Filtering (:not & :is)",
+        "id": "Penyaringan Lanjutan (:not & :is)"
+      },
+      "description": {
+        "en": "Power moves: Exclude elements or match groups.",
+        "id": "Langkah pro: Kecualikan elemen atau cocokkan grup."
+      },
+      "instructions": {
+        "en": "# Advanced Filtering\n\nModern CSS selectors give you logic gates. The most useful one for testing is **Negation**.\n\n## The `:not()` Selector\n\"Select everything that is X, but NOT Y.\"\n\n### Use Case\n\"Select all active user cards, but ignore the ones that are suspended.\"\n\n## Your Mission\nSelect the user card that has the class `.active`, but does **not** have the class `.suspended`.\n",
+        "id": "# Penyaringan Lanjutan\n\nSelector CSS modern memberimu gerbang logika. Yang paling berguna untuk pengujian adalah **Negasi**.\n\n## The `:not()` Selector\n\"Pilih semua yang X, tapi BUKAN Y.\"\n\n### Kasus Penggunaan\n\"Pilih semua kartu pengguna aktif, tapi abaikan yang ditangguhkan.\"\n\n## Misi Kamu\nPilih kartu pengguna yang memiliki class `.active`, tapi **tidak** memiliki class `.suspended`.\n"
+      },
+      "htmlContent": "<div class=\"user-list\">\n  <!-- This one is active AND suspended. Ignore it. -->\n  <div class=\"user-card active suspended\">\n    <h3>Bad Actor</h3>\n    <span class=\"badge\">Suspended</span>\n  </div>\n\n  <!-- This is your target. Active, healthy user. -->\n  <div class=\"user-card active\">\n    <h3>Good User</h3>\n    <span class=\"badge\">Active</span>\n  </div>\n\n  <div class=\"user-card inactive\">\n    <h3>Old User</h3>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": ".user-card.active:not(.suspended)",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": ".user-card.active:not(.suspended)",
+      "tags": [
+        "beginner",
+        "css",
+        "states",
+        "functional"
+      ]
+    },
+    {
+      "slug": "css-forms-boss",
+      "type": "CSS_SELECTOR",
+      "difficulty": "HARD",
+      "category": "css-basics",
+      "xpReward": 60,
+      "order": 12,
+      "title": {
+        "en": "Scenario: Dynamic Forms",
+        "id": "Skenario: Formulir Dinamis"
+      },
+      "description": {
+        "en": "Select a highly specific input based on what it is NOT.",
+        "id": "Pilih input yang sangat spesifik berdasarkan apa yang BUKAN."
+      },
+      "instructions": {
+        "en": "# Scenario: Dynamic Forms\n\nYou're testing a dynamic form where fields appear and disappear, or change states. You can't rely on simple classes. You need to select an element by its **properties**.\n\n## Your Mission\nSelect the **Phone Number** input.\n\n## Constraints\nTo ensure you have the right one, your selector must enforce these rules:\n1.  Type is **tel**.\n2.  It is **optional** (not required).\n3.  It is **enabled** (not disabled).\n4.  It is **not focused** (the user hasn't clicked it yet).\n\nSynthesize all your knowledge of attributes and pseudo-classes.\n",
+        "id": "# Skenario: Formulir Dinamis\n\nKamu sedang menguji formulir dinamis di mana kolom muncul dan menghilang, atau mengubah status. Kamu tidak bisa mengandalkan class sederhana. Kamu perlu memilih elemen berdasarkan **propertinya**.\n\n## Misi Kamu\nPilih input **Nomor Telepon**.\n\n## Kendala\nUntuk memastikan kamu punya yang benar, *selector*-mu harus menegakkan aturan ini:\n1. Tipe adalah **tel**.\n2. Itu **opsional** (tidak wajib).\n3. Itu **aktif** (tidak dinonaktifkan/disabled).\n4. Itu **tidak fokus** (pengguna belum mengkliknya).\n\nSintesiskan semua pengetahuanmu tentang atribut dan *pseudo-classes*.\n"
+      },
+      "htmlContent": "<form class=\"complex-form\">\n  <div class=\"row\">\n    <input type=\"text\" placeholder=\"Name\" required />\n  </div>\n  \n  <div class=\"row\">\n    <!-- Target -->\n    <input type=\"tel\" placeholder=\"Phone (Optional)\" />\n  </div>\n  \n  <div class=\"row\">\n    <input type=\"tel\" placeholder=\"Fax (Disabled)\" disabled />\n  </div>\n  \n  <div class=\"row\">\n    <input type=\"email\" placeholder=\"Email\" required class=\"focus\" />\n  </div>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "input[type=\"tel\"]:optional:not(:disabled)",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "input[type=\"tel\"]:optional:not(:disabled)",
+      "tags": [
+        "beginner",
+        "css",
+        "states",
+        "scenario"
+      ]
+    },
+    {
+      "slug": "css-nth-child",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "css-basics",
+      "xpReward": 20,
+      "order": 13,
+      "title": {
+        "en": "Position Indexing (Nth-Child)",
+        "id": "Pengindeksan Posisi (Nth-Child)"
+      },
+      "description": {
+        "en": "Select elements by their exact numerical position.",
+        "id": "Pilih elemen berdasarkan posisi numerik tepatnya."
+      },
+      "instructions": {
+        "en": "# Selecting by Index\n\nSometimes elements are identical (like a list of items), and the only way to distinguish them is **position**.\n\n## The `:nth-child(n)` Selector\nThis selects the element that is the **n-th child** of its parent.\n\n- `:nth-child(1)`: First item.\n- `:nth-child(3)`: Third item.\n- `:last-child`: The end of the list.\n\n## Your Mission\nSelect the **3rd** item in the feature list.\n",
+        "id": "# Memilih Berdasarkan Indeks\n\nTerkadang elemen identik (seperti daftar item), dan satu-satunya cara untuk membedakannya adalah **posisi**.\n\n## The `:nth-child(n)` Selector\nIni memilih elemen yang merupakan **anak ke-n** (*n-th child*) dari parent-nya.\n\n- `:nth-child(1)`: Item pertama.\n- `:nth-child(3)`: Item ketiga.\n- `:last-child`: Akhir daftar.\n\n## Misi Kamu\nPilih item **ke-3** dalam daftar fitur.\n"
+      },
+      "htmlContent": "<ul class=\"features\">\n  <li>Fast Performance</li>\n  <li>Secure by Default</li>\n  <!-- Target -->\n  <li>Cloud Sync</li>\n  <li>Offline Mode</li>\n</ul>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "li:nth-child(3)",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "li:nth-child(3)",
+      "tags": [
+        "beginner",
+        "css",
+        "structure"
+      ]
+    },
+    {
+      "slug": "css-nth-type-vs-child",
+      "type": "CSS_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "css-basics",
+      "xpReward": 30,
+      "order": 14,
+      "title": {
+        "en": "Nth-Type vs Nth-Child",
+        "id": "Nth-Type vs Nth-Child"
+      },
+      "description": {
+        "en": "Resolve the confusion between counting children and counting types.",
+        "id": "Selesaikan kebingungan antara menghitung anak dan menghitung tipe."
+      },
+      "instructions": {
+        "en": "# The \"Indices\" Trap\n\nOne of the most common mistakes in CSS selectors is confusing `:nth-child` with `:nth-of-type`.\n\n## The Difference\n*   **`:nth-child(2)`**: \"Am I the **2nd element overall** in this container?\"\n*   **`:nth-of-type(2)`**: \"Am I the **2nd element of my specific tag type**?\"\n\nIf you have a `<h1>` followed by two `<p>` tags:\n*   The first `<p>` is `nth-child(2)` (because h1 is #1).\n*   The first `<p>` is `nth-of-type(1)` (because it's the first paragraph).\n\n## Your Mission\nSelect the **second paragraph** in the article.\nNote that it is **not** the second child element!\n",
+        "id": "# Jebakan \"Indeks\"\n\nSalah satu kesalahan paling umum dalam selector CSS adalah membingungkan `:nth-child` dengan `:nth-of-type`.\n\n## Perbedaannya\n*   **`:nth-child(2)`**: \"Apakah saya **elemen ke-2 secara keseluruhan** dalam kontainer ini?\"\n*   **`:nth-of-type(2)`**: \"Apakah saya **elemen ke-2 dari tipe tag spesifik saya**?\"\n\nJika kamu memiliki `<h1>` diikuti oleh dua tag `<p>`:\n*   `<p>` pertama adalah `nth-child(2)` (karena h1 adalah #1).\n*   `<p>` pertama adalah `nth-of-type(1)` (karena itu paragraf pertama).\n\n## Misi Kamu\nPilih **paragraf kedua** dalam artikel.\nPerhatikan bahwa itu **bukan** elemen anak kedua!\n"
+      },
+      "htmlContent": "<article>\n  <h1>The News</h1>\n  <img src=\"banner.jpg\" />\n  \n  <p>Introductory paragraph.</p>\n  \n  <!-- Target -->\n  <p>The main details of the story.</p>\n  \n  <div class=\"ad\">Advertisement</div>\n</article>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "p:nth-of-type(2)",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "p:nth-of-type(2)",
+      "tags": [
+        "beginner",
+        "css",
+        "structure"
+      ]
+    },
+    {
+      "slug": "css-table-drill",
+      "type": "CSS_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "css-basics",
+      "xpReward": 35,
+      "order": 15,
+      "title": {
+        "en": "Table Cell Targeting",
+        "id": "Menargetkan Sel Tabel"
+      },
+      "description": {
+        "en": "Navigate table structure to select specific cells by row and column.",
+        "id": "Navigasi struktur tabel untuk memilih sel spesifik berdasarkan baris dan kolom."
+      },
+      "instructions": {
+        "en": "# Precision Table Navigation\n\nTables have a predictable structure: `table > tbody > tr > td`.\nEach row resets the child counter, so you can target specific cells.\n\n## The Pattern\n- **Row selection:** `tr:nth-child(n)` targets the nth row\n- **Column selection:** `td:nth-child(n)` targets the nth cell in a row\n- **Combined:** `tr:nth-child(2) > td:nth-child(3)` = Row 2, Column 3\n\n## Your Mission\nSelect the **Status** cell (3rd column) from the **2nd data row**.\n\n## Tip\nThe `tbody` contains only data rows. The header is in `thead`.\n",
+        "id": "# Navigasi Tabel Presisi\n\nTabel memiliki struktur yang dapat diprediksi: `table > tbody > tr > td`.\nSetiap baris mereset penghitung anak, jadi kamu bisa menargetkan sel spesifik.\n\n## Polanya\n- **Pilihan Baris:** `tr:nth-child(n)` menargetkan baris ke-n\n- **Pilihan Kolom:** `td:nth-child(n)` menargetkan sel ke-n dalam satu baris\n- **Gabungan:** `tr:nth-child(2) > td:nth-child(3)` = Baris 2, Kolom 3\n\n## Misi Kamu\nPilih sel **Status** (kolom ke-3) dari **baris data ke-2**.\n\n## Tip\n`tbody` hanya berisi baris data. Header ada di `thead`.\n"
+      },
+      "htmlContent": "<table class=\"user-table\">\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Email</th>\n      <th>Status</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Alice Johnson</td>\n      <td>alice@example.com</td>\n      <td>Active</td>\n    </tr>\n    <tr>\n      <td>Bob Smith</td>\n      <td>bob@example.com</td>\n      <!-- Target -->\n      <td>Pending</td>\n    </tr>\n    <tr>\n      <td>Carol White</td>\n      <td>carol@example.com</td>\n      <td>Active</td>\n    </tr>\n  </tbody>\n</table>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "tbody tr:nth-child(2) td:nth-child(3)",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "tbody tr:nth-child(2) td:nth-child(3)",
+      "tags": [
+        "beginner",
+        "css",
+        "structure",
+        "table",
+        "drill"
+      ]
+    },
+    {
+      "slug": "css-table-boss",
+      "type": "CSS_SELECTOR",
+      "difficulty": "HARD",
+      "category": "css-basics",
+      "xpReward": 70,
+      "order": 16,
+      "title": {
+        "en": "Scenario: Admin Grid",
+        "id": "Skenario: Grid Admin"
+      },
+      "description": {
+        "en": "Master advanced structural patterns in data tables.",
+        "id": "Kuasai pola struktural lanjutan dalam tabel data."
+      },
+      "instructions": {
+        "en": "# Scenario: Admin Grid\n\nData grids (tables) are common in admin panels. You often need to interact with a specific button in a specific row.\n\n## The Pattern\nWe have a table where every **Odd Row** (1, 3, 5...) is a \"Data Row\" that contains an **Edit Button**.\n(The even rows might be details or spacers).\n\n## Your Mission\nWrite a selector that targets the **Edit Button** in the **Last Column** of every **Odd Row**.\n\n## Breakdown\n1.  Target rows: `tr` that are odd.\n2.  Target cell: `td` that is the last one in that row.\n3.  Target content: The `button` inside that cell.\n",
+        "id": "# Skenario: Grid Admin\n\nGrid data (tabel) umum di panel admin. Kamu sering perlu berinteraksi dengan tombol spesifik di baris spesifik.\n\n## Polanya\nKita memiliki tabel di mana setiap **Baris Ganjil** (1, 3, 5...) adalah \"Baris Data\" yang berisi **Tombol Edit**.\n(Baris genap mungkin detail atau pemisah).\n\n## Misi Kamu\nTulis selector yang menargetkan **Tombol Edit** di **Kolom Terakhir** dari setiap **Baris Ganjil**.\n\n## Rincian\n1.  Targetkan baris: `tr` yang ganjil (*odd*).\n2.  Targetkan sel: `td` yang merupakan terakhir di baris itu.\n3.  Targetkan konten: `button` di dalam sel itu.\n"
+      },
+      "htmlContent": "<table class=\"data-grid\">\n  <tbody>\n    <!-- Row 1 (Odd) -->\n    <tr>\n      <td>User 1</td>\n      <td>2024-01-01</td>\n      <td class=\"actions\"><button>Edit</button></td>\n    </tr>\n    <!-- Row 2 (Even) -->\n    <tr class=\"spacer\">\n      <td colspan=\"3\">Details...</td>\n    </tr>\n    <!-- Row 3 (Odd) -->\n    <tr>\n      <td>User 2</td>\n      <td>2024-01-02</td>\n      <td class=\"actions\"><button>Edit</button></td>\n    </tr>\n  </tbody>\n</table>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "tr:nth-child(odd) td:last-child button",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "tr:nth-child(odd) td:last-child button",
+      "tags": [
+        "beginner",
+        "css",
+        "structure",
+        "scenario",
+        "table"
+      ]
+    },
+    {
+      "slug": "css-dynamic-elements",
+      "type": "CSS_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "css-basics",
+      "xpReward": 40,
+      "order": 17,
+      "title": {
+        "en": "Handling Dynamic Elements",
+        "id": "Menangani Elemen Dinamis"
+      },
+      "description": {
+        "en": "Select elements when IDs are unstable or random.",
+        "id": "Pilih elemen ketika ID tidak stabil atau acak."
+      },
+      "instructions": {
+        "en": "# Challenge: Unstable IDs\n\nModern React/Vue/Angular apps often generate random IDs like `#input-23423`. These change every time you reload the page. **You cannot rely on them.**\n\n## Strategy\nIf the ID is useless, use structure. \n\"I want the Delete button that lives inside the Second Item in the list.\"\n\n## Your Mission\nSelect the **Delete** button for the **Second List Item**.\nIgnore the ID tokens.\n",
+        "id": "# Tantangan: ID Tidak Stabil\n\nAplikasi modern React/Vue/Angular sering menghasilkan ID acak seperti `#input-23423`. Ini berubah setiap kali kamu memuat ulang halaman. **Kamu tidak bisa mengandalkan mereka.**\n\n## Strategi\nJika ID tidak berguna, gunakan struktur.\n\"Saya ingin tombol Hapus (Delete) yang hidup di dalam Item Kedua di daftar.\"\n\n## Misi Kamu\nPilih tombol **Delete** untuk **Item Daftar Kedua**.\nAbaikan token ID itu.\n"
+      },
+      "htmlContent": "<ul class=\"items\">\n  <li>\n    <span>Item A</span>\n    <button class=\"del\">Delete</button>\n  </li>\n  <li>\n    <span>Item B</span>\n    <!-- Target -->\n    <button class=\"del\">Delete</button>\n  </li>\n  <li>\n    <span>Item C</span>\n    <button class=\"del\">Delete</button>\n  </li>\n</ul>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "li:nth-child(2) .del",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "li:nth-child(2) .del",
+      "tags": [
+        "beginner",
+        "css",
+        "dynamic"
+      ]
+    },
+    {
+      "slug": "xpath-basics-101",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 10,
+      "order": 18,
+      "title": {
+        "en": "XPath Basics",
+        "id": "Dasar-Dasar XPath"
+      },
+      "description": {
+        "en": "Learn the fundamentals: absolute vs relative paths.",
+        "id": "Pelajari fundamental: absolute vs relative path."
+      },
+      "instructions": {
+        "en": "# XPath Basics\n\nXPath (XML Path Language) is a query language for selecting nodes from an HTML/XML document.\n\n## Absolute vs Relative XPath\n\n### Absolute XPath (`/`)\n- Starts from the **root element**\n- Begins with single slash: `/`\n- Example: `/html/body/div/button`\n- ⚠️ **Fragile** - breaks if structure changes\n\n### Relative XPath (`//`)\n- Starts from **anywhere** in the document\n- Begins with double slash: `//`\n- Example: `//button`\n- ✅ **Flexible** - more maintainable\n\n## Your Task\nSelect the **submit button** using a relative XPath.\n\n> **Best Practice:** Always prefer relative XPath for test automation!\n",
+        "id": "# Dasar-Dasar XPath\n\nXPath (XML Path Language) adalah bahasa kueri untuk memilih node dari dokumen HTML/XML.\n\n## Absolute vs Relative XPath\n\n### Absolute XPath (`/`)\n- Dimulai dari **root element**\n- Diawali dengan satu garis miring: `/`\n- Contoh: `/html/body/div/button`\n- ⚠️ **Rapuh** - rusak jika struktur berubah\n\n### Relative XPath (`//`)\n- Dimulai dari **mana saja** di dokumen\n- Diawali dengan garis miring ganda: `//`\n- Contoh: `//button`\n- ✅ **Fleksibel** - lebih mudah dikelola\n\n## Tugas Kamu\nPilih **tombol submit** menggunakan relative XPath.\n\n> **Best Practice:** Selalu utamakan relative XPath untuk test automation!\n"
+      },
+      "htmlContent": "<div class=\"contact-page\">\n  <h1>Contact Us</h1>\n  <form id=\"contact-form\">\n    <input type=\"text\" name=\"name\" placeholder=\"Your Name\" />\n    <input type=\"email\" name=\"email\" placeholder=\"Your Email\" />\n    <textarea name=\"message\" placeholder=\"Your Message\"></textarea>\n    <button type=\"submit\">Send Message</button>\n  </form>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//button",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//button",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "basics",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-attribute-matching",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 15,
+      "order": 19,
+      "title": {
+        "en": "Attribute Matching",
+        "id": "Pencocokan Atribut"
+      },
+      "description": {
+        "en": "Select elements using attribute conditions.",
+        "id": "Pilih elemen menggunakan kondisi atribut."
+      },
+      "instructions": {
+        "en": "# XPath Attribute Matching\n\nXPath uses `@` to reference attributes within predicates `[]`.\n\n## Syntax\n```xpath\n//element[@attribute=\"value\"]\n```\n\n## Examples\n```xpath\n//input[@type=\"email\"]       // Input with type=\"email\"\n//button[@id=\"submit\"]       // Button with specific ID\n//div[@class=\"container\"]    // Div with exact class\n//a[@href]                   // All links with href\n```\n\n## Your Task\nSelect the **password input** field using its type attribute.\n",
+        "id": "# Pencocokan Atribut XPath\n\nXPath menggunakan `@` untuk mereferensikan atribut di dalam predikat `[]`.\n\n## Sintaks\n```xpath\n//element[@attribute=\"value\"]\n```\n\n## Contoh\n```xpath\n//input[@type=\"email\"]       // Input dengan type=\"email\"\n//button[@id=\"submit\"]       // Tombol dengan ID spesifik\n//div[@class=\"container\"]    // Div dengan class exact\n//a[@href]                   // Semua link dengan href\n```\n\n## Tugas Kamu\nPilih kolom **input password** menggunakan atribut tipe-nya.\n"
+      },
+      "htmlContent": "<div class=\"login-container\">\n  <h2>Sign In</h2>\n  <form>\n    <div class=\"field\">\n      <input type=\"text\" name=\"username\" placeholder=\"Username\" />\n    </div>\n    <div class=\"field\">\n      <input type=\"password\" name=\"password\" placeholder=\"Password\" />\n    </div>\n    <div class=\"field\">\n      <input type=\"checkbox\" name=\"remember\" id=\"remember\" />\n      <label for=\"remember\">Remember me</label>\n    </div>\n    <button type=\"submit\">Login</button>\n  </form>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//input[@type=\"password\"]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//input[@type=\"password\"]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "attribute",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-text-content",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 20,
+      "order": 20,
+      "title": {
+        "en": "Text Content",
+        "id": "Konten Teks"
+      },
+      "description": {
+        "en": "Select elements by their text content.",
+        "id": "Pilih elemen berdasarkan konten teksnya."
+      },
+      "instructions": {
+        "en": "# XPath Text Content\n\nXPath can select elements based on their text content using `text()`.\n\n## Syntax Options\n| Function | Description |\n|----------|-------------|\n| `text()=\"exact\"` | Exact text match |\n| `contains(text(), \"partial\")` | Contains text |\n| `normalize-space()=\"text\"` | Ignores extra whitespace |\n\n## Examples\n```xpath\n//button[text()=\"Submit\"]           // Exact match\n//a[text()=\"Learn More\"]            // Link with exact text\n//span[contains(text(), \"Price\")]   // Contains \"Price\"\n```\n\n## Your Task\nSelect the **\"Add to Cart\"** button using its text.\n",
+        "id": "# Konten Teks XPath\n\nXPath bisa memilih elemen berdasarkan konten teksnya menggunakan `text()`.\n\n## Opsi Sintaks\n| Fungsi | Deskripsi |\n|----------|-------------|\n| `text()=\"exact\"` | Cocok persis (Exact text match) |\n| `contains(text(), \"partial\")` | Mengandung teks (Contains) |\n| `normalize-space()=\"text\"` | Mengabaikan spasi ekstra |\n\n## Contoh\n```xpath\n//button[text()=\"Submit\"]           // Cocok persis\n//a[text()=\"Learn More\"]            // Link dengan teks persis\n//span[contains(text(), \"Price\")]   // Mengandung \"Price\"\n```\n\n## Tugas Kamu\nPilih tombol **\"Add to Cart\"** menggunakan teksnya.\n"
+      },
+      "htmlContent": "<div class=\"product-card\">\n  <img src=\"/product.jpg\" alt=\"Wireless Headphones\" />\n  <h3>Wireless Headphones</h3>\n  <p class=\"price\">$99.99</p>\n  <div class=\"actions\">\n    <button class=\"btn outline\">View Details</button>\n    <button class=\"btn primary\">Add to Cart</button>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//button[text()=\"Add to Cart\"]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//button[text()=\"Add to Cart\"]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "text",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-contains-starts-with",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 25,
+      "order": 21,
+      "title": {
+        "en": "Contains & Starts-with",
+        "id": "Contains & Starts-with"
+      },
+      "description": {
+        "en": "Use partial matching for flexible selections.",
+        "id": "Gunakan pencocokan parsial untuk seleksi fleksibel."
+      },
+      "instructions": {
+        "en": "# Contains & Starts-with\n\nWhen exact matching is too rigid, use partial match functions.\n\n## Functions\n| Function | Description |\n|----------|-------------|\n| `contains(@attr, \"value\")` | Attribute contains value |\n| `starts-with(@attr, \"value\")` | Attribute starts with |\n| `contains(text(), \"text\")` | Text contains |\n\n## Examples\n```xpath\n//div[contains(@class, \"card\")]      // Class contains \"card\"\n//input[starts-with(@id, \"user\")]    // ID starts with \"user\"\n//button[contains(text(), \"Save\")]   // Text contains \"Save\"\n```\n\n## When to Use\n- **Dynamic classes** with changing suffixes\n- **Generated IDs** with stable prefixes\n- **Partial text** matching\n\n## Your Task\nSelect the **error message** div (has a class containing \"error\").\n",
+        "id": "# Contains & Starts-with\n\nKetika pencocokan persis terlalu kaku, gunakan fungsi pencocokan parsial.\n\n## Fungsi\n| Fungsi | Deskripsi |\n|----------|-------------|\n| `contains(@attr, \"value\")` | Atribut mengandung nilai |\n| `starts-with(@attr, \"value\")` | Atribut dimulai dengan |\n| `contains(text(), \"text\")` | Teks mengandung |\n\n## Contoh\n```xpath\n//div[contains(@class, \"card\")]      // Class mengandung \"card\"\n//input[starts-with(@id, \"user\")]    // ID dimulai dengan \"user\"\n//button[contains(text(), \"Save\")]   // Teks mengandung \"Save\"\n```\n\n## Kapan Digunakan\n- **Dynamic classes** dengan akhiran yang berubah-ubah\n- **Generated IDs** dengan awalan stabil\n- **Partial text** matching\n\n## Tugas Kamu\nPilih div **error message** (punya class mengandung \"error\").\n"
+      },
+      "htmlContent": "<form class=\"registration-form\">\n  <div class=\"form-group\">\n    <input type=\"email\" class=\"input\" placeholder=\"Email\" />\n    <div class=\"message error-message\">Please enter a valid email address</div>\n  </div>\n  <div class=\"form-group\">\n    <input type=\"password\" class=\"input\" placeholder=\"Password\" />\n    <div class=\"message hint-message\">Password must be at least 8 characters</div>\n  </div>\n  <div class=\"form-group\">\n    <input type=\"password\" class=\"input\" placeholder=\"Confirm Password\" />\n    <div class=\"message success-message\">Passwords match!</div>\n  </div>\n  <button type=\"submit\">Register</button>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//div[contains(@class, \"error\")]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//div[contains(@class, \"error\")]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "contains",
+        "starts-with",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-fundamentals-boss",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "HARD",
+      "category": "xpath-basics",
+      "xpReward": 55,
+      "order": 22,
+      "title": {
+        "en": "Scenario: Legacy Login",
+        "id": "Skenario: Login Legacy"
+      },
+      "description": {
+        "en": "Combine all fundamental XPath skills to locate elements in a legacy app.",
+        "id": "Gabungkan semua skill dasar XPath untuk menemukan elemen di aplikasi legacy."
+      },
+      "instructions": {
+        "en": "# Scenario: Legacy Login Form\n\nYou're automating tests for a legacy application. The HTML is messy:\n- IDs are dynamically generated (useless!)\n- Classes are generic and reused everywhere\n- But the **text content** is stable\n\n## The Challenge\nFind the **\"Sign In\"** button. It's buried in the form, and there are multiple buttons on the page.\n\n## What You Know\n1. The button contains the text \"Sign In\"\n2. It's inside a form with class containing \"login\"\n3. There's also a \"Sign Up\" button elsewhere (don't select that!)\n\n## Your Mission\nWrite an XPath that finds the exact \"Sign In\" button inside the login form.\n\n> **Tip:** Combine `contains()` for the class AND `text()` for the button text!\n",
+        "id": "# Skenario: Formulir Login Legacy\n\nKamu mengotomatisasi tes untuk aplikasi legacy. HTML-nya berantakan:\n- ID di-generate secara dinamis (tidak berguna!)\n- Class bersifat umum dan dipakai di mana-mana\n- Tapi **konten teks** stabil\n\n## Tantangan\nTemukan tombol **\"Sign In\"**. Tombol itu terkubur di dalam form, dan ada banyak tombol lain di halaman.\n\n## Apa yang Kamu Tahu\n1. Tombol mengandung teks \"Sign In\"\n2. Tombol berada di dalam form dengan class mengandung \"login\"\n3. Ada juga tombol \"Sign Up\" di tempat lain (jangan pilih itu!)\n\n## Misi Kamu\nTulis XPath yang menemukan tombol \"Sign In\" yang tepat di dalam form login.\n\n> **Tip:** Gabungkan `contains()` untuk class DAN `text()` untuk teks tombol!\n"
+      },
+      "htmlContent": "<div class=\"page-wrapper\">\n  <header>\n    <nav class=\"main-nav\">\n      <button id=\"nav-btn-12345\" class=\"btn nav-btn\">Menu</button>\n      <button id=\"nav-btn-67890\" class=\"btn nav-btn\">Sign Up</button>\n    </nav>\n  </header>\n  \n  <main class=\"content\">\n    <form id=\"form-abc123\" class=\"form login-form\">\n      <h2>Welcome Back</h2>\n      <div class=\"field\">\n        <input type=\"email\" id=\"input-xyz789\" class=\"input\" placeholder=\"Email\" />\n      </div>\n      <div class=\"field\">\n        <input type=\"password\" id=\"input-xyz790\" class=\"input\" placeholder=\"Password\" />\n      </div>\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn secondary\">Forgot Password</button>\n        <button type=\"submit\" class=\"btn primary\">Sign In</button>\n      </div>\n    </form>\n  </main>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//form[contains(@class, \"login\")]//button[text()=\"Sign In\"]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//form[contains(@class, \"login\")]//button[text()=\"Sign In\"]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "scenario",
+        "fundamentals"
+      ]
+    },
+    {
+      "slug": "xpath-parent-ancestor",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 30,
+      "order": 23,
+      "title": {
+        "en": "Parent/Ancestor",
+        "id": "Parent/Ancestor"
+      },
+      "description": {
+        "en": "Navigate UP the DOM tree.",
+        "id": "Navigasi ke ATAS pohon DOM."
+      },
+      "instructions": {
+        "en": "# Parent & Ancestor Axes\n\nXPath can navigate UP the DOM tree - something CSS cannot do!\n\n## Axes\n| Axis | Description |\n|------|-------------|\n| `parent::` | Direct parent |\n| `ancestor::` | All ancestors |\n| `..` | Shorthand for parent |\n\n## Examples\n```xpath\n//input[@id=\"email\"]/parent::div     // Parent div of input\n//span[@class=\"error\"]/ancestor::form // Form containing error\n//button/..                           // Parent of button\n```\n\n## Why This Matters\n- Find the **row** containing an error\n- Get the **form** from child input\n- Navigate from **known element** to related container\n\n## Your Task  \nFind the **list item (li)** that contains the \"Settings\" link.\n",
+        "id": "# Sumbu (Axes) Parent & Ancestor\n\nXPath dapat menavigasi ke ATAS pohon DOM - sesuatu yang tidak bisa dilakukan CSS!\n\n## Axes\n| Sumbu (Axis) | Deskripsi |\n|------|-------------|\n| `parent::` | Orang tua langsung |\n| `ancestor::` | Semua leluhur |\n| `..` | Singkatan untuk parent |\n\n## Contoh\n```xpath\n//input[@id=\"email\"]/parent::div     // Parent div dari input\n//span[@class=\"error\"]/ancestor::form // Form yang berisi error\n//button/..                           // Parent dari button\n```\n\n## Mengapa Ini Penting\n- Menemukan **baris** (row) yang berisi error\n- Mengambil **form** dari input anak\n- Navigasi dari **elemen yang diketahui** ke kontainer terkait\n\n## Tugas Kamu\nTemukan **item daftar (li)** yang berisi tautan \"Settings\".\n"
+      },
+      "htmlContent": "<nav class=\"sidebar\">\n  <ul class=\"menu\">\n    <li class=\"menu-item\">\n      <a href=\"/dashboard\">Dashboard</a>\n    </li>\n    <li class=\"menu-item\">\n      <a href=\"/profile\">Profile</a>\n    </li>\n    <li class=\"menu-item active\">\n      <a href=\"/settings\">Settings</a>\n    </li>\n    <li class=\"menu-item\">\n      <a href=\"/logout\">Logout</a>\n    </li>\n  </ul>\n</nav>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//a[text()=\"Settings\"]/parent::li",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//a[text()=\"Settings\"]/parent::li",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "parent",
+        "ancestor",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-following-sibling",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 35,
+      "order": 24,
+      "title": {
+        "en": "Following-sibling",
+        "id": "Following-sibling"
+      },
+      "description": {
+        "en": "Navigate to elements that come after.",
+        "id": "Navigasi ke elemen yang muncul setelahnya."
+      },
+      "instructions": {
+        "en": "# Following-sibling Axis\n\nNavigate to siblings that come AFTER the current element.\n\n## Axes\n| Axis | Description |\n|------|-------------|\n| `following-sibling::` | All following siblings |\n| `preceding-sibling::` | All preceding siblings |\n\n## Examples\n```xpath\n// label[text()=\"Email\"]/following-sibling::input\n//h2/following-sibling::p[1]           // First p after h2\n//dt[text()=\"Price\"]/following-sibling::dd\n```\n\n## Use Cases\n- Find the **input** for a specific **label**\n- Get the **value** next to a **label** in definition lists\n- Navigate in **forms** with label-input pairs\n\n## Your Task\nSelect the **input** field that follows the \"Username\" label.\n",
+        "id": "# Sumbu (Axis) Following-sibling\n\nNavigasi ke saudara (*siblings*) yang muncul SETELAH elemen saat ini.\n\n## Axes\n| Sumbu (Axis) | Deskripsi |\n|------|-------------|\n| `following-sibling::` | Semua saudara setelahnya |\n| `preceding-sibling::` | Semua saudara sebelumnya |\n\n## Contoh\n```xpath\n//label[text()=\"Email\"]/following-sibling::input\n//h2/following-sibling::p[1]           // p pertama setelah h2\n//dt[text()=\"Price\"]/following-sibling::dd\n```\n\n## Kasus Penggunaan\n- Menemukan **input** untuk **label** spesifik\n- Mengambil **nilai** di sebelah **label** dalam daftar definisi\n- Navigasi dalam **formulir** dengan pasangan label-input\n\n## Tugas Kamu\nPilih kolom **input** yang mengikuti label \"Username\".\n"
+      },
+      "htmlContent": "<form class=\"user-form\">\n  <div class=\"field-row\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"fullname\" placeholder=\"John Doe\" />\n  </div>\n  <div class=\"field-row\">\n    <label>Username</label>\n    <input type=\"text\" name=\"username\" placeholder=\"johndoe\" />\n  </div>\n  <div class=\"field-row\">\n    <label>Phone</label>\n    <input type=\"tel\" name=\"phone\" placeholder=\"+1 234 567 890\" />\n  </div>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//label[text()=\"Username\"]/following-sibling::input",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//label[text()=\"Username\"]/following-sibling::input",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "following-sibling",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-preceding-sibling",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 35,
+      "order": 25,
+      "title": {
+        "en": "Preceding-sibling",
+        "id": "Preceding-sibling"
+      },
+      "description": {
+        "en": "Navigate to elements that come before.",
+        "id": "Navigasi ke elemen yang muncul sebelumnya."
+      },
+      "instructions": {
+        "en": "# Preceding-sibling Axis\n\nNavigate to siblings that come BEFORE the current element.\n\n## The Reverse Direction\n| Axis | Description |\n|------|-------------|\n| `following-sibling::` | Elements AFTER |\n| `preceding-sibling::` | Elements BEFORE |\n\n## Use Cases\n- Find the **label** for a specific **error message**\n- Get the **header** above a content section\n- Navigate BACKWARDS from a known element\n\n## Examples\n```xpath\n//span[@class=\"error\"]/preceding-sibling::label\n//div[@class=\"content\"]/preceding-sibling::h2\n```\n\n## Your Task\nAn error message appeared! Find the **label** that comes before the error message.\n",
+        "id": "# Sumbu (Axis) Preceding-sibling\n\nNavigasi ke saudara (*siblings*) yang muncul SEBELUM elemen saat ini.\n\n## Arah Sebaliknya\n| Sumbu (Axis) | Deskripsi |\n|------|-------------|\n| `following-sibling::` | Elemen SETELAHNYA |\n| `preceding-sibling::` | Elemen SEBELUMNYA |\n\n## Kasus Penggunaan\n- Menemukan **label** untuk **pesan error** spesifik\n- Mengambil **header** di atas bagian konten\n- Navigasi MUNDUR dari elemen yang diketahui\n\n## Contoh\n```xpath\n//span[@class=\"error\"]/preceding-sibling::label\n//div[@class=\"content\"]/preceding-sibling::h2\n```\n\n## Tugas Kamu\nSebuah pesan error muncul! Temukan **label** yang muncul sebelum pesan error tersebut.\n"
+      },
+      "htmlContent": "<form class=\"registration-form\">\n  <div class=\"field-group\">\n    <label>Email Address</label>\n    <input type=\"email\" name=\"email\" />\n    <span class=\"hint\">We'll never share your email</span>\n  </div>\n  <div class=\"field-group\">\n    <label>Password</label>\n    <input type=\"password\" name=\"password\" />\n    <span class=\"error\">Password must be at least 8 characters</span>\n  </div>\n  <div class=\"field-group\">\n    <label>Confirm Password</label>\n    <input type=\"password\" name=\"confirm\" />\n  </div>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//span[@class=\"error\"]/preceding-sibling::label",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//span[@class=\"error\"]/preceding-sibling::label",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "preceding-sibling",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-traversal-boss",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "HARD",
+      "category": "xpath-basics",
+      "xpReward": 60,
+      "order": 26,
+      "title": {
+        "en": "Scenario: Error Recovery",
+        "id": "Skenario: Pemulihan Error"
+      },
+      "description": {
+        "en": "Navigate from an error to fix the input that caused it.",
+        "id": "Navigasi dari error untuk memperbaiki input yang menyebabkannya."
+      },
+      "instructions": {
+        "en": "# Scenario: Error Recovery\n\nYou're building an error handler. When a validation error appears, you need to focus the input that caused it.\n\n## The Challenge\nThe page shows an error message: **\"Invalid email format\"**\n\nYour task: Find the **input field** that is associated with this error.\n\n## Navigation Strategy\n1. Find the error message by its text\n2. Navigate UP to the parent container\n3. Find the INPUT within that container\n\n## Your Mission\nSelect the **input** element that belongs to the field showing \"Invalid email format\".\n\n> **Hint:** Combine `ancestor::` and descendant navigation!\n",
+        "id": "# Skenario: Pemulihan Error\n\nKamu sedang membangun penangan error. Ketika kesalahan validasi muncul, kamu perlu memfokuskan input yang menyebabkannya.\n\n## Tantangan\nHalaman menunjukkan pesan error: **\"Invalid email format\"**\n\nTugasmu: Temukan **kolom input** yang terkait dengan error ini.\n\n## Strategi Navigasi\n1. Temukan pesan error berdasarkan teksnya\n2. Navigasi ke ATAS ke kontainer parent\n3. Temukan INPUT di dalam kontainer tersebut\n\n## Misi Kamu\nPilih elemen **input** yang termasuk dalam kolom yang menunjukkan \"Invalid email format\".\n\n> **Petunjuk:** Gabungkan `ancestor::` dan navigasi *descendant*!\n"
+      },
+      "htmlContent": "<form class=\"checkout-form\">\n  <div class=\"form-field\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"name\" value=\"John Doe\" />\n    <span class=\"validation valid\">✓ Looks good</span>\n  </div>\n  <div class=\"form-field has-error\">\n    <label>Email</label>\n    <input type=\"email\" name=\"email\" value=\"invalid-email\" />\n    <span class=\"validation error\">Invalid email format</span>\n  </div>\n  <div class=\"form-field\">\n    <label>Phone</label>\n    <input type=\"tel\" name=\"phone\" value=\"+1234567890\" />\n    <span class=\"validation valid\">✓ Valid number</span>\n  </div>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//span[text()=\"Invalid email format\"]/ancestor::div//input",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//span[text()=\"Invalid email format\"]/ancestor::div//input",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "ancestor",
+        "traversal",
+        "scenario"
+      ]
+    },
+    {
+      "slug": "xpath-multiple-conditions",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 35,
+      "order": 27,
+      "title": {
+        "en": "Multiple Conditions",
+        "id": "Beberapa Kondisi"
+      },
+      "description": {
+        "en": "Combine conditions with and/or operators.",
+        "id": "Gabungkan kondisi dengan operator and/or."
+      },
+      "instructions": {
+        "en": "# Multiple Conditions\n\nCombine multiple conditions using logical operators.\n\n## Operators\n| Operator | Description |\n|----------|-------------|\n| `and` | Both conditions must be true |\n| `or` | Either condition can be true |\n| `not()` | Negates the condition |\n\n## Examples\n```xpath\n//input[@type=\"text\" and @required]\n//button[@disabled or @aria-disabled=\"true\"]\n//input[not(@disabled)]\n//div[@class=\"alert\" and contains(text(), \"error\")]\n```\n\n## Your Task\nSelect the button that is both **type=\"submit\"** AND has the **\"primary\"** class.\n",
+        "id": "# Beberapa Kondisi (Multiple Conditions)\n\nGabungkan beberapa kondisi menggunakan operator logika.\n\n## Operator\n| Operator | Deskripsi |\n|----------|-------------|\n| `and` | Kedua kondisi harus benar |\n| `or` | Salah satu kondisi bisa benar |\n| `not()` | Menegasikan kondisi |\n\n## Contoh\n```xpath\n//input[@type=\"text\" and @required]\n//button[@disabled or @aria-disabled=\"true\"]\n//input[not(@disabled)]\n//div[@class=\"alert\" and contains(text(), \"error\")]\n```\n\n## Tugas Kamu\nPilih tombol yang merupakan **type=\"submit\"** DAN memiliki class **\"primary\"**.\n"
+      },
+      "htmlContent": "<div class=\"dialog\">\n  <h2>Confirm Action</h2>\n  <p>Are you sure you want to proceed?</p>\n  <div class=\"dialog-actions\">\n    <button type=\"button\" class=\"btn secondary\">Cancel</button>\n    <button type=\"button\" class=\"btn danger\">Delete</button>\n    <button type=\"submit\" class=\"btn primary\">Confirm</button>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//button[@type=\"submit\" and contains(@class, \"primary\")]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//button[@type=\"submit\" and contains(@class, \"primary\")]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "and",
+        "or",
+        "conditions",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-position-indexing",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 40,
+      "order": 28,
+      "title": {
+        "en": "Position & Indexing",
+        "id": "Posisi & Pengindeksan"
+      },
+      "description": {
+        "en": "Select elements by their position.",
+        "id": "Pilih elemen berdasarkan posisinya."
+      },
+      "instructions": {
+        "en": "# Position & Indexing\n\nXPath uses 1-based indexing to select elements by position.\n\n## Position Functions\n| Syntax | Description |\n|--------|-------------|\n| `[1]` | First element |\n| `[last()]` | Last element |\n| `[position()=2]` | Second element |\n| `[position()>1]` | All except first |\n| `[position()<4]` | First three |\n\n## Examples\n```xpath\n//ul/li[1]              // First list item\n//table/tr[last()]      // Last table row  \n//div[@class=\"item\"][2] // Second matching div\n(//button)[3]           // Third button on page\n```\n\n## ⚠️ Important Note\n- `//div[1]` = First div **within each parent**\n- `(//div)[1]` = First div **on the entire page**\n\n## Your Task\nSelect the **last item** in the navigation menu.\n",
+        "id": "# Posisi & Pengindeksan\n\nXPath menggunakan pengindeksan berbasis 1 (1-based indexing) untuk memilih elemen berdasarkan posisi.\n\n## Fungsi Posisi\n| Sintaks | Deskripsi |\n|--------|-------------|\n| `[1]` | Elemen pertama |\n| `[last()]` | Elemen terakhir |\n| `[position()=2]` | Elemen kedua |\n| `[position()>1]` | Semua kecuali yang pertama |\n| `[position()<4]` | Tiga pertama |\n\n## Contoh\n```xpath\n//ul/li[1]              // Item daftar pertama\n//table/tr[last()]      // Baris tabel terakhir\n//div[@class=\"item\"][2] // Div kedua yang cocok\n(//button)[3]           // Tombol ketiga di halaman\n```\n\n## ⚠️ Catatan Penting\n- `//div[1]` = Div pertama **di dalam setiap parent**\n- `(//div)[1]` = Div pertama **di seluruh halaman**\n\n## Tugas Kamu\nPilih **item terakhir** dalam menu navigasi.\n"
+      },
+      "htmlContent": "<nav class=\"top-nav\">\n  <ul class=\"nav-list\">\n    <li><a href=\"/\">Home</a></li>\n    <li><a href=\"/products\">Products</a></li>\n    <li><a href=\"/services\">Services</a></li>\n    <li><a href=\"/about\">About</a></li>\n    <li><a href=\"/contact\">Contact</a></li>\n  </ul>\n</nav>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//ul/li[last()]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//ul/li[last()]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "position",
+        "indexing",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-normalize-space",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 45,
+      "order": 29,
+      "title": {
+        "en": "Normalize-space",
+        "id": "Normalize-space"
+      },
+      "description": {
+        "en": "Handle whitespace in text content.",
+        "id": "Tangani spasi putih (whitespace) dalam konten teks."
+      },
+      "instructions": {
+        "en": "# Normalize-space\n\nReal HTML often has inconsistent whitespace. `normalize-space()` handles this.\n\n## What It Does\n- Strips leading/trailing whitespace\n- Collapses multiple spaces to single space\n\n## Examples\n```html\n<button>  Submit   Form  </button>\n```\n\n```xpath\n// Won't match:\n//button[text()=\"Submit Form\"]\n\n// Will match:\n//button[normalize-space()=\"Submit Form\"]\n```\n\n## Common Uses\n```xpath\n//button[normalize-space()=\"Submit\"]\n//span[normalize-space(text())=\"Hello World\"]\n//*[normalize-space()=\"Search\"]\n```\n\n## Your Task\nSelect the button with text \"   Save Changes   \" (has extra whitespace).\n",
+        "id": "# Normalize-space\n\nHTML asli seringkali memiliki spasi putih (*whitespace*) yang tidak konsisten. `normalize-space()` menangani hal ini.\n\n## Apa yang Dilakukannya\n- Menghapus spasi di awal/akhir\n- Menggabungkan beberapa spasi menjadi spasi tunggal\n\n## Contoh\n```html\n<button>  Submit   Form  </button>\n```\n\n```xpath\n// Tidak akan cocok:\n//button[text()=\"Submit Form\"]\n\n// Akan cocok:\n//button[normalize-space()=\"Submit Form\"]\n```\n\n## Penggunaan Umum\n```xpath\n//button[normalize-space()=\"Submit\"]\n//span[normalize-space(text())=\"Hello World\"]\n//*[normalize-space()=\"Search\"]\n```\n\n## Tugas Kamu\nPilih tombol dengan teks \"   Save Changes   \" (yang memiliki spasi ekstra).\n"
+      },
+      "htmlContent": "<div class=\"form-actions\">\n  <button type=\"button\" class=\"btn\">\n    Cancel\n  </button>\n  <button type=\"button\" class=\"btn secondary\">\n    Save Draft\n  </button>\n  <button type=\"submit\" class=\"btn primary\">\n    Save Changes\n  </button>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//button[normalize-space()=\"Save Changes\"]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//button[normalize-space()=\"Save Changes\"]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "normalize-space",
+        "whitespace",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-complex-table",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "xpath-basics",
+      "xpReward": 50,
+      "order": 30,
+      "title": {
+        "en": "Complex XPath: Tables",
+        "id": "XPath Kompleks: Tabel"
+      },
+      "description": {
+        "en": "Navigate complex table structures.",
+        "id": "Navigasi struktur tabel yang kompleks."
+      },
+      "instructions": {
+        "en": "# Complex XPath: Tables\n\nTables are common in web apps. Let's master navigating them!\n\n## Table Structure\n```html\n<table>\n  <thead>\n    <tr><th>Header</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Data</td></tr>\n  </tbody>\n</table>\n```\n\n## Common Patterns\n```xpath\n// Cell by row and column\n//table//tr[2]/td[3]\n\n// Row containing specific text\n//tr[td[text()=\"John\"]]\n\n// Cell in same row as another cell\n//td[text()=\"John\"]/following-sibling::td[1]\n```\n\n## Your Task\nSelect the **status cell** for the order with ID \"ORD-002\".\n\n> **Hint:** First find the row with that order ID, then get the status column.\n",
+        "id": "# XPath Kompleks: Tabel\n\nTabel umum ditemukan di aplikasi web. Mari kuasai cara menavigasinya!\n\n## Struktur Tabel\n```html\n<table>\n  <thead>\n    <tr><th>Header</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Data</td></tr>\n  </tbody>\n</table>\n```\n\n## Pola Umum\n```xpath\n// Sel berdasarkan baris dan kolom\n//table//tr[2]/td[3]\n\n// Baris yang berisi teks spesifik\n//tr[td[text()=\"John\"]]\n\n// Sel di baris yang sama dengan sel lain\n//td[text()=\"John\"]/following-sibling::td[1]\n```\n\n## Tugas Kamu\nPilih **sel status** (status cell) untuk pesanan dengan ID \"ORD-002\".\n\n> **Petunjuk:** Pertama temukan baris dengan ID pesanan tersebut, lalu ambil kolom status.\n"
+      },
+      "htmlContent": "<table class=\"orders-table\">\n  <thead>\n    <tr>\n      <th>Order ID</th>\n      <th>Customer</th>\n      <th>Amount</th>\n      <th>Status</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>ORD-001</td>\n      <td>Alice Johnson</td>\n      <td>$150.00</td>\n      <td class=\"status shipped\">Shipped</td>\n    </tr>\n    <tr>\n      <td>ORD-002</td>\n      <td>Bob Smith</td>\n      <td>$89.99</td>\n      <td class=\"status pending\">Pending</td>\n    </tr>\n    <tr>\n      <td>ORD-003</td>\n      <td>Carol White</td>\n      <td>$220.50</td>\n      <td class=\"status delivered\">Delivered</td>\n    </tr>\n  </tbody>\n</table>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//tr[td[text()=\"ORD-002\"]]/td[4]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//tr[td[text()=\"ORD-002\"]]/td[4]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "table",
+        "complex",
+        "basic"
+      ]
+    },
+    {
+      "slug": "xpath-axes-master",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "MEDIUM",
+      "category": "xpath-advanced",
+      "xpReward": 65,
+      "order": 31,
+      "title": {
+        "en": "Axes Master",
+        "id": "Axes Master"
+      },
+      "description": {
+        "en": "Navigate freely with preceding and following axes.",
+        "id": "Navigasi dengan bebas menggunakan sumbu preceding dan following."
+      },
+      "instructions": {
+        "en": "# XPath Axes: Preceding & Following\n\nStandard navigation usually goes DOWN (child) or SIDEWAYS (siblings).\nAxes let you jump comfortably anywhere in the document flow.\n\n## The \"Everything Else\" Axes\n| Axis | Description |\n|---|---|\n| `following::` | EVERYTHING after the closing tag of current node |\n| `preceding::` | EVERYTHING before the opening tag of current node |\n\nThese differ from `following-sibling::` because they **ignore nesting**. They just scroll down (or up) the HTML source code.\n\n## Scenario\nYou found a User Header (\"Alice\") and need to click the \"Edit\" button that appears physically after it in a completely different container.\n\n```xpath\n//h3[text()=\"Alice\"]/following::button[1]\n```\nThis grabs the *very next button* in the DOM after Alice's header, regardless of <div> nesting.\n\n## Your Task\nFind the **\"Edit\" button** that appears after \"Product A\".\n\n> **Warning:** Don't confuse with `following-sibling`. The button is NOT a sibling, it's in a different container!\n",
+        "id": "# Sumbu (Axes) XPath: Preceding & Following\n\nNavigasi standar biasanya berjalan ke BAWAH (*child*) atau ke SAMPING (*siblings*).\nSumbu (*Axes*) memungkinkan kamu melompat dengan nyaman ke mana saja dalam alur dokumen.\n\n## Sumbu \"Segala Sesuatu Lainnya\"\n| Sumbu (Axis) | Deskripsi |\n|---|---|\n| `following::` | SEGALA SESUATU setelah tag penutup node saat ini |\n| `preceding::` | SEGALA SESUATU sebelum tag pembuka node saat ini |\n\nIni berbeda dari `following-sibling::` karena mereka **mengabaikan nesting**. Mereka hanya menelusuri kode sumber HTML ke bawah (atau ke atas).\n\n## Skenario\nKamu menemukan Header Pengguna (\"Alice\") dan perlu mengklik tombol \"Edit\" yang muncul secara fisik setelahnya di kontainer yang sama sekali berbeda.\n\n```xpath\n//h3[text()=\"Alice\"]/following::button[1]\n```\nIni mengambil *tombol berikutnya* di DOM setelah header Alice, terlepas dari struktur <div>.\n\n## Tugas Kamu\nTemukan tombol **\"Edit\"** yang muncul setelah \"Product A\".\n\n> **Peringatan:** Jangan bingung dengan `following-sibling`. Tombol tersebut BUKANLAH saudara (*sibling*), ia berada di kontainer yang berbeda!\n"
+      },
+      "htmlContent": "<div class=\"product-list\">\n  <div class=\"header-section\">\n    <h3>Product A</h3>\n    <span class=\"badge\">New</span>\n  </div>\n  <div class=\"details-section\">\n    <p>Price: $10</p>\n  </div>\n  <div class=\"actions-section\">\n    <button class=\"btn\">View</button>\n    <button class=\"btn\">Edit</button>\n  </div>\n  \n  <hr>\n\n  <div class=\"header-section\">\n    <h3>Product B</h3>\n  </div>\n  <div class=\"actions-section\">\n    <button class=\"btn\">View</button>\n    <button class=\"btn\">Edit</button>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//h3[text()=\"Product A\"]/following::button[text()=\"Edit\"][1]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//h3[text()=\"Product A\"]/following::button[text()=\"Edit\"][1]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "axes",
+        "advanced"
+      ]
+    },
+    {
+      "slug": "xpath-advanced-boss",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "HARD",
+      "category": "xpath-advanced",
+      "xpReward": 80,
+      "order": 32,
+      "title": {
+        "en": "Scenario: Admin User Management",
+        "id": "Skenario: Manajemen User Admin"
+      },
+      "description": {
+        "en": "Master advanced XPath to navigate a complex admin table.",
+        "id": "Kuasai XPath tingkat lanjut untuk menavigasi tabel admin yang kompleks."
+      },
+      "instructions": {
+        "en": "# Scenario: Admin User Management\n\nYou're automating an admin dashboard. The user table is complex:\n- Multiple columns with different data types\n- Action buttons in each row\n- You need to find a specific button for a specific user\n\n## The Challenge\nFind the **\"Delete\"** button for the user named **\"John Doe\"** who has the role **\"Admin\"**.\n\n## Why This Is Hard\n- There are multiple \"John Doe\" users (one is Admin, one is Editor)\n- There are multiple \"Delete\" buttons\n- You must use ALL conditions to find the right one\n\n## Your Mission\nWrite an XPath that:\n1. Finds the row containing BOTH \"John Doe\" AND \"Admin\"\n2. Selects the Delete button in that row\n\n> **Tip:** Use `and` to combine multiple cell conditions in a single row predicate!\n",
+        "id": "# Skenario: Manajemen User Admin\n\nKamu sedang mengotomatisasi dasbor admin. Tabel pengguna sangat kompleks:\n- Banyak kolom dengan tipe data berbeda\n- Tombol tindakan di setiap baris\n- Kamu perlu menemukan tombol spesifik untuk pengguna spesifik\n\n## Tantangan\nTemukan tombol **\"Delete\"** untuk pengguna bernama **\"John Doe\"** yang memiliki peran (*role*) **\"Admin\"**.\n\n## Kenapa Ini Sulit\n- Ada beberapa pengguna \"John Doe\" (satu Admin, satu Editor)\n- Ada beberapa tombol \"Delete\"\n- Kamu harus menggunakan SEMUA kondisi untuk menemukan yang tepat\n\n## Misi Kamu\nTulis XPath yang:\n1. Menemukan baris yang berisi KEDUA \"John Doe\" DAN \"Admin\"\n2. Memilih tombol Delete di baris tersebut\n\n> **Petunjuk:** Gunakan `and` untuk menggabungkan beberapa kondisi sel dalam satu predikat baris!\n"
+      },
+      "htmlContent": "<table class=\"admin-users-table\">\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Email</th>\n      <th>Role</th>\n      <th>Status</th>\n      <th>Actions</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Alice Smith</td>\n      <td>alice@example.com</td>\n      <td>Admin</td>\n      <td class=\"status active\">Active</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n    <tr>\n      <td>John Doe</td>\n      <td>john.editor@example.com</td>\n      <td>Editor</td>\n      <td class=\"status active\">Active</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n    <tr>\n      <td>John Doe</td>\n      <td>john.admin@example.com</td>\n      <td>Admin</td>\n      <td class=\"status active\">Active</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n    <tr>\n      <td>Bob Wilson</td>\n      <td>bob@example.com</td>\n      <td>Viewer</td>\n      <td class=\"status inactive\">Inactive</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n  </tbody>\n</table>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//tr[td[text()=\"John Doe\"] and td[text()=\"Admin\"]]//button[text()=\"Delete\"]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//tr[td[text()=\"John Doe\"] and td[text()=\"Admin\"]]//button[text()=\"Delete\"]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "selector",
+        "advanced",
+        "table",
+        "scenario"
+      ]
+    },
+    {
+      "slug": "selector-comparison-same-element",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "selector-comparison",
+      "xpReward": 30,
+      "order": 33,
+      "title": {
+        "en": "Same Element, Two Ways",
+        "id": "Elemen Sama, Dua Cara"
+      },
+      "description": {
+        "en": "Write both CSS and XPath for the same element.",
+        "id": "Tulis CSS dan XPath untuk elemen yang sama."
+      },
+      "instructions": {
+        "en": "# Same Element, Two Ways\n\nOften you can select the same element with either CSS or XPath. Let's compare!\n\n## The Target\nSelect the **Search button** in the form below.\n\n## CSS Approach\n```css\n#search-btn          /* By ID */\nbutton[type=\"submit\"]\n.search-form button\n```\n\n## XPath Approach\n```xpath\n//*[@id=\"search-btn\"]\n//button[@type=\"submit\"]\n//form[@class=\"search-form\"]//button\n```\n\n## Your Task (CSS)\nWrite a CSS selector to select the search button.\n\n> **Note:** Toggle to XPath to try the same element with XPath!\n",
+        "id": "# Elemen Sama, Dua Cara\n\nSeringkali kamu dapat memilih elemen yang sama dengan CSS atau XPath. Mari kita bandingkan!\n\n## Target\nPilih tombol **Search** pada formulir di bawah ini.\n\n## Pendekatan CSS\n```css\n#search-btn          /* Berdasarkan ID */\nbutton[type=\"submit\"]\n.search-form button\n```\n\n## Pendekatan XPath\n```xpath\n//*[@id=\"search-btn\"]\n//button[@type=\"submit\"]\n//form[@class=\"search-form\"]//button\n```\n\n## Tugas Kamu (CSS)\nTulis *CSS selector* untuk memilih tombol pencarian.\n\n> **Catatan:** Ganti ke XPath untuk mencoba elemen yang sama dengan XPath!\n"
+      },
+      "htmlContent": "<header class=\"main-header\">\n  <div class=\"logo\">MySite</div>\n  <form class=\"search-form\">\n    <input type=\"text\" placeholder=\"Search...\" class=\"search-input\" />\n    <button type=\"submit\" id=\"search-btn\" class=\"btn search-btn\">Search</button>\n  </form>\n  <nav class=\"user-nav\">\n    <button class=\"btn\">Login</button>\n  </nav>\n</header>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "#search-btn",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "#search-btn",
+      "tags": [
+        "beginner",
+        "css",
+        "xpath",
+        "comparison",
+        "basic"
+      ]
+    },
+    {
+      "slug": "selector-when-xpath-wins",
+      "type": "XPATH_SELECTOR",
+      "difficulty": "EASY",
+      "category": "selector-comparison",
+      "xpReward": 35,
+      "order": 34,
+      "title": {
+        "en": "When XPath Wins",
+        "id": "Ketika XPath Menang"
+      },
+      "description": {
+        "en": "A scenario where XPath can do what CSS cannot.",
+        "id": "Skenario di mana XPath dapat melakukan apa yang tidak bisa dilakukan CSS."
+      },
+      "instructions": {
+        "en": "# When XPath Wins\n\nThere are things XPath can do that CSS **cannot**:\n\n## XPath Exclusive Features\n1. ✅ **Navigate UP** (parent, ancestor)\n2. ✅ **Select by text content** (text())\n3. ✅ **Preceding siblings**\n4. ✅ **Complex conditions**\n\n## The Challenge\nFind the **product card** (div.product-card) that contains \"Out of Stock\" text.\n\nWith CSS, you'd need JavaScript. With XPath, it's one line!\n\n## Your Task\nWrite an XPath to select the product card containing \"Out of Stock\".\n\n> **Tip:** Use `contains()` to check for text within children.\n",
+        "id": "# Ketika XPath Menang\n\nAda hal-hal yang dapat dilakukan XPath tetapi **tidak bisa** dilakukan oleh CSS:\n\n## Fitur Eksklusif XPath\n1. ✅ **Navigasi ke ATAS** (parent, ancestor)\n2. ✅ **Pilih berdasarkan konten teks** (text())\n3. ✅ **Saudara sebelumnya** (*preceding siblings*)\n4. ✅ **Kondisi kompleks**\n\n## Tantangan\nTemukan **kartu produk** (div.product-card) yang berisi teks \"Out of Stock\".\n\nDengan CSS, kamu membutuhkan JavaScript. Dengan XPath, cukup satu baris!\n\n## Tugas Kamu\nTulis XPath untuk memilih kartu produk yang berisi \"Out of Stock\".\n\n> **Petunjuk:** Gunakan `contains()` untuk memeriksa teks di dalam elemen anak.\n"
+      },
+      "htmlContent": "<div class=\"products-grid\">\n  <div class=\"product-card\">\n    <h3>Wireless Mouse</h3>\n    <p class=\"price\">$29.99</p>\n    <span class=\"stock in-stock\">In Stock</span>\n    <button class=\"btn\">Add to Cart</button>\n  </div>\n  <div class=\"product-card\">\n    <h3>Mechanical Keyboard</h3>\n    <p class=\"price\">$89.99</p>\n    <span class=\"stock out-of-stock\">Out of Stock</span>\n    <button class=\"btn\" disabled>Unavailable</button>\n  </div>\n  <div class=\"product-card\">\n    <h3>USB Hub</h3>\n    <p class=\"price\">$19.99</p>\n    <span class=\"stock in-stock\">In Stock</span>\n    <button class=\"btn\">Add to Cart</button>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "//div[contains(@class, \"product-card\") and .//text()[contains(., \"Out of Stock\")]]",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "//div[contains(@class, \"product-card\") and .//text()[contains(., \"Out of Stock\")]]",
+      "tags": [
+        "beginner",
+        "xpath",
+        "comparison",
+        "text",
+        "parent",
+        "basic"
+      ]
+    },
+    {
+      "slug": "selector-performance",
+      "type": "CSS_SELECTOR",
+      "difficulty": "EASY",
+      "category": "selector-comparison",
+      "xpReward": 40,
+      "order": 35,
+      "title": {
+        "en": "The Faster Selector",
+        "id": "Selector yang Lebih Cepat"
+      },
+      "description": {
+        "en": "Understand selector performance implications.",
+        "id": "Pahami implikasi performa selector."
+      },
+      "instructions": {
+        "en": "# Selector Performance\n\nIn general, **CSS selectors are faster** than XPath in modern browsers.\n\n## Performance Ranking (Fastest → Slowest)\n1. 🏆 **ID selector** - `#myId`\n2. 🥈 **Class selector** - `.myClass`\n3. 🥉 **Tag selector** - `div`\n4. ⚡ **Attribute selector** - `[data-testid]`\n5. 🐢 **Complex XPath** - `//div[contains(@class, \"x\")]//span`\n\n## Best Practices\n- Prefer **ID** when available\n- Use **data-testid** for test automation\n- Keep selectors **short and specific**\n- Avoid **overly complex** XPath\n\n## Your Task\nSelect the submit button using the **most performant** selector.\n\n> **Hint:** ID is the fastest!\n",
+        "id": "# Performa Selector\n\nSecara umum, **CSS selector lebih cepat** daripada XPath di browser modern.\n\n## Peringkat Performa (Tercepat → Terlambat)\n1. 🏆 **ID selector** - `#myId`\n2. 🥈 **Class selector** - `.myClass`\n3. 🥉 **Tag selector** - `div`\n4. ⚡ **Attribute selector** - `[data-testid]`\n5. 🐢 **Complex XPath** - `//div[contains(@class, \"x\")]//span`\n\n## Best Practices\n- Utamakan **ID** jika tersedia\n- Gunakan **data-testid** untuk otomatisasi pengujian\n- Buat *selector* tetap **pendek dan spesifik**\n- Hindari XPath yang **terlalu kompleks**\n\n## Tugas Kamu\nPilih tombol submit menggunakan *selector* yang **paling performan**.\n\n> **Petunjuk:** ID adalah yang tercepat!\n"
+      },
+      "htmlContent": "<form id=\"contact-form\" class=\"form contact-form modern-design\">\n  <div class=\"form-group\">\n    <input type=\"text\" id=\"name-field\" data-testid=\"name\" class=\"input\" placeholder=\"Name\" />\n  </div>\n  <div class=\"form-group\">\n    <input type=\"email\" id=\"email-field\" data-testid=\"email\" class=\"input\" placeholder=\"Email\" />\n  </div>\n  <div class=\"form-group\">\n    <textarea id=\"message-field\" data-testid=\"message\" class=\"input textarea\" placeholder=\"Message\"></textarea>\n  </div>\n  <div class=\"form-actions\">\n    <button type=\"reset\" id=\"reset-btn\" class=\"btn secondary\">Clear</button>\n    <button type=\"submit\" id=\"submit-btn\" data-testid=\"submit\" class=\"btn primary\">Send Message</button>\n  </div>\n</form>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "#submit-btn",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "#submit-btn",
+      "tags": [
+        "beginner",
+        "css",
+        "performance",
+        "best-practices",
+        "basic"
+      ]
+    },
+    {
+      "slug": "selector-comparison-boss",
+      "type": "CSS_SELECTOR",
+      "difficulty": "HARD",
+      "category": "selector-comparison",
+      "xpReward": 70,
+      "order": 36,
+      "title": {
+        "en": "Scenario: Choose Your Weapon",
+        "id": "Skenario: Pilih Senjatamu"
+      },
+      "description": {
+        "en": "Analyze a real scenario and pick the optimal selector strategy.",
+        "id": "Analisis skenario nyata dan pilih strategi selector yang optimal."
+      },
+      "instructions": {
+        "en": "# Scenario: Choose Your Weapon\n\nYou're writing tests for a shopping cart. You need to find a specific element, but you must choose wisely.\n\n## The Challenge\nFind the **\"Remove\"** button for the product named **\"Wireless Mouse\"**.\n\n## The Trade-offs\n| Approach | Selector | Pros | Cons |\n|----------|----------|------|------|\n| **CSS** | Complex chaining | Fast execution | Can't use text |\n| **XPath** | Text-based | Human readable | Slightly slower |\n\n## Decision Criteria\n- If the element has a **stable ID or data-testid**: Use CSS\n- If you need to find by **text content**: Use XPath\n- If you need to navigate **UP** the DOM: Use XPath\n\n## Your Mission\nLook at the HTML. The product name \"Wireless Mouse\" is visible, but we want the button.\n\n**For THIS scenario**, write a **CSS selector** that works.\n\n> **Hint:** Look for data attributes or class patterns that uniquely identify the product row!\n",
+        "id": "# Skenario: Pilih Senjatamu\n\nKamu sedang menulis tes untuk keranjang belanja. Kamu perlu menemukan elemen spesifik, tetapi kamu harus memilih dengan bijak.\n\n## Tantangan\nTemukan tombol **\"Remove\"** untuk produk bernama **\"Wireless Mouse\"**.\n\n## Trade-off\n| Pendekatan | Selector | Kelebihan | Kekurangan |\n|----------|----------|------|------|\n| **CSS** | Perangkaian kompleks | Eksekusi cepat | Tidak bisa pakai teks |\n| **XPath** | Berbasis teks | Mudah dibaca manusia | Sedikit lebih lambat |\n\n## Kriteria Keputusan\n- Jika elemen memiliki **ID atau data-testid yang stabil**: Gunakan CSS\n- Jika kamu perlu mencari berdasarkan **konten teks**: Gunakan XPath\n- Jika kamu perlu menavigasi ke **ATAS** DOM: Gunakan XPath\n\n## Misi Kamu\nLihat HTML-nya. Nama produk \"Wireless Mouse\" terlihat, tetapi kita menginginkan tombolnya.\n\n**Untuk skenario INI**, tulis **CSS selector** yang berfungsi.\n\n> **Petunjuk:** Cari data attributes atau pola class yang mengidentifikasi baris produk secara unik!\n"
+      },
+      "htmlContent": "<div class=\"shopping-cart\">\n  <h2>Your Cart (2 items)</h2>\n  \n  <div class=\"cart-item\" data-product-id=\"prod-101\">\n    <img src=\"/mouse.jpg\" alt=\"Wireless Mouse\" />\n    <div class=\"item-details\">\n      <h3 class=\"product-name\">Wireless Mouse</h3>\n      <span class=\"price\">$29.99</span>\n      <span class=\"quantity\">Qty: 1</span>\n    </div>\n    <div class=\"item-actions\">\n      <button class=\"btn update\">Update</button>\n      <button class=\"btn remove\">Remove</button>\n    </div>\n  </div>\n  \n  <div class=\"cart-item\" data-product-id=\"prod-202\">\n    <img src=\"/keyboard.jpg\" alt=\"Mechanical Keyboard\" />\n    <div class=\"item-details\">\n      <h3 class=\"product-name\">Mechanical Keyboard</h3>\n      <span class=\"price\">$89.99</span>\n      <span class=\"quantity\">Qty: 1</span>\n    </div>\n    <div class=\"item-actions\">\n      <button class=\"btn update\">Update</button>\n      <button class=\"btn remove\">Remove</button>\n    </div>\n  </div>\n  \n  <div class=\"cart-summary\">\n    <span class=\"total\">Total: $119.98</span>\n    <button class=\"btn checkout\">Checkout</button>\n  </div>\n</div>",
+      "starterCode": "",
+      "testCases": [
+        {
+          "description": "Selects the target element",
+          "expectedOutput": {
+            "selector": "[data-product-id=\"prod-101\"] .remove",
+            "matchCount": 1
+          },
+          "isHidden": false
+        }
+      ],
+      "solution": "[data-product-id=\"prod-101\"] .remove",
+      "tags": [
+        "beginner",
+        "css",
+        "xpath",
+        "comparison",
+        "scenario",
+        "decision"
+      ]
+    }
+  ]
+}

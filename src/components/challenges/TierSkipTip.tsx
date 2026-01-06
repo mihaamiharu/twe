@@ -1,5 +1,6 @@
 import { AlertCircle, ArrowRight, X } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
@@ -12,6 +13,7 @@ interface TierSkipTipProps {
 }
 
 export function TierSkipTip({ currentTier, missingPrerequisites }: TierSkipTipProps) {
+    const { t } = useTranslation(['challenges', 'common']);
     const [isVisible, setIsVisible] = useState(true);
 
     if (!isVisible || missingPrerequisites.length === 0) return null;
@@ -23,13 +25,14 @@ export function TierSkipTip({ currentTier, missingPrerequisites }: TierSkipTipPr
             <div className="flex items-center gap-2 text-xs">
                 <AlertCircle className="h-3.5 w-3.5 shrink-0 text-amber-500" />
                 <p>
-                    <span className="font-semibold">Recommendation:</span> This {currentTier.toLowerCase()} challenge uses concepts from the <span className="font-semibold">{mainMissing.name}</span> tier.
+                    <span className="font-semibold">{t('challenges:playground.recommendation')}</span> {t('challenges:playground.recommendationDescription', { tier: currentTier.toLowerCase(), missingName: mainMissing.name })}
                     <Link
-                        to="/challenges"
+                        to="/$locale/challenges"
+                        params={{ locale: window.location.pathname.split('/')[1] || 'en' }}
                         search={{ tier: mainMissing.tier }}
                         className="ml-2 inline-flex items-center gap-0.5 font-semibold underline decoration-amber-500/30 underline-offset-2 hover:text-amber-500 hover:decoration-amber-500"
                     >
-                        Try {mainMissing.name} first <ArrowRight className="h-3 w-3" />
+                        {t('challenges:playground.tryPrereq', { missingName: mainMissing.name })} <ArrowRight className="h-3 w-3" />
                     </Link>
                 </p>
             </div>
@@ -40,7 +43,7 @@ export function TierSkipTip({ currentTier, missingPrerequisites }: TierSkipTipPr
                 onClick={() => setIsVisible(false)}
             >
                 <X className="h-3.5 w-3.5" />
-                <span className="sr-only">Dismiss</span>
+                <span className="sr-only">{t('common:actions.dismiss')}</span>
             </Button>
         </div>
     );

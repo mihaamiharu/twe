@@ -1,12 +1,19 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-// Imports moved inside handler to avoid client-side bundling issues
+
+// Helper for localizable fields (still needed for challenges)
+const getLocalizedValue = (value: unknown, locale: string): string => {
+    if (!value || typeof value !== 'object') return '';
+    const obj = value as Record<string, string>;
+    return obj[locale] || obj['en'] || '';
+};
 
 // ----------------------------------------------------------------------------
-// GET TUTORIALS (LIST)
+// GET TUTORIALS (LIST) - NOW USING FILESYSTEM
 // ----------------------------------------------------------------------------
 
 const TutorialFiltersSchema = z.object({
+    locale: z.string().default('en'),
     search: z.string().optional(),
     tag: z.string().optional(),
     page: z.number().default(1),
@@ -24,62 +31,61 @@ export const getTutorials = createServerFn({ method: 'GET' })
             const { auth } = await import('./auth.server');
             const { db } = await import('@/db');
             const { tutorials, progress } = await import('@/db/schema');
-            const { eq, and, asc, desc, sql, or } = await import('drizzle-orm');
+            const { eq, and, inArray } = await import('drizzle-orm');
+            const { getTutorialList } = await import('./content.server');
 
-            // Build conditions
-            const conditions = [eq(tutorials.isPublished, true)];
+            // Load tutorials from filesystem (content service)
+            let allTutorials = await getTutorialList(filters.locale);
 
+            // Apply search filter (in-memory since content is from filesystem)
             if (filters.search) {
-                const searchCondition = or(
-                    sql`${tutorials.title} ILIKE ${`%${filters.search}%`}`,
-                    sql`${tutorials.description} ILIKE ${`%${filters.search}%`}`
+                const searchLower = filters.search.toLowerCase();
+                allTutorials = allTutorials.filter(t =>
+                    t.title.toLowerCase().includes(searchLower) ||
+                    t.description.toLowerCase().includes(searchLower)
                 );
-                if (searchCondition) {
-                    conditions.push(searchCondition);
-                }
             }
 
+            // Apply tag filter
             if (filters.tag) {
-                conditions.push(sql`${filters.tag} = ANY(${tutorials.tags})`);
+                allTutorials = allTutorials.filter(t => t.tags.includes(filters.tag!));
             }
 
-            // Get total count
-            const [countResult] = await db
-                .select({ count: sql<number>`count(*)::int` })
-                .from(tutorials)
-                .where(and(...conditions));
+            // Sort
+            allTutorials.sort((a, b) => {
+                let comparison = 0;
+                switch (filters.sortBy) {
+                    case 'order':
+                        comparison = a.order - b.order;
+                        break;
+                    case 'estimatedMinutes':
+                        comparison = a.estimatedMinutes - b.estimatedMinutes;
+                        break;
+                    // viewCount and createdAt would need DB lookup
+                    default:
+                        comparison = a.order - b.order;
+                }
+                return filters.sortOrder === 'desc' ? -comparison : comparison;
+            });
 
-            const total = countResult?.count || 0;
-
-            // Determine sort
-            const sortColumn = {
-                order: tutorials.order,
-                estimatedMinutes: tutorials.estimatedMinutes,
-                viewCount: tutorials.viewCount,
-                createdAt: tutorials.createdAt,
-            }[filters.sortBy];
-
-            const orderFn = filters.sortOrder === 'desc' ? desc : asc;
+            const total = allTutorials.length;
 
             // Pagination
             const offset = (filters.page - 1) * filters.limit;
+            const paginatedTutorials = allTutorials.slice(offset, offset + filters.limit);
 
-            const tutorialList = await db
+            // Get DB records for viewCount (optional enhancement)
+            const slugs = paginatedTutorials.map(t => t.slug);
+            const dbRecords = await db
                 .select({
-                    id: tutorials.id,
                     slug: tutorials.slug,
-                    title: tutorials.title,
-                    description: tutorials.description,
-                    estimatedMinutes: tutorials.estimatedMinutes,
-                    tags: tutorials.tags,
+                    id: tutorials.id,
                     viewCount: tutorials.viewCount,
-                    order: tutorials.order,
                 })
                 .from(tutorials)
-                .where(and(...conditions))
-                .orderBy(orderFn(sortColumn))
-                .limit(filters.limit)
-                .offset(offset);
+                .where(inArray(tutorials.slug, slugs));
+
+            const dbBySlug = new Map(dbRecords.map(r => [r.slug, r]));
 
             // Get user progress
             let userProgress: Record<string, { isCompleted: boolean; readingProgress: number }> = {};
@@ -87,7 +93,8 @@ export const getTutorials = createServerFn({ method: 'GET' })
             const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
-            if (session?.user?.id) {
+            if (session?.user?.id && dbRecords.length > 0) {
+                const tutorialIds = dbRecords.map(r => r.id);
                 const progressRecords = await db
                     .select({
                         tutorialId: progress.tutorialId,
@@ -95,7 +102,10 @@ export const getTutorials = createServerFn({ method: 'GET' })
                         readingProgress: progress.readingProgress,
                     })
                     .from(progress)
-                    .where(eq(progress.userId, session.user.id));
+                    .where(and(
+                        eq(progress.userId, session.user.id),
+                        inArray(progress.tutorialId, tutorialIds)
+                    ));
 
                 userProgress = progressRecords.reduce((acc, p) => {
                     if (p.tutorialId) {
@@ -108,19 +118,25 @@ export const getTutorials = createServerFn({ method: 'GET' })
                 }, {} as Record<string, { isCompleted: boolean; readingProgress: number }>);
             }
 
-            const tutorialsWithProgress = tutorialList.map((tutorial) => ({
-                ...tutorial,
-                isCompleted: userProgress[tutorial.id]?.isCompleted || false,
-                readingProgress: userProgress[tutorial.id]?.readingProgress || 0,
-            }));
+            // Merge filesystem content with DB data
+            const tutorialsWithProgress = paginatedTutorials.map((tutorial) => {
+                const dbRecord = dbBySlug.get(tutorial.slug);
+                return {
+                    id: dbRecord?.id || tutorial.slug, // Use slug as fallback ID
+                    slug: tutorial.slug,
+                    title: tutorial.title,
+                    description: tutorial.description,
+                    estimatedMinutes: tutorial.estimatedMinutes,
+                    tags: tutorial.tags,
+                    order: tutorial.order,
+                    viewCount: dbRecord?.viewCount || 0,
+                    isCompleted: dbRecord ? (userProgress[dbRecord.id]?.isCompleted || false) : false,
+                    readingProgress: dbRecord ? (userProgress[dbRecord.id]?.readingProgress || 0) : 0,
+                };
+            });
 
-            // Get available tags
-            const allTagsResult = await db
-                .selectDistinct({ tag: sql<string>`unnest(${tutorials.tags})` })
-                .from(tutorials)
-                .where(eq(tutorials.isPublished, true));
-
-            const allTags = allTagsResult.map(r => r.tag).filter(Boolean).sort();
+            // Get all available tags from registry
+            const allTags = [...new Set(allTutorials.flatMap(t => t.tags))].sort();
 
             return {
                 success: true,
@@ -146,48 +162,81 @@ export const getTutorials = createServerFn({ method: 'GET' })
 
 
 // ----------------------------------------------------------------------------
-// GET TUTORIAL (DETAIL)
+// GET TUTORIAL (DETAIL) - NOW USING FILESYSTEM
 // ----------------------------------------------------------------------------
 
 const TutorialDetailSchema = z.object({
     slug: z.string(),
+    locale: z.string().default('en'),
 });
 
 export const getTutorial = createServerFn({ method: 'GET' })
     .inputValidator((data: unknown) => TutorialDetailSchema.parse(data))
-    .handler(async ({ data: { slug } }) => {
+    .handler(async ({ data: { slug, locale } }) => {
         try {
             // Dynamically import server-only modules
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
             const { db } = await import('@/db');
             const { tutorials, progress, challenges } = await import('@/db/schema');
-            const { eq, and, asc, gt } = await import('drizzle-orm');
+            const { eq, and, asc, gt, inArray } = await import('drizzle-orm');
+            const { getTutorialContent, getTutorialList } = await import('./content.server');
 
-            // Fetch tutorial
-            const tutorial = await db.query.tutorials.findFirst({
+            // Load tutorial content from filesystem
+            const tutorialContent = await getTutorialContent(slug, locale);
+
+            if (!tutorialContent) {
+                throw new Error('Tutorial not found');
+            }
+
+            // Get DB record for this tutorial (for ID, viewCount, etc.)
+            const dbTutorial = await db.query.tutorials.findFirst({
                 where: and(
                     eq(tutorials.slug, slug),
                     eq(tutorials.isPublished, true)
                 ),
-                with: {
-                    challenges: {
-                        columns: {
-                            slug: true,
-                            title: true,
-                            difficulty: true,
-                            type: true,
-                            xpReward: true,
-                            category: true,
-                        },
-                        where: eq(challenges.isPublished, true),
-                        orderBy: asc(challenges.order),
-                    },
+                columns: {
+                    id: true,
+                    viewCount: true,
+                    order: true,
                 },
             });
 
-            if (!tutorial) {
-                throw new Error('Tutorial not found');
+            // Get related challenges from DB (if any)
+            let relatedChallenges: Array<{
+                slug: string;
+                title: string;
+                difficulty: string;
+                type: string;
+                xpReward: number;
+                category: string;
+            }> = [];
+
+            if (tutorialContent.relatedChallenges && tutorialContent.relatedChallenges.length > 0) {
+                const challengeRecords = await db
+                    .select({
+                        slug: challenges.slug,
+                        title: challenges.title,
+                        difficulty: challenges.difficulty,
+                        type: challenges.type,
+                        xpReward: challenges.xpReward,
+                        category: challenges.category,
+                    })
+                    .from(challenges)
+                    .where(and(
+                        inArray(challenges.slug, tutorialContent.relatedChallenges),
+                        eq(challenges.isPublished, true)
+                    ))
+                    .orderBy(asc(challenges.order));
+
+                relatedChallenges = challengeRecords.map(c => ({
+                    slug: c.slug,
+                    title: getLocalizedValue(c.title, locale),
+                    difficulty: c.difficulty,
+                    type: c.type,
+                    xpReward: c.xpReward,
+                    category: c.category,
+                }));
             }
 
             // User progress
@@ -196,11 +245,11 @@ export const getTutorial = createServerFn({ method: 'GET' })
             const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
 
-            if (session?.user?.id) {
+            if (session?.user?.id && dbTutorial) {
                 const progressRecord = await db.query.progress.findFirst({
                     where: and(
                         eq(progress.userId, session.user.id),
-                        eq(progress.tutorialId, tutorial.id)
+                        eq(progress.tutorialId, dbTutorial.id)
                     ),
                 });
 
@@ -213,27 +262,30 @@ export const getTutorial = createServerFn({ method: 'GET' })
                 }
             }
 
-            // Next Tutorial
-            const nextTutorial = await db.query.tutorials.findFirst({
-                where: and(
-                    eq(tutorials.isPublished, true),
-                    tutorial.order !== null ? gt(tutorials.order, tutorial.order) : undefined
-                ),
-                orderBy: asc(tutorials.order),
-                columns: {
-                    slug: true,
-                    title: true,
-                },
-            });
+            // Next Tutorial (from filesystem registry)
+            const allTutorials = await getTutorialList(locale);
+            const currentOrder = tutorialContent.order;
+            const nextTutorial = allTutorials
+                .filter(t => t.order > currentOrder)
+                .sort((a, b) => a.order - b.order)[0];
 
             return {
                 success: true,
                 data: {
-                    ...tutorial,
+                    id: dbTutorial?.id || slug,
+                    slug: tutorialContent.slug,
+                    title: tutorialContent.title,
+                    description: tutorialContent.description,
+                    content: tutorialContent.content,
+                    estimatedMinutes: tutorialContent.estimatedMinutes,
+                    tags: tutorialContent.tags,
+                    order: tutorialContent.order,
+                    viewCount: dbTutorial?.viewCount || 0,
+                    challenges: relatedChallenges,
                     userProgress: userProgressData,
                     nextTutorial: nextTutorial ? {
                         slug: nextTutorial.slug,
-                        title: nextTutorial.title
+                        title: nextTutorial.title,
                     } : null,
                 },
             };
@@ -286,7 +338,7 @@ export const updateTutorialProgress = createServerFn({ method: "POST" })
                 return { success: false, error: 'Tutorial not found' };
             }
 
-            // Check existing progress
+            // Check for existing progress
             const existingProgress = await db.query.progress.findFirst({
                 where: and(
                     eq(progress.userId, userId),
@@ -295,27 +347,32 @@ export const updateTutorialProgress = createServerFn({ method: "POST" })
             });
 
             if (existingProgress) {
-                // Only update if not completed or just reading progress
-                await db
-                    .update(progress)
-                    .set({
-                        readingProgress: newProgress,
-                        lastAccessedAt: new Date(),
-                        updatedAt: new Date(),
-                    })
-                    .where(eq(progress.id, existingProgress.id));
+                // Update
+                await db.update(progress).set({
+                    readingProgress: newProgress,
+                    isCompleted: newProgress >= 100 ? true : existingProgress.isCompleted,
+                    lastAccessedAt: new Date(),
+                }).where(eq(progress.id, existingProgress.id));
             } else {
+                // Insert
                 await db.insert(progress).values({
                     userId,
                     tutorialId: tutorial.id,
                     readingProgress: newProgress,
-                    isCompleted: false,
+                    isCompleted: newProgress >= 100,
                     lastAccessedAt: new Date(),
                 });
             }
 
-            return { success: true };
+            return {
+                success: true,
+                data: {
+                    readingProgress: newProgress,
+                    isCompleted: newProgress >= 100,
+                },
+            };
         } catch (error) {
+            console.error('Error updating tutorial progress:', error);
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error',
@@ -323,27 +380,24 @@ export const updateTutorialProgress = createServerFn({ method: "POST" })
         }
     });
 
-
 // ----------------------------------------------------------------------------
-// COMPLETE TUTORIAL
+// MARK TUTORIAL COMPLETE
 // ----------------------------------------------------------------------------
 
-const CompleteTutorialSchema = z.object({
+const MarkTutorialCompleteSchema = z.object({
     slug: z.string(),
+    locale: z.string().optional(), // Optional for backward compatibility
 });
 
 export const completeTutorial = createServerFn({ method: "POST" })
-    .inputValidator((data: unknown) => CompleteTutorialSchema.parse(data))
-    .handler(async ({ data: { slug } }) => {
+    .inputValidator((data: unknown) => MarkTutorialCompleteSchema.parse(data))
+    .handler(async ({ data: input }) => {
         try {
             const { getRequestHeaders } = await import('@tanstack/react-start/server');
             const { auth } = await import('./auth.server');
             const { db } = await import('@/db');
-            const { tutorials, progress } = await import('@/db/schema');
-            const { eq, and } = await import('drizzle-orm');
-            const { logger } = await import('@/lib/logger');
-            const { checkAchievements } = await import('@/lib/achievements');
-            const { getUserStats, getEarnedAchievementIds, awardAchievements } = await import('@/lib/stats');
+            const { tutorials, progress, users } = await import('@/db/schema');
+            const { eq, and, sql } = await import('drizzle-orm');
 
             const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
@@ -353,18 +407,18 @@ export const completeTutorial = createServerFn({ method: "POST" })
             }
 
             const userId = session.user.id;
+            const { slug } = input;
 
-            // Get tutorial id
+            // Get tutorial
             const tutorial = await db.query.tutorials.findFirst({
                 where: eq(tutorials.slug, slug),
-                columns: { id: true, title: true },
             });
 
             if (!tutorial) {
                 return { success: false, error: 'Tutorial not found' };
             }
 
-            // Upsert progress
+            // Check existing progress
             const existingProgress = await db.query.progress.findFirst({
                 where: and(
                     eq(progress.userId, userId),
@@ -372,19 +426,19 @@ export const completeTutorial = createServerFn({ method: "POST" })
                 ),
             });
 
-            const isFirstCompletion = !existingProgress || !existingProgress.isCompleted;
+            let wasAlreadyCompleted = false;
 
             if (existingProgress) {
-                await db
-                    .update(progress)
-                    .set({
+                wasAlreadyCompleted = existingProgress.isCompleted;
+
+                if (!wasAlreadyCompleted) {
+                    await db.update(progress).set({
                         isCompleted: true,
                         readingProgress: 100,
-                        completedAt: existingProgress.isCompleted ? existingProgress.completedAt : new Date(),
+                        completedAt: new Date(),
                         lastAccessedAt: new Date(),
-                        updatedAt: new Date(),
-                    })
-                    .where(eq(progress.id, existingProgress.id));
+                    }).where(eq(progress.id, existingProgress.id));
+                }
             } else {
                 await db.insert(progress).values({
                     userId,
@@ -396,39 +450,57 @@ export const completeTutorial = createServerFn({ method: "POST" })
                 });
             }
 
-            // Check achievements if first completion
-            let newAchievements: { id: string; name: string; icon: string }[] = [];
-
-            if (isFirstCompletion) {
-                try {
-                    const userStats = await getUserStats(userId);
-                    const alreadyEarned = await getEarnedAchievementIds(userId);
-                    const earnedAchievements = checkAchievements(userStats, alreadyEarned);
-
-                    if (earnedAchievements.length > 0) {
-                        await awardAchievements(userId, earnedAchievements.map(a => a.id));
-                        newAchievements = earnedAchievements.map(a => ({
-                            id: a.id,
-                            name: a.name,
-                            icon: a.icon,
-                        }));
-                        logger.info(`[Achievements] User ${userId} earned: ${earnedAchievements.map(a => a.name).join(', ')}`);
-                    }
-                } catch (error) {
-                    logger.error('Error checking achievements:', error);
-                }
+            // Award XP if first completion (tutorials give 25 XP)
+            if (!wasAlreadyCompleted) {
+                await db.update(users).set({
+                    xp: sql`${users.xp} + 25`,
+                }).where(eq(users.id, userId));
             }
+
+            // Increment view/completion count
+            await db.update(tutorials).set({
+                viewCount: sql`${tutorials.viewCount} + 1`,
+            }).where(eq(tutorials.id, tutorial.id));
 
             return {
                 success: true,
-                newAchievements,
+                data: {
+                    isCompleted: true,
+                    xpAwarded: wasAlreadyCompleted ? 0 : 25,
+                },
             };
-
         } catch (error) {
-            console.error('Error completing tutorial:', error);
+            console.error('Error marking tutorial complete:', error);
             return {
                 success: false,
                 error: error instanceof Error ? error.message : 'Unknown error',
             };
+        }
+    });
+
+// ----------------------------------------------------------------------------
+// INCREMENT VIEW COUNT
+// ----------------------------------------------------------------------------
+
+const IncrementViewCountSchema = z.object({
+    slug: z.string(),
+});
+
+export const incrementTutorialViewCount = createServerFn({ method: "POST" })
+    .inputValidator((data: unknown) => IncrementViewCountSchema.parse(data))
+    .handler(async ({ data: { slug } }) => {
+        try {
+            const { db } = await import('@/db');
+            const { tutorials } = await import('@/db/schema');
+            const { eq, sql } = await import('drizzle-orm');
+
+            await db.update(tutorials).set({
+                viewCount: sql`${tutorials.viewCount} + 1`,
+            }).where(eq(tutorials.slug, slug));
+
+            return { success: true };
+        } catch (error) {
+            console.error('Error incrementing view count:', error);
+            return { success: false, error: 'Failed to increment view count' };
         }
     });

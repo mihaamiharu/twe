@@ -9,7 +9,8 @@
  * - Hover effects and click handling
  */
 
-import { Link } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -23,6 +24,7 @@ import {
     Users,
     ArrowRight,
 } from 'lucide-react';
+import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 
 export type ChallengeType = 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
@@ -88,10 +90,13 @@ export function ChallengeCard({
     tags = [],
     className,
 }: ChallengeCardProps) {
+    const { t } = useTranslation(['challenges', 'common']);
+    const params = useParams({ strict: false }) as { locale?: string };
+    const locale = params.locale || 'en';
     const diffStyle = difficultyStyles[difficulty];
 
     return (
-        <Link to="/challenges/$slug" params={{ slug }}>
+        <Link to={LocaleRoutes.challengeDetail} params={localeSlugParams(locale, slug)}>
             <Card className={cn(
                 'group relative overflow-hidden transition-all duration-300',
                 'hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5',
@@ -104,7 +109,7 @@ export function ChallengeCard({
                     <div className="absolute top-3 right-3 z-10">
                         <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/20 text-green-500 text-xs font-medium">
                             <CheckCircle2 className="h-3 w-3" />
-                            Completed
+                            {t('challenges:status.completed')}
                         </div>
                     </div>
                 )}
@@ -129,7 +134,7 @@ export function ChallengeCard({
 
                             {/* Type Label */}
                             <p className="text-xs text-muted-foreground mt-0.5">
-                                {typeLabels[type]}
+                                {t(`challenges:types.${type.toLowerCase()}`)}
                             </p>
                         </div>
                     </div>
@@ -171,7 +176,7 @@ export function ChallengeCard({
                                 diffStyle.border
                             )}
                         >
-                            {difficulty}
+                            {t(`challenges:difficulty.${difficulty.toLowerCase()}`)}
                         </Badge>
 
                         {/* Completion Count */}
@@ -188,7 +193,7 @@ export function ChallengeCard({
                         {/* XP Reward */}
                         <div className="flex items-center gap-1 text-sm font-medium text-amber-500">
                             <Star className="h-4 w-4 fill-current" />
-                            {xpReward} XP
+                            {xpReward} {t('common:labels.xp')}
                         </div>
 
                         {/* Arrow */}

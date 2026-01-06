@@ -9,67 +9,35 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TermsRouteImport } from './routes/terms'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as LeaderboardRouteImport } from './routes/leaderboard'
-import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TutorialsIndexRouteImport } from './routes/tutorials/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
-import { Route as ChallengesIndexRouteImport } from './routes/challenges/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as TutorialsSlugRouteImport } from './routes/tutorials/$slug'
+import { Route as LocaleIndexRouteImport } from './routes/$locale/index'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
-import { Route as ChallengesSlugRouteImport } from './routes/challenges/$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminChallengesRouteImport } from './routes/admin/challenges'
 import { Route as AdminBugsRouteImport } from './routes/admin/bugs'
-import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as LocaleTermsRouteImport } from './routes/$locale/terms'
+import { Route as LocaleResetPasswordRouteImport } from './routes/$locale/reset-password'
+import { Route as LocaleRegisterRouteImport } from './routes/$locale/register'
+import { Route as LocalePrivacyRouteImport } from './routes/$locale/privacy'
+import { Route as LocaleLoginRouteImport } from './routes/$locale/login'
+import { Route as LocaleLeaderboardRouteImport } from './routes/$locale/leaderboard'
+import { Route as LocaleForgotPasswordRouteImport } from './routes/$locale/forgot-password'
+import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authenticated'
+import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
+import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
+import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
+import { Route as LocaleAuthenticatedSettingsRouteImport } from './routes/$locale/_authenticated/settings'
+import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
 
-const TermsRoute = TermsRouteImport.update({
-  id: '/terms',
-  path: '/terms',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PrivacyRoute = PrivacyRouteImport.update({
-  id: '/privacy',
-  path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LeaderboardRoute = LeaderboardRouteImport.update({
-  id: '/leaderboard',
-  path: '/leaderboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
-  id: '/forgot-password',
-  path: '/forgot-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const LocaleRoute = LocaleRouteImport.update({
+  id: '/$locale',
+  path: '/$locale',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SplatRoute = SplatRouteImport.update({
@@ -82,19 +50,9 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TutorialsIndexRoute = TutorialsIndexRouteImport.update({
-  id: '/tutorials/',
-  path: '/tutorials/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DocsIndexRoute = DocsIndexRouteImport.update({
   id: '/docs/',
   path: '/docs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChallengesIndexRoute = ChallengesIndexRouteImport.update({
-  id: '/challenges/',
-  path: '/challenges/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
@@ -102,19 +60,14 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TutorialsSlugRoute = TutorialsSlugRouteImport.update({
-  id: '/tutorials/$slug',
-  path: '/tutorials/$slug',
-  getParentRoute: () => rootRouteImport,
+const LocaleIndexRoute = LocaleIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LocaleRoute,
 } as any)
 const DocsApiRoute = DocsApiRouteImport.update({
   id: '/docs/api',
   path: '/docs/api',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChallengesSlugRoute = ChallengesSlugRouteImport.update({
-  id: '/challenges/$slug',
-  path: '/challenges/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
@@ -132,252 +85,263 @@ const AdminBugsRoute = AdminBugsRouteImport.update({
   path: '/admin/bugs',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => AuthenticatedRoute,
+const LocaleTermsRoute = LocaleTermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => LocaleRoute,
 } as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRoute,
+const LocaleResetPasswordRoute = LocaleResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleRegisterRoute = LocaleRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocalePrivacyRoute = LocalePrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleLoginRoute = LocaleLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleLeaderboardRoute = LocaleLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleForgotPasswordRoute = LocaleForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleAuthenticatedRoute = LocaleAuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleTutorialsIndexRoute = LocaleTutorialsIndexRouteImport.update({
+  id: '/tutorials/',
+  path: '/tutorials/',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleChallengesIndexRoute = LocaleChallengesIndexRouteImport.update({
+  id: '/challenges/',
+  path: '/challenges/',
+  getParentRoute: () => LocaleRoute,
 } as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocaleTutorialsSlugRoute = LocaleTutorialsSlugRouteImport.update({
+  id: '/tutorials/$slug',
+  path: '/tutorials/$slug',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleChallengesSlugRoute = LocaleChallengesSlugRouteImport.update({
+  id: '/challenges/$slug',
+  path: '/challenges/$slug',
+  getParentRoute: () => LocaleRoute,
+} as any)
+const LocaleAuthenticatedSettingsRoute =
+  LocaleAuthenticatedSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => LocaleAuthenticatedRoute,
+  } as any)
+const LocaleAuthenticatedProfileRoute =
+  LocaleAuthenticatedProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => LocaleAuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/leaderboard': typeof LeaderboardRoute
-  '/login': typeof LoginRoute
-  '/privacy': typeof PrivacyRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/terms': typeof TermsRoute
-  '/profile': typeof AuthenticatedProfileRoute
-  '/settings': typeof AuthenticatedSettingsRoute
+  '/$locale': typeof LocaleAuthenticatedRouteWithChildren
+  '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/leaderboard': typeof LocaleLeaderboardRoute
+  '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/privacy': typeof LocalePrivacyRoute
+  '/$locale/register': typeof LocaleRegisterRoute
+  '/$locale/reset-password': typeof LocaleResetPasswordRoute
+  '/$locale/terms': typeof LocaleTermsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
   '/admin/users': typeof AdminUsersRoute
-  '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
-  '/tutorials/$slug': typeof TutorialsSlugRoute
+  '/$locale/': typeof LocaleIndexRoute
   '/admin': typeof AdminIndexRoute
-  '/challenges': typeof ChallengesIndexRoute
   '/docs': typeof DocsIndexRoute
-  '/tutorials': typeof TutorialsIndexRoute
+  '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
+  '/$locale/settings': typeof LocaleAuthenticatedSettingsRoute
+  '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
+  '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/$locale/challenges': typeof LocaleChallengesIndexRoute
+  '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/leaderboard': typeof LeaderboardRoute
-  '/login': typeof LoginRoute
-  '/privacy': typeof PrivacyRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/terms': typeof TermsRoute
-  '/profile': typeof AuthenticatedProfileRoute
-  '/settings': typeof AuthenticatedSettingsRoute
+  '/$locale': typeof LocaleIndexRoute
+  '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/leaderboard': typeof LocaleLeaderboardRoute
+  '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/privacy': typeof LocalePrivacyRoute
+  '/$locale/register': typeof LocaleRegisterRoute
+  '/$locale/reset-password': typeof LocaleResetPasswordRoute
+  '/$locale/terms': typeof LocaleTermsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
   '/admin/users': typeof AdminUsersRoute
-  '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
-  '/tutorials/$slug': typeof TutorialsSlugRoute
   '/admin': typeof AdminIndexRoute
-  '/challenges': typeof ChallengesIndexRoute
   '/docs': typeof DocsIndexRoute
-  '/tutorials': typeof TutorialsIndexRoute
+  '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
+  '/$locale/settings': typeof LocaleAuthenticatedSettingsRoute
+  '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
+  '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/$locale/challenges': typeof LocaleChallengesIndexRoute
+  '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/forgot-password': typeof ForgotPasswordRoute
-  '/leaderboard': typeof LeaderboardRoute
-  '/login': typeof LoginRoute
-  '/privacy': typeof PrivacyRoute
-  '/register': typeof RegisterRoute
-  '/reset-password': typeof ResetPasswordRoute
-  '/terms': typeof TermsRoute
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/$locale': typeof LocaleRouteWithChildren
+  '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
+  '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/leaderboard': typeof LocaleLeaderboardRoute
+  '/$locale/login': typeof LocaleLoginRoute
+  '/$locale/privacy': typeof LocalePrivacyRoute
+  '/$locale/register': typeof LocaleRegisterRoute
+  '/$locale/reset-password': typeof LocaleResetPasswordRoute
+  '/$locale/terms': typeof LocaleTermsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
   '/admin/users': typeof AdminUsersRoute
-  '/challenges/$slug': typeof ChallengesSlugRoute
   '/docs/api': typeof DocsApiRoute
-  '/tutorials/$slug': typeof TutorialsSlugRoute
+  '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
-  '/challenges/': typeof ChallengesIndexRoute
   '/docs/': typeof DocsIndexRoute
-  '/tutorials/': typeof TutorialsIndexRoute
+  '/$locale/_authenticated/profile': typeof LocaleAuthenticatedProfileRoute
+  '/$locale/_authenticated/settings': typeof LocaleAuthenticatedSettingsRoute
+  '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
+  '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/$locale/challenges/': typeof LocaleChallengesIndexRoute
+  '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/$'
-    | '/forgot-password'
-    | '/leaderboard'
-    | '/login'
-    | '/privacy'
-    | '/register'
-    | '/reset-password'
-    | '/terms'
-    | '/profile'
-    | '/settings'
+    | '/$locale'
+    | '/$locale/forgot-password'
+    | '/$locale/leaderboard'
+    | '/$locale/login'
+    | '/$locale/privacy'
+    | '/$locale/register'
+    | '/$locale/reset-password'
+    | '/$locale/terms'
     | '/admin/bugs'
     | '/admin/challenges'
     | '/admin/users'
-    | '/challenges/$slug'
     | '/docs/api'
-    | '/tutorials/$slug'
+    | '/$locale/'
     | '/admin'
-    | '/challenges'
     | '/docs'
-    | '/tutorials'
+    | '/$locale/profile'
+    | '/$locale/settings'
+    | '/$locale/challenges/$slug'
+    | '/$locale/tutorials/$slug'
     | '/api/auth/$'
+    | '/$locale/challenges'
+    | '/$locale/tutorials'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
-    | '/forgot-password'
-    | '/leaderboard'
-    | '/login'
-    | '/privacy'
-    | '/register'
-    | '/reset-password'
-    | '/terms'
-    | '/profile'
-    | '/settings'
+    | '/$locale'
+    | '/$locale/forgot-password'
+    | '/$locale/leaderboard'
+    | '/$locale/login'
+    | '/$locale/privacy'
+    | '/$locale/register'
+    | '/$locale/reset-password'
+    | '/$locale/terms'
     | '/admin/bugs'
     | '/admin/challenges'
     | '/admin/users'
-    | '/challenges/$slug'
     | '/docs/api'
-    | '/tutorials/$slug'
     | '/admin'
-    | '/challenges'
     | '/docs'
-    | '/tutorials'
+    | '/$locale/profile'
+    | '/$locale/settings'
+    | '/$locale/challenges/$slug'
+    | '/$locale/tutorials/$slug'
     | '/api/auth/$'
+    | '/$locale/challenges'
+    | '/$locale/tutorials'
   id:
     | '__root__'
     | '/'
     | '/$'
-    | '/_authenticated'
-    | '/forgot-password'
-    | '/leaderboard'
-    | '/login'
-    | '/privacy'
-    | '/register'
-    | '/reset-password'
-    | '/terms'
-    | '/_authenticated/profile'
-    | '/_authenticated/settings'
+    | '/$locale'
+    | '/$locale/_authenticated'
+    | '/$locale/forgot-password'
+    | '/$locale/leaderboard'
+    | '/$locale/login'
+    | '/$locale/privacy'
+    | '/$locale/register'
+    | '/$locale/reset-password'
+    | '/$locale/terms'
     | '/admin/bugs'
     | '/admin/challenges'
     | '/admin/users'
-    | '/challenges/$slug'
     | '/docs/api'
-    | '/tutorials/$slug'
+    | '/$locale/'
     | '/admin/'
-    | '/challenges/'
     | '/docs/'
-    | '/tutorials/'
+    | '/$locale/_authenticated/profile'
+    | '/$locale/_authenticated/settings'
+    | '/$locale/challenges/$slug'
+    | '/$locale/tutorials/$slug'
     | '/api/auth/$'
+    | '/$locale/challenges/'
+    | '/$locale/tutorials/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  ForgotPasswordRoute: typeof ForgotPasswordRoute
-  LeaderboardRoute: typeof LeaderboardRoute
-  LoginRoute: typeof LoginRoute
-  PrivacyRoute: typeof PrivacyRoute
-  RegisterRoute: typeof RegisterRoute
-  ResetPasswordRoute: typeof ResetPasswordRoute
-  TermsRoute: typeof TermsRoute
+  LocaleRoute: typeof LocaleRouteWithChildren
   AdminBugsRoute: typeof AdminBugsRoute
   AdminChallengesRoute: typeof AdminChallengesRoute
   AdminUsersRoute: typeof AdminUsersRoute
-  ChallengesSlugRoute: typeof ChallengesSlugRoute
   DocsApiRoute: typeof DocsApiRoute
-  TutorialsSlugRoute: typeof TutorialsSlugRoute
   AdminIndexRoute: typeof AdminIndexRoute
-  ChallengesIndexRoute: typeof ChallengesIndexRoute
   DocsIndexRoute: typeof DocsIndexRoute
-  TutorialsIndexRoute: typeof TutorialsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/terms': {
-      id: '/terms'
-      path: '/terms'
-      fullPath: '/terms'
-      preLoaderRoute: typeof TermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/privacy': {
-      id: '/privacy'
-      path: '/privacy'
-      fullPath: '/privacy'
-      preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leaderboard': {
-      id: '/leaderboard'
-      path: '/leaderboard'
-      fullPath: '/leaderboard'
-      preLoaderRoute: typeof LeaderboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/forgot-password': {
-      id: '/forgot-password'
-      path: '/forgot-password'
-      fullPath: '/forgot-password'
-      preLoaderRoute: typeof ForgotPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: ''
-      preLoaderRoute: typeof AuthenticatedRouteImport
+    '/$locale': {
+      id: '/$locale'
+      path: '/$locale'
+      fullPath: '/$locale'
+      preLoaderRoute: typeof LocaleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$': {
@@ -394,25 +358,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tutorials/': {
-      id: '/tutorials/'
-      path: '/tutorials'
-      fullPath: '/tutorials'
-      preLoaderRoute: typeof TutorialsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/docs/': {
       id: '/docs/'
       path: '/docs'
       fullPath: '/docs'
       preLoaderRoute: typeof DocsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/challenges/': {
-      id: '/challenges/'
-      path: '/challenges'
-      fullPath: '/challenges'
-      preLoaderRoute: typeof ChallengesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/': {
@@ -422,25 +372,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tutorials/$slug': {
-      id: '/tutorials/$slug'
-      path: '/tutorials/$slug'
-      fullPath: '/tutorials/$slug'
-      preLoaderRoute: typeof TutorialsSlugRouteImport
-      parentRoute: typeof rootRouteImport
+    '/$locale/': {
+      id: '/$locale/'
+      path: '/'
+      fullPath: '/$locale/'
+      preLoaderRoute: typeof LocaleIndexRouteImport
+      parentRoute: typeof LocaleRoute
     }
     '/docs/api': {
       id: '/docs/api'
       path: '/docs/api'
       fullPath: '/docs/api'
       preLoaderRoute: typeof DocsApiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/challenges/$slug': {
-      id: '/challenges/$slug'
-      path: '/challenges/$slug'
-      fullPath: '/challenges/$slug'
-      preLoaderRoute: typeof ChallengesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
@@ -464,19 +407,75 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBugsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/settings': {
-      id: '/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/$locale/terms': {
+      id: '/$locale/terms'
+      path: '/terms'
+      fullPath: '/$locale/terms'
+      preLoaderRoute: typeof LocaleTermsRouteImport
+      parentRoute: typeof LocaleRoute
     }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/$locale/reset-password': {
+      id: '/$locale/reset-password'
+      path: '/reset-password'
+      fullPath: '/$locale/reset-password'
+      preLoaderRoute: typeof LocaleResetPasswordRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/register': {
+      id: '/$locale/register'
+      path: '/register'
+      fullPath: '/$locale/register'
+      preLoaderRoute: typeof LocaleRegisterRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/privacy': {
+      id: '/$locale/privacy'
+      path: '/privacy'
+      fullPath: '/$locale/privacy'
+      preLoaderRoute: typeof LocalePrivacyRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/login': {
+      id: '/$locale/login'
+      path: '/login'
+      fullPath: '/$locale/login'
+      preLoaderRoute: typeof LocaleLoginRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/leaderboard': {
+      id: '/$locale/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/$locale/leaderboard'
+      preLoaderRoute: typeof LocaleLeaderboardRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/forgot-password': {
+      id: '/$locale/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/$locale/forgot-password'
+      preLoaderRoute: typeof LocaleForgotPasswordRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/_authenticated': {
+      id: '/$locale/_authenticated'
+      path: ''
+      fullPath: '/$locale'
+      preLoaderRoute: typeof LocaleAuthenticatedRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/tutorials/': {
+      id: '/$locale/tutorials/'
+      path: '/tutorials'
+      fullPath: '/$locale/tutorials'
+      preLoaderRoute: typeof LocaleTutorialsIndexRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/challenges/': {
+      id: '/$locale/challenges/'
+      path: '/challenges'
+      fullPath: '/$locale/challenges'
+      preLoaderRoute: typeof LocaleChallengesIndexRouteImport
+      parentRoute: typeof LocaleRoute
     }
     '/api/auth/$': {
       id: '/api/auth/$'
@@ -485,44 +484,95 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$locale/tutorials/$slug': {
+      id: '/$locale/tutorials/$slug'
+      path: '/tutorials/$slug'
+      fullPath: '/$locale/tutorials/$slug'
+      preLoaderRoute: typeof LocaleTutorialsSlugRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/challenges/$slug': {
+      id: '/$locale/challenges/$slug'
+      path: '/challenges/$slug'
+      fullPath: '/$locale/challenges/$slug'
+      preLoaderRoute: typeof LocaleChallengesSlugRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/_authenticated/settings': {
+      id: '/$locale/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/$locale/settings'
+      preLoaderRoute: typeof LocaleAuthenticatedSettingsRouteImport
+      parentRoute: typeof LocaleAuthenticatedRoute
+    }
+    '/$locale/_authenticated/profile': {
+      id: '/$locale/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/$locale/profile'
+      preLoaderRoute: typeof LocaleAuthenticatedProfileRouteImport
+      parentRoute: typeof LocaleAuthenticatedRoute
+    }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+interface LocaleAuthenticatedRouteChildren {
+  LocaleAuthenticatedProfileRoute: typeof LocaleAuthenticatedProfileRoute
+  LocaleAuthenticatedSettingsRoute: typeof LocaleAuthenticatedSettingsRoute
 }
 
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+const LocaleAuthenticatedRouteChildren: LocaleAuthenticatedRouteChildren = {
+  LocaleAuthenticatedProfileRoute: LocaleAuthenticatedProfileRoute,
+  LocaleAuthenticatedSettingsRoute: LocaleAuthenticatedSettingsRoute,
 }
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
-)
+const LocaleAuthenticatedRouteWithChildren =
+  LocaleAuthenticatedRoute._addFileChildren(LocaleAuthenticatedRouteChildren)
+
+interface LocaleRouteChildren {
+  LocaleAuthenticatedRoute: typeof LocaleAuthenticatedRouteWithChildren
+  LocaleForgotPasswordRoute: typeof LocaleForgotPasswordRoute
+  LocaleLeaderboardRoute: typeof LocaleLeaderboardRoute
+  LocaleLoginRoute: typeof LocaleLoginRoute
+  LocalePrivacyRoute: typeof LocalePrivacyRoute
+  LocaleRegisterRoute: typeof LocaleRegisterRoute
+  LocaleResetPasswordRoute: typeof LocaleResetPasswordRoute
+  LocaleTermsRoute: typeof LocaleTermsRoute
+  LocaleIndexRoute: typeof LocaleIndexRoute
+  LocaleChallengesSlugRoute: typeof LocaleChallengesSlugRoute
+  LocaleTutorialsSlugRoute: typeof LocaleTutorialsSlugRoute
+  LocaleChallengesIndexRoute: typeof LocaleChallengesIndexRoute
+  LocaleTutorialsIndexRoute: typeof LocaleTutorialsIndexRoute
+}
+
+const LocaleRouteChildren: LocaleRouteChildren = {
+  LocaleAuthenticatedRoute: LocaleAuthenticatedRouteWithChildren,
+  LocaleForgotPasswordRoute: LocaleForgotPasswordRoute,
+  LocaleLeaderboardRoute: LocaleLeaderboardRoute,
+  LocaleLoginRoute: LocaleLoginRoute,
+  LocalePrivacyRoute: LocalePrivacyRoute,
+  LocaleRegisterRoute: LocaleRegisterRoute,
+  LocaleResetPasswordRoute: LocaleResetPasswordRoute,
+  LocaleTermsRoute: LocaleTermsRoute,
+  LocaleIndexRoute: LocaleIndexRoute,
+  LocaleChallengesSlugRoute: LocaleChallengesSlugRoute,
+  LocaleTutorialsSlugRoute: LocaleTutorialsSlugRoute,
+  LocaleChallengesIndexRoute: LocaleChallengesIndexRoute,
+  LocaleTutorialsIndexRoute: LocaleTutorialsIndexRoute,
+}
+
+const LocaleRouteWithChildren =
+  LocaleRoute._addFileChildren(LocaleRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  ForgotPasswordRoute: ForgotPasswordRoute,
-  LeaderboardRoute: LeaderboardRoute,
-  LoginRoute: LoginRoute,
-  PrivacyRoute: PrivacyRoute,
-  RegisterRoute: RegisterRoute,
-  ResetPasswordRoute: ResetPasswordRoute,
-  TermsRoute: TermsRoute,
+  LocaleRoute: LocaleRouteWithChildren,
   AdminBugsRoute: AdminBugsRoute,
   AdminChallengesRoute: AdminChallengesRoute,
   AdminUsersRoute: AdminUsersRoute,
-  ChallengesSlugRoute: ChallengesSlugRoute,
   DocsApiRoute: DocsApiRoute,
-  TutorialsSlugRoute: TutorialsSlugRoute,
   AdminIndexRoute: AdminIndexRoute,
-  ChallengesIndexRoute: ChallengesIndexRoute,
   DocsIndexRoute: DocsIndexRoute,
-  TutorialsIndexRoute: TutorialsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

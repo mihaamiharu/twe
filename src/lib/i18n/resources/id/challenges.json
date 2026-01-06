@@ -1,0 +1,101 @@
+{
+    "page": {
+        "title": "Tantangan",
+        "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
+        "overallProgress": "Progres Keseluruhan",
+        "notFound": "Tantangan Tidak Ditemukan",
+        "notFoundDescription": "Tantangan yang kamu cari tidak dapat ditemukan.",
+        "reviewTutorial": "Tinjau Tutorial: {{title}}"
+    },
+    "filters": {
+        "allDifficulties": "Semua Kesulitan",
+        "clear": "Bersihkan",
+        "searchPlaceholder": "Cari tantangan..."
+    },
+    "difficulty": {
+        "EASY": "Mudah",
+        "MEDIUM": "Sedang",
+        "HARD": "Sulit"
+    },
+    "toasts": {
+        "comingSoon": "Tantangan ini akan segera hadir!",
+        "comingSoonDescription": "Nantikan pembaruan pada rencana perjalanan kami.",
+        "notPassed": "Solusi kamu tidak lulus semua tes. Terus mencoba!",
+        "submittedSuccess": "Solusi berhasil dikirim!",
+        "submittedFailed": "Gagal mengirim solusi"
+    },
+    "playground": {
+        "instructions": "Instruksi",
+        "preview": "Pratinjau Target",
+        "editor": "Editor",
+        "results": "Hasil",
+        "console": "Konsol",
+        "resetCode": "Atur Ulang Kode",
+        "testSelector": "Tes Selektor",
+        "correct": "Benar!",
+        "jsUndefined": "Hasil kamu undefined. Pastikan kamu memberikan nilai pada `result`.",
+        "jsMismatch": "Hasil kamu tidak sesuai dengan output yang diharapkan. Periksa logika kamu dan coba lagi.",
+        "noAssertions": "Tidak ada assertion yang dipanggil. Tulis assertion seperti: await expect(locator).toHaveText('...');",
+        "selectorMismatch": "Selektor tidak cocok dengan elemen target",
+        "executionError": "Kesalahan Eksekusi",
+        "alreadyCompleted": "Kamu telah menyelesaikan tantangan ini! Jangan ragu untuk berlatih lagi.",
+        "step1": "Langkah 1: Tangkap Elemen",
+        "goal": "TUJUAN:",
+        "resetTitle": "Atur Ulang Tantangan?",
+        "resetDescription": "Ini akan mengatur ulang kode/selektor kamu ke keadaan awal. Progres sesi kamu saat ini akan hilang.",
+        "recommendation": "Rekomendasi:",
+        "recommendationDescription": "Tantangan {{tier}} ini menggunakan konsep dari tingkat {{missingName}}.",
+        "tryPrereq": "Coba {{missingName}} terlebih dahulu"
+    },
+    "success": {
+        "title": "Tantangan Selesai!",
+        "description": "Selamat! Kamu telah berhasil lulus tes untuk tantangan ini.",
+        "earnedXP": "Diperoleh dari penyelesaian",
+        "levelUp": "Naik Level!",
+        "levelUpDescription": "Kamu sekarang level {{level}}: {{title}}",
+        "achievementsUnlocked": "Pencapaian Terbuka",
+        "nextChallenge": "Tantangan Berikutnya",
+        "retry": "Lagi",
+        "browseList": "Lihat Daftar"
+    },
+    "types": {
+        "css_selector": "Selektor CSS",
+        "xpath_selector": "XPath",
+        "javascript": "JavaScript",
+        "playwright": "Playwright",
+        "selector": "Selektor"
+    },
+    "tiers": {
+        "basic": "Dasar",
+        "beginner": "Pemula",
+        "intermediate": "Menengah",
+        "expert": "Ahli"
+    },
+    "categories": {
+        "css-basics": "Dasar CSS",
+        "xpath-basics": "Dasar XPath",
+        "xpath-advanced": "XPath Lanjutan",
+        "selector-comparison": "CSS vs XPath",
+        "js-fundamentals": "Dasar JavaScript",
+        "js-dom": "Dasar DOM",
+        "js-async": "Dasar Async",
+        "playwright-navigation": "Navigasi & Aksi",
+        "playwright-locators": "Locator",
+        "playwright-assertions": "Assertion",
+        "playwright-waits": "Strategi Menunggu",
+        "playwright-pom": "Page Object Model",
+        "playwright-data-driven": "Pengujian Berbasis Data",
+        "playwright-infrastructure": "Infrastruktur Pengujian",
+        "playwright-integration-patterns": "Pola Integrasi"
+    },
+    "labels": {
+        "allTypes": "Semua Tipe",
+        "comingSoon": "Segera Hadir",
+        "completed": "selesai",
+        "rank": "Peringkat",
+        "challenge": "Tantangan",
+        "stats": "Statistik",
+        "creatingNew": "Membuat tantangan baru...",
+        "craftingScenarios": "Saya sedang menyusun skenario baru berdasarkan bug nyata yang saya temukan. Cek kembali segera!"
+    }
+}

@@ -19,3 +19,4 @@ lint-results.json
 lint-results.json
 
 playwright-report/
+.env.staging

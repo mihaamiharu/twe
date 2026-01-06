@@ -9,7 +9,8 @@
  * - Works for both logged-in and anonymous users
  */
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -43,12 +44,16 @@ import { createBugReport } from '@/lib/bug-reports.fn';
 
 // Form validation schema
 const bugReportFormSchema = z.object({
-    title: z.string().min(5, 'Title must be at least 5 characters').max(200),
-    severity: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
-    stepsToReproduce: z.string().min(10, 'Please provide detailed steps to reproduce the bug'),
-    expectedBehavior: z.string().min(10, 'Please describe what you expected to happen'),
-    actualBehavior: z.string().min(10, 'Please describe what actually happened'),
     email: z.string().email('Please enter a valid email').optional().or(z.literal('')),
+});
+
+const getBugReportSchema = (t: any) => z.object({
+    title: z.string().min(5, t('bugs:validation.titleTooShort')).max(200),
+    severity: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
+    stepsToReproduce: z.string().min(10, t('bugs:validation.stepsTooShort')),
+    expectedBehavior: z.string().min(10, t('bugs:validation.expectedTooShort')),
+    actualBehavior: z.string().min(10, t('bugs:validation.actualTooShort')),
+    email: z.string().email(t('bugs:validation.invalidEmail')).optional().or(z.literal('')),
 });
 
 type BugReportFormData = z.infer<typeof bugReportFormSchema>;
@@ -56,12 +61,12 @@ type BugReportFormData = z.infer<typeof bugReportFormSchema>;
 type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
 // Severity badge styles
-const severityConfig: Record<Severity, { label: string; color: string; icon: typeof AlertTriangle }> = {
-    CRITICAL: { label: 'Critical', color: 'bg-red-500/10 text-red-500 border-red-500/20', icon: AlertTriangle },
-    HIGH: { label: 'High', color: 'bg-orange-500/10 text-orange-500 border-orange-500/20', icon: AlertCircle },
-    MEDIUM: { label: 'Medium', color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20', icon: Info },
-    LOW: { label: 'Low', color: 'bg-green-500/10 text-green-500 border-green-500/20', icon: CheckCircle },
-};
+const getSeverityConfig = (t: any): Record<Severity, { label: string; color: string; icon: typeof AlertTriangle }> => ({
+    CRITICAL: { label: t('bugs:form.severity.critical'), color: 'bg-red-500/10 text-red-500 border-red-500/20', icon: AlertTriangle },
+    HIGH: { label: t('bugs:form.severity.high'), color: 'bg-orange-500/10 text-orange-500 border-orange-500/20', icon: AlertCircle },
+    MEDIUM: { label: t('bugs:form.severity.medium'), color: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20', icon: Info },
+    LOW: { label: t('bugs:form.severity.low'), color: 'bg-green-500/10 text-green-500 border-green-500/20', icon: CheckCircle },
+});
 
 interface BugReportDialogProps {
     trigger?: React.ReactNode;
@@ -69,9 +74,13 @@ interface BugReportDialogProps {
 }
 
 export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
+    const { t } = useTranslation(['bugs', 'common']);
     const [open, setOpen] = useState(false);
     const { data: session } = useSession();
     const isLoggedIn = !!session?.user;
+
+    const severityConfig = useMemo(() => getSeverityConfig(t), [t]);
+    const bugReportFormSchema = useMemo(() => getBugReportSchema(t), [t]);
 
     const form = useForm<BugReportFormData>({
         resolver: zodResolver(bugReportFormSchema),
@@ -102,8 +111,8 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
             return response.data;
         },
         onSuccess: () => {
-            toast.success('Bug report submitted!', {
-                description: 'Thank you for helping us improve.',
+            toast.success(t('bugs:toast.success.title'), {
+                description: t('bugs:toast.success.description'),
             });
 
             // Track analytics
@@ -113,7 +122,7 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
             setOpen(false);
         },
         onError: (error: Error) => {
-            toast.error('Failed to submit bug report', {
+            toast.error(t('bugs:toast.error.title'), {
                 description: error.message,
             });
         },
@@ -130,7 +139,7 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                 {trigger || (
                     <Button variant="ghost" size="sm" className={cn('gap-2', className)}>
                         <Bug className="h-4 w-4" />
-                        Report Bug
+                        {t('bugs:dialog.trigger')}
                     </Button>
                 )}
             </DialogTrigger>
@@ -138,21 +147,21 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                 <DialogHeader className="p-6 pb-2 shrink-0">
                     <DialogTitle className="flex items-center gap-2">
                         <Bug className="h-5 w-5 text-destructive" />
-                        Report a Bug
+                        {t('bugs:dialog.title')}
                     </DialogTitle>
                 </DialogHeader>
                 <DialogDescription className="px-6 py-1">
-                    Help us improve by reporting issues you find. Please be as detailed as possible.
+                    {t('bugs:dialog.description')}
                 </DialogDescription>
 
                 <div className="flex-1 overflow-y-auto p-6 pt-2">
                     <form id="bug-report-form" onSubmit={(e) => void form.handleSubmit(onSubmit)(e)} className="space-y-6">
                         {/* Title */}
                         <div className="space-y-2">
-                            <Label htmlFor="title">Bug Title *</Label>
+                            <Label htmlFor="title">{t('bugs:form.title.label')}</Label>
                             <Input
                                 id="title"
-                                placeholder="Brief description of the issue"
+                                placeholder={t('bugs:form.title.placeholder')}
                                 {...form.register('title')}
                             />
                             {form.formState.errors.title && (
@@ -162,13 +171,13 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
 
                         {/* Severity */}
                         <div className="space-y-2">
-                            <Label>Severity *</Label>
+                            <Label>{t('bugs:form.severity.label')}</Label>
                             <Select
                                 value={form.watch('severity')}
                                 onValueChange={(value: Severity) => form.setValue('severity', value)}
                             >
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select severity" />
+                                    <SelectValue placeholder={t('bugs:form.severity.placeholder')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     {Object.entries(severityConfig).map(([key, config]) => {
@@ -189,22 +198,19 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
 
                             {/* Severity Guide */}
                             <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3 space-y-1">
-                                <p><strong>Critical:</strong> App is unusable, data loss, security issue</p>
-                                <p><strong>High:</strong> Major feature broken, no workaround</p>
-                                <p><strong>Medium:</strong> Feature works but with issues</p>
-                                <p><strong>Low:</strong> Minor issue, cosmetic problem</p>
+                                <p><strong>{t('bugs:form.severity.critical')}:</strong> {t('bugs:form.severity.guide.critical')}</p>
+                                <p><strong>{t('bugs:form.severity.high')}:</strong> {t('bugs:form.severity.guide.high')}</p>
+                                <p><strong>{t('bugs:form.severity.medium')}:</strong> {t('bugs:form.severity.guide.medium')}</p>
+                                <p><strong>{t('bugs:form.severity.low')}:</strong> {t('bugs:form.severity.guide.low')}</p>
                             </div>
                         </div>
 
                         {/* Steps to Reproduce */}
                         <div className="space-y-2">
-                            <Label htmlFor="stepsToReproduce">Steps to Reproduce *</Label>
+                            <Label htmlFor="stepsToReproduce">{t('bugs:form.steps.label')}</Label>
                             <Textarea
                                 id="stepsToReproduce"
-                                placeholder={`1. Go to the page "..."
-2. Click on "..."
-3. Enter "..." in the field
-4. Observe the error`}
+                                placeholder={t('bugs:form.steps.placeholder')}
                                 rows={5}
                                 {...form.register('stepsToReproduce')}
                             />
@@ -216,10 +222,10 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                         {/* Expected vs Actual Behavior */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label htmlFor="expectedBehavior">Expected Behavior *</Label>
+                                <Label htmlFor="expectedBehavior">{t('bugs:form.expected.label')}</Label>
                                 <Textarea
                                     id="expectedBehavior"
-                                    placeholder="What should happen?"
+                                    placeholder={t('bugs:form.expected.placeholder')}
                                     rows={4}
                                     {...form.register('expectedBehavior')}
                                 />
@@ -228,10 +234,10 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                                 )}
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="actualBehavior">Actual Behavior *</Label>
+                                <Label htmlFor="actualBehavior">{t('bugs:form.actual.label')}</Label>
                                 <Textarea
                                     id="actualBehavior"
-                                    placeholder="What actually happened?"
+                                    placeholder={t('bugs:form.actual.placeholder')}
                                     rows={4}
                                     {...form.register('actualBehavior')}
                                 />
@@ -244,15 +250,15 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                         {/* Email (only for anonymous users) */}
                         {!isLoggedIn && (
                             <div className="space-y-2">
-                                <Label htmlFor="email">Your Email (optional)</Label>
+                                <Label htmlFor="email">{t('bugs:form.email.label')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
-                                    placeholder="For follow-up questions"
+                                    placeholder={t('bugs:form.email.placeholder')}
                                     {...form.register('email')}
                                 />
                                 <p className="text-xs text-muted-foreground">
-                                    We may contact you if we need more information.
+                                    {t('bugs:form.email.description')}
                                 </p>
                                 {form.formState.errors.email && (
                                     <p className="text-sm text-destructive">{form.formState.errors.email.message}</p>
@@ -262,10 +268,10 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
 
                         {/* Auto-captured info notice */}
                         <div className="text-xs text-muted-foreground bg-muted/30 rounded-md p-3">
-                            <p className="font-medium mb-1">Auto-captured information:</p>
-                            <p>• Current page URL</p>
-                            <p>• Browser information</p>
-                            {isLoggedIn && <p>• Your user account</p>}
+                            <p className="font-medium mb-1">{t('bugs:form.autocapture.title')}</p>
+                            <p>• {t('bugs:form.autocapture.url')}</p>
+                            <p>• {t('bugs:form.autocapture.browser')}</p>
+                            {isLoggedIn && <p>• {t('bugs:form.autocapture.user')}</p>}
                         </div>
 
                         {/* Submit Button */}
@@ -275,7 +281,7 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                 <div className="p-6 pt-2 border-t mt-auto shrink-0 bg-background">
                     <div className="flex justify-end gap-3">
                         <Button type="button" variant="ghost" onClick={() => setOpen(false)}>
-                            Cancel
+                            {t('common:actions.cancel')}
                         </Button>
                         <Button
                             type="submit"
@@ -286,12 +292,12 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
                             {submitMutation.isPending ? (
                                 <>
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                    Submitting...
+                                    {t('bugs:form.submit.loading')}
                                 </>
                             ) : (
                                 <>
                                     <Bug className="h-4 w-4 mr-2" />
-                                    Submit Bug Report
+                                    {t('bugs:form.submit.button')}
                                 </>
                             )}
                         </Button>

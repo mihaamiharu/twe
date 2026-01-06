@@ -1,4 +1,4 @@
-import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router';
+import { HeadContent, Outlet, Scripts, createRootRoute, useParams } from '@tanstack/react-router';
 import { type AuthSession } from '@/lib/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
@@ -13,6 +13,8 @@ import { ThemeProvider } from '@/components/theme-provider';
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
+import i18n from '@/lib/i18n';
+import { useTranslation } from 'react-i18next';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -54,11 +56,35 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TestingWithEkki - Learn Testing Skills',
+        title: i18n.t('common:seo.title'),
       },
       {
         name: 'description',
-        content: 'Learn testing skills through interactive tutorials and coding challenges',
+        content: i18n.t('common:seo.description'),
+      },
+      {
+        property: 'og:title',
+        content: i18n.t('common:seo.ogTitle'),
+      },
+      {
+        property: 'og:description',
+        content: i18n.t('common:seo.ogDescription'),
+      },
+      {
+        property: 'og:type',
+        content: 'website',
+      },
+      {
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:title',
+        content: i18n.t('common:seo.ogTitle'),
+      },
+      {
+        name: 'twitter:description',
+        content: i18n.t('common:seo.ogDescription'),
       },
     ],
     links: [
@@ -96,8 +122,11 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const params = useParams({ strict: false }) as { locale?: string };
+  const locale = params.locale || 'en';
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <head>
         <HeadContent />
         <script
