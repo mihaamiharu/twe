@@ -94,6 +94,8 @@ export const accounts = pgTable('accounts', {
     accessToken: text('access_token'),
     refreshToken: text('refresh_token'),
     idToken: text('id_token'),
+    accessTokenExpiresAt: timestamp('access_token_expires_at'),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
     expiresAt: timestamp('expires_at'),
     scope: text('scope'),
     password: text('password'), // For email/password auth

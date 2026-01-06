@@ -7,12 +7,8 @@ import { auth } from '@/lib/auth.server';
 export const Route = createFileRoute('/api/auth/$')({
     server: {
         handlers: {
-            GET: async ({ request }) => {
-                return await auth.handler(request);
-            },
-            POST: async ({ request }) => {
-                return await auth.handler(request);
-            },
+            GET: ({ request }) => auth.handler(request),
+            POST: ({ request }) => auth.handler(request),
         },
     },
 });
