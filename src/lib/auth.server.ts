@@ -59,17 +59,16 @@ export const auth = betterAuth({
         },
     },
 
-    // Google OAuth removed - using email verification only
-    // To re-enable, uncomment and set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET
-    // socialProviders: {
-    //     google: {
-    //         clientId: process.env.GOOGLE_CLIENT_ID || '',
-    //         clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-    //         enabled: !!(
-    //             process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-    //         ),
-    //     },
-    // },
+    // Google OAuth
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID || '',
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
+            enabled: !!(
+                process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
+            ),
+        },
+    },
 
     // Session configuration
     session: {
