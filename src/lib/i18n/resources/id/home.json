@@ -127,5 +127,10 @@
         "freeToUse": "Gratis digunakan",
         "noCreditCard": "Tanpa kartu kredit",
         "learnAtOwnPace": "Belajar dengan kecepatan sendiri"
+    },
+    "hallOfFame": {
+        "title": "Daftar",
+        "titleHighlight": "Kehormatan",
+        "subtitle": "Lihat pencapaian terbaru yang dibuka oleh komunitas."
     }
 }

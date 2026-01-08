@@ -38,6 +38,7 @@ export interface UserStats {
     longestStreak: number;
     tutorialsCompleted: number;
     perfectScores: number;
+    bugReportsFiled: number;
 }
 
 export interface AwardedAchievement {
@@ -247,6 +248,16 @@ export const ACHIEVEMENTS: Achievement[] = [
         xpReward: 25,
         criteria: { type: 'count', target: 1 },
     },
+    {
+        id: 'bug-squasher',
+        key: 'bug-squasher',
+        name: 'Bug Squasher',
+        description: 'Report your first valid bug',
+        icon: '🐞',
+        category: 'SPECIAL',
+        xpReward: 100,
+        criteria: { type: 'count', target: 1 },
+    },
 ];
 
 /**
@@ -273,6 +284,8 @@ export function checkAchievements(
                     earned = count >= criteria.target;
                 } else if (achievement.category === 'TUTORIALS') {
                     earned = stats.tutorialsCompleted >= criteria.target;
+                } else if (achievement.id === 'bug-squasher') {
+                    earned = stats.bugReportsFiled >= criteria.target;
                 } else {
                     // Total challenge count
                     earned = stats.totalChallengesCompleted >= criteria.target;
@@ -339,6 +352,8 @@ export function getAchievementProgress(
                 current = stats.challengesByType[criteria.challengeType] || 0;
             } else if (achievement.category === 'TUTORIALS') {
                 current = stats.tutorialsCompleted;
+            } else if (achievement.id === 'bug-squasher') {
+                current = stats.bugReportsFiled;
             } else {
                 current = stats.totalChallengesCompleted;
             }

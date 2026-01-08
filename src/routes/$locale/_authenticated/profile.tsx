@@ -12,6 +12,8 @@ import { Award, BookOpen, Code, Settings, Zap, AlertCircle } from 'lucide-react'
 import { getXPForLevel } from '@/lib/gamification';
 import { getUserSettings } from '@/lib/user.fn';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
+import { AchievementBadge } from '@/components/gamification/AchievementBadge';
+import { Achievement } from '@/lib/achievements';
 
 export const Route = createFileRoute('/$locale/_authenticated/profile')({
     component: ProfilePage,
@@ -36,12 +38,7 @@ interface UserProfile {
         achievementsCount: number;
         challengesByType: Record<string, number>;
     };
-    recentAchievements: {
-        name: string;
-        description: string;
-        icon: string;
-        unlockedAt: Date;
-    }[];
+    earnedAchievements: (Achievement & { unlockedAt: Date })[];
     recentActivity: {
         type: 'challenge' | 'achievement';
         title: string;
@@ -346,7 +343,7 @@ function ProfilePage() {
                     </TabsContent>
 
                     <TabsContent value="achievements" className="mt-6">
-                        {(!user.recentAchievements || user.recentAchievements.length === 0) ? (
+                        {(!user.earnedAchievements || user.earnedAchievements.length === 0) ? (
                             <Card className="glass-card">
                                 <CardContent className="p-8 text-center text-muted-foreground">
                                     <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />
@@ -355,15 +352,20 @@ function ProfilePage() {
                                 </CardContent>
                             </Card>
                         ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                {user.recentAchievements.map((achievement, index) => (
-                                    <Card key={index} className="glass-card card-hover">
-                                        <CardContent className="p-6 text-center">
-                                            <div className="text-4xl mb-3 animate-scale-in" style={{ animationDelay: `${index * 100}ms` }}>{achievement.icon}</div>
-                                            <h3 className="font-semibold mb-1">{achievement.name}</h3>
-                                            <p className="text-sm text-muted-foreground">{achievement.description}</p>
-                                        </CardContent>
-                                    </Card>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {user.earnedAchievements.map((achievement, index) => (
+                                    <AchievementBadge
+                                        key={index}
+                                        achievement={{
+                                            ...achievement,
+                                            key: achievement.id,
+                                            criteria: { type: 'count', target: 1 }, // Dummy criteria
+                                        }}
+                                        earned
+                                        earnedAt={new Date(achievement.unlockedAt)}
+                                        className="animate-scale-in"
+                                        style={{ animationDelay: `${index * 50}ms` }}
+                                    />
                                 ))}
                             </div>
                         )}

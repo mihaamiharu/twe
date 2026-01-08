@@ -1,8 +1,8 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
-import { achievements } from '@/db/schema';
+import { achievements, userAchievements, users } from '@/db/schema';
 import { logger } from '@/lib/logger';
-import { sql } from 'drizzle-orm';
+import { sql, desc } from 'drizzle-orm';
 import { getChallengeList, getTutorialList } from './content.server';
 
 // In-memory cache for stats (refreshed every 24 hours)
@@ -17,12 +17,36 @@ interface StatsCache {
             intermediate: number;
             expert: number;
         };
+        latestAchievements: {
+            achievementName: string;
+            achievementIcon: string;
+            userName: string;
+            userAvatar: string | null;
+        }[];
     };
     timestamp: number;
 }
 
 let cachedStats: StatsCache | null = null;
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+async function getLatestAchievements() {
+    const latest = await db
+        .select({
+            achievementName: achievements.name,
+            achievementIcon: achievements.icon,
+            userName: users.name,
+            userAvatar: users.image,
+        })
+        .from(userAchievements)
+        .innerJoin(achievements, sql`user_achievements.achievement_id = achievements.id`)
+        .innerJoin(users, sql`user_achievements.user_id = users.id`)
+        .orderBy(desc(userAchievements.unlockedAt))
+        .limit(5);
+    
+    return latest;
+}
+
 
 async function fetchStats() {
     // Get challenges and tutorials from FILESYSTEM (single source of truth)
@@ -54,12 +78,15 @@ async function fetchStats() {
             tiers.expert++;
         }
     }
+    
+    const latestAchievements = await getLatestAchievements();
 
     return {
         challenges: allChallenges.length,
         tutorials: allTutorials.length,
         achievements: achievementCount?.count || 0,
         tiers,
+        latestAchievements,
     };
 }
 
