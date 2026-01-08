@@ -46,6 +46,8 @@ export interface Locator {
     evaluate<R, Arg>(pageFunction: (element: HTMLElement, arg: Arg) => R | Promise<R>, arg?: Arg): Promise<R>;
     locator(selector: string): Locator;
     filter(options: { hasText?: string | RegExp }): Locator;
+    all(): Promise<Locator[]>;
+    allTextContents(): Promise<string[]>;
 }
 
 export interface LocatorOptions {
@@ -1133,6 +1135,22 @@ export class MockedPlaywrightPage {
                         return true;
                     });
                 });
+            },
+
+            all: async () => {
+                const elements = finder();
+                return elements.map((_, index) => {
+                    // Create a new locator for each specific index
+                    // This uses .nth(index) semantics
+                    const newLocator = this.createLocator(finder);
+                    newLocator.nth(index);
+                    return newLocator;
+                });
+            },
+
+            allTextContents: async () => {
+                const elements = finder();
+                return elements.map(el => el.textContent || '');
             },
         };
 
