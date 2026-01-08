@@ -99,6 +99,14 @@ export interface APIRequest {
     postData(): string | null;
 }
 
+export interface Dialog {
+    message(): string;
+    type(): 'alert' | 'confirm' | 'prompt' | 'beforeunload';
+    accept(promptText?: string): Promise<void>;
+    dismiss(): Promise<void>;
+    defaultValue(): string;
+}
+
 export interface BrowserContext {
     tracing: {
         start(options?: unknown): Promise<void>;
@@ -116,6 +124,22 @@ export interface Browser {
     newContext(options?: unknown): Promise<BrowserContext>;
     close(): Promise<void>;
     version(): string;
+}
+
+export interface Keyboard {
+    down(key: string): Promise<void>;
+    up(key: string): Promise<void>;
+    insertText(text: string): Promise<void>;
+    type(text: string, options?: { delay?: number }): Promise<void>;
+    press(key: string, options?: { delay?: number }): Promise<void>;
+}
+
+export interface Mouse {
+    move(x: number, y: number, options?: { steps?: number }): Promise<void>;
+    down(options?: { button?: 'left' | 'right' | 'middle', clickCount?: number }): Promise<void>;
+    up(options?: { button?: 'left' | 'right' | 'middle', clickCount?: number }): Promise<void>;
+    click(x: number, y: number, options?: { delay?: number, button?: 'left' | 'right' | 'middle', clickCount?: number }): Promise<void>;
+    dblclick(x: number, y: number, options?: { delay?: number, button?: 'left' | 'right' | 'middle' }): Promise<void>;
 }
 
 export interface FrameLocator {
@@ -143,6 +167,8 @@ export class MockedPlaywrightPage {
     private targetDocument: Document;
     private defaultTimeout: number;
     public request: APIRequestContext;
+    public keyboard: Keyboard;
+    public mouse: Mouse;
     private currentUrl: string = 'about:blank';
     private _context: BrowserContext;
 
@@ -151,11 +177,157 @@ export class MockedPlaywrightPage {
         this.defaultTimeout = options?.timeout || 2500;
         this.request = this._createAPIRequestContext();
         this._context = this._createBrowserContext();
+        this.keyboard = this._createKeyboard();
+        this.mouse = this._createMouse();
     }
 
     // ============================================
     // Core Actions
     // ============================================
+
+    private _createKeyboard(): Keyboard {
+        const getActiveElement = () => this.targetDocument.activeElement as HTMLElement || this.targetDocument.body;
+
+        return {
+            down: async (key: string) => {
+                logger.debug(`[Keyboard] down: ${key}`);
+                const el = getActiveElement();
+                el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+            },
+            up: async (key: string) => {
+                logger.debug(`[Keyboard] up: ${key}`);
+                const el = getActiveElement();
+                el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+            },
+            insertText: async (text: string) => {
+                logger.debug(`[Keyboard] insertText: ${text}`);
+                const el = getActiveElement();
+                if ('value' in el) {
+                    (el as HTMLInputElement).value += text;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                } else {
+                    el.textContent += text;
+                }
+            },
+            type: async (text: string, options) => {
+                logger.debug(`[Keyboard] type: ${text}`);
+                const el = getActiveElement();
+                for (const char of text) {
+                    el.dispatchEvent(new KeyboardEvent('keydown', { key: char, bubbles: true }));
+                    el.dispatchEvent(new KeyboardEvent('keypress', { key: char, bubbles: true }));
+                    if ('value' in el) {
+                        (el as HTMLInputElement).value += char;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                    } else {
+                        // Very basic contenteditable shim
+                        el.textContent += char;
+                    }
+                    el.dispatchEvent(new KeyboardEvent('keyup', { key: char, bubbles: true }));
+                    if (options?.delay) await this.delay(options.delay);
+                }
+            },
+            press: async (key: string, options) => {
+                logger.debug(`[Keyboard] press: ${key}`);
+                const el = getActiveElement();
+                el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+                el.dispatchEvent(new KeyboardEvent('keypress', { key, bubbles: true }));
+                el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+                if (options?.delay) await this.delay(options.delay);
+            }
+        };
+    }
+
+    private _createMouse(): Mouse {
+        let x = 0;
+        let y = 0;
+
+        return {
+            move: async (newX, newY) => {
+                // logger.debug(`[Mouse] move: ${newX}, ${newY}`); // Too spammy
+                x = newX;
+                y = newY;
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+                el.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, bubbles: true, view: this.targetDocument.defaultView }));
+            },
+            down: async (options) => {
+                logger.debug(`[Mouse] down`);
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, button: options?.button === 'right' ? 2 : 0, bubbles: true, view: this.targetDocument.defaultView }));
+            },
+            up: async (options) => {
+                logger.debug(`[Mouse] up`);
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, button: options?.button === 'right' ? 2 : 0, bubbles: true, view: this.targetDocument.defaultView }));
+            },
+            click: async (targetX, targetY, options) => {
+                logger.debug(`[Mouse] click at ${targetX},${targetY}`);
+                x = targetX;
+                y = targetY;
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+
+                // Highlight target if found
+                if (el instanceof HTMLElement) {
+                    void this._highlight(el, '#3b82f6'); // Blue for mouse click
+                }
+
+                el.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y, bubbles: true }));
+                if (options?.delay) await this.delay(options.delay);
+            },
+            dblclick: async (targetX, targetY, options) => {
+                logger.debug(`[Mouse] dblclick at ${targetX},${targetY}`);
+                x = targetX;
+                y = targetY;
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+
+                if (el instanceof HTMLElement) {
+                    void this._highlight(el, '#3b82f6');
+                }
+
+                el.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('dblclick', { clientX: x, clientY: y, bubbles: true }));
+                if (options?.delay) await this.delay(options.delay);
+            }
+        };
+    }
+
+    /**
+     * Handle dialogs
+     */
+    async on(event: string, handler: (dialog: Dialog) => void): Promise<void> {
+        if (event === 'dialog') {
+            // Register global handler that iframe logic can call
+            const iframeWindow = this.targetDocument.defaultView as any;
+            if (!iframeWindow) return;
+
+            if (!iframeWindow.__MOCK_DIALOG_HANDLER__) {
+                iframeWindow.__MOCK_DIALOG_HANDLER__ = (type: string, message: string, defaultValue?: string) => {
+                    return new Promise((resolve) => {
+                        const dialog: Dialog = {
+                            type: () => type as any,
+                            message: () => message,
+                            defaultValue: () => defaultValue || '',
+                            accept: async (promptText) => {
+                                resolve({ action: 'accept', promptText });
+                            },
+                            dismiss: async () => {
+                                resolve({ action: 'dismiss' });
+                            }
+                        };
+                        handler(dialog);
+                    });
+                };
+            }
+        }
+    }
 
     /**
      * Visual feedback helper
