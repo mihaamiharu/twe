@@ -10,7 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { AlertCircle, Clock, ArrowLeft, CheckCircle2, ArrowRight, Layers } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
@@ -205,9 +205,8 @@ function TutorialDetailPage() {
     const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : (readingProgress ?? tutorial?.userProgress?.readingProgress ?? 0);
 
     // Parse TOC
-    const toc = useRef<TOCItem[]>([]);
-    useEffect(() => {
-        if (!tutorial?.content) return;
+    const toc = useMemo<TOCItem[]>(() => {
+        if (!tutorial?.content) return [];
 
         const lines = tutorial.content.split('\n');
         const items: TOCItem[] = [];
@@ -234,7 +233,7 @@ function TutorialDetailPage() {
             }
         });
 
-        toc.current = items;
+        return items;
     }, [tutorial?.content]);
 
     const [activeId, setActiveId] = useState<string>('');
@@ -364,9 +363,9 @@ function TutorialDetailPage() {
                     {/* Progress Sidebar - Sticky positioning with top offset for header */}
                     <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
                         {/* Table of Contents - Only show if there are items */}
-                        {toc.current.length > 0 && (
+                        {toc.length > 0 && (
                             <div className="hidden lg:block mb-6">
-                                <TableOfContents headers={toc.current} activeId={activeId} />
+                                <TableOfContents headers={toc} activeId={activeId} />
                             </div>
                         )}
 
