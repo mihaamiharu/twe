@@ -16,19 +16,11 @@ export const Route = createFileRoute('/$locale/register')({
     component: RegisterPage,
 });
 
-import { useSession } from '@/lib/auth.client';
 import { useEffect } from 'react';
 
 function RegisterPage() {
     const { locale } = useParams({ from: '/$locale/register' });
     const navigate = useNavigate();
-    const { data: session } = useSession();
-
-    useEffect(() => {
-        if (session?.user) {
-            void navigate({ to: LocaleRoutes.home, params: localeParams(locale) });
-        }
-    }, [session, navigate, locale]);
 
     return (
         <div className="min-h-screen flex items-center justify-center p-6 bg-background">

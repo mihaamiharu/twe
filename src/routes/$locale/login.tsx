@@ -16,19 +16,11 @@ export const Route = createFileRoute('/$locale/login')({
     component: LoginPage,
 });
 
-import { useSession } from '@/lib/auth.client';
 import { useEffect } from 'react';
 
 function LoginPage() {
     const { locale } = useParams({ from: '/$locale/login' });
     const navigate = useNavigate();
-    const { data: session } = useSession();
-
-    useEffect(() => {
-        if (session?.user) {
-            void navigate({ to: LocaleRoutes.home, params: localeParams(locale) });
-        }
-    }, [session, navigate, locale]);
 
     const handleLoginSuccess = () => {
         // Redirect to original path if available, otherwise home
