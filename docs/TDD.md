@@ -312,14 +312,12 @@ QA-style bug reporting from users.
 #### Authentication Endpoints
 
 ```
-POST   /auth/register          - Register new user
-POST   /auth/login             - Login with email/password
-POST   /auth/oauth/google      - OAuth with Google
-POST   /auth/oauth/github      - OAuth with GitHub
-POST   /auth/refresh           - Refresh JWT token
-POST   /auth/logout            - Logout user
-POST   /auth/forgot-password   - Request password reset
-POST   /auth/reset-password    - Reset password with token
+POST   /api/auth/sign-up/email      - Register new user
+POST   /api/auth/sign-in/email      - Login with email/password
+POST   /api/auth/sign-in/social     - OAuth login
+POST   /api/auth/sign-out           - Logout user
+POST   /api/auth/forget-password    - Request password reset
+POST   /api/auth/reset-password     - Reset password with token
 ```
 
 #### User Endpoints

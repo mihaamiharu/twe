@@ -16,7 +16,8 @@
                 "css-selector-101-id-class",
                 "css-tag-selectors",
                 "css-combining-basics"
-            ]
+            ],
+            "nextTutorialSlug": "css-selectors-for-qa"
         },
         {
             "slug": "css-selectors-for-qa",
@@ -34,7 +35,8 @@
                 "css-selector-101-id-class",
                 "css-tag-selectors",
                 "css-combining-basics"
-            ]
+            ],
+            "nextTutorialSlug": "xpath-for-test-automation"
         },
         {
             "slug": "xpath-for-test-automation",
@@ -51,7 +53,8 @@
                 "xpath-basics-element",
                 "xpath-basics-id",
                 "xpath-basics-class"
-            ]
+            ],
+            "nextTutorialSlug": "building-robust-test-selectors"
         },
         {
             "slug": "building-robust-test-selectors",
@@ -65,7 +68,8 @@
                 "qa",
                 "beginner"
             ],
-            "relatedChallenges": []
+            "relatedChallenges": [],
+            "nextTutorialSlug": "selector-decision-framework"
         },
         {
             "slug": "selector-decision-framework",
@@ -79,7 +83,8 @@
                 "comparison",
                 "beginner"
             ],
-            "relatedChallenges": []
+            "relatedChallenges": [],
+            "nextTutorialSlug": "javascript-fundamentals-for-qa"
         },
         {
             "slug": "javascript-fundamentals-for-qa",
@@ -95,7 +100,8 @@
             "relatedChallenges": [
                 "js-variables-basics",
                 "js-functions-basics"
-            ]
+            ],
+            "nextTutorialSlug": "dom-manipulation-for-testing"
         },
         {
             "slug": "dom-manipulation-for-testing",
@@ -111,7 +117,8 @@
             "relatedChallenges": [
                 "js-dom-query",
                 "js-dom-text"
-            ]
+            ],
+            "nextTutorialSlug": "async-await-basics"
         },
         {
             "slug": "async-await-basics",
@@ -127,7 +134,8 @@
             "relatedChallenges": [
                 "js-async-timeout",
                 "js-async-fetch"
-            ]
+            ],
+            "nextTutorialSlug": "playwright-navigation-actions"
         },
         {
             "slug": "playwright-navigation-actions",
@@ -142,7 +150,8 @@
             "relatedChallenges": [
                 "pw-navigation-goto",
                 "pw-actions-click"
-            ]
+            ],
+            "nextTutorialSlug": "playwright-locators"
         },
         {
             "slug": "playwright-locators",
@@ -157,7 +166,8 @@
             "relatedChallenges": [
                 "pw-locator-text",
                 "pw-locator-role"
-            ]
+            ],
+            "nextTutorialSlug": "playwright-assertions"
         },
         {
             "slug": "playwright-assertions",
@@ -172,7 +182,8 @@
             "relatedChallenges": [
                 "pw-assert-visible",
                 "pw-assert-text"
-            ]
+            ],
+            "nextTutorialSlug": "playwright-waits"
         },
         {
             "slug": "playwright-waits",
@@ -187,7 +198,8 @@
             "relatedChallenges": [
                 "pw-wait-selector",
                 "pw-wait-function"
-            ]
+            ],
+            "nextTutorialSlug": "playwright-pom"
         },
         {
             "slug": "playwright-pom",
@@ -199,7 +211,8 @@
                 "patterns",
                 "advanced"
             ],
-            "relatedChallenges": []
+            "relatedChallenges": [],
+            "nextTutorialSlug": "playwright-data-driven"
         },
         {
             "slug": "playwright-data-driven",
@@ -211,7 +224,8 @@
                 "parameterized",
                 "advanced"
             ],
-            "relatedChallenges": []
+            "relatedChallenges": [],
+            "nextTutorialSlug": "playwright-advanced-patterns"
         },
         {
             "slug": "playwright-advanced-patterns",
@@ -223,7 +237,8 @@
                 "patterns",
                 "advanced"
             ],
-            "relatedChallenges": []
+            "relatedChallenges": [],
+            "nextTutorialSlug": "playwright-fixtures"
         },
         {
             "slug": "playwright-fixtures",
@@ -235,7 +250,8 @@
                 "patterns",
                 "advanced"
             ],
-            "relatedChallenges": []
+            "relatedChallenges": [],
+            "nextTutorialSlug": null
         }
     ]
 }
