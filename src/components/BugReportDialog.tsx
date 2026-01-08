@@ -38,7 +38,8 @@ import {
 import { toast } from 'sonner';
 import { Bug, Loader2, AlertTriangle, AlertCircle, Info, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSession } from '@/lib/auth.client';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
 import { createBugReport } from '@/lib/bug-reports.fn';
 
@@ -76,7 +77,8 @@ interface BugReportDialogProps {
 export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
     const { t } = useTranslation(['bugs', 'common']);
     const [open, setOpen] = useState(false);
-    const { data: session } = useSession();
+    const { data: auth } = useSuspenseQuery(authQueryOptions);
+    const session = auth;
     const isLoggedIn = !!session?.user;
 
     const severityConfig = useMemo(() => getSeverityConfig(t), [t]);

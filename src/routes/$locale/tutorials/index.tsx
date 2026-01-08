@@ -288,7 +288,7 @@ function TutorialCard({ tutorial, locale }: { tutorial: any; locale: string }) {
             params={{ locale, slug: tutorial.slug }}
             className="group"
         >
-            <Card className="h-full glass-card hover:border-brand-teal/50 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-brand-teal/5 relative overflow-hidden border border-border">
+            <Card className="h-full glass-card hover:border-brand-teal/50 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-brand-teal/10 relative overflow-hidden border border-border flex flex-col mx-auto w-full">
                 {/* Completed Badge */}
                 {tutorial.isCompleted && (
                     <div className="absolute top-0 right-0 p-2 bg-green-500/10 rounded-bl-lg border-l border-b border-green-500/20 z-10">
@@ -299,26 +299,39 @@ function TutorialCard({ tutorial, locale }: { tutorial: any; locale: string }) {
                     </div>
                 )}
                 <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                        <BookOpen className="h-5 w-5 text-brand-teal" />
+                    <div className="flex items-center gap-2 mb-3">
+                        <div className="p-2 rounded-lg bg-brand-teal/10 text-brand-teal">
+                            <BookOpen className="h-5 w-5" />
+                        </div>
                         {tutorial.tags && tutorial.tags.length > 0 && (
                             <Badge variant="secondary" className="border-transparent bg-secondary/50 text-secondary-foreground">{tutorial.tags[0]}</Badge>
                         )}
                     </div>
-                    <CardTitle className="group-hover:text-brand-teal transition-colors text-lg">
+                    <CardTitle className="group-hover:text-brand-teal transition-colors text-xl leading-tight">
                         {tutorial.title}
                     </CardTitle>
-                    <CardDescription className="line-clamp-2">
-                        {/* {tutorial.description} */} {/* Description commented out in original code? No, keeping it. */}
+                    <CardDescription className="line-clamp-3 mt-2 text-base">
                         {tutorial.description}
                     </CardDescription>
                 </CardHeader>
-                <CardContent>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
+                {/* Spacer to push content to bottom if needed */}
+                <div className="flex-grow" />
+                <CardContent className="mt-auto pt-0">
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground border-t border-border/50 pt-4">
+                        <div className="flex items-center gap-1.5">
                             <Clock className="h-4 w-4" />
-                            {t('card.estimatedTimeShort', { minutes: tutorial.estimatedMinutes })}
+                            <span className="font-medium">{tutorial.estimatedMinutes} min</span>
                         </div>
+                        {tutorial.difficulty && (
+                            <div className="flex items-center gap-1.5 capitalize ml-auto">
+                                <span className={
+                                    tutorial.difficulty === 'BEGINNER' ? 'text-green-500' :
+                                        tutorial.difficulty === 'INTERMEDIATE' ? 'text-yellow-500' :
+                                            'text-red-500'
+                                }>●</span>
+                                {tutorial.difficulty.toLowerCase()}
+                            </div>
+                        )}
                     </div>
                 </CardContent>
             </Card>

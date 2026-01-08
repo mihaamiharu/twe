@@ -1,7 +1,8 @@
-import { createFileRoute, Link, useParams, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
+import { useIntlayer } from 'react-intlayer';
 import { useCallback, useMemo, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { getChallenge, getChallenges } from '@/lib/challenges.fn';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
@@ -13,7 +14,7 @@ import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
 import { createSubmission } from '@/lib/submissions.fn';
-import { useSession } from '@/lib/auth.client';
+import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 import { TierSkipTip } from '@/components/challenges/TierSkipTip';
@@ -138,7 +139,7 @@ function ChallengeDetailPage() {
             if (tierChallenges.length > 0 && completedInTier < tierChallenges.length) {
                 missing.push({
                     tier: prereqTier,
-                    name: t(`challenges:tiers.${prereqTier}`)
+                    name: t(`challenges: tiers.${prereqTier} `)
                 });
             }
         }
@@ -146,7 +147,8 @@ function ChallengeDetailPage() {
         return missing;
     }, [data, allChallengesData]);
 
-    const { data: sessionData } = useSession();
+    const { data: auth } = useSuspenseQuery(authQueryOptions);
+    const sessionData = auth; // Alias for compatibility
     const userId = sessionData?.user?.id;
 
     // Deobfuscate inputs if needed (for selector challenges)
