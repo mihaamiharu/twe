@@ -127,5 +127,10 @@
         "freeToUse": "Free to use",
         "noCreditCard": "No credit card required",
         "learnAtOwnPace": "Learn at your own pace"
+    },
+    "hallOfFame": {
+        "title": "Hall of",
+        "titleHighlight": "Fame",
+        "subtitle": "See the latest achievements unlocked by the community."
     }
 }
