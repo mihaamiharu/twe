@@ -97,8 +97,18 @@ export async function executePlaywrightCode(
             document.body.appendChild(iframe);
         }
 
+        let timeoutId: any;
+
+        const cleanup = () => {
+            if (timeoutId) clearTimeout(timeoutId);
+            // Only remove if we created it
+            if (!useExistingIframe && iframe.parentNode) {
+                document.body.removeChild(iframe);
+            }
+        };
+
         // Timeout handler
-        const timeoutId = setTimeout(() => {
+        timeoutId = setTimeout(() => {
             cleanup();
             resolve({
                 status: 'TIMEOUT',
@@ -108,14 +118,6 @@ export async function executePlaywrightCode(
                 logs,
             });
         }, timeout);
-
-        const cleanup = () => {
-            clearTimeout(timeoutId);
-            // Only remove if we created it
-            if (!useExistingIframe && iframe.parentNode) {
-                document.body.removeChild(iframe);
-            }
-        };
 
         try {
             const executeCode = async () => {
@@ -411,10 +413,24 @@ export async function executePlaywrightCode(
 
                     const enhancedDocument = createEnhancedDocument(iframeDoc);
 
+                    // Mock test runner object
+                    const test = {
+                        step: async (name: string, callback: () => Promise<any>) => {
+                            interceptedConsole.log(`[Step] ${name}`);
+                            try {
+                                await callback();
+                            } catch (error) {
+                                interceptedConsole.error(`[Step] ${name} FAILED: ${error}`);
+                                throw error;
+                            }
+                        }
+                    };
+
                     // eslint-disable-next-line @typescript-eslint/no-implied-eval
                     const userFunction = new Function(
                         'page',
                         'expect',
+                        'test',
                         'window',
                         'document',
                         'console',
@@ -427,13 +443,27 @@ export async function executePlaywrightCode(
                     );
 
                     // Simple expect function with assertion tracking
-                    const { expect, getAssertionCount } = createExpect();
+                    const { expect, getAssertionCount, getTestResults } = createExpect();
 
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                    const returnValue = await userFunction(page, expect, iframe.contentWindow, enhancedDocument, interceptedConsole);
+                    const returnValue = await userFunction(page, expect, test, iframe.contentWindow, enhancedDocument, interceptedConsole);
 
                     const executionTime = Date.now() - startTime;
                     cleanup();
+
+                    // Check for soft failures
+                    const softFailures = getTestResults().filter(r => !r.passed);
+                    if (softFailures.length > 0) {
+                        resolve({
+                            status: 'FAILED',
+                            output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map(f => `- ${f.message}`).join('\n')}`,
+                            executionTime,
+                            error: softFailures[0].message, // Return first error
+                            logs,
+                            assertionCount: getAssertionCount(),
+                        });
+                        return;
+                    }
 
                     resolve({
                         status: 'PASSED',
@@ -617,13 +647,16 @@ interface ExpectResult {
         toHaveCount: (count: number) => Promise<void>;
     };
     getAssertionCount: () => number;
+    getTestResults: () => Array<{ message: string; passed: boolean }>;
 }
 
 function createExpect(): ExpectResult {
     let assertionCount = 0;
+    const testResults: Array<{ message: string; passed: boolean }> = [];
 
     const incrementCount = () => { assertionCount++; };
     const getAssertionCount = () => assertionCount;
+    const getTestResults = () => testResults;
 
     /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
     const expect = function (actual: any) {
@@ -632,12 +665,12 @@ function createExpect(): ExpectResult {
                 incrementCount(); // Count every assertion call
                 if (!pass) {
                     if (isSoft) {
-                        try {
-                            // In a real environment we'd collect this, but for now we'll just log or ignore
-                            // console.warn(`Soft assertion failed: ${message}`);
-                        } catch {
-                            // ignore soft assertion
-                        }
+                        // Soft failure - record it but don't throw
+                        const formattedMessage = message.includes('Expected')
+                            ? `Soft Assertion Failed: ${message}`
+                            : `Soft Assertion Failed: ${message} (Actual value did not match expected criteria)`;
+                        console.error(formattedMessage);
+                        testResults.push({ message: formattedMessage, passed: false });
                     } else {
                         // Improve error message format
                         const formattedMessage = message.includes('Expected')
