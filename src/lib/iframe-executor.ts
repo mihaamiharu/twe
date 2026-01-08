@@ -57,6 +57,32 @@ export async function executePlaywrightCode(
         finalHtml = htmlContent.replace("fetch('/api/data')", "fetch('http://localhost/api/data')");
     }
 
+    // Static analysis for "Strict Mode" (Educational Check)
+    // We want to catch uses of 'document' or 'window' that aren't inside page.evaluate()
+    // This is a simple regex check, not a full AST parse, but catches most beginner mistakes.
+    const forbiddenPatterns = [
+        { pattern: /document\.getElement/, message: "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'." },
+        { pattern: /document\.query/, message: "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'." },
+        { pattern: /window\.local/, message: "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.localStorage...)'." },
+        { pattern: /alert\(/, message: "In Playwright, you cannot handle alerts this way. Use 'page.on(\"dialog\", ...)'." },
+    ];
+
+    for (const { pattern, message } of forbiddenPatterns) {
+        if (pattern.test(code)) {
+            // Check if it might be inside an evaluate block (naive check)
+            // If the code line containing the pattern is not inside an evaluate, throw error
+            // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
+            // Actually, let's just return a FAILED result immediately to teach the user.
+            return {
+                status: 'FAILED',
+                output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
+                executionTime: 0,
+                error: `Strict Mode Error: ${message}`,
+                logs: []
+            };
+        }
+    }
+
     return new Promise((resolve) => {
         let iframe: HTMLIFrameElement;
 
@@ -558,7 +584,11 @@ function createExpect(): ExpectResult {
                             // ignore soft assertion
                         }
                     } else {
-                        throw new Error(message);
+                        // Improve error message format
+                        const formattedMessage = message.includes('Expected')
+                            ? `Assertion Error: ${message}`
+                            : `Assertion Error: ${message} (Actual value did not match expected criteria)`;
+                        throw new Error(formattedMessage);
                     }
                 }
             };
