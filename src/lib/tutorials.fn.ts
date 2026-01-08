@@ -262,12 +262,9 @@ export const getTutorial = createServerFn({ method: 'GET' })
                 }
             }
 
-            // Next Tutorial (from filesystem registry)
-            const allTutorials = await getTutorialList(locale);
-            const currentOrder = tutorialContent.order;
-            const nextTutorial = allTutorials
-                .filter(t => t.order > currentOrder)
-                .sort((a, b) => a.order - b.order)[0];
+            // Next Tutorial (efficient O(1) lookup using registry)
+            const { getNextTutorial } = await import('./content.server');
+            const nextTutorial = await getNextTutorial(slug, locale);
 
             return {
                 success: true,
@@ -299,86 +296,8 @@ export const getTutorial = createServerFn({ method: 'GET' })
         }
     });
 
-// ----------------------------------------------------------------------------
-// UPDATE TUTORIAL PROGRESS
-// ----------------------------------------------------------------------------
-
-const UpdateTutorialProgressSchema = z.object({
-    slug: z.string(),
-    readingProgress: z.number().min(0).max(100),
-});
-
-export const updateTutorialProgress = createServerFn({ method: "POST" })
-    .inputValidator((data: unknown) => UpdateTutorialProgressSchema.parse(data))
-    .handler(async ({ data: input }) => {
-        try {
-            const { getRequestHeaders } = await import('@tanstack/react-start/server');
-            const { auth } = await import('./auth.server');
-            const { db } = await import('@/db');
-            const { tutorials, progress } = await import('@/db/schema');
-            const { eq, and } = await import('drizzle-orm');
-
-            const headers = getRequestHeaders() as Headers;
-            const session = await auth.api.getSession({ headers });
-
-            if (!session?.user?.id) {
-                return { success: false, error: 'Unauthorized' };
-            }
-
-            const userId = session.user.id;
-            const { slug, readingProgress: newProgress } = input;
-
-            // Get tutorial id
-            const tutorial = await db.query.tutorials.findFirst({
-                where: eq(tutorials.slug, slug),
-                columns: { id: true },
-            });
-
-            if (!tutorial) {
-                return { success: false, error: 'Tutorial not found' };
-            }
-
-            // Check for existing progress
-            const existingProgress = await db.query.progress.findFirst({
-                where: and(
-                    eq(progress.userId, userId),
-                    eq(progress.tutorialId, tutorial.id)
-                ),
-            });
-
-            if (existingProgress) {
-                // Update
-                await db.update(progress).set({
-                    readingProgress: newProgress,
-                    isCompleted: newProgress >= 100 ? true : existingProgress.isCompleted,
-                    lastAccessedAt: new Date(),
-                }).where(eq(progress.id, existingProgress.id));
-            } else {
-                // Insert
-                await db.insert(progress).values({
-                    userId,
-                    tutorialId: tutorial.id,
-                    readingProgress: newProgress,
-                    isCompleted: newProgress >= 100,
-                    lastAccessedAt: new Date(),
-                });
-            }
-
-            return {
-                success: true,
-                data: {
-                    readingProgress: newProgress,
-                    isCompleted: newProgress >= 100,
-                },
-            };
-        } catch (error) {
-            console.error('Error updating tutorial progress:', error);
-            return {
-                success: false,
-                error: error instanceof Error ? error.message : 'Unknown error',
-            };
-        }
-    });
+// NOTE: Reading progress is tracked client-side only.
+// Progress is saved to DB only when user clicks "Complete" via completeTutorial().
 
 // ----------------------------------------------------------------------------
 // MARK TUTORIAL COMPLETE
@@ -398,6 +317,7 @@ export const completeTutorial = createServerFn({ method: "POST" })
             const { db } = await import('@/db');
             const { tutorials, progress, users } = await import('@/db/schema');
             const { eq, and, sql } = await import('drizzle-orm');
+            const { getTutorialContent } = await import('./content.server');
 
             const headers = getRequestHeaders() as Headers;
             const session = await auth.api.getSession({ headers });
@@ -409,13 +329,29 @@ export const completeTutorial = createServerFn({ method: "POST" })
             const userId = session.user.id;
             const { slug } = input;
 
-            // Get tutorial
-            const tutorial = await db.query.tutorials.findFirst({
+            // Get tutorial from DB, or create it from filesystem content
+            let tutorial = await db.query.tutorials.findFirst({
                 where: eq(tutorials.slug, slug),
             });
 
             if (!tutorial) {
-                return { success: false, error: 'Tutorial not found' };
+                // Tutorial not in DB yet - create it from filesystem
+                const tutorialContent = await getTutorialContent(slug, 'en');
+                if (!tutorialContent) {
+                    return { success: false, error: 'Tutorial not found' };
+                }
+
+                const [newTutorial] = await db.insert(tutorials).values({
+                    slug: tutorialContent.slug,
+                    title: { en: tutorialContent.title, id: tutorialContent.title },
+                    description: { en: tutorialContent.description, id: tutorialContent.description },
+                    content: { en: tutorialContent.content, id: tutorialContent.content },
+                    order: tutorialContent.order,
+                    estimatedMinutes: tutorialContent.estimatedMinutes,
+                    tags: tutorialContent.tags,
+                    isPublished: true,
+                }).returning();
+                tutorial = newTutorial;
             }
 
             // Check existing progress

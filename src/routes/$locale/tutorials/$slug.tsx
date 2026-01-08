@@ -1,19 +1,20 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTutorial, completeTutorial, updateTutorialProgress } from '@/lib/tutorials.fn';
+import { getTutorial, completeTutorial } from '@/lib/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { AlertCircle, Clock, ArrowLeft, CheckCircle2, ArrowRight } from 'lucide-react';
+import { AlertCircle, Clock, ArrowLeft, CheckCircle2, ArrowRight, Layers } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState, useRef, useEffect } from 'react';
-import { useSession } from '@/lib/auth.client';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { authQueryOptions } from '@/lib/auth.query';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
-import { showAchievementToasts } from '@/lib/achievement-toast';
+import { TableOfContents, type TOCItem } from '@/components/tutorials/TableOfContents';
 
 export const Route = createFileRoute('/$locale/tutorials/$slug')({
     component: TutorialDetailPage,
@@ -60,7 +61,8 @@ function TutorialDetailPage() {
     const [readingProgress, setReadingProgress] = useState(0);
     const [showAuthGuard, setShowAuthGuard] = useState(false);
     const contentRef = useRef<HTMLDivElement>(null);
-    const { data: sessionData } = useSession();
+    const { data: auth } = useSuspenseQuery(authQueryOptions);
+    const sessionData = auth; // Alias for compatibility
 
     const { data: tutorialData, isLoading, error } = useQuery({
         queryKey: ['tutorial', slug],
@@ -82,7 +84,7 @@ function TutorialDetailPage() {
             if (!result.success) throw new Error(result.error);
             return result;
         },
-        onSuccess: async (response) => {
+        onSuccess: async () => {
             toast.success(t('tutorials:toasts.completed'));
             await queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
             await queryClient.invalidateQueries({ queryKey: ['tutorials'] });
@@ -90,24 +92,15 @@ function TutorialDetailPage() {
             await queryClient.invalidateQueries({ queryKey: ['profile'] });
             await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
 
-            // Show toast notifications for new achievements
-            if (response?.newAchievements?.length) {
-                showAchievementToasts(response.newAchievements);
-            }
+            // Achievement toasts would go here if tutorials awarded achievements
+            // Currently tutorials only award XP
         },
         onError: () => {
             toast.error(t('tutorials:toasts.failed'));
         },
     });
 
-    // Update progress mutation
-    const updateProgressMutation = useMutation({
-        mutationFn: async (progress: number) => {
-            const result = await updateTutorialProgress({ data: { slug, readingProgress: progress } });
-            if (!result.success) throw new Error(result.error);
-            return result;
-        },
-    });
+    // Progress is tracked client-side only, saved to DB only on "Complete" click
 
     // Use a ref to track progress for the event listener without re-binding
     const progressRef = useRef(readingProgress);
@@ -157,13 +150,9 @@ function TutorialDetailPage() {
                 progress = 100;
             }
 
-            // Only update if progress is genuinely increasing
+            // Only update local state if progress is genuinely increasing
             if (progress > progressRef.current) {
                 setReadingProgress(progress);
-                // Update progress in DB - only on significant milestones or 100%
-                if ((progress % 20 === 0 || progress === 100)) {
-                    updateProgressMutation.mutate(progress);
-                }
             }
         };
 
@@ -214,6 +203,58 @@ function TutorialDetailPage() {
     // Get display progress - always 100% for completed tutorials
     // Use nullish coalescing (??) so that 0 is not treated as falsy
     const displayProgress = tutorial?.userProgress?.isCompleted ? 100 : (readingProgress ?? tutorial?.userProgress?.readingProgress ?? 0);
+
+    // Parse TOC
+    const toc = useMemo<TOCItem[]>(() => {
+        if (!tutorial?.content) return [];
+
+        const lines = tutorial.content.split('\n');
+        const items: TOCItem[] = [];
+        const slugify = (text: string) => text.toLowerCase().replace(/[^\w]+/g, '-');
+
+        // Simple regex to find headers in code blocks to ignore them
+        let inCodeBlock = false;
+
+        lines.forEach(line => {
+            if (line.trim().startsWith('```')) {
+                inCodeBlock = !inCodeBlock;
+                return;
+            }
+
+            if (inCodeBlock) return;
+
+            const h2Match = line.match(/^##\s+(.+)$/);
+            const h3Match = line.match(/^###\s+(.+)$/);
+
+            if (h2Match) {
+                items.push({ id: slugify(h2Match[1]), text: h2Match[1], level: 2 });
+            } else if (h3Match) {
+                items.push({ id: slugify(h3Match[1]), text: h3Match[1], level: 3 });
+            }
+        });
+
+        return items;
+    }, [tutorial?.content]);
+
+    const [activeId, setActiveId] = useState<string>('');
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        setActiveId(entry.target.id);
+                    }
+                });
+            },
+            { rootMargin: '-100px 0px -66% 0px' }
+        );
+
+        const headings = document.querySelectorAll('h2, h3');
+        headings.forEach((h) => observer.observe(h));
+
+        return () => observer.disconnect();
+    }, [tutorial?.content]);
 
     // Loading state
     if (isLoading) {
@@ -276,21 +317,34 @@ function TutorialDetailPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content - No card wrapper, let it breathe */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Streamlined Header - Only once, with gradient */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                {tutorial.tags?.map((tag) => (
-                                    <Badge key={tag} variant="secondary">
-                                        {tag}
-                                    </Badge>
-                                ))}
+                        {/* Redesigned Header */}
+                        <div className="flex flex-col items-center text-center space-y-8 mb-12 pt-8">
+                            {/* Tags & Meta */}
+                            <div className="flex items-center gap-3">
+                                {tutorial.tags?.[0] && (
+                                    <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-bold tracking-wider uppercase">
+                                        {tutorial.tags[0]}
+                                    </div>
+                                )}
+                                <div className="text-sm text-muted-foreground flex items-center gap-1">
+                                    <span>•</span>
+                                    <span>{t('card.estimatedTimeShort', { minutes: tutorial.estimatedMinutes })} read</span>
+                                </div>
                             </div>
-                            <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+
+                            {/* Title */}
+                            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight max-w-4xl" style={{ fontFamily: 'var(--font-reading)' }}>
                                 {tutorial.title}
                             </h1>
-                            <p className="text-xl text-muted-foreground">
+
+                            {/* Description */}
+                            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
                                 {tutorial.description}
                             </p>
+
+
+
+
                         </div>
 
                         {/* Content - Direct on page, no card container */}
@@ -308,6 +362,13 @@ function TutorialDetailPage() {
 
                     {/* Progress Sidebar - Sticky positioning with top offset for header */}
                     <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+                        {/* Table of Contents - Only show if there are items */}
+                        {toc.length > 0 && (
+                            <div className="hidden lg:block mb-6">
+                                <TableOfContents headers={toc} activeId={activeId} />
+                            </div>
+                        )}
+
                         {/* Progress Card */}
                         <Card className="glass-card shadow-lg">
                             <CardHeader>
