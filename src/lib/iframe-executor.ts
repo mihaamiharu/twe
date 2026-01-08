@@ -160,7 +160,62 @@ export async function executePlaywrightCode(
                                         }
                                     }
 
-                                    // Mock /api/data
+                                    // Check against dynamic routes from page.route()
+                                    if (window.__MOCK_ROUTES__) {
+                                        for (const route of window.__MOCK_ROUTES__) {
+                                            let isMatch = false;
+                                            if (typeof route.matcher === 'string') {
+                                                // Simple glob-like matching (very basic)
+                                                // If it contains *, treat as simple wildcard
+                                                if (route.matcher.includes('*')) {
+                                                    const regex = new RegExp(route.matcher.replace(/\*/g, '.*'));
+                                                    isMatch = regex.test(url);
+                                                } else {
+                                                    isMatch = url.includes(route.matcher);
+                                                }
+                                            } else if (route.matcher instanceof RegExp) {
+                                                isMatch = route.matcher.test(url);
+                                            } else if (typeof route.matcher === 'function') {
+                                                try {
+                                                    isMatch = route.matcher(new URL(url));
+                                                } catch {
+                                                    isMatch = false;
+                                                }
+                                            }
+
+                                            if (isMatch) {
+                                                console.log('Mocking fetch via page.route to ' + url);
+
+                                                // Create a request object to pass to handler
+                                                const requestInfo = {
+                                                    url,
+                                                    method: init?.method || 'GET',
+                                                    headers: init?.headers || {},
+                                                    body: init?.body
+                                                };
+
+                                                return route.handler(requestInfo).then(result => {
+                                                    if (result && result.type === 'fulfill') {
+                                                        const resp = result.response;
+                                                        return Promise.resolve({
+                                                            ok: (resp.status || 200) >= 200 && (resp.status || 200) < 300,
+                                                            status: resp.status || 200,
+                                                            json: () => Promise.resolve(resp.json || JSON.parse(typeof resp.body === 'string' ? resp.body : '{}')),
+                                                            text: () => Promise.resolve(typeof resp.body === 'string' ? resp.body : JSON.stringify(resp.json || {})),
+                                                            headers: new Headers(resp.headers || {'content-type': 'application/json'})
+                                                        });
+                                                    } else if (result && result.type === 'continue') {
+                                                        // Fall through to original fetch (network)
+                                                        // In our sandbox, this means hitting the actual URL (or failing if CORS/offline)
+                                                        // return originalFetch(url, init);
+                                                    }
+                                                    return Promise.reject(new Error('Route handler did not fulfill or continue'));
+                                                });
+                                            }
+                                        }
+                                    }
+
+                                    // Legacy Mock for /api/data (for backward compatibility with existing challenges)
                                     if (typeof url === 'string' && url.includes('/api/data')) {
                                         console.log('Mocking fetch to ' + url);
                                         return Promise.resolve({

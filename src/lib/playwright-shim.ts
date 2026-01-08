@@ -75,6 +75,30 @@ export interface APIResponse {
     body(): Promise<Buffer>;
 }
 
+export interface Route {
+    fulfill(response: {
+        status?: number;
+        headers?: Record<string, string>;
+        contentType?: string;
+        body?: string | Buffer;
+        json?: unknown;
+        path?: string;
+    }): Promise<void>;
+    continue(options?: {
+        method?: string;
+        headers?: Record<string, string>;
+        postData?: string | Buffer;
+    }): Promise<void>;
+    request(): APIRequest;
+}
+
+export interface APIRequest {
+    url(): string;
+    method(): string;
+    headers(): Record<string, string>;
+    postData(): string | null;
+}
+
 export interface BrowserContext {
     tracing: {
         start(options?: unknown): Promise<void>;
@@ -132,6 +156,68 @@ export class MockedPlaywrightPage {
     // ============================================
     // Core Actions
     // ============================================
+
+    async route(
+        urlOrPredicate: string | RegExp | ((url: URL) => boolean),
+        handler: (route: Route, request: APIRequest) => Promise<void> | void
+    ): Promise<void> {
+        // Register route in global registry on the iframe window
+        // The iframe fetch polyfill will read from this
+        const iframeWindow = this.targetDocument.defaultView as any;
+        if (!iframeWindow) return;
+
+        if (!iframeWindow.__MOCK_ROUTES__) {
+            iframeWindow.__MOCK_ROUTES__ = [];
+        }
+
+        iframeWindow.__MOCK_ROUTES__.push({
+            matcher: urlOrPredicate,
+            handler: async (requestInfo: any) => {
+                const route: Route = {
+                    fulfill: async (response) => {
+                        return Promise.resolve(response);
+                    },
+                    continue: async () => {
+                        return Promise.resolve(null); // Signal to continue
+                    },
+                    request: () => ({
+                        url: () => requestInfo.url,
+                        method: () => requestInfo.method,
+                        headers: () => requestInfo.headers,
+                        postData: () => requestInfo.body
+                    })
+                };
+
+                const request: APIRequest = route.request();
+
+                // We need to capture the response from the handler
+                // Since handler returns void, we depend on it calling fulfill or continue
+                // This is a bit tricky to bridge synchronously, so we'll use a Promise
+
+                return new Promise(async (resolve) => {
+                    // Override fulfill/continue to resolve our promise
+                    route.fulfill = async (response) => {
+                        resolve({ type: 'fulfill', response });
+                    };
+                    route.continue = async (options) => {
+                        resolve({ type: 'continue', options });
+                    };
+
+                    await handler(route, request);
+                });
+            }
+        });
+    }
+
+    async unroute(urlOrPredicate: string | RegExp | ((url: URL) => boolean)): Promise<void> {
+        const iframeWindow = this.targetDocument.defaultView as any;
+        if (!iframeWindow || !iframeWindow.__MOCK_ROUTES__) return;
+
+        // Remove matching routes
+        iframeWindow.__MOCK_ROUTES__ = iframeWindow.__MOCK_ROUTES__.filter((r: any) =>
+            r.matcher.toString() !== urlOrPredicate.toString()
+        );
+    }
 
     async goto(url: string): Promise<void> {
         // Mock navigation
@@ -709,8 +795,80 @@ export class MockedPlaywrightPage {
      */
     locator(selector: string): Locator {
         return this.createLocator(() => {
-            return Array.from(this.targetDocument.querySelectorAll(selector));
+            return this._findAll(this.targetDocument, selector);
         });
+    }
+
+    /**
+     * Internal helper to find elements handling special Playwright selectors
+     */
+    private _findAll(root: Document | Element, selector: string): HTMLElement[] {
+        let matchedElements: HTMLElement[] = [];
+
+        // Text selector: text=...
+        if (selector.startsWith('text=')) {
+            const text = selector.substring(5);
+            const exact = text.startsWith('"') && text.endsWith('"');
+            const cleanText = exact ? text.slice(1, -1) : text;
+
+            const allElements = root.querySelectorAll('*');
+            Array.from(allElements).forEach(el => {
+                const element = el as HTMLElement;
+                const content = element.textContent || '';
+                if (exact ? content === cleanText : content.includes(cleanText)) {
+                    matchedElements.push(element);
+                }
+            });
+
+            // Sort by depth (deepest first)
+            matchedElements.sort((a, b) => {
+                let depthA = 0, pA = a;
+                while(pA.parentElement && pA !== root) { depthA++; pA = pA.parentElement; }
+                let depthB = 0, pB = b;
+                while(pB.parentElement && pB !== root) { depthB++; pB = pB.parentElement; }
+                return depthB - depthA;
+            });
+
+            // Filter out parents if children match (Deepest match principle)
+            // If A contains B, and both match, only keep B.
+            matchedElements = matchedElements.filter(el => {
+                // Check if any *other* matched element is a descendant of this 'el'
+                const hasMatchingDescendant = matchedElements.some(other =>
+                    other !== el && el.contains(other)
+                );
+                return !hasMatchingDescendant;
+            });
+        }
+        // XPath selector: xpath=...
+        else if (selector.startsWith('xpath=')) {
+            const xpath = selector.substring(6);
+            try {
+                const doc = root instanceof Document ? root : root.ownerDocument;
+                const result = doc.evaluate(
+                    xpath,
+                    root,
+                    null,
+                    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+                    null
+                );
+                for (let i = 0; i < result.snapshotLength; i++) {
+                    const node = result.snapshotItem(i);
+                    if (node instanceof HTMLElement) {
+                        matchedElements.push(node);
+                    }
+                }
+            } catch (e) {
+                console.warn('Invalid XPath:', xpath, e);
+            }
+        }
+        // CSS selector: css=... or just ...
+        else {
+            const cssSelector = selector.startsWith('css=') ? selector.substring(4) : selector;
+            // Standard querySelectorAll
+            matchedElements = Array.from(root.querySelectorAll(cssSelector)) as HTMLElement[];
+        }
+
+        return matchedElements;
     }
 
     // ============================================
@@ -1114,8 +1272,8 @@ export class MockedPlaywrightPage {
                     const parents = finder();
                     const children: HTMLElement[] = [];
                     for (const parent of parents) {
-                        const matches = Array.from(parent.querySelectorAll(subSelector));
-                        children.push(...matches as HTMLElement[]);
+                        const matchedElements = this._findAll(parent, subSelector);
+                        children.push(...matchedElements);
                     }
                     return children;
                 });
