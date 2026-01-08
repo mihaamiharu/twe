@@ -157,6 +157,32 @@ export class MockedPlaywrightPage {
     // Core Actions
     // ============================================
 
+    /**
+     * Visual feedback helper
+     * Highlights an element briefly to show interaction
+     */
+    private async _highlight(element: HTMLElement, color = '#dc2626'): Promise<void> {
+        // Skip if document is hidden or detached (safety check)
+        if (!element.isConnected) return;
+
+        const originalTransition = element.style.transition;
+        const originalOutline = element.style.outline;
+        const originalBoxShadow = element.style.boxShadow;
+
+        // Apply highlight
+        element.style.transition = 'all 0.1s ease';
+        element.style.outline = `2px solid ${color}`;
+        element.style.boxShadow = `0 0 0 4px ${color}40`; // 40 is alpha for hex
+
+        // Wait a bit so user sees it
+        await this.delay(300);
+
+        // Restore
+        element.style.outline = originalOutline;
+        element.style.boxShadow = originalBoxShadow;
+        element.style.transition = originalTransition;
+    }
+
     async route(
         urlOrPredicate: string | RegExp | ((url: URL) => boolean),
         handler: (route: Route, request: APIRequest) => Promise<void> | void
@@ -1029,6 +1055,9 @@ export class MockedPlaywrightPage {
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 if (!this.isVisible(el)) throw new Error('Element is not visible');
+
+                logger.debug(`[Action] click`);
+                await this._highlight(el);
                 el.click();
             },
 
@@ -1038,6 +1067,9 @@ export class MockedPlaywrightPage {
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 if (!this.isVisible(el)) throw new Error('Element is not visible');
+
+                logger.debug(`[Action] dblclick`);
+                await this._highlight(el);
                 el.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true, view: window }));
             },
 
@@ -1046,6 +1078,9 @@ export class MockedPlaywrightPage {
                 strictCheck();
                 const el = getElement() as HTMLInputElement | HTMLTextAreaElement;
                 if (!el) throw new Error('Element not found');
+
+                logger.debug(`[Action] fill: "${value}"`);
+                await this._highlight(el);
                 el.focus();
                 el.value = value;
                 el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1093,6 +1128,9 @@ export class MockedPlaywrightPage {
                 if (el.type !== 'checkbox' && el.type !== 'radio') {
                     throw new Error('Element is not a checkbox or radio');
                 }
+
+                logger.debug(`[Action] check`);
+                await this._highlight(el);
                 if (!el.checked) el.click();
             },
 
@@ -1102,6 +1140,9 @@ export class MockedPlaywrightPage {
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'checkbox') throw new Error('Element is not a checkbox');
+
+                logger.debug(`[Action] uncheck`);
+                await this._highlight(el);
                 if (el.checked) el.click();
             },
 
@@ -1113,6 +1154,9 @@ export class MockedPlaywrightPage {
                 if (el.tagName !== 'SELECT') throw new Error('Element is not a select');
 
                 const values = Array.isArray(value) ? value : [value];
+                logger.debug(`[Action] selectOption: ${JSON.stringify(values)}`);
+                await this._highlight(el);
+
                 for (const option of Array.from(el.options)) {
                     option.selected = values.includes(option.value);
                 }
@@ -1189,6 +1233,9 @@ export class MockedPlaywrightPage {
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'file') throw new Error('Element is not a file input');
 
+                logger.debug(`[Action] setInputFiles`);
+                await this._highlight(el);
+
                 const dataTransfer = new DataTransfer();
                 const fileList = Array.isArray(files) ? files : [files];
 
@@ -1256,6 +1303,9 @@ export class MockedPlaywrightPage {
                 await this.delay(50);
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
+
+                logger.debug(`[Action] press: "${key}"`);
+                await this._highlight(el);
                 el.focus();
                 el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
                 el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
