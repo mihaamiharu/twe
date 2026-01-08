@@ -470,27 +470,65 @@ export async function executePlaywrightCode(
                         }
                     };
 
-                    // eslint-disable-next-line @typescript-eslint/no-implied-eval
-                    const userFunction = new Function(
-                        'page',
-                        'expect',
-                        'test',
-                        'window',
-                        'document',
-                        'console',
-                        `
-                            const fetch = window.fetch;
-                            return (async () => {
-                              ${code} try { if (typeof result !== "undefined") return result; } catch(e) {}
-                            })();
-                        `
-                    );
+                    // Prepare the iframe execution environment
+                    const contentWindow = iframe.contentWindow as any;
+
+                    // Inject tools into the iframe context
+                    contentWindow.page = page;
+                    // We need to inject a proxied expect that works in the iframe context but uses our matcher logic?
+                    // OR we just inject the expect function.
+                    // The 'expect' function we created handles logic in the parent (shim), but it's called from code.
+                    // It should work fine if injected.
 
                     // Simple expect function with assertion tracking
                     const { expect, getAssertionCount, getTestResults } = createExpect();
+                    contentWindow.expect = expect;
+                    contentWindow.test = test;
 
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                    const returnValue = await userFunction(page, expect, test, iframe.contentWindow, enhancedDocument, interceptedConsole);
+                    // Inject console interceptor
+                    // We can't easily replace console inside the iframe if we want to keep native behavior too?
+                    // Actually, let's override it but proxy to interceptedConsole
+                    const originalIframeConsole = contentWindow.console;
+                    contentWindow.console = {
+                        ...originalIframeConsole,
+                        log: (...args: any[]) => { interceptedConsole.log(...args); originalIframeConsole.log(...args); },
+                        error: (...args: any[]) => { interceptedConsole.error(...args); originalIframeConsole.error(...args); },
+                        warn: (...args: any[]) => { interceptedConsole.warn(...args); originalIframeConsole.warn(...args); },
+                        info: (...args: any[]) => { interceptedConsole.info(...args); originalIframeConsole.info(...args); },
+                    };
+
+                    // Execute user code INSIDE the iframe context using eval
+                    // This ensures 'Array', 'Object', 'HTMLElement' match the iframe's classes.
+                    // We wrap it in an async function to handle await.
+                    // We use 'return (async () => { ... })()' pattern.
+
+                    // Note: 'fetch' is already patched in the iframe by the document.write() script.
+
+                    const wrappedCode = `
+                        return (async () => {
+                            try {
+                                ${code}
+                                if (typeof result !== "undefined") return result;
+                            } catch (e) {
+                                throw e;
+                            }
+                        })();
+                    `;
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    let returnValue;
+                    if (typeof contentWindow.eval === 'function') {
+                        returnValue = await contentWindow.eval(`(function() { ${wrappedCode} })()`);
+                    } else {
+                        // Fallback for environments without iframe eval (e.g. HappyDOM tests)
+                        // This runs in parent context, so 'Array' !== iframe.contentWindow.Array
+                        console.warn('iframe.contentWindow.eval not supported, falling back to new Function() in parent context.');
+                        const fallbackFn = new Function(
+                            'page', 'expect', 'test', 'window', 'document', 'console',
+                            wrappedCode
+                        );
+                        returnValue = await fallbackFn(page, expect, test, contentWindow, enhancedDocument, contentWindow.console);
+                    }
 
                     const executionTime = Date.now() - startTime;
                     cleanup();
@@ -978,7 +1016,7 @@ function createExpect(): ExpectResult {
         return softMatchers;
     };
 
-    return { expect, getAssertionCount };
+    return { expect, getAssertionCount, getTestResults };
     /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
 }
 
