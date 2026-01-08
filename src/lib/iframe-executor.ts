@@ -241,6 +241,50 @@ export async function executePlaywrightCode(
                                         text: () => Promise.resolve('Not Found')
                                     });
                                 };
+
+                                // Patch Dialogs
+                                const originalAlert = window.alert;
+                                const originalConfirm = window.confirm;
+                                const originalPrompt = window.prompt;
+
+                                window.alert = function(message) {
+                                    console.log('[Dialog] alert: ' + message);
+                                    if (window.__MOCK_DIALOG_HANDLER__) {
+                                        window.__MOCK_DIALOG_HANDLER__('alert', message);
+                                        return;
+                                    }
+                                    return originalAlert(message);
+                                };
+
+                                window.confirm = function(message) {
+                                    console.log('[Dialog] confirm: ' + message);
+                                    if (window.__MOCK_DIALOG_HANDLER__) {
+                                        // This needs to be synchronous for window.confirm, but our handler is async (bridged via promise)
+                                        // In a real browser, we can't pause the main thread for an async handler easily.
+                                        // However, Playwright handles this via CDP which pauses execution.
+                                        // Here, we have a problem: window.confirm implies sync return.
+                                        // We'll have to just log and return true (default) or rely on a predefined behavior if we could.
+                                        // BUT, since we are in a shim, users might expect to handle it.
+                                        // For now, we'll log it and auto-accept unless we figure out a sync bridge.
+                                        // Actually, we can't await the handler.
+                                        // Limitation: window.confirm/prompt will auto-accept/return null in this shim unless we use a buffer or similar.
+                                        // Let's just log for now and try to fire the handler asynchronously so at least 'dialog' event fires.
+                                        window.__MOCK_DIALOG_HANDLER__('confirm', message).then(result => {
+                                            // Too late to affect return value
+                                        });
+                                        return true;
+                                    }
+                                    return true;
+                                };
+
+                                window.prompt = function(message, defaultValue) {
+                                    console.log('[Dialog] prompt: ' + message);
+                                    if (window.__MOCK_DIALOG_HANDLER__) {
+                                        window.__MOCK_DIALOG_HANDLER__('prompt', message, defaultValue);
+                                        return defaultValue || null;
+                                    }
+                                    return defaultValue || null;
+                                };
                             </script>
                             
                           </head>
