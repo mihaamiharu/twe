@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { AlertCircle, Clock, ArrowLeft, CheckCircle2, ArrowRight, Layers } from 'lucide-react';
+import { AlertCircle, ArrowLeft, ArrowRight, CheckCircle2, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -327,8 +327,7 @@ function TutorialDetailPage() {
                                     </div>
                                 )}
                                 <div className="text-sm text-muted-foreground flex items-center gap-1">
-                                    <span>•</span>
-                                    <span>{t('card.estimatedTimeShort', { minutes: tutorial.estimatedMinutes })} read</span>
+                                    <span>{t('card.estimatedTime', { minutes: tutorial.estimatedMinutes })}</span>
                                 </div>
                             </div>
 
@@ -411,11 +410,13 @@ function TutorialDetailPage() {
                                         </div>
                                         {tutorial.nextTutorial && (
                                             <Button
-                                                className="w-full"
+                                                className="w-full h-auto py-3 whitespace-normal"
                                                 onClick={() => { void navigate({ to: '/$locale/tutorials/$slug', params: { locale, slug: tutorial.nextTutorial!.slug } }) }}
                                             >
-                                                {t('tutorials:sidebar.nextLabel', { title: tutorial.nextTutorial.title })}
-                                                <ArrowRight className="h-4 w-4 ml-2" />
+                                                <span className="flex-1 px-1">
+                                                    {t('tutorials:sidebar.nextLabel', { title: tutorial.nextTutorial.title })}
+                                                </span>
+                                                <ArrowRight className="h-4 w-4 ml-2 shrink-0" />
                                             </Button>
                                         )}
                                     </div>

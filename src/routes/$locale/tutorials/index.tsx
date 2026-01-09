@@ -280,7 +280,21 @@ function TutorialsPage() {
     );
 }
 
-function TutorialCard({ tutorial, locale }: { tutorial: any; locale: string }) {
+interface TutorialListItem {
+    id: string;
+    slug: string;
+    title: string;
+    description: string;
+    estimatedMinutes: number;
+    tags: string[];
+    order: number;
+    viewCount: number;
+    isCompleted: boolean;
+    readingProgress: number;
+    difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+}
+
+function TutorialCard({ tutorial, locale }: { tutorial: TutorialListItem; locale: string }) {
     const { t } = useTranslation('tutorials');
     return (
         <Link
