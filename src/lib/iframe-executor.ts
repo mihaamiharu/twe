@@ -57,6 +57,32 @@ export async function executePlaywrightCode(
         finalHtml = htmlContent.replace("fetch('/api/data')", "fetch('http://localhost/api/data')");
     }
 
+    // Static analysis for "Strict Mode" (Educational Check)
+    // We want to catch uses of 'document' or 'window' that aren't inside page.evaluate()
+    // This is a simple regex check, not a full AST parse, but catches most beginner mistakes.
+    const forbiddenPatterns = [
+        { pattern: /document\.getElement/, message: "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'." },
+        { pattern: /document\.query/, message: "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'." },
+        { pattern: /window\.local/, message: "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.localStorage...)'." },
+        { pattern: /alert\(/, message: "In Playwright, you cannot handle alerts this way. Use 'page.on(\"dialog\", ...)'." },
+    ];
+
+    for (const { pattern, message } of forbiddenPatterns) {
+        if (pattern.test(code)) {
+            // Check if it might be inside an evaluate block (naive check)
+            // If the code line containing the pattern is not inside an evaluate, throw error
+            // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
+            // Actually, let's just return a FAILED result immediately to teach the user.
+            return {
+                status: 'FAILED',
+                output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
+                executionTime: 0,
+                error: `Strict Mode Error: ${message}`,
+                logs: []
+            };
+        }
+    }
+
     return new Promise((resolve) => {
         let iframe: HTMLIFrameElement;
 
@@ -71,8 +97,18 @@ export async function executePlaywrightCode(
             document.body.appendChild(iframe);
         }
 
+        let timeoutId: any;
+
+        const cleanup = () => {
+            if (timeoutId) clearTimeout(timeoutId);
+            // Only remove if we created it
+            if (!useExistingIframe && iframe.parentNode) {
+                document.body.removeChild(iframe);
+            }
+        };
+
         // Timeout handler
-        const timeoutId = setTimeout(() => {
+        timeoutId = setTimeout(() => {
             cleanup();
             resolve({
                 status: 'TIMEOUT',
@@ -82,14 +118,6 @@ export async function executePlaywrightCode(
                 logs,
             });
         }, timeout);
-
-        const cleanup = () => {
-            clearTimeout(timeoutId);
-            // Only remove if we created it
-            if (!useExistingIframe && iframe.parentNode) {
-                document.body.removeChild(iframe);
-            }
-        };
 
         try {
             const executeCode = async () => {
@@ -134,7 +162,62 @@ export async function executePlaywrightCode(
                                         }
                                     }
 
-                                    // Mock /api/data
+                                    // Check against dynamic routes from page.route()
+                                    if (window.__MOCK_ROUTES__) {
+                                        for (const route of window.__MOCK_ROUTES__) {
+                                            let isMatch = false;
+                                            if (typeof route.matcher === 'string') {
+                                                // Simple glob-like matching (very basic)
+                                                // If it contains *, treat as simple wildcard
+                                                if (route.matcher.includes('*')) {
+                                                    const regex = new RegExp(route.matcher.replace(/\*/g, '.*'));
+                                                    isMatch = regex.test(url);
+                                                } else {
+                                                    isMatch = url.includes(route.matcher);
+                                                }
+                                            } else if (route.matcher instanceof RegExp) {
+                                                isMatch = route.matcher.test(url);
+                                            } else if (typeof route.matcher === 'function') {
+                                                try {
+                                                    isMatch = route.matcher(new URL(url));
+                                                } catch {
+                                                    isMatch = false;
+                                                }
+                                            }
+
+                                            if (isMatch) {
+                                                console.log('Mocking fetch via page.route to ' + url);
+
+                                                // Create a request object to pass to handler
+                                                const requestInfo = {
+                                                    url,
+                                                    method: init?.method || 'GET',
+                                                    headers: init?.headers || {},
+                                                    body: init?.body
+                                                };
+
+                                                return route.handler(requestInfo).then(result => {
+                                                    if (result && result.type === 'fulfill') {
+                                                        const resp = result.response;
+                                                        return Promise.resolve({
+                                                            ok: (resp.status || 200) >= 200 && (resp.status || 200) < 300,
+                                                            status: resp.status || 200,
+                                                            json: () => Promise.resolve(resp.json || JSON.parse(typeof resp.body === 'string' ? resp.body : '{}')),
+                                                            text: () => Promise.resolve(typeof resp.body === 'string' ? resp.body : JSON.stringify(resp.json || {})),
+                                                            headers: new Headers(resp.headers || {'content-type': 'application/json'})
+                                                        });
+                                                    } else if (result && result.type === 'continue') {
+                                                        // Fall through to original fetch (network)
+                                                        // In our sandbox, this means hitting the actual URL (or failing if CORS/offline)
+                                                        // return originalFetch(url, init);
+                                                    }
+                                                    return Promise.reject(new Error('Route handler did not fulfill or continue'));
+                                                });
+                                            }
+                                        }
+                                    }
+
+                                    // Legacy Mock for /api/data (for backward compatibility with existing challenges)
                                     if (typeof url === 'string' && url.includes('/api/data')) {
                                         console.log('Mocking fetch to ' + url);
                                         return Promise.resolve({
@@ -157,6 +240,50 @@ export async function executePlaywrightCode(
                                         json: () => Promise.resolve({}),
                                         text: () => Promise.resolve('Not Found')
                                     });
+                                };
+
+                                // Patch Dialogs
+                                const originalAlert = window.alert;
+                                const originalConfirm = window.confirm;
+                                const originalPrompt = window.prompt;
+
+                                window.alert = function(message) {
+                                    console.log('[Dialog] alert: ' + message);
+                                    if (window.__MOCK_DIALOG_HANDLER__) {
+                                        window.__MOCK_DIALOG_HANDLER__('alert', message);
+                                        return;
+                                    }
+                                    return originalAlert(message);
+                                };
+
+                                window.confirm = function(message) {
+                                    console.log('[Dialog] confirm: ' + message);
+                                    if (window.__MOCK_DIALOG_HANDLER__) {
+                                        // This needs to be synchronous for window.confirm, but our handler is async (bridged via promise)
+                                        // In a real browser, we can't pause the main thread for an async handler easily.
+                                        // However, Playwright handles this via CDP which pauses execution.
+                                        // Here, we have a problem: window.confirm implies sync return.
+                                        // We'll have to just log and return true (default) or rely on a predefined behavior if we could.
+                                        // BUT, since we are in a shim, users might expect to handle it.
+                                        // For now, we'll log it and auto-accept unless we figure out a sync bridge.
+                                        // Actually, we can't await the handler.
+                                        // Limitation: window.confirm/prompt will auto-accept/return null in this shim unless we use a buffer or similar.
+                                        // Let's just log for now and try to fire the handler asynchronously so at least 'dialog' event fires.
+                                        window.__MOCK_DIALOG_HANDLER__('confirm', message).then(result => {
+                                            // Too late to affect return value
+                                        });
+                                        return true;
+                                    }
+                                    return true;
+                                };
+
+                                window.prompt = function(message, defaultValue) {
+                                    console.log('[Dialog] prompt: ' + message);
+                                    if (window.__MOCK_DIALOG_HANDLER__) {
+                                        window.__MOCK_DIALOG_HANDLER__('prompt', message, defaultValue);
+                                        return defaultValue || null;
+                                    }
+                                    return defaultValue || null;
                                 };
                             </script>
                             
@@ -330,29 +457,95 @@ export async function executePlaywrightCode(
 
                     const enhancedDocument = createEnhancedDocument(iframeDoc);
 
-                    // eslint-disable-next-line @typescript-eslint/no-implied-eval
-                    const userFunction = new Function(
-                        'page',
-                        'expect',
-                        'window',
-                        'document',
-                        'console',
-                        `
-                            const fetch = window.fetch;
-                            return (async () => {
-                              ${code} try { if (typeof result !== "undefined") return result; } catch(e) {}
-                            })();
-                        `
-                    );
+                    // Mock test runner object
+                    const test = {
+                        step: async (name: string, callback: () => Promise<any>) => {
+                            interceptedConsole.log(`[Step] ${name}`);
+                            try {
+                                await callback();
+                            } catch (error) {
+                                interceptedConsole.error(`[Step] ${name} FAILED: ${error}`);
+                                throw error;
+                            }
+                        }
+                    };
+
+                    // Prepare the iframe execution environment
+                    const contentWindow = iframe.contentWindow as any;
+
+                    // Inject tools into the iframe context
+                    contentWindow.page = page;
+                    // We need to inject a proxied expect that works in the iframe context but uses our matcher logic?
+                    // OR we just inject the expect function.
+                    // The 'expect' function we created handles logic in the parent (shim), but it's called from code.
+                    // It should work fine if injected.
 
                     // Simple expect function with assertion tracking
-                    const { expect, getAssertionCount } = createExpect();
+                    const { expect, getAssertionCount, getTestResults } = createExpect();
+                    contentWindow.expect = expect;
+                    contentWindow.test = test;
 
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
-                    const returnValue = await userFunction(page, expect, iframe.contentWindow, enhancedDocument, interceptedConsole);
+                    // Inject console interceptor
+                    // We can't easily replace console inside the iframe if we want to keep native behavior too?
+                    // Actually, let's override it but proxy to interceptedConsole
+                    const originalIframeConsole = contentWindow.console;
+                    contentWindow.console = {
+                        ...originalIframeConsole,
+                        log: (...args: any[]) => { interceptedConsole.log(...args); originalIframeConsole.log(...args); },
+                        error: (...args: any[]) => { interceptedConsole.error(...args); originalIframeConsole.error(...args); },
+                        warn: (...args: any[]) => { interceptedConsole.warn(...args); originalIframeConsole.warn(...args); },
+                        info: (...args: any[]) => { interceptedConsole.info(...args); originalIframeConsole.info(...args); },
+                    };
+
+                    // Execute user code INSIDE the iframe context using eval
+                    // This ensures 'Array', 'Object', 'HTMLElement' match the iframe's classes.
+                    // We wrap it in an async function to handle await.
+                    // We use 'return (async () => { ... })()' pattern.
+
+                    // Note: 'fetch' is already patched in the iframe by the document.write() script.
+
+                    const wrappedCode = `
+                        return (async () => {
+                            try {
+                                ${code}
+                                if (typeof result !== "undefined") return result;
+                            } catch (e) {
+                                throw e;
+                            }
+                        })();
+                    `;
+
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+                    let returnValue;
+                    if (typeof contentWindow.eval === 'function') {
+                        returnValue = await contentWindow.eval(`(function() { ${wrappedCode} })()`);
+                    } else {
+                        // Fallback for environments without iframe eval (e.g. HappyDOM tests)
+                        // This runs in parent context, so 'Array' !== iframe.contentWindow.Array
+                        console.warn('iframe.contentWindow.eval not supported, falling back to new Function() in parent context.');
+                        const fallbackFn = new Function(
+                            'page', 'expect', 'test', 'window', 'document', 'console',
+                            wrappedCode
+                        );
+                        returnValue = await fallbackFn(page, expect, test, contentWindow, enhancedDocument, contentWindow.console);
+                    }
 
                     const executionTime = Date.now() - startTime;
                     cleanup();
+
+                    // Check for soft failures
+                    const softFailures = getTestResults().filter(r => !r.passed);
+                    if (softFailures.length > 0) {
+                        resolve({
+                            status: 'FAILED',
+                            output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map(f => `- ${f.message}`).join('\n')}`,
+                            executionTime,
+                            error: softFailures[0].message, // Return first error
+                            logs,
+                            assertionCount: getAssertionCount(),
+                        });
+                        return;
+                    }
 
                     resolve({
                         status: 'PASSED',
@@ -536,13 +729,16 @@ interface ExpectResult {
         toHaveCount: (count: number) => Promise<void>;
     };
     getAssertionCount: () => number;
+    getTestResults: () => Array<{ message: string; passed: boolean }>;
 }
 
 function createExpect(): ExpectResult {
     let assertionCount = 0;
+    const testResults: Array<{ message: string; passed: boolean }> = [];
 
     const incrementCount = () => { assertionCount++; };
     const getAssertionCount = () => assertionCount;
+    const getTestResults = () => testResults;
 
     /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
     const expect = function (actual: any) {
@@ -551,14 +747,18 @@ function createExpect(): ExpectResult {
                 incrementCount(); // Count every assertion call
                 if (!pass) {
                     if (isSoft) {
-                        try {
-                            // In a real environment we'd collect this, but for now we'll just log or ignore
-                            // console.warn(`Soft assertion failed: ${message}`);
-                        } catch {
-                            // ignore soft assertion
-                        }
+                        // Soft failure - record it but don't throw
+                        const formattedMessage = message.includes('Expected')
+                            ? `Soft Assertion Failed: ${message}`
+                            : `Soft Assertion Failed: ${message} (Actual value did not match expected criteria)`;
+                        console.error(formattedMessage);
+                        testResults.push({ message: formattedMessage, passed: false });
                     } else {
-                        throw new Error(message);
+                        // Improve error message format
+                        const formattedMessage = message.includes('Expected')
+                            ? `Assertion Error: ${message}`
+                            : `Assertion Error: ${message} (Actual value did not match expected criteria)`;
+                        throw new Error(formattedMessage);
                     }
                 }
             };
@@ -816,7 +1016,7 @@ function createExpect(): ExpectResult {
         return softMatchers;
     };
 
-    return { expect, getAssertionCount };
+    return { expect, getAssertionCount, getTestResults };
     /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
 }
 

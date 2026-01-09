@@ -5,7 +5,7 @@
  */
 
 import { db } from '@/db';
-import { progress, users, challenges, userAchievements, achievements } from '@/db/schema';
+import { progress, users, challenges, userAchievements, achievements, bugReports } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import type { UserStats } from './achievements';
 import { logger } from '@/lib/logger';
@@ -80,6 +80,14 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 
     const perfectScores = perfectScoresResult[0]?.count || 0;
 
+    // Count bug reports
+    const bugReportsResult = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(bugReports)
+        .where(eq(bugReports.userId, userId));
+
+    const bugReportsFiled = bugReportsResult[0]?.count || 0;
+
     return {
         totalChallengesCompleted: completedChallenges.length,
         challengesByType,
@@ -89,6 +97,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
         longestStreak,
         tutorialsCompleted,
         perfectScores,
+        bugReportsFiled,
     };
 }
 

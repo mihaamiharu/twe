@@ -25,11 +25,14 @@ export type UserData = {
         achievementsCount: number;
         challengesByType: Record<string, number>;
     };
-    recentAchievements: {
+    earnedAchievements: {
+        id: string;
         name: string;
         description: string;
         icon: string;
         unlockedAt: Date;
+        xpReward: number;
+        category: string;
     }[];
     // heatmapData removed
     recentActivity: {
@@ -219,11 +222,14 @@ export const getUserSettings = createServerFn({ method: 'GET' })
                             challengesByType: stats.challengesByType || {},
                         },
 
-                        recentAchievements: userAchievementsList.map((a) => ({
+                        earnedAchievements: userAchievementsList.map((a) => ({
+                            id: a.id,
                             name: a.name,
                             description: a.description,
                             icon: a.icon,
                             unlockedAt: a.unlockedAt,
+                            xpReward: a.xpReward,
+                            category: a.category,
                         })),
 
                         recentActivity: activity,

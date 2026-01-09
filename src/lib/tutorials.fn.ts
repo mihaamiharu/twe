@@ -130,6 +130,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
                     tags: tutorial.tags,
                     order: tutorial.order,
                     viewCount: dbRecord?.viewCount || 0,
+                    difficulty: tutorial.difficulty,
                     isCompleted: dbRecord ? (userProgress[dbRecord.id]?.isCompleted || false) : false,
                     readingProgress: dbRecord ? (userProgress[dbRecord.id]?.readingProgress || 0) : 0,
                 };

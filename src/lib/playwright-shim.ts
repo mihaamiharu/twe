@@ -46,6 +46,8 @@ export interface Locator {
     evaluate<R, Arg>(pageFunction: (element: HTMLElement, arg: Arg) => R | Promise<R>, arg?: Arg): Promise<R>;
     locator(selector: string): Locator;
     filter(options: { hasText?: string | RegExp }): Locator;
+    all(): Promise<Locator[]>;
+    allTextContents(): Promise<string[]>;
 }
 
 export interface LocatorOptions {
@@ -73,6 +75,38 @@ export interface APIResponse {
     body(): Promise<Buffer>;
 }
 
+export interface Route {
+    fulfill(response: {
+        status?: number;
+        headers?: Record<string, string>;
+        contentType?: string;
+        body?: string | Buffer;
+        json?: unknown;
+        path?: string;
+    }): Promise<void>;
+    continue(options?: {
+        method?: string;
+        headers?: Record<string, string>;
+        postData?: string | Buffer;
+    }): Promise<void>;
+    request(): APIRequest;
+}
+
+export interface APIRequest {
+    url(): string;
+    method(): string;
+    headers(): Record<string, string>;
+    postData(): string | null;
+}
+
+export interface Dialog {
+    message(): string;
+    type(): 'alert' | 'confirm' | 'prompt' | 'beforeunload';
+    accept(promptText?: string): Promise<void>;
+    dismiss(): Promise<void>;
+    defaultValue(): string;
+}
+
 export interface BrowserContext {
     tracing: {
         start(options?: unknown): Promise<void>;
@@ -90,6 +124,22 @@ export interface Browser {
     newContext(options?: unknown): Promise<BrowserContext>;
     close(): Promise<void>;
     version(): string;
+}
+
+export interface Keyboard {
+    down(key: string): Promise<void>;
+    up(key: string): Promise<void>;
+    insertText(text: string): Promise<void>;
+    type(text: string, options?: { delay?: number }): Promise<void>;
+    press(key: string, options?: { delay?: number }): Promise<void>;
+}
+
+export interface Mouse {
+    move(x: number, y: number, options?: { steps?: number }): Promise<void>;
+    down(options?: { button?: 'left' | 'right' | 'middle', clickCount?: number }): Promise<void>;
+    up(options?: { button?: 'left' | 'right' | 'middle', clickCount?: number }): Promise<void>;
+    click(x: number, y: number, options?: { delay?: number, button?: 'left' | 'right' | 'middle', clickCount?: number }): Promise<void>;
+    dblclick(x: number, y: number, options?: { delay?: number, button?: 'left' | 'right' | 'middle' }): Promise<void>;
 }
 
 export interface FrameLocator {
@@ -117,6 +167,8 @@ export class MockedPlaywrightPage {
     private targetDocument: Document;
     private defaultTimeout: number;
     public request: APIRequestContext;
+    public keyboard: Keyboard;
+    public mouse: Mouse;
     private currentUrl: string = 'about:blank';
     private _context: BrowserContext;
 
@@ -125,11 +177,245 @@ export class MockedPlaywrightPage {
         this.defaultTimeout = options?.timeout || 2500;
         this.request = this._createAPIRequestContext();
         this._context = this._createBrowserContext();
+        this.keyboard = this._createKeyboard();
+        this.mouse = this._createMouse();
     }
 
     // ============================================
     // Core Actions
     // ============================================
+
+    private _createKeyboard(): Keyboard {
+        const getActiveElement = () => this.targetDocument.activeElement as HTMLElement || this.targetDocument.body;
+
+        return {
+            down: async (key: string) => {
+                logger.debug(`[Keyboard] down: ${key}`);
+                const el = getActiveElement();
+                el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+            },
+            up: async (key: string) => {
+                logger.debug(`[Keyboard] up: ${key}`);
+                const el = getActiveElement();
+                el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+            },
+            insertText: async (text: string) => {
+                logger.debug(`[Keyboard] insertText: ${text}`);
+                const el = getActiveElement();
+                if ('value' in el) {
+                    (el as HTMLInputElement).value += text;
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                } else {
+                    el.textContent += text;
+                }
+            },
+            type: async (text: string, options) => {
+                logger.debug(`[Keyboard] type: ${text}`);
+                const el = getActiveElement();
+                for (const char of text) {
+                    el.dispatchEvent(new KeyboardEvent('keydown', { key: char, bubbles: true }));
+                    el.dispatchEvent(new KeyboardEvent('keypress', { key: char, bubbles: true }));
+                    if ('value' in el) {
+                        (el as HTMLInputElement).value += char;
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                    } else {
+                        // Very basic contenteditable shim
+                        el.textContent += char;
+                    }
+                    el.dispatchEvent(new KeyboardEvent('keyup', { key: char, bubbles: true }));
+                    if (options?.delay) await this.delay(options.delay);
+                }
+            },
+            press: async (key: string, options) => {
+                logger.debug(`[Keyboard] press: ${key}`);
+                const el = getActiveElement();
+                el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+                el.dispatchEvent(new KeyboardEvent('keypress', { key, bubbles: true }));
+                el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+                if (options?.delay) await this.delay(options.delay);
+            }
+        };
+    }
+
+    private _createMouse(): Mouse {
+        let x = 0;
+        let y = 0;
+
+        return {
+            move: async (newX, newY) => {
+                // logger.debug(`[Mouse] move: ${newX}, ${newY}`); // Too spammy
+                x = newX;
+                y = newY;
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+                el.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, bubbles: true, view: this.targetDocument.defaultView }));
+            },
+            down: async (options) => {
+                logger.debug(`[Mouse] down`);
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, button: options?.button === 'right' ? 2 : 0, bubbles: true, view: this.targetDocument.defaultView }));
+            },
+            up: async (options) => {
+                logger.debug(`[Mouse] up`);
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, button: options?.button === 'right' ? 2 : 0, bubbles: true, view: this.targetDocument.defaultView }));
+            },
+            click: async (targetX, targetY, options) => {
+                logger.debug(`[Mouse] click at ${targetX},${targetY}`);
+                x = targetX;
+                y = targetY;
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+
+                // Highlight target if found
+                if (el instanceof HTMLElement) {
+                    void this._highlight(el, '#3b82f6'); // Blue for mouse click
+                }
+
+                el.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y, bubbles: true }));
+                if (options?.delay) await this.delay(options.delay);
+            },
+            dblclick: async (targetX, targetY, options) => {
+                logger.debug(`[Mouse] dblclick at ${targetX},${targetY}`);
+                x = targetX;
+                y = targetY;
+                const el = this.targetDocument.elementFromPoint(x, y) || this.targetDocument.body;
+
+                if (el instanceof HTMLElement) {
+                    void this._highlight(el, '#3b82f6');
+                }
+
+                el.dispatchEvent(new MouseEvent('mousemove', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mousedown', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('mouseup', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('click', { clientX: x, clientY: y, bubbles: true }));
+                el.dispatchEvent(new MouseEvent('dblclick', { clientX: x, clientY: y, bubbles: true }));
+                if (options?.delay) await this.delay(options.delay);
+            }
+        };
+    }
+
+    /**
+     * Handle dialogs
+     */
+    async on(event: string, handler: (dialog: Dialog) => void): Promise<void> {
+        if (event === 'dialog') {
+            // Register global handler that iframe logic can call
+            const iframeWindow = this.targetDocument.defaultView as any;
+            if (!iframeWindow) return;
+
+            if (!iframeWindow.__MOCK_DIALOG_HANDLER__) {
+                iframeWindow.__MOCK_DIALOG_HANDLER__ = (type: string, message: string, defaultValue?: string) => {
+                    return new Promise((resolve) => {
+                        const dialog: Dialog = {
+                            type: () => type as any,
+                            message: () => message,
+                            defaultValue: () => defaultValue || '',
+                            accept: async (promptText) => {
+                                resolve({ action: 'accept', promptText });
+                            },
+                            dismiss: async () => {
+                                resolve({ action: 'dismiss' });
+                            }
+                        };
+                        handler(dialog);
+                    });
+                };
+            }
+        }
+    }
+
+    /**
+     * Visual feedback helper
+     * Highlights an element briefly to show interaction
+     */
+    private async _highlight(element: HTMLElement, color = '#dc2626'): Promise<void> {
+        // Skip if document is hidden or detached (safety check)
+        if (!element.isConnected) return;
+
+        const originalTransition = element.style.transition;
+        const originalOutline = element.style.outline;
+        const originalBoxShadow = element.style.boxShadow;
+
+        // Apply highlight
+        element.style.transition = 'all 0.1s ease';
+        element.style.outline = `2px solid ${color}`;
+        element.style.boxShadow = `0 0 0 4px ${color}40`; // 40 is alpha for hex
+
+        // Wait a bit so user sees it
+        await this.delay(300);
+
+        // Restore
+        element.style.outline = originalOutline;
+        element.style.boxShadow = originalBoxShadow;
+        element.style.transition = originalTransition;
+    }
+
+    async route(
+        urlOrPredicate: string | RegExp | ((url: URL) => boolean),
+        handler: (route: Route, request: APIRequest) => Promise<void> | void
+    ): Promise<void> {
+        // Register route in global registry on the iframe window
+        // The iframe fetch polyfill will read from this
+        const iframeWindow = this.targetDocument.defaultView as any;
+        if (!iframeWindow) return;
+
+        if (!iframeWindow.__MOCK_ROUTES__) {
+            iframeWindow.__MOCK_ROUTES__ = [];
+        }
+
+        iframeWindow.__MOCK_ROUTES__.push({
+            matcher: urlOrPredicate,
+            handler: async (requestInfo: any) => {
+                const route: Route = {
+                    fulfill: async (response) => {
+                        return Promise.resolve(response);
+                    },
+                    continue: async () => {
+                        return Promise.resolve(null); // Signal to continue
+                    },
+                    request: () => ({
+                        url: () => requestInfo.url,
+                        method: () => requestInfo.method,
+                        headers: () => requestInfo.headers,
+                        postData: () => requestInfo.body
+                    })
+                };
+
+                const request: APIRequest = route.request();
+
+                // We need to capture the response from the handler
+                // Since handler returns void, we depend on it calling fulfill or continue
+                // This is a bit tricky to bridge synchronously, so we'll use a Promise
+
+                return new Promise(async (resolve) => {
+                    // Override fulfill/continue to resolve our promise
+                    route.fulfill = async (response) => {
+                        resolve({ type: 'fulfill', response });
+                    };
+                    route.continue = async (options) => {
+                        resolve({ type: 'continue', options });
+                    };
+
+                    await handler(route, request);
+                });
+            }
+        });
+    }
+
+    async unroute(urlOrPredicate: string | RegExp | ((url: URL) => boolean)): Promise<void> {
+        const iframeWindow = this.targetDocument.defaultView as any;
+        if (!iframeWindow || !iframeWindow.__MOCK_ROUTES__) return;
+
+        // Remove matching routes
+        iframeWindow.__MOCK_ROUTES__ = iframeWindow.__MOCK_ROUTES__.filter((r: any) =>
+            r.matcher.toString() !== urlOrPredicate.toString()
+        );
+    }
 
     async goto(url: string): Promise<void> {
         // Mock navigation
@@ -707,8 +993,80 @@ export class MockedPlaywrightPage {
      */
     locator(selector: string): Locator {
         return this.createLocator(() => {
-            return Array.from(this.targetDocument.querySelectorAll(selector));
+            return this._findAll(this.targetDocument, selector);
         });
+    }
+
+    /**
+     * Internal helper to find elements handling special Playwright selectors
+     */
+    private _findAll(root: Document | Element, selector: string): HTMLElement[] {
+        let matchedElements: HTMLElement[] = [];
+
+        // Text selector: text=...
+        if (selector.startsWith('text=')) {
+            const text = selector.substring(5);
+            const exact = text.startsWith('"') && text.endsWith('"');
+            const cleanText = exact ? text.slice(1, -1) : text;
+
+            const allElements = root.querySelectorAll('*');
+            Array.from(allElements).forEach(el => {
+                const element = el as HTMLElement;
+                const content = element.textContent || '';
+                if (exact ? content === cleanText : content.includes(cleanText)) {
+                    matchedElements.push(element);
+                }
+            });
+
+            // Sort by depth (deepest first)
+            matchedElements.sort((a, b) => {
+                let depthA = 0, pA = a;
+                while(pA.parentElement && pA !== root) { depthA++; pA = pA.parentElement; }
+                let depthB = 0, pB = b;
+                while(pB.parentElement && pB !== root) { depthB++; pB = pB.parentElement; }
+                return depthB - depthA;
+            });
+
+            // Filter out parents if children match (Deepest match principle)
+            // If A contains B, and both match, only keep B.
+            matchedElements = matchedElements.filter(el => {
+                // Check if any *other* matched element is a descendant of this 'el'
+                const hasMatchingDescendant = matchedElements.some(other =>
+                    other !== el && el.contains(other)
+                );
+                return !hasMatchingDescendant;
+            });
+        }
+        // XPath selector: xpath=...
+        else if (selector.startsWith('xpath=')) {
+            const xpath = selector.substring(6);
+            try {
+                const doc = root instanceof Document ? root : root.ownerDocument;
+                const result = doc.evaluate(
+                    xpath,
+                    root,
+                    null,
+                    XPathResult.ORDERED_NODE_SNAPSHOT_TYPE,
+                    null
+                );
+                for (let i = 0; i < result.snapshotLength; i++) {
+                    const node = result.snapshotItem(i);
+                    if (node instanceof HTMLElement) {
+                        matchedElements.push(node);
+                    }
+                }
+            } catch (e) {
+                console.warn('Invalid XPath:', xpath, e);
+            }
+        }
+        // CSS selector: css=... or just ...
+        else {
+            const cssSelector = selector.startsWith('css=') ? selector.substring(4) : selector;
+            // Standard querySelectorAll
+            matchedElements = Array.from(root.querySelectorAll(cssSelector)) as HTMLElement[];
+        }
+
+        return matchedElements;
     }
 
     // ============================================
@@ -869,6 +1227,9 @@ export class MockedPlaywrightPage {
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 if (!this.isVisible(el)) throw new Error('Element is not visible');
+
+                logger.debug(`[Action] click`);
+                await this._highlight(el);
                 el.click();
             },
 
@@ -878,6 +1239,9 @@ export class MockedPlaywrightPage {
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
                 if (!this.isVisible(el)) throw new Error('Element is not visible');
+
+                logger.debug(`[Action] dblclick`);
+                await this._highlight(el);
                 el.dispatchEvent(new MouseEvent('dblclick', { bubbles: true, cancelable: true, view: window }));
             },
 
@@ -886,6 +1250,9 @@ export class MockedPlaywrightPage {
                 strictCheck();
                 const el = getElement() as HTMLInputElement | HTMLTextAreaElement;
                 if (!el) throw new Error('Element not found');
+
+                logger.debug(`[Action] fill: "${value}"`);
+                await this._highlight(el);
                 el.focus();
                 el.value = value;
                 el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -933,6 +1300,9 @@ export class MockedPlaywrightPage {
                 if (el.type !== 'checkbox' && el.type !== 'radio') {
                     throw new Error('Element is not a checkbox or radio');
                 }
+
+                logger.debug(`[Action] check`);
+                await this._highlight(el);
                 if (!el.checked) el.click();
             },
 
@@ -942,6 +1312,9 @@ export class MockedPlaywrightPage {
                 const el = getElement() as HTMLInputElement;
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'checkbox') throw new Error('Element is not a checkbox');
+
+                logger.debug(`[Action] uncheck`);
+                await this._highlight(el);
                 if (el.checked) el.click();
             },
 
@@ -953,6 +1326,9 @@ export class MockedPlaywrightPage {
                 if (el.tagName !== 'SELECT') throw new Error('Element is not a select');
 
                 const values = Array.isArray(value) ? value : [value];
+                logger.debug(`[Action] selectOption: ${JSON.stringify(values)}`);
+                await this._highlight(el);
+
                 for (const option of Array.from(el.options)) {
                     option.selected = values.includes(option.value);
                 }
@@ -1029,6 +1405,9 @@ export class MockedPlaywrightPage {
                 if (!el) throw new Error('Element not found');
                 if (el.type !== 'file') throw new Error('Element is not a file input');
 
+                logger.debug(`[Action] setInputFiles`);
+                await this._highlight(el);
+
                 const dataTransfer = new DataTransfer();
                 const fileList = Array.isArray(files) ? files : [files];
 
@@ -1096,6 +1475,9 @@ export class MockedPlaywrightPage {
                 await this.delay(50);
                 const el = getElement();
                 if (!el) throw new Error('Element not found');
+
+                logger.debug(`[Action] press: "${key}"`);
+                await this._highlight(el);
                 el.focus();
                 el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
                 el.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
@@ -1112,8 +1494,8 @@ export class MockedPlaywrightPage {
                     const parents = finder();
                     const children: HTMLElement[] = [];
                     for (const parent of parents) {
-                        const matches = Array.from(parent.querySelectorAll(subSelector));
-                        children.push(...matches as HTMLElement[]);
+                        const matchedElements = this._findAll(parent, subSelector);
+                        children.push(...matchedElements);
                     }
                     return children;
                 });
@@ -1133,6 +1515,22 @@ export class MockedPlaywrightPage {
                         return true;
                     });
                 });
+            },
+
+            all: async () => {
+                const elements = finder();
+                return elements.map((_, index) => {
+                    // Create a new locator for each specific index
+                    // This uses .nth(index) semantics
+                    const newLocator = this.createLocator(finder);
+                    newLocator.nth(index);
+                    return newLocator;
+                });
+            },
+
+            allTextContents: async () => {
+                const elements = finder();
+                return elements.map(el => el.textContent || '');
             },
         };
 

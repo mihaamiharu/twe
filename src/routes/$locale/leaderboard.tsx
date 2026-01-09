@@ -97,21 +97,34 @@ function LeaderboardPage() {
                                     <div className={cn(
                                         "grid gap-6 mb-12 items-end",
                                         TopThree.length === 1 ? "grid-cols-1 max-w-sm mx-auto" :
-                                            TopThree.length === 2 ? "grid-cols-2 max-w-2xl mx-auto" :
-                                                "grid-cols-1 md:grid-cols-3"
+                                            "grid-cols-1 md:grid-cols-3 max-w-5xl mx-auto"
                                     )}>
-                                        {TopThree.length === 2 ? (
-                                            <>
-                                                <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />
-                                                <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />
-                                            </>
-                                        ) : TopThree.length === 1 ? (
+                                        {TopThree.length === 1 ? (
                                             <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />
                                         ) : (
                                             <>
-                                                <div className="order-2 md:order-1">{TopThree[1] && <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />}</div>
-                                                <div className="order-1 md:order-2">{TopThree[0] && <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />}</div>
-                                                <div className="order-3 md:order-3">{TopThree[2] && <PodiumCard user={TopThree[2]} rank={3} isAuthenticated={isAuthenticated} />}</div>
+                                                {/* Rank 2 (Left) */}
+                                                <div className="order-2 md:order-1">
+                                                    {TopThree[1] ? (
+                                                        <PodiumCard user={TopThree[1]} rank={2} isAuthenticated={isAuthenticated} />
+                                                    ) : (
+                                                        <div className="h-[300px]" /> /* Placeholder */
+                                                    )}
+                                                </div>
+
+                                                {/* Rank 1 (Center) */}
+                                                <div className="order-1 md:order-2">
+                                                    <PodiumCard user={TopThree[0]} rank={1} isCenter isAuthenticated={isAuthenticated} />
+                                                </div>
+
+                                                {/* Rank 3 (Right) */}
+                                                <div className="order-3 md:order-3">
+                                                    {TopThree[2] ? (
+                                                        <PodiumCard user={TopThree[2]} rank={3} isAuthenticated={isAuthenticated} />
+                                                    ) : (
+                                                        <div className="hidden md:block h-[300px]" /> /* Placeholder for balance */
+                                                    )}
+                                                </div>
                                             </>
                                         )}
                                     </div>
