@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { signUp } from '@/lib/auth.client';
-import { resendVerification } from '@/lib/auth.fn';
+import { resendVerification } from '@/server/auth.fn';
 import { signUpSchema, type SignUpInput } from '@/lib/validations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

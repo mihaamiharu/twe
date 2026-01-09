@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { cn } from '@/lib/utils';
-import { executePlaywrightCode } from '@/lib/challenge-executor';
+import { executePlaywrightCode } from '@/core/executor';
 import { Play, Send, RotateCcw, Zap, Loader2, Target, BookOpen, AlertCircle, GripVertical } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { storage } from '@/lib/storage-adapter';
