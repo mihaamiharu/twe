@@ -28,12 +28,12 @@ interface StatsCache {
 }
 
 let cachedStats: StatsCache | null = null;
-const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+const CACHE_TTL_MS = 60 * 1000; // 1 minute in milliseconds
 
 async function getLatestAchievements() {
     const latest = await db
         .select({
-            achievementName: achievements.name,
+            achievementName: sql<string>`${achievements.name}->>'en'`,
             achievementIcon: achievements.icon,
             userName: users.name,
             userAvatar: users.image,
@@ -43,7 +43,7 @@ async function getLatestAchievements() {
         .innerJoin(users, sql`user_achievements.user_id = users.id`)
         .orderBy(desc(userAchievements.unlockedAt))
         .limit(5);
-    
+
     return latest;
 }
 
@@ -78,7 +78,7 @@ async function fetchStats() {
             tiers.expert++;
         }
     }
-    
+
     const latestAchievements = await getLatestAchievements();
 
     return {
