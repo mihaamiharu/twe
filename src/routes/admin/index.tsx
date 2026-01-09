@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { getAdminStats } from '@/lib/admin.fn';
+import { getAdminStats } from '@/server/admin.fn';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Users, FileCode, Trophy, AlertCircle, Activity, ArrowRight, Layout } from 'lucide-react';

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useIntlayer } from 'react-intlayer';
 import { useCallback, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { getChallenge, getChallenges } from '@/lib/challenges.fn';
+import { getChallenge, getChallenges } from '@/server/challenges.fn';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { deobfuscate } from '@/lib/obfuscator';
@@ -13,13 +13,13 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { type TestResult } from '@/components/challenges/TestResults';
-import { createSubmission } from '@/lib/submissions.fn';
+import { createSubmission } from '@/server/submissions.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
 import { TierSkipTip } from '@/components/challenges/TierSkipTip';
 import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
-import { showAchievementToasts } from '@/lib/achievement-toast';
+import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 
 export const Route = createFileRoute('/$locale/challenges/$slug')({

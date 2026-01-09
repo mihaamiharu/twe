@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAdminUsers, updateUserStatus } from '@/lib/admin.fn';
+import { getAdminUsers, updateUserStatus } from '@/server/admin.fn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Shield, ShieldAlert, Search } from 'lucide-react';

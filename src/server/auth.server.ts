@@ -4,7 +4,7 @@ import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
 import * as dotenv from 'dotenv';
-import { sendVerificationEmail, sendPasswordResetEmail } from '@/lib/email.server';
+import { sendVerificationEmail, sendPasswordResetEmail } from '@/server/email.server';
 
 dotenv.config();
 

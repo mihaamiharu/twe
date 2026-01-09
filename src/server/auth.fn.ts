@@ -87,7 +87,7 @@ export const resendVerification = createServerFn({ method: "POST" })
             const { db } = await import('@/db');
             const { users } = await import('@/db/schema');
             const { eq } = await import('drizzle-orm');
-            const { sendVerificationEmail } = await import('@/lib/email.server');
+            const { sendVerificationEmail } = await import('@/server/email.server');
             const { logger } = await import('@/lib/logger');
 
             // Find user by email

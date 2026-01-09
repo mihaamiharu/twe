@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { auth } from '@/lib/auth.server';
+import { auth } from '@/server/auth.server';
 
 // TanStack Start API route for BetterAuth
 // Handles all auth-related requests at /api/auth/*
