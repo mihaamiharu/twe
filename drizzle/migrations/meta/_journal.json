@@ -43,6 +43,13 @@
       "when": 1767707504438,
       "tag": "0005_groovy_jean_grey",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1767931226071,
+      "tag": "0006_seed_achievements",
+      "breakpoints": true
     }
   ]
 }
