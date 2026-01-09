@@ -20,7 +20,7 @@ interface StatsCache {
         latestAchievements: {
             achievementName: string;
             achievementIcon: string;
-            userName: string;
+            userName: string | null;
             userAvatar: string | null;
         }[];
     };
@@ -28,7 +28,7 @@ interface StatsCache {
 }
 
 let cachedStats: StatsCache | null = null;
-const CACHE_TTL_MS = 60 * 1000; // 1 minute in milliseconds
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
 
 async function getLatestAchievements() {
     const latest = await db
