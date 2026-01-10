@@ -11,6 +11,7 @@
     "hiddenUser": "Hidden User",
     "anonymous": "Anonymous",
     "challengesCount": "{{count}} challenges",
+    "challenges": "challenges",
     "emptyState": "No other runners yet. Invite your friends!"
   },
   "gating": {
