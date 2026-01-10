@@ -11,6 +11,7 @@
     "hiddenUser": "Pengguna Tersembunyi",
     "anonymous": "Anonim",
     "challengesCount": "{{count}} tantangan",
+    "challenges": "tantangan",
     "emptyState": "Belum ada pelari lain. Undang temanmu!"
   },
   "gating": {
