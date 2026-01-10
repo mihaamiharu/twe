@@ -1,5 +1,5 @@
 ---
-title: "API Testing Fundamentals"
+title: 'API Testing Fundamentals'
 description: "Learn to test APIs directly with Playwright's request API."
 ---
 
@@ -10,7 +10,7 @@ Learn to test APIs directly with Playwright's request API.
 ## Why API Testing?
 
 - **Speed**: API tests run 10-100x faster than UI tests
-- **Stability**: No browser rendering = fewer flaky tests  
+- **Stability**: No browser rendering = fewer flaky tests
 - **Coverage**: Test business logic without UI dependency
 - **Setup**: Create test data quickly for UI tests
 
@@ -20,12 +20,12 @@ Learn to test APIs directly with Playwright's request API.
 
 ### HTTP Methods
 
-| Method | Purpose | Example |
-|--------|---------|---------|
-| GET | Read data | Fetch user profile |
-| POST | Create data | Register new user |
-| PUT | Update data | Change password |
-| DELETE | Remove data | Delete account |
+| Method | Purpose     | Example            |
+| ------ | ----------- | ------------------ |
+| GET    | Read data   | Fetch user profile |
+| POST   | Create data | Register new user  |
+| PUT    | Update data | Change password    |
+| DELETE | Remove data | Delete account     |
 
 ### Request Anatomy
 
@@ -33,12 +33,12 @@ Learn to test APIs directly with Playwright's request API.
 const response = await request.post('/api/users', {
   headers: {
     'Content-Type': 'application/json',
-    'Authorization': 'Bearer token123'
+    Authorization: 'Bearer token123',
   },
   data: {
     name: 'Test User',
-    email: 'test@example.com'
-  }
+    email: 'test@example.com',
+  },
 });
 ```
 
@@ -46,29 +46,29 @@ const response = await request.post('/api/users', {
 
 ```javascript
 // Status code (200, 201, 400, 404, 500...)
-response.status()
+response.status();
 
 // Response body as JSON
-const data = await response.json()
+const data = await response.json();
 
 // Response headers
-response.headers()
+response.headers();
 ```
 
 ---
 
 ## Status Codes to Know
 
-| Code | Meaning | When You See It |
-|------|---------|-----------------|
-| 200 | OK | Successful GET/PUT |
-| 201 | Created | Successful POST |
-| 204 | No Content | Successful DELETE |
-| 400 | Bad Request | Invalid input |
-| 401 | Unauthorized | Missing/bad auth |
-| 403 | Forbidden | No permission |
-| 404 | Not Found | Resource missing |
-| 500 | Server Error | Backend bug |
+| Code | Meaning      | When You See It    |
+| ---- | ------------ | ------------------ |
+| 200  | OK           | Successful GET/PUT |
+| 201  | Created      | Successful POST    |
+| 204  | No Content   | Successful DELETE  |
+| 400  | Bad Request  | Invalid input      |
+| 401  | Unauthorized | Missing/bad auth   |
+| 403  | Forbidden    | No permission      |
+| 404  | Not Found    | Resource missing   |
+| 500  | Server Error | Backend bug        |
 
 ---
 
@@ -104,8 +104,8 @@ expect(users.length).toBeGreaterThan(0);
 const response = await request.post('/api/users', {
   data: {
     name: 'Alice',
-    email: 'alice@test.com'
-  }
+    email: 'alice@test.com',
+  },
 });
 
 expect(response.status()).toBe(201);
@@ -118,15 +118,15 @@ expect(user.id).toBeDefined();
 ```javascript
 // Login to get token
 const loginRes = await request.post('/api/login', {
-  data: { email: 'admin@test.com', password: 'secret' }
+  data: { email: 'admin@test.com', password: 'secret' },
 });
 const { token } = await loginRes.json();
 
 // Use token in subsequent requests
 const profileRes = await request.get('/api/profile', {
   headers: {
-    'Authorization': `Bearer ${token}`
-  }
+    Authorization: `Bearer ${token}`,
+  },
 });
 ```
 
@@ -154,7 +154,7 @@ expect(data.name).toBe('Alice');
 expect(data.items).toHaveLength(5);
 expect(data.items[0]).toMatchObject({
   type: 'product',
-  price: expect.any(Number)
+  price: expect.any(Number),
 });
 ```
 
@@ -172,14 +172,14 @@ expect(response.headers()['content-type']).toContain('application/json');
 test('User can see their orders', async ({ page, request }) => {
   // 1. API: Create test data (fast!)
   await request.post('/api/orders', {
-    data: { userId: 'test-user', product: 'Widget', quantity: 2 }
+    data: { userId: 'test-user', product: 'Widget', quantity: 2 },
   });
-  
+
   // 2. API: Login and get session
   const loginRes = await request.post('/api/login', {
-    data: { email: 'test@qa.com', password: 'pass' }
+    data: { email: 'test@qa.com', password: 'pass' },
   });
-  
+
   // 3. UI: Verify display (what we actually test)
   await page.goto('/orders');
   await expect(page.locator('.order-item')).toContainText('Widget');
@@ -190,13 +190,13 @@ test('User can see their orders', async ({ page, request }) => {
 
 ## Quick Reference
 
-| Action | Code |
-|--------|------|
-| GET request | `await request.get(url)` |
-| POST with JSON | `await request.post(url, { data: {...} })` |
-| With headers | `await request.get(url, { headers: {...} })` |
-| Check status | `expect(response.status()).toBe(200)` |
-| Parse JSON | `await response.json()` |
-| Check OK (2xx) | `expect(response.ok()).toBeTruthy()` |
+| Action         | Code                                         |
+| -------------- | -------------------------------------------- |
+| GET request    | `await request.get(url)`                     |
+| POST with JSON | `await request.post(url, { data: {...} })`   |
+| With headers   | `await request.get(url, { headers: {...} })` |
+| Check status   | `expect(response.status()).toBe(200)`        |
+| Parse JSON     | `await response.json()`                      |
+| Check OK (2xx) | `expect(response.ok()).toBeTruthy()`         |
 
 ---

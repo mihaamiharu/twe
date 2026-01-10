@@ -79,7 +79,7 @@ function HomePage() {
       title: t('tiers.basic.title'),
       description: t('tiers.basic.description'),
       skills: t('tiers.basic.skills', { returnObjects: true }) as string[],
-      count: (stats?.tiers.basic || 0),
+      count: stats?.tiers.basic || 0,
     },
     {
       tier: 'beginner',
@@ -87,15 +87,17 @@ function HomePage() {
       title: t('tiers.beginner.title'),
       description: t('tiers.beginner.description'),
       skills: t('tiers.beginner.skills', { returnObjects: true }) as string[],
-      count: (stats?.tiers.beginner || 0),
+      count: stats?.tiers.beginner || 0,
     },
     {
       tier: 'intermediate',
       emoji: '🟠',
       title: t('tiers.intermediate.title'),
       description: t('tiers.intermediate.description'),
-      skills: t('tiers.intermediate.skills', { returnObjects: true }) as string[],
-      count: (stats?.tiers.intermediate || 0),
+      skills: t('tiers.intermediate.skills', {
+        returnObjects: true,
+      }) as string[],
+      count: stats?.tiers.intermediate || 0,
     },
     {
       tier: 'expert',
@@ -103,7 +105,7 @@ function HomePage() {
       title: t('tiers.expert.title'),
       description: t('tiers.expert.description'),
       skills: t('tiers.expert.skills', { returnObjects: true }) as string[],
-      count: (stats?.tiers.expert || 0),
+      count: stats?.tiers.expert || 0,
     },
   ];
 
@@ -139,8 +141,6 @@ function HomePage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent animate-pulse"></div>
 
         <div className="relative max-w-5xl mx-auto">
-
-
           {/* Title */}
           <h1 className="text-5xl md:text-7xl font-bold mb-6">
             <span className="gradient-text">{t('hero.title')}</span>
@@ -160,13 +160,20 @@ function HomePage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
             <Link to="/$locale/challenges" params={{ locale }}>
-              <Button size="lg" className="text-lg px-8 py-6 rounded-xl border-2 border-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow">
+              <Button
+                size="lg"
+                className="text-lg px-8 py-6 rounded-xl border-2 border-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
+              >
                 {t('hero.startLearning')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
             <Link to="/$locale/tutorials" params={{ locale }}>
-              <Button variant="outline" size="lg" className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-muted">
+              <Button
+                variant="outline"
+                size="lg"
+                className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-muted"
+              >
                 {t('hero.browseTutorials')}
               </Button>
             </Link>
@@ -182,7 +189,9 @@ function HomePage() {
                   <AnimatedCounter value={stats?.challenges || 0} suffix="+" />
                 )}
               </div>
-              <div className="text-sm text-muted-foreground font-medium">{t('stats.challenges')}</div>
+              <div className="text-sm text-muted-foreground font-medium">
+                {t('stats.challenges')}
+              </div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
@@ -192,7 +201,9 @@ function HomePage() {
                   <AnimatedCounter value={stats?.tutorials || 0} />
                 )}
               </div>
-              <div className="text-sm text-muted-foreground font-medium">{t('stats.tutorials')}</div>
+              <div className="text-sm text-muted-foreground font-medium">
+                {t('stats.tutorials')}
+              </div>
             </div>
             <div className="text-center">
               <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
@@ -202,11 +213,17 @@ function HomePage() {
                   <AnimatedCounter value={stats?.achievements || 0} />
                 )}
               </div>
-              <div className="text-sm text-muted-foreground font-medium">{t('stats.achievements')}</div>
+              <div className="text-sm text-muted-foreground font-medium">
+                {t('stats.achievements')}
+              </div>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">∞</div>
-              <div className="text-sm text-muted-foreground font-medium">{t('stats.learning')}</div>
+              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                ∞
+              </div>
+              <div className="text-sm text-muted-foreground font-medium">
+                {t('stats.learning')}
+              </div>
             </div>
           </div>
         </div>
@@ -217,7 +234,10 @@ function HomePage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('careerPath.title')} <span className="gradient-text">{t('careerPath.titleHighlight')}</span>
+              {t('careerPath.title')}{' '}
+              <span className="gradient-text">
+                {t('careerPath.titleHighlight')}
+              </span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('careerPath.subtitle')}
@@ -235,14 +255,22 @@ function HomePage() {
                   <div className="flex items-center gap-3 mb-4">
                     <span className="text-3xl">{tier.emoji}</span>
                     <div>
-                      <div className="text-sm text-muted-foreground font-bold">Tier {index + 1}</div>
+                      <div className="text-sm text-muted-foreground font-bold">
+                        Tier {index + 1}
+                      </div>
                       <h3 className="text-xl font-bold">{tier.title}</h3>
                     </div>
                   </div>
-                  <p className="text-sm text-muted-foreground mb-4">{tier.description}</p>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    {tier.description}
+                  </p>
                   <div className="flex flex-wrap gap-1 mb-4">
-                    {tier.skills.map(skill => (
-                      <Badge key={skill} variant="secondary" className="text-xs font-medium border border-border">
+                    {tier.skills.map((skill) => (
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className="text-xs font-medium border border-border"
+                      >
                         {skill}
                       </Badge>
                     ))}
@@ -262,7 +290,10 @@ function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('featuredChallenges.title')} <span className="gradient-text">{t('featuredChallenges.titleHighlight')}</span>
+              {t('featuredChallenges.title')}{' '}
+              <span className="gradient-text">
+                {t('featuredChallenges.titleHighlight')}
+              </span>
             </h2>
             <p className="text-lg text-muted-foreground">
               {t('featuredChallenges.subtitle')}
@@ -295,8 +326,12 @@ function HomePage() {
                         +{challenge.xp} XP
                       </span>
                     </div>
-                    <h3 className="text-xl font-bold mb-2">{challenge.title}</h3>
-                    <p className="text-sm text-muted-foreground font-medium">{challenge.type}</p>
+                    <h3 className="text-xl font-bold mb-2">
+                      {challenge.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground font-medium">
+                      {challenge.type}
+                    </p>
                   </CardContent>
                 </Card>
               </Link>
@@ -305,7 +340,11 @@ function HomePage() {
 
           <div className="text-center mt-8">
             <Link to="/$locale/challenges" params={{ locale }}>
-              <Button variant="outline" size="lg" className="rounded-xl border-2">
+              <Button
+                variant="outline"
+                size="lg"
+                className="rounded-xl border-2"
+              >
                 {t('featuredChallenges.viewAll')}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -319,7 +358,10 @@ function HomePage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('features.title')} <span className="gradient-text">{t('features.titleHighlight')}</span>
+              {t('features.title')}{' '}
+              <span className="gradient-text">
+                {t('features.titleHighlight')}
+              </span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               {t('features.subtitle')}
@@ -352,7 +394,9 @@ function HomePage() {
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 {t('hallOfFame.title')}{' '}
-                <span className="gradient-text">{t('hallOfFame.titleHighlight')}</span>
+                <span className="gradient-text">
+                  {t('hallOfFame.titleHighlight')}
+                </span>
               </h2>
               <p className="text-lg text-muted-foreground">
                 {t('hallOfFame.subtitle')}
@@ -360,7 +404,10 @@ function HomePage() {
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
               {stats.latestAchievements.map((achievement, index) => (
-                <div key={index} className="flex flex-col items-center text-center">
+                <div
+                  key={index}
+                  className="flex flex-col items-center text-center"
+                >
                   <div className="relative mb-2">
                     <Avatar className="h-16 w-16 mb-2 border-2 border-primary/50">
                       <AvatarImage src={achievement.userAvatar || ''} />
@@ -372,7 +419,9 @@ function HomePage() {
                       {achievement.achievementIcon}
                     </div>
                   </div>
-                  <p className="font-semibold text-sm">{achievement.userName}</p>
+                  <p className="font-semibold text-sm">
+                    {achievement.userName}
+                  </p>
                   <p className="text-xs text-muted-foreground">
                     Unlocked {achievement.achievementName}
                   </p>
@@ -388,7 +437,10 @@ function HomePage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('howItWorks.title')} <span className="gradient-text">{t('howItWorks.titleHighlight')}</span>
+              {t('howItWorks.title')}{' '}
+              <span className="gradient-text">
+                {t('howItWorks.titleHighlight')}
+              </span>
             </h2>
           </div>
 
@@ -412,7 +464,9 @@ function HomePage() {
             ].map((item) => (
               <div key={item.step} className="text-center group">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl font-bold text-primary">{item.step}</span>
+                  <span className="text-2xl font-bold text-primary">
+                    {item.step}
+                  </span>
                 </div>
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                 <p className="text-muted-foreground">{item.description}</p>
@@ -420,15 +474,17 @@ function HomePage() {
             ))}
           </div>
         </div>
-
-      </section >
+      </section>
 
       {/* Mission Section */}
-      < section className="py-20 px-6 bg-muted/30" >
+      <section className="py-20 px-6 bg-muted/30">
         <div className="max-w-4xl mx-auto text-center">
           <div className="mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('mission.title')} <span className="gradient-text">{t('mission.titleHighlight')}</span>
+              {t('mission.title')}{' '}
+              <span className="gradient-text">
+                {t('mission.titleHighlight')}
+              </span>
             </h2>
           </div>
 
@@ -442,7 +498,9 @@ function HomePage() {
               <div className="space-y-6 text-lg text-muted-foreground leading-relaxed font-reading">
                 <p>{t('mission.story1')}</p>
                 <p>
-                  <strong className="text-foreground font-medium">{t('mission.story2')}</strong>
+                  <strong className="text-foreground font-medium">
+                    {t('mission.story2')}
+                  </strong>
                 </p>
                 <p>{t('mission.story3')}</p>
               </div>
@@ -452,17 +510,21 @@ function HomePage() {
                   E
                 </div>
                 <div>
-                  <div className="font-bold text-foreground">{t('mission.author')}</div>
-                  <div className="text-sm text-muted-foreground">{t('mission.authorRole')}</div>
+                  <div className="font-bold text-foreground">
+                    {t('mission.author')}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {t('mission.authorRole')}
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
-      </section >
+      </section>
 
       {/* CTA Section */}
-      < section className="py-20 px-6" >
+      <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <div className="glass-card p-12 rounded-3xl border-2 border-primary/20">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
@@ -473,12 +535,19 @@ function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/login">
-                <Button size="lg" className="text-lg px-8 rounded-xl border-2 border-primary shadow-lg shadow-primary/20">
+                <Button
+                  size="lg"
+                  className="text-lg px-8 rounded-xl border-2 border-primary shadow-lg shadow-primary/20"
+                >
                   {t('cta.getStarted')}
                 </Button>
               </Link>
               <Link to="/leaderboard">
-                <Button variant="outline" size="lg" className="text-lg px-8 rounded-xl border-2">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="text-lg px-8 rounded-xl border-2"
+                >
                   {t('cta.viewLeaderboard')}
                 </Button>
               </Link>
@@ -500,7 +569,7 @@ function HomePage() {
             </div>
           </div>
         </div>
-      </section >
-    </div >
+      </section>
+    </div>
   );
 }

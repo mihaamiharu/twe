@@ -106,14 +106,14 @@ erDiagram
 
 The application uses the following PostgreSQL enums:
 
-| Enum Name | Values | Description |
-|-----------|--------|-------------|
-| `block_type` | `JAVASCRIPT`, `PLAYWRIGHT`, `CSS_SELECTOR`, `XPATH_SELECTOR` | Types of challenges available |
-| `user_role` | `USER`, `ADMIN` | User permission levels |
-| `difficulty` | `EASY`, `MEDIUM`, `HARD` | Challenge difficulty levels |
-| `profile_visibility` | `PUBLIC`, `PRIVATE` | User privacy settings |
-| `bug_severity` | `CRITICAL`, `HIGH`, `MEDIUM`, `LOW` | Impact level of reported bugs |
-| `bug_report_status` | `NEW`, `IN_PROGRESS`, `RESOLVED`, `WONT_FIX`, `CLOSED` | Lifecycle status of a bug report |
+| Enum Name            | Values                                                       | Description                      |
+| -------------------- | ------------------------------------------------------------ | -------------------------------- |
+| `block_type`         | `JAVASCRIPT`, `PLAYWRIGHT`, `CSS_SELECTOR`, `XPATH_SELECTOR` | Types of challenges available    |
+| `user_role`          | `USER`, `ADMIN`                                              | User permission levels           |
+| `difficulty`         | `EASY`, `MEDIUM`, `HARD`                                     | Challenge difficulty levels      |
+| `profile_visibility` | `PUBLIC`, `PRIVATE`                                          | User privacy settings            |
+| `bug_severity`       | `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`                          | Impact level of reported bugs    |
+| `bug_report_status`  | `NEW`, `IN_PROGRESS`, `RESOLVED`, `WONT_FIX`, `CLOSED`       | Lifecycle status of a bug report |
 
 ## Tables Schema
 

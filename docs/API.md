@@ -15,10 +15,10 @@ The TestingWithEkki API is organized around REST. It accepts JSON-encoded reques
 
 ## Base URL
 
-| Environment | URL |
-|-------------|-----|
-| Development | `http://localhost:3000` |
-| Production | `https://testingwithekki.com` |
+| Environment | URL                           |
+| ----------- | ----------------------------- |
+| Development | `http://localhost:3000`       |
+| Production  | `https://testingwithekki.com` |
 
 ## Authentication
 
@@ -30,52 +30,52 @@ After successful login, a session cookie (`better_auth.session`) is set automati
 
 ### Auth Endpoints
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/sign-up/email` | Register with email |
-| POST | `/api/auth/sign-in/email` | Login with email |
-| POST | `/api/auth/sign-in/social` | OAuth login (Google) |
-| POST | `/api/auth/sign-out` | Sign out |
-| GET | `/api/auth/get-session` | Get current session |
+| Method | Endpoint                   | Description          |
+| ------ | -------------------------- | -------------------- |
+| POST   | `/api/auth/sign-up/email`  | Register with email  |
+| POST   | `/api/auth/sign-in/email`  | Login with email     |
+| POST   | `/api/auth/sign-in/social` | OAuth login (Google) |
+| POST   | `/api/auth/sign-out`       | Sign out             |
+| GET    | `/api/auth/get-session`    | Get current session  |
 
 ## Endpoints
 
 ### Challenges
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/challenges` | List all challenges |
-| GET | `/api/challenges/:slug` | Get challenge details |
-| POST | `/api/submissions` | Submit solution |
+| Method | Endpoint                | Description           |
+| ------ | ----------------------- | --------------------- |
+| GET    | `/api/challenges`       | List all challenges   |
+| GET    | `/api/challenges/:slug` | Get challenge details |
+| POST   | `/api/submissions`      | Submit solution       |
 
 ### Users
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/users/me` | Get current user profile |
-| PATCH | `/api/users/me` | Update user profile |
-| GET | `/api/users/me/achievements` | Get user achievements |
+| Method | Endpoint                     | Description              |
+| ------ | ---------------------------- | ------------------------ |
+| GET    | `/api/users/me`              | Get current user profile |
+| PATCH  | `/api/users/me`              | Update user profile      |
+| GET    | `/api/users/me/achievements` | Get user achievements    |
 
 ### Gamification
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/leaderboard` | Get leaderboard |
-| GET | `/api/achievements` | List all achievements |
+| Method | Endpoint            | Description           |
+| ------ | ------------------- | --------------------- |
+| GET    | `/api/leaderboard`  | Get leaderboard       |
+| GET    | `/api/achievements` | List all achievements |
 
 ## Error Handling
 
 The API returns standard HTTP status codes:
 
-| Code | Description |
-|------|-------------|
-| 200 | Success |
-| 400 | Bad Request - Invalid input |
-| 401 | Unauthorized - Not logged in |
-| 403 | Forbidden - No permission |
-| 404 | Not Found |
-| 429 | Rate Limited |
-| 500 | Server Error |
+| Code | Description                  |
+| ---- | ---------------------------- |
+| 200  | Success                      |
+| 400  | Bad Request - Invalid input  |
+| 401  | Unauthorized - Not logged in |
+| 403  | Forbidden - No permission    |
+| 404  | Not Found                    |
+| 429  | Rate Limited                 |
+| 500  | Server Error                 |
 
 ### Error Response Format
 

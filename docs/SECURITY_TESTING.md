@@ -12,7 +12,7 @@ We use `eslint-plugin-security` to statically analyze the source code for insecu
 bun run lint
 ```
 
-*Look for errors prefixed with `security/`.*
+_Look for errors prefixed with `security/`._
 
 ## 2. Software Composition Analysis (SCA)
 
@@ -24,7 +24,7 @@ We audit dependencies for known vulnerabilities.
 npm audit
 ```
 
-*If critical vulnerabilities are found, run `npm audit fix` or update the specific dependency.*
+_If critical vulnerabilities are found, run `npm audit fix` or update the specific dependency._
 
 ## 3. Secret Scanning
 
@@ -36,7 +36,7 @@ We use **Gitleaks** to detect hardcoded secrets (API keys, passwords) in the rep
 podman run -v $(pwd):/path zricethezav/gitleaks:latest detect --source="/path" -v
 ```
 
-*(Ensure you have Podman or Docker installed).*
+_(Ensure you have Podman or Docker installed)._
 
 ## 4. Container Security
 
@@ -49,7 +49,7 @@ We use **Trivy** to scan our container images for OS-level vulnerabilities.
 podman run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/input aquasec/trivy image postgres:16
 ```
 
-*(You may need to pull the image first).*
+_(You may need to pull the image first)._
 
 ## 5. Dynamic Application Security Testing (DAST)
 

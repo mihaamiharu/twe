@@ -1,40 +1,40 @@
 {
-    "header": {
-        "title": "Profil Kamu",
-        "level": "Level {{level}}",
-        "progressTo": "Kemajuan ke Level {{level}}",
-        "settings": "Pengaturan"
-    },
-    "stats": {
-        "tutorials": "Tutorial",
-        "challenges": "Tantangan",
-        "totalXp": "Total XP",
-        "achievements": "Pencapaian"
-    },
-    "tabs": {
-        "progress": "Progres Tingkat",
-        "activity": "Aktivitas Terbaru",
-        "achievements": "Pencapaian"
-    },
-    "tierProgress": {
-        "title": "Progres Tingkat",
-        "description": "Progres kamu di semua tingkat pembelajaran",
-        "basic": "Dasar (Selektor)",
-        "beginner": "Pemula (JavaScript)",
-        "intermediate": "Menengah (Playwright)",
-        "expert": "Ahli (Lanjutan)",
-        "challengeCount": "{{count}} tantangan"
-    },
-    "milestones": {
-        "title": "Pencapaian XP"
-    },
-    "activity": {
-        "title": "Aktivitas Terbaru",
-        "description": "Kemajuan pembelajaran terbaru kamu",
-        "empty": "Belum ada aktivitas terbaru. Mulai belajar!"
-    },
-    "achievements": {
-        "empty": "Belum ada pencapaian. Selesaikan tantangan untuk mendapatkan lencana!",
-        "available": "{{count}} lencana tersedia untuk dibuka"
-    }
+  "header": {
+    "title": "Profil Kamu",
+    "level": "Level {{level}}",
+    "progressTo": "Kemajuan ke Level {{level}}",
+    "settings": "Pengaturan"
+  },
+  "stats": {
+    "tutorials": "Tutorial",
+    "challenges": "Tantangan",
+    "totalXp": "Total XP",
+    "achievements": "Pencapaian"
+  },
+  "tabs": {
+    "progress": "Progres Tingkat",
+    "activity": "Aktivitas Terbaru",
+    "achievements": "Pencapaian"
+  },
+  "tierProgress": {
+    "title": "Progres Tingkat",
+    "description": "Progres kamu di semua tingkat pembelajaran",
+    "basic": "Dasar (Selektor)",
+    "beginner": "Pemula (JavaScript)",
+    "intermediate": "Menengah (Playwright)",
+    "expert": "Ahli (Lanjutan)",
+    "challengeCount": "{{count}} tantangan"
+  },
+  "milestones": {
+    "title": "Pencapaian XP"
+  },
+  "activity": {
+    "title": "Aktivitas Terbaru",
+    "description": "Kemajuan pembelajaran terbaru kamu",
+    "empty": "Belum ada aktivitas terbaru. Mulai belajar!"
+  },
+  "achievements": {
+    "empty": "Belum ada pencapaian. Selesaikan tantangan untuk mendapatkan lencana!",
+    "available": "{{count}} lencana tersedia untuk dibuka"
+  }
 }

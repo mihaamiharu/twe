@@ -33,13 +33,7 @@
         }
       ],
       "solution": "#login-btn",
-      "tags": [
-        "beginner",
-        "css",
-        "basics",
-        "id",
-        "class"
-      ]
+      "tags": ["beginner", "css", "basics", "id", "class"]
     },
     {
       "slug": "css-tag-selectors",
@@ -73,12 +67,7 @@
         }
       ],
       "solution": "p",
-      "tags": [
-        "beginner",
-        "css",
-        "basics",
-        "tag"
-      ]
+      "tags": ["beginner", "css", "basics", "tag"]
     },
     {
       "slug": "css-combining-basics",
@@ -112,12 +101,7 @@
         }
       ],
       "solution": "div.error",
-      "tags": [
-        "beginner",
-        "css",
-        "basics",
-        "combining"
-      ]
+      "tags": ["beginner", "css", "basics", "combining"]
     },
     {
       "slug": "css-foundations-boss",
@@ -151,12 +135,7 @@
         }
       ],
       "solution": "button.btn.primary.large",
-      "tags": [
-        "beginner",
-        "css",
-        "basics",
-        "scenario"
-      ]
+      "tags": ["beginner", "css", "basics", "scenario"]
     },
     {
       "slug": "css-child-descendant",
@@ -190,12 +169,7 @@
         }
       ],
       "solution": ".nav-menu > li",
-      "tags": [
-        "beginner",
-        "css",
-        "relationships",
-        "child"
-      ]
+      "tags": ["beginner", "css", "relationships", "child"]
     },
     {
       "slug": "css-sibling-selectors",
@@ -229,12 +203,7 @@
         }
       ],
       "solution": "h1 + p",
-      "tags": [
-        "beginner",
-        "css",
-        "relationships",
-        "siblings"
-      ]
+      "tags": ["beginner", "css", "relationships", "siblings"]
     },
     {
       "slug": "css-family-drill",
@@ -268,12 +237,7 @@
         }
       ],
       "solution": ".profile-card .card-content span",
-      "tags": [
-        "beginner",
-        "css",
-        "relationships",
-        "drill"
-      ]
+      "tags": ["beginner", "css", "relationships", "drill"]
     },
     {
       "slug": "css-navigation-boss",
@@ -307,12 +271,7 @@
         }
       ],
       "solution": "#user-menu .dropdown-list .action-item a",
-      "tags": [
-        "beginner",
-        "css",
-        "relationships",
-        "scenario"
-      ]
+      "tags": ["beginner", "css", "relationships", "scenario"]
     },
     {
       "slug": "css-attribute-selectors",
@@ -346,11 +305,7 @@
         }
       ],
       "solution": "[type=\"email\"]",
-      "tags": [
-        "beginner",
-        "css",
-        "attributes"
-      ]
+      "tags": ["beginner", "css", "attributes"]
     },
     {
       "slug": "css-validation-states",
@@ -384,12 +339,7 @@
         }
       ],
       "solution": "input:invalid",
-      "tags": [
-        "beginner",
-        "css",
-        "states",
-        "validation"
-      ]
+      "tags": ["beginner", "css", "states", "validation"]
     },
     {
       "slug": "css-functional-pseudo",
@@ -423,12 +373,7 @@
         }
       ],
       "solution": ".user-card.active:not(.suspended)",
-      "tags": [
-        "beginner",
-        "css",
-        "states",
-        "functional"
-      ]
+      "tags": ["beginner", "css", "states", "functional"]
     },
     {
       "slug": "css-forms-boss",
@@ -462,12 +407,7 @@
         }
       ],
       "solution": "input[type=\"tel\"]:optional:not(:disabled)",
-      "tags": [
-        "beginner",
-        "css",
-        "states",
-        "scenario"
-      ]
+      "tags": ["beginner", "css", "states", "scenario"]
     },
     {
       "slug": "css-nth-child",
@@ -501,11 +441,7 @@
         }
       ],
       "solution": "li:nth-child(3)",
-      "tags": [
-        "beginner",
-        "css",
-        "structure"
-      ]
+      "tags": ["beginner", "css", "structure"]
     },
     {
       "slug": "css-nth-type-vs-child",
@@ -539,11 +475,7 @@
         }
       ],
       "solution": "p:nth-of-type(2)",
-      "tags": [
-        "beginner",
-        "css",
-        "structure"
-      ]
+      "tags": ["beginner", "css", "structure"]
     },
     {
       "slug": "css-table-drill",
@@ -577,13 +509,7 @@
         }
       ],
       "solution": "tbody tr:nth-child(2) td:nth-child(3)",
-      "tags": [
-        "beginner",
-        "css",
-        "structure",
-        "table",
-        "drill"
-      ]
+      "tags": ["beginner", "css", "structure", "table", "drill"]
     },
     {
       "slug": "css-table-boss",
@@ -617,13 +543,7 @@
         }
       ],
       "solution": "tr:nth-child(odd) td:last-child button",
-      "tags": [
-        "beginner",
-        "css",
-        "structure",
-        "scenario",
-        "table"
-      ]
+      "tags": ["beginner", "css", "structure", "scenario", "table"]
     },
     {
       "slug": "css-dynamic-elements",
@@ -657,11 +577,7 @@
         }
       ],
       "solution": "li:nth-child(2) .del",
-      "tags": [
-        "beginner",
-        "css",
-        "dynamic"
-      ]
+      "tags": ["beginner", "css", "dynamic"]
     },
     {
       "slug": "xpath-basics-101",
@@ -695,13 +611,7 @@
         }
       ],
       "solution": "//button",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "basics",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "basics", "basic"]
     },
     {
       "slug": "xpath-attribute-matching",
@@ -735,13 +645,7 @@
         }
       ],
       "solution": "//input[@type=\"password\"]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "attribute",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "attribute", "basic"]
     },
     {
       "slug": "xpath-text-content",
@@ -775,13 +679,7 @@
         }
       ],
       "solution": "//button[text()=\"Add to Cart\"]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "text",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "text", "basic"]
     },
     {
       "slug": "xpath-contains-starts-with",
@@ -856,13 +754,7 @@
         }
       ],
       "solution": "//form[contains(@class, \"login\")]//button[text()=\"Sign In\"]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "scenario",
-        "fundamentals"
-      ]
+      "tags": ["beginner", "xpath", "selector", "scenario", "fundamentals"]
     },
     {
       "slug": "xpath-parent-ancestor",
@@ -896,14 +788,7 @@
         }
       ],
       "solution": "//a[text()=\"Settings\"]/parent::li",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "parent",
-        "ancestor",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "parent", "ancestor", "basic"]
     },
     {
       "slug": "xpath-following-sibling",
@@ -937,13 +822,7 @@
         }
       ],
       "solution": "//label[text()=\"Username\"]/following-sibling::input",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "following-sibling",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "following-sibling", "basic"]
     },
     {
       "slug": "xpath-preceding-sibling",
@@ -977,13 +856,7 @@
         }
       ],
       "solution": "//span[@class=\"error\"]/preceding-sibling::label",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "preceding-sibling",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "preceding-sibling", "basic"]
     },
     {
       "slug": "xpath-traversal-boss",
@@ -1100,14 +973,7 @@
         }
       ],
       "solution": "//ul/li[last()]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "position",
-        "indexing",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "position", "indexing", "basic"]
     },
     {
       "slug": "xpath-normalize-space",
@@ -1182,14 +1048,7 @@
         }
       ],
       "solution": "//tr[td[text()=\"ORD-002\"]]/td[4]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "table",
-        "complex",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "selector", "table", "complex", "basic"]
     },
     {
       "slug": "xpath-axes-master",
@@ -1223,13 +1082,7 @@
         }
       ],
       "solution": "//h3[text()=\"Product A\"]/following::button[text()=\"Edit\"][1]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "axes",
-        "advanced"
-      ]
+      "tags": ["beginner", "xpath", "selector", "axes", "advanced"]
     },
     {
       "slug": "xpath-advanced-boss",
@@ -1263,14 +1116,7 @@
         }
       ],
       "solution": "//tr[td[text()=\"John Doe\"] and td[text()=\"Admin\"]]//button[text()=\"Delete\"]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "selector",
-        "advanced",
-        "table",
-        "scenario"
-      ]
+      "tags": ["beginner", "xpath", "selector", "advanced", "table", "scenario"]
     },
     {
       "slug": "selector-comparison-same-element",
@@ -1304,13 +1150,7 @@
         }
       ],
       "solution": "#search-btn",
-      "tags": [
-        "beginner",
-        "css",
-        "xpath",
-        "comparison",
-        "basic"
-      ]
+      "tags": ["beginner", "css", "xpath", "comparison", "basic"]
     },
     {
       "slug": "selector-when-xpath-wins",
@@ -1344,14 +1184,7 @@
         }
       ],
       "solution": "//div[contains(@class, \"product-card\") and .//text()[contains(., \"Out of Stock\")]]",
-      "tags": [
-        "beginner",
-        "xpath",
-        "comparison",
-        "text",
-        "parent",
-        "basic"
-      ]
+      "tags": ["beginner", "xpath", "comparison", "text", "parent", "basic"]
     },
     {
       "slug": "selector-performance",
@@ -1385,13 +1218,7 @@
         }
       ],
       "solution": "#submit-btn",
-      "tags": [
-        "beginner",
-        "css",
-        "performance",
-        "best-practices",
-        "basic"
-      ]
+      "tags": ["beginner", "css", "performance", "best-practices", "basic"]
     },
     {
       "slug": "selector-comparison-boss",
@@ -1425,14 +1252,7 @@
         }
       ],
       "solution": "[data-product-id=\"prod-101\"] .remove",
-      "tags": [
-        "beginner",
-        "css",
-        "xpath",
-        "comparison",
-        "scenario",
-        "decision"
-      ]
+      "tags": ["beginner", "css", "xpath", "comparison", "scenario", "decision"]
     }
   ]
 }

@@ -29,6 +29,7 @@ All planning artifacts have been created and finalized:
 - ✅ **PostgreSQL 15** as the database
 
 **Key Benefits:**
+
 - Simpler deployment (one codebase, one app)
 - No code execution security concerns
 - Type-safe end-to-end
@@ -41,7 +42,7 @@ All planning artifacts have been created and finalized:
 
 ### 🎮 Gamification System
 
-- **XP & Levels**: Formula-based progression (100 * level²)
+- **XP & Levels**: Formula-based progression (100 \* level²)
 - **Achievements**: Unlockable badges for milestones
 - **Leaderboard**: Global ranking (opt-in)
 - **Private by Default**: User profiles are private unless user opts in
@@ -56,6 +57,7 @@ All planning artifacts have been created and finalized:
 ### 📊 Analytics & Tracking
 
 **Google Analytics GA4 Integration:**
+
 - Event tracking for challenge completion
 - Level-up events
 - User engagement metrics
@@ -64,6 +66,7 @@ All planning artifacts have been created and finalized:
 ### 🖥️ Server Configuration
 
 **Target Environment:**
+
 - **OS**: Ubuntu
 - **CPU**: 2 cores
 - **RAM**: 2 GB
@@ -71,6 +74,7 @@ All planning artifacts have been created and finalized:
 - **Domain**: www.testingwithekki.com
 
 **Optimizations:**
+
 - PostgreSQL tuned for 2GB RAM (256MB shared_buffers)
 - Docker resource limits (512MB for Postgres, 1GB for app)
 - Nginx reverse proxy with SSL (Let's Encrypt)
@@ -99,15 +103,15 @@ All planning artifacts have been created and finalized:
 
 **7-Week Plan:**
 
-| Week | Phase | Focus |
-|------|-------|-------|
-| 1 | Project Setup | TanStack Start, PostgreSQL, Drizzle schema |
-| 1-2 | Data Layer & Auth | BetterAuth, API routes, user management |
-| 2-3 | Frontend Foundation | Design system, routing, tutorial interface |
-| 3-4 | Challenge Runner Logic | Playwright shim, iframe executor, Monaco Editor |
-| 4-5 | Gamification System | XP/levels, achievements, leaderboard |
-| 5-6 | Polish & Testing | Unit tests, responsive design, dark mode |
-| 6-7 | Content & Deployment | Seed data, server setup, production deploy |
+| Week | Phase                  | Focus                                           |
+| ---- | ---------------------- | ----------------------------------------------- |
+| 1    | Project Setup          | TanStack Start, PostgreSQL, Drizzle schema      |
+| 1-2  | Data Layer & Auth      | BetterAuth, API routes, user management         |
+| 2-3  | Frontend Foundation    | Design system, routing, tutorial interface      |
+| 3-4  | Challenge Runner Logic | Playwright shim, iframe executor, Monaco Editor |
+| 4-5  | Gamification System    | XP/levels, achievements, leaderboard            |
+| 5-6  | Polish & Testing       | Unit tests, responsive design, dark mode        |
+| 6-7  | Content & Deployment   | Seed data, server setup, production deploy      |
 
 ---
 
@@ -134,11 +138,13 @@ testingwithekki/
 ### 1. Mocked Playwright Shim
 
 **Revolutionary Approach:**
+
 - Users write: `await page.click('#btn')`
 - Browser executes: `document.querySelector('#btn').click()`
 - **Result**: Real syntax learning without server-side security risks!
 
 **Example:**
+
 ```typescript
 class MockedPlaywrightPage {
   async click(selector: string) {
@@ -203,6 +209,7 @@ PORT=3000
 5. ⏭️ **Next**: Begin Week 1 - Project Setup
 
 **First Commands:**
+
 ```bash
 # Initialize TanStack Start project
 npm create @tanstack/start@latest
@@ -219,14 +226,14 @@ npx drizzle-kit migrate
 
 ## Configuration Summary
 
-| Setting | Value |
-|---------|-------|
-| **Hosting** | Own server (Ubuntu) |
-| **Domain** | www.testingwithekki.com |
-| **Analytics** | Google Analytics GA4 |
-| **Profile Privacy** | Private by default |
-| **Server Specs** | 2 CPU, 2GB RAM, 20GB disk |
-| **Expected Capacity** | 50-100 concurrent users |
+| Setting               | Value                     |
+| --------------------- | ------------------------- |
+| **Hosting**           | Own server (Ubuntu)       |
+| **Domain**            | www.testingwithekki.com   |
+| **Analytics**         | Google Analytics GA4      |
+| **Profile Privacy**   | Private by default        |
+| **Server Specs**      | 2 CPU, 2GB RAM, 20GB disk |
+| **Expected Capacity** | 50-100 concurrent users   |
 
 ---
 
@@ -236,7 +243,7 @@ npx drizzle-kit migrate
 ✅ **Scalability**: Mocked Playwright runs in browser, infinite scale  
 ✅ **Performance**: Optimized PostgreSQL config for 2GB RAM  
 ✅ **Maintenance**: Single codebase with TanStack Start  
-✅ **Privacy**: GDPR-friendly, private-by-default design  
+✅ **Privacy**: GDPR-friendly, private-by-default design
 
 ---
 

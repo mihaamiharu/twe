@@ -39,19 +39,18 @@ Example Preference:
 
 CSS
 
-/*BAD*/
+/_BAD_/
 .card {
-  transition: all 0.3s ease;
-  border-radius: 8px;
+transition: all 0.3s ease;
+border-radius: 8px;
 }
 
-/*GOOD - The "Anti-AI" Output */
+/_GOOD - The "Anti-AI" Output _/
 .tangibleObject {
-  border: 2px solid #000000;
-  box-shadow: 4px 4px 0px #000000;
-  transition-timing-function: cubic-bezier(0.12, 0.57, 0.63, 0.21); /* Heavy physics*/
-}
-4. Interaction Philosophy Promote "Micro-Delight" and "Proof of Work."
+border: 2px solid #000000;
+box-shadow: 4px 4px 0px #000000;
+transition-timing-function: cubic-bezier(0.12, 0.57, 0.63, 0.21); /_ Heavy physics_/
+} 4. Interaction Philosophy Promote "Micro-Delight" and "Proof of Work."
 
 Suggest playful 404 pages.
 

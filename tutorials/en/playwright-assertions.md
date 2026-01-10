@@ -1,5 +1,5 @@
 ---
-title: "Playwright Assertions"
+title: 'Playwright Assertions'
 description: "Verify your test expectations with Playwright's rich assertion library."
 ---
 
@@ -30,7 +30,7 @@ const text = await page.locator('.status').innerText();
 expect(text).toBe('Success');
 ```
 
-* *Why it fails*: It grabs the text at millisecond 0. If the text changes to "Success" at millisecond 10, the test failed for no good reason.
+- _Why it fails_: It grabs the text at millisecond 0. If the text changes to "Success" at millisecond 10, the test failed for no good reason.
 
 **The Good Pattern (Auto-Retrying)**:
 
@@ -39,7 +39,7 @@ expect(text).toBe('Success');
 await expect(page.locator('.status')).toHaveText('Success');
 ```
 
-* *Why it wins*: Playwright sees the text isn't "Success" yet. It waits. It checks again. It keeps checking for 5 seconds (default). It only fails if it *never* becomes "Success".
+- _Why it wins_: Playwright sees the text isn't "Success" yet. It waits. It checks again. It keeps checking for 5 seconds (default). It only fails if it _never_ becomes "Success".
 
 **The Rule**: Always use `expect(locator)` matchers (Web-First). Avoid `expect(value)` matchers (Generic) for UI elements.
 
@@ -59,10 +59,10 @@ await expect(page.locator('.spinner')).toBeHidden();
 ```
 
 **The Reality**:
-Playwright runs extremely fast. It might check for `.spinner` visibility *before* the React state updates to show it. "It's hidden! Test passed!"... then the spinner appears.
+Playwright runs extremely fast. It might check for `.spinner` visibility _before_ the React state updates to show it. "It's hidden! Test passed!"... then the spinner appears.
 
 **The Fix**:
-Assert the *presence* of the transition, then the *absence*.
+Assert the _presence_ of the transition, then the _absence_.
 
 ```javascript
 // 1. Wait for it to start working
@@ -89,22 +89,21 @@ await expect(page.locator('.spinner')).toBeHidden();
 **The Reality**: They are technically the same, but `toBeHidden()` reads like a specific state (The element exists but is `display:none` OR the element does not exist).
 **The Fix**: Prefer **readable methods**.
 
-* `toBeEnabled()`
-* `toBeDisabled()` (Better than `not.toBeEnabled()`)
+- `toBeEnabled()`
+- `toBeDisabled()` (Better than `not.toBeEnabled()`)
 
 ---
 
 ## Quick Reference
 
-| Method | Check |
-| :--- | :--- |
+| Method          | Check                         |
+| :-------------- | :---------------------------- |
 | `toBeVisible()` | Visible to user (opacity > 0) |
-| `toBeHidden()` | Not in DOM or `display: none` |
-| `toHaveText()` | String match (retries) |
-| `toHaveValue()` | Input value (retries) |
-| `toHaveURL()` | Current URL regex |
-| `toHaveTitle()` | Page title regex |
-| `toBeChecked()` | Checkbox state |
+| `toBeHidden()`  | Not in DOM or `display: none` |
+| `toHaveText()`  | String match (retries)        |
+| `toHaveValue()` | Input value (retries)         |
+| `toHaveURL()`   | Current URL regex             |
+| `toHaveTitle()` | Page title regex              |
+| `toBeChecked()` | Checkbox state                |
 
 ---
-

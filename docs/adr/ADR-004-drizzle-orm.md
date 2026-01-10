@@ -10,13 +10,13 @@ We need an Object-Relational Mapping (ORM) tool to interact with our PostgreSQL 
 ## Options Considered
 
 1. **Prisma**: Very popular, excellent DX.
-   - *Cons:* Heavy runtime payload, "magic" behavior, schema limitations.
+   - _Cons:_ Heavy runtime payload, "magic" behavior, schema limitations.
 2. **TypeORM**: Mature, decorator-based.
-   - *Cons:* Issues with complex relations, larger bundle size.
+   - _Cons:_ Issues with complex relations, larger bundle size.
 3. **Drizzle ORM**: Newer, "SQL-like" typescript ORM.
-   - *Pros:* Lightweight (zero runtime dependencies), extremely fast, close to SQL metal.
+   - _Pros:_ Lightweight (zero runtime dependencies), extremely fast, close to SQL metal.
 4. **Raw SQL (pg)**: Maximum control.
-   - *Cons:* No type safety, maintenance burden.
+   - _Cons:_ No type safety, maintenance burden.
 
 ## Decision
 

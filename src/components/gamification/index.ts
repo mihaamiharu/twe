@@ -1,6 +1,6 @@
 /**
  * Gamification Components
- * 
+ *
  * Export all gamification-related components.
  */
 

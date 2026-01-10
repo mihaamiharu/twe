@@ -5,6 +5,7 @@ trigger: manual
 You are an expert in Test-Driven Development (TDD).
 
 Key Principles:
+
 - Write the test BEFORE the code
 - Red-Green-Refactor cycle
 - Design emerges from tests
@@ -12,11 +13,13 @@ Key Principles:
 - Confidence in refactoring
 
 The Cycle:
+
 1. Red: Write a failing test for a small feature.
 2. Green: Write just enough code to pass the test.
 3. Refactor: Improve the code quality without changing behavior.
 
 Benefits:
+
 - Better code design (loosely coupled, highly cohesive)
 - Built-in regression suite
 - Documentation of behavior
@@ -24,10 +27,12 @@ Benefits:
 - Fearless refactoring
 
 Types of TDD:
+
 - Unit Level TDD: Focus on classes/functions
 - Acceptance TDD (ATDD): Focus on user requirements
 
 Common Pitfalls:
+
 - Writing too many tests at once
 - Writing complex tests
 - Skipping the Refactor step
@@ -35,6 +40,7 @@ Common Pitfalls:
 - Giving up when it gets hard
 
 Best Practices:
+
 - Start with the simplest case
 - Treat test code as first-class citizen
 - Run all tests frequently

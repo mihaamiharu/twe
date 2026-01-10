@@ -1,6 +1,6 @@
 ---
-title: "Playwright Fixtures"
-description: "Stop repeating yourself. Let the framework handle the setup."
+title: 'Playwright Fixtures'
+description: 'Stop repeating yourself. Let the framework handle the setup.'
 ---
 
 # Playwright Fixtures
@@ -11,8 +11,8 @@ Stop repeating yourself. Let the framework handle the setup.
 
 Imagine checking into a hotel.
 
-* **Without Fixtures**: You enter the lobby, find your own key, carry your bags, make the bed, and verify the wifi works. Then you sleep.
-* **With Fixtures**: You walk in. The Concierge hands you a key to a room that is already prepared. You just sleep.
+- **Without Fixtures**: You enter the lobby, find your own key, carry your bags, make the bed, and verify the wifi works. Then you sleep.
+- **With Fixtures**: You walk in. The Concierge hands you a key to a room that is already prepared. You just sleep.
 
 In Playwright, **Fixtures are your Concierge**.
 Instead of writing `beforeEach` hooks to "setup the room" (login, navigate, create data), you simply **ask for the room** in your test arguments, and Playwright ensures it is ready.
@@ -24,31 +24,31 @@ Instead of writing `beforeEach` hooks to "setup the room" (login, navigate, crea
 Dependency Injection is the core of Playwright.
 **Your test arguments define your needs.**
 
-* **The Bad Way (Global Hooks)**:
+- **The Bad Way (Global Hooks)**:
 
-    ```javascript
-    let todoPage;
-    test.beforeEach(async ({ page }) => {
-      todoPage = new TodoPage(page);
-      await todoPage.goto();
-      await todoPage.addToCart('Milk');
-    });
-    ```
+  ```javascript
+  let todoPage;
+  test.beforeEach(async ({ page }) => {
+    todoPage = new TodoPage(page);
+    await todoPage.goto();
+    await todoPage.addToCart('Milk');
+  });
+  ```
 
-* **The Good Way (Fixtures)**:
+- **The Good Way (Fixtures)**:
 
-    ```javascript
-    // The test simply "asks" for a pre-loaded cart
-    test('Checkout works', async ({ cartPageWithItems }) => {
-       await cartPageWithItems.checkout();
-    });
-    ```
+  ```javascript
+  // The test simply "asks" for a pre-loaded cart
+  test('Checkout works', async ({ cartPageWithItems }) => {
+    await cartPageWithItems.checkout();
+  });
+  ```
 
 **Why it wins**:
 
 1. **Isolation**: Each test gets a fresh environment.
 2. **Readability**: The test signature tells you exactly what the test needs.
-3. **Laziness**: If a test *doesn't* ask for `cartPage`, the setup code never runs.
+3. **Laziness**: If a test _doesn't_ ask for `cartPage`, the setup code never runs.
 
 ---
 
@@ -74,7 +74,7 @@ export const test = base.extend({
     const loginPage = new LoginPage(page);
     await loginPage.goto();
     await loginPage.login('user', 'pass'); // Auto-login!
-    
+
     const settings = new SettingsPage(page);
     await settings.goto();
 
@@ -82,7 +82,7 @@ export const test = base.extend({
     await use(settings);
 
     // C. Teardown (Optional)
-    await settings.cleanup(); 
+    await settings.cleanup();
   },
 });
 ```
@@ -117,12 +117,11 @@ test('Change password', async ({ settingsPage }) => {
 
 ## Quick Reference
 
-| Concept | Description |
-| :--- | :--- |
-| `base.extend()` | Creates a customized `test` object |
-| `use(value)` | Passes the value to the test (pauses execution) |
+| Concept         | Description                                              |
+| :-------------- | :------------------------------------------------------- |
+| `base.extend()` | Creates a customized `test` object                       |
+| `use(value)`    | Passes the value to the test (pauses execution)          |
 | `worker` scoped | Shared across tests in the same worker (expensive setup) |
-| `test` scoped | Created fresh for every test (default) |
+| `test` scoped   | Created fresh for every test (default)                   |
 
 ---
-

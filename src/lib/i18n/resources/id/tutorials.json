@@ -1,60 +1,60 @@
 {
-    "page": {
-        "title": "Tutorial",
-        "subtitle": "Pelajari konsep inti bersama saya, langkah demi langkah.",
-        "searchPlaceholder": "Cari tutorial...",
-        "noResults": "Tutorial tidak ditemukan",
-        "tryDifferentSearch": "Coba kata kunci pencarian lain",
-        "checkBackSoon": "Cek lagi nanti untuk tutorial baru!",
-        "failedToLoad": "Gagal memuat tutorial",
-        "pleaseTryAgain": "Silakan coba lagi nanti",
-        "notFound": "Tutorial tidak ditemukan",
-        "notFoundDescription": "Tutorial yang kamu cari tidak ada"
-    },
-    "filters": {
-        "all": "Semua",
-        "beginner": "Pemula",
-        "intermediate": "Menengah",
-        "advanced": "Lanjutan"
-    },
-    "tracks": {
-        "beginner": "Jalur Pemula",
-        "intermediate": "Jalur Menengah",
-        "advanced": "Jalur Lanjutan",
-        "other": "Tutorial Tambahan"
-    },
-    "table": {
-        "title": "Judul",
-        "description": "Deskripsi",
-        "tags": "Tag",
-        "time": "Waktu",
-        "status": "Status"
-    },
-    "card": {
-        "estimatedTime": "{{minutes}} menit baca",
-        "estimatedTimeShort": "{{minutes}} mnt",
-        "startTutorial": "Mulai Tutorial",
-        "continueTutorial": "Lanjutkan",
-        "completed": "Selesai"
-    },
-    "view": {
-        "grid": "Tampilan Grid",
-        "list": "Tampilan Daftar"
-    },
-    "sidebar": {
-        "progress": "Progres Kamu",
-        "reading": "Membaca",
-        "readToComplete": "Baca untuk Menyelesaikan",
-        "completeAndContinue": "Selesai & Lanjutkan",
-        "completedTitle": "Selesai! 🎉",
-        "nextLabel": "Berikutnya: {{title}}",
-        "duration": "Durasi",
-        "statusCompleted": "Selesai",
-        "challengesTitle": "Tantangan Latihan",
-        "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini."
-    },
-    "toasts": {
-        "completed": "Tutorial selesai! 🎉",
-        "failed": "Gagal menandai sebagai selesai"
-    }
+  "page": {
+    "title": "Tutorial",
+    "subtitle": "Pelajari konsep inti bersama saya, langkah demi langkah.",
+    "searchPlaceholder": "Cari tutorial...",
+    "noResults": "Tutorial tidak ditemukan",
+    "tryDifferentSearch": "Coba kata kunci pencarian lain",
+    "checkBackSoon": "Cek lagi nanti untuk tutorial baru!",
+    "failedToLoad": "Gagal memuat tutorial",
+    "pleaseTryAgain": "Silakan coba lagi nanti",
+    "notFound": "Tutorial tidak ditemukan",
+    "notFoundDescription": "Tutorial yang kamu cari tidak ada"
+  },
+  "filters": {
+    "all": "Semua",
+    "beginner": "Pemula",
+    "intermediate": "Menengah",
+    "advanced": "Lanjutan"
+  },
+  "tracks": {
+    "beginner": "Jalur Pemula",
+    "intermediate": "Jalur Menengah",
+    "advanced": "Jalur Lanjutan",
+    "other": "Tutorial Tambahan"
+  },
+  "table": {
+    "title": "Judul",
+    "description": "Deskripsi",
+    "tags": "Tag",
+    "time": "Waktu",
+    "status": "Status"
+  },
+  "card": {
+    "estimatedTime": "{{minutes}} menit baca",
+    "estimatedTimeShort": "{{minutes}} mnt",
+    "startTutorial": "Mulai Tutorial",
+    "continueTutorial": "Lanjutkan",
+    "completed": "Selesai"
+  },
+  "view": {
+    "grid": "Tampilan Grid",
+    "list": "Tampilan Daftar"
+  },
+  "sidebar": {
+    "progress": "Progres Kamu",
+    "reading": "Membaca",
+    "readToComplete": "Baca untuk Menyelesaikan",
+    "completeAndContinue": "Selesai & Lanjutkan",
+    "completedTitle": "Selesai! 🎉",
+    "nextLabel": "Berikutnya: {{title}}",
+    "duration": "Durasi",
+    "statusCompleted": "Selesai",
+    "challengesTitle": "Tantangan Latihan",
+    "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini."
+  },
+  "toasts": {
+    "completed": "Tutorial selesai! 🎉",
+    "failed": "Gagal menandai sebagai selesai"
+  }
 }

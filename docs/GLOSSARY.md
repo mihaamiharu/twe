@@ -25,7 +25,7 @@ Points awarded for completing challenges. The amount depends on the difficulty t
 ### Assertion
 
 A statement in a test that verifies that a specific condition is true.
-*Example:* `expect(page.url()).toContain('/dashboard')`
+_Example:_ `expect(page.url()).toContain('/dashboard')`
 
 ### DOM (Document Object Model)
 
