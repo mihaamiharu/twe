@@ -20,17 +20,20 @@ function ApiDocsPage() {
       // Load CSS
       const link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css';
+      link.href =
+        'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css';
       document.head.appendChild(link);
 
       // Load standalone preset first
       const presetScript = document.createElement('script');
-      presetScript.src = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js';
+      presetScript.src =
+        'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js';
       document.body.appendChild(presetScript);
 
       // Load main bundle
       const script = document.createElement('script');
-      script.src = 'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js';
+      script.src =
+        'https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js';
       script.onload = () => {
         // Wait a bit for standalone preset to be available
         setTimeout(() => {
@@ -47,12 +50,8 @@ function ApiDocsPage() {
               url: '/openapi.json',
               dom_id: '#swagger-ui',
               deepLinking: true,
-              presets: [
-                win.SwaggerUIBundle.presets.apis,
-              ],
-              plugins: [
-                win.SwaggerUIBundle.plugins.DownloadUrl,
-              ],
+              presets: [win.SwaggerUIBundle.presets.apis],
+              plugins: [win.SwaggerUIBundle.plugins.DownloadUrl],
               defaultModelsExpandDepth: 1,
               defaultModelExpandDepth: 1,
               docExpansion: 'list',

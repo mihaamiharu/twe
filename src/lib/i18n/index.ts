@@ -20,39 +20,49 @@ import profileEn from './resources/en/profile.json';
 import profileId from './resources/id/profile.json';
 
 const resources = {
-    en: {
-        common: commonEn,
-        home: homeEn,
-        challenges: challengesEn,
-        tutorials: tutorialsEn,
-        leaderboard: leaderboardEn,
-        auth: authEn,
-        bugs: bugsEn,
-        legal: legalEn,
-        profile: profileEn,
-    },
-    id: {
-        common: commonId,
-        home: homeId,
-        challenges: challengesId,
-        tutorials: tutorialsId,
-        leaderboard: leaderboardId,
-        auth: authId,
-        bugs: bugsId,
-        legal: legalId,
-        profile: profileId,
-    },
+  en: {
+    common: commonEn,
+    home: homeEn,
+    challenges: challengesEn,
+    tutorials: tutorialsEn,
+    leaderboard: leaderboardEn,
+    auth: authEn,
+    bugs: bugsEn,
+    legal: legalEn,
+    profile: profileEn,
+  },
+  id: {
+    common: commonId,
+    home: homeId,
+    challenges: challengesId,
+    tutorials: tutorialsId,
+    leaderboard: leaderboardId,
+    auth: authId,
+    bugs: bugsId,
+    legal: legalId,
+    profile: profileId,
+  },
 };
 
 void i18n.use(initReactI18next).init({
-    resources,
-    lng: 'en',
-    fallbackLng: 'en',
-    interpolation: {
-        escapeValue: false,
-    },
-    ns: ['common', 'home', 'challenges', 'tutorials', 'leaderboard', 'auth', 'bugs', 'legal', 'profile'],
-    defaultNS: 'common',
+  resources,
+  lng: 'en',
+  fallbackLng: 'en',
+  interpolation: {
+    escapeValue: false,
+  },
+  ns: [
+    'common',
+    'home',
+    'challenges',
+    'tutorials',
+    'leaderboard',
+    'auth',
+    'bugs',
+    'legal',
+    'profile',
+  ],
+  defaultNS: 'common',
 });
 
 export default i18n;

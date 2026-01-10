@@ -1,124 +1,124 @@
 {
-    "appName": "TestingWithEkki",
-    "seo": {
-        "title": "TestingWithEkki - Learn Testing Skills",
-        "description": "Learn testing skills through interactive tutorials and coding challenges",
-        "ogTitle": "TestingWithEkki - Master the Art of Automation",
-        "ogDescription": "Interactive tutorials and coding challenges to level up your software testing skills."
-    },
-    "navigation": {
-        "home": "Home",
-        "challenges": "Challenges",
-        "tutorials": "Tutorials",
-        "leaderboard": "Leaderboard",
-        "login": "Login",
-        "register": "Register",
-        "profile": "Profile",
-        "logout": "Logout"
-    },
-    "actions": {
-        "submit": "Submit",
-        "cancel": "Cancel",
-        "save": "Save",
-        "run": "Run",
-        "runCode": "Run Code",
-        "reset": "Reset",
-        "continue": "Continue",
-        "back": "Back",
-        "next": "Next",
-        "viewAll": "View All",
-        "tryAgain": "Try Again",
-        "startLearning": "Start Learning",
-        "backToTutorials": "Back to Tutorials",
-        "browseTutorials": "Browse Tutorials",
-        "backToChallenges": "Back to Challenges",
-        "dismiss": "Dismiss",
-        "refresh": "Refresh Page",
-        "signIn": "Sign In",
-        "signUp": "Sign Up",
-        "backToSignIn": "Back to Sign In",
-        "signInNow": "Sign In Now",
-        "resetPassword": "Reset Password"
-    },
-    "labels": {
-        "difficulty": "Difficulty",
-        "xp": "XP",
-        "progress": "Progress",
-        "completed": "Completed",
-        "inProgress": "In Progress",
-        "notStarted": "Not Started",
-        "easy": "Easy",
-        "medium": "Medium",
-        "hard": "Hard",
-        "search": "Search",
-        "filter": "Filter",
-        "all": "All",
-        "rank": "Rank",
-        "user": "User",
-        "badges": "Badges",
-        "email": "Email",
-        "emailAddress": "Email Address",
-        "password": "Password",
-        "newPassword": "New Password",
-        "confirmNewPassword": "Confirm New Password",
-        "name": "Name",
-        "level": "Level",
-        "anonymous": "Anonymous"
-    },
-    "messages": {
-        "success": "Success!",
-        "error": "An error occurred",
-        "loading": "Loading...",
-        "noResults": "No results found",
-        "saving": "Saving...",
-        "submitting": "Submitting solution...",
-        "loadingChallenge": "Loading challenge...",
-        "unavailable": "Unavailable",
-        "challengeCompleted": "Challenge completed!",
-        "tutorialCompleted": "Tutorial completed!",
-        "achievementUnlocked": "Unlocked: {{name}}"
-    },
-    "footer": {
-        "description": "Master the art of software testing through interactive tutorials and real-world coding challenges. Built for developers, by developers.",
-        "product": "Product",
-        "resources": "Resources",
-        "copyright": "© {{year}} TestingWithEkki. All rights reserved.",
-        "madeWith": "Made with ❤️ for the QA community",
-        "reportBug": "Report a Bug"
-    },
-    "notFound": {
-        "title": "You are in Headless Mode",
-        "description": "The content is here, but you can't see it because your viewport is set to headless: true. Trust us, the tests are passing in the background.",
-        "backHome": "Switch to Headed Mode (Go Home)",
-        "tip": "Tip: Try running with --headed flag next time"
-    },
-    "auth": {
-        "signInToSubmit": "Sign in to Submit",
-        "signInToSubmitDescription": "You need to be signed in to save your solution, earn XP, and track your progress. Your code will be preserved."
-    },
-    "placeholders": {
-        "email": "you@example.com",
-        "password": "••••••••",
-        "passwordMin": "Minimum 8 characters",
-        "name": "John Doe"
-    },
-    "levelTitles": {
-        "novice": "Novice",
-        "apprentice": "Apprentice",
-        "practitioner": "Practitioner",
-        "specialist": "Specialist",
-        "expert": "Expert",
-        "master": "Master",
-        "grandmaster": "Grandmaster",
-        "legend": "Legend",
-        "mythic": "Mythic"
-    },
-    "errors": {
-        "validation": {
-            "slugRequired": "Challenge slug is required",
-            "codeRequired": "Code is required",
-            "unauthorized": "You must be signed in to perform this action",
-            "notFound": "Resource not found"
-        }
+  "appName": "TestingWithEkki",
+  "seo": {
+    "title": "TestingWithEkki - Learn Testing Skills",
+    "description": "Learn testing skills through interactive tutorials and coding challenges",
+    "ogTitle": "TestingWithEkki - Master the Art of Automation",
+    "ogDescription": "Interactive tutorials and coding challenges to level up your software testing skills."
+  },
+  "navigation": {
+    "home": "Home",
+    "challenges": "Challenges",
+    "tutorials": "Tutorials",
+    "leaderboard": "Leaderboard",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "logout": "Logout"
+  },
+  "actions": {
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "run": "Run",
+    "runCode": "Run Code",
+    "reset": "Reset",
+    "continue": "Continue",
+    "back": "Back",
+    "next": "Next",
+    "viewAll": "View All",
+    "tryAgain": "Try Again",
+    "startLearning": "Start Learning",
+    "backToTutorials": "Back to Tutorials",
+    "browseTutorials": "Browse Tutorials",
+    "backToChallenges": "Back to Challenges",
+    "dismiss": "Dismiss",
+    "refresh": "Refresh Page",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "backToSignIn": "Back to Sign In",
+    "signInNow": "Sign In Now",
+    "resetPassword": "Reset Password"
+  },
+  "labels": {
+    "difficulty": "Difficulty",
+    "xp": "XP",
+    "progress": "Progress",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "notStarted": "Not Started",
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard",
+    "search": "Search",
+    "filter": "Filter",
+    "all": "All",
+    "rank": "Rank",
+    "user": "User",
+    "badges": "Badges",
+    "email": "Email",
+    "emailAddress": "Email Address",
+    "password": "Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "name": "Name",
+    "level": "Level",
+    "anonymous": "Anonymous"
+  },
+  "messages": {
+    "success": "Success!",
+    "error": "An error occurred",
+    "loading": "Loading...",
+    "noResults": "No results found",
+    "saving": "Saving...",
+    "submitting": "Submitting solution...",
+    "loadingChallenge": "Loading challenge...",
+    "unavailable": "Unavailable",
+    "challengeCompleted": "Challenge completed!",
+    "tutorialCompleted": "Tutorial completed!",
+    "achievementUnlocked": "Unlocked: {{name}}"
+  },
+  "footer": {
+    "description": "Master the art of software testing through interactive tutorials and real-world coding challenges. Built for developers, by developers.",
+    "product": "Product",
+    "resources": "Resources",
+    "copyright": "© {{year}} TestingWithEkki. All rights reserved.",
+    "madeWith": "Made with ❤️ for the QA community",
+    "reportBug": "Report a Bug"
+  },
+  "notFound": {
+    "title": "You are in Headless Mode",
+    "description": "The content is here, but you can't see it because your viewport is set to headless: true. Trust us, the tests are passing in the background.",
+    "backHome": "Switch to Headed Mode (Go Home)",
+    "tip": "Tip: Try running with --headed flag next time"
+  },
+  "auth": {
+    "signInToSubmit": "Sign in to Submit",
+    "signInToSubmitDescription": "You need to be signed in to save your solution, earn XP, and track your progress. Your code will be preserved."
+  },
+  "placeholders": {
+    "email": "you@example.com",
+    "password": "••••••••",
+    "passwordMin": "Minimum 8 characters",
+    "name": "John Doe"
+  },
+  "levelTitles": {
+    "novice": "Novice",
+    "apprentice": "Apprentice",
+    "practitioner": "Practitioner",
+    "specialist": "Specialist",
+    "expert": "Expert",
+    "master": "Master",
+    "grandmaster": "Grandmaster",
+    "legend": "Legend",
+    "mythic": "Mythic"
+  },
+  "errors": {
+    "validation": {
+      "slugRequired": "Challenge slug is required",
+      "codeRequired": "Code is required",
+      "unauthorized": "You must be signed in to perform this action",
+      "notFound": "Resource not found"
     }
+  }
 }

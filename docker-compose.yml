@@ -4,7 +4,7 @@ services:
     container_name: twe-postgres
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - '5432:5432'
     environment:
       POSTGRES_USER: twe_user
       POSTGRES_PASSWORD: twe_password
@@ -45,7 +45,7 @@ services:
       - -c
       - effective_io_concurrency=200
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U twe_user -d twe_db"]
+      test: ['CMD-SHELL', 'pg_isready -U twe_user -d twe_db']
       interval: 10s
       timeout: 5s
       retries: 5
@@ -55,13 +55,13 @@ services:
     container_name: twe-postgres-test
     restart: unless-stopped
     ports:
-      - "5433:5432"
+      - '5433:5432'
     environment:
       POSTGRES_USER: twe_test
       POSTGRES_PASSWORD: twe_password
       POSTGRES_DB: twe_test
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U twe_test -d twe_test"]
+      test: ['CMD-SHELL', 'pg_isready -U twe_test -d twe_test']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -71,7 +71,7 @@ services:
     container_name: twe-postgres-staging
     restart: unless-stopped
     ports:
-      - "5434:5432"
+      - '5434:5432'
     environment:
       POSTGRES_USER: twe_staging
       POSTGRES_PASSWORD: twe_password
@@ -79,7 +79,7 @@ services:
     volumes:
       - postgres_staging_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U twe_staging -d twe_staging"]
+      test: ['CMD-SHELL', 'pg_isready -U twe_staging -d twe_staging']
       interval: 5s
       timeout: 5s
       retries: 5

@@ -4,7 +4,14 @@ import { getAdminBugs, updateBugStatus } from '@/server/admin.fn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -27,12 +34,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-type BugStatus = 'NEW' | 'OPEN' | 'IN_PROGRESS' | 'RESOLVED' | 'CLOSED' | 'WONT_FIX';
+type BugStatus =
+  | 'NEW'
+  | 'OPEN'
+  | 'IN_PROGRESS'
+  | 'RESOLVED'
+  | 'CLOSED'
+  | 'WONT_FIX';
 
 export const Route = createFileRoute('/admin/bugs')({
   loader: ({ context }) => {
     const session = context.auth;
-    if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
+    if (
+      !session?.user ||
+      (session.user as { role?: string }).role !== 'ADMIN'
+    ) {
       throw redirect({
         to: '/',
       });
@@ -60,7 +76,11 @@ function BugManager() {
   type BugReport = NonNullable<typeof bugs>[number];
 
   const updateMutation = useMutation({
-    mutationFn: async (data: { id: string; status?: BugStatus; adminNotes?: string }) => {
+    mutationFn: async (data: {
+      id: string;
+      status?: BugStatus;
+      adminNotes?: string;
+    }) => {
       const res = await updateBugStatus({ data });
       if (!res.success) throw new Error(res.error || 'Failed to update bug');
       return res;
@@ -103,7 +123,9 @@ function BugManager() {
         </Link>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Bug Reports</h1>
-          <p className="text-muted-foreground mt-1">Manage user-submitted issues.</p>
+          <p className="text-muted-foreground mt-1">
+            Manage user-submitted issues.
+          </p>
         </div>
       </div>
 
@@ -123,7 +145,10 @@ function BugManager() {
             <TableBody>
               {bugs?.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center h-24 text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="text-center h-24 text-muted-foreground"
+                  >
                     No bug reports found.
                   </TableCell>
                 </TableRow>
@@ -136,20 +161,34 @@ function BugManager() {
                     <TableCell>
                       <SeverityBadge severity={bug.severity} />
                     </TableCell>
-                    <TableCell className="font-medium max-w-[300px] truncate" title={bug.title}>
+                    <TableCell
+                      className="font-medium max-w-[300px] truncate"
+                      title={bug.title}
+                    >
                       {bug.title}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        {bug.user?.image && <img src={bug.user.image} className="h-5 w-5 rounded-full" />}
-                        <span className="text-sm">{bug.user?.name || bug.reporterEmail || 'Anonymous'}</span>
+                        {bug.user?.image && (
+                          <img
+                            src={bug.user.image}
+                            className="h-5 w-5 rounded-full"
+                          />
+                        )}
+                        <span className="text-sm">
+                          {bug.user?.name || bug.reporterEmail || 'Anonymous'}
+                        </span>
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground text-sm">
                       {new Date(bug.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="outline" size="sm" onClick={() => handleEdit(bug)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleEdit(bug)}
+                      >
                         Manage
                       </Button>
                     </TableCell>
@@ -168,7 +207,11 @@ function BugManager() {
               <DialogHeader>
                 <DialogTitle>Manage Bug Report</DialogTitle>
                 <DialogDescription>
-                  Reported by {selectedBug.user?.name || selectedBug.reporterEmail || 'Anonymous'} on {new Date(selectedBug.createdAt).toLocaleDateString()}
+                  Reported by{' '}
+                  {selectedBug.user?.name ||
+                    selectedBug.reporterEmail ||
+                    'Anonymous'}{' '}
+                  on {new Date(selectedBug.createdAt).toLocaleDateString()}
                 </DialogDescription>
               </DialogHeader>
 
@@ -208,7 +251,10 @@ function BugManager() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Status</Label>
-                    <Select value={status} onValueChange={(value) => setStatus(value as BugStatus)}>
+                    <Select
+                      value={status}
+                      onValueChange={(value) => setStatus(value as BugStatus)}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select status" />
                       </SelectTrigger>
@@ -216,7 +262,9 @@ function BugManager() {
                         <SelectItem value="NEW">New</SelectItem>
                         <SelectItem value="IN_PROGRESS">In Progress</SelectItem>
                         <SelectItem value="RESOLVED">Resolved</SelectItem>
-                        <SelectItem value="CLOSED">Closed (Won't Fix)</SelectItem>
+                        <SelectItem value="CLOSED">
+                          Closed (Won't Fix)
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -234,8 +282,13 @@ function BugManager() {
               </div>
 
               <DialogFooter>
-                <Button variant="outline" onClick={() => setIsOpen(false)}>Cancel</Button>
-                <Button onClick={handleSave} disabled={updateMutation.isPending}>
+                <Button variant="outline" onClick={() => setIsOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleSave}
+                  disabled={updateMutation.isPending}
+                >
                   {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
                 </Button>
               </DialogFooter>
@@ -250,11 +303,32 @@ function BugManager() {
 function StatusBadge({ status }: { status: string }) {
   switch (status) {
     case 'NEW':
-      return <Badge variant="outline" className="bg-blue-500/10 text-blue-500 border-blue-500/20">New</Badge>;
+      return (
+        <Badge
+          variant="outline"
+          className="bg-blue-500/10 text-blue-500 border-blue-500/20"
+        >
+          New
+        </Badge>
+      );
     case 'IN_PROGRESS':
-      return <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">In Progress</Badge>;
+      return (
+        <Badge
+          variant="outline"
+          className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20"
+        >
+          In Progress
+        </Badge>
+      );
     case 'RESOLVED':
-      return <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">Resolved</Badge>;
+      return (
+        <Badge
+          variant="outline"
+          className="bg-green-500/10 text-green-500 border-green-500/20"
+        >
+          Resolved
+        </Badge>
+      );
     case 'CLOSED':
       return <Badge variant="secondary">Closed</Badge>;
     default:
@@ -265,7 +339,11 @@ function StatusBadge({ status }: { status: string }) {
 function SeverityBadge({ severity }: { severity: string }) {
   switch (severity) {
     case 'CRITICAL':
-      return <div className="flex items-center text-red-500 font-medium text-xs"><AlertTriangle className="h-3 w-3 mr-1" /> Critical</div>;
+      return (
+        <div className="flex items-center text-red-500 font-medium text-xs">
+          <AlertTriangle className="h-3 w-3 mr-1" /> Critical
+        </div>
+      );
     case 'HIGH':
       return <div className="text-orange-500 font-medium text-xs">High</div>;
     case 'MEDIUM':

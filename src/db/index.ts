@@ -7,9 +7,9 @@ dotenv.config();
 
 // Check if DATABASE_URL is set
 if (!process.env.DATABASE_URL) {
-    throw new Error(
-        'DATABASE_URL environment variable is not set. Please check your .env file.',
-    );
+  throw new Error(
+    'DATABASE_URL environment variable is not set. Please check your .env file.',
+  );
 }
 
 // Create PostgreSQL connection
@@ -26,7 +26,7 @@ export * from './schema';
 
 // Helper function to close database connection (useful for scripts and testing)
 export async function closeDatabase() {
-    await queryClient.end();
+  await queryClient.end();
 }
 
 // Type definitions for better TypeScript support

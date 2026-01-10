@@ -12,27 +12,27 @@ graph TD
     Landing --> Browse{Browse Content}
     Browse --> Tutorials[View Tutorials]
     Browse --> Challenges[View Challenges]
-    
+
     Tutorials --> SignUpPrompt1{Want to Track Progress?}
     Challenges --> SignUpPrompt2{Want to Try Challenge?}
-    
+
     SignUpPrompt1 --> SignUp[Sign Up / Login]
     SignUpPrompt2 --> SignUp
-    
+
     SignUp --> Dashboard[User Dashboard]
     Dashboard --> Actions{Choose Action}
-    
+
     Actions --> ReadTutorial[Read Tutorial]
     Actions --> SolveChallenge[Solve Challenge]
     Actions --> ViewProfile[View Profile]
     Actions --> ViewLeaderboard[View Leaderboard]
-    
+
     SolveChallenge --> EarnXP[Earn XP]
     EarnXP --> CheckAchievement{New Achievement?}
     CheckAchievement -->|Yes| ShowBadge[Show Achievement]
     CheckAchievement -->|No| NextChallenge[Next Challenge]
     ShowBadge --> NextChallenge
-    
+
     NextChallenge --> Actions
     ReadTutorial --> Actions
     ViewProfile --> Actions
@@ -58,18 +58,18 @@ sequenceDiagram
     Database-->>API: Challenge Data
     API-->>Frontend: Challenge + Starter Code
     Frontend-->>User: Display Challenge
-    
+
     User->>Frontend: Write Code in Editor
     Frontend->>Frontend: Auto-save to localStorage
-    
+
     User->>Frontend: Click "Run Tests"
     Frontend->>API: POST /submissions
     API->>CodeExecutor: Execute(code, testCases)
-    
+
     CodeExecutor->>CodeExecutor: Create Sandboxed VM
     CodeExecutor->>CodeExecutor: Run Test Cases
     CodeExecutor-->>API: Execution Results
-    
+
     alt All Tests Passed
         API->>Database: Save Submission (PASSED)
         API->>GamificationEngine: Award XP
@@ -107,7 +107,7 @@ graph TB
         RegSuccess --> RegStore[Store Token in localStorage]
         RegStore --> RegRedirect[Redirect to Dashboard]
     end
-    
+
     subgraph "Login Flow"
         LoginStart[User Clicks Login] --> LoginForm[Fill Login Form]
         LoginForm --> LoginSubmit[POST /auth/login]
@@ -130,31 +130,31 @@ graph TD
     CalculateXP --> CurrentXP[Get User's Current XP]
     CurrentXP --> AddXP[Add New XP]
     AddXP --> CheckLevel{Level Up?}
-    
+
     CheckLevel -->|Yes| NewLevel[Increment Level]
     CheckLevel -->|No| UpdateXP[Update XP Only]
-    
+
     NewLevel --> LevelAchievement[Check Level Achievements]
     UpdateXP --> CheckAchievements[Check Other Achievements]
-    
+
     LevelAchievement --> AchievementLogic[Achievement Logic]
     CheckAchievements --> AchievementLogic
-    
+
     AchievementLogic --> CheckStreak{Daily Streak?}
     AchievementLogic --> CheckCount{Challenge Count Milestone?}
     AchievementLogic --> CheckCategory{Category Master?}
-    
+
     CheckStreak -->|Yes| AwardStreak[Award Streak Achievement]
     CheckCount -->|Yes| AwardCount[Award Count Achievement]
     CheckCategory -->|Yes| AwardCategory[Award Category Achievement]
-    
+
     AwardStreak --> UpdateLeaderboard[Update Leaderboard]
     AwardCount --> UpdateLeaderboard
     AwardCategory --> UpdateLeaderboard
     CheckStreak -->|No| UpdateLeaderboard
     CheckCount -->|No| UpdateLeaderboard
     CheckCategory -->|No| UpdateLeaderboard
-    
+
     UpdateLeaderboard --> NotifyUser[Notify User of Rewards]
 ```
 
@@ -171,30 +171,30 @@ graph TB
         Shim[Playwright Shim]
         Iframe[Isolated Iframe]
     end
-    
+
     subgraph "TanStack Start Server"
         ServerFn[Server Functions]
         API[API Routes]
         Auth[BetterAuth]
         Gamification[Gamification Engine]
     end
-    
+
     subgraph "Data Layer"
         DB[(PostgreSQL)]
     end
-    
+
     UI --> Store
     Store --> ServerFn
     Editor --> Shim
     Shim --> Iframe
-    
+
     ServerFn --> API
     API --> Auth
     API --> Gamification
-    
+
     Auth --> DB
     Gamification --> DB
-    
+
     style Shim fill:#ff6b6b
     style Iframe fill:#ffd93d
 ```
@@ -207,16 +207,16 @@ graph TB
 graph LR
     UserCode[User Code Submission] --> Validator[Input Validator]
     Validator --> Iframe[Iframe Sandbox]
-    
+
     Iframe --> Layer1[Layer 1: Isolated DOM]
     Layer1 --> Layer2[Layer 2: No Network Access]
     Layer2 --> Layer3[Layer 3: 10s Timeout]
     Layer3 --> Execution[Safe Execution]
-    
+
     Execution --> TestRunner[Run Test Cases]
     TestRunner --> Results[Capture Results]
     Results --> Response[Return to User]
-    
+
     style Iframe fill:#ff6b6b
     style Execution fill:#51cf66
 ```
@@ -228,23 +228,23 @@ graph LR
 ```mermaid
 graph TB
     Admin[Admin/Ekki] --> Create{Create Content}
-    
+
     Create --> Tutorial[New Tutorial]
     Create --> Challenge[New Challenge]
-    
+
     Tutorial --> TutorialMD[Write Markdown]
     TutorialMD --> TutorialMeta[Add Metadata]
     TutorialMeta --> TutorialSave[Save to Database]
-    
+
     Challenge --> ChallengeDesc[Write Description]
     ChallengeDesc --> ChallengeCode[Write Starter Code]
     ChallengeCode --> ChallengeSolution[Write Reference Solution]
     ChallengeSolution --> ChallengeTests[Create Test Cases]
     ChallengeTests --> ChallengeSave[Save to Database]
-    
+
     TutorialSave --> Publish[Publish Content]
     ChallengeSave --> Publish
-    
+
     Publish --> Users[Visible to Users]
 ```
 
@@ -257,26 +257,26 @@ erDiagram
     USER ||--o{ SUBMISSION : makes
     USER ||--o{ PROGRESS : has
     USER ||--o{ USER_ACHIEVEMENT : earns
-    
+
     CHALLENGE ||--o{ SUBMISSION : receives
     CHALLENGE ||--o{ PROGRESS : tracks
-    
+
     ACHIEVEMENT ||--o{ USER_ACHIEVEMENT : awarded_as
-    
+
     USER {
         uuid id
         int totalXp
         int level
         timestamp lastLoginAt
     }
-    
+
     PROGRESS {
         uuid userId
         uuid challengeId
         enum status
         timestamp completedAt
     }
-    
+
     SUBMISSION {
         uuid userId
         uuid challengeId
@@ -284,7 +284,7 @@ erDiagram
         enum status
         timestamp submittedAt
     }
-    
+
     USER_ACHIEVEMENT {
         uuid userId
         uuid achievementId
@@ -303,19 +303,19 @@ flowchart TB
         Main[Main Content Area]
         Sidebar[Sidebar: Progress/Stats]
     end
-    
+
     subgraph Mobile["Mobile Layout"]
         MobileHeader[Header: Logo, Hamburger]
         MobileMain[Main Content]
         MobileBottom[Bottom Nav Bar]
     end
-    
+
     subgraph PlayDesktop["Playground - Desktop"]
         PLLeft[Left: Description]
         PLCenter[Center: Code Editor]
         PLRight[Right: Test Results]
     end
-    
+
     subgraph PlayMobile["Playground - Mobile"]
         PLTabs[Tabs: Description, Editor, Results]
     end
@@ -328,22 +328,22 @@ flowchart TB
 ```mermaid
 graph TB
     User[User Action] --> Check{Achievement Check}
-    
+
     Check --> FirstChallenge{First Challenge Completed?}
     FirstChallenge -->|Yes| Award1[Award: First Steps]
-    
+
     Check --> TenChallenges{10 Challenges Completed?}
     TenChallenges -->|Yes| Award2[Award: Getting Warmed Up]
-    
+
     Check --> SevenDayStreak{7-Day Login Streak?}
     SevenDayStreak -->|Yes| Award3[Award: Dedicated Learner]
-    
+
     Check --> APICategory{Completed 5 API Challenges?}
     APICategory -->|Yes| Award4[Award: API Testing Pro]
-    
+
     Check --> PerfectScore{Challenge with 100% First Try?}
     PerfectScore -->|Yes| Award5[Award: Perfect Execution]
-    
+
     Award1 --> Notify[Notify User]
     Award2 --> Notify
     Award3 --> Notify
@@ -382,13 +382,13 @@ graph TB
     Register[User Registers] --> CreateUser[Create User Account]
     CreateUser --> SendEmail[Send Verification Email]
     SendEmail --> WaitVerify{Email Verified?}
-    
+
     WaitVerify -->|No| ShowBanner[Show "Verify Email" Banner]
     ShowBanner --> ResendOption[User Clicks Resend]
     ResendOption --> SendEmail
-    
+
     WaitVerify -->|Yes| FullAccess[Full Platform Access]
-    
+
     ShowBanner --> ClickLink[User Clicks Email Link]
     ClickLink --> VerifyToken{Valid Token?}
     VerifyToken -->|Yes| MarkVerified[Mark Email Verified]

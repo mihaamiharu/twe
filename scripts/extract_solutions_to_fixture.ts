@@ -1,4 +1,3 @@
-
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -14,63 +13,62 @@ let currentCode: string[] = [];
 let inCodeBlock = false;
 
 for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
+  const line = lines[i];
 
-    if (line.trim().startsWith('#### ')) {
-        // Save previous if exists
-        if (currentSlug && currentCode.length > 0) {
-            solutions[currentSlug] = currentCode.join('\n').trim();
-        }
-
-        currentSlug = line.replace('#### ', '').trim();
-        // Remove (Legacy App) or other suffix if present? No, looks like slugs are clean mostly.
-        // There are some headers like "#### css-foundations-boss (Legacy App)"?
-        // Let's check the glossaries. 
-        // "#### css-foundations-boss"
-        // "#### js-fundamentals-boss (JS Architect)" -> slug is js-fundamentals-boss
-
-        if (currentSlug.includes('(')) {
-            currentSlug = currentSlug.split('(')[0].trim();
-        }
-
-        currentCode = [];
-        inCodeBlock = false;
-        continue;
+  if (line.trim().startsWith('#### ')) {
+    // Save previous if exists
+    if (currentSlug && currentCode.length > 0) {
+      solutions[currentSlug] = currentCode.join('\n').trim();
     }
 
-    if (!currentSlug) continue;
+    currentSlug = line.replace('#### ', '').trim();
+    // Remove (Legacy App) or other suffix if present? No, looks like slugs are clean mostly.
+    // There are some headers like "#### css-foundations-boss (Legacy App)"?
+    // Let's check the glossaries.
+    // "#### css-foundations-boss"
+    // "#### js-fundamentals-boss (JS Architect)" -> slug is js-fundamentals-boss
 
-    if (line.trim().startsWith('```javascript')) {
-        inCodeBlock = true;
-        continue;
+    if (currentSlug.includes('(')) {
+      currentSlug = currentSlug.split('(')[0].trim();
     }
 
-    if (line.trim().startsWith('```') && inCodeBlock) {
-        inCodeBlock = false;
-        continue;
-    }
+    currentCode = [];
+    inCodeBlock = false;
+    continue;
+  }
 
-    if (inCodeBlock) {
-        currentCode.push(line);
-        continue;
-    }
+  if (!currentSlug) continue;
 
-    // Handle inline code `...` for selectors
-    if (line.trim().startsWith('`') && !line.trim().startsWith('```')) {
-        // It might be `selector` or `selector`
-        // Extract text between backticks
-        const match = line.match(/^`([^`]+)`/);
-        if (match) {
-            currentCode.push(match[1]);
-        }
+  if (line.trim().startsWith('```javascript')) {
+    inCodeBlock = true;
+    continue;
+  }
+
+  if (line.trim().startsWith('```') && inCodeBlock) {
+    inCodeBlock = false;
+    continue;
+  }
+
+  if (inCodeBlock) {
+    currentCode.push(line);
+    continue;
+  }
+
+  // Handle inline code `...` for selectors
+  if (line.trim().startsWith('`') && !line.trim().startsWith('```')) {
+    // It might be `selector` or `selector`
+    // Extract text between backticks
+    const match = line.match(/^`([^`]+)`/);
+    if (match) {
+      currentCode.push(match[1]);
     }
+  }
 }
 
 // Save last one
 if (currentSlug && currentCode.length > 0) {
-    solutions[currentSlug] = currentCode.join('\n').trim();
+  solutions[currentSlug] = currentCode.join('\n').trim();
 }
 
 console.log(`Extracted ${Object.keys(solutions).length} solutions.`);
 fs.writeFileSync(outputPath, JSON.stringify(solutions, null, 2));
-

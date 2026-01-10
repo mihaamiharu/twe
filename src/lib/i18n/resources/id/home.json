@@ -1,136 +1,119 @@
 {
-    "hero": {
-        "title": "Belajar QA Automation",
-        "titleSuffix": "dengan Tantangan Praktis",
-        "tagline": "Bangun skill dunia nyata, bukan cuma teori.",
-        "description": "Saya berbagi <strong>skill praktis yang saya kumpulkan dari mentor yang supportif dan pengalaman memecahkan masalah nyata</strong>, membantu kamu membangun kepercayaan diri langkah demi langkah.",
-        "startLearning": "Mulai Belajar",
-        "browseTutorials": "Lihat Tutorial"
+  "hero": {
+    "title": "Belajar QA Automation",
+    "titleSuffix": "dengan Tantangan Praktis",
+    "tagline": "Bangun skill dunia nyata, bukan cuma teori.",
+    "description": "Saya berbagi <strong>skill praktis yang saya kumpulkan dari mentor yang supportif dan pengalaman memecahkan masalah nyata</strong>, membantu kamu membangun kepercayaan diri langkah demi langkah.",
+    "startLearning": "Mulai Belajar",
+    "browseTutorials": "Lihat Tutorial"
+  },
+  "stats": {
+    "challenges": "Tantangan",
+    "tutorials": "Tutorial",
+    "achievements": "Pencapaian",
+    "learning": "Pembelajaran"
+  },
+  "careerPath": {
+    "title": "Jalur",
+    "titleHighlight": "Karir Kamu",
+    "subtitle": "Dari dasar selektor hingga arsitektur otomasi tingkat lanjut.",
+    "tier": "Tier",
+    "challenges": "tantangan"
+  },
+  "tiers": {
+    "basic": {
+      "title": "Selektor",
+      "description": "Kuasai selektor CSS dan XPath - fondasi pengujian web",
+      "skills": ["Selektor CSS", "Query XPath", "Penargetan Elemen"]
     },
-    "stats": {
-        "challenges": "Tantangan",
-        "tutorials": "Tutorial",
-        "achievements": "Pencapaian",
-        "learning": "Pembelajaran"
+    "beginner": {
+      "title": "JavaScript",
+      "description": "Pelajari dasar-dasar JavaScript untuk otomasi pengujian",
+      "skills": ["Variabel & Tipe", "Manipulasi DOM", "Async/Await"]
     },
-    "careerPath": {
-        "title": "Jalur",
-        "titleHighlight": "Karir Kamu",
-        "subtitle": "Dari dasar selektor hingga arsitektur otomasi tingkat lanjut.",
-        "tier": "Tier",
-        "challenges": "tantangan"
+    "intermediate": {
+      "title": "Playwright",
+      "description": "Buat tes otomatis nyata dengan Playwright",
+      "skills": ["Navigasi", "Locator", "Assertion", "Wait"]
     },
-    "tiers": {
-        "basic": {
-            "title": "Selektor",
-            "description": "Kuasai selektor CSS dan XPath - fondasi pengujian web",
-            "skills": [
-                "Selektor CSS",
-                "Query XPath",
-                "Penargetan Elemen"
-            ]
-        },
-        "beginner": {
-            "title": "JavaScript",
-            "description": "Pelajari dasar-dasar JavaScript untuk otomasi pengujian",
-            "skills": [
-                "Variabel & Tipe",
-                "Manipulasi DOM",
-                "Async/Await"
-            ]
-        },
-        "intermediate": {
-            "title": "Playwright",
-            "description": "Buat tes otomatis nyata dengan Playwright",
-            "skills": [
-                "Navigasi",
-                "Locator",
-                "Assertion",
-                "Wait"
-            ]
-        },
-        "expert": {
-            "title": "Tingkat Lanjut",
-            "description": "Pola profesional untuk pengujian produksi",
-            "skills": [
-                "Page Object",
-                "Data-Driven",
-                "CI/CD"
-            ]
-        }
-    },
-    "featuredChallenges": {
-        "title": "Selesaikan",
-        "titleHighlight": "Masalah Nyata",
-        "subtitle": "Mulai coding langsung. Tanpa setup.",
-        "viewAll": "Lihat Semua Tantangan"
-    },
-    "features": {
-        "title": "Semua yang Kamu Butuhkan untuk",
-        "titleHighlight": "Belajar Testing",
-        "subtitle": "Platform lengkap yang dirancang untuk membawamu dari pemula ke ahli",
-        "interactiveTutorials": {
-            "title": "Tutorial Interaktif",
-            "description": "Pelajari konsep testing langkah demi langkah. Saya sudah memecah bagian-bagian sulit agar kamu tidak perlu berjuang."
-        },
-        "playwrightChallenges": {
-            "title": "Tantangan Playwright",
-            "description": "Latihan dengan skenario nyata. Seperti punya sandbox untuk mencoba hal-hal tanpa merusak produksi."
-        },
-        "selectorChallenges": {
-            "title": "Tantangan Selektor",
-            "description": "Kuasai selektor CSS dan XPath dengan feedback visual. Lihat elemen menyala saat kamu mengetik."
-        },
-        "gamification": {
-            "title": "Gamifikasi",
-            "description": "Dapatkan XP, naik level, unlock achievement, dan bersaing di leaderboard. Belajar jadi menyenangkan!"
-        },
-        "instantFeedback": {
-            "title": "Feedback Instan",
-            "description": "Dapatkan hasil langsung. Seperti punya teman di samping yang menunjukkan apa yang perlu diperbaiki."
-        },
-        "trackProgress": {
-            "title": "Lacak Progres",
-            "description": "Lihat progres kamu di tutorial dan tantangan. Jangan pernah kehilangan jejak di mana kamu terakhir berhenti."
-        }
-    },
-    "howItWorks": {
-        "title": "Cara",
-        "titleHighlight": "Kerjanya",
-        "step1": {
-            "title": "Pilih Tantangan",
-            "description": "Pilih dari tantangan Playwright, selektor CSS, atau JavaScript."
-        },
-        "step2": {
-            "title": "Tulis Kode Kamu",
-            "description": "Gunakan editor kode embedded kami untuk menulis dan menguji script otomasi kamu."
-        },
-        "step3": {
-            "title": "Dapatkan Feedback Instan",
-            "description": "Jalankan kode kamu dan lihat hasil langsung. Dapatkan XP saat kamu lulus!"
-        }
-    },
-    "mission": {
-        "title": "Kenapa Saya",
-        "titleHighlight": "Membangun Ini",
-        "story1": "Saya memulai karir dengan nol pengalaman QA. Saya bertahan di hari-hari awal itu berkat senior yang sabar yang membimbing saya melewati bagian-bagian sulit.",
-        "story2": "TestingWithEkki adalah cara saya untuk meneruskan kebaikan itu.",
-        "story3": "Tidak semua orang punya mentor untuk membimbing mereka, jadi saya membangun sumber daya yang saya harap saya punya: pelajaran praktis dan langsung yang benar-benar masuk akal.",
-        "author": "Ekki",
-        "authorRole": "Pembuat TestingWithEkki"
-    },
-    "cta": {
-        "title": "Mulai Karir Quality Engineering Kamu",
-        "subtitle": "Bergabung dengan ribuan tester yang menguasai tools standar industri. Gratis selamanya untuk individu.",
-        "getStarted": "Mulai Gratis",
-        "viewLeaderboard": "Lihat Leaderboard",
-        "freeToUse": "Gratis digunakan",
-        "noCreditCard": "Tanpa kartu kredit",
-        "learnAtOwnPace": "Belajar dengan kecepatan sendiri"
-    },
-    "hallOfFame": {
-        "title": "Daftar",
-        "titleHighlight": "Kehormatan",
-        "subtitle": "Lihat pencapaian terbaru yang dibuka oleh komunitas."
+    "expert": {
+      "title": "Tingkat Lanjut",
+      "description": "Pola profesional untuk pengujian produksi",
+      "skills": ["Page Object", "Data-Driven", "CI/CD"]
     }
+  },
+  "featuredChallenges": {
+    "title": "Selesaikan",
+    "titleHighlight": "Masalah Nyata",
+    "subtitle": "Mulai coding langsung. Tanpa setup.",
+    "viewAll": "Lihat Semua Tantangan"
+  },
+  "features": {
+    "title": "Semua yang Kamu Butuhkan untuk",
+    "titleHighlight": "Belajar Testing",
+    "subtitle": "Platform lengkap yang dirancang untuk membawamu dari pemula ke ahli",
+    "interactiveTutorials": {
+      "title": "Tutorial Interaktif",
+      "description": "Pelajari konsep testing langkah demi langkah. Saya sudah memecah bagian-bagian sulit agar kamu tidak perlu berjuang."
+    },
+    "playwrightChallenges": {
+      "title": "Tantangan Playwright",
+      "description": "Latihan dengan skenario nyata. Seperti punya sandbox untuk mencoba hal-hal tanpa merusak produksi."
+    },
+    "selectorChallenges": {
+      "title": "Tantangan Selektor",
+      "description": "Kuasai selektor CSS dan XPath dengan feedback visual. Lihat elemen menyala saat kamu mengetik."
+    },
+    "gamification": {
+      "title": "Gamifikasi",
+      "description": "Dapatkan XP, naik level, unlock achievement, dan bersaing di leaderboard. Belajar jadi menyenangkan!"
+    },
+    "instantFeedback": {
+      "title": "Feedback Instan",
+      "description": "Dapatkan hasil langsung. Seperti punya teman di samping yang menunjukkan apa yang perlu diperbaiki."
+    },
+    "trackProgress": {
+      "title": "Lacak Progres",
+      "description": "Lihat progres kamu di tutorial dan tantangan. Jangan pernah kehilangan jejak di mana kamu terakhir berhenti."
+    }
+  },
+  "howItWorks": {
+    "title": "Cara",
+    "titleHighlight": "Kerjanya",
+    "step1": {
+      "title": "Pilih Tantangan",
+      "description": "Pilih dari tantangan Playwright, selektor CSS, atau JavaScript."
+    },
+    "step2": {
+      "title": "Tulis Kode Kamu",
+      "description": "Gunakan editor kode embedded kami untuk menulis dan menguji script otomasi kamu."
+    },
+    "step3": {
+      "title": "Dapatkan Feedback Instan",
+      "description": "Jalankan kode kamu dan lihat hasil langsung. Dapatkan XP saat kamu lulus!"
+    }
+  },
+  "mission": {
+    "title": "Kenapa Saya",
+    "titleHighlight": "Membangun Ini",
+    "story1": "Saya memulai karir dengan nol pengalaman QA. Saya bertahan di hari-hari awal itu berkat senior yang sabar yang membimbing saya melewati bagian-bagian sulit.",
+    "story2": "TestingWithEkki adalah cara saya untuk meneruskan kebaikan itu.",
+    "story3": "Tidak semua orang punya mentor untuk membimbing mereka, jadi saya membangun sumber daya yang saya harap saya punya: pelajaran praktis dan langsung yang benar-benar masuk akal.",
+    "author": "Ekki",
+    "authorRole": "Pembuat TestingWithEkki"
+  },
+  "cta": {
+    "title": "Mulai Karir Quality Engineering Kamu",
+    "subtitle": "Bergabung dengan ribuan tester yang menguasai tools standar industri. Gratis selamanya untuk individu.",
+    "getStarted": "Mulai Gratis",
+    "viewLeaderboard": "Lihat Leaderboard",
+    "freeToUse": "Gratis digunakan",
+    "noCreditCard": "Tanpa kartu kredit",
+    "learnAtOwnPace": "Belajar dengan kecepatan sendiri"
+  },
+  "hallOfFame": {
+    "title": "Daftar",
+    "titleHighlight": "Kehormatan",
+    "subtitle": "Lihat pencapaian terbaru yang dibuka oleh komunitas."
+  }
 }

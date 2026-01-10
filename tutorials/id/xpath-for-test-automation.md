@@ -1,36 +1,36 @@
 ---
-title: "XPath untuk Test Automation"
-description: "Kuasai selector XPath untuk membuka kemampuan navigasi DOM yang kuat yang tidak bisa disediakan oleh CSS."
+title: 'XPath untuk Test Automation'
+description: 'Kuasai selector XPath untuk membuka kemampuan navigasi DOM yang kuat yang tidak bisa disediakan oleh CSS.'
 ---
 
 # XPath untuk Test Automation
 
-Kuasai *selector* XPath untuk membuka kemampuan navigasi DOM yang kuat yang tidak bisa disediakan oleh CSS.
+Kuasai _selector_ XPath untuk membuka kemampuan navigasi DOM yang kuat yang tidak bisa disediakan oleh CSS.
 
 ## Mental Model: File System
 
 Bayangkan DOM komputer-mu sebagai **File System**.
 
-* `/` adalah Root (Efektifnya `C:\` atau `/`).
-* `div` adalah Folder.
-* `input` adalah File.
+- `/` adalah Root (Efektifnya `C:\` atau `/`).
+- `div` adalah Folder.
+- `input` adalah File.
 
 **CSS** itu seperti "Quick Search" (Spotlight/Windows Search) – dia menemukan file berdasarkan nama atau tag tidak peduli di mana mereka berada.
-**XPath** itu seperti Terminal/Command Line – dia memberimu kontrol presisi untuk menavigasi jalur (*path*), naik direktori (`../`), dan memfilter berdasarkan metadata yang kompleks.
+**XPath** itu seperti Terminal/Command Line – dia memberimu kontrol presisi untuk menavigasi jalur (_path_), naik direktori (`../`), dan memfilter berdasarkan metadata yang kompleks.
 
 ---
 
 ## Strategi: Pendekatan Sniper
 
-XPath itu kuat tapi *verbose* (panjang lebar) dan seringkali lebih lambat dari CSS.
-**Strategi**: Gunakan CSS sebagai senapan mesin-mu (pilihan *default*), dan XPath sebagai senapan *sniper*-mu (kasus penggunaan khusus).
+XPath itu kuat tapi _verbose_ (panjang lebar) dan seringkali lebih lambat dari CSS.
+**Strategi**: Gunakan CSS sebagai senapan mesin-mu (pilihan _default_), dan XPath sebagai senapan _sniper_-mu (kasus penggunaan khusus).
 
 ### Kapan menggunakan Sniper (XPath)
 
 1. **Navigasi NAIK (Up)**: Kamu menemukan tombol "Delete" dan perlu mencari `row` spesifik tempat tombol itu berada. CSS belum bisa naik ke atas.
-    * `//button[text()="Delete"]/ancestor::tr`
+   - `//button[text()="Delete"]/ancestor::tr`
 2. **Matching Teks**: Kamu perlu menemukan tombol yang secara spesifik berlabel "Submit".
-    * `//button[text()="Submit"]`
+   - `//button[text()="Submit"]`
 3. **Logika Kompleks**: Kamu perlu elemen yang menyerupai "X" ATAU "Y" tapi BUKAN "Z".
 
 ---
@@ -39,29 +39,29 @@ XPath itu kuat tapi *verbose* (panjang lebar) dan seringkali lebih lambat dari C
 
 ### 1. Dasar-Dasar
 
-* **Root**: `/html/body` (Absolute path - HINDARI ini!)
-* **Di mana saja**: `//input` (Relative path - GUNAKAN ini!)
-* **Predikat**: `//button[@type="submit"]` (Kondisi di dalam kurung `[]`)
+- **Root**: `/html/body` (Absolute path - HINDARI ini!)
+- **Di mana saja**: `//input` (Relative path - GUNAKAN ini!)
+- **Predikat**: `//button[@type="submit"]` (Kondisi di dalam kurung `[]`)
 
 ### 2. Kekuatan Super (Axes)
 
 Inilah kenapa kita pakai XPath. Kita bisa bergerak ke arah mana saja.
 
-* **Parent**: `/..` atau `/parent::div`
-  * `//span[@id="error"]/..` (Naik satu level)
-* **Ancestor**: `/ancestor::form`
-  * `//button/ancestor::div[@class="modal"]` (Naik terus sampai  menabrak modal)
-* **Following Sibling**: `/following-sibling::input`
-  * `//label[text()="Email"]/following-sibling::input` (Cari input di sebelah label)
+- **Parent**: `/..` atau `/parent::div`
+  - `//span[@id="error"]/..` (Naik satu level)
+- **Ancestor**: `/ancestor::form`
+  - `//button/ancestor::div[@class="modal"]` (Naik terus sampai menabrak modal)
+- **Following Sibling**: `/following-sibling::input`
+  - `//label[text()="Email"]/following-sibling::input` (Cari input di sebelah label)
 
 ### 3. Pencocokan Teks (Text Matching)
 
-* **Exact Match**: `text()="Value"`
-  * `//button[text()="Save"]` (Case sensitive!)
-* **Contains**: `contains(text(), "Value")`
-  * `//div[contains(text(), "Success")]`
-* **Normalize Space**: `normalize-space()="Value"`
-  * `//h1[normalize-space()="Welcome Back"]` (Mengabaikan spasi/baris baru yang tersembunyi)
+- **Exact Match**: `text()="Value"`
+  - `//button[text()="Save"]` (Case sensitive!)
+- **Contains**: `contains(text(), "Value")`
+  - `//div[contains(text(), "Success")]`
+- **Normalize Space**: `normalize-space()="Value"`
+  - `//h1[normalize-space()="Welcome Back"]` (Mengabaikan spasi/baris baru yang tersembunyi)
 
 ---
 
@@ -71,8 +71,8 @@ Inilah kenapa kita pakai XPath. Kita bisa bergerak ke arah mana saja.
 
 **Skenario**: Menyalin XPath dari Chrome DevTools.
 **Kodenya**: `/html/body/div[2]/div/div[3]/form/button`
-**Masalahnya**: Jika *ada apa pun* yang berubah dalam struktur (contoh: div pembungkus ditambahkan), *path* ini akan rusak.
-**Solusinya**: Gunakan *relative path* dengan atribut unik: `//form[@id="login"]//button`.
+**Masalahnya**: Jika _ada apa pun_ yang berubah dalam struktur (contoh: div pembungkus ditambahkan), _path_ ini akan rusak.
+**Solusinya**: Gunakan _relative path_ dengan atribut unik: `//form[@id="login"]//button`.
 
 ### Jebakan #2: Jebakan Teks
 
@@ -80,19 +80,17 @@ Inilah kenapa kita pakai XPath. Kita bisa bergerak ke arah mana saja.
 **Masalahnya**: Whitespace! Jika HTML-nya diformat seperti:
 
 ```html
-<button>
-  Submit
-</button>
+<button>Submit</button>
 ```
 
 Teks sebenarnya mengandung baris baru dan spasi.
-**Solusinya**: Selalu gunakan `normalize-space()` untuk ketahanan (*robustness*): `//button[normalize-space()="Submit"]`.
+**Solusinya**: Selalu gunakan `normalize-space()` untuk ketahanan (_robustness_): `//button[normalize-space()="Submit"]`.
 
 ### Jebakan #3: Pajak Performa
 
 **Skenario**: `//*[contains(text(), "Login")]`
-**Masalahnya**: Memulai dengan `//*` memaksa browser untuk memindai *setiap elemen tunggal* di DOM. Pada halaman besar, ini lambat.
-**Solusinya**: Jadilah spesifik. `//a[contains(text(), "Login")]` hanya memindai *link*.
+**Masalahnya**: Memulai dengan `//*` memaksa browser untuk memindai _setiap elemen tunggal_ di DOM. Pada halaman besar, ini lambat.
+**Solusinya**: Jadilah spesifik. `//a[contains(text(), "Login")]` hanya memindai _link_.
 
 ---
 

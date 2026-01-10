@@ -1,136 +1,119 @@
 {
-    "hero": {
-        "title": "Learn QA Automation",
-        "titleSuffix": "with Practical Challenges",
-        "tagline": "Build real-world skills, not just theory.",
-        "description": "I'm sharing the <strong>practical skills I accumulated from supportive mentors and real-world problem solving</strong>, helping you build confidence step-by-step.",
-        "startLearning": "Start Learning",
-        "browseTutorials": "Browse Tutorials"
+  "hero": {
+    "title": "Learn QA Automation",
+    "titleSuffix": "with Practical Challenges",
+    "tagline": "Build real-world skills, not just theory.",
+    "description": "I'm sharing the <strong>practical skills I accumulated from supportive mentors and real-world problem solving</strong>, helping you build confidence step-by-step.",
+    "startLearning": "Start Learning",
+    "browseTutorials": "Browse Tutorials"
+  },
+  "stats": {
+    "challenges": "Challenges",
+    "tutorials": "Tutorials",
+    "achievements": "Achievements",
+    "learning": "Learning"
+  },
+  "careerPath": {
+    "title": "Your",
+    "titleHighlight": "Career Path",
+    "subtitle": "From selector basics to advanced automation architectures.",
+    "tier": "Tier",
+    "challenges": "challenges"
+  },
+  "tiers": {
+    "basic": {
+      "title": "Selectors",
+      "description": "Master CSS and XPath selectors - the foundation of web testing",
+      "skills": ["CSS Selectors", "XPath Queries", "Element Targeting"]
     },
-    "stats": {
-        "challenges": "Challenges",
-        "tutorials": "Tutorials",
-        "achievements": "Achievements",
-        "learning": "Learning"
+    "beginner": {
+      "title": "JavaScript",
+      "description": "Learn JavaScript fundamentals for test automation",
+      "skills": ["Variables & Types", "DOM Manipulation", "Async/Await"]
     },
-    "careerPath": {
-        "title": "Your",
-        "titleHighlight": "Career Path",
-        "subtitle": "From selector basics to advanced automation architectures.",
-        "tier": "Tier",
-        "challenges": "challenges"
+    "intermediate": {
+      "title": "Playwright",
+      "description": "Build real automated tests with Playwright",
+      "skills": ["Navigation", "Locators", "Assertions", "Waits"]
     },
-    "tiers": {
-        "basic": {
-            "title": "Selectors",
-            "description": "Master CSS and XPath selectors - the foundation of web testing",
-            "skills": [
-                "CSS Selectors",
-                "XPath Queries",
-                "Element Targeting"
-            ]
-        },
-        "beginner": {
-            "title": "JavaScript",
-            "description": "Learn JavaScript fundamentals for test automation",
-            "skills": [
-                "Variables & Types",
-                "DOM Manipulation",
-                "Async/Await"
-            ]
-        },
-        "intermediate": {
-            "title": "Playwright",
-            "description": "Build real automated tests with Playwright",
-            "skills": [
-                "Navigation",
-                "Locators",
-                "Assertions",
-                "Waits"
-            ]
-        },
-        "expert": {
-            "title": "Advanced",
-            "description": "Professional patterns for production testing",
-            "skills": [
-                "Page Objects",
-                "Data-Driven",
-                "CI/CD"
-            ]
-        }
-    },
-    "featuredChallenges": {
-        "title": "Solve a",
-        "titleHighlight": "Real Problem",
-        "subtitle": "Start coding immediately. No setup required.",
-        "viewAll": "View All Challenges"
-    },
-    "features": {
-        "title": "Everything You Need to",
-        "titleHighlight": "Learn Testing",
-        "subtitle": "A complete platform designed to take you from beginner to expert",
-        "interactiveTutorials": {
-            "title": "Interactive Tutorials",
-            "description": "Learn testing concepts step-by-step. I've broken down the tricky parts so you don't have to struggle."
-        },
-        "playwrightChallenges": {
-            "title": "Playwright Challenges",
-            "description": "Practice with real scenarios. It's like having a sandbox to try things without breaking production."
-        },
-        "selectorChallenges": {
-            "title": "Selector Challenges",
-            "description": "Master CSS and XPath selectors with visual feedback. See elements highlight as you type."
-        },
-        "gamification": {
-            "title": "Gamification",
-            "description": "Earn XP, level up, unlock achievements, and compete on the leaderboard. Learning made fun!"
-        },
-        "instantFeedback": {
-            "title": "Instant Feedback",
-            "description": "Get results immediately. Like a friend sitting next to you pointing out what needs fixing."
-        },
-        "trackProgress": {
-            "title": "Track Progress",
-            "description": "See your progress across tutorials and challenges. Never lose track of where you left off."
-        }
-    },
-    "howItWorks": {
-        "title": "How It",
-        "titleHighlight": "Works",
-        "step1": {
-            "title": "Choose a Challenge",
-            "description": "Pick from Playwright, CSS selectors, or JavaScript challenges."
-        },
-        "step2": {
-            "title": "Write Your Code",
-            "description": "Use our embedded code editor to write and test your automation scripts."
-        },
-        "step3": {
-            "title": "Get Instant Feedback",
-            "description": "Run your code and see results immediately. Earn XP when you pass!"
-        }
-    },
-    "mission": {
-        "title": "Why I",
-        "titleHighlight": "Built This",
-        "story1": "I started my career with zero QA experience. I survived those early days thanks to patient seniors who coached me through the hard parts.",
-        "story2": "TestingWithEkki is my way of passing that forward.",
-        "story3": "Not everyone has a mentor to guide them, so I'm building the resource I wish I had: practical, hands-on lessons that actually make sense.",
-        "author": "Ekki",
-        "authorRole": "Creator of TestingWithEkki"
-    },
-    "cta": {
-        "title": "Start Your Quality Engineering Career",
-        "subtitle": "Join thousands of testers mastering standard industry tools. Free forever for individuals.",
-        "getStarted": "Get Started for Free",
-        "viewLeaderboard": "View Leaderboard",
-        "freeToUse": "Free to use",
-        "noCreditCard": "No credit card required",
-        "learnAtOwnPace": "Learn at your own pace"
-    },
-    "hallOfFame": {
-        "title": "Hall of",
-        "titleHighlight": "Fame",
-        "subtitle": "See the latest achievements unlocked by the community."
+    "expert": {
+      "title": "Advanced",
+      "description": "Professional patterns for production testing",
+      "skills": ["Page Objects", "Data-Driven", "CI/CD"]
     }
+  },
+  "featuredChallenges": {
+    "title": "Solve a",
+    "titleHighlight": "Real Problem",
+    "subtitle": "Start coding immediately. No setup required.",
+    "viewAll": "View All Challenges"
+  },
+  "features": {
+    "title": "Everything You Need to",
+    "titleHighlight": "Learn Testing",
+    "subtitle": "A complete platform designed to take you from beginner to expert",
+    "interactiveTutorials": {
+      "title": "Interactive Tutorials",
+      "description": "Learn testing concepts step-by-step. I've broken down the tricky parts so you don't have to struggle."
+    },
+    "playwrightChallenges": {
+      "title": "Playwright Challenges",
+      "description": "Practice with real scenarios. It's like having a sandbox to try things without breaking production."
+    },
+    "selectorChallenges": {
+      "title": "Selector Challenges",
+      "description": "Master CSS and XPath selectors with visual feedback. See elements highlight as you type."
+    },
+    "gamification": {
+      "title": "Gamification",
+      "description": "Earn XP, level up, unlock achievements, and compete on the leaderboard. Learning made fun!"
+    },
+    "instantFeedback": {
+      "title": "Instant Feedback",
+      "description": "Get results immediately. Like a friend sitting next to you pointing out what needs fixing."
+    },
+    "trackProgress": {
+      "title": "Track Progress",
+      "description": "See your progress across tutorials and challenges. Never lose track of where you left off."
+    }
+  },
+  "howItWorks": {
+    "title": "How It",
+    "titleHighlight": "Works",
+    "step1": {
+      "title": "Choose a Challenge",
+      "description": "Pick from Playwright, CSS selectors, or JavaScript challenges."
+    },
+    "step2": {
+      "title": "Write Your Code",
+      "description": "Use our embedded code editor to write and test your automation scripts."
+    },
+    "step3": {
+      "title": "Get Instant Feedback",
+      "description": "Run your code and see results immediately. Earn XP when you pass!"
+    }
+  },
+  "mission": {
+    "title": "Why I",
+    "titleHighlight": "Built This",
+    "story1": "I started my career with zero QA experience. I survived those early days thanks to patient seniors who coached me through the hard parts.",
+    "story2": "TestingWithEkki is my way of passing that forward.",
+    "story3": "Not everyone has a mentor to guide them, so I'm building the resource I wish I had: practical, hands-on lessons that actually make sense.",
+    "author": "Ekki",
+    "authorRole": "Creator of TestingWithEkki"
+  },
+  "cta": {
+    "title": "Start Your Quality Engineering Career",
+    "subtitle": "Join thousands of testers mastering standard industry tools. Free forever for individuals.",
+    "getStarted": "Get Started for Free",
+    "viewLeaderboard": "View Leaderboard",
+    "freeToUse": "Free to use",
+    "noCreditCard": "No credit card required",
+    "learnAtOwnPace": "Learn at your own pace"
+  },
+  "hallOfFame": {
+    "title": "Hall of",
+    "titleHighlight": "Fame",
+    "subtitle": "See the latest achievements unlocked by the community."
+  }
 }

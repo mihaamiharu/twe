@@ -1,28 +1,29 @@
 {
-    "header": {
-        "title": "Hall of Fame",
-        "subtitle": "The elite testers mastering the art of automation."
-    },
-    "tabs": {
-        "allTime": "All Time",
-        "thisMonth": "This Month"
-    },
-    "table": {
-        "hiddenUser": "Hidden User",
-        "anonymous": "Anonymous",
-        "challengesCount": "{{count}} challenges",
-        "emptyState": "No other runners yet. Invite your friends!"
-    },
-    "gating": {
-        "title": "Join the Elite",
-        "description": "Sign in to see full rankings, track your own progress, and earn unique badges.",
-        "button": "Sign In to Compete"
-    },
-    "monthly": {
-        "comingSoon": "Monthly Rankings Coming Soon",
-        "description": "Compete for the monthly crown in the next season update!"
-    },
-    "error": {
-        "description": "Unable to load the leaderboard at this time."
-    }
+  "header": {
+    "title": "Hall of Fame",
+    "subtitle": "The elite testers mastering the art of automation."
+  },
+  "tabs": {
+    "allTime": "All Time",
+    "thisMonth": "This Month"
+  },
+  "table": {
+    "hiddenUser": "Hidden User",
+    "anonymous": "Anonymous",
+    "challengesCount": "{{count}} challenges",
+    "challenges": "challenges",
+    "emptyState": "No other runners yet. Invite your friends!"
+  },
+  "gating": {
+    "title": "Join the Elite",
+    "description": "Sign in to see full rankings, track your own progress, and earn unique badges.",
+    "button": "Sign In to Compete"
+  },
+  "monthly": {
+    "comingSoon": "Monthly Rankings Coming Soon",
+    "description": "Compete for the monthly crown in the next season update!"
+  },
+  "error": {
+    "description": "Unable to load the leaderboard at this time."
+  }
 }

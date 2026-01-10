@@ -1,6 +1,6 @@
 /**
  * Email Service - Gmail SMTP with Nodemailer
- * 
+ *
  * Features:
  * - Email verification for new registrations
  * - Bug report notifications to admin
@@ -10,39 +10,38 @@
 import nodemailer from 'nodemailer';
 import { logger } from '@/lib/logger';
 
-
 // Create reusable transporter
 const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: process.env.SMTP_HOST || 'smtp.gmail.com',
-        port: Number(process.env.SMTP_PORT) || 587,
-        secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASSWORD,
-        },
-    });
+  return nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASSWORD,
+    },
+  });
 };
 
 // Get sender address
 const getFromAddress = () => {
-    return process.env.SMTP_FROM || `TestingWithEkki <${process.env.SMTP_USER}>`;
+  return process.env.SMTP_FROM || `TestingWithEkki <${process.env.SMTP_USER}>`;
 };
 
 /**
  * Send verification email to new user
  */
 export async function sendVerificationEmail(
-    to: string,
-    verificationUrl: string,
-    userName?: string
+  to: string,
+  verificationUrl: string,
+  userName?: string,
 ): Promise<void> {
-    const transporter = createTransporter();
+  const transporter = createTransporter();
 
-    const appName = 'TestingWithEkki';
-    const subject = `Verify your ${appName} account`;
+  const appName = 'TestingWithEkki';
+  const subject = `Verify your ${appName} account`;
 
-    const html = `
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -87,7 +86,7 @@ export async function sendVerificationEmail(
 </html>
     `;
 
-    const text = `
+  const text = `
 Welcome${userName ? ', ' + userName : ''}!
 
 Thank you for signing up for ${appName}. Please verify your email address to get started.
@@ -103,35 +102,35 @@ If you didn't create an account with us, you can safely ignore this email.
 ${appName}
     `;
 
-    try {
-        await transporter.sendMail({
-            from: getFromAddress(),
-            to,
-            subject,
-            text,
-            html,
-        });
-        logger.info(`[Email] Verification email sent to ${to}`);
-    } catch (error) {
-        logger.error('[Email] Failed to send verification email:', error);
-        throw new Error('Failed to send verification email');
-    }
+  try {
+    await transporter.sendMail({
+      from: getFromAddress(),
+      to,
+      subject,
+      text,
+      html,
+    });
+    logger.info(`[Email] Verification email sent to ${to}`);
+  } catch (error) {
+    logger.error('[Email] Failed to send verification email:', error);
+    throw new Error('Failed to send verification email');
+  }
 }
 
 /**
  * Send password reset email to user
  */
 export async function sendPasswordResetEmail(
-    to: string,
-    resetUrl: string,
-    userName?: string
+  to: string,
+  resetUrl: string,
+  userName?: string,
 ): Promise<void> {
-    const transporter = createTransporter();
+  const transporter = createTransporter();
 
-    const appName = 'TestingWithEkki';
-    const subject = `Reset your ${appName} password`;
+  const appName = 'TestingWithEkki';
+  const subject = `Reset your ${appName} password`;
 
-    const html = `
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -179,7 +178,7 @@ export async function sendPasswordResetEmail(
 </html>
     `;
 
-    const text = `
+  const text = `
 Hello${userName ? ', ' + userName : ''}!
 
 We received a request to reset your password for your ${appName} account.
@@ -195,54 +194,57 @@ If you didn't request a password reset, you can safely ignore this email. Your p
 ${appName}
     `;
 
-    try {
-        await transporter.sendMail({
-            from: getFromAddress(),
-            to,
-            subject,
-            text,
-            html,
-        });
-        logger.info(`[Email] Password reset email sent to ${to}`);
-    } catch (error) {
-        logger.error('[Email] Failed to send password reset email:', error);
-        throw new Error('Failed to send password reset email');
-    }
+  try {
+    await transporter.sendMail({
+      from: getFromAddress(),
+      to,
+      subject,
+      text,
+      html,
+    });
+    logger.info(`[Email] Password reset email sent to ${to}`);
+  } catch (error) {
+    logger.error('[Email] Failed to send password reset email:', error);
+    throw new Error('Failed to send password reset email');
+  }
 }
 
 /**
  * Send bug report notification to admin
  */
 export async function sendBugReportNotification(report: {
-    id: string;
-    title: string;
-    severity: string;
-    stepsToReproduce: string;
-    expectedBehavior: string;
-    actualBehavior: string;
-    pageUrl?: string | null;
-    browserInfo?: string | null;
-    reporterEmail?: string | null;
+  id: string;
+  title: string;
+  severity: string;
+  stepsToReproduce: string;
+  expectedBehavior: string;
+  actualBehavior: string;
+  pageUrl?: string | null;
+  browserInfo?: string | null;
+  reporterEmail?: string | null;
 }): Promise<void> {
-    const adminEmail = process.env.ADMIN_EMAIL;
+  const adminEmail = process.env.ADMIN_EMAIL;
 
-    if (!adminEmail) {
-        logger.info('[Email] No ADMIN_EMAIL configured, skipping bug report notification');
-        return;
-    }
+  if (!adminEmail) {
+    logger.info(
+      '[Email] No ADMIN_EMAIL configured, skipping bug report notification',
+    );
+    return;
+  }
 
-    const transporter = createTransporter();
+  const transporter = createTransporter();
 
-    const severityEmoji = {
-        CRITICAL: '🔴',
-        HIGH: '🟠',
-        MEDIUM: '🟡',
-        LOW: '🟢',
+  const severityEmoji =
+    {
+      CRITICAL: '🔴',
+      HIGH: '🟠',
+      MEDIUM: '🟡',
+      LOW: '🟢',
     }[report.severity] || '⚪';
 
-    const subject = `${severityEmoji} [Bug Report] ${report.title}`;
+  const subject = `${severityEmoji} [Bug Report] ${report.title}`;
 
-    const html = `
+  const html = `
 <!DOCTYPE html>
 <html>
 <head>
@@ -301,16 +303,16 @@ export async function sendBugReportNotification(report: {
 </html>
     `;
 
-    try {
-        await transporter.sendMail({
-            from: getFromAddress(),
-            to: adminEmail,
-            subject,
-            html,
-        });
-        logger.info(`[Email] Bug report notification sent to admin: ${report.id}`);
-    } catch (error) {
-        logger.error('[Email] Failed to send bug report notification:', error);
-        // Don't throw - this is a notification, not critical
-    }
+  try {
+    await transporter.sendMail({
+      from: getFromAddress(),
+      to: adminEmail,
+      subject,
+      html,
+    });
+    logger.info(`[Email] Bug report notification sent to admin: ${report.id}`);
+  } catch (error) {
+    logger.error('[Email] Failed to send bug report notification:', error);
+    // Don't throw - this is a notification, not critical
+  }
 }

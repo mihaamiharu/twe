@@ -76,13 +76,13 @@ sequenceDiagram
 
 ## Key Design Decisions
 
-| Decision | Rationale |
-|----------|-----------|
-| Client-side execution | No server load, instant feedback |
-| Iframe sandbox | Isolates user code from main app |
-| Playwright API shim | Teaches real-world automation patterns |
-| Synthetic events | Works in browser (not CDP) |
-| State-based validation | Simple, reliable for educational use |
+| Decision               | Rationale                              |
+| ---------------------- | -------------------------------------- |
+| Client-side execution  | No server load, instant feedback       |
+| Iframe sandbox         | Isolates user code from main app       |
+| Playwright API shim    | Teaches real-world automation patterns |
+| Synthetic events       | Works in browser (not CDP)             |
+| State-based validation | Simple, reliable for educational use   |
 
 ## Limitations
 

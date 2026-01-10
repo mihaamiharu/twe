@@ -1,6 +1,6 @@
 ---
-title: "Selector Decision Framework"
-description: "A practical guide to choosing between CSS and XPath selectors for maximum effectiveness."
+title: 'Selector Decision Framework'
+description: 'A practical guide to choosing between CSS and XPath selectors for maximum effectiveness.'
 ---
 
 # Selector Decision Framework
@@ -12,16 +12,16 @@ A practical guide to choosing between CSS and XPath selectors for maximum effect
 When inspecting an element, run this rapid decision logic in your head:
 
 1. **Can I use a Test API?** (`data-testid`)
-    * **YES**: Stop. Use it.
-    * **NO**: Go to step 2.
+   - **YES**: Stop. Use it.
+   - **NO**: Go to step 2.
 
 2. **Can I use a Semantic Attribute?** (`name`, `type`, `role`, `aria-label`)
-    * **YES**: Stop. Use it (CSS).
-    * **NO**: Go to step 3.
+   - **YES**: Stop. Use it (CSS).
+   - **NO**: Go to step 3.
 
 3. **Do I need Superpowers?** (Text matching, Parent/Ancestor traversal)
-    * **YES**: Switch to XPath immediately.
-    * **NO**: Use CSS Class/ID (if stable).
+   - **YES**: Switch to XPath immediately.
+   - **NO**: Use CSS Class/ID (if stable).
 
 ---
 
@@ -35,7 +35,7 @@ The table has 50 rows. The "Delete" button has no unique ID.
 
 ```css
 /* Brittle: Relies on John being the 3rd row */
-tr:nth-child(3) .delete-btn 
+tr: nth-child(3) .delete-btn;
 ```
 
 **The Pure XPath Attempt (Verbose)**:
@@ -47,15 +47,16 @@ tr:nth-child(3) .delete-btn
 **The Hybrid Approach (Success)**:
 Combine the best of both worlds. Use a high-level locator for the container, then filter.
 
-* **Logic**: Find the row by Text ("John Doe"), then find the Button inside that row.
-* **Playwright Implementation**:
+- **Logic**: Find the row by Text ("John Doe"), then find the Button inside that row.
+- **Playwright Implementation**:
 
-    ```typescript
-    await page.getByRole('row')
-              .filter({ hasText: 'John Doe' })
-              .getByRole('button', { name: 'Delete' })
-              .click();
-    ```
+  ```typescript
+  await page
+    .getByRole('row')
+    .filter({ hasText: 'John Doe' })
+    .getByRole('button', { name: 'Delete' })
+    .click();
+  ```
 
 **The Lesson**:
 Don't be a purist. Real-world applications often require mixing strategies (`Role` + `Text Filter`) to achieve robustness.
@@ -70,9 +71,9 @@ When writing a selector, apply the **3-Second Rule**:
 
 **Why?**
 
-* CSS is great for simple things: `.btn-primary`, `#login`.
-* If you find yourself writing `div > div:nth-child(2) > span + input`, you have already lost. The selector is brittle and hard to read.
-* XPath `//label[text()="Email"]/following-sibling::input` is verbose, but it's **readable logic**.
+- CSS is great for simple things: `.btn-primary`, `#login`.
+- If you find yourself writing `div > div:nth-child(2) > span + input`, you have already lost. The selector is brittle and hard to read.
+- XPath `//label[text()="Email"]/following-sibling::input` is verbose, but it's **readable logic**.
 
 ---
 
@@ -89,25 +90,24 @@ When writing a selector, apply the **3-Second Rule**:
 **The Mindset**: "I need the absolute fastest selector."
 **The Reality**:
 
-* Selector A (CSS): 1ms execution
-* Selector B (XPath): 2ms execution
-* Network Request: 500ms
-* React Render: 50ms
-**The Fix**: Selector performance is negligible compared to network/rendering. Optimize for **Maintenance** first, Performance second.
+- Selector A (CSS): 1ms execution
+- Selector B (XPath): 2ms execution
+- Network Request: 500ms
+- React Render: 50ms
+  **The Fix**: Selector performance is negligible compared to network/rendering. Optimize for **Maintenance** first, Performance second.
 
 ---
 
 ## Quick Reference
 
-| Requirement | Preferred Tool | Example |
-| :--- | :--- | :--- |
-| **Unique Attribute** | CSS | `[data-testid="submit"]` |
-| **Form Input** | CSS | `input[name="email"]` |
-| **Exact Text** | XPath | `//button[text()="Save"]` |
-| **Contains Text** | XPath | `//div[contains(text(), "Error")]` |
-| **Parent/Ancestor** | XPath | `//input/ancestor::form` |
-| **Sibling Preceding** | XPath | `//td/preceding-sibling::td` |
-| **Fastest Readability** | CSS | `.card-header` |
+| Requirement             | Preferred Tool | Example                            |
+| :---------------------- | :------------- | :--------------------------------- |
+| **Unique Attribute**    | CSS            | `[data-testid="submit"]`           |
+| **Form Input**          | CSS            | `input[name="email"]`              |
+| **Exact Text**          | XPath          | `//button[text()="Save"]`          |
+| **Contains Text**       | XPath          | `//div[contains(text(), "Error")]` |
+| **Parent/Ancestor**     | XPath          | `//input/ancestor::form`           |
+| **Sibling Preceding**   | XPath          | `//td/preceding-sibling::td`       |
+| **Fastest Readability** | CSS            | `.card-header`                     |
 
 ---
-

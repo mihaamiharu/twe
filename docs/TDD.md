@@ -20,31 +20,31 @@ graph TB
         Editor[Monaco Code Editor]
         PlaywrightShim[Mocked Playwright Shim]
     end
-    
+
     subgraph "TanStack Start Server"
         ServerFn[Server Functions]
         APIRoutes[API Routes]
         Auth[BetterAuth]
         Gamification[Gamification Engine]
     end
-    
+
     subgraph "Data Layer"
         PG[(PostgreSQL)]
     end
-    
+
     UI --> Store
     Store --> ServerFn
     Editor --> PlaywrightShim
     PlaywrightShim --> ServerFn
-    
+
     ServerFn --> Auth
     ServerFn --> Gamification
     APIRoutes --> Auth
     APIRoutes --> Gamification
-    
+
     Auth --> PG
     Gamification --> PG
-    
+
     style PlaywrightShim fill:#ff6b6b
     style Gamification fill:#4ecdc4
     style Auth fill:#ffd93d
@@ -64,48 +64,48 @@ graph TB
 
 ### 2.1 Frontend
 
-| Component | Technology | Justification |
-|-----------|-----------|---------------|
-| Framework | **TanStack Start** | Full-stack React framework with SSR, type-safe routing |
-| Build Tool | **Vite** | Fast dev server, optimized builds (built into TanStack Start) |
-| Routing | **TanStack Router** | Type-safe file-based routing, integrated with TanStack Start |
-| State Management | **Zustand** | Lightweight, simple API |
-| Server State | **TanStack Query** | React Query for data fetching and caching |
-| UI Components | **Custom + Radix UI** | Accessible primitives, full control |
-| Styling | **Tailwind CSS v4** | Utility-first, rapid development |
-| Code Editor | **Monaco Editor** | VSCode editor, feature-rich |
-| Markdown Rendering | **React Markdown + remark** | Extensible, supports GFM |
-| HTTP Client | **fetch** (native) | Built-in, works with TanStack Query |
+| Component          | Technology                  | Justification                                                 |
+| ------------------ | --------------------------- | ------------------------------------------------------------- |
+| Framework          | **TanStack Start**          | Full-stack React framework with SSR, type-safe routing        |
+| Build Tool         | **Vite**                    | Fast dev server, optimized builds (built into TanStack Start) |
+| Routing            | **TanStack Router**         | Type-safe file-based routing, integrated with TanStack Start  |
+| State Management   | **Zustand**                 | Lightweight, simple API                                       |
+| Server State       | **TanStack Query**          | React Query for data fetching and caching                     |
+| UI Components      | **Custom + Radix UI**       | Accessible primitives, full control                           |
+| Styling            | **Tailwind CSS v4**         | Utility-first, rapid development                              |
+| Code Editor        | **Monaco Editor**           | VSCode editor, feature-rich                                   |
+| Markdown Rendering | **React Markdown + remark** | Extensible, supports GFM                                      |
+| HTTP Client        | **fetch** (native)          | Built-in, works with TanStack Query                           |
 
 ### 2.2 Server-Side (TanStack Start)
 
-| Component | Technology | Justification |
-|-----------|-----------|---------------|
-| Full-Stack Framework | **TanStack Start** | Unified backend/frontend, server functions, API routes |
-| Language | **TypeScript** | Type safety, better DX |
-| ORM | **Drizzle** | Lightweight, type-safe, SQL-first |
-| Validation | **Zod** | Schema validation, TypeScript integration |
-| Authentication | **BetterAuth** | Framework-agnostic, OAuth + email/password, session management |
-| Code Execution | **Mocked Playwright (Browser)** | Client-side shim, no server sandboxing needed |
-| Testing | **Vitest** | Fast, modern testing |
-| API Documentation | **TypeScript** | Type-safe APIs with TanStack Start |
+| Component            | Technology                      | Justification                                                  |
+| -------------------- | ------------------------------- | -------------------------------------------------------------- |
+| Full-Stack Framework | **TanStack Start**              | Unified backend/frontend, server functions, API routes         |
+| Language             | **TypeScript**                  | Type safety, better DX                                         |
+| ORM                  | **Drizzle**                     | Lightweight, type-safe, SQL-first                              |
+| Validation           | **Zod**                         | Schema validation, TypeScript integration                      |
+| Authentication       | **BetterAuth**                  | Framework-agnostic, OAuth + email/password, session management |
+| Code Execution       | **Mocked Playwright (Browser)** | Client-side shim, no server sandboxing needed                  |
+| Testing              | **Vitest**                      | Fast, modern testing                                           |
+| API Documentation    | **TypeScript**                  | Type-safe APIs with TanStack Start                             |
 
 ### 2.3 Database & Storage
 
-| Component | Technology | Justification |
-|-----------|-----------|---------------|
-| Primary Database | **PostgreSQL 15** | ACID, powerful, open-source |
-| Object Storage | Local file system / **S3** (prod) | File uploads, avatars |
+| Component        | Technology                        | Justification               |
+| ---------------- | --------------------------------- | --------------------------- |
+| Primary Database | **PostgreSQL 15**                 | ACID, powerful, open-source |
+| Object Storage   | Local file system / **S3** (prod) | File uploads, avatars       |
 
 ### 2.4 DevOps & Infrastructure
 
-| Component | Technology | Justification |
-|-----------|-----------|---------------|
-| Containerization | **Docker + Docker Compose** | Consistent environments |
-| CI/CD | **GitHub Actions** | Integrated with repo |
-| Hosting | **VPS (DigitalOcean)** or **Railway** | Cost-effective for solo dev |
-| Reverse Proxy | **Nginx** | Handle SSL, static files |
-| Monitoring | **Sentry** (errors) + **Plausible** (analytics) | Privacy-focused, lightweight |
+| Component        | Technology                                      | Justification                |
+| ---------------- | ----------------------------------------------- | ---------------------------- |
+| Containerization | **Docker + Docker Compose**                     | Consistent environments      |
+| CI/CD            | **GitHub Actions**                              | Integrated with repo         |
+| Hosting          | **VPS (DigitalOcean)** or **Railway**           | Cost-effective for solo dev  |
+| Reverse Proxy    | **Nginx**                                       | Handle SSL, static files     |
+| Monitoring       | **Sentry** (errors) + **Plausible** (analytics) | Privacy-focused, lightweight |
 
 ---
 
@@ -120,7 +120,7 @@ erDiagram
     USER ||--o{ PROGRESS : tracks
     USER ||--o{ SESSION : has
     USER ||--o{ ACCOUNT : links
-    
+
     USER {
         uuid id PK
         string email UK
@@ -133,14 +133,14 @@ erDiagram
         timestamp createdAt
         timestamp lastLoginAt
     }
-    
+
     SESSION {
         uuid id PK
         uuid userId FK
         string token
         timestamp expiresAt
     }
-    
+
     ACCOUNT {
         uuid id PK
         uuid userId FK
@@ -148,7 +148,7 @@ erDiagram
         string providerAccountId
         string accessToken
     }
-    
+
     TUTORIAL ||--o{ PROGRESS : has
     TUTORIAL {
         uuid id PK
@@ -161,7 +161,7 @@ erDiagram
         timestamp publishedAt
         timestamp updatedAt
     }
-    
+
     CHALLENGE ||--o{ TEST_CASE : contains
     CHALLENGE ||--o{ SUBMISSION : receives
     CHALLENGE ||--o{ PROGRESS : tracks
@@ -179,7 +179,7 @@ erDiagram
         uuid tutorialId FK
         timestamp createdAt
     }
-    
+
     TestCase {
         uuid id PK
         uuid challengeId FK
@@ -188,7 +188,7 @@ erDiagram
         boolean isHidden
         int order
     }
-    
+
     Submission {
         uuid id PK
         uuid userId FK
@@ -199,7 +199,7 @@ erDiagram
         int executionTime
         timestamp submittedAt
     }
-    
+
     Achievement ||--o{ UserAchievement : awarded
     Achievement {
         uuid id PK
@@ -210,14 +210,14 @@ erDiagram
         enum category
         json criteria
     }
-    
+
     UserAchievement {
         uuid id PK
         uuid userId FK
         uuid achievementId FK
         timestamp earnedAt
     }
-    
+
     Progress {
         uuid id PK
         uuid userId FK
@@ -393,9 +393,7 @@ POST   /auth/send-verification-email  - Resend verification email
 {
   "challengeSlug": "click-the-button",
   "code": "await page.click('#submit-btn');",
-  "testResults": [
-    { "passed": true }
-  ],
+  "testResults": [{ "passed": true }],
   "executionTime": 150
 }
 ```
@@ -415,9 +413,7 @@ POST   /auth/send-verification-email  - Resend verification email
     },
     "isFirstCompletion": true,
     "levelUp": null,
-    "newAchievements": [
-      { "id": "...", "name": "First Steps", "icon": "🎯" }
-    ]
+    "newAchievements": [{ "id": "...", "name": "First Steps", "icon": "🎯" }]
   }
 }
 ```
@@ -465,7 +461,7 @@ import { db } from './db';
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
-    provider: 'pg'
+    provider: 'pg',
   }),
   emailAndPassword: {
     enabled: true,
@@ -517,11 +513,11 @@ export type Session = typeof auth.$Infer.Session;
 // app/server/playwright-shim.ts
 export class MockedPlaywrightPage {
   private targetDocument: Document;
-  
+
   constructor(iframeDocument: Document) {
     this.targetDocument = iframeDocument;
   }
-  
+
   async click(selector: string): Promise<void> {
     await this.delay(50); // Simulate async
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
@@ -533,35 +529,49 @@ export class MockedPlaywrightPage {
     }
     element.click();
   }
-  
+
   async fill(selector: string, value: string): Promise<void> {
     await this.delay(50);
-    const element = this.targetDocument.querySelector(selector) as HTMLInputElement;
+    const element = this.targetDocument.querySelector(
+      selector,
+    ) as HTMLInputElement;
     if (!element) {
       throw new Error(`Element not found: ${selector}`);
     }
     element.value = value;
     element.dispatchEvent(new Event('input', { bubbles: true }));
   }
-  
-  async getByRole(role: string, options?: { name?: string }): Promise<HTMLElement | null> {
+
+  async getByRole(
+    role: string,
+    options?: { name?: string },
+  ): Promise<HTMLElement | null> {
     await this.delay(20);
-    const elements = Array.from(this.targetDocument.querySelectorAll(`[role="${role}"]`));
+    const elements = Array.from(
+      this.targetDocument.querySelectorAll(`[role="${role}"]`),
+    );
     if (options?.name) {
-      return elements.find(el => el.textContent?.includes(options.name)) as HTMLElement || null;
+      return (
+        (elements.find((el) =>
+          el.textContent?.includes(options.name),
+        ) as HTMLElement) || null
+      );
     }
-    return elements[0] as HTMLElement || null;
+    return (elements[0] as HTMLElement) || null;
   }
-  
+
   async textContent(selector: string): Promise<string | null> {
     const element = this.targetDocument.querySelector(selector);
     return element?.textContent || null;
   }
-  
-  async waitForSelector(selector: string, options?: { timeout?: number }): Promise<void> {
+
+  async waitForSelector(
+    selector: string,
+    options?: { timeout?: number },
+  ): Promise<void> {
     const timeout = options?.timeout || 5000;
     const startTime = Date.now();
-    
+
     while (Date.now() - startTime < timeout) {
       if (this.targetDocument.querySelector(selector)) {
         return;
@@ -570,7 +580,7 @@ export class MockedPlaywrightPage {
     }
     throw new Error(`Timeout waiting for selector: ${selector}`);
   }
-  
+
   locator(selector: string) {
     return {
       click: () => this.click(selector),
@@ -578,37 +588,46 @@ export class MockedPlaywrightPage {
       textContent: () => this.textContent(selector),
     };
   }
-  
+
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
 // Frontend usage
-export function executePlaywrightCode(code: string, htmlContent: string): Promise<ExecutionResult> {
+export function executePlaywrightCode(
+  code: string,
+  htmlContent: string,
+): Promise<ExecutionResult> {
   return new Promise((resolve, reject) => {
     // Create isolated iframe
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     document.body.appendChild(iframe);
-    
+
     try {
       // Inject HTML into iframe
       iframe.contentDocument!.body.innerHTML = htmlContent;
-      
+
       // Create mocked page object
       const page = new MockedPlaywrightPage(iframe.contentDocument!);
-      
+
       // Execute user code with mocked page
-      const userFunction = new Function('page', `
+      const userFunction = new Function(
+        'page',
+        `
         return (async () => {
           ${code}
         })();
-      `);
-      
+      `,
+      );
+
       userFunction(page)
         .then(() => {
-          resolve({ status: 'PASSED', output: 'All steps completed successfully' });
+          resolve({
+            status: 'PASSED',
+            output: 'All steps completed successfully',
+          });
         })
         .catch((error: Error) => {
           resolve({ status: 'FAILED', output: error.message });
@@ -653,10 +672,10 @@ const text = await page.textContent('.success-message');
 
 ```typescript
 class GamificationEngine {
-  awardXP(userId: string, xp: number): Promise<LevelUp?>
-  checkAchievements(userId: string, event: GameEvent): Promise<Achievement[]>
-  updateLeaderboard(userId: string): Promise<void>
-  calculateLevel(totalXp: number): number
+  awardXP(userId: string, xp: number): Promise<LevelUp?>;
+  checkAchievements(userId: string, event: GameEvent): Promise<Achievement[]>;
+  updateLeaderboard(userId: string): Promise<void>;
+  calculateLevel(totalXp: number): number;
 }
 ```
 
@@ -743,19 +762,19 @@ frontend/
 
 backend/
 ├── src/
-│   ├── db/
-│   │   ├── schema.ts         # Drizzle schema
-│   │   ├── index.ts          # DB client
-│   │   └── migrations/       # SQL migrations
-│   ├── lib/
-│   │   └── auth.ts           # BetterAuth server config
-│   ├── services/
-│   ├── routes/
-│   ├── middleware/
-│   └── server.ts
-└── drizzle.config.ts         # Drizzle Kit config
+│ ├── db/
+│ │ ├── schema.ts # Drizzle schema
+│ │ ├── index.ts # DB client
+│ │ └── migrations/ # SQL migrations
+│ ├── lib/
+│ │ └── auth.ts # BetterAuth server config
+│ ├── services/
+│ ├── routes/
+│ ├── middleware/
+│ └── server.ts
+└── drizzle.config.ts # Drizzle Kit config
 
-```
+````
 
 ### 6.2 Key Frontend Components
 
@@ -771,7 +790,7 @@ interface CodeEditorProps {
 // Monaco Editor integration
 // Keyboard shortcuts (Cmd+Enter to run)
 // Auto-save to localStorage
-```
+````
 
 #### ChallengeView Component
 
@@ -869,7 +888,11 @@ interface ChallengeStore {
 const registerSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).max(100),
-  username: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_]+$/)
+  username: z
+    .string()
+    .min(3)
+    .max(20)
+    .regex(/^[a-zA-Z0-9_]+$/),
 });
 ```
 
@@ -887,7 +910,7 @@ Other endpoints: 100 requests/min
 const corsOptions = {
   origin: process.env.FRONTEND_URL,
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
 };
 ```
 
@@ -909,11 +932,11 @@ services:
       POSTGRES_PASSWORD: dev_password
     volumes:
       - postgres_data:/var/lib/postgresql/data
-  
+
   app:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - postgres
     environment:
@@ -954,7 +977,7 @@ jobs:
       - Checkout code
       - Run backend tests
       - Run frontend tests
-  
+
   deploy:
     needs: test
     runs-on: ubuntu-latest
@@ -1235,15 +1258,15 @@ test: Add playground security tests
 
 ## 17. Decision Log
 
-| Decision | Options Considered | Choice | Rationale |
-|----------|-------------------|--------|-----------|
+| Decision           | Options Considered                  | Choice         | Rationale                                  |
+| ------------------ | ----------------------------------- | -------------- | ------------------------------------------ |
 | Frontend Framework | React+Vite, TanStack Start, Next.js | TanStack Start | Type-safe routing, SSR built-in, better DX |
-| Backend Framework | Express, Fastify, NestJS | Express | Simple, flexible, well-known |
-| Database | PostgreSQL, MySQL, MongoDB | PostgreSQL | ACID, powerful queries |
-| ORM | Prisma, Drizzle, TypeORM | Drizzle | Lightweight, SQL-first, type-safe |
-| Authentication | Passport+JWT, BetterAuth, Lucia | BetterAuth | OAuth built-in, framework-agnostic |
-| Code Editor | Monaco, CodeMirror, Ace | Monaco | VSCode quality |
-| State Management | Redux, Zustand, Jotai | Zustand | Simple, minimal boilerplate |
+| Backend Framework  | Express, Fastify, NestJS            | Express        | Simple, flexible, well-known               |
+| Database           | PostgreSQL, MySQL, MongoDB          | PostgreSQL     | ACID, powerful queries                     |
+| ORM                | Prisma, Drizzle, TypeORM            | Drizzle        | Lightweight, SQL-first, type-safe          |
+| Authentication     | Passport+JWT, BetterAuth, Lucia     | BetterAuth     | OAuth built-in, framework-agnostic         |
+| Code Editor        | Monaco, CodeMirror, Ace             | Monaco         | VSCode quality                             |
+| State Management   | Redux, Zustand, Jotai               | Zustand        | Simple, minimal boilerplate                |
 
 ---
 
@@ -1267,13 +1290,17 @@ If starting over or scaling:
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   const token = req.headers.authorization?.split(' ')[1];
-  
+
   if (!token) {
     return res.status(401).json({ error: 'No token provided' });
   }
-  
+
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!);
     req.user = decoded;
@@ -1312,7 +1339,7 @@ api.interceptors.response.use(
       window.location.href = '/login';
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

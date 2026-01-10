@@ -114,12 +114,12 @@ Create a unique learning ecosystem where QA professionals can:
 
 The platform includes **96 challenges** organized into 4 progressive tiers:
 
-| Tier | Count | Focus Areas | XP Range |
-|------|-------|-------------|----------|
-| Basic | 23 | CSS Selectors, XPath, Comparison | 10-50 |
-| Beginner | 23 | JavaScript Fundamentals, DOM, Async | 15-55 |
-| Intermediate | 29 | Playwright Actions, Locators, Assertions, Waits | 40-85 |
-| Expert | 21 | Page Object Model, Data-Driven, Advanced Patterns | 75-120 |
+| Tier         | Count | Focus Areas                                       | XP Range |
+| ------------ | ----- | ------------------------------------------------- | -------- |
+| Basic        | 23    | CSS Selectors, XPath, Comparison                  | 10-50    |
+| Beginner     | 23    | JavaScript Fundamentals, DOM, Async               | 15-55    |
+| Intermediate | 29    | Playwright Actions, Locators, Assertions, Waits   | 40-85    |
+| Expert       | 21    | Page Object Model, Data-Driven, Advanced Patterns | 75-120   |
 
 ### 3.3 Gamification System
 
@@ -179,22 +179,22 @@ Users can report bugs directly from the platform:
 ### 4.1 First-Time Visitor Flow
 
 ```
-Landing Page → Explore Tutorials/Challenges → Sign Up → 
+Landing Page → Explore Tutorials/Challenges → Sign Up →
 Complete Profile → Tutorial/Challenge → Earn First XP → Dashboard
 ```
 
 ### 4.2 Learning Flow (Tutorials)
 
 ```
-Browse Tutorials → Select Category → Choose Tutorial → 
+Browse Tutorials → Select Category → Choose Tutorial →
 Read & Learn → Try Related Challenge → Bookmark/Share
 ```
 
 ### 4.3 Challenge Solving Flow
 
 ```
-Browse Challenges → Select Challenge → Read Description → 
-Write Code in Editor → Run Tests → View Results → 
+Browse Challenges → Select Challenge → Read Description →
+Write Code in Editor → Run Tests → View Results →
 (If Passed) Get XP + Achievement → Next Challenge
 (If Failed) Retry → Improve Code → View Solution (optional)
 ```
@@ -202,8 +202,8 @@ Write Code in Editor → Run Tests → View Results →
 ### 4.4 Content Creation Flow (Admin)
 
 ```
-Admin Dashboard → Create New Tutorial/Challenge → 
-Write Content/Test Cases → Preview → Publish → 
+Admin Dashboard → Create New Tutorial/Challenge →
+Write Content/Test Cases → Preview → Publish →
 Monitor Engagement
 ```
 
@@ -335,7 +335,6 @@ Monitor Engagement
   - User discussions/comments
   - Share solutions with community
   - Upvote/downvote solutions
-  
 - **Advanced Playground:**
   - Selenium challenges
   - Cypress challenges
@@ -376,13 +375,13 @@ Monitor Engagement
 
 ## 11. Risks & Mitigation
 
-| Risk | Impact | Probability | Mitigation |
-|------|--------|-------------|------------|
-| Code execution security vulnerabilities | Low | Low | Client-side iframe execution (browser's built-in sandbox) |
-| Low user adoption | High | Medium | Focus on marketing, SEO, community building |
-| Infrastructure costs | Low | Low | Client-side execution reduces server costs |
-| Content creation bottleneck | Medium | Medium | Build content pipeline, guest contributors |
-| Cheating/gaming the system | Low | Medium | Implement anti-cheat measures, rate limiting |
+| Risk                                    | Impact | Probability | Mitigation                                                |
+| --------------------------------------- | ------ | ----------- | --------------------------------------------------------- |
+| Code execution security vulnerabilities | Low    | Low         | Client-side iframe execution (browser's built-in sandbox) |
+| Low user adoption                       | High   | Medium      | Focus on marketing, SEO, community building               |
+| Infrastructure costs                    | Low    | Low         | Client-side execution reduces server costs                |
+| Content creation bottleneck             | Medium | Medium      | Build content pipeline, guest contributors                |
+| Cheating/gaming the system              | Low    | Medium      | Implement anti-cheat measures, rate limiting              |
 
 ---
 
