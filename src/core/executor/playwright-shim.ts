@@ -7,7 +7,7 @@
  * Based on: docs/TDD.md Section 5.2
  */
 
-import { logger } from './logger';
+import { logger } from '@/lib/logger';
 
 export interface FilePayload {
     name: string;
@@ -1021,9 +1021,9 @@ export class MockedPlaywrightPage {
             // Sort by depth (deepest first)
             matchedElements.sort((a, b) => {
                 let depthA = 0, pA = a;
-                while(pA.parentElement && pA !== root) { depthA++; pA = pA.parentElement; }
+                while (pA.parentElement && pA !== root) { depthA++; pA = pA.parentElement; }
                 let depthB = 0, pB = b;
-                while(pB.parentElement && pB !== root) { depthB++; pB = pB.parentElement; }
+                while (pB.parentElement && pB !== root) { depthB++; pB = pB.parentElement; }
                 return depthB - depthA;
             });
 

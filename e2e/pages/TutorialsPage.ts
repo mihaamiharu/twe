@@ -11,12 +11,12 @@ export class TutorialsPage extends BasePage {
         this.completeButton = page.getByRole('button', { name: /Complete|Selesai/i });
     }
 
-    async gotoList() {
-        await this.goto('/en/tutorials');
+    async gotoList(locale: string = 'en') {
+        await this.goto(`/${locale}/tutorials`);
     }
 
-    async gotoTutorial(slug: string) {
-        await this.goto(`/en/tutorials/${slug}`);
+    async gotoTutorial(slug: string, locale: string = 'en') {
+        await this.goto(`/${locale}/tutorials/${slug}`);
     }
 
     async verifyTutorialContent() {
