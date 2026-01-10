@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -17,6 +18,7 @@ interface LeaderboardEntry {
   name: string | null;
   image: string | null;
   xp: number;
+  monthlyXp?: number; // Added monthly XP
   level: number;
   createdAt: Date | null;
   challengesCompleted: number;
@@ -40,15 +42,18 @@ function LeaderboardPage() {
   const session = auth;
   const isAuthenticated = !!session?.user;
 
+  // State for active tab period using state instead of just Tabs defaultValue
+  const [period, setPeriod] = useState<'all' | 'monthly'>('all');
+
   const {
     data: leaderboardData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['leaderboard'],
+    queryKey: ['leaderboard', period], // Add period to query key
     queryFn: async () => {
       const result = await getLeaderboard({
-        data: { page: 1, limit: 50, period: 'all', locale },
+        data: { page: 1, limit: 50, period, locale },
       });
       if (!result.success) throw new Error(result.error);
       return result;
@@ -60,6 +65,9 @@ function LeaderboardPage() {
   const TopThree = users.slice(0, 3);
   const RestUsers = users.slice(3);
 
+  // Animation delay utility
+  const getDelay = (index: number) => ({ animationDelay: `${index * 50}ms` });
+
   return (
     <div className="min-h-screen p-4 md:p-8 relative overflow-hidden bg-background">
       {/* Background decoration - softer gradient */}
@@ -67,27 +75,31 @@ function LeaderboardPage() {
 
       <div className="max-w-4xl mx-auto space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-black tracking-tight flex items-center justify-center gap-3">
+          <h1 className="text-4xl font-black tracking-tight flex items-center justify-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
             <span className="text-primary">~</span>
             {t('leaderboard:header.title')}
           </h1>
-          <p className="text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg animate-in fade-in slide-in-from-top-4 duration-700 delay-100">
             {t('leaderboard:header.subtitle')}
           </p>
         </div>
 
-        <Tabs defaultValue="all-time" className="space-y-8">
+        <Tabs
+          defaultValue="all-time"
+          className="space-y-8"
+          onValueChange={(val) => setPeriod(val === 'monthly' ? 'monthly' : 'all')}
+        >
           <div className="flex justify-center">
-            <TabsList className="bg-muted/30 p-1 h-12 rounded-2xl">
+            <TabsList className="bg-muted/30 p-1 h-12 rounded-2xl animate-in fade-in zoom-in-50 duration-500 delay-200">
               <TabsTrigger
                 value="all-time"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 {t('leaderboard:tabs.allTime')}
               </TabsTrigger>
               <TabsTrigger
                 value="monthly"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm"
+                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
               >
                 {t('leaderboard:tabs.thisMonth')}
               </TabsTrigger>
@@ -95,8 +107,8 @@ function LeaderboardPage() {
           </div>
 
           <TabsContent
-            value="all-time"
-            className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500"
+            value={period === 'all' ? 'all-time' : 'monthly'}
+            className="space-y-8"
           >
             {isLoading ? (
               <LeaderboardSkeleton />
@@ -106,7 +118,7 @@ function LeaderboardPage() {
               <>
                 {/* Top 3 Podium - Compact & Floating */}
                 {TopThree.length > 0 && (
-                  <div className="relative pt-10 pb-4">
+                  <div className="relative pt-10 pb-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
                     {/* Glow effect for rank 1 */}
                     <div className="absolute left-1/2 top-4 -translate-x-1/2 w-64 h-64 bg-accent/20 blur-[80px] rounded-full -z-10" />
 
@@ -117,21 +129,25 @@ function LeaderboardPage() {
                       )}
                     >
                       {TopThree.length === 1 ? (
-                        <PodiumCard
-                          user={TopThree[0]}
-                          rank={1}
-                          isCenter
-                          isAuthenticated={isAuthenticated}
-                        />
+                        <div className="animate-in fade-in zoom-in-75 duration-500 delay-300">
+                          <PodiumCard
+                            user={TopThree[0]}
+                            rank={1}
+                            isCenter
+                            isAuthenticated={isAuthenticated}
+                            displayXp={period === 'monthly' ? TopThree[0].monthlyXp : TopThree[0].xp}
+                          />
+                        </div>
                       ) : (
                         <>
                           {/* Rank 2 (Left) */}
-                          <div className="order-2 md:order-1 w-full md:w-auto flex justify-center">
+                          <div className="order-2 md:order-1 w-full md:w-auto flex justify-center animate-in fade-in slide-in-from-right-8 duration-500 delay-400">
                             {TopThree[1] ? (
                               <PodiumCard
                                 user={TopThree[1]}
                                 rank={2}
                                 isAuthenticated={isAuthenticated}
+                                displayXp={period === 'monthly' ? TopThree[1].monthlyXp : TopThree[1].xp}
                               />
                             ) : (
                               <div className="w-[200px]" />
@@ -139,22 +155,24 @@ function LeaderboardPage() {
                           </div>
 
                           {/* Rank 1 (Center) */}
-                          <div className="order-1 md:order-2 w-full md:w-auto flex justify-center -mt-8 mb-4 md:mb-8 z-10">
+                          <div className="order-1 md:order-2 w-full md:w-auto flex justify-center -mt-8 mb-4 md:mb-8 z-10 animate-in fade-in zoom-in-75 duration-500 delay-300">
                             <PodiumCard
                               user={TopThree[0]}
                               rank={1}
                               isCenter
                               isAuthenticated={isAuthenticated}
+                              displayXp={period === 'monthly' ? TopThree[0].monthlyXp : TopThree[0].xp}
                             />
                           </div>
 
                           {/* Rank 3 (Right) */}
-                          <div className="order-3 w-full md:w-auto flex justify-center">
+                          <div className="order-3 w-full md:w-auto flex justify-center animate-in fade-in slide-in-from-left-8 duration-500 delay-500">
                             {TopThree[2] ? (
                               <PodiumCard
                                 user={TopThree[2]}
                                 rank={3}
                                 isAuthenticated={isAuthenticated}
+                                displayXp={period === 'monthly' ? TopThree[2].monthlyXp : TopThree[2].xp}
                               />
                             ) : (
                               <div className="hidden md:block w-[200px]" />
@@ -175,21 +193,22 @@ function LeaderboardPage() {
                     <div
                       key={user.id}
                       data-testid="leaderboard-item"
+                      style={getDelay(index)}
                       className={cn(
-                        'group flex items-center gap-4 p-3 md:p-4 rounded-2xl bg-card border border-border/40 hover:border-border transition-all hover:translate-x-1',
+                        'group flex items-center gap-4 p-3 md:p-4 rounded-2xl bg-card border border-border/40 hover:border-border transition-all hover:translate-x-1 hover:shadow-md animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards',
                         !isAuthenticated && 'opacity-60 blur-[1px]'
                       )}
                     >
                       {/* Rank */}
                       <div className="flex-none w-8 md:w-12 flex justify-center">
-                        <div className="h-8 w-8 rounded-full bg-accent/10 text-accent font-black flex items-center justify-center text-sm">
+                        <div className="h-8 w-8 rounded-full bg-accent/10 text-accent font-black flex items-center justify-center text-sm transition-transform group-hover:scale-110">
                           {index + 4}
                         </div>
                       </div>
 
                       {/* Avatar */}
                       <div className="flex-none">
-                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-muted overflow-hidden">
+                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-muted overflow-hidden transition-transform group-hover:rotate-3">
                           {isAuthenticated ? (
                             user.image ? (
                               <img
@@ -233,26 +252,26 @@ function LeaderboardPage() {
                       {/* XP */}
                       <div className="flex-none text-right">
                         <div className="font-black text-primary">
-                          {user.xp.toLocaleString()} <span className="text-xs text-muted-foreground font-medium">XP</span>
+                          {((period === 'monthly' ? user.monthlyXp : user.xp) || 0).toLocaleString()} <span className="text-xs text-muted-foreground font-medium">XP</span>
                         </div>
                       </div>
                     </div>
                   ))}
 
                   {RestUsers.length === 0 && (
-                    <div className="text-center p-8 text-muted-foreground">
+                    <div className="text-center p-8 text-muted-foreground animate-in fade-in zoom-in-95 duration-500">
                       {t('leaderboard:table.emptyState')}
                     </div>
                   )}
 
                   {!isAuthenticated && (
-                    <div className="mt-8 text-center p-8 bg-card/50 backdrop-blur-sm rounded-3xl border border-dashed border-border relative overflow-hidden">
+                    <div className="mt-8 text-center p-8 bg-card/50 backdrop-blur-sm rounded-3xl border border-dashed border-border relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
                       <div className="relative z-10 max-w-md mx-auto space-y-4">
                         <Shield className="h-12 w-12 text-primary mx-auto opacity-50" />
                         <h3 className="text-xl font-bold">{t('leaderboard:gating.title')}</h3>
                         <p className="text-muted-foreground">{t('leaderboard:gating.description')}</p>
                         <Link to="/$locale/login" params={{ locale }} search={{ redirect: '/leaderboard' }}>
-                          <Button size="lg" className="rounded-xl px-8 font-bold">
+                          <Button size="lg" className="rounded-xl px-8 font-bold hover:scale-105 transition-transform">
                             {t('leaderboard:gating.button')}
                           </Button>
                         </Link>
@@ -262,13 +281,6 @@ function LeaderboardPage() {
                 </div>
               </>
             )}
-          </TabsContent>
-          <TabsContent value="monthly" className="text-center py-20">
-            <div className="opacity-50">
-              <Calendar className="h-20 w-20 mx-auto mb-6 text-muted-foreground" />
-              <h3 className="text-2xl font-black mb-2">{t('leaderboard:monthly.comingSoon')}</h3>
-              <p className="text-lg text-muted-foreground">{t('leaderboard:monthly.description')}</p>
-            </div>
           </TabsContent>
         </Tabs>
       </div>
@@ -281,11 +293,13 @@ function PodiumCard({
   rank,
   isCenter = false,
   isAuthenticated = false,
+  displayXp,
 }: {
   user: LeaderboardEntry;
   rank: number;
   isCenter?: boolean;
   isAuthenticated?: boolean;
+  displayXp?: number;
 }) {
   const { t } = useTranslation(['leaderboard', 'common']);
 
@@ -298,6 +312,7 @@ function PodiumCard({
     ? user.name || t('leaderboard:table.anonymous')
     : t('leaderboard:table.hiddenUser');
   const displayAvatar = isAuthenticated ? user.image : null;
+  const xpToShow = displayXp !== undefined ? displayXp : user.xp;
 
   return (
     <div
@@ -341,7 +356,7 @@ function PodiumCard({
           {displayName}
         </div>
         <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-          <span className={cn("font-bold", accentColor)}>{user.xp.toLocaleString()}</span> XP
+          <span className={cn("font-bold", accentColor)}>{xpToShow.toLocaleString()}</span> XP
         </div>
         {/* Badges */}
         <div className="flex -space-x-1 mt-1">

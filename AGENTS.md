@@ -17,6 +17,9 @@ This file contains guidelines for agentic coding assistants working in this repo
 - `npm run test:unit` - Run unit tests only
 - `npm run test:integration` - Run integration tests (requires test DB)
 - `npm run test:ci` - Run all tests in CI environment
+- `npm run test:e2e` - Run E2E tests (Playwright, auto-starts postgres)
+- `npm run test:e2e:stop` - Stop postgres container
+- `npm run test:e2e:report` - Generate and open Allure report
 
 ### Linting & Formatting
 
@@ -29,132 +32,123 @@ This file contains guidelines for agentic coding assistants working in this repo
 - `npm run db:generate` - Generate Drizzle migrations
 - `npm run db:migrate` - Run database migrations
 - `npm run db:push` - Push schema changes to database
+- `npm run db:seed` - Seed database with challenges from JSON files
 - `npm run db:studio` - Open Drizzle Studio
 
-## Code Style Guidelines
+## TanStack Start Project Structure & Conventions
 
-### Imports
+### File-Based Routing (TanStack Router)
 
-- External dependencies first (React, TanStack, etc.)
-- Internal imports with `@/` alias next
-- Type imports can use `import type { ... }` for clarity
-- Keep imports organized and grouped
+TanStack Start uses file-based routing:
 
-Example:
+- **Routes Directory**: `src/routes/` - File paths become routes
+- **Pattern**: Files ending in `.tsx` or `.ts` are auto-registered as routes
+- **Authenticated Routes**: Protected routes go in `src/routes/$locale/_authenticated.tsx`
+- **Admin Routes**: Admin routes go in `src/routes/admin/`
+- **API Routes**: API routes go in `src/routes/api/auth/` and `src/routes/api/auth/`
+
+**Route Patterns**:
 
 ```ts
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { User } from '@/db/schema';
+// File-based route
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/')({
+  component: () => <div>Home</div>,
+});
 ```
 
-### Formatting (Prettier)
+### Server Functions (TanStack Start API)
 
-- Single quotes: `'string'`
-- Semicolons: always
-- Trailing commas: all
-- Print width: 80 characters
-- Tab width: 2 spaces
-- Arrow parens: always
-
-### TypeScript
-
-- Strict mode enabled
-- Use `export type` for type-only exports when possible
-- Explicit types for function parameters and return values
-- Use `interface` for object shapes, `type` for unions/primitives
-- Avoid `any` - use `unknown` when type cannot be determined
-
-### Naming Conventions
-
-- PascalCase: Components, Types, Interfaces (`UserProfile`, `AuthSession`)
-- camelCase: Functions, variables, objects (`getUserById`, `isLoading`)
-- SCREAMING_SNAKE_CASE: Constants, enum values (`API_URL`, `EASY`)
-- kebab-case: File names, component folders (`auth-form.tsx`, `user-profile/`)
-
-### Error Handling
-
-Use try/catch with the structured logger:
+**Create API Endpoints**:
 
 ```ts
-import { logger } from '@/lib/logger';
+import { createServerFn } from '@tanstack/react-start/server';
 
-try {
-  const result = await someOperation();
-  return { success: true, data: result };
-} catch (error) {
-  logger.error('Operation failed', error);
-  return {
-    success: false,
-    error: error instanceof Error ? error.message : 'Unknown error',
-  };
-}
-```
-
-Return pattern for server functions:
-
-```ts
-type Result<T> = { success: true; data: T } | { success: false; error: string };
-```
-
-### Server Functions (TanStack Start)
-
-Use `createServerFn` for all server-side operations:
-
-```ts
-export const myServerFn = createServerFn({ method: 'GET' })
-  .validator((input: { id: string }) => input)
+export const myApiFn = createServerFn({ method: 'POST' })
+  .validator((input: { email: string }) => input)
   .handler(async ({ data }) => {
-    const { id } = data;
-    // Server logic here
     return { success: true, data };
   });
 ```
 
+### Content Management (Filesystem-based)
+
+- **Challenges**: `content/challenges/` - JSON files for challenge data
+- **Tutorials**: `tutorials/` - Markdown files for tutorial content
+- **Loading**: `src/server/content.server.ts` - Loads content from JSON files
+
 ### Database (Drizzle ORM)
 
-- Import from `@/db` for database instance and schema
-- Use `eq()`, `and()`, `or()` from `drizzle-orm` for conditions
-- Use `sql` template literals for raw queries when needed
-- Relations defined in `src/db/schema.ts` with `relations()`
+**Imports**: Use `@/db` alias for database operations:
 
 ```ts
 import { db } from '@/db';
 import { users, challenges } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+```
 
+**Queries**: Use Drizzle query patterns:
+
+```ts
 const user = await db.query.users.findFirst({
   where: eq(users.id, userId),
   with: { challenges: true },
 });
 ```
 
-### React Components
-
-- Use `cn()` from `@/lib/utils` for className merging
-- Follow shadcn/ui patterns for component structure
-- Use `React.ComponentProps` for forwarding props
+**Relations**: Defined in `src/db/schema.ts`:
 
 ```ts
-import { cn } from '@/lib/utils';
+import { relations } from '@/db/schema';
+```
 
+### State Management
+
+**Authentication** (Better-Auth):
+
+```ts
+import { auth } from '@/lib/auth.server';
+const session = await auth.api.getSession({ headers });
+```
+
+**Client Data Fetching** (TanStack Query):
+
+```ts
+import { useQuery } from '@tanstack/react-query';
+
+function MyComponent() {
+  const { data } = useQuery({
+    queryKey: ['my-data'],
+    queryFn: () => fetch('/api/data'),
+  });
+  const data = data.data;
+  return data;
+}
+```
+
+**Return Pattern**:
+
+```ts
+type Result<T> = { success: true; data: T } | { success: false; error: string };
+```
+
+### React Components
+
+- **Use `cn()` from `@/lib/utils` for className merging**
+- **Follow shadcn/ui patterns** for component structure
+- **Use `React.ComponentProps` for forwarding props**
+
+```ts
 function MyComponent({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div className={cn('base-classes', className)} {...props}>
-      {/* content */}
-    </div>
-  );
+  return <div className={cn('base-classes', className)} {...props}>...</div>;
 }
 ```
 
 ### Testing
 
-- Use Bun test framework
-- Import from 'bun/test': `describe`, `it`, `expect`
-- For unit tests, use `--preload ./src/tests/bun-preload.ts`
-- Integration tests should use `src/tests/integration/setup.ts` for DB setup
+- **Bun test framework**: Import from `'bun/test'`: `describe`, `it`, `expect`
+- **Unit tests**: Use `--preload ./src/tests/bun-preload.ts`
+- **Integration tests**: Use `src/tests/integration/setup.ts` for DB setup
 
 ```ts
 import { describe, it, expect } from 'bun:test';
@@ -167,9 +161,9 @@ describe('myFunction', () => {
 });
 ```
 
-### Validation
+### Validation (Zod)
 
-Use Zod for runtime validation:
+**Runtime validation**:
 
 ```ts
 import { z } from 'zod';
@@ -195,11 +189,11 @@ logger.warn('Warning message');
 logger.error('Error message', error);
 ```
 
-### Internationalization
+### Internationalization (i18next)
 
-- Use `useTranslation` from 'react-i18next'
-- Translation keys in format: `'namespace:key'`
-- Namespace files in `src/locales/`
+- **Use `useTranslation`** from 'react-i18next'
+- **Translation keys**: `'namespace:key'`
+- **Namespace files**: `src/locales/`
 
 ```ts
 import { useTranslation } from 'react-i18next';
@@ -212,10 +206,50 @@ const text = t('navigation.login');
 
 - `src/components/` - React components, organized by feature
 - `src/lib/` - Utilities and shared logic
-- `src/server/` - Server functions (`.fn.ts` files)
+- `src/server/` - Server functions (`.fn.ts` files`)
 - `src/db/` - Database schema and connection
 - `src/routes/` - TanStack Router file-based routes
 - `src/tests/` - Unit and integration tests
 - `e2e/` - Playwright end-to-end tests
 - `content/` - Challenge content (JSON)
 - `tutorials/` - Tutorial markdown files
+
+## TanStack Start Technology Stack
+
+### Core Frameworks
+
+| Technology      | Purpose                                               |
+| --------------- | ----------------------------------------------------- |
+| TanStack Start  | Meta-framework (Vite + React Router + Query + Server) |
+| TanStack Router | File-based routing (v1+)                              |
+| TanStack Query  | Client state management                               |
+| Drizzle ORM     | Type-safe SQL                                         |
+| Better-Auth     | Authentication                                        |
+| Playwright      | E2E testing                                           |
+| Drizzle Studio  | Database GUI                                          |
+
+### Integration Points
+
+**TanStack Router → Routes**: Auto-generated routes from `src/routes/`
+**Better-Auth → Server Functions**: `createServerFn()` for API routes
+**TanStack Query → React Hooks**: `useQuery()` for component data
+**Drizzle ORM → Database**: `@/db` for database access
+
+## Development Workflow
+
+1. **Start Development**:
+
+   ```bash
+   npm run dev
+   ```
+
+2. **Run Tests**:
+
+   ```bash
+   npm run test:e2e    # Runs E2E tests with Allure report
+   ```
+
+3. **Generate Report**:
+   ```bash
+   npm run test:e2e:report    # Opens Allure HTML report
+   ```
