@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Award, BookOpen, Code, Settings, Zap, AlertCircle } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
-import { getUserSettings } from '@/lib/user.fn';
+import { getUserSettings } from '@/server/user.fn';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { AchievementBadge } from '@/components/gamification/AchievementBadge';
 import { Achievement } from '@/lib/achievements';

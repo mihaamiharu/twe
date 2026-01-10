@@ -10,7 +10,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { getLeaderboard } from '@/lib/leaderboard.fn';
+import { getLeaderboard } from '@/server/leaderboard.fn';
 
 interface LeaderboardEntry {
     id: string;

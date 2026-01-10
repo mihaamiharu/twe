@@ -19,7 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { cn } from '@/lib/utils';
-import { executePlaywrightCode } from '@/lib/challenge-executor';
+import { executePlaywrightCode } from '@/core/executor';
 import { Play, Send, RotateCcw, Zap, Loader2, Target, BookOpen, AlertCircle, GripVertical } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { storage } from '@/lib/storage-adapter';
@@ -231,6 +231,7 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
             const result = await executePlaywrightCode(codeToRun, challenge.htmlContent || '<div></div>', {
                 timeout: 10000,
                 existingIframe: previewIframeRef.current || undefined,
+                strictMode: challenge.type === 'PLAYWRIGHT',
             });
 
 
@@ -553,8 +554,11 @@ export function ChallengePlayground({ challenge, onSubmit, userId, className }: 
                 </Tabs>
             </Panel>
 
-            <PanelResizeHandle className="w-1.5 bg-border/50 hover:bg-brand-teal transition-colors focus:outline-none focus:bg-brand-teal flex items-center justify-center group relative z-10">
-                <GripVertical className="h-4 w-4 text-muted-foreground group-hover:text-white transition-colors" />
+            <PanelResizeHandle className="w-3 bg-transparent hover:bg-primary/5 transition-colors focus:outline-none flex items-center justify-center group relative z-10 -mx-1.5 cursor-col-resize">
+                <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[1px] bg-border group-hover:bg-primary/50 transition-colors" />
+                <div className="h-8 w-4 bg-background border border-border rounded-md flex items-center justify-center shadow-sm z-20 group-hover:border-primary group-hover:shadow-md transition-all scale-90 group-hover:scale-100">
+                    <GripVertical className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+                </div>
             </PanelResizeHandle>
 
             {/* Right Panel: Editor & Results */}

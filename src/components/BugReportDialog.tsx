@@ -41,7 +41,7 @@ import { cn } from '@/lib/utils';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
-import { createBugReport } from '@/lib/bug-reports.fn';
+import { createBugReport } from '@/server/bug-reports.fn';
 
 // Form validation schema
 const bugReportFormSchema = z.object({

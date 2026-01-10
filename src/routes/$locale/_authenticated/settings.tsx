@@ -9,7 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
-import { getUserSettings, updateUserProfile } from '@/lib/user.fn';
+import { getUserSettings, updateUserProfile } from '@/server/user.fn';
 
 export const Route = createFileRoute('/$locale/_authenticated/settings')({
     beforeLoad: ({ context, params }) => {

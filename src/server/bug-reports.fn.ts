@@ -22,7 +22,7 @@ export const createBugReport = createServerFn({ method: "POST" })
             const { db } = await import('@/db');
             const { bugReports } = await import('@/db/schema');
             const { logger } = await import('@/lib/logger');
-            const { sendBugReportNotification } = await import('@/lib/email.server');
+            const { sendBugReportNotification } = await import('@/server/email.server');
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             const headers = getRequestHeaders();

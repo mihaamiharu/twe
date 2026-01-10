@@ -16,7 +16,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
-import { getDashboardStats } from '@/lib/dashboard.fn';
+import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute('/$locale/')({ component: HomePage });

@@ -12,9 +12,11 @@ Welcome to the **TestingWithEkki** project documentation.
 
 - [**PRD.md**](./PRD.md): **Product Requirements Document**. The "What" and "Why" of the platform.
 - [**TDD.md**](./TDD.md): **Technical Design Document**. The "How," covering architecture, stack, and systems.
+- [**ARCHITECTURE.md**](./ARCHITECTURE.md): **Challenge Executor Architecture**. How user code is executed and validated.
 - [**ERD.md**](./ERD.md): **Entity Relationship Diagram**. Database schema and relationships.
 - [**app_flows.md**](./app_flows.md): Visual diagrams of user journeys and system flows.
 - [**API.md**](./API.md): API reference documentation.
+- [**github_issues.md**](./github_issues.md): Breakdown of tasks and issues.
 - [**github_issues.md**](./github_issues.md): Breakdown of tasks and issues.
 
 ## Architecture Decisions

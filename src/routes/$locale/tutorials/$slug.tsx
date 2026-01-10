@@ -1,7 +1,7 @@
 import { createFileRoute, useParams, useNavigate, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTutorial, completeTutorial } from '@/lib/tutorials.fn';
+import { getTutorial, completeTutorial } from '@/server/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
