@@ -3,7 +3,10 @@ import { TutorialsPage } from '../pages/TutorialsPage';
 
 test.describe('Tutorials', () => {
     let tutorialsPage: TutorialsPage;
-    test.beforeEach(async ({ page }) => {
+    test.beforeEach(async ({ page, context, request }) => {
+        const { loginViaApi } = await import('../utils/auth');
+        await loginViaApi(context, request, page);
+
         tutorialsPage = new TutorialsPage(page);
         await tutorialsPage.gotoList();
     });
@@ -25,27 +28,24 @@ test.describe('Tutorials', () => {
         await firstTutorial.click();
         await tutorialsPage.verifyTutorialContent();
 
-        // Force body height to ensure scroll logic works even if content is short
-        await page.evaluate(() => document.body.style.height = '5000px');
+        // 1. Force a huge body height to ensure we can scroll a lot
+        await page.evaluate(() => {
+            document.body.style.minHeight = '10000px';
+        });
 
-        // Simulate real scroll to trigger progress tracking
-        await page.mouse.wheel(0, 15000);
-        await page.waitForTimeout(500);
-        await page.mouse.wheel(0, 15000); // Scroll more to be sure
+        // 2. Perform multiple scrolls to ensure progress hits 100%
+        // We use a loop for robustness in headless mode
+        for (let i = 0; i < 10; i++) {
+            await page.mouse.wheel(0, 2000);
+            await page.waitForTimeout(200);
+        }
 
-        // Wait for scroll event to register and state to update
+        // 3. Scroll to the bottom where the button usually lives
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
         await page.waitForTimeout(1000);
 
-        // Need to be logged in for this to work. 
-        // If not logged in, it shows AuthGuard.
-        // For this basic test suite, we'll check if we can see the button first.
-        // TODO: Fix scroll progress tracking test in headless mode
-        /*
-        if (await tutorialsPage.completeButton.isVisible()) {
-            await tutorialsPage.completeTutorial();
-        } else {
-            console.log('Complete button not visible - likely not logged in. Skipping completion action.');
-        }
-        */
+        // 4. Verify and Click Complete
+        await expect(tutorialsPage.completeButton).toBeVisible({ timeout: 10000 });
+        await tutorialsPage.completeTutorial();
     });
 });
