@@ -1,11 +1,40 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { getAdminStats } from '@/server/admin.fn';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Users, FileCode, Trophy, AlertCircle, Activity, ArrowRight, Layout } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import {
+  Users,
+  FileCode,
+  Trophy,
+  AlertCircle,
+  Activity,
+  ArrowRight,
+  Layout,
+} from 'lucide-react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 
 interface PopularChallenge {
   id: string;
@@ -42,16 +71,23 @@ export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
   loader: ({ context }) => {
     const session = context.auth;
-    if (!session?.user || (session.user as { role?: string }).role !== 'ADMIN') {
+    if (
+      !session?.user ||
+      (session.user as { role?: string }).role !== 'ADMIN'
+    ) {
       throw redirect({
         to: '/',
       });
     }
-  }
+  },
 });
 
 function AdminDashboard() {
-  const { data: stats, isLoading, error } = useQuery({
+  const {
+    data: stats,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ['admin-stats'],
     queryFn: async () => {
       const res = await getAdminStats();
@@ -59,21 +95,31 @@ function AdminDashboard() {
         throw new Error(res.error || 'Failed to fetch stats');
       }
       return res.data;
-    }
+    },
   });
 
   if (isLoading) {
-    return <div className="p-8 flex justify-center"><Activity className="h-8 w-8 animate-spin text-primary" /></div>;
+    return (
+      <div className="p-8 flex justify-center">
+        <Activity className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
   }
 
   if (error || !stats) {
     return (
       <div className="p-8 text-center text-destructive">
         <AlertCircle className="h-12 w-12 mx-auto mb-4" />
-        <h2 className="text-xl font-bold">Access Denied or Error Loading Stats</h2>
-        <p className="mt-2 text-muted-foreground">Ensure you have admin privileges.</p>
+        <h2 className="text-xl font-bold">
+          Access Denied or Error Loading Stats
+        </h2>
+        <p className="mt-2 text-muted-foreground">
+          Ensure you have admin privileges.
+        </p>
         {/* Fallback link to home */}
-        <a href="/" className="text-primary hover:underline mt-4 block">Return Home</a>
+        <a href="/" className="text-primary hover:underline mt-4 block">
+          Return Home
+        </a>
       </div>
     );
   }
@@ -83,9 +129,14 @@ function AdminDashboard() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-          <p className="text-muted-foreground mt-1">Platform overview and analytics.</p>
+          <p className="text-muted-foreground mt-1">
+            Platform overview and analytics.
+          </p>
         </div>
-        <Badge variant="outline" className="px-3 py-1 border-primary/20 bg-primary/5 text-primary">
+        <Badge
+          variant="outline"
+          className="px-3 py-1 border-primary/20 bg-primary/5 text-primary"
+        >
           Admin Access
         </Badge>
       </div>
@@ -99,32 +150,44 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">+12% from last month</p>
+            <p className="text-xs text-muted-foreground">
+              +12% from last month
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Submissions
+            </CardTitle>
             <FileCode className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalSubmissions}</div>
-            <p className="text-xs text-muted-foreground">Across all challenges</p>
+            <p className="text-xs text-muted-foreground">
+              Across all challenges
+            </p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Challenges</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Active Challenges
+            </CardTitle>
             <Trophy className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.popularChallenges.length}+</div>
+            <div className="text-2xl font-bold">
+              {stats.popularChallenges.length}+
+            </div>
             <p className="text-xs text-muted-foreground">Live and published</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Platform Health</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Platform Health
+            </CardTitle>
             <Activity className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
@@ -140,20 +203,29 @@ function AdminDashboard() {
         <Card className="col-span-4">
           <CardHeader>
             <CardTitle>Submission Activity</CardTitle>
-            <p className="text-sm text-muted-foreground">Daily submissions over the last 30 days</p>
+            <p className="text-sm text-muted-foreground">
+              Daily submissions over the last 30 days
+            </p>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.submissionsByDate}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                    opacity={0.4}
+                  />
                   <XAxis
                     dataKey="date"
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={12}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(value: string) => value.split('-').slice(1).join('/')}
+                    tickFormatter={(value: string) =>
+                      value.split('-').slice(1).join('/')
+                    }
                   />
                   <YAxis
                     stroke="hsl(var(--muted-foreground))"
@@ -169,7 +241,7 @@ function AdminDashboard() {
                       backgroundColor: 'hsl(var(--popover))',
                       border: '1px solid hsl(var(--border))',
                       borderRadius: '6px',
-                      color: 'hsl(var(--popover-foreground))'
+                      color: 'hsl(var(--popover-foreground))',
                     }}
                     itemStyle={{ color: 'hsl(var(--primary))' }}
                   />
@@ -190,17 +262,31 @@ function AdminDashboard() {
         <Card className="col-span-3">
           <CardHeader>
             <CardTitle>Most Popular Challenges</CardTitle>
-            <p className="text-sm text-muted-foreground">Top 5 by completion count</p>
+            <p className="text-sm text-muted-foreground">
+              Top 5 by completion count
+            </p>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {stats.popularChallenges.map((challenge: PopularChallenge) => (
-                <div key={challenge.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                <div
+                  key={challenge.id}
+                  className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                >
                   <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">{challenge.title}</p>
+                    <p className="text-sm font-medium leading-none">
+                      {challenge.title}
+                    </p>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="text-[10px] h-4 px-1">{challenge.difficulty}</Badge>
-                      <span className="text-xs text-muted-foreground font-mono">{challenge.slug}</span>
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] h-4 px-1"
+                      >
+                        {challenge.difficulty}
+                      </Badge>
+                      <span className="text-xs text-muted-foreground font-mono">
+                        {challenge.slug}
+                      </span>
                     </div>
                   </div>
                   <div className="flex items-center gap-1 font-bold text-sm">
@@ -230,27 +316,42 @@ function AdminDashboard() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {stats.recentActivity.map((submission: RecentSubmission, i: number) => (
-                <TableRow key={i}>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center gap-2">
-                      {submission.user?.image && (
-                        <img src={submission.user.image} alt={submission.user.name || 'User'} className="h-6 w-6 rounded-full" />
-                      )}
-                      <span>{submission.user?.name || 'Anonymous'}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{submission.challenge?.title || 'Unknown Challenge'}</TableCell>
-                  <TableCell>
-                    <Badge variant={submission.isPassed ? 'default' : 'secondary'} className={submission.isPassed ? 'bg-green-500/15 text-green-600 hover:bg-green-500/25' : ''}>
-                      {submission.isPassed ? 'Passed' : 'Failed'}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
-                    {new Date(submission.createdAt).toLocaleTimeString()}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {stats.recentActivity.map(
+                (submission: RecentSubmission, i: number) => (
+                  <TableRow key={i}>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {submission.user?.image && (
+                          <img
+                            src={submission.user.image}
+                            alt={submission.user.name || 'User'}
+                            className="h-6 w-6 rounded-full"
+                          />
+                        )}
+                        <span>{submission.user?.name || 'Anonymous'}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {submission.challenge?.title || 'Unknown Challenge'}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        variant={submission.isPassed ? 'default' : 'secondary'}
+                        className={
+                          submission.isPassed
+                            ? 'bg-green-500/15 text-green-600 hover:bg-green-500/25'
+                            : ''
+                        }
+                      >
+                        {submission.isPassed ? 'Passed' : 'Failed'}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {new Date(submission.createdAt).toLocaleTimeString()}
+                    </TableCell>
+                  </TableRow>
+                ),
+              )}
             </TableBody>
           </Table>
         </CardContent>

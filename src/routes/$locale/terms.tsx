@@ -14,27 +14,21 @@ function TermsPage() {
         {t('terms.title')}
       </h1>
       <div className="prose dark:prose-invert max-w-none">
-        <p>{t('terms.lastUpdated')}: {new Date().toLocaleDateString()}</p>
+        <p>
+          {t('terms.lastUpdated')}: {new Date().toLocaleDateString()}
+        </p>
 
         <h2>{t('terms.sections.acceptance.title')}</h2>
-        <p>
-          {t('terms.sections.acceptance.content')}
-        </p>
+        <p>{t('terms.sections.acceptance.content')}</p>
 
         <h2>{t('terms.sections.description.title')}</h2>
-        <p>
-          {t('terms.sections.description.content')}
-        </p>
+        <p>{t('terms.sections.description.content')}</p>
 
         <h2>{t('terms.sections.accounts.title')}</h2>
-        <p>
-          {t('terms.sections.accounts.content')}
-        </p>
+        <p>{t('terms.sections.accounts.content')}</p>
 
         <h2>{t('terms.sections.conduct.title')}</h2>
-        <p>
-          {t('terms.sections.conduct.content')}
-        </p>
+        <p>{t('terms.sections.conduct.content')}</p>
       </div>
     </div>
   );

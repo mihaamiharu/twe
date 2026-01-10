@@ -3,6 +3,7 @@
 ## Goal
 
 Implement the MVP (Minimum Viable Product) for **TestingWithEkki**, a gamified QA portfolio and learning platform. The MVP will include:
+
 - User authentication system
 - Tutorial content management and display
 - Interactive coding playground with JavaScript challenges
@@ -17,38 +18,42 @@ This implementation follows the PRD and TDD specifications created in the planni
 
 > [!IMPORTANT]
 > **Updated Technology Stack**
-> 
+>
 > Based on your feedback, the stack is now:
+>
 > - **Full-Stack Framework:** TanStack Start + TypeScript (handles both frontend and backend)
 > - **Database:** PostgreSQL 15 + Drizzle ORM
 > - **Authentication:** BetterAuth (OAuth + email/password built-in)
 > - **Code Execution:** Mocked Playwright in browser (no real sandboxing)
 > - **Deployment:** Docker + your own server
-> 
+>
 > **Key Architecture Decision:** TanStack Start provides server functions and API routes, eliminating the need for a separate Express backend! All backend logic runs within TanStack Start's server-side features.
 
 > [!IMPORTANT]
 > **Updated MVP Scope**
-> 
+>
 > For Phase 1, we'll include:
+>
 > 1. **JavaScript/Playwright challenges** - Using mocked Playwright compatibility layer
 > 2. **CSS/XPath Selector challenges** - Show a web component/page, user inputs the correct selector
 > 3. OAuth login with Google (via BetterAuth)
 > 4. Email/password authentication
-> 
+>
 > **Mocked Playwright Approach:**
 > Instead of real sandboxing with Docker or isolated-vm:
+>
 > - User writes real Playwright syntax: `await page.click('#btn')`
 > - We run a lightweight compatibility shim in the browser
 > - The shim mimics Playwright commands using standard DOM APIs (`document.querySelector`)
 > - User learns real Playwright syntax, but execution is safe client-side JavaScript
 > - No server-side code execution needed!
-> 
+>
 > **Selector Challenges:**
+>
 > - Visual preview of the web component (iframe or screenshot)
 > - Input field for CSS selector or XPath
 > - Validation against the correct selector
-> 
+>
 > **Domain:** www.testingwithekki.com
 > **Hosting:** Your own server
 
@@ -83,6 +88,7 @@ TanStack Start is a full-stack framework, so there's **no separate backend**. Ev
 #### [NEW] [package.json](file:///Users/ekkisyam/Learn/twe/package.json)
 
 Dependencies:
+
 - `@tanstack/start` - Full-stack React framework
 - `@tanstack/react-router` - Type-safe routing
 - `vinxi` - TanStack Start's build tool
@@ -102,6 +108,7 @@ Dependencies:
 #### [NEW] [app/db/schema.ts](file:///Users/ekkisyam/Learn/twe/app/db/schema.ts)
 
 Drizzle schema definition including:
+
 - `users` table (authentication via BetterAuth, profile, XP, level)
 - `sessions` table (BetterAuth session management)
 - `accounts` table (OAuth provider accounts)
@@ -119,6 +126,7 @@ Drizzle client initialization and connection management using postgres.js driver
 #### [NEW] [app/lib/auth.server.ts](file:///Users/ekkisyam/Learn/twe/app/lib/auth.server.ts)
 
 BetterAuth server configuration:
+
 - Email/password authentication
 - OAuth providers (Google)
 - Session management
@@ -128,6 +136,7 @@ BetterAuth server configuration:
 #### [NEW] [app/lib/auth.client.ts](file:///Users/ekkisyam/Learn/twe/app/lib/auth.client.ts)
 
 BetterAuth client for React components:
+
 - Login/logout hooks
 - User session access
 - OAuth button components
@@ -135,6 +144,7 @@ BetterAuth client for React components:
 #### [NEW] [app/server/playwright-shim.ts](file:///Users/ekkisyam/Learn/twe/app/server/playwright-shim.ts)
 
 Mocked Playwright compatibility layer:
+
 - Mimics Playwright API in browser
 - Translates `page.click()` to `document.querySelector().click()`
 - Translates `page.fill()` to `element.value = 'text'`
@@ -144,6 +154,7 @@ Mocked Playwright compatibility layer:
 - No actual browser automation - just DOM manipulation
 
 Example implementation:
+
 ```javascript
 const mockPage = {
   async click(selector) {
@@ -163,6 +174,7 @@ const mockPage = {
 #### [NEW] [app/server/selector-validator.ts](file:///Users/ekkisyam/Learn/twe/app/server/selector-validator.ts)
 
 CSS/XPath selector validation functions:
+
 - Parse and validate CSS selectors
 - Parse and validate XPath expressions
 - Compare user selector with correct selector(s)
@@ -173,6 +185,7 @@ CSS/XPath selector validation functions:
 #### [NEW] [app/server/gamification.ts](file:///Users/ekkisyam/Learn/twe/app/server/gamification.ts)
 
 Gamification logic:
+
 - XP award calculation
 - Level-up detection (formula: `100 * level^2`)
 - Achievement checking and awarding
@@ -181,34 +194,40 @@ Gamification logic:
 #### [NEW] [app/routes/api/challenges.ts](file:///Users/ekkisyam/Learn/twe/app/routes/api/challenges.ts)
 
 TanStack Start API route:
+
 - `GET` - List challenges (with filters)
 - Handlers use server functions for database access
 
 #### [NEW] [app/routes/api/challenges/$slug.ts](file:///Users/ekkisyam/Learn/twe/app/routes/api/challenges/$slug.ts)
 
 TanStack Start API route:
+
 - `GET` - Get challenge details by slug
 
 #### [NEW] [app/routes/api/submissions.ts](file:///Users/ekkisyam/Learn/twe/app/routes/api/submissions.ts)
 
 TanStack Start API route:
+
 - `POST` - Submit code/selector for validation (runs in browser!)
 - Returns validation results and XP rewards
 
 #### [NEW] [app/routes/api/tutorials.ts](file:///Users/ekkisyam/Learn/twe/app/routes/api/tutorials.ts)
 
 Tutorial endpoints:
+
 - `GET` - List tutorials
 
 #### [NEW] [app/routes/api/users/me.ts](file:///Users/ekkisyam/Learn/twe/app/routes/api/users/me.ts)
 
 User endpoints:
+
 - `GET` - Get current user profile
 - Uses BetterAuth session
 
 #### [NEW] [app/routes/api/leaderboard.ts](file:///Users/ekkisyam/Learn/twe/app/routes/api/leaderboard.ts)
 
 Leaderboard endpoint:
+
 - `GET` - Get global leaderboard
 
 ---
@@ -232,6 +251,7 @@ Challenge preview card (title, difficulty, XP, status).
 #### [NEW] [app/components/challenges/CodeEditor.tsx](file:///Users/ekkisyam/Learn/twe/app/components/challenges/CodeEditor.tsx)
 
 Monaco Editor wrapper with:
+
 - Syntax highlighting
 - Theme support (light/dark)
 - Keyboard shortcuts (Cmd/Ctrl+Enter to run)
@@ -240,6 +260,7 @@ Monaco Editor wrapper with:
 #### [NEW] [app/components/challenges/TestResults.tsx](file:///Users/ekkisyam/Learn/twe/app/components/challenges/TestResults.tsx)
 
 Display test execution results:
+
 - Passed/failed indicator
 - Expected vs actual output
 - Execution time
@@ -247,6 +268,7 @@ Display test execution results:
 #### [NEW] [app/components/challenges/SelectorInput.tsx](file:///Users/ekkisyam/Learn/twe/app/components/challenges/SelectorInput.tsx)
 
 Selector challenge input:
+
 - Text input for CSS selector or XPath
 - Selector type toggle (CSS / XPath)
 - Validation button
@@ -256,6 +278,7 @@ Selector challenge input:
 #### [NEW] [app/components/challenges/WebComponentPreview.tsx](file:///Users/ekkisyam/Learn/twe/app/components/challenges/WebComponentPreview.tsx)
 
 Visual preview of the target web component:
+
 - Render HTML in sandboxed iframe
 - Highlight target element when hovered
 - Show element path on click
@@ -277,6 +300,7 @@ Top users leaderboard table.
 #### [NEW] [app/routes/index.tsx](file:///Users/ekkisyam/Learn/twe/app/routes/index.tsx)
 
 Landing page route:
+
 - Hero section with tagline
 - Feature highlights
 - CTA to browse challenges/tutorials
@@ -296,6 +320,7 @@ Challenge browsing page with filters (difficulty, category).
 #### [NEW] [app/routes/challenges/$slug.tsx](file:///Users/ekkisyam/Learn/twe/app/routes/challenges/$slug.tsx)
 
 Challenge solving interface:
+
 - Split layout (description | code editor | output)
 - Run tests button
 - Submit button
@@ -305,6 +330,7 @@ Challenge solving interface:
 #### [NEW] [app/routes/profile.tsx](file:///Users/ekkisyam/Learn/twe/app/routes/profile.tsx)
 
 User profile and dashboard:
+
 - Level and XP display
 - Achievement showcase
 - Completed challenges list
@@ -313,6 +339,7 @@ User profile and dashboard:
 #### [NEW] [app/styles/global.css](file:///Users/ekkisyam/Learn/twe/app/styles/global.css)
 
 Global styles:
+
 - CSS variables for theming
 - Dark mode support
 - Typography system
@@ -325,6 +352,7 @@ Global styles:
 #### [NEW] [docker-compose.yml](file:///Users/ekkisyam/Learn/twe/docker-compose.yml)
 
 Development environment with:
+
 - PostgreSQL container only (TanStack Start handles the app)
 - Environment variables for database connection
 
@@ -339,12 +367,13 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - '5432:5432'
 ```
 
 #### [NEW] [Dockerfile](file:///Users/ekkisyam/Learn/twe/Dockerfile)
 
 Production deployment:
+
 ```dockerfile
 FROM node:20-alpine
 WORKDIR /app
@@ -359,6 +388,7 @@ CMD ["npm", "start"]
 #### [NEW] [.env.example](file:///Users/ekkisyam/Learn/twe/.env.example)
 
 Template for environment variables:
+
 ```
 # Database
 DATABASE_URL=postgresql://ekki:dev_password@localhost:5432/testingwithekki
@@ -382,6 +412,7 @@ PORT=3000
 #### [NEW] [README.md](file:///Users/ekkisyam/Learn/twe/README.md)
 
 Setup and development instructions:
+
 - Prerequisites (Node.js 20, PostgreSQL)
 - Installation steps
 - Running locally with `npm run dev`
@@ -401,6 +432,7 @@ Setup and development instructions:
 **Test File:** `app/lib/__tests__/playwright-shim.test.ts`
 
 Test the mocked Playwright compatibility layer:
+
 ```typescript
 import { describe, it, expect } from 'vitest';
 import { MockedPlaywrightPage } from '../playwright-shim';
@@ -409,42 +441,47 @@ describe('MockedPlaywrightPage', () => {
   it('should throw error when clicking non-existent element', async () => {
     const doc = document.implementation.createHTMLDocument();
     const page = new MockedPlaywrightPage(doc);
-    
-    await expect(page.click('#non-existent')).rejects.toThrow('Element not found: #non-existent');
+
+    await expect(page.click('#non-existent')).rejects.toThrow(
+      'Element not found: #non-existent',
+    );
   });
-  
+
   it('should successfully update input value on .fill()', async () => {
     const doc = document.implementation.createHTMLDocument();
     doc.body.innerHTML = '<input id="email" />';
     const page = new MockedPlaywrightPage(doc);
-    
+
     await page.fill('#email', 'test@example.com');
     const input = doc.querySelector('#email') as HTMLInputElement;
     expect(input.value).toBe('test@example.com');
   });
-  
+
   it('should wait for selector visibility (mocked delay)', async () => {
     const doc = document.implementation.createHTMLDocument();
     const page = new MockedPlaywrightPage(doc);
-    
+
     setTimeout(() => {
       doc.body.innerHTML = '<div id="late">Loaded</div>';
     }, 100);
-    
-    await expect(page.waitForSelector('#late', { timeout: 500 })).resolves.toBeUndefined();
+
+    await expect(
+      page.waitForSelector('#late', { timeout: 500 }),
+    ).resolves.toBeUndefined();
   });
-  
+
   it('should throw error when element is not visible', async () => {
     const doc = document.implementation.createHTMLDocument();
     doc.body.innerHTML = '<button id="btn" style="display:none">Click</button>';
     const page = new MockedPlaywrightPage(doc);
-    
+
     await expect(page.click('#btn')).rejects.toThrow('Element is not visible');
   });
 });
 ```
 
 **Run command:**
+
 ```bash
 npm test -- playwright-shim
 ```
@@ -454,6 +491,7 @@ npm test -- playwright-shim
 **Test File:** `app/lib/__tests__/selector-validator.test.ts`
 
 Test CSS/XPath selector validation:
+
 ```typescript
 import { describe, it, expect } from 'vitest';
 import { validateCSSSelector, validateXPath } from '../selector-validator';
@@ -464,12 +502,12 @@ describe('Selector Validator', () => {
     expect(validateCSSSelector('.btn-primary')).toBe(true);
     expect(validateCSSSelector('button[type="submit"]')).toBe(true);
   });
-  
+
   it('should correctly identify valid XPath', () => {
     expect(validateXPath('//button[@type="submit"]')).toBe(true);
     expect(validateXPath('//div[@class="container"]/p[1]')).toBe(true);
   });
-  
+
   it('should return false for syntax errors', () => {
     expect(validateCSSSelector('#[invalid')).toBe(false);
     expect(validateCSSSelector('##double')).toBe(false);
@@ -479,6 +517,7 @@ describe('Selector Validator', () => {
 ```
 
 **Run command:**
+
 ```bash
 npm test -- selector-validator
 ```
@@ -488,9 +527,14 @@ npm test -- selector-validator
 **Test File:** `app/lib/__tests__/gamification.test.ts`
 
 Test XP and leveling calculations:
+
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { calculateLevel, getXPForNextLevel, getXPReward } from '../gamification';
+import {
+  calculateLevel,
+  getXPForNextLevel,
+  getXPReward,
+} from '../gamification';
 
 describe('Gamification Engine', () => {
   it('should calculate correct level from XP', () => {
@@ -499,14 +543,14 @@ describe('Gamification Engine', () => {
     expect(calculateLevel(400)).toBe(2);
     expect(calculateLevel(900)).toBe(3);
   });
-  
+
   it('should award correct XP for challenge difficulty', () => {
     expect(getXPReward('EASY')).toBeGreaterThanOrEqual(10);
     expect(getXPReward('EASY')).toBeLessThanOrEqual(30);
     expect(getXPReward('MEDIUM')).toBeGreaterThanOrEqual(40);
     expect(getXPReward('HARD')).toBeGreaterThanOrEqual(80);
   });
-  
+
   it('should calculate XP needed for next level', () => {
     expect(getXPForNextLevel(0)).toBe(100); // Level 0 -> 1
     expect(getXPForNextLevel(1)).toBe(400); // Level 1 -> 2
@@ -516,6 +560,7 @@ describe('Gamification Engine', () => {
 ```
 
 **Run command:**
+
 ```bash
 npm test -- gamification
 ```
@@ -525,6 +570,7 @@ npm test -- gamification
 **Test File:** `app/routes/api/__tests__/auth.test.ts`
 
 Test authentication API routes:
+
 ```typescript
 import { describe, it, expect } from 'vitest';
 import { auth } from '@/lib/auth.server';
@@ -533,29 +579,29 @@ describe('Auth API Routes', () => {
   it('should create session on valid login', async () => {
     const result = await auth.api.signInEmail({
       email: 'test@example.com',
-      password: 'password123'
+      password: 'password123',
     });
-    
+
     expect(result).toHaveProperty('session');
     expect(result.session).toHaveProperty('token');
   });
-  
+
   it('should reject invalid credentials', async () => {
     await expect(
       auth.api.signInEmail({
         email: 'test@example.com',
-        password: 'wrongpassword'
-      })
+        password: 'wrongpassword',
+      }),
     ).rejects.toThrow('Invalid credentials');
   });
-  
+
   it('should create new user on registration', async () => {
     const result = await auth.api.signUpEmail({
       email: 'newuser@example.com',
       password: 'securepass123',
-      name: 'New User'
+      name: 'New User',
     });
-    
+
     expect(result).toHaveProperty('user');
     expect(result.user.email).toBe('newuser@example.com');
   });
@@ -563,6 +609,7 @@ describe('Auth API Routes', () => {
 ```
 
 **Run command:**
+
 ```bash
 npm test -- auth
 ```
@@ -572,6 +619,7 @@ npm test -- auth
 **Test File:** `app/components/__tests__/CodeEditor.test.tsx`
 
 Test React components:
+
 ```typescript
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
@@ -586,6 +634,7 @@ describe('CodeEditor Component', () => {
 ```
 
 **Run command:**
+
 ```bash
 npm test
 ```
@@ -594,6 +643,7 @@ npm test
 
 > [!NOTE]
 > The following manual tests require the application to be running. Start with:
+>
 > ```bash
 > docker-compose up
 > ```
@@ -601,6 +651,7 @@ npm test
 #### Test 1: User Registration and Authentication
 
 **Steps:**
+
 1. Navigate to `http://localhost:5173`
 2. Click "Sign Up"
 3. Fill in email: `ekki@test.com`, username: `ekki`, password: `Test1234`
@@ -616,6 +667,7 @@ npm test
 #### Test 2: Browse and Solve a Challenge
 
 **Steps:**
+
 1. Log in to the application
 2. Navigate to "Challenges" page
 3. Click on an EASY JavaScript challenge (e.g., "Reverse a String")
@@ -632,6 +684,7 @@ npm test
 #### Test 3: Gamification Flow
 
 **Steps:**
+
 1. Complete 3 different EASY challenges
 2. Navigate to your profile
 3. Verify XP has accumulated
@@ -644,6 +697,7 @@ npm test
 #### Test 4: Tutorial Reading
 
 **Steps:**
+
 1. Navigate to "Tutorials" page
 2. Click on a tutorial (e.g., "Introduction to Playwright")
 3. Verify markdown content renders correctly
@@ -656,6 +710,7 @@ npm test
 #### Test 5: CSS/XPath Selector Challenge
 
 **Steps:**
+
 1. Log in to the application
 2. Navigate to "Challenges" page
 3. Filter by "Selector" challenge type
@@ -674,6 +729,7 @@ npm test
 #### Test 6: Dark Mode (if implemented)
 
 **Steps:**
+
 1. Click the theme toggle button (moon/sun icon)
 2. Verify the entire UI switches to dark mode
 3. Check code editor also switches theme
@@ -684,6 +740,7 @@ npm test
 ### Performance Verification
 
 **Manual Check:**
+
 - Use Chrome DevTools Network tab
 - Verify API response times < 500ms
 - Check page load times < 2 seconds
@@ -777,12 +834,14 @@ The implementation will follow this order:
 ### Server Deployment Plan (2 CPU / 2 GB RAM)
 
 **What This Supports:**
+
 - ~50-100 concurrent users comfortably
 - PostgreSQL (configured for low memory usage)
 - TanStack Start app (Node.js)
 - Nginx as reverse proxy
 
 **Optimization for Limited Resources:**
+
 ```yaml
 # PostgreSQL configuration (postgresql.conf)
 shared_buffers = 256MB          # 25% of RAM
@@ -793,10 +852,11 @@ max_connections = 50             # Conservative limit
 ```
 
 **Docker Compose for Production:**
+
 ```yaml
 services:
   postgres:
-    image: postgres:15-alpine      # Smaller image
+    image: postgres:15-alpine # Smaller image
     restart: always
     environment:
       POSTGRES_DB: testingwithekki
@@ -807,13 +867,13 @@ services:
     deploy:
       resources:
         limits:
-          memory: 512M               # Reserve RAM for app
-    
+          memory: 512M # Reserve RAM for app
+
   app:
     build: .
     restart: always
     ports:
-      - "3000:3000"
+      - '3000:3000'
     environment:
       DATABASE_URL: ${DATABASE_URL}
       NODE_ENV: production
@@ -826,6 +886,7 @@ services:
 ```
 
 **Nginx Configuration:**
+
 ```nginx
 server {
     listen 80;
@@ -836,10 +897,10 @@ server {
 server {
     listen 443 ssl http2;
     server_name www.testingwithekki.com;
-    
+
     ssl_certificate /etc/letsencrypt/live/testingwithekki.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/testingwithekki.com/privkey.pem;
-    
+
     location / {
         proxy_pass http://localhost:3000;
         proxy_http_version 1.1;
@@ -854,21 +915,23 @@ server {
 ### Google Analytics Integration
 
 **Setup:**
+
 1. Create GA4 property at analytics.google.com
 2. Get Measurement ID (format: G-XXXXXXXXXX)
 3. Add to environment variables
 4. Set up Google OAuth credentials at console.cloud.google.com
 
 **Implementation:**
+
 ```typescript
 // app/components/analytics/GoogleAnalytics.tsx
 import Script from 'next/script';
 
 export function GoogleAnalytics() {
   const GA_ID = import.meta.env.VITE_GA_MEASUREMENT_ID;
-  
+
   if (!GA_ID) return null;
-  
+
   return (
     <>
       <Script
@@ -891,6 +954,7 @@ export function GoogleAnalytics() {
 ```
 
 **Track Events:**
+
 ```typescript
 // app/lib/analytics.ts
 export function trackEvent(eventName: string, params?: Record<string, any>) {
@@ -900,13 +964,13 @@ export function trackEvent(eventName: string, params?: Record<string, any>) {
 }
 
 // Usage examples:
-trackEvent('challenge_completed', { 
-  challenge_id: challengeId, 
-  difficulty: 'EASY' 
+trackEvent('challenge_completed', {
+  challenge_id: challengeId,
+  difficulty: 'EASY',
 });
 
-trackEvent('level_up', { 
-  new_level: userLevel 
+trackEvent('level_up', {
+  new_level: userLevel,
 });
 ```
 
@@ -918,12 +982,15 @@ trackEvent('level_up', {
 // app/db/schema.ts
 export const users = pgTable('users', {
   // ...
-  profileVisibility: text('profile_visibility').$type<'private' | 'public'>().default('private'),
+  profileVisibility: text('profile_visibility')
+    .$type<'private' | 'public'>()
+    .default('private'),
   showOnLeaderboard: boolean('show_on_leaderboard').default(false),
 });
 ```
 
 **Profile Settings UI:**
+
 - User can toggle profile visibility in settings
 - User can opt-in/out of leaderboard display
 - Achievements always private unless profile is public

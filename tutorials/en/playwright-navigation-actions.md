@@ -1,6 +1,6 @@
 ---
-title: "Playwright Navigation & Actions"
-description: "Master page navigation and user interactions with Playwright."
+title: 'Playwright Navigation & Actions'
+description: 'Master page navigation and user interactions with Playwright.'
 ---
 
 # Playwright Navigation & Actions
@@ -29,11 +29,11 @@ When your test fails with a "Timeout", don't panic. It usually means the **Actio
 
 Playwright performs these checks for you automatically:
 
-* **Attached**: Is the element in the DOM?
-* **Visible**: Is it `display: none` or `visibility: hidden`?
-* **Stable**: Is the animation finished?
-* **Receives Events**: Is another element (like a sticky header) covering it?
-* **Enabled**: Is the `disabled` attribute present?
+- **Attached**: Is the element in the DOM?
+- **Visible**: Is it `display: none` or `visibility: hidden`?
+- **Stable**: Is the animation finished?
+- **Receives Events**: Is another element (like a sticky header) covering it?
+- **Enabled**: Is the `disabled` attribute present?
 
 **The Strategy**: Trust the wait. If Playwright isn't clicking, there is usually a real UX reason why.
 
@@ -75,7 +75,7 @@ await page.locator('#save-btn').click();
 
 **The Crime**: `await page.click('#btn', { force: true });`
 **The Reality**: You are telling Playwright "I don't care if it's covered, click it anyway."
-**The Risk**: You might be clicking the "Cancel" button hidden *behind* the "Save" button. Or clicking a button that a real user literally cannot reach.
+**The Risk**: You might be clicking the "Cancel" button hidden _behind_ the "Save" button. Or clicking a button that a real user literally cannot reach.
 **The Fix**: Never use `force: true` unless you are testing a CSS hack. Fix the visibility issue instead.
 
 ### Trap #2: The Hover Phantom
@@ -119,4 +119,3 @@ await page.locator('select').selectOption('blue');
 ```
 
 ---
-

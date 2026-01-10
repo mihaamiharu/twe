@@ -8,22 +8,22 @@ This document provides **2 solution options** for each challenge, plus a complet
 
 1. [Achievements](#achievements)
 2. [Basic Tier (CSS/XPath Selectors)](#basic-tier-cssxpath-selectors)
-    - [CSS Selectors](#css-selectors)
-    - [XPath Selectors](#xpath-selectors)
-    - [Selector Comparisons](#selector-comparisons)
+   - [CSS Selectors](#css-selectors)
+   - [XPath Selectors](#xpath-selectors)
+   - [Selector Comparisons](#selector-comparisons)
 3. [Beginner Tier (JavaScript)](#beginner-tier-javascript)
-    - [JS Fundamentals](#js-fundamentals)
-    - [DOM Manipulation](#dom-manipulation)
-    - [Async JavaScript](#async-javascript)
+   - [JS Fundamentals](#js-fundamentals)
+   - [DOM Manipulation](#dom-manipulation)
+   - [Async JavaScript](#async-javascript)
 4. [Intermediate Tier (Playwright)](#intermediate-tier-playwright)
-    - [Navigation & Actions](#navigation--actions)
-    - [Advanced Locators](#advanced-locators)
-    - [Assertions](#assertions)
-    - [Wait Strategies](#wait-strategies)
+   - [Navigation & Actions](#navigation--actions)
+   - [Advanced Locators](#advanced-locators)
+   - [Assertions](#assertions)
+   - [Wait Strategies](#wait-strategies)
 5. [Expert Tier (Advanced Patterns)](#expert-tier-advanced-patterns)
-    - [Page Object Model](#page-object-model)
-    - [Data-Driven Testing](#data-driven-testing)
-    - [Advanced Scenarios](#advanced-scenarios)
+   - [Page Object Model](#page-object-model)
+   - [Data-Driven Testing](#data-driven-testing)
+   - [Advanced Scenarios](#advanced-scenarios)
 
 ---
 
@@ -31,58 +31,58 @@ This document provides **2 solution options** for each challenge, plus a complet
 
 ### Milestones & Challenges
 
-| Icon | Name | Description | XP |
-|------|------|-------------|-----|
-| 🎯 | First Steps | Complete your first challenge | 50 |
-| 📖 | Eager Learner | Complete your first tutorial | 25 |
-| 🔥 | Getting Warmed Up | Complete 10 challenges | 100 |
-| ⚡ | Challenge Accepted | Complete 25 challenges | 200 |
-| 🏆 | Halfway Hero | Complete 50 challenges | 500 |
-| 👑 | Completionist | Complete all 88 challenges | 1000 |
+| Icon | Name               | Description                   | XP   |
+| ---- | ------------------ | ----------------------------- | ---- |
+| 🎯   | First Steps        | Complete your first challenge | 50   |
+| 📖   | Eager Learner      | Complete your first tutorial  | 25   |
+| 🔥   | Getting Warmed Up  | Complete 10 challenges        | 100  |
+| ⚡   | Challenge Accepted | Complete 25 challenges        | 200  |
+| 🏆   | Halfway Hero       | Complete 50 challenges        | 500  |
+| 👑   | Completionist      | Complete all 88 challenges    | 1000 |
 
 ### Streak Achievements
 
-| Icon | Name | Description | XP |
-|------|------|-------------|-----|
-| 🔥 | On Fire | 3-day streak | 50 |
-| ⚡ | Week Warrior | 7-day streak | 100 |
-| 💪 | Two Week Champion | 14-day streak | 200 |
-| 🏆 | Monthly Master | 30-day streak | 500 |
+| Icon | Name              | Description   | XP  |
+| ---- | ----------------- | ------------- | --- |
+| 🔥   | On Fire           | 3-day streak  | 50  |
+| ⚡   | Week Warrior      | 7-day streak  | 100 |
+| 💪   | Two Week Champion | 14-day streak | 200 |
+| 🏆   | Monthly Master    | 30-day streak | 500 |
 
 ### XP Milestones
 
-| Icon | Name | Description | XP |
-|------|------|-------------|-----|
-| ✨ | XP Starter | Earn 100 XP | 25 |
-| 💫 | XP Hunter | Earn 500 XP | 50 |
-| 🌟 | XP Collector | Earn 1000 XP | 100 |
-| ⭐ | XP Master | Earn 2500 XP | 200 |
-| 🌠 | XP Legend | Earn 5000 XP | 500 |
+| Icon | Name         | Description  | XP  |
+| ---- | ------------ | ------------ | --- |
+| ✨   | XP Starter   | Earn 100 XP  | 25  |
+| 💫   | XP Hunter    | Earn 500 XP  | 50  |
+| 🌟   | XP Collector | Earn 1000 XP | 100 |
+| ⭐   | XP Master    | Earn 2500 XP | 200 |
+| 🌠   | XP Legend    | Earn 5000 XP | 500 |
 
 ### Tier Masters
 
-| Icon | Name | Description | XP |
-|------|------|-------------|-----|
-| 🎨 | Selector Specialist | Complete all Basic tier | 150 |
-| 💛 | JavaScript Hero | Complete all Beginner tier | 200 |
-| 🎭 | Playwright Pro | Complete all Intermediate tier | 300 |
-| 🚀 | Automation Expert | Complete all Advanced tier | 400 |
+| Icon | Name                | Description                    | XP  |
+| ---- | ------------------- | ------------------------------ | --- |
+| 🎨   | Selector Specialist | Complete all Basic tier        | 150 |
+| 💛   | JavaScript Hero     | Complete all Beginner tier     | 200 |
+| 🎭   | Playwright Pro      | Complete all Intermediate tier | 300 |
+| 🚀   | Automation Expert   | Complete all Advanced tier     | 400 |
 
 ### Secret Boss Achievements 🔒
 
-| Icon | Name | Boss Fight | XP |
-|------|------|------------|-----|
-| 🏗️ | JS Architect | Test Data Generator | 300 |
-| 🕷️ | DOMinator | Dashboard Scraper | 300 |
-| ⏳ | Async Avenger | API Data Aggregator | 300 |
-| 🛒 | Action Hero | E-Commerce Checkout | 400 |
-| 🎯 | Locator Legend | Dynamic Product Grid | 400 |
-| 🔍 | Sherlock Homes | Form Validation Suite | 400 |
-| ⚡ | Time Wizard | Polling Dashboard | 400 |
-| ✈️ | POM Pilot | Multi-Page POM | 500 |
-| 💾 | Data Dynamo | Cross-Browser Data Suite | 500 |
-| 🛠️ | Infrastructure Idol | Self-Healing Test Suite | 500 |
-| 🔄 | Integration Icon | E2E Pipeline Integration | 500 |
+| Icon | Name                | Boss Fight               | XP  |
+| ---- | ------------------- | ------------------------ | --- |
+| 🏗️   | JS Architect        | Test Data Generator      | 300 |
+| 🕷️   | DOMinator           | Dashboard Scraper        | 300 |
+| ⏳   | Async Avenger       | API Data Aggregator      | 300 |
+| 🛒   | Action Hero         | E-Commerce Checkout      | 400 |
+| 🎯   | Locator Legend      | Dynamic Product Grid     | 400 |
+| 🔍   | Sherlock Homes      | Form Validation Suite    | 400 |
+| ⚡   | Time Wizard         | Polling Dashboard        | 400 |
+| ✈️   | POM Pilot           | Multi-Page POM           | 500 |
+| 💾   | Data Dynamo         | Cross-Browser Data Suite | 500 |
+| 🛠️   | Infrastructure Idol | Self-Healing Test Suite  | 500 |
+| 🔄   | Integration Icon    | E2E Pipeline Integration | 500 |
 
 ---
 
@@ -283,7 +283,7 @@ This document provides **2 solution options** for each challenge, plus a complet
 #### js-variables-types
 
 ```javascript
-const testName = "Login Test";
+const testName = 'Login Test';
 let passCount = 0;
 passCount++;
 const result = passCount;
@@ -292,15 +292,15 @@ const result = passCount;
 #### js-arrays-test-data
 
 ```javascript
-const testCredentials = ["admin", "user", "guest"];
-testCredentials.push("superadmin");
+const testCredentials = ['admin', 'user', 'guest'];
+testCredentials.push('superadmin');
 const result = testCredentials.length;
 ```
 
 #### js-objects-for-tests
 
 ```javascript
-const testUser = { email: "test@example.com", isActive: true, loginCount: 5 };
+const testUser = { email: 'test@example.com', isActive: true, loginCount: 5 };
 testUser.loginCount++;
 const result = testUser.loginCount;
 ```
@@ -309,9 +309,9 @@ const result = testUser.loginCount;
 
 ```javascript
 let result;
-if (passCount === totalTests) result = "ALL_PASSED";
-else if (passCount > 0) result = "PARTIAL";
-else result = "ALL_FAILED";
+if (passCount === totalTests) result = 'ALL_PASSED';
+else if (passCount > 0) result = 'PARTIAL';
+else result = 'ALL_FAILED';
 ```
 
 #### js-loops-testing
@@ -319,7 +319,7 @@ else result = "ALL_FAILED";
 ```javascript
 let result = 0;
 for (const score of scores) {
-    if (score >= 80) result++;
+  if (score >= 80) result++;
 }
 ```
 
@@ -327,7 +327,7 @@ for (const score of scores) {
 
 ```javascript
 function calculatePassRate(passed, total) {
-    return (passed / total) * 100;
+  return (passed / total) * 100;
 }
 const result = calculatePassRate(7, 10);
 ```
@@ -335,36 +335,36 @@ const result = calculatePassRate(7, 10);
 #### js-arrow-functions
 
 ```javascript
-const isPositive = n => n > 0;
-const square = n => n * n;
+const isPositive = (n) => n > 0;
+const square = (n) => n * n;
 const result = square(8);
 ```
 
 #### js-array-methods
 
 ```javascript
-const result = testResults.filter(t => t.status === "passed").length;
+const result = testResults.filter((t) => t.status === 'passed').length;
 ```
 
 #### js-string-methods
 
 ```javascript
-const result = rawMessage.trim().split(": ")[1];
+const result = rawMessage.trim().split(': ')[1];
 ```
 
 #### js-destructuring
 
 ```javascript
 const { duration, status } = testResult;
-const result = status === "passed" ? duration : 0;
+const result = status === 'passed' ? duration : 0;
 ```
 
 #### js-fundamentals-boss (JS Architect)
 
 ```javascript
 const activeEmails = users
-    .filter(user => user.status === "active")
-    .map(user => user.email);
+  .filter((user) => user.status === 'active')
+  .map((user) => user.email);
 const result = activeEmails.length;
 ```
 
@@ -379,7 +379,9 @@ const result = document.querySelectorAll('.item').length;
 #### dom-element-properties
 
 ```javascript
-const result = Number(document.querySelector('.price').textContent) * Number(document.querySelector('#quantity').value);
+const result =
+  Number(document.querySelector('.price').textContent) *
+  Number(document.querySelector('#quantity').value);
 ```
 
 #### dom-check-element-state
@@ -387,7 +389,7 @@ const result = Number(document.querySelector('.price').textContent) * Number(doc
 ```javascript
 let result = 0;
 for (const box of document.querySelectorAll('input[type="checkbox"]')) {
-    if (box.checked) result++;
+  if (box.checked) result++;
 }
 ```
 
@@ -401,7 +403,9 @@ const result = document.querySelector('.active').parentElement.children.length;
 
 ```javascript
 const btn = document.querySelector('#increment');
-btn.click(); btn.click(); btn.click();
+btn.click();
+btn.click();
+btn.click();
 const result = Number(document.querySelector('#count').textContent);
 ```
 
@@ -411,7 +415,10 @@ const result = Number(document.querySelector('#count').textContent);
 document.querySelector('#username').value = 'testuser';
 document.querySelector('#password').value = 'secret123';
 document.querySelector('#remember').checked = true;
-const result = document.querySelector('#username').value + ':' + document.querySelector('#password').value;
+const result =
+  document.querySelector('#username').value +
+  ':' +
+  document.querySelector('#password').value;
 ```
 
 #### dom-table-data-extraction
@@ -420,16 +427,17 @@ const result = document.querySelector('#username').value + ':' + document.queryS
 const rows = document.querySelectorAll('tbody tr');
 let result = 0;
 for (const row of rows) {
-    result += Number(row.querySelectorAll('td')[2].textContent);
+  result += Number(row.querySelectorAll('td')[2].textContent);
 }
 ```
 
 #### dom-wait-for-element
 
 ```javascript
-const result = (document.querySelector('#header') ? 1 : 0) + 
-               (document.querySelector('#footer') ? 1 : 0) + 
-               (document.querySelector('#sidebar') ? 1 : 0);
+const result =
+  (document.querySelector('#header') ? 1 : 0) +
+  (document.querySelector('#footer') ? 1 : 0) +
+  (document.querySelector('#sidebar') ? 1 : 0);
 ```
 
 #### dom-boss (DOMinator)
@@ -437,9 +445,11 @@ const result = (document.querySelector('#header') ? 1 : 0) +
 ```javascript
 let totalSalesValue = 0;
 for (const card of document.querySelectorAll('.stat-card')) {
-    if (card.querySelector('.label').textContent === 'Total Sales') {
-        totalSalesValue = Number(card.querySelector('.value').textContent.replace(',', ''));
-    }
+  if (card.querySelector('.label').textContent === 'Total Sales') {
+    totalSalesValue = Number(
+      card.querySelector('.value').textContent.replace(',', ''),
+    );
+  }
 }
 const result = totalSalesValue;
 ```
@@ -449,15 +459,15 @@ const result = totalSalesValue;
 #### async-understanding-promises
 
 ```javascript
-const result = await new Promise(resolve => resolve(42));
+const result = await new Promise((resolve) => resolve(42));
 ```
 
 #### async-await-basics
 
 ```javascript
 async function doubleValue() {
-    const value = await getValue();
-    return value * 2;
+  const value = await getValue();
+  return value * 2;
 }
 const result = await doubleValue();
 ```
@@ -466,8 +476,11 @@ const result = await doubleValue();
 
 ```javascript
 async function safeOperation() {
-    try { return await riskyOperation(); }
-    catch (e) { return 'fallback'; }
+  try {
+    return await riskyOperation();
+  } catch (e) {
+    return 'fallback';
+  }
 }
 const result = await safeOperation();
 ```
@@ -483,10 +496,13 @@ const result = a + b + c;
 
 ```javascript
 async function retry(fn, maxAttempts = 3) {
-    for (let i = 0; i < maxAttempts; i++) {
-        try { return await fn(); }
-        catch (e) { if (i === maxAttempts - 1) throw e; }
+  for (let i = 0; i < maxAttempts; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      if (i === maxAttempts - 1) throw e;
     }
+  }
 }
 await retry(flakyOperation);
 const result = attempts;
@@ -496,10 +512,14 @@ const result = attempts;
 
 ```javascript
 try {
-    const [users, orders, products] = await Promise.all([getUsers(), getOrders(), getProducts()]);
-    const result = users.length + orders.length + products.length;
+  const [users, orders, products] = await Promise.all([
+    getUsers(),
+    getOrders(),
+    getProducts(),
+  ]);
+  const result = users.length + orders.length + products.length;
 } catch (e) {
-    const result = 0;
+  const result = 0;
 }
 ```
 
@@ -589,15 +609,23 @@ const result = await page.locator('#dropzone').textContent();
 #### pw-iframes
 
 ```javascript
-const result = await page.frameLocator('#embed').locator('#frame-content').textContent();
+const result = await page
+  .frameLocator('#embed')
+  .locator('#frame-content')
+  .textContent();
 ```
 
 #### pw-dynamic-table
 
 ```javascript
 await page.click('th:has-text("Status")');
-await page.waitForFunction(() => document.querySelector('tbody tr td:nth-child(2)').textContent === 'Active');
-const result = await page.locator('tbody tr:first-child td:nth-child(2)').textContent();
+await page.waitForFunction(
+  () =>
+    document.querySelector('tbody tr td:nth-child(2)').textContent === 'Active',
+);
+const result = await page
+  .locator('tbody tr:first-child td:nth-child(2)')
+  .textContent();
 ```
 
 #### pw-actions-boss (Action Hero)
@@ -775,8 +803,8 @@ const result = await page.title();
 
 ```javascript
 const [response] = await Promise.all([
-    page.waitForResponse('/api/data'),
-    page.click('#load')
+  page.waitForResponse('/api/data'),
+  page.click('#load'),
 ]);
 const result = await page.locator('#status').textContent();
 ```
@@ -784,7 +812,9 @@ const result = await page.locator('#status').textContent();
 #### pw-wait-for-function
 
 ```javascript
-await page.waitForFunction(() => parseInt(document.getElementById('counter').textContent) >= 3);
+await page.waitForFunction(
+  () => parseInt(document.getElementById('counter').textContent) >= 3,
+);
 const result = await page.locator('#counter').textContent();
 ```
 
@@ -798,8 +828,12 @@ const result = await page.locator('#fast-btn').textContent();
 #### pw-waits-boss (Time Wizard)
 
 ```javascript
-await page.waitForFunction(() => document.getElementById('status').textContent.includes('Connected'));
-await page.waitForFunction(() => document.getElementById('data').textContent.includes('Data received'));
+await page.waitForFunction(() =>
+  document.getElementById('status').textContent.includes('Connected'),
+);
+await page.waitForFunction(() =>
+  document.getElementById('data').textContent.includes('Data received'),
+);
 const result = (await page.locator('#data').textContent()).split(': ')[1];
 ```
 
@@ -813,17 +847,17 @@ const result = (await page.locator('#data').textContent()).split(': ')[1];
 
 ```javascript
 class LoginPage {
-    constructor(page) {
-        this.page = page;
-        this.email = page.locator('#email');
-        this.pass = page.locator('#password');
-        this.btn = page.locator('#submit');
-    }
-    async login(e, p) {
-        await this.email.fill(e);
-        await this.pass.fill(p);
-        await this.btn.click();
-    }
+  constructor(page) {
+    this.page = page;
+    this.email = page.locator('#email');
+    this.pass = page.locator('#password');
+    this.btn = page.locator('#submit');
+  }
+  async login(e, p) {
+    await this.email.fill(e);
+    await this.pass.fill(p);
+    await this.btn.click();
+  }
 }
 const loginPage = new LoginPage(page);
 await loginPage.login('test@qa.com', 'password123');
@@ -834,16 +868,21 @@ const result = await page.locator('#message').textContent();
 
 ```javascript
 class CartPage {
-    constructor(page) {
-        this.page = page;
-        this.addBtn = page.locator('#add-item');
-        this.total = page.locator('#total');
-    }
-    async addItem() { await this.addBtn.click(); }
-    async getTotal() { return await this.total.textContent(); }
+  constructor(page) {
+    this.page = page;
+    this.addBtn = page.locator('#add-item');
+    this.total = page.locator('#total');
+  }
+  async addItem() {
+    await this.addBtn.click();
+  }
+  async getTotal() {
+    return await this.total.textContent();
+  }
 }
 const cp = new CartPage(page);
-await cp.addItem(); await cp.addItem();
+await cp.addItem();
+await cp.addItem();
 const result = await cp.getTotal();
 ```
 
@@ -851,17 +890,21 @@ const result = await cp.getTotal();
 
 ```javascript
 class Header {
-    constructor(page) {
-        this.logoutBtn = page.locator('#logout');
-    }
-    async logout() { await this.logoutBtn.click(); }
+  constructor(page) {
+    this.logoutBtn = page.locator('#logout');
+  }
+  async logout() {
+    await this.logoutBtn.click();
+  }
 }
 class Dashboard {
-    constructor(page) {
-        this.header = new Header(page);
-        this.status = page.locator('#status');
-    }
-    async getStatus() { return await this.status.textContent(); }
+  constructor(page) {
+    this.header = new Header(page);
+    this.status = page.locator('#status');
+  }
+  async getStatus() {
+    return await this.status.textContent();
+  }
 }
 const dash = new Dashboard(page);
 await dash.header.logout();
@@ -872,20 +915,24 @@ const result = await dash.getStatus();
 
 ```javascript
 class HomePage {
-    constructor(page) { this.welcome = page.locator('#welcome'); }
-    async getWelcomeMessage() { return await this.welcome.textContent(); }
+  constructor(page) {
+    this.welcome = page.locator('#welcome');
+  }
+  async getWelcomeMessage() {
+    return await this.welcome.textContent();
+  }
 }
 class LoginPage {
-    constructor(page) {
-        this.page = page;
-        this.loginBtn = page.locator('#login-btn');
-    }
-    async login() {
-        await this.page.fill('#email', 'test@qa.com'); 
-        await this.page.fill('#password', 'pass');
-        await this.loginBtn.click();
-        return new HomePage(this.page);
-    }
+  constructor(page) {
+    this.page = page;
+    this.loginBtn = page.locator('#login-btn');
+  }
+  async login() {
+    await this.page.fill('#email', 'test@qa.com');
+    await this.page.fill('#password', 'pass');
+    await this.loginBtn.click();
+    return new HomePage(this.page);
+  }
 }
 const home = await new LoginPage(page).login();
 const result = await home.getWelcomeMessage();
@@ -895,8 +942,12 @@ const result = await home.getWelcomeMessage();
 
 ```javascript
 class BasePage {
-    constructor(page) { this.page = page; }
-    async getPageTitle() { return await this.page.title(); }
+  constructor(page) {
+    this.page = page;
+  }
+  async getPageTitle() {
+    return await this.page.title();
+  }
 }
 class ProductPage extends BasePage {}
 const result = await new ProductPage(page).getPageTitle();
@@ -906,18 +957,35 @@ const result = await new ProductPage(page).getPageTitle();
 
 ```javascript
 class ProductPage {
-    constructor(page) { this.page = page; }
-    async addToCart() { await this.page.click('#add-to-cart'); return new CartPage(this.page); }
+  constructor(page) {
+    this.page = page;
+  }
+  async addToCart() {
+    await this.page.click('#add-to-cart');
+    return new CartPage(this.page);
+  }
 }
 class CartPage {
-    constructor(page) { this.page = page; }
-    async checkout() { await this.page.click('#checkout'); return new CheckoutPage(this.page); }
+  constructor(page) {
+    this.page = page;
+  }
+  async checkout() {
+    await this.page.click('#checkout');
+    return new CheckoutPage(this.page);
+  }
 }
 class CheckoutPage {
-    constructor(page) { this.page = page; }
-    async placeOrder() { await this.page.click('#place-order'); return await this.page.locator('#confirmation h2').textContent(); }
+  constructor(page) {
+    this.page = page;
+  }
+  async placeOrder() {
+    await this.page.click('#place-order');
+    return await this.page.locator('#confirmation h2').textContent();
+  }
 }
-const result = await (await (await new ProductPage(page).addToCart()).checkout()).placeOrder();
+const result = await (
+  await (await new ProductPage(page).addToCart()).checkout()
+).placeOrder();
 ```
 
 ### Data-Driven Testing
@@ -927,10 +995,10 @@ const result = await (await (await new ProductPage(page).addToCart()).checkout()
 ```javascript
 let passed = 0;
 for (const { a, b, expected } of testCases) {
-    await page.fill('#num1', String(a));
-    await page.fill('#num2', String(b));
-    await page.click('#add');
-    if (await page.locator('#result').textContent() === expected) passed++;
+  await page.fill('#num1', String(a));
+  await page.fill('#num2', String(b));
+  await page.click('#add');
+  if ((await page.locator('#result').textContent()) === expected) passed++;
 }
 const result = String(passed);
 ```
@@ -948,7 +1016,10 @@ const result = await page.locator('#greeting').textContent();
 
 ```javascript
 const rows = csvData.split('\n').slice(1);
-const data = rows.map(r => { const [name, role, expected] = r.split(','); return { name, role, expected }; });
+const data = rows.map((r) => {
+  const [name, role, expected] = r.split(',');
+  return { name, role, expected };
+});
 await page.fill('#username', data[1].name);
 await page.click('#welcome');
 const result = await page.locator('#message').textContent();
@@ -960,7 +1031,11 @@ const result = await page.locator('#message').textContent();
 const user = 'User_' + Math.random().toString(36).substr(2, 5);
 await page.fill('#username', user);
 await page.click('#signup');
-const result = (await page.locator('#confirm').textContent()).includes('Registered') ? 'success' : 'failed';
+const result = (await page.locator('#confirm').textContent()).includes(
+  'Registered',
+)
+  ? 'success'
+  : 'failed';
 ```
 
 #### pw-environment-data
@@ -978,13 +1053,13 @@ const result = await page.locator('#status').textContent();
 ```javascript
 let passed = 0;
 for (const user of users) {
-    for (const scenario of scenarios) {
-        await page.fill('#email', user.email);
-        await page.fill('#password', user.password);
-        await page.click('#login');
-        if ((await page.locator('#result').textContent()) === 'Success') passed++;
-        await page.fill('#email', '');
-    }
+  for (const scenario of scenarios) {
+    await page.fill('#email', user.email);
+    await page.fill('#password', user.password);
+    await page.click('#login');
+    if ((await page.locator('#result').textContent()) === 'Success') passed++;
+    await page.fill('#email', '');
+  }
 }
 const result = String(passed);
 ```
@@ -995,7 +1070,10 @@ const result = String(passed);
 
 ```javascript
 await page.click('#create-api');
-const result = (await page.locator('#user-name').textContent()) === 'API User' ? 'hybrid-success' : 'failed';
+const result =
+  (await page.locator('#user-name').textContent()) === 'API User'
+    ? 'hybrid-success'
+    : 'failed';
 ```
 
 #### pw-state-setup-api
@@ -1026,15 +1104,19 @@ const result = await page.locator('#status').textContent();
 await page.click('#flaky');
 let result = await page.locator('#result').textContent();
 if (result.includes('Failed')) {
-    await page.click('#flaky');
-    result = await page.locator('#result').textContent();
+  await page.click('#flaky');
+  result = await page.locator('#result').textContent();
 }
 ```
 
 #### pw-parallel-execution
 
 ```javascript
-await Promise.all([page.click('#task1'), page.click('#task2'), page.click('#task3')]);
+await Promise.all([
+  page.click('#task1'),
+  page.click('#task2'),
+  page.click('#task3'),
+]);
 const result = await page.locator('#results').textContent();
 ```
 
@@ -1057,14 +1139,18 @@ const result = await page.locator('#layout').textContent();
 #### pw-csv-workflow
 
 ```javascript
-const orders = csvData.trim().split('\n').slice(1).map(line => {
+const orders = csvData
+  .trim()
+  .split('\n')
+  .slice(1)
+  .map((line) => {
     const [id, qty] = line.split(',');
     return { id, qty };
-});
+  });
 for (const order of orders) {
-    await page.fill('#order-id', order.id);
-    await page.fill('#qty', order.qty);
-    await page.click('#process');
+  await page.fill('#order-id', order.id);
+  await page.fill('#qty', order.qty);
+  await page.click('#process');
 }
 const result = await page.locator('#completed-count').textContent();
 ```
@@ -1073,15 +1159,18 @@ const result = await page.locator('#completed-count').textContent();
 
 ```javascript
 async function retryWithScreenshot(action) {
-    for (let i = 0; i < 3; i++) {
-        try {
-            await action();
-            if ((await page.locator('#result').textContent()).includes('Success')) return 'passed';
-        } catch (e) {}
-    }
-    return 'failed-with-screenshot';
+  for (let i = 0; i < 3; i++) {
+    try {
+      await action();
+      if ((await page.locator('#result').textContent()).includes('Success'))
+        return 'passed';
+    } catch (e) {}
+  }
+  return 'failed-with-screenshot';
 }
-const result = await retryWithScreenshot(async () => await page.click('#action'));
+const result = await retryWithScreenshot(
+  async () => await page.click('#action'),
+);
 ```
 
 #### pw-integration-boss (Integration Icon)
@@ -1089,7 +1178,12 @@ const result = await retryWithScreenshot(async () => await page.click('#action')
 ```javascript
 await page.click('#setup');
 await page.waitForSelector('#data-display');
-const setupValid = (await page.locator('#user-name').textContent()) === 'Test User';
+const setupValid =
+  (await page.locator('#user-name').textContent()) === 'Test User';
 await page.click('#cleanup');
-const result = setupValid && (await page.locator('#status').textContent()) === 'Cleanup complete' ? 'integration-passed' : 'failed';
+const result =
+  setupValid &&
+  (await page.locator('#status').textContent()) === 'Cleanup complete'
+    ? 'integration-passed'
+    : 'failed';
 ```

@@ -1,6 +1,6 @@
 ---
-title: "JavaScript Fundamentals for QA Engineers"
-description: "Master the JavaScript essentials you need for test automation."
+title: 'JavaScript Fundamentals for QA Engineers'
+description: 'Master the JavaScript essentials you need for test automation.'
 ---
 
 # JavaScript Fundamentals for QA Engineers
@@ -12,8 +12,8 @@ Master the JavaScript essentials you need for test automation.
 Don't think of yourself as a "Software Developer" building a complex application.
 Think of yourself as a **Scientist in a Lab**.
 
-* **The Application** is the experiment running in the cage.
-* **JavaScript** is your clipboard and observation tool.
+- **The Application** is the experiment running in the cage.
+- **JavaScript** is your clipboard and observation tool.
 
 You use JS to **prepare data** (setup), **poke the experiment** (interactions), and **record results** (assertions). You don't need to know how to build the cage (complex classes, inheritance, webpack), you just need to know how to read the clipboard.
 
@@ -25,17 +25,17 @@ JavaScript is huge. For QA, you only need about 20% of the language to do 90% of
 
 ### 1. Variables: The Labels
 
-Use `const` for everything. Use `let` only if you *really* need to change it later.
+Use `const` for everything. Use `let` only if you _really_ need to change it later.
 
-* **Good**: `const url = 'https://google.com';` (Stable label)
-* **Bad**: `var x = 5;` (Old, leaky bucket)
+- **Good**: `const url = 'https://google.com';` (Stable label)
+- **Bad**: `var x = 5;` (Old, leaky bucket)
 
 ### 2. Data Types: The Evidence
 
-* **Strings**: What you see on screen. `const text = "Login Failed";`
-* **Booleans**: Logic flags. `const isVisible = true;`
-* **Objects**: Your test data. `const user = { name: "Alice", id: 123 };`
-* **Arrays**: Lists of things. `const errors = ["Email required", "Password too short"];`
+- **Strings**: What you see on screen. `const text = "Login Failed";`
+- **Booleans**: Logic flags. `const isVisible = true;`
+- **Objects**: Your test data. `const user = { name: "Alice", id: 123 };`
+- **Arrays**: Lists of things. `const errors = ["Email required", "Password too short"];`
 
 ### 3. Functions: The Reusable Experiments
 
@@ -43,7 +43,7 @@ Don't write the same setup code 50 times. Wrap it.
 
 ```javascript
 const createTestUser = () => {
-  return { username: `user_${Date.now()}`, password: "secure" };
+  return { username: `user_${Date.now()}`, password: 'secure' };
 };
 ```
 
@@ -62,7 +62,7 @@ expect(rows).toBeGreaterThan(0);
 
 **The Mystery**:
 "But it works manually!"
-The test fails because JavaScript is **asynchronous**. The click happens, and JS immediately runs the next line *before* the server responds.
+The test fails because JavaScript is **asynchronous**. The click happens, and JS immediately runs the next line _before_ the server responds.
 
 **The Fix**:
 Understand **Promises** and `await`. You must tell JS to "pause" until the action is complete.
@@ -70,7 +70,7 @@ Understand **Promises** and `await`. You must tell JS to "pause" until the actio
 ```javascript
 await page.click('#load-btn');
 // Wait for the rows to actually appear
-await expect(page.locator('tr')).toHaveCount(5); 
+await expect(page.locator('tr')).toHaveCount(5);
 ```
 
 **The Lesson**:
@@ -88,7 +88,7 @@ In QA, time is not linear. You must explicitly wait for the universe to catch up
 // ❌ BAD
 if (user.role === 'admin') {
   for (let i = 0; i < 5; i++) {
-     // ... complex logic
+    // ... complex logic
   }
 }
 ```
@@ -107,13 +107,12 @@ if (user.role === 'admin') {
 
 ## Quick Reference: The QA Toolkit
 
-| Concept | Usage in QA | Example |
-| :--- | :--- | :--- |
-| **Template Literals** | Dynamic selectors | `` `[data-id="${userId}"]` `` |
-| **Destructuring** | Extracting API data | `const { token } = response.body;` |
-| **Arrow Functions** | Short callbacks | `users.filter(u => u.active)` |
-| **Spread Operator** | Merging test config | `const finalConfig = { ...defaultConfig, ...overrides };` |
-| **Async/Await** | Waiting for UI | `await page.click();` |
+| Concept               | Usage in QA         | Example                                                   |
+| :-------------------- | :------------------ | :-------------------------------------------------------- |
+| **Template Literals** | Dynamic selectors   | `` `[data-id="${userId}"]` ``                             |
+| **Destructuring**     | Extracting API data | `const { token } = response.body;`                        |
+| **Arrow Functions**   | Short callbacks     | `users.filter(u => u.active)`                             |
+| **Spread Operator**   | Merging test config | `const finalConfig = { ...defaultConfig, ...overrides };` |
+| **Async/Await**       | Waiting for UI      | `await page.click();`                                     |
 
 ---
-

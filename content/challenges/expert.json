@@ -30,12 +30,7 @@
         }
       ],
       "solution": "Welcome, test@qa.com!",
-      "tags": [
-        "playwright",
-        "pom",
-        "page-object",
-        "advanced"
-      ]
+      "tags": ["playwright", "pom", "page-object", "advanced"]
     },
     {
       "slug": "pw-encapsulate-actions",
@@ -66,12 +61,7 @@
         }
       ],
       "solution": "Total: $20",
-      "tags": [
-        "playwright",
-        "pom",
-        "actions",
-        "advanced"
-      ]
+      "tags": ["playwright", "pom", "actions", "advanced"]
     },
     {
       "slug": "pw-page-components",
@@ -102,12 +92,7 @@
         }
       ],
       "solution": "Logged out!",
-      "tags": [
-        "playwright",
-        "pom",
-        "components",
-        "advanced"
-      ]
+      "tags": ["playwright", "pom", "components", "advanced"]
     },
     {
       "slug": "pw-fluent-navigation",
@@ -138,13 +123,7 @@
         }
       ],
       "solution": "Welcome back!",
-      "tags": [
-        "playwright",
-        "pom",
-        "navigation",
-        "fluent",
-        "advanced"
-      ]
+      "tags": ["playwright", "pom", "navigation", "fluent", "advanced"]
     },
     {
       "slug": "pw-base-page-class",
@@ -175,13 +154,7 @@
         }
       ],
       "solution": "Product Details",
-      "tags": [
-        "playwright",
-        "pom",
-        "inheritance",
-        "base-class",
-        "advanced"
-      ]
+      "tags": ["playwright", "pom", "inheritance", "base-class", "advanced"]
     },
     {
       "slug": "pw-pom-boss",
@@ -212,14 +185,7 @@
         }
       ],
       "solution": "Order #12345 Confirmed!",
-      "tags": [
-        "playwright",
-        "pom",
-        "e2e",
-        "scenario",
-        "boss",
-        "advanced"
-      ]
+      "tags": ["playwright", "pom", "e2e", "scenario", "boss", "advanced"]
     },
     {
       "slug": "pw-parameterized-tests",
@@ -250,12 +216,7 @@
         }
       ],
       "solution": "3",
-      "tags": [
-        "playwright",
-        "data-driven",
-        "parameterized",
-        "advanced"
-      ]
+      "tags": ["playwright", "data-driven", "parameterized", "advanced"]
     },
     {
       "slug": "pw-test-data-json",
@@ -286,12 +247,7 @@
         }
       ],
       "solution": "Hello, Charlie!",
-      "tags": [
-        "playwright",
-        "data-driven",
-        "json",
-        "advanced"
-      ]
+      "tags": ["playwright", "data-driven", "json", "advanced"]
     },
     {
       "slug": "pw-csv-test-data",
@@ -322,12 +278,7 @@
         }
       ],
       "solution": "Welcome Bob",
-      "tags": [
-        "playwright",
-        "data-driven",
-        "csv",
-        "advanced"
-      ]
+      "tags": ["playwright", "data-driven", "csv", "advanced"]
     },
     {
       "slug": "pw-dynamic-data",
@@ -358,13 +309,7 @@
         }
       ],
       "solution": "success",
-      "tags": [
-        "playwright",
-        "data-driven",
-        "faker",
-        "dynamic",
-        "advanced"
-      ]
+      "tags": ["playwright", "data-driven", "faker", "dynamic", "advanced"]
     },
     {
       "slug": "pw-environment-data",
@@ -395,13 +340,7 @@
         }
       ],
       "solution": "Logged into staging",
-      "tags": [
-        "playwright",
-        "data-driven",
-        "environment",
-        "config",
-        "advanced"
-      ]
+      "tags": ["playwright", "data-driven", "environment", "config", "advanced"]
     },
     {
       "slug": "pw-data-driven-boss",
@@ -432,13 +371,7 @@
         }
       ],
       "solution": "4",
-      "tags": [
-        "playwright",
-        "data-driven",
-        "scenario",
-        "boss",
-        "advanced"
-      ]
+      "tags": ["playwright", "data-driven", "scenario", "boss", "advanced"]
     },
     {
       "slug": "pw-api-ui-testing",
@@ -469,12 +402,7 @@
         }
       ],
       "solution": "hybrid-success",
-      "tags": [
-        "playwright",
-        "api",
-        "hybrid",
-        "advanced"
-      ]
+      "tags": ["playwright", "api", "hybrid", "advanced"]
     },
     {
       "slug": "pw-state-setup-api",
@@ -505,12 +433,7 @@
         }
       ],
       "solution": "Welcome, authenticated user!",
-      "tags": [
-        "playwright",
-        "api",
-        "setup",
-        "advanced"
-      ]
+      "tags": ["playwright", "api", "setup", "advanced"]
     },
     {
       "slug": "pw-screenshot-failure",
@@ -541,12 +464,7 @@
         }
       ],
       "solution": "Screenshot: captured",
-      "tags": [
-        "playwright",
-        "screenshot",
-        "debugging",
-        "advanced"
-      ]
+      "tags": ["playwright", "screenshot", "debugging", "advanced"]
     },
     {
       "slug": "pw-video-recording",
@@ -577,12 +495,7 @@
         }
       ],
       "solution": "Video: saved",
-      "tags": [
-        "playwright",
-        "video",
-        "recording",
-        "advanced"
-      ]
+      "tags": ["playwright", "video", "recording", "advanced"]
     },
     {
       "slug": "pw-retry-logic",
@@ -613,12 +526,7 @@
         }
       ],
       "solution": "Success on retry",
-      "tags": [
-        "playwright",
-        "retry",
-        "flaky",
-        "advanced"
-      ]
+      "tags": ["playwright", "retry", "flaky", "advanced"]
     },
     {
       "slug": "pw-parallel-execution",
@@ -649,12 +557,7 @@
         }
       ],
       "solution": "Completed: 3/3",
-      "tags": [
-        "playwright",
-        "parallel",
-        "performance",
-        "advanced"
-      ]
+      "tags": ["playwright", "parallel", "performance", "advanced"]
     },
     {
       "slug": "pw-cross-browser",
@@ -685,12 +588,7 @@
         }
       ],
       "solution": "Tested on: chromium",
-      "tags": [
-        "playwright",
-        "cross-browser",
-        "compatibility",
-        "advanced"
-      ]
+      "tags": ["playwright", "cross-browser", "compatibility", "advanced"]
     },
     {
       "slug": "pw-mobile-viewport",
@@ -721,13 +619,7 @@
         }
       ],
       "solution": "Layout: mobile",
-      "tags": [
-        "playwright",
-        "mobile",
-        "responsive",
-        "viewport",
-        "advanced"
-      ]
+      "tags": ["playwright", "mobile", "responsive", "viewport", "advanced"]
     },
     {
       "slug": "pw-csv-workflow",
@@ -758,13 +650,7 @@
         }
       ],
       "solution": "Export CompleteDownload Result Report",
-      "tags": [
-        "playwright",
-        "upload",
-        "workflow",
-        "csv",
-        "advanced"
-      ]
+      "tags": ["playwright", "upload", "workflow", "csv", "advanced"]
     },
     {
       "slug": "pw-infrastructure-boss",

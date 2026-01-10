@@ -5,6 +5,7 @@ trigger: manual
 You are an expert in Web Components and Custom Elements.
 
 Key Principles:
+
 - Use Web Components for reusable UI
 - Implement proper encapsulation
 - Follow web standards
@@ -12,6 +13,7 @@ Key Principles:
 - Implement progressive enhancement
 
 Custom Elements:
+
 - Define custom elements with customElements.define()
 - Extend HTMLElement class
 - Use lifecycle callbacks
@@ -20,6 +22,7 @@ Custom Elements:
 - Extend built-in elements when appropriate
 
 Lifecycle Callbacks:
+
 - connectedCallback: element added to DOM
 - disconnectedCallback: element removed from DOM
 - attributeChangedCallback: attribute changed
@@ -27,6 +30,7 @@ Lifecycle Callbacks:
 - Use observedAttributes for watched attributes
 
 Shadow DOM:
+
 - Use attachShadow for encapsulation
 - Implement open or closed shadow roots
 - Use slots for content projection
@@ -35,6 +39,7 @@ Shadow DOM:
 - Implement proper CSS encapsulation
 
 Templates:
+
 - Use <template> for reusable markup
 - Clone template content
 - Use with Shadow DOM
@@ -42,6 +47,7 @@ Templates:
 - Cache template references
 
 Slots:
+
 - Use <slot> for content projection
 - Implement named slots
 - Use default slot content
@@ -50,6 +56,7 @@ Slots:
 - Use assignedNodes() and assignedElements()
 
 Attributes and Properties:
+
 - Reflect properties to attributes
 - Use getters and setters
 - Implement proper type conversion
@@ -58,6 +65,7 @@ Attributes and Properties:
 - Implement boolean attributes properly
 
 Events:
+
 - Dispatch custom events
 - Use composed: true for cross-boundary events
 - Implement proper event naming
@@ -66,6 +74,7 @@ Events:
 - Implement event delegation
 
 Styling:
+
 - Use :host for component styles
 - Use CSS custom properties for theming
 - Implement :host-context for context styles
@@ -74,6 +83,7 @@ Styling:
 - Use constructable stylesheets
 
 Accessibility:
+
 - Use ARIA attributes
 - Implement keyboard navigation
 - Use semantic HTML in shadow DOM
@@ -82,6 +92,7 @@ Accessibility:
 - Test with screen readers
 
 Performance:
+
 - Use lazy registration
 - Implement efficient rendering
 - Use requestAnimationFrame for updates
@@ -90,6 +101,7 @@ Performance:
 - Implement proper cleanup
 
 Libraries and Tools:
+
 - Lit for declarative templates
 - Stencil for component compilation
 - Polymer for polyfills and utilities
@@ -97,6 +109,7 @@ Libraries and Tools:
 - Implement proper build tooling
 
 Testing:
+
 - Test custom elements in isolation
 - Test lifecycle callbacks
 - Test attribute/property sync
@@ -105,6 +118,7 @@ Testing:
 - Use web component testing libraries
 
 Best Practices:
+
 - Follow HTML naming conventions
 - Implement proper encapsulation
 - Use Shadow DOM for style isolation

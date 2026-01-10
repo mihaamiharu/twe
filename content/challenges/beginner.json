@@ -30,12 +30,7 @@
         }
       ],
       "solution": "1",
-      "tags": [
-        "javascript",
-        "variables",
-        "types",
-        "beginner"
-      ]
+      "tags": ["javascript", "variables", "types", "beginner"]
     },
     {
       "slug": "js-arrays-test-data",
@@ -66,12 +61,7 @@
         }
       ],
       "solution": "4",
-      "tags": [
-        "javascript",
-        "arrays",
-        "test-data",
-        "beginner"
-      ]
+      "tags": ["javascript", "arrays", "test-data", "beginner"]
     },
     {
       "slug": "js-objects-for-tests",
@@ -102,12 +92,7 @@
         }
       ],
       "solution": "6",
-      "tags": [
-        "javascript",
-        "objects",
-        "test-data",
-        "beginner"
-      ]
+      "tags": ["javascript", "objects", "test-data", "beginner"]
     },
     {
       "slug": "js-if-else-logic",
@@ -138,12 +123,7 @@
         }
       ],
       "solution": "PARTIAL",
-      "tags": [
-        "javascript",
-        "conditionals",
-        "logic",
-        "beginner"
-      ]
+      "tags": ["javascript", "conditionals", "logic", "beginner"]
     },
     {
       "slug": "js-loops-testing",
@@ -174,12 +154,7 @@
         }
       ],
       "solution": "4",
-      "tags": [
-        "javascript",
-        "loops",
-        "iteration",
-        "beginner"
-      ]
+      "tags": ["javascript", "loops", "iteration", "beginner"]
     },
     {
       "slug": "js-functions-basics",
@@ -210,12 +185,7 @@
         }
       ],
       "solution": "70",
-      "tags": [
-        "javascript",
-        "functions",
-        "helpers",
-        "beginner"
-      ]
+      "tags": ["javascript", "functions", "helpers", "beginner"]
     },
     {
       "slug": "js-arrow-functions",
@@ -246,12 +216,7 @@
         }
       ],
       "solution": "64",
-      "tags": [
-        "javascript",
-        "arrow-functions",
-        "modern",
-        "beginner"
-      ]
+      "tags": ["javascript", "arrow-functions", "modern", "beginner"]
     },
     {
       "slug": "js-array-methods",
@@ -282,13 +247,7 @@
         }
       ],
       "solution": "3",
-      "tags": [
-        "javascript",
-        "array-methods",
-        "map",
-        "filter",
-        "beginner"
-      ]
+      "tags": ["javascript", "array-methods", "map", "filter", "beginner"]
     },
     {
       "slug": "js-string-methods",
@@ -319,12 +278,7 @@
         }
       ],
       "solution": "AUTH_FAILED",
-      "tags": [
-        "javascript",
-        "strings",
-        "assertions",
-        "beginner"
-      ]
+      "tags": ["javascript", "strings", "assertions", "beginner"]
     },
     {
       "slug": "js-destructuring",
@@ -355,12 +309,7 @@
         }
       ],
       "solution": "250",
-      "tags": [
-        "javascript",
-        "destructuring",
-        "modern",
-        "beginner"
-      ]
+      "tags": ["javascript", "destructuring", "modern", "beginner"]
     },
     {
       "slug": "js-fundamentals-boss",
@@ -391,12 +340,7 @@
         }
       ],
       "solution": "3",
-      "tags": [
-        "javascript",
-        "scenario",
-        "boss",
-        "beginner"
-      ]
+      "tags": ["javascript", "scenario", "boss", "beginner"]
     },
     {
       "slug": "dom-queryselector-vs-all",
@@ -427,12 +371,7 @@
         }
       ],
       "solution": "4",
-      "tags": [
-        "javascript",
-        "dom",
-        "querySelector",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "querySelector", "beginner"]
     },
     {
       "slug": "dom-element-properties",
@@ -463,12 +402,7 @@
         }
       ],
       "solution": "100",
-      "tags": [
-        "javascript",
-        "dom",
-        "properties",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "properties", "beginner"]
     },
     {
       "slug": "dom-check-element-state",
@@ -499,13 +433,7 @@
         }
       ],
       "solution": "3",
-      "tags": [
-        "javascript",
-        "dom",
-        "state",
-        "forms",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "state", "forms", "beginner"]
     },
     {
       "slug": "dom-parent-child-navigation",
@@ -536,12 +464,7 @@
         }
       ],
       "solution": "4",
-      "tags": [
-        "javascript",
-        "dom",
-        "traversal",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "traversal", "beginner"]
     },
     {
       "slug": "dom-event-listeners",
@@ -572,12 +495,7 @@
         }
       ],
       "solution": "3",
-      "tags": [
-        "javascript",
-        "dom",
-        "events",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "events", "beginner"]
     },
     {
       "slug": "dom-form-interaction",
@@ -608,12 +526,7 @@
         }
       ],
       "solution": "testuser:secret123",
-      "tags": [
-        "javascript",
-        "dom",
-        "forms",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "forms", "beginner"]
     },
     {
       "slug": "dom-table-data-extraction",
@@ -644,12 +557,7 @@
         }
       ],
       "solution": "550",
-      "tags": [
-        "javascript",
-        "dom",
-        "tables",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "tables", "beginner"]
     },
     {
       "slug": "dom-wait-for-element",
@@ -680,12 +588,7 @@
         }
       ],
       "solution": "2",
-      "tags": [
-        "javascript",
-        "dom",
-        "existence",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "existence", "beginner"]
     },
     {
       "slug": "dom-boss",
@@ -716,13 +619,7 @@
         }
       ],
       "solution": "5678",
-      "tags": [
-        "javascript",
-        "dom",
-        "scenario",
-        "boss",
-        "beginner"
-      ]
+      "tags": ["javascript", "dom", "scenario", "boss", "beginner"]
     },
     {
       "slug": "async-understanding-promises",
@@ -753,12 +650,7 @@
         }
       ],
       "solution": "42",
-      "tags": [
-        "javascript",
-        "async",
-        "promises",
-        "beginner"
-      ]
+      "tags": ["javascript", "async", "promises", "beginner"]
     },
     {
       "slug": "async-await-basics",
@@ -789,12 +681,7 @@
         }
       ],
       "solution": "42",
-      "tags": [
-        "javascript",
-        "async",
-        "await",
-        "beginner"
-      ]
+      "tags": ["javascript", "async", "await", "beginner"]
     },
     {
       "slug": "async-error-handling",
@@ -825,12 +712,7 @@
         }
       ],
       "solution": "fallback",
-      "tags": [
-        "javascript",
-        "async",
-        "error-handling",
-        "beginner"
-      ]
+      "tags": ["javascript", "async", "error-handling", "beginner"]
     },
     {
       "slug": "async-parallel-execution",
@@ -861,13 +743,7 @@
         }
       ],
       "solution": "42",
-      "tags": [
-        "javascript",
-        "async",
-        "parallel",
-        "promise-all",
-        "beginner"
-      ]
+      "tags": ["javascript", "async", "parallel", "promise-all", "beginner"]
     },
     {
       "slug": "async-testing-patterns",
@@ -898,13 +774,7 @@
         }
       ],
       "solution": "3",
-      "tags": [
-        "javascript",
-        "async",
-        "testing",
-        "retry",
-        "beginner"
-      ]
+      "tags": ["javascript", "async", "testing", "retry", "beginner"]
     },
     {
       "slug": "async-boss",
@@ -935,13 +805,7 @@
         }
       ],
       "solution": "12",
-      "tags": [
-        "javascript",
-        "async",
-        "scenario",
-        "boss",
-        "beginner"
-      ]
+      "tags": ["javascript", "async", "scenario", "boss", "beginner"]
     }
   ]
 }

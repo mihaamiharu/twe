@@ -80,15 +80,15 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## 📦 Tech Stack
 
-| Category | Technology |
-|----------|------------|
-| **Framework** | [TanStack Start](https://tanstack.com/start) |
-| **Language** | TypeScript 5.0 |
-| **Database** | PostgreSQL 15 + [Drizzle ORM](https://orm.drizzle.team) |
-| **Auth** | [BetterAuth](https://better-auth.com) |
-| **UI** | [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS |
+| Category        | Technology                                                  |
+| --------------- | ----------------------------------------------------------- |
+| **Framework**   | [TanStack Start](https://tanstack.com/start)                |
+| **Language**    | TypeScript 5.0                                              |
+| **Database**    | PostgreSQL 15 + [Drizzle ORM](https://orm.drizzle.team)     |
+| **Auth**        | [BetterAuth](https://better-auth.com)                       |
+| **UI**          | [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS           |
 | **Code Editor** | [Monaco Editor](https://microsoft.github.io/monaco-editor/) |
-| **Markdown** | react-markdown + rehype-highlight |
+| **Markdown**    | react-markdown + rehype-highlight                           |
 
 ## 📂 Project Structure
 
@@ -154,7 +154,7 @@ To run everything (Infrastructure + Tests) in one go:
 bun run test:ci
 ```
 
-*Starts `postgres_test`, runs all tests, and stops the container cleanup regardless of result.*
+_Starts `postgres_test`, runs all tests, and stops the container cleanup regardless of result._
 
 ### Manual Database Control
 
@@ -168,12 +168,12 @@ bun test
 
 ## 🎮 Challenge Types
 
-| Type | Description |
-|------|-------------|
-| **JavaScript** | Write JS functions to solve problems |
-| **Playwright** | Write Playwright-style automation code |
-| **CSS Selector** | Select elements using CSS selectors |
-| **XPath** | Select elements using XPath expressions |
+| Type             | Description                             |
+| ---------------- | --------------------------------------- |
+| **JavaScript**   | Write JS functions to solve problems    |
+| **Playwright**   | Write Playwright-style automation code  |
+| **CSS Selector** | Select elements using CSS selectors     |
+| **XPath**        | Select elements using XPath expressions |
 
 ### Example Playwright Challenge
 
@@ -200,12 +200,12 @@ expect(text).toContain('Success');
 
 The platform includes **96 challenges** across 4 progressive tiers:
 
-| Tier | Count | Focus Areas |
-|------|-------|-------------|
-| Basic | 23 | CSS Selectors, XPath, Comparison |
-| Beginner | 23 | JavaScript Fundamentals, DOM, Async |
-| Intermediate | 29 | Playwright Actions, Locators, Assertions |
-| Expert | 21 | Page Object Model, Data-Driven Testing |
+| Tier         | Count | Focus Areas                              |
+| ------------ | ----- | ---------------------------------------- |
+| Basic        | 23    | CSS Selectors, XPath, Comparison         |
+| Beginner     | 23    | JavaScript Fundamentals, DOM, Async      |
+| Intermediate | 29    | Playwright Actions, Locators, Assertions |
+| Expert       | 21    | Page Object Model, Data-Driven Testing   |
 
 ## 📄 Documentation
 

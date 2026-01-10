@@ -1,11 +1,11 @@
 ---
-title: "Dasar-Dasar Async/Await untuk Pengujian"
+title: 'Dasar-Dasar Async/Await untuk Pengujian'
 description: "Kuasai seni 'menunggu' untuk membasmi tes flaky selamanya."
 ---
 
 # Dasar-Dasar Async/Await untuk Pengujian
 
-Kuasai seni "menunggu" untuk membasmi tes *flaky* selamanya.
+Kuasai seni "menunggu" untuk membasmi tes _flaky_ selamanya.
 
 ## Mental Model: Kedai Kopi
 
@@ -16,7 +16,7 @@ Bayangkan dunia **Sinkron** (Mesin Penjual Otomatis):
 3. Keripik jatuh.
 4. Kamu mengambilnya.
 
-* *Kendala*: Kamu **tidak bisa** melakukan hal lain sampai Langkah 4 selesai. Kamu terblokir.
+- _Kendala_: Kamu **tidak bisa** melakukan hal lain sampai Langkah 4 selesai. Kamu terblokir.
 
 Sekarang bayangkan dunia **Asinkron** (Kedai Kopi):
 
@@ -28,25 +28,25 @@ Sekarang bayangkan dunia **Asinkron** (Kedai Kopi):
 
 **Dalam Javascript:**
 
-* `Promise` = Tiket.
-* `async/await` = Berdiri di meja kasir menolak pindah sampai kopimu siap.
+- `Promise` = Tiket.
+- `async/await` = Berdiri di meja kasir menolak pindah sampai kopimu siap.
 
 ---
 
 ## Strategi: Aturan "Await Segalanya"
 
-Dalam otomatisasi tes modern (Playwright/Puppeteer), 99% perintah berinteraksi dengan proses browser yang hidup *di luar* skrip kamu.
+Dalam otomatisasi tes modern (Playwright/Puppeteer), 99% perintah berinteraksi dengan proses browser yang hidup _di luar_ skrip kamu.
 
 **Aturan**: Jika baris kodemu menyentuh browser, **await itu**.
 
-* Cek Detail:
-  * Apakah dia mengklik? `await page.click()`
-  * Apakah dia mengetik? `await page.typed()`
-  * Apakah dia menavigasi? `await page.goto()`
-  * Apakah dia memverifikasi? `await expect(page).toHaveURL()`
+- Cek Detail:
+  - Apakah dia mengklik? `await page.click()`
+  - Apakah dia mengetik? `await page.typed()`
+  - Apakah dia menavigasi? `await page.goto()`
+  - Apakah dia memverifikasi? `await expect(page).toHaveURL()`
 
 **Pengecualian**:
-Kode yang berjalan murni di dalam proses *Node.js* kamu (seperti menghitung `1 + 1` atau mengubah string) tidak butuh await.
+Kode yang berjalan murni di dalam proses _Node.js_ kamu (seperti menghitung `1 + 1` atau mengubah string) tidak butuh await.
 
 ---
 
@@ -86,8 +86,8 @@ await api.post('/users', { ... });
 ### Jebakan #1: Fire-and-Forget (Tembak dan Lupakan)
 
 **Kodenya**: `page.click('#submit')` (tanpa await)
-**Akibatnya**: Skrip mengirim sinyal "klik" dan segera pindah ke asersi. Asersi mungkin berjalan *milidetik* sebelum klik benar-benar terjadi di browser.
-**Hasilnya**: Tes yang sangat *flaky* yang hanya lulus 50% dari waktu.
+**Akibatnya**: Skrip mengirim sinyal "klik" dan segera pindah ke asersi. Asersi mungkin berjalan _milidetik_ sebelum klik benar-benar terjadi di browser.
+**Hasilnya**: Tes yang sangat _flaky_ yang hanya lulus 50% dari waktu.
 
 ### Jebakan #2: Balapan Gerak Lambat (Slow-Motion Race)
 
@@ -105,11 +105,7 @@ await createUser('C'); // 1 dtk
 **Solusinya**: Pesan semuanya sekaligus (Paralelisme).
 
 ```javascript
-await Promise.all([
-  createUser('A'),
-  createUser('B'),
-  createUser('C')
-]);
+await Promise.all([createUser('A'), createUser('B'), createUser('C')]);
 // Total: 1 detik
 ```
 
@@ -117,11 +113,11 @@ await Promise.all([
 
 ## Referensi Cepat
 
-| Aksi | Kode | Arti |
-| :--- | :--- | :--- |
+| Aksi                   | Kode                           | Arti                                |
+| :--------------------- | :----------------------------- | :---------------------------------- |
 | **Mulai Fungsi Async** | `async function foo() { ... }` | "Saya akan gunakan await di dalam." |
-| **Jeda Eksekusi** | `await promise` | "Berhenti di sini sampai selesai." |
-| **Paralelkan** | `await Promise.all([p1, p2])` | "Tunggu SEMUA ini." |
-| **Balapan** | `await Promise.race([p1, p2])` | "Tunggu yang PERTAMA dari ini." |
+| **Jeda Eksekusi**      | `await promise`                | "Berhenti di sini sampai selesai."  |
+| **Paralelkan**         | `await Promise.all([p1, p2])`  | "Tunggu SEMUA ini."                 |
+| **Balapan**            | `await Promise.race([p1, p2])` | "Tunggu yang PERTAMA dari ini."     |
 
 ---

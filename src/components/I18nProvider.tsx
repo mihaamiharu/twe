@@ -5,8 +5,8 @@ import { isValidLocale, fallbackLng } from '@/lib/i18n/settings';
 import type { Locale } from '@/lib/i18n/settings';
 
 interface I18nProviderProps {
-    children: React.ReactNode;
-    locale?: string;
+  children: React.ReactNode;
+  locale?: string;
 }
 
 /**
@@ -14,13 +14,15 @@ interface I18nProviderProps {
  * Wrap this around your app content to enable translations.
  */
 export function I18nProvider({ children, locale }: I18nProviderProps) {
-    useEffect(() => {
-        const targetLocale: Locale = isValidLocale(locale ?? '') ? locale as Locale : fallbackLng;
+  useEffect(() => {
+    const targetLocale: Locale = isValidLocale(locale ?? '')
+      ? (locale as Locale)
+      : fallbackLng;
 
-        if (i18n.language !== targetLocale) {
-            i18n.changeLanguage(targetLocale);
-        }
-    }, [locale]);
+    if (i18n.language !== targetLocale) {
+      i18n.changeLanguage(targetLocale);
+    }
+  }, [locale]);
 
-    return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
+  return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }

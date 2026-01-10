@@ -2,30 +2,34 @@ import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class TutorialsPage extends BasePage {
-    readonly tutorialCards: Locator;
-    readonly completeButton: Locator;
+  readonly tutorialCards: Locator;
+  readonly completeButton: Locator;
 
-    constructor(page: Page) {
-        super(page);
-        this.tutorialCards = page.locator('a[href*="/tutorials/"][class*="group"]');
-        this.completeButton = page.getByRole('button', { name: /Complete|Selesai/i });
-    }
+  constructor(page: Page) {
+    super(page);
+    this.tutorialCards = page.locator('a[href*="/tutorials/"][class*="group"]');
+    this.completeButton = page.getByRole('button', {
+      name: /Complete|Selesai/i,
+    });
+  }
 
-    async gotoList(locale: string = 'en') {
-        await this.goto(`/${locale}/tutorials`);
-    }
+  async gotoList(locale: string = 'en') {
+    await this.goto(`/${locale}/tutorials`);
+  }
 
-    async gotoTutorial(slug: string, locale: string = 'en') {
-        await this.goto(`/${locale}/tutorials/${slug}`);
-    }
+  async gotoTutorial(slug: string, locale: string = 'en') {
+    await this.goto(`/${locale}/tutorials/${slug}`);
+  }
 
-    async verifyTutorialContent() {
-        // await expect(this.page.locator('.prose')).toBeVisible(); // Flaky in some envs, rely on title
-        await expect(this.page.locator('h1')).toBeVisible();
-    }
+  async verifyTutorialContent() {
+    // await expect(this.page.locator('.prose')).toBeVisible(); // Flaky in some envs, rely on title
+    await expect(this.page.locator('h1')).toBeVisible();
+  }
 
-    async completeTutorial() {
-        await this.completeButton.click();
-        await expect(this.page.getByText('Completed', { exact: false })).toBeVisible();
-    }
+  async completeTutorial() {
+    await this.completeButton.click();
+    await expect(
+      this.page.getByText('Completed', { exact: false }),
+    ).toBeVisible();
+  }
 }

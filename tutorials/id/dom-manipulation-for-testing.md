@@ -1,6 +1,6 @@
 ---
-title: "Manipulasi DOM untuk Pengujian"
-description: "Belajar kapan harus keluar dari kotak otomatisasi standar dan melakukan operasi bedah pada DOM."
+title: 'Manipulasi DOM untuk Pengujian'
+description: 'Belajar kapan harus keluar dari kotak otomatisasi standar dan melakukan operasi bedah pada DOM.'
 ---
 
 # Manipulasi DOM untuk Pengujian
@@ -15,8 +15,8 @@ Seringkali, memeriksa tanda vital (membaca teks) dan meresepkan obat (mengklik t
 **Manipulasi DOM Langsung** adalah **Pembedahan**.
 Ini invasif. Kamu membedah pasien (halaman browser) untuk memperbaiki sesuatu di dalam.
 
-* **Risiko**: Tinggi. Kamu mungkin melewati validasi yang akan dihadapi pengguna sungguhan.
-* **Kekuatan**: Mutlak. Kamu bisa mengubah nilai, atribut, atau status apa pun secara instan.
+- **Risiko**: Tinggi. Kamu mungkin melewati validasi yang akan dihadapi pengguna sungguhan.
+- **Kekuatan**: Mutlak. Kamu bisa mengubah nilai, atribut, atau status apa pun secara instan.
 
 Gunakan pembedahan hanya ketika perawatan non-invasif gagal.
 
@@ -30,7 +30,7 @@ Dalam pengujian "Glass Box", kamu bisa melihat ke dalam dan menyentuh roda gigin
 **Gunakan Manipulasi DOM untuk:**
 
 1. **Setup (Injecting State)**: Mempercepat aplikasi ke status tertentu.
-    * *Contoh*: Menyuntikkan token JWT ke LocalStorage agar kamu tidak perlu login via UI setiap saat.
+   - _Contoh_: Menyuntikkan token JWT ke LocalStorage agar kamu tidak perlu login via UI setiap saat.
 2. **Teardown (Cleanup)**: Mereset aplikasi.
 3. **Membaca Deep State**: Memeriksa properti yang tidak terlihat (contoh, `data-analytics-id`).
 
@@ -45,7 +45,7 @@ Dalam pengujian "Glass Box", kamu bisa melihat ke dalam dan menyentuh roda gigin
 **Skenario**:
 Kamu sedang mengetes formulir "Booking Penerbangan".
 Date picker pihak ketiga yang umum menutupi field `<input>` yang sebenarnya.
-Playwright mencoba mengklik input, tapi date picker menghalanginya. Tes menjadi *flaky*.
+Playwright mencoba mengklik input, tapi date picker menghalanginya. Tes menjadi _flaky_.
 
 **Pendekatan Ahli Bedah**:
 Daripada melawan lapisan UI, lakukan pembedahan. Set nilai langsung pada input.
@@ -61,8 +61,8 @@ await page.evaluate(() => {
 ```
 
 **Override yang Valid**:
-Kita tidak mengetes *library Date Picker* (itu tugas pembuat library). Kita mengetes *Logika Booking*.
-Dengan memintas gangguan UI, kita memastikan Logika Booking kita dites dengan kuat (*robust*).
+Kita tidak mengetes _library Date Picker_ (itu tugas pembuat library). Kita mengetes _Logika Booking_.
+Dengan memintas gangguan UI, kita memastikan Logika Booking kita dites dengan kuat (_robust_).
 
 ---
 
@@ -73,16 +73,16 @@ Dengan memintas gangguan UI, kita memastikan Logika Booking kita dites dengan ku
 **Kejahatan**: Menggunakan `element.click()` di JavaScript untuk "mengklik" tombol.
 **Realitanya**:
 
-* Klik pengguna asli memicu: `mousedown`, `focus`, `mouseup`, `click`.
-* Klik JS memicu: `click` saja.
-**Risikonya**: Kamu mungkin mengklik tombol yang sebenarnya tertutup modal atau dinonaktifkan oleh CSS. Tes lulus, tapi pengguna terblokir.
-**Solusinya**: Selalu gunakan klik native framework kamu (`page.click()`), yang memeriksa visibilitas dan aksiabilitas.
+- Klik pengguna asli memicu: `mousedown`, `focus`, `mouseup`, `click`.
+- Klik JS memicu: `click` saja.
+  **Risikonya**: Kamu mungkin mengklik tombol yang sebenarnya tertutup modal atau dinonaktifkan oleh CSS. Tes lulus, tapi pengguna terblokir.
+  **Solusinya**: Selalu gunakan klik native framework kamu (`page.click()`), yang memeriksa visibilitas dan aksiabilitas.
 
 ### Jebakan #2: Diskoneksi React/State
 
 **Kejahatan**: `input.value = 'hello'`
 **Realitanya**: Framework modern (React, Vue) melihat state internal mereka, bukan DOM. Mengubah DOM tidak mengupdate React.
-**Solusinya**: Kamu harus mengirimkan *event* (`dispatchEvent(new Event('input'))`) setelah mengubah nilai untuk membangunkan framework.
+**Solusinya**: Kamu harus mengirimkan _event_ (`dispatchEvent(new Event('input'))`) setelah mengubah nilai untuk membangunkan framework.
 
 ---
 
@@ -103,12 +103,12 @@ Menemukan semua kecocokan. Mengembalikan NodeList.
 ```javascript
 const links = document.querySelectorAll('a');
 // Konversi ke Array untuk filter
-const pdfs = [...links].filter(link => link.href.endsWith('.pdf'));
+const pdfs = [...links].filter((link) => link.href.endsWith('.pdf'));
 ```
 
 ### 3. `element.closest()` (Pelacak)
 
-Berjalan NAIK ke atas pohon (*tree*). Bagus untuk menemukan kontainer sebuah tombol.
+Berjalan NAIK ke atas pohon (_tree_). Bagus untuk menemukan kontainer sebuah tombol.
 
 ```javascript
 const row = deleteBtn.closest('tr'); // Menemukan barisnya!
