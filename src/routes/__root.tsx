@@ -1,5 +1,5 @@
 import { HeadContent, Outlet, Scripts, createRootRoute, useParams } from '@tanstack/react-router';
-import { type AuthSession } from '@/lib/auth.fn';
+import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';

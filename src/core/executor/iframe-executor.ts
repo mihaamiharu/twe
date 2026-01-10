@@ -42,12 +42,13 @@ export interface TestCaseResult {
 export async function executePlaywrightCode(
     code: string,
     htmlContent: string,
-    options?: ExecuteOptions & { existingIframe?: HTMLIFrameElement }
+    options?: ExecuteOptions & { existingIframe?: HTMLIFrameElement; strictMode?: boolean }
 ): Promise<ExecutionResult> {
     const timeout = options?.timeout || 10000;
     const startTime = Date.now();
     const useExistingIframe = !!options?.existingIframe;
     const logs: Array<{ id: string; type: string; message: string }> = [];
+    const strictMode = options?.strictMode !== false; // Default to true for backward compatibility
 
 
     // Patch HTML content for specific challenges where happy-dom needs checking
@@ -67,19 +68,21 @@ export async function executePlaywrightCode(
         { pattern: /alert\(/, message: "In Playwright, you cannot handle alerts this way. Use 'page.on(\"dialog\", ...)'." },
     ];
 
-    for (const { pattern, message } of forbiddenPatterns) {
-        if (pattern.test(code)) {
-            // Check if it might be inside an evaluate block (naive check)
-            // If the code line containing the pattern is not inside an evaluate, throw error
-            // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
-            // Actually, let's just return a FAILED result immediately to teach the user.
-            return {
-                status: 'FAILED',
-                output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
-                executionTime: 0,
-                error: `Strict Mode Error: ${message}`,
-                logs: []
-            };
+    if (strictMode) {
+        for (const { pattern, message } of forbiddenPatterns) {
+            if (pattern.test(code)) {
+                // Check if it might be inside an evaluate block (naive check)
+                // If the code line containing the pattern is not inside an evaluate, throw error
+                // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
+                // Actually, let's just return a FAILED result immediately to teach the user.
+                return {
+                    status: 'FAILED',
+                    output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
+                    executionTime: 0,
+                    error: `Strict Mode Error: ${message}`,
+                    logs: []
+                };
+            }
         }
     }
 
@@ -148,8 +151,7 @@ export async function executePlaywrightCode(
                                 margin: 0;
                               }
                             </style>
-                            <script>
-                                // Polyfill fetch to handle relative URLs if base tag doesn't work
+                            <script data-internal="true">
                                 // Polyfill fetch to handle relative URLs and MOCK requests
                                 const originalFetch = window.fetch;
                                 window.fetch = function(input, init) {
@@ -162,15 +164,12 @@ export async function executePlaywrightCode(
                                         }
                                     }
 
-                                    // Check against dynamic routes from page.route()
                                     if (window.__MOCK_ROUTES__) {
                                         for (const route of window.__MOCK_ROUTES__) {
                                             let isMatch = false;
                                             if (typeof route.matcher === 'string') {
-                                                // Simple glob-like matching (very basic)
-                                                // If it contains *, treat as simple wildcard
                                                 if (route.matcher.includes('*')) {
-                                                    const regex = new RegExp(route.matcher.replace(/\*/g, '.*'));
+                                                    const regex = new RegExp(route.matcher.replace(/\\*/g, '.*'));
                                                     isMatch = regex.test(url);
                                                 } else {
                                                     isMatch = url.includes(route.matcher);
@@ -187,8 +186,6 @@ export async function executePlaywrightCode(
 
                                             if (isMatch) {
                                                 console.log('Mocking fetch via page.route to ' + url);
-
-                                                // Create a request object to pass to handler
                                                 const requestInfo = {
                                                     url,
                                                     method: init?.method || 'GET',
@@ -206,20 +203,14 @@ export async function executePlaywrightCode(
                                                             text: () => Promise.resolve(typeof resp.body === 'string' ? resp.body : JSON.stringify(resp.json || {})),
                                                             headers: new Headers(resp.headers || {'content-type': 'application/json'})
                                                         });
-                                                    } else if (result && result.type === 'continue') {
-                                                        // Fall through to original fetch (network)
-                                                        // In our sandbox, this means hitting the actual URL (or failing if CORS/offline)
-                                                        // return originalFetch(url, init);
                                                     }
-                                                    return Promise.reject(new Error('Route handler did not fulfill or continue'));
+                                                    return Promise.reject(new Error('Route handler did not fulfill'));
                                                 });
                                             }
                                         }
                                     }
 
-                                    // Legacy Mock for /api/data (for backward compatibility with existing challenges)
                                     if (typeof url === 'string' && url.includes('/api/data')) {
-                                        console.log('Mocking fetch to ' + url);
                                         return Promise.resolve({
                                             ok: true,
                                             status: 200,
@@ -229,11 +220,6 @@ export async function executePlaywrightCode(
                                         });
                                     }
                                     
-                                    // For other requests, try to fetch (or fail)
-                                    // But usually we should mock everything in tests
-                                    // return originalFetch(url, init);
-                                    
-                                    // Default mock for anything else to avoid connection refused
                                     return Promise.resolve({
                                         ok: true,
                                         status: 404,
@@ -242,51 +228,13 @@ export async function executePlaywrightCode(
                                     });
                                 };
 
-                                // Patch Dialogs
-                                const originalAlert = window.alert;
-                                const originalConfirm = window.confirm;
-                                const originalPrompt = window.prompt;
-
                                 window.alert = function(message) {
                                     console.log('[Dialog] alert: ' + message);
                                     if (window.__MOCK_DIALOG_HANDLER__) {
                                         window.__MOCK_DIALOG_HANDLER__('alert', message);
-                                        return;
                                     }
-                                    return originalAlert(message);
-                                };
-
-                                window.confirm = function(message) {
-                                    console.log('[Dialog] confirm: ' + message);
-                                    if (window.__MOCK_DIALOG_HANDLER__) {
-                                        // This needs to be synchronous for window.confirm, but our handler is async (bridged via promise)
-                                        // In a real browser, we can't pause the main thread for an async handler easily.
-                                        // However, Playwright handles this via CDP which pauses execution.
-                                        // Here, we have a problem: window.confirm implies sync return.
-                                        // We'll have to just log and return true (default) or rely on a predefined behavior if we could.
-                                        // BUT, since we are in a shim, users might expect to handle it.
-                                        // For now, we'll log it and auto-accept unless we figure out a sync bridge.
-                                        // Actually, we can't await the handler.
-                                        // Limitation: window.confirm/prompt will auto-accept/return null in this shim unless we use a buffer or similar.
-                                        // Let's just log for now and try to fire the handler asynchronously so at least 'dialog' event fires.
-                                        window.__MOCK_DIALOG_HANDLER__('confirm', message).then(result => {
-                                            // Too late to affect return value
-                                        });
-                                        return true;
-                                    }
-                                    return true;
-                                };
-
-                                window.prompt = function(message, defaultValue) {
-                                    console.log('[Dialog] prompt: ' + message);
-                                    if (window.__MOCK_DIALOG_HANDLER__) {
-                                        window.__MOCK_DIALOG_HANDLER__('prompt', message, defaultValue);
-                                        return defaultValue || null;
-                                    }
-                                    return defaultValue || null;
                                 };
                             </script>
-                            
                           </head>
                           <body>
                             ${finalHtml}
@@ -295,13 +243,10 @@ export async function executePlaywrightCode(
                     `);
                     iframeDoc.close();
 
-                    // NOTE: Console logs from user code are captured via interceptedConsole
-                    // which is injected into the user function scope below
-
                     // Manually execute scripts using scoped execution
-                    // This works around HappyDOM limitations where inline scripts in iframes don't execute
-                    // and timers within local iframe context don't fire reliably.
-                    const scripts = Array.from(iframeDoc.querySelectorAll('script'));
+                    // Skip internal scripts marked with data-internal="true"
+                    const scripts = Array.from(iframeDoc.querySelectorAll('script:not([data-internal="true"])'));
+
                     scripts.forEach((script) => {
                         if (script.textContent) {
                             try {
@@ -311,9 +256,6 @@ export async function executePlaywrightCode(
                                 if (!win || !doc) return;
                                 /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
-                                // Convert function declarations to window assignments
-                                // e.g. "function runTask(n) {...}" -> "window.runTask = function(n) {...}"
-                                // This ensures functions are accessible from onclick handlers
                                 const scriptCode = script.textContent;
 
                                 // Extract function names and assign them to window
@@ -323,14 +265,10 @@ export async function executePlaywrightCode(
                                     funcNames.push(match[1]);
                                 }
 
-                                // Wrap code in a closure that shadows window and document
-                                // This allows us to run the code in the MAIN window context (where timers work)
-                                // but operating on the IFRAME's document and window.
                                 const code = `
                                     return (function(window, document) {
                                         try {
                                             ${scriptCode}
-                                            // Assign declared functions to window for onclick access
                                             ${funcNames.map(name => `if (typeof ${name} === 'function') window.${name} = ${name};`).join('\n')}
                                         } catch(err) {
                                             console.error('Error in injected script:', err);

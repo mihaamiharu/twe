@@ -12,7 +12,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Check, Copy, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { validateSelector, type SelectorType, type ValidationResult } from '@/lib/selector-validator';
+import { validateSelector, type SelectorType, type ValidationResult } from '@/core/executor/selector-validator';
 
 // Re-export types for consumers
 export type { SelectorType };

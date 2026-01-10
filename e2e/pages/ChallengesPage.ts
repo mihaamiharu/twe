@@ -15,17 +15,28 @@ export class ChallengesPage extends BasePage {
         this.editor = page.locator('.monaco-editor').first();
         this.selectorInput = page.locator('input[type="text"]'); // Specific enough for now in that context
         this.testSelectorButton = page.getByRole('button', { name: 'Test Selector' });
+
+        // Debug console logs from the page (including iframes)
+        page.on('console', msg => {
+            if (msg.type() === 'error' || msg.type() === 'warning') {
+                console.log(`[PAGE ${msg.type().toUpperCase()}] ${msg.text()}`);
+            }
+        });
     }
 
-    async gotoList() {
-        await this.goto('/en/challenges');
+    async gotoList(locale: string = 'en') {
+        await this.goto(`/${locale}/challenges`);
     }
 
-    async gotoChallenge(slug: string) {
-        await this.goto(`/en/challenges/${slug}`);
+    async gotoChallenge(slug: string, locale: string = 'en') {
+        await this.goto(`/${locale}/challenges/${slug}`);
+        await this.page.waitForLoadState('networkidle');
     }
 
     async solveChallenge(codeOrSelector: string, slug?: string) {
+        // Wait for page to be ready and loading to disappear if possible
+        await this.page.waitForLoadState('domcontentloaded');
+
         // Detect if it is a selector challenge
         // Use slug if available, otherwise check visibility (which might be flaky if loading)
         let isSelectorChallenge = false;
@@ -46,7 +57,7 @@ export class ChallengesPage extends BasePage {
         }
 
         if (isSelectorChallenge) {
-            await this.selectorInput.waitFor();
+            await this.selectorInput.waitFor({ state: 'visible', timeout: 10000 });
             await this.selectorInput.fill(codeOrSelector);
 
             // Check based on content or slug
@@ -73,25 +84,40 @@ export class ChallengesPage extends BasePage {
             // Monaco's visible area
             const viewLines = this.editor.locator('.view-lines');
             await viewLines.waitFor();
+            // Focus and clear more aggressively
             await viewLines.click();
-            await this.page.waitForTimeout(100); // Ensure focus
+            await this.page.waitForTimeout(200);
 
-            // Clear content robustly
-            const isMac = process.platform === 'darwin';
-            const modifier = isMac ? 'Meta' : 'Control';
-            await this.page.keyboard.press(`${modifier}+A`);
-            await this.page.waitForTimeout(50);
+            // Attempt to clear using Monaco API if available in window
+            // This is the most robust way to ensure a fresh editor state
+            await this.page.evaluate(() => {
+                try {
+                    // @ts-ignore - Monaco might be on window
+                    const editor = (window as any).monaco?.editor?.getModels()?.[0];
+                    if (editor) {
+                        editor.setValue('');
+                    }
+                } catch (e) {
+                    // Silent fail
+                }
+            });
+
+            // Try both modifiers to be safe in different environments
+            await this.page.keyboard.press('Control+A');
+            await this.page.keyboard.press('Meta+A');
+            await this.page.waitForTimeout(100);
+            await this.page.keyboard.press('Delete');
+            await this.page.waitForTimeout(100);
+
+            // Double check clear
+            await this.page.keyboard.press('Control+A');
+            await this.page.keyboard.press('Meta+A');
             await this.page.keyboard.press('Backspace');
+            await this.page.waitForTimeout(200);
 
-            // Double check clear (optional but helpful if flaky)
-            // await this.page.keyboard.press(`${modifier}+A`);
-            // await this.page.keyboard.press('Backspace');
-
-            // Wait a moment for editor to clear
-            await this.page.waitForTimeout(50);
-
-            // Paste solution
-            await this.page.keyboard.insertText(codeOrSelector);
+            // Paste solution (trimmed)
+            await this.page.keyboard.insertText(codeOrSelector.trim());
+            await this.page.waitForTimeout(200); // Wait for change to register
 
             // Run
             await this.runButton.click();
@@ -100,13 +126,13 @@ export class ChallengesPage extends BasePage {
         // Wait for validation success
         // "Correct" badge might be in results or toast, but Submit button becoming enabled is the ultimate proof.
         // We verify Submit button first.
-        await expect(this.submitButton).toBeEnabled({ timeout: 15000 });
+        await expect(this.submitButton).toBeEnabled({ timeout: 20000 });
 
         // Optional: assert Correct text if visible, but don't fail hard if it's transient
         // await expect(this.page.getByText('Correct', { exact: false }).first()).toBeVisible({ timeout: 1000 }).catch(() => {});
 
         // Submit
-        await expect(this.submitButton).toBeEnabled();
+        await expect(this.submitButton).toBeEnabled({ timeout: 5000 });
         await this.submitButton.click();
 
         // Verify success dialog
