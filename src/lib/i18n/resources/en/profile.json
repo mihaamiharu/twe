@@ -1,40 +1,40 @@
 {
-    "header": {
-        "title": "Your Profile",
-        "level": "Level {{level}}",
-        "progressTo": "Progress to Level {{level}}",
-        "settings": "Settings"
-    },
-    "stats": {
-        "tutorials": "Tutorials",
-        "challenges": "Challenges",
-        "totalXp": "Total XP",
-        "achievements": "Achievements"
-    },
-    "tabs": {
-        "progress": "Tier Progress",
-        "activity": "Recent Activity",
-        "achievements": "Achievements"
-    },
-    "tierProgress": {
-        "title": "Tier Progress",
-        "description": "Your progress across all learning tiers",
-        "basic": "Basic (Selectors)",
-        "beginner": "Beginner (JavaScript)",
-        "intermediate": "Intermediate (Playwright)",
-        "expert": "Expert (Advanced)",
-        "challengeCount": "{{count}} challenges"
-    },
-    "milestones": {
-        "title": "XP Milestones"
-    },
-    "activity": {
-        "title": "Recent Activity",
-        "description": "Your latest learning progress",
-        "empty": "No recent activity yet. Start learning!"
-    },
-    "achievements": {
-        "empty": "No achievements yet. Complete challenges to earn badges!",
-        "available": "{{count}} badges available to unlock"
-    }
+  "header": {
+    "title": "Your Profile",
+    "level": "Level {{level}}",
+    "progressTo": "Progress to Level {{level}}",
+    "settings": "Settings"
+  },
+  "stats": {
+    "tutorials": "Tutorials",
+    "challenges": "Challenges",
+    "totalXp": "Total XP",
+    "achievements": "Achievements"
+  },
+  "tabs": {
+    "progress": "Tier Progress",
+    "activity": "Recent Activity",
+    "achievements": "Achievements"
+  },
+  "tierProgress": {
+    "title": "Tier Progress",
+    "description": "Your progress across all learning tiers",
+    "basic": "Basic (Selectors)",
+    "beginner": "Beginner (JavaScript)",
+    "intermediate": "Intermediate (Playwright)",
+    "expert": "Expert (Advanced)",
+    "challengeCount": "{{count}} challenges"
+  },
+  "milestones": {
+    "title": "XP Milestones"
+  },
+  "activity": {
+    "title": "Recent Activity",
+    "description": "Your latest learning progress",
+    "empty": "No recent activity yet. Start learning!"
+  },
+  "achievements": {
+    "empty": "No achievements yet. Complete challenges to earn badges!",
+    "available": "{{count}} badges available to unlock"
+  }
 }

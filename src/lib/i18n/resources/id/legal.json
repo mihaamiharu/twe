@@ -1,28 +1,28 @@
 {
-    "privacy": {
-        "title": "Kebijakan Privasi",
-        "placeholder": "Kebijakan Privasi kami akan segera hadir. Kami menghargai privasi kamu dan sedang mengerjakan detailnya."
-    },
-    "terms": {
-        "title": "Ketentuan Layanan",
-        "lastUpdated": "Terakhir diperbarui",
-        "sections": {
-            "acceptance": {
-                "title": "1. Penerimaan Ketentuan",
-                "content": "Dengan mengakses atau menggunakan TestingWithEkki, kamu setuju untuk terikat oleh Ketentuan Layanan ini."
-            },
-            "description": {
-                "title": "2. Deskripsi Layanan",
-                "content": "TestingWithEkki berfungsi sebagai platform edukasi untuk mempelajari otomasi pengujian perangkat lunak melalui tantangan dan tutorial interaktif."
-            },
-            "accounts": {
-                "title": "3. Akun Pengguna",
-                "content": "Kamu bertanggung jawab untuk menjaga kerahasiaan kredensial akun kamu dan untuk semua aktivitas yang terjadi di bawah akun kamu."
-            },
-            "conduct": {
-                "title": "4. Kode Etik",
-                "content": "Pengguna setuju untuk tidak menipu dalam tantangan atau melecehkan pengguna lain di papan peringkat/fitur komunitas."
-            }
-        }
+  "privacy": {
+    "title": "Kebijakan Privasi",
+    "placeholder": "Kebijakan Privasi kami akan segera hadir. Kami menghargai privasi kamu dan sedang mengerjakan detailnya."
+  },
+  "terms": {
+    "title": "Ketentuan Layanan",
+    "lastUpdated": "Terakhir diperbarui",
+    "sections": {
+      "acceptance": {
+        "title": "1. Penerimaan Ketentuan",
+        "content": "Dengan mengakses atau menggunakan TestingWithEkki, kamu setuju untuk terikat oleh Ketentuan Layanan ini."
+      },
+      "description": {
+        "title": "2. Deskripsi Layanan",
+        "content": "TestingWithEkki berfungsi sebagai platform edukasi untuk mempelajari otomasi pengujian perangkat lunak melalui tantangan dan tutorial interaktif."
+      },
+      "accounts": {
+        "title": "3. Akun Pengguna",
+        "content": "Kamu bertanggung jawab untuk menjaga kerahasiaan kredensial akun kamu dan untuk semua aktivitas yang terjadi di bawah akun kamu."
+      },
+      "conduct": {
+        "title": "4. Kode Etik",
+        "content": "Pengguna setuju untuk tidak menipu dalam tantangan atau melecehkan pengguna lain di papan peringkat/fitur komunitas."
+      }
     }
+  }
 }

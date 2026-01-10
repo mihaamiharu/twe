@@ -1,5 +1,5 @@
 ---
-title: "Playwright Locators"
+title: 'Playwright Locators'
 description: "Master the art of finding elements with Playwright's powerful locator API."
 ---
 
@@ -11,10 +11,10 @@ Master the art of finding elements with Playwright's powerful locator API.
 
 Think of a locator as **your finger pointing at the screen**.
 
-* **Bad Pointer**: "Click the 3rd blue widget in the 2nd row." (CSS/XPath)
-  * *Problem*: If the design shifts, you point at empty space.
-* **Good Pointer**: "Click the 'Submit' button." (Semantic)
-  * *Result*: Even if the button moves to the top of the page, your finger follows it.
+- **Bad Pointer**: "Click the 3rd blue widget in the 2nd row." (CSS/XPath)
+  - _Problem_: If the design shifts, you point at empty space.
+- **Good Pointer**: "Click the 'Submit' button." (Semantic)
+  - _Result_: Even if the button moves to the top of the page, your finger follows it.
 
 Playwright Locators are **auto-waiting**, **retry-able** pointers. They don't just find the element once; they keep pointing until the element is ready.
 
@@ -22,16 +22,16 @@ Playwright Locators are **auto-waiting**, **retry-able** pointers. They don't ju
 
 ## The Strategy: The Hierarchy of Trust
 
-When choosing *how* to point, follow this priority list. Start at the top; only go down if you must.
+When choosing _how_ to point, follow this priority list. Start at the top; only go down if you must.
 
 1. **Tested By User (Best)**: `getByRole`, `getByLabel`, `getByPlaceholder`.
-    * *Why*: This ensures your app is accessible. If you can't click "Submit", a screen reader user can't either.
+   - _Why_: This ensures your app is accessible. If you can't click "Submit", a screen reader user can't either.
 2. **Tested By Content (Good)**: `getByText`.
-    * *Why*: Good for static content, but fragile if marketing changes copy frequently.
+   - _Why_: Good for static content, but fragile if marketing changes copy frequently.
 3. **Tested By Contract (Reliable)**: `getByTestId` (`data-testid`).
-    * *Why*: The "Backdoor". Use this when an element has no semantic role or text (e.g., a dynamic graph or icon).
+   - _Why_: The "Backdoor". Use this when an element has no semantic role or text (e.g., a dynamic graph or icon).
 4. **Tested By Structure (Last Resort)**: `locator('div > span')` (CSS/XPath).
-    * *Why*: Heavily tied to implementation details.
+   - _Why_: Heavily tied to implementation details.
 
 ---
 
@@ -40,8 +40,8 @@ When choosing *how* to point, follow this priority list. Start at the top; only 
 **The Scenario**:
 Marketing is A/B testing a new layout.
 
-* **Version A**: The "Buy" button is in a sidebar.
-* **Version B**: The "Buy" button is in a sticky footer.
+- **Version A**: The "Buy" button is in a sidebar.
+- **Version B**: The "Buy" button is in a sticky footer.
 
 **The CSS Fail**:
 
@@ -60,7 +60,7 @@ page.getByText('Buy Now').click();
 
 **The Robust Fix**:
 Use a **Test ID** (The Contract).
-This requires developer buy-in, but it is the *only* way to survive rapid UI/text changes without rewriting tests daily.
+This requires developer buy-in, but it is the _only_ way to survive rapid UI/text changes without rewriting tests daily.
 
 ```javascript
 // Robust in both Layouts AND Text changes
@@ -85,8 +85,8 @@ await userRow.getByRole('button', { name: 'Delete' }).click();
 
 **Why this wins**:
 
-* It reads like English.
-* It is resilient. If the row content changes order, it still works.
+- It reads like English.
+- It is resilient. If the row content changes order, it still works.
 
 ---
 
@@ -100,7 +100,7 @@ await userRow.getByRole('button', { name: 'Delete' }).click();
 
 1. Make it specific: `getByRole('button', { name: 'Save' })`
 2. Filter it: `.filter({ hasText: 'Modal' })`
-3. *Avoid* `.first()` unless you truly don't care which one you click.
+3. _Avoid_ `.first()` unless you truly don't care which one you click.
 
 ### Trap #2: The Hidden Text
 
@@ -117,14 +117,13 @@ page.getByText(/welcome/i); // Matches "WELCOME"
 
 ## Quick Reference
 
-| Method | Use Case | Example |
-| :--- | :--- | :--- |
-| `getByRole` | Interactive elements | `getByRole('button', {name: 'Save'})` |
-| `getByLabel` | Forms | `getByLabel('Email')` |
-| `getByPlaceholder` | Search/Input | `getByPlaceholder('Search...')` |
-| `getByText` | Static content | `getByText('Success')` |
-| `getByTestId` | Hard-to-select, Dynamic | `getByTestId('graph-canvas')` |
-| `.filter()` | Narrowing down | `.filter({ hasText: 'Active' })` |
+| Method             | Use Case                | Example                               |
+| :----------------- | :---------------------- | :------------------------------------ |
+| `getByRole`        | Interactive elements    | `getByRole('button', {name: 'Save'})` |
+| `getByLabel`       | Forms                   | `getByLabel('Email')`                 |
+| `getByPlaceholder` | Search/Input            | `getByPlaceholder('Search...')`       |
+| `getByText`        | Static content          | `getByText('Success')`                |
+| `getByTestId`      | Hard-to-select, Dynamic | `getByTestId('graph-canvas')`         |
+| `.filter()`        | Narrowing down          | `.filter({ hasText: 'Active' })`      |
 
 ---
-

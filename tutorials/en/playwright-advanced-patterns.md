@@ -1,6 +1,6 @@
 ---
-title: "Advanced Playwright Patterns"
-description: "Move beyond basic scripting. Build a high-performance, expert-level framework."
+title: 'Advanced Playwright Patterns'
+description: 'Move beyond basic scripting. Build a high-performance, expert-level framework.'
 ---
 
 # Advanced Playwright Patterns
@@ -9,11 +9,11 @@ Move beyond basic scripting. Build a high-performance, expert-level framework.
 
 ## The Mental Model: The Factory Line
 
-* **Manual Testing**: An artisan hand-crafting a single car. Slow, precise, unique.
-* **Expert Automation**: A high-speed factory line.
-  * Robots (API calls) handle the heavy lifting (Setup).
-  * Specialists (UI Tests) only touch the final screws.
-  * Everything runs in parallel.
+- **Manual Testing**: An artisan hand-crafting a single car. Slow, precise, unique.
+- **Expert Automation**: A high-speed factory line.
+  - Robots (API calls) handle the heavy lifting (Setup).
+  - Specialists (UI Tests) only touch the final screws.
+  - Everything runs in parallel.
 
 If your "Factory" takes 1 hour to build one "Car" (Test Run), you are doing it wrong. It should take 5 minutes.
 
@@ -43,25 +43,25 @@ The Login UI (fill form, click submit, wait for redirect) takes **5 seconds**.
 
 **The Math**:
 
-* 100 tests * 5 seconds = 500 seconds.
-* That is **8.3 minutes** of *just logging in* per build.
+- 100 tests \* 5 seconds = 500 seconds.
+- That is **8.3 minutes** of _just logging in_ per build.
 
 **The Fix (API Login)**:
 
-* API Login takes **0.2 seconds**.
-* 100 * 0.2 = 20 seconds.
-* **Savings**: You just saved 8 minutes per run. On a team with 10 devs running tests 5 times a day, you saved **7 hours of developer time per day**.
+- API Login takes **0.2 seconds**.
+- 100 \* 0.2 = 20 seconds.
+- **Savings**: You just saved 8 minutes per run. On a team with 10 devs running tests 5 times a day, you saved **7 hours of developer time per day**.
 
 ```javascript
 test.beforeEach(async ({ page, request }) => {
   // 1. API Login (Fast)
   const response = await request.post('/api/login', {
-    data: { user: 'alice', pass: 'secret' }
+    data: { user: 'alice', pass: 'secret' },
   });
   const { token } = await response.json();
 
   // 2. Inject State
-  await page.addInitScript(value => {
+  await page.addInitScript((value) => {
     window.localStorage.setItem('token', value);
   }, token);
 });
@@ -74,16 +74,16 @@ test.beforeEach(async ({ page, request }) => {
 
 ### Trap #1: The Shared User
 
-**The crime**: Using the *same* static user account (`admin@test.com`) for all 4 parallel workers.
+**The crime**: Using the _same_ static user account (`admin@test.com`) for all 4 parallel workers.
 **The result**:
 
-* Worker 1: Changes "Admin Name" to "Bob".
-* Worker 2: Asserts "Admin Name" is "Alice". -> **FAIL**.
-**The Fix**: Use **Dynamic Data** (Faker) to create a unique user for *every single test*, or use Worker-indexed users (`admin-1@test.com`, `admin-2@test.com`).
+- Worker 1: Changes "Admin Name" to "Bob".
+- Worker 2: Asserts "Admin Name" is "Alice". -> **FAIL**.
+  **The Fix**: Use **Dynamic Data** (Faker) to create a unique user for _every single test_, or use Worker-indexed users (`admin-1@test.com`, `admin-2@test.com`).
 
 ### Trap #2: The Video Hoarder
 
-**The crime**: Recording video for *every* test.
+**The crime**: Recording video for _every_ test.
 **The result**: Your CI artifacts are 5GB large. The pipeline crashes on upload.
 **The Fix**:
 
@@ -115,9 +115,8 @@ Compare pixel-perfect screenshots.
 
 ```javascript
 await expect(page).toHaveScreenshot('home-page.png', {
-  maxDiffPixels: 100 // Allow minor rendering noise
+  maxDiffPixels: 100, // Allow minor rendering noise
 });
 ```
 
 ---
-

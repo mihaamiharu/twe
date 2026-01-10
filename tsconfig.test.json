@@ -1,11 +1,7 @@
 {
-    "extends": "./tsconfig.json",
-    "compilerOptions": {
-        "types": [
-            "bun-types"
-        ]
-    },
-    "include": [
-        "src/tests/**/*"
-    ]
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["bun-types"]
+  },
+  "include": ["src/tests/**/*"]
 }

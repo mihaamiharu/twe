@@ -1,9 +1,20 @@
-import { HeadContent, Outlet, Scripts, createRootRoute, useParams } from '@tanstack/react-router';
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRoute,
+  useParams,
+} from '@tanstack/react-router';
 import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from '@tanstack/react-query';
+import {
+  QueryClient,
+  QueryClientProvider,
+  QueryCache,
+  MutationCache,
+} from '@tanstack/react-query';
 import { logger } from '@/lib/logger';
 
 import { NotFound } from '@/components/NotFound';
@@ -122,7 +133,7 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const params = useParams({ strict: false }) as { locale?: string };
+  const params = useParams({ strict: false });
   const locale = params.locale || 'en';
 
   return (

@@ -1,1036 +1,973 @@
 {
-    "openapi": "3.0.3",
-    "info": {
-        "title": "TestingWithEkki API",
-        "description": "API documentation for TestingWithEkki - A gamified platform for learning QA testing skills.",
-        "version": "1.0.0",
-        "contact": {
-            "name": "TestingWithEkki",
-            "url": "https://testingwithekki.com"
-        },
-        "license": {
-            "name": "MIT",
-            "url": "https://opensource.org/licenses/MIT"
-        }
+  "openapi": "3.0.3",
+  "info": {
+    "title": "TestingWithEkki API",
+    "description": "API documentation for TestingWithEkki - A gamified platform for learning QA testing skills.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "TestingWithEkki",
+      "url": "https://testingwithekki.com"
     },
-    "servers": [
-        {
-            "url": "http://localhost:3000",
-            "description": "Development server"
-        },
-        {
-            "url": "https://testingwithekki.com",
-            "description": "Production server"
-        }
-    ],
-    "tags": [
-        {
-            "name": "Authentication",
-            "description": "User authentication endpoints (powered by BetterAuth)"
-        },
-        {
-            "name": "Users",
-            "description": "User profile and settings"
-        },
-        {
-            "name": "Challenges",
-            "description": "Challenge management and submissions"
-        },
-        {
-            "name": "Tutorials",
-            "description": "Tutorial content and progress"
-        },
-        {
-            "name": "Gamification",
-            "description": "XP, levels, achievements, and leaderboard"
-        }
-    ],
-    "paths": {
-        "/api/auth/sign-up/email": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Register with email",
-                "description": "Create a new user account with email and password",
-                "operationId": "signUpEmail",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SignUpRequest"
-                            },
-                            "example": {
-                                "name": "John Doe",
-                                "email": "john@example.com",
-                                "password": "securePassword123"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "User created successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Validation error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "409": {
-                        "description": "Email already exists"
-                    }
-                }
-            }
-        },
-        "/api/auth/sign-in/email": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Sign in with email",
-                "description": "Authenticate user with email and password",
-                "operationId": "signInEmail",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/SignInRequest"
-                            },
-                            "example": {
-                                "email": "john@example.com",
-                                "password": "securePassword123"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Login successful",
-                        "headers": {
-                            "Set-Cookie": {
-                                "description": "Session cookie",
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        },
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Invalid credentials"
-                    }
-                }
-            }
-        },
-        "/api/auth/sign-in/social": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Sign in with social provider",
-                "description": "Authenticate user with Google OAuth",
-                "operationId": "signInSocial",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "type": "object",
-                                "required": [
-                                    "provider",
-                                    "callbackURL"
-                                ],
-                                "properties": {
-                                    "provider": {
-                                        "type": "string",
-                                        "enum": [
-                                            "google"
-                                        ],
-                                        "description": "OAuth provider"
-                                    },
-                                    "callbackURL": {
-                                        "type": "string",
-                                        "description": "URL to redirect after authentication"
-                                    }
-                                }
-                            },
-                            "example": {
-                                "provider": "google",
-                                "callbackURL": "/profile"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Returns redirect URL for OAuth flow",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "url": {
-                                            "type": "string",
-                                            "description": "OAuth authorization URL"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/auth/sign-out": {
-            "post": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Sign out",
-                "description": "End the current user session",
-                "operationId": "signOut",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Signed out successfully"
-                    }
-                }
-            }
-        },
-        "/api/auth/get-session": {
-            "get": {
-                "tags": [
-                    "Authentication"
-                ],
-                "summary": "Get current session",
-                "description": "Get the current authenticated user session",
-                "operationId": "getSession",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Session data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SessionResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authenticated"
-                    }
-                }
-            }
-        },
-        "/api/challenges": {
-            "get": {
-                "tags": [
-                    "Challenges"
-                ],
-                "summary": "List challenges",
-                "description": "Get a list of available challenges with optional filtering",
-                "operationId": "listChallenges",
-                "parameters": [
-                    {
-                        "name": "type",
-                        "in": "query",
-                        "description": "Filter by challenge type",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "JAVASCRIPT",
-                                "PLAYWRIGHT",
-                                "CSS_SELECTOR",
-                                "XPATH_SELECTOR"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "difficulty",
-                        "in": "query",
-                        "description": "Filter by difficulty",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "EASY",
-                                "MEDIUM",
-                                "HARD"
-                            ]
-                        }
-                    },
-                    {
-                        "name": "page",
-                        "in": "query",
-                        "description": "Page number",
-                        "schema": {
-                            "type": "integer",
-                            "default": 1
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Items per page",
-                        "schema": {
-                            "type": "integer",
-                            "default": 20
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "List of challenges",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ChallengeListResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/challenges/{slug}": {
-            "get": {
-                "tags": [
-                    "Challenges"
-                ],
-                "summary": "Get challenge by slug",
-                "description": "Get detailed information about a specific challenge",
-                "operationId": "getChallenge",
-                "parameters": [
-                    {
-                        "name": "slug",
-                        "in": "path",
-                        "required": true,
-                        "description": "Challenge URL slug",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Challenge details",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Challenge"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Challenge not found"
-                    }
-                }
-            }
-        },
-        "/api/challenges/{id}/submit": {
-            "post": {
-                "tags": [
-                    "Challenges"
-                ],
-                "summary": "Submit challenge solution",
-                "description": "Submit a solution for a challenge and get results",
-                "operationId": "submitChallenge",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "Challenge ID",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/ChallengeSubmission"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Submission result",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/SubmissionResult"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authenticated"
-                    }
-                }
-            }
-        },
-        "/api/users/me": {
-            "get": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Get current user profile",
-                "description": "Get the authenticated user's profile including stats",
-                "operationId": "getCurrentUser",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User profile",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UserProfile"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Not authenticated"
-                    }
-                }
-            },
-            "patch": {
-                "tags": [
-                    "Users"
-                ],
-                "summary": "Update user profile",
-                "description": "Update the authenticated user's profile",
-                "operationId": "updateUser",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/UpdateUserRequest"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Updated user profile",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UserProfile"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/leaderboard": {
-            "get": {
-                "tags": [
-                    "Gamification"
-                ],
-                "summary": "Get leaderboard",
-                "description": "Get the top users by XP",
-                "operationId": "getLeaderboard",
-                "parameters": [
-                    {
-                        "name": "period",
-                        "in": "query",
-                        "description": "Time period for leaderboard",
-                        "schema": {
-                            "type": "string",
-                            "enum": [
-                                "all-time",
-                                "monthly",
-                                "weekly"
-                            ],
-                            "default": "all-time"
-                        }
-                    },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "description": "Number of users to return",
-                        "schema": {
-                            "type": "integer",
-                            "default": 100
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Leaderboard data",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LeaderboardResponse"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/achievements": {
-            "get": {
-                "tags": [
-                    "Gamification"
-                ],
-                "summary": "Get all achievements",
-                "description": "Get a list of all available achievements",
-                "operationId": "listAchievements",
-                "responses": {
-                    "200": {
-                        "description": "List of achievements",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/Achievement"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/users/me/achievements": {
-            "get": {
-                "tags": [
-                    "Gamification"
-                ],
-                "summary": "Get user achievements",
-                "description": "Get achievements earned by the current user",
-                "operationId": "getUserAchievements",
-                "security": [
-                    {
-                        "cookieAuth": []
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "User's earned achievements",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "$ref": "#/components/schemas/EarnedAchievement"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "components": {
-        "securitySchemes": {
-            "cookieAuth": {
-                "type": "apiKey",
-                "in": "cookie",
-                "name": "better_auth.session"
-            }
-        },
-        "schemas": {
-            "SignUpRequest": {
-                "type": "object",
-                "required": [
-                    "name",
-                    "email",
-                    "password"
-                ],
-                "properties": {
-                    "name": {
-                        "type": "string",
-                        "minLength": 2,
-                        "maxLength": 100
-                    },
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "password": {
-                        "type": "string",
-                        "minLength": 8
-                    }
-                }
-            },
-            "SignInRequest": {
-                "type": "object",
-                "required": [
-                    "email",
-                    "password"
-                ],
-                "properties": {
-                    "email": {
-                        "type": "string",
-                        "format": "email"
-                    },
-                    "password": {
-                        "type": "string"
-                    }
-                }
-            },
-            "AuthResponse": {
-                "type": "object",
-                "properties": {
-                    "user": {
-                        "$ref": "#/components/schemas/User"
-                    },
-                    "session": {
-                        "$ref": "#/components/schemas/Session"
-                    }
-                }
-            },
-            "SessionResponse": {
-                "type": "object",
-                "properties": {
-                    "user": {
-                        "$ref": "#/components/schemas/User"
-                    },
-                    "session": {
-                        "$ref": "#/components/schemas/Session"
-                    }
-                }
-            },
-            "User": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "image": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "Session": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "userId": {
-                        "type": "string"
-                    },
-                    "expiresAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "UserProfile": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "email": {
-                        "type": "string"
-                    },
-                    "username": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "image": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "bio": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "xp": {
-                        "type": "integer"
-                    },
-                    "level": {
-                        "type": "integer"
-                    },
-                    "streak": {
-                        "type": "integer"
-                    },
-                    "challengesCompleted": {
-                        "type": "integer"
-                    },
-                    "showOnLeaderboard": {
-                        "type": "boolean"
-                    },
-                    "createdAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "UpdateUserRequest": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "username": {
-                        "type": "string"
-                    },
-                    "bio": {
-                        "type": "string"
-                    },
-                    "showOnLeaderboard": {
-                        "type": "boolean"
-                    }
-                }
-            },
-            "Challenge": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "slug": {
-                        "type": "string"
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "instructions": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string",
-                        "enum": [
-                            "JAVASCRIPT",
-                            "PLAYWRIGHT",
-                            "CSS_SELECTOR",
-                            "XPATH_SELECTOR"
-                        ]
-                    },
-                    "difficulty": {
-                        "type": "string",
-                        "enum": [
-                            "EASY",
-                            "MEDIUM",
-                            "HARD"
-                        ]
-                    },
-                    "xp": {
-                        "type": "integer"
-                    },
-                    "starterCode": {
-                        "type": "string"
-                    },
-                    "htmlContent": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "hints": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Hint"
-                        }
-                    }
-                }
-            },
-            "ChallengeListResponse": {
-                "type": "object",
-                "properties": {
-                    "challenges": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/ChallengeSummary"
-                        }
-                    },
-                    "total": {
-                        "type": "integer"
-                    },
-                    "page": {
-                        "type": "integer"
-                    },
-                    "totalPages": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "ChallengeSummary": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "slug": {
-                        "type": "string"
-                    },
-                    "title": {
-                        "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "type": {
-                        "type": "string"
-                    },
-                    "difficulty": {
-                        "type": "string"
-                    },
-                    "xp": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "Hint": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "content": {
-                        "type": "string"
-                    },
-                    "xpCost": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "ChallengeSubmission": {
-                "type": "object",
-                "required": [
-                    "code"
-                ],
-                "properties": {
-                    "code": {
-                        "type": "string",
-                        "description": "User's solution code"
-                    },
-                    "hintsUsed": {
-                        "type": "array",
-                        "items": {
-                            "type": "string"
-                        },
-                        "description": "IDs of hints revealed"
-                    }
-                }
-            },
-            "SubmissionResult": {
-                "type": "object",
-                "properties": {
-                    "status": {
-                        "type": "string",
-                        "enum": [
-                            "PASSED",
-                            "FAILED",
-                            "ERROR",
-                            "TIMEOUT"
-                        ]
-                    },
-                    "xpEarned": {
-                        "type": "integer"
-                    },
-                    "newLevel": {
-                        "type": "integer",
-                        "nullable": true,
-                        "description": "New level if user leveled up"
-                    },
-                    "achievements": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/Achievement"
-                        },
-                        "description": "Newly unlocked achievements"
-                    },
-                    "testResults": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/TestResult"
-                        }
-                    }
-                }
-            },
-            "TestResult": {
-                "type": "object",
-                "properties": {
-                    "name": {
-                        "type": "string"
-                    },
-                    "passed": {
-                        "type": "boolean"
-                    },
-                    "error": {
-                        "type": "string",
-                        "nullable": true
-                    }
-                }
-            },
-            "Achievement": {
-                "type": "object",
-                "properties": {
-                    "id": {
-                        "type": "string"
-                    },
-                    "name": {
-                        "type": "string"
-                    },
-                    "description": {
-                        "type": "string"
-                    },
-                    "icon": {
-                        "type": "string"
-                    },
-                    "category": {
-                        "type": "string",
-                        "enum": [
-                            "CHALLENGES",
-                            "TUTORIALS",
-                            "STREAK",
-                            "XP",
-                            "SPECIAL"
-                        ]
-                    },
-                    "xpReward": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "EarnedAchievement": {
-                "type": "object",
-                "properties": {
-                    "achievement": {
-                        "$ref": "#/components/schemas/Achievement"
-                    },
-                    "earnedAt": {
-                        "type": "string",
-                        "format": "date-time"
-                    }
-                }
-            },
-            "LeaderboardResponse": {
-                "type": "object",
-                "properties": {
-                    "users": {
-                        "type": "array",
-                        "items": {
-                            "$ref": "#/components/schemas/LeaderboardUser"
-                        }
-                    },
-                    "period": {
-                        "type": "string"
-                    },
-                    "currentUserRank": {
-                        "type": "integer",
-                        "nullable": true
-                    }
-                }
-            },
-            "LeaderboardUser": {
-                "type": "object",
-                "properties": {
-                    "rank": {
-                        "type": "integer"
-                    },
-                    "userId": {
-                        "type": "string"
-                    },
-                    "username": {
-                        "type": "string"
-                    },
-                    "displayName": {
-                        "type": "string"
-                    },
-                    "avatarUrl": {
-                        "type": "string",
-                        "nullable": true
-                    },
-                    "level": {
-                        "type": "integer"
-                    },
-                    "xp": {
-                        "type": "integer"
-                    },
-                    "challengesCompleted": {
-                        "type": "integer"
-                    }
-                }
-            },
-            "ErrorResponse": {
-                "type": "object",
-                "properties": {
-                    "error": {
-                        "type": "string"
-                    },
-                    "message": {
-                        "type": "string"
-                    },
-                    "statusCode": {
-                        "type": "integer"
-                    }
-                }
-            }
-        }
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
     }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Development server"
+    },
+    {
+      "url": "https://testingwithekki.com",
+      "description": "Production server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Authentication",
+      "description": "User authentication endpoints (powered by BetterAuth)"
+    },
+    {
+      "name": "Users",
+      "description": "User profile and settings"
+    },
+    {
+      "name": "Challenges",
+      "description": "Challenge management and submissions"
+    },
+    {
+      "name": "Tutorials",
+      "description": "Tutorial content and progress"
+    },
+    {
+      "name": "Gamification",
+      "description": "XP, levels, achievements, and leaderboard"
+    }
+  ],
+  "paths": {
+    "/api/auth/sign-up/email": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Register with email",
+        "description": "Create a new user account with email and password",
+        "operationId": "signUpEmail",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignUpRequest"
+              },
+              "example": {
+                "name": "John Doe",
+                "email": "john@example.com",
+                "password": "securePassword123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Email already exists"
+          }
+        }
+      }
+    },
+    "/api/auth/sign-in/email": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Sign in with email",
+        "description": "Authenticate user with email and password",
+        "operationId": "signInEmail",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInRequest"
+              },
+              "example": {
+                "email": "john@example.com",
+                "password": "securePassword123"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "headers": {
+              "Set-Cookie": {
+                "description": "Session cookie",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/auth/sign-in/social": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Sign in with social provider",
+        "description": "Authenticate user with Google OAuth",
+        "operationId": "signInSocial",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["provider", "callbackURL"],
+                "properties": {
+                  "provider": {
+                    "type": "string",
+                    "enum": ["google"],
+                    "description": "OAuth provider"
+                  },
+                  "callbackURL": {
+                    "type": "string",
+                    "description": "URL to redirect after authentication"
+                  }
+                }
+              },
+              "example": {
+                "provider": "google",
+                "callbackURL": "/profile"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Returns redirect URL for OAuth flow",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "description": "OAuth authorization URL"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/sign-out": {
+      "post": {
+        "tags": ["Authentication"],
+        "summary": "Sign out",
+        "description": "End the current user session",
+        "operationId": "signOut",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Signed out successfully"
+          }
+        }
+      }
+    },
+    "/api/auth/get-session": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Get current session",
+        "description": "Get the current authenticated user session",
+        "operationId": "getSession",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Session data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/api/challenges": {
+      "get": {
+        "tags": ["Challenges"],
+        "summary": "List challenges",
+        "description": "Get a list of available challenges with optional filtering",
+        "operationId": "listChallenges",
+        "parameters": [
+          {
+            "name": "type",
+            "in": "query",
+            "description": "Filter by challenge type",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "JAVASCRIPT",
+                "PLAYWRIGHT",
+                "CSS_SELECTOR",
+                "XPATH_SELECTOR"
+              ]
+            }
+          },
+          {
+            "name": "difficulty",
+            "in": "query",
+            "description": "Filter by difficulty",
+            "schema": {
+              "type": "string",
+              "enum": ["EASY", "MEDIUM", "HARD"]
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Items per page",
+            "schema": {
+              "type": "integer",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of challenges",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChallengeListResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/challenges/{slug}": {
+      "get": {
+        "tags": ["Challenges"],
+        "summary": "Get challenge by slug",
+        "description": "Get detailed information about a specific challenge",
+        "operationId": "getChallenge",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "description": "Challenge URL slug",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Challenge details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Challenge"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Challenge not found"
+          }
+        }
+      }
+    },
+    "/api/challenges/{id}/submit": {
+      "post": {
+        "tags": ["Challenges"],
+        "summary": "Submit challenge solution",
+        "description": "Submit a solution for a challenge and get results",
+        "operationId": "submitChallenge",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Challenge ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChallengeSubmission"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submission result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubmissionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      }
+    },
+    "/api/users/me": {
+      "get": {
+        "tags": ["Users"],
+        "summary": "Get current user profile",
+        "description": "Get the authenticated user's profile including stats",
+        "operationId": "getCurrentUser",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not authenticated"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Update user profile",
+        "description": "Update the authenticated user's profile",
+        "operationId": "updateUser",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated user profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserProfile"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/leaderboard": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get leaderboard",
+        "description": "Get the top users by XP",
+        "operationId": "getLeaderboard",
+        "parameters": [
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Time period for leaderboard",
+            "schema": {
+              "type": "string",
+              "enum": ["all-time", "monthly", "weekly"],
+              "default": "all-time"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of users to return",
+            "schema": {
+              "type": "integer",
+              "default": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leaderboard data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LeaderboardResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/achievements": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get all achievements",
+        "description": "Get a list of all available achievements",
+        "operationId": "listAchievements",
+        "responses": {
+          "200": {
+            "description": "List of achievements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Achievement"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/users/me/achievements": {
+      "get": {
+        "tags": ["Gamification"],
+        "summary": "Get user achievements",
+        "description": "Get achievements earned by the current user",
+        "operationId": "getUserAchievements",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's earned achievements",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EarnedAchievement"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "better_auth.session"
+      }
+    },
+    "schemas": {
+      "SignUpRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8
+          }
+        }
+      },
+      "SignInRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "session": {
+            "$ref": "#/components/schemas/Session"
+          }
+        }
+      },
+      "SessionResponse": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "session": {
+            "$ref": "#/components/schemas/Session"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Session": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UserProfile": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "image": {
+            "type": "string",
+            "nullable": true
+          },
+          "bio": {
+            "type": "string",
+            "nullable": true
+          },
+          "xp": {
+            "type": "integer"
+          },
+          "level": {
+            "type": "integer"
+          },
+          "streak": {
+            "type": "integer"
+          },
+          "challengesCompleted": {
+            "type": "integer"
+          },
+          "showOnLeaderboard": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "showOnLeaderboard": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Challenge": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "JAVASCRIPT",
+              "PLAYWRIGHT",
+              "CSS_SELECTOR",
+              "XPATH_SELECTOR"
+            ]
+          },
+          "difficulty": {
+            "type": "string",
+            "enum": ["EASY", "MEDIUM", "HARD"]
+          },
+          "xp": {
+            "type": "integer"
+          },
+          "starterCode": {
+            "type": "string"
+          },
+          "htmlContent": {
+            "type": "string",
+            "nullable": true
+          },
+          "hints": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Hint"
+            }
+          }
+        }
+      },
+      "ChallengeListResponse": {
+        "type": "object",
+        "properties": {
+          "challenges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChallengeSummary"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "page": {
+            "type": "integer"
+          },
+          "totalPages": {
+            "type": "integer"
+          }
+        }
+      },
+      "ChallengeSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "string"
+          },
+          "xp": {
+            "type": "integer"
+          }
+        }
+      },
+      "Hint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "xpCost": {
+            "type": "integer"
+          }
+        }
+      },
+      "ChallengeSubmission": {
+        "type": "object",
+        "required": ["code"],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "User's solution code"
+          },
+          "hintsUsed": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "IDs of hints revealed"
+          }
+        }
+      },
+      "SubmissionResult": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": ["PASSED", "FAILED", "ERROR", "TIMEOUT"]
+          },
+          "xpEarned": {
+            "type": "integer"
+          },
+          "newLevel": {
+            "type": "integer",
+            "nullable": true,
+            "description": "New level if user leveled up"
+          },
+          "achievements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Achievement"
+            },
+            "description": "Newly unlocked achievements"
+          },
+          "testResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TestResult"
+            }
+          }
+        }
+      },
+      "TestResult": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "passed": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "Achievement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["CHALLENGES", "TUTORIALS", "STREAK", "XP", "SPECIAL"]
+          },
+          "xpReward": {
+            "type": "integer"
+          }
+        }
+      },
+      "EarnedAchievement": {
+        "type": "object",
+        "properties": {
+          "achievement": {
+            "$ref": "#/components/schemas/Achievement"
+          },
+          "earnedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "LeaderboardResponse": {
+        "type": "object",
+        "properties": {
+          "users": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LeaderboardUser"
+            }
+          },
+          "period": {
+            "type": "string"
+          },
+          "currentUserRank": {
+            "type": "integer",
+            "nullable": true
+          }
+        }
+      },
+      "LeaderboardUser": {
+        "type": "object",
+        "properties": {
+          "rank": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "level": {
+            "type": "integer"
+          },
+          "xp": {
+            "type": "integer"
+          },
+          "challengesCompleted": {
+            "type": "integer"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "integer"
+          }
+        }
+      }
+    }
+  }
 }

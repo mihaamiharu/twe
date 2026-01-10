@@ -8,200 +8,201 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { GoogleOAuthButton } from '@/components/auth/GoogleOAuthButton';
 
 interface LoginFormProps {
-    onSuccess?: () => void;
-    onRegisterClick?: () => void;
+  onSuccess?: () => void;
+  onRegisterClick?: () => void;
 }
 
 export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
-    const { t } = useTranslation(['auth', 'common']);
-    const { locale } = useParams({ strict: false }) as { locale: string };
-    const queryClient = useQueryClient();
-    const [formData, setFormData] = useState<SignInInput>({
-        email: '',
-        password: '',
-    });
-    const [errors, setErrors] = useState<Record<string, string>>({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [formError, setFormError] = useState('');
+  const { t } = useTranslation(['auth', 'common']);
+  const { locale } = useParams({ strict: false });
+  const queryClient = useQueryClient();
+  const [formData, setFormData] = useState<SignInInput>({
+    email: '',
+    password: '',
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [formError, setFormError] = useState('');
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
 
-        // Clear field error on change
-        if (errors[name]) {
-            setErrors((prev) => {
-                const newErrors = { ...prev };
-                delete newErrors[name];
-                return newErrors;
-            });
+    // Clear field error on change
+    if (errors[name]) {
+      setErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[name];
+        return newErrors;
+      });
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    setErrors({});
+
+    // Validate with Zod
+    const result = signInSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const error of result.error.issues) {
+        const path = error.path.join('.');
+        if (!fieldErrors[path]) {
+          fieldErrors[path] = error.message;
         }
-    };
+      }
+      setErrors(fieldErrors);
+      return;
+    }
 
+    setIsLoading(true);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setFormError('');
-        setErrors({});
+    try {
+      const response = await signIn.email({
+        email: formData.email,
+        password: formData.password,
+      });
 
-        // Validate with Zod
-        const result = signInSchema.safeParse(formData);
-        if (!result.success) {
-            const fieldErrors: Record<string, string> = {};
-            for (const error of result.error.issues) {
-                const path = error.path.join('.');
-                if (!fieldErrors[path]) {
-                    fieldErrors[path] = error.message;
-                }
-            }
-            setErrors(fieldErrors);
-            return;
-        }
+      if (response.error) {
+        setFormError(
+          response.error.message || t('auth:errors.invalidCredentials'),
+        );
+        return;
+      }
 
-        setIsLoading(true);
+      // Invalidate auth query to trigger router re-check
+      await queryClient.invalidateQueries({ queryKey: ['auth', 'session'] });
 
-        try {
-            const response = await signIn.email({
-                email: formData.email,
-                password: formData.password,
-            });
+      onSuccess?.();
+    } catch (err) {
+      setFormError(t('common:messages.error'));
+      console.error('Login error:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            if (response.error) {
-                setFormError(response.error.message || t('auth:errors.invalidCredentials'));
-                return;
-            }
+  return (
+    <Card className="w-full max-w-md glass-card">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl font-bold gradient-text">
+          {t('auth:login.title')}
+        </CardTitle>
+        <CardDescription>{t('auth:login.description')}</CardDescription>
+      </CardHeader>
 
-            // Invalidate auth query to trigger router re-check
-            await queryClient.invalidateQueries({ queryKey: ['auth', 'session'] });
+      <form onSubmit={(e) => void handleSubmit(e)} method="post">
+        <CardContent className="space-y-6">
+          {formError && (
+            <div
+              role="alert"
+              className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              {formError}
+            </div>
+          )}
 
-            onSuccess?.();
-        } catch (err) {
-            setFormError(t('common:messages.error'));
-            console.error('Login error:', err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+          <div className="space-y-2">
+            <Label htmlFor="email">{t('common:labels.email')}</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder={t('common:placeholders.email')}
+              value={formData.email}
+              onChange={handleChange}
+              disabled={isLoading}
+              autoComplete="email"
+              className={cn(errors.email && 'border-destructive')}
+            />
+            {errors.email && (
+              <p className="text-sm text-destructive">{errors.email}</p>
+            )}
+          </div>
 
-    return (
-        <Card className="w-full max-w-md glass-card">
-            <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-bold gradient-text">
-                    {t('auth:login.title')}
-                </CardTitle>
-                <CardDescription>
-                    {t('auth:login.description')}
-                </CardDescription>
-            </CardHeader>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">{t('common:labels.password')}</Label>
+              <Link
+                to={LocaleRoutes.forgotPassword}
+                params={localeParams(locale)}
+                className="text-xs text-primary hover:underline"
+              >
+                {t('auth:login.forgotPassword')}
+              </Link>
+            </div>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder={t('common:placeholders.password')}
+              value={formData.password}
+              onChange={handleChange}
+              disabled={isLoading}
+              autoComplete="current-password"
+              className={cn(errors.password && 'border-destructive')}
+            />
+            {errors.password && (
+              <p className="text-sm text-destructive">{errors.password}</p>
+            )}
+          </div>
+        </CardContent>
 
-            <form onSubmit={(e) => void handleSubmit(e)} method="post">
-                <CardContent className="space-y-6">
-                    {formError && (
-                        <div
-                            role="alert"
-                            className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
-                        >
-                            {formError}
-                        </div>
-                    )}
+        <CardFooter className="flex flex-col gap-4 pt-4">
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? (
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+            ) : (
+              t('common:actions.signIn')
+            )}
+          </Button>
 
-                    <div className="space-y-2">
-                        <Label htmlFor="email">{t('common:labels.email')}</Label>
-                        <Input
-                            id="email"
-                            name="email"
-                            type="email"
-                            placeholder={t('common:placeholders.email')}
-                            value={formData.email}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                            autoComplete="email"
-                            className={cn(errors.email && 'border-destructive')}
-                        />
-                        {errors.email && (
-                            <p className="text-sm text-destructive">{errors.email}</p>
-                        )}
-                    </div>
+          <div className="relative w-full">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-card px-2 text-muted-foreground">
+                {t('auth:login.orContinueWith')}
+              </span>
+            </div>
+          </div>
 
-                    <div className="space-y-2">
-                        <div className="flex items-center justify-between">
-                            <Label htmlFor="password">{t('common:labels.password')}</Label>
-                            <Link
-                                to={LocaleRoutes.forgotPassword}
-                                params={localeParams(locale)}
-                                className="text-xs text-primary hover:underline"
-                            >
-                                {t('auth:login.forgotPassword')}
-                            </Link>
-                        </div>
-                        <Input
-                            id="password"
-                            name="password"
-                            type="password"
-                            placeholder={t('common:placeholders.password')}
-                            value={formData.password}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                            autoComplete="current-password"
-                            className={cn(errors.password && 'border-destructive')}
-                        />
-                        {errors.password && (
-                            <p className="text-sm text-destructive">{errors.password}</p>
-                        )}
-                    </div>
-                </CardContent>
+          <GoogleOAuthButton
+            callbackURL={`/${locale}`}
+            label={t('auth:login.googleButton')}
+          />
 
-                <CardFooter className="flex flex-col gap-4 pt-4">
-                    <Button type="submit" className="w-full" disabled={isLoading}>
-                        {isLoading ? (
-                            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-                        ) : (
-                            t('common:actions.signIn')
-                        )}
-                    </Button>
-
-                    <div className="relative w-full">
-                        <div className="absolute inset-0 flex items-center">
-                            <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                            <span className="bg-card px-2 text-muted-foreground">{t('auth:login.orContinueWith')}</span>
-                        </div>
-                    </div>
-
-                    <GoogleOAuthButton
-                        callbackURL={`/${locale}`}
-                        label={t('auth:login.googleButton')}
-                    />
-
-                    {onRegisterClick && (
-                        <p className="text-center text-sm text-muted-foreground">
-                            {t('auth:login.noAccount')}{' '}
-                            <button
-                                type="button"
-                                className="text-primary hover:underline font-medium"
-                                onClick={onRegisterClick}
-                            >
-                                {t('common:actions.signUp')}
-                            </button>
-                        </p>
-                    )}
-                </CardFooter>
-            </form>
-        </Card>
-    );
+          {onRegisterClick && (
+            <p className="text-center text-sm text-muted-foreground">
+              {t('auth:login.noAccount')}{' '}
+              <button
+                type="button"
+                className="text-primary hover:underline font-medium"
+                onClick={onRegisterClick}
+              >
+                {t('common:actions.signUp')}
+              </button>
+            </p>
+          )}
+        </CardFooter>
+      </form>
+    </Card>
+  );
 }
 
 export default LoginForm;

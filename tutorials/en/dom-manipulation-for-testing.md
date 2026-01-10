@@ -1,6 +1,6 @@
 ---
-title: "DOM Manipulation for Testing"
-description: "Learn when to step outside the standard automation box and perform surgery on the DOM."
+title: 'DOM Manipulation for Testing'
+description: 'Learn when to step outside the standard automation box and perform surgery on the DOM.'
 ---
 
 # DOM Manipulation for Testing
@@ -15,8 +15,8 @@ Most of the time, checking vitals (reading text) and prescribing meds (clicking 
 **Direct DOM Manipulation** is **Surgery**.
 It is invasive. You cut open the patient (the browser page) to fix something internal.
 
-* **Risk**: High. You might bypass validations that a real user would face.
-* **Power**: Absolute. You can change any value, attribute, or state instantly.
+- **Risk**: High. You might bypass validations that a real user would face.
+- **Power**: Absolute. You can change any value, attribute, or state instantly.
 
 Use surgery only when the non-invasive treatment fails.
 
@@ -30,7 +30,7 @@ In "Glass Box" testing, you can see inside and touch the gears.
 **Use DOM Manipulation for:**
 
 1. **Setup (Injecting State)**: Fast-forwarding the app to a specific state.
-    * *Example*: Injecting a JWT token into LocalStorage so you don't have to log in via UI every time.
+   - _Example_: Injecting a JWT token into LocalStorage so you don't have to log in via UI every time.
 2. **Teardown (Cleanup)**: Resetting the application.
 3. **Reading Deep State**: Checking properties that aren't visible (e.g., `data-analytics-id`).
 
@@ -61,7 +61,7 @@ await page.evaluate(() => {
 ```
 
 **The Valid Override**:
-We aren't testing the *Date Picker library* (that's the library author's job). We are testing the *Booking Logic*.
+We aren't testing the _Date Picker library_ (that's the library author's job). We are testing the _Booking Logic_.
 By bypassing the UI glitch, we ensure our Booking Logic is tested robustly.
 
 ---
@@ -73,10 +73,10 @@ By bypassing the UI glitch, we ensure our Booking Logic is tested robustly.
 **The Crime**: Using `element.click()` in JavaScript to "click" a button.
 **The Reality**:
 
-* A real user click triggers: `mousedown`, `focus`, `mouseup`, `click`.
-* A JS click triggers: `click`.
-**The Risk**: You might click a button that is actually covered by a modal or disabled by CSS. The test passes, but the user is blocked.
-**The Fix**: Always use your framework's native click (`page.click()`), which checks for visibility and actionability.
+- A real user click triggers: `mousedown`, `focus`, `mouseup`, `click`.
+- A JS click triggers: `click`.
+  **The Risk**: You might click a button that is actually covered by a modal or disabled by CSS. The test passes, but the user is blocked.
+  **The Fix**: Always use your framework's native click (`page.click()`), which checks for visibility and actionability.
 
 ### Trap #2: The React/State disconnect
 
@@ -103,7 +103,7 @@ Finds all matches. Returns a NodeList.
 ```javascript
 const links = document.querySelectorAll('a');
 // Convert to Array to filter
-const pdfs = [...links].filter(link => link.href.endsWith('.pdf'));
+const pdfs = [...links].filter((link) => link.href.endsWith('.pdf'));
 ```
 
 ### 3. `element.closest()` (The Tracer)
@@ -115,4 +115,3 @@ const row = deleteBtn.closest('tr'); // Found the row!
 ```
 
 ---
-

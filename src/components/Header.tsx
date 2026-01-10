@@ -36,9 +36,11 @@ export function Header() {
   const { t } = useTranslation(['common', 'bugs']);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const params = useParams({ strict: false }) as { locale?: string };
+  const params = useParams({ strict: false });
   const locale = params.locale || 'en';
-  const isAuthPage = location.pathname.includes('/login') || location.pathname.includes('/register');
+  const isAuthPage =
+    location.pathname.includes('/login') ||
+    location.pathname.includes('/register');
 
   // Use TanStack Query to get the session (hydrated from server)
   const { data: auth } = useSuspenseQuery(authQueryOptions);
@@ -47,9 +49,24 @@ export function Header() {
 
   // Dynamic nav links based on locale
   const navLinks = [
-    { to: LocaleRoutes.tutorials, params: localeParams(locale), label: t('common:navigation.tutorials'), icon: BookOpen },
-    { to: LocaleRoutes.challenges, params: localeParams(locale), label: t('common:navigation.challenges'), icon: Code },
-    { to: LocaleRoutes.leaderboard, params: localeParams(locale), label: t('common:navigation.leaderboard'), icon: Trophy },
+    {
+      to: LocaleRoutes.tutorials,
+      params: localeParams(locale),
+      label: t('common:navigation.tutorials'),
+      icon: BookOpen,
+    },
+    {
+      to: LocaleRoutes.challenges,
+      params: localeParams(locale),
+      label: t('common:navigation.challenges'),
+      icon: Code,
+    },
+    {
+      to: LocaleRoutes.leaderboard,
+      params: localeParams(locale),
+      label: t('common:navigation.leaderboard'),
+      icon: Trophy,
+    },
   ];
 
   const user = session?.user;
@@ -77,11 +94,23 @@ export function Header() {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-8">
-              <Link to={LocaleRoutes.home} params={localeParams(locale)} className="flex items-center gap-2 btn-animate">
+              <Link
+                to={LocaleRoutes.home}
+                params={localeParams(locale)}
+                className="flex items-center gap-2 btn-animate"
+              >
                 {/* Dark Mode Logo */}
-                <img src="/logo-dark-new.png" alt="Logo" className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen" />
+                <img
+                  src="/logo-dark-new.png"
+                  alt="Logo"
+                  className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen"
+                />
                 {/* Light Mode Logo */}
-                <img src="/logo-light-new.png" alt="Logo" className="h-8 w-8 rounded-lg block dark:hidden mix-blend-multiply" />
+                <img
+                  src="/logo-light-new.png"
+                  alt="Logo"
+                  className="h-8 w-8 rounded-lg block dark:hidden mix-blend-multiply"
+                />
                 <span className="text-xl font-bold gradient-text">
                   TestingWithEkki
                 </span>
@@ -122,7 +151,9 @@ export function Header() {
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={user.image || undefined} />
                         <AvatarFallback className="bg-primary/10 text-primary">
-                          {(user.name || user.email || 'U').charAt(0).toUpperCase()}
+                          {(user.name || user.email || 'U')
+                            .charAt(0)
+                            .toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -137,7 +168,10 @@ export function Header() {
                           {user.email}
                         </p>
                         {isAdmin && (
-                          <Badge variant="outline" className="mt-1 w-fit bg-purple-500/10 text-purple-600 border-purple-500/20 text-[10px] h-4">
+                          <Badge
+                            variant="outline"
+                            className="mt-1 w-fit bg-purple-500/10 text-purple-600 border-purple-500/20 text-[10px] h-4"
+                          >
                             Admin
                           </Badge>
                         )}
@@ -145,26 +179,40 @@ export function Header() {
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem asChild>
-                      <Link to={LocaleRoutes.profile} params={localeParams(locale)} className="cursor-pointer font-medium">
+                      <Link
+                        to={LocaleRoutes.profile}
+                        params={localeParams(locale)}
+                        className="cursor-pointer font-medium"
+                      >
                         <User className="mr-2 h-4 w-4" />
                         {t('common:navigation.profile')}
                       </Link>
                     </DropdownMenuItem>
                     {isAdmin && (
                       <DropdownMenuItem asChild>
-                        <Link to="/admin" className="cursor-pointer font-medium text-purple-600 focus:text-purple-600">
+                        <Link
+                          to="/admin"
+                          className="cursor-pointer font-medium text-purple-600 focus:text-purple-600"
+                        >
                           <LayoutDashboard className="mr-2 h-4 w-4" />
                           {t('common:navigation.admin')}
                         </Link>
                       </DropdownMenuItem>
                     )}
                     <DropdownMenuItem asChild>
-                      <Link to={LocaleRoutes.settings} params={localeParams(locale)} className="cursor-pointer">
+                      <Link
+                        to={LocaleRoutes.settings}
+                        params={localeParams(locale)}
+                        className="cursor-pointer"
+                      >
                         <Settings className="mr-2 h-4 w-4" />
                         {t('common:navigation.settings')}
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      asChild
+                    >
                       <div className="w-full cursor-pointer">
                         <BugReportDialog
                           trigger={
@@ -190,10 +238,20 @@ export function Header() {
                 !isAuthPage && (
                   <div className="hidden md:flex items-center gap-2">
                     <Button variant="ghost" asChild>
-                      <Link to={LocaleRoutes.login} params={localeParams(locale)}>{t('common:navigation.login')}</Link>
+                      <Link
+                        to={LocaleRoutes.login}
+                        params={localeParams(locale)}
+                      >
+                        {t('common:navigation.login')}
+                      </Link>
                     </Button>
                     <Button asChild>
-                      <Link to={LocaleRoutes.register} params={localeParams(locale)}>{t('common:actions.startLearning')}</Link>
+                      <Link
+                        to={LocaleRoutes.register}
+                        params={localeParams(locale)}
+                      >
+                        {t('common:actions.startLearning')}
+                      </Link>
                     </Button>
                   </div>
                 )
@@ -216,108 +274,116 @@ export function Header() {
             </div>
           </div>
         </div>
-      </header >
+      </header>
 
       {/* Mobile Navigation */}
-      {
-        isMobileMenuOpen && (
-          <div className="fixed inset-0 z-30 md:hidden">
-            {/* Backdrop */}
-            <div
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm"
-              onClick={() => setIsMobileMenuOpen(false)}
-            />
+      {isMobileMenuOpen && (
+        <div className="fixed inset-0 z-30 md:hidden">
+          {/* Backdrop */}
+          <div
+            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
 
-            {/* Menu panel */}
-            <nav className="fixed top-16 left-0 right-0 bg-background border-b border-border p-4 animate-slide-up">
-              <div className="space-y-2">
-                {navLinks.map((link) => (
+          {/* Menu panel */}
+          <nav className="fixed top-16 left-0 right-0 bg-background border-b border-border p-4 animate-slide-up">
+            <div className="space-y-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  params={link.params}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors btn-animate"
+                  activeProps={{
+                    className:
+                      'flex items-center gap-3 p-3 rounded-lg text-primary bg-primary/10 font-medium pl-4 border-l-2 border-primary',
+                  }}
+                >
+                  <link.icon className="h-5 w-5" />
+                  {link.label}
+                </Link>
+              ))}
+
+              {/* Bug Report - Removed from top level mobile menu */}
+
+              {isAuthenticated && user ? (
+                <>
                   <Link
-                    key={link.to}
-                    to={link.to}
-                    params={link.params}
+                    to={LocaleRoutes.profile}
+                    params={localeParams(locale)}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors btn-animate"
-                    activeProps={{
-                      className:
-                        'flex items-center gap-3 p-3 rounded-lg text-primary bg-primary/10 font-medium pl-4 border-l-2 border-primary',
-                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
                   >
-                    <link.icon className="h-5 w-5" />
-                    {link.label}
+                    <User className="h-5 w-5" />
+                    {t('common:navigation.profile')}
                   </Link>
-                ))}
-
-                {/* Bug Report - Removed from top level mobile menu */}
-
-                {isAuthenticated && user ? (
-                  <>
+                  {isAdmin && (
                     <Link
-                      to={LocaleRoutes.profile}
-                      params={localeParams(locale)}
+                      to="/admin"
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                      className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
                     >
-                      <User className="h-5 w-5" />
-                      {t('common:navigation.profile')}
+                      <LayoutDashboard className="h-5 w-5" />
+                      Admin Dashboard
                     </Link>
-                    {isAdmin && (
-                      <Link
-                        to="/admin"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
-                      >
-                        <LayoutDashboard className="h-5 w-5" />
-                        Admin Dashboard
-                      </Link>
-                    )}
-                    <div className="px-3">
-                      <BugReportDialog
-                        trigger={
-                          <button className="flex items-center gap-3 w-full py-3 text-muted-foreground hover:text-foreground transition-colors">
-                            <Bug className="h-5 w-5" />
-                            {t('bugs:dialog.trigger')}
-                          </button>
-                        }
-                      />
-                    </div>
-                    <button
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        void handleSignOut();
-                      }}
-                      className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
+                  )}
+                  <div className="px-3">
+                    <BugReportDialog
+                      trigger={
+                        <button className="flex items-center gap-3 w-full py-3 text-muted-foreground hover:text-foreground transition-colors">
+                          <Bug className="h-5 w-5" />
+                          {t('bugs:dialog.trigger')}
+                        </button>
+                      }
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      void handleSignOut();
+                    }}
+                    className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    {t('common:navigation.logout')}
+                  </button>
+                </>
+              ) : (
+                !isAuthPage && (
+                  <div className="space-y-2">
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      asChild
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      <LogOut className="h-5 w-5" />
-                      {t('common:navigation.logout')}
-                    </button>
-                  </>
-                ) : (
-                  !isAuthPage && (
-                    <div className="space-y-2">
-                      <Button
-                        variant="outline"
-                        className="w-full"
-                        asChild
-                        onClick={() => setIsMobileMenuOpen(false)}
+                      <Link
+                        to={LocaleRoutes.login}
+                        params={localeParams(locale)}
                       >
-                        <Link to={LocaleRoutes.login} params={localeParams(locale)}>{t('common:navigation.login')}</Link>
-                      </Button>
-                      <Button
-                        className="w-full"
-                        asChild
-                        onClick={() => setIsMobileMenuOpen(false)}
+                        {t('common:navigation.login')}
+                      </Link>
+                    </Button>
+                    <Button
+                      className="w-full"
+                      asChild
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Link
+                        to={LocaleRoutes.register}
+                        params={localeParams(locale)}
                       >
-                        <Link to={LocaleRoutes.register} params={localeParams(locale)}>{t('common:actions.startLearning')}</Link>
-                      </Button>
-                    </div>
-                  )
-                )}
-              </div>
-            </nav>
-          </div>
-        )
-      }
+                        {t('common:actions.startLearning')}
+                      </Link>
+                    </Button>
+                  </div>
+                )
+              )}
+            </div>
+          </nav>
+        </div>
+      )}
     </>
   );
 }

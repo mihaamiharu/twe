@@ -5,40 +5,44 @@ This document serves as the **source of truth** for development patterns, archit
 ## 1. Core Architecture 🏗️
 
 ### Framework: TanStack Start
-- **Routing**: We use **File-Based Routing** in `src/routes`.
-    - `__root.tsx`: Global layout and providers.
-    - `index.tsx`: Page components.
-    - `$slug.tsx`: Dynamic routes.
-    - `_authenticated.tsx`: Layout wrapper for protected routes.
-- **Data Fetching**:
-    - **Loaders**: Use `beforeLoad` in routes for critical data pre-fetching (e.g., Auth).
-    - **React Query**: Use standard `useQuery` / `useMutation` hooks in components, calling Server Functions.
-- **Server Functions (RPC)**:
-    - **DO NOT** create standard REST API routes in `src/routes/api` unless absolutely necessary (e.g., webhooks).
-    - **DO** create Server Functions in `src/lib/*.fn.ts`.
-    - **Pattern**:
-        ```typescript
-        import { createServerFn } from '@tanstack/start';
-        import { getWebRequest } from 'vinxi/http';
 
-        export const myAction = createServerFn({ method: 'POST' })
-            .validator((data: MyInput) => data)
-            .handler(async ({ data }) => {
-                // Logic
-            });
-        ```
+- **Routing**: We use **File-Based Routing** in `src/routes`.
+  - `__root.tsx`: Global layout and providers.
+  - `index.tsx`: Page components.
+  - `$slug.tsx`: Dynamic routes.
+  - `_authenticated.tsx`: Layout wrapper for protected routes.
+- **Data Fetching**:
+  - **Loaders**: Use `beforeLoad` in routes for critical data pre-fetching (e.g., Auth).
+  - **React Query**: Use standard `useQuery` / `useMutation` hooks in components, calling Server Functions.
+- **Server Functions (RPC)**:
+  - **DO NOT** create standard REST API routes in `src/routes/api` unless absolutely necessary (e.g., webhooks).
+  - **DO** create Server Functions in `src/lib/*.fn.ts`.
+  - **Pattern**:
+
+    ```typescript
+    import { createServerFn } from '@tanstack/start';
+    import { getWebRequest } from 'vinxi/http';
+
+    export const myAction = createServerFn({ method: 'POST' })
+      .validator((data: MyInput) => data)
+      .handler(async ({ data }) => {
+        // Logic
+      });
+    ```
 
 ### Database & ORM
+
 - **PostgreSQL** + **Drizzle ORM**.
 - **Schema**: Defined in `src/db/schema.ts`.
 - **Migrations**: `drizzle/migrations`.
 - **Workflow**:
-    1.  Edit `src/db/schema.ts`.
-    2.  `bun run db:generate` (creates SQL).
-    3.  `bun run db:migrate` (applies SQL).
+  1.  Edit `src/db/schema.ts`.
+  2.  `bun run db:generate` (creates SQL).
+  3.  `bun run db:migrate` (applies SQL).
 - **Access Pattern**: All DB access happens in `*.fn.ts` files (Server Functions) or `src/db/*.ts` scripts. Never import `db` directly in client components.
 
 ### Authentication
+
 - **BetterAuth**: Handled in `src/lib/auth.*.ts`.
 - **Client Usage**: `useSession()` hook from `@/lib/auth.client`.
 - **Server Usage**: `auth.api.getSession({ headers: req.headers })`.
@@ -46,15 +50,17 @@ This document serves as the **source of truth** for development patterns, archit
 ## 2. Coding Standards & Style 💅
 
 ### React Components
+
 - **Functional Components**: Always.
 - **Hooks**: Custom hooks in `src/lib/` or alongside components if specific.
 - **Styling**: **Tailwind CSS v4** + **shadcn/ui**.
-    - Use `cn()` utility for class merging.
-    - Avoid inline styles.
-    - Dark mode first (supported via `ThemeProvider`).
+  - Use `cn()` utility for class merging.
+  - Avoid inline styles.
+  - Dark mode first (supported via `ThemeProvider`).
 - **Icons**: `lucide-react`.
 
 ### Project Structure
+
 ```
 src/
 ├── components/         # UI & Feature components
@@ -71,6 +77,7 @@ src/
 ```
 
 ### Naming Conventions
+
 - **Files**: `kebab-case.tsx` (e.g., `challenge-card.tsx`).
 - **Components**: `PascalCase` (e.g., `ChallengeCard`).
 - **Functions**: `camelCase` (e.g., `getChallenge`).
@@ -81,21 +88,21 @@ src/
 This project **does not** run Playwright on the server. It mocks it in the browser.
 
 - **`src/lib/playwright-shim.ts`**:
-    - Implements `page.click()`, `expect()`, `locator()`, etc.
-    - Uses `document.querySelector` and native DOM events.
-    - **Rule**: If a challenge needs a new Playwright method, implement it here first. Do not add a dependency on real Playwright for execution.
+  - Implements `page.click()`, `expect()`, `locator()`, etc.
+  - Uses `document.querySelector` and native DOM events.
+  - **Rule**: If a challenge needs a new Playwright method, implement it here first. Do not add a dependency on real Playwright for execution.
 
 - **`src/lib/iframe-executor.ts`**:
-    - Manages the sandboxed `<iframe>` where user code runs.
-    - Handles `console.log` interception and error catching.
+  - Manages the sandboxed `<iframe>` where user code runs.
+  - Handles `console.log` interception and error catching.
 
 ## 4. Database Schema Summary 🗄️
 
 - **`users`**: Extended with `xp`, `level`, `role`.
 - **`challenges`**: The core content.
-    - `htmlContent`: The DOM string injected into the iframe.
-    - `starterCode`: What the user sees in Monaco.
-    - `testCases`: JSON structure for validation.
+  - `htmlContent`: The DOM string injected into the iframe.
+  - `starterCode`: What the user sees in Monaco.
+  - `testCases`: JSON structure for validation.
 - **`submissions`**: Record of every attempt.
 - **`achievements`**: Gamification badges.
 
@@ -114,13 +121,13 @@ When implementing a new feature:
 
 - **Unit Tests**: `bun test`. Focus on utility functions and `playwright-shim.ts`.
 - **Integration Tests**: `bun test:integration`. Tests DB interactions and Server Functions.
-    - Requires Docker (`docker compose up -d postgres_test`).
-- **E2E**: We use Playwright to test the *platform itself* (not the user's code).
+  - Requires Docker (`docker compose up -d postgres_test`).
+- **E2E**: We use Playwright to test the _platform itself_ (not the user's code).
 
 ## 7. Common Pitfalls to Avoid ⚠️
 
 - **Server vs Client**:
-    - `*.fn.ts` runs on Server.
-    - Components run on Client (mostly).
-    - **Never** import server-only modules (like `fs`, `postgres`) into client components.
+  - `*.fn.ts` runs on Server.
+  - Components run on Client (mostly).
+  - **Never** import server-only modules (like `fs`, `postgres`) into client components.
 - **Shim Limitations**: The browser shim cannot do everything real Playwright does (e.g., multiple tabs, true network interception). Keep challenges within the DOM manipulation scope.

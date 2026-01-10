@@ -73,14 +73,14 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
           .from(userAchievements)
           .innerJoin(
             achievements,
-            eq(userAchievements.achievementId, achievements.id)
+            eq(userAchievements.achievementId, achievements.id),
           )
           .where(
             and(
               inArray(userAchievements.userId, userIds),
               // Filter for Boss achievements (assuming slugs contain 'boss')
-              like(achievements.slug, '%boss%')
-            )
+              like(achievements.slug, '%boss%'),
+            ),
           );
 
         badges.forEach((badge) => {

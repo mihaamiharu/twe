@@ -10,13 +10,13 @@ The core value proposition of the platform is the coding playground. Users need 
 ## Options Considered
 
 1. **Monaco Editor**: The code editor that powers VS Code.
-   - *Pros:* IntelliSense, minimap, syntax highlighting, validation, familiar shortcuts.
-   - *Cons:* Heavy bundle size.
+   - _Pros:_ IntelliSense, minimap, syntax highlighting, validation, familiar shortcuts.
+   - _Cons:_ Heavy bundle size.
 2. **CodeMirror**: Lightweight, extensible.
-   - *Pros:* Smaller footprint.
-   - *Cons:* Setup for "IDE-like" features (IntelliSense) is complex.
+   - _Pros:_ Smaller footprint.
+   - _Cons:_ Setup for "IDE-like" features (IntelliSense) is complex.
 3. **Ace Editor**: Older, stable.
-   - *Cons:* Handles modern features less well than Monaco.
+   - _Cons:_ Handles modern features less well than Monaco.
 
 ## Decision
 

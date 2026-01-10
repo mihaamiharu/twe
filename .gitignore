@@ -19,4 +19,6 @@ lint-results.json
 lint-results.json
 
 playwright-report/
+allure-results/
+allure-report/
 .env.staging

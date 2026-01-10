@@ -1,70 +1,70 @@
 {
-    "dialog": {
-        "title": "Report a Bug",
-        "trigger": "Report Bug",
-        "description": "Help us improve by reporting issues you find. Please be as detailed as possible."
+  "dialog": {
+    "title": "Report a Bug",
+    "trigger": "Report Bug",
+    "description": "Help us improve by reporting issues you find. Please be as detailed as possible."
+  },
+  "form": {
+    "title": {
+      "label": "Bug Title *",
+      "placeholder": "Brief description of the issue"
     },
-    "form": {
-        "title": {
-            "label": "Bug Title *",
-            "placeholder": "Brief description of the issue"
-        },
-        "severity": {
-            "label": "Severity *",
-            "placeholder": "Select severity",
-            "critical": "Critical",
-            "high": "High",
-            "medium": "Medium",
-            "low": "Low",
-            "guide": {
-                "critical": "App is unusable, data loss, security issue",
-                "high": "Major feature broken, no workaround",
-                "medium": "Feature works but with issues",
-                "low": "Minor issue, cosmetic problem"
-            }
-        },
-        "steps": {
-            "label": "Steps to Reproduce *",
-            "placeholder": "1. Go to the page \"...\"\n2. Click on \"...\"\n3. Enter \"...\" in the field\n4. Observe the error"
-        },
-        "expected": {
-            "label": "Expected Behavior *",
-            "placeholder": "What should happen?"
-        },
-        "actual": {
-            "label": "Actual Behavior *",
-            "placeholder": "What actually happened?"
-        },
-        "email": {
-            "label": "Your Email (optional)",
-            "placeholder": "For follow-up questions",
-            "description": "We may contact you if we need more information."
-        },
-        "autocapture": {
-            "title": "Auto-captured information:",
-            "url": "Current page URL",
-            "browser": "Browser information",
-            "user": "Your user account"
-        },
-        "submit": {
-            "button": "Submit Bug Report",
-            "loading": "Submitting..."
-        }
+    "severity": {
+      "label": "Severity *",
+      "placeholder": "Select severity",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low",
+      "guide": {
+        "critical": "App is unusable, data loss, security issue",
+        "high": "Major feature broken, no workaround",
+        "medium": "Feature works but with issues",
+        "low": "Minor issue, cosmetic problem"
+      }
     },
-    "toast": {
-        "success": {
-            "title": "Bug report submitted!",
-            "description": "Thank you for helping us improve."
-        },
-        "error": {
-            "title": "Failed to submit bug report"
-        }
+    "steps": {
+      "label": "Steps to Reproduce *",
+      "placeholder": "1. Go to the page \"...\"\n2. Click on \"...\"\n3. Enter \"...\" in the field\n4. Observe the error"
     },
-    "validation": {
-        "titleTooShort": "Title must be at least 5 characters",
-        "stepsTooShort": "Please provide detailed steps to reproduce the bug",
-        "expectedTooShort": "Please describe what you expected to happen",
-        "actualTooShort": "Please describe what actually happened",
-        "invalidEmail": "Please enter a valid email"
+    "expected": {
+      "label": "Expected Behavior *",
+      "placeholder": "What should happen?"
+    },
+    "actual": {
+      "label": "Actual Behavior *",
+      "placeholder": "What actually happened?"
+    },
+    "email": {
+      "label": "Your Email (optional)",
+      "placeholder": "For follow-up questions",
+      "description": "We may contact you if we need more information."
+    },
+    "autocapture": {
+      "title": "Auto-captured information:",
+      "url": "Current page URL",
+      "browser": "Browser information",
+      "user": "Your user account"
+    },
+    "submit": {
+      "button": "Submit Bug Report",
+      "loading": "Submitting..."
     }
+  },
+  "toast": {
+    "success": {
+      "title": "Bug report submitted!",
+      "description": "Thank you for helping us improve."
+    },
+    "error": {
+      "title": "Failed to submit bug report"
+    }
+  },
+  "validation": {
+    "titleTooShort": "Title must be at least 5 characters",
+    "stepsTooShort": "Please provide detailed steps to reproduce the bug",
+    "expectedTooShort": "Please describe what you expected to happen",
+    "actualTooShort": "Please describe what actually happened",
+    "invalidEmail": "Please enter a valid email"
+  }
 }

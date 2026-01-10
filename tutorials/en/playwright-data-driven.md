@@ -1,6 +1,6 @@
 ---
-title: "Data-Driven Testing"
-description: "Multiply your test coverage without duplicating your code."
+title: 'Data-Driven Testing'
+description: 'Multiply your test coverage without duplicating your code.'
 ---
 
 # Data-Driven Testing
@@ -12,9 +12,9 @@ Multiply your test coverage without duplicating your code.
 Think of a standard test as a specific cookie: "Chocolate Chip".
 Think of Data-Driven Testing (DDT) as a **Cookie Cutter**.
 
-* **The Dough**: Your Data Source (JSON, CSV, Array).
-* **The Cutter**: Your Test Logic.
-* **The Result**: 50 distinct cookies (Tests), each with different toppings (Inputs).
+- **The Dough**: Your Data Source (JSON, CSV, Array).
+- **The Cutter**: Your Test Logic.
+- **The Result**: 50 distinct cookies (Tests), each with different toppings (Inputs).
 
 You write the logic **once**. You run it **infinite** times.
 
@@ -26,28 +26,28 @@ There are two ways to do DDT. One is great. One is terrible.
 
 ### ❌ The "Iterate" Anti-Pattern (Bad)
 
-Putting the loop *inside* the test.
+Putting the loop _inside_ the test.
 
 ```javascript
 test('Process all users', async ({ page }) => {
   for (const user of users) {
-     // If User #30 fails, the test stops.
-     // You never know if User #31-#50 would have passed.
-     await process(user);
+    // If User #30 fails, the test stops.
+    // You never know if User #31-#50 would have passed.
+    await process(user);
   }
 });
 ```
 
 ### ✅ The "Generate" Pattern (Good)
 
-Putting the loop *outside* the test.
+Putting the loop _outside_ the test.
 
 ```javascript
 for (const user of users) {
   test(`Process user: ${user.name}`, async ({ page }) => {
-     // If User #30 fails, it's just one failed test.
-     // User #31-#50 still run perfectly.
-     await process(user);
+    // If User #30 fails, it's just one failed test.
+    // User #31-#50 still run perfectly.
+    await process(user);
   });
 }
 ```
@@ -64,9 +64,9 @@ You need to verify who can see the "Delete" button.
 
 **The Matrix**:
 
-* Admin: ✅ Visible
-* Editor: ❌ Hidden
-* Viewer: ❌ Hidden
+- Admin: ✅ Visible
+- Editor: ❌ Hidden
+- Viewer: ❌ Hidden
 
 **The Logic**:
 
@@ -79,14 +79,14 @@ const testData = [
 
 for (const data of testData) {
   test(`Role ${data.role} delete visibility`, async ({ page }) => {
-     await loginAs(page, data.role);
-     const deleteBtn = page.getByRole('button', { name: 'Delete' });
-     
-     if (data.shouldSeeDelete) {
-       await expect(deleteBtn).toBeVisible();
-     } else {
-       await expect(deleteBtn).toBeHidden();
-     }
+    await loginAs(page, data.role);
+    const deleteBtn = page.getByRole('button', { name: 'Delete' });
+
+    if (data.shouldSeeDelete) {
+      await expect(deleteBtn).toBeVisible();
+    } else {
+      await expect(deleteBtn).toBeHidden();
+    }
   });
 }
 ```
@@ -104,15 +104,15 @@ for (const data of testData) {
 
 ### Trap #2: The Network Dependency
 
-**The crime**: Fetching test data from an API *at the top of your test file*.
+**The crime**: Fetching test data from an API _at the top of your test file_.
 
 ```javascript
 // ❌ Don't do this
 const data = await fetch('https://api.my-app.com/users'); // Top-level await
 ```
 
-**The problem**: This runs *before* Playwright sharding. It blocks everything. It might fail before tests even start.
-**The Fix**: Hardcode critical data (JSON) or use a "Setup" project to fetch data *once* and save it to a local JSON file.
+**The problem**: This runs _before_ Playwright sharding. It blocks everything. It might fail before tests even start.
+**The Fix**: Hardcode critical data (JSON) or use a "Setup" project to fetch data _once_ and save it to a local JSON file.
 
 ---
 
@@ -140,4 +140,3 @@ for (const record of records) { ... }
 ```
 
 ---
-

@@ -1,6 +1,6 @@
 /**
  * WebComponentPreview - Visual preview for selector challenges
- * 
+ *
  * Features:
  * - Renders HTML in sandboxed iframe
  * - Highlights target element on hover
@@ -16,47 +16,50 @@ import { CodeEditor } from './CodeEditor';
 import { Lock, Eye, Code2, Minus, Plus, MousePointerClick } from 'lucide-react';
 
 export interface WebComponentPreviewProps {
-    htmlContent: string;
-    cssContent?: string;
-    targetElementId?: string;
-    targetSelector?: string;
-    userSelector?: string;
-    selectorType?: 'css' | 'xpath';
-    targetSelectorType?: 'css' | 'xpath';
-    onElementClick?: (elementPath: string) => void;
-    onValidationChange?: (result: { isValid: boolean; matchCount: number }) => void;
-    showControls?: boolean;
-    height?: string | number;
-    className?: string;
-    /** Expose iframe ref for external access (e.g., for code execution) */
-    iframeRef?: React.RefObject<HTMLIFrameElement | null>;
+  htmlContent: string;
+  cssContent?: string;
+  targetElementId?: string;
+  targetSelector?: string;
+  userSelector?: string;
+  selectorType?: 'css' | 'xpath';
+  targetSelectorType?: 'css' | 'xpath';
+  onElementClick?: (elementPath: string) => void;
+  onValidationChange?: (result: {
+    isValid: boolean;
+    matchCount: number;
+  }) => void;
+  showControls?: boolean;
+  height?: string | number;
+  className?: string;
+  /** Expose iframe ref for external access (e.g., for code execution) */
+  iframeRef?: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export function WebComponentPreview({
-    htmlContent,
-    cssContent,
-    targetElementId,
-    targetSelector,
-    userSelector,
-    selectorType = 'css',
-    onElementClick,
-    onValidationChange,
-    showControls = true,
-    // height prop is reserved for future use
-    className,
-    iframeRef: externalIframeRef,
-    ...props
+  htmlContent,
+  cssContent,
+  targetElementId,
+  targetSelector,
+  userSelector,
+  selectorType = 'css',
+  onElementClick,
+  onValidationChange,
+  showControls = true,
+  // height prop is reserved for future use
+  className,
+  iframeRef: externalIframeRef,
+  ...props
 }: WebComponentPreviewProps) {
-    const internalIframeRef = useRef<HTMLIFrameElement>(null);
-    const iframeRef = externalIframeRef || internalIframeRef;
-    const [zoom, setZoom] = useState(100);
-    const [hoveredElement, setHoveredElement] = useState<string | null>(null);
-    const [isFullscreen, setIsFullscreen] = useState(false);
-    const [viewMode, setViewMode] = useState<'preview' | 'source'>('preview');
+  const internalIframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeRef = externalIframeRef || internalIframeRef;
+  const [zoom, setZoom] = useState(100);
+  const [hoveredElement, setHoveredElement] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [viewMode, setViewMode] = useState<'preview' | 'source'>('preview');
 
-    // Generate the HTML document for the iframe
-    const getIframeContent = useCallback(() => {
-        const highlightStyles = `
+  // Generate the HTML document for the iframe
+  const getIframeContent = useCallback(() => {
+    const highlightStyles = `
             .twe-target-highlight {
                 outline: 3px solid #22c55e !important;
                 outline-offset: 2px;
@@ -114,7 +117,7 @@ export function WebComponentPreview({
             }
         `;
 
-        return `
+    return `
             <!DOCTYPE html>
             <html>
             <head>
@@ -279,190 +282,221 @@ export function WebComponentPreview({
 
                     // Initial highlight of target element
                     setTimeout(() => {
-                        ${targetElementId ? `
+                        ${
+                          targetElementId
+                            ? `
                             const target = document.getElementById('${targetElementId}');
                             if (target) target.classList.add('twe-target-highlight');
-                        ` : ''}
-                        ${targetSelector && !targetElementId ? `
+                        `
+                            : ''
+                        }
+                        ${
+                          targetSelector && !targetElementId
+                            ? `
                             highlightElements('${targetSelector}', 'css', 'twe-target-highlight');
-                        ` : ''}
+                        `
+                            : ''
+                        }
                     }, 100);
                 </script>
             </body>
             </html>
         `;
-    }, [htmlContent, cssContent, targetElementId, targetSelector]);
+  }, [htmlContent, cssContent, targetElementId, targetSelector]);
 
-    // Update iframe content
-    useEffect(() => {
-        const iframe = iframeRef.current;
-        if (!iframe || viewMode !== 'preview') return;
+  // Update iframe content
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe || viewMode !== 'preview') return;
 
-        const doc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (doc) {
-            doc.open();
-            doc.write(getIframeContent());
-            doc.close();
-        }
-    }, [getIframeContent, viewMode]);
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (doc) {
+      doc.open();
+      doc.write(getIframeContent());
+      doc.close();
+    }
+  }, [getIframeContent, viewMode]);
 
-    // Listen for messages from iframe
-    useEffect(() => {
-        const handleMessage = (event: MessageEvent) => {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-            const data = event.data;
+  // Listen for messages from iframe
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const data = event.data;
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            if (data?.type === 'elementClick') {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
-                onElementClick?.(data.path);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            } else if (data?.type === 'elementHover') {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
-                setHoveredElement(data.path);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            } else if (data?.type === 'validationResult') {
-                onValidationChange?.({
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-                    isValid: data.isValid,
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-                    matchCount: data.matchCount
-                });
-            }
-        };
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      if (data?.type === 'elementClick') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+        onElementClick?.(data.path);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      } else if (data?.type === 'elementHover') {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument
+        setHoveredElement(data.path);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+      } else if (data?.type === 'validationResult') {
+        onValidationChange?.({
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+          isValid: data.isValid,
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+          matchCount: data.matchCount,
+        });
+      }
+    };
 
-        window.addEventListener('message', handleMessage);
-        return () => window.removeEventListener('message', handleMessage);
-    }, [onElementClick]);
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [onElementClick]);
 
-    // Highlight user's selector matches
-    useEffect(() => {
-        const iframe = iframeRef.current;
-        if (!iframe?.contentWindow || !userSelector || viewMode !== 'preview') return;
+  // Highlight user's selector matches
+  useEffect(() => {
+    const iframe = iframeRef.current;
+    if (!iframe?.contentWindow || !userSelector || viewMode !== 'preview')
+      return;
 
-        iframe.contentWindow.postMessage({
-            type: 'highlight',
-            selector: userSelector,
-            selectorType,
-            className: 'twe-user-match',
-            // Pass target info for validation
-            targetSelector,
-            targetSelectorType: props.targetSelectorType || 'css'
-        }, '*');
+    iframe.contentWindow.postMessage(
+      {
+        type: 'highlight',
+        selector: userSelector,
+        selectorType,
+        className: 'twe-user-match',
+        // Pass target info for validation
+        targetSelector,
+        targetSelectorType: props.targetSelectorType || 'css',
+      },
+      '*',
+    );
 
-        return () => {
-            if (iframe?.contentWindow) {
-                iframe.contentWindow.postMessage({ type: 'clearHighlights' }, '*');
-            }
-        };
-    }, [userSelector, selectorType, viewMode, targetSelector, props.targetSelectorType]);
+    return () => {
+      if (iframe?.contentWindow) {
+        iframe.contentWindow.postMessage({ type: 'clearHighlights' }, '*');
+      }
+    };
+  }, [
+    userSelector,
+    selectorType,
+    viewMode,
+    targetSelector,
+    props.targetSelectorType,
+  ]);
 
-    // Zoom controls
-    const handleZoomIn = () => setZoom(prev => Math.min(prev + 25, 200));
-    const handleZoomOut = () => setZoom(prev => Math.max(prev - 25, 50));
+  // Zoom controls
+  const handleZoomIn = () => setZoom((prev) => Math.min(prev + 25, 200));
+  const handleZoomOut = () => setZoom((prev) => Math.max(prev - 25, 50));
 
-    return (
-        <div className={cn(
-            'flex flex-col bg-background rounded-lg overflow-hidden border border-border/50 shadow-sm',
-            isFullscreen && 'fixed inset-4 z-50 border-2 shadow-2xl',
-            className
-        )}>
-            {/* Browser Window Frame */}
-            <div className="flex-1 flex flex-col min-h-0 bg-background relative">
-                {/* Browser Toolbar */}
-                <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-muted/50 shrink-0">
-                    {/* Window Controls */}
-                    <div className="flex gap-1.5 group">
-                        <div className="w-3 h-3 rounded-full bg-red-500/80 group-hover:bg-red-500 transition-colors" />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500/80 group-hover:bg-yellow-500 transition-colors" />
-                        <div className="w-3 h-3 rounded-full bg-green-500/80 group-hover:bg-green-500 transition-colors" />
-                    </div>
+  return (
+    <div
+      className={cn(
+        'flex flex-col bg-background rounded-lg overflow-hidden border border-border/50 shadow-sm',
+        isFullscreen && 'fixed inset-4 z-50 border-2 shadow-2xl',
+        className,
+      )}
+    >
+      {/* Browser Window Frame */}
+      <div className="flex-1 flex flex-col min-h-0 bg-background relative">
+        {/* Browser Toolbar */}
+        <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-muted/50 shrink-0">
+          {/* Window Controls */}
+          <div className="flex gap-1.5 group">
+            <div className="w-3 h-3 rounded-full bg-red-500/80 group-hover:bg-red-500 transition-colors" />
+            <div className="w-3 h-3 rounded-full bg-yellow-500/80 group-hover:bg-yellow-500 transition-colors" />
+            <div className="w-3 h-3 rounded-full bg-green-500/80 group-hover:bg-green-500 transition-colors" />
+          </div>
 
-                    {/* URL Bar & Controls */}
-                    <div className="flex-1 flex gap-2 max-w-2xl mx-auto w-full">
-                        <div className="flex-1 flex items-center bg-background border border-border rounded-md px-3 h-8 shadow-sm relative overflow-hidden">
-                            <Lock className="h-3 w-3 text-muted-foreground mr-2 shrink-0" />
-                            <span className="text-xs text-muted-foreground truncate flex-1">
-                                {targetElementId ? `target-website.com/preview#${targetElementId}` : 'target-website.com/preview'}
-                            </span>
+          {/* URL Bar & Controls */}
+          <div className="flex-1 flex gap-2 max-w-2xl mx-auto w-full">
+            <div className="flex-1 flex items-center bg-background border border-border rounded-md px-3 h-8 shadow-sm relative overflow-hidden">
+              <Lock className="h-3 w-3 text-muted-foreground mr-2 shrink-0" />
+              <span className="text-xs text-muted-foreground truncate flex-1">
+                {targetElementId
+                  ? `target-website.com/preview#${targetElementId}`
+                  : 'target-website.com/preview'}
+              </span>
 
-                            {/* Visual/Source Toggle inside URL bar */}
-                            <div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5 ml-2 shrink-0">
-                                <button
-                                    onClick={() => setViewMode('preview')}
-                                    className={cn(
-                                        "p-1 rounded transition-colors",
-                                        viewMode === 'preview' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                    )}
-                                    title="Visual Preview"
-                                >
-                                    <Eye className="h-3 w-3" />
-                                </button>
-                                <button
-                                    onClick={() => setViewMode('source')}
-                                    className={cn(
-                                        "p-1 rounded transition-colors",
-                                        viewMode === 'source' ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                                    )}
-                                    title="View Source"
-                                >
-                                    <Code2 className="h-3 w-3" />
-                                </button>
-                            </div>
+              {/* Visual/Source Toggle inside URL bar */}
+              <div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5 ml-2 shrink-0">
+                <button
+                  onClick={() => setViewMode('preview')}
+                  className={cn(
+                    'p-1 rounded transition-colors',
+                    viewMode === 'preview'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                  )}
+                  title="Visual Preview"
+                >
+                  <Eye className="h-3 w-3" />
+                </button>
+                <button
+                  onClick={() => setViewMode('source')}
+                  className={cn(
+                    'p-1 rounded transition-colors',
+                    viewMode === 'source'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                  )}
+                  title="View Source"
+                >
+                  <Code2 className="h-3 w-3" />
+                </button>
+              </div>
 
-                            {/* Inspect Mode Badge Inline */}
-                            {showControls && viewMode === 'preview' && (
-                                <div className="ml-3 flex items-center pr-2 border-l border-border pl-3">
-                                    <Badge variant="secondary" className="h-5 px-1.5 text-[10px] gap-1.5 font-normal bg-primary/10 text-primary border-primary/20 pointer-events-none">
-                                        <MousePointerClick className="h-3 w-3" />
-                                        Inspect Active
-                                    </Badge>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Right Actions - Zoom Controls */}
-                    {viewMode === 'preview' && (
-                        <div className="flex items-center gap-1 shrink-0">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={handleZoomOut}
-                                title="Zoom Out"
-                            >
-                                <Minus className="h-3.5 w-3.5" />
-                            </Button>
-                            <span className="text-xs w-8 text-center tabular-nums text-muted-foreground">{zoom}%</span>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7"
-                                onClick={handleZoomIn}
-                                title="Zoom In"
-                            >
-                                <Plus className="h-3.5 w-3.5" />
-                            </Button>
-                        </div>
-                    )}
+              {/* Inspect Mode Badge Inline */}
+              {showControls && viewMode === 'preview' && (
+                <div className="ml-3 flex items-center pr-2 border-l border-border pl-3">
+                  <Badge
+                    variant="secondary"
+                    className="h-5 px-1.5 text-[10px] gap-1.5 font-normal bg-primary/10 text-primary border-primary/20 pointer-events-none"
+                  >
+                    <MousePointerClick className="h-3 w-3" />
+                    Inspect Active
+                  </Badge>
                 </div>
+              )}
+            </div>
+          </div>
 
-                {/* Content Area */}
-                <div className="flex-1 relative overflow-hidden bg-white/50 dark:bg-black/20">
-                    {viewMode === 'preview' ? (
-                        <div
-                            className="w-full h-full overflow-auto"
-                            style={{
-                                transform: `scale(${zoom / 100})`,
-                                transformOrigin: 'top left',
-                                width: `${100 * (100 / zoom)}%`,
-                                height: `${100 * (100 / zoom)}%`
-                            }}
-                        >
-                            <iframe
-                                ref={iframeRef}
-                                srcDoc={`
+          {/* Right Actions - Zoom Controls */}
+          {viewMode === 'preview' && (
+            <div className="flex items-center gap-1 shrink-0">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleZoomOut}
+                title="Zoom Out"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </Button>
+              <span className="text-xs w-8 text-center tabular-nums text-muted-foreground">
+                {zoom}%
+              </span>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-7 w-7"
+                onClick={handleZoomIn}
+                title="Zoom In"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Content Area */}
+        <div className="flex-1 relative overflow-hidden bg-white/50 dark:bg-black/20">
+          {viewMode === 'preview' ? (
+            <div
+              className="w-full h-full overflow-auto"
+              style={{
+                transform: `scale(${zoom / 100})`,
+                transformOrigin: 'top left',
+                width: `${100 * (100 / zoom)}%`,
+                height: `${100 * (100 / zoom)}%`,
+              }}
+            >
+              <iframe
+                ref={iframeRef}
+                srcDoc={`
                                     <!DOCTYPE html>
                                     <html>
                                         <head>
@@ -490,56 +524,56 @@ export function WebComponentPreview({
                                         <body>${htmlContent}</body>
                                     </html>
                                 `}
-                                className="w-full h-full border-none bg-white"
-                                title="Challenge Preview"
-                                sandbox="allow-same-origin allow-scripts"
-                            />
-                        </div>
-                    ) : (
-                        <div className="w-full h-full">
-                            <CodeEditor
-                                initialCode={htmlContent}
-                                language="html"
-                                readOnly={true}
-                                height="100%"
-                                className="border-none rounded-none h-full"
-                                showMinimap={false}
-                            />
-                        </div>
-                    )}
-                </div>
-
-                {/* Footer Status */}
-                {viewMode === 'preview' && (
-                    <div className="bg-muted/30 border-t border-border px-3 py-1.5 flex items-center justify-between text-xs text-muted-foreground shrink-0">
-                        <div className="flex items-center gap-2 truncate">
-                            {hoveredElement ? (
-                                <>
-                                    <div className="w-2 h-2 rounded-full bg-blue-500" />
-                                    <span className="font-mono">{hoveredElement}</span>
-                                </>
-                            ) : (
-                                <>
-                                    <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
-                                    <span>Hover over elements to inspect</span>
-                                </>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <span>{zoom}%</span>
-                        </div>
-                    </div>
-                )}
+                className="w-full h-full border-none bg-white"
+                title="Challenge Preview"
+                sandbox="allow-same-origin allow-scripts"
+              />
             </div>
-            {/* Fullscreen Overlay Backdrop */}
-            {isFullscreen && (
-                <div
-                    className="fixed inset-0 bg-background/80 backdrop-blur-sm -z-10"
-                    onClick={() => setIsFullscreen(false)}
-                />
-            )}
+          ) : (
+            <div className="w-full h-full">
+              <CodeEditor
+                initialCode={htmlContent}
+                language="html"
+                readOnly={true}
+                height="100%"
+                className="border-none rounded-none h-full"
+                showMinimap={false}
+              />
+            </div>
+          )}
         </div>
-    );
+
+        {/* Footer Status */}
+        {viewMode === 'preview' && (
+          <div className="bg-muted/30 border-t border-border px-3 py-1.5 flex items-center justify-between text-xs text-muted-foreground shrink-0">
+            <div className="flex items-center gap-2 truncate">
+              {hoveredElement ? (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-blue-500" />
+                  <span className="font-mono">{hoveredElement}</span>
+                </>
+              ) : (
+                <>
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground/30" />
+                  <span>Hover over elements to inspect</span>
+                </>
+              )}
+            </div>
+            <div className="flex items-center gap-4">
+              <span>{zoom}%</span>
+            </div>
+          </div>
+        )}
+      </div>
+      {/* Fullscreen Overlay Backdrop */}
+      {isFullscreen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm -z-10"
+          onClick={() => setIsFullscreen(false)}
+        />
+      )}
+    </div>
+  );
 }
 
 export default WebComponentPreview;

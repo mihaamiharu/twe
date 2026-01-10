@@ -1,6 +1,6 @@
 ---
-title: "From Manual to Automated Testing"
-description: "Bridge the gap between manual testing expertise and automation skills."
+title: 'From Manual to Automated Testing'
+description: 'Bridge the gap between manual testing expertise and automation skills.'
 ---
 
 # From Manual to Automated Testing
@@ -39,16 +39,16 @@ Test: Login with valid credentials
 test('Login with valid credentials', async ({ page }) => {
   // 1. Navigate
   await page.goto('/login');
-  
+
   // 2. Enter email
   await page.fill('#email', 'qa@test.com');
-  
-  // 3. Enter password  
+
+  // 3. Enter password
   await page.fill('#password', 'secret');
-  
+
   // 4. Click button
   await page.click('button[type="submit"]');
-  
+
   // 5. Verify
   await expect(page.locator('.welcome')).toBeVisible();
 });
@@ -147,12 +147,12 @@ test.beforeEach(async ({ page }) => {
 
 When reviewing selectors, ask:
 
-| Question | Good Answer |
-|----------|-------------|
-| Will it break if text changes? | No (uses ID/class/testid) |
-| Is it unique on the page? | Yes (only matches one element) |
-| Is it readable? | Yes (clear what it targets) |
-| Is it short? | Yes (minimal DOM traversal) |
+| Question                       | Good Answer                    |
+| ------------------------------ | ------------------------------ |
+| Will it break if text changes? | No (uses ID/class/testid)      |
+| Is it unique on the page?      | Yes (only matches one element) |
+| Is it readable?                | Yes (clear what it targets)    |
+| Is it short?                   | Yes (minimal DOM traversal)    |
 
 ### Selector Quality Scale
 
@@ -168,14 +168,14 @@ When reviewing selectors, ask:
 
 ## Quick Reference
 
-| Manual Action | Playwright Code |
-|---------------|-----------------|
-| Go to URL | `await page.goto(url)` |
-| Click element | `await page.click(selector)` |
-| Type text | `await page.fill(selector, text)` |
-| Check visible | `await expect(locator).toBeVisible()` |
-| Check text | `await expect(locator).toHaveText(text)` |
-| Wait for element | `await page.waitForSelector(selector)` |
-| Take screenshot | `await page.screenshot({ path: 'name.png' })` |
+| Manual Action    | Playwright Code                               |
+| ---------------- | --------------------------------------------- |
+| Go to URL        | `await page.goto(url)`                        |
+| Click element    | `await page.click(selector)`                  |
+| Type text        | `await page.fill(selector, text)`             |
+| Check visible    | `await expect(locator).toBeVisible()`         |
+| Check text       | `await expect(locator).toHaveText(text)`      |
+| Wait for element | `await page.waitForSelector(selector)`        |
+| Take screenshot  | `await page.screenshot({ path: 'name.png' })` |
 
 ---
