@@ -7,6 +7,7 @@ export class ChallengesPage extends BasePage {
   readonly editor: Locator;
   readonly selectorInput: Locator;
   readonly testSelectorButton: Locator;
+  readonly hideCompletedToggle: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -17,6 +18,7 @@ export class ChallengesPage extends BasePage {
     this.testSelectorButton = page.getByRole('button', {
       name: 'Test Selector',
     });
+    this.hideCompletedToggle = page.getByRole('button', { name: /Hide Completed|hm/i }); // Regex for flexibility & locale
 
     // Debug console logs from the page (including iframes)
     page.on('console', (msg) => {

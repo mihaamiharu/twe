@@ -1,7 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
-import { getChallenges } from '@/server/challenges.fn';
 import {
   Card,
   CardContent,
@@ -23,7 +22,6 @@ import {
   Code,
   Trophy,
   Zap,
-  AlertCircle,
   CheckCircle2,
   Palette,
   Route as RouteIcon,
@@ -31,6 +29,7 @@ import {
   List,
   Search,
   Lock,
+  Circle,
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
@@ -45,7 +44,6 @@ import { useDebounce } from '@/lib/useDebounce';
 import { ChallengeTierProgress } from '@/components/challenges/ChallengeTierProgress';
 import {
   tierLabels,
-  categoryLabels,
   difficultyColors,
   getTierFromCategory,
   TIER_ORDER,
@@ -163,6 +161,8 @@ function ChallengesPage() {
   const [filterTier, setFilterTier] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [hideCompleted, setHideCompleted] = useState<boolean>(false);
 
   const {
     data: challengesResponse,
@@ -192,6 +192,7 @@ function ChallengesPage() {
   const filteredChallenges = useMemo(() => {
     if (!challenges) return [];
     return challenges.filter((c: Challenge) => {
+      if (hideCompleted && c.isCompleted) return false;
       if (
         filterTier !== 'all' &&
         getTierFromCategory(c.category ?? undefined) !== filterTier
@@ -199,7 +200,7 @@ function ChallengesPage() {
         return false;
       return true;
     });
-  }, [challenges, filterTier]);
+  }, [challenges, filterTier, hideCompleted]);
 
   // Group challenges by category
   const challengesByCategory = useMemo(() => {
@@ -278,8 +279,6 @@ function ChallengesPage() {
     });
   }, [challengesByCategory]);
 
-  // State for view mode
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
     <div className="min-h-screen p-6 md:p-10">
@@ -322,7 +321,7 @@ function ChallengesPage() {
 
         {/* Search & Filters */}
         <div className="flex flex-col gap-4 mb-10">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -342,12 +341,28 @@ function ChallengesPage() {
               )}
             </div>
 
-            <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setHideCompleted(!hideCompleted)}
+              className={`h-11 px-4 rounded-xl shadow-sm whitespace-nowrap border-border bg-card hover:bg-accent hover:text-accent-foreground ${hideCompleted ? 'ring-2 ring-primary/20 border-primary/50 text-foreground' : 'text-muted-foreground'
+                }`}
+            >
+              {hideCompleted ? (
+                <CheckCircle2 className="mr-2 h-5 w-5 text-primary fill-primary/10" />
+              ) : (
+                <Circle className="mr-2 h-5 w-5 text-muted-foreground/50" />
+              )}
+              <span className={hideCompleted ? 'font-medium' : 'font-normal'}>
+                {t('filters.hideCompleted', { defaultValue: 'Hide Completed' })}
+              </span>
+            </Button>
+
+            <div className="flex items-center gap-3">
               <Select
                 value={filterDifficulty}
                 onValueChange={setFilterDifficulty}
               >
-                <SelectTrigger className="w-[160px] h-11 rounded-xl bg-card border-border shadow-sm">
+                <SelectTrigger className="w-[160px] !h-11 rounded-xl bg-card border-border shadow-sm">
                   <SelectValue
                     placeholder={t('common:labels.difficulty', {
                       defaultValue: 'Difficulty',
@@ -366,7 +381,7 @@ function ChallengesPage() {
                 </SelectContent>
               </Select>
 
-              <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-xl border border-border shadow-sm shrink-0">
+              <div className="flex items-center gap-2 bg-muted/50 h-11 px-1.5 rounded-xl border border-border shadow-sm shrink-0">
                 <Button
                   variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                   size="sm"

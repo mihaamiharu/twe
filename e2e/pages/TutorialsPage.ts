@@ -4,6 +4,7 @@ import { BasePage } from './BasePage';
 export class TutorialsPage extends BasePage {
   readonly tutorialCards: Locator;
   readonly completeButton: Locator;
+  readonly hideCompletedToggle: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -11,6 +12,7 @@ export class TutorialsPage extends BasePage {
     this.completeButton = page.getByRole('button', {
       name: /Complete|Selesai/i,
     });
+    this.hideCompletedToggle = page.getByRole('button', { name: /Hide Completed|hm/i });
   }
 
   async gotoList(locale: string = 'en') {

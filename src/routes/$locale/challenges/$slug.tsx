@@ -11,6 +11,7 @@ import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
+  useQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
 import { getChallenge, getChallenges } from '@/server/challenges.fn';
@@ -97,23 +98,13 @@ function ChallengeDetailPage() {
   // Rename for compatibility with existing code
   const data = challengeData;
 
-  // Handle Coming Soon redirect
-  useEffect(() => {
-    if (error?.message === 'COMING_SOON') {
-      toast.info(t('challenges:toasts.comingSoon'), {
-        description: t('challenges:toasts.comingSoonDescription'),
-        duration: 4000,
-      });
-      void navigate({ to: '/$locale/challenges', params: { locale } });
-    }
-  }, [error, navigate]);
 
   const { data: allChallengesResponse } = useQuery({
     queryKey: ['challenges', 'prerequisites'], // Different key from main list
     queryFn: async () => {
       const result = await getChallenges({ data: { limit: 100, locale } });
       if (!result.success) throw new Error(result.error);
-      return result;
+      return result.data; // Return the array directly to simplify usage
     },
   });
 
@@ -121,9 +112,9 @@ function ChallengeDetailPage() {
   const allChallengesData = allChallengesResponse;
 
   const missingPrerequisites = useMemo(() => {
-    if (!data || !allChallengesData) return [];
+    if (!data?.data || !allChallengesData) return [];
 
-    const currentTier = getTierFromCategory(data.category);
+    const currentTier = getTierFromCategory(data.data.category);
     const currentTierIndex = TIER_ORDER.indexOf(currentTier);
 
     if (currentTierIndex <= 0) return []; // Basic tier has no prerequisites
@@ -131,7 +122,7 @@ function ChallengeDetailPage() {
     const missing = [];
     for (let i = 0; i < currentTierIndex; i++) {
       const prereqTier = TIER_ORDER[i];
-      const tierChallenges = allChallengesData.data.filter(
+      const tierChallenges = allChallengesData.filter(
         (c) => getTierFromCategory(c.category ?? undefined) === prereqTier,
       );
       const completedInTier = tierChallenges.filter(
@@ -158,8 +149,8 @@ function ChallengeDetailPage() {
 
   // Deobfuscate inputs if needed (for selector challenges)
   const testCases = useMemo(() => {
-    if (!data?.testCases) return [];
-    return data.testCases.map((tc) => {
+    if (!data?.data?.testCases) return [];
+    return data.data.testCases.map((tc) => {
       const input = tc.input as { selector?: string; xpath?: string };
       const processedInput = { ...input };
 
@@ -175,47 +166,49 @@ function ChallengeDetailPage() {
         input: processedInput,
       };
     });
-  }, [data?.testCases]);
+  }, [data?.data?.testCases]);
 
   // Transform API response to Challenge type expected by ChallengePlayground
-  const challenge: Challenge | null = data
-    ? {
-      id: data.id,
-      slug: data.slug,
-      title: data.title,
-      description: data.description,
-      type: data.type,
-      difficulty:
-        data.difficulty === 'EASY'
-          ? 'Easy'
-          : data.difficulty === 'MEDIUM'
-            ? 'Medium'
-            : 'Hard',
-      xp: data.xpReward,
-      instructions: data.instructions,
-      htmlContent: data.htmlContent || '',
-      starterCode: data.starterCode || '',
-      targetSelector: (() => {
-        if (!testCases.length) return '';
+  const challenge: Challenge | null =
+    data && data.success && data.data
+      ? {
+        id: data.data.id,
+        slug: data.data.slug,
+        title: data.data.title,
+        description: data.data.description,
+        type: data.data.type,
+        difficulty:
+          data.data.difficulty === 'EASY'
+            ? 'Easy'
+            : data.data.difficulty === 'MEDIUM'
+              ? 'Medium'
+              : 'Hard',
+        xp: data.data.xpReward,
+        instructions: data.data.instructions,
+        htmlContent: data.data.htmlContent || '',
+        starterCode: data.data.starterCode || '',
+        targetSelector: (() => {
+          if (!testCases.length) return '';
 
-        // Try to find selector in the first test case input
-        const firstTestInput = testCases[0].input as {
-          selector?: string;
-          xpath?: string;
-        };
-        return firstTestInput?.selector || firstTestInput?.xpath || '';
-      })(),
+          // Try to find selector in the first test case input
+          const firstTestInput = testCases[0].input as {
+            selector?: string;
+            xpath?: string;
+          };
+          return firstTestInput?.selector || firstTestInput?.xpath || '';
+        })(),
 
-      testCases: testCases.map((tc) => ({
-        id: tc.id,
-        name: tc.description,
-        input: tc.input,
-        expectedOutput: tc.expectedOutput,
-      })),
-      category: data.category,
-      isCompleted: data.userProgress?.isCompleted || false,
-    }
-    : null;
+        testCases: testCases.map((tc) => ({
+          id: tc.id,
+          name: tc.description,
+          input: tc.input,
+          expectedOutput: tc.expectedOutput,
+        })),
+        category: data.data.category,
+        isCompleted: data.data.userProgress?.isCompleted || false,
+        tutorial: data.data.tutorial,
+      }
+      : null;
 
   const submitMutation = useMutation({
     mutationFn: async (submissionData: {
@@ -260,10 +253,10 @@ function ChallengeDetailPage() {
         });
 
         // Track analytics events
-        if (data) {
+        if (data?.data) {
           trackEvent('challenge_completed', {
-            slug: data.slug,
-            difficulty: data.difficulty,
+            slug: data.data.slug,
+            difficulty: data.data.difficulty,
             xp: response.data.submission.xpEarned,
           });
         }
@@ -344,7 +337,7 @@ function ChallengeDetailPage() {
   );
 
 
-  if (error || !challenge) {
+  if (!challenge) {
     return (
       <div className="min-h-screen p-6 md:p-10">
         <div className="max-w-4xl mx-auto">
@@ -354,7 +347,7 @@ function ChallengeDetailPage() {
                 {t('challenges:page.notFound')}
               </h1>
               <p className="text-muted-foreground mb-6">
-                {error?.message || t('challenges:page.notFoundDescription')}
+                {t('challenges:page.notFoundDescription')}
               </p>
               <div className="flex items-center gap-4 mb-6 justify-center">
                 <Link to="/$locale/challenges" params={{ locale }}>
