@@ -1,0 +1,17 @@
+node_modules/
+dist/
+.output/
+.git/
+.env*
+! .env.example
+*.log
+.vscode/
+allure-results/
+playwright-report/
+test-results/
+e2e/
+docker-compose*.yml
+Dockerfile
+.github/
+README.md
+CHANGELOG.md

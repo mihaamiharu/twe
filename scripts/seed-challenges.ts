@@ -9,7 +9,7 @@ const CHALLENGES_DIR = join(process.cwd(), 'content', 'challenges');
 
 async function getChallengeFiles() {
   const files = await readdir(CHALLENGES_DIR);
-  return files.filter(f => f.endsWith('.json'));
+  return files.filter((f) => f.endsWith('.json'));
 }
 
 async function loadChallengesFromFile(filename: string) {
@@ -36,45 +36,51 @@ async function seedChallenges() {
       totalChallenges++;
 
       try {
-        await db.insert(challenges).values({
-          id: challenge.slug,
-          slug: challenge.slug,
-          title: challenge.title?.en || challenge.title,
-          description: challenge.description?.en || challenge.description,
-          type: challenge.type,
-          difficulty: challenge.difficulty,
-          xpReward: challenge.xpReward,
-          order: challenge.order,
-          instructions: challenge.instructions?.en || challenge.instructions,
-          htmlContent: challenge.htmlContent || null,
-          starterCode: challenge.starterCode || null,
-          category: challenge.category || null,
-          tags: challenge.tags || [],
-          isPublished: true,
-          completionCount: 0,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        }).onConflictDoNothing();
+        await db
+          .insert(challenges)
+          .values({
+            id: challenge.slug,
+            slug: challenge.slug,
+            title: challenge.title?.en || challenge.title,
+            description: challenge.description?.en || challenge.description,
+            type: challenge.type,
+            difficulty: challenge.difficulty,
+            xpReward: challenge.xpReward,
+            order: challenge.order,
+            instructions: challenge.instructions?.en || challenge.instructions,
+            htmlContent: challenge.htmlContent || null,
+            starterCode: challenge.starterCode || null,
+            category: challenge.category || null,
+            tags: challenge.tags || [],
+            isPublished: true,
+            completionCount: 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .onConflictDoNothing();
 
         if (challenge.testCases && Array.isArray(challenge.testCases)) {
           for (const [index, tc] of challenge.testCases.entries()) {
-            await db.insert(testCases).values({
-              id: `${challenge.slug}-${index}`,
-              challengeId: challenge.slug,
-              description: tc.description?.en || tc.description,
-              input: JSON.stringify(tc.input),
-              expectedOutput: JSON.stringify(tc.expectedOutput),
-              isHidden: tc.isHidden || false,
-              order: index,
-              createdAt: new Date(),
-            }).onConflictDoNothing();
+            await db
+              .insert(testCases)
+              .values({
+                id: `${challenge.slug}-${index}`,
+                challengeId: challenge.slug,
+                description: tc.description?.en || tc.description,
+                input: JSON.stringify(tc.input),
+                expectedOutput: JSON.stringify(tc.expectedOutput),
+                isHidden: tc.isHidden || false,
+                order: index,
+                createdAt: new Date(),
+              })
+              .onConflictDoNothing();
           }
         }
-      }
 
-      console.log(`  ✅ Seeded: ${challenge.slug}`);
-    } catch (error) {
-      console.error(`  ❌ Failed to seed ${challenge.slug}:`, error);
+        console.log(`  ✅ Seeded: ${challenge.slug}`);
+      } catch (error) {
+        console.error(`  ❌ Failed to seed ${challenge.slug}:`, error);
+      }
     }
   }
 
