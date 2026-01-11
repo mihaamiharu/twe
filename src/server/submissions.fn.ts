@@ -81,7 +81,7 @@ export const createSubmission = createServerFn({ method: 'POST' })
       const { challengeSlug, code, testResults, executionTime } = input;
 
       // Get challenge by slug
-      const challenge = await db.query.challenges.findFirst({
+      let challenge = await db.query.challenges.findFirst({
         where: eq(challenges.slug, challengeSlug),
       });
 
@@ -118,7 +118,7 @@ export const createSubmission = createServerFn({ method: 'POST' })
           // Insert test cases
           if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
             await db.insert(testCases).values(
-              fsChallenge.testCases.map((tc, index) => ({
+              fsChallenge.testCases.map((tc: any, index: number) => ({
                 challengeId: newChallenge.id,
                 description: tc.description,
                 input: tc.input,
