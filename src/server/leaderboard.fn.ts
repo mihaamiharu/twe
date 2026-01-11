@@ -33,12 +33,40 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
       // Get leaderboard with pagination
       const offset = (filters.page - 1) * filters.limit;
 
+      // Calculate start of current month
+      const startOfMonth = new Date();
+      startOfMonth.setDate(1);
+      startOfMonth.setHours(0, 0, 0, 0);
+
+      // Subquery for monthly XP from submissions
+      const monthlySubmissionsXp = sql<number>`(
+        SELECT COALESCE(SUM(${submissions.xpEarned}), 0)
+        FROM ${submissions}
+        WHERE ${submissions.userId} = ${users.id}
+        AND ${submissions.createdAt} >= ${startOfMonth.toISOString()}
+      )`;
+
+      // Subquery for monthly XP from achievements
+      const monthlyAchievementsXp = sql<number>`(
+        SELECT COALESCE(SUM(${achievements.xpReward}), 0)
+        FROM ${userAchievements}
+        INNER JOIN ${achievements} ON ${userAchievements.achievementId} = ${achievements.id}
+        WHERE ${userAchievements.userId} = ${users.id}
+        AND ${userAchievements.unlockedAt} >= ${startOfMonth.toISOString()}
+      )`;
+
+      // Define the score column based on period
+      const scoreColumn = filters.period === 'monthly'
+        ? sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})`
+        : users.xp;
+
       const leaderboard = await db
         .select({
           id: users.id,
           name: users.name,
           image: users.image,
-          xp: users.xp,
+          xp: users.xp, // Global XP
+          monthlyXp: sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})::int`, // Expose monthly XP
           level: users.level,
           createdAt: users.createdAt,
           challengesCompleted: sql<number>`(
@@ -50,8 +78,16 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
           )`,
         })
         .from(users)
-        .where(and(...conditions))
-        .orderBy(desc(users.xp), desc(users.level))
+        .where(
+          and(
+            ...conditions,
+            // If monthly, ensure they have some monthly XP
+            filters.period === 'monthly'
+              ? sql`(${monthlySubmissionsXp} + ${monthlyAchievementsXp}) > 0`
+              : undefined
+          )
+        )
+        .orderBy(desc(scoreColumn), desc(users.level))
         .limit(filters.limit)
         .offset(offset);
 
