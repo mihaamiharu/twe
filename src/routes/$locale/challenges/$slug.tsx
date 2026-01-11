@@ -8,16 +8,16 @@ import { useTranslation } from 'react-i18next';
 import { useIntlayer } from 'react-intlayer';
 import { useCallback, useMemo, useEffect } from 'react';
 import {
-  useQuery,
   useMutation,
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
+import { challengeDetailQueryOptions } from '@/lib/challenges.query';
 import { getChallenge, getChallenges } from '@/server/challenges.fn';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { deobfuscate } from '@/lib/obfuscator';
-import { ArrowLeft, Loader2, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -33,6 +33,11 @@ import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 
 export const Route = createFileRoute('/$locale/challenges/$slug')({
+  loader: ({ context, params }) => {
+    return context.queryClient.ensureQueryData(
+      challengeDetailQueryOptions(params.slug, params.locale),
+    );
+  },
   component: ChallengeDetailPage,
 });
 
@@ -87,32 +92,7 @@ function ChallengeDetailPage() {
 
   const {
     data: challengeData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['challenge', slug],
-    queryFn: async () => {
-      if (!slug) throw new Error('Slug is required');
-      const result = (await getChallenge({ data: { slug, locale } })) as {
-        success: boolean;
-        data?: APIChallenge;
-        error?: string;
-      };
-      if (!result.success || !result.data) {
-        if (result.error === 'This challenge is coming soon!') {
-          throw new Error('COMING_SOON'); // Match existing error handling
-        }
-        throw new Error(result.error || 'Unknown error');
-      }
-      return result.data;
-    },
-    enabled: !!slug,
-    retry: (failureCount, error: Error) => {
-      // Don't retry if it's a 403/COMING_SOON error
-      if (error?.message === 'COMING_SOON') return false;
-      return failureCount < 3;
-    },
-  });
+  } = useSuspenseQuery(challengeDetailQueryOptions(slug, locale));
 
   // Rename for compatibility with existing code
   const data = challengeData;
@@ -200,41 +180,41 @@ function ChallengeDetailPage() {
   // Transform API response to Challenge type expected by ChallengePlayground
   const challenge: Challenge | null = data
     ? {
-        id: data.id,
-        slug: data.slug,
-        title: data.title,
-        description: data.description,
-        type: data.type,
-        difficulty:
-          data.difficulty === 'EASY'
-            ? 'Easy'
-            : data.difficulty === 'MEDIUM'
-              ? 'Medium'
-              : 'Hard',
-        xp: data.xpReward,
-        instructions: data.instructions,
-        htmlContent: data.htmlContent || '',
-        starterCode: data.starterCode || '',
-        targetSelector: (() => {
-          if (!testCases.length) return '';
+      id: data.id,
+      slug: data.slug,
+      title: data.title,
+      description: data.description,
+      type: data.type,
+      difficulty:
+        data.difficulty === 'EASY'
+          ? 'Easy'
+          : data.difficulty === 'MEDIUM'
+            ? 'Medium'
+            : 'Hard',
+      xp: data.xpReward,
+      instructions: data.instructions,
+      htmlContent: data.htmlContent || '',
+      starterCode: data.starterCode || '',
+      targetSelector: (() => {
+        if (!testCases.length) return '';
 
-          // Try to find selector in the first test case input
-          const firstTestInput = testCases[0].input as {
-            selector?: string;
-            xpath?: string;
-          };
-          return firstTestInput?.selector || firstTestInput?.xpath || '';
-        })(),
+        // Try to find selector in the first test case input
+        const firstTestInput = testCases[0].input as {
+          selector?: string;
+          xpath?: string;
+        };
+        return firstTestInput?.selector || firstTestInput?.xpath || '';
+      })(),
 
-        testCases: testCases.map((tc) => ({
-          id: tc.id,
-          name: tc.description,
-          input: tc.input,
-          expectedOutput: tc.expectedOutput,
-        })),
-        category: data.category,
-        isCompleted: data.userProgress?.isCompleted || false,
-      }
+      testCases: testCases.map((tc) => ({
+        id: tc.id,
+        name: tc.description,
+        input: tc.input,
+        expectedOutput: tc.expectedOutput,
+      })),
+      category: data.category,
+      isCompleted: data.userProgress?.isCompleted || false,
+    }
     : null;
 
   const submitMutation = useMutation({
@@ -264,9 +244,9 @@ function ChallengeDetailPage() {
           achievements: response.data.newAchievements || [],
           levelUp: response.data.levelUp
             ? {
-                newLevel: response.data.levelUp.newLevel,
-                title: getLevelTitle(response.data.levelUp.newLevel),
-              }
+              newLevel: response.data.levelUp.newLevel,
+              title: getLevelTitle(response.data.levelUp.newLevel),
+            }
             : undefined,
         });
         setShowSuccessDialog(true);
@@ -274,8 +254,8 @@ function ChallengeDetailPage() {
         toast.success(t('common:messages.challengeCompleted'), {
           description: response.data.newAchievements?.length
             ? t('common:messages.achievementUnlocked', {
-                name: response.data.newAchievements[0].name,
-              })
+              name: response.data.newAchievements[0].name,
+            })
             : undefined,
         });
 
@@ -363,18 +343,6 @@ function ChallengeDetailPage() {
     [challenge, submitMutation, sessionData, locale, t],
   );
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen p-6 md:p-10 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">
-            {t('common:messages.loadingChallenge')}
-          </p>
-        </div>
-      </div>
-    );
-  }
 
   if (error || !challenge) {
     return (
@@ -452,12 +420,12 @@ function ChallengeDetailPage() {
           onNextChallenge={
             data?.nextChallenge
               ? () => {
-                  setShowSuccessDialog(false);
-                  void navigate({
-                    to: '/$locale/challenges/$slug',
-                    params: { locale, slug: data.nextChallenge!.slug },
-                  });
-                }
+                setShowSuccessDialog(false);
+                void navigate({
+                  to: '/$locale/challenges/$slug',
+                  params: { locale, slug: data.nextChallenge!.slug },
+                });
+              }
               : undefined
           }
         />

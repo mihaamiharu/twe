@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { getChallenges } from '@/server/challenges.fn';
 import {
   Card,
@@ -9,7 +10,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -54,6 +54,14 @@ import {
 import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute('/$locale/challenges/')({
+  loader: ({ context, params }) => {
+    return context.queryClient.ensureQueryData(
+      challengeListQueryOptions({
+        locale: params.locale,
+        limit: 500,
+      }),
+    );
+  },
   component: ChallengesPage,
   head: ({ params }) => ({
     meta: [
@@ -158,39 +166,25 @@ function ChallengesPage() {
 
   const {
     data: challengesResponse,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: [
-      'challenges',
-      filterType,
-      filterDifficulty,
-      debouncedSearchQuery,
-    ],
-    queryFn: async () => {
-      const result = await getChallenges({
-        data: {
-          locale,
-          limit: 500,
-          type:
-            filterType === 'all'
-              ? undefined
-              : (filterType as
-                  | 'JAVASCRIPT'
-                  | 'PLAYWRIGHT'
-                  | 'CSS_SELECTOR'
-                  | 'XPATH_SELECTOR'),
-          difficulty:
-            filterDifficulty === 'all'
-              ? undefined
-              : (filterDifficulty as 'EASY' | 'MEDIUM' | 'HARD'),
-          search: debouncedSearchQuery || undefined,
-        },
-      });
-      if (!result.success) throw new Error(result.error);
-      return result;
-    },
-  });
+  } = useSuspenseQuery(
+    challengeListQueryOptions({
+      locale,
+      limit: 500,
+      type:
+        filterType === 'all'
+          ? undefined
+          : (filterType as
+            | 'JAVASCRIPT'
+            | 'PLAYWRIGHT'
+            | 'CSS_SELECTOR'
+            | 'XPATH_SELECTOR'),
+      difficulty:
+        filterDifficulty === 'all'
+          ? undefined
+          : (filterDifficulty as 'EASY' | 'MEDIUM' | 'HARD'),
+      search: debouncedSearchQuery || undefined,
+    }),
+  );
 
   const challenges = challengesResponse?.data ?? [];
 
@@ -430,39 +424,11 @@ function ChallengesPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="h-full glass-card">
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-5 w-20 mb-2" />
-                  <Skeleton className="h-6 w-3/4 mb-1" />
-                  <Skeleton className="h-4 w-full" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
 
         {/* Error State */}
-        {error && (
-          <div className="text-center py-12">
-            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {t('common:messages.failedToLoad')}
-            </h3>
-            <p className="text-muted-foreground">
-              {t('common:messages.retry')}
-            </p>
-          </div>
-        )}
 
         {/* Empty State */}
-        {!isLoading && !error && challenges.length === 0 && (
+        {challenges.length === 0 && (
           <div className="text-center py-12">
             <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">
@@ -475,7 +441,7 @@ function ChallengesPage() {
         )}
 
         {/* Challenges Content */}
-        {!isLoading && !error && sortedChallengesByCategory.length > 0 && (
+        {sortedChallengesByCategory.length > 0 && (
           <div className="space-y-10">
             {sortedChallengesByCategory.map(
               ([category, categoryChallenges]) => (
@@ -503,13 +469,12 @@ function ChallengesPage() {
 
                         const ChallengeCard = (
                           <Card
-                            className={`h-full transition-all duration-300 rounded-xl group/card overflow-hidden ${
-                              isComingSoon
-                                ? 'bg-muted/50 border-muted opacity-80'
-                                : challenge.isCompleted
-                                  ? 'border-green-500/20 bg-green-500/5 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-                                  : 'glass-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-                            }`}
+                            className={`h-full transition-all duration-300 rounded-xl group/card overflow-hidden ${isComingSoon
+                              ? 'bg-muted/50 border-muted opacity-80'
+                              : challenge.isCompleted
+                                ? 'border-green-500/20 bg-green-500/5 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
+                                : 'glass-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
+                              }`}
                           >
                             <CardHeader className="pb-3 md:pb-4 space-y-3">
                               <div className="flex items-start justify-between gap-2">
@@ -759,7 +724,7 @@ function ChallengesPage() {
                                       variant="secondary"
                                       className={
                                         difficultyColors[
-                                          challenge.difficulty
+                                        challenge.difficulty
                                         ] || ''
                                       }
                                     >
