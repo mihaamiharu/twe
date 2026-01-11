@@ -2,7 +2,7 @@ import {
   HeadContent,
   Outlet,
   Scripts,
-  createRootRoute,
+  createRootRouteWithContext,
   useParams,
 } from '@tanstack/react-router';
 import { type AuthSession } from '@/server/auth.fn';
@@ -12,11 +12,7 @@ import { TanStackDevtools } from '@tanstack/react-devtools';
 import {
   QueryClient,
   QueryClientProvider,
-  QueryCache,
-  MutationCache,
 } from '@tanstack/react-query';
-import { logger } from '@/lib/logger';
-
 import { NotFound } from '@/components/NotFound';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -25,36 +21,17 @@ import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
-import { useTranslation } from 'react-i18next';
-
-const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (error, query) => {
-      logger.error(`Query Error: ${JSON.stringify(query.queryKey)}`, error);
-    },
-  }),
-  mutationCache: new MutationCache({
-    onError: (error) => {
-      logger.error(`Mutation Error:`, error);
-    },
-  }),
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
-      refetchOnWindowFocus: false,
-    },
-  },
-});
 
 // Export context type for child routes
 export interface RootContext {
-  auth: AuthSession;
+  auth?: AuthSession;
+  queryClient: QueryClient;
 }
 
-export const Route = createRootRoute({
-  beforeLoad: async () => {
+export const Route = createRootRouteWithContext<RootContext>()({
+  beforeLoad: async ({ context }) => {
     // Optimization: Check cache first to avoid blocking every navigation
-    const auth = await queryClient.ensureQueryData(authQueryOptions);
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
     return { auth };
   },
   head: () => ({
@@ -133,6 +110,8 @@ function RootComponent() {
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
+  const context = Route.useRouteContext();
+  const queryClient = context?.queryClient;
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
 
