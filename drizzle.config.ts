@@ -8,7 +8,9 @@ export default defineConfig({
   out: './drizzle/migrations',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL!,
+    // Use DIRECT_URL for migrations (bypasses PgBouncer on Supabase)
+    // Falls back to DATABASE_URL for local development
+    url: process.env.DIRECT_URL || process.env.DATABASE_URL!,
   },
   verbose: true,
   strict: true,
