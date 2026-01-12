@@ -404,6 +404,7 @@ function ChallengeDetailPage() {
 
       {lastSubmissionResult && (
         <ChallengeSuccessDialog
+          isBoss={challenge.slug.includes('boss')}
           open={showSuccessDialog}
           onClose={() => setShowSuccessDialog(false)}
           xpEarned={lastSubmissionResult.xpEarned}

@@ -30,6 +30,7 @@ import {
   Search,
   Lock,
   Circle,
+  Swords, /* Added Swords icon */
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
@@ -61,7 +62,7 @@ export const Route = createFileRoute('/$locale/challenges/')({
     );
   },
   component: ChallengesPage,
-  head: ({ params }) => ({
+  head: () => ({
     meta: [
       {
         title: 'Coding Challenges | TestingWithEkki',
@@ -125,6 +126,10 @@ const challengeTypeConfig: Record<
     icon: <RouteIcon className="h-4 w-4" />,
     label: 'XPath',
   },
+};
+
+const isBossChallenge = (challenge: Challenge) => {
+  return challenge.slug.includes('boss');
 };
 
 export interface Challenge {
@@ -482,13 +487,17 @@ function ChallengesPage() {
                         const isComingSoon =
                           challenge.tags?.includes('coming-soon');
 
+                        const isBoss = isBossChallenge(challenge);
+
                         const ChallengeCard = (
                           <Card
                             className={`h-full transition-all duration-300 rounded-xl group/card overflow-hidden ${isComingSoon
                               ? 'bg-muted/50 border-muted opacity-80'
                               : challenge.isCompleted
                                 ? 'border-green-500/20 bg-green-500/5 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-                                : 'glass-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
+                                : isBoss
+                                  ? 'border-red-500/40 bg-gradient-to-br from-red-500/5 to-purple-500/5 hover:border-red-500/60 hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-1'
+                                  : 'glass-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
                               }`}
                           >
                             <CardHeader className="pb-3 md:pb-4 space-y-3">
@@ -512,6 +521,15 @@ function ChallengesPage() {
                                       )}
                                     </span>
                                   </Badge>
+                                  {isBoss && !isComingSoon && (
+                                    <Badge
+                                      variant="outline"
+                                      className="bg-red-500/10 text-red-500 border-red-500/30 text-[10px] px-1.5 h-5 animate-pulse"
+                                    >
+                                      <Swords className="h-3 w-3 mr-1" />
+                                      BOSS FIGHT
+                                    </Badge>
+                                  )}
                                   {isComingSoon && (
                                     <Badge
                                       variant="outline"
@@ -528,7 +546,7 @@ function ChallengesPage() {
                               </div>
                               <div>
                                 <CardTitle
-                                  className={`text-lg font-bold mt-1 transition-colors line-clamp-1 leading-tight ${isComingSoon ? 'text-muted-foreground' : 'group-hover/card:text-primary'}`}
+                                  className={`text-lg font-bold mt-1 transition-colors line-clamp-1 leading-tight ${isComingSoon ? 'text-muted-foreground' : isBoss ? 'text-red-500 group-hover/card:text-red-400' : 'group-hover/card:text-primary'}`}
                                 >
                                   {challenge.title}
                                 </CardTitle>
@@ -615,6 +633,8 @@ function ChallengesPage() {
                             const isComingSoon =
                               challenge.tags?.includes('coming-soon');
 
+                            const isBoss = isBossChallenge(challenge);
+
                             if (isComingSoon) {
                               return (
                                 <TableRow
@@ -682,7 +702,12 @@ function ChallengesPage() {
                             return (
                               <TableRow
                                 key={challenge.slug}
-                                className={`group cursor-pointer ${challenge.isCompleted ? 'bg-green-500/5' : ''}`}
+                                className={`group cursor-pointer ${challenge.isCompleted
+                                  ? 'bg-green-500/5'
+                                  : isBoss
+                                    ? 'bg-red-500/5 hover:bg-red-500/10'
+                                    : ''
+                                  }`}
                               >
                                 <TableCell className="font-mono text-muted-foreground w-[80px]">
                                   <Link
@@ -702,8 +727,9 @@ function ChallengesPage() {
                                     params={{ locale, slug: challenge.slug }}
                                     className="block"
                                   >
-                                    <div className="font-bold">
+                                    <div className={`font-bold ${isBoss ? 'text-red-500 flex items-center gap-2' : ''}`}>
                                       {challenge.title}
+                                      {isBoss && <Swords className="h-3.5 w-3.5" />}
                                     </div>
                                     <div className="text-xs text-muted-foreground line-clamp-1">
                                       {challenge.description}
