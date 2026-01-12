@@ -1,17 +1,18 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from '@tanstack/react-query';
+import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Trophy, Calendar, AlertCircle, Crown, Shield } from 'lucide-react';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { getLeaderboard } from '@/server/leaderboard.fn';
+import { leaderboardQueryOptions } from '@/lib/leaderboard.query';
+import { type RootContext } from '../__root';
 
 interface LeaderboardEntry {
   id: string;
@@ -32,33 +33,41 @@ interface LeaderboardEntry {
 }
 
 export const Route = createFileRoute('/$locale/leaderboard')({
+  loader: async ({ context, params }) => {
+    console.log('[Leaderboard Loader] context keys:', Object.keys(context || {}));
+
+    // Check if queryClient exists (should be provided by router)
+    if (!context?.queryClient) {
+      console.error('[Leaderboard Loader] queryClient missing! Params:', params);
+      return;
+    }
+
+    // Prefetch both all-time and monthly by default to make tabs instant
+    await Promise.all([
+      context.queryClient.ensureQueryData(
+        leaderboardQueryOptions({ period: 'all', locale: params.locale }),
+      ),
+      context.queryClient.ensureQueryData(
+        leaderboardQueryOptions({ period: 'monthly', locale: params.locale }),
+      ),
+    ]);
+  },
   component: LeaderboardPage,
 });
 
 function LeaderboardPage() {
   const { locale } = useParams({ from: '/$locale/leaderboard' });
   const { t } = useTranslation(['leaderboard', 'common']);
-  const { data: auth } = useSuspenseQuery(authQueryOptions);
+  const { auth } = Route.useRouteContext();
   const session = auth;
   const isAuthenticated = !!session?.user;
 
   // State for active tab period using state instead of just Tabs defaultValue
   const [period, setPeriod] = useState<'all' | 'monthly'>('all');
 
-  const {
-    data: leaderboardData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['leaderboard', period], // Add period to query key
-    queryFn: async () => {
-      const result = await getLeaderboard({
-        data: { page: 1, limit: 50, period, locale },
-      });
-      if (!result.success) throw new Error(result.error);
-      return result;
-    },
-  });
+  const { data: leaderboardData } = useSuspenseQuery(
+    leaderboardQueryOptions({ page: 1, limit: 50, period, locale }),
+  );
 
   const users: LeaderboardEntry[] = leaderboardData?.data ?? [];
 
@@ -110,10 +119,20 @@ function LeaderboardPage() {
             value={period === 'all' ? 'all-time' : 'monthly'}
             className="space-y-8"
           >
-            {isLoading ? (
-              <LeaderboardSkeleton />
-            ) : error ? (
-              <LeaderboardError />
+            {users.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500">
+                <div className="h-20 w-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-4">
+                  <Trophy className="h-10 w-10 text-muted-foreground/30" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">
+                  {t('leaderboard:table.emptyState')}
+                </h3>
+                <p className="text-muted-foreground max-w-xs">
+                  {t('leaderboard:table.emptyDescription', {
+                    defaultValue: 'No one has climbed the leaderboard yet. Be the first!',
+                  })}
+                </p>
+              </div>
             ) : (
               <>
                 {/* Top 3 Podium - Compact & Floating */}

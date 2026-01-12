@@ -8,16 +8,17 @@ import { useTranslation } from 'react-i18next';
 import { useIntlayer } from 'react-intlayer';
 import { useCallback, useMemo, useEffect } from 'react';
 import {
-  useQuery,
   useMutation,
   useQueryClient,
   useSuspenseQuery,
+  useQuery,
 } from '@tanstack/react-query';
+import { challengeDetailQueryOptions } from '@/lib/challenges.query';
 import { getChallenge, getChallenges } from '@/server/challenges.fn';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { deobfuscate } from '@/lib/obfuscator';
-import { ArrowLeft, Loader2, BookOpen } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -33,6 +34,11 @@ import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 
 export const Route = createFileRoute('/$locale/challenges/$slug')({
+  loader: ({ context, params }) => {
+    return context.queryClient.ensureQueryData(
+      challengeDetailQueryOptions(params.slug, params.locale),
+    );
+  },
   component: ChallengeDetailPage,
 });
 
@@ -87,53 +93,18 @@ function ChallengeDetailPage() {
 
   const {
     data: challengeData,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['challenge', slug],
-    queryFn: async () => {
-      if (!slug) throw new Error('Slug is required');
-      const result = (await getChallenge({ data: { slug, locale } })) as {
-        success: boolean;
-        data?: APIChallenge;
-        error?: string;
-      };
-      if (!result.success || !result.data) {
-        if (result.error === 'This challenge is coming soon!') {
-          throw new Error('COMING_SOON'); // Match existing error handling
-        }
-        throw new Error(result.error || 'Unknown error');
-      }
-      return result.data;
-    },
-    enabled: !!slug,
-    retry: (failureCount, error: Error) => {
-      // Don't retry if it's a 403/COMING_SOON error
-      if (error?.message === 'COMING_SOON') return false;
-      return failureCount < 3;
-    },
-  });
+  } = useSuspenseQuery(challengeDetailQueryOptions(slug, locale));
 
   // Rename for compatibility with existing code
   const data = challengeData;
 
-  // Handle Coming Soon redirect
-  useEffect(() => {
-    if (error?.message === 'COMING_SOON') {
-      toast.info(t('challenges:toasts.comingSoon'), {
-        description: t('challenges:toasts.comingSoonDescription'),
-        duration: 4000,
-      });
-      void navigate({ to: '/$locale/challenges', params: { locale } });
-    }
-  }, [error, navigate]);
 
   const { data: allChallengesResponse } = useQuery({
     queryKey: ['challenges', 'prerequisites'], // Different key from main list
     queryFn: async () => {
       const result = await getChallenges({ data: { limit: 100, locale } });
       if (!result.success) throw new Error(result.error);
-      return result;
+      return result.data; // Return the array directly to simplify usage
     },
   });
 
@@ -141,9 +112,9 @@ function ChallengeDetailPage() {
   const allChallengesData = allChallengesResponse;
 
   const missingPrerequisites = useMemo(() => {
-    if (!data || !allChallengesData) return [];
+    if (!data?.data || !allChallengesData) return [];
 
-    const currentTier = getTierFromCategory(data.category);
+    const currentTier = getTierFromCategory(data.data.category);
     const currentTierIndex = TIER_ORDER.indexOf(currentTier);
 
     if (currentTierIndex <= 0) return []; // Basic tier has no prerequisites
@@ -151,7 +122,7 @@ function ChallengeDetailPage() {
     const missing = [];
     for (let i = 0; i < currentTierIndex; i++) {
       const prereqTier = TIER_ORDER[i];
-      const tierChallenges = allChallengesData.data.filter(
+      const tierChallenges = allChallengesData.filter(
         (c) => getTierFromCategory(c.category ?? undefined) === prereqTier,
       );
       const completedInTier = tierChallenges.filter(
@@ -164,7 +135,7 @@ function ChallengeDetailPage() {
       ) {
         missing.push({
           tier: prereqTier,
-          name: t(`challenges: tiers.${prereqTier} `),
+          name: t(`challenges:tiers.${prereqTier}`),
         });
       }
     }
@@ -178,8 +149,8 @@ function ChallengeDetailPage() {
 
   // Deobfuscate inputs if needed (for selector challenges)
   const testCases = useMemo(() => {
-    if (!data?.testCases) return [];
-    return data.testCases.map((tc) => {
+    if (!data?.data?.testCases) return [];
+    return data.data.testCases.map((tc) => {
       const input = tc.input as { selector?: string; xpath?: string };
       const processedInput = { ...input };
 
@@ -195,26 +166,27 @@ function ChallengeDetailPage() {
         input: processedInput,
       };
     });
-  }, [data?.testCases]);
+  }, [data?.data?.testCases]);
 
   // Transform API response to Challenge type expected by ChallengePlayground
-  const challenge: Challenge | null = data
-    ? {
-        id: data.id,
-        slug: data.slug,
-        title: data.title,
-        description: data.description,
-        type: data.type,
+  const challenge: Challenge | null =
+    data && data.success && data.data
+      ? {
+        id: data.data.id,
+        slug: data.data.slug,
+        title: data.data.title,
+        description: data.data.description,
+        type: data.data.type,
         difficulty:
-          data.difficulty === 'EASY'
+          data.data.difficulty === 'EASY'
             ? 'Easy'
-            : data.difficulty === 'MEDIUM'
+            : data.data.difficulty === 'MEDIUM'
               ? 'Medium'
               : 'Hard',
-        xp: data.xpReward,
-        instructions: data.instructions,
-        htmlContent: data.htmlContent || '',
-        starterCode: data.starterCode || '',
+        xp: data.data.xpReward,
+        instructions: data.data.instructions,
+        htmlContent: data.data.htmlContent || '',
+        starterCode: data.data.starterCode || '',
         targetSelector: (() => {
           if (!testCases.length) return '';
 
@@ -232,10 +204,11 @@ function ChallengeDetailPage() {
           input: tc.input,
           expectedOutput: tc.expectedOutput,
         })),
-        category: data.category,
-        isCompleted: data.userProgress?.isCompleted || false,
+        category: data.data.category,
+        isCompleted: data.data.userProgress?.isCompleted || false,
+        tutorial: data.data.tutorial,
       }
-    : null;
+      : null;
 
   const submitMutation = useMutation({
     mutationFn: async (submissionData: {
@@ -258,15 +231,15 @@ function ChallengeDetailPage() {
       return response;
     },
     onSuccess: async (response) => {
-      if (response.success && response.data) {
+      if (response.success && response.data?.submission?.isPassed) {
         setLastSubmissionResult({
           xpEarned: response.data.submission.xpEarned,
           achievements: response.data.newAchievements || [],
           levelUp: response.data.levelUp
             ? {
-                newLevel: response.data.levelUp.newLevel,
-                title: getLevelTitle(response.data.levelUp.newLevel),
-              }
+              newLevel: response.data.levelUp.newLevel,
+              title: getLevelTitle(response.data.levelUp.newLevel),
+            }
             : undefined,
         });
         setShowSuccessDialog(true);
@@ -274,16 +247,16 @@ function ChallengeDetailPage() {
         toast.success(t('common:messages.challengeCompleted'), {
           description: response.data.newAchievements?.length
             ? t('common:messages.achievementUnlocked', {
-                name: response.data.newAchievements[0].name,
-              })
+              name: response.data.newAchievements[0].name,
+            })
             : undefined,
         });
 
         // Track analytics events
-        if (data) {
+        if (data?.data) {
           trackEvent('challenge_completed', {
-            slug: data.slug,
-            difficulty: data.difficulty,
+            slug: data.data.slug,
+            difficulty: data.data.difficulty,
             xp: response.data.submission.xpEarned,
           });
         }
@@ -363,20 +336,8 @@ function ChallengeDetailPage() {
     [challenge, submitMutation, sessionData, locale, t],
   );
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen p-6 md:p-10 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
-          <p className="text-muted-foreground">
-            {t('common:messages.loadingChallenge')}
-          </p>
-        </div>
-      </div>
-    );
-  }
 
-  if (error || !challenge) {
+  if (!challenge) {
     return (
       <div className="min-h-screen p-6 md:p-10">
         <div className="max-w-4xl mx-auto">
@@ -386,7 +347,7 @@ function ChallengeDetailPage() {
                 {t('challenges:page.notFound')}
               </h1>
               <p className="text-muted-foreground mb-6">
-                {error?.message || t('challenges:page.notFoundDescription')}
+                {t('challenges:page.notFoundDescription')}
               </p>
               <div className="flex items-center gap-4 mb-6 justify-center">
                 <Link to="/$locale/challenges" params={{ locale }}>
@@ -395,12 +356,12 @@ function ChallengeDetailPage() {
                     {t('common:actions.backToChallenges')}
                   </Button>
                 </Link>
-                {data?.tutorial && (
+                {data?.data?.tutorial && (
                   <>
                     <div className="h-4 w-px bg-border" />
                     <Link
                       to="/$locale/tutorials/$slug"
-                      params={{ locale, slug: data.tutorial.slug }}
+                      params={{ locale, slug: data.data.tutorial.slug }}
                     >
                       <Button
                         variant="ghost"
@@ -409,7 +370,7 @@ function ChallengeDetailPage() {
                       >
                         <BookOpen className="h-4 w-4 mr-2" />
                         {t('challenges:page.reviewTutorial', {
-                          title: data.tutorial.title,
+                          title: data.data.tutorial.title,
                         })}
                       </Button>
                     </Link>
@@ -428,7 +389,7 @@ function ChallengeDetailPage() {
       {missingPrerequisites.length > 0 && (
         <div className="px-6 pt-4">
           <TierSkipTip
-            currentTier={tierLabels[getTierFromCategory(data?.category)].name}
+            currentTier={tierLabels[getTierFromCategory(data?.data?.category)].name}
             missingPrerequisites={missingPrerequisites}
           />
         </div>
@@ -450,14 +411,14 @@ function ChallengeDetailPage() {
           levelUp={lastSubmissionResult.levelUp}
           onRetry={() => setShowSuccessDialog(false)}
           onNextChallenge={
-            data?.nextChallenge
+            data?.data?.nextChallenge
               ? () => {
-                  setShowSuccessDialog(false);
-                  void navigate({
-                    to: '/$locale/challenges/$slug',
-                    params: { locale, slug: data.nextChallenge!.slug },
-                  });
-                }
+                setShowSuccessDialog(false);
+                void navigate({
+                  to: '/$locale/challenges/$slug',
+                  params: { locale, slug: data.data.nextChallenge!.slug },
+                });
+              }
               : undefined
           }
         />

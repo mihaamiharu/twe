@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { adminChallengesQueryOptions } from '@/lib/admin.query';
 import { getAdminChallenges, updateChallengeStatus } from '@/server/admin.fn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -33,7 +34,7 @@ interface AdminChallenge {
 }
 
 export const Route = createFileRoute('/admin/challenges')({
-  loader: ({ context }) => {
+  loader: async ({ context }) => {
     const session = context.auth;
     if (
       !session?.user ||
@@ -43,6 +44,8 @@ export const Route = createFileRoute('/admin/challenges')({
         to: '/',
       });
     }
+
+    await context.queryClient.ensureQueryData(adminChallengesQueryOptions);
   },
   component: ChallengeManager,
 });
@@ -51,15 +54,7 @@ function ChallengeManager() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { data: challenges, isLoading } = useQuery({
-    queryKey: ['admin-challenges'],
-    queryFn: async () => {
-      const res = await getAdminChallenges();
-      if (!res.success)
-        throw new Error(res.error || 'Failed to fetch challenges');
-      return res.data;
-    },
-  });
+  const { data: challenges } = useSuspenseQuery(adminChallengesQueryOptions);
 
   const filteredChallenges = useMemo(() => {
     if (!challenges) return [];
@@ -92,10 +87,6 @@ function ChallengeManager() {
     },
   });
 
-  if (isLoading)
-    return (
-      <div className="p-8 text-center animate-pulse">Loading challenges...</div>
-    );
 
   return (
     <div className="container mx-auto p-6 space-y-8 animate-fade-in relative z-10">
