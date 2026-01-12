@@ -53,8 +53,8 @@ export const LocaleRoutes = {
   challenges: '/$locale/challenges/',
   challengeDetail: '/$locale/challenges/$slug',
   leaderboard: '/$locale/leaderboard',
-  profile: '/$locale/_authenticated/profile',
-  settings: '/$locale/_authenticated/settings',
+  profile: '/$locale/profile',
+  settings: '/$locale/settings',
   privacy: '/$locale/privacy',
   terms: '/$locale/terms',
 } as const;

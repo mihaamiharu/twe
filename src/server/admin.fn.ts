@@ -12,8 +12,10 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         await import('@tanstack/react-start/server');
       const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
-      const { users, submissions, challenges } = await import('@/db/schema');
-      const { count, desc, sql, gte } = await import('drizzle-orm');
+      const { users, submissions, challenges, bugReports } = await import(
+        '@/db/schema'
+      );
+      const { count, desc, sql, gte, eq } = await import('drizzle-orm');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const headers = getRequestHeaders();
@@ -85,6 +87,52 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         },
       });
 
+      // 6. User Growth (Last 30 Days)
+      const userGrowth = await db
+        .select({
+          date: sql<string>`to_char(${users.createdAt}, 'YYYY-MM-DD')`,
+          count: count(),
+        })
+        .from(users)
+        .where(gte(users.createdAt, thirtyDaysAgo))
+        .groupBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`)
+        .orderBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`);
+
+      // 7. Submission Success Rate
+      const submissionStats = await db
+        .select({
+          isPassed: submissions.isPassed,
+          count: count(),
+        })
+        .from(submissions)
+        .groupBy(submissions.isPassed);
+
+      // 8. Bug Stats
+      const bugStatsResults = await db
+        .select({
+          status: bugReports.status,
+          count: count(),
+        })
+        .from(bugReports)
+        .groupBy(bugReports.status);
+
+      // Normalize Bug Stats
+      const bugStats = {
+        OPEN: 0,
+        IN_PROGRESS: 0,
+        RESOLVED: 0,
+        CLOSED: 0,
+        NEW: 0,
+        WONT_FIX: 0,
+      };
+
+      bugStatsResults.forEach((stat) => {
+        if (stat.status) {
+          // @ts-expect-error - dynamic assignment
+          bugStats[stat.status] = stat.count;
+        }
+      });
+
       return {
         success: true,
         data: {
@@ -93,16 +141,21 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
           submissionsByDate,
           popularChallenges,
           recentActivity,
+          userGrowth,
+          submissionStats: {
+            passed: submissionStats.find(s => s.isPassed)?.count || 0,
+            failed: submissionStats.find(s => !s.isPassed)?.count || 0,
+          },
+          bugStats
         },
       };
     } catch (ignored) {
       const error = ignored as Error;
       console.error('Failed to fetch admin stats:', error);
       return {
-        users: 0,
-        active: 0,
-        submissions: 0,
-        completions: 0,
+        // Return basic structure on error to prevent UI crash
+        // ideally we should probably just return success: false and handle it in UI
+        success: false,
         error: error.message,
       };
     }

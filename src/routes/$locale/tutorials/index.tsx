@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { getTutorials } from '@/server/tutorials.fn';
+import { z } from 'zod';
 import {
   Card,
   CardContent,
@@ -33,8 +34,28 @@ import {
   Circle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useDebounce } from '@/lib/useDebounce';
+
+// --- Search Params Schema ---
+const TutorialsSearchSchema = z.object({
+  q: z.string().optional(),
+  difficulty: z.enum(['all', 'beginner', 'intermediate', 'advanced']).optional().default('all'),
+  view: z.enum(['grid', 'list']).optional().default('grid'),
+  hideCompleted: z.coerce.boolean().optional().default(false),
+});
 
 export const Route = createFileRoute('/$locale/tutorials/')({
+  validateSearch: TutorialsSearchSchema,
+  loader: async ({ context, params }) => {
+    // Prefetch tutorials for SSR
+    const result = await getTutorials({
+      data: {
+        locale: params.locale,
+        limit: 50,
+      },
+    });
+    return result;
+  },
   component: TutorialsPage,
   head: () => ({
     meta: [
@@ -55,29 +76,51 @@ const difficulties = ['all', 'beginner', 'intermediate', 'advanced'] as const;
 function TutorialsPage() {
   const { locale } = Route.useParams();
   const { t } = useTranslation('tutorials');
-  const [search, setSearch] = useState('');
-  const [selectedDifficulty, setSelectedDifficulty] =
-    useState<(typeof difficulties)[number]>('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [hideCompleted, setHideCompleted] = useState<boolean>(false);
+  const navigate = Route.useNavigate();
+
+  // URL-based State
+  const { q, difficulty, view, hideCompleted } = Route.useSearch();
+  const selectedDifficulty = difficulty;
+  const viewMode = view;
+
+  // Local state for search input (debounced to URL)
+  const [searchInput, setSearchInput] = useState(q ?? '');
+  const debouncedSearchQuery = useDebounce(searchInput, 300);
+
+  // Helper to update URL search params
+  const updateSearch = (updates: Partial<z.infer<typeof TutorialsSearchSchema>>) => {
+    void navigate({
+      to: '.',
+      search: (prev) => ({ ...prev, ...updates }),
+      replace: true,
+    });
+  };
+
+  // Sync debounced search to URL
+  useEffect(() => {
+    if (debouncedSearchQuery !== (q ?? '')) {
+      updateSearch({ q: debouncedSearchQuery || undefined });
+    }
+  }, [debouncedSearchQuery]);
 
   const {
     data: tutorialsResponse,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['tutorials', search],
+    queryKey: ['tutorials', q],
     queryFn: async () => {
       const result = await getTutorials({
         data: {
           locale,
-          search: search || undefined,
+          search: q || undefined,
           limit: 50,
         },
       });
       if (!result.success) throw new Error(result.error);
       return result;
     },
+    placeholderData: keepPreviousData,
   });
 
   const tutorials = tutorialsResponse?.data ?? [];
@@ -137,15 +180,15 @@ function TutorialsPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder={t('page.searchPlaceholder')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 className="pl-10 h-11 bg-card border-border rounded-xl shadow-sm focus-visible:ring-primary/20"
               />
             </div>
 
             <Button
               variant="outline"
-              onClick={() => setHideCompleted(!hideCompleted)}
+              onClick={() => updateSearch({ hideCompleted: !hideCompleted })}
               className={`h-11 px-4 rounded-lg shadow-sm whitespace-nowrap border-border bg-card hover:bg-accent hover:text-accent-foreground self-end md:self-auto ${hideCompleted ? 'ring-2 ring-primary/20 border-primary/50 text-foreground' : 'text-muted-foreground'
                 }`}
             >
@@ -162,7 +205,7 @@ function TutorialsPage() {
               <Button
                 variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('grid')}
+                onClick={() => updateSearch({ view: 'grid' })}
                 className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'grid' ? 'bg-background shadow-sm' : ''}`}
                 title={t('view.grid')}
               >
@@ -171,7 +214,7 @@ function TutorialsPage() {
               <Button
                 variant={viewMode === 'list' ? 'secondary' : 'ghost'}
                 size="sm"
-                onClick={() => setViewMode('list')}
+                onClick={() => updateSearch({ view: 'list' })}
                 className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'list' ? 'bg-background shadow-sm' : ''}`}
                 title={t('view.list')}
               >
@@ -189,9 +232,9 @@ function TutorialsPage() {
                 }
                 className="cursor-pointer px-3 py-1 text-sm"
                 onClick={() =>
-                  setSelectedDifficulty(
-                    selectedDifficulty === difficulty ? 'all' : difficulty,
-                  )
+                  updateSearch({
+                    difficulty: selectedDifficulty === difficulty ? 'all' : difficulty,
+                  })
                 }
               >
                 {t(`filters.${difficulty}`)}

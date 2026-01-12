@@ -6,6 +6,7 @@ export const challengeListQueryOptions = (filters: {
     type?: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';
     difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
     search?: string;
+    limit?: number;
 }) =>
     queryOptions({
         queryKey: ['challenges', filters],

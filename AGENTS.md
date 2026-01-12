@@ -66,7 +66,7 @@ export const Route = createFileRoute('/')({
 import { createServerFn } from '@tanstack/react-start/server';
 
 export const myApiFn = createServerFn({ method: 'POST' })
-  .validator((input: { email: string }) => input)
+  .inputValidator((input: { email: string }) => input)
   .handler(async ({ data }) => {
     return { success: true, data };
   });
@@ -132,6 +132,20 @@ function MyComponent() {
 type Result<T> = { success: true; data: T } | { success: false; error: string };
 ```
 
+**Search & Filtering**:
+When implementing live search or filtering, **Avoid `useSuspenseQuery`** as it triggers suspense boundaries (flickering) on every keystroke.
+Instead, use `useQuery` with `placeholderData: keepPreviousData`:
+
+```ts
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
+
+const { data } = useQuery({
+  queryKey: ['items', search],
+  queryFn: () => fetchItems(search),
+  placeholderData: keepPreviousData, // Keeps old data visible while fetching
+});
+```
+
 ### React Components
 
 - **Use `cn()` from `@/lib/utils` for className merging**
@@ -143,6 +157,21 @@ function MyComponent({ className, ...props }: React.ComponentProps<'div'>) {
   return <div className={cn('base-classes', className)} {...props}>...</div>;
 }
 ```
+
+### Data Tables (TanStack Table)
+
+**Use TanStack Table** (`@tanstack/react-table`) for:
+
+- Complex datasets requiring **sorting, filtering, or pagination**.
+- Data grids with mixed content types or row selection.
+
+**Avoid** for simple, small, or static lists where a simple `.map()` is sufficient.
+
+**Implementation Pattern**:
+
+- Define columns using `createColumnHelper`.
+- Decouple data logic (hooks) from UI rendering.
+- Integrate with `shadcn/ui` Table components for styling.
 
 ### Testing
 
@@ -250,6 +279,7 @@ const text = t('navigation.login');
    ```
 
 3. **Generate Report**:
+
    ```bash
    npm run test:e2e:report    # Opens Allure HTML report
    ```
