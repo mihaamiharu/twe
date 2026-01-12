@@ -225,7 +225,8 @@
         "advanced"
       ],
       "relatedChallenges": [],
-      "nextTutorialSlug": "playwright-data-driven"
+      "nextTutorialSlug": "playwright-data-driven",
+      "status": "draft"
     },
     {
       "slug": "playwright-data-driven",

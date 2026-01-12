@@ -6,6 +6,12 @@
  */
 
 // =============================================================================
+// CONTENT STATUS
+// =============================================================================
+
+export type ContentStatus = 'published' | 'draft' | 'coming_soon';
+
+// =============================================================================
 // LOCALIZED CONTENT
 // =============================================================================
 
@@ -28,6 +34,7 @@ export interface TutorialRegistryEntry {
   tags: string[];
   relatedChallenges?: string[];
   nextTutorialSlug?: string | null;
+  status?: ContentStatus;
 }
 
 /**
@@ -100,6 +107,7 @@ export interface ChallengeDefinition {
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
+  status?: ContentStatus;
 }
 
 /**
