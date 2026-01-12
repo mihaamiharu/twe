@@ -32,7 +32,7 @@ const ChallengeFiltersSchema = z.object({
   category: z.string().optional(),
   search: z.string().optional(),
   page: z.number().default(1),
-  limit: z.number().max(500).default(50),
+  limit: z.number().max(1000).default(50),
   sortBy: z
     .enum(['order', 'difficulty', 'xpReward', 'completionCount'])
     .default('order'),
@@ -100,13 +100,13 @@ export const getChallenges = createServerFn({ method: 'GET' })
       const dbRecords =
         slugs.length > 0
           ? await db
-              .select({
-                slug: challenges.slug,
-                id: challenges.id,
-                completionCount: challenges.completionCount,
-              })
-              .from(challenges)
-              .where(inArray(challenges.slug, slugs))
+            .select({
+              slug: challenges.slug,
+              id: challenges.id,
+              completionCount: challenges.completionCount,
+            })
+            .from(challenges)
+            .where(inArray(challenges.slug, slugs))
           : [];
 
       const dbBySlug = new Map(dbRecords.map((r) => [r.slug, r]));
@@ -360,9 +360,9 @@ export const getChallenge = createServerFn({ method: 'GET' })
           bestSubmission: bestSubmissionData,
           nextChallenge: nextChallenge
             ? {
-                slug: nextChallenge.slug,
-                title: nextChallenge.title,
-              }
+              slug: nextChallenge.slug,
+              title: nextChallenge.title,
+            }
             : null,
         },
       };
