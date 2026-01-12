@@ -15,7 +15,9 @@
     "all": "All",
     "beginner": "Beginner",
     "intermediate": "Intermediate",
-    "advanced": "Advanced"
+    "advanced": "Advanced",
+    "hideCompleted": "Hide Completed",
+    "showCompleted": "Show Completed"
   },
   "tracks": {
     "beginner": "Beginner Track",

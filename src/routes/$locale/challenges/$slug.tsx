@@ -135,7 +135,7 @@ function ChallengeDetailPage() {
       ) {
         missing.push({
           tier: prereqTier,
-          name: t(`challenges: tiers.${prereqTier} `),
+          name: t(`challenges:tiers.${prereqTier}`),
         });
       }
     }
@@ -231,7 +231,7 @@ function ChallengeDetailPage() {
       return response;
     },
     onSuccess: async (response) => {
-      if (response.success && response.data) {
+      if (response.success && response.data?.submission?.isPassed) {
         setLastSubmissionResult({
           xpEarned: response.data.submission.xpEarned,
           achievements: response.data.newAchievements || [],
@@ -356,12 +356,12 @@ function ChallengeDetailPage() {
                     {t('common:actions.backToChallenges')}
                   </Button>
                 </Link>
-                {data?.tutorial && (
+                {data?.data?.tutorial && (
                   <>
                     <div className="h-4 w-px bg-border" />
                     <Link
                       to="/$locale/tutorials/$slug"
-                      params={{ locale, slug: data.tutorial.slug }}
+                      params={{ locale, slug: data.data.tutorial.slug }}
                     >
                       <Button
                         variant="ghost"
@@ -370,7 +370,7 @@ function ChallengeDetailPage() {
                       >
                         <BookOpen className="h-4 w-4 mr-2" />
                         {t('challenges:page.reviewTutorial', {
-                          title: data.tutorial.title,
+                          title: data.data.tutorial.title,
                         })}
                       </Button>
                     </Link>
@@ -389,7 +389,7 @@ function ChallengeDetailPage() {
       {missingPrerequisites.length > 0 && (
         <div className="px-6 pt-4">
           <TierSkipTip
-            currentTier={tierLabels[getTierFromCategory(data?.category)].name}
+            currentTier={tierLabels[getTierFromCategory(data?.data?.category)].name}
             missingPrerequisites={missingPrerequisites}
           />
         </div>
@@ -411,12 +411,12 @@ function ChallengeDetailPage() {
           levelUp={lastSubmissionResult.levelUp}
           onRetry={() => setShowSuccessDialog(false)}
           onNextChallenge={
-            data?.nextChallenge
+            data?.data?.nextChallenge
               ? () => {
                 setShowSuccessDialog(false);
                 void navigate({
                   to: '/$locale/challenges/$slug',
-                  params: { locale, slug: data.nextChallenge!.slug },
+                  params: { locale, slug: data.data.nextChallenge!.slug },
                 });
               }
               : undefined
