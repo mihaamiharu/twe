@@ -101,6 +101,9 @@ export async function getTutorialContent(
 
     if (!entry) return null;
 
+    // Block access to non-published content
+    if (entry.status && entry.status !== 'published') return null;
+
     // Try requested locale first, then fallback to 'en'
     let content: string;
     let usedLocale = locale;
@@ -143,6 +146,9 @@ export async function getTutorialList(
   const tutorials: Omit<Tutorial, 'content'>[] = [];
 
   for (const entry of registry.tutorials) {
+    // Skip non-published content (default to published if no status)
+    if (entry.status && entry.status !== 'published') continue;
+
     // Try to load frontmatter for title/description
     let title = entry.slug;
     let description = '';
@@ -270,6 +276,9 @@ export async function getChallengeContent(
 
   if (!def) return null;
 
+  // Block access to non-published content
+  if (def.status && def.status !== 'published') return null;
+
   return {
     slug: def.slug,
     type: def.type,
@@ -300,6 +309,9 @@ export async function getChallengeList(
   const results: Omit<Challenge, 'testCases' | 'solution'>[] = [];
 
   for (const def of challenges.values()) {
+    // Skip non-published content (default to published if no status)
+    if (def.status && def.status !== 'published') continue;
+
     // Apply filters
     if (filters?.type && def.type !== filters.type) continue;
     if (filters?.difficulty && def.difficulty !== filters.difficulty) continue;
