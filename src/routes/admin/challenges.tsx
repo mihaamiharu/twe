@@ -23,7 +23,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface AdminChallenge {
   id: string;
-  title: string;
+  title: string | { en: string;[key: string]: string }; // Updated to support localized title
   slug: string;
   type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
@@ -61,9 +61,11 @@ function ChallengeManager() {
     const query = searchQuery.toLowerCase().trim();
     if (!query) return challenges;
     return challenges.filter(
-      (c: AdminChallenge) =>
-        c.title?.toLowerCase().includes(query) ||
-        c.slug?.toLowerCase().includes(query),
+      (c: AdminChallenge) => {
+        const title = typeof c.title === 'object' ? c.title?.en || '' : c.title;
+        return title.toLowerCase().includes(query) ||
+          c.slug?.toLowerCase().includes(query)
+      }
     );
   }, [challenges, searchQuery]);
 
@@ -189,13 +191,13 @@ function ChallengeManager() {
                           {' '}
                           {/* Workaround for motion.tr typings if needed, but usually motion.tr works fine as child of tbody if TableBody accepts valid nodes? Actually radix/shadcn TableBody is basically a tbody. Framer motion needs direct direct parent context sometimes or replace TableRow with motion copy of it. */}
                           {/* Ideally I should use a custom component for motion row or just motion.tr inside standard tbody. 
-                                                       However, shadcn TableRow is a component. I should make it a motion component.
-                                                       Or better: wrap the content of TableRow? No, animation needs to be on the row.
-                                                       Let's try using standard motion.tr but keeping ShadCN classes on it.
-                                                     */}
+                                                     However, shadcn TableRow is a component. I should make it a motion component.
+                                                     Or better: wrap the content of TableRow? No, animation needs to be on the row.
+                                                     Let's try using standard motion.tr but keeping ShadCN classes on it.
+                                                   */}
                           <div className="flex flex-col py-2">
                             <span className="font-medium text-sm group-hover:text-primary transition-colors">
-                              {challenge.title}
+                              {typeof challenge.title === 'object' ? challenge.title?.en : challenge.title}
                             </span>
                             <span className="text-xs text-muted-foreground font-mono">
                               {challenge.slug}

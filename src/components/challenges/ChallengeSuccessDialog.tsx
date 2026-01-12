@@ -10,7 +10,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Trophy, Star, ArrowRight, RotateCw } from 'lucide-react';
+import { Trophy, Star, ArrowRight, RotateCw, Swords } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
@@ -31,6 +31,7 @@ export interface ChallengeSuccessDialogProps {
   };
   onNextChallenge?: () => void;
   onRetry?: () => void;
+  isBoss?: boolean;
 }
 
 export function ChallengeSuccessDialog({
@@ -41,6 +42,7 @@ export function ChallengeSuccessDialog({
   levelUp,
   onNextChallenge,
   onRetry,
+  isBoss = false,
 }: ChallengeSuccessDialogProps) {
   const { t } = useTranslation(['challenges', 'common']);
   const params = useParams({ strict: false });
@@ -57,10 +59,14 @@ export function ChallengeSuccessDialog({
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md text-center">
+      <DialogContent className={`sm:max-w-md text-center border-2 ${isBoss ? 'border-red-500/50 bg-gradient-to-b from-red-950/20 to-background shadow-[0_0_50px_-12px_rgba(239,68,68,0.25)]' : ''}`}>
         <DialogHeader>
-          <div className="mx-auto bg-yellow-500/20 p-4 rounded-full w-fit mb-4">
-            <Trophy className="h-10 w-10 text-yellow-500" />
+          <div className={`mx-auto p-4 rounded-full w-fit mb-4 ${isBoss ? 'bg-red-500/20 animate-pulse' : 'bg-yellow-500/20'}`}>
+            {isBoss ? (
+              <Swords className="h-10 w-10 text-red-500" />
+            ) : (
+              <Trophy className="h-10 w-10 text-yellow-500" />
+            )}
           </div>
           <DialogTitle className="text-2xl font-bold text-center">
             {t('challenges:success.title')}

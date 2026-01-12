@@ -38,7 +38,7 @@ import {
 
 interface PopularChallenge {
   id: string;
-  title: string;
+  title: string | { en: string;[key: string]: string };
   slug: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   completionCount: number;
@@ -62,7 +62,7 @@ interface RecentSubmission {
     email: string;
   };
   challenge: {
-    title: string;
+    title: string | { en: string;[key: string]: string };
     slug: string;
   };
 }
@@ -199,13 +199,11 @@ function AdminDashboard() {
 
       {/* Charts & Tables */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        {/* Chart */}
+
+        {/* Row 1: Submissions & User Growth */}
         <Card className="col-span-4">
           <CardHeader>
-            <CardTitle>Submission Activity</CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Daily submissions over the last 30 days
-            </p>
+            <CardTitle>Activity Overview</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
             <div className="h-[300px] w-full">
@@ -251,6 +249,7 @@ function AdminDashboard() {
                     radius={[4, 4, 0, 0]}
                     barSize={50}
                     activeBar={{ fill: '#60a5fa' }}
+                    name="Submissions"
                   />
                 </BarChart>
               </ResponsiveContainer>
@@ -258,8 +257,115 @@ function AdminDashboard() {
           </CardContent>
         </Card>
 
-        {/* Popular Challenges */}
         <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>Submission Success Rate</CardTitle>
+            <CardDescription>All time pass vs fail ratio</CardDescription>
+          </CardHeader>
+          <CardContent className="flex items-center justify-center">
+            <div className="h-[300px] w-full flex items-center justify-center relative">
+              {/* Simple custom Donut Chart visualization if Recharts Pie is too complex to setup quickly or just use text stats if preferred. 
+                     Let's stick to a simple visual representation using progress bars or just metrics for now to ensure robustness.
+                     Actually, let's try a simple Recharts Pie if we have it imported, otherwise simple stats.
+                 */}
+              {/* Fallback to simple stats for reliability */}
+              <div className="flex flex-col items-center gap-6 w-full">
+                <div className="flex items-center justify-center gap-8">
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-green-500">{stats.submissionStats.passed}</div>
+                    <div className="text-sm text-muted-foreground uppercase tracking-wide mt-1">Passed</div>
+                  </div>
+                  <div className="h-16 w-[1px] bg-border"></div>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-red-500">{stats.submissionStats.failed}</div>
+                    <div className="text-sm text-muted-foreground uppercase tracking-wide mt-1">Failed</div>
+                  </div>
+                </div>
+
+                <div className="w-full max-w-xs space-y-2">
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Success Rate</span>
+                    <span>
+                      {stats.submissionStats.passed + stats.submissionStats.failed > 0
+                        ? Math.round((stats.submissionStats.passed / (stats.submissionStats.passed + stats.submissionStats.failed)) * 100)
+                        : 0}%
+                    </span>
+                  </div>
+                  <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-green-500 rounded-full"
+                      style={{
+                        width: `${stats.submissionStats.passed + stats.submissionStats.failed > 0
+                          ? (stats.submissionStats.passed / (stats.submissionStats.passed + stats.submissionStats.failed)) * 100
+                          : 0}%`
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Row 2: User Growth & Bug Stats */}
+        <Card className="col-span-4">
+          <CardHeader>
+            <CardTitle>User Growth</CardTitle>
+            <CardDescription>New registrations (Last 30 days)</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[250px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={stats.userGrowth}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
+                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => v.split('-').slice(1).join('/')} />
+                  <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                  <Tooltip
+                    cursor={{ fill: 'transparent' }}
+                    contentStyle={{ backgroundColor: 'hsl(var(--popover))', border: '1px solid hsl(var(--border))', borderRadius: '6px' }}
+                  />
+                  <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} barSize={40} name="New Users" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="col-span-3">
+          <CardHeader>
+            <CardTitle>Bug Reports Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 rounded-lg bg-orange-500/10 border border-orange-500/20 flex flex-col items-center justify-center">
+                <span className="text-3xl font-bold text-orange-600 dark:text-orange-400">{stats.bugStats.OPEN + stats.bugStats.NEW + stats.bugStats.IN_PROGRESS}</span>
+                <span className="text-xs font-semibold uppercase text-orange-600/70 dark:text-orange-400/70 mt-1">Active Issues</span>
+              </div>
+              <div className="p-4 rounded-lg bg-green-500/10 border border-green-500/20 flex flex-col items-center justify-center">
+                <span className="text-3xl font-bold text-green-600 dark:text-green-400">{stats.bugStats.RESOLVED}</span>
+                <span className="text-xs font-semibold uppercase text-green-600/70 dark:text-green-400/70 mt-1">Resolved</span>
+              </div>
+              <div className="col-span-2 space-y-3 mt-2">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-blue-500"></div>New</span>
+                  <span className="font-mono">{stats.bugStats.NEW}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-yellow-500"></div>In Progress</span>
+                  <span className="font-mono">{stats.bugStats.IN_PROGRESS}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-gray-500"></div>Closed</span>
+                  <span className="font-mono">{stats.bugStats.CLOSED}</span>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+
+        {/* Popular Challenges */}
+        <Card className="col-span-3 lg:col-span-7">
           <CardHeader>
             <CardTitle>Most Popular Challenges</CardTitle>
             <p className="text-sm text-muted-foreground">
@@ -267,32 +373,30 @@ function AdminDashboard() {
             </p>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {stats.popularChallenges.map((challenge: PopularChallenge) => (
                 <div
                   key={challenge.id}
-                  className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0"
+                  className="flex flex-col p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors"
                 >
-                  <div className="space-y-1">
-                    <p className="text-sm font-medium leading-none">
-                      {challenge.title}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Badge
-                        variant="secondary"
-                        className="text-[10px] h-4 px-1"
-                      >
-                        {challenge.difficulty}
-                      </Badge>
-                      <span className="text-xs text-muted-foreground font-mono">
-                        {challenge.slug}
-                      </span>
+                  <div className="flex items-start justify-between mb-2">
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] h-5 px-1.5"
+                    >
+                      {challenge.difficulty}
+                    </Badge>
+                    <div className="flex items-center gap-1 font-bold text-sm text-muted-foreground">
+                      {challenge.completionCount}
+                      <Users className="h-3 w-3" />
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 font-bold text-sm">
-                    {challenge.completionCount}
-                    <Users className="h-3 w-3 text-muted-foreground" />
-                  </div>
+                  <p className="font-semibold text-sm line-clamp-2 mb-1" title={typeof challenge.title === 'string' ? challenge.title : challenge.title?.en}>
+                    {typeof challenge.title === 'object' ? challenge.title?.en : challenge.title}
+                  </p>
+                  <span className="text-xs text-muted-foreground font-mono truncate">
+                    {challenge.slug}
+                  </span>
                 </div>
               ))}
             </div>
@@ -332,7 +436,11 @@ function AdminDashboard() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      {submission.challenge?.title || 'Unknown Challenge'}
+                      {submission.challenge
+                        ? (typeof submission.challenge.title === 'object'
+                          ? submission.challenge.title.en
+                          : submission.challenge.title)
+                        : 'Unknown Challenge'}
                     </TableCell>
                     <TableCell>
                       <Badge
