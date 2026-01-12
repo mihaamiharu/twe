@@ -24,22 +24,39 @@
     "basic": {
       "title": "Selektor",
       "description": "Kuasai selektor CSS dan XPath - fondasi pengujian web",
-      "skills": ["Selektor CSS", "Query XPath", "Penargetan Elemen"]
+      "skills": [
+        "Selektor CSS",
+        "Query XPath",
+        "Penargetan Elemen"
+      ]
     },
     "beginner": {
       "title": "JavaScript",
       "description": "Pelajari dasar-dasar JavaScript untuk otomasi pengujian",
-      "skills": ["Variabel & Tipe", "Manipulasi DOM", "Async/Await"]
+      "skills": [
+        "Variabel & Tipe",
+        "Manipulasi DOM",
+        "Async/Await"
+      ]
     },
     "intermediate": {
       "title": "Playwright",
       "description": "Buat tes otomatis nyata dengan Playwright",
-      "skills": ["Navigasi", "Locator", "Assertion", "Wait"]
+      "skills": [
+        "Navigasi",
+        "Locator",
+        "Assertion",
+        "Wait"
+      ]
     },
     "expert": {
       "title": "Tingkat Lanjut",
       "description": "Pola profesional untuk pengujian produksi",
-      "skills": ["Page Object", "Data-Driven", "CI/CD"]
+      "skills": [
+        "Page Object",
+        "Data-Driven",
+        "CI/CD"
+      ]
     }
   },
   "featuredChallenges": {
@@ -96,11 +113,11 @@
   "mission": {
     "title": "Kenapa Saya",
     "titleHighlight": "Membangun Ini",
-    "story1": "Saya memulai karir dengan nol pengalaman QA. Saya bertahan di hari-hari awal itu berkat senior yang sabar yang membimbing saya melewati bagian-bagian sulit.",
-    "story2": "TestingWithEkki adalah cara saya untuk meneruskan kebaikan itu.",
-    "story3": "Tidak semua orang punya mentor untuk membimbing mereka, jadi saya membangun sumber daya yang saya harap saya punya: pelajaran praktis dan langsung yang benar-benar masuk akal.",
+    "story1": "Saya memulai karier di dunia QA dengan nol pengalaman. Saya bisa bertahan di masa-masa awal berkat bimbingan para senior yang sangat sabar membantu saya melewati tantangan tersulit.",
+    "story2": "TestingWithEkki adalah cara saya untuk pay it forward.",
+    "story3": "Sadar kalo gak semua orang punya mentor, saya membangun resource yang dulu saya dambakan: materi praktis dan hands-on yang beneran masuk akal.",
     "author": "Ekki",
-    "authorRole": "Pembuat TestingWithEkki"
+    "authorRole": "Creator of TestingWithEkki"
   },
   "cta": {
     "title": "Mulai Karir Quality Engineering Kamu",

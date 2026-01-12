@@ -2,15 +2,16 @@
 
 ## TestingWithEkki - Gamified QA Portfolio & Learning Platform
 
-**Version:** 2.1  
-**Date:** January 2, 2026  
+**Version:** 3.0
+**Date:** January 12, 2026
 **Author:** Ekki
+**Status:** MVP Implemented / Beta Refinement
 
 ---
 
 ## 1. Executive Summary
 
-**TestingWithEkki** is a gamified portfolio and learning platform designed for QA Engineers and SDET professionals. The platform combines content management (tutorials and blog posts) with an interactive coding playground similar to LeetCode, specifically tailored for testing disciplines including Web Testing, API Testing, and test automation scripting with JavaScript/Playwright.
+**TestingWithEkki** is a gamified portfolio and learning platform designed for QA Engineers and SDET professionals. Built on a modern **TanStack Start** architecture, it provides a high-performance, server-side rendered (SSR) experience. The platform combines content management (tutorials) with an interactive coding playground similar to LeetCode, specifically tailored for testing disciplines including Web Testing, API Testing, and test automation scripting.
 
 ### Vision
 
@@ -53,368 +54,195 @@ Create a unique learning ecosystem where QA professionals can:
 
 ### 3.1 Content Management System (CMS)
 
+#### Hybrid Content Strategy
+
+- **Filesystem-First:** Challenges and tutorials are defined in JSON/Markdown files for easy version control and editing.
+- **Lazy Sync:** Content is synchronized to the database on-demand (e.g., when a user submits a solution), ensuring the DB schema always matches the file content without complex migration scripts.
+
 #### Tutorials Section
 
-- **Browse Tutorials:** Categorized by topic (Web Testing, API Testing, Automation, etc.)
-- **Search & Filter:** Find tutorials by keyword, difficulty, tags
-- **Reading Experience:** Clean, markdown-based tutorial viewer
-- **Code Snippets:** Syntax-highlighted code examples
-- **Categories:**
-  - Web Testing Fundamentals
-  - API Testing with Postman/REST Assured
-  - Playwright Automation
-  - JavaScript for Testers
-  - CI/CD for QA
-  - Test Strategy & Planning
+- **Browse Tutorials:** Categorized by topic (Web Testing, API Testing, Automation).
+- **Search & Filter:** Find tutorials by keyword, difficulty, tags.
+- **Reading Experience:** Clean, markdown-based tutorial viewer.
+- **Code Snippets:** Syntax-highlighted code examples.
 
 #### Blog/Writing Section
 
-- Personal blog posts and articles
-- Share insights, experiences, and opinions
-- RSS feed support
-- Social sharing capabilities
+- Personal blog posts and articles.
+- RSS feed support.
+- Social sharing capabilities.
 
 ### 3.2 Interactive Playground (TestLab)
 
 #### Supported Challenge Types
 
-**1. Web Testing Challenges**
+**1. Selector Challenges (CSS & XPath)**
 
-- Test case design exercises
-- Bug identification in demo applications
-- Exploratory testing scenarios
-- UI automation script completion
-- Example: "Find all accessibility issues in this form"
+- **Target:** Beginners to Intermediates.
+- **Mechanism:** Visual DOM preview where users must select specific elements.
+- **Visual Feedback:** Real-time highlighting of matched elements in the preview iframe.
+- **Validation:** Automated check against expected selectors and DOM matching.
 
-**2. API Testing Challenges**
+**2. JavaScript & Playwright Scripting**
 
-- RESTful API testing scenarios
-- Request/response validation
-- Authentication testing
-- API automation scripting
-- Example: "Write assertions for this API endpoint"
+- **Target:** Automated Testers (SDETs).
+- **Mechanism:** Monaco Editor Environment.
+- **Execution:** Secure client-side execution in isolated iframes (Playwright Shim).
+- **Scenarios:**
+  - Code completion
+  - Fixing broken scripts
+  - Implementing full test flows (Locate -> Action -> Assert)
+- **Validation:** Test Runner with assertions and detailed error reporting.
 
-**3. JavaScript/Playwright Scripting**
+#### Challenge Library Structure (96+ Challenges)
 
-- Code completion challenges
-- Fix the broken test script
-- Write selectors for given scenarios
-- Async/await practice
-- Example: "Complete this Playwright test for login flow"
-
-#### Playground Features
-
-- **Code Editor:** Monaco Editor with syntax highlighting
-- **Playwright Shim:** Mocked Playwright API running in browser
-- **Iframe Execution:** User code executes in isolated iframe (client-side)
-- **Real-time Feedback:** Instant test results with detailed output
-- **Visual Challenges:** CSS/XPath selector challenges with component preview
-
-#### Challenge Library
-
-The platform includes **96 challenges** organized into 4 progressive tiers:
-
-| Tier         | Count | Focus Areas                                       | XP Range |
-| ------------ | ----- | ------------------------------------------------- | -------- |
-| Basic        | 23    | CSS Selectors, XPath, Comparison                  | 10-50    |
-| Beginner     | 23    | JavaScript Fundamentals, DOM, Async               | 15-55    |
-| Intermediate | 29    | Playwright Actions, Locators, Assertions, Waits   | 40-85    |
-| Expert       | 21    | Page Object Model, Data-Driven, Advanced Patterns | 75-120   |
+| Tier | Focus Areas | XP Range |
+| --- | --- | --- |
+| **Basic** | CSS Selectors, XPath, Element Targeting | 10-50 |
+| **Beginner** | JS Fundamentals: Variables, DOM, Async/Await | 15-55 |
+| **Intermediate** | Playwright Core: Locators, Actions, Assertions | 40-85 |
+| **Expert** | Advanced Patterns: POM, Data-Driven, CI/CD | 75-120 |
 
 ### 3.3 Gamification System
 
 #### Experience Points (XP) & Leveling
 
-- Earn XP for completing challenges
-- Different XP values based on difficulty
-- Progress through levels (Beginner → Apprentice → Professional → Expert → Master)
-- Visual progress bars and level badges
+- Earn XP for specific actions (completing challenges, reading tutorials).
+- Progressive leveling system (Beginner → Apprentice → Professional → Expert → Master).
+- "Level Up" animations and celebrations.
 
 #### Achievement System
 
-- **Challenge-based:** "First Challenge Completed", "10 Challenges Solved"
-- **Streak-based:** "7-Day Streak", "30-Day Streak"
-- **Category-based:** "API Testing Master", "Playwright Pro"
-- **Special:** "Early Adopter", "Perfect Score", "Speed Demon"
+- **Dynamic Awards:** Unlocked based on user stats (e.g., specific challenge counts, streaks).
+- **Categories:** "First Challenge", "Selector Master", "JS Ninja".
 
 #### Leaderboard
 
-- Global leaderboard (all-time)
-- Monthly leaderboard (resets monthly)
-- Category-specific leaderboards
-- Friend leaderboard (future)
-
-#### User Profile
-
-- Display level, XP, and achievements
-- Show completed challenges
-- Personal statistics dashboard
-- Skills heatmap (activity over time)
-- Shareable profile URL
+- **Global & Monthly:** Comparison of user rankings.
+- **Optimized UI:** "Podium" view for top 3, efficient list view for others.
+- **Context:** Shows Level, XP, and Badges.
 
 ### 3.4 User Authentication & Management
 
-- Email/password authentication with **email verification**
-- **Resend verification email** option
-- OAuth (Google)
-- Profile customization (avatar, bio, links)
-- **Privacy settings** (profile visibility, leaderboard opt-out)
-- Progress persistence
-- Account settings
+- **Providers:** Email/Password (BetterAuth) & OAuth (Google).
+- **Security:** CSRF protection, secure session management.
+- **Profile:** Public profile pages showcasing stats and achievements.
 
 ### 3.5 Bug Reporting System
 
-Users can report bugs directly from the platform:
-
-- **QA-style bug reports** with severity levels (Critical, High, Medium, Low)
-- **Structured format:** Steps to Reproduce, Expected/Actual Behavior
-- **Auto-capture:** Page URL, browser info, user context
-- Works for both logged-in and anonymous users
-- Email field for follow-up on anonymous reports
+- **Integrated Feedback:** Users can report issues directly from the app.
+- **Context Aware:** Auto-captures route, browser info, and potential errors.
 
 ---
 
-## 4. User Flows
+## 4. Technical Architecture
 
-### 4.1 First-Time Visitor Flow
+### 4.1 Core Stack
+
+- **Framework:** TanStack Start (Server-Side Rendering, Server Functions).
+- **Routing:** TanStack Router (Type-safe routing).
+- **Data Fetching:** TanStack Query (Caching, Optimistic Updates, SSR hydration).
+- **Database:** PostgreSQL (via Supabase).
+- **ORM:** Drizzle ORM.
+- **Runtime:** Bun (Local dev), Node.js (Production).
+
+### 4.2 Key Architectural Decisions
+
+- **SSR-First:** Critical for SEO and initial load performance.
+- **Type Safety:** End-to-end type safety from database to frontend components.
+- **Optimistic UI:** Immediate feedback on actions (like submissions) before server confirmation.
+- **Isolated Execution:** User code runs in sandboxed iframes to prevent XSS and ensure security without heavy server-side sandboxing infrastructure.
+
+---
+
+## 5. User Flows
+
+### 5.1 Learning Flow
 
 ```
-Landing Page → Explore Tutorials/Challenges → Sign Up →
-Complete Profile → Tutorial/Challenge → Earn First XP → Dashboard
+Landing Page -> Explore Challenges -> Filter by "Basic" ->
+Select Challenge -> Interactive Playground ->
+Write Selector/Code -> "Run" (Client-Side) -> "Submit" (Server-Side) ->
+Success Dialog -> XP Awarded -> Leaderboard Updated
 ```
 
-### 4.2 Learning Flow (Tutorials)
+### 5.2 Content Update Flow
 
 ```
-Browse Tutorials → Select Category → Choose Tutorial →
-Read & Learn → Try Related Challenge → Bookmark/Share
-```
-
-### 4.3 Challenge Solving Flow
-
-```
-Browse Challenges → Select Challenge → Read Description →
-Write Code in Editor → Run Tests → View Results →
-(If Passed) Get XP + Achievement → Next Challenge
-(If Failed) Retry → Improve Code → View Solution (optional)
-```
-
-### 4.4 Content Creation Flow (Admin)
-
-```
-Admin Dashboard → Create New Tutorial/Challenge →
-Write Content/Test Cases → Preview → Publish →
-Monitor Engagement
+Edit JSON/MD file in VS Code -> Commit & Push ->
+(On User Access) Lazy Sync Function Triggers ->
+DB Challenge Record Updated -> User sees new content
 ```
 
 ---
 
-## 5. Functional Requirements
+## 6. Functional Requirements (Updated)
 
-### 5.1 Authentication
+### 6.1 Authentication
 
-- FR-1: Users must be able to register with email/password
-- FR-2: Users must be able to login with OAuth providers
-- FR-3: Users must be able to reset forgotten passwords
-- FR-4: System must validate email addresses
+- FR-1: Secure Email/Pass & OAuth login.
+- FR-2: Persist user sessions across reloads.
+- FR-3: Protect "Admin" and "Profile" routes.
 
-### 5.2 Content Display
+### 6.2 Playground
 
-- FR-5: Display tutorials with markdown rendering
-- FR-6: Support code syntax highlighting
-- FR-7: Enable search across tutorials and challenges
-- FR-8: Implement tag-based filtering
+- FR-4: Render HTML/CSS content for selector challenges.
+- FR-5: Execute JS safely in browser.
+- FR-6: Provide "Reset Code" and "Show Instructions" toggle.
+- FR-7: Mobile-responsive layout (Stack vs Split view).
 
-### 5.3 Playground
+### 6.3 Gamification
 
-- FR-9: Execute JavaScript/Playwright code in isolated iframe (client-side)
-- FR-10: Display test execution results in real-time
-- FR-11: Validate user code against expected outcomes
-- FR-12: Leverage browser's built-in resource limits for safety
-- FR-13: Store user's code submissions and results
-
-### 5.4 Gamification
-
-- FR-14: Award XP based on challenge difficulty
-- FR-15: Calculate and display user level
-- FR-16: Track and award achievements
-- FR-17: Update leaderboards in real-time
-- FR-18: Display user statistics and progress
-
-### 5.5 Admin Features
-
-- FR-19: CRUD operations for tutorials
-- FR-20: CRUD operations for challenges
-- FR-21: Analytics dashboard
-- FR-22: User management
+- FR-8: Real-time XP updates.
+- FR-9: "First Completion" bonus logic.
+- FR-10: Prevent duplicate XP for same challenge.
 
 ---
 
-## 6. Non-Functional Requirements
+## 7. Success Metrics
 
-### 6.1 Performance
+### Engagement
 
-- NFR-1: Page load time < 2 seconds
-- NFR-2: Code execution timeout: 10 seconds max
-- NFR-3: Support 100 concurrent users initially
-- NFR-4: API response time < 500ms
+- **Completion Rate:** % of started challenges that are submitted successfully.
+- **Retention:** % of users returning > 2 times/week.
+- **Time on Task:** Average time spent in Playground.
 
-### 6.2 Security
+### Performance
 
-- NFR-5: All passwords must be hashed automatically (BetterAuth)
-- NFR-6: Code execution isolated in iframe (browser sandbox)
-- NFR-7: Input validation on all forms
-- NFR-8: Rate limiting on API endpoints
-- NFR-9: HTTPS only in production
-
-### 6.3 Scalability
-
-- NFR-10: Modular architecture for easy feature addition
-- NFR-11: Database designed for horizontal scaling
-- NFR-12: Stateless API design
-
-### 6.4 Usability
-
-- NFR-13: Responsive design (mobile, tablet, desktop)
-- NFR-14: Keyboard shortcuts in code editor
-- NFR-15: Accessibility (WCAG 2.1 AA compliance)
-- NFR-16: Dark mode support
-
-### 6.5 Maintainability
-
-- NFR-17: Comprehensive API documentation
-- NFR-18: Unit test coverage > 70%
-- NFR-19: Clear code comments and documentation
+- **LCP (Largest Contentful Paint):** < 2.5s.
+- **TTFB (Time to First Byte):** < 500ms (leveraging SSR).
 
 ---
 
-## 7. Technical Constraints
+## 8. Development Roadmap
 
-### Solo Developer Constraints
+### Completed (v2.0)
 
-- Must use familiar technology stack
-- Minimize infrastructure costs
-- Simple deployment pipeline
-- Easy to maintain and update
-- Open-source tools preferred
+- ✅ Core Architecture (TanStack Start/Query/Router)
+- ✅ Authentication System
+- ✅ Challenge Engine (Selector & JS)
+- ✅ Leaderboard & Stats
+- ✅ Filesystem Content Source
 
-### MVP Timeline
+### In Progress / Refinement (v3.0)
 
-- Phase 1 (Weeks 1-2): Core auth, CMS, basic UI
-- Phase 2 (Weeks 3-4): Playground with JS challenges
-- Phase 3 (Weeks 5-6): Gamification system
-- Phase 4 (Week 7): Testing, deployment, polish
+- 🔄 Enhanced Mobile Experience
+- 🔄 More Challenge Content (scaling to 100+)
+- 🔄 Social Sharing Features
+- 🔄 SEO Optimization
 
----
+### Future (v4.0+)
 
-## 8. Success Metrics
-
-### Launch Metrics (First 3 Months)
-
-- 100+ registered users
-- 50+ challenges completed
-- 10+ tutorials published
-- 70% user retention (return within 7 days)
-- Average session time > 10 minutes
-
-### Engagement Metrics
-
-- Daily active users (DAU)
-- Challenges completed per user
-- Tutorial read-through rate
-- Social shares
-- User feedback score
+- ⏳ Community Solutions (Comment threads per challenge)
+- ⏳ User-Created Challenges
+- ⏳ Interactive Video Tutorials
 
 ---
 
-## 9. Future Enhancements (Post-MVP)
+## 9. Risks & Mitigation
 
-### Phase 2 Features
-
-- **Community Features:**
-  - User discussions/comments
-  - Share solutions with community
-  - Upvote/downvote solutions
-- **Advanced Playground:**
-  - Selenium challenges
-  - Cypress challenges
-  - Performance testing scenarios
-  - Load testing sandbox
-
-- **Enhanced Gamification:**
-  - Challenges with time limits
-  - Head-to-head competitions
-  - Team challenges
-  - Seasonal events
-
-- **Content Expansion:**
-  - Video tutorials
-  - Interactive courses
-  - Certifications
-  - Guest contributions
-
-### Phase 3 Features
-
-- Mobile app (React Native)
-- API for third-party integrations
-- Premium features/subscription model
-- Company-sponsored challenges
-- Job board integration
-
----
-
-## 10. Open Questions
-
-1. Should we allow users to create and share their own challenges?
-2. What should be the initial set of challenges (quantity and distribution)?
-3. Should there be a newsletter/email notification system?
-4. Do we need content moderation for user-generated content?
-5. Should the leaderboard be opt-in or opt-out?
-
----
-
-## 11. Risks & Mitigation
-
-| Risk                                    | Impact | Probability | Mitigation                                                |
-| --------------------------------------- | ------ | ----------- | --------------------------------------------------------- |
-| Code execution security vulnerabilities | Low    | Low         | Client-side iframe execution (browser's built-in sandbox) |
-| Low user adoption                       | High   | Medium      | Focus on marketing, SEO, community building               |
-| Infrastructure costs                    | Low    | Low         | Client-side execution reduces server costs                |
-| Content creation bottleneck             | Medium | Medium      | Build content pipeline, guest contributors                |
-| Cheating/gaming the system              | Low    | Medium      | Implement anti-cheat measures, rate limiting              |
-
----
-
-## 12. Appendices
-
-### A. Competitive Analysis Summary
-
-**LeetCode:**
-
-- ✅ Excellent code playground
-- ✅ Strong gamification
-- ❌ Not QA-specific
-- ❌ Limited testing content
-
-**TestDome:**
-
-- ✅ QA assessments
-- ✅ Real-world scenarios
-- ❌ Not a learning platform
-- ❌ No gamification
-
-**Exercism:**
-
-- ✅ Great mentorship model
-- ✅ Good UX
-- ❌ Not QA-focused
-- ❌ Limited interactivity
-
-**The API Challenges:**
-
-- ✅ API testing focus
-- ✅ Practice environment
-- ❌ Limited scope
-- ❌ Basic UI
-
-**Our Differentiator:** Combine gamification + QA-specific content + interactive playground + personal branding
+| Risk | Impact | Mitigation |
+| --- | --- | --- |
+| **Security (Code Exec)** | High | Client-side sandbox (iframe) + no server-side execution of user code. |
+| **Content Staleness** | Medium | Lazy sync ensures DB never lags behind code repo. |
+| **Performance (SSR)** | Medium | Aggressive caching with TanStack Query + Edge caching where possible. |

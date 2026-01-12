@@ -14,7 +14,9 @@
     "login": "Login",
     "register": "Register",
     "profile": "Profile",
-    "logout": "Logout"
+    "logout": "Logout",
+    "admin": "Admin",
+    "settings": "Settings"
   },
   "actions": {
     "submit": "Submit",
