@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { z } from 'zod';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -32,7 +32,13 @@ interface LeaderboardEntry {
   }[];
 }
 
+// --- Search Params Schema ---
+const LeaderboardSearchSchema = z.object({
+  period: z.enum(['all', 'monthly']).optional().default('all'),
+});
+
 export const Route = createFileRoute('/$locale/leaderboard')({
+  validateSearch: LeaderboardSearchSchema,
   loader: async ({ context, params }) => {
     console.log('[Leaderboard Loader] context keys:', Object.keys(context || {}));
 
@@ -61,9 +67,10 @@ function LeaderboardPage() {
   const { auth } = Route.useRouteContext();
   const session = auth;
   const isAuthenticated = !!session?.user;
+  const navigate = Route.useNavigate();
 
-  // State for active tab period using state instead of just Tabs defaultValue
-  const [period, setPeriod] = useState<'all' | 'monthly'>('all');
+  // URL-based State
+  const { period } = Route.useSearch();
 
   const { data: leaderboardData } = useSuspenseQuery(
     leaderboardQueryOptions({ page: 1, limit: 50, period, locale }),
@@ -94,9 +101,15 @@ function LeaderboardPage() {
         </div>
 
         <Tabs
-          defaultValue="all-time"
+          value={period === 'all' ? 'all-time' : 'monthly'}
           className="space-y-8"
-          onValueChange={(val) => setPeriod(val === 'monthly' ? 'monthly' : 'all')}
+          onValueChange={(val) => {
+            void navigate({
+              to: '.',
+              search: { period: val === 'monthly' ? 'monthly' : 'all' },
+              replace: true,
+            });
+          }}
         >
           <div className="flex justify-center">
             <TabsList className="bg-muted/30 p-1 h-12 rounded-2xl animate-in fade-in zoom-in-50 duration-500 delay-200">
