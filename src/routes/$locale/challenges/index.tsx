@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
+import { z } from 'zod';
 import {
   Card,
   CardContent,
@@ -29,35 +30,47 @@ import {
   List,
   Search,
   Lock,
-  Circle,
-  Swords, /* Added Swords icon */
+  Swords,
+  LayoutDashboard,
+  Layers,
+  Box,
+  Compass,
+  Menu,
+  ChevronRight,
+  MousePointer2,
+  FileCode2,
 } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { useDebounce } from '@/lib/useDebounce';
-import { ChallengeTierProgress } from '@/components/challenges/ChallengeTierProgress';
+  useDebounce,
+} from '@/lib/useDebounce';
 import {
-  tierLabels,
   difficultyColors,
   getTierFromCategory,
   TIER_ORDER,
   CATEGORY_ORDER,
 } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
+import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+
+// --- Search Params Schema ---
+const ChallengesSearchSchema = z.object({
+  track: z.enum(['all', 'selectors', 'javascript', 'core', 'advanced']).optional().default('all'),
+  q: z.string().optional(),
+  hideCompleted: z.coerce.boolean().optional().default(false),
+  view: z.enum(['grid', 'list']).optional().default('grid'),
+});
 
 export const Route = createFileRoute('/$locale/challenges/')({
+  validateSearch: ChallengesSearchSchema,
   loader: ({ context, params }) => {
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
-        limit: 500,
+        limit: 1000,
       }),
     );
   },
@@ -76,32 +89,9 @@ export const Route = createFileRoute('/$locale/challenges/')({
   }),
 });
 
-// Main tech pillars for filtering
-const filterConfig: Record<
-  string,
-  { color: string; icon: React.ReactNode; label: string; types: string[] }
-> = {
-  SELECTOR: {
-    color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    icon: <Palette className="h-4 w-4" />,
-    label: 'Selectors',
-    types: ['CSS_SELECTOR', 'XPATH_SELECTOR'],
-  },
-  JAVASCRIPT: {
-    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    icon: <Code className="h-4 w-4" />,
-    label: 'JavaScript',
-    types: ['JAVASCRIPT'],
-  },
-  PLAYWRIGHT: {
-    color: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    icon: <Code className="h-4 w-4" />,
-    label: 'Playwright',
-    types: ['PLAYWRIGHT'],
-  },
-};
+// --- Configuration ---
 
-// Detailed badge config for challenge cards
+// Detailed badge config for challenge cards (kept for cards/table)
 const challengeTypeConfig: Record<
   string,
   { color: string; icon: React.ReactNode; label: string }
@@ -147,128 +137,185 @@ export interface Challenge {
   tags: string[] | null;
 }
 
-export interface ChallengesResponse {
-  success: boolean;
-  data: Challenge[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
+// --- Sidebar / Tracks Configuration ---
+
+type TrackId = 'all' | 'selectors' | 'javascript' | 'core' | 'advanced';
+
+interface TrackConfig {
+  id: TrackId;
+  label: string;
+  icon: React.ReactNode;
+  description: string;
+  match: (challenge: Challenge) => boolean;
 }
+
+interface TrackGroup {
+  title: string;
+  tracks: TrackConfig[];
+}
+
+const SIDEBAR_GROUPS: TrackGroup[] = [
+  {
+    title: 'Overview',
+    tracks: [
+      {
+        id: 'all',
+        label: 'All Challenges',
+        icon: <LayoutDashboard className="h-4 w-4" />,
+        description: 'Overview of all available challenges',
+        match: () => true,
+      },
+    ]
+  },
+  {
+    title: 'Core Skills',
+    tracks: [
+      {
+        id: 'selectors',
+        label: 'Selectors',
+        icon: <MousePointer2 className="h-4 w-4" />,
+        description: 'Master CSS Selectors and XPath',
+        match: (c) =>
+          ['CSS_SELECTOR', 'XPATH_SELECTOR'].includes(c.type) ||
+          getTierFromCategory(c.category ?? undefined) === 'basic',
+      },
+      {
+        id: 'javascript',
+        label: 'JavaScript',
+        icon: <FileCode2 className="h-4 w-4" />,
+        description: 'JavaScript & DOM Fundamentals',
+        match: (c) =>
+          c.type === 'JAVASCRIPT' ||
+          getTierFromCategory(c.category ?? undefined) === 'beginner',
+      },
+    ]
+  },
+  {
+    title: 'Playwright',
+    tracks: [
+      {
+        id: 'core',
+        label: 'Core',
+        icon: <Compass className="h-4 w-4" />,
+        description: 'Navigation, Locators, Actions & Assertions',
+        match: (c) => {
+          const cat = c.category ?? '';
+          return (
+            c.type === 'PLAYWRIGHT' &&
+            (cat.startsWith('playwright-navigation') ||
+              cat.startsWith('playwright-locators') ||
+              cat.startsWith('playwright-assertions') ||
+              cat.startsWith('playwright-waits'))
+          );
+        },
+      },
+      {
+        id: 'advanced',
+        label: 'Advanced & POM',
+        icon: <Layers className="h-4 w-4" />,
+        description: 'POM, Data-Driven, Infrastructure',
+        match: (c) => {
+          const cat = c.category ?? '';
+          return (
+            c.type === 'PLAYWRIGHT' &&
+            (cat.startsWith('playwright-pom') ||
+              cat.startsWith('playwright-data') ||
+              cat.startsWith('playwright-infrastructure') ||
+              cat.startsWith('playwright-integration'))
+          );
+        },
+      },
+    ]
+  }
+];
+
+// Flatten for easy lookup
+const ALL_TRACKS = SIDEBAR_GROUPS.flatMap(g => g.tracks);
 
 function ChallengesPage() {
   const { locale } = Route.useParams();
   const { t } = useTranslation('challenges');
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
-  const [filterTier, setFilterTier] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const debouncedSearchQuery = useDebounce(searchQuery, 300);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [hideCompleted, setHideCompleted] = useState<boolean>(false);
+  const navigate = Route.useNavigate();
 
-  const {
-    data: challengesResponse,
-  } = useSuspenseQuery(
-    challengeListQueryOptions({
+  // URL-based State
+  const { track, q, hideCompleted, view } = Route.useSearch();
+  const activeTrackId = track as TrackId;
+  const viewMode = view;
+
+  // Local state for search input (debounced to URL)
+  const [searchInput, setSearchInput] = useState(q ?? '');
+  const debouncedSearchQuery = useDebounce(searchInput, 300);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Helper to update URL search params
+  const updateSearch = (updates: Partial<z.infer<typeof ChallengesSearchSchema>>) => {
+    void navigate({
+      to: '.',
+      search: (prev) => ({ ...prev, ...updates }),
+      replace: true,
+    });
+  };
+
+  // Sync debounced search to URL
+  useEffect(() => {
+    if (debouncedSearchQuery !== (q ?? '')) {
+      updateSearch({ q: debouncedSearchQuery || undefined });
+    }
+  }, [debouncedSearchQuery]);
+
+
+  // Derive active track
+  const activeTrack = ALL_TRACKS.find(t => t.id === activeTrackId) || ALL_TRACKS[0];
+
+  const { data: challengesResponse } = useQuery({
+    ...challengeListQueryOptions({
       locale,
-      limit: 500,
-      type:
-        filterType === 'all'
-          ? undefined
-          : (filterType as
-            | 'JAVASCRIPT'
-            | 'PLAYWRIGHT'
-            | 'CSS_SELECTOR'
-            | 'XPATH_SELECTOR'),
-      difficulty:
-        filterDifficulty === 'all'
-          ? undefined
-          : (filterDifficulty as 'EASY' | 'MEDIUM' | 'HARD'),
       search: debouncedSearchQuery || undefined,
+      limit: 1000,
     }),
-  );
+    placeholderData: keepPreviousData,
+  });
 
   const challenges = challengesResponse?.data ?? [];
 
-  // Filter by tier locally since it's a derived property
+  // Filter challenges based on Active Track & Search & Completed status
   const filteredChallenges = useMemo(() => {
     if (!challenges) return [];
+
     return challenges.filter((c: Challenge) => {
+      // Track Filter
+      if (!activeTrack.match(c)) return false;
+
+      // Hide Completed Filter
       if (hideCompleted && c.isCompleted) return false;
-      if (
-        filterTier !== 'all' &&
-        getTierFromCategory(c.category ?? undefined) !== filterTier
-      )
-        return false;
+
       return true;
     });
-  }, [challenges, filterTier, hideCompleted]);
+  }, [challenges, activeTrack, hideCompleted]);
 
-  // Group challenges by category
-  const challengesByCategory = useMemo(() => {
+  // Group challenges by category (for display)
+  const groupedChallenges = useMemo(() => {
     const groups: Record<string, Challenge[]> = {};
 
     for (const challenge of filteredChallenges) {
-      if (!challenge.category || challenge.category === 'uncategorized')
-        continue;
-
-      const category = challenge.category;
+      const category = challenge.category || 'uncategorized';
       if (!groups[category]) {
         groups[category] = [];
       }
       groups[category].push(challenge);
     }
 
-    // Sort by order within each category
+    // Sort challenges within groups by order
     for (const category in groups) {
       groups[category].sort((a, b) => a.order - b.order);
     }
 
-    return groups;
-  }, [filteredChallenges]);
+    // Sort Categories themselves
+    return Object.entries(groups).sort(([catA], [catB]) => {
+      // Special case: uncategorized last
+      if (catA === 'uncategorized') return 1;
+      if (catB === 'uncategorized') return -1;
 
-  // Calculate progress
-  const totalChallenges = challenges.length;
-  const completedChallenges = challenges.filter((c) => c.isCompleted).length;
-  const progressPercent =
-    totalChallenges > 0
-      ? Math.round((completedChallenges / totalChallenges) * 100)
-      : 0;
-
-  // Calculate tier progress
-  const tierProgress = useMemo(() => {
-    const tiers: Record<string, { completed: number; total: number }> = {
-      basic: { completed: 0, total: 0 },
-      beginner: { completed: 0, total: 0 },
-      intermediate: { completed: 0, total: 0 },
-      expert: { completed: 0, total: 0 },
-    };
-
-    challenges.forEach((c) => {
-      const tier = getTierFromCategory(c.category ?? undefined);
-      if (tiers[tier]) {
-        tiers[tier].total++;
-        if (c.isCompleted) {
-          tiers[tier].completed++;
-        }
-      }
-    });
-
-    return TIER_ORDER.map((tier) => ({
-      tier,
-      name: t(`tiers.${tier}`),
-      color: tierLabels[tier].color,
-      completed: tiers[tier].completed,
-      total: tiers[tier].total,
-    }));
-  }, [challenges]);
-
-  // Sort categories pedagogically
-  const sortedChallengesByCategory = useMemo(() => {
-    return Object.entries(challengesByCategory).sort(([catA], [catB]) => {
       const tierA = getTierFromCategory(catA);
       const tierB = getTierFromCategory(catB);
       const tierOrderA = TIER_ORDER.indexOf(tierA);
@@ -282,535 +329,472 @@ function ChallengesPage() {
       const catOrderB = CATEGORY_ORDER[catB] ?? 999;
       return catOrderA - catOrderB;
     });
-  }, [challengesByCategory]);
+  }, [filteredChallenges]);
 
+  // Calculate counts for Sidebar Badges
+  const trackCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    challenges.forEach(c => {
+      ALL_TRACKS.forEach(track => {
+        if (track.match(c)) {
+          counts[track.id] = (counts[track.id] || 0) + 1;
+        }
+      });
+    });
+    return counts;
+  }, [challenges]);
+
+
+  // Helper component for Sidebar Item
+  const SidebarItem = ({ track }: { track: TrackConfig }) => (
+    <button
+      onClick={() => {
+        updateSearch({ track: track.id });
+        setIsMobileMenuOpen(false);
+      }}
+      className={cn(
+        "w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium",
+        activeTrackId === track.id
+          ? "bg-primary/10 text-primary shadow-sm"
+          : "text-muted-foreground/80 hover:bg-muted/50 hover:text-foreground"
+      )}
+    >
+      <div className="flex items-center gap-3">
+        {track.icon}
+        <span>{track.label}</span>
+      </div>
+      <Badge
+        variant="secondary"
+        className={cn(
+          "ml-auto text-[10px] h-5 px-1.5 min-w-[24px] justify-center shadow-none",
+          activeTrackId === track.id ? "bg-background text-primary" : "bg-muted text-muted-foreground"
+        )}
+      >
+        {trackCounts[track.id] || 0}
+      </Badge>
+    </button>
+  );
+
+  const SidebarContent = () => (
+    <div className='flex flex-col h-full'>
+      <div className="mb-6 lg:mb-8 lg:px-2">
+        <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
+          <Box className="h-6 w-6 fill-primary/20 text-primary" />
+          Challenges
+        </h2>
+        <p className="text-xs text-muted-foreground mt-1">Level up your automation skills</p>
+      </div>
+
+      <nav className="flex-1 space-y-6 overflow-y-auto">
+        {SIDEBAR_GROUPS.map((group) => (
+          <div key={group.title}>
+            {group.title !== 'Overview' && (
+              <h3 className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2 px-3">
+                {group.title}
+              </h3>
+            )}
+
+            <div className="space-y-1">
+              {group.tracks.map(track => (
+                <SidebarItem key={track.id} track={track} />
+              ))}
+            </div>
+          </div>
+        ))}
+      </nav>
+
+      <div className="mt-auto pt-6 border-t border-border/50 bg-background/95 backdrop-blur-sm sticky bottom-0 pb-2">
+        <div className="px-2">
+          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
+            <span>Overall Progress</span>
+            <span>{Math.round((challenges.filter(c => c.isCompleted).length / challenges.length) * 100)}%</span>
+          </div>
+          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+            <div
+              className="h-full bg-primary transition-all duration-500"
+              style={{ width: `${(challenges.filter(c => c.isCompleted).length / challenges.length) * 100}%` }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-6xl mx-auto">
-        {/* Header & Overall Progress */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">
-              {t('page.title')}
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              {t('page.subtitle')}
-            </p>
+    <div className="min-h-screen bg-background">
+      <div className="flex">
+
+        {/* --- Desktop Sidebar --- */}
+        <aside className="hidden lg:flex flex-col w-[260px] h-[calc(100vh-64px)] shrink-0 border-r border-border/50 sticky top-[64px] bg-card/10 backdrop-blur-xl p-4 overflow-hidden">
+          <SidebarContent />
+        </aside>
+
+        {/* --- Main Content Area --- */}
+        <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto w-full min-h-[calc(100vh-64px)]">
+
+          {/* Mobile Header / Controls */}
+          <div className="lg:hidden flex items-center justify-between mb-6 gap-4">
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="shrink-0">
+                  <Menu className="h-5 w-5" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="w-[300px] p-4 pt-10">
+                <SidebarContent />
+              </SheetContent>
+            </Sheet>
+            <div className="flex-1">
+              <h1 className="text-lg font-bold truncate">{activeTrack.label}</h1>
+            </div>
           </div>
-          {totalChallenges > 0 && (
-            <div className="glass-card p-4 min-w-[240px] shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium">
-                  {t('page.overallProgress')}
-                </span>
-                <span className="text-sm text-muted-foreground">
-                  {progressPercent}%
-                </span>
+
+
+          {/* Toolbar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <div className="hidden lg:block">
+              <div className="flex items-center gap-2 mb-1">
+                {/* Breadcrumb-ish */}
+                {SIDEBAR_GROUPS.find(g => g.tracks.some(t => t.id === activeTrackId))?.title !== 'Overview' && (
+                  <>
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {SIDEBAR_GROUPS.find(g => g.tracks.some(t => t.id === activeTrackId))?.title}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+                  </>
+                )}
+                <h1 className="text-2xl font-bold tracking-tight">
+                  {activeTrack.label}
+                </h1>
               </div>
-              <div className="h-2 bg-muted rounded-full overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-primary to-accent transition-all duration-500"
-                  style={{ width: `${progressPercent}%` }}
+
+              <p className="text-muted-foreground text-sm">
+                {activeTrack.description}
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <div className="relative flex-1 sm:min-w-[240px]">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search challenges..."
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  className="pl-9 bg-card/50"
                 />
               </div>
-            </div>
-          )}
-        </div>
-
-        <ChallengeTierProgress
-          progress={tierProgress}
-          selectedTier={filterTier}
-          onSelectTier={setFilterTier}
-        />
-
-        {/* Search & Filters */}
-        <div className="flex flex-col gap-4 mb-10">
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="text"
-                placeholder={t('filters.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 h-11 bg-card border-border rounded-xl shadow-sm focus-visible:ring-primary/20"
-              />
-              {searchQuery && (
-                <button
-                  onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground text-sm"
-                >
-                  {t('filters.clear')}
-                </button>
-              )}
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={() => setHideCompleted(!hideCompleted)}
-              className={`h-11 px-4 rounded-xl shadow-sm whitespace-nowrap border-border bg-card hover:bg-accent hover:text-accent-foreground ${hideCompleted ? 'ring-2 ring-primary/20 border-primary/50 text-foreground' : 'text-muted-foreground'
-                }`}
-            >
-              {hideCompleted ? (
-                <CheckCircle2 className="mr-2 h-5 w-5 text-primary fill-primary/10" />
-              ) : (
-                <Circle className="mr-2 h-5 w-5 text-muted-foreground/50" />
-              )}
-              <span className={hideCompleted ? 'font-medium' : 'font-normal'}>
-                {t('filters.hideCompleted', { defaultValue: 'Hide Completed' })}
-              </span>
-            </Button>
-
-            <div className="flex items-center gap-3">
-              <Select
-                value={filterDifficulty}
-                onValueChange={setFilterDifficulty}
-              >
-                <SelectTrigger className="w-[160px] !h-11 rounded-xl bg-card border-border shadow-sm">
-                  <SelectValue
-                    placeholder={t('common:labels.difficulty', {
-                      defaultValue: 'Difficulty',
-                    })}
-                  />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    {t('filters.allDifficulties')}
-                  </SelectItem>
-                  <SelectItem value="EASY">{t('difficulty.EASY')}</SelectItem>
-                  <SelectItem value="MEDIUM">
-                    {t('difficulty.MEDIUM')}
-                  </SelectItem>
-                  <SelectItem value="HARD">{t('difficulty.HARD')}</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <div className="flex items-center gap-2 bg-muted/50 h-11 px-1.5 rounded-xl border border-border shadow-sm shrink-0">
+              <div className="flex items-center gap-2">
                 <Button
-                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                  className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'grid' ? 'bg-background shadow-sm' : ''}`}
-                  title={t('labels.gridView', { defaultValue: 'Grid View' })}
+                  variant="outline"
+                  onClick={() => updateSearch({ hideCompleted: !hideCompleted })}
+                  className={cn(
+                    "flex-1 sm:flex-none",
+                    hideCompleted && "bg-primary/5 border-primary/30 text-primary"
+                  )}
                 >
-                  <LayoutGrid className="h-4 w-4" />
+                  {hideCompleted ? <CheckCircle2 className="h-4 w-4 mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2 opacity-30" />}
+                  <span className="sr-only sm:not-sr-only sm:inline">Hide Done</span>
                 </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                  className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'list' ? 'bg-background shadow-sm' : ''}`}
-                  title={t('labels.listView', { defaultValue: 'List View' })}
-                >
-                  <List className="h-4 w-4" />
-                </Button>
+
+                <div className="flex p-1 bg-muted/50 rounded-lg border border-border/50">
+                  <Button
+                    variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => updateSearch({ view: 'grid' })}
+                  >
+                    <LayoutGrid className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => updateSearch({ view: 'list' })}
+                  >
+                    <List className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Filter Chips */}
-          <div className="flex flex-wrap gap-2">
-            <Badge
-              variant="outline"
-              className={`cursor-pointer px-3 py-1.5 h-8 rounded-lg transition-all ${filterType === 'all' ? 'bg-primary text-primary-foreground border-primary' : 'hover:bg-primary/10 hover:border-primary/30'}`}
-              onClick={() => setFilterType('all')}
-            >
-              {t('labels.allTypes')}
-            </Badge>
-            {Object.entries(filterConfig).map(([type, config]) => {
-              const count = challenges.filter((c) =>
-                config.types.includes(c.type),
-              ).length;
-              if (count === 0) return null;
-              const isSelected = filterType === type;
-              return (
-                <Badge
-                  key={type}
-                  variant="outline"
-                  onClick={() => setFilterType(isSelected ? 'all' : type)}
-                  className={`cursor-pointer px-3 py-1.5 h-8 rounded-lg transition-all ${isSelected ? config.color + ' border-current brightness-110' : 'text-muted-foreground hover:text-foreground hover:bg-muted'}`}
+          {/* Content */}
+          {groupedChallenges.length === 0 ? (
+            <div className="text-center py-20">
+              <div className="bg-muted/30 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Search className="h-10 w-10 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-lg font-semibold">No challenges found</h3>
+              <p className="text-muted-foreground mt-1">Try adjusting your filters or search query.</p>
+              {(searchInput || hideCompleted) && (
+                <Button
+                  variant="link"
+                  className="mt-4"
+                  onClick={() => {
+                    setSearchInput('');
+                    updateSearch({ q: undefined, hideCompleted: false });
+                  }}
                 >
-                  {config.icon}
-                  <span className="ml-2">
-                    {t(`types.${type.toLowerCase()}`)}
-                  </span>
-                  <span className="ml-1.5 opacity-60 text-[10px]">
-                    ({count})
-                  </span>
-                </Badge>
-              );
-            })}
-          </div>
-        </div>
-
-
-        {/* Error State */}
-
-        {/* Empty State */}
-        {challenges.length === 0 && (
-          <div className="text-center py-12">
-            <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {t('labels.creatingNew')}
-            </h3>
-            <p className="text-muted-foreground">
-              {t('labels.craftingScenarios')}
-            </p>
-          </div>
-        )}
-
-        {/* Challenges Content */}
-        {sortedChallengesByCategory.length > 0 && (
-          <div className="space-y-10">
-            {sortedChallengesByCategory.map(
-              ([category, categoryChallenges]) => (
-                <div key={category}>
-                  {/* Category Header */}
-                  <div className="flex items-center gap-3 mb-4">
-                    <h2 className="text-xl font-semibold">
+                  Clear filters
+                </Button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-12">
+              {groupedChallenges.map(([category, categoryChallenges]) => (
+                <div key={category} className="space-y-4">
+                  <div className="flex items-center gap-3 pb-2 border-b border-border/30">
+                    <div className="h-8 w-1 rounded-full bg-gradient-to-b from-primary to-transparent" />
+                    <h2 className="text-xl font-semibold tracking-tight">
                       {t(`categories.${category}`) || category}
                     </h2>
-                    <Badge variant="secondary" className="text-xs">
-                      {categoryChallenges.filter((c) => c.isCompleted).length} /{' '}
-                      {categoryChallenges.length}
+                    <Badge variant="outline" className="ml-auto text-xs font-normal text-muted-foreground">
+                      {categoryChallenges.length} items
                     </Badge>
                   </div>
 
                   {viewMode === 'grid' ? (
-                    /* Grid View */
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {categoryChallenges.map((challenge, index) => {
-                        const config =
-                          challengeTypeConfig[challenge.type] ||
-                          challengeTypeConfig.JAVASCRIPT;
-                        const isComingSoon =
-                          challenge.tags?.includes('coming-soon');
+                    <motion.div
+                      layout
+                      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"
+                    >
+                      <AnimatePresence mode="popLayout">
+                        {categoryChallenges.map((challenge, idx) => {
+                          const config = challengeTypeConfig[challenge.type] || challengeTypeConfig.JAVASCRIPT;
+                          const isComingSoon = challenge.tags?.includes('coming-soon');
+                          const isBoss = isBossChallenge(challenge);
 
-                        const isBoss = isBossChallenge(challenge);
-
-                        const ChallengeCard = (
-                          <Card
-                            className={`h-full transition-all duration-300 rounded-xl group/card overflow-hidden ${isComingSoon
-                              ? 'bg-muted/50 border-muted opacity-80'
-                              : challenge.isCompleted
-                                ? 'border-green-500/20 bg-green-500/5 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-                                : isBoss
-                                  ? 'border-red-500/40 bg-gradient-to-br from-red-500/5 to-purple-500/5 hover:border-red-500/60 hover:shadow-lg hover:shadow-red-500/10 hover:-translate-y-1'
-                                  : 'glass-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-                              }`}
-                          >
-                            <CardHeader className="pb-3 md:pb-4 space-y-3">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xs font-mono text-muted-foreground/40 group-hover/card:text-muted-foreground transition-colors">
-                                    #{index + 1}
-                                  </span>
-                                  <Badge
-                                    className={
-                                      isComingSoon
-                                        ? 'bg-muted-foreground/20 text-muted-foreground border-muted-foreground/30'
-                                        : config.color
-                                    }
-                                    variant="outline"
-                                  >
-                                    {config.icon}
-                                    <span className="ml-1">
-                                      {t(
-                                        `types.${challenge.type.toLowerCase()}`,
-                                      )}
-                                    </span>
-                                  </Badge>
-                                  {isBoss && !isComingSoon && (
-                                    <Badge
-                                      variant="outline"
-                                      className="bg-red-500/10 text-red-500 border-red-500/30 text-[10px] px-1.5 h-5 animate-pulse"
-                                    >
-                                      <Swords className="h-3 w-3 mr-1" />
-                                      BOSS FIGHT
-                                    </Badge>
-                                  )}
-                                  {isComingSoon && (
-                                    <Badge
-                                      variant="outline"
-                                      className="bg-amber-500/10 text-amber-600 border-amber-500/20 text-[10px] px-1.5 h-5"
-                                    >
-                                      <Lock className="h-3 w-3 mr-1" />
-                                      {t('labels.comingSoon')}
-                                    </Badge>
-                                  )}
-                                </div>
-                                {challenge.isCompleted && !isComingSoon && (
-                                  <CheckCircle2 className="h-5 w-5 text-green-500 shrink-0" />
-                                )}
-                              </div>
-                              <div>
-                                <CardTitle
-                                  className={`text-lg font-bold mt-1 transition-colors line-clamp-1 leading-tight ${isComingSoon ? 'text-muted-foreground' : isBoss ? 'text-red-500 group-hover/card:text-red-400' : 'group-hover/card:text-primary'}`}
-                                >
-                                  {challenge.title}
-                                </CardTitle>
-                                <CardDescription className="line-clamp-2 text-sm mt-1.5 leading-relaxed text-muted-foreground/80">
-                                  {challenge.description}
-                                </CardDescription>
-                              </div>
-                            </CardHeader>
-                            <CardContent className="pt-0">
-                              <div className="flex items-center justify-between text-sm">
-                                <Badge
-                                  variant="secondary"
-                                  className={`${isComingSoon ? 'bg-muted text-muted-foreground' : difficultyColors[challenge.difficulty]} font-medium border-transparent`}
-                                >
-                                  {t(`difficulty.${challenge.difficulty}`)}
-                                </Badge>
-                                {!isComingSoon && (
-                                  <div className="flex items-center gap-3">
-                                    <span className="flex items-center gap-1 text-muted-foreground text-xs font-medium">
-                                      <Trophy className="h-3.5 w-3.5 opacity-70" />
-                                      {challenge.completionCount}
-                                    </span>
-                                    <span className="flex items-center gap-1 text-amber-500 font-bold">
-                                      <Zap className="h-3.5 w-3.5 fill-current" />
-                                      {challenge.xpReward}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </CardContent>
-                          </Card>
-                        );
-
-                        if (isComingSoon) {
                           return (
-                            <div
+                            <ChallengeCard
                               key={challenge.slug}
-                              className="cursor-not-allowed select-none"
-                            >
-                              {ChallengeCard}
-                            </div>
-                          );
-                        }
-
-                        return (
-                          <Link
-                            key={challenge.slug}
-                            to="/$locale/challenges/$slug"
-                            params={{ locale, slug: challenge.slug }}
-                            className="group"
-                          >
-                            {ChallengeCard}
-                          </Link>
-                        );
-                      })}
-                    </div>
+                              challenge={challenge}
+                              index={idx}
+                              config={config}
+                              isComingSoon={!!isComingSoon}
+                              isBoss={isBoss}
+                              params={{ locale, slug: challenge.slug }}
+                              t={t}
+                            />
+                          )
+                        })}
+                      </AnimatePresence>
+                    </motion.div>
                   ) : (
-                    /* List View */
-                    <div className="rounded-md border bg-card">
+                    <div className="rounded-xl border bg-card/50 overflow-hidden w-full">
                       <Table>
                         <TableHeader>
-                          <TableRow>
-                            <TableHead className="w-[80px]">#</TableHead>
-                            <TableHead className="w-[300px]">
-                              {t('labels.challenge')}
-                            </TableHead>
-                            <TableHead>{t('common:labels.type')}</TableHead>
-                            <TableHead>
-                              {t('common:labels.difficulty')}
-                            </TableHead>
-                            <TableHead className="text-right">
-                              {t('labels.stats')}
-                            </TableHead>
-                            <TableHead className="w-[100px] text-right">
-                              {t('common:labels.xp')}
-                            </TableHead>
+                          <TableRow className="hover:bg-transparent">
+                            <TableHead className="w-[60px] pl-4">#</TableHead>
+                            <TableHead className="w-full min-w-[300px]">Challenge</TableHead>
+                            {/* Type Column Restored */}
+                            <TableHead className="w-[120px]">Type</TableHead>
+                            <TableHead className="w-[80px]">Difficulty</TableHead>
+                            <TableHead className="w-[80px] text-right">XP</TableHead>
+                            {/* Spacer Column REMOVED */}
+                            <TableHead className="w-[40px] px-2"></TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {categoryChallenges.map((challenge, index) => {
-                            const config =
-                              challengeTypeConfig[challenge.type] ||
-                              challengeTypeConfig.JAVASCRIPT;
-                            const isComingSoon =
-                              challenge.tags?.includes('coming-soon');
+                          <AnimatePresence mode="popLayout">
+                            {categoryChallenges.map((challenge, idx) => {
+                              const config = challengeTypeConfig[challenge.type] || challengeTypeConfig.JAVASCRIPT;
+                              const isComingSoon = challenge.tags?.includes('coming-soon');
+                              const isBoss = isBossChallenge(challenge);
 
-                            const isBoss = isBossChallenge(challenge);
-
-                            if (isComingSoon) {
                               return (
-                                <TableRow
+                                <ChallengeRow
                                   key={challenge.slug}
-                                  className="opacity-60 cursor-not-allowed bg-muted/30 hover:bg-muted/30"
-                                >
-                                  <TableCell className="font-mono text-muted-foreground w-[80px]">
-                                    <div className="flex items-center gap-2">
-                                      #{index + 1}
-                                      <Lock className="h-3 w-3 text-muted-foreground" />
-                                    </div>
-                                  </TableCell>
-                                  <TableCell className="w-[300px]">
-                                    <div className="font-bold text-muted-foreground">
-                                      {challenge.title}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground line-clamp-1">
-                                      {challenge.description}
-                                    </div>
-                                    <Badge
-                                      variant="outline"
-                                      className="mt-1 text-[10px] px-1 h-5 text-muted-foreground border-dashed"
-                                    >
-                                      {t('labels.comingSoon')}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge
-                                      className="bg-muted text-muted-foreground border-muted-foreground/20 whitespace-nowrap"
-                                      variant="outline"
-                                    >
-                                      {config.icon}
-                                      <span className="ml-1">
-                                        {t(
-                                          `types.${challenge.type.toLowerCase()}`,
-                                        )}
-                                      </span>
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Badge
-                                      variant="secondary"
-                                      className="bg-muted text-muted-foreground"
-                                    >
-                                      {t(`difficulty.${challenge.difficulty}`)}
-                                    </Badge>
-                                  </TableCell>
-                                  <TableCell className="text-right text-muted-foreground">
-                                    <span className="text-xs italic">
-                                      {t('labels.locked', {
-                                        defaultValue: 'Locked',
-                                      })}
-                                    </span>
-                                  </TableCell>
-                                  <TableCell className="text-right">
-                                    <span className="flex items-center justify-end gap-1 text-muted-foreground font-medium opacity-50">
-                                      <Zap className="h-3 w-3" />
-                                      {challenge.xpReward}
-                                    </span>
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            }
-
-                            return (
-                              <TableRow
-                                key={challenge.slug}
-                                className={`group cursor-pointer ${challenge.isCompleted
-                                  ? 'bg-green-500/5'
-                                  : isBoss
-                                    ? 'bg-red-500/5 hover:bg-red-500/10'
-                                    : ''
-                                  }`}
-                              >
-                                <TableCell className="font-mono text-muted-foreground w-[80px]">
-                                  <Link
-                                    to="/$locale/challenges/$slug"
-                                    params={{ locale, slug: challenge.slug }}
-                                    className="block h-full w-full flex items-center gap-2"
-                                  >
-                                    #{index + 1}
-                                    {challenge.isCompleted && (
-                                      <CheckCircle2 className="h-4 w-4 text-green-500" />
-                                    )}
-                                  </Link>
-                                </TableCell>
-                                <TableCell className="font-medium group-hover:text-primary transition-colors w-[300px]">
-                                  <Link
-                                    to="/$locale/challenges/$slug"
-                                    params={{ locale, slug: challenge.slug }}
-                                    className="block"
-                                  >
-                                    <div className={`font-bold ${isBoss ? 'text-red-500 flex items-center gap-2' : ''}`}>
-                                      {challenge.title}
-                                      {isBoss && <Swords className="h-3.5 w-3.5" />}
-                                    </div>
-                                    <div className="text-xs text-muted-foreground line-clamp-1">
-                                      {challenge.description}
-                                    </div>
-                                  </Link>
-                                </TableCell>
-                                <TableCell>
-                                  <Link
-                                    to="/$locale/challenges/$slug"
-                                    params={{ locale, slug: challenge.slug }}
-                                    className="block h-full w-full"
-                                  >
-                                    <Badge
-                                      className={`${config.color} whitespace-nowrap`}
-                                      variant="outline"
-                                    >
-                                      {config.icon}
-                                      <span className="ml-1">
-                                        {t(
-                                          `types.${challenge.type.toLowerCase()}`,
-                                        )}
-                                      </span>
-                                    </Badge>
-                                  </Link>
-                                </TableCell>
-                                <TableCell>
-                                  <Link
-                                    to="/$locale/challenges/$slug"
-                                    params={{ locale, slug: challenge.slug }}
-                                    className="block h-full w-full"
-                                  >
-                                    <Badge
-                                      variant="secondary"
-                                      className={
-                                        difficultyColors[
-                                        challenge.difficulty
-                                        ] || ''
-                                      }
-                                    >
-                                      {t(`difficulty.${challenge.difficulty}`)}
-                                    </Badge>
-                                  </Link>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  <Link
-                                    to="/$locale/challenges/$slug"
-                                    params={{ locale, slug: challenge.slug }}
-                                    className="block h-full w-full"
-                                  >
-                                    <div className="flex items-center justify-end gap-1 text-muted-foreground text-xs">
-                                      <Trophy className="h-3 w-3" />
-                                      {challenge.completionCount}{' '}
-                                      {t('labels.completed')}
-                                    </div>
-                                  </Link>
-                                </TableCell>
-                                <TableCell className="text-right">
-                                  <Link
-                                    to="/$locale/challenges/$slug"
-                                    params={{ locale, slug: challenge.slug }}
-                                    className="block h-full w-full"
-                                  >
-                                    <span className="flex items-center justify-end gap-1 text-amber-500 font-medium">
-                                      <Zap className="h-3 w-3" />
-                                      {challenge.xpReward}
-                                    </span>
-                                  </Link>
-                                </TableCell>
-                              </TableRow>
-                            );
-                          })}
+                                  challenge={challenge}
+                                  index={idx}
+                                  config={config}
+                                  isComingSoon={!!isComingSoon}
+                                  isBoss={isBoss}
+                                  params={{ locale, slug: challenge.slug }}
+                                  t={t}
+                                />
+                              )
+                            })}
+                          </AnimatePresence>
                         </TableBody>
                       </Table>
                     </div>
                   )}
                 </div>
-              ),
-            )}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </main>
       </div>
     </div>
+  );
+}
+
+// --- Sub-components for Cleaner Render ---
+
+function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: any) {
+  const CardContentWrapper = (
+    <Card
+      className={cn(
+        "h-full transition-all duration-200 overflow-hidden border-border/50",
+        isComingSoon ? "opacity-60 bg-muted/20" : "hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 bg-card/50 hover:bg-card",
+        isBoss && !isComingSoon && "border-red-500/20 bg-red-500/5 hover:border-red-500/40 hover:shadow-red-500/10",
+        challenge.isCompleted && !isComingSoon && "bg-green-500/5 border-green-500/20"
+      )}
+    >
+      <CardHeader className="p-5 pb-3 space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <Badge
+            variant="outline"
+            className={cn(
+              "rounded-md px-2 py-0.5 text-[10px] font-medium border-transparent",
+              isComingSoon ? "bg-muted text-muted-foreground" : config.color
+            )}
+          >
+            {config.icon}
+            <span className="ml-1.5">{t(`types.${challenge.type.toLowerCase()}`)}</span>
+          </Badge>
+          {challenge.isCompleted && !isComingSoon && (
+            <div className="h-6 w-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-600 shrink-0">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <CardTitle className={cn(
+            "text-base font-bold leading-tight line-clamp-1",
+            isBoss ? "text-red-600 dark:text-red-400" : ""
+          )}>
+            {isBoss && <Swords className="inline-block h-4 w-4 mr-1.5 -mt-0.5" />}
+            {challenge.title}
+          </CardTitle>
+          <CardDescription className="text-xs line-clamp-2 min-h-[2.5em]">
+            {challenge.description}
+          </CardDescription>
+        </div>
+      </CardHeader>
+
+      <CardContent className="p-5 pt-0">
+        <div className="flex items-center justify-between mt-4">
+          <Badge variant="secondary" className={cn("text-[10px] h-5 font-medium", difficultyColors[challenge.difficulty])}>
+            {t(`difficulty.${challenge.difficulty}`)}
+          </Badge>
+
+          {!isComingSoon && (
+            <div className="flex items-center gap-3 text-xs font-medium">
+              <div className="flex items-center gap-1 text-muted-foreground/70">
+                <Trophy className="h-3.5 w-3.5" />
+                <span>{challenge.completionCount}</span>
+              </div>
+              <div className="flex items-center gap-1 text-amber-500">
+                <Zap className="h-3.5 w-3.5 fill-current" />
+                <span>{challenge.xpReward}</span>
+              </div>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  if (isComingSoon) {
+    return (
+      <motion.div
+        layout
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.95 }}
+        transition={{ duration: 0.2 }}
+        className="cursor-not-allowed h-full"
+      >
+        {CardContentWrapper}
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.2 }}
+      className="h-full"
+    >
+      <Link to="/$locale/challenges/$slug" params={params} className="block h-full group outline-none">
+        {CardContentWrapper}
+      </Link>
+    </motion.div>
+  );
+}
+
+function ChallengeRow({ challenge, index, config, isComingSoon, isBoss, params, t }: any) {
+  const RowContent = (
+    <>
+      <TableCell className="font-mono text-xs text-muted-foreground w-[60px] pl-4">
+        <div className="flex items-center gap-2">
+          {String(index + 1).padStart(2, '0')}
+          {challenge.isCompleted && <CheckCircle2 className="h-3 w-3 text-green-500" />}
+        </div>
+      </TableCell>
+      <TableCell className="w-full min-w-[300px]">
+        <div className="flex flex-col">
+          <Link to="/$locale/challenges/$slug" params={params} className={cn("font-medium text-sm flex items-center gap-2 w-fit hover:underline decoration-primary/50 underline-offset-4", isBoss && "text-red-500")}>
+            {challenge.title}
+            {isBoss && <Swords className="h-3 w-3" />}
+            {isComingSoon && <Lock className="h-3 w-3 text-muted-foreground" />}
+          </Link>
+          <span className="text-xs text-muted-foreground mt-0.5">{challenge.description}</span>
+        </div>
+      </TableCell>
+      {/* Type Column Restored */}
+      <TableCell className="w-[120px]">
+        <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0.5 gap-1 font-normal w-fit", isComingSoon ? "opacity-50" : "", config.color, "bg-transparent border-current/20")}>
+          {config.icon}
+          {t(`types.${challenge.type.toLowerCase()}`)}
+        </Badge>
+      </TableCell>
+      <TableCell className="w-[80px]">
+        <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", difficultyColors[challenge.difficulty])}>
+          {t(`difficulty.${challenge.difficulty}`)}
+        </span>
+      </TableCell>
+      <TableCell className="w-[80px] text-right font-medium text-amber-500 tabular-nums text-xs">
+        {isComingSoon ? '-' : <span className="flex items-center justify-end gap-1"><Zap className="h-3 w-3" /> {challenge.xpReward}</span>}
+      </TableCell>
+
+      <TableCell className="w-[40px] px-2">
+        <Link to="/$locale/challenges/$slug" params={params} className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-muted transition-colors">
+          <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+        </Link>
+      </TableCell>
+    </>
+  );
+
+
+  if (isComingSoon) {
+    return (
+      <motion.tr
+        initial={{ opacity: 0, x: -10 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: -10 }}
+        className="opacity-50 cursor-not-allowed hover:bg-transparent border-b transition-colors"
+        style={{ display: 'table-row' }} // Ensure motion doesn't override display
+      >
+        {RowContent}
+      </motion.tr>
+    );
+  }
+
+  return (
+    <motion.tr
+      initial={{ opacity: 0, x: -10 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -10 }}
+      className="group hover:bg-muted/50 transition-colors border-b"
+      style={{ display: 'table-row' }}
+    >
+      {RowContent}
+    </motion.tr>
   );
 }
