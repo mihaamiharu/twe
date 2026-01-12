@@ -81,15 +81,62 @@ export const createSubmission = createServerFn({ method: 'POST' })
       const { challengeSlug, code, testResults, executionTime } = input;
 
       // Get challenge by slug
-      const challenge = await db.query.challenges.findFirst({
+      let challenge = await db.query.challenges.findFirst({
         where: eq(challenges.slug, challengeSlug),
       });
 
       if (!challenge) {
-        return {
-          success: false,
-          error: getErrorMessage('challengeNotFound', locale),
-        };
+        // LAZY SYNC: Check if challenge exists in filesystem
+        const { getChallengeContent } = await import('./content.server');
+
+        // Try to get English content as canonical source, fallback to current locale
+        let fsChallenge = await getChallengeContent(challengeSlug, 'en');
+        if (!fsChallenge && locale !== 'en') {
+          fsChallenge = await getChallengeContent(challengeSlug, locale);
+        }
+
+        if (fsChallenge) {
+          logger.info(`[Submission] Lazy syncing challenge: ${challengeSlug}`);
+
+          // Insert challenge
+          const [newChallenge] = await db.insert(challenges).values({
+            slug: fsChallenge.slug,
+            title: { en: fsChallenge.title, [locale]: fsChallenge.title },
+            description: { en: fsChallenge.description, [locale]: fsChallenge.description },
+            type: fsChallenge.type,
+            difficulty: fsChallenge.difficulty,
+            xpReward: fsChallenge.xpReward,
+            order: fsChallenge.order,
+            instructions: { en: fsChallenge.instructions, [locale]: fsChallenge.instructions },
+            htmlContent: fsChallenge.htmlContent,
+            starterCode: fsChallenge.starterCode,
+            category: fsChallenge.category,
+            tags: fsChallenge.tags,
+            isPublished: true, // Auto-publish if found on FS during submission
+          }).returning();
+
+          // Insert test cases
+          if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
+            await db.insert(testCases).values(
+              fsChallenge.testCases.map((tc: any, index: number) => ({
+                challengeId: newChallenge.id,
+                description: tc.description,
+                input: tc.input,
+                expectedOutput: tc.expectedOutput,
+                isHidden: tc.isHidden || false,
+                order: index,
+              }))
+            );
+          }
+
+          // Use the newly created challenge
+          challenge = newChallenge;
+        } else {
+          return {
+            success: false,
+            error: getErrorMessage('challengeNotFound', locale),
+          };
+        }
       }
 
       // Get total test cases
@@ -267,10 +314,10 @@ export const createSubmission = createServerFn({ method: 'POST' })
           isFirstCompletion,
           levelUp: levelUpInfo?.leveledUp
             ? {
-                oldLevel: levelUpInfo.oldLevel,
-                newLevel: levelUpInfo.newLevel,
-                levelsGained: levelUpInfo.levelsGained,
-              }
+              oldLevel: levelUpInfo.oldLevel,
+              newLevel: levelUpInfo.newLevel,
+              levelsGained: levelUpInfo.levelsGained,
+            }
             : null,
           newAchievements,
         },

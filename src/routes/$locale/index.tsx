@@ -387,50 +387,7 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Hall of Fame Section */}
-      {stats?.latestAchievements && stats.latestAchievements.length > 0 && (
-        <section className="py-20 px-6">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                {t('hallOfFame.title')}{' '}
-                <span className="gradient-text">
-                  {t('hallOfFame.titleHighlight')}
-                </span>
-              </h2>
-              <p className="text-lg text-muted-foreground">
-                {t('hallOfFame.subtitle')}
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-              {stats.latestAchievements.map((achievement, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center text-center"
-                >
-                  <div className="relative mb-2">
-                    <Avatar className="h-16 w-16 mb-2 border-2 border-primary/50">
-                      <AvatarImage src={achievement.userAvatar || ''} />
-                      <AvatarFallback>
-                        {achievement.userName.charAt(0)}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 text-2xl">
-                      {achievement.achievementIcon}
-                    </div>
-                  </div>
-                  <p className="font-semibold text-sm">
-                    {achievement.userName}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Unlocked {achievement.achievementName}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
+
 
       {/* How It Works Section */}
       <section className="py-20 px-6">
@@ -505,15 +462,15 @@ function HomePage() {
                 <p>{t('mission.story3')}</p>
               </div>
 
-              <div className="mt-8 pt-8 border-t border-border/50 flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-xl shadow-sm border-2 border-primary">
+              <div className="mt-8 pt-8 border-t border-border/50 flex flex-col items-center gap-3 text-center">
+                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-2xl shadow-sm border-2 border-primary">
                   E
                 </div>
                 <div>
-                  <div className="font-bold text-foreground">
+                  <div className="font-extrabold text-foreground text-lg">
                     {t('mission.author')}
                   </div>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-muted-foreground font-medium">
                     {t('mission.authorRole')}
                   </div>
                 </div>

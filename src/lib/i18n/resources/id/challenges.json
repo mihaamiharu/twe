@@ -10,6 +10,8 @@
   "filters": {
     "allDifficulties": "Semua Kesulitan",
     "clear": "Bersihkan",
+    "hideCompleted": "Sembunyikan Selesai",
+    "showCompleted": "Tampilkan Selesai",
     "searchPlaceholder": "Cari tantangan..."
   },
   "difficulty": {

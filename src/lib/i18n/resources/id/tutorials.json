@@ -15,7 +15,9 @@
     "all": "Semua",
     "beginner": "Pemula",
     "intermediate": "Menengah",
-    "advanced": "Lanjutan"
+    "advanced": "Lanjutan",
+    "hideCompleted": "Sembunyikan Selesai",
+    "showCompleted": "Tampilkan Selesai"
   },
   "tracks": {
     "beginner": "Jalur Pemula",

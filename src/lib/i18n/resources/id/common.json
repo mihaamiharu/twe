@@ -14,7 +14,9 @@
     "login": "Masuk",
     "register": "Daftar",
     "profile": "Profil",
-    "logout": "Keluar"
+    "logout": "Keluar",
+    "admin": "Admin",
+    "settings": "Pengaturan"
   },
   "actions": {
     "submit": "Kirim",

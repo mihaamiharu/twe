@@ -30,6 +30,7 @@ import {
   LayoutGrid,
   List,
   Layers,
+  Circle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -58,6 +59,7 @@ function TutorialsPage() {
   const [selectedDifficulty, setSelectedDifficulty] =
     useState<(typeof difficulties)[number]>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [hideCompleted, setHideCompleted] = useState<boolean>(false);
 
   const {
     data: tutorialsResponse,
@@ -92,6 +94,7 @@ function TutorialsPage() {
     };
 
     tutorials.forEach((t) => {
+      if (hideCompleted && t.isCompleted) return;
       const tag = t.tags?.find((tag) =>
         ['beginner', 'intermediate', 'advanced'].includes(tag.toLowerCase()),
       );
@@ -105,16 +108,17 @@ function TutorialsPage() {
     });
 
     return groups;
-  }, [tutorials, selectedDifficulty]);
+  }, [tutorials, selectedDifficulty, hideCompleted]);
 
   const filteredTutorials = useMemo(() => {
-    if (selectedDifficulty === 'all') return tutorials;
-    return tutorials.filter((t) =>
-      t.tags?.some(
+    return tutorials.filter((t) => {
+      if (hideCompleted && t.isCompleted) return false;
+      if (selectedDifficulty === 'all') return true;
+      return t.tags?.some(
         (tag) => tag.toLowerCase() === selectedDifficulty.toLowerCase(),
-      ),
-    );
-  }, [tutorials, selectedDifficulty]);
+      );
+    });
+  }, [tutorials, selectedDifficulty, hideCompleted]);
 
   return (
     <div className="min-h-screen p-6 md:p-10">
@@ -135,15 +139,31 @@ function TutorialsPage() {
                 placeholder={t('page.searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="pl-10"
+                className="pl-10 h-11 bg-card border-border rounded-xl shadow-sm focus-visible:ring-primary/20"
               />
             </div>
-            <div className="flex items-center gap-2 self-end md:self-auto bg-muted/50 p-1 rounded-lg border border-border">
+
+            <Button
+              variant="outline"
+              onClick={() => setHideCompleted(!hideCompleted)}
+              className={`h-11 px-4 rounded-lg shadow-sm whitespace-nowrap border-border bg-card hover:bg-accent hover:text-accent-foreground self-end md:self-auto ${hideCompleted ? 'ring-2 ring-primary/20 border-primary/50 text-foreground' : 'text-muted-foreground'
+                }`}
+            >
+              {hideCompleted ? (
+                <CheckCircle2 className="mr-2 h-5 w-5 text-primary fill-primary/10" />
+              ) : (
+                <Circle className="mr-2 h-5 w-5 text-muted-foreground/50" />
+              )}
+              <span className={hideCompleted ? 'font-medium' : 'font-normal'}>
+                {t('filters.hideCompleted', { defaultValue: 'Hide Completed' })}
+              </span>
+            </Button>
+            <div className="flex items-center gap-2 self-end md:self-auto bg-muted/50 h-11 px-1.5 rounded-xl border border-border shadow-sm shrink-0">
               <Button
                 variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('grid')}
-                className="h-8 w-8 p-0"
+                className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'grid' ? 'bg-background shadow-sm' : ''}`}
                 title={t('view.grid')}
               >
                 <LayoutGrid className="h-4 w-4" />
@@ -152,7 +172,7 @@ function TutorialsPage() {
                 variant={viewMode === 'list' ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setViewMode('list')}
-                className="h-8 w-8 p-0"
+                className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'list' ? 'bg-background shadow-sm' : ''}`}
                 title={t('view.list')}
               >
                 <List className="h-4 w-4" />
@@ -258,102 +278,102 @@ function TutorialsPage() {
                 })}
               </div>
             ) : /* Filtered Grid or List View */
-            viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredTutorials.map((tutorial) => (
-                  <TutorialCard
-                    key={tutorial.slug}
-                    tutorial={tutorial}
-                    locale={locale}
-                  />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-md border bg-card">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-[50px]"></TableHead>
-                      <TableHead className="w-[300px]">
-                        {t('table.title')}
-                      </TableHead>
-                      <TableHead className="hidden md:table-cell">
-                        {t('table.description')}
-                      </TableHead>
-                      <TableHead>{t('table.tags')}</TableHead>
-                      <TableHead className="text-right">
-                        {t('table.time')}
-                      </TableHead>
-                      <TableHead className="w-[100px] text-right">
-                        {t('table.status')}
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredTutorials.map((tutorial) => (
-                      <TableRow
-                        key={tutorial.slug}
-                        className="group cursor-pointer"
-                      >
-                        <TableCell>
-                          <Link
-                            to="/$locale/tutorials/$slug"
-                            params={{ locale, slug: tutorial.slug }}
-                            className="block h-full w-full flex items-center justify-center text-muted-foreground group-hover:text-primary"
-                          >
-                            <BookOpen className="h-4 w-4" />
-                          </Link>
-                        </TableCell>
-                        <TableCell className="font-medium group-hover:text-primary transition-colors">
-                          <Link
-                            to="/$locale/tutorials/$slug"
-                            params={{ locale, slug: tutorial.slug }}
-                            className="block"
-                          >
-                            {tutorial.title}
-                          </Link>
-                        </TableCell>
-                        <TableCell className="hidden md:table-cell text-muted-foreground max-w-[300px] truncate">
-                          {tutorial.description}
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex flex-wrap gap-1">
-                            {tutorial.tags?.slice(0, 2).map((tag) => (
-                              <Badge
-                                key={tag}
-                                variant="secondary"
-                                className="text-xs px-1.5 py-0 border-border/50"
-                              >
-                                {tag}
-                              </Badge>
-                            ))}
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-1 text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            {tutorial.estimatedMinutes}m
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex justify-end">
-                            {tutorial.isCompleted && (
-                              <Badge
-                                variant="outline"
-                                className="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 gap-1 pr-2"
-                              >
-                                <CheckCircle2 className="h-3 w-3" />
-                                {t('card.completed')}
-                              </Badge>
-                            )}
-                          </div>
-                        </TableCell>
+              viewMode === 'grid' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredTutorials.map((tutorial) => (
+                    <TutorialCard
+                      key={tutorial.slug}
+                      tutorial={tutorial}
+                      locale={locale}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-md border bg-card">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[50px]"></TableHead>
+                        <TableHead className="w-[300px]">
+                          {t('table.title')}
+                        </TableHead>
+                        <TableHead className="hidden md:table-cell">
+                          {t('table.description')}
+                        </TableHead>
+                        <TableHead>{t('table.tags')}</TableHead>
+                        <TableHead className="text-right">
+                          {t('table.time')}
+                        </TableHead>
+                        <TableHead className="w-[100px] text-right">
+                          {t('table.status')}
+                        </TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            )}
+                    </TableHeader>
+                    <TableBody>
+                      {filteredTutorials.map((tutorial) => (
+                        <TableRow
+                          key={tutorial.slug}
+                          className="group cursor-pointer"
+                        >
+                          <TableCell>
+                            <Link
+                              to="/$locale/tutorials/$slug"
+                              params={{ locale, slug: tutorial.slug }}
+                              className="block h-full w-full flex items-center justify-center text-muted-foreground group-hover:text-primary"
+                            >
+                              <BookOpen className="h-4 w-4" />
+                            </Link>
+                          </TableCell>
+                          <TableCell className="font-medium group-hover:text-primary transition-colors">
+                            <Link
+                              to="/$locale/tutorials/$slug"
+                              params={{ locale, slug: tutorial.slug }}
+                              className="block"
+                            >
+                              {tutorial.title}
+                            </Link>
+                          </TableCell>
+                          <TableCell className="hidden md:table-cell text-muted-foreground max-w-[300px] truncate">
+                            {tutorial.description}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex flex-wrap gap-1">
+                              {tutorial.tags?.slice(0, 2).map((tag) => (
+                                <Badge
+                                  key={tag}
+                                  variant="secondary"
+                                  className="text-xs px-1.5 py-0 border-border/50"
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex items-center justify-end gap-1 text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {tutorial.estimatedMinutes}m
+                            </div>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <div className="flex justify-end">
+                              {tutorial.isCompleted && (
+                                <Badge
+                                  variant="outline"
+                                  className="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 gap-1 pr-2"
+                                >
+                                  <CheckCircle2 className="h-3 w-3" />
+                                  {t('card.completed')}
+                                </Badge>
+                              )}
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
           </>
         )}
       </div>

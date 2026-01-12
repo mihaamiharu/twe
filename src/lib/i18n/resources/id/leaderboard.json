@@ -1,29 +1,29 @@
 {
   "header": {
-    "title": "Hall of Fame",
-    "subtitle": "Para penguji elit yang menguasai seni otomasi."
+    "title": "Para Suhu",
+    "subtitle": "Barisan para suhu yang berhasil menaklukkan tantangan."
   },
   "tabs": {
-    "allTime": "Sepanjang Waktu",
+    "allTime": "All Time",
     "thisMonth": "Bulan Ini"
   },
   "table": {
-    "hiddenUser": "Pengguna Tersembunyi",
+    "hiddenUser": "User Privat",
     "anonymous": "Anonim",
     "challengesCount": "{{count}} tantangan",
     "challenges": "tantangan",
-    "emptyState": "Belum ada pelari lain. Undang temanmu!"
+    "emptyState": "Belum ada runner di sini. Ajak temanmu buat berkompetisi!"
   },
   "gating": {
-    "title": "Bergabung dengan Elit",
-    "description": "Masuk untuk melihat peringkat lengkap, melacak progres kamu, dan mendapatkan lencana unik.",
-    "button": "Masuk untuk Bersaing"
+    "title": "Masuk Circle Para Suhu",
+    "description": "Login untuk akses ranking lengkap, pantau progress, dan klaim badge eksklusif.",
+    "button": "Login untuk Adu Skill"
   },
   "monthly": {
-    "comingSoon": "Peringkat Bulanan Segera Hadir",
-    "description": "Bersainglah untuk mahkota bulanan di pembaruan musim berikutnya!"
+    "comingSoon": "Ranking Bulanan Segera Hadir",
+    "description": "Siapkan strategi terbaik untuk rebut posisi puncak di season depan!"
   },
   "error": {
-    "description": "Tidak dapat memuat papan peringkat saat ini."
+    "description": "Leaderboard gagal dimuat. Coba cek koneksi internet atau balik lagi nanti."
   }
 }

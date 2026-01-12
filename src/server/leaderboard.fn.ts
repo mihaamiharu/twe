@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
-import { users, progress, achievements, userAchievements } from '@/db/schema';
+import { users, progress, achievements, userAchievements, submissions } from '@/db/schema';
 import { logger } from '@/lib/logger';
 import { desc, eq, and, sql, inArray, like } from 'drizzle-orm';
 import { z } from 'zod';

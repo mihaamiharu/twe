@@ -884,7 +884,9 @@ export function ChallengePlayground({
                 variant="outline"
                 className="font-bold border-border/50 bg-background"
               >
-                {t(`challenges:types.${challenge.type.toLowerCase()}`)}
+                {t(
+                  `challenges:types.${challenge.type?.toLowerCase() || 'unknown'}`,
+                )}
               </Badge>
               <span className="text-accent flex items-center gap-1 font-bold">
                 <Zap className="h-3 w-3 fill-current" />

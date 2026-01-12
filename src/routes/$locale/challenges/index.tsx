@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { getChallenges } from '@/server/challenges.fn';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { challengeListQueryOptions } from '@/lib/challenges.query';
 import {
   Card,
   CardContent,
@@ -9,7 +9,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -23,7 +22,6 @@ import {
   Code,
   Trophy,
   Zap,
-  AlertCircle,
   CheckCircle2,
   Palette,
   Route as RouteIcon,
@@ -31,6 +29,7 @@ import {
   List,
   Search,
   Lock,
+  Circle,
 } from 'lucide-react';
 import { useState, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
@@ -45,7 +44,6 @@ import { useDebounce } from '@/lib/useDebounce';
 import { ChallengeTierProgress } from '@/components/challenges/ChallengeTierProgress';
 import {
   tierLabels,
-  categoryLabels,
   difficultyColors,
   getTierFromCategory,
   TIER_ORDER,
@@ -54,6 +52,14 @@ import {
 import { useTranslation } from 'react-i18next';
 
 export const Route = createFileRoute('/$locale/challenges/')({
+  loader: ({ context, params }) => {
+    return context.queryClient.ensureQueryData(
+      challengeListQueryOptions({
+        locale: params.locale,
+        limit: 500,
+      }),
+    );
+  },
   component: ChallengesPage,
   head: ({ params }) => ({
     meta: [
@@ -155,42 +161,30 @@ function ChallengesPage() {
   const [filterTier, setFilterTier] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [hideCompleted, setHideCompleted] = useState<boolean>(false);
 
   const {
     data: challengesResponse,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: [
-      'challenges',
-      filterType,
-      filterDifficulty,
-      debouncedSearchQuery,
-    ],
-    queryFn: async () => {
-      const result = await getChallenges({
-        data: {
-          locale,
-          limit: 500,
-          type:
-            filterType === 'all'
-              ? undefined
-              : (filterType as
-                  | 'JAVASCRIPT'
-                  | 'PLAYWRIGHT'
-                  | 'CSS_SELECTOR'
-                  | 'XPATH_SELECTOR'),
-          difficulty:
-            filterDifficulty === 'all'
-              ? undefined
-              : (filterDifficulty as 'EASY' | 'MEDIUM' | 'HARD'),
-          search: debouncedSearchQuery || undefined,
-        },
-      });
-      if (!result.success) throw new Error(result.error);
-      return result;
-    },
-  });
+  } = useSuspenseQuery(
+    challengeListQueryOptions({
+      locale,
+      limit: 500,
+      type:
+        filterType === 'all'
+          ? undefined
+          : (filterType as
+            | 'JAVASCRIPT'
+            | 'PLAYWRIGHT'
+            | 'CSS_SELECTOR'
+            | 'XPATH_SELECTOR'),
+      difficulty:
+        filterDifficulty === 'all'
+          ? undefined
+          : (filterDifficulty as 'EASY' | 'MEDIUM' | 'HARD'),
+      search: debouncedSearchQuery || undefined,
+    }),
+  );
 
   const challenges = challengesResponse?.data ?? [];
 
@@ -198,6 +192,7 @@ function ChallengesPage() {
   const filteredChallenges = useMemo(() => {
     if (!challenges) return [];
     return challenges.filter((c: Challenge) => {
+      if (hideCompleted && c.isCompleted) return false;
       if (
         filterTier !== 'all' &&
         getTierFromCategory(c.category ?? undefined) !== filterTier
@@ -205,7 +200,7 @@ function ChallengesPage() {
         return false;
       return true;
     });
-  }, [challenges, filterTier]);
+  }, [challenges, filterTier, hideCompleted]);
 
   // Group challenges by category
   const challengesByCategory = useMemo(() => {
@@ -284,8 +279,6 @@ function ChallengesPage() {
     });
   }, [challengesByCategory]);
 
-  // State for view mode
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   return (
     <div className="min-h-screen p-6 md:p-10">
@@ -328,7 +321,7 @@ function ChallengesPage() {
 
         {/* Search & Filters */}
         <div className="flex flex-col gap-4 mb-10">
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -348,12 +341,28 @@ function ChallengesPage() {
               )}
             </div>
 
-            <div className="flex gap-3">
+            <Button
+              variant="outline"
+              onClick={() => setHideCompleted(!hideCompleted)}
+              className={`h-11 px-4 rounded-xl shadow-sm whitespace-nowrap border-border bg-card hover:bg-accent hover:text-accent-foreground ${hideCompleted ? 'ring-2 ring-primary/20 border-primary/50 text-foreground' : 'text-muted-foreground'
+                }`}
+            >
+              {hideCompleted ? (
+                <CheckCircle2 className="mr-2 h-5 w-5 text-primary fill-primary/10" />
+              ) : (
+                <Circle className="mr-2 h-5 w-5 text-muted-foreground/50" />
+              )}
+              <span className={hideCompleted ? 'font-medium' : 'font-normal'}>
+                {t('filters.hideCompleted', { defaultValue: 'Hide Completed' })}
+              </span>
+            </Button>
+
+            <div className="flex items-center gap-3">
               <Select
                 value={filterDifficulty}
                 onValueChange={setFilterDifficulty}
               >
-                <SelectTrigger className="w-[160px] h-11 rounded-xl bg-card border-border shadow-sm">
+                <SelectTrigger className="w-[160px] !h-11 rounded-xl bg-card border-border shadow-sm">
                   <SelectValue
                     placeholder={t('common:labels.difficulty', {
                       defaultValue: 'Difficulty',
@@ -372,7 +381,7 @@ function ChallengesPage() {
                 </SelectContent>
               </Select>
 
-              <div className="flex items-center gap-2 bg-muted/50 p-1.5 rounded-xl border border-border shadow-sm shrink-0">
+              <div className="flex items-center gap-2 bg-muted/50 h-11 px-1.5 rounded-xl border border-border shadow-sm shrink-0">
                 <Button
                   variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
                   size="sm"
@@ -430,39 +439,11 @@ function ChallengesPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="h-full glass-card">
-                <CardHeader className="pb-2">
-                  <Skeleton className="h-5 w-20 mb-2" />
-                  <Skeleton className="h-6 w-3/4 mb-1" />
-                  <Skeleton className="h-4 w-full" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
 
         {/* Error State */}
-        {error && (
-          <div className="text-center py-12">
-            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {t('common:messages.failedToLoad')}
-            </h3>
-            <p className="text-muted-foreground">
-              {t('common:messages.retry')}
-            </p>
-          </div>
-        )}
 
         {/* Empty State */}
-        {!isLoading && !error && challenges.length === 0 && (
+        {challenges.length === 0 && (
           <div className="text-center py-12">
             <Code className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">
@@ -475,7 +456,7 @@ function ChallengesPage() {
         )}
 
         {/* Challenges Content */}
-        {!isLoading && !error && sortedChallengesByCategory.length > 0 && (
+        {sortedChallengesByCategory.length > 0 && (
           <div className="space-y-10">
             {sortedChallengesByCategory.map(
               ([category, categoryChallenges]) => (
@@ -503,13 +484,12 @@ function ChallengesPage() {
 
                         const ChallengeCard = (
                           <Card
-                            className={`h-full transition-all duration-300 rounded-xl group/card overflow-hidden ${
-                              isComingSoon
-                                ? 'bg-muted/50 border-muted opacity-80'
-                                : challenge.isCompleted
-                                  ? 'border-green-500/20 bg-green-500/5 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-                                  : 'glass-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
-                            }`}
+                            className={`h-full transition-all duration-300 rounded-xl group/card overflow-hidden ${isComingSoon
+                              ? 'bg-muted/50 border-muted opacity-80'
+                              : challenge.isCompleted
+                                ? 'border-green-500/20 bg-green-500/5 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
+                                : 'glass-card hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-1'
+                              }`}
                           >
                             <CardHeader className="pb-3 md:pb-4 space-y-3">
                               <div className="flex items-start justify-between gap-2">
@@ -759,7 +739,7 @@ function ChallengesPage() {
                                       variant="secondary"
                                       className={
                                         difficultyColors[
-                                          challenge.difficulty
+                                        challenge.difficulty
                                         ] || ''
                                       }
                                     >
