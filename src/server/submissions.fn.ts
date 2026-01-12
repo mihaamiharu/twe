@@ -30,6 +30,7 @@ const getErrorMessage = (key: string, locale: string) => {
 const CreateSubmissionSchema = z.object({
   challengeSlug: z.string().min(1, 'Challenge slug is required'),
   code: z.string().min(1, 'Code is required'),
+  isPractice: z.boolean().optional().default(false),
   testResults: z.array(
     z.object({
       testCaseId: z.string().uuid().optional(),
@@ -41,6 +42,7 @@ const CreateSubmissionSchema = z.object({
   executionTime: z.number().optional(),
   locale: z.string().default('en'),
 });
+
 
 export const createSubmission = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => CreateSubmissionSchema.parse(data))
@@ -78,7 +80,32 @@ export const createSubmission = createServerFn({ method: 'POST' })
       }
 
       const userId = session.user.id;
-      const { challengeSlug, code, testResults, executionTime } = input;
+      const { challengeSlug, code, testResults, executionTime, isPractice } = input;
+
+      // Practice mode: skip all DB writes and return lightweight response
+      if (isPractice) {
+        const testsTotal = testResults.length;
+        const testsPassed = testResults.filter((r) => r.passed).length;
+        const isPassed = testsPassed === testsTotal && testsTotal > 0;
+
+        return {
+          success: true,
+          data: {
+            submission: {
+              id: 'practice',
+              isPassed,
+              testsPassed,
+              testsTotal,
+              xpEarned: 0,
+              executionTime,
+            },
+            isFirstCompletion: false,
+            isPracticeMode: true,
+            levelUp: null,
+            newAchievements: [],
+          },
+        };
+      }
 
       // Get challenge by slug
       let challenge = await db.query.challenges.findFirst({

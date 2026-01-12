@@ -214,6 +214,7 @@ function ChallengeDetailPage() {
     mutationFn: async (submissionData: {
       challengeSlug: string;
       code: string;
+      isPractice?: boolean;
       testResults: {
         testCaseId?: string;
         passed: boolean;
@@ -232,6 +233,12 @@ function ChallengeDetailPage() {
     },
     onSuccess: async (response) => {
       if (response.success && response.data?.submission?.isPassed) {
+        // Practice mode: show simple toast, skip success dialog
+        if (response.data.isPracticeMode) {
+          toast.success(t('challenges:practice.complete'));
+          return;
+        }
+
         setLastSubmissionResult({
           xpEarned: response.data.submission.xpEarned,
           achievements: response.data.newAchievements || [],
@@ -316,6 +323,7 @@ function ChallengeDetailPage() {
       const submissionData = {
         challengeSlug: challenge.slug,
         code: data.code,
+        isPractice: challenge.isCompleted, // Auto-detect practice mode
         testResults: data.testResults.map((tr) => ({
           testCaseId:
             tr.id !== 'main' && tr.id !== 'selector' ? tr.id : undefined,
