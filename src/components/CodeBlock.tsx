@@ -56,7 +56,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
         </button>
       </div>
       <div className="overflow-x-auto p-4">
-        <code className={cn('text-sm font-mono block', className)} {...props}>
+        <code className={cn('text-sm font-mono block whitespace-pre-wrap', className)} {...props}>
           {children}
         </code>
       </div>

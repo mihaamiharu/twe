@@ -310,9 +310,9 @@ export const getTutorial = createServerFn({ method: 'GET' })
           userProgress: userProgressData,
           nextTutorial: nextTutorial
             ? {
-                slug: nextTutorial.slug,
-                title: nextTutorial.title,
-              }
+              slug: nextTutorial.slug,
+              title: nextTutorial.title,
+            }
             : null,
         },
       };

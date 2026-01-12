@@ -60,6 +60,11 @@
     "retry": "Lagi",
     "browseList": "Lihat Daftar"
   },
+  "practice": {
+    "badge": "Mode Latihan",
+    "complete": "Latihan selesai! Bagus untuk terus berlatih.",
+    "noXp": "Tidak ada XP di mode latihan"
+  },
   "types": {
     "css_selector": "Selektor CSS",
     "xpath_selector": "XPath",

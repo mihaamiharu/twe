@@ -19,7 +19,25 @@ import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
 
-export const Route = createFileRoute('/$locale/')({ component: HomePage });
+export const Route = createFileRoute('/$locale/')({
+  loader: async ({ context }) => {
+    // Prefetch stats for SSR
+    if (context?.queryClient) {
+      await context.queryClient.ensureQueryData({
+        queryKey: ['homepage-stats'],
+        queryFn: async () => {
+          const result = await getDashboardStats();
+          if (!result.success || !result.data) {
+            throw new Error(result.error || 'Failed to fetch stats');
+          }
+          return result.data;
+        },
+        staleTime: 1000 * 60 * 5,
+      });
+    }
+  },
+  component: HomePage,
+});
 
 function HomePage() {
   const { locale } = Route.useParams();

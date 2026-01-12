@@ -15,8 +15,14 @@ if (!process.env.DATABASE_URL) {
 // Create PostgreSQL connection
 const connectionString = process.env.DATABASE_URL;
 
+// Detect if using Supabase (requires prepare: false for PgBouncer)
+const isSupabase = connectionString.includes('supabase.com');
+
 // For query purposes
-const queryClient = postgres(connectionString);
+// Supabase uses PgBouncer in transaction mode which doesn't support prepared statements
+const queryClient = postgres(connectionString, {
+  prepare: !isSupabase,
+});
 
 // Create Drizzle database instance with schema
 export const db = drizzle(queryClient, { schema });
