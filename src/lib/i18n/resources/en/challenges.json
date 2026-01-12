@@ -60,6 +60,11 @@
     "retry": "Again",
     "browseList": "Browse List"
   },
+  "practice": {
+    "badge": "Practice Mode",
+    "complete": "Practice complete! Great job reviewing this challenge.",
+    "noXp": "No XP awarded in practice mode"
+  },
   "types": {
     "css_selector": "CSS Selector",
     "xpath_selector": "XPath",
