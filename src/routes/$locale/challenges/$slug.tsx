@@ -5,8 +5,7 @@ import {
   Link,
 } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useIntlayer } from 'react-intlayer';
-import { useCallback, useMemo, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   useMutation,
   useQueryClient,
@@ -14,7 +13,7 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { getChallenge, getChallenges } from '@/server/challenges.fn';
+import { getChallenges } from '@/server/challenges.fn';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { deobfuscate } from '@/lib/obfuscator';
@@ -72,41 +71,6 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
   },
 });
 
-interface APIChallenge {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  category?: string;
-  xpReward: number;
-  instructions: string;
-  htmlContent?: string;
-  starterCode?: string;
-
-  tags?: string[];
-  testCases?: Array<{
-    id: string;
-    description: string;
-    input: unknown;
-    expectedOutput: unknown;
-    order: number;
-  }>;
-  userProgress?: {
-    isCompleted: boolean;
-    attempts: number;
-    lastAccessedAt: string;
-  };
-  nextChallenge?: {
-    slug: string;
-    title: string;
-  } | null;
-  tutorial?: {
-    slug: string;
-    title: string;
-  } | null;
-}
 
 function ChallengeDetailPage() {
   const { locale, slug } = useParams({ from: '/$locale/challenges/$slug' });

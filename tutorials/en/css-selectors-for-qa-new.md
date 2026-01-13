@@ -134,3 +134,126 @@ When you write robust selectors:
 3. **Collaboration improves** as you establish clear `data-testid` contracts with developers.
 
 **Ready to put this into practice?** Head over to our [CSS Challenges](/challenges) and see if you can find the elements without breaking the bank!
+
+
+This is a strong choice. It reinforces the engineering mindset from Foundation 4: understanding the limitations of your tools is just as important as knowing how to use them.
+
+Here is the updated **Tutorial 5** using **Option B**.
+
+---
+
+---
+
+## title: 'Tutorial 5: CSS Selector Strategies' description: 'Techniques for identifying robust and maintainable elements for test automation.'
+
+## 1. Introduction: Robustness vs. Brittleness
+
+A CSS Selector is the "address" your script uses to locate an element in the DOM.
+
+* **Brittle Selector:** Relies on unstable properties like visual styles or deep DOM paths.
+* **Robust Selector:** Relies on stable, functional attributes.
+
+In professional automation, we prioritize **Stability** over precision. A selector that breaks when a `div` is added or a color is changed creates "flaky" tests.
+
+---
+
+## 2. Selector Priority List (Best to Worst)
+
+When inspecting an element, evaluate attributes in this specific order to ensure long-term stability.
+
+### Priority 1: Test Attributes (The Contract)
+
+* **Syntax:** `[data-testid="value"]`
+* **Why:** Explicitly added for automation. They do not change when the UI is redesigned.
+
+### Priority 2: Unique Functional IDs
+
+* **Syntax:** `#value` (matches `id="value"`)
+* **Why:** IDs are unique per page.
+* **Risk:** Avoid "Dynamic IDs" (e.g., `id="id-123"`) that change on every page refresh.
+
+### Priority 3: Accessible Names (A11y)
+
+* **Syntax:** `[name="value"]`, `[aria-label="value"]`
+* **Why:** These control how screen readers see the site. Developers rarely change them because it breaks accessibility.
+
+### Priority 4: Compound Selectors
+
+* **Syntax:** `.class[attribute="value"]`
+* **Why:** Combines a class and an attribute to narrow down the search without relying on the DOM tree.
+
+### Priority 5: Full DOM Paths (Anti-Pattern)
+
+* **Syntax:** `html > body > div > div > button`
+* **Why:** Extremely fragile. Any minor change to the page structure breaks the test.
+
+---
+
+## 3. The "Tailwind" Problem: When CSS Reaches Its Limit
+
+Modern frameworks like Tailwind CSS use **Utility Classes**. These describe how an element looks (color, padding) rather than what it is.
+
+**The Problem Case:**
+
+```html
+<button class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">
+  Login
+</button>
+
+```
+
+In this specific snippet, there are no IDs, no Names, and no functional attributes.
+
+**Why this is a "Dead End" for CSS:**
+
+1. **CSS cannot see text:** You cannot write a pure CSS selector that says "Find the button with the word 'Login'."
+2. **Classes are visual:** If you target `.bg-blue-500`, your test fails the moment a designer changes the button to green, even if the login logic is still working.
+
+### How to Solve This (In Order of Engineering Priority):
+
+#### A. Use a Parent Anchor (Context)
+
+Find the nearest unique parent container and look for the button inside it.
+
+* **Selector:** `.login-form button`
+
+#### B. Use Positional Pseudo-classes
+
+If this is the first button in its container, use a positional selector.
+
+* **Selector:** `button:first-of-type`
+
+#### C. Request a Test Attribute (The Professional Choice)
+
+If you cannot find a unique path, the correct engineering move is to **modify the HTML**. Add a `data-testid` so the element is "Testable."
+
+* **Updated Code:** `<button data-testid="login-submit" ...>`
+* **Selector:** `[data-testid="login-submit"]`
+
+---
+
+## 4. Essential Syntax Cheatsheet
+
+| Pattern | Syntax | Usage |
+| --- | --- | --- |
+| **Attribute** | `[type="submit"]` | Exact match for an attribute. |
+| **Contains** | `[class*="success"]` | Matches if the value appears anywhere in the string. |
+| **Starts With** | `[id^="user_"]` | Useful for IDs with stable prefixes. |
+| **Descendant** | `.form input` | Finds any `input` inside `.form`. |
+| **Direct Child** | `.card > h1` | Finds `h1` only if it is the immediate child. |
+| **Next Sibling** | `label + input` | Finds the `input` immediately following a `label`. |
+
+---
+
+## 5. Summary Checklist
+
+* **Avoid visual classes:** Ignore classes like `bg-blue-500` or `rounded`.
+* **Avoid Auto-Generated Paths:** Never copy-paste the selector provided by DevTools.
+* **Prioritize Function:** Look for `name`, `type`, or `data-testid`.
+* **Recognize "Untestable" HTML:** If an element has no unique identifiers and no stable parents, it is untestable. Fix the HTML before writing the script.
+
+---
+
+**This concludes the strategies for finding elements.**
+
+**Would you like me to prepare Tutorial 6: Element Interactions (The "Act" Step), or should we look at how XPath solves the 'Login' text problem?**

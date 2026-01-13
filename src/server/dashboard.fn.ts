@@ -132,7 +132,7 @@ export const getDashboardStats = createServerFn({ method: 'GET' }).handler(
       logger.error('Error fetching dashboard stats:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred while loading dashboard stats.',
       };
     }
   },

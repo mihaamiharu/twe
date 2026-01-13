@@ -65,7 +65,62 @@
         "principles"
       ],
       "relatedChallenges": [],
-      "nextTutorialSlug": "css-selectors-for-qa-new"
+      "nextTutorialSlug": "css-selector-strategies"
+    },
+    {
+      "slug": "css-selector-strategies",
+      "order": 5,
+      "estimatedMinutes": 10,
+      "tags": [
+        "beginner",
+        "css",
+        "selectors",
+        "strategy",
+        "best-practices"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "xpath-strategies"
+    },
+    {
+      "slug": "xpath-strategies",
+      "order": 6,
+      "estimatedMinutes": 10,
+      "tags": [
+        "xpath",
+        "selectors",
+        "strategies",
+        "beginner"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "element-interactions"
+    },
+    {
+      "slug": "element-interactions",
+      "order": 7,
+      "estimatedMinutes": 8,
+      "tags": [
+        "beginner",
+        "interactions",
+        "playwright",
+        "automation",
+        "mechanics"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "assertions-verify"
+    },
+    {
+      "slug": "assertions-verify",
+      "order": 8,
+      "estimatedMinutes": 8,
+      "tags": [
+        "beginner",
+        "assertions",
+        "validation",
+        "expect",
+        "verification"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "javascript-fundamentals-for-qa"
     },
     {
       "slug": "css-selectors-for-qa-new",
@@ -155,7 +210,7 @@
     },
     {
       "slug": "javascript-fundamentals-for-qa",
-      "order": 20,
+      "order": 8.5,
       "estimatedMinutes": 20,
       "tags": [
         "javascript",
@@ -168,7 +223,7 @@
         "js-variables-basics",
         "js-functions-basics"
       ],
-      "nextTutorialSlug": "dom-manipulation-for-testing"
+      "nextTutorialSlug": "css-selectors-for-qa-new"
     },
     {
       "slug": "dom-manipulation-for-testing",

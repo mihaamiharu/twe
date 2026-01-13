@@ -4,7 +4,7 @@ import { getTutorials } from '@/server/tutorials.fn';
 
 const BASE_URL = 'https://testingwithekki.com';
 
-export const Route = createFileRoute('/sitemap.xml')({
+export const Route = createFileRoute('/sitemap/xml')({
     loader: async () => {
         const [challengesRes, tutorialsRes] = await Promise.all([
             getChallenges({ data: { limit: 1000 } }),

@@ -254,7 +254,7 @@ export const getUserSettings = createServerFn({ method: 'GET' })
         logger.error('Error fetching user profile:', error);
         return {
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'An error occurred while loading your profile.',
         };
       }
     },
@@ -317,7 +317,7 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
         logger.error('Error updating user profile:', error);
         return {
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'An error occurred while loading your profile.',
         };
       }
     },
