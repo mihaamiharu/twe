@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selector Practice</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f4f4f5;
+            color: #18181b;
+        }
+
+        .container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+        }
+
+        h1 {
+            color: #27272a;
+            margin-bottom: 1.5rem;
+        }
+
+        .practice-area {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px dashed #d4d4d8;
+            border-radius: 0.25rem;
+        }
+
+        /* Utility Classes for Testing */
+        .text-bold { font-weight: bold; }
+        .text-red { color: #ef4444; }
+        .hidden { display: none; }
+        
+        /* Specific IDs and Classes for Targeting */
+        #login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 300px;
+        }
+
+        input {
+            padding: 0.5rem;
+            border: 1px solid #d4d4d8;
+            border-radius: 0.25rem;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2563eb;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .data-table th, .data-table td {
+            border: 1px solid #e4e4e7;
+            padding: 0.5rem;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Selector Practice Playground</h1>
+        <p>Use your browser's DevTools to inspect these elements and practice writing selectors.</p>
+
+        <div class="practice-area">
+            <h2>Basic Elements</h2>
+            <div id="unique-id">I have an ID: #unique-id</div>
+            <div class="common-class">I have a class: .common-class</div>
+            <div class="common-class">I also have the same class: .common-class</div>
+            <p data-testid="custom-attribute">I have a data attribute: [data-testid="custom-attribute"]</p>
+        </div>
+
+        <div class="practice-area">
+            <h2>Forms</h2>
+            <form id="login-form">
+                <input type="text" name="username" placeholder="Username" id="user-input">
+                <input type="password" name="password" placeholder="Password">
+                <button type="submit" id="submit-btn">Login</button>
+            </form>
+        </div>
+
+        <div class="practice-area">
+            <h2>Tables & Lists</h2>
+            <table class="data-table" id="users-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1</td>
+                        <td>Alice</td>
+                        <td>Admin</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>Bob</td>
+                        <td>User</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Charlie</td>
+                        <td>User</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <ul id="items-list" style="margin-top: 1rem;">
+                <li class="item">Item 1</li>
+                <li class="item special">Item 2 (Special)</li>
+                <li class="item">Item 3</li>
+            </ul>
+        </div>
+        
+        <div class="practice-area">
+             <h2>Dynamic Content</h2>
+             <button id="show-message-btn" onclick="document.getElementById('hidden-message').classList.remove('hidden')">Show Hidden Message</button>
+             <div id="hidden-message" class="hidden" style="margin-top: 10px; padding: 10px; background-color: #dcfce7; color: #166534; border-radius: 4px;">
+                 You found me! Now try identifying me by my ID or text.
+             </div>
+        </div>
+    </div>
+</body>
+</html>
