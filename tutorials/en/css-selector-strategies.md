@@ -141,3 +141,17 @@ Avoid selecting buttons by their text (e.g., "Submit"). Text often changes for m
 
 * **Best:** `[name="user_email"]` (Stable, unique, functional).
 * **Alternative:** `.login-form input[type="email"]` (Scoped to the form).
+
+---
+
+## 7. Further Reading (Deep Dive)
+
+Strategy is about knowing *what* to select, not just *how*.
+
+### Official Documentation (MDN)
+
+* **[CSS Selectors Guide](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors)**: The complete dictionary of every selector available in the browser.
+
+### Industry Best Practices
+
+* **[Testing Library Priority](https://testing-library.com/docs/queries/about/#priority)**: The "Gold Standard" philosophy for selecting elements by "User-Facing" attributes (Role, Label, Text) instead of code implementation details.

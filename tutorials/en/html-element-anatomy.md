@@ -96,3 +96,14 @@ Before moving to the next foundation, make sure you can answer these:
 1. Can you identify the **Tag Name** of an element?
 2. Can you list the **Attributes** and their **Values**?
 3. Do you know the difference between the **ID attribute** and the **Text content**?
+
+---
+
+## 6. Further Reading (Deep Dive)
+
+To dive deeper into the official specs:
+
+### Official Documentation (MDN)
+
+* **[Anatomy of an HTML Element](https://developer.mozilla.org/en-US/docs/Learn/HTML/Introduction_to_HTML/Getting_started#anatomy_of_an_html_element)**: A visual guide to tags, attributes, and nesting.
+* **[HTML Attributes Reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes)**: The complete list of global attributes like `id`, `class`, and `hidden`.

@@ -111,3 +111,14 @@ To master the DOM tree, you should be able to:
 1. Identify the **Parent** of any given element.
 2. Identify if two elements are **Siblings** (sharing the same parent).
 3. Use **Indentation** to quickly spot which elements are nested inside others.
+
+---
+
+## 6. Further Reading (Deep Dive)
+
+Explore the official definitions of the DOM layout.
+
+### Official Documentation (MDN)
+
+* **[Introduction to the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction)**: A high-level overview of what the DOM really is.
+* **[Traversing the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Node)**: Detailed documentation on concepts like `parentNode`, `childNodes`, and `nextSibling`.
