@@ -2,6 +2,10 @@
   "page": {
     "title": "Tutorials",
     "subtitle": "Walk through core concepts with me, step-by-step.",
+    "seo": {
+      "title": "Interactive Playwright Tutorials | TestingWithEkki",
+      "description": "Step-by-step guides for mastering software testing. Learn Playwright, end-to-end testing strategies, and best practices."
+    },
     "searchPlaceholder": "Search tutorials...",
     "noResults": "No tutorials found",
     "tryDifferentSearch": "Try a different search term",
@@ -13,6 +17,7 @@
   },
   "filters": {
     "all": "All",
+    "foundations": "Foundations",
     "beginner": "Beginner",
     "intermediate": "Intermediate",
     "advanced": "Advanced",
@@ -20,6 +25,7 @@
     "showCompleted": "Show Completed"
   },
   "tracks": {
+    "foundations": "Foundations Track",
     "beginner": "Beginner Track",
     "intermediate": "Intermediate Track",
     "advanced": "Advanced Track",

@@ -19,6 +19,8 @@ import { AnimatedCounter } from '@/components/AnimatedCounter';
 import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
 
+import i18n from '@/lib/i18n';
+
 export const Route = createFileRoute('/$locale/')({
   loader: async ({ context }) => {
     // Prefetch stats for SSR
@@ -37,6 +39,46 @@ export const Route = createFileRoute('/$locale/')({
     }
   },
   component: HomePage,
+  head: () => ({
+    meta: [
+      {
+        title: i18n.t('common:seo.title'),
+      },
+      {
+        name: 'description',
+        content: i18n.t('common:seo.description'),
+      },
+      {
+        property: 'og:title',
+        content: i18n.t('common:seo.ogTitle'),
+      },
+      {
+        property: 'og:description',
+        content: i18n.t('common:seo.ogDescription'),
+      },
+    ],
+    links: [
+      {
+        rel: 'canonical',
+        href: 'https://testingwithekki.com/en',
+      },
+      {
+        rel: 'alternate',
+        hrefLang: 'en',
+        href: 'https://testingwithekki.com/en',
+      },
+      {
+        rel: 'alternate',
+        hrefLang: 'id',
+        href: 'https://testingwithekki.com/id',
+      },
+      {
+        rel: 'alternate',
+        hrefLang: 'x-default',
+        href: 'https://testingwithekki.com/en',
+      },
+    ],
+  }),
 });
 
 function HomePage() {
