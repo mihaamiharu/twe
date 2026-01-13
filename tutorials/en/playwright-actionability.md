@@ -98,5 +98,5 @@ Explore the official documentation and the exact code Playwright uses to decide 
 
 ### GitHub Source Code (Open Source)
 
-* **[The Actionability Logic](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/injected/injected.ts)**: This implies the core logic injected into the page to check visibility and stability.
+* **[The Actionability Logic](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/injected/injected.ts)**: This implies the core logic injected into the page to check visibility and stability.
 * **[ElementHandle Implementation](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/dom.ts)**: The server-side code that manages DOM elements and coordinates these checks.
