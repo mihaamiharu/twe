@@ -149,7 +149,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
       logger.error('Error fetching leaderboard:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : String(error), // Return actual error for debugging
+        error: 'An error occurred while loading the leaderboard.',
       };
     }
   });
