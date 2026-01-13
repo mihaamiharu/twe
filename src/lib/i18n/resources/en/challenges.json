@@ -2,6 +2,10 @@
   "page": {
     "title": "Challenges",
     "subtitle": "Practice your CSS and XPath selectors with real-world scenarios.",
+    "seo": {
+      "title": "Coding Challenges | TestingWithEkki",
+      "description": "Practice your Playwright, Selenium, and Cypress skills with real-world coding scenarios. Master selectors, automation authentication, and more."
+    },
     "overallProgress": "Overall Progress",
     "notFound": "Challenge Not Found",
     "notFoundDescription": "The requested challenge could not be found.",
