@@ -35,18 +35,19 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from '@/lib/useDebounce';
+import i18n from '@/lib/i18n';
 
 // --- Search Params Schema ---
 const TutorialsSearchSchema = z.object({
   q: z.string().optional(),
-  difficulty: z.enum(['all', 'beginner', 'intermediate', 'advanced']).optional().default('all'),
+  difficulty: z.enum(['all', 'foundations', 'beginner', 'intermediate', 'advanced']).optional().default('all'),
   view: z.enum(['grid', 'list']).optional().default('grid'),
   hideCompleted: z.coerce.boolean().optional().default(false),
 });
 
 export const Route = createFileRoute('/$locale/tutorials/')({
   validateSearch: TutorialsSearchSchema,
-  loader: async ({ context, params }) => {
+  loader: async ({ params }) => {
     // Prefetch tutorials for SSR
     const result = await getTutorials({
       data: {
@@ -60,18 +61,23 @@ export const Route = createFileRoute('/$locale/tutorials/')({
   head: () => ({
     meta: [
       {
-        title: 'Testing Tutorials | TestingWithEkki',
+        title: i18n.t('tutorials:page.seo.title'),
       },
       {
         name: 'description',
-        content:
-          'Step-by-step guides for mastering software testing. Learn Playwright, end-to-end testing strategies, and best practices.',
+        content: i18n.t('tutorials:page.seo.description'),
+      },
+    ],
+    links: [
+      {
+        rel: 'canonical',
+        href: 'https://testingwithekki.com/en/tutorials',
       },
     ],
   }),
 });
 
-const difficulties = ['all', 'beginner', 'intermediate', 'advanced'] as const;
+const difficulties = ['all', 'foundations', 'beginner', 'intermediate', 'advanced'] as const;
 
 function TutorialsPage() {
   const { locale } = Route.useParams();
@@ -130,6 +136,7 @@ function TutorialsPage() {
     if (selectedDifficulty !== 'all') return null;
 
     const groups: Record<string, typeof tutorials> = {
+      foundations: [],
       beginner: [],
       intermediate: [],
       advanced: [],
@@ -138,11 +145,12 @@ function TutorialsPage() {
 
     tutorials.forEach((t) => {
       if (hideCompleted && t.isCompleted) return;
-      const tag = t.tags?.find((tag) =>
-        ['beginner', 'intermediate', 'advanced'].includes(tag.toLowerCase()),
+      const tag = t.tags?.find((tag: string) =>
+        ['foundations', 'beginner', 'intermediate', 'advanced'].includes(tag.toLowerCase()),
       );
       if (tag) {
-        const key = tag.toLowerCase();
+        // Explicitly cast tag to string to avoid typescript error since we just checked it
+        const key = (tag as string).toLowerCase();
         if (groups[key]) groups[key].push(t);
         else groups['other'].push(t);
       } else {
@@ -158,7 +166,7 @@ function TutorialsPage() {
       if (hideCompleted && t.isCompleted) return false;
       if (selectedDifficulty === 'all') return true;
       return t.tags?.some(
-        (tag) => tag.toLowerCase() === selectedDifficulty.toLowerCase(),
+        (tag: string) => tag.toLowerCase() === selectedDifficulty.toLowerCase(),
       );
     });
   }, [tutorials, selectedDifficulty, hideCompleted]);
@@ -280,7 +288,7 @@ function TutorialsPage() {
               {t('page.noResults')}
             </h3>
             <p className="text-muted-foreground">
-              {search ? t('page.tryDifferentSearch') : t('page.checkBackSoon')}
+              {q ? t('page.tryDifferentSearch') : t('page.checkBackSoon')}
             </p>
           </div>
         )}
@@ -292,7 +300,7 @@ function TutorialsPage() {
             {viewMode === 'grid' && groupedTutorials ? (
               <div className="space-y-12">
                 {(
-                  ['beginner', 'intermediate', 'advanced', 'other'] as const
+                  ['foundations', 'beginner', 'intermediate', 'advanced', 'other'] as const
                 ).map((level) => {
                   const items = groupedTutorials[level];
                   if (!items || items.length === 0) return null;
@@ -435,7 +443,7 @@ interface TutorialListItem {
   viewCount: number;
   isCompleted: boolean;
   readingProgress: number;
-  difficulty?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  difficulty?: 'FOUNDATIONS' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
 }
 
 function TutorialCard({
@@ -497,11 +505,13 @@ function TutorialCard({
               <div className="flex items-center gap-1.5 capitalize ml-auto">
                 <span
                   className={
-                    tutorial.difficulty === 'BEGINNER'
-                      ? 'text-green-500'
-                      : tutorial.difficulty === 'INTERMEDIATE'
-                        ? 'text-yellow-500'
-                        : 'text-red-500'
+                    tutorial.difficulty === 'FOUNDATIONS'
+                      ? 'text-purple-500'
+                      : tutorial.difficulty === 'BEGINNER'
+                        ? 'text-green-500'
+                        : tutorial.difficulty === 'INTERMEDIATE'
+                          ? 'text-yellow-500'
+                          : 'text-red-500'
                   }
                 >
                   ●

@@ -7,6 +7,7 @@
       "difficulty": "HARD",
       "category": "playwright-pom",
       "xpReward": 80,
+      "status": "draft",
       "order": 801,
       "title": {
         "en": "First Page Object",
@@ -30,7 +31,12 @@
         }
       ],
       "solution": "Welcome, test@qa.com!",
-      "tags": ["playwright", "pom", "page-object", "advanced"]
+      "tags": [
+        "playwright",
+        "pom",
+        "page-object",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-encapsulate-actions",
@@ -38,6 +44,7 @@
       "difficulty": "HARD",
       "category": "playwright-pom",
       "xpReward": 85,
+      "status": "draft",
       "order": 802,
       "title": {
         "en": "Encapsulate Actions",
@@ -61,7 +68,12 @@
         }
       ],
       "solution": "Total: $20",
-      "tags": ["playwright", "pom", "actions", "advanced"]
+      "tags": [
+        "playwright",
+        "pom",
+        "actions",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-page-components",
@@ -69,6 +81,7 @@
       "difficulty": "HARD",
       "category": "playwright-pom",
       "xpReward": 90,
+      "status": "draft",
       "order": 803,
       "title": {
         "en": "Page Components",
@@ -92,7 +105,12 @@
         }
       ],
       "solution": "Logged out!",
-      "tags": ["playwright", "pom", "components", "advanced"]
+      "tags": [
+        "playwright",
+        "pom",
+        "components",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-fluent-navigation",
@@ -100,6 +118,7 @@
       "difficulty": "HARD",
       "category": "playwright-pom",
       "xpReward": 95,
+      "status": "draft",
       "order": 804,
       "title": {
         "en": "Page Navigation Pattern",
@@ -123,7 +142,13 @@
         }
       ],
       "solution": "Welcome back!",
-      "tags": ["playwright", "pom", "navigation", "fluent", "advanced"]
+      "tags": [
+        "playwright",
+        "pom",
+        "navigation",
+        "fluent",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-base-page-class",
@@ -131,6 +156,7 @@
       "difficulty": "HARD",
       "category": "playwright-pom",
       "xpReward": 100,
+      "status": "draft",
       "order": 805,
       "title": {
         "en": "Base Page Class",
@@ -154,7 +180,13 @@
         }
       ],
       "solution": "Product Details",
-      "tags": ["playwright", "pom", "inheritance", "base-class", "advanced"]
+      "tags": [
+        "playwright",
+        "pom",
+        "inheritance",
+        "base-class",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-pom-boss",
@@ -162,6 +194,7 @@
       "difficulty": "HARD",
       "category": "playwright-pom",
       "xpReward": 120,
+      "status": "draft",
       "order": 806,
       "title": {
         "en": "Scenario: Full E2E with Multi-Page POM",
@@ -185,7 +218,14 @@
         }
       ],
       "solution": "Order #12345 Confirmed!",
-      "tags": ["playwright", "pom", "e2e", "scenario", "boss", "advanced"]
+      "tags": [
+        "playwright",
+        "pom",
+        "e2e",
+        "scenario",
+        "boss",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-parameterized-tests",
@@ -193,6 +233,7 @@
       "difficulty": "HARD",
       "category": "playwright-data-driven",
       "xpReward": 75,
+      "status": "draft",
       "order": 901,
       "title": {
         "en": "Parameterized Tests",
@@ -216,7 +257,12 @@
         }
       ],
       "solution": "3",
-      "tags": ["playwright", "data-driven", "parameterized", "advanced"]
+      "tags": [
+        "playwright",
+        "data-driven",
+        "parameterized",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-test-data-json",
@@ -224,6 +270,7 @@
       "difficulty": "HARD",
       "category": "playwright-data-driven",
       "xpReward": 80,
+      "status": "draft",
       "order": 902,
       "title": {
         "en": "Test Data from JSON",
@@ -247,7 +294,12 @@
         }
       ],
       "solution": "Hello, Charlie!",
-      "tags": ["playwright", "data-driven", "json", "advanced"]
+      "tags": [
+        "playwright",
+        "data-driven",
+        "json",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-csv-test-data",
@@ -255,6 +307,7 @@
       "difficulty": "HARD",
       "category": "playwright-data-driven",
       "xpReward": 85,
+      "status": "draft",
       "order": 903,
       "title": {
         "en": "CSV Test Data",
@@ -278,7 +331,12 @@
         }
       ],
       "solution": "Welcome Bob",
-      "tags": ["playwright", "data-driven", "csv", "advanced"]
+      "tags": [
+        "playwright",
+        "data-driven",
+        "csv",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-dynamic-data",
@@ -286,6 +344,7 @@
       "difficulty": "HARD",
       "category": "playwright-data-driven",
       "xpReward": 90,
+      "status": "draft",
       "order": 904,
       "title": {
         "en": "Dynamic Data Generation",
@@ -309,7 +368,13 @@
         }
       ],
       "solution": "success",
-      "tags": ["playwright", "data-driven", "faker", "dynamic", "advanced"]
+      "tags": [
+        "playwright",
+        "data-driven",
+        "faker",
+        "dynamic",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-environment-data",
@@ -317,6 +382,7 @@
       "difficulty": "HARD",
       "category": "playwright-data-driven",
       "xpReward": 100,
+      "status": "draft",
       "order": 905,
       "title": {
         "en": "Environment-Based Data",
@@ -340,7 +406,13 @@
         }
       ],
       "solution": "Logged into staging",
-      "tags": ["playwright", "data-driven", "environment", "config", "advanced"]
+      "tags": [
+        "playwright",
+        "data-driven",
+        "environment",
+        "config",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-data-driven-boss",
@@ -348,6 +420,7 @@
       "difficulty": "HARD",
       "category": "playwright-data-driven",
       "xpReward": 110,
+      "status": "draft",
       "order": 906,
       "title": {
         "en": "Scenario: Cross-Browser Data Suite",
@@ -371,7 +444,13 @@
         }
       ],
       "solution": "4",
-      "tags": ["playwright", "data-driven", "scenario", "boss", "advanced"]
+      "tags": [
+        "playwright",
+        "data-driven",
+        "scenario",
+        "boss",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-api-ui-testing",
@@ -379,6 +458,7 @@
       "difficulty": "HARD",
       "category": "playwright-integration-patterns",
       "xpReward": 100,
+      "status": "draft",
       "order": 1101,
       "title": {
         "en": "API + UI Testing",
@@ -402,7 +482,12 @@
         }
       ],
       "solution": "hybrid-success",
-      "tags": ["playwright", "api", "hybrid", "advanced"]
+      "tags": [
+        "playwright",
+        "api",
+        "hybrid",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-state-setup-api",
@@ -410,6 +495,7 @@
       "difficulty": "HARD",
       "category": "playwright-integration-patterns",
       "xpReward": 110,
+      "status": "draft",
       "order": 1102,
       "title": {
         "en": "State Setup via API",
@@ -433,7 +519,12 @@
         }
       ],
       "solution": "Welcome, authenticated user!",
-      "tags": ["playwright", "api", "setup", "advanced"]
+      "tags": [
+        "playwright",
+        "api",
+        "setup",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-screenshot-failure",
@@ -441,6 +532,7 @@
       "difficulty": "HARD",
       "category": "playwright-infrastructure",
       "xpReward": 90,
+      "status": "draft",
       "order": 1001,
       "title": {
         "en": "Screenshot on Failure",
@@ -464,7 +556,12 @@
         }
       ],
       "solution": "Screenshot: captured",
-      "tags": ["playwright", "screenshot", "debugging", "advanced"]
+      "tags": [
+        "playwright",
+        "screenshot",
+        "debugging",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-video-recording",
@@ -472,6 +569,7 @@
       "difficulty": "HARD",
       "category": "playwright-infrastructure",
       "xpReward": 95,
+      "status": "draft",
       "order": 1002,
       "title": {
         "en": "Video Recording",
@@ -495,7 +593,12 @@
         }
       ],
       "solution": "Video: saved",
-      "tags": ["playwright", "video", "recording", "advanced"]
+      "tags": [
+        "playwright",
+        "video",
+        "recording",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-retry-logic",
@@ -503,6 +606,7 @@
       "difficulty": "HARD",
       "category": "playwright-infrastructure",
       "xpReward": 100,
+      "status": "draft",
       "order": 1003,
       "title": {
         "en": "Retry Logic",
@@ -526,7 +630,12 @@
         }
       ],
       "solution": "Success on retry",
-      "tags": ["playwright", "retry", "flaky", "advanced"]
+      "tags": [
+        "playwright",
+        "retry",
+        "flaky",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-parallel-execution",
@@ -534,6 +643,7 @@
       "difficulty": "HARD",
       "category": "playwright-infrastructure",
       "xpReward": 120,
+      "status": "draft",
       "order": 1004,
       "title": {
         "en": "Parallel Execution",
@@ -557,7 +667,12 @@
         }
       ],
       "solution": "Completed: 3/3",
-      "tags": ["playwright", "parallel", "performance", "advanced"]
+      "tags": [
+        "playwright",
+        "parallel",
+        "performance",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-cross-browser",
@@ -565,6 +680,7 @@
       "difficulty": "HARD",
       "category": "playwright-integration-patterns",
       "xpReward": 110,
+      "status": "draft",
       "order": 1103,
       "title": {
         "en": "Cross-browser Testing",
@@ -588,7 +704,12 @@
         }
       ],
       "solution": "Tested on: chromium",
-      "tags": ["playwright", "cross-browser", "compatibility", "advanced"]
+      "tags": [
+        "playwright",
+        "cross-browser",
+        "compatibility",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-mobile-viewport",
@@ -596,6 +717,7 @@
       "difficulty": "HARD",
       "category": "playwright-integration-patterns",
       "xpReward": 100,
+      "status": "draft",
       "order": 1104,
       "title": {
         "en": "Mobile Viewport Testing",
@@ -619,7 +741,13 @@
         }
       ],
       "solution": "Layout: mobile",
-      "tags": ["playwright", "mobile", "responsive", "viewport", "advanced"]
+      "tags": [
+        "playwright",
+        "mobile",
+        "responsive",
+        "viewport",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-csv-workflow",
@@ -627,6 +755,7 @@
       "difficulty": "HARD",
       "category": "playwright-integration-patterns",
       "xpReward": 100,
+      "status": "draft",
       "order": 1105,
       "title": {
         "en": "CSV Processing Workflow",
@@ -650,7 +779,13 @@
         }
       ],
       "solution": "Export CompleteDownload Result Report",
-      "tags": ["playwright", "upload", "workflow", "csv", "advanced"]
+      "tags": [
+        "playwright",
+        "upload",
+        "workflow",
+        "csv",
+        "advanced"
+      ]
     },
     {
       "slug": "pw-infrastructure-boss",
@@ -658,6 +793,7 @@
       "difficulty": "HARD",
       "category": "playwright-infrastructure",
       "xpReward": 115,
+      "status": "draft",
       "order": 1005,
       "title": {
         "en": "Scenario: Self-Healing Test Suite",
@@ -696,6 +832,7 @@
       "difficulty": "HARD",
       "category": "playwright-integration-patterns",
       "xpReward": 125,
+      "status": "draft",
       "order": 1106,
       "title": {
         "en": "Scenario: E2E Pipeline Integration",

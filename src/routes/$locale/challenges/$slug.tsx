@@ -33,6 +33,8 @@ import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
 import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 
+import i18n from '@/lib/i18n';
+
 export const Route = createFileRoute('/$locale/challenges/$slug')({
   loader: ({ context, params }) => {
     return context.queryClient.ensureQueryData(
@@ -40,6 +42,34 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
     );
   },
   component: ChallengeDetailPage,
+  head: ({ loaderData }) => {
+    const data = loaderData?.data;
+    if (!data) {
+      return {
+        meta: [
+          { title: i18n.t('challenges:page.seo.title') },
+          { name: 'description', content: i18n.t('challenges:page.seo.description') },
+        ],
+      };
+    }
+
+    const title = `${data.title} (${data.difficulty === 'EASY' ? i18n.t('common:labels.easy') : data.difficulty === 'MEDIUM' ? i18n.t('common:labels.medium') : i18n.t('common:labels.hard')}) | TestingWithEkki`;
+
+    return {
+      meta: [
+        { title },
+        { name: 'description', content: data.description },
+        { property: 'og:title', content: title },
+        { property: 'og:description', content: data.description },
+      ],
+      links: [
+        {
+          rel: 'canonical',
+          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
+        },
+      ],
+    };
+  },
 });
 
 interface APIChallenge {
