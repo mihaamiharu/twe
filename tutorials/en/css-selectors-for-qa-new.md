@@ -29,6 +29,14 @@ Before we dive into selectors, we must understand what we are actually searching
 
 ---
 
+### Hands-on Practice
+
+Launch the DevTools on this embedded page to practice finding elements without the noise of the main application.
+
+```html-preview
+/static-tutorials/selector-practice.html
+```
+
 ## 🛑 The Chaos: Brittle Selectors
 
 When you rely on the exact structure of the DOM, you are building your house on sand.

@@ -101,6 +101,30 @@ export function MarkdownRenderer({
                 </code>
               );
             }
+
+            // Check for html-preview language
+            const match = /language-([\w-]+)/.exec(codeClassName || '');
+            const language = match ? match[1] : '';
+
+            if (language === 'html-preview') {
+              const src = String(children).trim();
+              return (
+                <div className="my-6 rounded-lg border-2 border-border overflow-hidden bg-background">
+                  <div className="bg-muted/50 px-4 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
+                    <span>Preview: {src}</span>
+                    <span className="text-[10px] uppercase tracking-wider">
+                      Static HTML
+                    </span>
+                  </div>
+                  <iframe
+                    src={src}
+                    className="w-full h-[400px] bg-white dark:bg-zinc-950"
+                    title="Preview"
+                  />
+                </div>
+              );
+            }
+
             return (
               <CodeBlock className={codeClassName} {...props}>
                 {children}
