@@ -7,6 +7,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 40,
+      "status": "draft",
       "order": 401,
       "title": {
         "en": "Page Navigation",
@@ -30,7 +31,11 @@
         }
       ],
       "solution": "Login Page",
-      "tags": ["playwright", "navigation", "intermediate"]
+      "tags": [
+        "playwright",
+        "navigation",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-click-actions",
@@ -38,6 +43,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 45,
+      "status": "draft",
       "order": 402,
       "title": {
         "en": "Click Actions",
@@ -61,7 +67,12 @@
         }
       ],
       "solution": "3",
-      "tags": ["playwright", "click", "actions", "intermediate"]
+      "tags": [
+        "playwright",
+        "click",
+        "actions",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-fill-type",
@@ -69,6 +80,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 50,
+      "status": "draft",
       "order": 403,
       "title": {
         "en": "Fill & Type",
@@ -92,7 +104,13 @@
         }
       ],
       "solution": "qa@test.com",
-      "tags": ["playwright", "fill", "type", "forms", "intermediate"]
+      "tags": [
+        "playwright",
+        "fill",
+        "type",
+        "forms",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-select-dropdowns",
@@ -100,6 +118,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 55,
+      "status": "draft",
       "order": 404,
       "title": {
         "en": "Select Dropdowns",
@@ -123,7 +142,12 @@
         }
       ],
       "solution": "javascript",
-      "tags": ["playwright", "select", "dropdown", "intermediate"]
+      "tags": [
+        "playwright",
+        "select",
+        "dropdown",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-checkbox-radio",
@@ -131,6 +155,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 55,
+      "status": "draft",
       "order": 405,
       "title": {
         "en": "Checkbox & Radio",
@@ -154,7 +179,12 @@
         }
       ],
       "solution": "true",
-      "tags": ["playwright", "checkbox", "radio", "intermediate"]
+      "tags": [
+        "playwright",
+        "checkbox",
+        "radio",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-keyboard-actions",
@@ -162,6 +192,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 60,
+      "status": "draft",
       "order": 406,
       "title": {
         "en": "Keyboard Actions",
@@ -185,7 +216,12 @@
         }
       ],
       "solution": "Results for: Playwright",
-      "tags": ["playwright", "keyboard", "press", "intermediate"]
+      "tags": [
+        "playwright",
+        "keyboard",
+        "press",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-hover-focus",
@@ -193,6 +229,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 60,
+      "status": "draft",
       "order": 407,
       "title": {
         "en": "Hover & Focus",
@@ -216,7 +253,12 @@
         }
       ],
       "solution": "Dropdown Content",
-      "tags": ["playwright", "hover", "focus", "intermediate"]
+      "tags": [
+        "playwright",
+        "hover",
+        "focus",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-file-upload",
@@ -224,6 +266,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 70,
+      "status": "draft",
       "order": 408,
       "title": {
         "en": "File Upload",
@@ -247,7 +290,12 @@
         }
       ],
       "solution": "test-report.pdf",
-      "tags": ["playwright", "upload", "files", "intermediate"]
+      "tags": [
+        "playwright",
+        "upload",
+        "files",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-drag-drop",
@@ -255,6 +303,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 80,
+      "status": "draft",
       "order": 409,
       "title": {
         "en": "Drag & Drop",
@@ -278,7 +327,12 @@
         }
       ],
       "solution": "Dropped: Item A",
-      "tags": ["playwright", "drag", "drop", "intermediate"]
+      "tags": [
+        "playwright",
+        "drag",
+        "drop",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-iframes",
@@ -286,6 +340,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 85,
+      "status": "draft",
       "order": 410,
       "title": {
         "en": "Working with iFrames",
@@ -309,7 +364,12 @@
         }
       ],
       "solution": "Hello from iframe!",
-      "tags": ["playwright", "iframe", "frames", "intermediate"]
+      "tags": [
+        "playwright",
+        "iframe",
+        "frames",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-dynamic-table",
@@ -317,6 +377,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 90,
+      "status": "draft",
       "order": 411,
       "title": {
         "en": "Dynamic Table Sorting",
@@ -340,7 +401,13 @@
         }
       ],
       "solution": "Active",
-      "tags": ["playwright", "table", "dynamic", "sorting", "intermediate"]
+      "tags": [
+        "playwright",
+        "table",
+        "dynamic",
+        "sorting",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-actions-boss",
@@ -348,6 +415,7 @@
       "difficulty": "HARD",
       "category": "playwright-navigation",
       "xpReward": 100,
+      "status": "draft",
       "order": 412,
       "title": {
         "en": "Scenario: E-Commerce Checkout",
@@ -371,7 +439,13 @@
         }
       ],
       "solution": "Order confirmed: 3 items (Express)",
-      "tags": ["playwright", "scenario", "boss", "checkout", "intermediate"]
+      "tags": [
+        "playwright",
+        "scenario",
+        "boss",
+        "checkout",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-get-by-role",
@@ -402,7 +476,12 @@
         }
       ],
       "solution": "Signed up!",
-      "tags": ["playwright", "locators", "accessibility", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "accessibility",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-get-by-text",
@@ -433,7 +512,12 @@
         }
       ],
       "solution": "Clicked!",
-      "tags": ["playwright", "locators", "text", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "text",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-get-by-label",
@@ -501,7 +585,12 @@
         }
       ],
       "solution": "Playwright testing",
-      "tags": ["playwright", "locators", "placeholder", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "placeholder",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-get-by-testid",
@@ -532,7 +621,12 @@
         }
       ],
       "solution": "1",
-      "tags": ["playwright", "locators", "testid", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "testid",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-locator-chaining",
@@ -563,7 +657,12 @@
         }
       ],
       "solution": "Products",
-      "tags": ["playwright", "locators", "chaining", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "chaining",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-frame-locators",
@@ -594,7 +693,12 @@
         }
       ],
       "solution": "Button clicked!",
-      "tags": ["playwright", "locators", "iframe", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "iframe",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-list-items",
@@ -625,7 +729,13 @@
         }
       ],
       "solution": "5",
-      "tags": ["playwright", "locators", "lists", "multiple", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "lists",
+        "multiple",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-locators-boss",
@@ -656,7 +766,13 @@
         }
       ],
       "solution": "Added Widget Pro!",
-      "tags": ["playwright", "locators", "scenario", "boss", "intermediate"]
+      "tags": [
+        "playwright",
+        "locators",
+        "scenario",
+        "boss",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-to-be-visible",
@@ -687,7 +803,12 @@
         }
       ],
       "solution": "visible",
-      "tags": ["playwright", "assertions", "visibility", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "visibility",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-to-have-text",
@@ -717,7 +838,12 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "text", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "text",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-to-have-value",
@@ -747,7 +873,12 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "forms", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "forms",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-state-assertions",
@@ -777,7 +908,12 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "state", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "state",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-to-have-attribute",
@@ -807,7 +943,12 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "attributes", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "attributes",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-to-have-count",
@@ -837,7 +978,12 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "count", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "count",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-page-assertions",
@@ -867,7 +1013,13 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "url", "title", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "url",
+        "title",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-soft-assertions",
@@ -897,7 +1049,12 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "soft", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "soft",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-assertions-boss",
@@ -927,7 +1084,13 @@
         }
       ],
       "solution": "PATTERN_CHALLENGE",
-      "tags": ["playwright", "assertions", "scenario", "boss", "intermediate"]
+      "tags": [
+        "playwright",
+        "assertions",
+        "scenario",
+        "boss",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-auto-wait",
@@ -958,7 +1121,12 @@
         }
       ],
       "solution": "Clicked!",
-      "tags": ["playwright", "waits", "auto-wait", "intermediate"]
+      "tags": [
+        "playwright",
+        "waits",
+        "auto-wait",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-wait-for-selector",
@@ -989,7 +1157,12 @@
         }
       ],
       "solution": "Data loaded!",
-      "tags": ["playwright", "waits", "selector", "intermediate"]
+      "tags": [
+        "playwright",
+        "waits",
+        "selector",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-wait-for-load-state",
@@ -1020,7 +1193,12 @@
         }
       ],
       "solution": "Dashboard",
-      "tags": ["playwright", "waits", "load", "intermediate"]
+      "tags": [
+        "playwright",
+        "waits",
+        "load",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-wait-for-response",
@@ -1051,7 +1229,13 @@
         }
       ],
       "solution": "API Success",
-      "tags": ["playwright", "waits", "api", "response", "intermediate"]
+      "tags": [
+        "playwright",
+        "waits",
+        "api",
+        "response",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-wait-for-function",
@@ -1082,7 +1266,13 @@
         }
       ],
       "solution": "3",
-      "tags": ["playwright", "waits", "function", "custom", "intermediate"]
+      "tags": [
+        "playwright",
+        "waits",
+        "function",
+        "custom",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-timeout-config",
@@ -1113,7 +1303,13 @@
         }
       ],
       "solution": "Done!",
-      "tags": ["playwright", "waits", "timeout", "config", "intermediate"]
+      "tags": [
+        "playwright",
+        "waits",
+        "timeout",
+        "config",
+        "intermediate"
+      ]
     },
     {
       "slug": "pw-waits-boss",
@@ -1144,7 +1340,13 @@
         }
       ],
       "solution": "42",
-      "tags": ["playwright", "waits", "scenario", "boss", "intermediate"]
+      "tags": [
+        "playwright",
+        "waits",
+        "scenario",
+        "boss",
+        "intermediate"
+      ]
     }
   ]
 }

@@ -55,6 +55,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import i18n from '@/lib/i18n';
 
 // --- Search Params Schema ---
 const ChallengesSearchSchema = z.object({
@@ -78,12 +79,17 @@ export const Route = createFileRoute('/$locale/challenges/')({
   head: () => ({
     meta: [
       {
-        title: 'Coding Challenges | TestingWithEkki',
+        title: i18n.t('challenges:page.seo.title'),
       },
       {
         name: 'description',
-        content:
-          'Practice your Playwright, Selenium, and Cypress skills with real-world coding scenarios. Master selectors, automation authentication, and more.',
+        content: i18n.t('challenges:page.seo.description'),
+      },
+    ],
+    links: [
+      {
+        rel: 'canonical',
+        href: 'https://testingwithekki.com/en/challenges',
       },
     ],
   }),

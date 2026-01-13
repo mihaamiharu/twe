@@ -238,6 +238,7 @@
         "parameterized",
         "advanced"
       ],
+      "status": "draft",
       "relatedChallenges": [],
       "nextTutorialSlug": "playwright-advanced-patterns"
     },
@@ -251,6 +252,7 @@
         "patterns",
         "advanced"
       ],
+      "status": "draft",
       "relatedChallenges": [],
       "nextTutorialSlug": "playwright-fixtures"
     },
@@ -264,6 +266,7 @@
         "patterns",
         "advanced"
       ],
+      "status": "draft",
       "relatedChallenges": [],
       "nextTutorialSlug": null
     }
