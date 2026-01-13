@@ -95,4 +95,14 @@ Most tools allow a `force: true` parameter. This bypasses actionability checks (
 
 * **Intent:** Choose `Fill` for speed and `Type` only for keyboard-triggered logic.
 * **Actionability:** Ensure the element is visible and stable before the action.
-* **Logic over Force:** Do not use `doubleClick()` or `force: true` to bypass timing issues; fix the underlying wait logic instead.
+
+---
+
+## 6. Further Reading (Deep Dive)
+
+Understand the events that fire when you "Act."
+
+### Official Documentation (MDN)
+
+* **[MouseEvent (Click)](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent)**: What actually happens in the browser when `click()` is called.
+* **[InputEvent vs Change Event](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event)**: The technical difference between typing a character (Input) and committing the value (Change).

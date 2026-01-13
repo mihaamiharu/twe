@@ -146,3 +146,17 @@ ES6 allows you to "unpack" data quickly.
 | **Async/Await** | Managing the "Remote" delay | `await page.click('#submit');` |
 
 ---
+
+## 8. Further Reading (Deep Dive)
+
+Mastering the language is the first step to mastering the tool.
+
+### Official Documentation (MDN)
+
+* **[Async/Await Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)**: The official technical explanation of promises and waiting.
+* **[Template Literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)**: How backticks work under the hood.
+
+### The Modern Standard
+
+* **[Modern JavaScript Tutorial](https://javascript.info/)**: The community-favorite resource for learning "Modern" JS (ES6+) from scratch.
+* **[Destructuring Assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)**: A detailed guide on "unpacking" data objects.

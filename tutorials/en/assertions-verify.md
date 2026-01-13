@@ -93,3 +93,18 @@ A "Soft Assertion" allows the test to keep running even if it fails.
 2. **Use Web-First Logic:** Ensure your tool is waiting for the state to settle before failing.
 3. **Verify the Negative:** Check that error messages disappear when they are supposed to.
 4. **One Goal Per Test:** Avoid "Assertion Soup." Each test should prove one specific functional outcome.
+
+---
+
+## 6. Further Reading (Deep Dive)
+
+Validating "Truth" is a science.
+
+### Official Documentation
+
+* **[Playwright Assertions](https://playwright.dev/docs/test-assertions)**: The guide to "Web-First" checking that never sleeps.
+* **[Jest Expect API](https://jestjs.io/docs/expect)**: Playwright uses Jest under the hood. This acts as the "Dictionary" of every check possible (e.g., `.toBeGreaterThan()`).
+
+### Technical Logic (MDN)
+
+* **[console.assert()](https://developer.mozilla.org/en-US/docs/Web/API/console/assert)**: How manual assertions work in vanilla JavaScript.

@@ -60,7 +60,15 @@ If you relied on memorizing JavaScript syntax, you are in trouble. But if you re
 
 > **This completes the 4 Foundations.**
 >
-> 1. **Anatomy of an Element** (The bricks)
-> 2. **The DOM Tree** (The blueprint)
-> 3. **DevTools** (The magnifying glass)
-> 4. **Universal Mindset + AI** (The strategy)
+> 1. **Universal Mindset + AI** (The strategy)
+
+---
+
+## 5. Further Reading (Deep Dive)
+
+While "Mindset" is personal, these industry standards prove that the logic is universal.
+
+### The "Universal Pattern"
+
+* **[Arrange, Act, Assert (AAA)](https://automationpanda.com/2020/07/07/arrange-act-assert-a-pattern-for-writing-good-tests/)**: The industry standard pattern for structuring any automated test (Unit, Integration, or UI).
+* **[Given-When-Then](https://martinfowler.com/bliki/GivenWhenThen.html)**: The BDD (Behavior Driven Development) version of the same logic.

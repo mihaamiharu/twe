@@ -77,3 +77,18 @@ XPath allows you to navigate the DOM Tree (Foundation 2) in any direction.
 2. **Switch to XPath for Text:** If the element has no unique attributes and text is the only identifier.
 3. **Switch to XPath for Logic:** If you need to find a specific row in a table based on a value in one of the cells.
 4. **Avoid "Full XPath":** If your selector starts with `/html`, delete it and rewrite it using `//`.
+
+---
+
+## 6. Further Reading (Deep Dive)
+
+Useful references for when you need to use the "Emergency Hatch."
+
+### Official Documentation (MDN)
+
+* **[Introduction to XPath](https://developer.mozilla.org/en-US/docs/Web/XPath/Introduction_to_using_XPath_in_JavaScript)**: How XPath works in the browser.
+* **[XPath Functions](https://developer.mozilla.org/en-US/docs/Web/XPath/Functions)**: A list of functions you can use like `contains()`, `starts-with()`, and `text()`.
+
+### Cheat Sheets
+
+* **[DevHints XPath Cheat Sheet](https://devhints.io/xpath)**: A very popular, quick reference for syntax like `//ul/li` and `//button[text()="Submit"]`.
