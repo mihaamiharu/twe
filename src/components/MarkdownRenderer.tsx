@@ -333,6 +333,8 @@ export function MarkdownRenderer({
             <img
               src={src}
               alt={alt}
+              loading="lazy"
+              decoding="async"
               className="rounded-lg my-4 max-w-full h-auto"
             />
           ),

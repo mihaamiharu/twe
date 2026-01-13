@@ -1,18 +1,12 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useSuspenseQuery, useQueryClient } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent } from '@/components/ui/card';
+import { Trophy, Crown, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Trophy, Calendar, AlertCircle, Crown, Shield } from 'lucide-react';
-import { authQueryOptions } from '@/lib/auth.query';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { getLeaderboard } from '@/server/leaderboard.fn';
 import { leaderboardQueryOptions } from '@/lib/leaderboard.query';
-import { type RootContext } from '../__root';
 
 interface LeaderboardEntry {
   id: string;
@@ -338,7 +332,6 @@ function PodiumCard({
   // Compact styling
   // Rank 1 gets special teal accent, others are more muted
   const accentColor = rank === 1 ? 'text-teal-400' : rank === 2 ? 'text-slate-400' : 'text-amber-700';
-  const ringColor = rank === 1 ? 'ring-teal-500' : rank === 2 ? 'ring-slate-400' : 'ring-amber-700';
 
   const displayName = isAuthenticated
     ? user.name || t('leaderboard:table.anonymous')
@@ -400,49 +393,5 @@ function PodiumCard({
         </div>
       </div>
     </div>
-  );
-}
-
-function LeaderboardSkeleton() {
-  return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[300px] items-end">
-        {[1, 2, 3].map((i) => (
-          <Skeleton key={i} className="h-full w-full opacity-30 rounded-3xl" />
-        ))}
-      </div>
-      <Card className="glass-card rounded-3xl border-2">
-        <CardContent className="p-6">
-          <Skeleton className="h-[400px] w-full" />
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function LeaderboardError() {
-  const { t } = useTranslation(['leaderboard', 'common']);
-  return (
-    <Card className="glass-card border-2 border-destructive/20 bg-destructive/5">
-      <CardContent className="p-12 text-center">
-        <div className="mx-auto mb-4 h-16 w-16 rounded-2xl bg-destructive/10 flex items-center justify-center border-2 border-destructive/20">
-          <AlertCircle className="h-8 w-8 text-destructive" />
-        </div>
-        <h3 className="text-2xl font-bold text-foreground mb-2">
-          {t('common:messages.unavailable')}
-        </h3>
-        <p className="text-muted-foreground mb-6 text-lg">
-          {t('leaderboard:error.description')}
-        </p>
-        <Button
-          variant="outline"
-          size="lg"
-          className="rounded-xl border-2 hover:bg-background"
-          onClick={() => window.location.reload()}
-        >
-          {t('common:actions.refresh')}
-        </Button>
-      </CardContent>
-    </Card>
   );
 }

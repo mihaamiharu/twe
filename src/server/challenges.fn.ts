@@ -176,7 +176,7 @@ export const getChallenges = createServerFn({ method: 'GET' })
       logger.error('Error fetching challenges:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred while processing your request.',
       };
     }
   });
@@ -370,7 +370,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
       logger.error('Error fetching challenge detail:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred while processing your request.',
       };
     }
   });
