@@ -5,10 +5,64 @@
       "order": 0,
       "estimatedMinutes": 5,
       "tags": [
+        "foundations",
         "mindset",
         "fundamentals",
         "qa",
         "risk"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "html-element-anatomy"
+    },
+    {
+      "slug": "html-element-anatomy",
+      "order": 1,
+      "estimatedMinutes": 8,
+      "tags": [
+        "foundations",
+        "html",
+        "anatomy"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "dom-tree-hierarchy"
+    },
+    {
+      "slug": "dom-tree-hierarchy",
+      "order": 2,
+      "estimatedMinutes": 8,
+      "tags": [
+        "foundations",
+        "dom",
+        "hierarchy",
+        "parent-child"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "devtools-mastery"
+    },
+    {
+      "slug": "devtools-mastery",
+      "order": 3,
+      "estimatedMinutes": 10,
+      "tags": [
+        "foundations",
+        "devtools",
+        "console",
+        "elements",
+        "debugging"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "universal-mindset"
+    },
+    {
+      "slug": "universal-mindset",
+      "order": 4,
+      "estimatedMinutes": 5,
+      "tags": [
+        "foundations",
+        "mindset",
+        "ai",
+        "automation",
+        "principles"
       ],
       "relatedChallenges": [],
       "nextTutorialSlug": "css-selectors-for-qa-new"

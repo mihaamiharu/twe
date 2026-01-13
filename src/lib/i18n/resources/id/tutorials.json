@@ -13,6 +13,7 @@
   },
   "filters": {
     "all": "Semua",
+    "foundations": "Pondasi",
     "beginner": "Pemula",
     "intermediate": "Menengah",
     "advanced": "Lanjutan",
@@ -20,6 +21,7 @@
     "showCompleted": "Tampilkan Selesai"
   },
   "tracks": {
+    "foundations": "Jalur Pondasi",
     "beginner": "Jalur Pemula",
     "intermediate": "Jalur Menengah",
     "advanced": "Jalur Lanjutan",
