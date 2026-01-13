@@ -170,15 +170,8 @@ export function ChallengePlayground({
   userId,
   className,
 }: ChallengePlaygroundProps) {
-  const { t } = useTranslation(['challenges', 'common']);
-  // SEO & Accessibility: Semantic Title
-  // If the design doesn't allow a visible H1, we provide one for screen readers and SEO crawlers
-  const seoHeader = (
-    <div className="sr-only">
-      <h1>{challenge.title}</h1>
-      <p>{challenge.description}</p>
-    </div>
-  );
+  const { t, i18n } = useTranslation(['challenges', 'common']);
+  const locale = i18n.language;
 
   const [code, setCode] = useState(challenge.starterCode);
   const [selector, setSelector] = useState('');
@@ -505,7 +498,6 @@ export function ChallengePlayground({
     handleRunCode,
     handleValidateSelector,
     handleSubmit,
-    handleReset,
     isCodeChallenge,
     isSelectorChallenge,
     isRunning,
@@ -610,27 +602,402 @@ export function ChallengePlayground({
     </div>
   );
 
-  return (
-    <div className={cn("h-full flex flex-col w-full", className)}>
-      {seoHeader}
-      {isMobile ? mobileLayout : desktopLayout}
+  const desktopLayout = (
+    <PanelGroup direction="horizontal" autoSaveId={`challenge-layout-v1`}>
+      {/* Left Panel: Instructions & Preview */}
+      <Panel defaultSize={40} minSize={20} className="flex flex-col bg-muted/5">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex-1 flex flex-col min-h-0"
+        >
+          <div className="px-4 pt-4 pb-2 shrink-0">
+            <TabsList className="w-full justify-start h-10 bg-muted/50 p-1 border border-border rounded-lg">
+              <TabsTrigger value="instructions" className="flex-1">
+                {t('challenges:playground.instructions')}
+              </TabsTrigger>
+              {challenge.htmlContent && (
+                <TabsTrigger value="preview" className="flex-1">
+                  {t('challenges:playground.preview')}
+                </TabsTrigger>
+              )}
+            </TabsList>
+          </div>
 
-      <Dialog open={isResetConfirmOpen} onOpenChange={setIsResetConfirmOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('challenges:playground.resetTitle')}</DialogTitle>
-            <DialogDescription>
-              {t('challenges:playground.resetDescription')}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
+          <TabsContent
+            value="instructions"
+            className="flex-1 overflow-auto p-6 focus-visible:ring-0"
+          >
+            <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:border prose-pre:border-border">
+              <MarkdownRenderer content={challenge.instructions} />
+            </div>
+          </TabsContent>
+
+          {challenge.htmlContent && (
+            <TabsContent
+              value="preview"
+              className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col data-[state=inactive]:hidden"
+              forceMount
+            >
+              <WebComponentPreview
+                htmlContent={challenge.htmlContent}
+                cssContent={
+                  isSelectorChallenge ? defaultSelectorStyles : undefined
+                }
+                userSelector={isSelectorChallenge ? selector : undefined}
+                selectorType={selectorType}
+                targetSelector={challenge.targetSelector as string}
+                targetSelectorType={
+                  challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
+                }
+                onValidationChange={handlePreviewValidation}
+                className="flex-1 border border-border rounded-xl bg-white shadow-sm"
+                showControls={true}
+                height="100%"
+                iframeRef={previewIframeRef}
+              />
+            </TabsContent>
+          )}
+        </Tabs>
+      </Panel>
+
+      <PanelResizeHandle className="w-3 bg-transparent hover:bg-primary/5 transition-colors focus:outline-none flex items-center justify-center group relative z-10 -mx-1.5 cursor-col-resize">
+        <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[1px] bg-border group-hover:bg-primary/50 transition-colors" />
+        <div className="h-8 w-4 bg-background border border-border rounded-md flex items-center justify-center shadow-sm z-20 group-hover:border-primary group-hover:shadow-md transition-all scale-90 group-hover:scale-100">
+          <GripVertical className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
+        </div>
+      </PanelResizeHandle>
+
+      {/* Right Panel: Editor & Results */}
+      <Panel minSize={30} className="flex flex-col bg-background relative z-0">
+        {/* Top: Editor */}
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          {isCodeChallenge ? (
+            <div className="flex flex-col h-full">
+              <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/5 shrink-0">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                  {t('challenges:playground.editor')}
+                </h3>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                    onClick={handleReset}
+                    title={t('challenges:playground.resetCode')}
+                  >
+                    <RotateCcw className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
+              <div className="flex-1 relative">
+                <CodeEditor
+                  initialCode={challenge.starterCode}
+                  language="javascript"
+                  onChange={setCode}
+                  onRun={() => void handleRunCode()}
+                  storageKey={
+                    userId
+                      ? `challenge-${challenge.id}-${userId}`
+                      : `challenge-${challenge.id}`
+                  }
+                  height="100%"
+                  className="h-full border-b border-border"
+                  key={`${challenge.id}-${resetCount}`}
+                />
+              </div>
+            </div>
+          ) : (
+            /* Selector Input for CSS challenges */
+            <div className="p-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
+                    <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">
+                      1
+                    </div>
+                    {t('challenges:playground.step1')}
+                  </h3>
+                  <Card className="border border-border rounded-xl shadow-sm overflow-hidden bg-muted/5">
+                    <CardContent className="p-4 space-y-4">
+                      <SelectorInput
+                        value={selector}
+                        onChange={handleSelectorChange}
+                        onValidate={handleValidateSelector}
+                        defaultType={selectorType}
+                        allowTypeChange={true}
+                      />
+                      <div className="flex items-center justify-between pt-2 border-t border-border/50">
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={handleValidateSelector}
+                          disabled={isRunning || !selector}
+                          className="font-bold border border-border bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black transition-all"
+                        >
+                          {isRunning ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          ) : (
+                            <Play className="h-4 w-4 mr-2" />
+                          )}
+                          {t('challenges:playground.testSelector')}
+                        </Button>
+
+                        {/* Inline validation badge */}
+                        {testResults.length > 0 && (
+                          <div
+                            className={cn(
+                              'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all',
+                              hasPassed
+                                ? 'bg-green-500/10 text-green-600 border border-green-500/30'
+                                : 'bg-red-500/10 text-red-600 border border-red-500/30',
+                            )}
+                          >
+                            {hasPassed ? (
+                              <>
+                                <Zap className="h-4 w-4 fill-current" />{' '}
+                                {t('challenges:playground.correct')}
+                              </>
+                            ) : (
+                              <>
+                                <AlertCircle className="h-4 w-4 shrink-0" />{' '}
+                                {testResults[0]?.error ||
+                                  t('challenges:playground.selectorMismatch')}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Bottom: Results & Console - Only for code challenges */}
+        {isCodeChallenge && (
+          <div className="h-[40%] flex flex-col shrink-0 border-t border-border bg-white dark:bg-slate-950">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/10 shrink-0">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setResultsTab('results')}
+                  className={cn(
+                    'px-3 py-1 text-xs font-bold rounded-md transition-colors',
+                    resultsTab === 'results'
+                      ? 'bg-brand-teal/20 text-brand-teal-dark'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                  )}
+                >
+                  {t('challenges:playground.results')}
+                </button>
+                <button
+                  onClick={() => setResultsTab('console')}
+                  className={cn(
+                    'px-3 py-1 text-xs font-bold rounded-md transition-colors',
+                    resultsTab === 'console'
+                      ? 'bg-brand-teal/20 text-brand-teal-dark'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                  )}
+                >
+                  {t('challenges:playground.console')}
+                  {consoleLogs.length > 0 && (
+                    <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-muted rounded-full">
+                      {consoleLogs.length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <Button
+                size="sm"
+                onClick={() => void handleRunCode()}
+                disabled={isRunning}
+                className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
+              >
+                {isRunning ? (
+                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                ) : (
+                  <Play className="h-3 w-3 mr-1" />
+                )}
+                {t('common:actions.run')}
+              </Button>
+            </div>
+            <div className="flex-1 overflow-auto">
+              {resultsTab === 'results' ? (
+                <div className="p-4 pt-2">
+                  <TestResults
+                    results={testResults}
+                    isRunning={isRunning}
+                    challengeType={challenge.type}
+                    className="border-0 shadow-none bg-transparent"
+                  />
+                </div>
+              ) : (
+                <ConsoleOutput
+                  logs={consoleLogs}
+                  onClear={() => setConsoleLogs([])}
+                  className="h-full"
+                />
+              )}
+            </div>
+          </div>
+        )}
+      </Panel>
+    </PanelGroup>
+  );
+
+  return (
+    <div
+      className={cn(
+        'flex flex-col h-full bg-background animate-fade-in',
+        className,
+      )}
+    >
+      {/* Practice Mode Banner */}
+      {challenge.isCompleted && (
+        <div className="bg-blue-500/10 border-b border-blue-500/20 px-4 py-2 flex items-center justify-center gap-2 text-blue-600 text-sm font-medium animate-in slide-in-from-top-2">
+          <Badge variant="secondary" className="bg-blue-500/20 text-blue-700 border-blue-500/30 dark:text-blue-300">
+            {t('challenges:practice.badge')}
+          </Badge>
+          <Zap className="h-4 w-4 fill-current" />
+          {t('challenges:playground.alreadyCompleted')}
+        </div>
+      )}
+
+
+      {/* Header */}
+      <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0">
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="font-bold text-xl tracking-tight text-foreground">
+              {challenge.title}
+            </h1>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+              <Badge
+                variant="secondary"
+                className="font-bold border border-border/50"
+              >
+                {t(
+                  `challenges:difficulty.${challenge.difficulty.toUpperCase()}`,
+                )}
+              </Badge>
+              <Badge
+                variant="outline"
+                className="font-bold border-border/50 bg-background"
+              >
+                {t(
+                  `challenges:types.${challenge.type?.toLowerCase() || 'unknown'}`,
+                )}
+              </Badge>
+              <span className="text-accent flex items-center gap-1 font-bold">
+                <Zap className="h-3 w-3 fill-current" />
+                {challenge.xp} XP
+              </span>
+            </div>
+          </div>
+        </div>
+        <div className="flex items-center gap-3">
+          {/* Mobile Run Button */}
+          {isMobile && isCodeChallenge && (
             <Button
+              size="sm"
               variant="outline"
+              onClick={() => void handleRunCode()}
+              disabled={isRunning}
+              className="font-bold border-brand-teal text-brand-teal-dark hover:bg-brand-teal/10"
+            >
+              {isRunning ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Play className="h-4 w-4" />
+              )}
+            </Button>
+          )}
+
+          {challenge.tutorial && (
+            <Link
+              to={LocaleRoutes.tutorialDetail}
+              params={localeSlugParams(locale, challenge.tutorial.slug)}
+            >
+              <Button
+                variant="ghost"
+                size="sm"
+                className="hidden md:flex font-bold text-muted-foreground hover:text-foreground"
+              >
+                <BookOpen className="h-4 w-4 mr-2" />
+                {t('common:navigation.tutorials')}
+              </Button>
+            </Link>
+          )}
+
+          <Button
+            size="sm"
+            onClick={handleSubmit}
+            disabled={!hasPassed}
+            className={cn(
+              'font-bold border border-border transition-all',
+              hasPassed
+                ? 'bg-green-500 hover:bg-green-600 text-black'
+                : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
+            )}
+            title={t('common:actions.submit')}
+          >
+            <Send className="h-4 w-4 mr-2" />
+            {t('common:actions.submit')}
+          </Button>
+        </div>
+      </div>
+
+      {/* Persistent Goal Bar - Compact */}
+      <div className="bg-brand-teal/5 border-b border-border px-4 py-2 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="bg-brand-teal/20 p-1 rounded-md shrink-0 border border-brand-teal/30">
+            <Target className="h-3.5 w-3.5 text-brand-teal-dark" />
+          </div>
+          <p className="text-sm font-bold text-foreground/90 leading-tight">
+            <span className="text-brand-teal mr-2">
+              {t('challenges:playground.goal')}
+            </span>
+            {challenge.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Main content */}
+      <div className="flex-1 overflow-hidden">
+        {isMobile ? mobileLayout : desktopLayout}
+      </div>
+
+      {/* Reset Confirmation Dialog */}
+      <Dialog open={isResetConfirmOpen} onOpenChange={setIsResetConfirmOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-destructive/10 p-2 rounded-full">
+                <AlertCircle className="h-5 w-5 text-destructive" />
+              </div>
+              <DialogTitle>{t('challenges:playground.resetTitle')}</DialogTitle>
+            </div>
+          </DialogHeader>
+          <DialogDescription>
+            {t('challenges:playground.resetDescription')}
+          </DialogDescription>
+          <DialogFooter className="mt-4 sm:justify-end gap-2">
+            <Button
+              variant="ghost"
               onClick={() => setIsResetConfirmOpen(false)}
+              className="hover:bg-accent"
             >
               {t('common:actions.cancel')}
             </Button>
-            <Button variant="destructive" onClick={confirmReset}>
+            <Button
+              variant="destructive"
+              onClick={() => void confirmReset()}
+              className="shadow-sm"
+            >
               {t('common:actions.reset')}
             </Button>
           </DialogFooter>
@@ -638,410 +1005,6 @@ export function ChallengePlayground({
       </Dialog>
     </div>
   );
-}
-const desktopLayout = (
-  <PanelGroup direction="horizontal" autoSaveId={`challenge-layout-v1`}>
-    {/* Left Panel: Instructions & Preview */}
-    <Panel defaultSize={40} minSize={20} className="flex flex-col bg-muted/5">
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="flex-1 flex flex-col min-h-0"
-      >
-        <div className="px-4 pt-4 pb-2 shrink-0">
-          <TabsList className="w-full justify-start h-10 bg-muted/50 p-1 border border-border rounded-lg">
-            <TabsTrigger value="instructions" className="flex-1">
-              {t('challenges:playground.instructions')}
-            </TabsTrigger>
-            {challenge.htmlContent && (
-              <TabsTrigger value="preview" className="flex-1">
-                {t('challenges:playground.preview')}
-              </TabsTrigger>
-            )}
-          </TabsList>
-        </div>
-
-        <TabsContent
-          value="instructions"
-          className="flex-1 overflow-auto p-6 focus-visible:ring-0"
-        >
-          <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:border prose-pre:border-border">
-            <MarkdownRenderer content={challenge.instructions} />
-          </div>
-        </TabsContent>
-
-        {challenge.htmlContent && (
-          <TabsContent
-            value="preview"
-            className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col data-[state=inactive]:hidden"
-            forceMount
-          >
-            <WebComponentPreview
-              htmlContent={challenge.htmlContent}
-              cssContent={
-                isSelectorChallenge ? defaultSelectorStyles : undefined
-              }
-              userSelector={isSelectorChallenge ? selector : undefined}
-              selectorType={selectorType}
-              targetSelector={challenge.targetSelector as string}
-              targetSelectorType={
-                challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
-              }
-              onValidationChange={handlePreviewValidation}
-              className="flex-1 border border-border rounded-xl bg-white shadow-sm"
-              showControls={true}
-              height="100%"
-              iframeRef={previewIframeRef}
-            />
-          </TabsContent>
-        )}
-      </Tabs>
-    </Panel>
-
-    <PanelResizeHandle className="w-3 bg-transparent hover:bg-primary/5 transition-colors focus:outline-none flex items-center justify-center group relative z-10 -mx-1.5 cursor-col-resize">
-      <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-[1px] bg-border group-hover:bg-primary/50 transition-colors" />
-      <div className="h-8 w-4 bg-background border border-border rounded-md flex items-center justify-center shadow-sm z-20 group-hover:border-primary group-hover:shadow-md transition-all scale-90 group-hover:scale-100">
-        <GripVertical className="h-3 w-3 text-muted-foreground group-hover:text-primary transition-colors" />
-      </div>
-    </PanelResizeHandle>
-
-    {/* Right Panel: Editor & Results */}
-    <Panel minSize={30} className="flex flex-col bg-background relative z-0">
-      {/* Top: Editor */}
-      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
-        {isCodeChallenge ? (
-          <div className="flex flex-col h-full">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/5 shrink-0">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                {t('challenges:playground.editor')}
-              </h3>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-6 w-6 text-muted-foreground hover:text-destructive"
-                  onClick={handleReset}
-                  title={t('challenges:playground.resetCode')}
-                >
-                  <RotateCcw className="h-3 w-3" />
-                </Button>
-              </div>
-            </div>
-            <div className="flex-1 relative">
-              <CodeEditor
-                initialCode={challenge.starterCode}
-                language="javascript"
-                onChange={setCode}
-                onRun={() => void handleRunCode()}
-                storageKey={
-                  userId
-                    ? `challenge-${challenge.id}-${userId}`
-                    : `challenge-${challenge.id}`
-                }
-                height="100%"
-                className="h-full border-b border-border"
-                key={`${challenge.id}-${resetCount}`}
-              />
-            </div>
-          </div>
-        ) : (
-          /* Selector Input for CSS challenges */
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
-                  <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">
-                    1
-                  </div>
-                  {t('challenges:playground.step1')}
-                </h3>
-                <Card className="border border-border rounded-xl shadow-sm overflow-hidden bg-muted/5">
-                  <CardContent className="p-4 space-y-4">
-                    <SelectorInput
-                      value={selector}
-                      onChange={handleSelectorChange}
-                      onValidate={handleValidateSelector}
-                      defaultType={selectorType}
-                      allowTypeChange={true}
-                    />
-                    <div className="flex items-center justify-between pt-2 border-t border-border/50">
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={handleValidateSelector}
-                        disabled={isRunning || !selector}
-                        className="font-bold border border-border bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black transition-all"
-                      >
-                        {isRunning ? (
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        ) : (
-                          <Play className="h-4 w-4 mr-2" />
-                        )}
-                        {t('challenges:playground.testSelector')}
-                      </Button>
-
-                      {/* Inline validation badge */}
-                      {testResults.length > 0 && (
-                        <div
-                          className={cn(
-                            'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all',
-                            hasPassed
-                              ? 'bg-green-500/10 text-green-600 border border-green-500/30'
-                              : 'bg-red-500/10 text-red-600 border border-red-500/30',
-                          )}
-                        >
-                          {hasPassed ? (
-                            <>
-                              <Zap className="h-4 w-4 fill-current" />{' '}
-                              {t('challenges:playground.correct')}
-                            </>
-                          ) : (
-                            <>
-                              <AlertCircle className="h-4 w-4 shrink-0" />{' '}
-                              {testResults[0]?.error ||
-                                t('challenges:playground.selectorMismatch')}
-                            </>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Bottom: Results & Console - Only for code challenges */}
-      {isCodeChallenge && (
-        <div className="h-[40%] flex flex-col shrink-0 border-t border-border bg-white dark:bg-slate-950">
-          <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/10 shrink-0">
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setResultsTab('results')}
-                className={cn(
-                  'px-3 py-1 text-xs font-bold rounded-md transition-colors',
-                  resultsTab === 'results'
-                    ? 'bg-brand-teal/20 text-brand-teal-dark'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
-                )}
-              >
-                {t('challenges:playground.results')}
-              </button>
-              <button
-                onClick={() => setResultsTab('console')}
-                className={cn(
-                  'px-3 py-1 text-xs font-bold rounded-md transition-colors',
-                  resultsTab === 'console'
-                    ? 'bg-brand-teal/20 text-brand-teal-dark'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
-                )}
-              >
-                {t('challenges:playground.console')}
-                {consoleLogs.length > 0 && (
-                  <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-muted rounded-full">
-                    {consoleLogs.length}
-                  </span>
-                )}
-              </button>
-            </div>
-
-            <Button
-              size="sm"
-              onClick={() => void handleRunCode()}
-              disabled={isRunning}
-              className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
-            >
-              {isRunning ? (
-                <Loader2 className="h-3 w-3 animate-spin mr-1" />
-              ) : (
-                <Play className="h-3 w-3 mr-1" />
-              )}
-              {t('common:actions.run')}
-            </Button>
-          </div>
-          <div className="flex-1 overflow-auto">
-            {resultsTab === 'results' ? (
-              <div className="p-4 pt-2">
-                <TestResults
-                  results={testResults}
-                  isRunning={isRunning}
-                  challengeType={challenge.type}
-                  className="border-0 shadow-none bg-transparent"
-                />
-              </div>
-            ) : (
-              <ConsoleOutput
-                logs={consoleLogs}
-                onClear={() => setConsoleLogs([])}
-                className="h-full"
-              />
-            )}
-          </div>
-        </div>
-      )}
-    </Panel>
-  </PanelGroup>
-);
-
-return (
-  <div
-    className={cn(
-      'flex flex-col h-full bg-background animate-fade-in',
-      className,
-    )}
-  >
-    {/* Practice Mode Banner */}
-    {challenge.isCompleted && (
-      <div className="bg-blue-500/10 border-b border-blue-500/20 px-4 py-2 flex items-center justify-center gap-2 text-blue-600 text-sm font-medium animate-in slide-in-from-top-2">
-        <Badge variant="secondary" className="bg-blue-500/20 text-blue-700 border-blue-500/30 dark:text-blue-300">
-          {t('challenges:practice.badge')}
-        </Badge>
-        <Zap className="h-4 w-4 fill-current" />
-        {t('challenges:playground.alreadyCompleted')}
-      </div>
-    )}
-
-
-    {/* Header */}
-    <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0">
-      <div className="flex items-center gap-4">
-        <div>
-          <h1 className="font-bold text-xl tracking-tight text-foreground">
-            {challenge.title}
-          </h1>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-            <Badge
-              variant="secondary"
-              className="font-bold border border-border/50"
-            >
-              {t(
-                `challenges:difficulty.${challenge.difficulty.toUpperCase()}`,
-              )}
-            </Badge>
-            <Badge
-              variant="outline"
-              className="font-bold border-border/50 bg-background"
-            >
-              {t(
-                `challenges:types.${challenge.type?.toLowerCase() || 'unknown'}`,
-              )}
-            </Badge>
-            <span className="text-accent flex items-center gap-1 font-bold">
-              <Zap className="h-3 w-3 fill-current" />
-              {challenge.xp} XP
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="flex items-center gap-3">
-        {/* Mobile Run Button */}
-        {isMobile && isCodeChallenge && (
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => void handleRunCode()}
-            disabled={isRunning}
-            className="font-bold border-brand-teal text-brand-teal-dark hover:bg-brand-teal/10"
-          >
-            {isRunning ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Play className="h-4 w-4" />
-            )}
-          </Button>
-        )}
-
-        {challenge.tutorial && (
-          <Link
-            to={LocaleRoutes.tutorialDetail}
-            params={localeSlugParams(locale, challenge.tutorial.slug)}
-          >
-            <Button
-              variant="ghost"
-              size="sm"
-              className="hidden md:flex font-bold text-muted-foreground hover:text-foreground"
-            >
-              <BookOpen className="h-4 w-4 mr-2" />
-              {t('common:navigation.tutorials')}
-            </Button>
-          </Link>
-        )}
-
-        <Button
-          size="sm"
-          onClick={handleSubmit}
-          disabled={!hasPassed}
-          className={cn(
-            'font-bold border border-border transition-all',
-            hasPassed
-              ? 'bg-green-500 hover:bg-green-600 text-black'
-              : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
-          )}
-          title={t('common:actions.submit')}
-        >
-          <Send className="h-4 w-4 mr-2" />
-          {t('common:actions.submit')}
-        </Button>
-      </div>
-    </div>
-
-    {/* Persistent Goal Bar - Compact */}
-    <div className="bg-brand-teal/5 border-b border-border px-4 py-2 shrink-0">
-      <div className="flex items-center gap-3">
-        <div className="bg-brand-teal/20 p-1 rounded-md shrink-0 border border-brand-teal/30">
-          <Target className="h-3.5 w-3.5 text-brand-teal-dark" />
-        </div>
-        <p className="text-sm font-bold text-foreground/90 leading-tight">
-          <span className="text-brand-teal mr-2">
-            {t('challenges:playground.goal')}
-          </span>
-          {challenge.description}
-        </p>
-      </div>
-    </div>
-
-    {/* Main content */}
-    <div className="flex-1 overflow-hidden">
-      {isMobile ? mobileLayout : desktopLayout}
-    </div>
-
-    {/* Reset Confirmation Dialog */}
-    <Dialog open={isResetConfirmOpen} onOpenChange={setIsResetConfirmOpen}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="bg-destructive/10 p-2 rounded-full">
-              <AlertCircle className="h-5 w-5 text-destructive" />
-            </div>
-            <DialogTitle>{t('challenges:playground.resetTitle')}</DialogTitle>
-          </div>
-        </DialogHeader>
-        <DialogDescription>
-          {t('challenges:playground.resetDescription')}
-        </DialogDescription>
-        <DialogFooter className="mt-4 sm:justify-end gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => setIsResetConfirmOpen(false)}
-            className="hover:bg-accent"
-          >
-            {t('common:actions.cancel')}
-          </Button>
-          <Button
-            variant="destructive"
-            onClick={() => void confirmReset()}
-            className="shadow-sm"
-          >
-            {t('common:actions.reset')}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  </div>
-);
 }
 
 export default ChallengePlayground;

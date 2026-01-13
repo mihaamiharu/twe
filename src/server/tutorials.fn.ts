@@ -180,7 +180,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
       console.error('Error fetching tutorials:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred while processing your request.',
       };
     }
   });
@@ -320,7 +320,7 @@ export const getTutorial = createServerFn({ method: 'GET' })
       console.error('Error fetching tutorial detail:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred while processing your request.',
       };
     }
   });
@@ -457,7 +457,7 @@ export const completeTutorial = createServerFn({ method: 'POST' })
       console.error('Error marking tutorial complete:', error);
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'An error occurred while processing your request.',
       };
     }
   });

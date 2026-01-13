@@ -28,7 +28,6 @@
     "start": "bun run scripts/server.ts"
   },
   "dependencies": {
-    "@fontsource/inter": "^5.2.8",
     "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -48,7 +47,6 @@
     "@tanstack/react-router": "^1.132.0",
     "@tanstack/react-router-devtools": "^1.132.0",
     "@tanstack/react-start": "^1.132.0",
-    "@tanstack/router-plugin": "^1.132.0",
     "better-auth": "^1.4.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -72,7 +70,6 @@
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss": "^4.0.6",
     "vite-tsconfig-paths": "^5.1.4",
     "zod": "^4.2.0"
   },

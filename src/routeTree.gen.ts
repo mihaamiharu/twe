@@ -15,6 +15,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as LocaleIndexRouteImport } from './routes/$locale/index'
+import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
+import { Route as RobotsTxtRouteImport } from './routes/robots.txt'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminChallengesRouteImport } from './routes/admin/challenges'
@@ -64,6 +66,16 @@ const LocaleIndexRoute = LocaleIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LocaleRoute,
+} as any)
+const SitemapXmlRoute = SitemapXmlRouteImport.update({
+  id: '/sitemap/xml',
+  path: '/sitemap/xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsTxtRoute = RobotsTxtRouteImport.update({
+  id: '/robots/txt',
+  path: '/robots/txt',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const DocsApiRoute = DocsApiRouteImport.update({
   id: '/docs/api',
@@ -177,6 +189,8 @@ export interface FileRoutesByFullPath {
   '/admin/challenges': typeof AdminChallengesRoute
   '/admin/users': typeof AdminUsersRoute
   '/docs/api': typeof DocsApiRoute
+  '/robots/txt': typeof RobotsTxtRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
@@ -203,6 +217,8 @@ export interface FileRoutesByTo {
   '/admin/challenges': typeof AdminChallengesRoute
   '/admin/users': typeof AdminUsersRoute
   '/docs/api': typeof DocsApiRoute
+  '/robots/txt': typeof RobotsTxtRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
@@ -230,6 +246,8 @@ export interface FileRoutesById {
   '/admin/challenges': typeof AdminChallengesRoute
   '/admin/users': typeof AdminUsersRoute
   '/docs/api': typeof DocsApiRoute
+  '/robots/txt': typeof RobotsTxtRoute
+  '/sitemap/xml': typeof SitemapXmlRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/docs/': typeof DocsIndexRoute
@@ -258,6 +276,8 @@ export interface FileRouteTypes {
     | '/admin/challenges'
     | '/admin/users'
     | '/docs/api'
+    | '/robots/txt'
+    | '/sitemap/xml'
     | '/$locale/'
     | '/admin'
     | '/docs'
@@ -284,6 +304,8 @@ export interface FileRouteTypes {
     | '/admin/challenges'
     | '/admin/users'
     | '/docs/api'
+    | '/robots/txt'
+    | '/sitemap/xml'
     | '/admin'
     | '/docs'
     | '/$locale/profile'
@@ -310,6 +332,8 @@ export interface FileRouteTypes {
     | '/admin/challenges'
     | '/admin/users'
     | '/docs/api'
+    | '/robots/txt'
+    | '/sitemap/xml'
     | '/$locale/'
     | '/admin/'
     | '/docs/'
@@ -330,6 +354,8 @@ export interface RootRouteChildren {
   AdminChallengesRoute: typeof AdminChallengesRoute
   AdminUsersRoute: typeof AdminUsersRoute
   DocsApiRoute: typeof DocsApiRoute
+  RobotsTxtRoute: typeof RobotsTxtRoute
+  SitemapXmlRoute: typeof SitemapXmlRoute
   AdminIndexRoute: typeof AdminIndexRoute
   DocsIndexRoute: typeof DocsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
@@ -378,6 +404,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/'
       preLoaderRoute: typeof LocaleIndexRouteImport
       parentRoute: typeof LocaleRoute
+    }
+    '/sitemap/xml': {
+      id: '/sitemap/xml'
+      path: '/sitemap/xml'
+      fullPath: '/sitemap/xml'
+      preLoaderRoute: typeof SitemapXmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots/txt': {
+      id: '/robots/txt'
+      path: '/robots/txt'
+      fullPath: '/robots/txt'
+      preLoaderRoute: typeof RobotsTxtRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/docs/api': {
       id: '/docs/api'
@@ -571,6 +611,8 @@ const rootRouteChildren: RootRouteChildren = {
   AdminChallengesRoute: AdminChallengesRoute,
   AdminUsersRoute: AdminUsersRoute,
   DocsApiRoute: DocsApiRoute,
+  RobotsTxtRoute: RobotsTxtRoute,
+  SitemapXmlRoute: SitemapXmlRoute,
   AdminIndexRoute: AdminIndexRoute,
   DocsIndexRoute: DocsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,

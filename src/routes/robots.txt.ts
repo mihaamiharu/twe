@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/robots.txt')({
+export const Route = createFileRoute('/robots/txt')({
     loader: () => {
         return new Response(
             `User-agent: *

@@ -74,3 +74,15 @@ To master DevTools, you should be able to:
 1. Use the **Select tool** to jump to a specific button or input field in the code.
 2. Use `Ctrl + F` to check if your selector is **unique** (1 of 1).
 3. Use the **Console** to confirm that the browser "sees" the same element you do.
+
+---
+
+## 6. Further Reading (Deep Dive)
+
+Master your browser's built-in toolkit.
+
+### Official Documentation (Chrome)
+
+* **[Chrome DevTools Overview](https://developer.chrome.com/docs/devtools/)**: The hub for all DevTools documentation.
+* **[Inspect DOM Elements](https://developer.chrome.com/docs/devtools/dom)**: Deep dive into editing and debugging HTML.
+* **[Console Overview](https://developer.chrome.com/docs/devtools/console)**: Learn how to log messages and run JavaScript interactively.

@@ -1,20 +1,6 @@
 {
   "tutorials": [
     {
-      "slug": "qa-mindset",
-      "order": 0,
-      "estimatedMinutes": 5,
-      "tags": [
-        "foundations",
-        "mindset",
-        "fundamentals",
-        "qa",
-        "risk"
-      ],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "html-element-anatomy"
-    },
-    {
       "slug": "html-element-anatomy",
       "order": 1,
       "estimatedMinutes": 8,
@@ -65,97 +51,66 @@
         "principles"
       ],
       "relatedChallenges": [],
-      "nextTutorialSlug": "css-selectors-for-qa-new"
+      "nextTutorialSlug": "css-selector-strategies"
     },
     {
-      "slug": "css-selectors-for-qa-new",
-      "order": 9,
-      "estimatedMinutes": 20,
+      "slug": "css-selector-strategies",
+      "order": 5,
+      "estimatedMinutes": 10,
       "tags": [
+        "beginner",
         "css",
         "selectors",
-        "qa",
-        "automation",
-        "testing",
-        "beginner"
+        "strategy",
+        "best-practices"
       ],
-      "relatedChallenges": [
-        "css-selector-101-id-class",
-        "css-tag-selectors",
-        "css-combining-basics"
-      ],
-      "nextTutorialSlug": "css-selectors-for-qa"
+      "relatedChallenges": [],
+      "nextTutorialSlug": "xpath-strategies"
     },
     {
-      "slug": "css-selectors-for-qa",
-      "order": 10,
-      "estimatedMinutes": 18,
-      "tags": [
-        "css",
-        "selectors",
-        "qa",
-        "automation",
-        "testing",
-        "beginner"
-      ],
-      "relatedChallenges": [
-        "css-selector-101-id-class",
-        "css-tag-selectors",
-        "css-combining-basics"
-      ],
-      "nextTutorialSlug": "xpath-for-test-automation"
-    },
-    {
-      "slug": "xpath-for-test-automation",
-      "order": 11,
-      "estimatedMinutes": 18,
+      "slug": "xpath-strategies",
+      "order": 6,
+      "estimatedMinutes": 10,
       "tags": [
         "xpath",
         "selectors",
-        "automation",
-        "testing",
-        "beginner"
-      ],
-      "relatedChallenges": [
-        "xpath-basics-element",
-        "xpath-basics-id",
-        "xpath-basics-class"
-      ],
-      "nextTutorialSlug": "building-robust-test-selectors"
-    },
-    {
-      "slug": "building-robust-test-selectors",
-      "order": 12,
-      "estimatedMinutes": 12,
-      "tags": [
-        "selectors",
-        "best-practices",
-        "testing",
-        "maintenance",
-        "qa",
+        "strategies",
         "beginner"
       ],
       "relatedChallenges": [],
-      "nextTutorialSlug": "selector-decision-framework"
+      "nextTutorialSlug": "element-interactions"
     },
     {
-      "slug": "selector-decision-framework",
-      "order": 13,
-      "estimatedMinutes": 10,
+      "slug": "element-interactions",
+      "order": 7,
+      "estimatedMinutes": 8,
       "tags": [
-        "css",
-        "xpath",
-        "decision-making",
-        "best-practices",
-        "comparison",
-        "beginner"
+        "beginner",
+        "interactions",
+        "playwright",
+        "automation",
+        "mechanics"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "assertions-verify"
+    },
+    {
+      "slug": "assertions-verify",
+      "order": 8,
+      "estimatedMinutes": 8,
+      "tags": [
+        "beginner",
+        "assertions",
+        "validation",
+        "expect",
+        "verification"
       ],
       "relatedChallenges": [],
       "nextTutorialSlug": "javascript-fundamentals-for-qa"
     },
     {
       "slug": "javascript-fundamentals-for-qa",
-      "order": 20,
+      "order": 9,
       "estimatedMinutes": 20,
       "tags": [
         "javascript",
@@ -168,28 +123,11 @@
         "js-variables-basics",
         "js-functions-basics"
       ],
-      "nextTutorialSlug": "dom-manipulation-for-testing"
-    },
-    {
-      "slug": "dom-manipulation-for-testing",
-      "order": 21,
-      "estimatedMinutes": 15,
-      "tags": [
-        "javascript",
-        "dom",
-        "testing",
-        "automation",
-        "beginner"
-      ],
-      "relatedChallenges": [
-        "js-dom-query",
-        "js-dom-text"
-      ],
       "nextTutorialSlug": "async-await-basics"
     },
     {
       "slug": "async-await-basics",
-      "order": 22,
+      "order": 10,
       "estimatedMinutes": 12,
       "tags": [
         "javascript",
@@ -202,125 +140,45 @@
         "js-async-timeout",
         "js-async-fetch"
       ],
-      "nextTutorialSlug": "playwright-navigation-actions"
+      "nextTutorialSlug": "playwright-architecture"
     },
     {
-      "slug": "playwright-navigation-actions",
-      "order": 30,
-      "estimatedMinutes": 15,
+      "slug": "playwright-architecture",
+      "order": 11,
+      "estimatedMinutes": 10,
       "tags": [
         "playwright",
-        "navigation",
-        "actions",
+        "architecture",
+        "cdp",
         "intermediate"
       ],
-      "relatedChallenges": [
-        "pw-navigation-goto",
-        "pw-actions-click"
-      ],
-      "nextTutorialSlug": "playwright-locators"
+      "relatedChallenges": [],
+      "nextTutorialSlug": "playwright-actionability"
     },
     {
-      "slug": "playwright-locators",
-      "order": 31,
+      "slug": "playwright-actionability",
+      "order": 12,
+      "estimatedMinutes": 10,
+      "tags": [
+        "playwright",
+        "actionability",
+        "auto-wait",
+        "intermediate"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "playwright-interaction-fundamentals"
+    },
+    {
+      "slug": "playwright-interaction-fundamentals",
+      "order": 13,
       "estimatedMinutes": 12,
       "tags": [
         "playwright",
         "locators",
-        "selectors",
-        "intermediate"
-      ],
-      "relatedChallenges": [
-        "pw-locator-text",
-        "pw-locator-role"
-      ],
-      "nextTutorialSlug": "playwright-assertions"
-    },
-    {
-      "slug": "playwright-assertions",
-      "order": 32,
-      "estimatedMinutes": 10,
-      "tags": [
-        "playwright",
+        "actions",
         "assertions",
-        "expect",
         "intermediate"
       ],
-      "relatedChallenges": [
-        "pw-assert-visible",
-        "pw-assert-text"
-      ],
-      "nextTutorialSlug": "playwright-waits"
-    },
-    {
-      "slug": "playwright-waits",
-      "order": 33,
-      "estimatedMinutes": 10,
-      "tags": [
-        "playwright",
-        "waits",
-        "async",
-        "intermediate"
-      ],
-      "relatedChallenges": [
-        "pw-wait-selector",
-        "pw-wait-function"
-      ],
-      "nextTutorialSlug": "playwright-pom"
-    },
-    {
-      "slug": "playwright-pom",
-      "order": 40,
-      "estimatedMinutes": 12,
-      "tags": [
-        "playwright",
-        "pom",
-        "patterns",
-        "advanced"
-      ],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "playwright-data-driven",
-      "status": "draft"
-    },
-    {
-      "slug": "playwright-data-driven",
-      "order": 41,
-      "estimatedMinutes": 10,
-      "tags": [
-        "playwright",
-        "data-driven",
-        "parameterized",
-        "advanced"
-      ],
-      "status": "draft",
-      "relatedChallenges": [],
-      "nextTutorialSlug": "playwright-advanced-patterns"
-    },
-    {
-      "slug": "playwright-advanced-patterns",
-      "order": 42,
-      "estimatedMinutes": 15,
-      "tags": [
-        "playwright",
-        "advanced",
-        "patterns",
-        "advanced"
-      ],
-      "status": "draft",
-      "relatedChallenges": [],
-      "nextTutorialSlug": "playwright-fixtures"
-    },
-    {
-      "slug": "playwright-fixtures",
-      "order": 43,
-      "estimatedMinutes": 20,
-      "tags": [
-        "playwright",
-        "fixtures",
-        "patterns",
-        "advanced"
-      ],
-      "status": "draft",
       "relatedChallenges": [],
       "nextTutorialSlug": null
     }
