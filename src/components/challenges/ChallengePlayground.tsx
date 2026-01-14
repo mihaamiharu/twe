@@ -199,6 +199,12 @@ export function ChallengePlayground({
   const [resetCount, setResetCount] = useState(0);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
+  // Challenge type logic moved up for access in mutation
+  const isCodeChallenge =
+    challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
+  const isSelectorChallenge =
+    challenge.type === 'CSS_SELECTOR' || challenge.type === 'XPATH_SELECTOR';
+
   // AI Hint state
   const [isHintDialogOpen, setIsHintDialogOpen] = useState(false);
   const [hintContent, setHintContent] = useState<string | null>(null);
@@ -222,6 +228,13 @@ export function ChallengePlayground({
         setHintContent(result.hint);
         setHintUsed(true);
         setIsHintDialogOpen(false);
+
+        // Insert hint into editor/selector field
+        if (isCodeChallenge) {
+          setCode((prev) => `// AI Hint: ${result.hint}\n${prev}`);
+        } else {
+          setSelector((prev) => `/* AI Hint: ${result.hint} */\n${prev}`);
+        }
       }
     },
     onError: (error) => {
@@ -269,11 +282,6 @@ export function ChallengePlayground({
   const [hasPassed, setHasPassed] = useState(false);
 
   const [activeTab, setActiveTab] = useState('instructions');
-
-  const isCodeChallenge =
-    challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
-  const isSelectorChallenge =
-    challenge.type === 'CSS_SELECTOR' || challenge.type === 'XPATH_SELECTOR';
 
   // State to store real-time validation result from preview
   const [previewValidation, setPreviewValidation] = useState<{
