@@ -794,15 +794,14 @@
         "id": "# toBeVisible & toBeHidden\n\nPeriksa apakah elemen terlihat atau tersembunyi!\n\n## Asersi Visibilitas\n\n```javascript\nawait expect(page.locator('#modal')).toBeVisible();\nawait expect(page.locator('.spinner')).toBeHidden();\nawait expect(page.locator('.menu')).not.toBeVisible();\n```\n\n## Kasus Penggunaan Umum\n\n- Modal yang muncul/hilang\n- Loading spinner\n- Elemen UI kondisional\n\n## Tugas Kamu\n1. Klik untuk menampilkan modal\n2. Asert bahwa modal tersebut terlihat\n"
       },
       "htmlContent": "<div class=\"app\">\n  <button id=\"show\" onclick=\"document.getElementById('modal').style.display = 'block'\">Show Modal</button>\n  <div id=\"modal\" style=\"display: none;\">Modal Content</div>\n</div>",
-      "starterCode": "// Show the modal\n// Your code here\n\n// Assert modal is visible\n// Your code here\n\nconst result = 'visible';",
+      "starterCode": "// Show the modal\n// Your code here\n\n// Assert modal is visible\n// Your code here",
       "testCases": [
         {
           "description": "Returns the expected output",
-          "expectedOutput": "visible",
           "isHidden": false
         }
       ],
-      "solution": "visible",
+      "solution": "PATTERN_CHALLENGE",
       "tags": [
         "playwright",
         "assertions",
