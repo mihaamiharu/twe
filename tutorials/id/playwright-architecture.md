@@ -9,7 +9,7 @@ Perbedaan paling mendasar antara Playwright dan alat-alat "sepuh" (kayak Seleniu
 
 ### Cara Lama: WebDriver (Si Makelar)
 
-Alat lama pake WebDriver—sebuah *software* terpisah yang tugasnya jadi penerjemah. Kode kamu ngirim perintah ke WebDriver, diterjemahin buat browser, baru deh browser kasih respon balik.
+Alat lama pake WebDriver - sebuah *software* terpisah yang tugasnya jadi penerjemah. Kode kamu ngirim perintah ke WebDriver, diterjemahin buat browser, baru deh browser kasih respon balik.
 
 **Masalahnya:** Proses terjemahan ini makan waktu. Plus, WebDriver itu agak "buta" sama apa yang sebenernya lagi terjadi di dalem browser. Dia nggak tau pasti apakah halaman beneran udah kelar *loading* atau ada *request* jaringan yang masih nyangkut.
 
@@ -45,7 +45,7 @@ Karena Playwright ngontrol mesinnya langsung, kamu bisa ngetes aplikasi kamu di 
 
 ## 3. Model Efisiensi: Browser Contexts
 
-Di *tools* lama, setiap satu tes biasanya harus buka satu aplikasi browser baru. Ini ibarat kamu beli mobil baru cuma buat pergi ke minimarket depan komplek—boros bensin (memori) dan lama nyalainnya.
+Di *tools* lama, setiap satu tes biasanya harus buka satu aplikasi browser baru. Ini ibarat kamu beli mobil baru cuma buat pergi ke minimarket depan komplek - boros bensin (memori) dan lama nyalainnya.
 
 Playwright ngenalin konsep **Browser Contexts**.
 
