@@ -47,124 +47,121 @@ export const getChallenges = createServerFn({ method: 'GET' })
       const { getRequestHeaders } =
         await import('@tanstack/react-start/server');
       const { auth } = await import('./auth.server');
-      const { getChallengeList } = await import('./content.server');
+      const { db } = await import('@/db');
+      const { challenges, progress } = await import('@/db/schema');
+      const { eq, and, or, ilike, sql, desc, asc, not } = await import('drizzle-orm');
 
-      // Load challenges from filesystem
-      let allChallenges = await getChallengeList(filters.locale, {
-        type: filters.type === 'SELECTOR' ? undefined : filters.type,
-        difficulty: filters.difficulty,
-        category: filters.category,
-        search: filters.search,
-      });
-
-      // Handle SELECTOR type (both CSS and XPath)
-      if (filters.type === 'SELECTOR') {
-        allChallenges = allChallenges.filter(
-          (c) => c.type === 'CSS_SELECTOR' || c.type === 'XPATH_SELECTOR',
-        );
-      }
-
-      // Sort
-      allChallenges.sort((a, b) => {
-        let comparison = 0;
-        switch (filters.sortBy) {
-          case 'order':
-            comparison = a.order - b.order;
-            break;
-          case 'xpReward':
-            comparison = a.xpReward - b.xpReward;
-            break;
-          case 'difficulty':
-            const diffOrder = { EASY: 1, MEDIUM: 2, HARD: 3 };
-            comparison =
-              (diffOrder[a.difficulty as keyof typeof diffOrder] || 0) -
-              (diffOrder[b.difficulty as keyof typeof diffOrder] || 0);
-            break;
-          default:
-            comparison = a.order - b.order;
-        }
-        return filters.sortOrder === 'desc' ? -comparison : comparison;
-      });
-
-      const total = allChallenges.length;
-
-      // Pagination
-      const offset = (filters.page - 1) * filters.limit;
-      const paginatedChallenges = allChallenges.slice(
-        offset,
-        offset + filters.limit,
-      );
-
-      // Get DB records for completionCount and IDs
-      const slugs = paginatedChallenges.map((c) => c.slug);
-      const dbRecords =
-        slugs.length > 0
-          ? await db
-            .select({
-              slug: challenges.slug,
-              id: challenges.id,
-              completionCount: challenges.completionCount,
-            })
-            .from(challenges)
-            .where(inArray(challenges.slug, slugs))
-          : [];
-
-      const dbBySlug = new Map(dbRecords.map((r) => [r.slug, r]));
-
-      // Get user progress
-      let userProgress: Record<string, boolean> = {};
       const headers = getRequestHeaders() as Headers;
       const session = await auth.api.getSession({ headers });
+      const userId = session?.user?.id;
+      const locale = filters.locale;
 
-      if (session?.user?.id && dbRecords.length > 0) {
-        const challengeIds = dbRecords.map((r) => r.id);
-        const progressRecords = await db
-          .select({
-            challengeId: progress.challengeId,
-            isCompleted: progress.isCompleted,
-          })
-          .from(progress)
-          .where(
-            and(
-              eq(progress.userId, session.user.id),
-              inArray(progress.challengeId, challengeIds),
-            ),
-          );
+      // Build WHERE conditions
+      const conditions = [eq(challenges.isPublished, true)];
 
-        userProgress = progressRecords.reduce(
-          (acc, p) => {
-            if (p.challengeId) {
-              acc[p.challengeId] = p.isCompleted;
-            }
-            return acc;
-          },
-          {} as Record<string, boolean>,
+      if (filters.difficulty) {
+        conditions.push(eq(challenges.difficulty, filters.difficulty));
+      }
+
+      if (filters.type) {
+        if (filters.type === 'SELECTOR') {
+          conditions.push(or(eq(challenges.type, 'CSS_SELECTOR'), eq(challenges.type, 'XPATH_SELECTOR')));
+        } else {
+          conditions.push(eq(challenges.type, filters.type));
+        }
+      }
+
+      if (filters.category) {
+        conditions.push(eq(challenges.category, filters.category));
+      }
+
+      if (filters.search) {
+        const searchPattern = `%${filters.search}%`;
+        // Search in localized title or description (checking both current locale and en fallback)
+        conditions.push(
+          or(
+            sql`${challenges.title}->>${locale} ILIKE ${searchPattern}`,
+            sql`${challenges.title}->>'en' ILIKE ${searchPattern}`,
+            sql`${challenges.description}->>${locale} ILIKE ${searchPattern}`,
+            sql`${challenges.description}->>'en' ILIKE ${searchPattern}`
+          )
         );
       }
 
-      // Merge filesystem content with DB data
-      const challengesWithProgress = paginatedChallenges.map((challenge) => {
-        const dbRecord = dbBySlug.get(challenge.slug);
-        return {
-          id: dbRecord?.id || challenge.slug,
-          slug: challenge.slug,
-          title: challenge.title,
-          description: challenge.description,
-          instructions: challenge.instructions,
-          type: challenge.type,
-          difficulty: challenge.difficulty,
-          category: challenge.category,
-          xpReward: challenge.xpReward,
-          order: challenge.order,
-          tags: challenge.tags,
-          completionCount: dbRecord?.completionCount || 0,
-          isCompleted: dbRecord ? userProgress[dbRecord.id] || false : false,
-        };
-      });
+      // Calculate Offset
+      const offset = (filters.page - 1) * filters.limit;
+
+      // Build Query
+      // We want to fetch challenges AND the user's progress in one go
+      // Note: mapping to the shape the UI expects
+      const query = db
+        .select({
+          id: challenges.id,
+          slug: challenges.slug,
+          title: sql<string>`COALESCE(${challenges.title}->>${locale}, ${challenges.title}->>'en', '')`,
+          description: sql<string>`COALESCE(${challenges.description}->>${locale}, ${challenges.description}->>'en', '')`,
+          type: challenges.type,
+          difficulty: challenges.difficulty,
+          category: challenges.category,
+          xpReward: challenges.xpReward,
+          order: challenges.order,
+          tags: challenges.tags,
+          completionCount: challenges.completionCount,
+          isCompleted: userId ? sql<boolean>`${progress.isCompleted} IS TRUE` : sql<boolean>`false`,
+        })
+        .from(challenges)
+        .where(and(...conditions));
+
+      // Join Progress if user is logged in
+      if (userId) {
+        // @ts-expect-error Drizzle join inference
+        query.leftJoin(progress, and(eq(progress.challengeId, challenges.id), eq(progress.userId, userId)));
+      }
+
+      // Apply Sort
+      // Drizzle dynamic sort
+      if (filters.sortBy === 'xpReward') {
+        // @ts-expect-error Dynamic sort
+        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.xpReward) : asc(challenges.xpReward));
+      } else if (filters.sortBy === 'difficulty') {
+        // Enum sorting works naturally for EASY < MEDIUM < HARD if properly ordered in PG, 
+        // but let's be safe and map to integers for robust sorting if needed. 
+        // Actually PG enums sort by their declared order. schema.ts has EASY, MEDIUM, HARD.
+        // So standard sort works.
+        // @ts-expect-error Dynamic sort
+        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.difficulty) : asc(challenges.difficulty));
+      } else if (filters.sortBy === 'completionCount') {
+        // @ts-expect-error Dynamic sort
+        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.completionCount) : asc(challenges.completionCount));
+      } else {
+        // Default: Order
+        // @ts-expect-error Dynamic sort
+        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.order) : asc(challenges.order));
+      }
+
+      // Apply Pagination
+      // @ts-expect-error Dynamic limit/offset
+      query.limit(filters.limit).offset(offset);
+
+      const data = await query;
+
+      // Get Total Count for Pagination (separate efficient query)
+      const countQuery = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(challenges)
+        .where(and(...conditions));
+
+      const total = Number(countQuery[0].count);
 
       return {
         success: true,
-        data: challengesWithProgress,
+        data: data.map(c => ({
+          ...c,
+          // Ensure tags is array
+          tags: c.tags || [],
+          // UI expects explicit boolean
+          isCompleted: Boolean(c.isCompleted)
+        })),
         pagination: {
           page: filters.page,
           limit: filters.limit,

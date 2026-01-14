@@ -7,6 +7,7 @@ import {
   uuid,
   pgEnum,
   jsonb,
+  index,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -160,7 +161,13 @@ export const challenges = pgTable('challenges', {
 
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  publishedIdx: index('idx_challenges_published').on(table.isPublished),
+  categoryIdx: index('idx_challenges_category').on(table.category),
+  difficultyIdx: index('idx_challenges_difficulty').on(table.difficulty),
+  typeIdx: index('idx_challenges_type').on(table.type),
+  orderIdx: index('idx_challenges_order').on(table.order),
+}));
 
 export const testCases = pgTable('test_cases', {
   id: uuid('id').defaultRandom().primaryKey(),
