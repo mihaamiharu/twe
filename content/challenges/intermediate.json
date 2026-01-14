@@ -986,42 +986,6 @@
       ]
     },
     {
-      "slug": "pw-page-assertions",
-      "type": "PLAYWRIGHT",
-      "difficulty": "MEDIUM",
-      "category": "playwright-assertions",
-      "xpReward": 60,
-      "order": 607,
-      "title": {
-        "en": "Page Assertions",
-        "id": "Asersi Halaman"
-      },
-      "description": {
-        "en": "Assert URL and page title.",
-        "id": "Asert URL dan judul halaman."
-      },
-      "instructions": {
-        "en": "# Page Assertions\n\nCheck URL and title!\n\n## URL Assertion\n\n```javascript\nawait expect(page).toHaveURL('https://example.com/login');\nawait expect(page).toHaveURL(/\\/dashboard$/);\n```\n\n## Title Assertion\n\n```javascript\nawait expect(page).toHaveTitle('Welcome');\nawait expect(page).toHaveTitle(/Dashboard/);\n```\n\n## Your Task\n1. Navigate to the page\n2. Assert the title matches\n",
-        "id": "# Asersi Halaman\n\nPeriksa URL dan judul!\n\n## Asersi URL\n\n```javascript\nawait expect(page).toHaveURL('https://example.com/login');\nawait expect(page).toHaveURL(/\\/dashboard$/);\n```\n\n## Asersi Judul (Title Assertion)\n\n```javascript\nawait expect(page).toHaveTitle('Welcome');\nawait expect(page).toHaveTitle(/Dashboard/);\n```\n\n## Tugas Kamu\n1. Navigasi ke halaman\n2. Asert bahwa judulnya cocok\n"
-      },
-      "htmlContent": "<html>\n  <head><title>Test Page</title></head>\n  <body>\n    <h1>Welcome</h1>\n  </body>\n</html>",
-      "starterCode": "// Assert page title\n// Your assertion here",
-      "testCases": [
-        {
-          "description": "Returns the expected output",
-          "isHidden": false
-        }
-      ],
-      "solution": "PATTERN_CHALLENGE",
-      "tags": [
-        "playwright",
-        "assertions",
-        "url",
-        "title",
-        "intermediate"
-      ]
-    },
-    {
       "slug": "pw-soft-assertions",
       "type": "PLAYWRIGHT",
       "difficulty": "MEDIUM",
