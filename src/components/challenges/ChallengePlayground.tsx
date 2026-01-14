@@ -614,6 +614,7 @@ export function ChallengePlayground({
         <div className="h-[400px] border border-border rounded-lg overflow-hidden">
           <CodeEditor
             initialCode={challenge.starterCode}
+            value={code}
             language="javascript"
             onChange={setCode}
             onRun={() => void handleRunCode()}
@@ -753,6 +754,7 @@ export function ChallengePlayground({
               <div className="flex-1 relative">
                 <CodeEditor
                   initialCode={challenge.starterCode}
+                  value={code}
                   language="javascript"
                   onChange={setCode}
                   onRun={() => void handleRunCode()}
