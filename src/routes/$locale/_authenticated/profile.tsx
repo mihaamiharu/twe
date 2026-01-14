@@ -49,7 +49,11 @@ interface UserProfile {
     completedChallenges: number;
     completedTutorials: number;
     achievementsCount: number;
+    completedTutorials: number;
+    achievementsCount: number;
     challengesByType: Record<string, number>;
+    challengesByTier: Record<string, number>;
+    tierTotalCounts: Record<string, number>;
   };
   earnedAchievements: (Achievement & { unlockedAt: Date })[];
   recentActivity: {
@@ -147,12 +151,18 @@ function ProfilePage() {
   const neededXp = xpToNext - currentLevelXp;
   const levelProgress = neededXp > 0 ? (progressXp / neededXp) * 100 : 100;
 
-  // Counts for tiers
-  const selectorCount =
-    (user.stats.challengesByType?.['CSS_SELECTOR'] ?? 0) +
-    (user.stats.challengesByType?.['XPATH_SELECTOR'] ?? 0);
-  const jsCount = user.stats.challengesByType?.['JAVASCRIPT'] ?? 0;
-  const playwrightCount = user.stats.challengesByType?.['PLAYWRIGHT'] ?? 0;
+  // Helper for safe access
+  const getTierStats = (tier: string) => {
+    const completed = user.stats.challengesByTier?.[tier] || 0;
+    const total = user.stats.tierTotalCounts?.[tier] || 0;
+    const progress = total > 0 ? (completed / total) * 100 : 0;
+    return { completed, total, progress };
+  };
+
+  const basicStats = getTierStats('basic');
+  const beginnerStats = getTierStats('beginner');
+  const intermediateStats = getTierStats('intermediate');
+  const expertStats = getTierStats('expert');
 
   return (
     <div className="min-h-screen p-6 md:p-10 page-transition">
@@ -285,13 +295,16 @@ function ProfilePage() {
                       </span>
                     </div>
                     <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: 36 })}
+                      {t('profile:tierProgress.challengeCount', { count: basicStats.total })}
                     </Badge>
                   </div>
                   <Progress
-                    value={Math.min((selectorCount / 36) * 100, 100)}
+                    value={basicStats.progress}
                     className="h-2"
                   />
+                  <div className="text-right text-xs text-muted-foreground">
+                    {basicStats.completed} / {basicStats.total}
+                  </div>
                 </div>
 
                 {/* Tier: Beginner */}
@@ -304,13 +317,16 @@ function ProfilePage() {
                       </span>
                     </div>
                     <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: 26 })}
+                      {t('profile:tierProgress.challengeCount', { count: beginnerStats.total })}
                     </Badge>
                   </div>
                   <Progress
-                    value={Math.min((jsCount / 26) * 100, 100)}
+                    value={beginnerStats.progress}
                     className="h-2"
                   />
+                  <div className="text-right text-xs text-muted-foreground">
+                    {beginnerStats.completed} / {beginnerStats.total}
+                  </div>
                 </div>
 
                 {/* Tier: Intermediate */}
@@ -323,13 +339,16 @@ function ProfilePage() {
                       </span>
                     </div>
                     <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: 37 })}
+                      {t('profile:tierProgress.challengeCount', { count: intermediateStats.total })}
                     </Badge>
                   </div>
                   <Progress
-                    value={Math.min((playwrightCount / 37) * 100, 100)}
+                    value={intermediateStats.progress}
                     className="h-2"
                   />
+                  <div className="text-right text-xs text-muted-foreground">
+                    {intermediateStats.completed} / {intermediateStats.total}
+                  </div>
                 </div>
 
                 {/* Tier: Expert */}
@@ -342,16 +361,16 @@ function ProfilePage() {
                       </span>
                     </div>
                     <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: 23 })}
+                      {t('profile:tierProgress.challengeCount', { count: expertStats.total })}
                     </Badge>
                   </div>
                   <Progress
-                    value={Math.min(
-                      (Math.max(playwrightCount - 37, 0) / 23) * 100,
-                      100,
-                    )}
+                    value={expertStats.progress}
                     className="h-2"
                   />
+                  <div className="text-right text-xs text-muted-foreground">
+                    {expertStats.completed} / {expertStats.total}
+                  </div>
                 </div>
 
                 {/* XP Milestones */}
@@ -446,7 +465,7 @@ function ProfilePage() {
 
           <TabsContent value="achievements" className="mt-6">
             {!user.earnedAchievements ||
-            user.earnedAchievements.length === 0 ? (
+              user.earnedAchievements.length === 0 ? (
               <Card className="glass-card">
                 <CardContent className="p-8 text-center text-muted-foreground">
                   <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />

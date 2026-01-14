@@ -32,6 +32,7 @@ export interface AchievementCriteria {
 export interface UserStats {
   totalChallengesCompleted: number;
   challengesByType: Record<string, number>;
+  challengesByTier: Record<string, number>;
   totalXP: number;
   level: number;
   currentStreak: number;

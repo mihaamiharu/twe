@@ -16,6 +16,7 @@ import {
 import { eq, and, sql } from 'drizzle-orm';
 import type { UserStats } from './achievements';
 import { logger } from '@/lib/logger';
+import { getTierFromCategory } from '@/lib/constants';
 
 /**
  * Get user stats for achievement checking
@@ -35,6 +36,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     .select({
       challengeId: progress.challengeId,
       type: challenges.type,
+      category: challenges.category,
       completedAt: progress.completedAt,
     })
     .from(progress)
@@ -49,10 +51,14 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 
   // Count challenges by type
   const challengesByType: Record<string, number> = {};
+  const challengesByTier: Record<string, number> = {};
+
   for (const c of completedChallenges) {
     if (c.type) {
       challengesByType[c.type] = (challengesByType[c.type] || 0) + 1;
     }
+    const tier = getTierFromCategory(c.category || undefined);
+    challengesByTier[tier] = (challengesByTier[tier] || 0) + 1;
   }
 
   // Get completed tutorials count
@@ -107,6 +113,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     tutorialsCompleted,
     perfectScores,
     bugReportsFiled,
+    challengesByTier,
   };
 }
 
