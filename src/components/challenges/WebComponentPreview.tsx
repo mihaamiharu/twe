@@ -282,21 +282,19 @@ export function WebComponentPreview({
 
                     // Initial highlight of target element
                     setTimeout(() => {
-                        ${
-                          targetElementId
-                            ? `
+                        ${targetElementId
+        ? `
                             const target = document.getElementById('${targetElementId}');
                             if (target) target.classList.add('twe-target-highlight');
                         `
-                            : ''
-                        }
-                        ${
-                          targetSelector && !targetElementId
-                            ? `
+        : ''
+      }
+                        ${targetSelector && !targetElementId
+        ? `
                             highlightElements('${targetSelector}', 'css', 'twe-target-highlight');
                         `
-                            : ''
-                        }
+        : ''
+      }
                     }, 100);
                 </script>
             </body>
@@ -307,7 +305,7 @@ export function WebComponentPreview({
   // Update iframe content
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe || viewMode !== 'preview') return;
+    if (!iframe) return;
 
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
     if (doc) {
@@ -349,7 +347,7 @@ export function WebComponentPreview({
   // Highlight user's selector matches
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe?.contentWindow || !userSelector || viewMode !== 'preview')
+    if (!iframe?.contentWindow || !userSelector)
       return;
 
     iframe.contentWindow.postMessage(
@@ -484,19 +482,19 @@ export function WebComponentPreview({
 
         {/* Content Area */}
         <div className="flex-1 relative overflow-hidden bg-white/50 dark:bg-black/20">
-          {viewMode === 'preview' ? (
-            <div
-              className="w-full h-full overflow-auto"
-              style={{
-                transform: `scale(${zoom / 100})`,
-                transformOrigin: 'top left',
-                width: `${100 * (100 / zoom)}%`,
-                height: `${100 * (100 / zoom)}%`,
-              }}
-            >
-              <iframe
-                ref={iframeRef}
-                srcDoc={`
+          <div
+            className="w-full h-full overflow-auto"
+            style={{
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: 'top left',
+              width: `${100 * (100 / zoom)}%`,
+              height: `${100 * (100 / zoom)}%`,
+              display: viewMode === 'preview' ? 'block' : 'none',
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              srcDoc={`
                                     <!DOCTYPE html>
                                     <html>
                                         <head>
@@ -524,12 +522,12 @@ export function WebComponentPreview({
                                         <body>${htmlContent}</body>
                                     </html>
                                 `}
-                className="w-full h-full border-none bg-white"
-                title="Challenge Preview"
-                sandbox="allow-same-origin allow-scripts"
-              />
-            </div>
-          ) : (
+              className="w-full h-full border-none bg-white"
+              title="Challenge Preview"
+              sandbox="allow-same-origin allow-scripts"
+            />
+          </div>
+          {viewMode === 'source' && (
             <div className="w-full h-full">
               <CodeEditor
                 initialCode={htmlContent}

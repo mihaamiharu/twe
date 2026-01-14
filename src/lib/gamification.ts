@@ -184,18 +184,18 @@ export function formatXP(xp: number | null | undefined): string {
 export function getLevelTitle(level: number | null | undefined): string {
   const effectiveLevel = level ?? 1;
   const titles: Record<number, string> = {
-    1: 'Novice',
-    5: 'Apprentice',
-    10: 'Practitioner',
-    15: 'Specialist',
-    20: 'Expert',
-    25: 'Master',
-    30: 'Grandmaster',
-    40: 'Legend',
-    50: 'Mythic',
+    1: 'novice',
+    5: 'apprentice',
+    10: 'practitioner',
+    15: 'specialist',
+    20: 'expert',
+    25: 'master',
+    30: 'grandmaster',
+    40: 'legend',
+    50: 'mythic',
   };
 
-  let titleKey = 'Novice';
+  let titleKey = 'novice';
   for (const [minLevel, key] of Object.entries(titles)) {
     if (effectiveLevel >= parseInt(minLevel)) {
       titleKey = key;
