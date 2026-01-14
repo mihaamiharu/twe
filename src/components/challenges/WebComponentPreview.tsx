@@ -63,12 +63,12 @@ export function WebComponentPreview({
             .twe-target-highlight {
                 outline: 3px solid #22c55e !important;
                 outline-offset: 2px;
-                background-color: rgba(34, 197, 94, 0.1) !important;
+                box-shadow: inset 0 0 0 1000px rgba(34, 197, 94, 0.1) !important;
             }
             .twe-user-match {
                 outline: 2px dashed #3b82f6 !important;
                 outline-offset: 1px;
-                background-color: rgba(59, 130, 246, 0.1) !important;
+                box-shadow: inset 0 0 0 1000px rgba(59, 130, 246, 0.1) !important;
             }
             .twe-hover-highlight {
                 outline: 2px solid #f59e0b !important;
