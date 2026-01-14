@@ -9,7 +9,7 @@ The biggest difference between Playwright and older tools (like Selenium) is how
 
 ### The Old Way: WebDriver (The Middleman)
 
-Older tools used a WebDriver—a separate piece of software that acted as a translator. Your code would send a command to the WebDriver, which translated it for the browser, and then sent a response back.
+Older tools used a WebDriver - a separate piece of software that acted as a translator. Your code would send a command to the WebDriver, which translated it for the browser, and then sent a response back.
 
 **The Problem:** This translation took time. More importantly, the WebDriver was "blind" to what the browser was doing internally. It didn't know if the page was still loading or if a network request was pending.
 
@@ -45,7 +45,7 @@ Because Playwright controls the engines directly, you can test how your app perf
 
 ## 3. The Efficiency Model: Browser Contexts
 
-In traditional automation, every test starts a brand-new browser instance. This is like buying a new car just to drive to the grocery store—it's slow and uses too much memory.
+In traditional automation, every test starts a brand-new browser instance. This is like buying a new car just to drive to the grocery store - it's slow and uses too much memory.
 
 Playwright introduces the concept of **Browser Contexts**.
 
@@ -88,7 +88,7 @@ When you write `await page.click()`, your Client sends a request across a local 
 ![Client-Server Communication Bridge](/images/tutorials/playwright-client-server-1.png)
 
 > [!CAUTION]
-> This is exactly why we need `async/await`—we are waiting for that signal to travel between these two processes. Forgetting `await` means your test continues before the action completes!
+> This is exactly why we need `async/await` - we are waiting for that signal to travel between these two processes. Forgetting `await` means your test continues before the action completes!
 
 ---
 
