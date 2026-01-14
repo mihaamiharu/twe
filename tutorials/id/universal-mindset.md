@@ -3,7 +3,7 @@ title: 'Pondasi 4: Logikanya Universal (Mindset)'
 description: 'Tool bisa berubah. Syntax itu cuma grammar. Prinsip otomatisasi itu abadi.'
 ---
 
-# Pondasi 4: Logikanya Universal (Mindset)
+
 
 > **"Tool bisa gonta-ganti. Syntax itu cuma urusan tata bahasa. Tapi prinsip otomatisasi itu abadi."**
 

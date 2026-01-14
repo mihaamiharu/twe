@@ -69,7 +69,7 @@ Because Playwright has a **Direct Connection** to the browser (from Tutorial 9: 
 | Benefit | Description |
 | --- | --- |
 | **No Manual Sleeps** | You never have to write `page.waitForTimeout(5000)` |
-| **Precision Timing** | If ready in 10ms, moves on in 10ms—no wasted time |
+| **Precision Timing** | If ready in 10ms, moves on in 10ms - no wasted time |
 | **Clearer Errors** | Tells you exactly which check failed (e.g., "Element is hidden") |
 
 > [!CAUTION]

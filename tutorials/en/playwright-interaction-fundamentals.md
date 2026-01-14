@@ -95,7 +95,7 @@ test('Successful Login Flow', async ({ page }) => {
 | Concept | Key Takeaway |
 | --- | --- |
 | **Locators** | Use `getByRole()` first, then Text, Label, TestId as fallbacks |
-| **Actions** | Always `await`—Playwright handles actionability automatically |
+| **Actions** | Always `await` - Playwright handles actionability automatically |
 | **Assertions** | Web-First Assertions auto-retry for up to 5 seconds |
 | **No Manual Waits** | The Locator + Assertion combo handles all timing |
 

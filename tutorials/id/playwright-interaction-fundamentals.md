@@ -95,7 +95,7 @@ test('Alur Login Sukses', async ({ page }) => {
 | Konsep | Poin Penting |
 | --- | --- |
 | **Locators** | Pake `getByRole()` duluan, baru Text, Label, TestId buat cadangan |
-| **Actions** | Selalu pake `await`—Playwright ngurus status elemen otomatis |
+| **Actions** | Selalu pake `await` - Playwright ngurus status elemen otomatis |
 | **Assertions** | Web-First Assertions nyoba terus (*auto-retry*) sampe 5 detik |
 | **No Manual Waits** | Kombinasi Locator + Assertion udah ngurusin semua masalah waktu |
 
