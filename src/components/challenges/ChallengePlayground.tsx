@@ -30,6 +30,8 @@ import {
   BookOpen,
   AlertCircle,
   GripVertical,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { storage } from '@/lib/storage-adapter';
@@ -42,6 +44,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { CodeEditor } from './CodeEditor';
@@ -150,6 +158,14 @@ export interface Challenge {
     title: string;
   };
   isCompleted?: boolean;
+  nextChallenge?: {
+    slug: string;
+    title: string;
+  };
+  prevChallenge?: {
+    slug: string;
+    title: string;
+  };
 }
 
 export interface ChallengePlaygroundProps {
@@ -811,19 +827,28 @@ export function ChallengePlayground({
                 </button>
               </div>
 
-              <Button
-                size="sm"
-                onClick={() => void handleRunCode()}
-                disabled={isRunning}
-                className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
-              >
-                {isRunning ? (
-                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                ) : (
-                  <Play className="h-3 w-3 mr-1" />
-                )}
-                {t('common:actions.run')}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      onClick={() => void handleRunCode()}
+                      disabled={isRunning}
+                      className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
+                    >
+                      {isRunning ? (
+                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                      ) : (
+                        <Play className="h-3 w-3 mr-1" />
+                      )}
+                      {t('common:actions.run')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Run code (⌘/Ctrl + Enter)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             <div className="flex-1 overflow-auto">
               {resultsTab === 'results' ? (
@@ -900,6 +925,39 @@ export function ChallengePlayground({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Navigation Buttons */}
+          <div className="flex items-center mr-2 bg-muted/30 rounded-lg p-0.5 border border-border/50">
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={!challenge.prevChallenge}
+              onClick={() => {
+                if (challenge.prevChallenge) {
+                  window.location.href = `/${locale}/challenges/${challenge.prevChallenge.slug}`;
+                }
+              }}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title={challenge.prevChallenge ? t('common:actions.previous') : undefined}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="w-px h-4 bg-border/50 mx-0.5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={!challenge.nextChallenge}
+              onClick={() => {
+                if (challenge.nextChallenge) {
+                  window.location.href = `/${locale}/challenges/${challenge.nextChallenge.slug}`;
+                }
+              }}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title={challenge.nextChallenge ? t('common:actions.next') : undefined}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
           {/* Mobile Run Button */}
           {isMobile && isCodeChallenge && (
             <Button
@@ -933,21 +991,30 @@ export function ChallengePlayground({
             </Link>
           )}
 
-          <Button
-            size="sm"
-            onClick={handleSubmit}
-            disabled={!hasPassed}
-            className={cn(
-              'font-bold border border-border transition-all',
-              hasPassed
-                ? 'bg-green-500 hover:bg-green-600 text-black'
-                : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
-            )}
-            title={t('common:actions.submit')}
-          >
-            <Send className="h-4 w-4 mr-2" />
-            {t('common:actions.submit')}
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={!hasPassed}
+                  className={cn(
+                    'font-bold border border-border transition-all',
+                    hasPassed
+                      ? 'bg-green-500 hover:bg-green-600 text-black'
+                      : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
+                  )}
+                  title={!hasPassed ? t('common:actions.submit') : undefined}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {t('common:actions.submit')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Submit solution (⌘/Ctrl + Shift + Enter)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 

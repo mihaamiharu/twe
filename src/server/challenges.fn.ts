@@ -333,6 +333,19 @@ export const getChallenge = createServerFn({ method: 'GET' })
           .sort((a, b) => a.order - b.order)[0];
       }
 
+      // Previous Challenge Logic
+      // Try same category first
+      let prevChallenge = allChallenges
+        .filter((c) => c.category === currentCategory && c.order < currentOrder)
+        .sort((a, b) => b.order - a.order)[0];
+
+      // Fallback to any category
+      if (!prevChallenge) {
+        prevChallenge = allChallenges
+          .filter((c) => c.order < currentOrder)
+          .sort((a, b) => b.order - a.order)[0];
+      }
+
       return {
         success: true,
         data: {
@@ -359,6 +372,12 @@ export const getChallenge = createServerFn({ method: 'GET' })
             ? {
               slug: nextChallenge.slug,
               title: nextChallenge.title,
+            }
+            : null,
+          prevChallenge: prevChallenge
+            ? {
+              slug: prevChallenge.slug,
+              title: prevChallenge.title,
             }
             : null,
         },
