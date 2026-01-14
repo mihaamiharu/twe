@@ -542,8 +542,7 @@ export function ChallengePlayground({
         </TabsContent>
         <TabsContent
           value="preview"
-          className="mt-4 h-[400px] data-[state=inactive]:hidden"
-          forceMount
+          className="mt-4 h-[400px]"
         >
           {challenge.htmlContent && (
             <WebComponentPreview
@@ -653,8 +652,7 @@ export function ChallengePlayground({
           {challenge.htmlContent && (
             <TabsContent
               value="preview"
-              className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col data-[state=inactive]:hidden"
-              forceMount
+              className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col"
             >
               <WebComponentPreview
                 htmlContent={challenge.htmlContent}
@@ -844,7 +842,7 @@ export function ChallengePlayground({
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent>
-                    <p>Run code (⌘/Ctrl + Enter)</p>
+                    <p>{t('common:actions.runTooltip')}</p>
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>

@@ -1,24 +1,24 @@
 {
   "hero": {
-    "title": "Belajar QA Automation",
-    "titleSuffix": "dengan Tantangan Praktis",
-    "tagline": "Bangun skill dunia nyata, bukan cuma teori.",
-    "description": "Saya berbagi <strong>skill praktis yang saya kumpulkan dari mentor yang supportif dan pengalaman memecahkan masalah nyata</strong>, membantu kamu membangun kepercayaan diri langkah demi langkah.",
+    "title": "Kuasai Test Automation",
+    "titleSuffix": "dengan panduan praktis saya",
+    "tagline": "Skenario dunia nyata yang dirancang oleh Senior QA Engineer.",
+    "description": "Saya membangun platform ini untuk berbagi <strong>pola praktis yang saya andalkan setiap hari</strong>. Bukan buku teks, hanya skenario nyata yang mengajarkan saya cara menguji.",
     "startLearning": "Mulai Belajar",
-    "browseTutorials": "Lihat Tutorial"
+    "browseTutorials": "Lihat Kurikulum"
   },
   "stats": {
-    "challenges": "Tantangan",
-    "tutorials": "Tutorial",
+    "challenges": "Skenario Nyata",
+    "tutorials": "Materi Terkurasi",
     "achievements": "Pencapaian",
     "learning": "Pembelajaran"
   },
   "careerPath": {
-    "title": "Jalur",
-    "titleHighlight": "Karir Kamu",
-    "subtitle": "Dari dasar selektor hingga arsitektur otomasi tingkat lanjut.",
-    "tier": "Tier",
-    "challenges": "tantangan"
+    "title": "Kurikulum",
+    "titleHighlight": "Kamu",
+    "subtitle": "Jalur terstruktur dari dasar selektor hingga arsitektur otomasi tingkat lanjut.",
+    "tier": "Fase",
+    "challenges": "skenario"
   },
   "tiers": {
     "basic": {
@@ -63,19 +63,40 @@
     "title": "Selesaikan",
     "titleHighlight": "Masalah Nyata",
     "subtitle": "Mulai coding langsung. Tanpa setup.",
-    "viewAll": "Lihat Semua Tantangan"
+    "viewAll": "Lihat Semua Tantangan",
+    "challenge1": {
+      "badge": "MUDAH",
+      "xp": "+10 XP",
+      "title": "CSS Selector 101",
+      "description": "Kuasai dasar-dasar mutlak",
+      "slug": "css-selector-101-id-class"
+    },
+    "challenge2": {
+      "badge": "SEDANG",
+      "xp": "+50 XP",
+      "title": "Testing Aplikasi Legacy",
+      "description": "Temukan elemen di kode berantakan",
+      "slug": "css-foundations-boss"
+    },
+    "challenge3": {
+      "badge": "SULIT",
+      "xp": "+60 XP",
+      "title": "Formulir Dinamis",
+      "description": "Tangani status validasi kompleks",
+      "slug": "css-forms-boss"
+    }
   },
   "features": {
     "title": "Semua yang Kamu Butuhkan untuk",
-    "titleHighlight": "Belajar Testing",
-    "subtitle": "Platform lengkap yang dirancang untuk membawamu dari pemula ke ahli",
+    "titleHighlight": "Naik Level",
+    "subtitle": "Kurikulum personal yang dirancang untuk membawamu dari pemula ke ahli",
     "interactiveTutorials": {
       "title": "Tutorial Interaktif",
       "description": "Pelajari konsep testing langkah demi langkah. Saya sudah memecah bagian-bagian sulit agar kamu tidak perlu berjuang."
     },
     "playwrightChallenges": {
-      "title": "Tantangan Playwright",
-      "description": "Latihan dengan skenario nyata. Seperti punya sandbox untuk mencoba hal-hal tanpa merusak produksi."
+      "title": "Simulasi Browser",
+      "description": "Latihan dengan <strong>skenario sandbox</strong>. Kode kamu berjalan <strong>sepenuhnya di browser</strong>—cepat, aman, dan tanpa instalasi."
     },
     "selectorChallenges": {
       "title": "Tantangan Selektor",
@@ -86,8 +107,8 @@
       "description": "Dapatkan XP, naik level, unlock achievement, dan bersaing di leaderboard. Belajar jadi menyenangkan!"
     },
     "instantFeedback": {
-      "title": "Feedback Instan",
-      "description": "Dapatkan hasil langsung. Seperti punya teman di samping yang menunjukkan apa yang perlu diperbaiki."
+      "title": "Tanpa Hambatan",
+      "description": "Mulai coding segera. <strong>Tanpa perlu akun</strong>. Cukup verifikasi skill kamu dan lanjut."
     },
     "trackProgress": {
       "title": "Lacak Progres",
@@ -103,7 +124,7 @@
     },
     "step2": {
       "title": "Tulis Kode Kamu",
-      "description": "Gunakan editor kode embedded kami untuk menulis dan menguji script otomasi kamu."
+      "description": "Gunakan editor kode kami. <strong>Semuanya berjalan lokal</strong> di browser kamu untuk feedback instan."
     },
     "step3": {
       "title": "Dapatkan Feedback Instan",
@@ -120,8 +141,8 @@
     "authorRole": "Creator of TestingWithEkki"
   },
   "cta": {
-    "title": "Mulai Karir Quality Engineering Kamu",
-    "subtitle": "Bergabung dengan ribuan tester yang menguasai tools standar industri. Gratis selamanya untuk individu.",
+    "title": "Siap mengotomasi skenario nyata pertamamu?",
+    "subtitle": "Mulai selesaikan tantangan praktis yang mencerminkan aplikasi dunia nyata. Gratis selamanya untuk individu.",
     "getStarted": "Mulai Gratis",
     "viewLeaderboard": "Lihat Leaderboard",
     "freeToUse": "Gratis digunakan",

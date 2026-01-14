@@ -1,0 +1,105 @@
+{
+    "hero": {
+        "title": "Hi, I'm <1>Ekki</1>",
+        "subtitle": "Senior Software Engineer (QA)",
+        "description": "I'm a Senior QA Engineer at <strong>Ninja Van</strong> with over 4 years of experience building automation frameworks for web, mobile, and APIs. I believe in <strong>\"Tooling over Manual Labor\"</strong>—building custom systems that empower teams to ship with confidence while preventing critical production issues.",
+        "connect": "Connect on LinkedIn",
+        "github": "GitHub Profile",
+        "resume": "Resume"
+    },
+    "philosophy": {
+        "title": "Engineering Quality",
+        "intro": "Quality isn't just about checking boxes. It's about <strong>Shift-Left</strong> and taking ownership of production.",
+        "listIntro": "I built TestingWithEkki to demonstrate the same engineering rigor I apply at work:",
+        "list": {
+            "auth": "<strong>Scalable Architecture</strong>: Real authentication and session management, not just a static site.",
+            "code": "<strong>Interactive Tooling</strong>: Sandboxed environments similar to the custom dev tools I build for internal teams.",
+            "gamification": "<strong>User Engagement</strong>: Gamification mechanics to make learning automation sticky.",
+            "i18n": "<strong>Global Readiness</strong>: Full internationalization support."
+        },
+        "conclusion": "Quality is an engineering discipline. I build the tools and frameworks that enforce reliability. Whether it's a Go backend or this React platform, I write code that solves real quality problems."
+    },
+    "expertise": {
+        "title": "Technical Expertise",
+        "subtitle": "My toolkit for building stable, scalable systems",
+        "automation": {
+            "title": "Test Automation",
+            "items": [
+                "Playwright",
+                "Appium",
+                "Selenium",
+                "DeepEval (LLM)",
+                "Rest Assured"
+            ]
+        },
+        "backend": {
+            "title": "Backend & Languages",
+            "items": [
+                "Go (Golang)",
+                "Java",
+                "Python",
+                "PostgreSQL",
+                "Bun"
+            ]
+        },
+        "engineering": {
+            "title": "Full-Stack & DevOps",
+            "items": [
+                "React 19",
+                "TypeScript",
+                "Docker",
+                "CI/CD (Bamboo/GHA)",
+                "TanStack"
+            ]
+        }
+    },
+    "gear": {
+        "title": "Gear & Tools",
+        "subtitle": "The tools I use to build and test high-quality software",
+        "hardware": "Hardware",
+        "software": "Software",
+        "productivity": "Productivity",
+        "items": {
+            "macbook": {
+                "name": "MacBook Pro M3 Max",
+                "desc": "My daily driver for everything."
+            },
+            "keyboard": {
+                "name": "Keychron Q1 Pro",
+                "desc": "Mechanical keyboard because sound matters."
+            },
+            "monitor": {
+                "name": "Dell UltraSharp 27\"",
+                "desc": "4K clarity for pixel-perfect testing."
+            },
+            "vscode": {
+                "name": "Visual Studio Code",
+                "desc": "With the GitHub Dark theme."
+            },
+            "arc": {
+                "name": "Arc Browser",
+                "desc": "The browser for the modern web."
+            },
+            "ghostty": {
+                "name": "Ghostty",
+                "desc": "Fast, feature-rich terminal."
+            },
+            "notion": {
+                "name": "Notion",
+                "desc": "For organizing my life and docs."
+            },
+            "linear": {
+                "name": "Linear",
+                "desc": "Issue tracking done right."
+            },
+            "raycast": {
+                "name": "Raycast",
+                "desc": "Spotlight on steroids."
+            }
+        }
+    },
+    "contact": {
+        "title": "Looking for a QA Engineer who understands the full stack?",
+        "cta": "Get in Touch"
+    }
+}
