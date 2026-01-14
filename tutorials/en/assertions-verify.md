@@ -103,7 +103,7 @@ Validating "Truth" is a science.
 ### Official Documentation
 
 * **[Playwright Assertions](https://playwright.dev/docs/test-assertions)**: The guide to "Web-First" checking that never sleeps.
-* **[Jest Expect API](https://jestjs.io/docs/expect)**: Playwright uses Jest under the hood. This acts as the "Dictionary" of every check possible (e.g., `.toBeGreaterThan()`).
+* **[Jest Expect API](https://jestjs.io/docs/expect)**: Playwright uses an Expect API compatible with Jest. This acts as the "Dictionary" of every check possible (e.g., `.toBeGreaterThan()`).
 
 ### Technical Logic (MDN)
 
