@@ -130,7 +130,7 @@ export function WebComponentPreview({
                     body {
                         margin: 0;
                         padding: 16px;
-                        font-family: system-ui, -apple-system, sans-serif;
+                        font-family: 'Outfit', system-ui, -apple-system, sans-serif;
                         background: #ffffff;
                         color: #1f2937;
                         min-height: 100vh;
@@ -499,6 +499,7 @@ export function WebComponentPreview({
                                     <html>
                                         <head>
                                             <style>
+                                                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
                                                 ${cssContent}
                                                 /* Inject selection styles */
                                                 [data-highlight="true"] {
@@ -515,7 +516,7 @@ export function WebComponentPreview({
                                                     margin: 0;
                                                     padding: 16px;
                                                     min-height: 100vh;
-                                                    font-family: system-ui, -apple-system, sans-serif;
+                                                    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
                                                 }
                                             </style>
                                         </head>
