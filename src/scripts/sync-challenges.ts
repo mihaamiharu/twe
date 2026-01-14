@@ -1,0 +1,95 @@
+import { db } from '../db';
+import { challenges, testCases } from '../db/schema';
+import { eq } from 'drizzle-orm';
+import { getRawChallengeContent, getChallengeList } from '../server/content.server';
+
+async function syncChallenges() {
+    console.log('🔄 Starting challenge sync...');
+
+    try {
+        // 1. Get all challenges from filesystem
+        const fsChallenges = await getChallengeList('en'); // Locale doesn't matter for list
+        console.log(`📂 Found ${fsChallenges.length} challenges in filesystem.`);
+
+        let updatedCount = 0;
+        let createdCount = 0;
+
+        for (const item of fsChallenges) {
+            const rawContent = await getRawChallengeContent(item.slug);
+
+            if (!rawContent) {
+                console.warn(`⚠️ Could not load raw content for ${item.slug}`);
+                continue;
+            }
+
+            // Check if exists in DB
+            const existing = await db.query.challenges.findFirst({
+                where: eq(challenges.slug, item.slug)
+            });
+
+            const challengeData = {
+                slug: rawContent.slug,
+                title: rawContent.title as any,
+                description: rawContent.description as any,
+                type: rawContent.type,
+                difficulty: rawContent.difficulty,
+                xpReward: rawContent.xpReward,
+                order: rawContent.order,
+                instructions: rawContent.instructions as any,
+                htmlContent: rawContent.htmlContent,
+                starterCode: rawContent.starterCode,
+                category: rawContent.category,
+                tags: rawContent.tags,
+                isPublished: true,
+                updatedAt: new Date()
+            };
+
+            if (existing) {
+                // Update
+                await db.update(challenges)
+                    .set(challengeData)
+                    .where(eq(challenges.id, existing.id));
+
+                // Sync test cases? (Optional, but good practice)
+                // For now, let's focus on healing the main metadata/titles
+                updatedCount++;
+            } else {
+                // Create
+                const [newChallenge] = await db.insert(challenges)
+                    .values(challengeData)
+                    .returning();
+
+                // Insert test cases for new challenge
+                if (rawContent.testCases && rawContent.testCases.length > 0) {
+                    await db.insert(testCases).values(
+                        rawContent.testCases.map((tc: any, index: number) => ({
+                            challengeId: newChallenge.id,
+                            description: tc.description,
+                            input: tc.input,
+                            expectedOutput: tc.expectedOutput,
+                            isHidden: tc.isHidden || false,
+                            order: index,
+                        }))
+                    );
+                }
+                createdCount++;
+            }
+        }
+
+        console.log(`✅ Sync Complete.`);
+        console.log(`   - Created: ${createdCount}`);
+        console.log(`   - Updated: ${updatedCount}`);
+
+    } catch (error) {
+        console.error('❌ Sync Failed:', error);
+        process.exit(1);
+    }
+}
+
+// Run the sync
+syncChallenges()
+    .then(() => process.exit(0))
+    .catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });

@@ -17,7 +17,7 @@ import type {
   ChallengeFilters,
   ChallengeTier,
   LocalizedString,
-} from './content.types';
+} from '@/lib/content.types';
 
 // =============================================================================
 // HELPERS
@@ -310,6 +310,23 @@ export async function getChallengeContent(
 }
 
 /**
+ * Get raw challenge definition (including localized objects)
+ */
+export async function getRawChallengeContent(
+  slug: string,
+): Promise<ChallengeDefinition | null> {
+  const challenges = await loadAllChallenges();
+  const def = challenges.get(slug);
+
+  if (!def) return null;
+
+  // Block access to non-published content
+  if (def.status && def.status !== 'published') return null;
+
+  return def;
+}
+
+/**
  * Get filtered challenge list
  */
 export async function getChallengeList(
@@ -358,6 +375,13 @@ export async function getChallengeList(
   return results.sort((a, b) => a.order - b.order);
 }
 
+// =============================================================================
+// CACHE & STATS
+// =============================================================================
+
+let tierTotalCache: Record<string, number> | null = null;
+import { getTierFromCategory } from '@/lib/constants';
+
 /**
  * Clear caches (useful for development/hot reload)
  */
@@ -365,4 +389,32 @@ export function clearContentCaches(): void {
   registryCache = null;
   challengeCache = new Map();
   challengeCacheLoaded = false;
+  tierTotalCache = null;
+}
+
+/**
+ * Get cached tier totals (fixes #3: avoids recalculating on every request)
+ */
+export async function getCachedTierTotals(): Promise<Record<string, number>> {
+  if (tierTotalCache) return tierTotalCache;
+
+  const allChallenges = await getChallengeList('en');
+  const totals: Record<string, number> = {
+    basic: 0,
+    beginner: 0,
+    intermediate: 0,
+    expert: 0,
+  };
+
+  allChallenges.forEach((c) => {
+    const tier = getTierFromCategory(c.category || undefined);
+    if (totals[tier] !== undefined) {
+      totals[tier]++;
+    } else {
+      totals['basic'] = (totals['basic'] || 0) + 1;
+    }
+  });
+
+  tierTotalCache = totals;
+  return totals;
 }
