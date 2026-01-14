@@ -47,10 +47,27 @@ export interface Locator {
     pageFunction: (element: HTMLElement, arg: Arg) => R | Promise<R>,
     arg?: Arg,
   ): Promise<R>;
-  locator(selector: string): Locator;
-  filter(options: { hasText?: string | RegExp }): Locator;
+  locator(
+    selector: string,
+    options?: { hasText?: string | RegExp; has?: Locator },
+  ): Locator;
+  filter(options: { hasText?: string | RegExp; has?: Locator }): Locator;
   all(): Promise<Locator[]>;
   allTextContents(): Promise<string[]>;
+  elementHandles(): Promise<HTMLElement[]>; // Internal helper exposed for filter({ has })
+  getByRole(role: string, options?: LocatorOptions): Locator;
+  getByText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+  getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator;
+  getByPlaceholder(
+    text: string | RegExp,
+    options?: { exact?: boolean },
+  ): Locator;
+  getByTestId(testId: string): Locator;
+  hover(options?: { force?: boolean; noWaitAfter?: boolean }): Promise<void>;
+  waitFor(options?: {
+    state?: 'attached' | 'detached' | 'visible' | 'hidden';
+    timeout?: number;
+  }): Promise<void>;
 }
 
 export interface LocatorOptions {
@@ -857,8 +874,8 @@ export class MockedPlaywrightPage {
   } | null {
     return {
       path: () => Promise.resolve('/tmp/video.mp4'),
-      delete: async () => {},
-      saveAs: async () => {},
+      delete: async () => { },
+      saveAs: async () => { },
     };
   }
 
@@ -1058,8 +1075,8 @@ export class MockedPlaywrightPage {
           return options.exact
             ? text.trim() === options.name
             : text
-                .toLowerCase()
-                .includes((options.name as string).toLowerCase());
+              .toLowerCase()
+              .includes((options.name as string).toLowerCase());
         });
       }
 
@@ -1096,6 +1113,16 @@ export class MockedPlaywrightPage {
         }
       }
 
+      // Filter out parents if children match (Deepest match principle)
+      // If A contains B, and both match, only keep B.
+      const filteredElements = elements.filter((el) => {
+        // Check if any *other* matched element is a descendant of this 'el'
+        const hasMatchingDescendant = elements.some(
+          (other) => other !== el && el.contains(other),
+        );
+        return !hasMatchingDescendant;
+      });
+
       // Sort by depth (deepest first) so innermost elements come first
       // This mimics Playwright's behavior of preferring specific elements
       const getDepth = (el: HTMLElement): number => {
@@ -1108,7 +1135,7 @@ export class MockedPlaywrightPage {
         return depth;
       };
 
-      return elements.sort((a, b) => getDepth(b) - getDepth(a));
+      return filteredElements.sort((a, b) => getDepth(b) - getDepth(a));
     });
   }
 
@@ -1381,9 +1408,8 @@ export class MockedPlaywrightPage {
     let filterIndex: number | null = null;
     let filterType: 'first' | 'last' | 'nth' | null = null;
 
-    // Expose finder for internal cross-locator delegation (e.g. frameLocator)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (this as any).finder = () => {
+    // Helper to apply current filters (first/last/nth) to the finder results
+    const getFilteredElements = (): HTMLElement[] => {
       const elements = finder();
       if (elements.length === 0) return [];
 
@@ -1395,28 +1421,28 @@ export class MockedPlaywrightPage {
       return elements;
     };
 
+    // Expose finder for internal cross-locator delegation (e.g. frameLocator)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (this as any).finder = getFilteredElements;
+
     const getElement = (): HTMLElement | null => {
-      const elements = finder();
+      const elements = getFilteredElements();
       if (elements.length === 0) return null;
-
-      if (filterType === 'first') return elements[0];
-      if (filterType === 'last') return elements[elements.length - 1];
-      if (filterType === 'nth' && filterIndex !== null)
-        return elements[filterIndex] || null;
-
-      return elements[0]; // Default to first
+      return elements[0];
     };
 
     /**
      * Strict mode check - throws if multiple elements match without explicit filter
      */
     const strictCheck = () => {
-      const elements = finder();
-      if (elements.length > 1 && filterType === null) {
+      // For strict check, we look at what would be returned *after* filtering
+      // If the user already applied .first(), filtering returns 1 element, so strictly valid.
+      const elements = getFilteredElements();
+      if (elements.length > 1) {
         throw new Error(
           `Strict mode violation: locator resolved to ${elements.length} elements. ` +
-            `Use .first(), .last(), or .nth() to select a specific element, ` +
-            `or make your selector more specific.`,
+          `Use .first(), .last(), or .nth() to select a specific element, ` +
+          `or make your selector more specific.`,
         );
       }
     };
@@ -1569,7 +1595,7 @@ export class MockedPlaywrightPage {
       },
 
       count: () => {
-        return Promise.resolve(finder().length);
+        return Promise.resolve(getFilteredElements().length);
       },
 
       first: () => {
@@ -1733,9 +1759,12 @@ export class MockedPlaywrightPage {
         return fn(el, arg as Arg);
       },
 
-      locator: (subSelector: string) => {
-        return this.createLocator(() => {
-          const parents = finder();
+      locator: (
+        subSelector: string,
+        options?: { hasText?: string | RegExp; has?: Locator },
+      ) => {
+        let loc = this.createLocator(() => {
+          const parents = getFilteredElements();
           const children: HTMLElement[] = [];
           for (const parent of parents) {
             const matchedElements = this._findAll(parent, subSelector);
@@ -1743,40 +1772,283 @@ export class MockedPlaywrightPage {
           }
           return children;
         });
+
+        if (options?.hasText || options?.has) {
+          loc = loc.filter(options);
+        }
+        return loc;
       },
 
-      filter: (options: { hasText?: string | RegExp }) => {
+      filter: (options: { hasText?: string | RegExp; has?: Locator }) => {
         return this.createLocator(() => {
-          const elements = finder();
-          return elements.filter((el) => {
-            if (options.hasText) {
+          const elements = getFilteredElements();
+
+          // Filter by hasText
+          let filtered = elements;
+          if (options.hasText) {
+            filtered = filtered.filter((el) => {
               const content = el.textContent || '';
               if (options.hasText instanceof RegExp) {
                 return options.hasText.test(content);
               }
               return content
                 .toLowerCase()
-                .includes(options.hasText.toLowerCase());
+                .includes((options.hasText as string).toLowerCase());
+            });
+          }
+
+          // Filter by has (Locator)
+          if (options.has) {
+            // We need to resolve the matching elements of the 'has' locator
+            // Since we can't await here, we rely on the fact that our shim's finder is synchronous
+            // EXCEPT that createLocator doesn't expose the finder publicly typed. 
+            // But we added elementHandles() which is async... wait.
+            // The finder inside createLocator is synchronous () => HTMLElement[].
+
+            // To solve this properly in a sync finder:
+            // We need access to the 'has' locator's finder.
+            // We cast to any to access the internal finder if possible.
+
+            const hasLocatorAny = options.has as any;
+            let hasElements: HTMLElement[] = [];
+
+            if (typeof hasLocatorAny.finder === 'function') {
+              hasElements = hasLocatorAny.finder();
+            } else {
+              // Fallback: If passed a locator from outside the shim or different structure
+              // We might just skip filtering or warn?
+              // For now assuming it's our Shim locator
             }
-            return true;
-          });
+
+            filtered = filtered.filter(el => {
+              return hasElements.some(hasEl => el.contains(hasEl));
+            });
+          }
+
+          return filtered;
         });
       },
 
       all: async () => {
-        const elements = finder();
+        const elements = getFilteredElements();
         return elements.map((_, index) => {
           // Create a new locator for each specific index
           // This uses .nth(index) semantics
-          const newLocator = this.createLocator(finder);
+          const newLocator = this.createLocator(getFilteredElements);
           newLocator.nth(index);
           return newLocator;
         });
       },
 
       allTextContents: async () => {
-        const elements = finder();
+        const elements = getFilteredElements();
         return elements.map((el) => el.textContent || '');
+      },
+
+      getByRole: (role: string, options?: LocatorOptions) => {
+        return this.createLocator(() => {
+          const parents = getFilteredElements();
+          const children: HTMLElement[] = [];
+
+          // Helper to reuse the page-level getByRole logic but scoped
+          // We cheat a bit by creating a temporary page wrapper for each parent's subtree
+          // This is inefficient but functional for the shim
+          for (const parent of parents) {
+            // Basic implementation: querySelectorAll within parent based on role logic
+            const roleToTag: Record<string, string> = {
+              button:
+                'button, [role="button"], input[type="submit"], input[type="button"]',
+              textbox:
+                'input[type="text"], input[type="email"], input[type="password"], textarea, [role="textbox"]',
+              checkbox: 'input[type="checkbox"], [role="checkbox"]',
+              radio: 'input[type="radio"], [role="radio"]',
+              link: 'a, [role="link"]',
+              heading: 'h1, h2, h3, h4, h5, h6, [role="heading"]',
+              listitem: 'li, [role="listitem"]',
+              img: 'img, [role="img"]',
+            };
+
+            const selector = roleToTag[role] || `[role="${role}"]`;
+            let matches = Array.from(
+              parent.querySelectorAll(selector),
+            ) as HTMLElement[];
+
+            if (options?.name) {
+              matches = matches.filter((el) => {
+                const text =
+                  el.textContent || el.getAttribute('aria-label') || '';
+                if (options.name instanceof RegExp) {
+                  return options.name.test(text);
+                }
+                return options.exact
+                  ? text.trim() === options.name
+                  : text.toLowerCase().includes(
+                    (options.name as string).toLowerCase(),
+                  );
+              });
+            }
+            children.push(...matches);
+          }
+          return children;
+        });
+      },
+
+      getByText: (text: string | RegExp, options?: { exact?: boolean }) => {
+        return this.createLocator(() => {
+          const parents = getFilteredElements();
+          const children: HTMLElement[] = [];
+
+          for (const parent of parents) {
+            const walker = this.targetDocument.createTreeWalker(
+              parent,
+              NodeFilter.SHOW_ELEMENT,
+            );
+            let node: Node | null;
+            const parentMatches: HTMLElement[] = [];
+            while ((node = walker.nextNode())) {
+              const el = node as HTMLElement;
+              const content = el.textContent || '';
+              const isMatch =
+                text instanceof RegExp
+                  ? text.test(content)
+                  : options?.exact
+                    ? content.trim() === text
+                    : content.toLowerCase().includes(text.toLowerCase());
+
+              if (isMatch) parentMatches.push(el);
+            }
+            // Apply deep filter per parent context
+            // Filter out parents if children match (Deepest match principle)
+            // If A contains B, and both match, only keep B.
+            const filteredElements = parentMatches.filter((el) => {
+              // Check if any *other* matched element is a descendant of this 'el'
+              const hasMatchingDescendant = parentMatches.some(
+                (other) => other !== el && el.contains(other),
+              );
+              return !hasMatchingDescendant;
+            });
+            children.push(...filteredElements);
+          }
+          return children;
+        });
+      },
+
+      getByLabel: (text: string | RegExp, options?: { exact?: boolean }) => {
+        return this.createLocator(() => {
+          const parents = getFilteredElements();
+          const children: HTMLElement[] = [];
+          for (const parent of parents) {
+            const labels = Array.from(parent.querySelectorAll('label'));
+            for (const label of labels) {
+              const labelText = label.textContent || '';
+              const isMatch =
+                text instanceof RegExp
+                  ? text.test(labelText)
+                  : options?.exact
+                    ? labelText.trim() === text
+                    : labelText.toLowerCase().includes(text.toLowerCase());
+
+              if (isMatch) {
+                const forId = label.getAttribute('for');
+                if (forId) {
+                  const input = this.targetDocument.getElementById(forId);
+                  if (input) children.push(input);
+                } else {
+                  const input = label.querySelector('input, textarea, select');
+                  if (input) children.push(input as HTMLElement);
+                }
+              }
+            }
+          }
+          return children;
+        });
+      },
+
+      getByPlaceholder: (
+        text: string | RegExp,
+        options?: { exact?: boolean },
+      ) => {
+        return this.createLocator(() => {
+          const parents = getFilteredElements();
+          const children: HTMLElement[] = [];
+          for (const parent of parents) {
+            const inputs = Array.from(
+              parent.querySelectorAll('[placeholder]'),
+            ) as HTMLElement[];
+            const matches = inputs.filter((el) => {
+              const ph = el.getAttribute('placeholder') || '';
+              return text instanceof RegExp
+                ? text.test(ph)
+                : options?.exact
+                  ? ph === text
+                  : ph.toLowerCase().includes(text.toLowerCase());
+            });
+            children.push(...matches);
+          }
+          return children;
+        });
+      },
+
+      getByTestId: (testId: string) => {
+        return locator.locator(`[data-testid="${testId}"]`);
+      },
+
+      hover: async (options?: { force?: boolean }) => {
+        await this.delay(50);
+        strictCheck();
+        const el = getElement();
+        if (!el) throw new Error('Element not found');
+        if (!options?.force && !this.isVisible(el))
+          throw new Error('Element is not visible');
+
+        logger.debug(`[Action] hover`);
+        await this._highlight(el);
+        el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+        el.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
+        el.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }));
+      },
+
+      waitFor: async (options?: {
+        state?: 'attached' | 'detached' | 'visible' | 'hidden';
+        timeout?: number;
+      }) => {
+        const state = options?.state || 'visible';
+        const timeout = options?.timeout || this.defaultTimeout;
+        const startTime = Date.now();
+
+        logger.debug(`[Action] waitFor state=${state}`);
+
+        while (Date.now() - startTime < timeout) {
+          const el = getElement();
+          const isAttached = !!el;
+          // For 'visible', we need attached AND visible
+          const isVisible = isAttached && this.isVisible(el!);
+
+          let satisfied = false;
+          switch (state) {
+            case 'attached':
+              satisfied = isAttached;
+              break;
+            case 'detached':
+              satisfied = !isAttached;
+              break;
+            case 'visible':
+              satisfied = isVisible;
+              break;
+            case 'hidden':
+              satisfied = !isVisible; // Detached is also considered hidden in Playwright
+              break;
+          }
+
+          if (satisfied) return;
+          await this.delay(100);
+        }
+
+        throw new Error(`Timeout ${timeout}ms exceeded waiting for ${state}`);
+      },
+
+      elementHandles: async () => {
+        return getFilteredElements();
       },
     };
 

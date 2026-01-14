@@ -548,6 +548,7 @@ export function ChallengePlayground({
           {challenge.htmlContent && (
             <WebComponentPreview
               htmlContent={challenge.htmlContent}
+              cssContent={defaultSelectorStyles}
               userSelector={isSelectorChallenge ? selector : undefined}
               selectorType={selectorType}
               targetSelector={challenge.targetSelector as string}
@@ -657,9 +658,7 @@ export function ChallengePlayground({
             >
               <WebComponentPreview
                 htmlContent={challenge.htmlContent}
-                cssContent={
-                  isSelectorChallenge ? defaultSelectorStyles : undefined
-                }
+                cssContent={defaultSelectorStyles}
                 userSelector={isSelectorChallenge ? selector : undefined}
                 selectorType={selectorType}
                 targetSelector={challenge.targetSelector as string}
