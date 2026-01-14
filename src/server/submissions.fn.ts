@@ -189,7 +189,10 @@ export const createSubmission = createServerFn({ method: 'POST' })
       let levelUpInfo = null;
 
       if (isFirstCompletion) {
-        xpEarned = challenge.xpReward;
+        // Check if hint was used for this challenge - apply 50% XP penalty
+        const hintUsed = existingProgress?.usedHint || false;
+        const xpMultiplier = hintUsed ? 0.5 : 1;
+        xpEarned = Math.floor(challenge.xpReward * xpMultiplier);
 
         // Get current user XP
         const user = await db.query.users.findFirst({
@@ -211,7 +214,7 @@ export const createSubmission = createServerFn({ method: 'POST' })
             .where(eq(users.id, userId));
 
           logger.info(
-            `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP.`,
+            `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP${hintUsed ? ' (50% penalty for hint usage)' : ''}.`,
           );
 
           // Increment challenge completion count

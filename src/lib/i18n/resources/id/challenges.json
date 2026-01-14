@@ -65,6 +65,18 @@
     "complete": "Latihan selesai! Bagus untuk terus berlatih.",
     "noXp": "Tidak ada XP di mode latihan"
   },
+  "hints": {
+    "button": "Dapatkan Petunjuk AI",
+    "loading": "Menghasilkan petunjuk...",
+    "used": "Petunjuk Digunakan",
+    "alreadyUsed": "Kamu sudah menggunakan petunjuk untuk tantangan ini",
+    "warningTitle": "Gunakan Petunjuk AI?",
+    "warning": "Menggunakan petunjuk akan mengurangi hadiah XP kamu sebesar 50% saat menyelesaikan tantangan ini.",
+    "confirm": "Tetap Gunakan Petunjuk",
+    "cancel": "Batal",
+    "title": "Petunjuk AI",
+    "penalty": "-50% XP"
+  },
   "types": {
     "css_selector": "Selektor CSS",
     "xpath_selector": "XPath",

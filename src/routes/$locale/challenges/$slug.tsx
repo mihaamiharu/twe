@@ -350,6 +350,7 @@ function ChallengeDetailPage() {
           challenge={challenge}
           onSubmit={handleSubmit}
           userId={userId}
+          hintUsed={data?.data?.userProgress?.usedHint || false}
         />
       </div>
 
