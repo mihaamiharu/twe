@@ -76,42 +76,41 @@ async function syncChallenges() {
             }
             createdCount++;
         }
-    }
 
         // 2. Handle Deletions (Unpublish content missing from FS)
         const fsSlugs = new Set(fsChallenges.map(c => c.slug));
 
-    // Get all published challenges from DB
-    const dbChallenges = await db.query.challenges.findMany({
-        where: eq(challenges.isPublished, true),
-        columns: { id: true, slug: true }
-    });
+        // Get all published challenges from DB
+        const dbChallenges = await db.query.challenges.findMany({
+            where: eq(challenges.isPublished, true),
+            columns: { id: true, slug: true }
+        });
 
-    let unpublishedCount = 0;
+        let unpublishedCount = 0;
 
-    for (const dbChallenge of dbChallenges) {
-        if (!fsSlugs.has(dbChallenge.slug)) {
-            // Challenge exists in DB but not in FS -> Unpublish
-            console.log(`🗑️  Unpublishing deleted challenge: ${dbChallenge.slug}`);
-            await db.update(challenges)
-                .set({
-                    isPublished: false,
-                    updatedAt: new Date()
-                })
-                .where(eq(challenges.id, dbChallenge.id));
-            unpublishedCount++;
+        for (const dbChallenge of dbChallenges) {
+            if (!fsSlugs.has(dbChallenge.slug)) {
+                // Challenge exists in DB but not in FS -> Unpublish
+                console.log(`🗑️  Unpublishing deleted challenge: ${dbChallenge.slug}`);
+                await db.update(challenges)
+                    .set({
+                        isPublished: false,
+                        updatedAt: new Date()
+                    })
+                    .where(eq(challenges.id, dbChallenge.id));
+                unpublishedCount++;
+            }
         }
+
+        console.log(`✅ Sync Complete.`);
+        console.log(`   - Created: ${createdCount}`);
+        console.log(`   - Updated: ${updatedCount}`);
+        console.log(`   - Unpublished: ${unpublishedCount}`);
+
+    } catch (error) {
+        console.error('❌ Sync Failed:', error);
+        process.exit(1);
     }
-
-    console.log(`✅ Sync Complete.`);
-    console.log(`   - Created: ${createdCount}`);
-    console.log(`   - Updated: ${updatedCount}`);
-    console.log(`   - Unpublished: ${unpublishedCount}`);
-
-} catch (error) {
-    console.error('❌ Sync Failed:', error);
-    process.exit(1);
-}
 }
 
 // Run the sync
