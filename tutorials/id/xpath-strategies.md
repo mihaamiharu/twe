@@ -39,7 +39,7 @@ Ini adalah perbedaan teknis paling krusial yang harus kamu tau biar script-mu ng
 
 ### Kekuatan Super #1: Pencocokan Teks (Text Matching)
 
-Kayak yang udah dibahas sebelumnya, CSS itu "buta huruf"—dia nggak bisa baca teks di layar. XPath bisa nargetin kata-kata yang persis sama atau cuma sebagian (*partial match*).
+Kayak yang udah dibahas sebelumnya, CSS itu "buta huruf" - dia nggak bisa baca teks di layar. XPath bisa nargetin kata-kata yang persis sama atau cuma sebagian (*partial match*).
 
 * **Exact Match (Persis):** `//button[text()='Login']`
 * **Partial Match (Mengandung kata):** `//p[contains(text(), 'Error')]`
