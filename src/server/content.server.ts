@@ -62,9 +62,20 @@ function parseFrontmatter(content: string): {
 
   for (const line of frontmatter.split('\n')) {
     const [key, ...valueParts] = line.split(':');
-    const value = valueParts.join(':').trim();
-    if (key === 'title') meta.title = value;
-    if (key === 'description') meta.description = value;
+    if (!key || valueParts.length === 0) continue;
+
+    let value = valueParts.join(':').trim();
+
+    // Strip quotes if present
+    if (
+      (value.startsWith("'") && value.endsWith("'")) ||
+      (value.startsWith('"') && value.endsWith('"'))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (key.trim() === 'title') meta.title = value;
+    if (key.trim() === 'description') meta.description = value;
   }
 
   return { meta, content: body.trim() };
