@@ -41,7 +41,7 @@ This document analyzes the current implementation of TestingWithEkki (TWE) again
 **The Conflict:** The project explicitly adopted "Soft Brutalism" recently. Moving to "Linear Style" requires a significant rollback of the `styles.css` and component classes (removing `hard-shadow`, `border-2`).
 
 **Recommendation:**
-Shift towards **"Refined Industrial"**—keep the _layout_ strict (like Brutalism) but refine the _interactivity_ and _borders_ to be thinner and cleaner (like Linear).
+Shift towards **"Refined Industrial"** - keep the _layout_ strict (like Brutalism) but refine the _interactivity_ and _borders_ to be thinner and cleaner (like Linear).
 
 - Change `border-2` -> `border`.
 - Remove `hard-shadow` in Dark Mode.
