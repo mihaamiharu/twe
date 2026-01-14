@@ -12,6 +12,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,8 @@ import {
   Loader2,
   Target,
   BookOpen,
+  Lightbulb,
+  Sparkles,
   AlertCircle,
   GripVertical,
   ChevronLeft,
@@ -178,6 +181,7 @@ export interface ChallengePlaygroundProps {
   }) => void;
   userId?: string;
   className?: string;
+  hintUsed?: boolean; // Whether user has already used hint for this challenge
 }
 
 export function ChallengePlayground({
@@ -185,6 +189,7 @@ export function ChallengePlayground({
   onSubmit,
   userId,
   className,
+  hintUsed: initialHintUsed = false,
 }: ChallengePlaygroundProps) {
   const { t, i18n } = useTranslation(['challenges', 'common']);
   const locale = i18n.language;
@@ -193,6 +198,37 @@ export function ChallengePlayground({
   const [selector, setSelector] = useState('');
   const [resetCount, setResetCount] = useState(0);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+
+  // AI Hint state
+  const [isHintDialogOpen, setIsHintDialogOpen] = useState(false);
+  const [hintContent, setHintContent] = useState<string | null>(null);
+  const [hintUsed, setHintUsed] = useState(initialHintUsed);
+
+  // AI Hint mutation
+  const hintMutation = useMutation({
+    mutationFn: async () => {
+      const { getAIHint } = await import('@/server/ai.fn');
+      const currentCode = isCodeChallenge ? code : selector;
+      return getAIHint({
+        data: {
+          challengeSlug: challenge.slug,
+          userAttempt: currentCode || undefined,
+          locale,
+        },
+      });
+    },
+    onSuccess: (result) => {
+      if (result.success && result.hint) {
+        setHintContent(result.hint);
+        setHintUsed(true);
+        setIsHintDialogOpen(false);
+      }
+    },
+    onError: (error) => {
+      console.error('[AI Hint] Error:', error);
+      setIsHintDialogOpen(false);
+    },
+  });
 
   const [selectorType, setSelectorType] = useState<SelectorType>(
     challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css',
@@ -219,7 +255,9 @@ export function ChallengePlayground({
     setIsRunning(false);
     setActiveTab('instructions');
     setPreviewValidation(null);
-  }, [challenge.id, challenge.starterCode, challenge.type]);
+    setHintContent(null);
+    setHintUsed(initialHintUsed);
+  }, [challenge.id, challenge.starterCode, challenge.type, initialHintUsed]);
 
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [consoleLogs, setConsoleLogs] = useState<LogEntry[]>([]);
@@ -988,6 +1026,46 @@ export function ChallengePlayground({
             </Link>
           )}
 
+          {/* AI Hint Button */}
+          {!challenge.isCompleted && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => hintUsed ? null : setIsHintDialogOpen(true)}
+                    disabled={hintMutation.isPending}
+                    className={cn(
+                      'font-bold border transition-all',
+                      hintUsed
+                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 cursor-default'
+                        : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
+                    )}
+                  >
+                    {hintMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Lightbulb className="h-4 w-4 mr-2" />
+                    )}
+                    {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}
+                    {!hintUsed && (
+                      <Badge variant="secondary" className="ml-2 bg-amber-500/20 text-amber-700 text-xs">
+                        {t('challenges:hints.penalty')}
+                      </Badge>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {hintUsed
+                    ? t('challenges:hints.alreadyUsed')
+                    : t('challenges:hints.warning')
+                  }
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -1067,6 +1145,83 @@ export function ChallengePlayground({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* AI Hint Confirmation Dialog */}
+      <Dialog open={isHintDialogOpen} onOpenChange={setIsHintDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-amber-500/10 p-2 rounded-full">
+                <Lightbulb className="h-5 w-5 text-amber-600" />
+              </div>
+              <DialogTitle>{t('challenges:hints.warningTitle')}</DialogTitle>
+            </div>
+          </DialogHeader>
+          <DialogDescription className="space-y-3">
+            <p>{t('challenges:hints.warning')}</p>
+            <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+              <span className="text-sm font-medium text-amber-700">
+                {t('challenges:hints.penalty')}
+              </span>
+            </div>
+          </DialogDescription>
+          <DialogFooter className="mt-4 sm:justify-end gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => setIsHintDialogOpen(false)}
+              className="hover:bg-accent"
+            >
+              {t('challenges:hints.cancel')}
+            </Button>
+            <Button
+              onClick={() => hintMutation.mutate()}
+              disabled={hintMutation.isPending}
+              className="bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
+            >
+              {hintMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              {t('challenges:hints.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Hint Display Panel (floating) */}
+      {hintContent && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-4">
+          <Card className="border-amber-500/30 bg-amber-50/95 dark:bg-amber-950/95 shadow-lg backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-amber-500/20 p-1.5 rounded-full shrink-0 mt-0.5">
+                  <Lightbulb className="h-4 w-4 text-amber-600" />
+                </div>
+                <div className="space-y-2 flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="font-bold text-amber-800 dark:text-amber-200 text-sm">
+                      {t('challenges:hints.title')}
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setHintContent(null)}
+                      className="h-6 w-6 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-500/20"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                  <p className="text-sm text-amber-900 dark:text-amber-100 leading-relaxed">
+                    {hintContent}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
