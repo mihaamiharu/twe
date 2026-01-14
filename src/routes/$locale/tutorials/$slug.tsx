@@ -370,7 +370,6 @@ function TutorialDetailPage() {
               {/* Title */}
               <h1
                 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight max-w-4xl"
-                style={{ fontFamily: 'var(--font-reading)' }}
               >
                 {tutorial.title}
               </h1>
@@ -386,7 +385,6 @@ function TutorialDetailPage() {
               ref={contentRef}
               className="prose prose-lg dark:prose-invert max-w-none scroll-smooth"
               style={{
-                fontFamily: 'var(--font-reading)',
                 lineHeight: '1.8',
               }}
             >

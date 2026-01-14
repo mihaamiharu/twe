@@ -61,7 +61,7 @@ import { SelectorInput, type SelectorType } from './SelectorInput';
 
 const defaultSelectorStyles = `
 /* Base Layout */
-body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #334155; }
+body { font-family: 'Outfit', system-ui, sans-serif; background: #f8fafc; color: #334155; }
 h1, h2, h3, h4 { color: #0f172a; margin-top: 0; }
 
 /* Components */
