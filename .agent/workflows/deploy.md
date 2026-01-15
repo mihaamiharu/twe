@@ -70,6 +70,23 @@ docker exec -it twe-app bun run db:migrate
 
 ---
 
+## Email Setup (Cloudflare Email Routing)
+
+1. In Cloudflare dashboard → select `testingwithekki.com`
+2. Go to **Email** → **Email Routing** → Enable
+3. Create route: `ekki` → `ekkisyam23@gmail.com`
+4. In Gmail → Settings → **Accounts and Import** → Add `ekki@testingwithekki.com` as "Send mail as"
+5. Update `.env.production`:
+
+```env
+SMTP_USER="ekkisyam23@gmail.com"
+SMTP_PASSWORD="your-app-password"
+SMTP_FROM="TestingWithEkki <ekki@testingwithekki.com>"
+ADMIN_EMAIL="ekki@testingwithekki.com"
+```
+
+---
+
 ## Logs & Debug
 
 ```bash
