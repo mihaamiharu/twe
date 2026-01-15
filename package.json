@@ -29,7 +29,6 @@
     "start": "bun run scripts/server.ts"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-avatar": "^1.1.11",
@@ -60,6 +59,7 @@
     "lucide-react": "^0.544.0",
     "monaco-editor": "^0.55.1",
     "nodemailer": "^7.0.11",
+    "openai": "^6.16.0",
     "postgres": "^3.4.7",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

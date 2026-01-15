@@ -1,16 +1,20 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import OpenAI from 'openai';
 
-// Initialize Gemini client
+// Initialize OpenAI client for DeepSeek
 const getClient = () => {
-    const apiKey = process.env.GOOGLE_AI_API_KEY || process.env.GEMINI_API_KEY;
+    const apiKey = process.env.DEEPSEEK_API_KEY;
     if (!apiKey) return null;
-    return new GoogleGenerativeAI(apiKey);
+    return new OpenAI({
+        baseURL: 'https://api.deepseek.com',
+        apiKey,
+    });
 };
 
 export interface HintRequest {
     challengeType: 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'PLAYWRIGHT' | 'JAVASCRIPT';
     instructions: string;
     htmlContent?: string;
+    starterCode?: string;
     userAttempt?: string;
     locale?: string;
 }
@@ -22,11 +26,11 @@ export interface HintResponse {
 }
 
 /**
- * Generate an AI hint for a challenge using Gemini 2.0 Flash-Lite.
+ * Generate an AI hint for a challenge using DeepSeek Chat (V3).
  * The hint guides the user without revealing the exact solution.
  */
 export async function generateHint(request: HintRequest): Promise<HintResponse> {
-    const { challengeType, instructions, htmlContent, userAttempt, locale = 'en' } = request;
+    const { challengeType, instructions, htmlContent, starterCode, userAttempt, locale = 'en' } = request;
 
     const client = getClient();
     if (!client) {
@@ -36,28 +40,27 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
         };
     }
 
-    const systemPrompt = getSystemPrompt(challengeType, locale);
-    const userPrompt = buildUserPrompt(instructions, htmlContent, userAttempt, locale);
+    // Optimization: Keep system prompt static for DeepSeek caching. 
+    // Pass 'challengeType' to user prompt instead.
+    const systemPrompt = getSystemPrompt(locale);
+    const userPrompt = buildUserPrompt(challengeType, instructions, htmlContent, starterCode, userAttempt, locale);
 
     console.log('[AI Debug] System Prompt:', systemPrompt);
     console.log('[AI Debug] User Prompt:', userPrompt);
 
     try {
-        const model = client.getGenerativeModel({
-            model: 'gemini-2.5-flash-lite',
-            systemInstruction: systemPrompt,
+        const completion = await client.chat.completions.create({
+            model: 'deepseek-chat',
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userPrompt },
+            ],
+            // DeepSeek specific parameters if any needed, usually standard OpenAI params work
+            temperature: 0.7,
+            max_tokens: 1024,
         });
 
-        // Add timeout to prevent hanging
-        const timeoutPromise = new Promise<never>((_, reject) => {
-            setTimeout(() => reject(new Error('Request timed out')), 15000);
-        });
-
-        const generatePromise = model.generateContent(userPrompt);
-        const result = await Promise.race([generatePromise, timeoutPromise]);
-
-        const response = result.response;
-        const hint = response.text()?.trim();
+        const hint = completion.choices[0].message.content?.trim();
 
         if (!hint) {
             return {
@@ -70,15 +73,32 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
             success: true,
             hint,
         };
-    } catch (error) {
+    } catch (error: unknown) {
         console.error('[AI Hint] Error generating hint:', error);
 
-        // Check for rate limit errors
+        // Specific DeepSeek/OpenAI error handling
         const errorMessage = error instanceof Error ? error.message : String(error);
-        if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('Too Many Requests')) {
+        const status = (error as { status?: number; response?: { status?: number } })?.status
+            || (error as { status?: number; response?: { status?: number } })?.response?.status; // Check for HTTP status code if available
+
+        if (status === 401) {
             return {
                 success: false,
-                error: 'AI service is busy. Please try again in a minute.',
+                error: 'AI authentication failed. Please check configuration.',
+            };
+        }
+
+        if (status === 402) {
+            return {
+                success: false,
+                error: 'AI service PI balance is exhausted. Hints are temporarily unavailable.',
+            };
+        }
+
+        if (status === 429 || errorMessage.includes('429') || errorMessage.includes('Too Many Requests')) {
+            return {
+                success: false,
+                error: 'AI service is busy, please try again.',
             };
         }
 
@@ -89,6 +109,14 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
             };
         }
 
+        // Generic 5xx or other errors
+        if (status && status >= 500) {
+            return {
+                success: false,
+                error: 'AI service unavailable. Please try again later.',
+            };
+        }
+
         return {
             success: false,
             error: 'Failed to generate hint. Please try again later.',
@@ -96,11 +124,12 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
     }
 }
 
-function getSystemPrompt(challengeType: string, locale: string): string {
+function getSystemPrompt(locale: string): string {
     const isIndonesian = locale === 'id';
 
+    // STATIC PROMPT - Do not include dynamic variables here to maximize DeepSeek caching
     const basePrompt = isIndonesian
-        ? `Kamu adalah mentor QA teknis yang membantu siswa belajar ${challengeType.replace('_', ' ')} untuk web testing.
+        ? `Kamu adalah mentor QA teknis yang membantu siswa belajar web testing.
 
 Aturan PENTING:
 1. JANGAN PERNAH memberikan solusi lengkap (copy-paste solution).
@@ -109,7 +138,7 @@ Aturan PENTING:
 4. Jangan basa-basi ("Hebat sekali", "Kamu sudah berusaha"). Langsung ke poin teknis.
 5. Jaga respons tetap singkat dan padat (maksimal 3 kalimat).
 6. Sertakan contoh coding singkat atau pola sintaks jika membantu memperjelas solusi.`
-        : `You are a technical QA mentor helping a student learn ${challengeType.replace('_', ' ')} for web testing.
+        : `You are a technical QA mentor helping a student learn web testing.
 
 IMPORTANT Rules:
 1. NEVER give the exact copy-paste solution.
@@ -123,14 +152,22 @@ IMPORTANT Rules:
 }
 
 function buildUserPrompt(
+    challengeType: string,
     instructions: string,
     htmlContent?: string,
+    starterCode?: string,
     userAttempt?: string,
     locale?: string
 ): string {
     const isIndonesian = locale === 'id';
+    const readableType = challengeType.replace('_', ' ');
 
+    // Start with Context to establish what we are testing (formerly in system prompt)
     let prompt = isIndonesian
+        ? `Konteks: Tantangan ${readableType}.\n\n`
+        : `Context: ${readableType} Challenge.\n\n`;
+
+    prompt += isIndonesian
         ? `## Instruksi Tantangan\n${instructions}\n`
         : `## Challenge Instructions\n${instructions}\n`;
 
@@ -140,14 +177,20 @@ function buildUserPrompt(
             : `\n## HTML Content\n\`\`\`html\n${htmlContent.slice(0, 1500)}\n\`\`\`\n`;
     }
 
-    if (userAttempt && userAttempt.trim()) {
+    // Optimization: Treat starter code as "no attempt" to get general guidance
+    // Normalize by stripping whitespace for loose comparison
+    const normalizedAttempt = userAttempt?.trim() || '';
+    const normalizedStarter = starterCode?.trim() || '';
+    const isStarterCode = normalizedAttempt === normalizedStarter;
+
+    if (normalizedAttempt && !isStarterCode) {
         prompt += isIndonesian
             ? `\n## Percobaan Siswa\n\`\`\`\n${userAttempt}\n\`\`\`\n\nSiswa sudah mencoba ini tapi belum berhasil. Bantu mereka pahami apa yang perlu diperbaiki tanpa memberikan jawabannya.`
             : `\n## Student's Attempt\n\`\`\`\n${userAttempt}\n\`\`\`\n\nThe student tried this but it didn't work. Help them understand what to adjust without giving away the answer.`;
     } else {
         prompt += isIndonesian
-            ? `\nSiswa belum mencoba apa-apa. Berikan petunjuk umum tentang teknik apa yang harus mereka eksplorasi.`
-            : `\nThe student hasn't tried anything yet. Give them a general hint about what technique they should explore.`;
+            ? `\nSiswa belum melakukan perubahan signifikan pada kode awal. Berikan petunjuk umum tentang teknik apa yang harus mereka eksplorasi.`
+            : `\nThe student hasn't made significant changes to the starter code yet. Give them a general hint about what technique they should explore.`;
     }
 
     return prompt;
