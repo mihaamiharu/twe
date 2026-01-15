@@ -19,6 +19,7 @@ const getFooterLinks = (locale: string) => ({
   resources: [
     { label: 'legal:privacy.title', href: `/${locale}/privacy` },
     { label: 'legal:terms.title', href: `/${locale}/terms` },
+    { label: 'navigation.about', href: `/${locale}/about` },
   ] as FooterLink[],
 });
 

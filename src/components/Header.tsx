@@ -12,6 +12,7 @@ import {
   User,
   X,
   LayoutDashboard,
+  Info,
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
@@ -66,6 +67,12 @@ export function Header() {
       params: localeParams(locale),
       label: t('common:navigation.leaderboard'),
       icon: Trophy,
+    },
+    {
+      to: LocaleRoutes.about,
+      params: localeParams(locale),
+      label: t('common:navigation.about'),
+      icon: Info,
     },
   ];
 

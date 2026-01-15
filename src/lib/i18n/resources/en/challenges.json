@@ -69,6 +69,20 @@
     "complete": "Practice complete! Great job reviewing this challenge.",
     "noXp": "No XP awarded in practice mode"
   },
+  "hints": {
+    "button": "Get AI Hint",
+    "loading": "Generating hint...",
+    "used": "Hint Used",
+    "alreadyUsed": "You already used a hint for this challenge",
+    "warningTitle": "Use AI Hint?",
+    "warning": "Using a hint will reduce your XP reward by 50% when you complete this challenge.",
+    "confirm": "Use Hint Anyway",
+    "cancel": "Cancel",
+    "loginRequired": "Login required for AI hints",
+    "freeTierNote": "Note: AI service uses a free tier. If it's busy, please wait a minute.",
+    "title": "AI Hint",
+    "penalty": "-50% XP"
+  },
   "types": {
     "css_selector": "CSS Selector",
     "xpath_selector": "XPath",

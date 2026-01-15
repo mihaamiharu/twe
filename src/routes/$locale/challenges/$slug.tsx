@@ -13,7 +13,6 @@ import {
   useQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { getChallenges } from '@/server/challenges.fn';
 import { ChallengePlayground, type Challenge } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { deobfuscate } from '@/lib/obfuscator';
@@ -27,8 +26,6 @@ import { createSubmission } from '@/server/submissions.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
 import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
-import { TierSkipTip } from '@/components/challenges/TierSkipTip';
-import { getTierFromCategory, TIER_ORDER, tierLabels } from '@/lib/constants';
 import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 
@@ -93,49 +90,7 @@ function ChallengeDetailPage() {
   const data = challengeData;
 
 
-  const { data: allChallengesResponse } = useQuery({
-    queryKey: ['challenges', 'prerequisites'], // Different key from main list
-    queryFn: async () => {
-      const result = await getChallenges({ data: { limit: 100, locale } });
-      if (!result.success) throw new Error(result.error);
-      return result.data; // Return the array directly to simplify usage
-    },
-  });
 
-  // Alias for compatibility
-  const allChallengesData = allChallengesResponse;
-
-  const missingPrerequisites = useMemo(() => {
-    if (!data?.data || !allChallengesData) return [];
-
-    const currentTier = getTierFromCategory(data.data.category);
-    const currentTierIndex = TIER_ORDER.indexOf(currentTier);
-
-    if (currentTierIndex <= 0) return []; // Basic tier has no prerequisites
-
-    const missing = [];
-    for (let i = 0; i < currentTierIndex; i++) {
-      const prereqTier = TIER_ORDER[i];
-      const tierChallenges = allChallengesData.filter(
-        (c) => getTierFromCategory(c.category ?? undefined) === prereqTier,
-      );
-      const completedInTier = tierChallenges.filter(
-        (c) => c.isCompleted,
-      ).length;
-
-      if (
-        tierChallenges.length > 0 &&
-        completedInTier < tierChallenges.length
-      ) {
-        missing.push({
-          tier: prereqTier,
-          name: t(`challenges:tiers.${prereqTier}`),
-        });
-      }
-    }
-
-    return missing;
-  }, [data, allChallengesData]);
 
   const { data: auth } = useSuspenseQuery(authQueryOptions);
   const sessionData = auth; // Alias for compatibility
@@ -201,6 +156,8 @@ function ChallengeDetailPage() {
         category: data.data.category,
         isCompleted: data.data.userProgress?.isCompleted || false,
         tutorial: data.data.tutorial,
+        nextChallenge: data.data.nextChallenge,
+        prevChallenge: data.data.prevChallenge,
       }
       : null;
 
@@ -388,19 +345,12 @@ function ChallengeDetailPage() {
 
   return (
     <div className="h-[calc(100vh-4rem)] flex flex-col">
-      {missingPrerequisites.length > 0 && (
-        <div className="px-6 pt-4">
-          <TierSkipTip
-            currentTier={tierLabels[getTierFromCategory(data?.data?.category)].name}
-            missingPrerequisites={missingPrerequisites}
-          />
-        </div>
-      )}
       <div className="flex-1 min-h-0">
         <ChallengePlayground
           challenge={challenge}
           onSubmit={handleSubmit}
           userId={userId}
+          hintUsed={data?.data?.userProgress?.usedHint || false}
         />
       </div>
 

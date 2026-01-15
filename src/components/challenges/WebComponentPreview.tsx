@@ -63,12 +63,12 @@ export function WebComponentPreview({
             .twe-target-highlight {
                 outline: 3px solid #22c55e !important;
                 outline-offset: 2px;
-                background-color: rgba(34, 197, 94, 0.1) !important;
+                box-shadow: inset 0 0 0 1000px rgba(34, 197, 94, 0.1) !important;
             }
             .twe-user-match {
                 outline: 2px dashed #3b82f6 !important;
                 outline-offset: 1px;
-                background-color: rgba(59, 130, 246, 0.1) !important;
+                box-shadow: inset 0 0 0 1000px rgba(59, 130, 246, 0.1) !important;
             }
             .twe-hover-highlight {
                 outline: 2px solid #f59e0b !important;
@@ -130,7 +130,7 @@ export function WebComponentPreview({
                     body {
                         margin: 0;
                         padding: 16px;
-                        font-family: system-ui, -apple-system, sans-serif;
+                        font-family: 'Outfit', system-ui, -apple-system, sans-serif;
                         background: #ffffff;
                         color: #1f2937;
                         min-height: 100vh;
@@ -282,21 +282,19 @@ export function WebComponentPreview({
 
                     // Initial highlight of target element
                     setTimeout(() => {
-                        ${
-                          targetElementId
-                            ? `
+                        ${targetElementId
+        ? `
                             const target = document.getElementById('${targetElementId}');
                             if (target) target.classList.add('twe-target-highlight');
                         `
-                            : ''
-                        }
-                        ${
-                          targetSelector && !targetElementId
-                            ? `
+        : ''
+      }
+                        ${targetSelector && !targetElementId
+        ? `
                             highlightElements('${targetSelector}', 'css', 'twe-target-highlight');
                         `
-                            : ''
-                        }
+        : ''
+      }
                     }, 100);
                 </script>
             </body>
@@ -307,7 +305,7 @@ export function WebComponentPreview({
   // Update iframe content
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe || viewMode !== 'preview') return;
+    if (!iframe) return;
 
     const doc = iframe.contentDocument || iframe.contentWindow?.document;
     if (doc) {
@@ -349,7 +347,7 @@ export function WebComponentPreview({
   // Highlight user's selector matches
   useEffect(() => {
     const iframe = iframeRef.current;
-    if (!iframe?.contentWindow || !userSelector || viewMode !== 'preview')
+    if (!iframe?.contentWindow || !userSelector)
       return;
 
     iframe.contentWindow.postMessage(
@@ -484,23 +482,24 @@ export function WebComponentPreview({
 
         {/* Content Area */}
         <div className="flex-1 relative overflow-hidden bg-white/50 dark:bg-black/20">
-          {viewMode === 'preview' ? (
-            <div
-              className="w-full h-full overflow-auto"
-              style={{
-                transform: `scale(${zoom / 100})`,
-                transformOrigin: 'top left',
-                width: `${100 * (100 / zoom)}%`,
-                height: `${100 * (100 / zoom)}%`,
-              }}
-            >
-              <iframe
-                ref={iframeRef}
-                srcDoc={`
+          <div
+            className="w-full h-full overflow-auto"
+            style={{
+              transform: `scale(${zoom / 100})`,
+              transformOrigin: 'top left',
+              width: `${100 * (100 / zoom)}%`,
+              height: `${100 * (100 / zoom)}%`,
+              display: viewMode === 'preview' ? 'block' : 'none',
+            }}
+          >
+            <iframe
+              ref={iframeRef}
+              srcDoc={`
                                     <!DOCTYPE html>
                                     <html>
                                         <head>
                                             <style>
+                                                @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
                                                 ${cssContent}
                                                 /* Inject selection styles */
                                                 [data-highlight="true"] {
@@ -517,19 +516,19 @@ export function WebComponentPreview({
                                                     margin: 0;
                                                     padding: 16px;
                                                     min-height: 100vh;
-                                                    font-family: system-ui, -apple-system, sans-serif;
+                                                    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
                                                 }
                                             </style>
                                         </head>
                                         <body>${htmlContent}</body>
                                     </html>
                                 `}
-                className="w-full h-full border-none bg-white"
-                title="Challenge Preview"
-                sandbox="allow-same-origin allow-scripts"
-              />
-            </div>
-          ) : (
+              className="w-full h-full border-none bg-white"
+              title="Challenge Preview"
+              sandbox="allow-same-origin allow-scripts"
+            />
+          </div>
+          {viewMode === 'source' && (
             <div className="w-full h-full">
               <CodeEditor
                 initialCode={htmlContent}

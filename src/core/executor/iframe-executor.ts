@@ -436,7 +436,7 @@ export async function executePlaywrightCode(
                 /* eslint-disable @typescript-eslint/no-unsafe-return */
                 const value = target[prop as keyof Document];
                 if (typeof value === 'function') {
-                   
+
                   return value.bind(target);
                 }
                 return value;
@@ -518,7 +518,7 @@ export async function executePlaywrightCode(
                         })();
                     `;
 
-           
+
           let returnValue;
           if (typeof contentWindow.eval === 'function') {
             returnValue = await contentWindow.eval(
@@ -632,6 +632,17 @@ function formatError(error: unknown): string {
   if (msg.includes('Expected')) {
     // Assertion error
     return `${msg}\n\n💡 Tip: Your assertion failed. Check the Expected vs Actual values.`;
+  }
+
+  if (msg.includes('Cannot read properties of null')) {
+    if (msg.includes('click')) {
+      return `${msg}\n\n💡 Tip: You are trying to click on an element that doesn't exist. Check your selector for typos.`;
+    }
+    return `${msg}\n\n💡 Tip: You are trying to access a property on a null value. Did your selector fail to find an element?`;
+  }
+
+  if (msg.includes('Cannot read properties of undefined')) {
+    return `${msg}\n\n💡 Tip: You are trying to access a property on an undefined value. Check your logic.`;
   }
 
   return msg;

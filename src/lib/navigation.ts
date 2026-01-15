@@ -57,6 +57,7 @@ export const LocaleRoutes = {
   settings: '/$locale/settings',
   privacy: '/$locale/privacy',
   terms: '/$locale/terms',
+  about: '/$locale/about',
 } as const;
 
 export type LocaleRoutePath = (typeof LocaleRoutes)[keyof typeof LocaleRoutes];

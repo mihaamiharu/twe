@@ -16,17 +16,20 @@
     "profile": "Profile",
     "logout": "Logout",
     "admin": "Admin",
-    "settings": "Settings"
+    "settings": "Settings",
+    "about": "About"
   },
   "actions": {
     "submit": "Submit",
     "cancel": "Cancel",
     "save": "Save",
     "run": "Run",
+    "runTooltip": "Run code (⌘/Ctrl + Enter) — Preview will reset",
     "runCode": "Run Code",
     "reset": "Reset",
     "continue": "Continue",
     "back": "Back",
+    "previous": "Previous",
     "next": "Next",
     "viewAll": "View All",
     "tryAgain": "Try Again",
@@ -81,7 +84,7 @@
     "achievementUnlocked": "Unlocked: {{name}}"
   },
   "footer": {
-    "description": "Master the art of software testing through interactive tutorials and real-world coding challenges. Built for developers, by developers.",
+    "description": "Master test automation with Ekki's battle-tested guide. Real scenarios, zero friction.",
     "product": "Product",
     "resources": "Resources",
     "copyright": "© {{year}} TestingWithEkki. All rights reserved.",

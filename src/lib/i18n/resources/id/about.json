@@ -1,0 +1,105 @@
+{
+    "hero": {
+        "title": "Halo, saya <1>Ekki</1>",
+        "subtitle": "Senior Software Engineer (QA)",
+        "description": "Saya adalah Senior QA Engineer di <strong>Ninja Van</strong> dengan 4+ tahun pengalaman membangun framework otomasi untuk web, mobile, dan API. Saya percaya pada prinsip <strong>\"Tooling over Manual Labor\"</strong>—membangun sistem kustom yang memberdayakan tim untuk rilis dengan percaya diri sambil mencegah masalah kritis di production.",
+        "connect": "Koneksi di LinkedIn",
+        "github": "Profil GitHub",
+        "resume": "Resume"
+    },
+    "philosophy": {
+        "title": "Engineering Quality",
+        "intro": "Kualitas bukan sekadar checklist. Ini tentang <strong>Shift-Left</strong> dan mengambil kepemilikan atas production.",
+        "listIntro": "Saya membangun TestingWithEkki untuk menunjukkan ketelitian engineering yang sama yang saya terapkan di tempat kerja:",
+        "list": {
+            "auth": "<strong>Arsitektur Skalabel</strong>: Otentikasi nyata dan manajemen sesi, bukan sekadar situs statis.",
+            "code": "<strong>Interactive Tooling</strong>: Lingkungan sandbox yang mirip dengan dev tools kustom yang saya buat untuk tim internal.",
+            "gamification": "<strong>User Engagement</strong>: Mekanisme gamifikasi untuk membuat belajar otomasi lebih menarik.",
+            "i18n": "<strong>Kesiapan Global</strong>: Dukungan internasionalisasi penuh."
+        },
+        "conclusion": "Kualitas adalah disiplin engineering. Saya membangun alat dan framework yang menegakkan keandalan. Entah itu backend Go atau platform React ini, saya menulis kode untuk memecahkan masalah kualitas yang nyata."
+    },
+    "expertise": {
+        "title": "Keahlian Teknis",
+        "subtitle": "Toolkit saya untuk membangun sistem yang stabil dan skalabel",
+        "automation": {
+            "title": "Test Automation",
+            "items": [
+                "Playwright",
+                "Appium",
+                "Selenium",
+                "DeepEval (LLM)",
+                "Rest Assured"
+            ]
+        },
+        "backend": {
+            "title": "Backend & Languages",
+            "items": [
+                "Go (Golang)",
+                "Java",
+                "Python",
+                "PostgreSQL",
+                "Bun"
+            ]
+        },
+        "engineering": {
+            "title": "Full-Stack & DevOps",
+            "items": [
+                "React 19",
+                "TypeScript",
+                "Docker",
+                "CI/CD (Bamboo/GHA)",
+                "TanStack"
+            ]
+        }
+    },
+    "gear": {
+        "title": "Gear & Tools",
+        "subtitle": "Alat yang saya gunakan untuk membangun software berkualitas",
+        "hardware": "Hardware",
+        "software": "Software",
+        "productivity": "Produktivitas",
+        "items": {
+            "macbook": {
+                "name": "MacBook Pro M3 Max",
+                "desc": "Daily driver untuk segalanya."
+            },
+            "keyboard": {
+                "name": "Keychron Q1 Pro",
+                "desc": "Mechanical keyboard karena suara itu penting."
+            },
+            "monitor": {
+                "name": "Dell UltraSharp 27\"",
+                "desc": "Kejernihan 4K untuk testing pixel-perfect."
+            },
+            "vscode": {
+                "name": "Visual Studio Code",
+                "desc": "Dengan tema GitHub Dark."
+            },
+            "arc": {
+                "name": "Arc Browser",
+                "desc": "Browser untuk web modern."
+            },
+            "ghostty": {
+                "name": "Ghostty",
+                "desc": "Terminal cepat dan kaya fitur."
+            },
+            "notion": {
+                "name": "Notion",
+                "desc": "Untuk mengatur hidup dan docs."
+            },
+            "linear": {
+                "name": "Linear",
+                "desc": "Issue tracking yang benar."
+            },
+            "raycast": {
+                "name": "Raycast",
+                "desc": "Spotlight on steroids."
+            }
+        }
+    },
+    "contact": {
+        "title": "Mencari QA Engineer yang paham full stack?",
+        "cta": "Hubungi Saya"
+    }
+}

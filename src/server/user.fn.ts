@@ -7,7 +7,7 @@ import {
   achievements,
   submissions,
 } from '@/db/schema';
-import { eq, desc, and, gte, sql } from 'drizzle-orm';
+import { eq, desc, sql } from 'drizzle-orm';
 import { getUserStats } from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
@@ -30,6 +30,8 @@ export type UserData = {
     completedTutorials: number;
     achievementsCount: number;
     challengesByType: Record<string, number>;
+    challengesByTier: Record<string, number>;
+    tierTotalCounts: Record<string, number>;
   };
   earnedAchievements: {
     id: string;
@@ -89,6 +91,10 @@ export const getUserSettings = createServerFn({ method: 'GET' })
         const completedChallenges = stats.totalChallengesCompleted;
         const completedTutorials = stats.tutorialsCompleted;
 
+        // Calculate Tier Totals (using cached version)
+        const { getCachedTierTotals } = await import('./content.server');
+        const tierTotalCounts = await getCachedTierTotals();
+
         // Get user achievements
         const userAchievementsList = await db
           .select({
@@ -124,7 +130,7 @@ export const getUserSettings = createServerFn({ method: 'GET' })
           .innerJoin(challenges, eq(submissions.challengeId, challenges.id))
           .where(eq(submissions.userId, userId))
           .orderBy(desc(submissions.createdAt))
-          .limit(100);
+          .limit(10);
 
         // Heatmap logic removed
 
@@ -151,36 +157,18 @@ export const getUserSettings = createServerFn({ method: 'GET' })
           timestamp: number;
         }[] = [];
 
-        // Safely add submissions (Deduplicated, preferring highest XP)
         if (recentSubmissions && Array.isArray(recentSubmissions)) {
-          const bestSubmissions = new Map<
-            string,
-            (typeof recentSubmissions)[0]
-          >();
-
           recentSubmissions
-            .filter((s) => s.isPassed)
+            .filter((s) => s.isPassed) // Ensure we only show passed ones
             .forEach((s) => {
-              const existing = bestSubmissions.get(s.challengeId);
-
-              // If we haven't seen this challenge, or if this submission has more XP than the saved one
-              // or (same XP but this one is older - implying it was the 'first' of the filtered batch?
-              // actually, usually we want the one that GAVE the XP.
-              // If multiple give 0, latest is fine. If mixed, we want the >0 one.
-              if (!existing || s.xpEarned > existing.xpEarned) {
-                bestSubmissions.set(s.challengeId, s);
-              }
+              activityItems.push({
+                type: 'challenge',
+                title: s.challengeTitle,
+                xp: s.xpEarned,
+                date: s.createdAt,
+                timestamp: s.createdAt.getTime(),
+              });
             });
-
-          bestSubmissions.forEach((s) => {
-            activityItems.push({
-              type: 'challenge',
-              title: s.challengeTitle,
-              xp: s.xpEarned,
-              date: s.createdAt,
-              timestamp: s.createdAt.getTime(),
-            });
-          });
         }
 
         // Safely add achievements
@@ -235,6 +223,8 @@ export const getUserSettings = createServerFn({ method: 'GET' })
               completedTutorials,
               achievementsCount: userAchievementsList.length,
               challengesByType: stats.challengesByType || {},
+              challengesByTier: stats.challengesByTier || {},
+              tierTotalCounts: tierTotalCounts,
             },
 
             earnedAchievements: userAchievementsList.map((a) => ({

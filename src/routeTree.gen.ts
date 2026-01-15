@@ -28,6 +28,7 @@ import { Route as LocalePrivacyRouteImport } from './routes/$locale/privacy'
 import { Route as LocaleLoginRouteImport } from './routes/$locale/login'
 import { Route as LocaleLeaderboardRouteImport } from './routes/$locale/leaderboard'
 import { Route as LocaleForgotPasswordRouteImport } from './routes/$locale/forgot-password'
+import { Route as LocaleAboutRouteImport } from './routes/$locale/about'
 import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authenticated'
 import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
 import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
@@ -132,6 +133,11 @@ const LocaleForgotPasswordRoute = LocaleForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => LocaleRoute,
 } as any)
+const LocaleAboutRoute = LocaleAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleAuthenticatedRoute = LocaleAuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => LocaleRoute,
@@ -178,6 +184,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleAuthenticatedRouteWithChildren
+  '/$locale/about': typeof LocaleAboutRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleIndexRoute
+  '/$locale/about': typeof LocaleAboutRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleRouteWithChildren
   '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
+  '/$locale/about': typeof LocaleAboutRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/$locale'
+    | '/$locale/about'
     | '/$locale/forgot-password'
     | '/$locale/leaderboard'
     | '/$locale/login'
@@ -293,6 +303,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/$locale'
+    | '/$locale/about'
     | '/$locale/forgot-password'
     | '/$locale/leaderboard'
     | '/$locale/login'
@@ -321,6 +332,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/$locale'
     | '/$locale/_authenticated'
+    | '/$locale/about'
     | '/$locale/forgot-password'
     | '/$locale/leaderboard'
     | '/$locale/login'
@@ -496,6 +508,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleForgotPasswordRouteImport
       parentRoute: typeof LocaleRoute
     }
+    '/$locale/about': {
+      id: '/$locale/about'
+      path: '/about'
+      fullPath: '/$locale/about'
+      preLoaderRoute: typeof LocaleAboutRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/_authenticated': {
       id: '/$locale/_authenticated'
       path: ''
@@ -570,6 +589,7 @@ const LocaleAuthenticatedRouteWithChildren =
 
 interface LocaleRouteChildren {
   LocaleAuthenticatedRoute: typeof LocaleAuthenticatedRouteWithChildren
+  LocaleAboutRoute: typeof LocaleAboutRoute
   LocaleForgotPasswordRoute: typeof LocaleForgotPasswordRoute
   LocaleLeaderboardRoute: typeof LocaleLeaderboardRoute
   LocaleLoginRoute: typeof LocaleLoginRoute
@@ -586,6 +606,7 @@ interface LocaleRouteChildren {
 
 const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleAuthenticatedRoute: LocaleAuthenticatedRouteWithChildren,
+  LocaleAboutRoute: LocaleAboutRoute,
   LocaleForgotPasswordRoute: LocaleForgotPasswordRoute,
   LocaleLeaderboardRoute: LocaleLeaderboardRoute,
   LocaleLoginRoute: LocaleLoginRoute,

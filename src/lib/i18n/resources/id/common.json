@@ -16,13 +16,15 @@
     "profile": "Profil",
     "logout": "Keluar",
     "admin": "Admin",
-    "settings": "Pengaturan"
+    "settings": "Pengaturan",
+    "about": "Tentang"
   },
   "actions": {
     "submit": "Kirim",
     "cancel": "Batal",
     "save": "Simpan",
     "run": "Jalankan",
+    "runTooltip": "Jalankan kode (⌘/Ctrl + Enter) — Preview akan direset",
     "runCode": "Jalankan Kode",
     "reset": "Atur Ulang",
     "continue": "Lanjutkan",
@@ -81,7 +83,7 @@
     "achievementUnlocked": "Berhasil dibuka: {{name}}"
   },
   "footer": {
-    "description": "Kuasai seni pengujian perangkat lunak melalui tutorial interaktif dan tantangan pengkodean dunia nyata. Dibangun untuk developer, oleh developer.",
+    "description": "Kuasai otomasi pengujian dengan panduan teruji dari Ekki. Skenario nyata, tanpa hambatan.",
     "product": "Produk",
     "resources": "Sumber Daya",
     "copyright": "© {{year}} TestingWithEkki. Hak cipta dilindungi.",
