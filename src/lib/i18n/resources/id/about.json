@@ -69,22 +69,22 @@
             ]
         },
         "backend": {
-            "title": "Backend & Languages",
+            "title": "Languages & Ecosystem",
             "items": [
+                "TypeScript",
                 "Go (Golang)",
                 "Java",
                 "Python",
-                "PostgreSQL",
-                "Bun"
+                "PostgreSQL"
             ]
         },
-        "frontend": {
-            "title": "frontend Modern",
+        "strategy": {
+            "title": "Strategi & Metodologi",
             "items": [
-                "React 19",
-                "TypeScript",
-                "TanStack",
-                "Tailwind CSS"
+                "Shift-Left Testing",
+                "Perencanaan Tes",
+                "Analisis Risiko",
+                "Agile / Scrum"
             ]
         },
         "devops": {

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, FileText, Terminal, Database, Globe, Server, Code2, Milestone, Layout, Activity } from 'lucide-react';
+import { Github, Linkedin, Mail, FileText, Terminal, Database, Globe, Server, Code2, Milestone, Brain, Activity } from 'lucide-react';
 import i18n from '@/lib/i18n';
 import { Boop } from '@/components/ui/boop';
 
@@ -39,9 +39,9 @@ function AboutPage() {
             skills: t('about:expertise.backend.items', { returnObjects: true }) as string[]
         },
         {
-            category: t('about:expertise.frontend.title'),
-            icon: <Layout className="h-5 w-5 text-purple-500" />,
-            skills: t('about:expertise.frontend.items', { returnObjects: true }) as string[]
+            category: t('about:expertise.strategy.title'),
+            icon: <Brain className="h-5 w-5 text-purple-500" />,
+            skills: t('about:expertise.strategy.items', { returnObjects: true }) as string[]
         },
         {
             category: t('about:expertise.devops.title'),
