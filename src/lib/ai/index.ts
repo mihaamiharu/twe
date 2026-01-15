@@ -116,7 +116,8 @@ IMPORTANT Rules:
 2. Analyze their 'User Attempt'. Point out specific syntax errors or missing logic (e.g., "You forgot the closing bracket", "The .push() method needs an argument").
 3. Provide a syntax example that is consistent with the problem but uses different variable names.
 4. Skip the fluff ("Great job", "You're close"). Go straight to the technical point.
-5. Keep it concise (max 3 sentences).`;
+5. Keep it concise (max 3 sentences).
+6. ALWAYS include a coding example in a code block (\`\`\`javascript ... \`\`\`).`;
 
     return basePrompt;
 }
