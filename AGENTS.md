@@ -35,6 +35,21 @@ This file contains guidelines for agentic coding assistants working in this repo
 - `npm run db:seed` - Seed database with challenges from JSON files
 - `npm run db:studio` - Open Drizzle Studio
 
+## AI & LLM Integration (DeepSeek)
+
+### Token Efficiency ("Static-First" Rule)
+
+Since DeepSeek uses **Automatic Prefix Caching**, you must order messages to maximize cache hits.
+
+**Rule**: "Always keep system instructions and project-wide context at the very top of the prompt. Do not rephrase the system instructions between turns."
+
+**Why**: DeepSeek only caches from the top down. If the first few tokens change (e.g., dynamic context in the system prompt), it breaks the cache for everything below it, increasing costs and latency.
+
+**Implementation**:
+
+1. **System Message**: Keep it completely static (e.g., "You are a QA mentor..."). Do NOT include dynamic values like `challengeType` or user names here.
+2. **User Message**: Start with the dynamic context (e.g., "Context: Challenge is CSS Selectors...").
+
 ## TanStack Start Project Structure & Conventions
 
 ### File-Based Routing (TanStack Router)
@@ -173,7 +188,7 @@ function MyComponent({ className, ...props }: React.ComponentProps<'div'>) {
 - Decouple data logic (hooks) from UI rendering.
 - Integrate with `shadcn/ui` Table components for styling.
 
-### Testing
+### Testing Guidelines
 
 - **Bun test framework**: Import from `'bun/test'`: `describe`, `it`, `expect`
 - **Unit tests**: Use `--preload ./src/tests/bun-preload.ts`

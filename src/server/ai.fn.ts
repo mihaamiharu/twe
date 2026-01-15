@@ -87,6 +87,7 @@ export const getAIHint = createServerFn({ method: 'POST' })
                 challengeType: challengeContent.type as 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'PLAYWRIGHT' | 'JAVASCRIPT',
                 instructions: challengeContent.instructions,
                 htmlContent: challengeContent.htmlContent,
+                starterCode: challengeContent.starterCode,
                 userAttempt,
                 locale,
             });
