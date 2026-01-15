@@ -103,7 +103,7 @@ function RootComponent() {
           <Outlet />
         </main>
         <Footer />
-        <Toaster position="top-center" theme="system" />
+        <Toaster position="top-right" theme="system" />
       </div>
     </ThemeProvider>
   );
