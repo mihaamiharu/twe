@@ -51,7 +51,8 @@
     "resetDescription": "This will reset your code/selector to the initial state. Your current progress for this session will be lost.",
     "recommendation": "Recommendation:",
     "recommendationDescription": "This {{tier}} challenge uses concepts from the {{missingName}} tier.",
-    "tryPrereq": "Try {{missingName}} first"
+    "tryPrereq": "Try {{missingName}} first",
+    "shimNote": "Practice environment — uses a browser shim for instant feedback"
   },
   "success": {
     "title": "Challenge Complete!",

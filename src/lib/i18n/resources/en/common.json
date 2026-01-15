@@ -24,7 +24,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "run": "Run",
-    "runTooltip": "Run code (⌘/Ctrl + Enter) — Preview will reset",
+    "runTooltip": "Run code (⌘/Ctrl + Enter)  -  Preview will reset",
     "runCode": "Run Code",
     "reset": "Reset",
     "continue": "Continue",
