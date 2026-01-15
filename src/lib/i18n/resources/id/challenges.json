@@ -75,6 +75,7 @@
     "confirm": "Tetap Gunakan Petunjuk",
     "cancel": "Batal",
     "loginRequired": "Login diperlukan untuk petunjuk AI",
+    "freeTierNote": "Catatan: Layanan AI menggunakan tier gratis. Jika sibuk, harap tunggu sebentar.",
     "title": "Petunjuk AI",
     "penalty": "-50% XP"
   },

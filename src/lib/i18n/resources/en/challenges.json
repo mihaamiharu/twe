@@ -79,6 +79,7 @@
     "confirm": "Use Hint Anyway",
     "cancel": "Cancel",
     "loginRequired": "Login required for AI hints",
+    "freeTierNote": "Note: AI service uses a free tier. If it's busy, please wait a minute.",
     "title": "AI Hint",
     "penalty": "-50% XP"
   },
