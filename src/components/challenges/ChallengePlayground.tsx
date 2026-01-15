@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { executePlaywrightCode } from '@/core/executor';
 import {
@@ -1218,9 +1219,36 @@ export function ChallengePlayground({
                       ×
                     </Button>
                   </div>
-                  <p className="text-sm text-amber-900 dark:text-amber-100 leading-relaxed">
-                    {hintContent}
-                  </p>
+                  <div className="text-sm text-amber-900 dark:text-amber-100 leading-relaxed markdown-prose">
+                    <ReactMarkdown
+                      components={{
+                        code: ({ className, children, ...props }) => {
+                          const match = /language-(\w+)/.exec(className || '');
+                          const content = String(children).replace(/\n$/, '');
+                          const isInline = !match && !content.includes('\n');
+                          return (
+                            <code
+                              className={cn(
+                                'font-mono text-xs rounded px-1 py-0.5',
+                                isInline
+                                  ? 'bg-amber-600/10 text-amber-800 dark:text-amber-200'
+                                  : 'block bg-black/80 text-white p-2 my-2 rounded-md overflow-x-auto',
+                                className
+                              )}
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          );
+                        },
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
+                      }}
+                    >
+                      {hintContent}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </div>
             </CardContent>
