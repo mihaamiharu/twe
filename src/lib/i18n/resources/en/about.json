@@ -61,21 +61,21 @@
         "automation": {
             "title": "Test Automation",
             "items": [
-                "Playwright",
-                "Appium",
                 "Selenium",
-                "DeepEval (LLM)",
-                "Rest Assured"
+                "Rest Assured",
+                "DeepEval",
+                "Playwright",
+                "Appium Flutter"
             ]
         },
         "backend": {
             "title": "Languages & Ecosystem",
             "items": [
-                "TypeScript",
-                "Go (Golang)",
                 "Java",
-                "Python",
-                "PostgreSQL"
+                "SQL",
+                "TypeScript",
+                "Go",
+                "Python"
             ]
         },
         "strategy": {
@@ -100,7 +100,7 @@
             "title": "DevOps & Observability",
             "items": [
                 "Docker",
-                "CI/CD (Bamboo/GHA)",
+                "CI (Bamboo)",
                 "Grafana",
                 "Datadog",
                 "Kibana"
