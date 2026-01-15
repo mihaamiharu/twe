@@ -67,12 +67,12 @@ import { SelectorInput, type SelectorType } from './SelectorInput';
 const defaultSelectorStyles = `
 /* Base Layout */
 body { font-family: 'Outfit', system-ui, sans-serif; background: #f8fafc; color: #334155; }
-h1, h2, h3, h4 { color: #0f172a; margin-top: 0; }
+h1, h2, h3, h4 { color: #0f172a; margin-top: 0; font-family: 'Outfit', sans-serif; letter-spacing: -0.02em; }
 
 /* Components */
 .card, .profile-card, .welcome-card, .login-wrapper, article {
-  background: white; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
+  background: white; border: 1px solid #e2e8f0; border-radius: 6px; padding: 1.5rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05); margin-bottom: 1.5rem;
 }
 
 /* Forms */
@@ -330,6 +330,7 @@ export function ChallengePlayground({
           timeout: 10000,
           existingIframe: previewIframeRef.current || undefined,
           strictMode: challenge.type === 'PLAYWRIGHT',
+          cssContent: defaultSelectorStyles,
         },
       );
 
@@ -1036,8 +1037,8 @@ export function ChallengePlayground({
             </Link>
           )}
 
-          {/* AI Hint Button (Temporarily Disabled) */}
-          {false && !challenge.isCompleted && (
+          {/* AI Hint Button */}
+          {!challenge.isCompleted && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>

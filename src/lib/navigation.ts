@@ -43,14 +43,14 @@ export function localeSlugParams(
  * Route paths that require locale parameter
  */
 export const LocaleRoutes = {
-  home: '/$locale/',
+  home: '/$locale',
   login: '/$locale/login',
   register: '/$locale/register',
   forgotPassword: '/$locale/forgot-password',
   resetPassword: '/$locale/reset-password',
-  tutorials: '/$locale/tutorials/',
+  tutorials: '/$locale/tutorials',
   tutorialDetail: '/$locale/tutorials/$slug',
-  challenges: '/$locale/challenges/',
+  challenges: '/$locale/challenges',
   challengeDetail: '/$locale/challenges/$slug',
   leaderboard: '/$locale/leaderboard',
   profile: '/$locale/profile',

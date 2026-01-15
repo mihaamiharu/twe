@@ -14,6 +14,10 @@ interface I18nProviderProps {
  * Wrap this around your app content to enable translations.
  */
 export function I18nProvider({ children, locale }: I18nProviderProps) {
+  // TANSTACK UPDATE: Language switching is handled in the route's beforeLoad
+  // to prevent flash of unlocalized content.
+  // HOWEVER, we keep this useEffect to ensure client-side transitions are
+  // caught if the router doesn't re-trigger beforeLoad.
   useEffect(() => {
     const targetLocale: Locale = isValidLocale(locale ?? '')
       ? (locale as Locale)
@@ -23,6 +27,7 @@ export function I18nProvider({ children, locale }: I18nProviderProps) {
       i18n.changeLanguage(targetLocale);
     }
   }, [locale]);
+
 
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;
 }

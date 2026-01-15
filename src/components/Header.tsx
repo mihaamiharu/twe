@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   BookOpen,
   Bug,
@@ -32,16 +32,27 @@ import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
+import { cn } from '@/lib/utils';
 
 export function Header() {
   const { t } = useTranslation(['common', 'bugs']);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
   const isAuthPage =
     location.pathname.includes('/login') ||
     location.pathname.includes('/register');
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Use TanStack Query to get the session (hydrated from server)
   const { data: auth } = useSuspenseQuery(authQueryOptions);
@@ -96,7 +107,17 @@ export function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 w-full border-b border-border/40 glass">
+      <header
+        className={cn(
+          'sticky top-0 z-40 w-full transition-all duration-200 border-b',
+          scrolled
+            ? 'bg-background/80 backdrop-blur-md border-border/40 shadow-sm'
+            : 'bg-background/0 border-transparent',
+        )}
+        style={{
+          paddingRight: 'var(--removed-body-scroll-bar-size, 0px)',
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
@@ -104,22 +125,23 @@ export function Header() {
               <Link
                 to={LocaleRoutes.home}
                 params={localeParams(locale)}
-                className="flex items-center gap-2 btn-animate"
+                className="flex items-center gap-2 group"
               >
                 {/* Dark Mode Logo */}
                 <img
                   src="/logo-dark-new.png"
                   alt="Logo"
-                  className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen"
+                  className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen opacity-90 group-hover:opacity-100 transition-all group-hover:scale-105"
                 />
                 {/* Light Mode Logo */}
                 <img
                   src="/logo-light-new.png"
                   alt="Logo"
-                  className="h-8 w-8 rounded-lg block dark:hidden mix-blend-multiply"
+                  className="h-8 w-8 rounded-lg block dark:hidden mix-blend-multiply opacity-90 group-hover:opacity-100 transition-all group-hover:scale-105"
                 />
-                <span className="text-xl font-bold gradient-text">
+                <span className="text-xl font-bold font-sans tracking-tight text-foreground group-hover:text-primary transition-colors">
                   TestingWithEkki
+                  <span className="text-primary animate-pulse">.</span>
                 </span>
               </Link>
 
@@ -129,10 +151,10 @@ export function Header() {
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="flex items-center gap-2 px-4 py-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all btn-animate"
+                    className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground"
                     activeProps={{
                       className:
-                        'flex items-center gap-2 px-4 py-2 rounded-lg text-primary bg-primary/10 font-medium scale-[1.02]',
+                        'text-primary bg-primary/5 hover:bg-primary/10 font-semibold shadow-sm ring-1 ring-border/20',
                     }}
                   >
                     <link.icon className="h-4 w-4" />
@@ -144,20 +166,23 @@ export function Header() {
 
             {/* Right side */}
             <div className="flex items-center gap-2">
-              <LanguageSwitcher />
-              <ThemeToggle />
+              <div className="hidden sm:flex items-center gap-1 mr-2">
+                <LanguageSwitcher />
+                <ThemeToggle />
+              </div>
+
               {isPending ? (
-                <div className="h-10 w-10 rounded-full bg-muted animate-pulse" />
+                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
               ) : isAuthenticated && user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="ghost"
-                      className="relative h-10 w-10 rounded-full"
+                      className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-border/50 transition-all p-0 overflow-hidden"
                     >
-                      <Avatar className="h-10 w-10">
+                      <Avatar className="h-9 w-9">
                         <AvatarImage src={user.image || undefined} />
-                        <AvatarFallback className="bg-primary/10 text-primary">
+                        <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-medium">
                           {(user.name || user.email || 'U')
                             .charAt(0)
                             .toUpperCase()}
@@ -175,12 +200,14 @@ export function Header() {
                           {user.email}
                         </p>
                         {isAdmin && (
-                          <Badge
-                            variant="outline"
-                            className="mt-1 w-fit bg-purple-500/10 text-purple-600 border-purple-500/20 text-[10px] h-4"
-                          >
-                            Admin
-                          </Badge>
+                          <div className="flex items-center gap-1 mt-1.5">
+                            <Badge
+                              variant="outline"
+                              className="w-fit bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 text-[10px] h-5 px-1.5 uppercase tracking-wider"
+                            >
+                              Admin
+                            </Badge>
+                          </div>
                         )}
                       </div>
                     </DropdownMenuLabel>
@@ -191,7 +218,7 @@ export function Header() {
                         params={localeParams(locale)}
                         className="cursor-pointer font-medium"
                       >
-                        <User className="mr-2 h-4 w-4" />
+                        <User className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary" />
                         {t('common:navigation.profile')}
                       </Link>
                     </DropdownMenuItem>
@@ -199,7 +226,7 @@ export function Header() {
                       <DropdownMenuItem asChild>
                         <Link
                           to="/admin"
-                          className="cursor-pointer font-medium text-purple-600 focus:text-purple-600"
+                          className="cursor-pointer font-medium text-purple-600 focus:text-purple-600 focus:bg-purple-50 dark:focus:bg-purple-500/10"
                         >
                           <LayoutDashboard className="mr-2 h-4 w-4" />
                           {t('common:navigation.admin')}
@@ -212,7 +239,7 @@ export function Header() {
                         params={localeParams(locale)}
                         className="cursor-pointer"
                       >
-                        <Settings className="mr-2 h-4 w-4" />
+                        <Settings className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary" />
                         {t('common:navigation.settings')}
                       </Link>
                     </DropdownMenuItem>
@@ -224,7 +251,7 @@ export function Header() {
                         <BugReportDialog
                           trigger={
                             <div className="flex items-center w-full gap-2">
-                              <Bug className="mr-2 h-4 w-4" />
+                              <Bug className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary" />
                               {t('bugs:dialog.trigger')}
                             </div>
                           }
@@ -234,7 +261,7 @@ export function Header() {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
                       onClick={() => void handleSignOut()}
-                      className="cursor-pointer text-destructive focus:text-destructive"
+                      className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
                     >
                       <LogOut className="mr-2 h-4 w-4" />
                       {t('common:navigation.logout')}
@@ -244,7 +271,7 @@ export function Header() {
               ) : (
                 !isAuthPage && (
                   <div className="hidden md:flex items-center gap-2">
-                    <Button variant="ghost" asChild>
+                    <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
                       <Link
                         to={LocaleRoutes.login}
                         params={localeParams(locale)}
@@ -252,7 +279,7 @@ export function Header() {
                         {t('common:navigation.login')}
                       </Link>
                     </Button>
-                    <Button asChild>
+                    <Button size="sm" asChild className="shadow-sm">
                       <Link
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
@@ -273,9 +300,9 @@ export function Header() {
                 aria-label="Toggle menu"
               >
                 {isMobileMenuOpen ? (
-                  <X className="h-6 w-6" />
+                  <X className="h-5 w-5" />
                 ) : (
-                  <Menu className="h-6 w-6" />
+                  <Menu className="h-5 w-5" />
                 )}
               </Button>
             </div>
@@ -283,9 +310,11 @@ export function Header() {
         </div>
       </header>
 
+      {/* Scroll Listener Space for Fixed/Sticky Header if needed in future */}
+
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-30 md:hidden">
+        <div className="fixed inset-0 z-50 md:hidden flex flex-col">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-background/80 backdrop-blur-sm"
@@ -293,18 +322,29 @@ export function Header() {
           />
 
           {/* Menu panel */}
-          <nav className="fixed top-16 left-0 right-0 bg-background border-b border-border p-4 animate-slide-up">
-            <div className="space-y-2">
+          <nav className="relative flex-1 bg-background border-r border-border/50 max-w-[80vw] w-full p-4 animate-slide-in-left shadow-2xl flex flex-col h-full">
+
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-2">
+                {/* Mobile Logo Rep */}
+                <span className="font-bold text-lg">TestingWithEkki</span>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+
+            <div className="space-y-1 flex-1">
               {navLinks.map((link) => (
                 <Link
                   key={link.to}
                   to={link.to}
                   params={link.params}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors btn-animate"
+                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
                   activeProps={{
                     className:
-                      'flex items-center gap-3 p-3 rounded-lg text-primary bg-primary/10 font-medium pl-4 border-l-2 border-primary',
+                      'text-primary bg-primary/5 font-medium border-l-2 border-primary rounded-l-none pl-3',
                   }}
                 >
                   <link.icon className="h-5 w-5" />
@@ -312,7 +352,7 @@ export function Header() {
                 </Link>
               ))}
 
-              {/* Bug Report - Removed from top level mobile menu */}
+              <div className="my-6 border-t border-border/50" />
 
               {isAuthenticated && user ? (
                 <>
@@ -335,33 +375,36 @@ export function Header() {
                       Admin Dashboard
                     </Link>
                   )}
-                  <div className="px-3">
+                  <div className="px-3 py-2">
                     <BugReportDialog
                       trigger={
-                        <button className="flex items-center gap-3 w-full py-3 text-muted-foreground hover:text-foreground transition-colors">
+                        <button className="flex items-center gap-3 w-full py-1 text-muted-foreground hover:text-foreground transition-colors">
                           <Bug className="h-5 w-5" />
                           {t('bugs:dialog.trigger')}
                         </button>
                       }
                     />
                   </div>
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      void handleSignOut();
-                    }}
-                    className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
-                  >
-                    <LogOut className="h-5 w-5" />
-                    {t('common:navigation.logout')}
-                  </button>
+
+                  <div className="mt-auto pt-4">
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        void handleSignOut();
+                      }}
+                      className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
+                    >
+                      <LogOut className="h-5 w-5" />
+                      {t('common:navigation.logout')}
+                    </button>
+                  </div>
                 </>
               ) : (
                 !isAuthPage && (
-                  <div className="space-y-2">
+                  <div className="space-y-3 mt-4">
                     <Button
                       variant="outline"
-                      className="w-full"
+                      className="w-full justify-start"
                       asChild
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -373,7 +416,7 @@ export function Header() {
                       </Link>
                     </Button>
                     <Button
-                      className="w-full"
+                      className="w-full justify-start"
                       asChild
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
@@ -387,6 +430,11 @@ export function Header() {
                   </div>
                 )
               )}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-border/50 flex gap-4">
+              <LanguageSwitcher />
+              <ThemeToggle />
             </div>
           </nav>
         </div>
