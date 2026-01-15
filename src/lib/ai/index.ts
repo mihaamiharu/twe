@@ -107,7 +107,8 @@ Aturan PENTING:
 2. Analisis 'User Attempt' mereka. Tunjukkan secara spesifik bagian mana yang salah atau kurang (misalnya: "Kamu lupa menutup kurung", "Method .push() belum dipanggil").
 3. Berikan contoh sintaks yang mirip tapi jangan gunakan nama variabel dari soal.
 4. Jangan basa-basi ("Hebat sekali", "Kamu sudah berusaha"). Langsung ke poin teknis.
-5. Jaga respons tetap singkat dan padat (maksimal 3 kalimat).`
+5. Jaga respons tetap singkat dan padat (maksimal 3 kalimat).
+6. WAJIB sertakan contoh coding dalam blok kode (\`\`\`javascript ... \`\`\`).`
         : `You are a technical QA mentor helping a student learn ${challengeType.replace('_', ' ')} for web testing.
 
 IMPORTANT Rules:
