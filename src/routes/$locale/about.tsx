@@ -204,10 +204,10 @@ function AboutPage() {
                         {t('about:contact.title')}
                     </p>
                     <Button asChild size="lg" className="h-12 px-8 text-lg">
-                        <a href="mailto:ekki.syam@gmail.com">
+                        <Link to="/$locale/contact" params={{ locale: i18n.language }}>
                             <Mail className="mr-2 h-5 w-5" />
                             {t('about:contact.cta')}
-                        </a>
+                        </Link>
                     </Button>
                 </section>
 
