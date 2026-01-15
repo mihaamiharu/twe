@@ -12,12 +12,15 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
+import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 import { executePlaywrightCode } from '@/core/executor';
 import {
@@ -28,8 +31,12 @@ import {
   Loader2,
   Target,
   BookOpen,
+  Lightbulb,
+  Sparkles,
   AlertCircle,
   GripVertical,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { storage } from '@/lib/storage-adapter';
@@ -42,6 +49,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { CodeEditor } from './CodeEditor';
@@ -53,7 +66,7 @@ import { SelectorInput, type SelectorType } from './SelectorInput';
 
 const defaultSelectorStyles = `
 /* Base Layout */
-body { font-family: 'Inter', system-ui, sans-serif; background: #f8fafc; color: #334155; }
+body { font-family: 'Outfit', system-ui, sans-serif; background: #f8fafc; color: #334155; }
 h1, h2, h3, h4 { color: #0f172a; margin-top: 0; }
 
 /* Components */
@@ -150,6 +163,14 @@ export interface Challenge {
     title: string;
   };
   isCompleted?: boolean;
+  nextChallenge?: {
+    slug: string;
+    title: string;
+  };
+  prevChallenge?: {
+    slug: string;
+    title: string;
+  };
 }
 
 export interface ChallengePlaygroundProps {
@@ -162,6 +183,7 @@ export interface ChallengePlaygroundProps {
   }) => void;
   userId?: string;
   className?: string;
+  hintUsed?: boolean; // Whether user has already used hint for this challenge
 }
 
 export function ChallengePlayground({
@@ -169,6 +191,7 @@ export function ChallengePlayground({
   onSubmit,
   userId,
   className,
+  hintUsed: initialHintUsed = false,
 }: ChallengePlaygroundProps) {
   const { t, i18n } = useTranslation(['challenges', 'common']);
   const locale = i18n.language;
@@ -177,6 +200,45 @@ export function ChallengePlayground({
   const [selector, setSelector] = useState('');
   const [resetCount, setResetCount] = useState(0);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
+
+  // AI Hint state
+  const [isHintDialogOpen, setIsHintDialogOpen] = useState(false);
+  const [hintContent, setHintContent] = useState<string | null>(null);
+  const [hintUsed, setHintUsed] = useState(initialHintUsed);
+
+  // AI Hint mutation
+  const hintMutation = useMutation({
+    mutationFn: async () => {
+      const { getAIHint } = await import('@/server/ai.fn');
+      const currentCode = isCodeChallenge ? code : selector;
+      return getAIHint({
+        data: {
+          challengeSlug: challenge.slug,
+          userAttempt: currentCode || undefined,
+          locale,
+        },
+      });
+    },
+    onSuccess: (result) => {
+      setIsHintDialogOpen(false);
+
+      if (result.success && result.hint) {
+        setHintContent(result.hint);
+        setHintUsed(true);
+      } else if (!result.success && result.error) {
+        toast.error(t('challenges:hints.errorTitle', 'Hint Generation Failed'), {
+          description: result.error,
+        });
+      }
+    },
+    onError: (error) => {
+      console.error('[AI Hint] Error:', error);
+      setIsHintDialogOpen(false);
+      toast.error(t('challenges:hints.errorTitle', 'Error'), {
+        description: t('challenges:hints.errorGeneric', 'Something went wrong. Please try again.'),
+      });
+    },
+  });
 
   const [selectorType, setSelectorType] = useState<SelectorType>(
     challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css',
@@ -203,7 +265,9 @@ export function ChallengePlayground({
     setIsRunning(false);
     setActiveTab('instructions');
     setPreviewValidation(null);
-  }, [challenge.id, challenge.starterCode, challenge.type]);
+    setHintContent(null);
+    setHintUsed(initialHintUsed);
+  }, [challenge.id, challenge.starterCode, challenge.type, initialHintUsed]);
 
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [consoleLogs, setConsoleLogs] = useState<LogEntry[]>([]);
@@ -526,12 +590,12 @@ export function ChallengePlayground({
         </TabsContent>
         <TabsContent
           value="preview"
-          className="mt-4 h-[400px] data-[state=inactive]:hidden"
-          forceMount
+          className="mt-4 h-[400px]"
         >
           {challenge.htmlContent && (
             <WebComponentPreview
               htmlContent={challenge.htmlContent}
+              cssContent={defaultSelectorStyles}
               userSelector={isSelectorChallenge ? selector : undefined}
               selectorType={selectorType}
               targetSelector={challenge.targetSelector as string}
@@ -636,14 +700,11 @@ export function ChallengePlayground({
           {challenge.htmlContent && (
             <TabsContent
               value="preview"
-              className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col data-[state=inactive]:hidden"
-              forceMount
+              className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col"
             >
               <WebComponentPreview
                 htmlContent={challenge.htmlContent}
-                cssContent={
-                  isSelectorChallenge ? defaultSelectorStyles : undefined
-                }
+                cssContent={defaultSelectorStyles}
                 userSelector={isSelectorChallenge ? selector : undefined}
                 selectorType={selectorType}
                 targetSelector={challenge.targetSelector as string}
@@ -811,19 +872,28 @@ export function ChallengePlayground({
                 </button>
               </div>
 
-              <Button
-                size="sm"
-                onClick={() => void handleRunCode()}
-                disabled={isRunning}
-                className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
-              >
-                {isRunning ? (
-                  <Loader2 className="h-3 w-3 animate-spin mr-1" />
-                ) : (
-                  <Play className="h-3 w-3 mr-1" />
-                )}
-                {t('common:actions.run')}
-              </Button>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      size="sm"
+                      onClick={() => void handleRunCode()}
+                      disabled={isRunning}
+                      className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
+                    >
+                      {isRunning ? (
+                        <Loader2 className="h-3 w-3 animate-spin mr-1" />
+                      ) : (
+                        <Play className="h-3 w-3 mr-1" />
+                      )}
+                      {t('common:actions.run')}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{t('common:actions.runTooltip')}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
             <div className="flex-1 overflow-auto">
               {resultsTab === 'results' ? (
@@ -900,6 +970,39 @@ export function ChallengePlayground({
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Navigation Buttons */}
+          <div className="flex items-center mr-2 bg-muted/30 rounded-lg p-0.5 border border-border/50">
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={!challenge.prevChallenge}
+              onClick={() => {
+                if (challenge.prevChallenge) {
+                  window.location.href = `/${locale}/challenges/${challenge.prevChallenge.slug}`;
+                }
+              }}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title={challenge.prevChallenge ? t('common:actions.previous') : undefined}
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <div className="w-px h-4 bg-border/50 mx-0.5" />
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled={!challenge.nextChallenge}
+              onClick={() => {
+                if (challenge.nextChallenge) {
+                  window.location.href = `/${locale}/challenges/${challenge.nextChallenge.slug}`;
+                }
+              }}
+              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              title={challenge.nextChallenge ? t('common:actions.next') : undefined}
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+
           {/* Mobile Run Button */}
           {isMobile && isCodeChallenge && (
             <Button
@@ -933,21 +1036,72 @@ export function ChallengePlayground({
             </Link>
           )}
 
-          <Button
-            size="sm"
-            onClick={handleSubmit}
-            disabled={!hasPassed}
-            className={cn(
-              'font-bold border border-border transition-all',
-              hasPassed
-                ? 'bg-green-500 hover:bg-green-600 text-black'
-                : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
-            )}
-            title={t('common:actions.submit')}
-          >
-            <Send className="h-4 w-4 mr-2" />
-            {t('common:actions.submit')}
-          </Button>
+          {/* AI Hint Button (Temporarily Disabled) */}
+          {false && !challenge.isCompleted && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => (hintUsed || !userId) ? null : setIsHintDialogOpen(true)}
+                    disabled={hintMutation.isPending || !userId}
+                    className={cn(
+                      'font-bold border transition-all',
+                      hintUsed || !userId
+                        ? 'bg-amber-500/5 border-amber-500/20 text-amber-600/60 cursor-default opacity-80'
+                        : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
+                    )}
+                  >
+                    {hintMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <Lightbulb className="h-4 w-4 mr-2" />
+                    )}
+                    {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}
+                    {!hintUsed && (
+                      <Badge variant="secondary" className="ml-2 bg-amber-500/20 text-amber-700 text-xs">
+                        {t('challenges:hints.penalty')}
+                      </Badge>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {!userId
+                    ? t('challenges:hints.loginRequired')
+                    : hintUsed
+                      ? t('challenges:hints.alreadyUsed')
+                      : t('challenges:hints.warning')
+                  }
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="sm"
+                  onClick={handleSubmit}
+                  disabled={!hasPassed}
+                  className={cn(
+                    'font-bold border border-border transition-all',
+                    hasPassed
+                      ? 'bg-green-500 hover:bg-green-600 text-black'
+                      : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
+                  )}
+                  title={!hasPassed ? t('common:actions.submit') : undefined}
+                >
+                  <Send className="h-4 w-4 mr-2" />
+                  {t('common:actions.submit')}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Submit solution (⌘/Ctrl + Shift + Enter)</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
@@ -1003,6 +1157,115 @@ export function ChallengePlayground({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* AI Hint Confirmation Dialog */}
+      <Dialog open={isHintDialogOpen} onOpenChange={setIsHintDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-amber-500/10 p-2 rounded-full">
+                <Lightbulb className="h-5 w-5 text-amber-600" />
+              </div>
+              <DialogTitle>{t('challenges:hints.warningTitle')}</DialogTitle>
+            </div>
+          </DialogHeader>
+          <DialogDescription className="space-y-3" asChild>
+            <div className="text-muted-foreground text-sm space-y-3">
+              <p>{t('challenges:hints.warning')}</p>
+              <div className="flex items-center gap-2 p-3 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <AlertCircle className="h-4 w-4 text-amber-600 shrink-0" />
+                <span className="text-sm font-medium text-amber-700">
+                  {t('challenges:hints.penalty')}
+                </span>
+              </div>
+              <p className="text-[10px] text-muted-foreground italic pt-2 border-t border-border/50">
+                {t('challenges:hints.freeTierNote')}
+              </p>
+            </div>
+          </DialogDescription>
+          <DialogFooter className="mt-4 sm:justify-end gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => setIsHintDialogOpen(false)}
+              className="hover:bg-accent"
+            >
+              {t('challenges:hints.cancel')}
+            </Button>
+            <Button
+              onClick={() => hintMutation.mutate()}
+              disabled={hintMutation.isPending}
+              className="bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
+            >
+              {hintMutation.isPending ? (
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4 mr-2" />
+              )}
+              {t('challenges:hints.confirm')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Hint Display Panel (floating) */}
+      {hintContent && (
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-4">
+          <Card className="border-amber-500/30 bg-amber-50/95 dark:bg-amber-950/95 shadow-lg backdrop-blur-sm">
+            <CardContent className="p-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-amber-500/20 p-1.5 rounded-full shrink-0 mt-0.5">
+                  <Lightbulb className="h-4 w-4 text-amber-600" />
+                </div>
+                <div className="space-y-2 flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="font-bold text-amber-800 dark:text-amber-200 text-sm">
+                      {t('challenges:hints.title')}
+                    </h4>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setHintContent(null)}
+                      className="h-6 w-6 p-0 text-amber-600 hover:text-amber-800 hover:bg-amber-500/20"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                  <div className="text-sm text-amber-900 dark:text-amber-100 leading-relaxed markdown-prose">
+                    <ReactMarkdown
+                      components={{
+                        code: ({ className, children, ...props }) => {
+                          const match = /language-(\w+)/.exec(className || '');
+                          const content = String(children).replace(/\n$/, '');
+                          const isInline = !match && !content.includes('\n');
+                          return (
+                            <code
+                              className={cn(
+                                'font-mono text-xs rounded px-1 py-0.5',
+                                isInline
+                                  ? 'bg-amber-600/10 text-amber-800 dark:text-amber-200'
+                                  : 'block bg-black/80 text-white p-2 my-2 rounded-md overflow-x-auto',
+                                className
+                              )}
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          );
+                        },
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc pl-4 mb-2 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal pl-4 mb-2 space-y-1">{children}</ol>,
+                      }}
+                    >
+                      {hintContent}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

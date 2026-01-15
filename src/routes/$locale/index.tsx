@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
+import { WaveSeparator } from '@/components/ui/wave-separator';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -286,6 +287,8 @@ function HomePage() {
             </div>
           </div>
         </div>
+        {/* Animated Wave Separator */}
+        <WaveSeparator />
       </section>
 
       {/* Learning Path Section */}
@@ -312,10 +315,10 @@ function HomePage() {
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <CardContent className="p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <span className="text-3xl">{tier.emoji}</span>
+                    <span className="text-3xl grayscale-[0.5]">{tier.emoji}</span>
                     <div>
                       <div className="text-sm text-muted-foreground font-bold">
-                        Tier {index + 1}
+                        Phase {index + 1}
                       </div>
                       <h3 className="text-xl font-bold">{tier.title}</h3>
                     </div>
@@ -335,7 +338,13 @@ function HomePage() {
                     ))}
                   </div>
                   <div className="text-sm font-bold text-primary">
-                    {tier.count} {t('careerPath.challenges')}
+                    {tier.count > 0 ? (
+                      `${tier.count} ${t('careerPath.challenges')}`
+                    ) : (
+                      <Badge variant="outline" className="text-xs border-dashed border-muted-foreground text-muted-foreground">
+                        Coming Soon
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -438,7 +447,7 @@ function HomePage() {
                     {feature.icon}
                   </div>
                   <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: feature.description }} />
                 </CardContent>
               </Card>
             ))}
@@ -485,59 +494,14 @@ function HomePage() {
                   </span>
                 </div>
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-muted-foreground">{item.description}</p>
+                <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Mission Section */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('mission.title')}{' '}
-              <span className="gradient-text">
-                {t('mission.titleHighlight')}
-              </span>
-            </h2>
-          </div>
 
-          <Card className="glass-card relative overflow-hidden">
-            <CardContent className="p-8 md:p-12 relative z-10">
-              {/* Decorative quote mark */}
-              <div className="absolute top-4 right-8 text-9xl text-primary/10 font-serif leading-none select-none pointer-events-none">
-                &rdquo;
-              </div>
-
-              <div className="space-y-6 text-lg text-muted-foreground leading-relaxed font-reading">
-                <p>{t('mission.story1')}</p>
-                <p>
-                  <strong className="text-foreground font-medium">
-                    {t('mission.story2')}
-                  </strong>
-                </p>
-                <p>{t('mission.story3')}</p>
-              </div>
-
-              <div className="mt-8 pt-8 border-t border-border/50 flex flex-col items-center gap-3 text-center">
-                <div className="h-14 w-14 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-2xl shadow-sm border-2 border-primary">
-                  E
-                </div>
-                <div>
-                  <div className="font-extrabold text-foreground text-lg">
-                    {t('mission.author')}
-                  </div>
-                  <div className="text-sm text-muted-foreground font-medium">
-                    {t('mission.authorRole')}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="py-20 px-6">

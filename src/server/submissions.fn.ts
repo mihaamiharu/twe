@@ -114,13 +114,10 @@ export const createSubmission = createServerFn({ method: 'POST' })
 
       if (!challenge) {
         // LAZY SYNC: Check if challenge exists in filesystem
-        const { getChallengeContent } = await import('./content.server');
+        const { getRawChallengeContent } = await import('./content.server');
 
-        // Try to get English content as canonical source, fallback to current locale
-        let fsChallenge = await getChallengeContent(challengeSlug, 'en');
-        if (!fsChallenge && locale !== 'en') {
-          fsChallenge = await getChallengeContent(challengeSlug, locale);
-        }
+        // Get raw content (with full localized objects)
+        const fsChallenge = await getRawChallengeContent(challengeSlug);
 
         if (fsChallenge) {
           logger.info(`[Submission] Lazy syncing challenge: ${challengeSlug}`);
@@ -128,13 +125,13 @@ export const createSubmission = createServerFn({ method: 'POST' })
           // Insert challenge
           const [newChallenge] = await db.insert(challenges).values({
             slug: fsChallenge.slug,
-            title: { en: fsChallenge.title, [locale]: fsChallenge.title },
-            description: { en: fsChallenge.description, [locale]: fsChallenge.description },
+            title: fsChallenge.title as any, // Cast to any for JSONB
+            description: fsChallenge.description as any,
             type: fsChallenge.type,
             difficulty: fsChallenge.difficulty,
             xpReward: fsChallenge.xpReward,
             order: fsChallenge.order,
-            instructions: { en: fsChallenge.instructions, [locale]: fsChallenge.instructions },
+            instructions: fsChallenge.instructions as any,
             htmlContent: fsChallenge.htmlContent,
             starterCode: fsChallenge.starterCode,
             category: fsChallenge.category,
@@ -192,7 +189,10 @@ export const createSubmission = createServerFn({ method: 'POST' })
       let levelUpInfo = null;
 
       if (isFirstCompletion) {
-        xpEarned = challenge.xpReward;
+        // Check if hint was used for this challenge - apply 50% XP penalty
+        const hintUsed = existingProgress?.usedHint || false;
+        const xpMultiplier = hintUsed ? 0.5 : 1;
+        xpEarned = Math.floor(challenge.xpReward * xpMultiplier);
 
         // Get current user XP
         const user = await db.query.users.findFirst({
@@ -214,7 +214,7 @@ export const createSubmission = createServerFn({ method: 'POST' })
             .where(eq(users.id, userId));
 
           logger.info(
-            `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP.`,
+            `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP${hintUsed ? ' (50% penalty for hint usage)' : ''}.`,
           );
 
           // Increment challenge completion count

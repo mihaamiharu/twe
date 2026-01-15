@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 3000",
+    "dev": "bun --bun vite dev --port 3000",
     "build": "vite build",
     "preview": "vite preview",
     "test": "bun test",
@@ -21,6 +21,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
+    "db:sync": "bun src/scripts/sync-challenges.ts",
     "db:seed": "bun run scripts/seed-challenges.ts",
     "staging:up": "podman compose up -d postgres_staging && sleep 3 && cp .env.staging .env && bun run db:migrate",
     "staging:down": "podman compose stop postgres_staging",
@@ -28,6 +29,7 @@
     "start": "bun run scripts/server.ts"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-avatar": "^1.1.11",

@@ -1,45 +1,62 @@
 {
   "hero": {
-    "title": "Learn QA Automation",
-    "titleSuffix": "with Practical Challenges",
-    "tagline": "Build real-world skills, not just theory.",
-    "description": "I'm sharing the <strong>practical skills I accumulated from supportive mentors and real-world problem solving</strong>, helping you build confidence step-by-step.",
+    "title": "Master Test Automation",
+    "titleSuffix": "with my battle-tested guide",
+    "tagline": "Real-world challenges designed by a Senior QA Engineer.",
+    "description": "I built this platform to share the <strong>practical patterns I rely on daily</strong>. No textbooks, just the real scenarios that taught me how to test.",
     "startLearning": "Start Learning",
-    "browseTutorials": "Browse Tutorials"
+    "browseTutorials": "Browse Curriculum"
   },
   "stats": {
-    "challenges": "Challenges",
-    "tutorials": "Tutorials",
+    "challenges": "Real Scenarios",
+    "tutorials": "Curated Lessons",
     "achievements": "Achievements",
-    "learning": "Learning"
+    "learning": "Continuous Learning"
   },
   "careerPath": {
     "title": "Your",
-    "titleHighlight": "Career Path",
-    "subtitle": "From selector basics to advanced automation architectures.",
-    "tier": "Tier",
-    "challenges": "challenges"
+    "titleHighlight": "Curriculum",
+    "subtitle": "A structured path from selector basics to advanced automation architectures.",
+    "tier": "Phase",
+    "challenges": "scenarios"
   },
   "tiers": {
     "basic": {
       "title": "Selectors",
       "description": "Master CSS and XPath selectors - the foundation of web testing",
-      "skills": ["CSS Selectors", "XPath Queries", "Element Targeting"]
+      "skills": [
+        "CSS Selectors",
+        "XPath Queries",
+        "Element Targeting"
+      ]
     },
     "beginner": {
       "title": "JavaScript",
       "description": "Learn JavaScript fundamentals for test automation",
-      "skills": ["Variables & Types", "DOM Manipulation", "Async/Await"]
+      "skills": [
+        "Variables & Types",
+        "DOM Manipulation",
+        "Async/Await"
+      ]
     },
     "intermediate": {
       "title": "Playwright",
       "description": "Build real automated tests with Playwright",
-      "skills": ["Navigation", "Locators", "Assertions", "Waits"]
+      "skills": [
+        "Navigation",
+        "Locators",
+        "Assertions",
+        "Waits"
+      ]
     },
     "expert": {
       "title": "Advanced",
       "description": "Professional patterns for production testing",
-      "skills": ["Page Objects", "Data-Driven", "CI/CD"]
+      "skills": [
+        "Page Objects",
+        "Data-Driven",
+        "CI/CD"
+      ]
     }
   },
   "featuredChallenges": {
@@ -50,15 +67,15 @@
   },
   "features": {
     "title": "Everything You Need to",
-    "titleHighlight": "Learn Testing",
-    "subtitle": "A complete platform designed to take you from beginner to expert",
+    "titleHighlight": "Level Up",
+    "subtitle": "A personal curriculum designed to take you from beginner to expert",
     "interactiveTutorials": {
       "title": "Interactive Tutorials",
       "description": "Learn testing concepts step-by-step. I've broken down the tricky parts so you don't have to struggle."
     },
     "playwrightChallenges": {
-      "title": "Playwright Challenges",
-      "description": "Practice with real scenarios. It's like having a sandbox to try things without breaking production."
+      "title": "Browser Simulation",
+      "description": "Practice with <strong>sandboxed scenarios</strong>. Your code runs <strong>entirely in your browser</strong>—fast, secure, and no installation."
     },
     "selectorChallenges": {
       "title": "Selector Challenges",
@@ -69,8 +86,8 @@
       "description": "Earn XP, level up, unlock achievements, and compete on the leaderboard. Learning made fun!"
     },
     "instantFeedback": {
-      "title": "Instant Feedback",
-      "description": "Get results immediately. Like a friend sitting next to you pointing out what needs fixing."
+      "title": "Zero Friction",
+      "description": "Start coding immediately. <strong>No account required</strong>. Just verify your skills and go."
     },
     "trackProgress": {
       "title": "Track Progress",
@@ -86,7 +103,7 @@
     },
     "step2": {
       "title": "Write Your Code",
-      "description": "Use our embedded code editor to write and test your automation scripts."
+      "description": "Use our embedded code editor. <strong>Everything runs locally</strong> in your browser for instant feedback."
     },
     "step3": {
       "title": "Get Instant Feedback",
@@ -94,22 +111,22 @@
     }
   },
   "mission": {
-    "title": "Why I",
-    "titleHighlight": "Built This",
-    "story1": "I started my career with zero QA experience. I survived those early days thanks to patient seniors who coached me through the hard parts.",
+    "title": "Built by",
+    "titleHighlight": "Ekki",
+    "story1": "I am a QA Engineer who loves building tools. I started my career with zero QA experience and survived thanks to patient mentors.",
     "story2": "TestingWithEkki is my way of passing that forward.",
     "story3": "Not everyone has a mentor to guide them, so I'm building the resource I wish I had: practical, hands-on lessons that actually make sense.",
     "author": "Ekki",
     "authorRole": "Creator of TestingWithEkki"
   },
   "cta": {
-    "title": "Start Your Quality Engineering Career",
-    "subtitle": "Join thousands of testers mastering standard industry tools. Free forever for individuals.",
-    "getStarted": "Get Started for Free",
-    "viewLeaderboard": "View Leaderboard",
-    "freeToUse": "Free to use",
-    "noCreditCard": "No credit card required",
-    "learnAtOwnPace": "Learn at your own pace"
+    "title": "Ready to automate your first real scenario?",
+    "subtitle": "Start solving practical challenges that mirror real-world applications. Free forever for individuals.",
+    "getStarted": "Start Solving",
+    "viewLeaderboard": "See Who's Best",
+    "freeToUse": "Open Source heart",
+    "noCreditCard": "No strings attached",
+    "learnAtOwnPace": "Self-paced mastery"
   },
   "hallOfFame": {
     "title": "Hall of",

@@ -242,7 +242,7 @@ export function CodeEditor({
       editorRef.current.addAction({
         id: 'run-code',
         label: 'Run Code',
-         
+
         keybindings: [
           monacoRef.current.KeyMod.CtrlCmd | monacoRef.current.KeyCode.Enter,
         ],
