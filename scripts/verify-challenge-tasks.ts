@@ -63,6 +63,15 @@ files.forEach(file => {
             }
         }
 
+        // Check for Real World Scenario
+        if (!instructions.includes('## Real World Scenario')) {
+            console.log(`[MISSING EN SCENARIO] File: ${file} | Slug: ${challenge.slug}`);
+        }
+        const instructionsIdContent = challenge.instructions?.id || '';
+        if (!instructionsIdContent.includes('## Skenario Dunia Nyata')) {
+            console.log(`[MISSING ID SCENARIO] File: ${file} | Slug: ${challenge.slug}`);
+        }
+
         // Check for empty starterCode (except basic.json)
         if (file !== 'basic.json' && (!challenge.starterCode || challenge.starterCode.trim() === '')) {
             console.log(`[EMPTY STARTER CODE] File: ${file} | Slug: ${challenge.slug}`);
