@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, FileText, Terminal, Database, Globe, Server, Code2 } from 'lucide-react';
+import { Github, Linkedin, Mail, FileText, Terminal, Database, Globe, Server, Code2, Milestone } from 'lucide-react';
 import i18n from '@/lib/i18n';
 import { Boop } from '@/components/ui/boop';
 
@@ -24,6 +24,7 @@ export const Route = createFileRoute('/$locale/about')({
 
 function AboutPage() {
     const { t } = useTranslation(['about', 'common']);
+    const milestones = t('about:milestones.items', { returnObjects: true }) as Array<{ year: string; title: string; description: string }>;
     // Hardcoded for now as it's personal content, could move to i18n later if needed
 
     const expertise = [
@@ -44,32 +45,7 @@ function AboutPage() {
         }
     ];
 
-    const gear = [
-        {
-            category: t('about:gear.hardware'),
-            items: [
-                { name: t('about:gear.items.macbook.name'), description: t('about:gear.items.macbook.desc') },
-                { name: t('about:gear.items.keyboard.name'), description: t('about:gear.items.keyboard.desc') },
-                { name: t('about:gear.items.monitor.name'), description: t('about:gear.items.monitor.desc') }
-            ]
-        },
-        {
-            category: t('about:gear.software'),
-            items: [
-                { name: t('about:gear.items.vscode.name'), description: t('about:gear.items.vscode.desc') },
-                { name: t('about:gear.items.arc.name'), description: t('about:gear.items.arc.desc') },
-                { name: t('about:gear.items.ghostty.name'), description: t('about:gear.items.ghostty.desc') }
-            ]
-        },
-        {
-            category: t('about:gear.productivity'),
-            items: [
-                { name: t('about:gear.items.notion.name'), description: t('about:gear.items.notion.desc') },
-                { name: t('about:gear.items.linear.name'), description: t('about:gear.items.linear.desc') },
-                { name: t('about:gear.items.raycast.name'), description: t('about:gear.items.raycast.desc') }
-            ]
-        }
-    ];
+
 
     return (
         <div className="min-h-screen py-20 px-6">
@@ -138,12 +114,53 @@ function AboutPage() {
                         <ul className="list-disc list-inside space-y-2 ml-4">
                             <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.auth') }} />
                             <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.code') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.gamification') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.i18n') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.adaptability') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.reliability') }} />
                         </ul>
                         <p className="mt-4">
                             {t('about:philosophy.conclusion')}
                         </p>
+                    </div>
+                </section>
+
+                {/* Milestones / Journey */}
+                <section>
+                    <div className="text-center mb-10">
+                        <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
+                            <Milestone className="h-6 w-6 text-primary" />
+                            {t('about:milestones.title')}
+                        </h3>
+                        <p className="text-muted-foreground">{t('about:milestones.subtitle')}</p>
+                    </div>
+
+                    <div className="relative border-l border-border ml-3.5 md:ml-1/2 space-y-12 pb-4">
+                        {milestones.map((milestone, index) => (
+                            <div key={index} className="relative pl-8 md:pl-0">
+                                {/* Dot on the line */}
+                                <div className="absolute -left-[5px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
+
+                                <div className="flex flex-col md:flex-row gap-4 md:gap-12 group">
+                                    {/* Year - distinct styling */}
+                                    <div className="md:w-32 md:text-right shrink-0">
+                                        <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-sm">
+                                            {milestone.year}
+                                        </span>
+                                    </div>
+
+                                    {/* Content card */}
+                                    <Card className="flex-1 transition-all hover:bg-card/50 hover:border-primary/50 relative -top-4 md:-top-5">
+                                        <CardHeader>
+                                            <CardTitle className="text-lg">{milestone.title}</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            <p className="text-muted-foreground leading-relaxed">
+                                                {milestone.description}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 </section>
 
@@ -179,29 +196,7 @@ function AboutPage() {
                     </div>
                 </section>
 
-                {/* Gear & Tools (Uses) */}
-                <section className="glass-card p-8 md:p-12 rounded-3xl border border-primary/10">
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl font-bold mb-2">{t('about:gear.title')}</h3>
-                        <p className="text-muted-foreground">{t('about:gear.subtitle')}</p>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {gear.map((category) => (
-                            <div key={category.category} className="space-y-4">
-                                <h4 className="text-lg font-semibold border-b border-border pb-2 text-primary">{category.category}</h4>
-                                <ul className="space-y-3">
-                                    {category.items.map((item) => (
-                                        <li key={item.name} className="flex flex-col">
-                                            <span className="font-medium text-foreground">{item.name}</span>
-                                            <span className="text-sm text-muted-foreground">{item.description}</span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        ))}
-                    </div>
-                </section>
 
                 {/* Contact/Ending */}
                 <section className="text-center pt-10 border-t border-border">
@@ -217,6 +212,6 @@ function AboutPage() {
                 </section>
 
             </div>
-        </div>
+        </div >
     );
 }
