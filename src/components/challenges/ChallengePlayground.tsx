@@ -226,20 +226,16 @@ export function ChallengePlayground({
         setHintContent(result.hint);
         setHintUsed(true);
       } else if (!result.success && result.error) {
-        toast({
-          title: t('challenges:hints.errorTitle', 'Hint Generation Failed'),
+        toast.error(t('challenges:hints.errorTitle', 'Hint Generation Failed'), {
           description: result.error,
-          variant: 'destructive',
         });
       }
     },
     onError: (error) => {
       console.error('[AI Hint] Error:', error);
       setIsHintDialogOpen(false);
-      toast({
-        title: t('challenges:hints.errorTitle', 'Error'),
+      toast.error(t('challenges:hints.errorTitle', 'Error'), {
         description: t('challenges:hints.errorGeneric', 'Something went wrong. Please try again.'),
-        variant: 'destructive',
       });
     },
   });
