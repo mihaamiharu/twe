@@ -24,7 +24,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "run": "Run",
-    "runTooltip": "Run code (⌘/Ctrl + Enter) — Preview will reset",
+    "runTooltip": "Run code (⌘/Ctrl + Enter)  -  Preview will reset",
     "runCode": "Run Code",
     "reset": "Reset",
     "continue": "Continue",
@@ -89,7 +89,16 @@
     "resources": "Resources",
     "copyright": "© {{year}} TestingWithEkki. All rights reserved.",
     "madeWith": "Made with ❤️ for the QA community",
-    "reportBug": "Report a Bug"
+    "reportBug": "Report a Bug",
+    "newsletter": {
+      "title": "Stay Updated",
+      "description": "Get the latest tutorials, challenges, and testing tips delivered to your inbox.",
+      "placeholder": "your@email.com",
+      "submit": "Subscribe",
+      "submitting": "Subscribing...",
+      "success": "Thanks for subscribing!",
+      "error": "Something went wrong."
+    }
   },
   "notFound": {
     "title": "You are in Headless Mode",

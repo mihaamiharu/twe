@@ -75,7 +75,7 @@
     },
     "playwrightChallenges": {
       "title": "Browser Simulation",
-      "description": "Practice with <strong>sandboxed scenarios</strong>. Your code runs <strong>entirely in your browser</strong>—fast, secure, and no installation."
+      "description": "Practice with <strong>sandboxed scenarios</strong>. Your code runs <strong>entirely in your browser</strong> - fast, secure, and no installation."
     },
     "selectorChallenges": {
       "title": "Selector Challenges",

@@ -9,7 +9,6 @@ import json from 'highlight.js/lib/languages/json';
 import typescript from 'highlight.js/lib/languages/typescript';
 
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/components/theme-provider';
 import { CodeBlock } from '@/components/CodeBlock';
 
 // Import custom theme-aware highlight.js styles
@@ -24,13 +23,10 @@ export function MarkdownRenderer({
   content,
   className,
 }: MarkdownRendererProps) {
-  const { resolvedTheme } = useTheme();
-
   return (
     <div
       className={cn(
-        'prose prose-lg max-w-none',
-        resolvedTheme === 'dark' && 'prose-invert',
+        'prose prose-lg max-w-none dark:prose-invert',
         className,
       )}
     >
@@ -53,7 +49,7 @@ export function MarkdownRenderer({
         components={{
           // Custom heading styles
           h1: ({ children }) => (
-            <h1 className="text-3xl font-bold gradient-text mb-4 mt-8 first:mt-0">
+            <h1 className="text-3xl font-bold mb-4 mt-8 first:mt-0 text-foreground">
               {children}
             </h1>
           ),
@@ -94,7 +90,7 @@ export function MarkdownRenderer({
             if (isInline) {
               return (
                 <code
-                  className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-border/50"
+                  className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-border/50 before:content-none after:content-none"
                   {...props}
                 >
                   {children}

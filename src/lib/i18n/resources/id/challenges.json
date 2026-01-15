@@ -47,7 +47,8 @@
     "resetDescription": "Ini akan mengatur ulang kode/selektor kamu ke keadaan awal. Progres sesi kamu saat ini akan hilang.",
     "recommendation": "Rekomendasi:",
     "recommendationDescription": "Tantangan {{tier}} ini menggunakan konsep dari tingkat {{missingName}}.",
-    "tryPrereq": "Coba {{missingName}} terlebih dahulu"
+    "tryPrereq": "Coba {{missingName}} terlebih dahulu",
+    "shimNote": "Lingkungan latihan — menggunakan simulasi browser untuk umpan balik instan"
   },
   "success": {
     "title": "Tantangan Selesai!",

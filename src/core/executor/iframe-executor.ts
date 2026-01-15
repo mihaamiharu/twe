@@ -20,6 +20,7 @@ export interface ExecutionResult {
 export interface ExecuteOptions {
   timeout?: number;
   testCases?: TestCase[];
+  cssContent?: string;
 }
 
 export interface TestCase {
@@ -170,6 +171,7 @@ export async function executePlaywrightCode(
                                 padding: 16px;
                                 margin: 0;
                               }
+                              ${options?.cssContent || ''}
                             </style>
                             <script data-internal="true">
                                 // Polyfill fetch to handle relative URLs and MOCK requests

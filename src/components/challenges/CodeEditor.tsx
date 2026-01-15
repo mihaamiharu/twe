@@ -26,6 +26,7 @@ export interface CodeEditorProps {
   language?: 'javascript' | 'typescript' | 'css' | 'html';
   onChange?: (code: string) => void;
   onRun?: (code: string) => void;
+  onReady?: () => void;
   storageKey?: string;
   readOnly?: boolean;
   height?: string | number;
@@ -101,6 +102,7 @@ export function CodeEditor({
   height = '400px',
   showMinimap = true,
   className,
+  onReady,
 }: CodeEditorProps) {
   const { resolvedTheme } = useTheme();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -232,8 +234,11 @@ export function CodeEditor({
 
       // Focus editor
       editor.focus();
+
+      // Signal that editor is ready
+      onReady?.();
     },
-    [onRun, storageKey],
+    [onRun, storageKey, onReady],
   );
 
   // Update editor when onRun changes

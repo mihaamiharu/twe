@@ -4,6 +4,7 @@ import {
   Scripts,
   createRootRouteWithContext,
   useParams,
+  useLocation,
 } from '@tanstack/react-router';
 import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
@@ -78,8 +79,8 @@ export const Route = createRootRouteWithContext<RootContext>()({
     links: [
       {
         rel: 'icon',
-        href: '/logo.jpg',
-        type: 'image/jpeg',
+        href: '/logo-icon.svg',
+        type: 'image/svg+xml',
       },
       {
         rel: 'stylesheet',
@@ -94,6 +95,13 @@ export const Route = createRootRouteWithContext<RootContext>()({
 });
 
 function RootComponent() {
+  const location = useLocation();
+  // Check if current route is a challenge detail page (e.g. /en/challenges/basic-selector)
+  // Exclude /admin/challenges and ensure it's not just the index /challenges
+  const isChallengeDetail =
+    /\/challenges\/[^/]+$/.test(location.pathname) &&
+    !location.pathname.includes('/admin/');
+
   return (
     <ThemeProvider>
       <GoogleAnalytics />
@@ -102,8 +110,8 @@ function RootComponent() {
         <main className="flex-1">
           <Outlet />
         </main>
-        <Footer />
-        <Toaster position="top-right" theme="system" />
+        {!isChallengeDetail && <Footer />}
+        <Toaster position="top-right" theme="system" closeButton />
       </div>
     </ThemeProvider>
   );
