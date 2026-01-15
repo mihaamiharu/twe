@@ -1,4 +1,4 @@
-import { Github, Twitter, Bug, Send, Loader2, CheckCircle } from 'lucide-react';
+import { Github, Twitter, Bug, Loader2, CheckCircle } from 'lucide-react';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
@@ -77,14 +77,14 @@ export function Footer() {
               className="flex items-center gap-2 group w-fit"
             >
               <img
-                src="/logo-dark-new.png"
+                src="/logo-dark.svg"
                 alt="Logo"
-                className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen opacity-90 group-hover:opacity-100 transition-opacity"
+                className="h-8 w-8 hidden dark:block transition-opacity"
               />
               <img
-                src="/logo-light-new.png"
+                src="/logo-light.svg"
                 alt="Logo"
-                className="h-8 w-8 rounded-lg block dark:hidden mix-blend-multiply opacity-90 group-hover:opacity-100 transition-opacity"
+                className="h-8 w-8 block dark:hidden transition-opacity"
               />
               <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 group-hover:to-primary transition-all">
                 TestingWithEkki

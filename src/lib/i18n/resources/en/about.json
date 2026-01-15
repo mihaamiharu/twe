@@ -4,8 +4,7 @@
         "subtitle": "Senior Software Engineer (QA)",
         "description": "I bridge the gap between <strong>Manual Testing</strong> and <strong>Automated Engineering</strong>. With 4+ years at <strong>Ninja Van</strong>, I build custom frameworks and internal tools that empower teams to ship faster, with confidence.",
         "connect": "Connect on LinkedIn",
-        "github": "GitHub Profile",
-        "resume": "Resume"
+        "github": "GitHub Profile"
     },
     "philosophy": {
         "title": "Quality Engineering",
@@ -61,31 +60,49 @@
         "automation": {
             "title": "Test Automation",
             "items": [
-                "Playwright",
-                "Appium",
                 "Selenium",
-                "DeepEval (LLM)",
-                "Rest Assured"
+                "Rest Assured",
+                "DeepEval",
+                "Playwright",
+                "Appium Flutter"
             ]
         },
         "backend": {
-            "title": "Backend & Languages",
+            "title": "Languages & Ecosystem",
             "items": [
-                "Go (Golang)",
                 "Java",
-                "Python",
-                "PostgreSQL",
-                "Bun"
+                "SQL",
+                "TypeScript",
+                "Go",
+                "Python"
             ]
         },
-        "engineering": {
-            "title": "Full-Stack & DevOps",
+        "strategy": {
+            "title": "Strategy & Methodologies",
+            "items": [
+                "Shift-Left Testing",
+                "Test Planning",
+                "Risk Analysis",
+                "Agile / Scrum"
+            ]
+        },
+        "frontend": {
+            "title": "Modern Frontend",
             "items": [
                 "React 19",
                 "TypeScript",
+                "TanStack",
+                "Tailwind CSS"
+            ]
+        },
+        "devops": {
+            "title": "DevOps & Observability",
+            "items": [
                 "Docker",
-                "CI/CD (Bamboo/GHA)",
-                "TanStack"
+                "CI (Bamboo)",
+                "Grafana",
+                "Datadog",
+                "Kibana"
             ]
         }
     },

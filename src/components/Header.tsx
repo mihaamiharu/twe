@@ -129,15 +129,15 @@ export function Header() {
               >
                 {/* Dark Mode Logo */}
                 <img
-                  src="/logo-dark-new.png"
+                  src="/logo-dark.svg"
                   alt="Logo"
-                  className="h-8 w-8 rounded-lg hidden dark:block mix-blend-screen opacity-90 group-hover:opacity-100 transition-all group-hover:scale-105"
+                  className="h-8 w-8 hidden dark:block group-hover:scale-105 transition-all"
                 />
                 {/* Light Mode Logo */}
                 <img
-                  src="/logo-light-new.png"
+                  src="/logo-light.svg"
                   alt="Logo"
-                  className="h-8 w-8 rounded-lg block dark:hidden mix-blend-multiply opacity-90 group-hover:opacity-100 transition-all group-hover:scale-105"
+                  className="h-8 w-8 block dark:hidden group-hover:scale-105 transition-all"
                 />
                 <span className="text-xl font-bold font-sans tracking-tight text-foreground group-hover:text-primary transition-colors">
                   TestingWithEkki
