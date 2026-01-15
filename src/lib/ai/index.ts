@@ -41,7 +41,7 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
 
     try {
         const model = client.getGenerativeModel({
-            model: 'gemini-2.5-flash-lite',
+            model: 'gemini-2.0-flash-lite',
             systemInstruction: systemPrompt,
         });
 

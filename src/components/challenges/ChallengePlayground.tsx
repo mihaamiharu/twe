@@ -1034,12 +1034,12 @@ export function ChallengePlayground({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => hintUsed ? null : setIsHintDialogOpen(true)}
-                    disabled={hintMutation.isPending}
+                    onClick={() => (hintUsed || !userId) ? null : setIsHintDialogOpen(true)}
+                    disabled={hintMutation.isPending || !userId}
                     className={cn(
                       'font-bold border transition-all',
-                      hintUsed
-                        ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 cursor-default'
+                      hintUsed || !userId
+                        ? 'bg-amber-500/5 border-amber-500/20 text-amber-600/60 cursor-default opacity-80'
                         : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
                     )}
                   >
@@ -1057,9 +1057,11 @@ export function ChallengePlayground({
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {hintUsed
-                    ? t('challenges:hints.alreadyUsed')
-                    : t('challenges:hints.warning')
+                  {!userId
+                    ? t('challenges:hints.loginRequired')
+                    : hintUsed
+                      ? t('challenges:hints.alreadyUsed')
+                      : t('challenges:hints.warning')
                   }
                 </TooltipContent>
               </Tooltip>
