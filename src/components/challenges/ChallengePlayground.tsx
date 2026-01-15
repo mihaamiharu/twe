@@ -219,15 +219,27 @@ export function ChallengePlayground({
       });
     },
     onSuccess: (result) => {
+      setIsHintDialogOpen(false);
+
       if (result.success && result.hint) {
         setHintContent(result.hint);
         setHintUsed(true);
-        setIsHintDialogOpen(false);
+      } else if (!result.success && result.error) {
+        toast({
+          title: t('challenges:hints.errorTitle', 'Hint Generation Failed'),
+          description: result.error,
+          variant: 'destructive',
+        });
       }
     },
     onError: (error) => {
       console.error('[AI Hint] Error:', error);
       setIsHintDialogOpen(false);
+      toast({
+        title: t('challenges:hints.errorTitle', 'Error'),
+        description: t('challenges:hints.errorGeneric', 'Something went wrong. Please try again.'),
+        variant: 'destructive',
+      });
     },
   });
 
