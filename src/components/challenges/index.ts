@@ -20,6 +20,7 @@ export type { WebComponentPreviewProps } from './WebComponentPreview';
 export { TestResults } from './TestResults';
 export type { TestResult, TestResultsProps } from './TestResults';
 
+export * from './ChallengeSkeleton';
 export { ChallengeCard } from './ChallengeCard';
 export type {
   ChallengeCardProps,

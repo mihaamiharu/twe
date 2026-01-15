@@ -1,4 +1,4 @@
-import { Github, Twitter, Zap, Bug } from 'lucide-react';
+import { Github, Twitter, Bug } from 'lucide-react';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
@@ -90,6 +90,7 @@ export function Footer() {
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
                   <Link
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
                     to={link.href as any}
                     className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
                   >
@@ -109,6 +110,7 @@ export function Footer() {
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
                   <Link
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
                     to={link.href as any}
                     className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
                   >
