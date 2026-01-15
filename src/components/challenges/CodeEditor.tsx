@@ -23,7 +23,6 @@ import { useTheme } from '@/components/theme-provider';
 
 export interface CodeEditorProps {
   initialCode?: string;
-  value?: string;
   language?: 'javascript' | 'typescript' | 'css' | 'html';
   onChange?: (code: string) => void;
   onRun?: (code: string) => void;
@@ -94,7 +93,6 @@ const CUSTOM_LIGHT_THEME: editor.IStandaloneThemeData = {
 
 export function CodeEditor({
   initialCode = '',
-  value,
   language = 'javascript',
   onChange,
   onRun,
@@ -109,13 +107,6 @@ export function CodeEditor({
   // eslint-disable-next-line @typescript-eslint/no-redundant-type-constituents
   const monacoRef = useRef<Monaco | null>(null);
   const [code, setCode] = useState<string>(initialCode);
-
-  // Sync internal state with reactive value prop
-  useEffect(() => {
-    if (value !== undefined && value !== code) {
-      setCode(value);
-    }
-  }, [value, code]);
 
   // Dynamic theme name
   const monacoTheme = useMemo(
