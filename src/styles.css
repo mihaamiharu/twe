@@ -2,13 +2,13 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap');
 @import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+@plugin 'tailwindcss-animate';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Font: Outfit (Friendly/Geometric) */
-
 @theme {
-  /* Colors - Semantic implementation for Theme Switching */
+  /* Colors - Semantic implementation */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
@@ -44,133 +44,176 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /* Fonts */
-  --font-sans:
-    'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-reading: 'Lora', Georgia, 'Times New Roman', serif;
   --font-mono: 'Fira Code', monospace;
+
   /* Custom Brand Colors */
   --color-brand-teal: #14b8a6;
-  /* teal-600 */
-  --color-brand-teal-light: #99f6e4;
-  /* teal-200 */
+  --color-brand-blue: #0ea5e9;
+
+  /* Animations */
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+  --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+
+    to {
+      height: 0;
+    }
+  }
+
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
 }
 
-/* Base Variables - Light Mode (Refined Industrial Light) */
+/* Base Variables - Light Mode (Technical Paper) */
 :root {
-  --radius: 0.5rem;
-  /* Friendly */
-  --font-sans:
-    'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    'Helvetica Neue', Arial, sans-serif;
-  --font-reading: 'Lora', Georgia, 'Times New Roman', serif;
+  --radius: 0.375rem;
+  /* 6px - Slightly closer to squared */
 
-  /* Light Mode Colors (Zinc-based Premium) */
-  --background: hsl(0 0% 100%);
-  /* White */
-  --foreground: hsl(240 10% 3.9%);
-  /* Zinc 950 */
+  /* Fonts */
+  --font-sans: 'Outfit', system-ui, sans-serif;
+  --font-reading: 'Lora', serif;
+  --font-mono: 'Fira Code', monospace;
+
+  /* Paper White / Ink */
+  --background: hsl(210 20% 98%);
+  /* Cool white */
+  --foreground: hsl(220 15% 10%);
+  /* Ink Black */
 
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(240 10% 3.9%);
+  --card-foreground: hsl(220 15% 10%);
 
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(240 10% 3.9%);
+  --popover-foreground: hsl(220 15% 10%);
 
-  --primary: hsl(240 5.9% 10%);
-  /* Zinc 900 */
-  --primary-foreground: hsl(0 0% 98%);
-  /* Zinc 50 */
+  /* Primary: Bold Technical Blue/Black */
+  --primary: hsl(220 15% 10%);
+  --primary-foreground: hsl(210 20% 98%);
 
-  --secondary: hsl(240 4.8% 95.9%);
-  /* Zinc 100 */
-  --secondary-foreground: hsl(240 5.9% 10%);
+  /* Secondary: Subtle Grey */
+  --secondary: hsl(210 10% 92%);
+  --secondary-foreground: hsl(220 15% 10%);
 
-  --muted: hsl(240 4.8% 95.9%);
-  --muted-foreground: hsl(240 3.8% 46.1%);
-  /* Zinc 500 */
+  /* Muted: Technical Grey */
+  --muted: hsl(210 10% 94%);
+  --muted-foreground: hsl(220 10% 45%);
 
-  --accent: hsl(168 85% 52%);
-  /* Brand Teal */
+  /* Accent: Electric Teal */
+  --accent: hsl(170 100% 35%);
   --accent-foreground: hsl(0 0% 100%);
 
+  /* Destructive */
   --destructive: hsl(0 84.2% 60.2%);
   --destructive-foreground: hsl(0 0% 98%);
 
-  --border: hsl(240 5.9% 90%);
-  /* Zinc 200 (Subtle) */
-  --input: hsl(240 5.9% 90%);
-  --ring: hsl(240 10% 3.9%);
+  /* Borders: Crisper */
+  --border: hsl(220 15% 88%);
+  --input: hsl(220 15% 88%);
 
-  /* Custom Variables */
+  --ring: hsl(220 15% 10%);
+
   --shadow-strength: 0px;
-  /* Clean flat look by default */
 }
 
-/* Dark Mode Overrides (Refined Industrial) */
+/* Dark Mode (Gunmetal & Electric) */
 .dark {
-  /* Dark Mode Colors (Zinc-based Industrial) */
-  --background: hsl(240 10% 3.9%);
-  /* Zinc 950 */
-  --foreground: hsl(0 0% 98%);
-  /* Zinc 50 */
+  /* Deep Gunmetal */
+  --background: hsl(225 15% 6%);
+  --foreground: hsl(210 20% 98%);
 
-  --card: hsl(240 10% 5%);
-  /* Slightly lighter than bg */
-  --card-foreground: hsl(0 0% 98%);
+  --card: hsl(225 15% 8%);
+  --card-foreground: hsl(210 20% 98%);
 
-  --popover: hsl(240 10% 3.9%);
-  --popover-foreground: hsl(0 0% 98%);
+  --popover: hsl(225 15% 8%);
+  --popover-foreground: hsl(210 20% 98%);
 
-  --primary: hsl(0 0% 98%);
-  /* White Primary */
-  --primary-foreground: hsl(240 5.9% 10%);
-  /* Dark Text */
+  /* Primary: White (High Contrast) */
+  --primary: hsl(210 20% 98%);
+  --primary-foreground: hsl(225 15% 6%);
 
-  --secondary: hsl(240 3.7% 15.9%);
-  /* Zinc 800 */
-  --secondary-foreground: hsl(0 0% 98%);
+  /* Secondary: Darker Gunmetal */
+  --secondary: hsl(225 15% 12%);
+  --secondary-foreground: hsl(210 20% 98%);
 
-  --muted: hsl(240 3.7% 15.9%);
-  --muted-foreground: hsl(240 5% 64.9%);
-  /* Zinc 400 */
+  /* Muted */
+  --muted: hsl(225 15% 12%);
+  --muted-foreground: hsl(215 15% 65%);
 
+  /* Accent: Electric Teal Neon */
   --accent: hsl(168 85% 52%);
-  /* Brand Teal */
-  --accent-foreground: hsl(0 0% 100%);
+  --accent-foreground: hsl(225 15% 6%);
 
   --destructive: hsl(0 62.8% 30.6%);
   --destructive-foreground: hsl(0 0% 98%);
 
-  --border: hsl(240 3.7% 15.9%);
-  /* Zinc 800 (Subtle) */
-  --input: hsl(240 3.7% 15.9%);
-  --ring: hsl(240 4.9% 83.9%);
+  /* Borders: Subtle Technical Lines */
+  --border: hsl(225 15% 16%);
+  --input: hsl(225 15% 16%);
 
-  --shadow-strength: 0px;
-}
-
-/* Glassmorphism Refined */
-.glass-card {
-  background: color-mix(in srgb, var(--background) 40%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 2px solid var(--border);
-  box-shadow: 4px 4px 0px var(--border);
-  @apply rounded-xl;
-}
-
-.dark .glass-card {
-  background: color-mix(in srgb, var(--background) 60%, transparent);
-  border: 1px solid var(--border);
-  /* Thin border */
-  box-shadow: none;
-  /* Cleaner in dark mode */
+  --ring: hsl(168 85% 52%);
 }
 
 /* Base Styles */
 html {
   scroll-behavior: smooth;
+}
+
+/* Noise Texture Overlay */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 50;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.dark body::before {
+  opacity: 0.05;
+  /* Slightly more visible in dark mode */
 }
 
 body {
@@ -182,42 +225,42 @@ body {
   margin: 0;
 }
 
-/* Utilities */
-.hard-shadow {
-  box-shadow: var(--shadow-strength) var(--shadow-strength) 0px
-    var(--color-border);
+/* Typography Utilities */
+.font-mono-tech {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
 }
 
-/* Only apply hard shadow in light mode or if explicitly wanted */
-.dark .hard-shadow {
-  box-shadow: none;
+/* Refined Glassmorphism */
+.glass {
+  background: color-mix(in srgb, var(--background) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+}
+
+.glass-card {
+  background: color-mix(in srgb, var(--card) 60%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
+  @apply rounded-lg shadow-sm;
 }
 
-.hard-shadow-sm {
-  box-shadow: 2px 2px 0px var(--color-border);
+/* Technical Interactive Elements */
+.btn-tech {
+  @apply relative overflow-hidden transition-all duration-200;
 }
 
-.dark .hard-shadow-sm {
-  box-shadow: none;
-  border: 1px solid var(--border);
+.btn-tech:active {
+  transform: scale(0.98) translateY(1px);
 }
 
-.hard-shadow-hover:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: calc(var(--shadow-strength) + 2px)
-    calc(var(--shadow-strength) + 2px) 0px var(--color-border);
-}
-
-.dark .hard-shadow-hover:hover {
-  transform: none;
-  box-shadow: none;
-  background-color: var(--secondary);
-}
-
-/* Smooth Physics for "Soft" feel */
-.animate-physics {
-  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* Technical Grid */
+.bg-grid-small {
+  background-size: 20px 20px;
+  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-border) 30%, transparent) 1px, transparent 1px),
+    linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 30%, transparent) 1px, transparent 1px);
 }
 
 /* Scrollbar */
@@ -226,36 +269,30 @@ body {
   scrollbar-color: var(--color-muted-foreground) transparent;
 }
 
-/* Focus */
-.focus-ring:focus {
-  outline: none;
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-.focus-ring:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-/* Animation overrides */
-@keyframes slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 999px;
 }
 
-.animate-slide-up {
-  animation: slide-up 0.4s cubic-bezier(0.12, 0.57, 0.63, 0.21);
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted-foreground);
 }
 
-/* Glassmorphism */
-.glass {
-  background: color-mix(in srgb, var(--background) 95%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+/* Markdown Content Styling */
+.prose-custom {
+  @apply prose prose-zinc dark:prose-invert max-w-none;
+  @apply prose-headings:font-sans prose-headings:tracking-tight prose-headings:font-semibold;
+  @apply prose-h1:text-3xl prose-h2:text-2xl prose-h3:text-xl;
+  @apply prose-code:font-mono prose-code:text-sm prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:before:content-none prose-code:after:content-none;
+  @apply prose-pre:bg-secondary/50 prose-pre:border prose-pre:border-border;
+  @apply prose-a:text-accent prose-a:no-underline hover:prose-a:underline;
 }
