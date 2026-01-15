@@ -30,7 +30,12 @@
         }
       ],
       "solution": "1",
-      "tags": ["javascript", "variables", "types", "beginner"]
+      "tags": [
+        "javascript",
+        "variables",
+        "types",
+        "beginner"
+      ]
     },
     {
       "slug": "js-arrays-test-data",
@@ -61,7 +66,12 @@
         }
       ],
       "solution": "4",
-      "tags": ["javascript", "arrays", "test-data", "beginner"]
+      "tags": [
+        "javascript",
+        "arrays",
+        "test-data",
+        "beginner"
+      ]
     },
     {
       "slug": "js-objects-for-tests",
@@ -92,7 +102,12 @@
         }
       ],
       "solution": "6",
-      "tags": ["javascript", "objects", "test-data", "beginner"]
+      "tags": [
+        "javascript",
+        "objects",
+        "test-data",
+        "beginner"
+      ]
     },
     {
       "slug": "js-if-else-logic",
@@ -123,7 +138,12 @@
         }
       ],
       "solution": "PARTIAL",
-      "tags": ["javascript", "conditionals", "logic", "beginner"]
+      "tags": [
+        "javascript",
+        "conditionals",
+        "logic",
+        "beginner"
+      ]
     },
     {
       "slug": "js-loops-testing",
@@ -141,7 +161,7 @@
         "id": "Iterasi data tes menggunakan loop for dan for...of."
       },
       "instructions": {
-        "en": "# Loops in Testing\n\nLoops let you repeat actions - essential for running tests across multiple data sets!\n\n## For Loop (Classic)\n\n```javascript\nfor (let i = 0; i < 5; i++) {\n    console.log(\"Attempt:\", i);\n}\n// Runs 5 times: 0, 1, 2, 3, 4\n```\n\n## For...of Loop (Modern - Preferred)\n\n```javascript\nconst browsers = [\"Chrome\", \"Firefox\", \"Safari\"];\n\nfor (const browser of browsers) {\n    console.log(\"Testing on:\", browser);\n}\n```\n\n## For...in Loop (for Objects)\n\n```javascript\nconst testCase = { name: \"Login\", priority: \"high\" };\n\nfor (const key in testCase) {\n    console.log(key, \":\", testCase[key]);\n}\n```\n\n## Practical Example: Counting Passed Tests\n\n```javascript\nconst results = [\"pass\", \"fail\", \"pass\", \"pass\", \"fail\"];\nlet passCount = 0;\n\nfor (const result of results) {\n    if (result === \"pass\") {\n        passCount++;\n    }\n}\n// passCount is 3\n```\n\n## Your Task\n\nGiven an array of test scores, count how many scores are **80 or above** (passing).\n\nStore the count in `result`.\n",
+        "en": "# Loops in Testing\n\nLoops let you repeat actions - essential for running tests across multiple data sets!\n\n## For Loop (Classic)\n\n```javascript\nfor (let i = 0; i < 5; i++) {\n    console.log(\"Attempt:\", i);\n}\n// Runs 5 times: 0, 1, 2, 3, 4\n```\n\n## For...of Loop (Modern - Preferred)\n\n```javascript\nconst browsers = [\"Chrome\", \"Firefox\", \"Safari\"];\n\nfor (const browser of browsers) {\n    console.log(\"Testing on:\", browser);\n}\n```\n\n## For...in Loop (for Objects)\n\n```javascript\nconst testCase = { name: \"Login\", priority: \"high\" };\n\nfor (const key in testCase) {\n    console.log(key, \":\", testCase[key]);\n}\n```\n\n## Example\nUse loops to check multiple values:\n```javascript\nconst browserTypes = [\"Desktop\", \"Mobile\", \"Tablet\"];\nfor (const type of browserTypes) {\n    console.log(\"Checking layout on:\", type);\n}\n```\n\n## Real World Scenario\nYou have a list of recent transaction amounts from an API. You need to verify that all transactions over $1000 are flagged for manual review. A loop lets you iterate through thousands of transactions instantly.\n\n## Your Task\nGiven an array of test scores (`scores`):\n1.  Initialize a counter variable (e.g., `result = 0`).\n2.  Iterate through the `scores` array.\n3.  Count how many scores are **80 or above**.\n4.  Store the final count in the `result` variable.\n",
         "id": "# Loop dalam Pengujian\n\nLoop membiarkan kamu mengulang tindakan - esensial untuk menjalankan tes di banyak set data!\n\n## For Loop (Klasik)\n\n```javascript\nfor (let i = 0; i < 5; i++) {\n    console.log(\"Attempt:\", i);\n}\n// Jalan 5 kali: 0, 1, 2, 3, 4\n```\n\n## For...of Loop (Modern - Disukai)\n\n```javascript\nconst browsers = [\"Chrome\", \"Firefox\", \"Safari\"];\n\nfor (const browser of browsers) {\n    console.log(\"Testing on:\", browser);\n}\n```\n\n## For...in Loop (untuk Objects)\n\n```javascript\nconst testCase = { name: \"Login\", priority: \"high\" };\n\nfor (const key in testCase) {\n    console.log(key, \":\", testCase[key]);\n}\n```\n\n## Contoh Praktis: Menghitung Tes yang Lulus\n\n```javascript\nconst results = [\"pass\", \"fail\", \"pass\", \"pass\", \"fail\"];\nlet passCount = 0;\n\nfor (const result of results) {\n    if (result === \"pass\") {\n        passCount++;\n    }\n}\n// passCount adalah 3\n```\n\n## Tugas Kamu\n\nDiketahui array skor tes, hitung berapa banyak skor yang **80 atau lebih** (lulus).\n\nSimpan jumlahnya di dalam `result`.\n"
       },
       "htmlContent": "<div class=\"score-analyzer\">\n  <h3>Score Analysis</h3>\n  <div id=\"pass-count\"></div>\n</div>",
@@ -154,7 +174,12 @@
         }
       ],
       "solution": "4",
-      "tags": ["javascript", "loops", "iteration", "beginner"]
+      "tags": [
+        "javascript",
+        "loops",
+        "iteration",
+        "beginner"
+      ]
     },
     {
       "slug": "js-functions-basics",
@@ -185,7 +210,12 @@
         }
       ],
       "solution": "70",
-      "tags": ["javascript", "functions", "helpers", "beginner"]
+      "tags": [
+        "javascript",
+        "functions",
+        "helpers",
+        "beginner"
+      ]
     },
     {
       "slug": "js-arrow-functions",
@@ -216,7 +246,12 @@
         }
       ],
       "solution": "64",
-      "tags": ["javascript", "arrow-functions", "modern", "beginner"]
+      "tags": [
+        "javascript",
+        "arrow-functions",
+        "modern",
+        "beginner"
+      ]
     },
     {
       "slug": "js-array-methods",
@@ -247,7 +282,13 @@
         }
       ],
       "solution": "3",
-      "tags": ["javascript", "array-methods", "map", "filter", "beginner"]
+      "tags": [
+        "javascript",
+        "array-methods",
+        "map",
+        "filter",
+        "beginner"
+      ]
     },
     {
       "slug": "js-string-methods",
@@ -269,7 +310,7 @@
         "id": "# Metode String\n\nMetode string sangat penting untuk memvalidasi konten teks dalam tes!\n\n## includes() - Cek Substring\n\n```javascript\nconst message = \"Login successful\";\nmessage.includes(\"successful\");  // true\nmessage.includes(\"failed\");      // false\n```\n\n## trim() - Hapus Spasi Kosong\n\n```javascript\nconst input = \"  hello world  \";\ninput.trim();        // \"hello world\"\ninput.trimStart();   // \"hello world  \"\ninput.trimEnd();     // \"  hello world\"\n```\n\n## split() - Pecah jadi Array\n\n```javascript\nconst csv = \"apple,banana,cherry\";\ncsv.split(\",\");  // [\"apple\", \"banana\", \"cherry\"]\n\nconst sentence = \"Hello World\";\nsentence.split(\" \");  // [\"Hello\", \"World\"]\n```\n\n## Metode Berguna Lainnya\n\n```javascript\nconst text = \"Hello World\";\n\ntext.toLowerCase();        // \"hello world\"\ntext.toUpperCase();        // \"HELLO WORLD\"\ntext.startsWith(\"Hello\");  // true\ntext.endsWith(\"World\");    // true\ntext.replace(\"World\", \"Test\");  // \"Hello Test\"\ntext.length;               // 11\n```\n\n## Contoh Asersi Tes\n\n```javascript\n// Verifikasi pesan error\nconst errorMsg = \"  Error: Invalid email format  \";\nconst cleaned = errorMsg.trim();\n\nif (cleaned.includes(\"Invalid email\")) {\n    console.log(\"Error yang benar ditampilkan!\");\n}\n```\n\n## Tugas Kamu\n\nDiketahui pesan error dengan spasi kosong ekstra:\n1. Trim spasi kosongnya\n2. Cek apakah mengandung \"failed\"\n3. Jika iya, ekstrak kode error-nya saja (setelah titik dua)\n4. Simpan kode error di dalam `result`\n"
       },
       "htmlContent": "<div class=\"error-parser\">\n  <h3>Error Parser</h3>\n</div>",
-      "starterCode": "const rawMessage = \"   Error: AUTH_FAILED   \";\n\n// 1. Trim the message\n// Your code here\n\n// 2 & 3. Split by \": \" and get the second part (error code)\n// Your code here\n\n// const result = parts[1]; // Store result here",
+      "starterCode": "const rawMessage = \"   Error: AUTH_FAILED   \";\n\n// 1. Trim the message\n// Your code here\n\n// 2. Extract just the error code (AUTH_FAILED)\n// Hint: You can use split() or other string methods\n// Your code here\n\n// const result = ...; // Store the error code here",
       "testCases": [
         {
           "description": "Returns the expected output",
@@ -278,7 +319,12 @@
         }
       ],
       "solution": "AUTH_FAILED",
-      "tags": ["javascript", "strings", "assertions", "beginner"]
+      "tags": [
+        "javascript",
+        "strings",
+        "assertions",
+        "beginner"
+      ]
     },
     {
       "slug": "js-destructuring",
@@ -309,7 +355,12 @@
         }
       ],
       "solution": "250",
-      "tags": ["javascript", "destructuring", "modern", "beginner"]
+      "tags": [
+        "javascript",
+        "destructuring",
+        "modern",
+        "beginner"
+      ]
     },
     {
       "slug": "js-fundamentals-boss",
@@ -327,7 +378,7 @@
         "id": "Gabungkan semua kemampuan JS untuk membangun pembuat data tes."
       },
       "instructions": {
-        "en": "# Scenario: Test Data Generator\n\nYou're building a utility to generate test data for your automation suite.\n\n## The Challenge\n\nCreate a function that:\n1. Takes an array of user objects\n2. Filters to only \"active\" users\n3. Maps to extract just their emails\n4. Returns the count of active user emails\n\n## Given Data\n\n```javascript\nconst users = [\n    { name: \"Alice\", email: \"alice@test.com\", status: \"active\" },\n    { name: \"Bob\", email: \"bob@test.com\", status: \"inactive\" },\n    { name: \"Carol\", email: \"carol@test.com\", status: \"active\" },\n    { name: \"Dave\", email: \"dave@test.com\", status: \"active\" }\n];\n```\n\n## Your Mission\n\nUse **filter**, **map**, and **array methods** to solve this elegantly!\n\n> **Tip:** Chain the array methods: `.filter().map().length`\n",
+        "en": "# Scenario: Test Data Generator\n\nYou're building a utility to generate test data for your automation suite.\n\n## The Challenge\n\nCreate a function that:\n1. Takes an array of user objects\n2. Filters to only \"active\" users\n3. Maps to extract just their emails\n4. Returns the count of active user emails\n\n## Given Data\n\n```javascript\nconst users = [\n    { name: \"Alice\", email: \"alice@test.com\", status: \"active\" },\n    { name: \"Bob\", email: \"bob@test.com\", status: \"inactive\" },\n    { name: \"Carol\", email: \"carol@test.com\", status: \"active\" },\n    { name: \"Dave\", email: \"dave@test.com\", status: \"active\" }\n];\n```\n\n## Strategy\n\nUse **filter**, **map**, and **array methods** to solve this elegantly!\n\n## Real World Scenario\nYou often need to prepare specific test data subsets from a large database dump. For example, grabbing the email addresses of all \"Active\" customers to send a test newsletter blast.\n\n## Your Task\n1.  Take the `users` array provided in the starter code.\n2.  **Filter** the array to keep only users where `status` is `\"active\"`.\n3.  **Map** the filtered users to extract just their `email` property.\n4.  Get the **length** (count) of the resulting email list.\n5.  Store this count in the `result` variable.\n\n> **Tip:** You can chain these methods: `users.filter(...).map(...).length`\n",
         "id": "# Skenario: Pembuat Data Tes\n\nKamu sedang membangun utilitas untuk menghasilkan data tes untuk suite otomatisasi kamu.\n\n## Tantangannya\n\nBuat fungsi yang:\n1. Menerima array object user\n2. Filter hanya user \"active\"\n3. Map untuk mengambil email mereka saja\n4. Mengembalikan jumlah email user aktif\n\n## Data yang Diberikan\n\n```javascript\nconst users = [\n    { name: \"Alice\", email: \"alice@test.com\", status: \"active\" },\n    { name: \"Bob\", email: \"bob@test.com\", status: \"inactive\" },\n    { name: \"Carol\", email: \"carol@test.com\", status: \"active\" },\n    { name: \"Dave\", email: \"dave@test.com\", status: \"active\" }\n];\n```\n\n## Misi Kamu\n\nGunakan **filter**, **map**, dan **metode array** untuk menyelesaikan ini dengan elegan!\n\n> **Tip:** Rantai metode array-nya: `.filter().map().length`\n"
       },
       "htmlContent": "<div class=\"test-generator\">\n  <h3>Test Data Generator</h3>\n  <div id=\"output\"></div>\n</div>",
@@ -340,7 +391,12 @@
         }
       ],
       "solution": "3",
-      "tags": ["javascript", "scenario", "boss", "beginner"]
+      "tags": [
+        "javascript",
+        "scenario",
+        "boss",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-queryselector-vs-all",
@@ -358,7 +414,7 @@
         "id": "Pelajari perbedaan antara memilih satu elemen vs banyak elemen."
       },
       "instructions": {
-        "en": "# querySelector vs querySelectorAll\n\nThese are the two main ways to find elements in test automation!\n\n## querySelector() - Get ONE Element\nReturns **first matching element** or null.\n\n## querySelectorAll() - Get ALL Elements  \nReturns a **NodeList** of all matches.\n\n## Your Task\n1. Use querySelector to get the element with id \"title\"\n2. Use querySelectorAll to get all elements with class \"item\"\n3. Store the **count** of items in result\n",
+        "en": "# querySelector vs querySelectorAll\n\nThese are the two main ways to find elements in test automation!\n\n## querySelector() - Get ONE Element\nReturns **first matching element** or null.\n\n## querySelectorAll() - Get ALL Elements  \nReturns a **NodeList** of all matches.\n\n## Real World Scenario\n- **querySelector**: Finding the \"Submit\" button or the main \"Header\".\n- **querySelectorAll**: Finding all items in a shopping cart list to verify the total count match the badge number.\n\n## Your Task\n1.  Use `document.querySelector` to find the element with id `\"title\"`.\n2.  Use `document.querySelectorAll` to find all elements with class `\"item\"`.\n3.  Calculate the number of items found in step 2.\n4.  Store this count in the `result` variable.\n",
         "id": "# querySelector vs querySelectorAll\n\nIni adalah dua cara utama untuk menemukan elemen dalam otomatisasi tes!\n\n## querySelector() - Ambil SATU Elemen\nMengembalikan **elemen pertama yang cocok** atau null.\n\n## querySelectorAll() - Ambil SEMUA Elemen\nMengembalikan **NodeList** dari semua yang cocok.\n\n## Tugas Kamu\n1. Gunakan querySelector untuk mengambil elemen dengan id \"title\"\n2. Gunakan querySelectorAll untuk mengambil semua elemen dengan class \"item\"\n3. Simpan **jumlah** item di dalam result\n"
       },
       "htmlContent": "<div class=\"shopping-list\">\n  <h1 id=\"title\">My Shopping List</h1>\n  <ul>\n    <li class=\"item\">Apples</li>\n    <li class=\"item\">Bananas</li>\n    <li class=\"item\">Oranges</li>\n    <li class=\"item\">Milk</li>\n  </ul>\n</div>",
@@ -371,7 +427,12 @@
         }
       ],
       "solution": "4",
-      "tags": ["javascript", "dom", "querySelector", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "querySelector",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-element-properties",
@@ -389,7 +450,7 @@
         "id": "Ekstrak teks, nilai, dan atribut dari elemen DOM."
       },
       "instructions": {
-        "en": "# Get Element Properties\n\nOnce you find an element, you need to get its data for assertions!\n\n- textContent: Gets all text inside element\n- value: Gets input field value\n- getAttribute(): Gets any attribute\n\n## Your Task\n1. Get the text content of the element with class \"price\"\n2. Get the value from the input with id \"quantity\"\n3. Multiply price x quantity and store in result\n",
+        "en": "# Get Element Properties\n\nOnce you find an element, you need to get its data for assertions!\n\n- textContent: Gets all text inside element\n- value: Gets input field value\n- getAttribute(): Gets any attribute\n\n## Real World Scenario\nAfter filling out a registration form, you need to verify that the \"Welcome, [Name]\" message actually contains the name you typed. You'd use `textContent` to grab the message and compare it.\n\n## Your Task\n1.  Get the **text content** of the element with class `\"price\"`.\n2.  Get the **value** from the input with id `\"quantity\"`.\n3.  Multiply the price by the quantity (remember to convert strings to numbers if needed!).\n4.  Store the calculation result in the `result` variable.\n",
         "id": "# Ambil Properti Elemen\n\nSetelah kamu menemukan elemen, kamu perlu mengambil datanya untuk asersi!\n\n- textContent: Mengambil semua teks di dalam elemen\n- value: Mengambil nilai kolom input\n- getAttribute(): Mengambil atribut apa pun\n\n## Tugas Kamu\n1. Ambil konten teks dari elemen dengan class \"price\"\n2. Ambil nilai dari input dengan id \"quantity\"\n3. Kalikan price x quantity dan simpan di dalam result\n"
       },
       "htmlContent": "<div class=\"product\">\n  <h2>Premium Widget</h2>\n  <span class=\"price\">25</span>\n  <label>Quantity: <input type=\"number\" id=\"quantity\" value=\"4\" /></label>\n</div>",
@@ -402,7 +463,12 @@
         }
       ],
       "solution": "100",
-      "tags": ["javascript", "dom", "properties", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "properties",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-check-element-state",
@@ -420,7 +486,7 @@
         "id": "Verifikasi apakah elemen dinonaktifkan, dicentang, atau disembunyikan."
       },
       "instructions": {
-        "en": "# Check Element State\n\nTesting often requires verifying element states!\n\n- disabled: Is the element disabled?\n- checked: Is the checkbox/radio checked?\n\n## Your Task\nCount how many checkboxes are checked and store in result.\n",
+        "en": "# Check Element State\n\nTesting often requires verifying element states!\n\n- disabled: Is the element disabled?\n- checked: Is the checkbox/radio checked?\n\n## Real World Scenario\nVerifying that the \"Submit\" button is `disabled` until all required fields are filled, or checking that the \"Subscribe to Newsletter\" checkbox is checked by default.\n\n## Your Task\n1.  Find all checkbox input elements.\n2.  Loop through them (or convert to array and filter) to count how many are `checked`.\n3.  Store the total count of checked boxes in the `result` variable.\n",
         "id": "# Cek Status Elemen\n\nPengujian sering kali membutuhkan verifikasi status elemen!\n\n- disabled: Apakah elemen dinonaktifkan?\n- checked: Apakah checkbox/radio dicentang?\n\n## Tugas Kamu\nHitung berapa banyak checkbox yang dicentang dan simpan di dalam result\n"
       },
       "htmlContent": "<form class=\"preferences\">\n  <label><input type=\"checkbox\" name=\"email\" checked /> Email</label>\n  <label><input type=\"checkbox\" name=\"sms\" /> SMS</label>\n  <label><input type=\"checkbox\" name=\"push\" checked /> Push</label>\n  <label><input type=\"checkbox\" name=\"newsletter\" checked /> Newsletter</label>\n</form>",
@@ -433,7 +499,13 @@
         }
       ],
       "solution": "3",
-      "tags": ["javascript", "dom", "state", "forms", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "state",
+        "forms",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-parent-child-navigation",
@@ -451,7 +523,7 @@
         "id": "Telusuri pohon DOM menggunakan properti induk, anak, dan saudara."
       },
       "instructions": {
-        "en": "# Parent/Child Navigation\n\nNavigate the DOM tree to find related elements!\n\n- parentElement: Direct parent\n- children: All child elements\n- nextElementSibling: Next sibling\n\n## Your Task\n1. Find the element with class \"active\"\n2. Get its parent element\n3. Count how many children the parent has\n",
+        "en": "# Parent/Child Navigation\n\nNavigate the DOM tree to find related elements!\n\n- parentElement: Direct parent\n- children: All child elements\n- nextElementSibling: Next sibling\n\n## Real World Scenario\nSometimes elements don't have unique IDs. You might find a specific \"Delete\" button by first finding the row containing \"User X\", then navigating to the button within that row.\n\n## Your Task\n1.  Find the element with class `\"active\"`.\n2.  Get its **parent element**.\n3.  Count the number of **children** that the parent element has.\n4.  Store this child count in the `result` variable.\n",
         "id": "# Navigasi Induk/Anak\n\nNavigasi pohon DOM untuk menemukan elemen terkait!\n\n- parentElement: Induk langsung\n- children: Semua elemen anak\n- nextElementSibling: Saudara berikutnya\n\n## Tugas Kamu\n1. Temukan elemen dengan class \"active\"\n2. Ambil elemen induknya\n3. Hitung berapa banyak anak yang dimiliki induknya\n"
       },
       "htmlContent": "<nav class=\"tabs\">\n  <button class=\"tab\">Home</button>\n  <button class=\"tab active\">Products</button>\n  <button class=\"tab\">About</button>\n  <button class=\"tab\">Contact</button>\n</nav>",
@@ -464,7 +536,12 @@
         }
       ],
       "solution": "4",
-      "tags": ["javascript", "dom", "traversal", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "traversal",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-event-listeners",
@@ -482,7 +559,7 @@
         "id": "Memahami klik, input, dan event DOM lainnya."
       },
       "instructions": {
-        "en": "# Event Listeners\n\nEvents are triggered when users interact with the page.\nYou can simulate clicks programmatically with .click()\n\n## Your Task\n1. Get the increment button\n2. Use .click() to click it three times\n3. Get the counter value and store in result\n",
+        "en": "# Event Listeners\n\nEvents are triggered when users interact with the page.\nYou can simulate clicks programmatically with .click()\n\n## Real World Scenario\nSimulating a user clicking a \"Load More\" button multiple times to verify that new items are appended to the list correctly.\n\n## Your Task\n1.  Select the element with id `\"increment\"` (the button).\n2.  Call its `.click()` method **3 times**.\n3.  Get the text content of the element with id `\"count\"` (which updates after clicks).\n4.  Store the final value in the `result` variable.\n",
         "id": "# Event Listener\n\nEvent dipicu saat pengguna berinteraksi dengan halaman.\nKamu bisa mensimulasikan klik secara terprogram dengan .click()\n\n## Tugas Kamu\n1. Ambil tombol penambah (increment)\n2. Gunakan .click() untuk menekannya tiga kali\n3. Ambil nilai counter dan simpan di dalam result\n"
       },
       "htmlContent": "<div class=\"counter-app\">\n  <span id=\"count\">0</span>\n  <button id=\"increment\" onclick=\"document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1\">+1</button>\n</div>",
@@ -495,7 +572,12 @@
         }
       ],
       "solution": "3",
-      "tags": ["javascript", "dom", "events", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "events",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-form-interaction",
@@ -513,8 +595,8 @@
         "id": "Mengambil dan mengatur nilai formulir secara terprogram."
       },
       "instructions": {
-        "en": "# Form Interaction\n\nWorking with forms is essential for testing!\n\n- Set .value for text inputs\n- Set .checked for checkboxes\n\n## Your Task\n1. Set username to \"testuser\"\n2. Set password to \"secret123\"\n3. Concatenate username + \":\" + password into result\n",
-        "id": "# Interaksi Formulir\n\nBekerja dengan formulir sangat penting untuk pengujian!\n\n- Set .value untuk input teks\n- Set .checked untuk checkbox\n\n## Tugas Kamu\n1. Atur username menjadi \"testuser\"\n2. Atur password menjadi \"secret123\"\n3. Gabungkan username + \":\" + password ke dalam result\n"
+        "en": "# Form Interaction\n\nWorking with forms is essential for testing!\n\n- Set .value for text inputs\n- Set .checked for checkboxes\n\n## Real World Scenario\nAutomating a login flow: finding the username and password fields, setting their values to a test account's credentials, and submitting the form.\n\n## Your Task\n1.  Find the input with id `\"username\"` and set its value to `\"testuser\"`.\n2.  Find the input with id `\"password\"` and set its value to `\"secret123\"`.\n3.  Create a string combining them: `username` + `\":\"` + `password`.\n4.  Store this combined string in the `result` variable.\n",
+        "id": "# Interaksi Formulir\n\nBekerja dengan formulir sangat penting untuk pengujian!\n\n- Set .value for text inputs\n- Set .checked for checkboxes\n\n## Tugas Kamu\n1. Set username menjadi \"testuser\"\n2. Set password menjadi \"secret123\"\n3. Gabungkan username + \":\" + password ke dalam result\n"
       },
       "htmlContent": "<form class=\"login-form\">\n  <input type=\"text\" id=\"username\" placeholder=\"Username\" />\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n  <label><input type=\"checkbox\" id=\"remember\" /> Remember me</label>\n</form>",
       "starterCode": "// 1. Set username to \"testuser\"\n// Your code here\n\n// 2. Set password to \"secret123\"\n// Your code here\n\n// 3. Set remember to checked\n// Your code here\n\n// 4. Concatenate username + \":\" + password into result\n// Your code here",
@@ -526,7 +608,12 @@
         }
       ],
       "solution": "testuser:secret123",
-      "tags": ["javascript", "dom", "forms", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "forms",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-table-data-extraction",
@@ -544,8 +631,8 @@
         "id": "Ekstrak dan parsing data dari tabel HTML."
       },
       "instructions": {
-        "en": "# Table Data Extraction\n\nTables are common in web apps!\n\n- tbody.rows: All rows in table body\n- row.cells[n]: Cell at index n\n\n## Your Task\nSum up the \"Amount\" column (column index 2) and store in result.\n",
-        "id": "# Ekstraksi Data Tabel\n\nTabel umum ditemukan di aplikasi web!\n\n- tbody.rows: Semua baris di dalam table body\n- row.cells[n]: Sel pada indeks n\n\n## Tugas Kamu\nJumlahkan kolom \"Amount\" (indeks kolom 2) dan simpan di dalam result.\n"
+        "en": "# Table Data Extraction\n\nTables are common in web apps!\n\n- tbody.rows: All rows in table body\n- row.cells[n]: Cell at index n\n\n## Real World Scenario\nValidating an \"Order History\" table. You'd iterate through the rows to ensure the sum of individual order amounts matches the \"Total\" displayed at the bottom.\n\n## Your Task\n1.  Select the table body (`tbody`).\n2.  Iterate through each row in the table body.\n3.  For each row, get the value from the **3rd cell** (index 2, the \"Amount\" column).\n4.  Sum these values to get the total amount.\n5.  Store the total sum in the `result` variable.\n",
+        "id": "# Ekstraksi Data Tabel\n\nTabel umum ditemukan di aplikasi web!\n\n- tbody.rows: All rows in table body\n- row.cells[n]: Cell at index n\n\n## Tugas Kamu\nJumlahkan kolom \"Amount\" (indeks kolom 2) dan simpan di dalam result.\n"
       },
       "htmlContent": "<table class=\"orders\">\n  <thead><tr><th>Order</th><th>Customer</th><th>Amount</th></tr></thead>\n  <tbody>\n    <tr><td>001</td><td>Alice</td><td>150</td></tr>\n    <tr><td>002</td><td>Bob</td><td>200</td></tr>\n    <tr><td>003</td><td>Carol</td><td>75</td></tr>\n    <tr><td>004</td><td>Dave</td><td>125</td></tr>\n  </tbody>\n</table>",
       "starterCode": "// Loop through rows and sum up the Amount column (index 2)\n// Your code here",
@@ -557,7 +644,12 @@
         }
       ],
       "solution": "550",
-      "tags": ["javascript", "dom", "tables", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "tables",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-wait-for-element",
@@ -575,7 +667,7 @@
         "id": "Periksa apakah elemen ada atau terlihat di DOM."
       },
       "instructions": {
-        "en": "# Wait for Element\n\nChecking element presence is crucial for reliable tests!\n\nquerySelector returns null if element not found.\n\n## Your Task\nCheck if header, footer, and sidebar exist. Count how many exist and store in result.\n",
+        "en": "# Wait for Element\n\nChecking element presence is crucial for reliable tests!\n\nquerySelector returns null if element not found.\n\n## Real World Scenario\nBefore interacting with a page, you verify that the \"Loading\" spinner is gone and the \"Main Content\" is completely visible. If a critical element like the \"Buy Now\" button is missing, the test should fail immediately.\n\n## Your Task\n1.  Check for the existence of the element with id `\"header\"`.\n2.  Check for the existence of the element with id `\"footer\"`.\n3.  Check for the existence of the element with id `\"sidebar\"` (Note: this one might be missing!).\n4.  Count the total number of elements that **exist** (are not null).\n5.  Store this count in the `result` variable.\n",
         "id": "# Menunggu Elemen\n\nMemeriksa keberadaan elemen sangat penting untuk tes yang andal!\n\nquerySelector mengembalikan null jika elemen tidak ditemukan.\n\n## Tugas Kamu\nPeriksa apakah header, footer, dan sidebar ada. Hitung berapa banyak yang ada dan simpan di dalam result.\n"
       },
       "htmlContent": "<div class=\"page\">\n  <header id=\"header\">Header Content</header>\n  <main id=\"content\">Main Content</main>\n  <footer id=\"footer\">Footer Content</footer>\n</div>",
@@ -588,7 +680,12 @@
         }
       ],
       "solution": "2",
-      "tags": ["javascript", "dom", "existence", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "existence",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-boss",
@@ -606,10 +703,10 @@
         "id": "Ekstrak dan rangkum data dari UI dashboard yang kompleks."
       },
       "instructions": {
-        "en": "# Scenario: Dashboard Scraper\n\nYou're building a test that verifies a dashboard displays correct summary data.\n\n## The Challenge\n\nThe dashboard shows:\n- A stats section with multiple cards\n- Each card has a label and a value\n\nYour test needs to:\n1. Find all stat cards\n2. Extract the value from the \"Total Sales\" card\n3. Return that value as a number\n\n## Your Mission\n\nNavigate the DOM to find the correct card and extract its value.\n\n> **Tip:** Use querySelector to find elements, then navigate with parent/child relationships!\n",
+        "en": "# Scenario: Dashboard Scraper\n\nYou're building a test that verifies a dashboard displays correct summary data.\n\n## The Challenge\n\nThe dashboard shows:\n- A stats section with multiple cards\n- Each card has a label and a value\n\nYour test needs to:\n1. Find all stat cards\n2. Extract the value from the \"Total Sales\" card\n3. Return that value as a number\n\n## Real World Scenario\nExtracting Key Performance Indicators (KPIs) from an analytics dashboard to verify that the frontend numbers match the backend database records.\n\n## Your Task\n1.  Select all elements with the class `.stat-card`.\n2.  Iterate through these cards to find the one where the `.label` text is `\"Total Sales\"`.\n3.  Once found, extract the text from its corresponding `.value` element (e.g., \"5,678\").\n4.  Convert this text to a number (removing any commas if necessary).\n5.  Store the final number in the `result` variable.\n",
         "id": "# Skenario: Dashboard Scraper\n\nKamu sedang membangun tes yang memverifikasi bahwa dashboard menampilkan data ringkasan yang benar.\n\n## Tantangannya\n\nDashboard menampilkan:\n- Bagian statistik dengan banyak kartu\n- Setiap kartu memiliki label dan nilai\n\nTes kamu perlu:\n1. Temukan semua kartu statistik (stat cards)\n2. Ekstrak nilai dari kartu \"Total Sales\"\n3. Kembalikan nilai tersebut sebagai angka\n\n## Misi Kamu\n\nNavigasi DOM untuk menemukan kartu yang benar dan ekstrak nilainya.\n\n> **Tip:** Gunakan querySelector untuk menemukan elemen, lalu navigasi dengan hubungan induk/anak!\n"
       },
-      "htmlContent": "<div class=\"dashboard\">\n  <h1>Sales Dashboard</h1>\n  <div class=\"stats-grid\">\n    <div class=\"stat-card\">\n      <span class=\"label\">Active Users</span>\n      <span class=\"value\">1,234</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Total Sales</span>\n      <span class=\"value\">5,678</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Pending Orders</span>\n      <span class=\"value\">42</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Revenue</span>\n      <span class=\"value\">$98,765</span>\n    </div>\n  </div>\n</div>",
+      "htmlContent": "<div class=\"dashboard\">\n  <h3>Sales Dashboard</h3>\n  <div class=\"stats-grid\">\n    <div class=\"stat-card\">\n      <span class=\"label\">Active Users</span>\n      <span class=\"value\">1,234</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Total Sales</span>\n      <span class=\"value\">5,678</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Pending Orders</span>\n      <span class=\"value\">42</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Revenue</span>\n      <span class=\"value\">$98,765</span>\n    </div>\n  </div>\n</div>",
       "starterCode": "// Find all stat cards\n// Your code here\n\n// Find the card with \"Total Sales\" label and extract value\n// Your code here\n\n// const result = totalSalesValue; // Uncomment this line after your code",
       "testCases": [
         {
@@ -619,7 +716,13 @@
         }
       ],
       "solution": "5678",
-      "tags": ["javascript", "dom", "scenario", "boss", "beginner"]
+      "tags": [
+        "javascript",
+        "dom",
+        "scenario",
+        "boss",
+        "beginner"
+      ]
     },
     {
       "slug": "async-understanding-promises",
@@ -637,7 +740,7 @@
         "id": "Pelajari apa itu Promise dan bagaimana mereka merepresentasikan nilai di masa depan."
       },
       "instructions": {
-        "en": "# Understanding Promises\n\nPromises represent a value that may not be available yet.\n\n## Promise States\n- **Pending**: Initial state, not yet fulfilled or rejected\n- **Fulfilled**: Operation completed successfully\n- **Rejected**: Operation failed\n\n## Creating a Promise\n\n```javascript\nconst promise = new Promise((resolve, reject) => {\n    // Async operation\n    if (success) {\n        resolve(value);  // Fulfilled\n    } else {\n        reject(error);   // Rejected\n    }\n});\n```\n\n## Using .then() and .catch()\n\n```javascript\npromise\n    .then(value => console.log(value))\n    .catch(error => console.log(error));\n```\n\n## Your Task\nCreate a Promise that resolves with the value 42 after execution.\nStore the resolved value in result.\n",
+        "en": "# Understanding Promises\n\nPromises represent a value that may not be available yet.\n\n## Promise States\n- **Pending**: Initial state, not yet fulfilled or rejected\n- **Fulfilled**: Operation completed successfully\n- **Rejected**: Operation failed\n\n## Creating a Promise\n\n```javascript\nconst promise = new Promise((resolve, reject) => {\n    // Async operation\n    if (success) {\n        resolve(value);  // Fulfilled\n    } else {\n        reject(error);   // Rejected\n    }\n});\n```\n\n## Using .then() and .catch()\n\n```javascript\npromise\n    .then(value => console.log(value))\n    .catch(error => console.log(error));\n```\n\n## Real World Scenario\nAn API call to fetch user profile data is asynchronous. A Promise represents that request. It might succeed (resolve with data) or fail (reject with network error).\n\n## Your Task\n1.  Create a new `Promise` that performs a mock operation.\n2.  Inside the promise executor, immediately `resolve` it with the value `42`.\n3.  Assign this promise object to the `result` variable.\n",
         "id": "# Memahami Promise\n\nPromise merepresentasikan nilai yang mungkin belum tersedia.\n\n## Status Promise\n- **Pending**: Status awal, belum terpenuhi atau ditolak\n- **Fulfilled**: Operasi selesai dengan sukses\n- **Rejected**: Operasi gagal\n\n## Membuat Promise\n\n```javascript\nconst promise = new Promise((resolve, reject) => {\n    // Operasi asinkron\n    if (success) {\n        resolve(value);  // Terpenuhi (Fulfilled)\n    } else {\n        reject(error);   // Ditolak (Rejected)\n    }\n});\n```\n\n## Menggunakan .then() dan .catch()\n\n```javascript\npromise\n    .then(value => console.log(value))\n    .catch(error => console.log(error));\n```\n\n## Tugas Kamu\nBuat sebuah Promise yang menghasilkan (resolve) nilai 42 setelah eksekusi.\nSimpan nilai tersebut di dalam result.\n"
       },
       "htmlContent": "<div class=\"promise-demo\">\n  <h3>Promise Demo</h3>\n</div>",
@@ -650,7 +753,12 @@
         }
       ],
       "solution": "42",
-      "tags": ["javascript", "async", "promises", "beginner"]
+      "tags": [
+        "javascript",
+        "async",
+        "promises",
+        "beginner"
+      ]
     },
     {
       "slug": "async-await-basics",
@@ -668,7 +776,7 @@
         "id": "Tulis kode asinkron yang lebih bersih menggunakan sintaks async/await."
       },
       "instructions": {
-        "en": "# Async/Await Basics\n\nasync/await makes async code look synchronous!\n\n## Async Function\n\n```javascript\nasync function fetchData() {\n    const data = await somePromise;\n    return data;\n}\n```\n\n## Key Rules\n- **async** keyword before function makes it return a Promise\n- **await** pauses execution until Promise resolves\n- Can only use await inside async functions\n\n## Arrow Function Syntax\n\n```javascript\nconst fetchData = async () => {\n    const data = await somePromise;\n    return data;\n};\n```\n\n## Your Task\nCreate an async function named `doubleValue` that awaits the `getValue()` promise and returns double its value.\nAssign the result of calling `doubleValue()` to a variable named `result`.\n",
+        "en": "# Async/Await Basics\n\nasync/await makes async code look synchronous!\n\n## Async Function\n\n```javascript\nasync function fetchData() {\n    const data = await somePromise;\n    return data;\n}\n```\n\n## Key Rules\n- **async** keyword before function makes it return a Promise\n- **await** pauses execution until Promise resolves\n- Can only use await inside async functions\n\n## Arrow Function Syntax\n\n```javascript\nconst fetchData = async () => {\n    const data = await somePromise;\n    return data;\n};\n```\n\n## Real World Scenario\nModern test frameworks (like Playwright) are almost entirely based on `async/await`. Every click, navigation, or text check is an async operation that you must `await` to ensure the browser has caught up.\n\n## Your Task\n1.  Define an `async` function named `doubleValue`.\n2.  Inside it, `await` the provided helper function `getValue()`.\n3.  Wait for the value, multiply it by 2, and return the new result.\n4.  Call your `doubleValue` function and store the resolved output in the `result` variable.\n",
         "id": "# Dasar-Dasar Async/Await\n\nasync/await membuat kode asinkron terlihat seperti sinkron!\n\n## Fungsi Async\n\n```javascript\nasync function fetchData() {\n    const data = await somePromise;\n    return data;\n}\n```\n\n## Aturan Kunci\n- Kata kunci **async** sebelum fungsi membuatnya mengembalikan Promise\n- **await** menghentikan eksekusi sementara sampai Promise selesai (resolve)\n- Hanya bisa menggunakan await di dalam fungsi async\n\n## Sintaks Arrow Function\n\n```javascript\nconst fetchData = async () => {\n    const data = await somePromise;\n    return data;\n};\n```\n\n## Tugas Kamu\nBuat sebuah fungsi async bernama `doubleValue` yang menunggu (await) promise `getValue()` dan mengembalikan dua kali lipat nilainya.\nMasukkan hasil pemanggilan `doubleValue()` ke variabel bernama `result`.\n"
       },
       "htmlContent": "<div class=\"async-demo\">\n  <h3>Async/Await</h3>\n</div>",
@@ -681,7 +789,12 @@
         }
       ],
       "solution": "42",
-      "tags": ["javascript", "async", "await", "beginner"]
+      "tags": [
+        "javascript",
+        "async",
+        "await",
+        "beginner"
+      ]
     },
     {
       "slug": "async-error-handling",
@@ -699,8 +812,8 @@
         "id": "Tangani error dalam kode asinkron dengan try/catch."
       },
       "instructions": {
-        "en": "# Async Error Handling\n\nAlways handle errors in async code!\n\n## Try/Catch with Async/Await\n\n```javascript\nasync function safeOperation() {\n    try {\n        const data = await riskyOperation();\n        return data; // Success\n    } catch (error) {\n        return 'fallback'; // Error handled\n    }\n}\n```\n\n## Your Task\nCreate an async function named `safeOperation` that handles the `riskyOperation()` using a try/catch block.\nIf `riskyOperation` fails, return the string `'fallback'`.\nAssign the result of calling `safeOperation()` to a variable named `result`.\n",
-        "id": "# Penanganan Error Asinkron\n\nSelalu tangani error dalam kode asinkron!\n\n## Try/Catch dengan Async/Await\n\n```javascript\nasync function safeOperation() {\n    try {\n        const data = await riskyOperation();\n        return data; // Sukses\n    } catch (error) {\n        return 'fallback'; // Error ditangani\n    }\n}\n```\n\n## Tugas Kamu\nBuat sebuah fungsi async bernama `safeOperation` yang menangani `riskyOperation()` menggunakan blok try/catch.\nJika `riskyOperation` gagal, kembalikan string `'fallback'`.\nMasukkan hasil pemanggilan `safeOperation()` ke variabel bernama `result`.\n"
+        "en": "# Async Error Handling\n\nAlways handle errors in async code!\n\n## Try/Catch with Async/Await\n\n```javascript\nasync function safeOperation() {\n    try {\n        const data = await riskyOperation();\n        return data; // Success\n    } catch (error) {\n        return 'fallback'; // Error handled\n    }\n}\n```\n\n## Real World Scenario\nWhen calling an external API service, it might be down or return a 500 error. Your test shouldn't crash; instead, it should catch the error and perhaps log it or retry, or at least fail gracefully with a meaningful message.\n\n## Your Task\n\n1. Create an async function named `safeOperation`.\n2. Inside the function, use a `try/catch` block.\n3. In the `try` block, `await` the function `riskyOperation()`.\n4. In the `catch` block, return the string `'fallback'` if an error occurs.\n5. Call `safeOperation()` and assign the result to the variable `result`.\n",
+        "id": "# Penanganan Error Asinkron\n\nSelalu tangani error dalam kode asinkron!\n\n## Try/Catch dengan Async/Await\n\n```javascript\nasync function safeOperation() {\n    try {\n        const data = await riskyOperation();\n        return data; // Sukses\n    } catch (error) {\n        return 'fallback'; // Error ditangani\n    }\n}\n```\n\n## Tugas Kamu\n\n1. Buat sebuah fungsi async bernama `safeOperation`.\n2. Di dalam fungsi, gunakan blok `try/catch`.\n3. Di dalam blok `try`, panggil `await riskyOperation()`.\n4. Di dalam blok `catch`, kembalikan string `'fallback'` jika terjadi error.\n5. Panggil `safeOperation()` dan simpan hasilnya di variabel `result`.\n"
       },
       "htmlContent": "<div class=\"error-demo\">\n  <h3>Error Handling</h3>\n</div>",
       "starterCode": "// This promise rejects with an error\nconst riskyOperation = () => Promise.reject(new Error('Network failed'));\n\n// Create an async function named safeOperation\n// Handle riskyOperation() with try/catch and return 'fallback' on error\n// Your code here\n\n// Call safeOperation and assign to result\nconst result = await safeOperation();",
@@ -712,7 +825,12 @@
         }
       ],
       "solution": "fallback",
-      "tags": ["javascript", "async", "error-handling", "beginner"]
+      "tags": [
+        "javascript",
+        "async",
+        "error-handling",
+        "beginner"
+      ]
     },
     {
       "slug": "async-parallel-execution",
@@ -730,8 +848,8 @@
         "id": "Jalankan banyak operasi asinkron secara paralel dengan Promise.all."
       },
       "instructions": {
-        "en": "# Parallel Async Operations\n\nRun multiple operations at once for better performance!\n\n## Promise.all()\n\nWaits for ALL promises to resolve:\n\n```javascript\nconst [a, b, c] = await Promise.all([\n    fetchA(),\n    fetchB(),\n    fetchC()\n]);\n```\n\n## Promise.race()\n\nReturns first promise to settle:\n\n```javascript\nconst fastest = await Promise.race([\n    slowOperation(),\n    fastOperation()\n]);\n```\n\n## Sequential vs Parallel\n\n```javascript\n// Sequential (slow) - 3 seconds total\nconst a = await fetch1();  // 1 sec\nconst b = await fetch2();  // 1 sec\nconst c = await fetch3();  // 1 sec\n\n// Parallel (fast) - 1 second total\nconst [a, b, c] = await Promise.all([\n    fetch1(), fetch2(), fetch3()\n]);\n```\n\n## Your Task\nSum the results of three parallel async operations using `Promise.all()`.\n1. Use the provided `getA()`, `getB()`, and `getC()` helpers.\n2. Run them in parallel and store their results in an array or destructure them.\n3. Calculate the sum and assign it to the variable named `result`.\n",
-        "id": "# Operasi Asinkron Paralel\n\nJalankan banyak operasi sekaligus untuk performa yang lebih baik!\n\n## Promise.all()\n\nMenunggu SEMUA promise selesai:\n\n```javascript\nconst [a, b, c] = await Promise.all([\n    fetchA(),\n    fetchB(),\n    fetchC()\n]);\n```\n\n## Promise.race()\n\nMengembalikan promise pertama yang selesai:\n\n```javascript\nconst fastest = await Promise.race([\n    slowOperation(),\n    fastOperation()\n]);\n```\n\n## Sekuensial vs Paralel\n\n```javascript\n// Sekuensial (lambat) - total 3 detik\nconst a = await fetch1();  // 1 detik\nconst b = await fetch2();  // 1 detik\nconst c = await fetch3();  // 1 detik\n\n// Paralel (cepat) - total 1 detik\nconst [a, b, c] = await Promise.all([\n    fetch1(), fetch2(), fetch3()\n]);\n```\n\n## Tugas Kamu\nJumlahkan hasil dari tiga operasi asinkron paralel menggunakan `Promise.all()`.\n1. Gunakan pembantu (helper) `getA()`, `getB()`, dan `getC()` yang disediakan.\n2. Jalankan mereka secara paralel dan simpan hasilnya dalam array atau lakukan destructure.\n3. Hitung jumlahnya (sum) dan masukkan ke variabel bernama `result`.\n"
+        "en": "# Parallel Async Operations\n\nRun multiple operations at once for better performance!\n\n## Promise.all()\n\nWaits for ALL promises to resolve:\n\n```javascript\nconst [a, b, c] = await Promise.all([\n    fetchA(),\n    fetchB(),\n    fetchC()\n]);\n```\n\n## Promise.race()\n\nReturns first promise to settle:\n\n```javascript\nconst fastest = await Promise.race([\n    slowOperation(),\n    fastOperation()\n]);\n```\n\n## Sequential vs Parallel\n\n```javascript\n// Sequential (slow) - 3 seconds total\nconst a = await fetch1();  // 1 sec\nconst b = await fetch2();  // 1 sec\nconst c = await fetch3();  // 1 sec\n\n// Parallel (fast) - 1 second total\nconst [a, b, c] = await Promise.all([\n    fetch1(), fetch2(), fetch3()\n]);\n```\n\n## Real World Scenario\nYou need to set up a test environment by creating a user, creating a product, and creating a store configuration. Since these are independent, you can create them all in parallel to cut your test setup time by 60%.\n\n## Your Task\n\n1. Use `Promise.all()` to run multiple promises in parallel.\n2. Pass an array containing calls to `getA()`, `getB()`, and `getC()`.\n3. Await the result and destructure it or store it in an array.\n4. Sum the three values together.\n5. Assign the final sum to the variable `result`.\n",
+        "id": "# Operasi Asinkron Paralel\n\nJalankan banyak operasi sekaligus untuk performa yang lebih baik!\n\n## Promise.all()\n\nMenunggu SEMUA promise selesai:\n\n```javascript\nconst [a, b, c] = await Promise.all([\n    fetchA(),\n    fetchB(),\n    fetchC()\n]);\n```\n\n## Promise.race()\n\nMengembalikan promise pertama yang selesai:\n\n```javascript\nconst fastest = await Promise.race([\n    slowOperation(),\n    fastOperation()\n]);\n```\n\n## Sekuensial vs Paralel\n\n```javascript\n// Sekuensial (lambat) - total 3 detik\nconst a = await fetch1();  // 1 detik\nconst b = await fetch2();  // 1 detik\nconst c = await fetch3();  // 1 detik\n\n// Paralel (cepat) - total 1 detik\nconst [a, b, c] = await Promise.all([\n    fetch1(), fetch2(), fetch3()\n]);\n```\n\n## Tugas Kamu\n\n1. Gunakan `Promise.all()` untuk menjalankan `getA()`, `getB()`, dan `getC()` secara paralel.\n2. Jumlahkan hasil dari ketiga promise tersebut.\n3. Simpan jumlah akhirnya di variabel `result`.\n"
       },
       "htmlContent": "<div class=\"parallel-demo\">\n  <h3>Parallel Execution</h3>\n</div>",
       "starterCode": "// Helpers: return promises resolving to numbers\nconst getA = () => Promise.resolve(10);\nconst getB = () => Promise.resolve(20);\nconst getC = () => Promise.resolve(12);\n\n// Run all in parallel, destructure results, and assign their sum to 'result'\n// Your code here\n",
@@ -743,7 +861,13 @@
         }
       ],
       "solution": "42",
-      "tags": ["javascript", "async", "parallel", "promise-all", "beginner"]
+      "tags": [
+        "javascript",
+        "async",
+        "parallel",
+        "promise-all",
+        "beginner"
+      ]
     },
     {
       "slug": "async-testing-patterns",
@@ -761,8 +885,8 @@
         "id": "Terapkan async/await dalam skenario otomatisasi pengujian umum."
       },
       "instructions": {
-        "en": "# Async Testing Patterns\n\nCommon patterns used in test automation!\n\n## Waiting for Element\n\n```javascript\nasync function waitForElement(selector, timeout = 5000) {\n    const start = Date.now();\n    while (Date.now() - start < timeout) {\n        const el = document.querySelector(selector);\n        if (el) return el;\n        await delay(100);\n    }\n    throw new Error('Element not found');\n}\n```\n\n## Retry Pattern\n\n```javascript\nasync function retry(fn, attempts = 3) {\n    for (let i = 0; i < attempts; i++) {\n        try {\n            return await fn();\n        } catch (e) {\n            if (i === attempts - 1) throw e;\n        }\n    }\n}\n```\n\n## Your Task\nCreate a retry function that attempts an operation 3 times before giving up.\nCount how many attempts were made.\n",
-        "id": "# Pola Pengujian Asinkron\n\nPola umum yang digunakan dalam otomatisasi pengujian!\n\n## Menunggu Elemen\n\n```javascript\nasync function waitForElement(selector, timeout = 5000) {\n    const start = Date.now();\n    while (Date.now() - start < timeout) {\n        const el = document.querySelector(selector);\n        if (el) return el;\n        await delay(100);\n    }\n    throw new Error('Element not found');\n}\n```\n\n## Pola Retry\n\n```javascript\nasync function retry(fn, attempts = 3) {\n    for (let i = 0; i < attempts; i++) {\n        try {\n            return await fn();\n        } catch (e) {\n            if (i === attempts - 1) throw e;\n        }\n    }\n}\n```\n\n## Tugas Kamu\nBuat sebuah fungsi retry yang mencoba sebuah operasi sebanyak 3 kali sebelum menyerah.\nHitung berapa banyak percobaan yang dilakukan.\n"
+        "en": "# Async Testing Patterns\n\nCommon patterns used in test automation!\n\n## Waiting for Element\n\n```javascript\nasync function waitForElement(selector, timeout = 5000) {\n    const start = Date.now();\n    while (Date.now() - start < timeout) {\n        const el = document.querySelector(selector);\n        if (el) return el;\n        await delay(100);\n    }\n    throw new Error('Element not found');\n}\n```\n\n## Retry Pattern\n\n```javascript\nasync function retry(fn, attempts = 3) {\n    for (let i = 0; i < attempts; i++) {\n        try {\n            return await fn();\n        } catch (e) {\n            if (i === attempts - 1) throw e;\n        }\n    }\n}\n```\n\n## Real World Scenario\nTests can be \"flaky\" due to temporary network blips or race conditions. Instead of failing immediately, a \"retry\" mechanism allows the test to try the action a few times (e.g., clicking a button that might still be initializing) before declaring failure.\n\n## Your Task\n\n1. Create a function named `retry` that accepts a function `fn` and a number `maxAttempts`.\n2. Use a loop to call `fn` up to `maxAttempts` times.\n3. If `fn` succeeds, return the result immediately.\n4. If `fn` fails (throws error), catch it and continue to the next iteration.\n5. If all attempts fail, throw the last error.\n6. (For this challenge) We just want you to implement the loop and increment an external `attempts` counter to prove you retried.\n",
+        "id": "# Pola Pengujian Asinkron\n\nPola umum yang digunakan dalam otomatisasi pengujian!\n\n## Menunggu Elemen\n\n```javascript\nasync function waitForElement(selector, timeout = 5000) {\n    const start = Date.now();\n    while (Date.now() - start < timeout) {\n        const el = document.querySelector(selector);\n        if (el) return el;\n        await delay(100);\n    }\n    throw new Error('Element not found');\n}\n```\n\n## Pola Retry\n\n```javascript\nasync function retry(fn, attempts = 3) {\n    for (let i = 0; i < attempts; i++) {\n        try {\n            return await fn();\n        } catch (e) {\n            if (i === attempts - 1) throw e;\n        }\n    }\n}\n```\n\n## Tugas Kamu\n\n1. Buat logika retry yang mencoba menjalankan fungsi `fn` hingga `maxAttempts` kali.\n2. Jika gagal, coba lagi sampai batas tercapai.\n3. Pastikan `attempts` counter bertambah setiap kali mencoba.\n"
       },
       "htmlContent": "<div class=\"patterns-demo\">\n  <h3>Testing Patterns</h3>\n</div>",
       "starterCode": "let attempts = 0;\nconst flakyOperation = async () => {\n    attempts++;\n    if (attempts < 3) throw new Error(\"Network failure\");\n    return \"Success\";\n};\n\n// Retry logic: create a function that retries maxAttempts times\n// Your code here\n\n// await retry(flakyOperation);\n// const result = attempts;",
@@ -774,7 +898,13 @@
         }
       ],
       "solution": "3",
-      "tags": ["javascript", "async", "testing", "retry", "beginner"]
+      "tags": [
+        "javascript",
+        "async",
+        "testing",
+        "retry",
+        "beginner"
+      ]
     },
     {
       "slug": "async-boss",
@@ -792,8 +922,8 @@
         "id": "Gabungkan banyak pemanggilan API asinkron menjadi satu hasil tunggal."
       },
       "instructions": {
-        "en": "# Scenario: API Data Aggregator\n\nYou're building a test that verifies data from multiple API endpoints.\n\n## The Challenge\n\nYou have 3 async functions that simulate API calls:\n- `getUsers()` → returns array of user IDs\n- `getOrders()` → returns array of order IDs  \n- `getProducts()` → returns array of product IDs\n\nYour task:\n1. Call all 3 APIs **in parallel** (for speed!)\n2. Sum up the **total count** of all items\n3. Handle any potential errors gracefully\n\n## Your Mission\n\nUse Promise.all to fetch all data simultaneously and aggregate the results.\n\n> **Tip:** Destructure the Promise.all result: `const [users, orders, products] = await Promise.all([...])`\n",
-        "id": "# Skenario: Agregator Data API\n\nKamu sedang membangun tes yang memverifikasi data dari beberapa endpoint API.\n\n## Tantangannya\n\nKamu memiliki 3 fungsi asinkron yang mensimulasikan pemanggilan API:\n- `getUsers()` → mengembalikan array ID user\n- `getOrders()` → mengembalikan array ID order\n- `getProducts()` → mengembalikan array ID produk\n\nTugas kamu:\n1. Panggil semua 3 API **secara paralel** (untuk kecepatan!)\n2. Jumlahkan **total hitungan** dari semua item\n3. Tangani potensi error dengan anggun\n\n## Misi Kamu\n\nGunakan Promise.all untuk mengambil semua data secara bersamaan dan agregasikan hasilnya.\n\n> **Tip:** Lakukan destructure pada hasil Promise.all: `const [users, orders, products] = await Promise.all([...])`\n"
+        "en": "# Scenario: API Data Aggregator\n\nYou're building a test that verifies data from multiple API endpoints.\n\n## The Challenge\n\nYou have 3 async functions that simulate API calls:\n- `getUsers()` → returns array of user IDs\n- `getOrders()` → returns array of order IDs  \n- `getProducts()` → returns array of product IDs\n\nYour task:\n1. Call all 3 APIs **in parallel** (for speed!)\n2. Sum up the **total count** of all items\n3. Handle any potential errors gracefully\n\n## Real World Scenario\nA \"Profile\" page usually fetches data from multiple microservices: User Service (name, email), Order Service (recent history), and Recommendation Service (suggested items). To test that the page loads within 2 seconds, you verify that the test framework requests all these endpoints in parallel rather than one by one.\n\n## Your Task\n\n1. Call `getUsers()`, `getOrders()`, and `getProducts()` simultaneously using `Promise.all()`.\n2. Destructure the returned array to get the three result arrays.\n3. Calculate the length of each array.\n4. Sum the lengths to get the total number of items.\n5. Assign the final count to the `result` variable.\n",
+        "id": "# Skenario: Agregator Data API\n\nKamu sedang membangun tes yang memverifikasi data dari beberapa endpoint API.\n\n## Tantangannya\n\nKamu memiliki 3 fungsi asinkron yang mensimulasikan pemanggilan API:\n- `getUsers()` → mengembalikan array ID user\n- `getOrders()` → mengembalikan array ID order\n- `getProducts()` → mengembalikan array ID produk\n\nTugas kamu:\n1. Panggil semua 3 API **secara paralel** (untuk kecepatan!)\n2. Jumlahkan **total hitungan** dari semua item\n3. Tangani potensi error dengan anggun\n\n## Tugas Kamu\n\n1. Gunakan `Promise.all()` untuk memanggil `getUsers()`, `getOrders()`, dan `getProducts()` secara bersamaan.\n2. Ambil hasil array dari ketiganya.\n3. Hitung total panjang items dari ketiga array tersebut.\n4. Simpan hasilnya di variabel `result`.\n"
       },
       "htmlContent": "<div class=\"api-aggregator\">\n  <h3>API Data Aggregator</h3>\n  <div id=\"output\"></div>\n</div>",
       "starterCode": "// Simulated API calls\nconst getUsers = () => Promise.resolve([1, 2, 3]);\nconst getOrders = () => Promise.resolve([101, 102, 103, 104]);\nconst getProducts = () => Promise.resolve([51, 52, 53, 54, 55]);\n\n// Fetch all data in parallel and count total items\n// Your code here\n\n// const result = await aggregateData();",
@@ -805,7 +935,13 @@
         }
       ],
       "solution": "12",
-      "tags": ["javascript", "async", "scenario", "boss", "beginner"]
+      "tags": [
+        "javascript",
+        "async",
+        "scenario",
+        "boss",
+        "beginner"
+      ]
     }
   ]
 }
