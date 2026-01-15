@@ -43,7 +43,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 45,
-      "status": "draft",
       "order": 402,
       "title": {
         "en": "Click Actions",
@@ -80,7 +79,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 50,
-      "status": "draft",
       "order": 403,
       "title": {
         "en": "Fill & Type",
@@ -118,7 +116,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 55,
-      "status": "draft",
       "order": 404,
       "title": {
         "en": "Select Dropdowns",
@@ -155,7 +152,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 55,
-      "status": "draft",
       "order": 405,
       "title": {
         "en": "Checkbox & Radio",
@@ -192,7 +188,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 60,
-      "status": "draft",
       "order": 406,
       "title": {
         "en": "Keyboard Actions",
@@ -229,7 +224,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 60,
-      "status": "draft",
       "order": 407,
       "title": {
         "en": "Hover & Focus",
@@ -266,7 +260,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 70,
-      "status": "draft",
       "order": 408,
       "title": {
         "en": "File Upload",
@@ -303,7 +296,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 80,
-      "status": "draft",
       "order": 409,
       "title": {
         "en": "Drag & Drop",
@@ -340,7 +332,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 85,
-      "status": "draft",
       "order": 410,
       "title": {
         "en": "Working with iFrames",
@@ -377,7 +368,6 @@
       "difficulty": "MEDIUM",
       "category": "playwright-navigation",
       "xpReward": 90,
-      "status": "draft",
       "order": 411,
       "title": {
         "en": "Dynamic Table Sorting",
@@ -415,7 +405,6 @@
       "difficulty": "HARD",
       "category": "playwright-navigation",
       "xpReward": 100,
-      "status": "draft",
       "order": 412,
       "title": {
         "en": "Scenario: E-Commerce Checkout",
@@ -444,6 +433,43 @@
         "scenario",
         "boss",
         "checkout",
+        "intermediate"
+      ]
+    },
+    {
+      "slug": "pw-locator-intro",
+      "type": "PLAYWRIGHT",
+      "difficulty": "EASY",
+      "category": "playwright-locators",
+      "xpReward": 35,
+      "order": 500,
+      "title": {
+        "en": "Introduction to Locators",
+        "id": "Pengenalan Locator"
+      },
+      "description": {
+        "en": "Learn the fundamentals of finding elements with Playwright locators.",
+        "id": "Pelajari dasar-dasar menemukan elemen dengan locator Playwright."
+      },
+      "instructions": {
+        "en": "# Introduction to Locators\n\nLocators are the heart of Playwright testing. They tell Playwright which element to interact with.\n\n## The page.locator() Method\n\nThe most fundamental way to find elements:\n\n```javascript\n// By CSS selector\npage.locator('#submit-btn')     // By ID\npage.locator('.primary-btn')    // By class\npage.locator('button')          // By tag\n```\n\n## Chaining Locators\n\n```javascript\n// Find button inside a form\npage.locator('form').locator('button')\n\n// Same as:\npage.locator('form button')\n```\n\n## Getting Text Content\n\n```javascript\nconst text = await page.locator('#title').textContent();\n```\n\n## Clicking Elements\n\n```javascript\nawait page.locator('#btn').click();\n```\n\n## Your Task\n1. Find the heading element using `page.locator('h1')`\n2. Get its text content\n3. Store it in `result`\n\n> **Tip:** Playwright locators auto-wait for elements to be ready!\n",
+        "id": "# Pengenalan Locator\n\nLocator adalah jantung dari pengujian Playwright. Mereka memberitahu Playwright elemen mana yang harus berinteraksi.\n\n## Metode page.locator()\n\nCara paling fundamental untuk menemukan elemen:\n\n```javascript\n// Dengan CSS selector\npage.locator('#submit-btn')     // Berdasarkan ID\npage.locator('.primary-btn')    // Berdasarkan class\npage.locator('button')          // Berdasarkan tag\n```\n\n## Merantai Locator\n\n```javascript\n// Temukan tombol di dalam form\npage.locator('form').locator('button')\n\n// Sama dengan:\npage.locator('form button')\n```\n\n## Mengambil Konten Teks\n\n```javascript\nconst text = await page.locator('#title').textContent();\n```\n\n## Mengklik Elemen\n\n```javascript\nawait page.locator('#btn').click();\n```\n\n## Tugas Kamu\n1. Temukan elemen heading menggunakan `page.locator('h1')`\n2. Ambil konten teksnya\n3. Simpan di `result`\n\n> **Tip:** Locator Playwright otomatis menunggu elemen siap!\n"
+      },
+      "htmlContent": "<div class=\"welcome-page\">\n  <h1>Welcome to Playwright</h1>\n  <p>The best end-to-end testing framework.</p>\n  <button id=\"start-btn\">Get Started</button>\n</div>",
+      "starterCode": "// Find the h1 element and get its text\n// Your code here\n\nconst result = \"\"; // Store the heading text here",
+      "testCases": [
+        {
+          "description": "Returns the expected output",
+          "expectedOutput": "Welcome to Playwright",
+          "isHidden": false
+        }
+      ],
+      "solution": "Welcome to Playwright",
+      "tags": [
+        "playwright",
+        "locators",
+        "basics",
+        "beginner",
         "intermediate"
       ]
     },
@@ -1061,6 +1087,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-waits",
       "xpReward": 50,
+      "status": "draft",
       "order": 701,
       "title": {
         "en": "Auto-Wait Understanding",
@@ -1097,6 +1124,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-waits",
       "xpReward": 55,
+      "status": "draft",
       "order": 702,
       "title": {
         "en": "waitForSelector",
@@ -1133,6 +1161,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-waits",
       "xpReward": 60,
+      "status": "draft",
       "order": 703,
       "title": {
         "en": "waitForLoadState",
@@ -1169,6 +1198,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-waits",
       "xpReward": 75,
+      "status": "draft",
       "order": 704,
       "title": {
         "en": "waitForResponse",
@@ -1206,6 +1236,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-waits",
       "xpReward": 85,
+      "status": "draft",
       "order": 705,
       "title": {
         "en": "waitForFunction",
@@ -1243,6 +1274,7 @@
       "difficulty": "MEDIUM",
       "category": "playwright-waits",
       "xpReward": 70,
+      "status": "draft",
       "order": 706,
       "title": {
         "en": "Timeout Configuration",
@@ -1280,6 +1312,7 @@
       "difficulty": "HARD",
       "category": "playwright-waits",
       "xpReward": 95,
+      "status": "draft",
       "order": 707,
       "title": {
         "en": "Scenario: Polling Dashboard",
