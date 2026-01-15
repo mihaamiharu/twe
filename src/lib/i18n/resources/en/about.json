@@ -69,13 +69,22 @@
             ]
         },
         "backend": {
-            "title": "Backend & Languages",
+            "title": "Languages & Ecosystem",
             "items": [
+                "TypeScript",
                 "Go (Golang)",
                 "Java",
                 "Python",
-                "PostgreSQL",
-                "Bun"
+                "PostgreSQL"
+            ]
+        },
+        "strategy": {
+            "title": "Strategy & Methodologies",
+            "items": [
+                "Shift-Left Testing",
+                "Test Planning",
+                "Risk Analysis",
+                "Agile / Scrum"
             ]
         },
         "frontend": {
