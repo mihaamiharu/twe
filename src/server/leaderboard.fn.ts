@@ -42,7 +42,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
       const monthlySubmissionsXp = sql<number>`(
         SELECT COALESCE(SUM(${submissions.xpEarned}), 0)
         FROM ${submissions}
-        WHERE ${submissions.userId} = ${users.id}
+        WHERE ${submissions.userId} = users.id
         AND ${submissions.createdAt} >= ${startOfMonth.toISOString()}
       )`;
 
@@ -51,7 +51,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         SELECT COALESCE(SUM(${achievements.xpReward}), 0)
         FROM ${userAchievements}
         INNER JOIN ${achievements} ON ${userAchievements.achievementId} = ${achievements.id}
-        WHERE ${userAchievements.userId} = ${users.id}
+        WHERE ${userAchievements.userId} = users.id
         AND ${userAchievements.unlockedAt} >= ${startOfMonth.toISOString()}
       )`;
 
@@ -72,7 +72,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
           challengesCompleted: sql<number>`(
             SELECT count(*)::int
             FROM ${progress}
-            WHERE ${progress.userId} = ${users.id}
+            WHERE ${progress.userId} = users.id
             AND ${progress.isCompleted} = true
             AND ${progress.challengeId} IS NOT NULL
           )`,
@@ -127,13 +127,14 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         });
       }
 
-      // Add rank and badges to each user
       const leaderboardWithRank = leaderboard.map((user, index) => ({
         ...user,
         rank: offset + index + 1,
         displayName: user.name || 'Anonymous',
         badges: userBadgesMap.get(user.id) || [],
       }));
+
+
 
       return {
         success: true,

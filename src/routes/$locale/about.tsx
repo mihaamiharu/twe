@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, FileText, Terminal, Database, Globe, Server, Code2, Milestone } from 'lucide-react';
+import { Github, Linkedin, Mail, FileText, Terminal, Database, Globe, Server, Code2, Milestone, Brain, Activity } from 'lucide-react';
 import i18n from '@/lib/i18n';
 import { Boop } from '@/components/ui/boop';
 
@@ -39,9 +39,14 @@ function AboutPage() {
             skills: t('about:expertise.backend.items', { returnObjects: true }) as string[]
         },
         {
-            category: t('about:expertise.engineering.title'),
-            icon: <Terminal className="h-5 w-5 text-purple-500" />,
-            skills: t('about:expertise.engineering.items', { returnObjects: true }) as string[]
+            category: t('about:expertise.strategy.title'),
+            icon: <Brain className="h-5 w-5 text-purple-500" />,
+            skills: t('about:expertise.strategy.items', { returnObjects: true }) as string[]
+        },
+        {
+            category: t('about:expertise.devops.title'),
+            icon: <Activity className="h-5 w-5 text-orange-500" />,
+            skills: t('about:expertise.devops.items', { returnObjects: true }) as string[]
         }
     ];
 
@@ -91,12 +96,7 @@ function AboutPage() {
                                 {t('about:hero.github')}
                             </a>
                         </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full">
-                            <a href="/ekki-resume.pdf" target="_blank" rel="noopener noreferrer">
-                                <FileText className="mr-2 h-4 w-4" />
-                                {t('about:hero.resume')}
-                            </a>
-                        </Button>
+
                     </div>
                 </section>
 
@@ -171,7 +171,7 @@ function AboutPage() {
                         <p className="text-muted-foreground">{t('about:expertise.subtitle')}</p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {expertise.map((stack, index) => (
                             <Card key={index} className="bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors">
                                 <CardHeader>
@@ -204,10 +204,10 @@ function AboutPage() {
                         {t('about:contact.title')}
                     </p>
                     <Button asChild size="lg" className="h-12 px-8 text-lg">
-                        <a href="mailto:ekki.syam@gmail.com">
+                        <Link to="/$locale/contact" params={{ locale: i18n.language }}>
                             <Mail className="mr-2 h-5 w-5" />
                             {t('about:contact.cta')}
-                        </a>
+                        </Link>
                     </Button>
                 </section>
 

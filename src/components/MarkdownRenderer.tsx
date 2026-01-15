@@ -90,7 +90,7 @@ export function MarkdownRenderer({
             if (isInline) {
               return (
                 <code
-                  className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-border/50"
+                  className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-border/50 before:content-none after:content-none"
                   {...props}
                 >
                   {children}
