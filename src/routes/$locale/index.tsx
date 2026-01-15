@@ -178,27 +178,27 @@ function HomePage() {
       slug: 'css-selector-101-id-class',
     },
     {
+      title: 'Variables & Types',
+      difficulty: 'EASY',
+      type: 'JavaScript',
+      xp: 15,
+      slug: 'js-variables-types',
+    },
+    {
       title: 'Click Actions',
       difficulty: 'MEDIUM',
       type: 'Playwright',
       xp: 45,
       slug: 'pw-click-actions',
     },
-    {
-      title: 'Page Object Model',
-      difficulty: 'HARD',
-      type: 'Expert',
-      xp: 80,
-      slug: 'pw-first-page-object',
-    },
   ];
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with animated gradient */}
-      <section className="relative py-20 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-primary/10 via-transparent to-transparent"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent animate-pulse"></div>
+      {/* Hero Section with Technical Grid */}
+      <section className="relative py-24 px-6 text-center overflow-hidden">
+        <div className="absolute inset-0 bg-grid-small [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background"></div>
 
         <div className="relative max-w-5xl mx-auto">
           {/* Title */}

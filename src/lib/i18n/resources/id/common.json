@@ -24,7 +24,7 @@
     "cancel": "Batal",
     "save": "Simpan",
     "run": "Jalankan",
-    "runTooltip": "Jalankan kode (⌘/Ctrl + Enter) — Preview akan direset",
+    "runTooltip": "Jalankan kode (⌘/Ctrl + Enter)  -  Preview akan direset",
     "runCode": "Jalankan Kode",
     "reset": "Atur Ulang",
     "continue": "Lanjutkan",
@@ -88,7 +88,16 @@
     "resources": "Sumber Daya",
     "copyright": "© {{year}} TestingWithEkki. Hak cipta dilindungi.",
     "madeWith": "Dibuat dengan ❤️ untuk komunitas QA",
-    "reportBug": "Laporkan Bug"
+    "reportBug": "Laporkan Bug",
+    "newsletter": {
+      "title": "Tetap Terupdate",
+      "description": "Dapatkan tutorial, tantangan, dan tips testing terbaru langsung di inbox Anda.",
+      "placeholder": "email@anda.com",
+      "submit": "Langganan",
+      "submitting": "Memproses...",
+      "success": "Terima kasih telah berlangganan!",
+      "error": "Terjadi kesalahan."
+    }
   },
   "notFound": {
     "title": "Kamu berada dalam Mode Headless",

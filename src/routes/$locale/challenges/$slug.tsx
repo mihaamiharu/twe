@@ -10,10 +10,9 @@ import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
-  useQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { ChallengePlayground, type Challenge } from '@/components/challenges';
+import { ChallengePlayground, type Challenge, ChallengeSkeleton } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -66,7 +65,11 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
       ],
     };
   },
+  pendingComponent: ChallengeSkeleton,
 });
+
+
+
 
 
 function ChallengeDetailPage() {
@@ -87,7 +90,8 @@ function ChallengeDetailPage() {
   } = useSuspenseQuery(challengeDetailQueryOptions(slug, locale));
 
   // Rename for compatibility with existing code
-  const data = challengeData;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+  const data = challengeData as any;
 
 
 

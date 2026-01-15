@@ -26,10 +26,10 @@ VALUES
      '{"en": "Complete 50 challenges", "id": "Selesaikan 50 tantangan"}', 
      '🏆', 'CHALLENGES', 'count', 50, 500, false),
 
-    ('challenge-88', 
-     '{"en": "Completionist"}', 
-     '{"en": "Complete all 88 challenges", "id": "Selesaikan semua 88 tantangan"}', 
-     '👑', 'CHALLENGES', 'count', 88, 1000, false),
+    ('challenge-100', 
+     '{"en": "Centurion", "id": "Centurion"}', 
+     '{"en": "Complete 100 challenges", "id": "Selesaikan 100 tantangan"}', 
+     '👑', 'CHALLENGES', 'count', 100, 1000, false),
 
     -- Streak
     ('streak-3', 
@@ -78,26 +78,26 @@ VALUES
      '{"en": "Earn 5,000 XP", "id": "Dapatkan 5.000 XP"}', 
      '🌠', 'XP', 'xp', 5000, 500, false),
 
-    -- Tiers
-    ('tier-basic-master', 
-     '{"en": "Selector Specialist"}', 
-     '{"en": "Complete all Basic tier challenges", "id": "Selesaikan semua tantangan tier Basic"}', 
-     '🎨', 'CHALLENGES', 'count:CSS_SELECTOR', 15, 150, false),
+    -- Daily Grind
+    ('daily-5', 
+     '{"en": "Warming Up", "id": "Pemanasan"}', 
+     '{"en": "Complete 5 challenges in one day", "id": "Selesaikan 5 tantangan dalam satu hari"}', 
+     '☀️', 'CHALLENGES', 'daily', 5, 100, false),
 
-    ('tier-beginner-master', 
-     '{"en": "JavaScript Hero"}', 
-     '{"en": "Complete all Beginner tier challenges", "id": "Selesaikan semua tantangan tier Beginner"}', 
-     '💛', 'CHALLENGES', 'count:JAVASCRIPT', 23, 200, false),
+    ('daily-10', 
+     '{"en": "On a Roll", "id": "Sedang Lancar"}', 
+     '{"en": "Complete 10 challenges in one day", "id": "Selesaikan 10 tantangan dalam satu hari"}', 
+     '🔥', 'CHALLENGES', 'daily', 10, 200, false),
 
-    ('tier-intermediate-master', 
-     '{"en": "Playwright Pro"}', 
-     '{"en": "Complete all Intermediate tier challenges", "id": "Selesaikan semua tantangan tier Intermediate"}', 
-     '🎭', 'CHALLENGES', 'count:PLAYWRIGHT', 32, 300, false),
+    ('daily-15', 
+     '{"en": "Unstoppable", "id": "Tidak Terhentikan"}', 
+     '{"en": "Complete 15 challenges in one day", "id": "Selesaikan 15 tantangan dalam satu hari"}', 
+     '⚡', 'CHALLENGES', 'daily', 15, 400, false),
 
-    ('tier-expert-master', 
-     '{"en": "Automation Expert"}', 
-     '{"en": "Complete all Expert tier challenges", "id": "Selesaikan semua tantangan tier Expert"}', 
-     '🚀', 'CHALLENGES', 'count:PLAYWRIGHT', 18, 400, false),
+    ('daily-20', 
+     '{"en": "Marathon Runner", "id": "Pelari Maraton"}', 
+     '{"en": "Complete 20 challenges in one day", "id": "Selesaikan 20 tantangan dalam satu hari"}', 
+     '🏃', 'CHALLENGES', 'daily', 20, 600, false),
 
     -- Config / Special
     ('first-tutorial', 

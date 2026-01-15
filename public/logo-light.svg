@@ -1,0 +1,33 @@
+<svg width="300" height="100" viewBox="0 0 300 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Character Group (Same as Icon but positioned) -->
+  <g transform="translate(10, 0)">
+      <!-- Ears -->
+      <circle cx="30" cy="35" r="8" fill="#A66F36" stroke="black" stroke-width="2"/>
+      <circle cx="70" cy="35" r="8" fill="#A66F36" stroke="black" stroke-width="2"/>
+      <!-- Head -->
+      <ellipse cx="50" cy="45" rx="28" ry="24" fill="#A66F36" stroke="black" stroke-width="2"/>
+      <!-- Face Patch -->
+      <ellipse cx="50" cy="50" rx="22" ry="16" fill="#E6B880"/>
+      <!-- Eye Mask -->
+      <path d="M32 42 C 32 36, 48 36, 48 42 C 48 46, 32 46, 32 42 Z" fill="black"/>
+      <path d="M52 42 C 52 36, 68 36, 68 42 C 68 46, 52 46, 52 42 Z" fill="black"/>
+      <!-- Nose -->
+      <path d="M47 50 Q 50 53 53 50 Z" fill="black"/>
+      <!-- Mouth -->
+      <path d="M47 56 Q 50 59 53 56" stroke="black" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Body -->
+      <path d="M35 68 Q 30 95 30 100 H 70 Q 70 95 65 68 Z" fill="#A66F36" stroke="black" stroke-width="2"/>
+      <path d="M40 68 Q 50 100 60 68 Z" fill="#E6B880"/>
+      <!-- Held Object -->
+      <rect x="42" y="70" width="16" height="25" rx="2" fill="#A8D1E7" stroke="black" stroke-width="2"/>
+      <path d="M42 70 Q 46 66 50 70 Q 54 66 58 70" fill="white" stroke="black" stroke-width="1"/>
+      <!-- Hands -->
+      <ellipse cx="40" cy="80" rx="6" ry="5" fill="#A66F36" stroke="black" stroke-width="2"/>
+      <ellipse cx="60" cy="80" rx="6" ry="5" fill="#A66F36" stroke="black" stroke-width="2"/>
+  </g>
+
+  <!-- Text "twe" (Black for Light Mode) -->
+  <g transform="translate(100, 65)">
+      <text font-family="Arial, sans-serif" font-weight="bold" font-size="50" fill="black" letter-spacing="-2">twe</text>
+  </g>
+</svg>

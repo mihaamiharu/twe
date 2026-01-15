@@ -75,10 +75,10 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 
   const tutorialsCompleted = tutorialsResult[0]?.count || 0;
 
-  // Calculate streak
-  const { currentStreak, longestStreak } = calculateStreak(
-    completedChallenges.map((c) => c.completedAt).filter(Boolean) as Date[],
-  );
+  // Calculate streak and max daily challenges
+  const completionDates = completedChallenges.map((c) => c.completedAt).filter(Boolean) as Date[];
+  const { currentStreak, longestStreak } = calculateStreak(completionDates);
+  const maxDailyChallenges = calculateMaxDailyChallenges(completionDates);
 
   // Count perfect scores (all tests passed on first try - we approximate by checking if attempts = 1)
   const perfectScoresResult = await db
@@ -114,6 +114,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
     perfectScores,
     bugReportsFiled,
     challengesByTier,
+    maxDailyChallenges,
   };
 }
 
@@ -193,6 +194,23 @@ function calculateStreak(completionDates: Date[]): {
   longestStreak = Math.max(longestStreak, tempStreak);
 
   return { currentStreak, longestStreak };
+}
+
+/**
+ * Calculate the maximum number of challenges completed in a single day
+ */
+function calculateMaxDailyChallenges(completionDates: Date[]): number {
+  if (completionDates.length === 0) {
+    return 0;
+  }
+
+  const countByDay = new Map<string, number>();
+  for (const date of completionDates) {
+    const dayKey = date.toISOString().split('T')[0]; // "2026-01-16"
+    countByDay.set(dayKey, (countByDay.get(dayKey) || 0) + 1);
+  }
+
+  return Math.max(0, ...countByDay.values());
 }
 
 /**

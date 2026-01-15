@@ -1,23 +1,58 @@
 {
     "hero": {
-        "title": "Hi, I'm <1>Ekki</1>",
+        "title": "Hi, I'm <strong>Ekki</strong>",
         "subtitle": "Senior Software Engineer (QA)",
-        "description": "I'm a Senior QA Engineer at <strong>Ninja Van</strong> with over 4 years of experience building automation frameworks for web, mobile, and APIs. I believe in <strong>\"Tooling over Manual Labor\"</strong>—building custom systems that empower teams to ship with confidence while preventing critical production issues.",
+        "description": "I bridge the gap between <strong>Manual Testing</strong> and <strong>Automated Engineering</strong>. With 4+ years at <strong>Ninja Van</strong>, I build custom frameworks and internal tools that empower teams to ship faster, with confidence.",
         "connect": "Connect on LinkedIn",
-        "github": "GitHub Profile",
-        "resume": "Resume"
+        "github": "GitHub Profile"
     },
     "philosophy": {
-        "title": "Engineering Quality",
-        "intro": "Quality isn't just about checking boxes. It's about <strong>Shift-Left</strong> and taking ownership of production.",
-        "listIntro": "I built TestingWithEkki to demonstrate the same engineering rigor I apply at work:",
+        "title": "Quality Engineering",
+        "intro": "Quality isn't just about finding bugs. It's about designing systems that prevent them.",
+        "listIntro": "My approach builds on three pillars:",
         "list": {
-            "auth": "<strong>Scalable Architecture</strong>: Real authentication and session management, not just a static site.",
-            "code": "<strong>Interactive Tooling</strong>: Sandboxed environments similar to the custom dev tools I build for internal teams.",
-            "gamification": "<strong>User Engagement</strong>: Gamification mechanics to make learning automation sticky.",
-            "i18n": "<strong>Global Readiness</strong>: Full internationalization support."
+            "auth": "<strong>Tooling over Toil</strong>: Automating repetitive tasks to empower testers to focus on exploration and strategy.",
+            "code": "<strong>Shift Left</strong>: Catching issues during development, not after deployment.",
+            "adaptability": "<strong>Technical Agility</strong>: Seamlessly switching contexts - Java, Go, Python - to match the team's evolving stack and business needs.",
+            "reliability": "<strong>Force Multiplier</strong>: Stepping up during critical shortages to solve complex automation problems and keep the pipeline moving."
         },
         "conclusion": "Quality is an engineering discipline. I build the tools and frameworks that enforce reliability. Whether it's a Go backend or this React platform, I write code that solves real quality problems."
+    },
+    "milestones": {
+        "title": "My Journey",
+        "subtitle": "Key milestones from my engineering journey",
+        "items": [
+            {
+                "year": "2026",
+                "title": "TestingWithEkki",
+                "description": "Started building this platform to share knowledge and bridge the gap between manual testing and engineering. A playground for modern web tech and high-quality automation patterns."
+            },
+            {
+                "year": "2025",
+                "title": "AI & Cost Efficiency",
+                "description": "Built the company's first AI testing framework in a team of three for intent classification, automating 50%+ of Tier 1 support. Validated features for a major optimization initiative that improved operational efficiency and saved over $60,000 per month."
+            },
+            {
+                "year": "2024",
+                "title": "Senior Engineer & Mentor",
+                "description": "Promoted to Senior QA. Identified internal team bottlenecks and engineered custom solutions: a Chrome extension for payload decoding and a config validation tool that boosted accuracy by 60%, preventing critical production failures."
+            },
+            {
+                "year": "2023",
+                "title": "Shift-Left Integration",
+                "description": "Co-developed the company's first integration testing framework using Go, empowering the team to adopt shift-left testing and accelerate defect detection by 80%."
+            },
+            {
+                "year": "2022",
+                "title": "Framework Stability",
+                "description": "Engineered a robust automation framework with <1% regression error rate. Enforced quality gates in CI/CD, eliminating recurring build failures."
+            },
+            {
+                "year": "2021",
+                "title": "Backend Intern",
+                "description": "Joined Ninja Van as a Backend Engineer Intern. Built secure RESTful APIs and data cleanup services before transitioning to specialize in Quality Engineering."
+            }
+        ]
     },
     "expertise": {
         "title": "Technical Expertise",
@@ -25,77 +60,50 @@
         "automation": {
             "title": "Test Automation",
             "items": [
-                "Playwright",
-                "Appium",
                 "Selenium",
-                "DeepEval (LLM)",
-                "Rest Assured"
+                "Rest Assured",
+                "DeepEval",
+                "Playwright",
+                "Appium Flutter"
             ]
         },
         "backend": {
-            "title": "Backend & Languages",
+            "title": "Languages & Ecosystem",
             "items": [
-                "Go (Golang)",
                 "Java",
-                "Python",
-                "PostgreSQL",
-                "Bun"
+                "SQL",
+                "TypeScript",
+                "Go",
+                "Python"
             ]
         },
-        "engineering": {
-            "title": "Full-Stack & DevOps",
+        "strategy": {
+            "title": "Strategy & Methodologies",
+            "items": [
+                "Shift-Left Testing",
+                "Test Planning",
+                "Risk Analysis",
+                "Agile / Scrum"
+            ]
+        },
+        "frontend": {
+            "title": "Modern Frontend",
             "items": [
                 "React 19",
                 "TypeScript",
-                "Docker",
-                "CI/CD (Bamboo/GHA)",
-                "TanStack"
+                "TanStack",
+                "Tailwind CSS"
             ]
-        }
-    },
-    "gear": {
-        "title": "Gear & Tools",
-        "subtitle": "The tools I use to build and test high-quality software",
-        "hardware": "Hardware",
-        "software": "Software",
-        "productivity": "Productivity",
-        "items": {
-            "macbook": {
-                "name": "MacBook Pro M3 Max",
-                "desc": "My daily driver for everything."
-            },
-            "keyboard": {
-                "name": "Keychron Q1 Pro",
-                "desc": "Mechanical keyboard because sound matters."
-            },
-            "monitor": {
-                "name": "Dell UltraSharp 27\"",
-                "desc": "4K clarity for pixel-perfect testing."
-            },
-            "vscode": {
-                "name": "Visual Studio Code",
-                "desc": "With the GitHub Dark theme."
-            },
-            "arc": {
-                "name": "Arc Browser",
-                "desc": "The browser for the modern web."
-            },
-            "ghostty": {
-                "name": "Ghostty",
-                "desc": "Fast, feature-rich terminal."
-            },
-            "notion": {
-                "name": "Notion",
-                "desc": "For organizing my life and docs."
-            },
-            "linear": {
-                "name": "Linear",
-                "desc": "Issue tracking done right."
-            },
-            "raycast": {
-                "name": "Raycast",
-                "desc": "Spotlight on steroids."
-            }
+        },
+        "devops": {
+            "title": "DevOps & Observability",
+            "items": [
+                "Docker",
+                "CI (Bamboo)",
+                "Grafana",
+                "Datadog",
+                "Kibana"
+            ]
         }
     },
     "contact": {

@@ -24,7 +24,7 @@ export interface Achievement {
 }
 
 export interface AchievementCriteria {
-  type: 'count' | 'streak' | 'xp' | 'level' | 'special';
+  type: 'count' | 'streak' | 'xp' | 'level' | 'special' | 'daily';
   target: number;
   challengeType?: string;
 }
@@ -40,6 +40,7 @@ export interface UserStats {
   tutorialsCompleted: number;
   perfectScores: number;
   bugReportsFiled: number;
+  maxDailyChallenges: number;
 }
 
 export interface AwardedAchievement {
@@ -92,14 +93,14 @@ export const ACHIEVEMENTS: Achievement[] = [
     criteria: { type: 'count', target: 50 },
   },
   {
-    id: 'challenge-88',
-    key: 'challenge-88',
-    name: 'Completionist',
-    description: 'Complete all 88 challenges',
+    id: 'challenge-100',
+    key: 'challenge-100',
+    name: 'Centurion',
+    description: 'Complete 100 challenges',
     icon: '👑',
     category: 'CHALLENGES',
     xpReward: 1000,
-    criteria: { type: 'count', target: 88 },
+    criteria: { type: 'count', target: 100 },
   },
 
   // Streak Milestones
@@ -196,46 +197,46 @@ export const ACHIEVEMENTS: Achievement[] = [
     criteria: { type: 'xp', target: 5000 },
   },
 
-  // Tier Masters (aligned with seed)
+  // Daily Grind Achievements
   {
-    id: 'tier-basic-master',
-    key: 'tier-basic-master',
-    name: 'Selector Specialist',
-    description: 'Complete all Basic tier challenges',
-    icon: '🎨',
+    id: 'daily-5',
+    key: 'daily-5',
+    name: 'Warming Up',
+    description: 'Complete 5 challenges in one day',
+    icon: '☀️',
     category: 'CHALLENGES',
-    xpReward: 150,
-    criteria: { type: 'count', target: 15, challengeType: 'CSS_SELECTOR' },
+    xpReward: 100,
+    criteria: { type: 'daily', target: 5 },
   },
   {
-    id: 'tier-beginner-master',
-    key: 'tier-beginner-master',
-    name: 'JavaScript Hero',
-    description: 'Complete all Beginner tier challenges',
-    icon: '💛',
+    id: 'daily-10',
+    key: 'daily-10',
+    name: 'On a Roll',
+    description: 'Complete 10 challenges in one day',
+    icon: '🔥',
     category: 'CHALLENGES',
     xpReward: 200,
-    criteria: { type: 'count', target: 23, challengeType: 'JAVASCRIPT' },
+    criteria: { type: 'daily', target: 10 },
   },
   {
-    id: 'tier-intermediate-master',
-    key: 'tier-intermediate-master',
-    name: 'Playwright Pro',
-    description: 'Complete all Intermediate tier challenges',
-    icon: '🎭',
-    category: 'CHALLENGES',
-    xpReward: 300,
-    criteria: { type: 'count', target: 32, challengeType: 'PLAYWRIGHT' },
-  },
-  {
-    id: 'tier-expert-master',
-    key: 'tier-expert-master',
-    name: 'Automation Expert',
-    description: 'Complete all Expert tier challenges',
-    icon: '🚀',
+    id: 'daily-15',
+    key: 'daily-15',
+    name: 'Unstoppable',
+    description: 'Complete 15 challenges in one day',
+    icon: '⚡',
     category: 'CHALLENGES',
     xpReward: 400,
-    criteria: { type: 'count', target: 18, challengeType: 'PLAYWRIGHT' },
+    criteria: { type: 'daily', target: 15 },
+  },
+  {
+    id: 'daily-20',
+    key: 'daily-20',
+    name: 'Marathon Runner',
+    description: 'Complete 20 challenges in one day',
+    icon: '🏃',
+    category: 'CHALLENGES',
+    xpReward: 600,
+    criteria: { type: 'daily', target: 20 },
   },
 
   // Tutorials
@@ -312,6 +313,10 @@ export function checkAchievements(
           earned = stats.perfectScores >= criteria.target;
         }
         break;
+
+      case 'daily':
+        earned = stats.maxDailyChallenges >= criteria.target;
+        break;
     }
 
     if (earned) {
@@ -377,6 +382,10 @@ export function getAchievementProgress(
       if (achievement.id === 'perfectionist') {
         current = stats.perfectScores;
       }
+      break;
+
+    case 'daily':
+      current = stats.maxDailyChallenges;
       break;
   }
 

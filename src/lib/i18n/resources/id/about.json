@@ -1,23 +1,58 @@
 {
     "hero": {
-        "title": "Halo, saya <1>Ekki</1>",
+        "title": "Halo, saya <strong>Ekki</strong>",
         "subtitle": "Senior Software Engineer (QA)",
-        "description": "Saya adalah Senior QA Engineer di <strong>Ninja Van</strong> dengan 4+ tahun pengalaman membangun framework otomasi untuk web, mobile, dan API. Saya percaya pada prinsip <strong>\"Tooling over Manual Labor\"</strong>—membangun sistem kustom yang memberdayakan tim untuk rilis dengan percaya diri sambil mencegah masalah kritis di production.",
+        "description": "Saya adalah Senior QA Engineer di <strong>Ninja Van</strong> dengan 4+ tahun pengalaman membangun framework otomasi untuk web, mobile, dan API. Saya percaya pada prinsip <strong>\"Tooling over Manual Labor\"</strong> - membangun sistem kustom yang memberdayakan tim untuk rilis dengan percaya diri sambil mencegah masalah kritis di production.",
         "connect": "Koneksi di LinkedIn",
-        "github": "Profil GitHub",
-        "resume": "Resume"
+        "github": "Profil GitHub"
     },
     "philosophy": {
         "title": "Engineering Quality",
         "intro": "Kualitas bukan sekadar checklist. Ini tentang <strong>Shift-Left</strong> dan mengambil kepemilikan atas production.",
         "listIntro": "Saya membangun TestingWithEkki untuk menunjukkan ketelitian engineering yang sama yang saya terapkan di tempat kerja:",
         "list": {
-            "auth": "<strong>Arsitektur Skalabel</strong>: Otentikasi nyata dan manajemen sesi, bukan sekadar situs statis.",
-            "code": "<strong>Interactive Tooling</strong>: Lingkungan sandbox yang mirip dengan dev tools kustom yang saya buat untuk tim internal.",
-            "gamification": "<strong>User Engagement</strong>: Mekanisme gamifikasi untuk membuat belajar otomasi lebih menarik.",
-            "i18n": "<strong>Kesiapan Global</strong>: Dukungan internasionalisasi penuh."
+            "auth": "<strong>Tooling over Toil</strong>: Mengotomatiskan tugas berulang agar tester bisa fokus pada eksplorasi dan strategi.",
+            "code": "<strong>Shift Left</strong>: Menemukan masalah saat pengembangan, bukan setelah deployment.",
+            "adaptability": "<strong>Ketangkasan Teknis</strong>: Beradaptasi dengan mulus antar konteks - Java, Go, Python - sesuai kebutuhan tim dan bisnis.",
+            "reliability": "<strong>Force Multiplier</strong>: Mengisi kekosongan tim saat kritis untuk memecahkan masalah otomasi kompleks dan menjaga pipeline tetap berjalan."
         },
         "conclusion": "Kualitas adalah disiplin engineering. Saya membangun alat dan framework yang menegakkan keandalan. Entah itu backend Go atau platform React ini, saya menulis kode untuk memecahkan masalah kualitas yang nyata."
+    },
+    "milestones": {
+        "title": "Perjalanan Saya",
+        "subtitle": "Momen penting dari perjalanan engineering saya",
+        "items": [
+            {
+                "year": "2026",
+                "title": "TestingWithEkki",
+                "description": "Mulai membangun platform ini untuk berbagi pengetahuan dan menjembatani manual testing dengan engineering. Taman bermain untuk teknologi web modern dan pola otomasi berkualitas tinggi."
+            },
+            {
+                "year": "2025",
+                "title": "AI & Efisiensi Operasional",
+                "description": "Bersama tim yang terdiri dari tiga orang, membangun framework testing AI pertama untuk klasifikasi intent, mengotomatiskan 50%+ support Tier 1. Memvalidasi fitur untuk inisiatif optimasi strategis yang meningkatkan efisiensi operasional dan menghemat lebih dari $60.000 per bulan."
+            },
+            {
+                "year": "2024",
+                "title": "Senior Engineer & Mentor",
+                "description": "Dipromosikan menjadi Senior QA. Mengidentifikasi kendala internal tim dan merekayasa solusi kustom: ekstensi Chrome untuk payload decoding dan alat validasi konfigurasi yang meningkatkan akurasi hingga 60%, mencegah kegagalan kritis."
+            },
+            {
+                "year": "2023",
+                "title": "Shift-Left Integration",
+                "description": "Mengembangkan framework testing integrasi pertama menggunakan Go, memungkinkan tim untuk menerapkan shift-left testing dan mempercepat deteksi defect hingga 80%."
+            },
+            {
+                "year": "2022",
+                "title": "Stabilitas Framework",
+                "description": "Membangun framework otomasi tangguh dengan tingkat error regresi <1%. Menegakkan quality gates di CI/CD, menghilangkan kegagalan build yang berulang."
+            },
+            {
+                "year": "2021",
+                "title": "Backend Intern",
+                "description": "Bergabung dengan Ninja Van sebagai Backend Engineer Intern. Membangun RESTful API yang aman dan layanan pembersihan data sebelum beralih spesialisasi ke Quality Engineering."
+            }
+        ]
     },
     "expertise": {
         "title": "Keahlian Teknis",
@@ -25,77 +60,41 @@
         "automation": {
             "title": "Test Automation",
             "items": [
-                "Playwright",
-                "Appium",
                 "Selenium",
-                "DeepEval (LLM)",
-                "Rest Assured"
+                "Rest Assured",
+                "DeepEval",
+                "Playwright",
+                "Appium Flutter"
             ]
         },
         "backend": {
-            "title": "Backend & Languages",
+            "title": "Languages & Ecosystem",
             "items": [
-                "Go (Golang)",
                 "Java",
-                "Python",
-                "PostgreSQL",
-                "Bun"
+                "SQL",
+                "TypeScript",
+                "Go",
+                "Python"
             ]
         },
-        "engineering": {
-            "title": "Full-Stack & DevOps",
+        "strategy": {
+            "title": "Strategi & Metodologi",
             "items": [
-                "React 19",
-                "TypeScript",
-                "Docker",
-                "CI/CD (Bamboo/GHA)",
-                "TanStack"
+                "Shift-Left Testing",
+                "Perencanaan Tes",
+                "Analisis Risiko",
+                "Agile / Scrum"
             ]
-        }
-    },
-    "gear": {
-        "title": "Gear & Tools",
-        "subtitle": "Alat yang saya gunakan untuk membangun software berkualitas",
-        "hardware": "Hardware",
-        "software": "Software",
-        "productivity": "Produktivitas",
-        "items": {
-            "macbook": {
-                "name": "MacBook Pro M3 Max",
-                "desc": "Daily driver untuk segalanya."
-            },
-            "keyboard": {
-                "name": "Keychron Q1 Pro",
-                "desc": "Mechanical keyboard karena suara itu penting."
-            },
-            "monitor": {
-                "name": "Dell UltraSharp 27\"",
-                "desc": "Kejernihan 4K untuk testing pixel-perfect."
-            },
-            "vscode": {
-                "name": "Visual Studio Code",
-                "desc": "Dengan tema GitHub Dark."
-            },
-            "arc": {
-                "name": "Arc Browser",
-                "desc": "Browser untuk web modern."
-            },
-            "ghostty": {
-                "name": "Ghostty",
-                "desc": "Terminal cepat dan kaya fitur."
-            },
-            "notion": {
-                "name": "Notion",
-                "desc": "Untuk mengatur hidup dan docs."
-            },
-            "linear": {
-                "name": "Linear",
-                "desc": "Issue tracking yang benar."
-            },
-            "raycast": {
-                "name": "Raycast",
-                "desc": "Spotlight on steroids."
-            }
+        },
+        "devops": {
+            "title": "DevOps & Observability",
+            "items": [
+                "Docker",
+                "CI (Bamboo)",
+                "Grafana",
+                "Datadog",
+                "Kibana"
+            ]
         }
     },
     "contact": {

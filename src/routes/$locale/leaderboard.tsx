@@ -144,7 +144,7 @@ function LeaderboardPage() {
               <>
                 {/* Top 3 Podium - Compact & Floating */}
                 {TopThree.length > 0 && (
-                  <div className="relative pt-10 pb-4 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-300">
+                  <div className="relative pt-10 pb-4">
                     {/* Glow effect for rank 1 */}
                     <div className="absolute left-1/2 top-4 -translate-x-1/2 w-64 h-64 bg-accent/20 blur-[80px] rounded-full -z-10" />
 
