@@ -1036,8 +1036,8 @@ export function ChallengePlayground({
             </Link>
           )}
 
-          {/* AI Hint Button */}
-          {!challenge.isCompleted && (
+          {/* AI Hint Button (Temporarily Disabled) */}
+          {false && !challenge.isCompleted && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
