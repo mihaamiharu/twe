@@ -1167,6 +1167,9 @@ export function ChallengePlayground({
                 {t('challenges:hints.penalty')}
               </span>
             </div>
+            <p className="text-[10px] text-muted-foreground italic pt-2 border-t border-border/50">
+              {t('challenges:hints.freeTierNote')}
+            </p>
           </DialogDescription>
           <DialogFooter className="mt-4 sm:justify-end gap-2">
             <Button
