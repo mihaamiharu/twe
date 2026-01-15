@@ -78,14 +78,23 @@
                 "Bun"
             ]
         },
-        "engineering": {
-            "title": "Full-Stack & DevOps",
+        "frontend": {
+            "title": "Modern Frontend",
             "items": [
                 "React 19",
                 "TypeScript",
+                "TanStack",
+                "Tailwind CSS"
+            ]
+        },
+        "devops": {
+            "title": "DevOps & Observability",
+            "items": [
                 "Docker",
                 "CI/CD (Bamboo/GHA)",
-                "TanStack"
+                "Grafana",
+                "Datadog",
+                "Kibana"
             ]
         }
     },
