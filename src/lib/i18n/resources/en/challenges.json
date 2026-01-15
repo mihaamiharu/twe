@@ -78,6 +78,7 @@
     "warning": "Using a hint will reduce your XP reward by 50% when you complete this challenge.",
     "confirm": "Use Hint Anyway",
     "cancel": "Cancel",
+    "loginRequired": "Login required for AI hints",
     "title": "AI Hint",
     "penalty": "-50% XP"
   },

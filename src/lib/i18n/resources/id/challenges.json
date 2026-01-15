@@ -74,6 +74,7 @@
     "warning": "Menggunakan petunjuk akan mengurangi hadiah XP kamu sebesar 50% saat menyelesaikan tantangan ini.",
     "confirm": "Tetap Gunakan Petunjuk",
     "cancel": "Batal",
+    "loginRequired": "Login diperlukan untuk petunjuk AI",
     "title": "Petunjuk AI",
     "penalty": "-50% XP"
   },
