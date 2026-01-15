@@ -39,6 +39,9 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
     const systemPrompt = getSystemPrompt(challengeType, locale);
     const userPrompt = buildUserPrompt(instructions, htmlContent, userAttempt, locale);
 
+    console.log('[AI Debug] System Prompt:', systemPrompt);
+    console.log('[AI Debug] User Prompt:', userPrompt);
+
     try {
         const model = client.getGenerativeModel({
             model: 'gemini-2.5-flash-lite',
