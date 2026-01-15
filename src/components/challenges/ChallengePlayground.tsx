@@ -58,6 +58,7 @@ import {
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { CodeEditor } from './CodeEditor';
+import { ChallengeSkeleton } from './ChallengeSkeleton';
 import { WebComponentPreview } from './WebComponentPreview';
 import { TestResults, type TestResult } from './TestResults';
 import { ConsoleOutput, type LogEntry } from './ConsoleOutput';
@@ -255,6 +256,11 @@ export function ChallengePlayground({
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Layout readiness state (prevent layout shifts)
+  const isCodeChallenge =
+    challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
+  const [isLayoutReady, setIsLayoutReady] = useState(!isCodeChallenge);
+
   // Reset state when challenge changes
   useEffect(() => {
     setCode(challenge.starterCode);
@@ -267,6 +273,10 @@ export function ChallengePlayground({
     setPreviewValidation(null);
     setHintContent(null);
     setHintUsed(initialHintUsed);
+
+    // Reset layout ready state for new code challenges
+    const newIsCodeChallenge = challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
+    setIsLayoutReady(!newIsCodeChallenge);
   }, [challenge.id, challenge.starterCode, challenge.type, initialHintUsed]);
 
   const [testResults, setTestResults] = useState<TestResult[]>([]);
@@ -280,8 +290,7 @@ export function ChallengePlayground({
 
   const [activeTab, setActiveTab] = useState('instructions');
 
-  const isCodeChallenge =
-    challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
+
   const isSelectorChallenge =
     challenge.type === 'CSS_SELECTOR' || challenge.type === 'XPATH_SELECTOR';
 
@@ -759,6 +768,7 @@ export function ChallengePlayground({
                   language="javascript"
                   onChange={setCode}
                   onRun={() => void handleRunCode()}
+                  onReady={() => setIsLayoutReady(true)}
                   storageKey={
                     userId
                       ? `challenge-${challenge.id}-${userId}`
@@ -1236,6 +1246,7 @@ export function ChallengePlayground({
                       components={{
                         code: ({ className, children, ...props }) => {
                           const match = /language-(\w+)/.exec(className || '');
+                          // eslint-disable-next-line @typescript-eslint/no-base-to-string
                           const content = String(children).replace(/\n$/, '');
                           const isInline = !match && !content.includes('\n');
                           return (
@@ -1267,6 +1278,30 @@ export function ChallengePlayground({
           </Card>
         </div>
       )}
+
+      {/* 
+        Loading Overlay:
+        Prevent layout shift by showing the skeleton until the heavy CodeEditor is fully mounted.
+        We overlap them absolutely, then fade out the skeleton.
+      */}
+      {!isLayoutReady && (
+        <div className="absolute inset-0 z-50 bg-background flex flex-col">
+          {/* Force skeleton to take full height */}
+          <div className="flex-1">
+            <ChallengeSkeleton />
+          </div>
+        </div>
+      )}
+
+      {/* Main Content: Hidden/Transparent until ready */}
+      <div
+        className={cn(
+          "w-full h-full transition-opacity duration-300",
+          isLayoutReady ? "opacity-100" : "opacity-0 invisible"
+        )}
+      >
+        {isMobile ? mobileLayout : desktopLayout}
+      </div>
     </div>
   );
 }

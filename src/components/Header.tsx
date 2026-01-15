@@ -26,7 +26,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useSession, signOut } from '@/lib/auth.client';
+import { signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
