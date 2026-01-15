@@ -96,12 +96,7 @@ function AboutPage() {
                                 {t('about:hero.github')}
                             </a>
                         </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full">
-                            <a href="/ekki-resume.pdf" target="_blank" rel="noopener noreferrer">
-                                <FileText className="mr-2 h-4 w-4" />
-                                {t('about:hero.resume')}
-                            </a>
-                        </Button>
+
                     </div>
                 </section>
 
