@@ -1,28 +1,85 @@
 {
   "privacy": {
     "title": "Kebijakan Privasi",
-    "placeholder": "Kebijakan Privasi kami akan segera hadir. Kami menghargai privasi kamu dan sedang mengerjakan detailnya."
-  },
-  "terms": {
-    "title": "Ketentuan Layanan",
-    "lastUpdated": "Terakhir diperbarui",
+    "lastUpdated": "Terakhir diperbarui: Januari 2026",
+    "intro": "TestingWithEkki (\"kami\") menghargai privasi kamu. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi kamu.",
     "sections": {
-      "acceptance": {
-        "title": "1. Penerimaan Ketentuan",
-        "content": "Dengan mengakses atau menggunakan TestingWithEkki, kamu setuju untuk terikat oleh Ketentuan Layanan ini."
+      "noSelling": {
+        "title": "Kami Tidak Menjual Data Kamu",
+        "content": "Kami tidak menjual atau membagikan informasi pribadi kamu kepada pengiklan atau pihak ketiga. Titik."
       },
-      "description": {
-        "title": "2. Deskripsi Layanan",
-        "content": "TestingWithEkki berfungsi sebagai platform edukasi untuk mempelajari otomasi pengujian perangkat lunak melalui tantangan dan tutorial interaktif."
+      "whatWeCollect": {
+        "title": "Apa yang Kami Kumpulkan",
+        "items": [
+          "**Informasi Akun**: Alamat email, username, dan foto profil (jika mendaftar dengan Google/GitHub).",
+          "**Progres Belajar**: Tantangan dan tutorial yang kamu selesaikan, XP, dan pencapaian.",
+          "**Data Teknis**: Data penggunaan dasar seperti kunjungan halaman via Google Analytics untuk meningkatkan platform."
+        ]
       },
-      "accounts": {
-        "title": "3. Akun Pengguna",
-        "content": "Kamu bertanggung jawab untuk menjaga kerahasiaan kredensial akun kamu dan untuk semua aktivitas yang terjadi di bawah akun kamu."
+      "howWeUse": {
+        "title": "Bagaimana Kami Menggunakan Data",
+        "items": [
+          "Untuk menyediakan pengalaman belajar kamu (menyimpan progres, menampilkan papan peringkat).",
+          "Untuk mengirim email penting (verifikasi, reset password).",
+          "Untuk meningkatkan platform berdasarkan pola penggunaan agregat."
+        ]
       },
-      "conduct": {
-        "title": "4. Kode Etik",
-        "content": "Pengguna setuju untuk tidak menipu dalam tantangan atau melecehkan pengguna lain di papan peringkat/fitur komunitas."
+      "yourControl": {
+        "title": "Kontrol Kamu",
+        "items": [
+          "Kamu bisa memperbarui atau menghapus profil kamu kapan saja.",
+          "Kamu bisa meminta ekspor atau penghapusan data lengkap dengan menghubungi kami.",
+          "Email kamu tidak pernah ditampilkan secara publik."
+        ]
+      },
+      "thirdParties": {
+        "title": "Layanan Pihak Ketiga",
+        "content": "Kami menggunakan layanan pihak ketiga terpercaya: Google OAuth (login), Google Analytics (penggunaan anonim), dan Supabase (database). Layanan ini memiliki kebijakan privasi masing-masing."
+      },
+      "security": {
+        "title": "Keamanan Data",
+        "content": "Kami menggunakan standar keamanan industri termasuk enkripsi HTTPS, hashing password yang aman, dan pembaruan keamanan rutin."
+      },
+      "children": {
+        "title": "Privasi Anak-Anak",
+        "content": "Platform ini ditujukan untuk pengguna berusia 13 tahun ke atas. Kami tidak dengan sengaja mengumpulkan data dari anak di bawah 13 tahun."
+      },
+      "changes": {
+        "title": "Perubahan Kebijakan",
+        "content": "Kami mungkin memperbarui kebijakan ini sesekali. Perubahan signifikan akan diumumkan di platform."
+      },
+      "contact": {
+        "title": "Hubungi Kami",
+        "content": "Pertanyaan tentang privasi? Email kami di ekki@testingwithekki.com"
       }
+    }
+  },
+  "contact": {
+    "title": "Kontak",
+    "description": "Punya pertanyaan, masukan, atau ingin berkolaborasi? Hubungi kami!",
+    "email": "ekki@testingwithekki.com",
+    "linkedin": "https://linkedin.com/in/ekkisyam",
+    "github": "https://github.com/mihaamiharu",
+    "form": {
+      "name": "Nama",
+      "email": "Email",
+      "message": "Pesan",
+      "submit": "Kirim Pesan",
+      "sending": "Mengirim...",
+      "successTitle": "Pesan Terkirim!",
+      "successMessage": "Terima kasih telah menghubungi! Saya akan segera membalasnya.",
+      "errorTitle": "Error",
+      "errorMessage": "Terjadi kesalahan. Silakan coba lagi nanti."
+    },
+    "booking": {
+      "title": "Booking Sesi 1-1",
+      "description": "Lebih suka ngobrol langsung? Jadwalkan video call untuk diskusi strategi testing, karir, atau review kode.",
+      "cta": "Jadwalkan di Google Calendar"
+    },
+    "hire": {
+      "title": "Terbuka untuk Peluang",
+      "description": "Mencari Senior QA Engineer atau Test Architect? Saya membantu tim membangun software yang handal dan berkualitas.",
+      "cta": "Lihat Resume Saya"
     }
   }
 }

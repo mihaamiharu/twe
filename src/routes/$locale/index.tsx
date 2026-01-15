@@ -178,18 +178,18 @@ function HomePage() {
       slug: 'css-selector-101-id-class',
     },
     {
+      title: 'Variables & Types',
+      difficulty: 'EASY',
+      type: 'JavaScript',
+      xp: 15,
+      slug: 'js-variables-types',
+    },
+    {
       title: 'Click Actions',
       difficulty: 'MEDIUM',
       type: 'Playwright',
       xp: 45,
       slug: 'pw-click-actions',
-    },
-    {
-      title: 'Page Object Model',
-      difficulty: 'HARD',
-      type: 'Expert',
-      xp: 80,
-      slug: 'pw-first-page-object',
     },
   ];
 
