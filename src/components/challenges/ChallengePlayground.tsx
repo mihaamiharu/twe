@@ -978,6 +978,12 @@ export function ChallengePlayground({
                 {challenge.xp} XP
               </span>
             </div>
+            {challenge.type === 'PLAYWRIGHT' && (
+              <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
+                <span className="opacity-70">ℹ️</span>
+                {t('challenges:playground.shimNote')}
+              </p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-3">
