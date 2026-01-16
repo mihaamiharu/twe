@@ -147,6 +147,7 @@ export const challenges = pgTable('challenges', {
   instructions: jsonb('instructions').notNull(), // Detailed instructions
   htmlContent: text('html_content'), // For selector challenges
   starterCode: text('starter_code'), // For JavaScript/Playwright challenges
+  files: jsonb('files').$type<Record<string, string>>(), // VFS: multi-page content for E2E challenges
 
   // Relations
   tutorialId: uuid('tutorial_id').references(() => tutorials.id, {

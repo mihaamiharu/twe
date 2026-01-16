@@ -215,6 +215,12 @@ export class MockedPlaywrightPage {
   private currentUrl: string = 'about:blank';
   private _context: BrowserContext;
 
+  // VFS (Virtual File System) for multi-page E2E support
+  private vfs: Record<string, string> | null = null;
+  private currentPath: string = '/index.html';
+  private onNavigate?: (path: string) => void;
+  private cssContent?: string;
+
   constructor(iframeDocument: Document, options?: { timeout?: number }) {
     this.targetDocument = iframeDocument;
     this.defaultTimeout = options?.timeout || 2500;
@@ -222,6 +228,21 @@ export class MockedPlaywrightPage {
     this._context = this._createBrowserContext();
     this.keyboard = this._createKeyboard();
     this.mouse = this._createMouse();
+  }
+
+  /**
+   * Set up Virtual File System for multi-page navigation
+   */
+  setVFS(
+    files: Record<string, string>,
+    options?: {
+      onNavigate?: (path: string) => void;
+      cssContent?: string;
+    },
+  ): void {
+    this.vfs = files;
+    this.onNavigate = options?.onNavigate;
+    this.cssContent = options?.cssContent;
   }
 
   // ============================================
@@ -555,11 +576,158 @@ export class MockedPlaywrightPage {
   }
 
   async goto(url: string): Promise<void> {
-    // Mock navigation
     logger.debug(`Navigating to ${url}`);
+
+    // Normalize URL to path
+    let path = url;
+    if (url.startsWith('http')) {
+      try {
+        path = new URL(url).pathname;
+      } catch {
+        // If URL parsing fails, use as-is
+      }
+    }
+    if (!path.startsWith('/')) {
+      path = '/' + path;
+    }
+
+    // VFS Mode: Replace iframe content with virtual file
+    if (this.vfs) {
+      const content = this.vfs[path];
+      if (!content) {
+        throw new Error(`Page not found in VFS: ${path}. Available pages: ${Object.keys(this.vfs).join(', ')}`);
+      }
+
+      // Wrap content with necessary HTML structure
+      const wrappedHtml = this._wrapVfsContent(content);
+
+      // Update iframe content
+      this.targetDocument.open();
+      this.targetDocument.write(wrappedHtml);
+      this.targetDocument.close();
+
+      // Re-execute scripts in new content
+      this._executeScripts();
+
+      this.currentPath = path;
+      this.currentUrl = path;
+
+      // Notify parent about navigation for URL bar update
+      this.onNavigate?.(path);
+
+      await this.delay(50);
+      return;
+    }
+
+    // Legacy mode (no VFS) - just update URL tracking
     this.currentUrl = url;
     await this.delay(50);
-    return Promise.resolve();
+  }
+
+  /**
+   * Wrap VFS content with full HTML structure including styles and polyfills
+   */
+  private _wrapVfsContent(content: string): string {
+    return `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <base href="http://localhost/" />
+        <style>
+          * { box-sizing: border-box; }
+          body { 
+            font-family: system-ui, sans-serif; 
+            padding: 16px;
+            margin: 0;
+          }
+          ${this.cssContent || ''}
+        </style>
+        <script data-internal="true">
+          // Polyfill fetch to handle mock routes
+          const originalFetch = window.fetch;
+          window.fetch = function(input, init) {
+            let url = input;
+            if (typeof input === 'string') {
+              if (input.startsWith('/')) {
+                url = 'http://localhost' + input;
+              }
+            }
+            if (window.__MOCK_ROUTES__) {
+              for (const route of window.__MOCK_ROUTES__) {
+                let isMatch = false;
+                if (typeof route.matcher === 'string') {
+                  isMatch = url.includes(route.matcher);
+                } else if (route.matcher instanceof RegExp) {
+                  isMatch = route.matcher.test(url);
+                }
+                if (isMatch) {
+                  return route.handler({ url, method: init?.method || 'GET' }).then(r => {
+                    if (r?.type === 'fulfill') {
+                      return Promise.resolve({
+                        ok: (r.response.status || 200) >= 200 && (r.response.status || 200) < 300,
+                        status: r.response.status || 200,
+                        json: () => Promise.resolve(r.response.json || {}),
+                        text: () => Promise.resolve(r.response.body || '')
+                      });
+                    }
+                    return Promise.reject(new Error('Route not fulfilled'));
+                  });
+                }
+              }
+            }
+            return Promise.resolve({ ok: true, status: 404, json: () => Promise.resolve({}) });
+          };
+
+          // Handle navigation for VFS
+          window.addEventListener('click', function(e) {
+            const link = e.target.closest('a[href]');
+            if (link && !link.getAttribute('target')) {
+              const href = link.getAttribute('href');
+              if (href && (href.startsWith('/') || href.endsWith('.html'))) {
+                e.preventDefault();
+                // VFS navigation will be handled by the shim via location change detection
+                window.__VFS_NAVIGATE__ && window.__VFS_NAVIGATE__(href);
+              }
+            }
+          }, true);
+        </script>
+      </head>
+      <body>${content}</body>
+      </html>
+    `;
+  }
+
+  /**
+   * Re-execute scripts after VFS page navigation
+   */
+  private _executeScripts(): void {
+    const scripts = Array.from(
+      this.targetDocument.querySelectorAll('script:not([data-internal="true"])'),
+    );
+
+    scripts.forEach((script) => {
+      if (script.textContent) {
+        try {
+          const win = this.targetDocument.defaultView as any;
+          if (!win) return;
+
+          // eslint-disable-next-line @typescript-eslint/no-implied-eval
+          const fn = new Function('window', 'document', `
+            return (function(window, document) {
+              try {
+                ${script.textContent}
+              } catch(err) {
+                console.error('Error in VFS script:', err);
+              }
+            }).call(window, window, document);
+          `);
+          fn(win, this.targetDocument);
+        } catch (e) {
+          console.error('Failed to execute VFS script:', e);
+        }
+      }
+    });
   }
 
   url(): string {

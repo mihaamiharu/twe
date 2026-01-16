@@ -21,6 +21,8 @@ export interface ExecuteOptions {
   timeout?: number;
   testCases?: TestCase[];
   cssContent?: string;
+  files?: Record<string, string>; // VFS: multi-page content for E2E challenges
+  onNavigate?: (path: string) => void; // Callback for URL bar updates
 }
 
 export interface TestCase {
@@ -373,6 +375,14 @@ export async function executePlaywrightCode(
 
           // Create mocked page object
           const page = new MockedPlaywrightPage(iframeDoc);
+
+          // Set up VFS for multi-page E2E challenges
+          if (options?.files) {
+            page.setVFS(options.files, {
+              onNavigate: options.onNavigate,
+              cssContent: options.cssContent,
+            });
+          }
 
           // Create an intercepted console object that logs to our logs array
           let logCounter = 0;

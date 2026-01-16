@@ -103,6 +103,7 @@ export interface ChallengeDefinition {
   description: LocalizedString;
   instructions: LocalizedString;
   htmlContent?: string;
+  files?: Record<string, string>; // VFS: multi-page content for E2E
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
@@ -133,6 +134,7 @@ export interface Challenge {
   description: string;
   instructions: string;
   htmlContent?: string;
+  files?: Record<string, string>; // VFS: multi-page content for E2E
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;

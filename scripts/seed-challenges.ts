@@ -49,6 +49,7 @@ async function seedChallenges() {
             order: challenge.order,
             instructions: challenge.instructions?.en || challenge.instructions,
             htmlContent: challenge.htmlContent || null,
+            files: challenge.files || null, // VFS support for multi-page E2E
             starterCode: challenge.starterCode || null,
             category: challenge.category || null,
             tags: challenge.tags || [],
