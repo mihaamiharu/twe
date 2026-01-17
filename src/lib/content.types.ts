@@ -89,6 +89,18 @@ export interface TestCaseDefinition {
 }
 
 /**
+ * Expected state rule for DOM validation after code execution
+ */
+export interface ExpectedStateRule {
+  selector: string;
+  visible?: boolean;
+  hidden?: boolean;
+  containsText?: string;
+  hasAttribute?: { name: string; value?: string | RegExp };
+  count?: number;
+}
+
+/**
  * Challenge definition from tier JSON files
  */
 export interface ChallengeDefinition {
@@ -109,6 +121,7 @@ export interface ChallengeDefinition {
   solution: string;
   tags?: string[];
   status?: ContentStatus;
+  expectedState?: ExpectedStateRule[]; // DOM state validation rules
 }
 
 /**
@@ -139,6 +152,7 @@ export interface Challenge {
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
+  expectedState?: ExpectedStateRule[]; // DOM state validation rules
   // Dynamic fields (from DB)
   completionCount?: number;
   isCompleted?: boolean;

@@ -609,6 +609,11 @@ export class MockedPlaywrightPage {
       // Re-execute scripts in new content
       this._executeScripts();
 
+      // Restore window.page reference for VFS navigation shim
+      if (this.targetDocument.defaultView) {
+        (this.targetDocument.defaultView as any).page = this;
+      }
+
       this.currentPath = path;
       this.currentUrl = path;
 
@@ -645,7 +650,12 @@ export class MockedPlaywrightPage {
         </style>
         <script data-internal="true">
           // Polyfill fetch to handle mock routes
-          const originalFetch = window.fetch;
+          // Polyfill fetch to handle mock routes
+          // Store original fetch if not already stored
+          if (!window['__tweShimOriginalFetch']) {
+              window['__tweShimOriginalFetch'] = window.fetch;
+          }
+
           window.fetch = function(input, init) {
             let url = input;
             if (typeof input === 'string') {
@@ -679,6 +689,16 @@ export class MockedPlaywrightPage {
             return Promise.resolve({ ok: true, status: 404, json: () => Promise.resolve({}) });
           };
 
+          // Define VFS Navigation Helper
+          window.__VFS_NAVIGATE__ = function(path) {
+            // console.log('[VFS] Navigating to ' + path);
+            if (window.page) {
+                window.page.goto(path).catch(e => console.error('Navigation failed:', e));
+            } else {
+                console.error('window.page not found for VFS navigation');
+            }
+          };
+
           // Handle navigation for VFS
           window.addEventListener('click', function(e) {
             const link = e.target.closest('a[href]');
@@ -689,6 +709,16 @@ export class MockedPlaywrightPage {
                 // VFS navigation will be handled by the shim via location change detection
                 window.__VFS_NAVIGATE__ && window.__VFS_NAVIGATE__(href);
               }
+            }
+          }, true);
+
+          // Handle form submission for VFS
+          window.addEventListener('submit', function(e) {
+            const form = e.target;
+            const action = form.getAttribute('action');
+            if (action && (action.startsWith('/') || action.endsWith('.html'))) {
+              e.preventDefault();
+              window.__VFS_NAVIGATE__ && window.__VFS_NAVIGATE__(action);
             }
           }, true);
         </script>
