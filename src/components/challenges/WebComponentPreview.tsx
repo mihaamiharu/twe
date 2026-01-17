@@ -37,6 +37,7 @@ export interface WebComponentPreviewProps {
   files?: Record<string, string>;
   /** Current VFS path (controlled externally) */
   currentPath?: string;
+  onNavigate?: (path: string) => void;
 }
 
 export function WebComponentPreview({
@@ -48,6 +49,7 @@ export function WebComponentPreview({
   selectorType = 'css',
   onElementClick,
   onValidationChange,
+  onNavigate,
   showControls = true,
   // height prop is reserved for future use
   className,
@@ -167,6 +169,28 @@ export function WebComponentPreview({
                         e.target.classList.remove('twe-hover-highlight');
                         window.parent.postMessage({ type: 'elementHover', path: null }, '*');
                     });
+
+                    // VFS Navigation Interception
+                    document.addEventListener('click', (e) => {
+                        const link = e.target.closest('a[href]');
+                        if (link && !link.getAttribute('target')) {
+                            const href = link.getAttribute('href');
+                            // Check if it looks like a VFS path (starts with / or ends with .html)
+                            if (href && (href.startsWith('/') || href.endsWith('.html'))) {
+                                e.preventDefault();
+                                window.parent.postMessage({ type: 'vfsNavigate', path: href }, '*');
+                            }
+                        }
+                    }, true);
+
+                    document.addEventListener('submit', (e) => {
+                        const form = e.target;
+                        const action = form.getAttribute('action');
+                        if (action && (action.startsWith('/') || action.endsWith('.html'))) {
+                            e.preventDefault();
+                            window.parent.postMessage({ type: 'vfsNavigate', path: action }, '*');
+                        }
+                    }, true);
 
                     function getElementPath(el) {
                         const parts = [];
@@ -343,6 +367,8 @@ export function WebComponentPreview({
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
           matchCount: data.matchCount,
         });
+      } else if (data?.type === 'vfsNavigate') {
+        onNavigate?.(data.path);
       }
     };
 
@@ -410,7 +436,7 @@ export function WebComponentPreview({
             <div className="flex-1 flex items-center bg-background border border-border rounded-md px-3 h-8 shadow-sm relative overflow-hidden">
               <Lock className="h-3 w-3 text-muted-foreground mr-2 shrink-0" />
               <span className="text-xs text-muted-foreground truncate flex-1">
-                {files 
+                {files
                   ? `testwizards.local${currentPath || '/index.html'}`
                   : targetElementId
                     ? `target-website.com/preview#${targetElementId}`
@@ -533,7 +559,7 @@ export function WebComponentPreview({
                                 `}
               className="w-full h-full border-none bg-white"
               title="Challenge Preview"
-              sandbox="allow-same-origin allow-scripts"
+              sandbox="allow-same-origin allow-scripts allow-forms"
             />
           </div>
           {viewMode === 'source' && (

@@ -159,6 +159,13 @@ export interface Challenge {
     input?: unknown;
     expectedOutput?: unknown;
   }[];
+  expectedState?: {
+    selector: string;
+    visible?: boolean;
+    hidden?: boolean;
+    containsText?: string;
+    count?: number;
+  }[];
   category?: string;
   tutorial?: {
     slug: string;
@@ -356,6 +363,7 @@ export function ChallengePlayground({
           cssContent: defaultSelectorStyles,
           files: challenge.files,
           onNavigate: (path) => setCurrentVfsPath(path),
+          expectedState: challenge.expectedState,
         },
       );
 
@@ -749,6 +757,7 @@ export function ChallengePlayground({
                 iframeRef={previewIframeRef}
                 files={challenge.files}
                 currentPath={currentVfsPath}
+                onNavigate={(path) => setCurrentVfsPath(path)}
               />
             </TabsContent>
           )}

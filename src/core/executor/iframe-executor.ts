@@ -6,6 +6,8 @@
  */
 
 import { MockedPlaywrightPage } from './playwright-shim';
+import { logger } from '@/lib/logger';
+import type { ExpectedStateRule } from '@/lib/content.types';
 
 export interface ExecutionResult {
   status: 'PASSED' | 'FAILED' | 'ERROR' | 'TIMEOUT';
@@ -23,6 +25,7 @@ export interface ExecuteOptions {
   cssContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E challenges
   onNavigate?: (path: string) => void; // Callback for URL bar updates
+  expectedState?: ExpectedStateRule[]; // DOM validation rules
 }
 
 export interface TestCase {
@@ -54,6 +57,26 @@ export async function executePlaywrightCode(
   const useExistingIframe = !!options?.existingIframe;
   const logs: Array<{ id: string; type: string; message: string }> = [];
   const strictMode = options?.strictMode !== false; // Default to true for backward compatibility
+
+  // Determine standard log level mapping
+  const getLogType = (level: string) => {
+    if (level === 'error') return 'error';
+    if (level === 'warn') return 'warn';
+    return 'log';
+  };
+
+  // 1. Capture logger.debug() and other calls (e.g. from playwright-shim)
+  // This redirects [Action] click logs from DevTools to the User Console UI
+  let logCounter = 0;
+  logger.setHandler((level, message, args) => {
+    // Basic formatting for args
+    const argsStr = args.length ? ' ' + args.map(String).join(' ') : '';
+    logs.push({
+      id: `log-${Date.now()}-${logCounter++}`,
+      type: getLogType(level),
+      message: `${message}${argsStr}`,
+    });
+  });
 
   // Patch HTML content for specific challenges where happy-dom needs checking
   // e.g. pw-wait-for-response uses relative fetch which fails in happy-dom
@@ -109,58 +132,62 @@ export async function executePlaywrightCode(
     }
   }
 
-  return new Promise((resolve) => {
-    let iframe: HTMLIFrameElement;
+  try {
+    return await new Promise((resolve) => {
+      let iframe: HTMLIFrameElement;
 
-    if (useExistingIframe && options?.existingIframe) {
-      // Use existing iframe - re-inject HTML content
-      iframe = options.existingIframe;
-    } else {
-      // Create isolated iframe (fallback behavior)
-      iframe = document.createElement('iframe');
-      iframe.style.cssText = 'display: none;';
-      iframe.sandbox.add('allow-scripts', 'allow-same-origin');
-      document.body.appendChild(iframe);
-    }
-
-    let timeoutId: any;
-
-    const cleanup = () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      // Only remove if we created it
-      if (!useExistingIframe && iframe.parentNode) {
-        document.body.removeChild(iframe);
+      if (useExistingIframe && options?.existingIframe) {
+        // Use existing iframe - re-inject HTML content
+        iframe = options.existingIframe;
+        if (iframe.sandbox && iframe.sandbox.add) {
+          iframe.sandbox.add('allow-scripts', 'allow-same-origin', 'allow-forms');
+        }
+      } else {
+        // Create isolated iframe (fallback behavior)
+        iframe = document.createElement('iframe');
+        iframe.style.cssText = 'display: none;';
+        iframe.sandbox.add('allow-scripts', 'allow-same-origin', 'allow-forms');
+        document.body.appendChild(iframe);
       }
-    };
 
-    // Timeout handler
-    timeoutId = setTimeout(() => {
-      cleanup();
-      resolve({
-        status: 'TIMEOUT',
-        output: `Process timed out. Please review your logic for potential errors or long-running tasks.`,
-        executionTime: timeout,
-        error: `Process timed out. Please review your logic for potential errors or long-running tasks.`,
-        logs,
-      });
-    }, timeout);
+      let timeoutId: any;
 
-    try {
-      const executeCode = async () => {
-        try {
-          // Inject HTML into iframe
-          const iframeDoc = iframe.contentDocument;
-          if (!iframeDoc) {
-            throw new Error('Could not access iframe document');
-          }
+      const cleanup = () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        // Only remove if we created it
+        if (!useExistingIframe && iframe.parentNode) {
+          document.body.removeChild(iframe);
+        }
+      };
 
-          // Set up the HTML content
-          iframeDoc.open();
+      // Timeout handler
+      timeoutId = setTimeout(() => {
+        cleanup();
+        resolve({
+          status: 'TIMEOUT',
+          output: `Process timed out. Please review your logic for potential errors or long-running tasks.`,
+          executionTime: timeout,
+          error: `Process timed out. Please review your logic for potential errors or long-running tasks.`,
+          logs,
+        });
+      }, timeout);
 
-          // NOTE: Console interception is done AFTER iframeDoc.close() below
-          // to ensure we intercept the final document's console object
+      try {
+        const executeCode = async () => {
+          try {
+            // Inject HTML into iframe
+            const iframeDoc = iframe.contentDocument;
+            if (!iframeDoc) {
+              throw new Error('Could not access iframe document');
+            }
 
-          iframeDoc.write(`
+            // Set up the HTML content
+            iframeDoc.open();
+
+            // NOTE: Console interception is done AFTER iframeDoc.close() below
+            // to ensure we intercept the final document's console object
+
+            iframeDoc.write(`
                         <!DOCTYPE html>
                         <html>
                           <head>
@@ -177,7 +204,9 @@ export async function executePlaywrightCode(
                             </style>
                             <script data-internal="true">
                                 // Polyfill fetch to handle relative URLs and MOCK requests
-                                const originalFetch = window.fetch;
+                                if (!window['__tweExecutorOriginalFetch']) {
+                                    window['__tweExecutorOriginalFetch'] = window.fetch;
+                                }
                                 window.fetch = function(input, init) {
                                     let url = input;
                                     if (typeof input === 'string') {
@@ -252,12 +281,48 @@ export async function executePlaywrightCode(
                                     });
                                 };
 
-                                window.alert = function(message) {
+                                    window.alert = function(message) {
                                     console.log('[Dialog] alert: ' + message);
                                     if (window.__MOCK_DIALOG_HANDLER__) {
                                         window.__MOCK_DIALOG_HANDLER__('alert', message);
                                     }
                                 };
+                                
+                                // VFS Navigation Shim for Initial Render
+                                // (Only active if files/VFS is enabled)
+                                ${options?.files
+                ? `
+                                window.__VFS_NAVIGATE__ = function(path) {
+                                    console.log('[VFS] Navigating to ' + path);
+                                    if (window.page) {
+                                        window.page.goto(path).catch(e => console.error('Navigation failed:', e));
+                                    } else {
+                                        console.error('window.page not found for VFS navigation');
+                                    }
+                                };
+
+                                window.addEventListener('click', function(e) {
+                                    const link = e.target.closest('a[href]');
+                                    if (link && !link.getAttribute('target')) {
+                                        const href = link.getAttribute('href');
+                                        if (href && (href.startsWith('/') || href.endsWith('.html'))) {
+                                            e.preventDefault();
+                                            window.__VFS_NAVIGATE__(href);
+                                        }
+                                    }
+                                }, true);
+
+                                window.addEventListener('submit', function(e) {
+                                    const form = e.target;
+                                    const action = form.getAttribute('action');
+                                    if (action && (action.startsWith('/') || action.endsWith('.html'))) {
+                                        e.preventDefault();
+                                        window.__VFS_NAVIGATE__(action);
+                                    }
+                                }, true);
+                                `
+                : ''
+              }
                             </script>
                           </head>
                           <body>
@@ -265,35 +330,35 @@ export async function executePlaywrightCode(
                           </body>
                         </html>
                     `);
-          iframeDoc.close();
+            iframeDoc.close();
 
-          // Manually execute scripts using scoped execution
-          // Skip internal scripts marked with data-internal="true"
-          const scripts = Array.from(
-            iframeDoc.querySelectorAll('script:not([data-internal="true"])'),
-          );
+            // Manually execute scripts using scoped execution
+            // Skip internal scripts marked with data-internal="true"
+            const scripts = Array.from(
+              iframeDoc.querySelectorAll('script:not([data-internal="true"])'),
+            );
 
-          scripts.forEach((script) => {
-            if (script.textContent) {
-              try {
-                /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
-                const win = iframe.contentWindow as any;
-                const doc = iframe.contentDocument;
-                if (!win || !doc) return;
-                /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
+            scripts.forEach((script) => {
+              if (script.textContent) {
+                try {
+                  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
+                  const win = iframe.contentWindow as any;
+                  const doc = iframe.contentDocument;
+                  if (!win || !doc) return;
+                  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
-                const scriptCode = script.textContent;
+                  const scriptCode = script.textContent;
 
-                // Extract function names and assign them to window
-                const funcMatches = Array.from(
-                  scriptCode.matchAll(/function\s+(\w+)\s*\(/g),
-                );
-                const funcNames: string[] = [];
-                for (const match of funcMatches) {
-                  funcNames.push(match[1]);
-                }
+                  // Extract function names and assign them to window
+                  const funcMatches = Array.from(
+                    scriptCode.matchAll(/function\s+(\w+)\s*\(/g),
+                  );
+                  const funcNames: string[] = [];
+                  for (const match of funcMatches) {
+                    funcNames.push(match[1]);
+                  }
 
-                const code = `
+                  const code = `
                                     return (function(window, document) {
                                         try {
                                             ${scriptCode}
@@ -304,50 +369,50 @@ export async function executePlaywrightCode(
                                     }).call(window, window, document);
                                 `;
 
-                // eslint-disable-next-line @typescript-eslint/no-implied-eval
-                const fn = new Function('window', 'document', code);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                fn(win, doc);
-              } catch (e) {
-                console.error('Failed to execute script shim:', e);
+                  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+                  const fn = new Function('window', 'document', code);
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                  fn(win, doc);
+                } catch (e) {
+                  console.error('Failed to execute script shim:', e);
+                }
               }
-            }
-          });
+            });
 
-          // Manually attach onclick handlers using scoped execution
-          // This works around HappyDOM limitation where inline event handlers don't verify consistently
-          const elementsWithClick = Array.from(
-            iframeDoc.querySelectorAll('[onclick]'),
-          );
-          elementsWithClick.forEach((el) => {
-            const handlerCode = el.getAttribute('onclick');
-            if (handlerCode) {
-              try {
-                /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-                const win = iframe.contentWindow as any;
-                const doc = iframe.contentDocument;
-                if (!win || !doc) return;
+            // Manually attach onclick handlers using scoped execution
+            // This works around HappyDOM limitation where inline event handlers don't verify consistently
+            const elementsWithClick = Array.from(
+              iframeDoc.querySelectorAll('[onclick]'),
+            );
+            elementsWithClick.forEach((el) => {
+              const handlerCode = el.getAttribute('onclick');
+              if (handlerCode) {
+                try {
+                  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+                  const win = iframe.contentWindow as any;
+                  const doc = iframe.contentDocument;
+                  if (!win || !doc) return;
 
-                // Extract function names from window that were defined in script tags
-                // and create local references for them
-                const windowFuncs = Object.keys(win).filter(
-                  (key) =>
-                    typeof win[key] === 'function' &&
-                    ![
-                      'fetch',
-                      'setTimeout',
-                      'setInterval',
-                      'clearTimeout',
-                      'clearInterval',
-                    ].includes(key),
-                );
-                /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-                const funcDestructure =
-                  windowFuncs.length > 0
-                    ? `const { ${windowFuncs.join(', ')} } = window;`
-                    : '';
+                  // Extract function names from window that were defined in script tags
+                  // and create local references for them
+                  const windowFuncs = Object.keys(win).filter(
+                    (key) =>
+                      typeof win[key] === 'function' &&
+                      ![
+                        'fetch',
+                        'setTimeout',
+                        'setInterval',
+                        'clearTimeout',
+                        'clearInterval',
+                      ].includes(key),
+                  );
+                  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
+                  const funcDestructure =
+                    windowFuncs.length > 0
+                      ? `const { ${windowFuncs.join(', ')} } = window;`
+                      : '';
 
-                const code = `
+                  const code = `
                                     const fetch = window.fetch;
                                     ${funcDestructure}
                                     return (function(window, document, event) {
@@ -359,167 +424,159 @@ export async function executePlaywrightCode(
                                     }).call(this, window, document, event);
                                 `;
 
-                // eslint-disable-next-line @typescript-eslint/no-implied-eval
-                const fn = new Function('window', 'document', 'event', code);
+                  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+                  const fn = new Function('window', 'document', 'event', code);
 
-                el.addEventListener('click', (event) => {
-                  fn.call(el, win, doc, event);
-                });
-                // Remove attribute to prevent double-execution if HappyDOM ever fixes this
-                el.removeAttribute('onclick');
-              } catch (e) {
-                console.error('Failed to attach onclick shim:', e);
+                  el.addEventListener('click', (event) => {
+                    fn.call(el, win, doc, event);
+                  });
+                  // Remove attribute to prevent double-execution if HappyDOM ever fixes this
+                  el.removeAttribute('onclick');
+                } catch (e) {
+                  console.error('Failed to attach onclick shim:', e);
+                }
               }
-            }
-          });
-
-          // Create mocked page object
-          const page = new MockedPlaywrightPage(iframeDoc);
-
-          // Set up VFS for multi-page E2E challenges
-          if (options?.files) {
-            page.setVFS(options.files, {
-              onNavigate: options.onNavigate,
-              cssContent: options.cssContent,
             });
-          }
 
-          // Create an intercepted console object that logs to our logs array
-          let logCounter = 0;
-          const interceptedConsole = {
-            log: (...args: unknown[]) => {
-              logs.push({
-                id: `log-${Date.now()}-${logCounter++}`,
-                type: 'log',
-                message: args.map((a) => String(a)).join(' '),
+            // Create mocked page object
+            const page = new MockedPlaywrightPage(iframeDoc);
+
+            // Set up VFS for multi-page E2E challenges
+            if (options?.files) {
+              page.setVFS(options.files, {
+                onNavigate: options.onNavigate,
+                cssContent: options.cssContent,
               });
-              console.log(...args); // Also log to browser console for debugging
-            },
-            error: (...args: unknown[]) => {
-              logs.push({
-                id: `log-${Date.now()}-${logCounter++}`,
-                type: 'error',
-                message: args.map((a) => String(a)).join(' '),
-              });
-              console.error(...args);
-            },
-            warn: (...args: unknown[]) => {
-              logs.push({
-                id: `log-${Date.now()}-${logCounter++}`,
-                type: 'warn',
-                message: args.map((a) => String(a)).join(' '),
-              });
-              console.warn(...args);
-            },
-            info: (...args: unknown[]) => {
-              logs.push({
-                id: `log-${Date.now()}-${logCounter++}`,
-                type: 'log',
-                message: args.map((a) => String(a)).join(' '),
-              });
-              console.info(...args);
-            },
-          };
+            }
 
-          // Execute user code
-          // For JS challenges, we need to capture the 'result' variable
-          // We use eval-style declaration to make result accessible even if user uses const/let
-
-          // Create an enhanced document wrapper with friendlier error messages
-          const createEnhancedDocument = (doc: Document) => {
-            const handler: ProxyHandler<Document> = {
-              get(target, prop) {
-                // querySelector override removed to allow null returns for existence checks
-
-                if (prop === 'querySelectorAll') {
-                  return (selector: string) => {
-                    const elements = target.querySelectorAll(selector);
-                    if (elements.length === 0) {
-                      console.warn(
-                        `Warning: No elements found for selector '${selector}'`,
-                      );
-                    }
-                    return elements;
-                  };
-                }
-                // getElementById override removed to allow null returns
-
-                // For all other properties, return the original value
-                /* eslint-disable @typescript-eslint/no-unsafe-return */
-                const value = target[prop as keyof Document];
-                if (typeof value === 'function') {
-
-                  return value.bind(target);
-                }
-                return value;
-                /* eslint-enable @typescript-eslint/no-unsafe-return */
+            // Create an intercepted console object that logs to our logs array
+            // Note: logCounter is shared with the logger handler above
+            const interceptedConsole = {
+              log: (...args: unknown[]) => {
+                logs.push({
+                  id: `log-${Date.now()}-${logCounter++}`,
+                  type: 'log',
+                  message: args.map((a) => String(a)).join(' '),
+                });
+              },
+              error: (...args: unknown[]) => {
+                logs.push({
+                  id: `log-${Date.now()}-${logCounter++}`,
+                  type: 'error',
+                  message: args.map((a) => String(a)).join(' '),
+                });
+              },
+              warn: (...args: unknown[]) => {
+                logs.push({
+                  id: `log-${Date.now()}-${logCounter++}`,
+                  type: 'warn',
+                  message: args.map((a) => String(a)).join(' '),
+                });
+              },
+              info: (...args: unknown[]) => {
+                logs.push({
+                  id: `log-${Date.now()}-${logCounter++}`,
+                  type: 'log',
+                  message: args.map((a) => String(a)).join(' '),
+                });
               },
             };
-            return new Proxy(doc, handler);
-          };
 
-          const enhancedDocument = createEnhancedDocument(iframeDoc);
+            // Execute user code
+            // For JS challenges, we need to capture the 'result' variable
+            // We use eval-style declaration to make result accessible even if user uses const/let
 
-          // Mock test runner object
-          const test = {
-            step: async (name: string, callback: () => Promise<any>) => {
-              interceptedConsole.log(`[Step] ${name}`);
-              try {
-                await callback();
-              } catch (error) {
-                interceptedConsole.error(`[Step] ${name} FAILED: ${error}`);
-                throw error;
-              }
-            },
-          };
+            // Create an enhanced document wrapper with friendlier error messages
+            const createEnhancedDocument = (doc: Document) => {
+              const handler: ProxyHandler<Document> = {
+                get(target, prop) {
+                  // querySelector override removed to allow null returns for existence checks
 
-          // Prepare the iframe execution environment
-          const contentWindow = iframe.contentWindow as any;
+                  if (prop === 'querySelectorAll') {
+                    return (selector: string) => {
+                      const elements = target.querySelectorAll(selector);
+                      if (elements.length === 0) {
+                        console.warn(
+                          `Warning: No elements found for selector '${selector}'`,
+                        );
+                      }
+                      return elements;
+                    };
+                  }
+                  // getElementById override removed to allow null returns
 
-          // Inject tools into the iframe context
-          contentWindow.page = page;
-          // We need to inject a proxied expect that works in the iframe context but uses our matcher logic?
-          // OR we just inject the expect function.
-          // The 'expect' function we created handles logic in the parent (shim), but it's called from code.
-          // It should work fine if injected.
+                  // For all other properties, return the original value
+                  /* eslint-disable @typescript-eslint/no-unsafe-return */
+                  const value = target[prop as keyof Document];
+                  if (typeof value === 'function') {
 
-          // Simple expect function with assertion tracking
-          const { expect, getAssertionCount, getTestResults } = createExpect();
-          contentWindow.expect = expect;
-          contentWindow.test = test;
+                    return value.bind(target);
+                  }
+                  return value;
+                  /* eslint-enable @typescript-eslint/no-unsafe-return */
+                },
+              };
+              return new Proxy(doc, handler);
+            };
 
-          // Inject console interceptor
-          // We can't easily replace console inside the iframe if we want to keep native behavior too?
-          // Actually, let's override it but proxy to interceptedConsole
-          const originalIframeConsole = contentWindow.console;
-          contentWindow.console = {
-            ...originalIframeConsole,
-            log: (...args: any[]) => {
-              interceptedConsole.log(...args);
-              originalIframeConsole.log(...args);
-            },
-            error: (...args: any[]) => {
-              interceptedConsole.error(...args);
-              originalIframeConsole.error(...args);
-            },
-            warn: (...args: any[]) => {
-              interceptedConsole.warn(...args);
-              originalIframeConsole.warn(...args);
-            },
-            info: (...args: any[]) => {
-              interceptedConsole.info(...args);
-              originalIframeConsole.info(...args);
-            },
-          };
+            const enhancedDocument = createEnhancedDocument(iframeDoc);
 
-          // Execute user code INSIDE the iframe context using eval
-          // This ensures 'Array', 'Object', 'HTMLElement' match the iframe's classes.
-          // We wrap it in an async function to handle await.
-          // We use 'return (async () => { ... })()' pattern.
+            // Mock test runner object
+            const test = {
+              step: async (name: string, callback: () => Promise<any>) => {
+                interceptedConsole.log(`[Step] ${name}`);
+                try {
+                  await callback();
+                } catch (error) {
+                  interceptedConsole.error(`[Step] ${name} FAILED: ${error}`);
+                  throw error;
+                }
+              },
+            };
 
-          // Note: 'fetch' is already patched in the iframe by the document.write() script.
+            // Prepare the iframe execution environment
+            const contentWindow = iframe.contentWindow as any;
 
-          const wrappedCode = `
+            // Inject tools into the iframe context
+            contentWindow.page = page;
+            // We need to inject a proxied expect that works in the iframe context but uses our matcher logic?
+            // OR we just inject the expect function.
+            // The 'expect' function we created handles logic in the parent (shim), but it's called from code.
+            // It should work fine if injected.
+
+            // Simple expect function with assertion tracking
+            const { expect, getAssertionCount, getTestResults } = createExpect();
+            contentWindow.expect = expect;
+            contentWindow.test = test;
+
+            // Inject console interceptor
+            // We can't easily replace console inside the iframe if we want to keep native behavior too?
+            // Actually, let's override it but proxy to interceptedConsole
+            const originalIframeConsole = contentWindow.console;
+            contentWindow.console = {
+              ...originalIframeConsole,
+              log: (...args: any[]) => {
+                interceptedConsole.log(...args);
+              },
+              error: (...args: any[]) => {
+                interceptedConsole.error(...args);
+              },
+              warn: (...args: any[]) => {
+                interceptedConsole.warn(...args);
+              },
+              info: (...args: any[]) => {
+                interceptedConsole.info(...args);
+              },
+            };
+
+            // Execute user code INSIDE the iframe context using eval
+            // This ensures 'Array', 'Object', 'HTMLElement' match the iframe's classes.
+            // We wrap it in an async function to handle await.
+            // We use 'return (async () => { ... })()' pattern.
+
+            // Note: 'fetch' is already patched in the iframe by the document.write() script.
+
+            const wrappedCode = `
                         return (async () => {
                             try {
                                 ${code}
@@ -531,99 +588,118 @@ export async function executePlaywrightCode(
                     `;
 
 
-          let returnValue;
-          if (typeof contentWindow.eval === 'function') {
-            returnValue = await contentWindow.eval(
-              `(function() { ${wrappedCode} })()`,
-            );
-          } else {
-            // Fallback for environments without iframe eval (e.g. HappyDOM tests)
-            // This runs in parent context, so 'Array' !== iframe.contentWindow.Array
-            console.warn(
-              'iframe.contentWindow.eval not supported, falling back to new Function() in parent context.',
-            );
-            const fallbackFn = new Function(
-              'page',
-              'expect',
-              'test',
-              'window',
-              'document',
-              'console',
-              wrappedCode,
-            );
-            returnValue = await fallbackFn(
-              page,
-              expect,
-              test,
-              contentWindow,
-              enhancedDocument,
-              contentWindow.console,
-            );
-          }
+            let returnValue;
+            if (typeof contentWindow.eval === 'function') {
+              returnValue = await contentWindow.eval(
+                `(function() { ${wrappedCode} })()`,
+              );
+            } else {
+              // Fallback for environments without iframe eval (e.g. HappyDOM tests)
+              // This runs in parent context, so 'Array' !== iframe.contentWindow.Array
+              console.warn(
+                'iframe.contentWindow.eval not supported, falling back to new Function() in parent context.',
+              );
+              const fallbackFn = new Function(
+                'page',
+                'expect',
+                'test',
+                'window',
+                'document',
+                'console',
+                wrappedCode,
+              );
+              returnValue = await fallbackFn(
+                page,
+                expect,
+                test,
+                contentWindow,
+                enhancedDocument,
+                contentWindow.console,
+              );
+            }
 
-          const executionTime = Date.now() - startTime;
-          cleanup();
+            const executionTime = Date.now() - startTime;
+            cleanup();
 
-          // Check for soft failures
-          const softFailures = getTestResults().filter((r) => !r.passed);
-          if (softFailures.length > 0) {
+            // Check for soft failures
+            const softFailures = getTestResults().filter((r) => !r.passed);
+            if (softFailures.length > 0) {
+              resolve({
+                status: 'FAILED',
+                output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map((f) => `- ${f.message}`).join('\n')}`,
+                executionTime,
+                error: softFailures[0].message, // Return first error
+                logs,
+                assertionCount: getAssertionCount(),
+              });
+              return;
+            }
+
+            // Validate expected DOM state if defined
+            if (options?.expectedState && options.expectedState.length > 0) {
+              const stateValidation = validateExpectedState(iframeDoc, options.expectedState);
+              if (!stateValidation.passed) {
+                resolve({
+                  status: 'FAILED',
+                  output: `DOM State Validation Failed: ${stateValidation.error}`,
+                  executionTime,
+                  error: stateValidation.error,
+                  logs,
+                  assertionCount: getAssertionCount(),
+                });
+                return;
+              }
+            }
+
             resolve({
-              status: 'FAILED',
-              output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map((f) => `- ${f.message}`).join('\n')}`,
+              status: 'PASSED',
+              output: 'All steps completed successfully',
               executionTime,
-              error: softFailures[0].message, // Return first error
+              returnValue,
               logs,
               assertionCount: getAssertionCount(),
             });
-            return;
+          } catch (error) {
+            const executionTime = Date.now() - startTime;
+            cleanup();
+
+            const errorMessage = formatError(error);
+            resolve({
+              status: 'FAILED',
+              output: errorMessage,
+              executionTime,
+              error: errorMessage,
+              logs,
+            });
           }
+        };
 
-          resolve({
-            status: 'PASSED',
-            output: 'All steps completed successfully',
-            executionTime,
-            returnValue,
-            logs,
-            assertionCount: getAssertionCount(),
-          });
-        } catch (error) {
-          const executionTime = Date.now() - startTime;
-          cleanup();
-
-          const errorMessage = formatError(error);
-          resolve({
-            status: 'FAILED',
-            output: errorMessage,
-            executionTime,
-            error: errorMessage,
-            logs,
-          });
+        if (useExistingIframe) {
+          // Execute immediately for existing iframe
+          void executeCode();
+        } else {
+          // Wait for iframe to be ready
+          iframe.onload = executeCode;
+          // Trigger load event by setting src
+          iframe.src = 'about:blank';
         }
-      };
+      } catch (error) {
+        const executionTime = Date.now() - startTime;
+        cleanup();
 
-      if (useExistingIframe) {
-        // Execute immediately for existing iframe
-        void executeCode();
-      } else {
-        // Wait for iframe to be ready
-        iframe.onload = executeCode;
-        // Trigger load event by setting src
-        iframe.src = 'about:blank';
+        const errorMessage = formatError(error);
+        resolve({
+          status: 'ERROR',
+          output: `Execution error: ${errorMessage}`,
+          executionTime,
+          error: errorMessage,
+          logs,
+        });
       }
-    } catch (error) {
-      const executionTime = Date.now() - startTime;
-      cleanup();
-
-      const errorMessage = formatError(error);
-      resolve({
-        status: 'ERROR',
-        output: `Execution error: ${errorMessage}`,
-        executionTime,
-        error: errorMessage,
-        logs,
-      });
-    }
-  });
+    });
+  } finally {
+    logger.setHandler(null as any);
+  }
 }
 
 /**
@@ -658,6 +734,83 @@ function formatError(error: unknown): string {
   }
 
   return msg;
+}
+
+/**
+ * Validate expected DOM state after code execution
+ */
+function validateExpectedState(
+  doc: Document,
+  rules: ExpectedStateRule[]
+): { passed: boolean; error?: string } {
+  for (const rule of rules) {
+    const elements = doc.querySelectorAll(rule.selector);
+
+    // Check count
+    if (rule.count !== undefined && elements.length !== rule.count) {
+      return {
+        passed: false,
+        error: `Expected ${rule.count} element(s) for '${rule.selector}', found ${elements.length}`,
+      };
+    }
+
+    // Check visible (at least one element exists)
+    if (rule.visible && elements.length === 0) {
+      return {
+        passed: false,
+        error: `Expected '${rule.selector}' to be visible, but it was not found`,
+      };
+    }
+
+    // Check hidden (no elements)
+    if (rule.hidden && elements.length > 0) {
+      return {
+        passed: false,
+        error: `Expected '${rule.selector}' to be hidden, but it was visible`,
+      };
+    }
+
+    // Check containsText
+    if (rule.containsText && elements.length > 0) {
+      const text = elements[0]?.textContent || '';
+      if (!text.includes(rule.containsText)) {
+        return {
+          passed: false,
+          error: `Expected '${rule.selector}' to contain "${rule.containsText}", but got "${text.slice(0, 50)}${text.length > 50 ? '...' : ''}"`,
+        };
+      }
+    }
+
+    // Check hasAttribute
+    if (rule.hasAttribute && elements.length > 0) {
+      const el = elements[0];
+      const attrValue = el?.getAttribute(rule.hasAttribute.name);
+      if (attrValue === null) {
+        return {
+          passed: false,
+          error: `Expected '${rule.selector}' to have attribute '${rule.hasAttribute.name}'`,
+        };
+      }
+      if (rule.hasAttribute.value !== undefined) {
+        const expectedVal = rule.hasAttribute.value;
+        if (expectedVal instanceof RegExp) {
+          if (!expectedVal.test(attrValue)) {
+            return {
+              passed: false,
+              error: `Expected '${rule.selector}' attribute '${rule.hasAttribute.name}' to match ${expectedVal}`,
+            };
+          }
+        } else if (attrValue !== expectedVal) {
+          return {
+            passed: false,
+            error: `Expected '${rule.selector}' attribute '${rule.hasAttribute.name}' to be "${expectedVal}", got "${attrValue}"`,
+          };
+        }
+      }
+    }
+  }
+
+  return { passed: true };
 }
 
 /**
