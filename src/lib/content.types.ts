@@ -76,7 +76,7 @@ export type ChallengeType =
   | 'JAVASCRIPT'
   | 'PLAYWRIGHT';
 export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
-export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert';
+export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert' | 'e2e';
 
 /**
  * Test case definition in challenge JSON
