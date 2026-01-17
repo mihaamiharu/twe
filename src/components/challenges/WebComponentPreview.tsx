@@ -33,6 +33,10 @@ export interface WebComponentPreviewProps {
   className?: string;
   /** Expose iframe ref for external access (e.g., for code execution) */
   iframeRef?: React.RefObject<HTMLIFrameElement | null>;
+  /** VFS files for multi-page E2E challenges */
+  files?: Record<string, string>;
+  /** Current VFS path (controlled externally) */
+  currentPath?: string;
 }
 
 export function WebComponentPreview({
@@ -48,6 +52,8 @@ export function WebComponentPreview({
   // height prop is reserved for future use
   className,
   iframeRef: externalIframeRef,
+  files,
+  currentPath,
   ...props
 }: WebComponentPreviewProps) {
   const internalIframeRef = useRef<HTMLIFrameElement>(null);
@@ -404,9 +410,11 @@ export function WebComponentPreview({
             <div className="flex-1 flex items-center bg-background border border-border rounded-md px-3 h-8 shadow-sm relative overflow-hidden">
               <Lock className="h-3 w-3 text-muted-foreground mr-2 shrink-0" />
               <span className="text-xs text-muted-foreground truncate flex-1">
-                {targetElementId
-                  ? `target-website.com/preview#${targetElementId}`
-                  : 'target-website.com/preview'}
+                {files 
+                  ? `testwizards.local${currentPath || '/index.html'}`
+                  : targetElementId
+                    ? `target-website.com/preview#${targetElementId}`
+                    : 'target-website.com/preview'}
               </span>
 
               {/* Visual/Source Toggle inside URL bar */}
