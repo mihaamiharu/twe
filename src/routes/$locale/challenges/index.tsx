@@ -55,11 +55,17 @@ import {
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import {
+  TRACK_CONFIG,
+  SIDEBAR_GROUPS,
+  TRACK_IDS,
+  type TrackId,
+} from '@/config/tracks';
 import i18n from '@/lib/i18n';
 
 // --- Search Params Schema ---
 const ChallengesSearchSchema = z.object({
-  track: z.enum(['all', 'selectors', 'javascript', 'core', 'advanced']).optional().default('all'),
+  track: z.enum(TRACK_IDS).optional().default('all'),
   q: z.string().optional(),
   hideCompleted: z.coerce.boolean().optional().default(false),
   view: z.enum(['grid', 'list']).optional().default('grid'),
@@ -145,98 +151,24 @@ export interface Challenge {
 
 // --- Sidebar / Tracks Configuration ---
 
-type TrackId = 'all' | 'selectors' | 'javascript' | 'core' | 'advanced';
+// --- Configuration ---
 
-interface TrackConfig {
-  id: TrackId;
-  label: string;
-  icon: React.ReactNode;
-  description: string;
-  match: (challenge: Challenge) => boolean;
-}
+// Map icons purely for UI (keeps config serializable/clean)
+const TRACK_ICONS: Record<TrackId, React.ReactNode> = {
+  all: <LayoutDashboard className="h-4 w-4" />,
+  selectors: <MousePointer2 className="h-4 w-4" />,
+  javascript: <FileCode2 className="h-4 w-4" />,
+  core: <Compass className="h-4 w-4" />,
+  e2e: <Layers className="h-4 w-4" />,
+};
 
-interface TrackGroup {
-  title: string;
-  tracks: TrackConfig[];
-}
-
-const SIDEBAR_GROUPS: TrackGroup[] = [
-  {
-    title: 'Overview',
-    tracks: [
-      {
-        id: 'all',
-        label: 'All Challenges',
-        icon: <LayoutDashboard className="h-4 w-4" />,
-        description: 'Overview of all available challenges',
-        match: () => true,
-      },
-    ]
-  },
-  {
-    title: 'Core Skills',
-    tracks: [
-      {
-        id: 'selectors',
-        label: 'Selectors',
-        icon: <MousePointer2 className="h-4 w-4" />,
-        description: 'Master CSS Selectors and XPath',
-        match: (c) =>
-          ['CSS_SELECTOR', 'XPATH_SELECTOR'].includes(c.type) ||
-          getTierFromCategory(c.category ?? undefined) === 'basic',
-      },
-      {
-        id: 'javascript',
-        label: 'JavaScript',
-        icon: <FileCode2 className="h-4 w-4" />,
-        description: 'JavaScript & DOM Fundamentals',
-        match: (c) =>
-          c.type === 'JAVASCRIPT' ||
-          getTierFromCategory(c.category ?? undefined) === 'beginner',
-      },
-    ]
-  },
-  {
-    title: 'Playwright',
-    tracks: [
-      {
-        id: 'core',
-        label: 'Core',
-        icon: <Compass className="h-4 w-4" />,
-        description: 'Navigation, Locators, Actions & Assertions',
-        match: (c) => {
-          const cat = c.category ?? '';
-          return (
-            c.type === 'PLAYWRIGHT' &&
-            (cat.startsWith('playwright-navigation') ||
-              cat.startsWith('playwright-locators') ||
-              cat.startsWith('playwright-assertions') ||
-              cat.startsWith('playwright-waits'))
-          );
-        },
-      },
-      {
-        id: 'advanced',
-        label: 'Advanced & POM',
-        icon: <Layers className="h-4 w-4" />,
-        description: 'POM, Data-Driven, Infrastructure',
-        match: (c) => {
-          const cat = c.category ?? '';
-          return (
-            c.type === 'PLAYWRIGHT' &&
-            (cat.startsWith('playwright-pom') ||
-              cat.startsWith('playwright-data') ||
-              cat.startsWith('playwright-infrastructure') ||
-              cat.startsWith('playwright-integration'))
-          );
-        },
-      },
-    ]
-  }
-];
-
-// Flatten for easy lookup
-const ALL_TRACKS = SIDEBAR_GROUPS.flatMap(g => g.tracks);
+// Reconstruct full track objects with icons for the UI
+// @ts-expect-error - we know TRACK_IDS are valid keys
+const ALL_TRACKS = TRACK_IDS.map((id) => ({
+  ...TRACK_CONFIG[id],
+  id,
+  icon: TRACK_ICONS[id],
+}));
 
 function ChallengesPage() {
   const { locale } = Route.useParams();
@@ -352,7 +284,7 @@ function ChallengesPage() {
 
 
   // Helper component for Sidebar Item
-  const SidebarItem = ({ track }: { track: TrackConfig }) => (
+  const SidebarItem = ({ track }: { track: typeof ALL_TRACKS[number] }) => (
     <button
       onClick={() => {
         updateSearch({ track: track.id });
@@ -401,9 +333,11 @@ function ChallengesPage() {
             )}
 
             <div className="space-y-1">
-              {group.tracks.map(track => (
-                <SidebarItem key={track.id} track={track} />
-              ))}
+              {group.tracks.map((trackId) => {
+                const track = ALL_TRACKS.find((t) => t.id === trackId);
+                if (!track) return null;
+                return <SidebarItem key={track.id} track={track} />;
+              })}
             </div>
           </div>
         ))}
@@ -461,10 +395,10 @@ function ChallengesPage() {
             <div className="hidden lg:block">
               <div className="flex items-center gap-2 mb-1">
                 {/* Breadcrumb-ish */}
-                {SIDEBAR_GROUPS.find(g => g.tracks.some(t => t.id === activeTrackId))?.title !== 'Overview' && (
+                {SIDEBAR_GROUPS.find(g => g.tracks.includes(activeTrackId))?.title !== 'Overview' && (
                   <>
                     <span className="text-sm font-medium text-muted-foreground">
-                      {SIDEBAR_GROUPS.find(g => g.tracks.some(t => t.id === activeTrackId))?.title}
+                      {SIDEBAR_GROUPS.find(g => g.tracks.includes(activeTrackId))?.title}
                     </span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
                   </>

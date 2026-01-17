@@ -112,7 +112,8 @@
     "playwright-pom": "Page Object Model",
     "playwright-data-driven": "Data-Driven Testing",
     "playwright-infrastructure": "Test Infrastructure",
-    "playwright-integration-patterns": "Integration Patterns"
+    "playwright-integration-patterns": "Integration Patterns",
+    "e2e-testing": "Simulations"
   },
   "labels": {
     "allTypes": "All Types",

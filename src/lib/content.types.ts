@@ -76,7 +76,7 @@ export type ChallengeType =
   | 'JAVASCRIPT'
   | 'PLAYWRIGHT';
 export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
-export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert';
+export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert' | 'e2e';
 
 /**
  * Test case definition in challenge JSON
@@ -86,6 +86,18 @@ export interface TestCaseDefinition {
   input?: unknown;
   expectedOutput: unknown;
   isHidden?: boolean;
+}
+
+/**
+ * Expected state rule for DOM validation after code execution
+ */
+export interface ExpectedStateRule {
+  selector: string;
+  visible?: boolean;
+  hidden?: boolean;
+  containsText?: string;
+  hasAttribute?: { name: string; value?: string | RegExp };
+  count?: number;
 }
 
 /**
@@ -103,11 +115,13 @@ export interface ChallengeDefinition {
   description: LocalizedString;
   instructions: LocalizedString;
   htmlContent?: string;
+  files?: Record<string, string>; // VFS: multi-page content for E2E
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
   status?: ContentStatus;
+  expectedState?: ExpectedStateRule[]; // DOM state validation rules
 }
 
 /**
@@ -133,10 +147,12 @@ export interface Challenge {
   description: string;
   instructions: string;
   htmlContent?: string;
+  files?: Record<string, string>; // VFS: multi-page content for E2E
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
+  expectedState?: ExpectedStateRule[]; // DOM state validation rules
   // Dynamic fields (from DB)
   completionCount?: number;
   isCompleted?: boolean;

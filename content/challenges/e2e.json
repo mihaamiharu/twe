@@ -1,0 +1,47 @@
+{
+  "tier": "e2e",
+  "challenges": [
+    {
+      "slug": "e2e-login-flow",
+      "type": "PLAYWRIGHT",
+      "difficulty": "MEDIUM",
+      "category": "e2e-testing",
+      "xpReward": 100,
+      "order": 1,
+      "title": {
+        "en": "E2E Login Flow",
+        "id": "Alur Login E2E"
+      },
+      "description": {
+        "en": "Practice multi-page navigation by automating a complete login flow.",
+        "id": "Praktikkan navigasi multi-halaman dengan mengotomatisasi alur login lengkap."
+      },
+      "instructions": {
+        "en": "# E2E Login Flow\n\nThis challenge simulates a real-world login flow across multiple pages.\n\n## The Scenario\nYou are testing a web application with:\n- A **Home page** (`/index.html`) with a \"Login\" link\n- A **Login page** (`/login.html`) with username/password fields\n- A **Dashboard page** (`/dashboard.html`) shown after successful login\n\n## Your Task\n\n### Given\nThe browser starts on the home page at `demo.twe.local/index.html`\n\n### When\n1. Click the \"Login\" link to navigate to the login page\n2. Fill in the username field with `testuser`\n3. Fill in the password field with `password123`\n4. Click the \"Login\" button\n5. Navigate to the dashboard page\n\n### Then\nVerify the dashboard displays a welcome message containing \"Welcome\"\n\n## Hints\n- Use `page.goto('/login.html')` to navigate between VFS pages\n- Use `page.locator()` with appropriate selectors\n- Use `await expect()` assertions to verify the result\n",
+        "id": "# Alur Login E2E\n\nTantangan ini mensimulasikan alur login dunia nyata di beberapa halaman.\n\n## Skenario\nAnda menguji aplikasi web dengan:\n- **Halaman Beranda** (`/index.html`) dengan link \"Login\"\n- **Halaman Login** (`/login.html`) dengan field username/password\n- **Halaman Dashboard** (`/dashboard.html`) ditampilkan setelah login berhasil\n\n## Tugas Anda\n\n### Diberikan\nBrowser dimulai di halaman beranda di `demo.twe.local/index.html`\n\n### Ketika\n1. Klik link \"Login\" untuk navigasi ke halaman login\n2. Isi field username dengan `testuser`\n3. Isi field password dengan `password123`\n4. Klik tombol \"Login\"\n5. Navigasi ke halaman dashboard\n\n### Kemudian\nVerifikasi dashboard menampilkan pesan selamat datang yang mengandung \"Welcome\"\n"
+      },
+      "files": {
+        "/index.html": "<!DOCTYPE html>\n<html>\n<head><title>Home - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n    <div class=\"nav-links\">\n      <a href=\"/login.html\" id=\"login-link\">Login</a>\n      <a href=\"/about.html\">About</a>\n    </div>\n  </nav>\n  <main>\n    <h1>Welcome to TWE Demo App</h1>\n    <p>The premier platform for learning test automation.</p>\n    <a href=\"/login.html\" class=\"btn btn-primary\">Get Started</a>\n  </main>\n</body>\n</html>",
+        "/login.html": "<!DOCTYPE html>\n<html>\n<head><title>Login - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n  </nav>\n  <main class=\"login-container\">\n    <h1>Sign In</h1>\n    <form id=\"login-form\" action=\"/dashboard.html\">\n      <div class=\"form-group\">\n        <label for=\"username\">Username</label>\n        <input type=\"text\" id=\"username\" name=\"username\" placeholder=\"Enter username\" />\n      </div>\n      <div class=\"form-group\">\n        <label for=\"password\">Password</label>\n        <input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Enter password\" />\n      </div>\n      <button type=\"submit\" id=\"login-btn\" class=\"btn btn-primary\">Login</button>\n    </form>\n    <p class=\"signup-link\">Don't have an account? <a href=\"/signup.html\">Sign up</a></p>\n  </main>\n</body>\n</html>",
+        "/dashboard.html": "<!DOCTYPE html>\n<html>\n<head><title>Dashboard - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n    <div class=\"nav-links\">\n      <span id=\"user-greeting\">Welcome, testuser!</span>\n      <a href=\"/logout\" id=\"logout-link\">Logout</a>\n    </div>\n  </nav>\n  <main class=\"dashboard\">\n    <h1 id=\"welcome-message\">Welcome to your Dashboard</h1>\n    <div class=\"stats-grid\">\n      <div class=\"stat-card\">\n        <h3>Challenges Completed</h3>\n        <span class=\"stat-value\">12</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>XP Earned</h3>\n        <span class=\"stat-value\">1,250</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>Current Streak</h3>\n        <span class=\"stat-value\">5 days</span>\n      </div>\n    </div>\n  </main>\n</body>\n</html>"
+      },
+      "starterCode": "// E2E Login Flow Test\n// Navigate through multiple pages and verify the login flow\n\n// Step 1: Start at the home page\nawait page.goto('/index.html');\n\n// Step 2: Click the login link to go to login page\n// Your code here...\n\n// Step 3: Fill in the login form\n// Your code here...\n\n// Step 4: Submit the form (auto-redirects to dashboard)\n// Your code here...\n\n// Step 5: Verify the welcome message\n// await expect(page.locator('#welcome-message')).toContainText('Welcome');\n",
+      "testCases": [],
+      "solution": "// E2E Login Flow Test\nawait page.goto('/index.html');\nawait page.locator('#login-link').click();\nawait page.goto('/login.html');\nawait page.locator('#username').fill('testuser');\nawait page.locator('#password').fill('password123');\nawait page.locator('#login-btn').click();\n// Navigation happens automatically via form action\nawait expect(page.locator('#welcome-message')).toContainText('Welcome');",
+      "tags": [
+        "e2e",
+        "playwright",
+        "navigation",
+        "login",
+        "vfs"
+      ],
+      "expectedState": [
+        {
+          "selector": "#welcome-message",
+          "visible": true,
+          "containsText": "Welcome"
+        }
+      ]
+    }
+  ]
+}
