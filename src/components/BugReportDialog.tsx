@@ -11,6 +11,7 @@
 
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -50,16 +51,8 @@ import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
 import { createBugReport } from '@/server/bug-reports.fn';
 
-// Form validation schema
-const bugReportFormSchema = z.object({
-  email: z
-    .string()
-    .email('Please enter a valid email')
-    .optional()
-    .or(z.literal('')),
-});
-
-const getBugReportSchema = (t: any) =>
+// Helper functions need to be moved or keep them here but typed correctly
+const getBugReportSchema = (t: TFunction) =>
   z.object({
     title: z.string().min(5, t('bugs:validation.titleTooShort')).max(200),
     severity: z.enum(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW']),
@@ -73,13 +66,13 @@ const getBugReportSchema = (t: any) =>
       .or(z.literal('')),
   });
 
-type BugReportFormData = z.infer<typeof bugReportFormSchema>;
+type BugReportFormData = z.infer<ReturnType<typeof getBugReportSchema>>;
 
 type Severity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW';
 
 // Severity badge styles
 const getSeverityConfig = (
-  t: any,
+  t: TFunction,
 ): Record<
   Severity,
   { label: string; color: string; icon: typeof AlertTriangle }

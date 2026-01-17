@@ -150,18 +150,18 @@ export async function executePlaywrightCode(
         document.body.appendChild(iframe);
       }
 
-      let timeoutId: any;
-
-      const cleanup = () => {
-        if (timeoutId) clearTimeout(timeoutId);
+      // Use function declaration for hoisting so it can be called by setTimeout
+      // and can see timeoutId defined below (TDZ is passed by the time this runs)
+      function cleanup() {
+        clearTimeout(timeoutId);
         // Only remove if we created it
         if (!useExistingIframe && iframe.parentNode) {
           document.body.removeChild(iframe);
         }
-      };
+      }
 
       // Timeout handler
-      timeoutId = setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         cleanup();
         resolve({
           status: 'TIMEOUT',
@@ -397,6 +397,7 @@ export async function executePlaywrightCode(
                   // and create local references for them
                   const windowFuncs = Object.keys(win).filter(
                     (key) =>
+                      // eslint-disable-next-line security/detect-object-injection
                       typeof win[key] === 'function' &&
                       ![
                         'fetch',
@@ -523,18 +524,19 @@ export async function executePlaywrightCode(
 
             // Mock test runner object
             const test = {
-              step: async (name: string, callback: () => Promise<any>) => {
+              step: async (name: string, callback: () => Promise<unknown>) => {
                 interceptedConsole.log(`[Step] ${name}`);
                 try {
                   await callback();
                 } catch (error) {
-                  interceptedConsole.error(`[Step] ${name} FAILED: ${error}`);
+                  interceptedConsole.error(`[Step] ${name} FAILED: ${String(error)}`);
                   throw error;
                 }
               },
             };
 
             // Prepare the iframe execution environment
+            /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
             const contentWindow = iframe.contentWindow as any;
 
             // Inject tools into the iframe context
@@ -568,6 +570,7 @@ export async function executePlaywrightCode(
                 interceptedConsole.info(...args);
               },
             };
+            /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
 
             // Execute user code INSIDE the iframe context using eval
             // This ensures 'Array', 'Object', 'HTMLElement' match the iframe's classes.
@@ -590,15 +593,18 @@ export async function executePlaywrightCode(
 
             let returnValue;
             if (typeof contentWindow.eval === 'function') {
+              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
               returnValue = await contentWindow.eval(
                 `(function() { ${wrappedCode} })()`,
               );
+              /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
             } else {
               // Fallback for environments without iframe eval (e.g. HappyDOM tests)
               // This runs in parent context, so 'Array' !== iframe.contentWindow.Array
               console.warn(
                 'iframe.contentWindow.eval not supported, falling back to new Function() in parent context.',
               );
+              // eslint-disable-next-line @typescript-eslint/no-implied-eval
               const fallbackFn = new Function(
                 'page',
                 'expect',
@@ -608,6 +614,7 @@ export async function executePlaywrightCode(
                 'console',
                 wrappedCode,
               );
+              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
               returnValue = await fallbackFn(
                 page,
                 expect,
@@ -616,6 +623,7 @@ export async function executePlaywrightCode(
                 enhancedDocument,
                 contentWindow.console,
               );
+              /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
             }
 
             const executionTime = Date.now() - startTime;
@@ -698,6 +706,7 @@ export async function executePlaywrightCode(
       }
     });
   } finally {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     logger.setHandler(null as any);
   }
 }
@@ -1262,10 +1271,7 @@ function createExpect(): ExpectResult {
   /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
 }
 
-// Helper type for createExpect internal use
-function createExpectInternal() {
-  return createExpect().expect;
-}
+
 
 /**
  * Helper to show iframe preview during development

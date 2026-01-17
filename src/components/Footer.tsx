@@ -58,7 +58,7 @@ export function Footer() {
       } else {
         toast.error(t('footer.newsletter.error'));
       }
-    } catch (error) {
+    } catch {
       toast.error(t('footer.newsletter.error'));
     } finally {
       setIsSubmitting(false);
@@ -124,7 +124,8 @@ export function Footer() {
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
                   <Link
-                    to={link.href as any}
+                    // @ts-expect-error - Dynamic paths are not statically typed by TanStack Router
+                    to={link.href}
                     className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
                   >
                     {t(link.label)}
@@ -143,7 +144,8 @@ export function Footer() {
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
                   <Link
-                    to={link.href as any}
+                    // @ts-expect-error - Dynamic paths are not statically typed by TanStack Router
+                    to={link.href}
                     className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
                   >
                     {t(link.label)}
@@ -167,7 +169,7 @@ export function Footer() {
                 <span className="text-sm font-medium">{t('footer.newsletter.success')}</span>
               </div>
             ) : (
-              <form onSubmit={handleNewsletterSubmit} className="space-y-3">
+              <form onSubmit={(e) => void handleNewsletterSubmit(e)} className="space-y-3">
                 <div className="relative">
                   <Input
                     type="email"

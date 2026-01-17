@@ -30,6 +30,53 @@ import { getLevelTitle } from '@/lib/gamification';
 
 import i18n from '@/lib/i18n';
 
+interface ServerChallengeResponse {
+  success: boolean;
+  data?: {
+    id: string;
+    slug: string;
+    title: string;
+    description: string;
+    instructions: string;
+    type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';
+    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
+    category: string;
+    xpReward: number;
+    order: number;
+    htmlContent?: string;
+    files?: Record<string, { code: string; active?: boolean; hidden?: boolean }>;
+    starterCode?: string;
+    tags?: string[];
+    completionCount: number;
+    tutorial?: { slug: string; title: string } | null;
+    testCases: {
+      id: string;
+      description: string;
+      input: unknown;
+      expectedOutput: unknown;
+      isHidden?: boolean;
+    }[];
+    hiddenTestCaseCount: number;
+    userProgress?: {
+      isCompleted: boolean;
+      attempts: number;
+      lastAccessedAt: Date;
+      usedHint: boolean;
+    } | null;
+    bestSubmission?: {
+      code: string;
+      isPassed: boolean;
+      xpEarned: number;
+      testsPassed: number;
+      testsTotal: number;
+      executionTime: number;
+    } | null;
+    nextChallenge?: { slug: string; title: string } | null;
+    prevChallenge?: { slug: string; title: string } | null;
+  };
+  error?: string;
+}
+
 export const Route = createFileRoute('/$locale/challenges/$slug')({
   loader: ({ context, params }) => {
     return context.queryClient.ensureQueryData(
@@ -37,7 +84,7 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
     );
   },
   component: ChallengeDetailPage,
-  head: ({ loaderData }) => {
+  head: ({ loaderData }: { loaderData: ServerChallengeResponse }) => {
     const data = loaderData?.data;
     if (!data) {
       return {
@@ -90,8 +137,8 @@ function ChallengeDetailPage() {
   } = useSuspenseQuery(challengeDetailQueryOptions(slug, locale));
 
   // Rename for compatibility with existing code
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
-  const data = challengeData as any;
+  // Rename for compatibility with existing code
+  const data = challengeData as ServerChallengeResponse;
 
 
 

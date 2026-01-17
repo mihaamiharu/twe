@@ -11,16 +11,19 @@ echo "🚀 Starting deployment of $APP_NAME..."
 echo "📥 Pulling latest changes from git..."
 git pull origin main
 
-# 2. Run migrations BEFORE starting containers (uses DIRECT_URL for Supabase)
-echo "🔄 Running database migrations..."
-set -a
-source $ENV_FILE
-set +a
-bun run db:migrate
+# 2. Build images first
+echo "🛠️ Building containers..."
+docker compose -f $DOCKER_COMPOSE_FILE build
 
-# 3. Build and start containers
-echo "🛠️ Building and starting containers..."
-docker compose -f $DOCKER_COMPOSE_FILE up -d --build
+# 3. Run migrations inside a temporary container
+# We use 'run --rm' to start a temporary container just for the migration
+# This ensures we use the exact environment defined in the Dockerfile
+echo "🔄 Running database migrations..."
+docker compose -f $DOCKER_COMPOSE_FILE run --rm app bun run db:migrate
+
+# 4. Start the application
+echo "🚀 Starting application..."
+docker compose -f $DOCKER_COMPOSE_FILE up -d
 
 # 4. Cleanup old images
 echo "🧹 Cleaning up old Docker images..."
