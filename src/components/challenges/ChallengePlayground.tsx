@@ -151,6 +151,7 @@ export interface Challenge {
   starterCode: string;
   htmlContent?: string;
   targetSelector?: string | string[];
+  files?: Record<string, string>; // VFS: multi-page content for E2E challenges
 
   testCases?: {
     id: string;
@@ -303,13 +304,21 @@ export function ChallengePlayground({
   // Ref for the preview iframe (used for in-tab code execution)
   const previewIframeRef = useRef<HTMLIFrameElement>(null);
 
+  // VFS path state for multi-page E2E challenges
+  const [currentVfsPath, setCurrentVfsPath] = useState<string>('/index.html');
+
   // Run code for Playwright/JS challenges - now executes in the preview tab
   const handleRunCode = useCallback(async () => {
     // Validation for JS challenges that just need logical execution
     const needsHtmlRun =
-      challenge.htmlContent && challenge.type !== 'JAVASCRIPT';
+      (challenge.htmlContent || challenge.files) && challenge.type !== 'JAVASCRIPT';
 
     if (!isCodeChallenge) return;
+
+    // Reset VFS path when running new code
+    if (challenge.files) {
+      setCurrentVfsPath('/index.html');
+    }
 
     // Switch to preview tab to show execution ONLY if needed (e.g. Playwright)
     if (needsHtmlRun) {
@@ -332,14 +341,21 @@ export function ChallengePlayground({
         codeToRun += '\nif (typeof result !== "undefined") return result;';
       }
 
+      // Determine initial HTML content: VFS mode uses /index.html, otherwise use htmlContent
+      const initialHtml = challenge.files 
+        ? challenge.files['/index.html'] || '<div></div>' 
+        : challenge.htmlContent || '<div></div>';
+
       const result = await executePlaywrightCode(
         codeToRun,
-        challenge.htmlContent || '<div></div>',
+        initialHtml,
         {
           timeout: 10000,
           existingIframe: previewIframeRef.current || undefined,
           strictMode: challenge.type === 'PLAYWRIGHT',
           cssContent: defaultSelectorStyles,
+          files: challenge.files,
+          onNavigate: (path) => setCurrentVfsPath(path),
         },
       );
 
@@ -690,7 +706,7 @@ export function ChallengePlayground({
               <TabsTrigger value="instructions" className="flex-1">
                 {t('challenges:playground.instructions')}
               </TabsTrigger>
-              {challenge.htmlContent && (
+              {(challenge.htmlContent || challenge.files) && (
                 <TabsTrigger value="preview" className="flex-1">
                   {t('challenges:playground.preview')}
                 </TabsTrigger>
@@ -707,13 +723,17 @@ export function ChallengePlayground({
             </div>
           </TabsContent>
 
-          {challenge.htmlContent && (
+          {(challenge.htmlContent || challenge.files) && (
             <TabsContent
               value="preview"
               className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col"
             >
               <WebComponentPreview
-                htmlContent={challenge.htmlContent}
+                htmlContent={
+                  challenge.files 
+                    ? challenge.files[currentVfsPath] || challenge.files['/index.html'] || '<div></div>'
+                    : challenge.htmlContent || '<div></div>'
+                }
                 cssContent={defaultSelectorStyles}
                 userSelector={isSelectorChallenge ? selector : undefined}
                 selectorType={selectorType}
@@ -726,6 +746,8 @@ export function ChallengePlayground({
                 showControls={true}
                 height="100%"
                 iframeRef={previewIframeRef}
+                files={challenge.files}
+                currentPath={currentVfsPath}
               />
             </TabsContent>
           )}
