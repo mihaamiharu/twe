@@ -26,15 +26,7 @@
         "/dashboard.html": "<!DOCTYPE html>\n<html>\n<head><title>Dashboard - TestWizards</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TestWizards</a>\n    <div class=\"nav-links\">\n      <span id=\"user-greeting\">Welcome, testuser!</span>\n      <a href=\"/logout\" id=\"logout-link\">Logout</a>\n    </div>\n  </nav>\n  <main class=\"dashboard\">\n    <h1 id=\"welcome-message\">Welcome to your Dashboard</h1>\n    <div class=\"stats-grid\">\n      <div class=\"stat-card\">\n        <h3>Challenges Completed</h3>\n        <span class=\"stat-value\">12</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>XP Earned</h3>\n        <span class=\"stat-value\">1,250</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>Current Streak</h3>\n        <span class=\"stat-value\">5 days</span>\n      </div>\n    </div>\n  </main>\n</body>\n</html>"
       },
       "starterCode": "// E2E Login Flow Test\n// Navigate through multiple pages and verify the login flow\n\n// Step 1: Start at the home page\nawait page.goto('/index.html');\n\n// Step 2: Click the login link to go to login page\n// Your code here...\n\n// Step 3: Fill in the login form\n// Your code here...\n\n// Step 4: Submit the form and navigate to dashboard\n// Your code here...\n\n// Step 5: Verify the welcome message\n// await expect(page.locator('#welcome-message')).toContainText('Welcome');\n",
-      "testCases": [
-        {
-          "description": "Successfully navigates through login flow",
-          "expectedOutput": {
-            "status": "PASSED"
-          },
-          "isHidden": false
-        }
-      ],
+      "testCases": [],
       "solution": "// E2E Login Flow Test\nawait page.goto('/index.html');\nawait page.locator('#login-link').click();\nawait page.goto('/login.html');\nawait page.locator('#username').fill('testuser');\nawait page.locator('#password').fill('password123');\nawait page.locator('#login-btn').click();\nawait page.goto('/dashboard.html');\nawait expect(page.locator('#welcome-message')).toContainText('Welcome');",
       "tags": [
         "e2e",

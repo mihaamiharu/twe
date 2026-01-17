@@ -108,7 +108,8 @@
     "playwright-pom": "Page Object Model",
     "playwright-data-driven": "Pengujian Berbasis Data",
     "playwright-infrastructure": "Infrastruktur Pengujian",
-    "playwright-integration-patterns": "Pola Integrasi"
+    "playwright-integration-patterns": "Pola Integrasi",
+    "e2e-testing": "Pengujian E2E"
   },
   "labels": {
     "allTypes": "Semua Tipe",

@@ -361,6 +361,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
           xpReward: challengeContent.xpReward,
           order: challengeContent.order,
           htmlContent: challengeContent.htmlContent,
+          files: challengeContent.files,
           starterCode: challengeContent.starterCode,
           tags: challengeContent.tags,
           completionCount: dbChallenge?.completionCount || 0,

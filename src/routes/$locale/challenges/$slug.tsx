@@ -139,6 +139,7 @@ function ChallengeDetailPage() {
         xp: data.data.xpReward,
         instructions: data.data.instructions,
         htmlContent: data.data.htmlContent || '',
+        files: data.data.files,
         starterCode: data.data.starterCode || '',
         targetSelector: (() => {
           if (!testCases.length) return '';
