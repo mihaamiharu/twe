@@ -1,4 +1,4 @@
-import { Github, Twitter, Bug, Loader2, CheckCircle } from 'lucide-react';
+import { Github, Linkedin, Youtube, Coffee, ExternalLink, Bug, Loader2, CheckCircle } from 'lucide-react';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
@@ -104,13 +104,40 @@ export function Footer() {
                 <Github className="h-5 w-5" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://www.linkedin.com/in/ekkisyamsugiardi/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
-                aria-label="Twitter"
+                aria-label="LinkedIn"
               >
-                <Twitter className="h-5 w-5" />
+                <Linkedin className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.youtube.com/@TestingWithEkki"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                aria-label="YouTube"
+              >
+                <Youtube className="h-5 w-5" />
+              </a>
+              <a
+                href="https://ko-fi.com/ekkisyam"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                aria-label="Ko-fi"
+              >
+                <Coffee className="h-5 w-5" />
+              </a>
+              <a
+                href="https://tako.id/TestingWithEkki"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                aria-label="Tako"
+              >
+                <ExternalLink className="h-5 w-5" />
               </a>
             </div>
           </div>
@@ -124,7 +151,6 @@ export function Footer() {
               {footerLinks.product.map((link) => (
                 <li key={link.label}>
                   <Link
-                    // @ts-expect-error - Dynamic paths are not statically typed by TanStack Router
                     to={link.href}
                     className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
                   >
@@ -144,7 +170,6 @@ export function Footer() {
               {footerLinks.resources.map((link) => (
                 <li key={link.label}>
                   <Link
-                    // @ts-expect-error - Dynamic paths are not statically typed by TanStack Router
                     to={link.href}
                     className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
                   >
