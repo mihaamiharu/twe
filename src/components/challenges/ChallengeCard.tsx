@@ -28,6 +28,7 @@ import {
   Star,
   Users,
   ArrowRight,
+  Target,
 } from 'lucide-react';
 import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 
@@ -35,7 +36,8 @@ export type ChallengeType =
   | 'JAVASCRIPT'
   | 'PLAYWRIGHT'
   | 'CSS_SELECTOR'
-  | 'XPATH_SELECTOR';
+  | 'XPATH_SELECTOR'
+  | 'SELECTOR';
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
 
 export interface ChallengeCardProps {
@@ -58,15 +60,9 @@ const typeIcons: Record<ChallengeType, React.ReactNode> = {
   PLAYWRIGHT: <Theater className="h-4 w-4" />,
   CSS_SELECTOR: <Palette className="h-4 w-4" />,
   XPATH_SELECTOR: <Route className="h-4 w-4" />,
+  SELECTOR: <Target className="h-4 w-4" />,
 };
 
-// Type labels
-const typeLabels: Record<ChallengeType, string> = {
-  JAVASCRIPT: 'JavaScript',
-  PLAYWRIGHT: 'Playwright',
-  CSS_SELECTOR: 'CSS Selector',
-  XPATH_SELECTOR: 'XPath',
-};
 
 // Difficulty colors
 const difficultyStyles: Record<
@@ -105,6 +101,7 @@ export function ChallengeCard({
   const { t } = useTranslation(['challenges', 'common']);
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+  // eslint-disable-next-line security/detect-object-injection
   const diffStyle = difficultyStyles[difficulty];
 
   return (
@@ -142,6 +139,7 @@ export function ChallengeCard({
                 'transition-colors duration-300',
               )}
             >
+              {/* eslint-disable-next-line security/detect-object-injection */}
               {typeIcons[type]}
             </div>
 

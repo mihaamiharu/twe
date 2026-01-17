@@ -60,6 +60,11 @@ const COPY_CONFIG: Record<
     failure: 'Scenario Failed',
     testName: 'Workflow Execution',
   },
+  SELECTOR: {
+    success: 'Target Hit!',
+    failure: 'Target Missed',
+    testName: 'Selector Verification',
+  },
   DEFAULT: {
     success: 'Mission Accomplished!',
     failure: 'Refinement Needed',
@@ -289,29 +294,29 @@ export function TestResults({
                 {/* Expected vs Actual */}
                 {(result.expected !== undefined ||
                   result.output !== undefined) && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {result.expected !== undefined && (
-                      <div className="p-3 rounded-lg bg-green-500/5 border-2 border-green-500/20">
-                        <div className="text-xs font-bold text-green-600 mb-2 uppercase tracking-tight">
-                          Expected
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {result.expected !== undefined && (
+                        <div className="p-3 rounded-lg bg-green-500/5 border-2 border-green-500/20">
+                          <div className="text-xs font-bold text-green-600 mb-2 uppercase tracking-tight">
+                            Expected
+                          </div>
+                          <pre className="text-sm font-bold font-mono text-green-600 whitespace-pre-wrap break-words">
+                            {JSON.stringify(result.expected, null, 2)}
+                          </pre>
                         </div>
-                        <pre className="text-sm font-bold font-mono text-green-600 whitespace-pre-wrap break-words">
-                          {JSON.stringify(result.expected, null, 2)}
-                        </pre>
-                      </div>
-                    )}
-                    {result.output !== undefined && (
-                      <div className="p-3 rounded-lg bg-destructive/5 border-2 border-destructive/20">
-                        <div className="text-xs font-bold text-destructive mb-2 uppercase tracking-tight">
-                          Received
+                      )}
+                      {result.output !== undefined && (
+                        <div className="p-3 rounded-lg bg-destructive/5 border-2 border-destructive/20">
+                          <div className="text-xs font-bold text-destructive mb-2 uppercase tracking-tight">
+                            Received
+                          </div>
+                          <pre className="text-sm font-bold font-mono text-destructive whitespace-pre-wrap break-words">
+                            {JSON.stringify(result.output, null, 2)}
+                          </pre>
                         </div>
-                        <pre className="text-sm font-bold font-mono text-destructive whitespace-pre-wrap break-words">
-                          {JSON.stringify(result.output, null, 2)}
-                        </pre>
-                      </div>
-                    )}
-                  </div>
-                )}
+                      )}
+                    </div>
+                  )}
               </div>
             )}
           </div>
