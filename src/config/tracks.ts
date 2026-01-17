@@ -54,7 +54,7 @@ export const TRACK_CONFIG: Record<TrackId, Omit<TrackConfig, 'id'>> = {
         },
     },
     e2e: {
-        label: 'E2E Testing',
+        label: 'Simulations',
         description: 'Full E2E Flows & Real Scenarios',
         match: (c) => {
             return getTierFromCategory(c.category ?? undefined) === 'e2e';
