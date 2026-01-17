@@ -19,6 +19,17 @@ interface MarkdownRendererProps {
   className?: string;
 }
 
+const extractText = (node: React.ReactNode): string => {
+  if (typeof node === 'string') return node;
+  if (typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join('');
+  if (React.isValidElement(node)) {
+    const props = node.props as { children?: React.ReactNode };
+    return props.children ? extractText(props.children) : '';
+  }
+  return '';
+};
+
 export function MarkdownRenderer({
   content,
   className,
@@ -54,8 +65,7 @@ export function MarkdownRenderer({
             </h1>
           ),
           h2: ({ children }) => {
-            const text =
-              typeof children === 'string' ? children : String(children);
+            const text = extractText(children);
             const id = text.toLowerCase().replace(/[^\w]+/g, '-');
             return (
               <h2
@@ -67,8 +77,7 @@ export function MarkdownRenderer({
             );
           },
           h3: ({ children }) => {
-            const text =
-              typeof children === 'string' ? children : String(children);
+            const text = extractText(children);
             const id = text.toLowerCase().replace(/[^\w]+/g, '-');
             return (
               <h3
@@ -103,7 +112,7 @@ export function MarkdownRenderer({
             const language = match ? match[1] : '';
 
             if (language === 'html-preview') {
-              const src = String(children).trim();
+              const src = extractText(children).trim();
               return (
                 <div className="my-6 rounded-lg border-2 border-border overflow-hidden bg-background">
                   <div className="bg-muted/50 px-4 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">

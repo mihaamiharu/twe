@@ -3,6 +3,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,7 @@ export function LevelUpNotification({
   className,
 }: LevelUpNotificationProps) {
   const { t } = useTranslation(['common', 'challenges']);
+  const [isVisible, setIsVisible] = useState(false);
   const newTitleKey = getLevelTitle(newLevel);
   const newTitle = t(`common:levelTitles.${newTitleKey}`);
 

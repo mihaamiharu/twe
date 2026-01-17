@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from '@tanstack/react-router';
+import { Link, useParams } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { signIn } from '@/lib/auth.client';
 import { signInSchema, type SignInInput } from '@/lib/validations';
@@ -41,9 +41,11 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear field error on change
+    // eslint-disable-next-line security/detect-object-injection
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
+        // eslint-disable-next-line security/detect-object-injection
         delete newErrors[name];
         return newErrors;
       });
@@ -61,7 +63,9 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
       const fieldErrors: Record<string, string> = {};
       for (const error of result.error.issues) {
         const path = error.path.join('.');
+        // eslint-disable-next-line security/detect-object-injection
         if (!fieldErrors[path]) {
+          // eslint-disable-next-line security/detect-object-injection
           fieldErrors[path] = error.message;
         }
       }
@@ -139,7 +143,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
               <Label htmlFor="password">{t('common:labels.password')}</Label>
               <Link
                 to={LocaleRoutes.forgotPassword}
-                params={localeParams(locale)}
+                params={localeParams(locale || 'en')}
                 className="text-xs text-primary hover:underline"
               >
                 {t('auth:login.forgotPassword')}

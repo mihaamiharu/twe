@@ -249,6 +249,7 @@ export function CodeEditor({
         label: 'Run Code',
 
         keybindings: [
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           monacoRef.current.KeyMod.CtrlCmd | monacoRef.current.KeyCode.Enter,
         ],
         run: () => {
