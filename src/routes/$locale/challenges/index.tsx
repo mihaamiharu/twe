@@ -69,6 +69,7 @@ const ChallengesSearchSchema = z.object({
   q: z.string().optional(),
   hideCompleted: z.coerce.boolean().optional().default(false),
   view: z.enum(['grid', 'list']).optional().default('grid'),
+  tier: z.string().optional(),
 });
 
 export const Route = createFileRoute('/$locale/challenges/')({
@@ -176,7 +177,7 @@ function ChallengesPage() {
   const navigate = Route.useNavigate();
 
   // URL-based State
-  const { track, q, hideCompleted, view } = Route.useSearch();
+  const { track, q, hideCompleted, view, tier } = Route.useSearch();
   const activeTrackId = track as TrackId;
   const viewMode = view;
 
@@ -227,9 +228,12 @@ function ChallengesPage() {
       // Hide Completed Filter
       if (hideCompleted && c.isCompleted) return false;
 
+      // Tier Filter
+      if (tier && getTierFromCategory(c.category || '') !== tier) return false;
+
       return true;
     });
-  }, [challenges, activeTrack, hideCompleted]);
+  }, [challenges, activeTrack, hideCompleted, tier]);
 
   // Group challenges by category (for display)
   const groupedChallenges = useMemo(() => {

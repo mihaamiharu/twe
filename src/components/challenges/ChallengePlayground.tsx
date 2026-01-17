@@ -137,7 +137,8 @@ export type ChallengeType =
   | 'JAVASCRIPT'
   | 'PLAYWRIGHT'
   | 'CSS_SELECTOR'
-  | 'XPATH_SELECTOR';
+  | 'XPATH_SELECTOR'
+  | 'SELECTOR';
 
 export interface Challenge {
   id: string;
