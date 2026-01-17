@@ -342,8 +342,8 @@ export function ChallengePlayground({
       }
 
       // Determine initial HTML content: VFS mode uses /index.html, otherwise use htmlContent
-      const initialHtml = challenge.files 
-        ? challenge.files['/index.html'] || '<div></div>' 
+      const initialHtml = challenge.files
+        ? challenge.files['/index.html'] || '<div></div>'
         : challenge.htmlContent || '<div></div>';
 
       const result = await executePlaywrightCode(
@@ -366,7 +366,8 @@ export function ChallengePlayground({
       const isCodeType =
         challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
       const isAssertionChallenge =
-        challenge.category === 'playwright-assertions';
+        challenge.category === 'playwright-assertions' ||
+        challenge.category === 'e2e-testing';
 
       // Special handling for assertion challenges: validate based on assertion success + count
       if (isAssertionChallenge && result.status === 'PASSED') {
@@ -730,7 +731,7 @@ export function ChallengePlayground({
             >
               <WebComponentPreview
                 htmlContent={
-                  challenge.files 
+                  challenge.files
                     ? challenge.files[currentVfsPath] || challenge.files['/index.html'] || '<div></div>'
                     : challenge.htmlContent || '<div></div>'
                 }
