@@ -66,7 +66,7 @@ function parseFrontmatter(content: string): {
 
     let value = valueParts.join(':').trim();
 
-    // Strip quotes if present
+    // Strip quotes if present7899
     if (
       (value.startsWith("'") && value.endsWith("'")) ||
       (value.startsWith('"') && value.endsWith('"'))
@@ -244,6 +244,7 @@ const TIER_FILES: ChallengeTier[] = [
   'beginner',
   'intermediate',
   'expert',
+  'e2e',
 ];
 let challengeCache: Map<string, ChallengeDefinition> = new Map();
 let challengeCacheLoaded = false;
@@ -302,6 +303,7 @@ export async function getChallengeContent(
     description: resolveLocale(def.description, locale),
     instructions: resolveLocale(def.instructions, locale),
     htmlContent: def.htmlContent,
+    files: def.files,
     starterCode: def.starterCode,
     testCases: def.testCases,
     solution: def.solution,
@@ -367,6 +369,7 @@ export async function getChallengeList(
       description: resolveLocale(def.description, locale),
       instructions: resolveLocale(def.instructions, locale),
       htmlContent: def.htmlContent,
+      files: def.files,
       starterCode: def.starterCode,
       tags: def.tags,
     });

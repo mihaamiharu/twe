@@ -22,7 +22,6 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:sync": "bun src/scripts/sync-challenges.ts",
-    "db:seed": "bun run scripts/seed-challenges.ts",
     "staging:up": "podman compose up -d postgres_staging && sleep 3 && cp .env.staging .env && bun run db:migrate",
     "staging:down": "podman compose stop postgres_staging",
     "staging:reset": "podman compose down postgres_staging -v && npm run staging:up",
