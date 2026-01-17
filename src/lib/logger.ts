@@ -55,6 +55,12 @@ class Logger {
     return LOG_LEVELS[level] >= LOG_LEVELS[config.level];
   }
 
+  private handler: ((level: LogLevel, message: string, args: unknown[]) => void) | null = null;
+
+  setHandler(handler: (level: LogLevel, message: string, args: unknown[]) => void) {
+    this.handler = handler;
+  }
+
   private formatMessage(level: LogLevel, message: string): unknown[] {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
@@ -77,24 +83,40 @@ class Logger {
   }
 
   debug(message: string, ...args: unknown[]) {
+    if (this.handler) {
+      this.handler('debug', message, args);
+      return;
+    }
     if (this.shouldLog('debug')) {
       console.debug(...this.formatMessage('debug', message), ...args);
     }
   }
 
   info(message: string, ...args: unknown[]) {
+    if (this.handler) {
+      this.handler('info', message, args);
+      return;
+    }
     if (this.shouldLog('info')) {
       console.info(...this.formatMessage('info', message), ...args);
     }
   }
 
   warn(message: string, ...args: unknown[]) {
+    if (this.handler) {
+      this.handler('warn', message, args);
+      return;
+    }
     if (this.shouldLog('warn')) {
       console.warn(...this.formatMessage('warn', message), ...args);
     }
   }
 
   error(message: string, ...args: unknown[]) {
+    if (this.handler) {
+      this.handler('error', message, args);
+      return;
+    }
     if (this.shouldLog('error')) {
       console.error(...this.formatMessage('error', message), ...args);
     }

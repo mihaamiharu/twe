@@ -1,0 +1,46 @@
+services:
+  app_staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: twe-app-staging
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://twe_staging:twe_password@postgres_staging:5432/twe_staging
+      - BETTER_AUTH_URL=http://localhost:3000
+    depends_on:
+      postgres_staging:
+        condition: service_healthy
+    networks:
+      - staging_net
+
+  postgres_staging:
+    image: postgres:15-alpine
+    container_name: twe-postgres-staging
+    restart: unless-stopped
+    ports:
+      - '5434:5432'
+    environment:
+      POSTGRES_USER: twe_staging
+      POSTGRES_PASSWORD: twe_password
+      POSTGRES_DB: twe_staging
+    volumes:
+      - postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U twe_staging -d twe_staging']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - staging_net
+
+volumes:
+  postgres_staging_data:
+    driver: local
+
+networks:
+  staging_net:
+    driver: bridge

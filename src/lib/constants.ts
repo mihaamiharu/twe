@@ -14,6 +14,7 @@ export const tierLabels: Record<
     tier: 'intermediate',
   },
   expert: { name: '🔴 Expert', color: 'text-red-400/90', tier: 'expert' },
+  e2e: { name: '🟣 E2E', color: 'text-purple-400/90', tier: 'e2e' },
 };
 
 export const difficultyColors: Record<string, string> = {
@@ -38,11 +39,12 @@ export const categoryLabels: Record<string, string> = {
   'playwright-assertions': '✅ Assertions',
   'playwright-waits': '⏳ Wait Strategies',
   // Tier 4: Expert (Advanced)
-  // Tier 4: Expert (Advanced)
   'playwright-pom': '🏗️ Page Object Model',
   'playwright-data-driven': '📊 Data-Driven Testing',
   'playwright-infrastructure': '🔧 Test Infrastructure',
   'playwright-integration-patterns': '🔄 Integration Patterns',
+  // Tier 5: E2E
+  'e2e-testing': '🟣 E2E Testing',
 };
 
 export function getTierFromCategory(category?: string): string {
@@ -68,10 +70,11 @@ export function getTierFromCategory(category?: string): string {
     category.startsWith('playwright-integration')
   )
     return 'expert';
+  if (category.startsWith('e2e-')) return 'e2e';
   return 'basic';
 }
 
-export const TIER_ORDER = ['basic', 'beginner', 'intermediate', 'expert'];
+export const TIER_ORDER = ['basic', 'beginner', 'intermediate', 'expert', 'e2e'];
 export const DIFFICULTY_ORDER = { EASY: 1, MEDIUM: 2, HARD: 3 };
 
 // Define display order for categories within each tier
@@ -95,4 +98,6 @@ export const CATEGORY_ORDER: Record<string, number> = {
   'playwright-data-driven': 2,
   'playwright-infrastructure': 3,
   'playwright-integration-patterns': 4,
+  // E2E Tier
+  'e2e-testing': 1,
 };
