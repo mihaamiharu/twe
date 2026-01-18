@@ -297,7 +297,7 @@ export function CodeEditor({
           minimap: { enabled: showMinimap },
           lineNumbers: 'on',
           scrollBeyondLastLine: false,
-          automaticLayout: true,
+          automaticLayout: false, // We handle layout manually with ResizeObserver to avoid "Canceled" errors
           tabSize: 2,
           wordWrap: 'on',
           padding: { top: 12, bottom: 12 },
