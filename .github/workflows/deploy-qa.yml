@@ -9,6 +9,7 @@ jobs:
   deploy:
     name: Deploy to QA VPS
     runs-on: ubuntu-latest
+    environment: qa
     
     steps:
       - name: Debug Secrets
