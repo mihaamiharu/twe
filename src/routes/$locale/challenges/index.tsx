@@ -74,10 +74,12 @@ const ChallengesSearchSchema = z.object({
 
 export const Route = createFileRoute('/$locale/challenges/')({
   validateSearch: ChallengesSearchSchema,
-  loader: ({ context, params }) => {
+  loaderDeps: ({ search: { q } }) => ({ q }),
+  loader: ({ context, params, deps: { q } }) => {
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
+        search: q,
         limit: 1000,
       }),
     );
@@ -206,14 +208,13 @@ function ChallengesPage() {
   // Derive active track
   const activeTrack = ALL_TRACKS.find(t => t.id === activeTrackId) || ALL_TRACKS[0];
 
-  const { data: challengesResponse } = useQuery({
-    ...challengeListQueryOptions({
+  const { data: challengesResponse } = useSuspenseQuery(
+    challengeListQueryOptions({
       locale,
       search: debouncedSearchQuery || undefined,
       limit: 1000,
-    }),
-    placeholderData: keepPreviousData,
-  });
+    })
+  );
 
   const challenges = challengesResponse?.data ?? [];
 
