@@ -65,9 +65,13 @@ function AboutPage() {
                  Since this is "Ekki", maybe I should use a specific asset if it exists, or just a nice placeholder. 
                  I'll use a text avatar for now to be safe. */}
                         <img
-                            src="/me.jpg"
+                            src="/me.small.jpg"
                             alt="Ekki"
                             className="w-full h-full object-cover"
+                            width={128}
+                            height={128}
+                            loading="eager"
+                            fetchPriority="high"
                         />
                     </div>
 

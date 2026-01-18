@@ -33,24 +33,30 @@ const LeaderboardSearchSchema = z.object({
 
 export const Route = createFileRoute('/$locale/leaderboard')({
   validateSearch: LeaderboardSearchSchema,
-  loader: async ({ context, params }) => {
-    console.log('[Leaderboard Loader] context keys:', Object.keys(context || {}));
+  loaderDeps: ({ search: { period } }) => ({ period }),
+  loader: async ({ context, params, deps: { period } }) => {
+    // Prefetch specific period first (priority)
+    const activePromise = context.queryClient.ensureQueryData(
+      leaderboardQueryOptions({
+        period,
+        locale: params.locale,
+        page: 1,
+        limit: 50,
+      }),
+    );
 
-    // Check if queryClient exists (should be provided by router)
-    if (!context?.queryClient) {
-      console.error('[Leaderboard Loader] queryClient missing! Params:', params);
-      return;
-    }
+    // Prefetch the other one in background for instant tab switch
+    const otherPeriod = period === 'all' ? 'monthly' : 'all';
+    void context.queryClient.prefetchQuery(
+      leaderboardQueryOptions({
+        period: otherPeriod,
+        locale: params.locale,
+        page: 1,
+        limit: 50,
+      }),
+    );
 
-    // Prefetch both all-time and monthly by default to make tabs instant
-    await Promise.all([
-      context.queryClient.ensureQueryData(
-        leaderboardQueryOptions({ period: 'all', locale: params.locale }),
-      ),
-      context.queryClient.ensureQueryData(
-        leaderboardQueryOptions({ period: 'monthly', locale: params.locale }),
-      ),
-    ]);
+    return activePromise;
   },
   component: LeaderboardPage,
 });
