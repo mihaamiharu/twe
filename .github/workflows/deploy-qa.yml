@@ -12,16 +12,6 @@ jobs:
     environment: qa
     
     steps:
-      - name: Debug Secrets
-        run: |
-          if [ -n "${{ secrets.VPS_HOST }}" ]; then
-            echo "VPS_HOST is set (length: ${#SECRET})"
-          else
-            echo "VPS_HOST is NOT set"
-          fi
-        env:
-          SECRET: ${{ secrets.VPS_HOST }}
-
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.2
         with:
