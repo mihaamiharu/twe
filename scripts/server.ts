@@ -23,7 +23,18 @@ Bun.serve({
             const filePath = `./dist/client${path}`;
             const file = Bun.file(filePath);
             if (await file.exists()) {
-                return new Response(file);
+                const response = new Response(file);
+
+                // Cache Control
+                if (path.startsWith('/assets/')) {
+                    // Immutable assets (hashed by Vite) - 1 year
+                    response.headers.set('Cache-Control', 'public, max-age=31536000, immutable');
+                } else {
+                    // Other static files (favicon, robots.txt, etc) - 1 hour
+                    response.headers.set('Cache-Control', 'public, max-age=3600');
+                }
+
+                return response;
             }
         }
 
