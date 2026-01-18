@@ -39,8 +39,6 @@ function SettingsPage() {
   const { locale } = useParams({ from: '/$locale/_authenticated/settings' });
   const { t } = useTranslation(['common']);
   const queryClient = useQueryClient();
-  const [name, setName] = useState('');
-
   // Auth is guaranteed by _authenticated parent route
   const { data, isLoading, error } = useQuery({
     queryKey: ['user', 'settings'],
@@ -52,46 +50,6 @@ function SettingsPage() {
       return result.data;
     },
   });
-
-  // Update form when data is loaded
-  useEffect(() => {
-    if (data?.name) {
-      setName(data.name);
-    }
-  }, [data]);
-
-  const updateProfileMutation = useMutation({
-    mutationFn: async (newName: string) => {
-      const result = await updateUserProfile({ data: { name: newName } });
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to update profile');
-      }
-      return result.data as {
-        name?: string;
-        email?: string;
-        [key: string]: unknown;
-      };
-    },
-    onSuccess: async () => {
-      toast.success('Settings updated', {
-        description: 'Your profile information has been saved.',
-      });
-      await queryClient.invalidateQueries({ queryKey: ['user'] });
-    },
-    onError: (error: Error) => {
-      toast.error('Update failed', {
-        description: error.message,
-      });
-    },
-  });
-
-  const handleSave = () => {
-    if (!name.trim()) {
-      toast.error('Name cannot be empty');
-      return;
-    }
-    updateProfileMutation.mutate(name);
-  };
 
   if (isLoading) {
     return (
@@ -146,49 +104,87 @@ function SettingsPage() {
 
         <div className="space-y-6">
           {/* Profile Settings */}
-          <Card className="glass-card">
-            <CardHeader>
-              <CardTitle>Profile Information</CardTitle>
-              <CardDescription>
-                Update your public profile information
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Display Name</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your display name"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  defaultValue={data?.email || ''}
-                  disabled
-                  className="opacity-60 cursor-not-allowed bg-muted/20"
-                />
-                <p className="text-xs text-muted-foreground">
-                  Email cannot be changed
-                </p>
-              </div>
-              <Button
-                className="mt-4"
-                onClick={handleSave}
-                disabled={updateProfileMutation.isPending}
-              >
-                {updateProfileMutation.isPending && (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                )}
-                Save Changes
-              </Button>
-            </CardContent>
-          </Card>
+          {data && <SettingsForm initialData={data} />}
         </div>
       </div>
     </div>
+  );
+}
+
+function SettingsForm({ initialData }: { initialData: { name?: string; email?: string } }) {
+  const [name, setName] = useState(initialData.name || '');
+  const queryClient = useQueryClient();
+
+  const updateProfileMutation = useMutation({
+    mutationFn: async (newName: string) => {
+      const result = await updateUserProfile({ data: { name: newName } });
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update profile');
+      }
+      return result.data;
+    },
+    onSuccess: async () => {
+      toast.success('Settings updated', {
+        description: 'Your profile information has been saved.',
+      });
+      await queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+    onError: (error: Error) => {
+      toast.error('Update failed', {
+        description: error.message,
+      });
+    },
+  });
+
+  const handleSave = () => {
+    if (!name.trim()) {
+      toast.error('Name cannot be empty');
+      return;
+    }
+    updateProfileMutation.mutate(name);
+  };
+
+  return (
+    <Card className="glass-card">
+      <CardHeader>
+        <CardTitle>Profile Information</CardTitle>
+        <CardDescription>
+          Update your public profile information
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Display Name</Label>
+          <Input
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Your display name"
+          />
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            defaultValue={initialData.email || ''}
+            disabled
+            className="opacity-60 cursor-not-allowed bg-muted/20"
+          />
+          <p className="text-xs text-muted-foreground">
+            Email cannot be changed
+          </p>
+        </div>
+        <Button
+          className="mt-4"
+          onClick={handleSave}
+          disabled={updateProfileMutation.isPending}
+        >
+          {updateProfileMutation.isPending && (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          )}
+          Save Changes
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

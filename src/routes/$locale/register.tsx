@@ -21,7 +21,7 @@ export const Route = createFileRoute('/$locale/register')({
   component: RegisterPage,
 });
 
-import { useEffect } from 'react';
+
 
 function RegisterPage() {
   const { locale } = useParams({ from: '/$locale/register' });
@@ -37,7 +37,7 @@ function RegisterPage() {
               params: localeParams(locale),
             });
           }}
-          // No onSuccess needed as RegisterForm handles the "Check Email" state internally
+        // No onSuccess needed as RegisterForm handles the "Check Email" state internally
         />
       </div>
     </div>

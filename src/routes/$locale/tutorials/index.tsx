@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { getTutorials } from '@/server/tutorials.fn';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { z } from 'zod';
 import {
   Card,
@@ -47,15 +47,15 @@ const TutorialsSearchSchema = z.object({
 
 export const Route = createFileRoute('/$locale/tutorials/')({
   validateSearch: TutorialsSearchSchema,
-  loader: async ({ params }) => {
-    // Prefetch tutorials for SSR
-    const result = await getTutorials({
-      data: {
+  loaderDeps: ({ search }) => search,
+  loader: ({ context, params, deps: search }) => {
+    return context.queryClient.ensureQueryData(
+      tutorialsListQueryOptions({
         locale: params.locale,
+        search: search.q,
         limit: 50,
-      },
-    });
-    return result;
+      }),
+    );
   },
   component: TutorialsPage,
   head: () => ({
@@ -109,25 +109,13 @@ function TutorialsPage() {
     }
   }, [debouncedSearchQuery]);
 
-  const {
-    data: tutorialsResponse,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ['tutorials', q],
-    queryFn: async () => {
-      const result = await getTutorials({
-        data: {
-          locale,
-          search: q || undefined,
-          limit: 50,
-        },
-      });
-      if (!result.success) throw new Error(result.error);
-      return result;
-    },
-    placeholderData: keepPreviousData,
-  });
+  const { data: tutorialsResponse } = useSuspenseQuery(
+    tutorialsListQueryOptions({
+      locale,
+      search: q || undefined,
+      limit: 50,
+    }),
+  );
 
   const tutorials = tutorialsResponse?.data ?? [];
 
@@ -251,37 +239,12 @@ function TutorialsPage() {
           </div>
         </div>
 
-        {/* Loading State */}
-        {isLoading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Card key={i} className="h-full glass-card">
-                <CardHeader>
-                  <Skeleton className="h-6 w-24 mb-2" />
-                  <Skeleton className="h-8 w-3/4 mb-2" />
-                  <Skeleton className="h-4 w-full" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-4 w-1/2" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
 
-        {/* Error State */}
-        {error && (
-          <div className="text-center py-12">
-            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {t('page.failedToLoad')}
-            </h3>
-            <p className="text-muted-foreground">{t('page.pleaseTryAgain')}</p>
-          </div>
-        )}
+
+
 
         {/* Empty State */}
-        {!isLoading && !error && filteredTutorials.length === 0 && (
+        {filteredTutorials.length === 0 && (
           <div className="text-center py-12">
             <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold mb-2">
@@ -294,7 +257,7 @@ function TutorialsPage() {
         )}
 
         {/* Tutorials Content */}
-        {!isLoading && !error && filteredTutorials.length > 0 && (
+        {filteredTutorials.length > 0 && (
           <>
             {/* Track View (Grouped) - Only in Grid Mode and when 'All' is selected */}
             {viewMode === 'grid' && groupedTutorials ? (
