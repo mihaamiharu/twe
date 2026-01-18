@@ -1,6 +1,7 @@
 import { Link, useLocation, useParams } from '@tanstack/react-router';
+import { type AuthSession } from '@/server/auth.fn';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import {
   BookOpen,
   Bug,
@@ -17,6 +18,7 @@ import {
 import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { UserMenu } from '@/components/UserMenu';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -30,11 +32,16 @@ import { signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
-import { useSuspenseQuery } from '@tanstack/react-query';
+
 import { authQueryOptions } from '@/lib/auth.query';
 import { cn } from '@/lib/utils';
 
-export function Header() {
+
+export function HeaderComponent({ session }: { session: AuthSession | null }) {
+  const user = session?.user;
+  const isAuthenticated = !!user;
+  const isAdmin = (user as { role?: string })?.role === 'ADMIN';
+
   const { t } = useTranslation(['common', 'bugs']);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -54,10 +61,7 @@ export function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Use TanStack Query to get the session (hydrated from server)
-  const { data: auth } = useSuspenseQuery(authQueryOptions);
-  const session = auth; // Alias for compatibility
-  const isPending = false; // Suspense handles loading state
+
 
   // Dynamic nav links based on locale
   const navLinks = [
@@ -87,9 +91,6 @@ export function Header() {
     },
   ];
 
-  const user = session?.user;
-  const isAuthenticated = !!user;
-  const isAdmin = (user as { role?: string })?.role === 'ADMIN';
 
   const handleSignOut = async () => {
     try {
@@ -171,103 +172,8 @@ export function Header() {
                 <ThemeToggle />
               </div>
 
-              {isPending ? (
-                <div className="h-9 w-9 rounded-full bg-muted animate-pulse" />
-              ) : isAuthenticated && user ? (
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-border/50 transition-all p-0 overflow-hidden"
-                    >
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={user.image || undefined} />
-                        <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-medium">
-                          {(user.name || user.email || 'U')
-                            .charAt(0)
-                            .toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
-                    <DropdownMenuLabel className="font-normal">
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {user.name || 'User'}
-                        </p>
-                        <p className="text-xs leading-none text-muted-foreground">
-                          {user.email}
-                        </p>
-                        {isAdmin && (
-                          <div className="flex items-center gap-1 mt-1.5">
-                            <Badge
-                              variant="outline"
-                              className="w-fit bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 text-[10px] h-5 px-1.5 uppercase tracking-wider"
-                            >
-                              Admin
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to={LocaleRoutes.profile}
-                        params={localeParams(locale)}
-                        className="cursor-pointer font-medium"
-                      >
-                        <User className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                        {t('common:navigation.profile')}
-                      </Link>
-                    </DropdownMenuItem>
-                    {isAdmin && (
-                      <DropdownMenuItem asChild>
-                        <Link
-                          to="/admin"
-                          className="cursor-pointer font-medium text-purple-600 focus:text-purple-600 focus:bg-purple-50 dark:focus:bg-purple-500/10"
-                        >
-                          <LayoutDashboard className="mr-2 h-4 w-4" />
-                          {t('common:navigation.admin')}
-                        </Link>
-                      </DropdownMenuItem>
-                    )}
-                    <DropdownMenuItem asChild>
-                      <Link
-                        to={LocaleRoutes.settings}
-                        params={localeParams(locale)}
-                        className="cursor-pointer"
-                      >
-                        <Settings className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                        {t('common:navigation.settings')}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      asChild
-                    >
-                      <div className="w-full cursor-pointer">
-                        <BugReportDialog
-                          trigger={
-                            <div className="flex items-center w-full gap-2">
-                              <Bug className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                              {t('bugs:dialog.trigger')}
-                            </div>
-                          }
-                        />
-                      </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => void handleSignOut()}
-                      className="cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10"
-                    >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      {t('common:navigation.logout')}
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              {isAuthenticated && user ? (
+                <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
                   <div className="hidden md:flex items-center gap-2">
@@ -440,6 +346,27 @@ export function Header() {
         </div>
       )}
     </>
+  );
+}
+
+export const Header = memo(HeaderComponent, areHeaderPropsEqual);
+
+function areHeaderPropsEqual(
+  prev: { session: AuthSession | null },
+  next: { session: AuthSession | null },
+) {
+  // If session existence changes, re-render
+  if (!!prev.session !== !!next.session) return false;
+  // If both null, no change
+  if (!prev.session && !next.session) return true;
+
+  // Check user details specifically (name, image, email)
+  return (
+    prev.session?.user?.id === next.session?.user?.id &&
+    prev.session?.user?.name === next.session?.user?.name &&
+    prev.session?.user?.image === next.session?.user?.image &&
+    prev.session?.user?.email === next.session?.user?.email &&
+    prev.session?.user?.role === next.session?.user?.role
   );
 }
 

@@ -20,11 +20,7 @@ export function TableOfContents({
   className,
 }: TableOfContentsProps) {
   const { t } = useTranslation('tutorials');
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  // State removed as it was unused
 
   if (!headers.length) return null;
 

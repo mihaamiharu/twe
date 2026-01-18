@@ -21,7 +21,7 @@ export const Route = createFileRoute('/$locale/login')({
   component: LoginPage,
 });
 
-import { useEffect } from 'react';
+
 
 function LoginPage() {
   const { locale } = useParams({ from: '/$locale/login' });

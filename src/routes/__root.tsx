@@ -6,6 +6,7 @@ import {
   useParams,
   useLocation,
 } from '@tanstack/react-router';
+import { Suspense } from 'react';
 import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
@@ -77,10 +78,32 @@ export const Route = createRootRouteWithContext<RootContext>()({
       },
     ],
     links: [
+      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap',
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap',
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap',
+      },
       {
         rel: 'icon',
         href: '/logo-icon.svg',
         type: 'image/svg+xml',
+      },
+      {
+        rel: 'apple-touch-icon',
+        href: '/logo-icon.svg',
+      },
+      {
+        rel: 'manifest',
+        href: '/manifest.json',
       },
       {
         rel: 'stylesheet',
@@ -94,30 +117,14 @@ export const Route = createRootRouteWithContext<RootContext>()({
   notFoundComponent: NotFound,
 });
 
+// RootComponent now just renders the Outlet
+// The layout (Header, Footer) is in RootDocument which is stable
 function RootComponent() {
-  const { auth } = Route.useRouteContext();
-  const location = useLocation();
-  // Check if current route is a challenge detail page (e.g. /en/challenges/basic-selector)
-  // Exclude /admin/challenges and ensure it's not just the index /challenges
-  const isChallengeDetail =
-    /\/challenges\/[^/]+$/.test(location.pathname) &&
-    !location.pathname.includes('/admin/');
-
-  return (
-    <ThemeProvider>
-      <GoogleAnalytics measurementId={auth?.gaMeasurementId} />
-      <div className="flex flex-col min-h-screen">
-        <Header />
-        <main className="flex-1">
-          <Outlet />
-        </main>
-        {!isChallengeDetail && <Footer />}
-        <Toaster position="top-right" theme="system" closeButton />
-      </div>
-    </ThemeProvider>
-  );
+  return <Outlet />;
 }
 
+// RootDocument is the "shell" that persists during SPA navigation
+// Header, Footer, and layout go here to prevent flicker
 function RootDocument({ children }: { children: React.ReactNode }) {
   const context = Route.useRouteContext();
   const queryClient = context?.queryClient;
@@ -145,7 +152,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="scrollbar-thin" suppressHydrationWarning>
         <QueryClientProvider client={queryClient}>
-          {children}
+          <ThemeProvider>
+            <AppLayout>{children}</AppLayout>
+          </ThemeProvider>
           <TanStackDevtools
             config={{
               position: 'bottom-right',
@@ -161,5 +170,34 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
+  );
+}
+
+// AppLayout handles the Header, Footer, and main content area
+// Uses route context (populated by beforeLoad) for auth data - always available
+function AppLayout({ children }: { children: React.ReactNode }) {
+  const context = Route.useRouteContext();
+  const auth = context?.auth;
+  const location = useLocation();
+
+  // Check if current route is a challenge detail page
+  const isChallengeDetail =
+    /\/challenges\/[^/]+$/.test(location.pathname) &&
+    !location.pathname.includes('/admin/');
+
+  return (
+    <>
+      <GoogleAnalytics measurementId={auth?.gaMeasurementId} />
+      <div className="flex flex-col min-h-screen">
+        <Header session={auth || null} />
+        <main className="flex-1">
+          <Suspense fallback={<div className="min-h-[50vh]" />}>
+            {children}
+          </Suspense>
+        </main>
+        {!isChallengeDetail && <Footer />}
+        <Toaster position="top-right" theme="system" closeButton />
+      </div>
+    </>
   );
 }
