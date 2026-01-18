@@ -16,6 +16,7 @@ export type SessionUser = {
 export type AuthSession = {
   user: SessionUser | null;
   isAuthenticated: boolean;
+  gaMeasurementId?: string;
 };
 
 export const getServerSession = createServerFn({ method: 'GET' }).handler(
@@ -44,13 +45,18 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             role: (session.user as any).role || 'USER',
           },
           isAuthenticated: true,
+          gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
         };
       }
     } catch (error) {
       console.error('[Auth] Failed to get session:', error);
     }
 
-    return { user: null, isAuthenticated: false };
+    return {
+      user: null,
+      isAuthenticated: false,
+      gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
+    };
   },
 );
 

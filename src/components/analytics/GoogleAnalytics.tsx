@@ -10,9 +10,8 @@ declare global {
   }
 }
 
-export function GoogleAnalytics() {
+export function GoogleAnalytics({ measurementId }: { measurementId?: string }) {
   const location = useLocation();
-  const measurementId = import.meta.env.VITE_GA_MEASUREMENT_ID;
 
   // Initialize GA
   useEffect(() => {

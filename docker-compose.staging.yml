@@ -7,10 +7,10 @@ services:
     restart: unless-stopped
     ports:
       - "3000:3000"
+    env_file:
+      - .env.staging
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=postgresql://twe_staging:twe_password@postgres_staging:5432/twe_staging
-      - BETTER_AUTH_URL=http://localhost:3000
     depends_on:
       postgres_staging:
         condition: service_healthy

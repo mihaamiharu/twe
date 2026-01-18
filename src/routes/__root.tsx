@@ -95,6 +95,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
 });
 
 function RootComponent() {
+  const { auth } = Route.useRouteContext();
   const location = useLocation();
   // Check if current route is a challenge detail page (e.g. /en/challenges/basic-selector)
   // Exclude /admin/challenges and ensure it's not just the index /challenges
@@ -104,7 +105,7 @@ function RootComponent() {
 
   return (
     <ThemeProvider>
-      <GoogleAnalytics />
+      <GoogleAnalytics measurementId={auth?.gaMeasurementId} />
       <div className="flex flex-col min-h-screen">
         <Header />
         <main className="flex-1">

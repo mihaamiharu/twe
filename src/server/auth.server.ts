@@ -83,6 +83,7 @@ export const auth = betterAuth({
   // Base URL
   baseURL: process.env.BETTER_AUTH_URL,
   secret: process.env.BETTER_AUTH_SECRET,
+  trustedOrigins: [process.env.BETTER_AUTH_URL],
 
   // Advanced options
   advanced: {
