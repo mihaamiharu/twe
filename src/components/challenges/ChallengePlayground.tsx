@@ -607,30 +607,32 @@ export function ChallengePlayground({
 
   // Mobile fallback layout (Stack)
   const mobileLayout = (
-    <div className="flex-1 overflow-auto p-4 space-y-8">
+    <div className="flex-1 overflow-auto p-4 space-y-4">
+      {/* Instructions/Preview Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="w-full">
-          <TabsTrigger value="instructions" className="flex-1">
+        <TabsList className="w-full h-10 bg-muted/50 p-1 border border-border rounded-lg">
+          <TabsTrigger value="instructions" className="flex-1 text-xs">
             {t('challenges:playground.instructions')}
           </TabsTrigger>
-          {challenge.htmlContent && (
-            <TabsTrigger value="preview" className="flex-1">
+          {(challenge.htmlContent || challenge.files) && (
+            <TabsTrigger value="preview" className="flex-1 text-xs">
               {t('challenges:playground.preview')}
             </TabsTrigger>
           )}
         </TabsList>
-        <TabsContent value="instructions" className="mt-4">
+        <TabsContent value="instructions" className="mt-3">
           <div className="prose prose-sm dark:prose-invert max-w-none">
             <MarkdownRenderer content={challenge.instructions} />
           </div>
         </TabsContent>
-        <TabsContent
-          value="preview"
-          className="mt-4 h-[400px]"
-        >
-          {challenge.htmlContent && (
+        <TabsContent value="preview" className="mt-3 h-[300px]">
+          {(challenge.htmlContent || challenge.files) && (
             <WebComponentPreview
-              htmlContent={challenge.htmlContent}
+              htmlContent={
+                challenge.files
+                  ? challenge.files[currentVfsPath] || challenge.files['/index.html'] || '<div></div>'
+                  : challenge.htmlContent || '<div></div>'
+              }
               cssContent={defaultSelectorStyles}
               userSelector={isSelectorChallenge ? selector : undefined}
               selectorType={selectorType}
@@ -643,62 +645,185 @@ export function ChallengePlayground({
               showControls={true}
               height="100%"
               iframeRef={previewIframeRef}
+              files={challenge.files}
+              currentPath={currentVfsPath}
+              onNavigate={(path) => setCurrentVfsPath(path)}
             />
           )}
         </TabsContent>
       </Tabs>
 
+      {/* Code Editor for code challenges */}
       {isCodeChallenge && (
-        <div className="h-[400px] border border-border rounded-lg overflow-hidden">
-          <CodeEditor
-            initialCode={challenge.starterCode}
-            language="javascript"
-            onChange={setCode}
-            onRun={() => void handleRunCode()}
-            storageKey={
-              userId
-                ? `challenge-${challenge.id}-${userId}`
-                : `challenge-${challenge.id}`
-            }
-            height="100%"
-            className="h-full"
-            key={`${challenge.id}-${resetCount}`}
-          />
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+              <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+              {t('challenges:playground.editor')}
+            </h3>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6 text-muted-foreground hover:text-destructive"
+              onClick={handleReset}
+              title={t('challenges:playground.resetCode')}
+            >
+              <RotateCcw className="h-3 w-3" />
+            </Button>
+          </div>
+          <div className="h-[280px] border border-border rounded-lg overflow-hidden">
+            <CodeEditor
+              initialCode={challenge.starterCode}
+              language="javascript"
+              onChange={setCode}
+              onRun={() => void handleRunCode()}
+              onReady={() => setIsLayoutReady(true)}
+              storageKey={
+                userId
+                  ? `challenge-${challenge.id}-${userId}`
+                  : `challenge-${challenge.id}`
+              }
+              height="100%"
+              className="h-full"
+              key={`${challenge.id}-${resetCount}`}
+            />
+          </div>
         </div>
       )}
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="font-bold">{t('challenges:playground.results')}</h3>
-          {isCodeChallenge && (
+      {/* Selector Input for selector challenges */}
+      {isSelectorChallenge && (
+        <div className="space-y-3">
+          <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
+            <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border">
+              1
+            </div>
+            {t('challenges:playground.step1')}
+          </h3>
+          <Card className="border border-border rounded-xl shadow-sm overflow-hidden bg-muted/5">
+            <CardContent className="p-3 space-y-3">
+              <SelectorInput
+                value={selector}
+                onChange={handleSelectorChange}
+                onValidate={handleValidateSelector}
+                defaultType={selectorType}
+                allowTypeChange={true}
+              />
+              <div className="flex items-center justify-between pt-2 border-t border-border/50 gap-2">
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleValidateSelector}
+                  disabled={isRunning || !selector}
+                  className="font-bold border border-border bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black transition-all text-xs"
+                >
+                  {isRunning ? (
+                    <Loader2 className="h-3.5 w-3.5 mr-1.5 animate-spin" />
+                  ) : (
+                    <Play className="h-3.5 w-3.5 mr-1.5" />
+                  )}
+                  {t('challenges:playground.testSelector')}
+                </Button>
+
+                {/* Inline validation badge */}
+                {testResults.length > 0 && (
+                  <div
+                    className={cn(
+                      'flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs font-bold transition-all',
+                      hasPassed
+                        ? 'bg-green-500/10 text-green-600 border border-green-500/30'
+                        : 'bg-red-500/10 text-red-600 border border-red-500/30',
+                    )}
+                  >
+                    {hasPassed ? (
+                      <>
+                        <Zap className="h-3.5 w-3.5 fill-current" />
+                        {t('challenges:playground.correct')}
+                      </>
+                    ) : (
+                      <>
+                        <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate max-w-[120px]">
+                          {testResults[0]?.error || t('challenges:playground.selectorMismatch')}
+                        </span>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Results & Console for code challenges */}
+      {isCodeChallenge && (
+        <div className="border border-border rounded-lg overflow-hidden bg-white dark:bg-slate-950">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border bg-muted/10">
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setResultsTab('results')}
+                className={cn(
+                  'px-2 py-1 text-xs font-bold rounded-md transition-colors',
+                  resultsTab === 'results'
+                    ? 'bg-brand-teal/20 text-brand-teal-dark'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                )}
+              >
+                {t('challenges:playground.results')}
+              </button>
+              <button
+                onClick={() => setResultsTab('console')}
+                className={cn(
+                  'px-2 py-1 text-xs font-bold rounded-md transition-colors',
+                  resultsTab === 'console'
+                    ? 'bg-brand-teal/20 text-brand-teal-dark'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+                )}
+              >
+                {t('challenges:playground.console')}
+                {consoleLogs.length > 0 && (
+                  <span className="ml-1 px-1 py-0.5 text-[10px] bg-muted rounded-full">
+                    {consoleLogs.length}
+                  </span>
+                )}
+              </button>
+            </div>
+
             <Button
               size="sm"
               onClick={() => void handleRunCode()}
               disabled={isRunning}
+              className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
             >
               {isRunning ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-3 w-3 animate-spin mr-1" />
               ) : (
-                <Play className="h-4 w-4 mr-2" />
+                <Play className="h-3 w-3 mr-1" />
               )}
               {t('common:actions.run')}
             </Button>
-          )}
-        </div>
-
-        {isCodeChallenge && (
-          <div className="border-t border-border pt-4">
-            <h3 className="font-bold mb-2">
-              {t('challenges:playground.results')}
-            </h3>
-            <TestResults
-              results={testResults}
-              isRunning={isRunning}
-              challengeType={challenge.type}
-            />
           </div>
-        )}
-      </div>
+          <div className="max-h-[200px] overflow-auto">
+            {resultsTab === 'results' ? (
+              <div className="p-3">
+                <TestResults
+                  results={testResults}
+                  isRunning={isRunning}
+                  challengeType={challenge.type}
+                  className="border-0 shadow-none bg-transparent"
+                />
+              </div>
+            ) : (
+              <ConsoleOutput
+                logs={consoleLogs}
+                onClear={() => setConsoleLogs([])}
+                className="h-full"
+              />
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -983,13 +1108,13 @@ export function ChallengePlayground({
 
 
       {/* Header */}
-      <div className="border-b border-border bg-card px-4 py-3 flex items-center justify-between shrink-0">
-        <div className="flex items-center gap-4">
-          <div>
-            <h1 className="font-bold text-xl tracking-tight text-foreground">
+      <div className="border-b border-border bg-card px-3 md:px-4 py-2 md:py-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
+        <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+          <div className="min-w-0">
+            <h1 className="font-bold text-base md:text-xl tracking-tight text-foreground truncate">
               {challenge.title}
             </h1>
-            <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+            <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1 flex-wrap">
               <Badge
                 variant="secondary"
                 className="font-bold border border-border/50"
@@ -1019,9 +1144,9 @@ export function ChallengePlayground({
             )}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
           {/* Navigation Buttons */}
-          <div className="flex items-center mr-2 bg-muted/30 rounded-lg p-0.5 border border-border/50">
+          <div className="flex items-center mr-1 md:mr-2 bg-muted/30 rounded-lg p-0.5 border border-border/50">
             <Button
               variant="ghost"
               size="icon"
@@ -1031,7 +1156,7 @@ export function ChallengePlayground({
                   window.location.href = `/${locale}/challenges/${challenge.prevChallenge.slug}`;
                 }
               }}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              className="h-7 w-7 md:h-8 md:w-8 text-muted-foreground hover:text-foreground"
               title={challenge.prevChallenge ? t('common:actions.previous') : undefined}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -1046,7 +1171,7 @@ export function ChallengePlayground({
                   window.location.href = `/${locale}/challenges/${challenge.nextChallenge.slug}`;
                 }
               }}
-              className="h-8 w-8 text-muted-foreground hover:text-foreground"
+              className="h-7 w-7 md:h-8 md:w-8 text-muted-foreground hover:text-foreground"
               title={challenge.nextChallenge ? t('common:actions.next') : undefined}
             >
               <ChevronRight className="h-4 w-4" />
@@ -1097,20 +1222,22 @@ export function ChallengePlayground({
                     onClick={() => (hintUsed || !userId) ? null : setIsHintDialogOpen(true)}
                     disabled={hintMutation.isPending || !userId}
                     className={cn(
-                      'font-bold border transition-all',
+                      'font-bold border transition-all h-8 md:h-9 px-2 md:px-3',
                       hintUsed || !userId
                         ? 'bg-amber-500/5 border-amber-500/20 text-amber-600/60 cursor-default opacity-80'
                         : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
                     )}
                   >
                     {hintMutation.isPending ? (
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
                     ) : (
-                      <Lightbulb className="h-4 w-4 mr-2" />
+                      <Lightbulb className="h-4 w-4 md:mr-2" />
                     )}
-                    {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}
+                    <span className="hidden md:inline">
+                      {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}
+                    </span>
                     {!hintUsed && (
-                      <Badge variant="secondary" className="ml-2 bg-amber-500/20 text-amber-700 text-xs">
+                      <Badge variant="secondary" className="hidden md:flex ml-2 bg-amber-500/20 text-amber-700 text-xs">
                         {t('challenges:hints.penalty')}
                       </Badge>
                     )}
@@ -1136,15 +1263,15 @@ export function ChallengePlayground({
                   onClick={handleSubmit}
                   disabled={!hasPassed}
                   className={cn(
-                    'font-bold border border-border transition-all',
+                    'font-bold border border-border transition-all h-8 md:h-9 px-2 md:px-3',
                     hasPassed
                       ? 'bg-green-500 hover:bg-green-600 text-black'
                       : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
                   )}
                   title={!hasPassed ? t('common:actions.submit') : undefined}
                 >
-                  <Send className="h-4 w-4 mr-2" />
-                  {t('common:actions.submit')}
+                  <Send className="h-4 w-4 md:mr-2" />
+                  <span className="hidden md:inline">{t('common:actions.submit')}</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
@@ -1156,13 +1283,13 @@ export function ChallengePlayground({
       </div>
 
       {/* Persistent Goal Bar - Compact */}
-      <div className="bg-brand-teal/5 border-b border-border px-4 py-2 shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="bg-brand-teal/20 p-1 rounded-md shrink-0 border border-brand-teal/30">
-            <Target className="h-3.5 w-3.5 text-brand-teal-dark" />
+      <div className="bg-brand-teal/5 border-b border-border px-3 md:px-4 py-1.5 md:py-2 shrink-0">
+        <div className="flex items-start gap-2 md:gap-3">
+          <div className="bg-brand-teal/20 p-1 rounded-md shrink-0 border border-brand-teal/30 mt-0.5">
+            <Target className="h-3 w-3 md:h-3.5 md:w-3.5 text-brand-teal-dark" />
           </div>
-          <p className="text-sm font-bold text-foreground/90 leading-tight">
-            <span className="text-brand-teal mr-2">
+          <p className="text-xs md:text-sm font-bold text-foreground/90 leading-snug">
+            <span className="text-brand-teal mr-1 md:mr-2">
               {t('challenges:playground.goal')}
             </span>
             {challenge.description}

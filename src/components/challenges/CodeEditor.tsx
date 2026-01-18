@@ -244,20 +244,25 @@ export function CodeEditor({
   // Update editor when onRun changes
   useEffect(() => {
     if (editorRef.current && monacoRef.current) {
+      // Disposing the previous action is tricky with Monaco's API as addAction returns a IDisposable
+      // but re-adding with the same ID usually works fine or we can rely on its internal management.
+      // However, to avoid churn, we should only do this when onRun changes, not on every code change.
+
+      // We use editor.getValue() inside the callback so we don't need 'code' in dependencies
       editorRef.current.addAction({
         id: 'run-code',
         label: 'Run Code',
-
         keybindings: [
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           monacoRef.current.KeyMod.CtrlCmd | monacoRef.current.KeyCode.Enter,
         ],
-        run: () => {
-          onRun?.(code);
+        run: (editor) => {
+          // Use the editor instance passed to the run command to get current value
+          onRun?.(editor.getValue());
         },
       });
     }
-  }, [code, onRun]);
+  }, [onRun]);
 
   if (!isStorageLoaded && storageKey) {
     return (
