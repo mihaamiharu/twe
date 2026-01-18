@@ -270,8 +270,17 @@ export function ChallengePlayground({
     challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
   const [isLayoutReady, setIsLayoutReady] = useState(!isCodeChallenge);
 
+  // Derived state: Force reset layout readiness when challenge ID changes
+  // This ensures we show the skeleton even if the component is reused
+  const [prevChallengeId, setPrevChallengeId] = useState(challenge.id);
+  if (challenge.id !== prevChallengeId) {
+    setPrevChallengeId(challenge.id);
+    setIsLayoutReady(!isCodeChallenge);
+  }
+
   // Reset state when challenge changes
   useEffect(() => {
+    // Other state resets
     setCode(challenge.starterCode);
     setSelector('');
     setSelectorType(challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css');
@@ -282,10 +291,6 @@ export function ChallengePlayground({
     setPreviewValidation(null);
     setHintContent(null);
     setHintUsed(initialHintUsed);
-
-    // Reset layout ready state for new code challenges
-    const newIsCodeChallenge = challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
-    setIsLayoutReady(!newIsCodeChallenge);
   }, [challenge.id, challenge.starterCode, challenge.type, initialHintUsed]);
 
   const [testResults, setTestResults] = useState<TestResult[]>([]);
@@ -1091,7 +1096,7 @@ export function ChallengePlayground({
   return (
     <div
       className={cn(
-        'flex flex-col h-full bg-background animate-fade-in',
+        'relative flex flex-col h-full bg-background animate-fade-in',
         className,
       )}
     >
