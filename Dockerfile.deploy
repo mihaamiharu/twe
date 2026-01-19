@@ -9,7 +9,7 @@ RUN bun install --frozen-lockfile --production
 # We assume "bun run build" has already run locally
 COPY dist ./dist
 # Copy missing config and scripts for DB migrations
-COPY drizzle.config.ts ./
+COPY drizzle.config.ts tsconfig.json ./
 COPY drizzle ./drizzle
 COPY src ./src
 
