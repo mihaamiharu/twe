@@ -8,6 +8,10 @@ RUN bun install --frozen-lockfile --production
 # Copy the pre-built application output
 # We assume "bun run build" has already run locally
 COPY dist ./dist
+# Copy missing config and scripts for DB migrations
+COPY drizzle.config.ts ./
+COPY drizzle ./drizzle
+COPY src ./src
 
 # Expose port and start
 ENV PORT=3000
