@@ -83,32 +83,14 @@ export const Route = createRootRouteWithContext<RootContext>()({
       {
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap',
-        media: 'print',
-        // @ts-expect-error - onload is not typed in LinkProps but works in HTML
-        onLoad: "this.media='all'"
       },
       {
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap',
-        media: 'print',
-        // @ts-expect-error - onload is not typed in LinkProps but works in HTML
-        onLoad: "this.media='all'"
       },
       {
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap',
-        media: 'print',
-        // @ts-expect-error - onload is not typed in LinkProps but works in HTML
-        onLoad: "this.media='all'"
-      },
-      // Fallback for no-js
-      {
-        rel: 'noscript',
-        children: `
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" />
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" />
-          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" />
-        `
       },
       {
         rel: 'icon',
