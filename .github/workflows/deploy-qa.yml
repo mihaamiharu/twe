@@ -53,11 +53,13 @@ jobs:
             # Extract artifacts
             tar -xzf deployment.tar.gz
             
+            echo "📂 Files after extraction:"
+            ls -la
+            echo "📂 Dist contents:"
+            ls -la dist || echo "Dist not found"
+            
             # Rename deploy dockerfile to avoid confusion or use explicitly
             mv Dockerfile.deploy Dockerfile.app.built
-            
-            # Stop existing container if needed (though compose handles it)
-            # docker compose -f docker-compose.qa.yml stop app
             
             # Update docker-compose.qa.yml to point to the new dockerfile? 
             # OR just build the image manually and tag it as 'twe-app'?
@@ -89,4 +91,4 @@ jobs:
             # Cleanup
             rm deployment.tar.gz
             
-            echo "✅ Deployment complete!"
+            echo "✅ Deployment complete! Artifacts deployed successfully."
