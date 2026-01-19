@@ -3,6 +3,7 @@
  * Used by route beforeLoad to check authentication
  */
 import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
 
 export type SessionUser = {
   id: string;
@@ -65,15 +66,16 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
 const rateLimitMap = new Map<string, number>();
 const COOLDOWN_MS = 60 * 1000;
 
+// Zod schema for email validation
+const ResendVerificationSchema = z.object({
+  email: z.string().email('Invalid email format'),
+});
+
 export const resendVerification = createServerFn({ method: 'POST' })
-  .inputValidator((data: { email: string }) => data)
+  .inputValidator((data: unknown) => ResendVerificationSchema.parse(data))
   .handler(async ({ data }) => {
     try {
       const { email } = data;
-
-      if (!email || typeof email !== 'string') {
-        return { success: false, error: 'Email is required' };
-      }
 
       const normalizedEmail = email.toLowerCase().trim();
 
