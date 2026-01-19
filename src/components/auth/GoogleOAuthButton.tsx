@@ -16,15 +16,23 @@ export function GoogleOAuthButton({
   const handleClick = async () => {
     setIsLoading(true);
     try {
-      await signIn.social({
+      const res = await signIn.social({
         provider: 'google',
         callbackURL,
+        disableRedirect: true,
       });
+
+      if (res.data?.url) {
+        if (window.top) {
+          window.top.location.href = res.data.url;
+        } else {
+          window.location.href = res.data.url;
+        }
+      }
     } catch (error) {
       console.error('Google OAuth error:', error);
       setIsLoading(false);
     }
-    // Note: If successful, the page will redirect, so no need to set loading to false
   };
 
   return (
