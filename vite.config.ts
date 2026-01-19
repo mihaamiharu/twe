@@ -16,6 +16,26 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          // React core
+          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
+            return 'react-vendor';
+          }
+          // TanStack libraries
+          if (id.includes('node_modules/@tanstack/')) {
+            return 'tanstack-vendor';
+          }
+          // UI libraries (Radix, Lucide)
+          if (id.includes('node_modules/@radix-ui/') || id.includes('node_modules/lucide-react/')) {
+            return 'ui-vendor';
+          }
+        },
+      },
+    },
+  },
 });
 
 export default config;
