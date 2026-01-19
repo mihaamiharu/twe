@@ -78,9 +78,9 @@ export const Route = createRootRouteWithContext<RootContext>()({
       },
     ],
     links: [
-      // Preload critical self-hosted fonts (non-blocking)
-      { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-      { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      // Preload critical fonts removed to avoid warnings (loaded via CSS)
+      // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
       // Deferred loading for Lora (reading font - not critical for LCP)
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
@@ -127,6 +127,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang={locale} suppressHydrationWarning>
       <head>
         <HeadContent />
+        {context?.auth?.user?.image && (
+          <link
+            rel="preload"
+            as="image"
+            href={context.auth.user.image}
+            referrerPolicy="no-referrer"
+          />
+        )}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -180,6 +188,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     if (imageUrl && imageUrl !== preloadedImageRef.current) {
       preloadedImageRef.current = imageUrl;
       const img = new Image();
+      img.referrerPolicy = 'no-referrer';
       img.src = imageUrl;
     }
   }, [auth?.user?.image]);

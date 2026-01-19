@@ -18,6 +18,7 @@ export interface AchievementBadgeProps {
   showProgress?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export function AchievementBadge({
@@ -28,6 +29,7 @@ export function AchievementBadge({
   showProgress = true,
   size = 'md',
   className,
+  style,
 }: AchievementBadgeProps) {
   const progress = stats ? getAchievementProgress(achievement, stats) : null;
 
@@ -52,6 +54,7 @@ export function AchievementBadge({
           : 'opacity-70 grayscale',
         className,
       )}
+      style={style}
     >
       <CardContent className={cn(sizeClasses[size])}>
         <div className="flex items-start gap-3">

@@ -8,7 +8,6 @@ import {
   Code,
   LogOut,
   Menu,
-  Settings,
   Trophy,
   User,
   X,
@@ -17,23 +16,11 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { UserMenu } from '@/components/UserMenu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/BugReportDialog';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
-
-import { authQueryOptions } from '@/lib/auth.query';
 import { cn } from '@/lib/utils';
 
 
