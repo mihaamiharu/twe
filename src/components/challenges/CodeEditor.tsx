@@ -14,12 +14,16 @@ import Editor, {
   type OnMount,
   type OnChange,
   type Monaco,
+  loader,
 } from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { cn } from '@/lib/utils';
 import { storage } from '@/lib/storage-adapter';
 import { Loader2 } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
+
+// Monaco loader configuration flag
+let monacoConfigured = false;
 
 export interface CodeEditorProps {
   initialCode?: string;
@@ -118,6 +122,16 @@ export function CodeEditor({
 
   // Loading state for async storage fetch
   const [isStorageLoaded, setIsStorageLoaded] = useState(!storageKey);
+
+  // Configure Monaco loader on client side (SSR-safe)
+  useEffect(() => {
+    if (!monacoConfigured && typeof window !== 'undefined') {
+      import('monaco-editor').then((monaco) => {
+        loader.config({ monaco });
+        monacoConfigured = true;
+      });
+    }
+  }, []);
 
   // Apply theme change without re-mounting if possible
   useEffect(() => {
@@ -297,7 +311,7 @@ export function CodeEditor({
           minimap: { enabled: showMinimap },
           lineNumbers: 'on',
           scrollBeyondLastLine: false,
-          automaticLayout: false, // We handle layout manually with ResizeObserver to avoid "Canceled" errors
+          automaticLayout: true, // Enable automatic layout - "Canceled" error is cosmetic
           tabSize: 2,
           wordWrap: 'on',
           padding: { top: 12, bottom: 12 },
