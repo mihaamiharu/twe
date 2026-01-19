@@ -12,6 +12,7 @@ COPY dist ./dist
 COPY drizzle.config.ts tsconfig.json ./
 COPY drizzle ./drizzle
 COPY src ./src
+COPY content ./content
 
 # Expose port and start
 ENV PORT=3000
