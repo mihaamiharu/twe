@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useParams } from '@tanstack/react-router';
+import { createFileRoute, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -12,19 +12,19 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
+
 import { Skeleton } from '@/components/ui/skeleton';
 import {
   Award,
   BookOpen,
   Code,
-  Settings,
+
   Zap,
   AlertCircle,
 } from 'lucide-react';
 import { getXPForLevel } from '@/lib/gamification';
 import { getUserSettings } from '@/server/user.fn';
-import { localeParams, LocaleRoutes } from '@/lib/navigation';
+
 import { AchievementBadge } from '@/components/gamification/AchievementBadge';
 import { Achievement } from '@/lib/achievements';
 
@@ -170,7 +170,7 @@ function ProfilePage() {
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={user.image || undefined} />
+                <AvatarImage src={user.image || undefined} referrerPolicy="no-referrer" />
                 <AvatarFallback className="text-2xl bg-primary/20 text-primary">
                   {(user.name || user.email).charAt(0).toUpperCase()}
                 </AvatarFallback>
@@ -202,12 +202,7 @@ function ProfilePage() {
                 </div>
               </div>
 
-              <Link to={LocaleRoutes.settings} params={localeParams(locale)}>
-                <Button variant="outline">
-                  <Settings className="h-4 w-4 mr-2" />
-                  {t('profile:header.settings')}
-                </Button>
-              </Link>
+
             </div>
           </CardContent>
         </Card>

@@ -54,7 +54,7 @@ export const LocaleRoutes = {
   challengeDetail: '/$locale/challenges/$slug',
   leaderboard: '/$locale/leaderboard',
   profile: '/$locale/profile',
-  settings: '/$locale/settings',
+
   privacy: '/$locale/privacy',
   terms: '/$locale/terms',
   about: '/$locale/about',

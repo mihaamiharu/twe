@@ -5,7 +5,7 @@ import {
     Bug,
     LayoutDashboard,
     LogOut,
-    Settings,
+
     User as UserIcon,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -55,7 +55,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
                     className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-border/50 transition-all p-0 overflow-hidden"
                 >
                     <Avatar className="h-9 w-9">
-                        <AvatarImage src={user.image || undefined} />
+                        <AvatarImage src={user.image || undefined} referrerPolicy="no-referrer" />
                         <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-medium">
                             {(user.name || user.email || 'U')
                                 .charAt(0)
@@ -107,16 +107,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
                         </Link>
                     </DropdownMenuItem>
                 )}
-                <DropdownMenuItem asChild>
-                    <Link
-                        to={LocaleRoutes.settings}
-                        params={localeParams(locale)}
-                        className="cursor-pointer"
-                    >
-                        <Settings className="mr-2 h-4 w-4 text-muted-foreground group-hover:text-primary" />
-                        {t('common:navigation.settings')}
-                    </Link>
-                </DropdownMenuItem>
+
                 <DropdownMenuItem
                     onSelect={(e) => e.preventDefault()}
                     asChild
