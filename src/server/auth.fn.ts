@@ -3,6 +3,7 @@
  * Used by route beforeLoad to check authentication
  */
 import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
 
 export type SessionUser = {
   id: string;
@@ -19,6 +20,36 @@ export type AuthSession = {
   gaMeasurementId?: string;
 };
 
+// Helper to update user image from Google if missing (Lazy Migration)
+async function ensureUserImage(userId: string): Promise<string | null> {
+  try {
+    const { db } = await import('@/db');
+    const { users, accounts } = await import('@/db/schema');
+    const { eq, and } = await import('drizzle-orm');
+
+    // Check for Google account
+    const account = await db.query.accounts.findFirst({
+      where: and(eq(accounts.userId, userId), eq(accounts.providerId, 'google')),
+    });
+
+    if (account?.idToken) {
+      // Decode ID Token to get picture
+      try {
+        const payload = JSON.parse(Buffer.from(account.idToken.split('.')[1], 'base64').toString());
+        if (payload.picture) {
+          await db.update(users).set({ image: payload.picture }).where(eq(users.id, userId));
+          return payload.picture as string;
+        }
+      } catch (e) {
+        // Ignore decoding errors
+      }
+    }
+  } catch (error) {
+    console.error('[Auth] Failed to lazy update user image:', error);
+  }
+  return null;
+}
+
 export const getServerSession = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthSession> => {
     try {
@@ -34,12 +65,20 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
       const session = await auth.api.getSession({ headers });
 
       if (session?.user) {
+        let image = session.user.image;
+        if (!image) {
+          const newImage = await ensureUserImage(session.user.id);
+          if (newImage) image = newImage;
+        }
+
+
+
         return {
           user: {
             id: session.user.id,
             email: session.user.email,
             name: session.user.name || null,
-            image: session.user.image || null,
+            image: image || null,
             emailVerified: session.user.emailVerified || false,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
             role: (session.user as any).role || 'USER',
@@ -65,15 +104,16 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
 const rateLimitMap = new Map<string, number>();
 const COOLDOWN_MS = 60 * 1000;
 
+// Zod schema for email validation
+const ResendVerificationSchema = z.object({
+  email: z.string().email('Invalid email format'),
+});
+
 export const resendVerification = createServerFn({ method: 'POST' })
-  .inputValidator((data: { email: string }) => data)
+  .inputValidator((data: unknown) => ResendVerificationSchema.parse(data))
   .handler(async ({ data }) => {
     try {
       const { email } = data;
-
-      if (!email || typeof email !== 'string') {
-        return { success: false, error: 'Email is required' };
-      }
 
       const normalizedEmail = email.toLowerCase().trim();
 

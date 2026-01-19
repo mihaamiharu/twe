@@ -66,7 +66,7 @@ export function Footer() {
   }
 
   return (
-    <footer className="border-t border-border/40 bg-zinc-50/50 dark:bg-zinc-950/50 backdrop-blur-xl transition-colors duration-300">
+    <footer className="min-h-[280px] lg:min-h-[260px] border-t border-border/40 bg-zinc-50/50 dark:bg-zinc-950/50 backdrop-blur-xl transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-6 py-12 lg:px-8 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Brand Section */}

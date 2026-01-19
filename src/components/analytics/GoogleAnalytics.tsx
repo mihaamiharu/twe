@@ -23,23 +23,30 @@ export function GoogleAnalytics({ measurementId }: { measurementId?: string }) {
     // Define gtag if it doesn't exist
     if (!window.gtag) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      window.gtag = function (...args: any[]) {
-        window.dataLayer.push(args);
+      window.gtag = function () {
+        // eslint-disable-next-line prefer-rest-params
+        window.dataLayer.push(arguments);
       };
     }
 
     // Load the script if it hasn't been loaded yet
     const scriptId = 'google-analytics-script';
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement('script');
-      script.id = scriptId;
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-      document.head.appendChild(script);
 
-      window.gtag('js', new Date());
-      window.gtag('config', measurementId);
-    }
+    // delay initialization to minimalize TBT
+    const timeoutId = setTimeout(() => {
+      if (!document.getElementById(scriptId)) {
+        const script = document.createElement('script');
+        script.id = scriptId;
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+        document.head.appendChild(script);
+
+        window.gtag('js', new Date());
+        window.gtag('config', measurementId);
+      }
+    }, 2000); // 2 seconds delay
+
+    return () => clearTimeout(timeoutId);
   }, [measurementId]);
 
   // Track page views

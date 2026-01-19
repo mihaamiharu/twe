@@ -65,7 +65,8 @@ export const getChallenges = createServerFn({ method: 'GET' })
 
       if (filters.type) {
         if (filters.type === 'SELECTOR') {
-          conditions.push(or(eq(challenges.type, 'CSS_SELECTOR'), eq(challenges.type, 'XPATH_SELECTOR')));
+          // Non-null assertion safe: or() always has two conditions here
+          conditions.push(or(eq(challenges.type, 'CSS_SELECTOR'), eq(challenges.type, 'XPATH_SELECTOR'))!);
         } else {
           conditions.push(eq(challenges.type, filters.type));
         }
@@ -78,22 +79,22 @@ export const getChallenges = createServerFn({ method: 'GET' })
       if (filters.search) {
         const searchPattern = `%${filters.search}%`;
         // Search in localized title or description (checking both current locale and en fallback)
+        // Non-null assertion safe: or() always has four conditions here
         conditions.push(
           or(
             sql`${challenges.title}->>${locale} ILIKE ${searchPattern}`,
             sql`${challenges.title}->>'en' ILIKE ${searchPattern}`,
             sql`${challenges.description}->>${locale} ILIKE ${searchPattern}`,
             sql`${challenges.description}->>'en' ILIKE ${searchPattern}`
-          )
+          )!
         );
       }
 
       // Calculate Offset
       const offset = (filters.page - 1) * filters.limit;
 
-      // Build Query
-      // We want to fetch challenges AND the user's progress in one go
-      // Note: mapping to the shape the UI expects
+      // Build Query with $dynamic() for proper TypeScript support
+      // This enables dynamic chaining (joins, orderBy, limit) without type errors
       const query = db
         .select({
           id: challenges.id,
@@ -110,37 +111,31 @@ export const getChallenges = createServerFn({ method: 'GET' })
           isCompleted: userId ? sql<boolean>`${progress.isCompleted} IS TRUE` : sql<boolean>`false`,
         })
         .from(challenges)
-        .where(and(...conditions));
+        .where(and(...conditions))
+        .$dynamic();
 
       // Join Progress if user is logged in
       if (userId) {
-        // @ts-expect-error Drizzle join inference
         query.leftJoin(progress, and(eq(progress.challengeId, challenges.id), eq(progress.userId, userId)));
       }
 
-      // Apply Sort
-      // Drizzle dynamic sort
-      if (filters.sortBy === 'xpReward') {
-        // @ts-expect-error Dynamic sort
-        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.xpReward) : asc(challenges.xpReward));
-      } else if (filters.sortBy === 'difficulty') {
-        // Enum sorting works naturally for EASY < MEDIUM < HARD if properly ordered in PG, 
-        // but let's be safe and map to integers for robust sorting if needed. 
-        // Actually PG enums sort by their declared order. schema.ts has EASY, MEDIUM, HARD.
-        // So standard sort works.
-        // @ts-expect-error Dynamic sort
-        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.difficulty) : asc(challenges.difficulty));
-      } else if (filters.sortBy === 'completionCount') {
-        // @ts-expect-error Dynamic sort
-        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.completionCount) : asc(challenges.completionCount));
-      } else {
-        // Default: Order
-        // @ts-expect-error Dynamic sort
-        query.orderBy(filters.sortOrder === 'desc' ? desc(challenges.order) : asc(challenges.order));
-      }
+      // Apply Sort - determine orderBy clause
+      const orderByClause = (() => {
+        switch (filters.sortBy) {
+          case 'xpReward':
+            return filters.sortOrder === 'desc' ? desc(challenges.xpReward) : asc(challenges.xpReward);
+          case 'difficulty':
+            return filters.sortOrder === 'desc' ? desc(challenges.difficulty) : asc(challenges.difficulty);
+          case 'completionCount':
+            return filters.sortOrder === 'desc' ? desc(challenges.completionCount) : asc(challenges.completionCount);
+          default:
+            return filters.sortOrder === 'desc' ? desc(challenges.order) : asc(challenges.order);
+        }
+      })();
+
+      query.orderBy(orderByClause);
 
       // Apply Pagination
-      // @ts-expect-error Dynamic limit/offset
       query.limit(filters.limit).offset(offset);
 
       const data = await query;
