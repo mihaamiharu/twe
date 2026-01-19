@@ -6,7 +6,7 @@ import {
   useParams,
   useLocation,
 } from '@tanstack/react-router';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
@@ -179,6 +179,18 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const context = Route.useRouteContext();
   const auth = context?.auth;
   const location = useLocation();
+  const preloadedImageRef = useRef<string | null>(null);
+
+  // Preload the avatar image to prevent flicker
+  // This runs once when we have the user's image URL
+  useEffect(() => {
+    const imageUrl = auth?.user?.image;
+    if (imageUrl && imageUrl !== preloadedImageRef.current) {
+      preloadedImageRef.current = imageUrl;
+      const img = new Image();
+      img.src = imageUrl;
+    }
+  }, [auth?.user?.image]);
 
   // Check if current route is a challenge detail page
   const isChallengeDetail =
