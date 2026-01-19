@@ -176,7 +176,9 @@ function TutorialDetailPage() {
 
     // Delay attaching the scroll listener to let the page settle after SPA navigation
     // This prevents the listener from firing with stale scrollY from the previous page
-    const attachTimeout = setTimeout(() => {
+    const timeouts: { main?: ReturnType<typeof setTimeout>; retry?: ReturnType<typeof setTimeout> } = {};
+
+    timeouts.main = setTimeout(() => {
       // Only attach if we're at the top of the page (scroll reset completed)
       if (window.scrollY === 0) {
         hasScrolledRef.current = false;
@@ -184,31 +186,20 @@ function TutorialDetailPage() {
         scrollListenerAttached = true;
       } else {
         // If still not at top, try again shortly
-        const retryTimeout = setTimeout(() => {
+        timeouts.retry = setTimeout(() => {
           hasScrolledRef.current = false;
           window.addEventListener('scroll', handleWindowScroll);
           scrollListenerAttached = true;
         }, 200);
-        // Store for cleanup
-        (
-          attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> }
-        ).retry = retryTimeout;
       }
     }, 300);
 
     return () => {
-      clearTimeout(attachTimeout);
-      if (
-        (attachTimeout as unknown as { retry?: ReturnType<typeof setTimeout> })
-          .retry
-      ) {
-        clearTimeout(
-          (
-            attachTimeout as unknown as {
-              retry?: ReturnType<typeof setTimeout>;
-            }
-          ).retry,
-        );
+      if (timeouts.main) {
+        clearTimeout(timeouts.main);
+      }
+      if (timeouts.retry) {
+        clearTimeout(timeouts.retry);
       }
       if (scrollListenerAttached) {
         window.removeEventListener('scroll', handleWindowScroll);
