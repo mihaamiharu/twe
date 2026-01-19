@@ -31,16 +31,22 @@ export function GoogleAnalytics({ measurementId }: { measurementId?: string }) {
 
     // Load the script if it hasn't been loaded yet
     const scriptId = 'google-analytics-script';
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement('script');
-      script.id = scriptId;
-      script.async = true;
-      script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
-      document.head.appendChild(script);
 
-      window.gtag('js', new Date());
-      window.gtag('config', measurementId);
-    }
+    // delay initialization to minimalize TBT
+    const timeoutId = setTimeout(() => {
+      if (!document.getElementById(scriptId)) {
+        const script = document.createElement('script');
+        script.id = scriptId;
+        script.async = true;
+        script.src = `https://www.googletagmanager.com/gtag/js?id=${measurementId}`;
+        document.head.appendChild(script);
+
+        window.gtag('js', new Date());
+        window.gtag('config', measurementId);
+      }
+    }, 2000); // 2 seconds delay
+
+    return () => clearTimeout(timeoutId);
   }, [measurementId]);
 
   // Track page views
