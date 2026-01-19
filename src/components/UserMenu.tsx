@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import {
     Bug,
     LayoutDashboard,
@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -31,7 +31,6 @@ interface UserMenuProps {
 
 const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
     const { t } = useTranslation(['common', 'bugs']);
-    const [imgError, setImgError] = useState(false);
     const isAdmin = user.role === 'ADMIN';
 
     const handleSignOut = async () => {
@@ -56,21 +55,16 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
                     className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-border/50 transition-all p-0 overflow-hidden"
                 >
                     <Avatar className="h-9 w-9">
-                        {user.image && !imgError ? (
-                            <img
-                                src={user.image}
-                                alt={user.name || 'User'}
-                                referrerPolicy="no-referrer"
-                                className="aspect-square size-full object-cover"
-                                onError={() => setImgError(true)}
-                            />
-                        ) : (
-                            <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-medium">
-                                {(user.name || user.email || 'U')
-                                    .charAt(0)
-                                    .toUpperCase()}
-                            </div>
-                        )}
+                        <AvatarImage
+                            src={user.image || undefined}
+                            alt={user.name || 'User'}
+                            className="object-cover"
+                        />
+                        <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-medium">
+                            {(user.name || user.email || 'U')
+                                .charAt(0)
+                                .toUpperCase()}
+                        </AvatarFallback>
                     </Avatar>
                 </Button>
             </DropdownMenuTrigger>
