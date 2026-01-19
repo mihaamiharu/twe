@@ -5,7 +5,7 @@ import viteReact from '@vitejs/plugin-react';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
 
-const config = defineConfig({
+export default defineConfig({
   plugins: [
     devtools(),
     // this is the plugin that enables path aliases
@@ -16,6 +16,23 @@ const config = defineConfig({
     tanstackStart(),
     viteReact(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: (id) => {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) {
+              return 'react-vendor';
+            }
+            if (id.includes('@tanstack')) {
+              return 'tanstack-vendor';
+            }
+            if (id.includes('@radix-ui') || id.includes('lucide-react')) {
+              return 'ui-vendor';
+            }
+          }
+        }
+      },
+    },
+  },
 });
-
-export default config;
