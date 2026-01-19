@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useQuery, useSuspenseQuery, keepPreviousData } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { z } from 'zod';
 import {
@@ -166,7 +166,6 @@ const TRACK_ICONS: Record<TrackId, React.ReactNode> = {
 };
 
 // Reconstruct full track objects with icons for the UI
-// @ts-expect-error - we know TRACK_IDS are valid keys
 const ALL_TRACKS = TRACK_IDS.map((id) => ({
   ...TRACK_CONFIG[id],
   id,
@@ -202,6 +201,7 @@ function ChallengesPage() {
     if (debouncedSearchQuery !== (q ?? '')) {
       updateSearch({ q: debouncedSearchQuery || undefined });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- updateSearch is stable, q is intentionally excluded to prevent loops
   }, [debouncedSearchQuery]);
 
 

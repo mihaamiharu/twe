@@ -49,8 +49,6 @@ interface UserProfile {
     completedChallenges: number;
     completedTutorials: number;
     achievementsCount: number;
-    completedTutorials: number;
-    achievementsCount: number;
     challengesByType: Record<string, number>;
     challengesByTier: Record<string, number>;
     tierTotalCounts: Record<string, number>;

@@ -1,8 +1,8 @@
-import { motion, useAnimation, type TargetAndTransition, type Transition } from 'framer-motion';
+import { motion, type TargetAndTransition, type Transition } from 'framer-motion';
 import React, { useEffect } from 'react';
 
 // Using a spring configuration similar to Josh Comeau's preferences
-const springConfig = {
+const springConfig: Transition = {
     type: 'spring',
     stiffness: 150,
     damping: 10,

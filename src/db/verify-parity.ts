@@ -1,7 +1,5 @@
 import { db } from './index';
 import { sql } from 'drizzle-orm';
-import { readFile } from 'fs/promises';
-import { join } from 'path';
 
 // This is a simplified version of the seeder data for verification
 // In a real scenario, we might want to import the actual seeder data arrays if exported
