@@ -22,13 +22,7 @@ Bun.serve({
         if (path !== '/') {
             const filePath = `./dist/client${path}`;
             const file = Bun.file(filePath);
-            const exists = await file.exists();
-            
-            if (path.startsWith('/assets/')) {
-               console.log(`[Static] Request: ${path} -> ${filePath} (Exists: ${exists})`);
-            }
-
-            if (exists) {
+            if (await file.exists()) {
                 const response = new Response(file);
 
                 // Cache Control
