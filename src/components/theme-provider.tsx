@@ -32,16 +32,18 @@ function getSystemTheme(): 'light' | 'dark' {
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') return 'system';
-    return (localStorage.getItem(THEME_KEY) as Theme) || 'system';
-  });
+  // Use consistent default values for SSR to prevent hydration mismatch
+  // The actual localStorage value will be synced in useEffect
+  const [theme, setThemeState] = useState<Theme>('system');
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
 
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
-    if (typeof window === 'undefined') return 'dark';
+  // Sync with localStorage after mount to prevent hydration mismatch
+  useEffect(() => {
     const stored = localStorage.getItem(THEME_KEY) as Theme;
-    return stored === 'system' || !stored ? getSystemTheme() : stored;
-  });
+    if (stored && stored !== theme) {
+      setThemeState(stored);
+    }
+  }, []);
 
   useEffect(() => {
     const root = window.document.documentElement;
