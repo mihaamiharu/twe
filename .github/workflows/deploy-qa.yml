@@ -28,7 +28,7 @@ jobs:
 
       - name: Create Deployment Package
         run: |
-          tar -czf deployment.tar.gz dist package.json bun.lock Dockerfile.deploy
+          tar -czf deployment.tar.gz dist package.json bun.lock Dockerfile.deploy .dockerignore
 
       - name: Upload Artifacts to VPS
         uses: appleboy/scp-action@v0.1.7
