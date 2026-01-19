@@ -71,6 +71,14 @@ export const auth = betterAuth({
       enabled: !!(
         process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
       ),
+      mapProfileToUser: (profile) => {
+        return {
+          name: profile.name,
+          email: profile.email,
+          image: profile.picture,
+          emailVerified: profile.email_verified,
+        };
+      },
     },
   },
 

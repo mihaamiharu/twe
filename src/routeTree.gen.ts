@@ -36,7 +36,6 @@ import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/chal
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
 import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
-import { Route as LocaleAuthenticatedSettingsRouteImport } from './routes/$locale/_authenticated/settings'
 import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
 
 const LocaleRoute = LocaleRouteImport.update({
@@ -173,12 +172,6 @@ const LocaleChallengesSlugRoute = LocaleChallengesSlugRouteImport.update({
   path: '/challenges/$slug',
   getParentRoute: () => LocaleRoute,
 } as any)
-const LocaleAuthenticatedSettingsRoute =
-  LocaleAuthenticatedSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => LocaleAuthenticatedRoute,
-  } as any)
 const LocaleAuthenticatedProfileRoute =
   LocaleAuthenticatedProfileRouteImport.update({
     id: '/profile',
@@ -209,7 +202,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
-  '/$locale/settings': typeof LocaleAuthenticatedSettingsRoute
   '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -238,7 +230,6 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
-  '/$locale/settings': typeof LocaleAuthenticatedSettingsRoute
   '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -270,7 +261,6 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/$locale/_authenticated/profile': typeof LocaleAuthenticatedProfileRoute
-  '/$locale/_authenticated/settings': typeof LocaleAuthenticatedSettingsRoute
   '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
@@ -302,7 +292,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/docs'
     | '/$locale/profile'
-    | '/$locale/settings'
     | '/$locale/challenges/$slug'
     | '/$locale/tutorials/$slug'
     | '/api/auth/$'
@@ -331,7 +320,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/docs'
     | '/$locale/profile'
-    | '/$locale/settings'
     | '/$locale/challenges/$slug'
     | '/$locale/tutorials/$slug'
     | '/api/auth/$'
@@ -362,7 +350,6 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/docs/'
     | '/$locale/_authenticated/profile'
-    | '/$locale/_authenticated/settings'
     | '/$locale/challenges/$slug'
     | '/$locale/tutorials/$slug'
     | '/api/auth/$'
@@ -576,13 +563,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleChallengesSlugRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/$locale/_authenticated/settings': {
-      id: '/$locale/_authenticated/settings'
-      path: '/settings'
-      fullPath: '/$locale/settings'
-      preLoaderRoute: typeof LocaleAuthenticatedSettingsRouteImport
-      parentRoute: typeof LocaleAuthenticatedRoute
-    }
     '/$locale/_authenticated/profile': {
       id: '/$locale/_authenticated/profile'
       path: '/profile'
@@ -595,12 +575,10 @@ declare module '@tanstack/react-router' {
 
 interface LocaleAuthenticatedRouteChildren {
   LocaleAuthenticatedProfileRoute: typeof LocaleAuthenticatedProfileRoute
-  LocaleAuthenticatedSettingsRoute: typeof LocaleAuthenticatedSettingsRoute
 }
 
 const LocaleAuthenticatedRouteChildren: LocaleAuthenticatedRouteChildren = {
   LocaleAuthenticatedProfileRoute: LocaleAuthenticatedProfileRoute,
-  LocaleAuthenticatedSettingsRoute: LocaleAuthenticatedSettingsRoute,
 }
 
 const LocaleAuthenticatedRouteWithChildren =

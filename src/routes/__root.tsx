@@ -180,6 +180,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     if (imageUrl && imageUrl !== preloadedImageRef.current) {
       preloadedImageRef.current = imageUrl;
       const img = new Image();
+      img.referrerPolicy = 'no-referrer';
       img.src = imageUrl;
     }
   }, [auth?.user?.image]);
