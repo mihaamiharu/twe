@@ -12,7 +12,6 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -26,7 +25,6 @@ import {
   BookOpen,
   Clock,
   Search,
-  AlertCircle,
   CheckCircle2,
   LayoutGrid,
   List,
