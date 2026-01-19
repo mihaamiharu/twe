@@ -13,10 +13,11 @@ COPY drizzle.config.ts tsconfig.json ./
 COPY drizzle ./drizzle
 COPY src ./src
 COPY content ./content
+COPY scripts ./scripts
 
 # Expose port and start
 ENV PORT=3000
 ENV HOST=0.0.0.0
 EXPOSE 3000
 
-CMD ["bun", "run", "dist/server/server.js"]
+CMD ["bun", "run", "scripts/server.ts"]
