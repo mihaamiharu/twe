@@ -4,7 +4,7 @@ import {
   useParams,
   redirect,
 } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
+
 import type { RootContext } from '../../__root';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -19,13 +19,13 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, ArrowLeft, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { getUserSettings, updateUserProfile } from '@/server/user.fn';
 
 export const Route = createFileRoute('/$locale/_authenticated/settings')({
   beforeLoad: ({ context, params }) => {
     const { auth } = context as RootContext;
-    if (!auth.isAuthenticated) {
+    if (!auth?.isAuthenticated) {
       throw redirect({
         to: '/$locale/login',
         params: { locale: params.locale },
@@ -37,8 +37,7 @@ export const Route = createFileRoute('/$locale/_authenticated/settings')({
 
 function SettingsPage() {
   const { locale } = useParams({ from: '/$locale/_authenticated/settings' });
-  const { t } = useTranslation(['common']);
-  const queryClient = useQueryClient();
+
   // Auth is guaranteed by _authenticated parent route
   const { data, isLoading, error } = useQuery({
     queryKey: ['user', 'settings'],

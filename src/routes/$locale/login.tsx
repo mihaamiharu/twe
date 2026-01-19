@@ -11,7 +11,7 @@ import { localeParams, LocaleRoutes } from '@/lib/navigation';
 export const Route = createFileRoute('/$locale/login')({
   beforeLoad: ({ context, params }) => {
     const { auth } = context as RootContext;
-    if (auth.isAuthenticated) {
+    if (auth?.isAuthenticated) {
       throw redirect({
         to: LocaleRoutes.home,
         params: localeParams(params.locale),

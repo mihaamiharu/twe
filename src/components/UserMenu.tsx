@@ -1,6 +1,6 @@
-import { Link, useParams } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { memo, useState } from 'react';
+import { memo } from 'react';
 import {
     Bug,
     LayoutDashboard,
