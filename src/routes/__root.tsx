@@ -127,6 +127,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang={locale} suppressHydrationWarning>
       <head>
         <HeadContent />
+        {context?.auth?.user?.image && (
+          <link
+            rel="preload"
+            as="image"
+            href={context.auth.user.image}
+            referrerPolicy="no-referrer"
+          />
+        )}
         <script
           dangerouslySetInnerHTML={{
             __html: `
