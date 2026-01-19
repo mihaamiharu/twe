@@ -8,7 +8,7 @@ import type { RootContext } from '../__root';
 export const Route = createFileRoute('/$locale/_authenticated')({
   beforeLoad: ({ context, location, params }) => {
     const { auth } = context as RootContext;
-    if (!auth.isAuthenticated) {
+    if (!auth?.isAuthenticated) {
       throw redirect({
         to: '/$locale/login',
         params: { locale: params.locale },

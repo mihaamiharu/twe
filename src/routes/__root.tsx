@@ -6,7 +6,7 @@ import {
   useParams,
   useLocation,
 } from '@tanstack/react-router';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useRef } from 'react';
 import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
@@ -78,20 +78,12 @@ export const Route = createRootRouteWithContext<RootContext>()({
       },
     ],
     links: [
+      // Preload critical fonts removed to avoid warnings (loaded via CSS)
+      // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+      // Deferred loading for Lora (reading font - not critical for LCP)
       { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
       { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap',
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap',
-      },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap',
-      },
       {
         rel: 'icon',
         href: '/logo-icon.svg',
@@ -135,6 +127,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang={locale} suppressHydrationWarning>
       <head>
         <HeadContent />
+        {context?.auth?.user?.image && (
+          <link
+            rel="preload"
+            as="image"
+            href={context.auth.user.image}
+            referrerPolicy="no-referrer"
+          />
+        )}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -179,6 +179,19 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const context = Route.useRouteContext();
   const auth = context?.auth;
   const location = useLocation();
+  const preloadedImageRef = useRef<string | null>(null);
+
+  // Preload the avatar image to prevent flicker
+  // This runs once when we have the user's image URL
+  useEffect(() => {
+    const imageUrl = auth?.user?.image;
+    if (imageUrl && imageUrl !== preloadedImageRef.current) {
+      preloadedImageRef.current = imageUrl;
+      const img = new Image();
+      img.referrerPolicy = 'no-referrer';
+      img.src = imageUrl;
+    }
+  }, [auth?.user?.image]);
 
   // Check if current route is a challenge detail page
   const isChallengeDetail =
