@@ -14,6 +14,8 @@
  * logger.error('Failed to fetch', error);
  */
 
+import * as Sentry from '@sentry/react';
+
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LoggerOptions {
@@ -113,6 +115,15 @@ class Logger {
   }
 
   error(message: string, ...args: unknown[]) {
+    // Automatically capture exception in Sentry if passed
+    const errorArg = args.find((arg) => arg instanceof Error);
+    if (errorArg) {
+      Sentry.captureException(errorArg);
+    } else {
+      // If just a message, capture as message
+      Sentry.captureMessage(message, "error");
+    }
+
     if (this.handler) {
       this.handler('error', message, args);
       return;

@@ -30,7 +30,10 @@ export interface RootContext {
   queryClient: QueryClient;
 }
 
+import { DefaultErrorComponent } from "@/components/DefaultErrorComponent";
+
 export const Route = createRootRouteWithContext<RootContext>()({
+  defaultErrorComponent: DefaultErrorComponent,
   beforeLoad: async ({ context }) => {
     // Optimization: Check cache first to avoid blocking every navigation
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);

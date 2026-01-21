@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestSentryRouteImport } from './routes/test-sentry'
 import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
@@ -38,6 +39,11 @@ import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutori
 import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
 import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
 
+const TestSentryRoute = TestSentryRouteImport.update({
+  id: '/test-sentry',
+  path: '/test-sentry',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LocaleRoute = LocaleRouteImport.update({
   id: '/$locale',
   path: '/$locale',
@@ -183,6 +189,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleAuthenticatedRouteWithChildren
+  '/test-sentry': typeof TestSentryRoute
   '/$locale/about': typeof LocaleAboutRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/test-sentry': typeof TestSentryRoute
   '/$locale': typeof LocaleIndexRoute
   '/$locale/about': typeof LocaleAboutRoute
   '/$locale/contact': typeof LocaleContactRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleRouteWithChildren
+  '/test-sentry': typeof TestSentryRoute
   '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
   '/$locale/about': typeof LocaleAboutRoute
   '/$locale/contact': typeof LocaleContactRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/$locale'
+    | '/test-sentry'
     | '/$locale/about'
     | '/$locale/contact'
     | '/$locale/forgot-password'
@@ -301,6 +311,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/test-sentry'
     | '/$locale'
     | '/$locale/about'
     | '/$locale/contact'
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/$locale'
+    | '/test-sentry'
     | '/$locale/_authenticated'
     | '/$locale/about'
     | '/$locale/contact'
@@ -361,6 +373,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   LocaleRoute: typeof LocaleRouteWithChildren
+  TestSentryRoute: typeof TestSentryRoute
   AdminBugsRoute: typeof AdminBugsRoute
   AdminChallengesRoute: typeof AdminChallengesRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -374,6 +387,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/test-sentry': {
+      id: '/test-sentry'
+      path: '/test-sentry'
+      fullPath: '/test-sentry'
+      preLoaderRoute: typeof TestSentryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/$locale': {
       id: '/$locale'
       path: '/$locale'
@@ -627,6 +647,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   LocaleRoute: LocaleRouteWithChildren,
+  TestSentryRoute: TestSentryRoute,
   AdminBugsRoute: AdminBugsRoute,
   AdminChallengesRoute: AdminChallengesRoute,
   AdminUsersRoute: AdminUsersRoute,
