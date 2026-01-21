@@ -12,7 +12,7 @@ jobs:
     environment: qa
 
     steps:
-     - name: Deploy to VPS
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
