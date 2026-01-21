@@ -7,16 +7,13 @@ export const getSentryConfig = () => {
     ? import.meta.env.VITE_SENTRY_DSN
     : (process.env.SENTRY_DSN || process.env.VITE_SENTRY_DSN);
 
-  if (!isClient) {
-    console.log('[Sentry Config] initializing with DSN:', dsn ? 'FOUND' : 'MISSING');
-  }
-
   return {
     dsn,
     // Adjust this value in production, or use tracesSampler for greater control
     tracesSampleRate: 1.0,
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
-    debug: true,
+    debug: false,
     environment: import.meta.env.MODE || process.env.NODE_ENV || 'development',
+    release: import.meta.env.VITE_APP_VERSION || process.env.npm_package_version || '1.0.0',
   };
 };
