@@ -186,9 +186,28 @@ export function WebComponentPreview({
                     document.addEventListener('submit', (e) => {
                         const form = e.target;
                         const action = form.getAttribute('action');
+
+                        // Prevent default for forms without explicit action (fixes page reload)
+                        if (!action || action === '#' || action.trim() === '') {
+                            e.preventDefault();
+                            return;
+                        }
+
                         if (action && (action.startsWith('/') || action.endsWith('.html'))) {
                             e.preventDefault();
                             window.parent.postMessage({ type: 'vfsNavigate', path: action }, '*');
+                        }
+                    }, true);
+
+                    document.addEventListener('error', (e) => {
+                        const target = e.target;
+                        if (target && target.tagName === 'IMG') {
+                            const altText = target.alt || 'Image';
+                            // Prevent infinite loop if placeholder fails
+                            if (!target.src.includes('placehold.co')) {
+                                target.src = 'https://placehold.co/600x400?text=' + encodeURIComponent(altText);
+                                target.style.objectFit = 'cover';
+                            }
                         }
                     }, true);
 

@@ -22,3 +22,6 @@ playwright-report/
 allure-results/
 allure-report/
 .env.staging
+
+# Local deployment scripts
+scripts/deploy-local.sh
