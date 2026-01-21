@@ -208,20 +208,20 @@ describe('gamification', () => {
 
   describe('getLevelTitle', () => {
     it('should return Novice for low levels', () => {
-      expect(getLevelTitle(1)).toBe('Novice');
-      expect(getLevelTitle(4)).toBe('Novice');
+      expect(getLevelTitle(1)).toBe('novice');
+      expect(getLevelTitle(4)).toBe('novice');
     });
 
     it('should return higher titles as level increases', () => {
-      expect(getLevelTitle(5)).toBe('Apprentice');
-      expect(getLevelTitle(10)).toBe('Practitioner');
-      expect(getLevelTitle(25)).toBe('Master');
-      expect(getLevelTitle(100)).toBe('Mythic');
+      expect(getLevelTitle(5)).toBe('apprentice');
+      expect(getLevelTitle(10)).toBe('practitioner');
+      expect(getLevelTitle(25)).toBe('master');
+      expect(getLevelTitle(100)).toBe('mythic');
     });
 
     it('should handle null/undefined by defaulting to Novice', () => {
-      expect(getLevelTitle(null)).toBe('Novice');
-      expect(getLevelTitle(undefined)).toBe('Novice');
+      expect(getLevelTitle(null)).toBe('novice');
+      expect(getLevelTitle(undefined)).toBe('novice');
     });
   });
 });
