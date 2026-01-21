@@ -1,14 +1,18 @@
 import { createMiddleware } from '@tanstack/react-start';
-import * as Sentry from '@sentry/bun';
 import { getSentryConfig } from '../lib/sentry.config';
-
-// Ensure Sentry is initialized within the bundled application context
-Sentry.init(getSentryConfig());
 
 /**
  * Middleware to attach user context to Sentry and capture errors
  */
 export const sentryMiddleware = createMiddleware().server(async ({ next, context }) => {
+    // Dynamic import to avoid bundling server dependencies (node:util) in client build
+    const Sentry = await import('@sentry/bun');
+
+    // Ensure initialized
+    if (!Sentry.isInitialized()) {
+        Sentry.init(getSentryConfig());
+    }
+
     try {
         // If we have a user in context (from auth middleware), add it to Sentry scope
         /* @ts-ignore - context type is dynamic */
