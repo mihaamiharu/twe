@@ -1,6 +1,10 @@
 # Challenge Solutions & Achievements Reference
 
-This document provides **2 solution options** for each challenge, plus a complete list of achievements.
+This document provides **3 solution options** for each challenge:
+
+1. **Correct & Compliant**: The intended best-practice solution.
+2. **Correct & Non-Compliant**: Works technically, but is fragile or bad practice.
+3. **Almost Correct**: Common mistakes that look right but fail.
 
 ---
 
@@ -8,22 +12,10 @@ This document provides **2 solution options** for each challenge, plus a complet
 
 1. [Achievements](#achievements)
 2. [Basic Tier (CSS/XPath Selectors)](#basic-tier-cssxpath-selectors)
-   - [CSS Selectors](#css-selectors)
-   - [XPath Selectors](#xpath-selectors)
-   - [Selector Comparisons](#selector-comparisons)
 3. [Beginner Tier (JavaScript)](#beginner-tier-javascript)
-   - [JS Fundamentals](#js-fundamentals)
-   - [DOM Manipulation](#dom-manipulation)
-   - [Async JavaScript](#async-javascript)
 4. [Intermediate Tier (Playwright)](#intermediate-tier-playwright)
-   - [Navigation & Actions](#navigation--actions)
-   - [Advanced Locators](#advanced-locators)
-   - [Assertions](#assertions)
-   - [Wait Strategies](#wait-strategies)
 5. [Expert Tier (Advanced Patterns)](#expert-tier-advanced-patterns)
-   - [Page Object Model](#page-object-model)
-   - [Data-Driven Testing](#data-driven-testing)
-   - [Advanced Scenarios](#advanced-scenarios)
+6. [E2E Tier (Full Flows)](#e2e-tier-full-flows)
 
 ---
 
@@ -90,1100 +82,2700 @@ This document provides **2 solution options** for each challenge, plus a complet
 
 ### CSS Selectors
 
-#### css-selector-101-id-class
+#### css-selector-101-id-class - ID & Class Selectors
 
-**Target:** Login button
-`#login-btn` or `button#login-btn`
+**Type 1: Correct & Compliant**
 
-#### css-tag-selectors
+```css
+#login-btn
+```
 
-**Target:** Paragraph text
-`p` or `.welcome-card p`
+**Type 2: Correct & Non-Compliant**
+*Why: Relies on generic attribute/tag combination, less stable than ID.*
 
-#### css-combining-basics
+```css
+button[type="submit"]
+```
 
-**Target:** Error div
-`div.error` or `.notification-area div.error`
+**Type 3: Almost Correct**
+*Bug: Uses dot (.) for ID instead of hash (#).*
 
-#### css-foundations-boss
+```css
+.login-btn
+```
 
-**Target:** Sign Up button (Legacy App)
-`button.btn.primary.large`
+#### css-tag-selectors - Tag Name Selectors
 
-#### css-child-descendant
+**Type 1: Correct & Compliant**
 
-**Target:** Top-level menu items
-`.nav-menu > li`
+```css
+p
+```
 
-#### css-sibling-selectors
+**Type 2: Correct & Non-Compliant**
+*Why: Overly specific path for a generic tag request.*
 
-**Target:** Subtitle after h1
-`h1 + p`
+```css
+div.welcome-card > p
+```
 
-#### css-family-drill
+**Type 3: Almost Correct**
+*Bug: Treating the tag name as a class.*
 
-**Target:** Span in profile card
-`.profile-card .card-content span`
+```css
+.p
+```
 
-#### css-navigation-boss
+#### css-combining-basics - Combining Selectors
 
-**Target:** Logout link in dropdown
-`#user-menu .dropdown-list .action-item a`
+**Type 1: Correct & Compliant**
 
-#### css-attribute-selectors
+```css
+div.error
+```
 
-**Target:** Email input
-`[type="email"]` or `input[type="email"]`
+**Type 2: Correct & Non-Compliant**
+*Why: Selects all error classes, including the span (which we want to avoid).*
 
-#### css-validation-states
+```css
+.error
+```
 
-**Target:** Invalid input
-`input:invalid` or `[required]:invalid`
+**Type 3: Almost Correct**
+*Bug: The space creates a descendant selector (div containing error) instead of combined.*
 
-#### css-functional-pseudo
+```css
+div .error
+```
 
-**Target:** Active but not suspended card
-`.user-card.active:not(.suspended)`
+#### css-foundations-boss - Scenario: Legacy App Testing
 
-#### css-forms-boss
+**Type 1: Correct & Compliant**
 
-**Target:** Phone input (optional, enabled, not focused)
-`input[type="tel"]:optional:not(:disabled)`
+```css
+button.btn.primary.large
+```
 
-#### css-nth-child
+**Type 2: Correct & Non-Compliant**
+*Why: Ignores the 'large' requirement, risking other primary buttons.*
 
-**Target:** 3rd list item
-`li:nth-child(3)`
+```css
+button.btn.primary
+```
 
-#### css-nth-type-vs-child
+**Type 3: Almost Correct**
+*Bug: Spaces between classes imply nesting, not combination.*
 
-**Target:** 2nd paragraph
-`p:nth-of-type(2)`
+```css
+button .btn .primary .large
+```
 
-#### css-table-drill
+#### css-child-descendant - Child vs Descendant
 
-**Target:** 2nd row, 3rd column (Status)
-`tbody tr:nth-child(2) td:nth-child(3)`
+**Type 1: Correct & Compliant**
 
-#### css-table-boss
+```css
+.nav-menu > li
+```
 
-**Target:** Edit button in last column of odd rows
-`tr:nth-child(odd) td:last-child button`
+**Type 2: Correct & Non-Compliant**
+*Why: Uses descendant space, selecting nested submenu items too.*
 
-#### css-dynamic-elements
+```css
+.nav-menu li
+```
 
-**Target:** Delete button in 2nd item
-`li:nth-child(2) .del`
+**Type 3: Almost Correct**
+*Bug: Wrong direction of bracket (invalid syntax).*
+
+```css
+.nav-menu < li
+```
+
+#### css-sibling-selectors - Sibling Selectors
+
+**Type 1: Correct & Compliant**
+
+```css
+h1 + p
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Uses general sibling (~), which works here but isn't strictly "immediately after".*
+
+```css
+h1 ~ p
+```
+
+**Type 3: Almost Correct**
+*Bug: Uses child combinator instead of sibling.*
+
+```css
+h1 > p
+```
+
+#### css-family-drill - Drill: Deep Nesting
+
+**Type 1: Correct & Compliant**
+
+```css
+.profile-card .card-content span
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Skipping the middle content layer, less specific.*
+
+```css
+.profile-card span
+```
+
+**Type 3: Almost Correct**
+*Bug: Uses direct child selectors where descendants are needed (or structure doesn't support it).*
+
+```css
+.profile-card > span
+```
+
+#### css-navigation-boss - Scenario: Nested Navigation
+
+**Type 1: Correct & Compliant**
+
+```css
+#user-menu .dropdown-list .action-item a
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Jumping straight to link, missing safety of container context.*
+
+```css
+.action-item a
+```
+
+**Type 3: Almost Correct**
+*Bug: targeting the list item instead of the link.*
+
+```css
+#user-menu .dropdown-list .action-item
+```
+
+#### css-attribute-selectors - Attribute Selectors
+
+**Type 1: Correct & Compliant**
+
+```css
+[type="email"]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Relies on name attribute which is less standardized.*
+
+```css
+[name="email"]
+```
+
+**Type 3: Almost Correct**
+*Bug: Missing quotes (often works but bad practice) or brackets.*
+
+```css
+type="email"
+```
+
+#### css-validation-states - Form Validation States
+
+**Type 1: Correct & Compliant**
+
+```css
+input:invalid
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Relies on typical error class rather than browser state.*
+
+```css
+.error
+```
+
+**Type 3: Almost Correct**
+*Bug: Wrong pseudo-class name.*
+
+```css
+input:error
+```
+
+#### css-functional-pseudo - Advanced Filtering (:not & :is)
+
+**Type 1: Correct & Compliant**
+
+```css
+.user-card.active:not(.suspended)
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Explicitly selecting 'active' without excluding 'suspended' (might catch bad actors).*
+
+```css
+.user-card.active
+```
+
+**Type 3: Almost Correct**
+*Bug: Negating the wrong class.*
+
+```css
+.user-card:not(.active)
+```
+
+#### css-forms-boss - Scenario: Dynamic Forms
+
+**Type 1: Correct & Compliant**
+
+```css
+input[type="tel"]:optional:not(:disabled)
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Missing the 'optional' check.*
+
+```css
+input[type="tel"]:not(:disabled)
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting that 'disabled' is a pseudo-class.*
+
+```css
+input[type="tel"]:optional:not([disabled])
+```
+
+#### css-nth-child - Position Indexing (Nth-Child)
+
+**Type 1: Correct & Compliant**
+
+```css
+li:nth-child(3)
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Searching by text content (which CSS can't do, but people try).*
+
+```css
+li[text="Cloud Sync"]
+```
+
+**Type 3: Almost Correct**
+*Bug: Used 0-based indexing (programming) instead of 1-based (CSS).*
+
+```css
+li:nth-child(2)
+```
+
+#### css-nth-type-vs-child - Nth-Type vs Nth-Child
+
+**Type 1: Correct & Compliant**
+
+```css
+p:nth-of-type(2)
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Uses nth-child, which counts the image tag and fails.*
+
+```css
+p:nth-child(2)
+```
+
+**Type 3: Almost Correct**
+*Bug: Syntax error.*
+
+```css
+p:nth-type(2)
+```
+
+#### css-table-drill - Table Cell Targeting
+
+**Type 1: Correct & Compliant**
+
+```css
+tbody tr:nth-child(2) td:nth-child(3)
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Relies on text content assumption or skips tbody.*
+
+```css
+tr:nth-child(2) td:nth-child(3)
+```
+
+**Type 3: Almost Correct**
+*Bug: Swapped row and column indices.*
+
+```css
+tbody tr:nth-child(3) td:nth-child(2)
+```
+
+#### css-table-boss - Scenario: Admin Grid
+
+**Type 1: Correct & Compliant**
+
+```css
+tr:nth-child(odd) td:last-child button
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Uses 'even' instead of 'odd'.*
+
+```css
+tr:nth-child(even) td:last-child button
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting to go into the last cell before finding the button.*
+
+```css
+tr:nth-child(odd) button
+```
+
+#### css-dynamic-elements - Handling Dynamic Elements
+
+**Type 1: Correct & Compliant**
+
+```css
+li:nth-child(2) .del
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Trying to use the unstable ID.*
+
+```css
+#unstable-id-123
+```
+
+**Type 3: Almost Correct**
+*Bug: Selecting all delete buttons.*
+
+```css
+.del
+```
 
 ### XPath Selectors
 
-#### xpath-basics-101
+#### xpath-selector-101 - XPath Basics
 
-**Target:** Submit button
-`//button`
+**Type 1: Correct & Compliant**
+```xpath
+//h1
+```
 
-#### xpath-attribute-matching
+**Type 2: Correct & Non-Compliant**
+*Why: Absolute path is extremely brittle.*
+```xpath
+/html/body/div/h1
+```
 
-**Target:** Password input
-`//input[@type="password"]`
+**Type 3: Almost Correct**
+*Bug: Missing double slash for recursive search.*
+```xpath
+/h1
+```
 
-#### xpath-text-content
+#### xpath-attributes - Attribute Selection
 
-**Target:** "Add to Cart" button
-`//button[text()="Add to Cart"]`
+**Type 1: Correct & Compliant**
+```xpath
+//*[@id="login"]
+```
 
-#### xpath-contains-starts-with
+**Type 2: Correct & Non-Compliant**
+*Why: Relies on structural index.*
+```xpath
+//div[1]
+```
 
-**Target:** Error message div
-`//div[contains(@class, "error")]`
+**Type 3: Almost Correct**
+*Bug: Invalid syntax (missing @ for attribute).*
+```xpath
+//id="login"
+```
 
-#### xpath-fundamentals-boss
+#### xpath-text-exact - Selecting by Text
 
-**Target:** "Sign In" button in login form
-`//form[contains(@class, "login")]//button[text()="Sign In"]`
+**Type 1: Correct & Compliant**
+```xpath
+//button[text()="Submit"]
+```
 
-#### xpath-parent-ancestor
+**Type 2: Correct & Non-Compliant**
+*Why: Selects any button, ignores the text requirement.*
+```xpath
+//button
+```
 
-**Target:** List item containing "Settings"
-`//a[text()="Settings"]/parent::li`
+**Type 3: Almost Correct**
+*Bug: Treating text() as an attribute.*
+```xpath
+//button[@text="Submit"]
+```
 
-#### xpath-following-sibling
+#### xpath-contains-starts-with - Partial Matches
 
-**Target:** Input after "Username" label
-`//label[text()="Username"]/following-sibling::input`
+**Type 1: Correct & Compliant**
+```xpath
+//div[contains(@class, "error")]
+```
 
-#### xpath-preceding-sibling
+**Type 2: Correct & Non-Compliant**
+*Why: Exact match fails if the element has multiple classes.*
+```xpath
+//div[@class="error"]
+```
 
-**Target:** Label before error message
-`//span[@class="error"]/preceding-sibling::label`
+**Type 3: Almost Correct**
+*Bug: Missing the attribute to check against.*
+```xpath
+//div[contains("error")]
+```
 
-#### xpath-traversal-boss
+#### xpath-fundamentals-boss - Scenario: Legacy Login
 
-**Target:** Input for "Invalid email format" error
-`//span[text()="Invalid email format"]/ancestor::div//input`
+**Type 1: Correct & Compliant**
+```xpath
+//form[contains(@class, "login")]//button[text()="Sign In"]
+```
 
-#### xpath-multiple-conditions
+**Type 2: Correct & Non-Compliant**
+*Why: Relies on global index.*
+```xpath
+(//button)[2]
+```
 
-**Target:** Submit button with primary class
-`//button[@type="submit" and contains(@class, "primary")]`
+**Type 3: Almost Correct**
+*Bug: Exact class match instead of contains.*
+```xpath
+//form[@class="login"]//button
+```
 
-#### xpath-position-indexing
+#### xpath-parent-ancestor - Parent/Ancestor
 
-**Target:** Last menu item
-`//ul/li[last()]`
+**Type 1: Correct & Compliant**
+```xpath
+//a[text()="Settings"]/parent::li
+```
 
-#### xpath-normalize-space
+**Type 2: Correct & Non-Compliant**
+*Why: Relies on index.*
+```xpath
+//ul/li[3]
+```
 
-**Target:** "Save Changes" button (with whitespace)
-`//button[normalize-space()="Save Changes"]`
+**Type 3: Almost Correct**
+*Bug: Missing valid axis syntax (::tag).*
+```xpath
+//a[text()="Settings"]/parent
+```
 
-#### xpath-complex-table
+#### xpath-following-sibling - Following Value
 
-**Target:** Status cell for ORD-002
-`//tr[td[text()="ORD-002"]]/td[4]`
+**Type 1: Correct & Compliant**
+```xpath
+//label[text()="Username"]/following-sibling::input
+```
 
-#### xpath-axes-master
+**Type 2: Correct & Non-Compliant**
+*Why: Bypasses the requirement to link label and input.*
+```xpath
+//input[@name="username"]
+```
 
-**Target:** "Edit" button after "Product A"
-`//h3[text()="Product A"]/following::button[text()="Edit"][1]`
+**Type 3: Almost Correct**
+*Bug: Assumes nesting instead of sibling relationship.*
+```xpath
+//label/input
+```
 
-#### xpath-advanced-boss
+#### xpath-preceding-sibling - Reverse Navigation
 
-**Target:** Delete button for "John Doe" (Admin)
-`//tr[td[text()="John Doe"] and td[text()="Admin"]]//button[text()="Delete"]`
+**Type 1: Correct & Compliant**
+```xpath
+//span[@class="error"]/preceding-sibling::label
+```
 
-### Selector Comparisons
+**Type 2: Correct & Non-Compliant**
+*Why: Direct selection ignores the relationship.*
+```xpath
+//label[text()="Password"]
+```
 
-#### selector-comparison-same-element
+**Type 3: Almost Correct**
+*Bug: Confusing preceding axis with sibling specific one.*
+```xpath
+//span[@class="error"]/preceding::label
+```
 
-**Target:** Search button (CSS)
-`#search-btn`
+#### xpath-traversal-boss - Scenario: Error Recovery
 
-#### selector-when-xpath-wins
+**Type 1: Correct & Compliant**
+```xpath
+//span[text()="Invalid email format"]/ancestor::div//input
+```
 
-**Target:** Product card with "Out of Stock" (XPath)
-`//div[contains(@class, "product-card") and .//text()[contains(., "Out of Stock")]]`
+**Type 2: Correct & Non-Compliant**
+*Why: Cheating by using the value directly.*
+```xpath
+//input[@value="invalid-email"]
+```
 
-#### selector-performance
+**Type 3: Almost Correct**
+*Bug: Assuming direct parent.*
+```xpath
+//span/parent/input
+```
 
-**Target:** Submit button (Fastest CSS)
-`#submit-btn`
+#### xpath-multiple-conditions - Multiple Conditions
 
-#### selector-comparison-boss
+**Type 1: Correct & Compliant**
+```xpath
+//button[@type="submit" and contains(@class, "primary")]
+```
 
-**Target:** Remove button for "Wireless Mouse" (CSS)
-`[data-product-id="prod-101"] .remove`
+**Type 2: Correct & Non-Compliant**
+*Why: Incomplete, misses the class check.*
+```xpath
+//button[@type="submit"]
+```
 
----
+**Type 3: Almost Correct**
+*Bug: Using & instead of 'and'.*
+```xpath
+//button[@type="submit" & @class="primary"]
+```
+
+#### xpath-position-indexing - Position & Indexing
+
+**Type 1: Correct & Compliant**
+```xpath
+//ul/li[last()]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Hardcoded index breaks if list length changes.*
+```xpath
+//ul/li[5]
+```
+
+**Type 3: Almost Correct**
+*Bug: Python-style negative indexing doesn't work.*
+```xpath
+//ul/li[-1]
+```
+
+#### xpath-normalize-space - Handling Whitespace
+
+**Type 1: Correct & Compliant**
+```xpath
+//button[normalize-space()="Save Changes"]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Exact match fails due to padding.*
+```xpath
+//button[text()="Save Changes"]
+```
+
+**Type 3: Almost Correct**
+*Bug: Using JS trim method in XPath.*
+```xpath
+//button[text().trim()="Save Changes"]
+```
+
+#### xpath-complex-table - Complex Tables
+
+**Type 1: Correct & Compliant**
+```xpath
+//tr[td[text()="ORD-002"]]/td[4]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Row index.*
+```xpath
+//tr[2]/td[4]
+```
+
+**Type 3: Almost Correct**
+*Bug: Trying to verify text on the row itself.*
+```xpath
+//tr[text()="ORD-002"]/td[4]
+```
+
+#### xpath-axes-master - Axes Master
+
+**Type 1: Correct & Compliant**
+```xpath
+//h3[text()="Product A"]/following::button[text()="Edit"][1]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Global index.*
+```xpath
+(//button[text()="Edit"])[1]
+```
+
+**Type 3: Almost Correct**
+*Bug: Using sibling axis when elements are not siblings.*
+```xpath
+//h3/following-sibling::button
+```
+
+#### xpath-advanced-boss - Scenario: Admin User
+
+**Type 1: Correct & Compliant**
+```xpath
+//tr[td[text()="John Doe"] and td[text()="Admin"]]//button[text()="Delete"]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Index based.*
+```xpath
+//tr[2]//button[2]
+```
+
+**Type 3: Almost Correct**
+*Bug: Invalid syntax for multiple text checks.*
+```xpath
+//tr[text()="John Doe" and "Admin"]
+```
+
+#### selector-comparison-same-element - Same Element Two Ways
+
+**Type 1: Correct & Compliant**
+```css
+#search-btn
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Instruction asked for CSS.*
+```xpath
+//*[@id="search-btn"]
+```
+
+**Type 3: Almost Correct**
+*Bug: Missing the hash for ID.*
+```css
+search-btn
+```
+
+#### selector-when-xpath-wins - XPath Exclusive Features
+
+**Type 1: Correct & Compliant**
+```xpath
+//div[contains(@class, "product-card") and .//text()[contains(., "Out of Stock")]]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: CSS cannot select by text content.*
+```css
+/* Not Possible */
+```
+
+**Type 3: Almost Correct**
+*Bug: jQuery syntax, not valid standard CSS.*
+```css
+.product-card:contains("Out of Stock")
+```
+
+#### selector-performance - Performance
+
+**Type 1: Correct & Compliant**
+```css
+#submit-btn
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Complex XPath is slower than ID.*
+```xpath
+//button[@id="submit-btn"]
+```
+
+**Type 3: Almost Correct**
+*Bug: Class selector is slower than ID.*
+```css
+.btn.primary
+```
+
+#### selector-comparison-boss - Scenario: Best Selector
+
+**Type 1: Correct & Compliant**
+```css
+[data-product-id="prod-101"] .remove
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: XPath used where CSS is sufficient and faster.*
+```xpath
+//div[@data-product-id="prod-101"]//button
+```
+
+**Type 3: Almost Correct**
+*Bug: Relying on index.*
+```css
+.cart-item:first-child .remove
+```
 
 ## Beginner Tier (JavaScript)
 
-### JS Fundamentals
+### Fundamentals
 
-#### js-variables-types
+#### js-variables-types - Variables & Types
 
+**Type 1: Correct & Compliant**
 ```javascript
-const testName = 'Login Test';
+const testName = "Login Test";
 let passCount = 0;
 passCount++;
 const result = passCount;
 ```
 
-#### js-arrays-test-data
-
+**Type 2: Correct & Non-Compliant**
+*Why: Usage of `var` is outdated and bad practice.*
 ```javascript
-const testCredentials = ['admin', 'user', 'guest'];
-testCredentials.push('superadmin');
-const result = testCredentials.length;
+var testName = "Login Test";
+var passCount = 0;
+passCount = passCount + 1;
+var result = passCount;
 ```
 
-#### js-objects-for-tests
-
+**Type 3: Almost Correct**
+*Bug: Attempting to reassign a `const` variable.*
 ```javascript
-const testUser = { email: 'test@example.com', isActive: true, loginCount: 5 };
-testUser.loginCount++;
-const result = testUser.loginCount;
+const passCount = 0;
+passCount++; // error
 ```
 
-#### js-if-else-logic
+#### js-arrays-test-data - Arrays
 
+**Type 1: Correct & Compliant**
 ```javascript
-let result;
-if (passCount === totalTests) result = 'ALL_PASSED';
-else if (passCount > 0) result = 'PARTIAL';
-else result = 'ALL_FAILED';
+const users = ["admin", "editor", "viewer"];
+users.push("guest");
+const result = users;
 ```
 
-#### js-loops-testing
-
+**Type 2: Correct & Non-Compliant**
+*Why: Using explicit Array constructor is verbose and unnecessary.*
 ```javascript
-let result = 0;
-for (const score of scores) {
-  if (score >= 80) result++;
+let users = new Array("admin", "editor", "viewer");
+users[users.length] = "guest";
+```
+
+**Type 3: Almost Correct**
+*Bug: String concatenation instead of array method.*
+```javascript
+const users = ["admin"] + "guest";
+```
+
+#### js-objects-for-tests - Objects
+
+**Type 1: Correct & Compliant**
+```javascript
+const config = { env: "staging", retries: 3 };
+config.retries = 5;
+const result = config;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Bracket notation for known properties is non-idiomatic.*
+```javascript
+config["retries"] = 5;
+```
+
+**Type 3: Almost Correct**
+*Bug: Reassigning the const object reference instead of mutating property.*
+```javascript
+const config = { env: "staging", retries: 3 };
+config = { env: "staging", retries: 5 }; // error
+```
+
+#### js-if-else-logic - Conditionals
+
+**Type 1: Correct & Compliant**
+```javascript
+let status;
+if (attempts >= 3) {
+  status = "failed";
+} else {
+  status = "retry";
+}
+const result = status;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Compact but harder to debug if logic grows.*
+```javascript
+const status = (attempts >= 3) ? "failed" : "retry";
+```
+
+**Type 3: Almost Correct**
+*Bug: Using single `=` (assignment) inside condition.*
+```javascript
+if (attempts = 3) { ... }
+```
+
+#### js-loops-testing - Loops
+
+**Type 1: Correct & Compliant**
+```javascript
+let total = 0;
+for (const price of prices) {
+  total += price;
+}
+const result = total;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: C-style loop is verbose and prone to off-by-one errors.*
+```javascript
+for (let i = 0; i < prices.length; i++) {
+  total = total + prices[i];
 }
 ```
 
-#### js-functions-basics
-
+**Type 3: Almost Correct**
+*Bug: Using `price` variable outside loop scope.*
 ```javascript
-function calculatePassRate(passed, total) {
-  return (passed / total) * 100;
+for (const price of prices) { ... }
+return price; // undefined or error
+```
+
+#### js-functions-basics - Functions
+
+**Type 1: Correct & Compliant**
+```javascript
+function formatUser(name, role) {
+  return `${name} (${role})`;
 }
-const result = calculatePassRate(7, 10);
+const result = formatUser("Alice", "Admin");
 ```
 
-#### js-arrow-functions
-
+**Type 2: Correct & Non-Compliant**
+*Why: Function expression syntax can be confusing for simple named functions.*
 ```javascript
-const isPositive = (n) => n > 0;
-const square = (n) => n * n;
-const result = square(8);
+const formatUser = function(name, role) { ... }
 ```
 
-#### js-array-methods
-
+**Type 3: Almost Correct**
+*Bug: Missing `return` keyword.*
 ```javascript
-const result = testResults.filter((t) => t.status === 'passed').length;
-```
-
-#### js-string-methods
-
-```javascript
-const result = rawMessage.trim().split(': ')[1];
-```
-
-#### js-destructuring
-
-```javascript
-const { duration, status } = testResult;
-const result = status === 'passed' ? duration : 0;
-```
-
-#### js-fundamentals-boss (JS Architect)
-
-```javascript
-const activeEmails = users
-  .filter((user) => user.status === 'active')
-  .map((user) => user.email);
-const result = activeEmails.length;
-```
-
-### DOM Manipulation
-
-#### dom-queryselector-vs-all
-
-```javascript
-const result = document.querySelectorAll('.item').length;
-```
-
-#### dom-element-properties
-
-```javascript
-const result =
-  Number(document.querySelector('.price').textContent) *
-  Number(document.querySelector('#quantity').value);
-```
-
-#### dom-check-element-state
-
-```javascript
-let result = 0;
-for (const box of document.querySelectorAll('input[type="checkbox"]')) {
-  if (box.checked) result++;
+function formatUser(name, role) {
+  `${name} (${role})`;
 }
 ```
 
-#### dom-parent-child-navigation
+#### js-arrow-functions - Arrow Functions
 
+**Type 1: Correct & Compliant**
 ```javascript
-const result = document.querySelector('.active').parentElement.children.length;
+const getStatus = (code) => code === 200 ? "OK" : "Error";
+const result = getStatus(200);
 ```
 
-#### dom-event-listeners
-
+**Type 2: Correct & Non-Compliant**
+*Why: Explicit return block is unnecessary for one-liners.*
 ```javascript
-const btn = document.querySelector('#increment');
-btn.click();
-btn.click();
-btn.click();
-const result = Number(document.querySelector('#count').textContent);
-```
-
-#### dom-form-interaction
-
-```javascript
-document.querySelector('#username').value = 'testuser';
-document.querySelector('#password').value = 'secret123';
-document.querySelector('#remember').checked = true;
-const result =
-  document.querySelector('#username').value +
-  ':' +
-  document.querySelector('#password').value;
-```
-
-#### dom-table-data-extraction
-
-```javascript
-const rows = document.querySelectorAll('tbody tr');
-let result = 0;
-for (const row of rows) {
-  result += Number(row.querySelectorAll('td')[2].textContent);
+const getStatus = (code) => {
+  return code === 200 ? "OK" : "Error";
 }
 ```
 
-#### dom-wait-for-element
-
+**Type 3: Almost Correct**
+*Bug: Including braces but forgetting `return`.*
 ```javascript
-const result =
-  (document.querySelector('#header') ? 1 : 0) +
-  (document.querySelector('#footer') ? 1 : 0) +
-  (document.querySelector('#sidebar') ? 1 : 0);
+const getStatus = (code) => { code === 200 ? "OK" : "Error" } // returns undefined
 ```
 
-#### dom-boss (DOMinator)
+#### js-array-methods - Array Methods (Map/Filter)
 
+**Type 1: Correct & Compliant**
 ```javascript
-let totalSalesValue = 0;
-for (const card of document.querySelectorAll('.stat-card')) {
-  if (card.querySelector('.label').textContent === 'Total Sales') {
-    totalSalesValue = Number(
-      card.querySelector('.value').textContent.replace(',', ''),
-    );
-  }
+const activeUsers = users.filter(user => user.isActive);
+const result = activeUsers;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Using `map` where `filter` is intended results in [true, false, true] arrays.*
+```javascript
+const result = users.map(user => user.isActive);
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting that `filter` returns a new array, not mutating.*
+```javascript
+users.filter(user => user.isActive);
+// users is unchanged
+```
+
+#### js-string-methods - String Manipulation
+
+**Type 1: Correct & Compliant**
+```javascript
+const id = url.split("/").pop();
+const result = id;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: indexOf/substring calculation is fragile.*
+```javascript
+const id = url.substring(url.lastIndexOf("/") + 1);
+```
+
+**Type 3: Almost Correct**
+*Bug: Python indexing syntax.*
+```javascript
+const id = url.split("/")[-1];
+```
+
+#### js-destructuring - Destructuring
+
+**Type 1: Correct & Compliant**
+```javascript
+const { status, data: { id } } = response;
+const result = id;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Dot notation chaining is less clean for deep access.*
+```javascript
+const id = response.data.id;
+```
+
+**Type 3: Almost Correct**
+*Bug: Destructuring to wrong variable name.*
+```javascript
+const { id } = response; // id is inside data, not root
+```
+
+#### js-fundamentals-boss - Test Data Generator
+
+**Type 1: Correct & Compliant**
+```javascript
+function createTestUser(role = "Guest") {
+  return {
+    id: Date.now(),
+    username: `test_${role.toLowerCase()}`,
+    role: role,
+    isActive: true
+  };
 }
-const result = totalSalesValue;
+const result = createTestUser("Admin");
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Hardcoded values reduce reusability reliability.*
+```javascript
+function createTestUser() {
+  return { id: 123, role: "Guest" };
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Function modifies global state instead of returning object.*
+```javascript
+let user;
+function create() { user = { ... }; }
+```
+
+### DOM Interaction
+
+#### dom-queryselector-vs-all - Selection
+
+**Type 1: Correct & Compliant**
+```javascript
+const count = document.querySelectorAll(".item").length;
+const result = count;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: getElementsByClassName returns live HTMLCollection (older API).*
+```javascript
+const count = document.getElementsByClassName("item").length;
+```
+
+**Type 3: Almost Correct**
+*Bug: querySelector returns first element, has no .length property.*
+```javascript
+const count = document.querySelector(".item").length;
+```
+
+#### dom-element-properties - properties
+
+**Type 1: Correct & Compliant**
+```javascript
+const text = document.querySelector("#welcome-msg").textContent;
+const result = text;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: innerHTML parses HTML, potential security risk (XSS).*
+```javascript
+const text = document.querySelector("#welcome-msg").innerHTML;
+```
+
+**Type 3: Almost Correct**
+*Bug: innerText is layout-dependent and slower.*
+```javascript
+const text = document.querySelector("#welcome-msg").innerText;
+```
+
+#### dom-check-element-state - States
+
+**Type 1: Correct & Compliant**
+```javascript
+const isEnabled = !document.querySelector("#submit").disabled;
+const result = isEnabled;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Checking 'disabled' attribute string existence instead of property.*
+```javascript
+const isEnabled = document.querySelector("#submit").getAttribute("disabled") === null;
+```
+
+**Type 3: Almost Correct**
+*Bug: Checking style.display for enabled state.*
+```javascript
+const isEnabled = document.querySelector("#submit").style.display !== "none";
+```
+
+#### dom-parent-child-navigation - Traversal
+
+**Type 1: Correct & Compliant**
+```javascript
+const parentTag = document.querySelector(".error-msg").parentElement.tagName;
+const result = parentTag;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: parentNode can return non-element nodes (like text).*
+```javascript
+const parentTag = document.querySelector(".error-msg").parentNode.tagName;
+```
+
+**Type 3: Almost Correct**
+*Bug: .parent does not exist.*
+```javascript
+const parentTag = document.querySelector(".error-msg").parent.tagName;
+```
+
+#### dom-event-listeners - Events
+
+**Type 1: Correct & Compliant**
+```javascript
+document.querySelector("#submit-btn").click();
+const result = "clicked";
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Manual event dispatch is overkill for simple clicks.*
+```javascript
+document.querySelector("#submit-btn").dispatchEvent(new Event("click"));
+```
+
+**Type 3: Almost Correct**
+*Bug: Calling the on-handler directly.*
+```javascript
+document.querySelector("#submit-btn").onclick(); // null if not set
+```
+
+#### dom-form-interaction - Forms
+
+**Type 1: Correct & Compliant**
+```javascript
+const input = document.querySelector("#username");
+input.value = "testuser";
+const result = input.value;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Setting attribute doesn't always update current value property.*
+```javascript
+input.setAttribute("value", "testuser");
+```
+
+**Type 3: Almost Correct**
+*Bug: Input uses value, not textContent.*
+```javascript
+input.textContent = "testuser";
+```
+
+#### dom-table-data-extraction - Tables
+
+**Type 1: Correct & Compliant**
+```javascript
+const cells = Array.from(document.querySelectorAll("td"));
+const result = cells.map(td => td.textContent);
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Manual push loop.*
+```javascript
+const result = [];
+const cells = document.querySelectorAll("td");
+for (let i = 0; i < cells.length; i++) {
+  result.push(cells[i].textContent);
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Mapping over NodeList directly (not supported in older browsers/environments).*
+```javascript
+const result = document.querySelectorAll("td").map(td => ...);
+```
+
+#### dom-wait-for-element - Waiting
+
+**Type 1: Correct & Compliant**
+```javascript
+/* Simulated wait logic */
+if (document.querySelector("#modal")) {
+  result = "found";
+}
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Busy waiting loop freezes browser.*
+```javascript
+while(!document.querySelector("#modal")) { ... }
+```
+
+**Type 3: Almost Correct**
+*Bug: setTimeout doesn't pause execution flow.*
+```javascript
+setTimeout(() => { ... }, 1000);
+// code continues immediately here
+```
+
+#### dom-boss - Dashboard Scraper
+
+**Type 1: Correct & Compliant**
+```javascript
+const items = Array.from(document.querySelectorAll(".card"));
+const data = items.map(card => ({
+  title: card.querySelector("h3").textContent,
+  price: card.querySelector(".price").textContent
+}));
+const result = data;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Regex parsing content.*
+```javascript
+const html = document.body.innerHTML;
+const matches = html.match(/class="card".*?h3>(.*?)<\/h3/g);
+```
+
+**Type 3: Almost Correct**
+*Bug: Selectors scoped to document instead of card.*
+```javascript
+// returns same title for all items
+const title = document.querySelector("h3").textContent; 
 ```
 
 ### Async JavaScript
 
-#### async-understanding-promises
+#### async-understanding-promises - Promises
 
+**Type 1: Correct & Compliant**
 ```javascript
-const result = await new Promise((resolve) => resolve(42));
+const result = await myPromise();
 ```
 
-#### async-await-basics
-
+**Type 2: Correct & Non-Compliant**
+*Why: mixing await and .then().*
 ```javascript
-async function doubleValue() {
-  const value = await getValue();
-  return value * 2;
+const result = await myPromise().then(r => r);
+```
+
+**Type 3: Almost Correct**
+*Bug: forgetting await returns the Promise object, not value.*
+```javascript
+const result = myPromise();
+```
+
+#### async-await-basics - Async/Await
+
+**Type 1: Correct & Compliant**
+```javascript
+async function getData() {
+  const data = await fetchApi();
+  return data;
 }
-const result = await doubleValue();
+const result = await getData();
 ```
 
-#### async-error-handling
-
+**Type 2: Correct & Non-Compliant**
+*Why: Using .then chaining inside async function.*
 ```javascript
-async function safeOperation() {
-  try {
-    return await riskyOperation();
-  } catch (e) {
-    return 'fallback';
-  }
+async function getData() {
+  return fetchApi().then(data => data);
 }
-const result = await safeOperation();
 ```
 
-#### async-parallel-execution
+**Type 3: Almost Correct**
+*Bug: Await only works in async functions.*
+```javascript
+function getData() {
+  const data = await fetchApi(); // SyntaxError
+}
+```
 
+#### async-error-handling - Try/Catch
+
+**Type 1: Correct & Compliant**
+```javascript
+try {
+  await riskyOperation();
+} catch (error) {
+  return "fallback";
+}
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Ignoring errors silently.*
+```javascript
+try { await riskyOperation(); } catch (e) {}
+```
+
+**Type 3: Almost Correct**
+*Bug: Catching outside the async boundary.*
+```javascript
+try {
+  riskyOperation(); // missing await, error won't be caught here
+} catch (e) { ... }
+```
+
+#### async-parallel-execution - Parallel
+
+**Type 1: Correct & Compliant**
 ```javascript
 const [a, b, c] = await Promise.all([getA(), getB(), getC()]);
 const result = a + b + c;
 ```
 
-#### async-testing-patterns
-
+**Type 2: Correct & Non-Compliant**
+*Why: Sequential execution is slower.*
 ```javascript
-async function retry(fn, maxAttempts = 3) {
-  for (let i = 0; i < maxAttempts; i++) {
-    try {
-      return await fn();
-    } catch (e) {
-      if (i === maxAttempts - 1) throw e;
-    }
+const a = await getA();
+const b = await getB();
+const c = await getC();
+```
+
+**Type 3: Almost Correct**
+*Bug: Promise.race returns only first one.*
+```javascript
+const result = await Promise.race([getA(), getB(), getC()]);
+```
+
+#### async-testing-patterns - Retry
+
+**Type 1: Correct & Compliant**
+```javascript
+for (let i = 0; i < 3; i++) {
+  try {
+    await flakyOperation();
+    break;
+  } catch (e) {
+    if (i === 2) throw e;
   }
 }
-await retry(flakyOperation);
-const result = attempts;
 ```
 
-#### async-boss (Async Avenger)
-
+**Type 2: Correct & Non-Compliant**
+*Why: Recursion depth limit usage.*
 ```javascript
-try {
-  const [users, orders, products] = await Promise.all([
-    getUsers(),
-    getOrders(),
-    getProducts(),
-  ]);
-  const result = users.length + orders.length + products.length;
-} catch (e) {
-  const result = 0;
+async function retry(n) {
+  if (n===0) throw err;
+  try { ... } catch { return retry(n-1); }
 }
 ```
 
----
+**Type 3: Almost Correct**
+*Bug: Infinite loop possibility.*
+```javascript
+while(true) {
+  try { await op(); break; } catch (e) {} 
+}
+```
+
+#### async-boss - API Aggregator
+
+**Type 1: Correct & Compliant**
+```javascript
+const [users, orders, products] = await Promise.all([
+  getUsers(), getOrders(), getProducts()
+]);
+const result = users.length + orders.length + products.length;
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Slow sequential.*
+```javascript
+const users = await getUsers();
+const orders = await getOrders();
+// ...
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting to await the Promise.all result.*
+```javascript
+const values = Promise.all([...]);
+const result = values.length; // undefined
+```
 
 ## Intermediate Tier (Playwright)
 
-### Navigation & Actions
+### Actions
 
-#### pw-page-navigation
+#### pw-page-navigation - Navigation
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.goto('/login');
-const result = await page.title();
+await page.goto('/dashboard');
 ```
 
-#### pw-click-actions
-
+**Type 2: Correct & Non-Compliant**
+*Why: Clicking links is valid E2E behavior but slower/flaky for setup steps.*
 ```javascript
-await page.click('#increment');
-await page.click('#increment');
-await page.click('#increment');
-const result = await page.locator('#count').textContent();
+await page.click('a[href="/dashboard"]');
 ```
 
-#### pw-fill-type
-
+**Type 3: Almost Correct**
+*Bug: Confusing Playwright with Selenium/Puppeteer method names.*
 ```javascript
-await page.fill('#email', 'qa@test.com');
-await page.fill('#password', 'secret123');
-const result = await page.locator('#email').inputValue();
+await page.navigateTo('/dashboard');
 ```
 
-#### pw-select-dropdowns
+#### pw-click-actions - Clicking
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.selectOption('#language', 'javascript');
-const result = await page.locator('#language').inputValue();
+await page.click('#submit-btn');
 ```
 
-#### pw-checkbox-radio
-
+**Type 2: Correct & Non-Compliant**
+*Why: Bypassing Playwright's auto-wait and actionability checks.*
 ```javascript
-await page.check('#terms');
-const result = await page.isChecked('#terms');
+await page.evaluate(() => document.querySelector('#submit-btn').click());
 ```
 
-#### pw-keyboard-actions
-
+**Type 3: Almost Correct**
+*Bug: Forgetting await, which causes race conditions.*
 ```javascript
-await page.fill('#search', 'Playwright');
+page.click('#submit-btn');
+```
+
+#### pw-fill-type - Text Input
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.fill('#username', 'testuser');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: .type() simulates keystrokes (slower, deprecated for simple fill).*
+```javascript
+await page.type('#username', 'testuser');
+```
+
+**Type 3: Almost Correct**
+*Bug: Missing selector argument.*
+```javascript
+await page.fill('testuser');
+```
+
+#### pw-select-dropdowns - Select Options
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.selectOption('select#country', 'US');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Manually clicking options is flaky vs the native select handler.*
+```javascript
+await page.click('select#country');
+await page.click('option[value="US"]');
+```
+
+**Type 3: Almost Correct**
+*Bug: Wrong method name.*
+```javascript
+await page.select('select#country', 'US');
+```
+
+#### pw-checkbox-radio - Checkboxes
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.check('#agree-terms');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Click toggles value (might uncheck if already checked).*
+```javascript
+await page.click('#agree-terms');
+```
+
+**Type 3: Almost Correct**
+*Bug: Invalid method.*
+```javascript
+await page.setChecked('#agree-terms', true);
+```
+
+#### pw-keyboard-actions - Keyboard
+
+**Type 1: Correct & Compliant**
+```javascript
 await page.press('#search', 'Enter');
-const result = await page.locator('#results').textContent();
 ```
 
-#### pw-hover-focus
-
+**Type 2: Correct & Non-Compliant**
+*Why: Global keyboard press assumes correct focus implicitly.*
 ```javascript
-await page.hover('#menu-btn');
-const result = await page.locator('#dropdown').textContent();
+await page.keyboard.press('Enter');
 ```
 
-#### pw-file-upload
-
+**Type 3: Almost Correct**
+*Bug: Typing the key name string literally.*
 ```javascript
-// Simple way (now supported in our shim):
-await page.setInputFiles('#file-input', 'test-report.pdf');
-
-// Complex way (with metadata):
-/*
-await page.setInputFiles('#file-input', {
-    name: 'test-report.pdf', 
-    mimeType: 'application/pdf', 
-    buffer: Buffer.from('test')
-});
-*/
-const result = await page.locator('#filename').textContent();
+await page.fill('#search', '{Enter}');
 ```
 
-#### pw-drag-drop
+#### pw-hover-focus - Hover
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.locator('#item-a').dragTo(page.locator('#dropzone'));
-const result = await page.locator('#dropzone').textContent();
+await page.hover('.dropdown-trigger');
 ```
 
-#### pw-iframes
-
+**Type 2: Correct & Non-Compliant**
+*Why: Focus is not the same as hover (mouse over).*
 ```javascript
-const result = await page
-  .frameLocator('#embed')
-  .locator('#frame-content')
-  .textContent();
+await page.focus('.dropdown-trigger');
 ```
 
-#### pw-dynamic-table
-
+**Type 3: Almost Correct**
+*Bug: Using raw mouse coordinates (fragile).*
 ```javascript
-await page.click('th:has-text("Status")');
-await page.waitForFunction(
-  () =>
-    document.querySelector('tbody tr td:nth-child(2)').textContent === 'Active',
-);
-const result = await page
-  .locator('tbody tr:first-child td:nth-child(2)')
-  .textContent();
+await page.mouse.move(100, 200);
 ```
 
-#### pw-actions-boss (Action Hero)
+#### pw-file-upload - File Upload
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.click('#add-btn');
-await page.fill('#qty', '3');
-await page.check('#express');
-await page.click('#checkout-btn');
-const result = await page.locator('#confirmation').textContent();
+await page.setInputFiles('#upload', 'data.csv');
 ```
 
-### Advanced Locators
-
-#### pw-get-by-role
-
+**Type 2: Correct & Non-Compliant**
+*Why: Expecting system dialog to open (Playwright can't interact with OS dialogs).*
 ```javascript
-await page.getByRole('button', { name: 'Sign Up' }).click();
-const result = await page.locator('#result').textContent();
+await page.click('#upload');
 ```
 
-#### pw-get-by-text
-
+**Type 3: Almost Correct**
+*Bug: Singular method name.*
 ```javascript
-await page.getByText('Click me').click();
-const result = await page.locator('#output').textContent();
+await page.setInputFile('#upload', 'data.csv');
 ```
 
-#### pw-get-by-label
+#### pw-drag-drop - Drag and Drop
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.getByLabel('Username').fill('testuser');
-await page.getByLabel('Password').fill('secret123');
-const result = await page.getByLabel('Username').inputValue();
+await page.dragAndDrop('#source', '#target');
 ```
 
-#### pw-get-by-placeholder
-
+**Type 2: Correct & Non-Compliant**
+*Why: Manual mouse events are verbose and error-prone.*
 ```javascript
-await page.getByPlaceholder('Search...').fill('Playwright testing');
-const result = await page.getByPlaceholder('Search...').inputValue();
+await page.hover('#source');
+await page.mouse.down();
+await page.hover('#target');
+await page.mouse.up();
 ```
 
-#### pw-get-by-testid
-
+**Type 3: Almost Correct**
+*Bug: Method does not exist.*
 ```javascript
-await page.getByTestId('add-to-cart').click();
-const result = await page.locator('#cart-count').textContent();
+await page.drag('#source').to('#target');
 ```
 
-#### pw-locator-chaining
+#### pw-iframes - Frames
 
+**Type 1: Correct & Compliant**
 ```javascript
-const result = await page.locator('.menu li').nth(1).textContent();
+await page.frameLocator('#payment-frame').locator('#cc-number').fill('1234');
 ```
 
-#### pw-frame-locators
-
+**Type 2: Correct & Non-Compliant**
+*Why: Accessing frame by index is fragile.*
 ```javascript
-const frame = page.frameLocator('#widget');
-await frame.locator('button').click();
-const result = await frame.locator('body').textContent();
+await page.frames()[1].fill('#cc-number', '1234');
 ```
 
-#### pw-list-items
-
+**Type 3: Almost Correct**
+*Bug: Treating iframe as regular element.*
 ```javascript
-const result = await page.locator('.todo-list li').count();
+await page.locator('#payment-frame #cc-number').fill('1234');
 ```
 
-#### pw-locators-boss (Locator Legend)
+#### pw-dynamic-table - Dynamic Tables
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.locator('.product').nth(1).locator('button').click();
-const result = await page.locator('#msg').textContent();
+await page.locator('tr', { has: page.locator('text=Invoice #101') }).locator('.status').textContent();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Iterating elements in JS is slow.*
+```javascript
+const rows = await page.$$('tr');
+for (const row of rows) { ... }
+```
+
+**Type 3: Almost Correct**
+*Bug: Invalid filter syntax.*
+```javascript
+await page.locator('tr').filter('text=Invoice #101')...
+```
+
+#### pw-actions-boss - Scenario: Form Flow
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.fill('#email', 'user@example.com');
+await page.fill('#password', 'secret123');
+await page.check('#newsletter');
+await page.click('button[type="submit"]');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Using tab navigation to reach fields (fragile).*
+```javascript
+await page.click('#email');
+await page.keyboard.type('user@example.com');
+await page.keyboard.press('Tab');
+```
+
+**Type 3: Almost Correct**
+*Bug: Chaining actions without await.*
+```javascript
+page.fill(...).fill(...).click(...);
+```
+
+### Locators
+
+#### pw-locator-intro - Locator Basics
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.locator('#submit').click();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Legacy selector text syntax used directly in action.*
+```javascript
+await page.click('id=submit');
+```
+
+**Type 3: Almost Correct**
+*Bug: Using $ (Puppeteer syntax).*
+```javascript
+await page.$('#submit').click();
+```
+
+#### pw-get-by-role - getByRole
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.getByRole('button', { name: 'Submit' }).click();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: CSS selector is less accessible-friendly.*
+```javascript
+await page.locator('button.submit-class').click();
+```
+
+**Type 3: Almost Correct**
+*Bug: Case sensitivity or wrong role name.*
+```javascript
+await page.getByRole('Button', { name: 'Submit' });
+```
+
+#### pw-get-by-text - getByText
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.getByText('Welcome, User').toBeVisible();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: XPath for simple text match.*
+```javascript
+await page.locator('//*[text()="Welcome, User"]');
+```
+
+**Type 3: Almost Correct**
+*Bug: Wrong method for partial text (unless configured).*
+```javascript
+await page.getByText('Welcome', { exact: true });
+```
+
+#### pw-get-by-label - getByLabel
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.getByLabel('Password').fill('secret');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Relying on input ID instead of user-facing label.*
+```javascript
+await page.locator('#pwd-input-123').fill('secret');
+```
+
+**Type 3: Almost Correct**
+*Bug: Label text must match exactly (default).*
+```javascript
+await page.getByLabel('Pass'); // if label is "Password"
+```
+
+#### pw-get-by-placeholder - getByPlaceholder
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.getByPlaceholder('mm/dd/yyyy').fill('01/01/2024');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Using generic input selector.*
+```javascript
+await page.locator('input[type="date"]').fill('01/01/2024');
+```
+
+**Type 3: Almost Correct**
+*Bug: Confusion with Label.*
+```javascript
+await page.getByLabel('mm/dd/yyyy');
+```
+
+#### pw-get-by-testid - getByTestId
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.getByTestId('submit-order').click();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Using attribute selector manually.*
+```javascript
+await page.locator('[data-testid="submit-order"]').click();
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting that test-id is configured (default "data-testid").*
+```javascript
+await page.getByTestId('#submit-order'); // id hash not needed
+```
+
+#### pw-locator-chaining - Chaining
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.locator('form').getByRole('button').click();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Long monolithic CSS selector.*
+```javascript
+await page.locator('form > div > button');
+```
+
+**Type 3: Almost Correct**
+*Bug: Attempting to chain actions instead of locators.*
+```javascript
+await page.locator('form').click().getByRole('button');
+```
+
+#### pw-frame-locators - List Items
+
+**Type 1: Correct & Compliant**
+```javascript
+const items = page.getByRole('listitem');
+await expect(items).toHaveCount(3);
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Using XPath count.*
+```javascript
+const count = await page.locator('//li').count();
+```
+
+**Type 3: Almost Correct**
+*Bug: Expecting array of elements.*
+```javascript
+const items = await page.getByRole('listitem');
+items.length; // Locator is not an array
+```
+
+#### pw-list-items - Filtering
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.getByRole('listitem')
+    .filter({ hasText: 'Product A' })
+    .getByRole('button')
+    .click();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Using loop to find element.*
+```javascript
+const rows = await page.$$('li');
+for (const row of rows) {
+   if ((await row.textContent()).includes('Product A')) { ... }
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: chaining finds ALL buttons in ALL items.*
+```javascript
+await page.getByRole('listitem').getByRole('button').click();
+```
+
+#### pw-locators-boss - Scenario: Dynamic Grid
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.locator('.product-card')
+    .filter({ hasText: 'Gaming Laptop' })
+    .getByRole('button', { name: 'Add to Cart' })
+    .click();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: CSS Structural selector.*
+```javascript
+await page.locator('.product-card:nth-child(2) .btn').click();
+```
+
+**Type 3: Almost Correct**
+*Bug: Imprecise text filter matches multiple items.*
+```javascript
+await page.locator('.product-card').filter({ hasText: 'Laptop' })...
 ```
 
 ### Assertions
 
-#### pw-to-be-visible
+#### pw-to-be-visible - Visibility
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.click('#show');
 await expect(page.locator('#modal')).toBeVisible();
-const result = 'visible';
 ```
 
-#### pw-to-have-text
-
+**Type 2: Correct & Non-Compliant**
+*Why: Manual boolean assertion loses auto-retry capability.*
 ```javascript
-await expect(page.locator('h1')).toHaveText('Hello World');
-const result = 'passed';
+const isVisible = await page.isVisible('#modal');
+expect(isVisible).toBe(true);
 ```
 
-#### pw-to-have-value
-
+**Type 3: Almost Correct**
+*Bug: Passing string selector to expect instead of locator.*
 ```javascript
-await page.fill('#email', 'qa@test.com');
-await expect(page.locator('#email')).toHaveValue('qa@test.com');
-const result = 'passed';
+await expect('#modal').toBeVisible();
 ```
 
-#### pw-state-assertions
+#### pw-to-have-text - Text Content
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.check('#terms');
-await expect(page.locator('#terms')).toBeChecked();
-const result = 'passed';
+await expect(page.locator('h1')).toHaveText('Welcome');
 ```
 
-#### pw-to-have-attribute
-
+**Type 2: Correct & Non-Compliant**
+*Why: toContain matches substrings, toHaveText matches exact (by default).*
 ```javascript
-await expect(page.locator('a')).toHaveAttribute('href', '/about');
-const result = 'passed';
+await expect(page.locator('h1')).toContainText('Welcome');
 ```
 
-#### pw-to-have-count
-
+**Type 3: Almost Correct**
+*Bug: Using Jest matcher on Playwright object.*
 ```javascript
-await expect(page.locator('#list li')).toHaveCount(4);
-const result = 'passed';
+expect(page.locator('h1').textContent()).toBe('Welcome');
 ```
 
-#### pw-page-assertions
+#### pw-to-have-value - Input Value
 
+**Type 1: Correct & Compliant**
 ```javascript
-await expect(page).toHaveTitle('Test Page');
-const result = 'passed';
+await expect(page.locator('#email')).toHaveValue('test@x.com');
 ```
 
-#### pw-soft-assertions
-
+**Type 2: Correct & Non-Compliant**
+*Why: checking "value" attribute vs current property state.*
 ```javascript
-await expect.soft(page.locator('#name-status')).toContainText('valid');
-await expect.soft(page.locator('#email-status')).toContainText('valid');
-const result = 'passed';
+await expect(page.locator('#email')).toHaveAttribute('value', 'test@x.com');
 ```
 
-#### pw-assertions-boss (Sherlock Homes)
-
+**Type 3: Almost Correct**
+*Bug: Trying to read value directly in expect.*
 ```javascript
-await page.fill('#email', '');
-await expect(page.locator('#email-error')).toBeVisible();
-await page.fill('#email', 'user@example.com');
-const visible = await page.locator('#email-error').isVisible();
-if (visible) throw new Error('Error should be hidden');
-const result = 'all assertions passed';
+await expect(page.inputValue('#email')).toBe('test@x.com');
 ```
 
-### Wait Strategies
+#### pw-state-assertions - Element State
 
-#### pw-auto-wait
-
+**Type 1: Correct & Compliant**
 ```javascript
-await page.click('#delayed-btn'); // Auto-waits for actionability
-const result = await page.locator('#delayed-btn').textContent();
+await expect(page.locator('#agree')).toBeChecked();
 ```
 
-#### pw-wait-for-selector
+**Type 2: Correct & Non-Compliant**
+*Why: Manual assertion.*
+```javascript
+expect(await page.isChecked('#agree')).toBeTruthy();
+```
 
+**Type 3: Almost Correct**
+*Bug: toBeSelected used for checkbox (it's for dropdown options).*
+```javascript
+await expect(page.locator('#agree')).toBeSelected();
+```
+
+#### pw-to-have-attribute - Attributes
+
+**Type 1: Correct & Compliant**
+```javascript
+await expect(page.locator('img')).toHaveAttribute('alt', 'Logo');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: No retry logic.*
+```javascript
+const alt = await page.getAttribute('img', 'alt');
+expect(alt).toBe('Logo');
+```
+
+**Type 3: Almost Correct**
+*Bug: toHaveProperty is for JS objects.*
+```javascript
+await expect(page.locator('img')).toHaveProperty('alt', 'Logo');
+```
+
+#### pw-to-have-count - List Count
+
+**Type 1: Correct & Compliant**
+```javascript
+await expect(page.locator('.item')).toHaveCount(5);
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: .count() is immediate, doesn't wait for list to populate.*
+```javascript
+expect(await page.locator('.item').count()).toBe(5);
+```
+
+**Type 3: Almost Correct**
+*Bug: Checking length of locator.*
+```javascript
+expect(page.locator('.item').length).toBe(5);
+```
+
+#### pw-soft-assertions - Soft Assertions
+
+**Type 1: Correct & Compliant**
+```javascript
+await expect.soft(page.locator('.item')).toBeVisible();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Try/catch blocks suppress errors but don't report them properly.*
+```javascript
+try { await expect(page.locator('.item')).toBeVisible(); } catch(e) {}
+```
+
+**Type 3: Almost Correct**
+*Bug: Invalid syntax.*
+```javascript
+await softExpect(page.locator('.item')).toBeVisible();
+```
+
+#### pw-assertions-boss - Scenario: Validation
+
+**Type 1: Correct & Compliant**
+```javascript
+await expect(page.locator('#submit')).toBeDisabled();
+await page.fill('#email', 'valid@x.com');
+await page.fill('#password', '12345678');
+await expect(page.locator('#submit')).toBeEnabled();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Checking class names instead of semantic state.*
+```javascript
+await expect(page.locator('#submit')).toHaveClass(/disabled/);
+```
+
+**Type 3: Almost Correct**
+*Bug: Missing await on expectations.*
+```javascript
+expect(page.locator('#submit')).toBeEnabled();
+```
+
+### Waits
+
+#### pw-auto-wait - Auto-Wait
+
+**Type 1: Correct & Compliant**
+```javascript
+// Just perform the action, Playwright waits automatically
+await page.click('#delayed-btn');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Redundant explicit wait.*
+```javascript
+await page.waitForSelector('#delayed-btn');
+await page.click('#delayed-btn');
+```
+
+**Type 3: Almost Correct**
+*Bug: Hardcoded sleep.*
+```javascript
+await page.waitForTimeout(1000);
+await page.click('#delayed-btn');
+```
+
+#### pw-wait-for-selector - Explicit Wait
+
+**Type 1: Correct & Compliant**
 ```javascript
 await page.waitForSelector('#spinner', { state: 'hidden' });
-const result = await page.locator('#result').textContent();
 ```
 
-#### pw-wait-for-load-state
-
+**Type 2: Correct & Non-Compliant**
+*Why: Guessing the time.*
 ```javascript
-await page.waitForLoadState('domcontentloaded');
-const result = await page.title();
+await page.waitForTimeout(5000);
 ```
 
-#### pw-wait-for-response
-
+**Type 3: Almost Correct**
+*Bug: Default state is 'visible', so this waits for spinner to appear, not hide.*
 ```javascript
-const [response] = await Promise.all([
-  page.waitForResponse('/api/data'),
-  page.click('#load'),
-]);
-const result = await page.locator('#status').textContent();
+await page.waitForSelector('#spinner');
 ```
 
-#### pw-wait-for-function
+#### pw-wait-for-load-state - Load States
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.waitForFunction(
-  () => parseInt(document.getElementById('counter').textContent) >= 3,
+await page.waitForLoadState('networkidle');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: 'load' fires too early for SPAs, 'networkidle' is safer for initial data.*
+```javascript
+await page.waitForLoadState('load');
+```
+
+**Type 3: Almost Correct**
+*Bug: Invalid state string.*
+```javascript
+await page.waitForLoadState('complete');
+```
+
+#### pw-wait-for-response - API Response
+
+**Type 1: Correct & Compliant**
+```javascript
+const response = await page.waitForResponse(resp => 
+  resp.url().includes('/api/data') && resp.status() === 200
 );
-const result = await page.locator('#counter').textContent();
 ```
 
-#### pw-timeout-config
-
+**Type 2: Correct & Non-Compliant**
+*Why: Only checking URL, ignoring failed (500) responses.*
 ```javascript
-await page.click('#fast-btn', { timeout: 1000 });
-const result = await page.locator('#fast-btn').textContent();
+await page.waitForResponse('/api/data');
 ```
 
-#### pw-waits-boss (Time Wizard)
-
+**Type 3: Almost Correct**
+*Bug: Race condition - defining wait AFTER action.*
 ```javascript
-await page.waitForFunction(() =>
-  document.getElementById('status').textContent.includes('Connected'),
-);
-await page.waitForFunction(() =>
-  document.getElementById('data').textContent.includes('Data received'),
-);
-const result = (await page.locator('#data').textContent()).split(': ')[1];
+await page.click('#load');
+await page.waitForResponse('/api/data'); // Too late!
 ```
 
----
+#### pw-wait-for-function - Custom Wait
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.waitForFunction(() => document.querySelector('#counter').textContent === '3');
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Polling loop in Node.js context is slower.*
+```javascript
+while(true) {
+  const t = await page.textContent('#counter');
+  if (t === '3') break;
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Passing external variable without arg.*
+```javascript
+const target = '3';
+await page.waitForFunction(() => document.body.innerText === target); // target undefined in browser
+```
+
+#### pw-timeout-config - Timeouts
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.click('#slow-btn', { timeout: 10000 });
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Changing global timeout affects future tests.*
+```javascript
+page.setDefaultTimeout(10000);
+await page.click('#slow-btn');
+```
+
+**Type 3: Almost Correct**
+*Bug: Wrong argument position.*
+```javascript
+await page.click('#slow-btn', 10000);
+```
+
+#### pw-waits-boss - Scenario: Polling
+
+**Type 1: Correct & Compliant**
+```javascript
+await expect(page.locator('#status')).toHaveText('Connected');
+await expect(page.locator('#data')).toContainText('Data received');
+const result = await page.locator('#data').textContent();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Hard waits correspond to specific timing, which might change.*
+```javascript
+await page.waitForTimeout(2000);
+```
+
+**Type 3: Almost Correct**
+*Bug: Waiting for selector only checks presence, not text update.*
+```javascript
+await page.waitForSelector('#data'); 
+// passes immediately even if empty
+```
 
 ## Expert Tier (Advanced Patterns)
 
 ### Page Object Model
 
-#### pw-first-page-object
+#### pw-first-page-object - Class Structure
 
+**Type 1: Correct & Compliant**
 ```javascript
 class LoginPage {
   constructor(page) {
     this.page = page;
-    this.email = page.locator('#email');
-    this.pass = page.locator('#password');
-    this.btn = page.locator('#submit');
-  }
-  async login(e, p) {
-    await this.email.fill(e);
-    await this.pass.fill(p);
-    await this.btn.click();
+    this.usernameInput = page.locator('#username');
+    this.passwordInput = page.locator('#password');
+    this.loginButton = page.locator('#login-btn');
   }
 }
-const loginPage = new LoginPage(page);
-await loginPage.login('test@qa.com', 'password123');
-const result = await page.locator('#message').textContent();
 ```
 
-#### pw-encapsulate-actions
-
+**Type 2: Correct & Non-Compliant**
+*Why: Defining selectors inside methods repeats code and makes maintenance harder.*
 ```javascript
-class CartPage {
-  constructor(page) {
-    this.page = page;
-    this.addBtn = page.locator('#add-item');
-    this.total = page.locator('#total');
-  }
-  async addItem() {
-    await this.addBtn.click();
-  }
-  async getTotal() {
-    return await this.total.textContent();
-  }
-}
-const cp = new CartPage(page);
-await cp.addItem();
-await cp.addItem();
-const result = await cp.getTotal();
-```
-
-#### pw-page-components
-
-```javascript
-class Header {
-  constructor(page) {
-    this.logoutBtn = page.locator('#logout');
-  }
-  async logout() {
-    await this.logoutBtn.click();
-  }
-}
-class Dashboard {
-  constructor(page) {
-    this.header = new Header(page);
-    this.status = page.locator('#status');
-  }
-  async getStatus() {
-    return await this.status.textContent();
-  }
-}
-const dash = new Dashboard(page);
-await dash.header.logout();
-const result = await dash.getStatus();
-```
-
-#### pw-fluent-navigation
-
-```javascript
-class HomePage {
-  constructor(page) {
-    this.welcome = page.locator('#welcome');
-  }
-  async getWelcomeMessage() {
-    return await this.welcome.textContent();
-  }
-}
 class LoginPage {
-  constructor(page) {
-    this.page = page;
-    this.loginBtn = page.locator('#login-btn');
-  }
+  constructor(page) { this.page = page; }
   async login() {
-    await this.page.fill('#email', 'test@qa.com');
-    await this.page.fill('#password', 'pass');
-    await this.loginBtn.click();
-    return new HomePage(this.page);
+    await this.page.fill('#username', ...);
   }
 }
-const home = await new LoginPage(page).login();
-const result = await home.getWelcomeMessage();
 ```
 
-#### pw-base-page-class
+**Type 3: Almost Correct**
+*Bug: Storing Elements (async) instead of Locators (sync) in constructor.*
+```javascript
+class LoginPage {
+  constructor(page) {
+    // This fails because await isn't allowed here
+    this.button = await page.$('#btn'); 
+  }
+}
+```
 
+#### pw-encapsulate-actions - Methods
+
+**Type 1: Correct & Compliant**
+```javascript
+async login(user, pass) {
+  await this.usernameInput.fill(user);
+  await this.passwordInput.fill(pass);
+  await this.loginButton.click();
+}
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Hardcoded credentials inside method limit reusability.*
+```javascript
+async login() {
+  await this.usernameInput.fill("admin");
+  await this.passwordInput.fill("secret");
+  await this.loginButton.click();
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting one await causes race conditions.*
+```javascript
+async login(user, pass) {
+  this.usernameInput.fill(user); // missing await
+  await this.loginButton.click();
+}
+```
+
+#### pw-page-components - Components
+
+**Type 1: Correct & Compliant**
+```javascript
+class Navigation {
+  constructor(page) {
+    this.page = page;
+    this.homeLink = page.getByRole('link', { name: 'Home' });
+  }
+}
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Putting navigation logic inside every Page Object duplicates code.*
+```javascript
+class DashboardPage {
+  // ... imports navigation methods directly
+}
+class ProfilePage {
+  // ... copies same navigation methods
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Passing 'this' instead of 'page' to component.*
+```javascript
+this.nav = new Navigation(this);
+```
+
+#### pw-fluent-navigation - Fluent Pattern
+
+**Type 1: Correct & Compliant**
+```javascript
+async gotoProfile() {
+  await this.profileIcon.click();
+  return new ProfilePage(this.page);
+}
+// Usage: await (await home.gotoProfile()).updateBio();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Returning `this` leads to incorrect chaining state if page changed.*
+```javascript
+async gotoProfile() {
+  await this.profileIcon.click();
+  return this;
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Missing await on the click before returning new page.*
+```javascript
+async gotoProfile() {
+  this.profileIcon.click();
+  return new ProfilePage(this.page);
+}
+```
+
+#### pw-base-page-class - Inheritance
+
+**Type 1: Correct & Compliant**
 ```javascript
 class BasePage {
+  constructor(page) { this.page = page; }
+  async navigate(path) { await this.page.goto(path); }
+}
+class LoginPage extends BasePage { ... }
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Duplicating common logic in every class.*
+```javascript
+class LoginPage { 
+  async navigate(path) { await this.page.goto(path); }
+}
+class HomePage {
+  async navigate(path) { await this.page.goto(path); }
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting super(page) call.*
+```javascript
+class LoginPage extends BasePage {
   constructor(page) {
-    this.page = page;
-  }
-  async getPageTitle() {
-    return await this.page.title();
+    this.loginBtn = ...; // ReferenceError: Must call super constructor
   }
 }
-class ProductPage extends BasePage {}
-const result = await new ProductPage(page).getPageTitle();
 ```
 
-#### pw-pom-boss (POM Pilot)
+#### pw-pom-boss - Scenario: Multi-Page POM
 
+**Type 1: Correct & Compliant**
 ```javascript
-class ProductPage {
-  constructor(page) {
-    this.page = page;
-  }
-  async addToCart() {
-    await this.page.click('#add-to-cart');
-    return new CartPage(this.page);
-  }
-}
-class CartPage {
-  constructor(page) {
-    this.page = page;
-  }
-  async checkout() {
-    await this.page.click('#checkout');
-    return new CheckoutPage(this.page);
-  }
-}
-class CheckoutPage {
-  constructor(page) {
-    this.page = page;
-  }
-  async placeOrder() {
-    await this.page.click('#place-order');
-    return await this.page.locator('#confirmation h2').textContent();
-  }
-}
-const result = await (
-  await (await new ProductPage(page).addToCart()).checkout()
-).placeOrder();
+const loginPage = new LoginPage(page);
+await loginPage.navigate();
+await loginPage.login('user', 'pass');
+const dashboard = new DashboardPage(page);
+await expect(dashboard.welcomeMessage).toBeVisible();
 ```
 
-### Data-Driven Testing
-
-#### pw-parameterized-tests
-
+**Type 2: Correct & Non-Compliant**
+*Why: Mixing POM and raw script commands.*
 ```javascript
-let passed = 0;
-for (const { a, b, expected } of testCases) {
-  await page.fill('#num1', String(a));
-  await page.fill('#num2', String(b));
-  await page.click('#add');
-  if ((await page.locator('#result').textContent()) === expected) passed++;
-}
-const result = String(passed);
+const loginPage = new LoginPage(page);
+await loginPage.login('user', 'pass');
+await page.locator('.welcome').waitFor(); // Raw usage breaks abstraction
 ```
 
-#### pw-test-data-json
-
+**Type 3: Almost Correct**
+*Bug: Instantiating page object before page is ready.*
 ```javascript
-const user = usersData[usersData.length - 1];
-await page.fill('#name', user.name);
-await page.click('#greet');
-const result = await page.locator('#greeting').textContent();
+const dashboard = new DashboardPage(page);
+// Login happens here... navigation changes...
+// dashboard.welcomeMessage might be stale? (Actually locators are lazy, so this is subtle. But often context is lost if frame changes).*
 ```
 
-#### pw-csv-test-data
+### Data Driven Testing
 
+#### pw-parameterized-tests - Loops
+
+**Type 1: Correct & Compliant**
 ```javascript
-const rows = csvData.split('\n').slice(1);
-const data = rows.map((r) => {
-  const [name, role, expected] = r.split(',');
-  return { name, role, expected };
-});
-await page.fill('#username', data[1].name);
-await page.click('#welcome');
-const result = await page.locator('#message').textContent();
-```
-
-#### pw-dynamic-data
-
-```javascript
-const user = 'User_' + Math.random().toString(36).substr(2, 5);
-await page.fill('#username', user);
-await page.click('#signup');
-const result = (await page.locator('#confirm').textContent()).includes(
-  'Registered',
-)
-  ? 'success'
-  : 'failed';
-```
-
-#### pw-environment-data
-
-```javascript
-const { email } = envConfig['staging'];
-await page.fill('#env', 'staging');
-await page.fill('#email', email);
-await page.click('#login');
-const result = await page.locator('#status').textContent();
-```
-
-#### pw-data-driven-boss (Data Dynamo)
-
-```javascript
-let passed = 0;
+const users = ['Alice', 'Bob', 'Charlie'];
 for (const user of users) {
-  for (const scenario of scenarios) {
-    await page.fill('#email', user.email);
-    await page.fill('#password', user.password);
-    await page.click('#login');
-    if ((await page.locator('#result').textContent()) === 'Success') passed++;
-    await page.fill('#email', '');
+  await testLogin(user);
+}
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Copy-pasting test blocks.*
+```javascript
+await testLogin('Alice');
+await testLogin('Bob');
+await testLogin('Charlie');
+```
+
+**Type 3: Almost Correct**
+*Bug: forEach with async/await acts unexpectedly.*
+```javascript
+users.forEach(async user => {
+  await testLogin(user); // Promises are not awaited by forEach
+});
+```
+
+#### pw-test-data-json - JSON Data
+
+**Type 1: Correct & Compliant**
+```javascript
+import data from './data.json';
+await page.fill('#username', data.username);
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Inline object is hard to manage for large datasets.*
+```javascript
+const data = { username: "..." };
+```
+
+**Type 3: Almost Correct**
+*Bug: require without json assertion (in ES modules).*
+```javascript
+import data from './data.json' assert { type: 'json' }; // Syntax varies by env
+```
+
+#### pw-csv-test-data - CSV Parsing
+
+**Type 1: Correct & Compliant**
+```javascript
+import { parse } from 'csv-parse/sync';
+const records = parse(csvContent, { columns: true });
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Manual string splitting is fragile (e.g., commas inside quotes).*
+```javascript
+const rows = csvContent.split('\n').map(r => r.split(','));
+```
+
+**Type 3: Almost Correct**
+*Bug: Async read inside sync context.*
+```javascript
+const records = await parse(file); // If parse is sync, await is useless but harmless. If async, must await.
+```
+
+#### pw-dynamic-data - Faker
+
+**Type 1: Correct & Compliant**
+```javascript
+const email = `user_${Date.now()}@test.com`;
+await page.fill('#email', email);
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Hardcoded "random" data causes collision.*
+```javascript
+await page.fill('#email', 'user_123@test.com');
+```
+
+**Type 3: Almost Correct**
+*Bug: Generating random data but not saving it for verification.*
+```javascript
+await page.fill('#email', key);
+// later: expect(page).toHaveText(key); // Variable undefined or different call
+```
+
+#### pw-environment-data - Env Vars
+
+**Type 1: Correct & Compliant**
+```javascript
+await page.goto(process.env.BASE_URL);
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Committing secrets/config to code.*
+```javascript
+await page.goto('https://staging.mysite.com');
+```
+
+**Type 3: Almost Correct**
+*Bug: Typos in env var name.*
+```javascript
+process.env.BaseURL // undefined (case sensitive)
+```
+
+#### pw-data-driven-boss - Scenario: Cross-Browser
+
+**Type 1: Correct & Compliant**
+```javascript
+// playwright.config.ts projects configuration
+projects: [
+  { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+  { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+]
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Manual browser launch in test file.*
+```javascript
+const browser = await chromium.launch();
+// ...
+const browser2 = await firefox.launch();
+```
+
+**Type 3: Almost Correct**
+*Bug: Incomplete device emulation.*
+```javascript
+use: { browserName: 'chromium' } // Missing viewport/agent settings
+```
+
+
+### Infrastructure & Integration
+
+#### pw-api-ui-testing - Hybrid Testing
+
+**Type 1: Correct & Compliant**
+```javascript
+const response = await request.post('/api/users', {
+  data: { name: 'TestUser' }
+});
+expect(response.ok()).toBeTruthy();
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Running API calls in browser context is slower and less powerful.*
+```javascript
+await page.evaluate(() => {
+  return fetch('/api/users', { method: 'POST', ... });
+});
+```
+
+**Type 3: Almost Correct**
+*Bug: Forgetting to await the request.*
+```javascript
+request.post('/api/users'); // Fire and forget, no validation
+```
+
+#### pw-state-setup-api - Auth State
+
+**Type 1: Correct & Compliant**
+```javascript
+// playwright.config.ts
+projects: [
+  { 
+    name: 'setup', 
+    testMatch: /.*\.setup\.ts/ 
+  },
+  {
+    name: 'e2e',
+    use: { storageState: 'playwright/.auth/user.json' },
+    dependencies: ['setup'],
   }
-}
-const result = String(passed);
+];
 ```
 
-### Advanced Scenarios
-
-#### pw-api-ui-testing
-
+**Type 2: Correct & Non-Compliant**
+*Why: Logging in via UI before every single test file.*
 ```javascript
-await page.click('#create-api');
-const result =
-  (await page.locator('#user-name').textContent()) === 'API User'
-    ? 'hybrid-success'
-    : 'failed';
+test.beforeEach(async ({ page }) => {
+  await page.goto('/login');
+  await page.fill(...);
+  await page.click(...);
+});
 ```
 
-#### pw-state-setup-api
-
+**Type 3: Almost Correct**
+*Bug: Path to storage state incorrect or not created.*
 ```javascript
-await page.click('#set-auth');
-const result = await page.locator('#message').textContent();
+use: { storageState: 'user.json' } // File not found usually
 ```
 
-#### pw-screenshot-failure
+#### pw-screenshot-failure - Screenshots
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.click('#action');
-const result = await page.locator('#result').textContent();
-```
-
-#### pw-video-recording
-
-```javascript
-await page.click('#record');
-await page.click('#stop');
-const result = await page.locator('#status').textContent();
-```
-
-#### pw-retry-logic
-
-```javascript
-await page.click('#flaky');
-let result = await page.locator('#result').textContent();
-if (result.includes('Failed')) {
-  await page.click('#flaky');
-  result = await page.locator('#result').textContent();
+// playwright.config.ts
+use: {
+  screenshot: 'only-on-failure',
 }
 ```
 
-#### pw-parallel-execution
-
+**Type 2: Correct & Non-Compliant**
+*Why: 'on' fills storage with useless images of passing tests.*
 ```javascript
-await Promise.all([
-  page.click('#task1'),
-  page.click('#task2'),
-  page.click('#task3'),
-]);
-const result = await page.locator('#results').textContent();
+use: { screenshot: 'on' }
 ```
 
-#### pw-cross-browser
-
+**Type 3: Almost Correct**
+*Bug: Invalid option string.*
 ```javascript
-await page.selectOption('#browser', 'chromium');
-await page.click('#test');
-const result = await page.locator('#result').textContent();
+use: { screenshot: 'true' }
 ```
 
-#### pw-mobile-viewport
+#### pw-video-recording - Video
 
+**Type 1: Correct & Compliant**
 ```javascript
-await page.selectOption('#viewport', 'mobile');
-await page.click('#apply');
-const result = await page.locator('#layout').textContent();
-```
-
-#### pw-csv-workflow
-
-```javascript
-const orders = csvData
-  .trim()
-  .split('\n')
-  .slice(1)
-  .map((line) => {
-    const [id, qty] = line.split(',');
-    return { id, qty };
-  });
-for (const order of orders) {
-  await page.fill('#order-id', order.id);
-  await page.fill('#qty', order.qty);
-  await page.click('#process');
+use: {
+  video: 'retain-on-failure',
 }
-const result = await page.locator('#completed-count').textContent();
 ```
 
-#### pw-infrastructure-boss (Infrastructure Idol)
-
+**Type 2: Correct & Non-Compliant**
+*Why: Always recording slows down execution significantly.*
 ```javascript
-async function retryWithScreenshot(action) {
-  for (let i = 0; i < 3; i++) {
+use: { video: 'on' }
+```
+
+**Type 3: Almost Correct**
+*Bug: Misspelled property.*
+```javascript
+use: { recordVideo: 'on' }
+```
+
+#### pw-retry-logic - Retries
+
+**Type 1: Correct & Compliant**
+```javascript
+// playwright.config.ts
+retries: process.env.CI ? 2 : 0,
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Excessive retries hide real bugs/instability.*
+```javascript
+retries: 10,
+```
+
+**Type 3: Almost Correct**
+*Bug: Setting retry in the test body (it's a config option).*
+```javascript
+test('my test', async ({ page }) => {
+  test.retry(2); // Not valid API like this
+});
+```
+
+#### pw-parallel-execution - Parallelism
+
+**Type 1: Correct & Compliant**
+```javascript
+// playwright.config.ts
+fullyParallel: true,
+workers: '50%',
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Serial execution is too slow for large suites.*
+```javascript
+workers: 1,
+```
+
+**Type 3: Almost Correct**
+*Bug: Conflict with serial mode.*
+```javascript
+test.describe.serial('group', () => { ... }); 
+// + fullyParallel: true in config causes confusion
+```
+
+#### pw-mobile-viewport - Mobile Testing
+
+**Type 1: Correct & Compliant**
+```javascript
+use: {
+  ...devices['iPhone 12'],
+}
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Only setting viewport size misses touch events and User Agent.*
+```javascript
+use: {
+  viewport: { width: 375, height: 667 },
+  hasTouch: true,
+}
+```
+
+**Type 3: Almost Correct**
+*Bug: Typos in device name.*
+```javascript
+...devices['Iphone 12'] // Case sensitive
+```
+
+#### pw-infrastructure-boss - Self-Healing Test Suite
+
+**Type 1: Correct & Compliant**
+```javascript
+async function retryAction(action, attempts = 3) {
+  for (let i = 0; i < attempts; i++) {
     try {
       await action();
-      if ((await page.locator('#result').textContent()).includes('Success'))
-        return 'passed';
-    } catch (e) {}
+      return 'passed';
+    } catch (e) {
+      if (i === attempts - 1) {
+        await page.screenshot({ path: 'failure.png' });
+        throw e;
+      }
+    }
   }
-  return 'failed-with-screenshot';
 }
-const result = await retryWithScreenshot(
-  async () => await page.click('#action'),
-);
 ```
 
-#### pw-integration-boss (Integration Icon)
-
+**Type 2: Correct & Non-Compliant**
+*Why: Silent failure.*
 ```javascript
-await page.click('#setup');
-await page.waitForSelector('#data-display');
-const setupValid =
-  (await page.locator('#user-name').textContent()) === 'Test User';
-await page.click('#cleanup');
-const result =
-  setupValid &&
-  (await page.locator('#status').textContent()) === 'Cleanup complete'
-    ? 'integration-passed'
-    : 'failed';
+try { await action(); } catch(e) { console.log('failed'); }
+```
+
+**Type 3: Almost Correct**
+*Bug: Rethrowing without screenshot.*
+```javascript
+catch (e) { throw e; } // Missed the requirement
+```
+
+#### pw-integration-boss - E2E Pipeline Integration
+
+**Type 1: Correct & Compliant**
+```javascript
+test('Full User Flow', async ({ page }) => {
+  // 1. Setup
+  await setupUserData(); 
+  // 2. Login
+  await page.goto('/login');
+  await page.fill('#u', 'test');
+  await page.fill('#p', 'pass');
+  await page.click('#submit');
+  // 3. Verify
+  await expect(page.locator('.dashboard')).toBeVisible();
+  // 4. Teardown
+  await cleanupUserData();
+});
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: No cleanup leaves dirty data.*
+```javascript
+test('Flow', async ({ page }) => {
+  await page.goto('/login');
+  // ... create data
+  // End of test
+});
+```
+
+**Type 3: Almost Correct**
+*Bug: Cleanup fails if test fails (should use try/finally or afterEach).*
+```javascript
+await setup();
+await test(); // if this throws
+await cleanup(); // this never runs
+```
+
+## E2E Tier (Full Flows)
+
+### Scenarios
+
+#### e2e-login-flow - Login Flow
+
+**Type 1: Correct & Compliant**
+```javascript
+import { test, expect } from '@playwright/test';
+
+test('User can log in', async ({ page }) => {
+  await page.goto('/login.html');
+  await page.fill('#username', 'testuser');
+  await page.fill('#password', 'password123');
+  await page.click('button[type="submit"]');
+  await expect(page.locator('#welcome-message')).toBeVisible();
+  await expect(page).toHaveURL('/dashboard.html');
+});
+```
+
+**Type 2: Correct & Non-Compliant**
+*Why: Hardcoded pauses.*
+```javascript
+await page.goto('/login.html');
+await page.fill('#username', 'testuser');
+await page.waitForTimeout(1000); // Bad practice
+await page.click('button');
+await page.waitForTimeout(2000); // Bad practice
+const visible = await page.isVisible('#welcome-message');
+expect(visible).toBe(true);
+```
+
+**Type 3: Almost Correct**
+*Bug: Wrong selector for welcome message.*
+```javascript
+await expect(page.locator('.welcome')).toBeVisible(); // Class instead of ID
 ```
