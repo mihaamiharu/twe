@@ -3,6 +3,11 @@ import server from '../dist/server/server.js';
 
 const PORT = process.env.PORT || 3000;
 
+import * as Sentry from "@sentry/bun";
+import { getSentryConfig } from "../src/lib/sentry.config";
+
+Sentry.init(getSentryConfig());
+
 console.log(`🚀 Production server starting on port ${PORT}...`);
 
 Bun.serve({
@@ -42,6 +47,7 @@ Bun.serve({
         try {
             return await server.fetch(req);
         } catch (error) {
+            Sentry.captureException(error);
             console.error('SSR Error:', error);
             return new Response('Internal Server Error', { status: 500 });
         }
