@@ -73,6 +73,13 @@ export interface Locator {
 export interface LocatorOptions {
   name?: string | RegExp;
   exact?: boolean;
+  checked?: boolean;
+  disabled?: boolean;
+  expanded?: boolean;
+  pressed?: boolean;
+  selected?: boolean;
+  level?: number;
+  includeHidden?: boolean;
 }
 
 export interface APIRequestContext {
@@ -1278,6 +1285,41 @@ export class MockedPlaywrightPage {
         heading: 'h1, h2, h3, h4, h5, h6, [role="heading"]',
         listitem: 'li, [role="listitem"]',
         img: 'img, [role="img"]',
+
+        // Table-related roles
+        cell: 'td, [role="cell"]',
+        columnheader: 'th, [role="columnheader"]',
+        row: 'tr, [role="row"]',
+        rowheader: 'th[scope="row"], [role="rowheader"]',
+        table: 'table, [role="table"]',
+        rowgroup: 'thead, tbody, tfoot, [role="rowgroup"]',
+
+        // List-related
+        list: 'ul, ol, [role="list"]',
+
+        // Form-related
+        combobox: 'select, [role="combobox"]',
+        option: 'option, [role="option"]',
+        spinbutton: 'input[type="number"], [role="spinbutton"]',
+        slider: 'input[type="range"], [role="slider"]',
+
+        // Dialog/Modal
+        dialog: 'dialog, [role="dialog"]',
+        alertdialog: '[role="alertdialog"]',
+
+        // Landmarks
+        navigation: 'nav, [role="navigation"]',
+        main: 'main, [role="main"]',
+        banner: 'header, [role="banner"]',
+        contentinfo: 'footer, [role="contentinfo"]',
+
+        // Widgets
+        tab: '[role="tab"]',
+        tablist: '[role="tablist"]',
+        tabpanel: '[role="tabpanel"]',
+        menu: '[role="menu"]',
+        menuitem: '[role="menuitem"]',
+        progressbar: 'progress, [role="progressbar"]',
       };
 
       // eslint-disable-next-line security/detect-object-injection
@@ -1296,6 +1338,30 @@ export class MockedPlaywrightPage {
             : text
               .toLowerCase()
               .includes((options.name as string).toLowerCase());
+        });
+      }
+
+      // Filter by state options
+      if (options?.checked !== undefined) {
+        elements = elements.filter((el) => (el as HTMLInputElement).checked === options.checked);
+      }
+      if (options?.disabled !== undefined) {
+        elements = elements.filter((el) => (el as HTMLButtonElement).disabled === options.disabled);
+      }
+      if (options?.selected !== undefined) {
+        elements = elements.filter((el) => (el as HTMLOptionElement).selected === options.selected);
+      }
+      if (options?.expanded !== undefined) {
+        elements = elements.filter((el) => el.getAttribute('aria-expanded') === String(options.expanded));
+      }
+      if (options?.pressed !== undefined) {
+        elements = elements.filter((el) => el.getAttribute('aria-pressed') === String(options.pressed));
+      }
+      if (options?.level !== undefined) {
+        elements = elements.filter((el) => {
+          const tagMatch = el.tagName.match(/^H(\d)$/);
+          if (tagMatch) return parseInt(tagMatch[1]) === options.level;
+          return el.getAttribute('aria-level') === String(options.level);
         });
       }
 
@@ -2084,13 +2150,48 @@ export class MockedPlaywrightPage {
               button:
                 'button, [role="button"], input[type="submit"], input[type="button"]',
               textbox:
-                'input[type="text"], input[type="email"], input[type="password"], textarea, [role="textbox"]',
+                'input[type="text"], input[type="email"], input[type="password"], input:not([type]), textarea, [role="textbox"]',
               checkbox: 'input[type="checkbox"], [role="checkbox"]',
               radio: 'input[type="radio"], [role="radio"]',
               link: 'a, [role="link"]',
               heading: 'h1, h2, h3, h4, h5, h6, [role="heading"]',
               listitem: 'li, [role="listitem"]',
               img: 'img, [role="img"]',
+
+              // Table-related roles
+              cell: 'td, [role="cell"]',
+              columnheader: 'th, [role="columnheader"]',
+              row: 'tr, [role="row"]',
+              rowheader: 'th[scope="row"], [role="rowheader"]',
+              table: 'table, [role="table"]',
+              rowgroup: 'thead, tbody, tfoot, [role="rowgroup"]',
+
+              // List-related
+              list: 'ul, ol, [role="list"]',
+
+              // Form-related
+              combobox: 'select, [role="combobox"]',
+              option: 'option, [role="option"]',
+              spinbutton: 'input[type="number"], [role="spinbutton"]',
+              slider: 'input[type="range"], [role="slider"]',
+
+              // Dialog/Modal
+              dialog: 'dialog, [role="dialog"]',
+              alertdialog: '[role="alertdialog"]',
+
+              // Landmarks
+              navigation: 'nav, [role="navigation"]',
+              main: 'main, [role="main"]',
+              banner: 'header, [role="banner"]',
+              contentinfo: 'footer, [role="contentinfo"]',
+
+              // Widgets
+              tab: '[role="tab"]',
+              tablist: '[role="tablist"]',
+              tabpanel: '[role="tabpanel"]',
+              menu: '[role="menu"]',
+              menuitem: '[role="menuitem"]',
+              progressbar: 'progress, [role="progressbar"]',
             };
 
             // eslint-disable-next-line security/detect-object-injection
@@ -2114,6 +2215,31 @@ export class MockedPlaywrightPage {
                   );
               });
             }
+
+            // Filter by state options
+            if (options?.checked !== undefined) {
+              matches = matches.filter((el) => (el as HTMLInputElement).checked === options.checked);
+            }
+            if (options?.disabled !== undefined) {
+              matches = matches.filter((el) => (el as HTMLButtonElement).disabled === options.disabled);
+            }
+            if (options?.selected !== undefined) {
+              matches = matches.filter((el) => (el as HTMLOptionElement).selected === options.selected);
+            }
+            if (options?.expanded !== undefined) {
+              matches = matches.filter((el) => el.getAttribute('aria-expanded') === String(options.expanded));
+            }
+            if (options?.pressed !== undefined) {
+              matches = matches.filter((el) => el.getAttribute('aria-pressed') === String(options.pressed));
+            }
+            if (options?.level !== undefined) {
+              matches = matches.filter((el) => {
+                const tagMatch = el.tagName.match(/^H(\d)$/);
+                if (tagMatch) return parseInt(tagMatch[1]) === options.level;
+                return el.getAttribute('aria-level') === String(options.level);
+              });
+            }
+
             children.push(...matches);
           }
           return children;

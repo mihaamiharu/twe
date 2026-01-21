@@ -18,15 +18,21 @@ export function I18nProvider({ children, locale }: I18nProviderProps) {
   // to prevent flash of unlocalized content.
   // HOWEVER, we keep this useEffect to ensure client-side transitions are
   // caught if the router doesn't re-trigger beforeLoad.
-  useEffect(() => {
-    const targetLocale: Locale = isValidLocale(locale ?? '')
-      ? (locale as Locale)
-      : fallbackLng;
+  const targetLocale: Locale = isValidLocale(locale ?? '')
+    ? (locale as Locale)
+    : fallbackLng;
 
+  // Synchronously set language if mismatch is detected during render
+  // This ensures the I18nextProvider receives the correct state immediately during hydration
+  if (i18n.language !== targetLocale) {
+    i18n.changeLanguage(targetLocale);
+  }
+
+  useEffect(() => {
     if (i18n.language !== targetLocale) {
       i18n.changeLanguage(targetLocale);
     }
-  }, [locale]);
+  }, [targetLocale]);
 
 
   return <I18nextProvider i18n={i18n}>{children}</I18nextProvider>;

@@ -514,7 +514,7 @@ function HomePage() {
               {t('cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/login">
+              <Link to="/$locale/challenges" params={{ locale }}>
                 <Button
                   size="lg"
                   className="text-lg px-8 rounded-xl border-2 border-primary shadow-lg shadow-primary/20"
@@ -522,7 +522,7 @@ function HomePage() {
                   {t('cta.getStarted')}
                 </Button>
               </Link>
-              <Link to="/leaderboard">
+              <Link to="/$locale/leaderboard" params={{ locale }}>
                 <Button
                   variant="outline"
                   size="lg"
