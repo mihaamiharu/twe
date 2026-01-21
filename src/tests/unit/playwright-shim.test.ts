@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
-import { MockedPlaywrightPage } from '../../lib/playwright-shim';
+import { MockedPlaywrightPage } from '../../core/executor/playwright-shim';
 
 describe('Playwright Shim', () => {
   let page: MockedPlaywrightPage;
@@ -223,5 +223,61 @@ describe('Playwright Shim', () => {
     document.body.appendChild(input);
 
     expect(await page.inputValue('#proxy-input')).toBe('typed value');
+  });
+
+  test('should find table-related roles', async () => {
+    const table = document.createElement('table');
+    table.innerHTML = `
+      <thead>
+        <tr><th role="columnheader">Status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Active</td></tr>
+      </tbody>
+    `;
+    document.body.appendChild(table);
+
+    expect(await page.getByRole('columnheader', { name: 'Status' }).count()).toBe(1);
+    expect(await page.getByRole('cell', { name: 'Active' }).count()).toBe(1);
+    expect(await page.getByRole('row').count()).toBe(2);
+  });
+
+  test('should filter by state options (checked, disabled)', async () => {
+    const cb1 = document.createElement('input');
+    cb1.type = 'checkbox';
+    cb1.checked = true;
+    cb1.id = 'cb1';
+
+    const cb2 = document.createElement('input');
+    cb2.type = 'checkbox';
+    cb2.checked = false;
+    cb2.id = 'cb2';
+
+    document.body.appendChild(cb1);
+    document.body.appendChild(cb2);
+
+    expect(await page.getByRole('checkbox', { checked: true }).count()).toBe(1);
+    expect(await page.getByRole('checkbox', { checked: false }).count()).toBe(1);
+
+    const btn = document.createElement('button');
+    btn.disabled = true;
+    btn.textContent = 'Disabled Button';
+    document.body.appendChild(btn);
+
+    expect(await page.getByRole('button', { disabled: true }).count()).toBe(1);
+    expect(await page.getByRole('button', { disabled: false }).count()).toBe(0);
+  });
+
+  test('should filter headings by level', async () => {
+    const h1 = document.createElement('h1');
+    h1.textContent = 'Title 1';
+    const h2 = document.createElement('h2');
+    h2.textContent = 'Title 2';
+    document.body.appendChild(h1);
+    document.body.appendChild(h2);
+
+    expect(await page.getByRole('heading', { level: 1 }).count()).toBe(1);
+    expect(await page.getByRole('heading', { level: 2 }).count()).toBe(1);
+    expect(await page.getByRole('heading', { level: 3 }).count()).toBe(0);
   });
 });
