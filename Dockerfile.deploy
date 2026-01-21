@@ -13,6 +13,7 @@ COPY drizzle.config.ts tsconfig.json ./
 COPY drizzle ./drizzle
 COPY src ./src
 COPY content ./content
+COPY tutorials ./tutorials
 COPY scripts ./scripts
 
 # Expose port and start
