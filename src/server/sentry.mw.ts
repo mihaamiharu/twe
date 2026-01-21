@@ -1,5 +1,9 @@
 import { createMiddleware } from '@tanstack/react-start';
 import * as Sentry from '@sentry/bun';
+import { getSentryConfig } from '../lib/sentry.config';
+
+// Ensure Sentry is initialized within the bundled application context
+Sentry.init(getSentryConfig());
 
 /**
  * Middleware to attach user context to Sentry and capture errors
