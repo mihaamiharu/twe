@@ -223,9 +223,16 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="mt-16 border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-xs text-muted-foreground font-medium">
-            © {new Date().getFullYear()} TestingWithEkki. All rights reserved.
-          </p>
+          <div className="flex flex-col gap-1 items-center md:items-start">
+            <p className="text-xs text-muted-foreground font-medium">
+              © {new Date().getFullYear()} TestingWithEkki. All rights reserved.
+            </p>
+            {import.meta.env.VITE_APP_VERSION && (
+              <p className="text-[10px] text-muted-foreground/50 font-mono">
+                Build: {import.meta.env.VITE_APP_VERSION}
+              </p>
+            )}
+          </div>
           <div className="flex items-center">
             <BugReportDialog
               trigger={
