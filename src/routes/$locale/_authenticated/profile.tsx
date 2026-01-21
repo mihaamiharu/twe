@@ -1,5 +1,5 @@
 import { createFileRoute, useParams } from '@tanstack/react-router';
-import { useState } from 'react';
+
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Avatar } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -144,7 +144,6 @@ function ProfilePage() {
   }
 
   const user = data.data;
-  const [imgError, setImgError] = useState(false);
   const xpToNext = getXPForLevel(user.level + 1);
   const currentLevelXp = getXPForLevel(user.level);
   const progressXp = user.xp - currentLevelXp;
@@ -172,19 +171,14 @@ function ProfilePage() {
           <CardContent className="p-8">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
                 <Avatar className="h-24 w-24">
-                  {user.image && !imgError ? (
-                    <img
-                      src={user.image}
-                      alt={user.name || 'User'}
-                      referrerPolicy="no-referrer"
-                      className="aspect-square size-full object-cover"
-                      onError={() => setImgError(true)}
-                    />
-                  ) : (
-                    <div className="flex h-full w-full items-center justify-center rounded-full bg-primary/20 text-2xl text-primary font-medium">
-                      {(user.name || user.email).charAt(0).toUpperCase()}
-                    </div>
-                  )}
+                  <AvatarImage
+                    src={user.image || undefined}
+                    alt={user.name || 'User'}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-primary/20 text-2xl text-primary font-medium">
+                    {(user.name || user.email).charAt(0).toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 
                 <div className="flex-1">

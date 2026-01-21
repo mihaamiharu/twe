@@ -1,0 +1,24 @@
+FROM oven/bun:1 AS base
+WORKDIR /app
+
+# Copy package files for installing production dependencies
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile --production
+
+# Copy the pre-built application output
+# We assume "bun run build" has already run locally
+COPY dist ./dist
+# Copy missing config and scripts for DB migrations
+COPY drizzle.config.ts tsconfig.json ./
+COPY drizzle ./drizzle
+COPY src ./src
+COPY content ./content
+COPY tutorials ./tutorials
+COPY scripts ./scripts
+
+# Expose port and start
+ENV PORT=3000
+ENV HOST=0.0.0.0
+EXPOSE 3000
+
+CMD ["bun", "run", "scripts/server.ts"]

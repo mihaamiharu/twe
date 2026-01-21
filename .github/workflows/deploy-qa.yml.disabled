@@ -1,0 +1,94 @@
+name: Deploy to QA
+
+on:
+  push:
+    branches:
+      - qa
+
+jobs:
+  deploy:
+    name: Deploy to QA VPS
+    runs-on: ubuntu-latest
+    environment: qa
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.2
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Build Application
+        run: bun run build
+
+      - name: Create Deployment Package
+        run: |
+          tar -czf deployment.tar.gz dist package.json bun.lock Dockerfile.deploy .dockerignore
+
+      - name: Upload Artifacts to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          source: "deployment.tar.gz"
+          target: "~/apps/twe/"
+
+      - name: Deploy on VPS
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            cd ~/apps/twe
+            
+            # Extract artifacts
+            tar -xzf deployment.tar.gz
+            
+            echo "📂 Files after extraction:"
+            ls -la
+            echo "📂 Dist contents:"
+            ls -la dist || echo "Dist not found"
+            
+            # Rename deploy dockerfile to avoid confusion or use explicitly
+            mv Dockerfile.deploy Dockerfile.app.built
+            
+            # Update docker-compose.qa.yml to point to the new dockerfile? 
+            # OR just build the image manually and tag it as 'twe-app'?
+            # Let's use a simpler approach: Build image locally on VPS using pre-built files
+            
+            docker build -f Dockerfile.app.built -t twe-app-staging:latest .
+            
+            # Now run compose, ensuring it uses the image we just built
+            # We assume docker-compose.staging.yml uses 'image: twe-app-staging:latest' or 'build: .'
+            # If it uses 'build: .', we need to make sure it doesn't try to rebuild using the heavy process.
+            # So let's force it to use the image we just built if possible, or
+            # Temporarily replace Dockerfile
+            
+            mv Dockerfile Dockerfile.bak
+            mv Dockerfile.app.built Dockerfile
+            
+            # Start up
+            docker compose -f docker-compose.staging.yml up -d --build
+            
+            # Restore Dockerfile (optional, for git cleanliness on server)
+            mv Dockerfile Dockerfile.app.built
+            mv Dockerfile.bak Dockerfile
+            
+            # Wait and migrate
+            sleep 10
+            docker exec twe-app-staging bun run db:migrate || true
+            docker exec twe-app-staging bun run db:sync
+            
+            # Cleanup
+            rm deployment.tar.gz
+            
+            echo "✅ Deployment complete! Artifacts deployed successfully."
