@@ -13,7 +13,7 @@ export const getSentryConfig = () => {
     tracesSampleRate: 1.0,
     // Setting this option to true will print useful information to the console while you're setting up Sentry.
     debug: false,
-    environment: import.meta.env.MODE || process.env.NODE_ENV || 'development',
+    environment: import.meta.env.VITE_SENTRY_ENVIRONMENT || process.env.SENTRY_ENVIRONMENT || import.meta.env.MODE || process.env.NODE_ENV || 'development',
     release: import.meta.env.VITE_APP_VERSION || process.env.npm_package_version || '1.0.0',
   };
 };
