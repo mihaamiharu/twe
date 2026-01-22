@@ -77,9 +77,9 @@ jobs:
             cd ~/apps/twe-prod
             # Overwrite .env.production with values from GitHub Secrets
             cat <<EOF > .env.production
-            DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}"
+            DATABASE_URL="${{ secrets.DATABASE_URL }}"
             BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
-            BETTER_AUTH_URL="${{ secrets.PROD_BETTER_AUTH_URL }}"
+            BETTER_AUTH_URL="${{ secrets.BETTER_AUTH_URL }}"
             GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
             GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
             SMTP_HOST="${{ secrets.SMTP_HOST }}"
