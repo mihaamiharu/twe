@@ -1,9 +1,9 @@
-name: Deploy to QA
+name: Deploy to Production
 
 on:
   push:
     branches:
-      - qa
+      - main # Change to master if that is your default branch
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -35,7 +35,7 @@ jobs:
             dist content drizzle scripts src \
             package.json bun.lock tsconfig.json \
             Dockerfile Dockerfile.deploy .dockerignore \
-            docker-compose.staging.yml
+            docker-compose.prod.yml
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -45,10 +45,10 @@ jobs:
           retention-days: 1
 
   deploy:
-    name: Deploy to QA VPS
+    name: Deploy to Production VPS
     needs: build
     runs-on: ubuntu-latest
-    environment: qa
+    environment: production
 
     steps:
       - name: Download artifact
@@ -64,9 +64,9 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           source: "deployment_package.tar.gz"
-          target: "~/apps/twe"
+          target: "~/apps/twe-prod"
 
-      - name: Create .env.staging from secrets
+      - name: Create .env.production from secrets
         uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -74,12 +74,12 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            cd ~/apps/twe
-            # Overwrite .env.staging with values from GitHub Secrets
-            cat <<EOF > .env.staging
-            DATABASE_URL="${{ secrets.STAGING_DATABASE_URL }}"
+            cd ~/apps/twe-prod
+            # Overwrite .env.production with values from GitHub Secrets
+            cat <<EOF > .env.production
+            DATABASE_URL="${{ secrets.PROD_DATABASE_URL }}"
             BETTER_AUTH_SECRET="${{ secrets.BETTER_AUTH_SECRET }}"
-            BETTER_AUTH_URL="${{ secrets.STAGING_BETTER_AUTH_URL }}"
+            BETTER_AUTH_URL="${{ secrets.PROD_BETTER_AUTH_URL }}"
             GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}"
             GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}"
             SMTP_HOST="${{ secrets.SMTP_HOST }}"
@@ -104,7 +104,7 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
           script: |
-            cd ~/apps/twe
+            cd ~/apps/twe-prod
             
             # Extract new files
             tar -xzf deployment_package.tar.gz
@@ -114,18 +114,18 @@ jobs:
             cp Dockerfile.deploy Dockerfile
             
             # Restart containers and clean up old images
-            docker compose -f docker-compose.staging.yml up -d --build
+            docker compose -f docker-compose.prod.yml up -d --build
             docker image prune -af
             
             # Wait for containers to be ready
             sleep 5
             
             # Run migrations and sync
-            docker exec twe-app-staging bun run db:migrate || true
-            docker exec twe-app-staging bun run db:sync
+            docker exec twe-app bun run db:migrate || true
+            docker exec twe-app bun run db:sync
             
-            echo "✅ Optimized deployment complete!"
+            echo "✅ Production deployment complete!"
 
       - name: Notify on failure
         if: failure()
-        run: echo "❌ Deployment to QA failed!"
+        run: echo "❌ Deployment to Production failed!"
