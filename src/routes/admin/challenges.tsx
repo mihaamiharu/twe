@@ -17,9 +17,10 @@ import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
+import { DataTablePagination } from '@/components/admin/data-table-pagination';
 
 interface AdminChallenge {
   id: string;
@@ -35,16 +36,6 @@ interface AdminChallenge {
 
 export const Route = createFileRoute('/admin/challenges')({
   loader: async ({ context }) => {
-    const session = context.auth;
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== 'ADMIN'
-    ) {
-      throw redirect({
-        to: '/',
-      });
-    }
-
     await context.queryClient.ensureQueryData(adminChallengesQueryOptions);
   },
   component: ChallengeManager,
@@ -53,21 +44,37 @@ export const Route = createFileRoute('/admin/challenges')({
 function ChallengeManager() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data: challenges } = useSuspenseQuery(adminChallengesQueryOptions);
 
   const filteredChallenges = useMemo(() => {
     if (!challenges) return [];
     const query = searchQuery.toLowerCase().trim();
-    if (!query) return challenges;
-    return challenges.filter(
-      (c: AdminChallenge) => {
-        const title = typeof c.title === 'object' ? c.title?.en || '' : c.title;
-        return title.toLowerCase().includes(query) ||
-          c.slug?.toLowerCase().includes(query)
-      }
-    );
+    const result = query
+      ? challenges.filter(
+        (c: AdminChallenge) => {
+          const title = typeof c.title === 'object' ? c.title?.en || '' : c.title;
+          return title.toLowerCase().includes(query) ||
+            c.slug?.toLowerCase().includes(query)
+        }
+      )
+      : challenges;
+
+    return result;
   }, [challenges, searchQuery]);
+
+  const totalPages = Math.ceil(filteredChallenges.length / pageSize);
+  const paginatedChallenges = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredChallenges.slice(start, start + pageSize);
+  }, [filteredChallenges, currentPage, pageSize]);
+
+  // Reset to page 1 on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: {
@@ -142,7 +149,7 @@ function ChallengeManager() {
             </TableHeader>
             <TableBody>
               <AnimatePresence mode="popLayout">
-                {filteredChallenges.length === 0 ? (
+                {paginatedChallenges.length === 0 ? (
                   <TableRow>
                     <TableCell
                       colSpan={5}
@@ -154,7 +161,7 @@ function ChallengeManager() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredChallenges.map((challenge: AdminChallenge) => {
+                  paginatedChallenges.map((challenge: AdminChallenge) => {
                     const isComingSoon =
                       challenge.tags?.includes('coming-soon');
 
@@ -257,6 +264,14 @@ function ChallengeManager() {
               </AnimatePresence>
             </TableBody>
           </Table>
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            onPageChange={setCurrentPage}
+            totalItems={filteredChallenges.length}
+          />
         </CardContent>
       </Card>
 

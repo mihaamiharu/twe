@@ -1,5 +1,6 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { cn } from '@/lib/utils';
 import { getAdminStats } from '@/server/admin.fn';
 import {
   Card,
@@ -17,6 +18,8 @@ import {
   Activity,
   ArrowRight,
   Layout,
+  ArrowUpRight,
+  ArrowDownRight,
 } from 'lucide-react';
 import {
   BarChart,
@@ -69,18 +72,24 @@ interface RecentSubmission {
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
-  loader: ({ context }) => {
-    const session = context.auth;
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== 'ADMIN'
-    ) {
-      throw redirect({
-        to: '/',
-      });
-    }
-  },
 });
+
+function TrendIndicator({ value }: { value: number }) {
+  const isPositive = value >= 0;
+  return (
+    <div className={cn(
+      "flex items-center text-xs font-medium",
+      isPositive ? "text-green-500" : "text-red-500"
+    )}>
+      {isPositive ? (
+        <ArrowUpRight className="h-3 w-3 mr-0.5" />
+      ) : (
+        <ArrowDownRight className="h-3 w-3 mr-0.5" />
+      )}
+      {Math.abs(value).toFixed(1)}%
+    </div>
+  );
+}
 
 function AdminDashboard() {
   const {
@@ -116,7 +125,6 @@ function AdminDashboard() {
         <p className="mt-2 text-muted-foreground">
           Ensure you have admin privileges.
         </p>
-        {/* Fallback link to home */}
         <a href="/" className="text-primary hover:underline mt-4 block">
           Return Home
         </a>
@@ -150,9 +158,10 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalUsers}</div>
-            <p className="text-xs text-muted-foreground">
-              +12% from last month
-            </p>
+            <div className="flex items-center mt-1">
+              <TrendIndicator value={stats.userGrowthPercent} />
+              <span className="text-xs text-muted-foreground ml-1">from last month</span>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -164,9 +173,10 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{stats.totalSubmissions}</div>
-            <p className="text-xs text-muted-foreground">
-              Across all challenges
-            </p>
+            <div className="flex items-center mt-1">
+              <TrendIndicator value={stats.submissionGrowthPercent} />
+              <span className="text-xs text-muted-foreground ml-1">from last month</span>
+            </div>
           </CardContent>
         </Card>
         <Card>
@@ -180,19 +190,19 @@ function AdminDashboard() {
             <div className="text-2xl font-bold">
               {stats.popularChallenges.length}+
             </div>
-            <p className="text-xs text-muted-foreground">Live and published</p>
+            <p className="text-xs text-muted-foreground mt-1">Live and published</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">
-              Platform Health
+              Active Users (7d)
             </CardTitle>
             <Activity className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">100%</div>
-            <p className="text-xs text-muted-foreground">Operational</p>
+            <div className="text-2xl font-bold">{stats.activeUsers}</div>
+            <p className="text-xs text-muted-foreground mt-1">Unique solvers this week</p>
           </CardContent>
         </Card>
       </div>
