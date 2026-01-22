@@ -15,7 +15,7 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
       const { users, submissions, challenges, bugReports } = await import(
         '@/db/schema'
       );
-      const { count, desc, sql, gte, eq } = await import('drizzle-orm');
+      const { count, desc, sql, gte, lt, and, eq } = await import('drizzle-orm');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const headers = getRequestHeaders();
@@ -39,10 +39,63 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         .from(submissions);
       const totalSubmissions = submissionCountResult[0].value;
 
-      // 3. Submissions last 30 days
+      // 3. Date ranges for growth calculation
+      const now = new Date();
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      const sixtyDaysAgo = new Date();
+      sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
+      // 4. User Growth
+      const currentMonthUsers = await db
+        .select({ value: count() })
+        .from(users)
+        .where(gte(users.createdAt, thirtyDaysAgo));
+
+      const previousMonthUsers = await db
+        .select({ value: count() })
+        .from(users)
+        .where(
+          and(
+            gte(users.createdAt, sixtyDaysAgo),
+            lt(users.createdAt, thirtyDaysAgo),
+          ),
+        );
+
+      const userGrowthPercent = previousMonthUsers[0].value > 0
+        ? ((currentMonthUsers[0].value - previousMonthUsers[0].value) / previousMonthUsers[0].value) * 100
+        : currentMonthUsers[0].value > 0 ? 100 : 0;
+
+      // 5. Submission Growth
+      const currentMonthSubmissions = await db
+        .select({ value: count() })
+        .from(submissions)
+        .where(gte(submissions.createdAt, thirtyDaysAgo));
+
+      const previousMonthSubmissions = await db
+        .select({ value: count() })
+        .from(submissions)
+        .where(
+          and(
+            gte(submissions.createdAt, sixtyDaysAgo),
+            lt(submissions.createdAt, thirtyDaysAgo),
+          ),
+        );
+
+      const submissionGrowthPercent = previousMonthSubmissions[0].value > 0
+        ? ((currentMonthSubmissions[0].value - previousMonthSubmissions[0].value) / previousMonthSubmissions[0].value) * 100
+        : currentMonthSubmissions[0].value > 0 ? 100 : 0;
+
+      // 6. Active Users (last 7 days)
+      const activeUsersResult = await db
+        .select({ value: count(sql`DISTINCT ${submissions.userId}`) })
+        .from(submissions)
+        .where(gte(submissions.createdAt, sevenDaysAgo));
+      const activeUsers = activeUsersResult[0].value;
+
+      // 7. Submissions by date chart data
       const submissionsByDate = await db
         .select({
           date: sql<string>`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`,
@@ -53,7 +106,7 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         .groupBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`)
         .orderBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`);
 
-      // 4. Popular Challenges
+      // 8. Popular Challenges
       const popularChallenges = await db
         .select({
           id: challenges.id,
@@ -66,7 +119,7 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         .orderBy(desc(challenges.completionCount))
         .limit(5);
 
-      // 5. Recent Activity
+      // 9. Recent Activity
       const recentActivity = await db.query.submissions.findMany({
         orderBy: (submissions, { desc }) => [desc(submissions.createdAt)],
         limit: 5,
@@ -87,8 +140,8 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         },
       });
 
-      // 6. User Growth (Last 30 Days)
-      const userGrowth = await db
+      // 10. User Growth chart data
+      const userGrowthData = await db
         .select({
           date: sql<string>`to_char(${users.createdAt}, 'YYYY-MM-DD')`,
           count: count(),
@@ -98,7 +151,7 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         .groupBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`)
         .orderBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`);
 
-      // 7. Submission Success Rate
+      // 11. Submission Success Rate
       const submissionStats = await db
         .select({
           isPassed: submissions.isPassed,
@@ -107,7 +160,7 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         .from(submissions)
         .groupBy(submissions.isPassed);
 
-      // 8. Bug Stats
+      // 12. Bug Stats
       const bugStatsResults = await db
         .select({
           status: bugReports.status,
@@ -138,10 +191,13 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         data: {
           totalUsers,
           totalSubmissions,
+          activeUsers,
+          userGrowthPercent,
+          submissionGrowthPercent,
           submissionsByDate,
           popularChallenges,
           recentActivity,
-          userGrowth,
+          userGrowth: userGrowthData,
           submissionStats: {
             passed: submissionStats.find(s => s.isPassed)?.count || 0,
             failed: submissionStats.find(s => !s.isPassed)?.count || 0,
@@ -477,6 +533,257 @@ export const updateChallengeStatus = createServerFn({ method: 'POST' })
     } catch (ignored) {
       const error = ignored as Error;
       console.error('Failed to update challenge:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+// ----------------------------------------------------------------------------
+// ADMIN SUBMISSIONS
+// ----------------------------------------------------------------------------
+
+export const getAdminSubmissions = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    try {
+      const { getRequestHeaders } =
+        await import('@tanstack/react-start/server');
+      const { auth } = await import('./auth.server');
+      const { db } = await import('@/db');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const session = await auth.api.getSession({ headers });
+
+      if (
+        !session?.user ||
+        (session.user as { role?: string }).role !== 'ADMIN'
+      ) {
+        return { success: false, error: 'Unauthorized' };
+      }
+
+      const submissionsList = await db.query.submissions.findMany({
+        orderBy: (submissions, { desc }) => [desc(submissions.createdAt)],
+        limit: 100, // For now, list last 100. We can add real pagination later.
+        with: {
+          user: {
+            columns: {
+              name: true,
+              email: true,
+              image: true,
+            },
+          },
+          challenge: {
+            columns: {
+              title: true,
+              slug: true,
+            },
+          },
+        },
+      });
+
+      return { success: true, data: submissionsList };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to fetch submissions:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  },
+);
+
+// ----------------------------------------------------------------------------
+// ADMIN TUTORIALS
+// ----------------------------------------------------------------------------
+
+export const getAdminTutorials = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    try {
+      const { getRequestHeaders } =
+        await import('@tanstack/react-start/server');
+      const { auth } = await import('./auth.server');
+      const { db } = await import('@/db');
+      const { tutorials } = await import('@/db/schema');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const session = await auth.api.getSession({ headers });
+
+      if (
+        !session?.user ||
+        (session.user as { role?: string }).role !== 'ADMIN'
+      ) {
+        return { success: false, error: 'Unauthorized' };
+      }
+
+      const list = await db.select().from(tutorials).orderBy(tutorials.createdAt);
+
+      return { success: true, data: list };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to fetch tutorials:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  },
+);
+
+const UpdateTutorialStatusSchema = z.object({
+  id: z.string(),
+  isPublished: z.boolean(),
+});
+
+export const updateTutorialStatus = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) => UpdateTutorialStatusSchema.parse(data))
+  .handler(async ({ data: input }) => {
+    try {
+      const { getRequestHeaders } =
+        await import('@tanstack/react-start/server');
+      const { auth } = await import('./auth.server');
+      const { db } = await import('@/db');
+      const { tutorials } = await import('@/db/schema');
+      const { eq } = await import('drizzle-orm');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const session = await auth.api.getSession({ headers });
+
+      if (
+        !session?.user ||
+        (session.user as { role?: string }).role !== 'ADMIN'
+      ) {
+        return { success: false, error: 'Unauthorized' };
+      }
+
+      await db
+        .update(tutorials)
+        .set({
+          isPublished: input.isPublished,
+          updatedAt: new Date(),
+        })
+        .where(eq(tutorials.id, input.id));
+
+      return { success: true, message: 'Tutorial updated' };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to update tutorial:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+// ----------------------------------------------------------------------------
+// ADMIN ACHIEVEMENTS
+// ----------------------------------------------------------------------------
+
+export const getAdminAchievements = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    try {
+      const { getRequestHeaders } =
+        await import('@tanstack/react-start/server');
+      const { auth } = await import('./auth.server');
+      const { db } = await import('@/db');
+      const { achievements, userAchievements } = await import('@/db/schema');
+      const { count, eq, sql } = await import('drizzle-orm');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const session = await auth.api.getSession({ headers });
+
+      if (
+        !session?.user ||
+        (session.user as { role?: string }).role !== 'ADMIN'
+      ) {
+        return { success: false, error: 'Unauthorized' };
+      }
+
+      const list = await db
+        .select({
+          id: achievements.id,
+          slug: achievements.slug,
+          name: achievements.name,
+          description: achievements.description,
+          icon: achievements.icon,
+          rarity: achievements.rarity,
+          category: achievements.category,
+          unlockCount: sql<number>`count(${userAchievements.id})::int`,
+        })
+        .from(achievements)
+        .leftJoin(userAchievements, eq(achievements.id, userAchievements.achievementId))
+        .groupBy(achievements.id)
+        .orderBy(achievements.slug);
+
+      return { success: true, data: list };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to fetch achievements:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  },
+);
+
+// ----------------------------------------------------------------------------
+// ADMIN USER DETAIL
+// ----------------------------------------------------------------------------
+
+export const getAdminUserDetail = createServerFn({ method: 'GET' })
+  .inputValidator((data: unknown) => z.object({ userId: z.string() }).parse(data))
+  .handler(async ({ data: input }) => {
+    try {
+      const { getRequestHeaders } =
+        await import('@tanstack/react-start/server');
+      const { auth } = await import('./auth.server');
+      const { db } = await import('@/db');
+      const { users, submissions, progress } = await import('@/db/schema');
+      const { eq, desc } = await import('drizzle-orm');
+
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const session = await auth.api.getSession({ headers });
+
+      if (
+        !session?.user ||
+        (session.user as { role?: string }).role !== 'ADMIN'
+      ) {
+        return { success: false, error: 'Unauthorized' };
+      }
+
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, input.userId),
+        with: {
+          submissions: {
+            orderBy: desc(submissions.createdAt),
+            limit: 20,
+            with: {
+              challenge: {
+                columns: {
+                  title: true,
+                  slug: true,
+                }
+              }
+            }
+          }
+        }
+      });
+
+      if (!user) return { success: false, error: 'User not found' };
+
+      // Get progress counts
+      const userProgress = await db
+        .select()
+        .from(progress)
+        .where(eq(progress.userId, input.userId));
+
+      return {
+        success: true,
+        data: {
+          ...user,
+          progressCount: userProgress.length
+        }
+      };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to fetch user detail:', error);
       return { success: false, error: 'Internal Server Error' };
     }
   });

@@ -247,6 +247,7 @@ export const achievements = pgTable('achievements', {
   name: jsonb('name').notNull(),
   description: jsonb('description').notNull(),
   icon: text('icon').notNull(), // Icon name or emoji
+  rarity: text('rarity').notNull().default('COMMON'), // COMMON, RARE, EPIC, LEGENDARY
   category: text('category').notNull(), // e.g., "challenges", "tutorials", "social"
 
   // Unlock criteria
