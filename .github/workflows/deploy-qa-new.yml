@@ -93,6 +93,7 @@ jobs:
             DEEPSEEK_API_KEY="${{ secrets.DEEPSEEK_API_KEY }}"
             VITE_SENTRY_DSN="${{ secrets.VITE_SENTRY_DSN }}"
             SENTRY_DSN="${{ secrets.SENTRY_DSN }}"
+            SENTRY_ENVIRONMENT=qa
             NODE_ENV=production
             EOF
 
