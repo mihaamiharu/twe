@@ -15,7 +15,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { DataTablePagination } from '@/components/admin/data-table-pagination';
 
 type BugStatus =
   | 'NEW'
@@ -43,17 +44,6 @@ type BugStatus =
   | 'WONT_FIX';
 
 export const Route = createFileRoute('/admin/bugs')({
-  loader: ({ context }) => {
-    const session = context.auth;
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== 'ADMIN'
-    ) {
-      throw redirect({
-        to: '/',
-      });
-    }
-  },
   component: BugManager,
 });
 
@@ -63,6 +53,8 @@ function BugManager() {
   const [adminNote, setAdminNote] = useState('');
   const [status, setStatus] = useState<BugStatus>('OPEN');
   const [isOpen, setIsOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data: bugs, isLoading } = useQuery({
     queryKey: ['admin-bugs'],
@@ -74,6 +66,13 @@ function BugManager() {
   });
 
   type BugReport = NonNullable<typeof bugs>[number];
+
+  const totalPages = Math.ceil((bugs?.length || 0) / pageSize);
+  const paginatedBugs = useMemo(() => {
+    if (!bugs) return [];
+    const start = (currentPage - 1) * pageSize;
+    return bugs.slice(start, start + pageSize);
+  }, [bugs, currentPage, pageSize]);
 
   const updateMutation = useMutation({
     mutationFn: async (data: {
@@ -143,7 +142,7 @@ function BugManager() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {bugs?.length === 0 ? (
+              {paginatedBugs.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={6}
@@ -153,7 +152,7 @@ function BugManager() {
                   </TableCell>
                 </TableRow>
               ) : (
-                bugs?.map((bug) => (
+                paginatedBugs.map((bug) => (
                   <TableRow key={bug.id}>
                     <TableCell>
                       <StatusBadge status={bug.status} />
@@ -197,6 +196,14 @@ function BugManager() {
               )}
             </TableBody>
           </Table>
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            onPageChange={setCurrentPage}
+            totalItems={bugs?.length || 0}
+          />
         </CardContent>
       </Card>
 
