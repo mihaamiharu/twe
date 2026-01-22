@@ -64,6 +64,13 @@
       "when": 1768614610433,
       "tag": "0008_broad_mikhail_rasputin",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1769061805538,
+      "tag": "0009_add_rarity_to_achievements",
+      "breakpoints": true
     }
   ]
 }

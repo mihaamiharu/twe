@@ -17,6 +17,7 @@ import { eq, and, sql } from 'drizzle-orm';
 import type { UserStats } from './achievements';
 import { logger } from '@/lib/logger';
 import { getTierFromCategory } from '@/lib/constants';
+import { checkLevelUp } from '@/lib/gamification';
 
 /**
  * Get user stats for achievement checking
@@ -121,7 +122,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
 /**
  * Calculate current and longest streak from completion dates
  */
-function calculateStreak(completionDates: Date[]): {
+export function calculateStreak(completionDates: Date[]): {
   currentStreak: number;
   longestStreak: number;
 } {
@@ -284,19 +285,23 @@ export async function awardAchievements(
     });
 
     if (user) {
-      // Calculate new level (simple check, importing helper might be circular if not careful)
-      // We'll stick to simple update for now, allowing level to be updated on next interaction
-      // or duplicate simple logic.
-      // Actually, let's just update XP. The client/next refresh will reflect it.
-      // If we really want to trigger level up here, we need the gamification helper.
+      // Calculate new level using the gamification helper
+      const levelUpInfo = checkLevelUp(user.xp, totalXpReward);
 
       await db
         .update(users)
         .set({
           xp: user.xp + totalXpReward,
+          level: levelUpInfo.newLevel,
           updatedAt: new Date(),
         })
         .where(eq(users.id, userId));
+
+      if (levelUpInfo.leveledUp) {
+        logger.info(
+          `[Achievements] User ${userId} leveled up! ${levelUpInfo.oldLevel} -> ${levelUpInfo.newLevel}`,
+        );
+      }
 
       logger.info(
         `[Achievements] Awarded ${totalXpReward} XP to user ${userId}`,

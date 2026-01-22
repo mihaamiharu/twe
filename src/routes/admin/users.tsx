@@ -17,8 +17,9 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
+import { DataTablePagination } from '@/components/admin/data-table-pagination';
 import {
   Tooltip,
   TooltipContent,
@@ -38,23 +39,14 @@ interface AdminUser {
 }
 
 export const Route = createFileRoute('/admin/users')({
-  loader: ({ context }) => {
-    const session = context.auth;
-    if (
-      !session?.user ||
-      (session.user as { role?: string }).role !== 'ADMIN'
-    ) {
-      throw redirect({
-        to: '/',
-      });
-    }
-  },
   component: UserManager,
 });
 
 function UserManager() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['admin-users'],
@@ -68,14 +60,28 @@ function UserManager() {
   const filteredUsers = useMemo(() => {
     if (!users) return [];
     const query = searchQuery.toLowerCase().trim();
-    if (!query) return users;
-    return users.filter(
-      (user: AdminUser) =>
-        user.name?.toLowerCase().includes(query) ||
-        user.email?.toLowerCase().includes(query) ||
-        user.id?.toLowerCase().includes(query),
-    );
+    const result = query
+      ? users.filter(
+        (user: AdminUser) =>
+          user.name?.toLowerCase().includes(query) ||
+          user.email?.toLowerCase().includes(query) ||
+          user.id?.toLowerCase().includes(query),
+      )
+      : users;
+
+    return result;
   }, [users, searchQuery]);
+
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
+  const paginatedUsers = useMemo(() => {
+    const start = (currentPage - 1) * pageSize;
+    return filteredUsers.slice(start, start + pageSize);
+  }, [filteredUsers, currentPage, pageSize]);
+
+  // Reset to page 1 on search
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const toggleBanMutation = useMutation({
     mutationFn: async ({
@@ -158,7 +164,7 @@ function UserManager() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredUsers.length === 0 ? (
+              {paginatedUsers.length === 0 ? (
                 <TableRow>
                   <TableCell
                     colSpan={5}
@@ -170,7 +176,7 @@ function UserManager() {
                   </TableCell>
                 </TableRow>
               ) : (
-                filteredUsers.map((user: AdminUser) => (
+                paginatedUsers.map((user: AdminUser) => (
                   <UserRow
                     key={user.id}
                     user={user}
@@ -189,6 +195,14 @@ function UserManager() {
               )}
             </TableBody>
           </Table>
+          <DataTablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            pageSize={pageSize}
+            setPageSize={setPageSize}
+            onPageChange={setCurrentPage}
+            totalItems={filteredUsers.length}
+          />
         </CardContent>
       </Card>
 
@@ -222,8 +236,12 @@ function UserRow({
   return (
     <TableRow>
       <TableCell>
-        <div className="flex items-center gap-3">
-          <Avatar className="h-9 w-9">
+        <Link
+          to="/admin/users/$userId"
+          params={{ userId: user.id }}
+          className="flex items-center gap-3 group transition-colors hover:bg-muted/50 p-1 -m-1 rounded-lg"
+        >
+          <Avatar className="h-9 w-9 border border-border group-hover:border-primary/50 transition-colors">
             <AvatarImage
               src={user.image ?? undefined}
               alt={user.name ?? undefined}
@@ -232,16 +250,16 @@ function UserRow({
               {user.name?.substring(0, 2).toUpperCase() || 'AN'}
             </AvatarFallback>
           </Avatar>
-          <div className="flex flex-col">
-            <span className="font-medium text-sm">
+          <div className="flex flex-col min-w-0">
+            <span className="font-medium text-sm group-hover:text-primary transition-colors truncate">
               {user.name || 'Anonymous'}
             </span>
-            <span className="text-xs text-muted-foreground">{user.email}</span>
-            <span className="text-[10px] text-muted-foreground font-mono">
+            <span className="text-xs text-muted-foreground truncate">{user.email}</span>
+            <span className="text-[10px] text-muted-foreground font-mono truncate">
               {user.id}
             </span>
           </div>
-        </div>
+        </Link>
       </TableCell>
       <TableCell>
         <Badge

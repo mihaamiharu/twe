@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestSentryRouteImport } from './routes/test-sentry'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as SplatRouteImport } from './routes/$'
 import { Route as IndexRouteImport } from './routes/index'
@@ -20,8 +21,12 @@ import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as RobotsTxtRouteImport } from './routes/robots.txt'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as AdminTutorialsRouteImport } from './routes/admin/tutorials'
+import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
+import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminChallengesRouteImport } from './routes/admin/challenges'
 import { Route as AdminBugsRouteImport } from './routes/admin/bugs'
+import { Route as AdminAchievementsRouteImport } from './routes/admin/achievements'
 import { Route as LocaleTermsRouteImport } from './routes/$locale/terms'
 import { Route as LocaleResetPasswordRouteImport } from './routes/$locale/reset-password'
 import { Route as LocaleRegisterRouteImport } from './routes/$locale/register'
@@ -35,6 +40,7 @@ import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authe
 import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
 import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
 import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
 import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
@@ -42,6 +48,11 @@ import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale
 const TestSentryRoute = TestSentryRouteImport.update({
   id: '/test-sentry',
   path: '/test-sentry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LocaleRoute = LocaleRouteImport.update({
@@ -65,9 +76,9 @@ const DocsIndexRoute = DocsIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
-  id: '/admin/',
-  path: '/admin/',
-  getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const LocaleIndexRoute = LocaleIndexRouteImport.update({
   id: '/',
@@ -90,19 +101,39 @@ const DocsApiRoute = DocsApiRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/admin/users',
-  path: '/admin/users',
-  getParentRoute: () => rootRouteImport,
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTutorialsRoute = AdminTutorialsRouteImport.update({
+  id: '/tutorials',
+  path: '/tutorials',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
+  id: '/submissions',
+  path: '/submissions',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSettingsRoute = AdminSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminChallengesRoute = AdminChallengesRouteImport.update({
-  id: '/admin/challenges',
-  path: '/admin/challenges',
-  getParentRoute: () => rootRouteImport,
+  id: '/challenges',
+  path: '/challenges',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminBugsRoute = AdminBugsRouteImport.update({
-  id: '/admin/bugs',
-  path: '/admin/bugs',
-  getParentRoute: () => rootRouteImport,
+  id: '/bugs',
+  path: '/bugs',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAchievementsRoute = AdminAchievementsRouteImport.update({
+  id: '/achievements',
+  path: '/achievements',
+  getParentRoute: () => AdminRoute,
 } as any)
 const LocaleTermsRoute = LocaleTermsRouteImport.update({
   id: '/terms',
@@ -168,6 +199,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
+  id: '/$userId',
+  path: '/$userId',
+  getParentRoute: () => AdminUsersRoute,
+} as any)
 const LocaleTutorialsSlugRoute = LocaleTutorialsSlugRouteImport.update({
   id: '/tutorials/$slug',
   path: '/tutorials/$slug',
@@ -189,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleAuthenticatedRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/test-sentry': typeof TestSentryRoute
   '/$locale/about': typeof LocaleAboutRoute
   '/$locale/contact': typeof LocaleContactRoute
@@ -199,18 +236,23 @@ export interface FileRoutesByFullPath {
   '/$locale/register': typeof LocaleRegisterRoute
   '/$locale/reset-password': typeof LocaleResetPasswordRoute
   '/$locale/terms': typeof LocaleTermsRoute
+  '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/tutorials': typeof AdminTutorialsRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
   '/sitemap/xml': typeof SitemapXmlRoute
   '/$locale/': typeof LocaleIndexRoute
-  '/admin': typeof AdminIndexRoute
+  '/admin/': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
   '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
@@ -229,9 +271,13 @@ export interface FileRoutesByTo {
   '/$locale/register': typeof LocaleRegisterRoute
   '/$locale/reset-password': typeof LocaleResetPasswordRoute
   '/$locale/terms': typeof LocaleTermsRoute
+  '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/tutorials': typeof AdminTutorialsRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
   '/sitemap/xml': typeof SitemapXmlRoute
@@ -240,6 +286,7 @@ export interface FileRoutesByTo {
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
   '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
@@ -249,6 +296,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/test-sentry': typeof TestSentryRoute
   '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
   '/$locale/about': typeof LocaleAboutRoute
@@ -260,9 +308,13 @@ export interface FileRoutesById {
   '/$locale/register': typeof LocaleRegisterRoute
   '/$locale/reset-password': typeof LocaleResetPasswordRoute
   '/$locale/terms': typeof LocaleTermsRoute
+  '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
-  '/admin/users': typeof AdminUsersRoute
+  '/admin/settings': typeof AdminSettingsRoute
+  '/admin/submissions': typeof AdminSubmissionsRoute
+  '/admin/tutorials': typeof AdminTutorialsRoute
+  '/admin/users': typeof AdminUsersRouteWithChildren
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
   '/sitemap/xml': typeof SitemapXmlRoute
@@ -272,6 +324,7 @@ export interface FileRoutesById {
   '/$locale/_authenticated/profile': typeof LocaleAuthenticatedProfileRoute
   '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
+  '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$locale/challenges/': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
@@ -282,6 +335,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/$locale'
+    | '/admin'
     | '/test-sentry'
     | '/$locale/about'
     | '/$locale/contact'
@@ -292,18 +346,23 @@ export interface FileRouteTypes {
     | '/$locale/register'
     | '/$locale/reset-password'
     | '/$locale/terms'
+    | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/settings'
+    | '/admin/submissions'
+    | '/admin/tutorials'
     | '/admin/users'
     | '/docs/api'
     | '/robots/txt'
     | '/sitemap/xml'
     | '/$locale/'
-    | '/admin'
+    | '/admin/'
     | '/docs'
     | '/$locale/profile'
     | '/$locale/challenges/$slug'
     | '/$locale/tutorials/$slug'
+    | '/admin/users/$userId'
     | '/api/auth/$'
     | '/$locale/challenges'
     | '/$locale/tutorials'
@@ -322,8 +381,12 @@ export interface FileRouteTypes {
     | '/$locale/register'
     | '/$locale/reset-password'
     | '/$locale/terms'
+    | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/settings'
+    | '/admin/submissions'
+    | '/admin/tutorials'
     | '/admin/users'
     | '/docs/api'
     | '/robots/txt'
@@ -333,6 +396,7 @@ export interface FileRouteTypes {
     | '/$locale/profile'
     | '/$locale/challenges/$slug'
     | '/$locale/tutorials/$slug'
+    | '/admin/users/$userId'
     | '/api/auth/$'
     | '/$locale/challenges'
     | '/$locale/tutorials'
@@ -341,6 +405,7 @@ export interface FileRouteTypes {
     | '/'
     | '/$'
     | '/$locale'
+    | '/admin'
     | '/test-sentry'
     | '/$locale/_authenticated'
     | '/$locale/about'
@@ -352,8 +417,12 @@ export interface FileRouteTypes {
     | '/$locale/register'
     | '/$locale/reset-password'
     | '/$locale/terms'
+    | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/settings'
+    | '/admin/submissions'
+    | '/admin/tutorials'
     | '/admin/users'
     | '/docs/api'
     | '/robots/txt'
@@ -364,6 +433,7 @@ export interface FileRouteTypes {
     | '/$locale/_authenticated/profile'
     | '/$locale/challenges/$slug'
     | '/$locale/tutorials/$slug'
+    | '/admin/users/$userId'
     | '/api/auth/$'
     | '/$locale/challenges/'
     | '/$locale/tutorials/'
@@ -373,14 +443,11 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SplatRoute: typeof SplatRoute
   LocaleRoute: typeof LocaleRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   TestSentryRoute: typeof TestSentryRoute
-  AdminBugsRoute: typeof AdminBugsRoute
-  AdminChallengesRoute: typeof AdminChallengesRoute
-  AdminUsersRoute: typeof AdminUsersRoute
   DocsApiRoute: typeof DocsApiRoute
   RobotsTxtRoute: typeof RobotsTxtRoute
   SitemapXmlRoute: typeof SitemapXmlRoute
-  AdminIndexRoute: typeof AdminIndexRoute
   DocsIndexRoute: typeof DocsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -392,6 +459,13 @@ declare module '@tanstack/react-router' {
       path: '/test-sentry'
       fullPath: '/test-sentry'
       preLoaderRoute: typeof TestSentryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/$locale': {
@@ -424,10 +498,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/': {
       id: '/admin/'
-      path: '/admin'
-      fullPath: '/admin'
+      path: '/'
+      fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/$locale/': {
       id: '/$locale/'
@@ -459,24 +533,52 @@ declare module '@tanstack/react-router' {
     }
     '/admin/users': {
       id: '/admin/users'
-      path: '/admin/users'
+      path: '/users'
       fullPath: '/admin/users'
       preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tutorials': {
+      id: '/admin/tutorials'
+      path: '/tutorials'
+      fullPath: '/admin/tutorials'
+      preLoaderRoute: typeof AdminTutorialsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/submissions': {
+      id: '/admin/submissions'
+      path: '/submissions'
+      fullPath: '/admin/submissions'
+      preLoaderRoute: typeof AdminSubmissionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/settings': {
+      id: '/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/challenges': {
       id: '/admin/challenges'
-      path: '/admin/challenges'
+      path: '/challenges'
       fullPath: '/admin/challenges'
       preLoaderRoute: typeof AdminChallengesRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/bugs': {
       id: '/admin/bugs'
-      path: '/admin/bugs'
+      path: '/bugs'
       fullPath: '/admin/bugs'
       preLoaderRoute: typeof AdminBugsRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/achievements': {
+      id: '/admin/achievements'
+      path: '/achievements'
+      fullPath: '/admin/achievements'
+      preLoaderRoute: typeof AdminAchievementsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/$locale/terms': {
       id: '/$locale/terms'
@@ -569,6 +671,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users/$userId': {
+      id: '/admin/users/$userId'
+      path: '/$userId'
+      fullPath: '/admin/users/$userId'
+      preLoaderRoute: typeof AdminUsersUserIdRouteImport
+      parentRoute: typeof AdminUsersRoute
+    }
     '/$locale/tutorials/$slug': {
       id: '/$locale/tutorials/$slug'
       path: '/tutorials/$slug'
@@ -643,18 +752,51 @@ const LocaleRouteChildren: LocaleRouteChildren = {
 const LocaleRouteWithChildren =
   LocaleRoute._addFileChildren(LocaleRouteChildren)
 
+interface AdminUsersRouteChildren {
+  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+}
+
+const AdminUsersRouteChildren: AdminUsersRouteChildren = {
+  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+}
+
+const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
+  AdminUsersRouteChildren,
+)
+
+interface AdminRouteChildren {
+  AdminAchievementsRoute: typeof AdminAchievementsRoute
+  AdminBugsRoute: typeof AdminBugsRoute
+  AdminChallengesRoute: typeof AdminChallengesRoute
+  AdminSettingsRoute: typeof AdminSettingsRoute
+  AdminSubmissionsRoute: typeof AdminSubmissionsRoute
+  AdminTutorialsRoute: typeof AdminTutorialsRoute
+  AdminUsersRoute: typeof AdminUsersRouteWithChildren
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminAchievementsRoute: AdminAchievementsRoute,
+  AdminBugsRoute: AdminBugsRoute,
+  AdminChallengesRoute: AdminChallengesRoute,
+  AdminSettingsRoute: AdminSettingsRoute,
+  AdminSubmissionsRoute: AdminSubmissionsRoute,
+  AdminTutorialsRoute: AdminTutorialsRoute,
+  AdminUsersRoute: AdminUsersRouteWithChildren,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SplatRoute: SplatRoute,
   LocaleRoute: LocaleRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   TestSentryRoute: TestSentryRoute,
-  AdminBugsRoute: AdminBugsRoute,
-  AdminChallengesRoute: AdminChallengesRoute,
-  AdminUsersRoute: AdminUsersRoute,
   DocsApiRoute: DocsApiRoute,
   RobotsTxtRoute: RobotsTxtRoute,
   SitemapXmlRoute: SitemapXmlRoute,
-  AdminIndexRoute: AdminIndexRoute,
   DocsIndexRoute: DocsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

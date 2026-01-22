@@ -1,0 +1,1 @@
+ALTER TABLE "achievements" ADD COLUMN "rarity" text DEFAULT 'COMMON' NOT NULL;
