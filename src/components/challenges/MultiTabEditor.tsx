@@ -124,7 +124,11 @@ export function MultiTabEditor({
                     onRun={onRun}
                     onReady={onReady}
                     readOnly={!isEditable}
-                    storageKey={storageKeyPrefix ? `${storageKeyPrefix}-${selectedFile}` : undefined}
+                    storageKey={
+                        isEditable && storageKeyPrefix
+                            ? `${storageKeyPrefix}-${selectedFile}`
+                            : undefined
+                    }
                     height="100%"
                     showMinimap={true}
                     className="h-full"
