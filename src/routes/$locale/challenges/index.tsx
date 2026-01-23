@@ -172,7 +172,7 @@ const ALL_TRACKS = TRACK_IDS.map((id) => ({
   icon: TRACK_ICONS[id],
 }));
 
-function ChallengesPage() {
+export function ChallengesPage() {
   const { locale } = Route.useParams();
   const { t } = useTranslation('challenges');
   const navigate = Route.useNavigate();
@@ -576,7 +576,7 @@ function ChallengesPage() {
 
 // --- Sub-components for Cleaner Render ---
 
-function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: any) {
+export function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: any) {
   const CardContentWrapper = (
     <Card
       className={cn(
@@ -673,7 +673,7 @@ function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: a
   );
 }
 
-function ChallengeRow({ challenge, index, config, isComingSoon, isBoss, params, t }: any) {
+export function ChallengeRow({ challenge, index, config, isComingSoon, isBoss, params, t }: any) {
   const RowContent = (
     <>
       <TableCell className="font-mono text-xs text-muted-foreground w-[60px] pl-4">
