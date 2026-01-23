@@ -304,6 +304,8 @@ export async function getChallengeContent(
     instructions: resolveLocale(def.instructions, locale),
     htmlContent: def.htmlContent,
     files: def.files,
+    editableFiles: def.editableFiles,
+    preloadModules: def.preloadModules,
     starterCode: def.starterCode,
     testCases: def.testCases,
     solution: def.solution,
@@ -370,6 +372,8 @@ export async function getChallengeList(
       instructions: resolveLocale(def.instructions, locale),
       htmlContent: def.htmlContent,
       files: def.files,
+      editableFiles: def.editableFiles,
+      preloadModules: def.preloadModules,
       starterCode: def.starterCode,
       tags: def.tags,
     });

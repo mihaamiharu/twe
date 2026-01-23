@@ -1,47 +1,288 @@
 {
-  "tier": "e2e",
-  "challenges": [
-    {
-      "slug": "e2e-login-flow",
-      "type": "PLAYWRIGHT",
-      "difficulty": "MEDIUM",
-      "category": "e2e-testing",
-      "xpReward": 100,
-      "order": 1,
-      "title": {
-        "en": "E2E Login Flow",
-        "id": "Alur Login E2E"
-      },
-      "description": {
-        "en": "Practice multi-page navigation by automating a complete login flow.",
-        "id": "Praktikkan navigasi multi-halaman dengan mengotomatisasi alur login lengkap."
-      },
-      "instructions": {
-        "en": "# E2E Login Flow\n\nThis challenge simulates a real-world login flow across multiple pages.\n\n## The Scenario\nYou are testing a web application with:\n- A **Home page** (`/index.html`) with a \"Login\" link\n- A **Login page** (`/login.html`) with username/password fields\n- A **Dashboard page** (`/dashboard.html`) shown after successful login\n\n## Your Task\n\n### Given\nThe browser starts on the home page at `demo.twe.local/index.html`\n\n### When\n1. Click the \"Login\" link to navigate to the login page\n2. Fill in the username field with `testuser`\n3. Fill in the password field with `password123`\n4. Click the \"Login\" button\n5. Navigate to the dashboard page\n\n### Then\nVerify the dashboard displays a welcome message containing \"Welcome\"\n\n## Hints\n- Use `page.goto('/login.html')` to navigate between VFS pages\n- Use `page.locator()` with appropriate selectors\n- Use `await expect()` assertions to verify the result\n",
-        "id": "# Alur Login E2E\n\nTantangan ini mensimulasikan alur login dunia nyata di beberapa halaman.\n\n## Skenario\nAnda menguji aplikasi web dengan:\n- **Halaman Beranda** (`/index.html`) dengan link \"Login\"\n- **Halaman Login** (`/login.html`) dengan field username/password\n- **Halaman Dashboard** (`/dashboard.html`) ditampilkan setelah login berhasil\n\n## Tugas Anda\n\n### Diberikan\nBrowser dimulai di halaman beranda di `demo.twe.local/index.html`\n\n### Ketika\n1. Klik link \"Login\" untuk navigasi ke halaman login\n2. Isi field username dengan `testuser`\n3. Isi field password dengan `password123`\n4. Klik tombol \"Login\"\n5. Navigasi ke halaman dashboard\n\n### Kemudian\nVerifikasi dashboard menampilkan pesan selamat datang yang mengandung \"Welcome\"\n"
-      },
-      "files": {
-        "/index.html": "<!DOCTYPE html>\n<html>\n<head><title>Home - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n    <div class=\"nav-links\">\n      <a href=\"/login.html\" id=\"login-link\">Login</a>\n      <a href=\"/about.html\">About</a>\n    </div>\n  </nav>\n  <main>\n    <h1>Welcome to TWE Demo App</h1>\n    <p>The premier platform for learning test automation.</p>\n    <a href=\"/login.html\" class=\"btn btn-primary\">Get Started</a>\n  </main>\n</body>\n</html>",
-        "/login.html": "<!DOCTYPE html>\n<html>\n<head><title>Login - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n  </nav>\n  <main class=\"login-container\">\n    <h1>Sign In</h1>\n    <form id=\"login-form\" action=\"/dashboard.html\">\n      <div class=\"form-group\">\n        <label for=\"username\">Username</label>\n        <input type=\"text\" id=\"username\" name=\"username\" placeholder=\"Enter username\" />\n      </div>\n      <div class=\"form-group\">\n        <label for=\"password\">Password</label>\n        <input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Enter password\" />\n      </div>\n      <button type=\"submit\" id=\"login-btn\" class=\"btn btn-primary\">Login</button>\n    </form>\n    <p class=\"signup-link\">Don't have an account? <a href=\"/signup.html\">Sign up</a></p>\n  </main>\n</body>\n</html>",
-        "/dashboard.html": "<!DOCTYPE html>\n<html>\n<head><title>Dashboard - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n    <div class=\"nav-links\">\n      <span id=\"user-greeting\">Welcome, testuser!</span>\n      <a href=\"/logout\" id=\"logout-link\">Logout</a>\n    </div>\n  </nav>\n  <main class=\"dashboard\">\n    <h1 id=\"welcome-message\">Welcome to your Dashboard</h1>\n    <div class=\"stats-grid\">\n      <div class=\"stat-card\">\n        <h3>Challenges Completed</h3>\n        <span class=\"stat-value\">12</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>XP Earned</h3>\n        <span class=\"stat-value\">1,250</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>Current Streak</h3>\n        <span class=\"stat-value\">5 days</span>\n      </div>\n    </div>\n  </main>\n</body>\n</html>"
-      },
-      "starterCode": "// E2E Login Flow Test\n// Navigate through multiple pages and verify the login flow\n\n// Step 1: Start at the home page\nawait page.goto('/index.html');\n\n// Step 2: Click the login link to go to login page\n// Your code here...\n\n// Step 3: Fill in the login form\n// Your code here...\n\n// Step 4: Submit the form (auto-redirects to dashboard)\n// Your code here...\n\n// Step 5: Verify the welcome message\n// await expect(page.locator('#welcome-message')).toContainText('Welcome');\n",
-      "testCases": [],
-      "solution": "// E2E Login Flow Test\nawait page.goto('/index.html');\nawait page.locator('#login-link').click();\nawait page.goto('/login.html');\nawait page.locator('#username').fill('testuser');\nawait page.locator('#password').fill('password123');\nawait page.locator('#login-btn').click();\n// Navigation happens automatically via form action\nawait expect(page.locator('#welcome-message')).toContainText('Welcome');",
-      "tags": [
-        "e2e",
-        "playwright",
-        "navigation",
-        "login",
-        "vfs"
-      ],
-      "expectedState": [
+    "tier": "e2e",
+    "challenges": [
         {
-          "selector": "#welcome-message",
-          "visible": true,
-          "containsText": "Welcome"
+            "slug": "pom-login-basics",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "page-object-model",
+            "xpReward": 100,
+            "order": 1,
+            "title": {
+                "en": "POM Basics: Using a Page Object",
+                "id": "Dasar POM: Menggunakan Page Object"
+            },
+            "description": {
+                "en": "Learn to use the Page Object Model pattern for cleaner, more maintainable tests.",
+                "id": "Pelajari penggunaan pola Page Object Model untuk test yang lebih bersih dan mudah dipelihara."
+            },
+            "instructions": {
+                "en": "# POM Basics: Using a Page Object\n\nThe **Page Object Model (POM)** is a design pattern that creates an object repository for web UI elements. It helps reduce code duplication and improves test maintenance.\n\n## The Scenario\nYou are testing a login flow using the POM pattern. We have provided a `LoginPage` class that handles all interactions with the login page.\n\n## Your Task\nOpen the `tests/login.spec.ts` file and complete the test using the `LoginPage` class.\n\n### Requirements\n1.  **Initialize**: Create an instance of `LoginPage` passing the `page` object.\n2.  **Navigate**: Call the `goto()` method to open the login page.\n3.  **Login**: Call the `login(username, password)` method with credentials:\n    -   Username: `testuser`\n    -   Password: `password123`\n4.  **Verify**: Assert that the dashboard's welcome message contains \"Welcome\".\n\n> 💡 **Tip**: Browse the `pages/` folder in the File Explorer to see how the Page Object is implemented. Study the `app/` folder to see the HTML structure of the site you are testing!\n",
+                "id": "# Dasar POM: Menggunakan Page Object\n\n**Page Object Model (POM)** adalah pola desain yang membuat repositori objek untuk elemen UI web. Ini membantu mengurangi duplikasi kode dan meningkatkan pemeliharaan pengujian.\n\n## Skenario\nAnda menguji alur login menggunakan pola POM. Kami telah menyediakan class `LoginPage` yang menangani semua interaksi dengan halaman login.\n\n## Tugas Anda\nBuka file `tests/login.spec.ts` dan selesaikan pengujian menggunakan class `LoginPage`.\n"
+            },
+            "files": {
+                "/tests/login.spec.ts": "// 🎯 Complete the test in this file!\n\n// 1. Initialize the Page Object (LoginPage is pre-loaded)\nconst loginPage = new LoginPage(page);\n\n// 2. Navigate to the login page\nawait loginPage.goto();\n\n// 3. Login with 'testuser' and 'password123'\n\n\n// 4. Verify success\n// await expect(page.locator('#welcome-message')).toContainText('Welcome');",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.locator('#username');\n    this.passwordInput = page.locator('#password');\n    this.loginBtn = page.locator('#login-btn');\n  }\n\n  async goto() {\n    await this.page.goto('/app/login.html');\n  }\n\n  async login(username, password) {\n    await this.usernameInput.fill(username);\n    await this.passwordInput.fill(password);\n    await this.loginBtn.click();\n  }\n}",
+                "/app/index.html": "<!DOCTYPE html><html><head><title>Home</title></head><body><h1>Welcome</h1><a href='/app/login.html' id='login-link'>Login</a></body></html>",
+                "/app/login.html": "<!DOCTYPE html><html><head><title>Login</title></head><body><h1>Sign In</h1><form action='/app/dashboard.html'><input id='username' placeholder='User'><input id='password' type='password' placeholder='Pass'><button id='login-btn'>Login</button></form></body></html>",
+                "/app/dashboard.html": "<!DOCTYPE html><html><head><title>Dashboard</title></head><body><h1 id='welcome-message'>Welcome, testuser!</h1></body></html>"
+            },
+            "editableFiles": [
+                "/tests/login.spec.ts"
+            ],
+            "preloadModules": {
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                }
+            },
+            "starterCode": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'password123');\nawait expect(page.locator('#welcome-message')).toContainText('Welcome');",
+            "testCases": [],
+            "solution": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'password123');\nawait expect(page.locator('#welcome-message')).toContainText('Welcome');",
+            "expectedState": [
+                {
+                    "selector": "#welcome-message",
+                    "visible": true,
+                    "containsText": "Welcome"
+                }
+            ],
+            "tags": [
+                "pom",
+                "playwright",
+                "e2e"
+            ]
+        },
+        {
+            "slug": "pom-navigation-flow",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "page-object-model",
+            "xpReward": 100,
+            "order": 2,
+            "title": {
+                "en": "POM: Navigation Flow",
+                "id": "POM: Alur Navigasi"
+            },
+            "description": {
+                "en": "Navigate through multiple pages using specialized Page Objects.",
+                "id": "Navigasi melalui beberapa halaman menggunakan Page Object khusus."
+            },
+            "instructions": {
+                "en": "# POM: Navigation Flow\n\nReal-world tests often involve navigating through multiple pages. Instead of having one giant Page Object, it's better to have specialized ones for each page.\n\n## Your Task\nComplete the navigation flow in `tests/nav.spec.ts` using `HomePage` and `LoginPage`.\n\n### Requirements\n1.  **Start at Home**: Use `HomePage.goto()`.\n2.  **Go to Login**: Use `HomePage.clickLogin()`.\n3.  **Perform Login**: Use `LoginPage.login('user', 'pass')`.\n4.  **Verify**: Assert that you are on the dashboard.\n",
+                "id": "# POM: Alur Navigasi\n\nTest dunia nyata sering melibatkan navigasi melalui beberapa halaman. Daripada memiliki satu Page Object raksasa, lebih baik memiliki yang khusus untuk setiap halaman.\n"
+            },
+            "files": {
+                "/tests/nav.spec.ts": "// 🎯 Complete the navigation flow\nconst homePage = new HomePage(page);\nconst loginPage = new LoginPage(page);\n\n// 1. Go to home\n\n\n// 2. Click login link\n\n\n// 3. Login with any credentials\n\n\n// 4. Verify dashboard heading\n// await expect(page.locator('h1')).toHaveText('Dashboard');",
+                "/pages/HomePage.ts": "export class HomePage {\n  constructor(page) {\n    this.page = page;\n    this.loginLink = page.locator('#login-link');\n  }\n  async goto() { await this.page.goto('/app/index.html'); }\n  async clickLogin() { await this.loginLink.click(); }\n}",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n  }\n  async login(u, p) {\n    await this.page.locator('#user').fill(u);\n    await this.page.locator('#pass').fill(p);\n    await this.page.locator('#btn').click();\n  }\n}",
+                "/app/index.html": "<html><body><a href='/app/login.html' id='login-link'>Login</a></body></html>",
+                "/app/login.html": "<html><body><form action='/app/dashboard.html'><input id='user'><input id='pass'><button id='btn'>Go</button></form></body></html>",
+                "/app/dashboard.html": "<html><body><h1>Dashboard</h1></body></html>"
+            },
+            "editableFiles": [
+                "/tests/nav.spec.ts"
+            ],
+            "preloadModules": {
+                "HomePage": {
+                    "exports": [
+                        "HomePage"
+                    ],
+                    "source": "/pages/HomePage.ts"
+                },
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                }
+            },
+            "starterCode": "const homePage = new HomePage(page);\nawait homePage.goto();\nawait homePage.clickLogin();\nconst loginPage = new LoginPage(page);\nawait loginPage.login('test', 'test');\nawait expect(page.locator('h1')).toHaveText('Dashboard');",
+            "solution": "const homePage = new HomePage(page);\nawait homePage.goto();\nawait homePage.clickLogin();\nconst loginPage = new LoginPage(page);\nawait loginPage.login('test', 'test');\nawait expect(page.locator('h1')).toHaveText('Dashboard');",
+            "expectedState": [
+                {
+                    "selector": "h1",
+                    "containsText": "Dashboard"
+                }
+            ],
+            "testCases": [],
+            "tags": [
+                "pom",
+                "playwright",
+                "navigation"
+            ]
+        },
+        {
+            "slug": "pom-form-validation",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "page-object-model",
+            "xpReward": 100,
+            "order": 3,
+            "title": {
+                "en": "POM: Form Validation",
+                "id": "POM: Validasi Form"
+            },
+            "description": {
+                "en": "Test error messages using POM helper methods.",
+                "id": "Uji pesan kesalahan menggunakan method helper POM."
+            },
+            "instructions": {
+                "en": "# POM: Form Validation\n\nPage Objects should not just handle success flows, but also help you verify error states. \n\n## Your Task\nVerify that submitting an empty login form displays the correct error message.\n\n### Requirements\n1.  Navigate to login page.\n2.  Click login without entering credentials.\n3.  Use `loginPage.errorMessage` to get the error element.\n4.  Assert the error text is \"Credentials required\".\n",
+                "id": "# POM: Validasi Form\n\nPage Object tidak hanya menangani alur sukses, tetapi juga membantu Anda memverifikasi status kesalahan.\n"
+            },
+            "files": {
+                "/tests/validation.spec.ts": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\n\n// 1. Submit empty form\nawait loginPage.submit();\n\n// 2. Verify error message using Locator assertion\n// This is better than getErrorMessage() because it auto-retries!\nawait expect(loginPage.errorMessage).toHaveText('Credentials required');",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n  }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async submit() { await this.page.locator('#btn').click(); }\n  \n  // Return the Locator, not the text!\n  get errorMessage() {\n    return this.page.locator('#error');\n  }\n}",
+                "/app/login.html": "<html><body>\n<div id='error'></div>\n<button id='btn' onclick=\"document.getElementById('error').innerText='Credentials required'\">Login</button>\n</body></html>"
+            },
+            "editableFiles": [
+                "/tests/validation.spec.ts"
+            ],
+            "preloadModules": {
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                }
+            },
+            "starterCode": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.submit();\nawait expect(loginPage.errorMessage).toHaveText('Credentials required');",
+            "solution": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.submit();\nawait expect(loginPage.errorMessage).toHaveText('Credentials required');",
+            "testCases": [
+                {
+                    "description": "Error message matches",
+                    "expectedOutput": "Credentials required"
+                }
+            ],
+            "expectedState": [
+                {
+                    "selector": "#error",
+                    "containsText": "Credentials required"
+                }
+            ],
+            "tags": [
+                "pom",
+                "playwright",
+                "validation"
+            ]
+        },
+        {
+            "slug": "pom-component-reuse",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "page-object-model",
+            "xpReward": 150,
+            "order": 4,
+            "title": {
+                "en": "POM: Component Reuse",
+                "id": "POM: Penggunaan Kembali Komponen"
+            },
+            "description": {
+                "en": "Use a shared Header component across multiple pages.",
+                "id": "Gunakan komponen Header yang dibagikan di beberapa halaman."
+            },
+            "instructions": {
+                "en": "# POM: Component Reuse\n\nModern web apps share components like Headers and Footers. In POM, we can represent these as separate classes and use them as properties within our Page Objects.\n\n## Your Task\nVerify the user's name in the header after logging in.\n\n### Requirements\n1.  Navigate to Login.\n2.  Perform Login.\n3.  Access the header via `dashboardPage.header`.\n4.  Verify `header.userName` text is \"testuser\".\n",
+                "id": "# POM: Penggunaan Kembali Komponen\n\nAplikasi web modern berbagi komponen seperti Header dan Footer. Dalam POM, kita dapat merepresentasikan ini sebagai class terpisah.\n"
+            },
+            "files": {
+                "/tests/smoke.spec.ts": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\n\n// DashboardPage uses the Header component\nconst dashboardPage = new DashboardPage(page);\n\n// Verify user name via the header component inside dashboard\nawait expect(dashboardPage.header.userName).toHaveText('testuser');",
+                "/pages/Header.ts": "export class Header {\n  constructor(page) {\n     this.page = page;\n     this.userLabel = page.locator('#user-name');\n  }\n  get userName() { return this.userLabel; }\n}",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { this.page = page; }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) { await this.page.locator('#btn').click(); }\n}",
+                "/pages/DashboardPage.ts": "export class DashboardPage {\n  constructor(page) {\n    this.page = page;\n    this.header = new Header(page);\n  }\n}",
+                "/app/login.html": "<html><body><button id='btn' onclick=\"window.location.href='/app/dashboard.html'\">Login</button></body></html>",
+                "/app/dashboard.html": "<html><body><header><span id='user-name'>testuser</span></header><h1>Dashboard</h1></body></html>"
+            },
+            "editableFiles": [
+                "/tests/smoke.spec.ts"
+            ],
+            "preloadModules": {
+                "Header": {
+                    "exports": [
+                        "Header"
+                    ],
+                    "source": "/pages/Header.ts"
+                },
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                },
+                "DashboardPage": {
+                    "exports": [
+                        "DashboardPage"
+                    ],
+                    "source": "/pages/DashboardPage.ts"
+                }
+            },
+            "starterCode": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\nconst dashboardPage = new DashboardPage(page);\nawait expect(dashboardPage.header.userName).toHaveText('testuser');",
+            "solution": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\nconst dashboardPage = new DashboardPage(page);\nawait expect(dashboardPage.header.userName).toHaveText('testuser');",
+            "expectedState": [
+                {
+                    "selector": "#user-name",
+                    "containsText": "testuser"
+                }
+            ],
+            "testCases": [],
+            "tags": [
+                "pom",
+                "playwright",
+                "components"
+            ]
+        },
+        {
+            "slug": "pom-data-driven",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "page-object-model",
+            "xpReward": 150,
+            "order": 5,
+            "title": {
+                "en": "POM: Data-Driven Testing",
+                "id": "POM: Pengujian Berbasis Data"
+            },
+            "description": {
+                "en": "Run the same POM-based test with multiple sets of data.",
+                "id": "Jalankan test berbasis POM yang sama dengan beberapa set data."
+            },
+            "instructions": {
+                "en": "# POM: Data-Driven Testing\n\nPOM combines perfectly with Data-Driven Testing (DDT). You can loop through a list of users and use the same Page Object methods for each.\n\n## Your Task\nLoop through the provided `users` array and attempt to login with each.\n\n### Requirements\n1.  Define an array of users: `['admin', 'editor']`.\n2.  For each user, navigate to login and perform login.\n3.  Verify the dashboard contains the username.\n",
+                "id": "# POM: Pengujian Berbasis Data\n\nPOM berpadu sempurna dengan Data-Driven Testing (DDT).\n"
+            },
+            "files": {
+                "/tests/ddt.spec.ts": "const users = ['admin', 'editor'];\nconst loginPage = new LoginPage(page);\n\nfor (const user of users) {\n  await loginPage.goto();\n  await loginPage.login(user, 'pass');\n  await expect(page.locator('h1')).toContainText(user);\n}",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { this.page = page; }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) {\n    await this.page.locator('#u').fill(u);\n    await this.page.locator('#btn').click();\n  }\n}",
+                "/app/login.html": "<html><body><input id='u'><button id='btn' onclick=\"window.location.href='/app/dashboard.html?u=' + document.getElementById('u').value\">Login</button></body></html>",
+                "/app/dashboard.html": "<html><body><h1 id='msg'></h1><script>const u = new URLSearchParams(window.location.search).get('u'); document.getElementById('msg').innerText = 'Welcome ' + u;</script></body></html>"
+            },
+            "editableFiles": [
+                "/tests/ddt.spec.ts"
+            ],
+            "preloadModules": {
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                }
+            },
+            "starterCode": "const users = ['admin', 'editor'];\nconst loginPage = new LoginPage(page);\nfor (const user of users) {\n  await loginPage.goto();\n  await loginPage.login(user, 'pass');\n  await expect(page.locator('h1')).toContainText(user);\n}",
+            "solution": "const users = ['admin', 'editor'];\nconst loginPage = new LoginPage(page);\nfor (const user of users) {\n  await loginPage.goto();\n  await loginPage.login(user, 'pass');\n  await expect(page.locator('h1')).toContainText(user);\n}",
+            "expectedState": [
+                {
+                    "selector": "h1",
+                    "containsText": "editor"
+                }
+            ],
+            "testCases": [],
+            "tags": [
+                "pom",
+                "playwright",
+                "ddt"
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }
