@@ -205,7 +205,16 @@ export function useChallengeExecution(
     const hintMutation = useMutation({
         mutationFn: async () => {
             const { getAIHint } = await import('@/server/ai.fn');
-            const currentCode = isCodeChallenge ? code : selector;
+
+            let currentCode = isCodeChallenge ? code : selector;
+
+            // For multi-file challenges (POM), bundle all files into the user attempt
+            if (isCodeChallenge && challenge.files && fileContents) {
+                currentCode = Object.entries(fileContents)
+                    .map(([path, content]) => `// File: ${path}\n${content}`)
+                    .join('\n\n');
+            }
+
             return getAIHint({
                 data: {
                     challengeSlug: challenge.slug,
