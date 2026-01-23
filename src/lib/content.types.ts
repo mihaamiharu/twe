@@ -74,9 +74,10 @@ export type ChallengeType =
   | 'CSS_SELECTOR'
   | 'XPATH_SELECTOR'
   | 'JAVASCRIPT'
+  | 'TYPESCRIPT'
   | 'PLAYWRIGHT';
 export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
-export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert' | 'e2e' | 'pom';
+export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert' | 'e2e' | 'pom' | 'typescript';
 
 /**
  * Test case definition in challenge JSON

@@ -20,6 +20,7 @@ export const challengeTypeEnum = pgEnum('challenge_type', [
   'PLAYWRIGHT',
   'CSS_SELECTOR',
   'XPATH_SELECTOR',
+  'TYPESCRIPT',
 ]);
 
 export const userRoleEnum = pgEnum('user_role', ['USER', 'ADMIN']);

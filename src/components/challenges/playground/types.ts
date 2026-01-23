@@ -3,6 +3,7 @@ import { LogEntry } from '../ConsoleOutput';
 
 export type ChallengeType =
     | 'JAVASCRIPT'
+    | 'TYPESCRIPT'
     | 'PLAYWRIGHT'
     | 'CSS_SELECTOR'
     | 'XPATH_SELECTOR'

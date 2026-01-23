@@ -1,0 +1,353 @@
+{
+    "tier": "typescript",
+    "challenges": [
+        {
+            "slug": "ts-type-annotations",
+            "type": "TYPESCRIPT",
+            "difficulty": "EASY",
+            "category": "ts-fundamentals",
+            "xpReward": 20,
+            "order": 501,
+            "title": {
+                "en": "TypeScript Type Annotations",
+                "id": "Anotasi Tipe TypeScript"
+            },
+            "description": {
+                "en": "Learn basic variable type annotations in TypeScript.",
+                "id": "Pelajari anotasi tipe variabel dasar di TypeScript."
+            },
+            "instructions": {
+                "en": "# TypeScript Type Annotations\n\nTypeScript acts as a \"safety layer\" on top of JavaScript. It allows you to explicitly define types for your variables using a colon `: type` syntax.\n\n## Common Types in Automation\n\n| Type | Description | Example |\n|------|-------------|---------|\n| `string` | Text values | `\"TC-101\"`, `\"Login\"` |\n| `number` | Integers or floats | `5`, `3.14`, `100` |\n| `boolean` | True/False flags | `true`, `false` |\n| `any` | Disables checking (Avoid!) | `userData` |\n\n## Syntax\n```typescript\n// variableName: type = value;\nconst testName: string = \"Checkout Flow\";\nconst maxRetries: number = 3;\n```\n\n> **Pro Tip:** TypeScript is smart! It often uses **Type Inference** to guess the type automatically (e.g., `let x = 0` is known to be a number). However, explicitly writing types is great for documentation and learning.\n\n## Real World Scenario\nIn large test suites, it is easy to accidentally reuse a variable name or pass the wrong data type (like passing a string `\"5\"` to a function that expects a number `5` for calculation). TypeScript catches these errors **instantly** in your editor, preventing runtime crashes.\n\n## Your Task\n\n1. Declare a variable `testId` as a `string` with value `\"TC-001\"`.\n2. Declare a variable `passCount` as a `number` with value `10`.\n3. Assign `passCount` to the provided `result` variable.\n",
+                "id": "# Anotasi Tipe TypeScript\n\nTypeScript bertindak sebagai \"lapisan keamanan\" di atas JavaScript. Ini membiarkan kamu mendefinisikan tipe secara eksplisit untuk variabelmu menggunakan sintaks titik dua `: type`.\n\n## Tipe Umum dalam Otomatisasi\n\n| Tipe | Deskripsi | Contoh |\n|------|-------------|---------|\n| `string` | Nilai teks | `\"TC-101\"`, `\"Login\"` |\n| `number` | Angka (bulat/desimal) | `5`, `3.14`, `100` |\n| `boolean` | Flag Benar/Salah | `true`, `false` |\n| `any` | Mematikan pengecekan (Hindari!) | `userData` |\n\n## Sintaks\n```typescript\n// namaVariabel: tipe = nilai;\nconst testName: string = \"Checkout Flow\";\nconst maxRetries: number = 3;\n```\n\n> **Pro Tip:** TypeScript itu pintar! Ia sering menggunakan **Type Inference** untuk menebak tipe secara otomatis (misal, `let x = 0` otomatis dianggap number). Namun, menulis tipe secara eksplisit sangat bagus untuk dokumentasi dan pembelajaran.\n\n## Skenario Dunia Nyata\nDalam rangkaian tes yang besar, mudah sekali untuk tidak sengaja menggunakan nama variabel yang sama atau memberikan tipe data yang salah (seperti memberikan string `\"5\"` ke fungsi yang butuh angka `5` untuk hitungan). TypeScript menangkap error ini **secara instan** di editormu, mencegah crash saat runtime.\n\n## Tugas Kamu\n\n1. Deklarasikan variabel `testId` sebagai `string` dengan nilai `\"TC-001\"`.\n2. Deklarasikan variabel `passCount` sebagai `number` dengan nilai `10`.\n3. Simpan nilai `passCount` ke dalam variabel `result`.\n"
+            },
+            "htmlContent": "<div class=\"test-runner\">\n  <h3>TypeScript Runner</h3>\n  <p>Compiling and checking types...</p>\n</div>",
+            "starterCode": "// 1. Declare a variable testId as a string with value \"TC-001\"\n// Your code here\n\n// 2. Declare a variable passCount as a number with value 10\n// Your code here\n\n// 3. Assign passCount to result\n// Your code here\n// result = passCount;",
+            "testCases": [
+                {
+                    "description": "Returns the expected output",
+                    "expectedOutput": "10",
+                    "isHidden": false
+                }
+            ],
+            "solution": "10",
+            "tags": [
+                "typescript",
+                "beginner",
+                "types"
+            ]
+        },
+        {
+            "slug": "ts-function-types",
+            "type": "TYPESCRIPT",
+            "difficulty": "EASY",
+            "category": "ts-fundamentals",
+            "xpReward": 25,
+            "order": 502,
+            "title": {
+                "en": "Function Types",
+                "id": "Tipe Fungsi"
+            },
+            "description": {
+                "en": "Define parameter and return types for functions.",
+                "id": "Definisikan tipe parameter dan return untuk fungsi."
+            },
+            "instructions": {
+                "en": "# Function Types\n\nFunctions are the workhorses of automation code. In TypeScript, we strictly define what goes **IN** (parameters) and what comes **OUT** (return value).\n\n## Syntax\n```typescript\nfunction functionName(param1: Type): ReturnType {\n  return value;\n}\n```\n\n## Examples\n\n| Type | Example | Description |\n|------|---------|-------------|\n| **Standard** | `(a: number): number` | Takes number, returns number |\n| **No Return** | `(msg: string): void` | Performs action, returns nothing |\n| **Optional** | `(name?: string)` | Parameter is not required |\n\n## Real World Scenario\nYou are writing a reporting utility. You create a function `formatDuration(ms: number): string` that converts milliseconds to a readable \"1m 30s\" string. By strictly typing the input as `number`, you prevent colleagues from accidentally passing a Date object or string, catching bugs at compile time.\n\n## Your Task\n\n1. Define a function named `formatScore` that takes one parameter `score` (a number).\n2. It should return a `string` in the format: `\"Score: {score}\"`.\n3. Call your function with the value `85` and assign the returned string to the `result` variable.\n",
+                "id": "# Tipe Fungsi\n\nFungsi adalah pekerja keras dalam kode otomatisasi. Di TypeScript, kita mendefinisikan secara ketat apa yang **MASUK** (parameter) dan apa yang **KELUAR** (nilai kembalian).\n\n## Sintaks\n```typescript\nfunction namaFungsi(param1: Tipe): TipeKembalian {\n  return nilai;\n}\n```\n\n## Contoh\n\n| Tipe | Contoh | Deskripsi |\n|------|---------|-------------|\n| **Standar** | `(a: number): number` | Menerima number, mengembalikan number |\n| **Tanpa Return** | `(msg: string): void` | Melakukan aksi, tidak mengembalikan apa-apa |\n| **Opsional** | `(name?: string)` | Parameter tidak wajib |\n\n## Skenario Dunia Nyata\nKamu sedang menulis utilitas laporan. Kamu membuat fungsi `formatDuration(ms: number): string` yang mengubah milidetik menjadi string \"1m 30s\" yang mudah dibaca. Dengan mengetik input secara ketat sebagai `number`, kamu mencegah rekan kerja secara tidak sengaja memberikan objek Date atau string, menangkap bug pada waktu kompilasi.\n\n## Tugas Kamu\n\n1. Definisikan fungsi bernama `formatScore` yang menerima satu parameter `score` (number).\n2. Fungsi harus mengembalikan `string` dengan format: `\"Score: {score}\"`.\n3. Panggil fungsimu dengan nilai `85` dan simpan hasilnya ke variabel `result`.\n"
+            },
+            "htmlContent": "<div class=\"scoreboard\">\n  <h3>Game Stats</h3>\n  <div id=\"display\">Waiting for score...</div>\n</div>",
+            "starterCode": "// 1. Define function formatScore(score: number): string\n// Your code here\n\n// 2. Call it with 85 and assign to result\n// Your code here\n// result = formatScore(85);",
+            "testCases": [
+                {
+                    "description": "Returns the expected output",
+                    "expectedOutput": "Score: 85",
+                    "isHidden": false
+                }
+            ],
+            "solution": "Score: 85",
+            "tags": [
+                "typescript",
+                "functions",
+                "types"
+            ]
+        },
+        {
+            "slug": "ts-interfaces-basics",
+            "type": "TYPESCRIPT",
+            "difficulty": "EASY",
+            "category": "ts-fundamentals",
+            "xpReward": 30,
+            "order": 503,
+            "title": {
+                "en": "Interfaces Basics",
+                "id": "Dasar Interface"
+            },
+            "description": {
+                "en": "Create blueprints for complex test data objects.",
+                "id": "Buat cetak biru untuk objek data tes yang kompleks."
+            },
+            "instructions": {
+                "en": "# Interfaces Basics\n\nInterfaces act as a contract for your objects. They define exactly what properties an object MUST have.\n\n## Defining Shapes\n\n```typescript\ninterface User {\n  username: string;\n  age: number;\n  isAdmin?: boolean; // Optional (marked with ?)\n}\n\nconst admin: User = {\n  username: \"admin_01\",\n  age: 30,\n  isAdmin: true\n};\n```\n\n## Property Types\n\n| Syntax | Description | Example |\n|---|---|---|\n| `key: type` | Required property | `id: number` |\n| `key?: type` | Optional property | `phone?: string` |\n| `readonly key: type` | Cannot be changed | `readonly apiKey: string` |\n\n> **Pro Tip:** Interfaces are the standard way to type JSON objects from API responses in automation projects.\n\n## Real World Scenario\nYou are testing a \"Sign Up\" API that returns a JSON response. By defining an interface `SignUpResponse` with fields like `token` and `userId`, you ensure your test code knows exactly what data to expect, and your editor will autocomplete these fields for you!\n\n## Your Task\n\n1. Define an interface `TestResult` with properties:\n   - `testName` (string)\n   - `duration` (number)\n2. Create an object `currentTest` typed as `TestResult` with:\n   - `testName`: `\"Login Flow\"`\n   - `duration`: `120`\n3. Assign the `currentTest.duration` to the provided `result` variable.\n",
+                "id": "# Dasar Interface\n\nInterface bertindak sebagai kontrak untuk objek kamu. Mereka mendefinisikan properti apa saja yang HARUS dimiliki oleh sebuah objek.\n\n## Mendefinisikan Bentuk\n\n```typescript\ninterface User {\n  username: string;\n  age: number;\n  isAdmin?: boolean; // Opsional (tandai dengan ?)\n}\n\nconst admin: User = {\n  username: \"admin_01\",\n  age: 30,\n  isAdmin: true\n};\n```\n\n## Tipe Properti\n\n| Sintaks | Deskripsi | Contoh |\n|---|---|---|\n| `key: type` | Properti Wajib | `id: number` |\n| `key?: type` | Properti Opsional | `phone?: string` |\n| `readonly key: type` | Tidak bisa diubah | `readonly apiKey: string` |\n\n> **Pro Tip:** Interface adalah cara standar untuk memberikan tipe pada objek JSON dari respons API di proyek otomatisasi.\n\n## Skenario Dunia Nyata\nKamu sedang menguji API \"Sign Up\" yang mengembalikan respons JSON. Dengan mendefinisikan interface `SignUpResponse` dengan field seperti `token` dan `userId`, kamu memastikan kode tes kamu tahu persis data apa yang diharapkan, dan editor kamu akan memberikan *autocomplete* untuk field-field ini!\n\n## Tugas Kamu\n\n1. Definisikan interface `TestResult` dengan properti:\n   - `testName` (string)\n   - `duration` (number)\n2. Buat objek `currentTest` bertipe `TestResult` dengan:\n   - `testName`: `\"Login Flow\"`\n   - `duration`: `120`\n3. Simpan `currentTest.duration` ke dalam variabel `result`.\n"
+            },
+            "htmlContent": "<div class=\"structure-viewer\">\n  <h3>Object Blueprint</h3>\n  <div id=\"output\">Waiting for object...</div>\n</div>",
+            "starterCode": "// 1. Define interface TestResult { testName: string, duration: number }\n// Your code here\n\n// 2. Create object currentTest of type TestResult with testName \"Login Flow\" and duration 120\n// Your code here\n\n// 3. Assign currentTest.duration to result\n// Your code here\n// result = currentTest.duration;",
+            "testCases": [
+                {
+                    "description": "Returns the expected output",
+                    "expectedOutput": "120",
+                    "isHidden": false
+                }
+            ],
+            "solution": "120",
+            "tags": [
+                "typescript",
+                "interfaces",
+                "test-data"
+            ]
+        },
+        {
+            "slug": "ts-union-types",
+            "type": "TYPESCRIPT",
+            "difficulty": "EASY",
+            "category": "ts-fundamentals",
+            "xpReward": 30,
+            "order": 504,
+            "title": {
+                "en": "Union Types",
+                "id": "Tipe Union"
+            },
+            "description": {
+                "en": "Allow multiple types for a single variable.",
+                "id": "Izinkan beberapa tipe untuk satu variabel."
+            },
+            "instructions": {
+                "en": "# Union Types\n\nUnion types allow a variable to hold more than one type of value, combining them with the pipe `|` symbol.\n\n## Syntax\n```typescript\nlet status: \"passed\" | \"failed\" | \"skipped\";\nstatus = \"passed\"; // OK\nstatus = \"running\"; // Error!\n```\n\n## Union Operations\n\n| Type | Example | Meaning |\n|---|---|---|\n| **Literal Union** | `\"yes\" \\| \"no\"` | Can only be exactly \"yes\" or \"no\" |\n| **Type Union** | `string \\| number` | Can be text or a count |\n| **Mixed** | `boolean \\| \"error\"` | Can be true/false OR the text \"error\" |\n\n## Real World Scenario\nIn test automation, a test status isn't just any string—it's a fixed set of possibilities. By typing it as `\"PASSED\" | \"FAILED\" | \"SKIPPED\"`, TypeScript prevents typos like `\"PASSSED\"` (extra S) from causing logic errors in your reports.\n\n## Your Task\n\n1. Define a type alias `Priority` that can match: `\"high\"` OR `\"medium\"` OR `\"low\"`.\n2. Create an object `task` with a property `priority` of type `Priority`, and set it to `\"high\"`.\n3. Assign `task.priority` to the `result` variable.\n",
+                "id": "# Tipe Union\n\nTipe Union memungkinkan sebuah variabel menampung lebih dari satu tipe nilai, menggabungkannya dengan simbol pipe `|`.\n\n## Sintaks\n```typescript\nlet status: \"passed\" | \"failed\" | \"skipped\";\nstatus = \"passed\"; // OK\nstatus = \"running\"; // Error!\n```\n\n## Operasi Union\n\n| Tipe | Contoh | Arti |\n|---|---|---|\n| **Literal Union** | `\"yes\" \\| \"no\"` | Hanya bisa persis \"yes\" atau \"no\" |\n| **Type Union** | `string \\| number` | Bisa berupa teks atau angka |\n| **Mixed** | `boolean \\| \"error\"` | Bisa true/false ATAU teks \"error\" |\n\n## Skenario Dunia Nyata\nDalam otomatisasi tes, status tes bukan sembarang string—itu adalah kumpulan kemungkinan yang tetap. Dengan memberinya tipe `\"PASSED\" | \"FAILED\" | \"SKIPPED\"`, TypeScript mencegah typo seperti `\"PASSSED\"` (kelebihan S) yang bisa menyebabkan error logika di laporan kamu.\n\n## Tugas Kamu\n\n1. Definisikan type alias `Priority` yang bisa bernilai: `\"high\"` ATAU `\"medium\"` ATAU `\"low\"`.\n2. Buat objek `task` dengan properti `priority` bertipe `Priority`, dan atur nilainya ke `\"high\"`.\n3. Simpan `task.priority` ke dalam variabel `result`.\n"
+            },
+            "htmlContent": "<div class=\"status-pill\">\n  <span class=\"badge high\">HIGH</span>\n  <span class=\"badge medium\">MEDIUM</span>\n  <span class=\"badge low\">LOW</span>\n</div>",
+            "starterCode": "// 1. Define type alias Priority = \"high\" | \"medium\" | \"low\"\n// Your code here\n\n// 2. Create object task with priority: \"high\"\n// Your code here\n\n// 3. Assign task.priority to result\n// Your code here\n// result = task.priority;",
+            "testCases": [
+                {
+                    "description": "Returns the expected output",
+                    "expectedOutput": "high",
+                    "isHidden": false
+                }
+            ],
+            "solution": "high",
+            "tags": [
+                "typescript",
+                "union-types",
+                "literals"
+            ]
+        },
+        {
+            "slug": "ts-optional-properties",
+            "type": "TYPESCRIPT",
+            "difficulty": "EASY",
+            "category": "ts-fundamentals",
+            "xpReward": 35,
+            "order": 505,
+            "title": {
+                "en": "Optional Properties",
+                "id": "Properti Opsional"
+            },
+            "description": {
+                "en": "Define properties that might not be present.",
+                "id": "Definisikan properti yang mungkin tidak ada."
+            },
+            "instructions": {
+                "en": "# Optional Properties\n\nSome properties are not always required. Use `?` to mark them as optional.\n\n## Syntax\n```typescript\ninterface Config {\n  url: string;      // Required\n  timeout?: number; // Optional (undefined if missing)\n}\n```\n\n## Handling Optional Values\n\n| Check | Syntax | Meaning |\n|---|---|---|\n| **Truthiness** | `if (config.timeout)` | Runs if timeout is not 0/null/undefined |\n| **Undefined** | `if (config.timeout !== undefined)` | Runs if explicit value exists |\n| **Default** | `const t = config.timeout || 5000` | Uses 5000 if timeout is missing |\n\n## Real World Scenario\nIn test configuration files (`playwright.config.ts`), almost every setting is optional. You might define a `baseURL` (required), but omit `retries` (optional) to use the system default. TypeScript lets you model this flexibility safely.\n\n## Your Task\n\n1. Define an interface `AppConfig` with:\n   - `apiUrl: string` (Required)\n   - `retryLimit?: number` (Optional)\n2. Create an object `myConfig` of type `AppConfig` with **only** the `apiUrl` set to `\"https://api.test.com\"`.\n3. Check if `retryLimit` exists. If not, assign `0` to `result`. If it does, assign the value.\n",
+                "id": "# Properti Opsional\n\nBeberapa properti tidak selalu wajib. Gunakan `?` untuk menandainya sebagai opsional.\n\n## Sintaks\n```typescript\ninterface Config {\n  url: string;      // Wajib\n  timeout?: number; // Opsional (undefined jika tidak ada)\n}\n```\n\n## Menangani Nilai Opsional\n\n| Cek | Sintaks | Arti |\n|---|---|---|\n| **Truthiness** | `if (config.timeout)` | Jalan jika timeout bukan 0/null/undefined |\n| **Undefined** | `if (config.timeout !== undefined)` | Jalan jika nilai eksplisit ada |\n| **Default** | `const t = config.timeout || 5000` | Pakai 5000 jika timeout tidak ada |\n\n## Skenario Dunia Nyata\nDalam file konfigurasi tes (`playwright.config.ts`), hampir setiap pengaturan bersifat opsional. Kamu mungkin mendefinisikan `baseURL` (wajib), tapi mengabaikan `retries` (opsional) untuk menggunakan default sistem. TypeScript membiarkan kamu memodelkan fleksibilitas ini dengan aman.\n\n## Tugas Kamu\n\n1. Definisikan interface `AppConfig` dengan:\n   - `apiUrl: string` (Wajib)\n   - `retryLimit?: number` (Opsional)\n2. Buat objek `myConfig` bertipe `AppConfig` dengan **hanya** `apiUrl` yang diisi `\"https://api.test.com\"`.\n3. Cek apakah `retryLimit` ada. Jika tidak, simpan `0` ke `result`. Jika ada, simpan nilainya.\n"
+            },
+            "htmlContent": "<div class=\"config-viewer\">\n  <h3>Configuration</h3>\n  <div id=\"json\">Waiting for config...</div>\n</div>",
+            "starterCode": "// 1. Define interface AppConfig { apiUrl: string, retryLimit?: number }\n// Your code here\n\n// 2. Create myConfig with only apiUrl\n// Your code here\n\n// 3. Logic: if retryLimit exists, result = retryLimit, else result = 0\n// Your code here\n// if (myConfig.retryLimit) { result = myConfig.retryLimit; } else { result = 0; }",
+            "testCases": [
+                {
+                    "description": "Returns 0 when optional property is missing",
+                    "expectedOutput": "0",
+                    "isHidden": false
+                }
+            ],
+            "solution": "0",
+            "tags": [
+                "typescript",
+                "interfaces",
+                "logic"
+            ]
+        },
+        {
+            "slug": "ts-type-aliases",
+            "type": "TYPESCRIPT",
+            "difficulty": "MEDIUM",
+            "category": "ts-fundamentals",
+            "xpReward": 40,
+            "order": 506,
+            "title": {
+                "en": "Type Aliases",
+                "id": "Type Alias"
+            },
+            "description": {
+                "en": "Create reusable custom types.",
+                "id": "Buat tipe kustom yang bisa digunakan kembali."
+            },
+            "instructions": {
+                "en": "# Type Aliases\n\nType aliases allow you to name any type, making complex types reusable and readable.\n\n## Alias vs Interface\n\n| Feature | Type Alias | Interface |\n|---|---|---|\n| **Definition** | `type Name = ...` | `interface Name { ... }` |\n| **Primitives** | Can name primitives (`string`) | No, shapes only |\n| **Unions** | Can name unions (`A \\| B`) | No |\n| **Tuples** | Can name tuples (`[num, num]`) | No |\n\n## Syntax\n```typescript\ntype ID = string | number;\ntype UserTuple = [string, boolean]; // [Name, IsActive]\n```\n\n## Real World Scenario\nSometimes you need to represent a specific coordinate or a fixed set of values. Instead of typing `[number, number]` everywhere in your map test, you define `type LatLong = [number, number]`. Now your code `function moveTo(loc: LatLong)` is self-documenting!\n\n## Your Task\n\n1. Create a type alias `Coordinate` representing a **tuple** of two numbers: `[number, number]`.\n2. Initialize a variable `pos` of type `Coordinate` with values `[10, 20]`.\n3. Add the two numbers together (`pos[0] + pos[1]`) and store the sum in `result`.\n",
+                "id": "# Type Alias\n\nType alias memungkinkan kamu memberi nama pada tipe apa pun, membuat tipe kompleks menjadi reusable dan mudah dibaca.\n\n## Alias vs Interface\n\n| Fitur | Type Alias | Interface |\n|---|---|---|\n| **Definisi** | `type Name = ...` | `interface Name { ... }` |\n| **Primitif** | Bisa menamai primitif (`string`) | Tidak, hanya objek |\n| **Union** | Bisa menamai union (`A \\| B`) | Tidak |\n| **Tuple** | Bisa menamai tuple (`[num, num]`) | Tidak |\n\n## Skenario Dunia Nyata\nTerkadang kamu perlu merepresentasikan koordinat tertentu atau kumpulan nilai tetap. Alih-alih mengetik `[number, number]` di mana-mana dalam tes peta-mu, kamu mendefinisikan `type LatLong = [number, number]`. Sekarang kodemu `function moveTo(loc: LatLong)` mendokumentasikan dirinya sendiri!\n\n## Tugas Kamu\n\n1. Buat type alias `Coordinate` yang merepresentasikan **tuple** berisi dua angka: `[number, number]`.\n2. Inisialisasi variabel `pos` bertipe `Coordinate` dengan nilai `[10, 20]`.\n3. Jumlahkan kedua angka tersebut (`pos[0] + pos[1]`) dan simpan hasilnya di `result`.\n"
+            },
+            "htmlContent": "<div class=\"geo-tracker\">\n  <h3>GPS Tracker</h3>\n  <div id=\"location\">Searching signal...</div>\n</div>",
+            "starterCode": "// 1. Define type Coordinate = [number, number]\n// Your code here\n\n// 2. Initialize pos: Coordinate = [10, 20]\n// Your code here\n\n// 3. result = pos[0] + pos[1]\n// Your code here",
+            "testCases": [
+                {
+                    "description": "Returns the sum of tuple elements",
+                    "expectedOutput": "30",
+                    "isHidden": false
+                }
+            ],
+            "solution": "30",
+            "tags": [
+                "typescript",
+                "type-aliases",
+                "tuples"
+            ]
+        },
+        {
+            "slug": "ts-type-inference",
+            "type": "TYPESCRIPT",
+            "difficulty": "EASY",
+            "category": "ts-fundamentals",
+            "xpReward": 25,
+            "order": 507,
+            "title": {
+                "en": "Type Inference",
+                "id": "Inferensi Tipe"
+            },
+            "description": {
+                "en": "Understand how TypeScript automatically detects types.",
+                "id": "Pahami bagaimana TypeScript mendeteksi tipe secara otomatis."
+            },
+            "instructions": {
+                "en": "# Type Inference\n\nYou don't always have to write types! TypeScript is smart enough to guess (infer) them based on the initial value you assign.\n\n## How it Works\n\n| Code | Inferred Type | Why? |\n|---|---|---|\n| `let score = 10` | `number` | 10 is a number |\n| `let name = \"Alice\"` | `string` | \"Alice\" is a string |\n| `let flags = [true, false]` | `boolean[]` | Array contains booleans |\n\n## Real World Scenario\nExplicitly typing every single variable can make your code noisy. Inference allows you to write cleaner code without losing safety. If you hover over a variable in VS Code, TypeScript will tell you exactly what type it inferred!\n\n## Your Task\n\n1. Declare a variable `message` **without** writing `: string`, but initialize it with the value `\"Inferred\"`.\n2. Use the `typeof` operator on `message` (e.g. `typeof variableName`) and assign the result to the `result` variable.\n",
+                "id": "# Inferensi Tipe\n\nKamu tidak selalu harus menulis tipe! TypeScript cukup pintar untuk menebak (menginferensi) tipe berdasarkan nilai awal yang kamu berikan.\n\n## Cara Kerjanya\n\n| Kode | Tipe Hasil Inferensi | Kenapa? |\n|---|---|---|\n| `let score = 10` | `number` | 10 adalah angka |\n| `let name = \"Alice\"` | `string` | \"Alice\" adalah string |\n| `let flags = [true, false]` | `boolean[]` | Array berisi boolean |\n\n## Skenario Dunia Nyata\nMenulis tipe secara eksplisit untuk setiap variabel bisa membuat kodemu penuh sesak. Inferensi memungkinkan kamu menulis kode yang lebih *clean* tanpa kehilangan keamanan. Jika kamu mengarahkan kursor ke variabel di VS Code, TypeScript akan memberi tahu tipe apa yang ia inferensi!\n\n## Tugas Kamu\n\n1. Deklarasikan variabel `message` **tanpa** menulis `: string`, tetapi inisialisasi dengan nilai `\"Inferred\"`.\n2. Gunakan operator `typeof` pada `message` (contoh: `typeof namaVariabel`) dan simpan hasilnya di variabel `result`.\n"
+            },
+            "htmlContent": "<div class=\"code-inspector\">\n  <h3>Variable Inspector</h3>\n  <div id=\"analysis\">Hover to infer...</div>\n</div>",
+            "starterCode": "// 1. Declare message = \"Inferred\" (no type annotation)\n// Your code here\n\n// 2. result = typeof message\n// Your code here",
+            "testCases": [
+                {
+                    "description": "Returns 'string' through inference",
+                    "expectedOutput": "string",
+                    "isHidden": false
+                }
+            ],
+            "solution": "string",
+            "tags": [
+                "typescript",
+                "inference"
+            ]
+        },
+        {
+            "slug": "ts-generics-intro",
+            "type": "TYPESCRIPT",
+            "difficulty": "MEDIUM",
+            "category": "ts-fundamentals",
+            "xpReward": 50,
+            "order": 508,
+            "title": {
+                "en": "Generics Introduction",
+                "id": "Pengenalan Generics"
+            },
+            "description": {
+                "en": "Create reusable components that work with a variety of types.",
+                "id": "Buat komponen yang bisa digunakan kembali yang bekerja dengan berbagai tipe."
+            },
+            "instructions": {
+                "en": "# Generics Introduction\n\nGenerics allow you to create code that acts like a template. You can define a function or class that works with a \"to-be-defined\" type (`T`), and the user decides what `T` is when they run it.\n\n## Syntax\n```typescript\n// T is a placeholder for the type\nfunction identity<T>(arg: T): T {\n  return arg;\n}\n\n// Usage\nconst n = identity<number>(5);\nconst s = identity<string>(\"hello\");\n```\n\n## Real World Scenario\nThink of a test helper like `api.post<ExpectedResponse>('/login')`. The `post` function doesn't know what data the API returns for every single endpoint. By using Generics, you can tell it: \"For *this* specific call, I expect a `LoginResponse` object,\" and TypeScript will enforce that structure on the result.\n\n## Your Task\n\n1. Create a generic function `wrapInArray<T>` that takes one argument `value` of type `T`.\n2. The function return type should be `T[]` (an array of T), and it should return `[value]`.\n3. Call `wrapInArray<number>(99)` and assign the result to a variable `val`.\n4. Assign the first element `val[0]` to `result`.\n",
+                "id": "# Pengenalan Generics\n\nGenerics memungkinkan kamu membuat kode yang bertindak seperti template. Kamu bisa mendefinisikan fungsi atau kelas yang bekerja dengan tipe yang \"akan ditentukan nanti\" (`T`), dan pengguna memutuskan apa itu `T` saat mereka menjalankannya.\n\n## Sintaks\n```typescript\n// T adalah placeholder untuk tipe\nfunction identity<T>(arg: T): T {\n  return arg;\n}\n\n// Penggunaan\nconst n = identity<number>(5);\nconst s = identity<string>(\"hello\");\n```\n\n## Skenario Dunia Nyata\nBayangkan sebuah *test helper* seperti `api.post<ExpectedResponse>('/login')`. Fungsi `post` tidak tahu data apa yang dikembalikan API untuk setiap endpoint. Dengan menggunakan Generics, kamu bisa memberitahunya: \"Untuk panggilan *ini*, saya mengharapkan objek `LoginResponse`,\" dan TypeScript akan memaksakan struktur tersebut pada hasilnya.\n\n## Tugas Kamu\n\n1. Buat fungsi generic `wrapInArray<T>` yang menerima satu argumen `value` bertipe `T`.\n2. Tipe kembalian fungsi harus `T[]` (array dari T), dan harus mengembalikan `[value]`.\n3. Panggil `wrapInArray<number>(99)` dan simpan hasilnya di variabel `val`.\n4. Simpan elemen pertama `val[0]` ke dalam variabel `result`.\n"
+            },
+            "starterCode": "// Create generic function\n// Your code here\n\n// const val = wrapInArray<number>(99);\n// result = val[0];",
+            "testCases": [
+                {
+                    "description": "Returns the wrapped generic value",
+                    "expectedOutput": "99",
+                    "isHidden": false
+                }
+            ],
+            "solution": "99",
+            "tags": [
+                "typescript",
+                "generics"
+            ]
+        },
+        {
+            "slug": "ts-utility-types",
+            "type": "TYPESCRIPT",
+            "difficulty": "MEDIUM",
+            "category": "ts-fundamentals",
+            "xpReward": 45,
+            "order": 509,
+            "title": {
+                "en": "Utility Types: Partial",
+                "id": "Utility Types: Partial"
+            },
+            "description": {
+                "en": "Use Partial to make all properties of an interface optional.",
+                "id": "Gunakan Partial untuk membuat semua properti interface menjadi opsional."
+            },
+            "instructions": {
+                "en": "# Utility Types: Partial\n\nTypeScript provides \"Utility Types\" to transform existing types. `Partial<T>` takes a type `T` and creates a new type where all properties are optional.\n\n## Common Utilities\n\n| Utility | Description |\n|---|---|\n| `Partial<T>` | Makes everything optional |\n| `Required<T>` | Makes everything required |\n| `Readonly<T>` | Makes everything unchangeable |\n\n## Syntax\n```typescript\ninterface User { name: string; age: number; }\n\n// Now name and age are optional (?)\ntype DraftUser = Partial<User>;\n```\n\n## Real World Scenario\nWhen implementing a \"Update Profile\" feature (API PATCH request), you rarely update *every* field at once. You might send just the `{ email: \"new@test.com\" }`. `Partial<User>` is the perfect type for this payload, as it allows any subset of the `User` fields.\n\n## Your Task\n\n1. Define an interface `FullReport` with properties `title`, `passed`, and `failed` (all required numbers/strings).\n2. Create a type alias `DraftReport` that uses `Partial<FullReport>`.\n3. Create an object `myDraft` of type `DraftReport` composed of **only** `{ passed: 5 }`.\n4. Assign `myDraft.passed` to the `result` variable.\n",
+                "id": "# Utility Types: Partial\n\nTypeScript menyediakan \"Utility Types\" untuk mengubah tipe yang sudah ada. `Partial<T>` mengambil tipe `T` dan membuat tipe baru di mana semua properti menjadi opsional.\n\n## Utilitas Umum\n\n| Utility | Deskripsi |\n|---|---|\n| `Partial<T>` | Membuat semuanya opsional |\n| `Required<T>` | Membuat semuanya wajib |\n| `Readonly<T>` | Membuat semuanya tidak bisa diubah |\n\n## Sintaks\n```typescript\ninterface User { name: string; age: number; }\n\n// Sekarang name dan age bersifat opsional (?)\ntype DraftUser = Partial<User>;\n```\n\n## Skenario Dunia Nyata\nSaat mengimplementasikan fitur \"Update Profile\" (request API PATCH), kamu jarang memperbarui *setiap* field sekaligus. Kamu mungkin hanya mengirim `{ email: \"new@test.com\" }`. `Partial<User>` adalah tipe yang sempurna untuk payload ini, karena mengizinkan subset apa pun dari field `User`.\n\n## Tugas Kamu\n\n1. Definisikan interface `FullReport` dengan properti `title`, `passed`, dan `failed` (semua wajib).\n2. Buat type alias `DraftReport` yang menggunakan `Partial<FullReport>`.\n3. Buat objek `myDraft` bertipe `DraftReport` yang **hanya** berisi `{ passed: 5 }`.\n4. Simpan `myDraft.passed` ke dalam variabel `result`.\n"
+            },
+            "htmlContent": "<div class=\"patch-tool\">\n  <h3>Data Patcher</h3>\n  <div id=\"payload\">Ready to patch...</div>\n</div>",
+            "starterCode": "// 1. Define interface FullReport { title: string, passed: number, failed: number }\n// Your code here\n\n// 2. Define DraftReport = Partial<FullReport>\n// Your code here\n\n// 3. Create myDraft: DraftReport = { passed: 5 }\n// Your code here\n\n// 4. result = myDraft.passed\n// Your code here",
+            "testCases": [
+                {
+                    "description": "Returns the property from a Partial object",
+                    "expectedOutput": "5",
+                    "isHidden": false
+                }
+            ],
+            "solution": "5",
+            "tags": [
+                "typescript",
+                "utility-types",
+                "partial"
+            ]
+        },
+        {
+            "slug": "ts-fundamentals-boss",
+            "type": "TYPESCRIPT",
+            "difficulty": "HARD",
+            "category": "ts-fundamentals",
+            "xpReward": 60,
+            "order": 510,
+            "title": {
+                "en": "Boss: Type-Safe Test Factory",
+                "id": "Boss: Pembuat Tes Aman Tipe"
+            },
+            "description": {
+                "en": "Build a type-safe factory for generating test objects.",
+                "id": "Bangun pembuat (factory) yang aman tipe untuk menghasilkan objek tes."
+            },
+            "instructions": {
+                "en": "# Scenario: Type-Safe Test Factory\n\nYou are building a critical utility for your test framework: a **User Factory**. This factory must generate user data for end-to-end tests, ensuring that every user created strictly adheres to the schema constraints.\n\n## The Mission\n\n1.  **Define the Schema**: Create an interface `User` with:\n    *   `id`: number\n    *   `email`: string\n    *   `role`: A union of literal strings `\"admin\" | \"guest\"`\n\n2.  **Build the Factory**: Create a function `createUser` that accepts:\n    *   `id` (number)\n    *   `role` (optional, defaults to `\"guest\"`)\n\n3.  **Implement Logic**: The function must return a `User` object constructed as:\n    *   `id`: The passed id\n    *   `role`: The passed role (or default)\n    *   `email`: Constructed using template literals `` `user${id}@test.com` ``\n\n4.  **Execute**: Create a user with `id: 5` and `role: \"admin\"`.\n\n5.  **Verify**: Assign the generated user's **email** to the `result` variable.\n",
+                "id": "# Skenario: Pembuat Tes Aman Tipe\n\nKamu sedang membangun utilitas kritis untuk framework pengujianmu: sebuah **User Factory**. Factory ini harus menghasilkan data pengguna untuk tes end-to-end, memastikan bahwa setiap pengguna yang dibuat benar-benar mematuhi batasan skema.\n\n## Misi Kamu\n\n1.  **Definisikan Skema**: Buat interface `User` dengan:\n    *   `id`: number\n    *   `email`: string\n    *   `role`: Union dari string literal `\"admin\" | \"guest\"`\n\n2.  **Bangun Factory**: Buat fungsi `createUser` yang menerima:\n    *   `id` (number)\n    *   `role` (opsional, default ke `\"guest\"`)\n\n3.  **Implementasi Logika**: Fungsi harus mengembalikan objek `User` yang dibuat sebagai berikut:\n    *   `id`: ID yang diberikan\n    *   `role`: Role yang diberikan (atau default)\n    *   `email`: Dibuat menggunakan template literal `` `user${id}@test.com` ``\n\n4.  **Eksekusi**: Buat user dengan `id: 5` dan `role: \"admin\"`.\n\n5.  **Verifikasi**: Simpan **email** dari user yang dihasilkan ke variabel `result`.\n"
+            },
+            "htmlContent": "<div class=\"boss-battle\">\n  <h3>🏭 USER FACTORY</h3>\n  <div id=\"output\">Initializing production line...</div>\n</div>",
+            "starterCode": "// 1. Define Interface User\n// Your code here\n\n// 2. Define function createUser(id: number, role?: ...): User\n// Your code here\n    // Return object with dynamic email\n\n// 3. Create Admin User (id: 5)\n// Your code here\n\n// 4. result = newUser.email\n// Your code here",
+            "testCases": [
+                {
+                    "description": "Returns the generated type-safe email",
+                    "expectedOutput": "user5@test.com",
+                    "isHidden": false
+                }
+            ],
+            "solution": "user5@test.com",
+            "tags": [
+                "typescript",
+                "boss",
+                "factory",
+                "scenario"
+            ]
+        }
+    ]
+}

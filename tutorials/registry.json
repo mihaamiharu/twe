@@ -123,11 +123,27 @@
         "js-variables-basics",
         "js-functions-basics"
       ],
+      "nextTutorialSlug": "typescript-for-qa"
+    },
+    {
+      "slug": "typescript-for-qa",
+      "order": 10,
+      "estimatedMinutes": 15,
+      "tags": [
+        "typescript",
+        "fundamentals",
+        "qa",
+        "automation"
+      ],
+      "relatedChallenges": [
+        "ts-type-annotations",
+        "ts-interfaces-basics"
+      ],
       "nextTutorialSlug": "async-await-basics"
     },
     {
       "slug": "async-await-basics",
-      "order": 10,
+      "order": 11,
       "estimatedMinutes": 12,
       "tags": [
         "javascript",
@@ -144,7 +160,7 @@
     },
     {
       "slug": "playwright-architecture",
-      "order": 11,
+      "order": 12,
       "estimatedMinutes": 10,
       "tags": [
         "playwright",
@@ -157,7 +173,7 @@
     },
     {
       "slug": "playwright-actionability",
-      "order": 12,
+      "order": 13,
       "estimatedMinutes": 10,
       "tags": [
         "playwright",
@@ -170,7 +186,7 @@
     },
     {
       "slug": "playwright-interaction-fundamentals",
-      "order": 13,
+      "order": 14,
       "estimatedMinutes": 12,
       "tags": [
         "playwright",
@@ -184,7 +200,7 @@
     },
     {
       "slug": "page-object-model",
-      "order": 14,
+      "order": 15,
       "estimatedMinutes": 15,
       "tags": [
         "playwright",
