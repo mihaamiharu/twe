@@ -217,7 +217,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
 
       // Prepare test cases from filesystem
       // Obfuscate sensitive inputs for selector challenges
-      const processedTestCases = challengeContent.testCases.map((tc, index) => ({
+      const processedTestCases = (challengeContent.testCases || []).map((tc, index) => ({
         id: `tc-${index}`,
         description: tc.description,
         input: tc.expectedOutput, // For display purposes
@@ -357,6 +357,8 @@ export const getChallenge = createServerFn({ method: 'GET' })
           order: challengeContent.order,
           htmlContent: challengeContent.htmlContent,
           files: challengeContent.files,
+          editableFiles: challengeContent.editableFiles,
+          preloadModules: challengeContent.preloadModules,
           starterCode: challengeContent.starterCode,
           tags: challengeContent.tags,
           completionCount: dbChallenge?.completionCount || 0,

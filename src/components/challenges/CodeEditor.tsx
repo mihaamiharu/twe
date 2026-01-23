@@ -36,6 +36,7 @@ export interface CodeEditorProps {
   height?: string | number;
   showMinimap?: boolean;
   className?: string;
+  extraLibs?: { content: string; filePath?: string }[];
 }
 
 // Custom dark theme matching app design
@@ -107,6 +108,7 @@ export function CodeEditor({
   showMinimap = true,
   className,
   onReady,
+  ...props
 }: CodeEditorProps) {
   const { resolvedTheme } = useTheme();
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
@@ -182,7 +184,7 @@ export function CodeEditor({
     return () => {
       mounted = false;
     };
-  }, [storageKey, initialCode]); // We intentionally omit onChange to avoid re-triggering loop
+  }, [storageKey]); // Rely on 'key' prop for re-mounting when file path or initialCode resets
 
   // Auto-save to IndexedDB
   useEffect(() => {
@@ -214,6 +216,29 @@ export function CodeEditor({
 
       // Define custom themes
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        target: monaco.languages.typescript.ScriptTarget.ESNext,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        module: monaco.languages.typescript.ModuleKind.ESNext,
+        allowNonTsExtensions: true,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+      });
+
+      // Disable diagnostics for challenge environment
+      // This prevents false positives like "cannot redeclare" for top-level await context
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions({
+        noSemanticValidation: true,
+        noSyntaxValidation: false, // Keep syntax validation for basic errors
+      });
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+        noSemanticValidation: true,
+        noSyntaxValidation: false,
+      });
+
       monaco.editor.defineTheme('customDark', CUSTOM_DARK_THEME);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
       monaco.editor.defineTheme('customLight', CUSTOM_LIGHT_THEME);
@@ -246,13 +271,29 @@ export function CodeEditor({
         },
       });
 
+      // Register extra libs (type definitions)
+      if (props.extraLibs) {
+        props.extraLibs.forEach((lib) => {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          monaco.languages.typescript.javascriptDefaults.addExtraLib(
+            lib.content,
+            lib.filePath
+          );
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+          monaco.languages.typescript.typescriptDefaults.addExtraLib(
+            lib.content,
+            lib.filePath
+          );
+        });
+      }
+
       // Focus editor
       editor.focus();
 
       // Signal that editor is ready
       onReady?.();
     },
-    [onRun, storageKey, onReady],
+    [onRun, storageKey, onReady, props.extraLibs],
   );
 
   // Update editor when onRun changes
