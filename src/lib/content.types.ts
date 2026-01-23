@@ -76,7 +76,7 @@ export type ChallengeType =
   | 'JAVASCRIPT'
   | 'PLAYWRIGHT';
 export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
-export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert' | 'e2e';
+export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'expert' | 'e2e' | 'pom';
 
 /**
  * Test case definition in challenge JSON
@@ -116,6 +116,11 @@ export interface ChallengeDefinition {
   instructions: LocalizedString;
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
+  editableFiles?: string[]; // Which files user can edit (default: all)
+  preloadModules?: Record<string, {
+    exports: string[];      // e.g., ["LoginPage", "DashboardPage"]
+    source: string;         // e.g., "/pages/LoginPage.ts"
+  }>;
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
@@ -148,6 +153,11 @@ export interface Challenge {
   instructions: string;
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
+  editableFiles?: string[]; // Which files user can edit (default: all)
+  preloadModules?: Record<string, {
+    exports: string[];      // e.g., ["LoginPage", "DashboardPage"]
+    source: string;         // e.g., "/pages/LoginPage.ts"
+  }>;
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;

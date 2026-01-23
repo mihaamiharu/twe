@@ -5,7 +5,7 @@ import {
   testCSSSelector,
   testSelectorAgainstTarget,
   generateSelectorHint,
-} from '../../lib/selector-validator';
+} from '../../core/executor/selector-validator';
 
 describe('selector-validator', () => {
   describe('validateCSSSelector', () => {
@@ -139,6 +139,50 @@ describe('selector-validator', () => {
       );
       expect(result.isCorrect).toBe(false);
       expect(result.feedback).toContain('did not match any elements');
+    });
+  });
+
+  describe('testSelectorAgainstTarget - Advanced', () => {
+    let container: HTMLElement;
+    beforeEach(() => {
+      container = document.createElement('div');
+      container.innerHTML = `
+              <div id="complex">
+                  <input type="text" data-testid="user-name" />
+                  <input type="password" data-testid="user-pass" />
+                  <button class="btn primary" data-action="submit">Submit</button>
+                  <button class="btn secondary" data-action="cancel">Cancel</button>
+              </div>
+          `;
+      document.body.appendChild(container);
+    });
+    afterEach(() => {
+      document.body.removeChild(container);
+    });
+
+    it('should handle multiple classes order independence', () => {
+      // .btn.primary should match irrespective of order in class attribute if logic is correct
+      const result = testSelectorAgainstTarget(
+        '.btn.primary',
+        'css',
+        container,
+        '[data-action="submit"]',
+        'submit-btn'
+      );
+      expect(result.isCorrect).toBe(true);
+    });
+
+    it('should handle partial attribute matching', () => {
+      const result = testSelectorAgainstTarget(
+        '[data-testid^="user"]',
+        'css',
+        container,
+        'input', // multiple matches
+        'inputs'
+      );
+      // Should match 2 elements
+      expect(result.userMatchCount).toBe(2);
+      expect(result.isCorrect).toBe(true); // Matches all targets correctly
     });
   });
 
