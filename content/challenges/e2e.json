@@ -129,12 +129,12 @@
                 "id": "Uji pesan kesalahan menggunakan method helper POM."
             },
             "instructions": {
-                "en": "# POM: Form Validation\n\nPage Objects should not just handle success flows, but also help you verify error states. \n\n## Your Task\nVerify that submitting an empty login form displays the correct error message.\n\n### Requirements\n1.  Navigate to login page.\n2.  Click login without entering credentials.\n3.  Use `loginPage.getErrorMessage()` to fetch the error text.\n4.  Assert the error text is \"Credentials required\".\n",
+                "en": "# POM: Form Validation\n\nPage Objects should not just handle success flows, but also help you verify error states. \n\n## Your Task\nVerify that submitting an empty login form displays the correct error message.\n\n### Requirements\n1.  Navigate to login page.\n2.  Click login without entering credentials.\n3.  Use `loginPage.errorMessage` to get the error element.\n4.  Assert the error text is \"Credentials required\".\n",
                 "id": "# POM: Validasi Form\n\nPage Object tidak hanya menangani alur sukses, tetapi juga membantu Anda memverifikasi status kesalahan.\n"
             },
             "files": {
-                "/tests/validation.spec.ts": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\n\n// 1. Submit empty form\nawait loginPage.submit();\n\n// 2. Get error message using POM method\nconst error = await loginPage.getErrorMessage();\n\n// 3. Verify\nawait expect(error).toBe('Credentials required');",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n  }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async submit() { await this.page.locator('#btn').click(); }\n  async getErrorMessage() {\n    return this.page.locator('#error').textContent();\n  }\n}",
+                "/tests/validation.spec.ts": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\n\n// 1. Submit empty form\nawait loginPage.submit();\n\n// 2. Verify error message using Locator assertion\n// This is better than getErrorMessage() because it auto-retries!\nawait expect(loginPage.errorMessage).toHaveText('Credentials required');",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n  }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async submit() { await this.page.locator('#btn').click(); }\n  \n  // Return the Locator, not the text!\n  get errorMessage() {\n    return this.page.locator('#error');\n  }\n}",
                 "/app/login.html": "<html><body>\n<div id='error'></div>\n<button id='btn' onclick=\"document.getElementById('error').innerText='Credentials required'\">Login</button>\n</body></html>"
             },
             "editableFiles": [
@@ -148,8 +148,8 @@
                     "source": "/pages/LoginPage.ts"
                 }
             },
-            "starterCode": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.submit();\nconst error = await loginPage.getErrorMessage();\nawait expect(error).toBe('Credentials required');",
-            "solution": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.submit();\nconst error = await loginPage.getErrorMessage();\nawait expect(error).toBe('Credentials required');",
+            "starterCode": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.submit();\nawait expect(loginPage.errorMessage).toHaveText('Credentials required');",
+            "solution": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.submit();\nawait expect(loginPage.errorMessage).toHaveText('Credentials required');",
             "testCases": [
                 {
                     "description": "Error message matches",
@@ -184,12 +184,12 @@
                 "id": "Gunakan komponen Header yang dibagikan di beberapa halaman."
             },
             "instructions": {
-                "en": "# POM: Component Reuse\n\nModern web apps share components like Headers and Footers. In POM, we can represent these as separate classes and use them as properties within our Page Objects.\n\n## Your Task\nVerify the user's name in the header after logging in.\n\n### Requirements\n1.  Navigate to Login.\n2.  Perform Login.\n3.  Access the header via `dashboardPage.header`.\n4.  Verify `header.getUserName()` returns \"testuser\".\n",
+                "en": "# POM: Component Reuse\n\nModern web apps share components like Headers and Footers. In POM, we can represent these as separate classes and use them as properties within our Page Objects.\n\n## Your Task\nVerify the user's name in the header after logging in.\n\n### Requirements\n1.  Navigate to Login.\n2.  Perform Login.\n3.  Access the header via `dashboardPage.header`.\n4.  Verify `header.userName` text is \"testuser\".\n",
                 "id": "# POM: Penggunaan Kembali Komponen\n\nAplikasi web modern berbagi komponen seperti Header dan Footer. Dalam POM, kita dapat merepresentasikan ini sebagai class terpisah.\n"
             },
             "files": {
-                "/tests/smoke.spec.ts": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\n\n// DashboardPage uses the Header component\nconst dashboardPage = new DashboardPage(page);\n\n// Verify user name via the header component inside dashboard\nconst name = await dashboardPage.header.getUserName();\nawait expect(name).toBe('testuser');",
-                "/pages/Header.ts": "export class Header {\n  constructor(page) {\n     this.page = page;\n     this.userLabel = page.locator('#user-name');\n  }\n  async getUserName() { return this.userLabel.textContent(); }\n}",
+                "/tests/smoke.spec.ts": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\n\n// DashboardPage uses the Header component\nconst dashboardPage = new DashboardPage(page);\n\n// Verify user name via the header component inside dashboard\nawait expect(dashboardPage.header.userName).toHaveText('testuser');",
+                "/pages/Header.ts": "export class Header {\n  constructor(page) {\n     this.page = page;\n     this.userLabel = page.locator('#user-name');\n  }\n  get userName() { return this.userLabel; }\n}",
                 "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { this.page = page; }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) { await this.page.locator('#btn').click(); }\n}",
                 "/pages/DashboardPage.ts": "export class DashboardPage {\n  constructor(page) {\n    this.page = page;\n    this.header = new Header(page);\n  }\n}",
                 "/app/login.html": "<html><body><button id='btn' onclick=\"window.location.href='/app/dashboard.html'\">Login</button></body></html>",
@@ -218,8 +218,8 @@
                     "source": "/pages/DashboardPage.ts"
                 }
             },
-            "starterCode": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\nconst dashboardPage = new DashboardPage(page);\nconst name = await dashboardPage.header.getUserName();\nawait expect(name).toBe('testuser');",
-            "solution": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\nconst dashboardPage = new DashboardPage(page);\nconst name = await dashboardPage.header.getUserName();\nawait expect(name).toBe('testuser');",
+            "starterCode": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\nconst dashboardPage = new DashboardPage(page);\nawait expect(dashboardPage.header.userName).toHaveText('testuser');",
+            "solution": "const loginPage = new LoginPage(page);\nawait loginPage.goto();\nawait loginPage.login('testuser', 'pass');\nconst dashboardPage = new DashboardPage(page);\nawait expect(dashboardPage.header.userName).toHaveText('testuser');",
             "expectedState": [
                 {
                     "selector": "#user-name",
