@@ -8,6 +8,7 @@
 import { MockedPlaywrightPage } from './playwright-shim';
 import { logger } from '@/lib/logger';
 import type { ExpectedStateRule } from '@/lib/content.types';
+import { transpileTypeScript } from './typescript-transpiler';
 
 export interface ExecutionResult {
   status: 'PASSED' | 'FAILED' | 'ERROR' | 'TIMEOUT';
@@ -26,6 +27,7 @@ export interface ExecuteOptions {
   files?: Record<string, string>; // VFS: multi-page content for E2E challenges
   onNavigate?: (path: string) => void; // Callback for URL bar updates
   expectedState?: ExpectedStateRule[]; // DOM validation rules
+  isTypeScript?: boolean;
 }
 
 export interface TestCase {
@@ -57,6 +59,22 @@ export async function executePlaywrightCode(
   const useExistingIframe = !!options?.existingIframe;
   const logs: Array<{ id: string; type: string; message: string }> = [];
   const strictMode = options?.strictMode !== false; // Default to true for backward compatibility
+  let executableCode = code;
+
+  // Transpile if TypeScript
+  if (options?.isTypeScript) {
+    try {
+      executableCode = await transpileTypeScript(code);
+    } catch (error) {
+      return {
+        status: 'ERROR',
+        output: error instanceof Error ? error.message : String(error),
+        executionTime: 0,
+        error: error instanceof Error ? error.message : String(error),
+        logs: [],
+      };
+    }
+  }
 
   // Determine standard log level mapping
   const getLogType = (level: string) => {
@@ -116,7 +134,7 @@ export async function executePlaywrightCode(
 
   if (strictMode) {
     for (const { pattern, message } of forbiddenPatterns) {
-      if (pattern.test(code)) {
+      if (pattern.test(executableCode)) {
         // Check if it might be inside an evaluate block (naive check)
         // If the code line containing the pattern is not inside an evaluate, throw error
         // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
@@ -484,7 +502,7 @@ export async function executePlaywrightCode(
             };
 
             // Execute user code
-            // For JS challenges, we need to capture the 'result' variable
+            // For JS/TS challenges, we need to capture the 'result' variable
             // We use eval-style declaration to make result accessible even if user uses const/let
 
             // Create an enhanced document wrapper with friendlier error messages
@@ -582,7 +600,7 @@ export async function executePlaywrightCode(
             const wrappedCode = `
                         return (async () => {
                             try {
-                                ${code}
+                                ${executableCode}
                                 if (typeof result !== "undefined") return result;
                             } catch (e) {
                                 throw e;

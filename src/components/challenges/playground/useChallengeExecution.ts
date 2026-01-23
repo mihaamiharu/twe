@@ -71,7 +71,11 @@ export function useChallengeExecution(
 
         try {
             let codeToRun = code;
-            if (challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT') {
+            if (
+                challenge.type === 'JAVASCRIPT' ||
+                challenge.type === 'TYPESCRIPT' ||
+                challenge.type === 'PLAYWRIGHT'
+            ) {
                 codeToRun += '\nif (typeof result !== "undefined") return result;';
             }
 
@@ -99,6 +103,7 @@ export function useChallengeExecution(
                     files: challenge.files,
                     onNavigate: (path) => setCurrentVfsPath(path),
                     expectedState: challenge.expectedState,
+                    isTypeScript: challenge.type === 'TYPESCRIPT',
                 },
             );
 

@@ -84,6 +84,7 @@
     "css_selector": "Selektor CSS",
     "xpath_selector": "XPath",
     "javascript": "JavaScript",
+    "typescript": "TypeScript",
     "playwright": "Playwright",
     "selector": "Selektor"
   },
@@ -102,6 +103,7 @@
     "js-fundamentals": "Dasar JavaScript",
     "js-dom": "Dasar DOM",
     "js-async": "Dasar Async",
+    "ts-fundamentals": "Dasar TypeScript",
     "playwright-navigation": "Navigasi & Aksi",
     "playwright-locators": "Locator",
     "playwright-assertions": "Assertion",

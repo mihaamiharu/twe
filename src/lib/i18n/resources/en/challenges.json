@@ -88,6 +88,7 @@
     "css_selector": "CSS Selector",
     "xpath_selector": "XPath",
     "javascript": "JavaScript",
+    "typescript": "TypeScript",
     "playwright": "Playwright",
     "selector": "Selectors"
   },
@@ -106,6 +107,7 @@
     "js-fundamentals": "JavaScript Fundamentals",
     "js-dom": "DOM Basics",
     "js-async": "Async Basics",
+    "ts-fundamentals": "TypeScript Fundamentals",
     "playwright-navigation": "Navigation & Actions",
     "playwright-locators": "Locators",
     "playwright-assertions": "Assertions",

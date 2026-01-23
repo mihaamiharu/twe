@@ -34,6 +34,7 @@ import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 
 export type ChallengeType =
   | 'JAVASCRIPT'
+  | 'TYPESCRIPT'
   | 'PLAYWRIGHT'
   | 'CSS_SELECTOR'
   | 'XPATH_SELECTOR'
@@ -57,6 +58,7 @@ export interface ChallengeCardProps {
 // Type icons mapping
 const typeIcons: Record<ChallengeType, React.ReactNode> = {
   JAVASCRIPT: <Code2 className="h-4 w-4" />,
+  TYPESCRIPT: <Code2 className="h-4 w-4 text-blue-500" />,
   PLAYWRIGHT: <Theater className="h-4 w-4" />,
   CSS_SELECTOR: <Palette className="h-4 w-4" />,
   XPATH_SELECTOR: <Route className="h-4 w-4" />,

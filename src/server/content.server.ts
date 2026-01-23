@@ -245,6 +245,7 @@ const TIER_FILES: ChallengeTier[] = [
   'intermediate',
   'expert',
   'e2e',
+  'typescript',
 ];
 let challengeCache: Map<string, ChallengeDefinition> = new Map();
 let challengeCacheLoaded = false;
