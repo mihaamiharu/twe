@@ -6,7 +6,7 @@
     "dev": "bun --bun vite dev --port 3000",
     "build": "NODE_ENV=production vite build",
     "preview": "vite preview --port 3000",
-    "test": "bun test",
+    "test": "bun test --preload ./src/tests/bun-preload.ts",
     "test:unit": "bun test --preload ./src/tests/bun-preload.ts src/tests/unit",
     "test:integration": "TEST_DATABASE_URL=postgresql://twe_test:twe_password@localhost:5433/twe_test bun test src/tests/integration",
     "test:ci": "podman compose up -d postgres_test && (bun run test:unit && bun run test:integration); EXIT_CODE=$?; podman compose stop postgres_test; exit $EXIT_CODE",
