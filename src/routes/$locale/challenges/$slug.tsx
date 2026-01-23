@@ -44,7 +44,9 @@ interface ServerChallengeResponse {
     xpReward: number;
     order: number;
     htmlContent?: string;
-    files?: Record<string, { code: string; active?: boolean; hidden?: boolean }>;
+    files?: Record<string, string>;
+    editableFiles?: string[];
+    preloadModules?: Record<string, { exports: string[]; source: string }>;
     starterCode?: string;
     tags?: string[];
     completionCount: number;
@@ -187,6 +189,8 @@ function ChallengeDetailPage() {
         instructions: data.data.instructions,
         htmlContent: data.data.htmlContent || '',
         files: data.data.files,
+        editableFiles: data.data.editableFiles,
+        preloadModules: data.data.preloadModules,
         starterCode: data.data.starterCode || '',
         targetSelector: (() => {
           if (!testCases.length) return '';

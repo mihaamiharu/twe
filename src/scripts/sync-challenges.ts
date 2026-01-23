@@ -38,6 +38,8 @@ async function syncChallenges() {
                 instructions: rawContent.instructions as any,
                 htmlContent: rawContent.htmlContent,
                 files: rawContent.files, // VFS support for multi-page E2E
+                editableFiles: rawContent.editableFiles,
+                preloadModules: rawContent.preloadModules,
                 starterCode: rawContent.starterCode,
                 category: rawContent.category,
                 tags: rawContent.tags,

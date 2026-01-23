@@ -11,7 +11,7 @@
  * - Responsive design
  */
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import { useMutation } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
@@ -58,6 +58,10 @@ import {
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 
 import { CodeEditor } from './CodeEditor';
+import { FileExplorer } from './FileExplorer';
+import { MultiTabEditor } from './MultiTabEditor';
+import { generatePreloadCode } from '@/core/executor/module-preloader';
+import { generateTypeDefinitions } from '@/core/type-generator';
 import { ChallengeSkeleton } from './ChallengeSkeleton';
 import { WebComponentPreview } from './WebComponentPreview';
 import { TestResults, type TestResult } from './TestResults';
@@ -153,6 +157,11 @@ export interface Challenge {
   htmlContent?: string;
   targetSelector?: string | string[];
   files?: Record<string, string>; // VFS: multi-page content for E2E challenges
+  editableFiles?: string[]; // Which files user can edit
+  preloadModules?: Record<string, {
+    exports: string[];
+    source: string;
+  }>;
 
   testCases?: {
     id: string;
@@ -208,6 +217,12 @@ export function ChallengePlayground({
 
   const [code, setCode] = useState(challenge.starterCode);
   const [selector, setSelector] = useState('');
+
+  // Multi-file state
+  const [fileContents, setFileContents] = useState<Record<string, string>>(challenge.files || {});
+  const [selectedFile, setSelectedFile] = useState<string>('');
+  const [openFiles, setOpenFiles] = useState<string[]>([]);
+
   const [resetCount, setResetCount] = useState(0);
   const [isResetConfirmOpen, setIsResetConfirmOpen] = useState(false);
 
@@ -268,6 +283,13 @@ export function ChallengePlayground({
   // Layout readiness state (prevent layout shifts)
   const isCodeChallenge =
     challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
+
+  // Generate type definitions for the editor
+  const extraLibs = useMemo(() => {
+    if (!challenge.files) return undefined;
+    return generateTypeDefinitions(challenge.files, challenge.preloadModules);
+  }, [challenge.files, challenge.preloadModules]);
+
   const [isLayoutReady, setIsLayoutReady] = useState(!isCodeChallenge);
 
   // Derived state: Force reset layout readiness when challenge ID changes
@@ -291,7 +313,32 @@ export function ChallengePlayground({
     setPreviewValidation(null);
     setHintContent(null);
     setHintUsed(initialHintUsed);
-  }, [challenge.id, challenge.starterCode, challenge.type, initialHintUsed]);
+
+    // Initialize multi-file state
+    if (challenge.files) {
+      setFileContents({ ...challenge.files });
+      const editable = challenge.editableFiles || [Object.keys(challenge.files)[0]];
+      setOpenFiles([...editable]);
+      setSelectedFile(editable[0]);
+
+      // Set initial VFS path more smartly
+      const paths = Object.keys(challenge.files);
+      if (paths.includes('/app/index.html')) {
+        setCurrentVfsPath('/app/index.html');
+      } else if (paths.includes('/index.html')) {
+        setCurrentVfsPath('/index.html');
+      } else if (paths.length > 0) {
+        // Find first HTML file
+        const htmlFile = paths.find(p => p.endsWith('.html'));
+        setCurrentVfsPath(htmlFile || paths[0]);
+      }
+    } else {
+      setFileContents({});
+      setOpenFiles([]);
+      setSelectedFile('');
+      setCurrentVfsPath('/index.html');
+    }
+  }, [challenge.id, challenge.starterCode, challenge.type, initialHintUsed, challenge.files, challenge.editableFiles]);
 
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [consoleLogs, setConsoleLogs] = useState<LogEntry[]>([]);
@@ -359,8 +406,17 @@ export function ChallengePlayground({
         ? challenge.files['/index.html'] || '<div></div>'
         : challenge.htmlContent || '<div></div>';
 
+      // Preload modules if configured
+      let preloadCode = '';
+      if (challenge.preloadModules) {
+        preloadCode = generatePreloadCode({
+          modules: challenge.preloadModules,
+          files: challenge.files || {}
+        });
+      }
+
       const result = await executePlaywrightCode(
-        codeToRun,
+        preloadCode + '\n' + codeToRun,
         initialHtml,
         {
           timeout: 10000,
@@ -552,7 +608,9 @@ export function ChallengePlayground({
 
   // Submit solution
   const handleSubmit = useCallback(() => {
-    const submissionCode = isCodeChallenge ? code : selector;
+    const submissionCode = isCodeChallenge
+      ? (challenge.files ? JSON.stringify(fileContents) : code)
+      : selector;
     const totalExecutionTime = testResults.reduce(
       (acc, r) => acc + (r.executionTime || 0),
       0,
@@ -574,6 +632,37 @@ export function ChallengePlayground({
     },
     [],
   );
+
+  const handleFileChange = useCallback((path: string, newCode: string) => {
+    setFileContents(prev => ({
+      ...prev,
+      [path]: newCode
+    }));
+
+    // If it's the main editable file, also update the main 'code' state 
+    // to maintain compatibility with existing logic
+    const mainFile = challenge.editableFiles?.[0] || '/test.spec.ts';
+    if (path === mainFile) {
+      setCode(newCode);
+    }
+  }, [challenge.editableFiles]);
+
+  const handleSelectFile = useCallback((path: string) => {
+    setSelectedFile(path);
+    if (!openFiles.includes(path)) {
+      setOpenFiles(prev => [...prev, path]);
+    }
+  }, [openFiles]);
+
+  const handleCloseFile = useCallback((path: string) => {
+    setOpenFiles(prev => prev.filter(p => p !== path));
+    if (selectedFile === path) {
+      const remaining = openFiles.filter(p => p !== path);
+      if (remaining.length > 0) {
+        setSelectedFile(remaining[remaining.length - 1]);
+      }
+    }
+  }, [openFiles, selectedFile]);
 
   // Keyboard Shortcuts
   useEffect(() => {
@@ -665,6 +754,11 @@ export function ChallengePlayground({
             <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
               <div className="h-2 w-2 rounded-full bg-blue-500"></div>
               {t('challenges:playground.editor')}
+              {challenge.files && challenge.editableFiles && (
+                <span className="text-[10px] lowercase text-muted-foreground/60 italic">
+                  — editing {challenge.editableFiles[0].split('/').pop()}
+                </span>
+              )}
             </h3>
             <Button
               variant="ghost"
@@ -676,22 +770,50 @@ export function ChallengePlayground({
               <RotateCcw className="h-3 w-3" />
             </Button>
           </div>
-          <div className="h-[280px] border border-border rounded-lg overflow-hidden">
-            <CodeEditor
-              initialCode={challenge.starterCode}
-              language="javascript"
-              onChange={setCode}
-              onRun={() => void handleRunCode()}
-              onReady={() => setIsLayoutReady(true)}
-              storageKey={
-                userId
-                  ? `challenge-${challenge.id}-${userId}`
-                  : `challenge-${challenge.id}`
-              }
-              height="100%"
-              className="h-full"
-              key={`${challenge.id}-${resetCount}`}
-            />
+
+          <div className="h-fit min-h-[350px] border border-border rounded-lg overflow-hidden flex flex-col">
+            {challenge.files && Object.keys(challenge.files).length > 1 ? (
+              <div className="flex h-full min-h-[400px]">
+                {!isMobile && (
+                  <FileExplorer
+                    files={challenge.files}
+                    editableFiles={challenge.editableFiles}
+                    selectedFile={selectedFile}
+                    onSelectFile={handleSelectFile}
+                    className="w-44 shrink-0 transition-all border-r border-border"
+                  />
+                )}
+                <MultiTabEditor
+                  files={fileContents}
+                  editableFiles={challenge.editableFiles}
+                  selectedFile={selectedFile}
+                  openFiles={openFiles}
+                  onSelectFile={handleSelectFile}
+                  onCloseFile={handleCloseFile}
+                  onCodeChange={handleFileChange}
+                  onRun={() => void handleRunCode()}
+                  onReady={() => setIsLayoutReady(true)}
+                  storageKeyPrefix={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
+                  className="flex-1"
+                />
+              </div>
+            ) : (
+              <CodeEditor
+                initialCode={challenge.starterCode}
+                language="javascript"
+                onChange={setCode}
+                onRun={() => void handleRunCode()}
+                onReady={() => setIsLayoutReady(true)}
+                storageKey={
+                  userId
+                    ? `challenge-${challenge.id}-${userId}`
+                    : `challenge-${challenge.id}`
+                }
+                height="100%"
+                className="h-full"
+                key={`${challenge.id}-${resetCount}`}
+              />
+            )}
           </div>
         </div>
       )}
@@ -912,6 +1034,11 @@ export function ChallengePlayground({
                 <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-blue-500"></div>
                   {t('challenges:playground.editor')}
+                  {challenge.files && challenge.editableFiles && (
+                    <span className="text-[10px] lowercase text-muted-foreground/60 italic">
+                      — editing {challenge.editableFiles[0].split('/').pop()}
+                    </span>
+                  )}
                 </h3>
                 <div className="flex items-center gap-2">
                   <Button
@@ -925,22 +1052,49 @@ export function ChallengePlayground({
                   </Button>
                 </div>
               </div>
-              <div className="flex-1 relative">
-                <CodeEditor
-                  initialCode={challenge.starterCode}
-                  language="javascript"
-                  onChange={setCode}
-                  onRun={() => void handleRunCode()}
-                  onReady={() => setIsLayoutReady(true)}
-                  storageKey={
-                    userId
-                      ? `challenge-${challenge.id}-${userId}`
-                      : `challenge-${challenge.id}`
-                  }
-                  height="100%"
-                  className="h-full border-b border-border"
-                  key={`${challenge.id}-${resetCount}`}
-                />
+              <div className="flex-1 relative overflow-hidden">
+                {challenge.files && Object.keys(challenge.files).length > 1 ? (
+                  <div className="flex h-full">
+                    <FileExplorer
+                      files={challenge.files}
+                      editableFiles={challenge.editableFiles}
+                      selectedFile={selectedFile}
+                      onSelectFile={handleSelectFile}
+                      className="w-44 shrink-0 border-r border-border"
+                    />
+                    <MultiTabEditor
+                      files={fileContents}
+                      editableFiles={challenge.editableFiles}
+                      selectedFile={selectedFile}
+                      openFiles={openFiles}
+                      onSelectFile={handleSelectFile}
+                      onCloseFile={handleCloseFile}
+                      onCodeChange={handleFileChange}
+                      onRun={() => void handleRunCode()}
+                      onReady={() => setIsLayoutReady(true)}
+                      storageKeyPrefix={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
+                      className="flex-1"
+                      extraLibs={extraLibs}
+                    />
+                  </div>
+                ) : (
+                  <CodeEditor
+                    initialCode={challenge.starterCode}
+                    language="javascript"
+                    onChange={setCode}
+                    onRun={() => void handleRunCode()}
+                    onReady={() => setIsLayoutReady(true)}
+                    storageKey={
+                      userId
+                        ? `challenge-${challenge.id}-${userId}`
+                        : `challenge-${challenge.id}`
+                    }
+                    height="100%"
+                    className="h-full"
+                    key={`${challenge.id}-${resetCount}`}
+                    extraLibs={extraLibs}
+                  />
+                )}
               </div>
             </div>
           ) : (

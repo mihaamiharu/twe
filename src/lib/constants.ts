@@ -64,13 +64,17 @@ export function getTierFromCategory(category?: string): string {
   )
     return 'intermediate';
   if (
-    category.startsWith('playwright-pom') ||
     category.startsWith('playwright-data') ||
     category.startsWith('playwright-infrastructure') ||
     category.startsWith('playwright-integration')
   )
     return 'expert';
-  if (category.startsWith('e2e-')) return 'e2e';
+  if (
+    category.startsWith('playwright-pom') ||
+    category === 'page-object-model' ||
+    category.startsWith('e2e-')
+  )
+    return 'e2e';
   return 'basic';
 }
 

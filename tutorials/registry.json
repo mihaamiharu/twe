@@ -180,6 +180,25 @@
         "intermediate"
       ],
       "relatedChallenges": [],
+      "nextTutorialSlug": "page-object-model"
+    },
+    {
+      "slug": "page-object-model",
+      "order": 14,
+      "estimatedMinutes": 15,
+      "tags": [
+        "playwright",
+        "pom",
+        "intermediate",
+        "architecture"
+      ],
+      "relatedChallenges": [
+        "pom-login-basics",
+        "pom-navigation-flow",
+        "pom-form-validation",
+        "pom-component-reuse",
+        "pom-data-driven"
+      ],
       "nextTutorialSlug": null
     }
   ]
