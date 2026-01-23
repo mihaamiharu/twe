@@ -61,6 +61,7 @@ export function usePlaygroundState({
 
     const [isLayoutReady, setIsLayoutReady] = useState(!isCodeChallenge);
 
+
     // Reset layout readiness when challenge ID changes
     const [prevChallengeId, setPrevChallengeId] = useState(challenge.id);
     if (challenge.id !== prevChallengeId) {

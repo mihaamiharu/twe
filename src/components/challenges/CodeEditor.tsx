@@ -48,7 +48,6 @@ export function CodeEditor(props: CodeEditorProps) {
 
   // Loading state for initial IndexedDB fetch
   if (!isStorageLoaded && storageKey) {
-    console.log('[CodeEditor] Waiting for storage:', storageKey);
     return (
       <div
         className={cn(

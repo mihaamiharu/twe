@@ -38,6 +38,18 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
     hintMutation,
   } = execution;
 
+  // Fallback: If layout isn't ready after 5 seconds, force it.
+  // This prevents infinite loading if the editor fails to report ready.
+  useEffect(() => {
+    if (!state.isLayoutReady && state.isCodeChallenge) {
+      const timer = setTimeout(() => {
+        console.warn('[ChallengePlayground] Layout load timeout - forcing ready state');
+        state.setIsLayoutReady(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [state.isLayoutReady, state.isCodeChallenge]);
+
   // Keyboard Shortcuts (Cmd/Ctrl + Enter to run, + Shift + Enter to submit)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
