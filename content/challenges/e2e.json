@@ -23,9 +23,9 @@
             "files": {
                 "/tests/login.spec.ts": "import { test, expect } from '@playwright/test';\n\n// 🎯 Complete the test in this file!\ntest('should login successfully', async ({ page }) => {\n  // 1. Initialize the Page Object (LoginPage is pre-loaded)\n  const loginPage = new LoginPage(page);\n\n  // 2. Navigate to the login page\n  await loginPage.goto();\n\n  // 3. Login with 'testuser' and 'password123'\n\n\n  // 4. Verify success\n  // await expect(page.locator('#welcome-message')).toContainText('Welcome');\n});",
                 "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.locator('#username');\n    this.passwordInput = page.locator('#password');\n    this.loginBtn = page.locator('#login-btn');\n  }\n\n  async goto() {\n    await this.page.goto('/app/login.html');\n  }\n\n  async login(username, password) {\n    await this.usernameInput.fill(username);\n    await this.passwordInput.fill(password);\n    await this.loginBtn.click();\n  }\n}",
-                "/app/index.html": "<!DOCTYPE html><html><head><title>Home</title></head><body><h1>Welcome</h1><a href='/app/login.html' id='login-link'>Login</a></body></html>",
-                "/app/login.html": "<!DOCTYPE html><html><head><title>Login</title></head><body><h1>Sign In</h1><form action='/app/dashboard.html'><input id='username' placeholder='User'><input id='password' type='password' placeholder='Pass'><button id='login-btn'>Login</button></form></body></html>",
-                "/app/dashboard.html": "<!DOCTYPE html><html><head><title>Dashboard</title></head><body><h1 id='welcome-message'>Welcome, testuser!</h1></body></html>"
+                "/app/index.html": "<h1>Welcome</h1><a href='/app/login.html' id='login-link'>Login</a>",
+                "/app/login.html": "<h1>Sign In</h1><form action='/app/dashboard.html'><input id='username' placeholder='Username'><input id='password' type='password' placeholder='Password'><button id='login-btn'>Login</button></form>",
+                "/app/dashboard.html": "<h1 id='welcome-message'>Welcome, testuser!</h1>"
             },
             "editableFiles": [
                 "/tests/login.spec.ts"
@@ -76,10 +76,10 @@
             "files": {
                 "/tests/nav.spec.ts": "import { test, expect } from '@playwright/test';\n\n// 🎯 Complete the navigation flow\ntest('should navigate through the site', async ({ page }) => {\n  const homePage = new HomePage(page);\n  const loginPage = new LoginPage(page);\n\n  // 1. Go to home\n  await homePage.goto();\n\n  // 2. Click login link\n  await homePage.clickLogin();\n\n  // 3. Login with any credentials\n  await loginPage.login('testuser', 'password123');\n\n  // 4. Verify dashboard heading\n  // await expect(page.locator('h1')).toHaveText('Dashboard');\n});",
                 "/pages/HomePage.ts": "export class HomePage {\n  constructor(page) {\n    this.page = page;\n    this.loginLink = page.locator('#login-link');\n  }\n  async goto() { await this.page.goto('/app/index.html'); }\n  async clickLogin() { await this.loginLink.click(); }\n}",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n  }\n  async login(u, p) {\n    await this.page.locator('#user').fill(u);\n    await this.page.locator('#pass').fill(p);\n    await this.page.locator('#btn').click();\n  }\n}",
-                "/app/index.html": "<html><body><a href='/app/login.html' id='login-link'>Login</a></body></html>",
-                "/app/login.html": "<html><body><form action='/app/dashboard.html'><input id='user'><input id='pass'><button id='btn'>Go</button></form></body></html>",
-                "/app/dashboard.html": "<html><body><h1>Dashboard</h1></body></html>"
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.locator('#user');\n    this.passwordInput = page.locator('#pass');\n    this.loginBtn = page.locator('#btn');\n  }\n  async login(u, p) {\n    await this.usernameInput.fill(u);\n    await this.passwordInput.fill(p);\n    await this.loginBtn.click();\n  }\n}",
+                "/app/index.html": "<a href='/app/login.html' id='login-link'>Login</a>",
+                "/app/login.html": "<form action='/app/dashboard.html'><input id='user' placeholder='User'><input id='pass' type='password' placeholder='Pass'><button id='btn'>Go</button></form>",
+                "/app/dashboard.html": "<h1>Dashboard</h1>"
             },
             "editableFiles": [
                 "/tests/nav.spec.ts"
@@ -134,8 +134,8 @@
             },
             "files": {
                 "/tests/validation.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should show error on empty form', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n\n  // 1. Submit empty form\n  await loginPage.submit();\n\n  // 2. Verify error message using Locator assertion\n  await expect(loginPage.errorMessage).toHaveText('Credentials required');\n});",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n  }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async submit() { await this.page.locator('#btn').click(); }\n  \n  // Return the Locator, not the text!\n  get errorMessage() {\n    return this.page.locator('#error');\n  }\n}",
-                "/app/login.html": "<html><body>\n<div id='error'></div>\n<button id='btn' onclick=\"document.getElementById('error').innerText='Credentials required'\">Login</button>\n</body></html>"
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.locator('#user');\n    this.passwordInput = page.locator('#pass');\n    this.loginBtn = page.locator('#btn');\n  }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async submit() { await this.loginBtn.click(); }\n  \n  get errorMessage() {\n    return this.page.locator('#error');\n  }\n}",
+                "/app/login.html": "<div id='error'></div><form><input id='user' placeholder='User'><input id='pass' type='password' placeholder='Pass'><button type='button' id='btn' onclick=\"document.getElementById('error').innerText='Credentials required'\">Login</button></form>"
             },
             "editableFiles": [
                 "/tests/validation.spec.ts"
@@ -190,10 +190,10 @@
             "files": {
                 "/tests/smoke.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should reuse header component', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('testuser', 'pass');\n\n  // DashboardPage uses the Header component\n  const dashboardPage = new DashboardPage(page);\n\n  // Verify user name via the header component inside dashboard\n  await expect(dashboardPage.header.userName).toHaveText('testuser');\n});",
                 "/pages/Header.ts": "export class Header {\n  constructor(page) {\n     this.page = page;\n     this.userLabel = page.locator('#user-name');\n  }\n  get userName() { return this.userLabel; }\n}",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { this.page = page; }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) { await this.page.locator('#btn').click(); }\n}",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { \n    this.page = page;\n    this.usernameInput = page.locator('#user');\n    this.passwordInput = page.locator('#pass');\n    this.loginBtn = page.locator('#btn');\n  }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) { await this.loginBtn.click(); }\n}",
                 "/pages/DashboardPage.ts": "export class DashboardPage {\n  constructor(page) {\n    this.page = page;\n    this.header = new Header(page);\n  }\n}",
-                "/app/login.html": "<html><body><button id='btn' onclick=\"window.location.href='/app/dashboard.html'\">Login</button></body></html>",
-                "/app/dashboard.html": "<html><body><header><span id='user-name'>testuser</span></header><h1>Dashboard</h1></body></html>"
+                "/app/login.html": "<input id='user' placeholder='User'><input id='pass' type='password' placeholder='Pass'><button id='btn' onclick=\"window.location.href='/app/dashboard.html'\">Login</button>",
+                "/app/dashboard.html": "<header><span id='user-name'>testuser</span></header><h1>Dashboard</h1>"
             },
             "editableFiles": [
                 "/tests/smoke.spec.ts"
@@ -254,9 +254,9 @@
             },
             "files": {
                 "/tests/ddt.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should login with multiple users', async ({ page }) => {\n  const users = ['admin', 'editor'];\n  const loginPage = new LoginPage(page);\n\n  for (const user of users) {\n    await loginPage.goto();\n    await loginPage.login(user, 'pass');\n    await expect(page.locator('h1')).toContainText(user);\n  }\n});",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { this.page = page; }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) {\n    await this.page.locator('#u').fill(u);\n    await this.page.locator('#btn').click();\n  }\n}",
-                "/app/login.html": "<html><body><input id='u'><button id='btn' onclick=\"window.location.href='/app/dashboard.html?u=' + document.getElementById('u').value\">Login</button></body></html>",
-                "/app/dashboard.html": "<html><body><h1 id='msg'></h1><script>const u = new URLSearchParams(window.location.search).get('u'); document.getElementById('msg').innerText = 'Welcome ' + u;</script></body></html>"
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { \n    this.page = page;\n    this.userInput = page.locator('#u');\n    this.passInput = page.locator('#p');\n    this.loginBtn = page.locator('#btn');\n  }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) {\n    await this.userInput.fill(u);\n    await this.passInput.fill(p);\n    await this.loginBtn.click();\n  }\n}",
+                "/app/login.html": "<input id='u' placeholder='User'><input id='p' type='password' placeholder='Pass'><button id='btn' onclick=\"window.location.href='/app/dashboard.html?u=' + document.getElementById('u').value\">Login</button>",
+                "/app/dashboard.html": "<h1 id='msg'></h1><script>const u = new URLSearchParams(window.location.search).get('u'); document.getElementById('msg').innerText = 'Welcome ' + u;</script>"
             },
             "editableFiles": [
                 "/tests/ddt.spec.ts"

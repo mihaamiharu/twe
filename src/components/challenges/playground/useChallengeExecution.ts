@@ -55,9 +55,8 @@ export function useChallengeExecution(
 
         if (!isCodeChallenge) return;
 
-        if (challenge.files) {
-            setCurrentVfsPath('/index.html');
-        }
+        // Initial path is set by usePlaygroundState. We don't reset it here
+        // to avoid blank previews for challenges starting on /app/ or other paths.
 
         if (needsHtmlRun) {
             setActiveTab('preview');
