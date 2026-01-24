@@ -55,9 +55,8 @@ export function useChallengeExecution(
 
         if (!isCodeChallenge) return;
 
-        if (challenge.files) {
-            setCurrentVfsPath('/index.html');
-        }
+        // Initial path is set by usePlaygroundState. We don't reset it here
+        // to avoid blank previews for challenges starting on /app/ or other paths.
 
         if (needsHtmlRun) {
             setActiveTab('preview');
@@ -71,7 +70,11 @@ export function useChallengeExecution(
 
         try {
             let codeToRun = code;
-            if (challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT') {
+            if (
+                challenge.type === 'JAVASCRIPT' ||
+                challenge.type === 'TYPESCRIPT' ||
+                challenge.type === 'PLAYWRIGHT'
+            ) {
                 codeToRun += '\nif (typeof result !== "undefined") return result;';
             }
 
@@ -99,17 +102,28 @@ export function useChallengeExecution(
                     files: challenge.files,
                     onNavigate: (path) => setCurrentVfsPath(path),
                     expectedState: challenge.expectedState,
+                    isTypeScript: challenge.type === 'TYPESCRIPT',
                 },
             );
 
             let validationPassed = result.status === 'PASSED';
             let outputMessage = result.output;
 
-            const isAssertionChallenge =
-                challenge.category === 'playwright-assertions' ||
-                challenge.category === 'e2e-testing';
+            const hasExpectedState = (challenge.expectedState?.length ?? 0) > 0;
+            const isAssertionChallenge = [
+                'playwright-assertions',
+                'page-object-model',
+                'playwright-pom',
+                'playwright-data-driven',
+                'playwright-infrastructure',
+                'playwright-integration-patterns',
+            ].includes(challenge.category ?? '');
 
-            if (isAssertionChallenge && result.status === 'PASSED') {
+            if (
+                isAssertionChallenge &&
+                !hasExpectedState &&
+                result.status === 'PASSED'
+            ) {
                 const assertionCount = result.assertionCount ?? 0;
                 if (assertionCount === 0) {
                     validationPassed = false;

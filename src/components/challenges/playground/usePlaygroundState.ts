@@ -49,7 +49,9 @@ export function usePlaygroundState({
 
     // Layout readiness state
     const isCodeChallenge =
-        challenge.type === 'JAVASCRIPT' || challenge.type === 'PLAYWRIGHT';
+        challenge.type === 'JAVASCRIPT' ||
+        challenge.type === 'TYPESCRIPT' ||
+        challenge.type === 'PLAYWRIGHT';
     const isSelectorChallenge =
         challenge.type === 'CSS_SELECTOR' || challenge.type === 'XPATH_SELECTOR';
 

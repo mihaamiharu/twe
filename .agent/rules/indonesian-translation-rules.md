@@ -5,54 +5,53 @@ description: Indonesian Localization guideline
 
 # Agent Guideline: Technical QA & Test Engineering Translation (EN to ID)
 
-## 1. Core Philosophy: The "Precision Engineer"
+## 1. Core Philosophy: The "Friendly Mentor"
 
-The tone should be **authoritative, methodical, and objective**. We are not just translating a "how-to"; we are translating a **validation process**. The language must prioritize clarity to ensure reproducibility.
+The tone should be **educational, encouraging, yet technically precise**. We are guiding the user through a learning journey. Use **"Kamu"** to address the user, creating a personal connection similar to a senior engineer mentoring a junior.
 
 ## 2. Terminology & Localization Strategy
 
 In Technical QA, clarity beats "pure" language. Follow this tiered approach:
 
-- **Tier 1: Industry Standards (Keep in English/Italicized)**
-- _Examples: Bug, Deploy, Automation Script, Repository, Branch, Merge Request, Environment, Framework, Assertion, Locator, Flaky, Edge Case._
+- **Tier 1: Industry Standards (Keep in English)**
+  - *Keep these in English (no italics needed for common terms):* Bug, Deploy, Automation, Repository, Branch, Merge Request, Environment, Framework, Assertion, Locator, Flaky, Edge Case, Array, Object, Loop, Function, Variable.
 
 - **Tier 2: UI & Action Elements (Bold & Match Source)**
-- Always match the software's UI. If the tool is in English, keep the button/menu names in English.
-- _Example: "Buka menu **Settings** lalu klik **Run Test**."_
+  - Always match the software's UI. If the tool is in English, keep the button/menu names in English.
+  - *Example: "Klik tombol **Submit**."*
 
-- **Tier 3: Technical Verbs (Indonesianized or Active)**
-- _Examples: Eksekusi (Execute), Inisialisasi (Initialize), Konfigurasi (Configure), Verifikasi (Verify)._
+- **Tier 3: Technical Verbs (Natural Indonesian)**
+  - *Examples:*
+    - "Store" -> "Simpan"
+    - "Create" -> "Buat"
+    - "Return" -> "Mengembalikan"
+    - "Call" -> "Panggil"
+    - "Assign" -> "Set" or "Berikan nilai"
+    - "Check/Verify" -> "Cek" or "Verifikasi"
 
-## 3. Structural Standards for QA Content
+## 3. Structural Standards
 
-### A. Procedural Precision
+Consistency is key.
 
-Avoid "flowery" transitions. Use direct, imperative commands.
+### A. Headers
 
-- _English:_ "You might want to check the logs if it fails."
-- _Natural Tech ID:_ "Cek log jika proses gagal." (More direct and efficient).
+- **"Real World Scenario"** -> **"Skenario Dunia Nyata"**
+- **"Your Task"** -> **"Tugas Kamu"**
 
-### B. The "Given-When-Then" Logic (Gherkin/BDD)
+### B. Tone & Style
 
-Even if not explicitly using Cucumber, maintain this logical flow in explanations:
-
-- **Kondisi (Given):** Keadaan awal (e.g., "Pastikan server sudah jalan.")
-- **Aksi (When):** Interaksi (e.g., "Kirim request POST ke endpoint...")
-- **Ekspektasi (Then):** Hasil (e.g., "Response harus mengembalikan status `200 OK`.")
-
-### C. Code & Variables
-
-- **Never translate** code, CLI commands, or variable names.
-- **Placeholders:** Use `<...>` or `[...]` and translate the intent inside (e.g., `git checkout <nama_branch>`).
+- **Address User:** Use **"Kamu"** (You). Avoid "Anda".
+- **Code References:** Use backticks for variables and code values.
+- **Direct & Active:** "Buat fungsi..." (Create a function...) instead of "Fungsi harus dibuat..."
 
 ## 4. Tone Adjustment Table
 
-| English Pattern                    | Robotic/Generic ID                  | **Professional QA-Tech ID**                                                |
-| ---------------------------------- | ----------------------------------- | -------------------------------------------------------------------------- |
-| "This helps avoid regressions."    | "Ini membantu menghindari regresi." | "Ini meminimalisir risiko **regression** pada sistem."                     |
-| "The test failed due to timeout."  | "Tes gagal karena waktu habis."     | "Test case **Fail** karena kendala **timeout**."                           |
-| "Ensure the element is clickable." | "Pastikan elemen bisa diklik."      | "**Verifikasi** bahwa elemen tersebut sudah _interactable_ (bisa diklik)." |
-| "Catching bugs early in the CI."   | "Menangkap bug awal di CI."         | "Mendeteksi **bug** lebih dini pada _pipeline_ CI."                        |
+| English Pattern | Robotic/Formal ID | **Friendly Mentor ID (Preferred)** |
+| :--- | :--- | :--- |
+| "You must verify..." | "Anda harus memverifikasi..." | "Kamu perlu memverifikasi..." |
+| "This helps prevent bugs." | "Ini membantu mencegah kutu." | "Ini membantu mencegah **bug**." |
+| "Store the result in..." | "Simpan hasil di..." | "Simpan hasilnya di dalam..." |
+| "It returns a string." | "Ia mengembalikan string." | "Fungsi ini mengembalikan **string**." |
 
 ## 5. Visual Scannability Rules
 
@@ -64,10 +63,10 @@ QA engineers scan for data points. Use Markdown effectively:
 
 ## 6. Final Quality Checklist
 
-- [ ] **Reproducibility:** Can a junior QA follow this without asking for clarification?
-- [ ] **No Ambiguity:** Are words like "mungkin" (maybe) or "sepertinya" (it seems) avoided in favor of definitive terms?
-- [ ] **Professionalism:** Is it free from "Indoglish" grammar while still using standard tech terms?
-- [ ] **Tool Accuracy:** Are specific tool terms (e.g., _Cypress commands, Selenium locators_) intact?
+- [ ] **Consistency:** Does it use "Kamu" and "Tugas Kamu"?
+- [ ] **Flow:** Does it read like a natural tutorial?
+- [ ] **Accuracy:** Are technical terms (English) preserved correctly?
+- [ ] **Structure:** Are the standard headers used?
 
 ---
 

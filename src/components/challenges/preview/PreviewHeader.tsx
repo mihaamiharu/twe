@@ -42,7 +42,7 @@ export function PreviewHeader({
                     <Lock className="h-3 w-3 text-muted-foreground mr-2 shrink-0" />
                     <span className="text-xs text-muted-foreground truncate flex-1">
                         {files
-                            ? `testwizards.local${currentPath || '/index.html'}`
+                            ? `testingwithekki.local${currentPath || '/index.html'}`
                             : targetElementId
                                 ? `target-website.com/preview#${targetElementId}`
                                 : 'target-website.com/preview'}
