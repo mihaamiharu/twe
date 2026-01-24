@@ -123,27 +123,11 @@
         "js-variables-basics",
         "js-functions-basics"
       ],
-      "nextTutorialSlug": "typescript-for-qa"
-    },
-    {
-      "slug": "typescript-for-qa",
-      "order": 10,
-      "estimatedMinutes": 15,
-      "tags": [
-        "typescript",
-        "fundamentals",
-        "qa",
-        "automation"
-      ],
-      "relatedChallenges": [
-        "ts-type-annotations",
-        "ts-interfaces-basics"
-      ],
       "nextTutorialSlug": "async-await-basics"
     },
     {
       "slug": "async-await-basics",
-      "order": 11,
+      "order": 10,
       "estimatedMinutes": 12,
       "tags": [
         "javascript",
@@ -155,6 +139,22 @@
       "relatedChallenges": [
         "js-async-timeout",
         "js-async-fetch"
+      ],
+      "nextTutorialSlug": "typescript-for-qa"
+    },
+    {
+      "slug": "typescript-for-qa",
+      "order": 11,
+      "estimatedMinutes": 15,
+      "tags": [
+        "typescript",
+        "fundamentals",
+        "qa",
+        "automation"
+      ],
+      "relatedChallenges": [
+        "ts-type-annotations",
+        "ts-interfaces-basics"
       ],
       "nextTutorialSlug": "playwright-architecture"
     },
