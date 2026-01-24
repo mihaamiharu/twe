@@ -109,11 +109,21 @@ export function useChallengeExecution(
             let validationPassed = result.status === 'PASSED';
             let outputMessage = result.output;
 
-            const isAssertionChallenge =
-                challenge.category === 'playwright-assertions' ||
-                challenge.category === 'e2e-testing';
+            const hasExpectedState = (challenge.expectedState?.length ?? 0) > 0;
+            const isAssertionChallenge = [
+                'playwright-assertions',
+                'page-object-model',
+                'playwright-pom',
+                'playwright-data-driven',
+                'playwright-infrastructure',
+                'playwright-integration-patterns',
+            ].includes(challenge.category ?? '');
 
-            if (isAssertionChallenge && result.status === 'PASSED') {
+            if (
+                isAssertionChallenge &&
+                !hasExpectedState &&
+                result.status === 'PASSED'
+            ) {
                 const assertionCount = result.assertionCount ?? 0;
                 if (assertionCount === 0) {
                     validationPassed = false;
