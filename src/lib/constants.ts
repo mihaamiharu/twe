@@ -33,6 +33,7 @@ export const categoryLabels: Record<string, string> = {
   'js-fundamentals': '📒 JavaScript Fundamentals',
   'js-dom': '📓 DOM Basics',
   'js-async': '📔 Async Basics',
+  'ts-fundamentals': '📘 TypeScript Fundamentals',
   // Tier 3: Intermediate (Playwright Basics)
   'playwright-navigation': '🎭 Navigation & Actions',
   'playwright-locators': '🔍 Locators',
@@ -55,7 +56,7 @@ export function getTierFromCategory(category?: string): string {
     category.startsWith('selector')
   )
     return 'basic';
-  if (category.startsWith('js-')) return 'beginner';
+  if (category.startsWith('js-') || category.startsWith('ts-')) return 'beginner';
   if (
     category.startsWith('playwright-navigation') ||
     category.startsWith('playwright-locators') ||
@@ -92,6 +93,7 @@ export const CATEGORY_ORDER: Record<string, number> = {
   'js-fundamentals': 1,
   'js-dom': 2,
   'js-async': 3,
+  'ts-fundamentals': 4,
   // Intermediate Tier
   'playwright-navigation': 1,
   'playwright-locators': 2,

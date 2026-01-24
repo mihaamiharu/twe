@@ -160,7 +160,7 @@ export interface Challenge {
 const TRACK_ICONS: Record<TrackId, React.ReactNode> = {
   all: <LayoutDashboard className="h-4 w-4" />,
   selectors: <MousePointer2 className="h-4 w-4" />,
-  javascript: <FileCode2 className="h-4 w-4" />,
+  scripting: <FileCode2 className="h-4 w-4" />,
   core: <Compass className="h-4 w-4" />,
   e2e: <Layers className="h-4 w-4" />,
 };
@@ -302,9 +302,9 @@ export function ChallengesPage() {
           : "text-muted-foreground/80 hover:bg-muted/50 hover:text-foreground"
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3 text-left">
         {track.icon}
-        <span>{track.label}</span>
+        <span className="leading-tight">{track.label}</span>
       </div>
       <Badge
         variant="secondary"

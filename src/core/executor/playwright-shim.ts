@@ -9,205 +9,26 @@
 
 import { logger } from '@/lib/logger';
 
-export interface FilePayload {
-  name: string;
-  mimeType: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  buffer: any;
-}
-
-export interface Locator {
-  click(): Promise<void>;
-  dblclick(): Promise<void>;
-  fill(value: string): Promise<void>;
-  textContent(): Promise<string | null>;
-  inputValue(): Promise<string>;
-  isVisible(): Promise<boolean>;
-  isChecked(): Promise<boolean>;
-  isDisabled(): Promise<boolean>;
-  isEditable(): Promise<boolean>;
-  check(): Promise<void>;
-  uncheck(): Promise<void>;
-  selectOption(value: string | string[]): Promise<void>;
-  getAttribute(name: string): Promise<string | null>;
-  innerHTML(): Promise<string>;
-  count(): Promise<number>;
-  first(): Locator;
-  last(): Locator;
-  nth(index: number): Locator;
-  focus(): Promise<void>;
-  blur(): Promise<void>;
-  clear(): Promise<void>;
-  dispatchEvent(type: string, eventInit?: CustomEventInit): Promise<void>;
-  setInputFiles(files: FilePayload | FilePayload[]): Promise<void>;
-  dragTo(target: Locator): Promise<void>;
-  dragAndDrop(target: Locator): Promise<void>;
-  press(key: string): Promise<void>;
-  evaluate<R, Arg>(
-    pageFunction: (element: HTMLElement, arg: Arg) => R | Promise<R>,
-    arg?: Arg,
-  ): Promise<R>;
-  locator(
-    selector: string,
-    options?: { hasText?: string | RegExp; has?: Locator },
-  ): Locator;
-  filter(options: { hasText?: string | RegExp; has?: Locator }): Locator;
-  all(): Promise<Locator[]>;
-  allTextContents(): Promise<string[]>;
-  elementHandles(): Promise<HTMLElement[]>; // Internal helper exposed for filter({ has })
-  getByRole(role: string, options?: LocatorOptions): Locator;
-  getByText(text: string | RegExp, options?: { exact?: boolean }): Locator;
-  getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator;
-  getByPlaceholder(
-    text: string | RegExp,
-    options?: { exact?: boolean },
-  ): Locator;
-  getByTestId(testId: string): Locator;
-  hover(options?: { force?: boolean; noWaitAfter?: boolean }): Promise<void>;
-  waitFor(options?: {
-    state?: 'attached' | 'detached' | 'visible' | 'hidden';
-    timeout?: number;
-  }): Promise<void>;
-}
-
-export interface LocatorOptions {
-  name?: string | RegExp;
-  exact?: boolean;
-  checked?: boolean;
-  disabled?: boolean;
-  expanded?: boolean;
-  pressed?: boolean;
-  selected?: boolean;
-  level?: number;
-  includeHidden?: boolean;
-}
-
-export interface APIRequestContext {
-  get(url: string, options?: unknown): Promise<APIResponse>;
-  post(url: string, options?: unknown): Promise<APIResponse>;
-  put(url: string, options?: unknown): Promise<APIResponse>;
-  delete(url: string, options?: unknown): Promise<APIResponse>;
-  fetch(url: string, options?: unknown): Promise<APIResponse>;
-  storageState(
-    options?: unknown,
-  ): Promise<{ cookies: unknown[]; origins: unknown[] }>;
-  newContext(options?: unknown): Promise<APIRequestContext>;
-}
-
-export interface APIResponse {
-  ok(): boolean;
-  status(): number;
-  statusText(): string;
-  headers(): Record<string, string>;
-  json(): Promise<unknown>;
-  text(): Promise<string>;
-  body(): Promise<Buffer>;
-}
-
-export interface Route {
-  fulfill(response: {
-    status?: number;
-    headers?: Record<string, string>;
-    contentType?: string;
-    body?: string | Buffer;
-    json?: unknown;
-    path?: string;
-  }): Promise<void>;
-  continue(options?: {
-    method?: string;
-    headers?: Record<string, string>;
-    postData?: string | Buffer;
-  }): Promise<void>;
-  request(): APIRequest;
-}
-
-export interface APIRequest {
-  url(): string;
-  method(): string;
-  headers(): Record<string, string>;
-  postData(): string | null;
-}
-
-export interface Dialog {
-  message(): string;
-  type(): 'alert' | 'confirm' | 'prompt' | 'beforeunload';
-  accept(promptText?: string): Promise<void>;
-  dismiss(): Promise<void>;
-  defaultValue(): string;
-}
-
-export interface BrowserContext {
-  tracing: {
-    start(options?: unknown): Promise<void>;
-    stop(options?: unknown): Promise<void>;
-  };
-  cookies(): Promise<unknown[]>;
-  addCookies(cookies: unknown[]): Promise<void>;
-  clearCookies(): Promise<void>;
-  newPage(): Promise<MockedPlaywrightPage>;
-  close(): Promise<void>;
-  request: APIRequestContext;
-}
-
-export interface Browser {
-  newContext(options?: unknown): Promise<BrowserContext>;
-  close(): Promise<void>;
-  version(): string;
-}
-
-export interface Keyboard {
-  down(key: string): Promise<void>;
-  up(key: string): Promise<void>;
-  insertText(text: string): Promise<void>;
-  type(text: string, options?: { delay?: number }): Promise<void>;
-  press(key: string, options?: { delay?: number }): Promise<void>;
-}
-
-export interface Mouse {
-  move(x: number, y: number, options?: { steps?: number }): Promise<void>;
-  down(options?: {
-    button?: 'left' | 'right' | 'middle';
-    clickCount?: number;
-  }): Promise<void>;
-  up(options?: {
-    button?: 'left' | 'right' | 'middle';
-    clickCount?: number;
-  }): Promise<void>;
-  click(
-    x: number,
-    y: number,
-    options?: {
-      delay?: number;
-      button?: 'left' | 'right' | 'middle';
-      clickCount?: number;
-    },
-  ): Promise<void>;
-  dblclick(
-    x: number,
-    y: number,
-    options?: { delay?: number; button?: 'left' | 'right' | 'middle' },
-  ): Promise<void>;
-}
-
-export interface FrameLocator {
-  locator(selector: string): Locator;
-  getByRole(role: string, options?: LocatorOptions): Locator;
-  getByText(text: string | RegExp, options?: { exact?: boolean }): Locator;
-  getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator;
-  getByPlaceholder(
-    text: string | RegExp,
-    options?: { exact?: boolean },
-  ): Locator;
-  getByTestId(testId: string): Locator;
-  first(): FrameLocator;
-  last(): FrameLocator;
-  nth(index: number): FrameLocator;
-}
-
-export interface WaitOptions {
-  timeout?: number;
-  state?: 'visible' | 'hidden' | 'attached' | 'detached';
-}
+import { ROLE_TO_TAG } from './role-mappings';
+import { createShimError } from './shim-errors';
+import type {
+  FilePayload,
+  Locator,
+  LocatorOptions,
+  ActionOptions,
+  ClickOptions,
+  FillOptions,
+  APIRequestContext,
+  APIResponse,
+  Route,
+  APIRequest,
+  Dialog,
+  BrowserContext,
+  Keyboard,
+  Mouse,
+  FrameLocator,
+  WaitOptions,
+} from './shim.types';
 
 /**
  * MockedPlaywrightPage - Implements a subset of Playwright's Page API
@@ -825,14 +646,14 @@ export class MockedPlaywrightPage {
     await this.waitForSelector(selector, { state: 'visible' });
 
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'click' });
     element.click();
   }
 
   async dblclick(selector: string): Promise<void> {
     await this.waitForSelector(selector, { state: 'visible' });
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'dblclick' });
     element.dispatchEvent(
       new MouseEvent('dblclick', {
         bubbles: true,
@@ -845,7 +666,7 @@ export class MockedPlaywrightPage {
   async focus(selector: string): Promise<void> {
     await this.waitForSelector(selector, { state: 'visible' });
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'focus' });
     element.focus();
   }
 
@@ -856,7 +677,7 @@ export class MockedPlaywrightPage {
   ): Promise<void> {
     await this.waitForSelector(selector, { state: 'visible' });
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'dispatchEvent' });
     element.dispatchEvent(
       new CustomEvent(type, { bubbles: true, cancelable: true, ...eventInit }),
     );
@@ -873,9 +694,14 @@ export class MockedPlaywrightPage {
       | HTMLInputElement
       | HTMLTextAreaElement;
 
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'fill' });
     if (!('value' in element)) {
-      throw new Error(`Element is not an input or textarea: ${selector}`);
+      throw createShimError('invalid_element_type', {
+        selector,
+        action: 'fill',
+        elementType: (element as HTMLElement).tagName?.toLowerCase() || 'unknown',
+        hint: 'input or textarea'
+      });
     }
 
     element.focus();
@@ -893,9 +719,14 @@ export class MockedPlaywrightPage {
       selector,
     ) as HTMLInputElement;
 
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'check' });
     if (element.type !== 'checkbox' && element.type !== 'radio') {
-      throw new Error(`Element is not a checkbox or radio: ${selector}`);
+      throw createShimError('invalid_element_type', {
+        selector,
+        action: 'check',
+        elementType: element.type || element.tagName.toLowerCase(),
+        hint: 'checkbox or radio'
+      });
     }
 
     if (!element.checked) {
@@ -972,9 +803,14 @@ export class MockedPlaywrightPage {
       selector,
     ) as HTMLInputElement;
 
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'uncheck' });
     if (element.type !== 'checkbox') {
-      throw new Error(`Element is not a checkbox: ${selector}`);
+      throw createShimError('invalid_element_type', {
+        selector,
+        action: 'uncheck',
+        elementType: element.type || element.tagName.toLowerCase(),
+        hint: 'checkbox'
+      });
     }
 
     if (element.checked) {
@@ -1026,9 +862,12 @@ export class MockedPlaywrightPage {
       await this.delay(100);
     }
 
-    throw new Error(
-      `Unable to locate ${selector}. Please verify the element exists.`,
-    );
+    throw createShimError('timeout', {
+      selector,
+      timeout,
+      action: 'waitForSelector',
+      hint: `waiting for state '${state}'`
+    });
   }
 
   /**
@@ -1066,7 +905,7 @@ export class MockedPlaywrightPage {
       if (result) return;
       await this.delay(100);
     }
-    throw new Error('Timeout waiting for function');
+    throw createShimError('timeout', { timeout, action: 'waitForFunction' });
   }
 
   async waitForResponse(
@@ -1110,7 +949,7 @@ export class MockedPlaywrightPage {
   async hover(selector: string): Promise<void> {
     await this.waitForSelector(selector, { state: 'visible' });
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'hover' });
     element.dispatchEvent(new Event('mouseenter', { bubbles: true }));
     element.dispatchEvent(new Event('mouseover', { bubbles: true }));
   }
@@ -1118,7 +957,7 @@ export class MockedPlaywrightPage {
   async press(selector: string, key: string): Promise<void> {
     await this.waitForSelector(selector, { state: 'visible' });
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
-    if (!element) throw new Error(`Element not found: ${selector}`);
+    if (!element) throw createShimError('element_not_found', { selector, action: 'press' });
 
     element.focus();
     element.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
@@ -1274,56 +1113,7 @@ export class MockedPlaywrightPage {
       let elements: HTMLElement[];
 
       // Handle common roles that map to HTML elements
-      const roleToTag: Record<string, string> = {
-        button:
-          'button, [role="button"], input[type="submit"], input[type="button"]',
-        textbox:
-          'input[type="text"], input[type="email"], input[type="password"], input:not([type]), textarea, [role="textbox"]',
-        checkbox: 'input[type="checkbox"], [role="checkbox"]',
-        radio: 'input[type="radio"], [role="radio"]',
-        link: 'a, [role="link"]',
-        heading: 'h1, h2, h3, h4, h5, h6, [role="heading"]',
-        listitem: 'li, [role="listitem"]',
-        img: 'img, [role="img"]',
-
-        // Table-related roles
-        cell: 'td, [role="cell"]',
-        columnheader: 'th, [role="columnheader"]',
-        row: 'tr, [role="row"]',
-        rowheader: 'th[scope="row"], [role="rowheader"]',
-        table: 'table, [role="table"]',
-        rowgroup: 'thead, tbody, tfoot, [role="rowgroup"]',
-
-        // List-related
-        list: 'ul, ol, [role="list"]',
-
-        // Form-related
-        combobox: 'select, [role="combobox"]',
-        option: 'option, [role="option"]',
-        spinbutton: 'input[type="number"], [role="spinbutton"]',
-        slider: 'input[type="range"], [role="slider"]',
-
-        // Dialog/Modal
-        dialog: 'dialog, [role="dialog"]',
-        alertdialog: '[role="alertdialog"]',
-
-        // Landmarks
-        navigation: 'nav, [role="navigation"]',
-        main: 'main, [role="main"]',
-        banner: 'header, [role="banner"]',
-        contentinfo: 'footer, [role="contentinfo"]',
-
-        // Widgets
-        tab: '[role="tab"]',
-        tablist: '[role="tablist"]',
-        tabpanel: '[role="tabpanel"]',
-        menu: '[role="menu"]',
-        menuitem: '[role="menuitem"]',
-        progressbar: 'progress, [role="progressbar"]',
-      };
-
-      // eslint-disable-next-line security/detect-object-injection
-      const selector = roleToTag[role] || `[role="${role}"]`;
+      const selector = ROLE_TO_TAG[role] || `[role="${role}"]`;
       elements = Array.from(this.targetDocument.querySelectorAll(selector));
 
       // Filter by name if provided
@@ -1725,11 +1515,9 @@ export class MockedPlaywrightPage {
       // If the user already applied .first(), filtering returns 1 element, so strictly valid.
       const elements = getFilteredElements();
       if (elements.length > 1) {
-        throw new Error(
-          `Strict mode violation: locator resolved to ${elements.length} elements. ` +
-          `Use .first(), .last(), or .nth() to select a specific element, ` +
-          `or make your selector more specific.`,
-        );
+        throw createShimError('strict_mode_violation', {
+          matchCount: elements.length,
+        });
       }
     };
 
@@ -1745,28 +1533,52 @@ export class MockedPlaywrightPage {
         if (el) return el;
         await this.delay(100);
       }
-      throw new Error('Timeout waiting for element to appear');
+      throw createShimError('timeout', { timeout, action: 'waitFor' });
+    };
+
+    /**
+     * Wait for element to be visible
+     */
+    const waitForVisible = async (
+      action: string,
+      options?: ActionOptions,
+    ): Promise<HTMLElement> => {
+      const timeout = options?.timeout ?? this.defaultTimeout;
+      const startTime = Date.now();
+
+      while (Date.now() - startTime < timeout) {
+        const el = getElement();
+        if (el) {
+          // If force option is set, skip visibility check
+          if (options?.force || this.isVisible(el)) {
+            return el;
+          }
+        }
+        await this.delay(100);
+      }
+
+      // Final check before timeout
+      const el = getElement();
+      if (!el) throw createShimError('timeout', { timeout, action, hint: 'element not found' });
+      if (!options?.force && !this.isVisible(el)) throw createShimError('timeout', { timeout, action, hint: 'element not visible' });
+      return el;
     };
 
     const locator: Locator = {
-      click: async () => {
+      click: async (options?: ClickOptions) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement();
-        if (!el) throw new Error('Element not found');
-        if (!this.isVisible(el)) throw new Error('Element is not visible');
+        const el = await waitForVisible('click', options);
 
         logger.debug(`[Action] click`);
         await this._highlight(el);
         el.click();
       },
 
-      dblclick: async () => {
+      dblclick: async (options?: ClickOptions) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement();
-        if (!el) throw new Error('Element not found');
-        if (!this.isVisible(el)) throw new Error('Element is not visible');
+        const el = await waitForVisible('dblclick', options);
 
         logger.debug(`[Action] dblclick`);
         await this._highlight(el);
@@ -1779,11 +1591,10 @@ export class MockedPlaywrightPage {
         );
       },
 
-      fill: async (value: string) => {
+      fill: async (value: string, options?: FillOptions) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement() as HTMLInputElement | HTMLTextAreaElement;
-        if (!el) throw new Error('Element not found');
+        const el = await waitForVisible('fill', options) as HTMLInputElement | HTMLTextAreaElement;
 
         logger.debug(`[Action] fill: "${value}"`);
         await this._highlight(el);
@@ -1826,13 +1637,16 @@ export class MockedPlaywrightPage {
         return Promise.resolve(!el.readOnly && !el.disabled);
       },
 
-      check: async () => {
+      check: async (options?: ActionOptions) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement() as HTMLInputElement;
-        if (!el) throw new Error('Element not found');
+        const el = await waitForVisible('check', options) as HTMLInputElement;
         if (el.type !== 'checkbox' && el.type !== 'radio') {
-          throw new Error('Element is not a checkbox or radio');
+          throw createShimError('invalid_element_type', {
+            action: 'check',
+            elementType: el.tagName.toLowerCase(),
+            hint: 'checkbox or radio'
+          });
         }
 
         logger.debug(`[Action] check`);
@@ -1840,25 +1654,31 @@ export class MockedPlaywrightPage {
         if (!el.checked) el.click();
       },
 
-      uncheck: async () => {
+      uncheck: async (options?: ActionOptions) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement() as HTMLInputElement;
-        if (!el) throw new Error('Element not found');
+        const el = await waitForVisible('uncheck', options) as HTMLInputElement;
         if (el.type !== 'checkbox')
-          throw new Error('Element is not a checkbox');
+          throw createShimError('invalid_element_type', {
+            action: 'uncheck',
+            elementType: el.tagName.toLowerCase(),
+            hint: 'checkbox'
+          });
 
         logger.debug(`[Action] uncheck`);
         await this._highlight(el);
         if (el.checked) el.click();
       },
 
-      selectOption: async (value: string | string[]) => {
+      selectOption: async (value: string | string[], options?: ActionOptions) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement() as HTMLSelectElement;
-        if (!el) throw new Error('Element not found');
-        if (el.tagName !== 'SELECT') throw new Error('Element is not a select');
+        const el = await waitForVisible('selectOption', options) as HTMLSelectElement;
+        if (el.tagName !== 'SELECT') throw createShimError('invalid_element_type', {
+          action: 'selectOption',
+          elementType: el.tagName.toLowerCase(),
+          hint: 'select'
+        });
 
         const values = Array.isArray(value) ? value : [value];
         logger.debug(`[Action] selectOption: ${JSON.stringify(values)}`);
@@ -1900,25 +1720,22 @@ export class MockedPlaywrightPage {
         return locator;
       },
 
-      focus: async () => {
+      focus: async (options?: ActionOptions) => {
         await this.delay(50);
-        const el = getElement();
-        if (!el) throw new Error('Element not found');
+        const el = await waitForVisible('focus', options);
         el.focus();
       },
 
-      blur: async () => {
+      blur: async (options?: ActionOptions) => {
         await this.delay(50);
-        const el = getElement();
-        if (!el) throw new Error('Element not found');
+        const el = await waitForVisible('blur', options);
         el.blur();
       },
 
-      clear: async () => {
+      clear: async (options?: ActionOptions) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement() as HTMLInputElement;
-        if (!el) throw new Error('Element not found');
+        const el = await waitForVisible('clear', options) as HTMLInputElement;
         el.focus();
         el.value = '';
         el.dispatchEvent(new Event('input', { bubbles: true }));
@@ -1929,7 +1746,7 @@ export class MockedPlaywrightPage {
         await this.delay(50);
         strictCheck();
         const el = getElement();
-        if (!el) throw new Error('Element not found');
+        if (!el) throw createShimError('element_not_found', { action: 'dispatchEvent' });
         el.dispatchEvent(
           new CustomEvent(type, {
             bubbles: true,
@@ -1941,12 +1758,16 @@ export class MockedPlaywrightPage {
 
       setInputFiles: async (
         files: string | FilePayload | string[] | FilePayload[],
+        options?: ActionOptions,
       ) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement() as HTMLInputElement;
-        if (!el) throw new Error('Element not found');
-        if (el.type !== 'file') throw new Error('Element is not a file input');
+        const el = await waitForVisible('setInputFiles', options) as HTMLInputElement;
+        if (el.type !== 'file') throw createShimError('invalid_element_type', {
+          action: 'setInputFiles',
+          elementType: el.type || el.tagName.toLowerCase(),
+          hint: 'file input'
+        });
 
         logger.debug(`[Action] setInputFiles`);
         await this._highlight(el);
@@ -1973,10 +1794,9 @@ export class MockedPlaywrightPage {
         el.dispatchEvent(new Event('input', { bubbles: true }));
       },
 
-      dragTo: async (target: Locator) => {
+      dragTo: async (target: Locator, options?: ActionOptions) => {
         await this.delay(50);
-        const sourceEl = getElement();
-        if (!sourceEl) throw new Error('Source element not found');
+        const sourceEl = await waitForVisible('dragTo', options);
 
         // Get target element via its own evaluate method to handle cross-locator logic
         await target.evaluate((targetEl) => {
@@ -2020,14 +1840,13 @@ export class MockedPlaywrightPage {
         });
       },
 
-      dragAndDrop: async (target: Locator) => {
-        return locator.dragTo(target);
+      dragAndDrop: async (target: Locator, options?: ActionOptions) => {
+        return locator.dragTo(target, options);
       },
 
-      press: async (key: string) => {
+      press: async (key: string, options?: ActionOptions) => {
         await this.delay(50);
-        const el = getElement();
-        if (!el) throw new Error('Element not found');
+        const el = await waitForVisible('press', options);
 
         logger.debug(`[Action] press: "${key}"`);
         await this._highlight(el);
@@ -2041,7 +1860,7 @@ export class MockedPlaywrightPage {
         arg?: Arg,
       ) => {
         const el = getElement();
-        if (!el) throw new Error('Element not found');
+        if (!el) throw createShimError('element_not_found', { action: 'evaluate' });
         return fn(el, arg as Arg);
       },
 
@@ -2146,56 +1965,8 @@ export class MockedPlaywrightPage {
           // This is inefficient but functional for the shim
           for (const parent of parents) {
             // Basic implementation: querySelectorAll within parent based on role logic
-            const roleToTag: Record<string, string> = {
-              button:
-                'button, [role="button"], input[type="submit"], input[type="button"]',
-              textbox:
-                'input[type="text"], input[type="email"], input[type="password"], input:not([type]), textarea, [role="textbox"]',
-              checkbox: 'input[type="checkbox"], [role="checkbox"]',
-              radio: 'input[type="radio"], [role="radio"]',
-              link: 'a, [role="link"]',
-              heading: 'h1, h2, h3, h4, h5, h6, [role="heading"]',
-              listitem: 'li, [role="listitem"]',
-              img: 'img, [role="img"]',
-
-              // Table-related roles
-              cell: 'td, [role="cell"]',
-              columnheader: 'th, [role="columnheader"]',
-              row: 'tr, [role="row"]',
-              rowheader: 'th[scope="row"], [role="rowheader"]',
-              table: 'table, [role="table"]',
-              rowgroup: 'thead, tbody, tfoot, [role="rowgroup"]',
-
-              // List-related
-              list: 'ul, ol, [role="list"]',
-
-              // Form-related
-              combobox: 'select, [role="combobox"]',
-              option: 'option, [role="option"]',
-              spinbutton: 'input[type="number"], [role="spinbutton"]',
-              slider: 'input[type="range"], [role="slider"]',
-
-              // Dialog/Modal
-              dialog: 'dialog, [role="dialog"]',
-              alertdialog: '[role="alertdialog"]',
-
-              // Landmarks
-              navigation: 'nav, [role="navigation"]',
-              main: 'main, [role="main"]',
-              banner: 'header, [role="banner"]',
-              contentinfo: 'footer, [role="contentinfo"]',
-
-              // Widgets
-              tab: '[role="tab"]',
-              tablist: '[role="tablist"]',
-              tabpanel: '[role="tabpanel"]',
-              menu: '[role="menu"]',
-              menuitem: '[role="menuitem"]',
-              progressbar: 'progress, [role="progressbar"]',
-            };
-
             // eslint-disable-next-line security/detect-object-injection
-            const selector = roleToTag[role] || `[role="${role}"]`;
+            const selector = ROLE_TO_TAG[role] || `[role="${role}"]`;
             // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
             let matches = Array.from(
               parent.querySelectorAll(selector),
@@ -2347,13 +2118,11 @@ export class MockedPlaywrightPage {
         return locator.locator(`[data-testid="${testId}"]`);
       },
 
-      hover: async (options?: { force?: boolean }) => {
+
+      hover: async (options?: ActionOptions & { position?: { x: number; y: number } }) => {
         await this.delay(50);
         strictCheck();
-        const el = getElement();
-        if (!el) throw new Error('Element not found');
-        if (!options?.force && !this.isVisible(el))
-          throw new Error('Element is not visible');
+        const el = await waitForVisible('hover', options);
 
         logger.debug(`[Action] hover`);
         await this._highlight(el);
@@ -2398,7 +2167,7 @@ export class MockedPlaywrightPage {
           await this.delay(100);
         }
 
-        throw new Error(`Timeout ${timeout}ms exceeded waiting for ${state}`);
+        throw createShimError('timeout', { timeout, action: 'waitFor', hint: `waiting for state '${state}'` });
       },
 
       elementHandles: async () => {

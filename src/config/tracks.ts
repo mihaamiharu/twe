@@ -1,6 +1,6 @@
 import { getTierFromCategory } from '@/lib/constants';
 
-export type TrackId = 'all' | 'selectors' | 'javascript' | 'core' | 'e2e';
+export type TrackId = 'all' | 'selectors' | 'scripting' | 'core' | 'e2e';
 
 interface ChallengeLike {
     type: string;
@@ -32,12 +32,14 @@ export const TRACK_CONFIG: Record<TrackId, Omit<TrackConfig, 'id'>> = {
             ['CSS_SELECTOR', 'XPATH_SELECTOR'].includes(c.type) ||
             getTierFromCategory(c.category ?? undefined) === 'basic',
     },
-    javascript: {
-        label: 'JavaScript',
-        description: 'JavaScript & DOM Fundamentals',
+    scripting: {
+        label: 'JavaScript & TypeScript',
+        description: 'Programming Fundamentals for Test Automation',
         match: (c) =>
             c.type === 'JAVASCRIPT' ||
-            getTierFromCategory(c.category ?? undefined) === 'beginner',
+            c.type === 'TYPESCRIPT' ||
+            getTierFromCategory(c.category ?? undefined) === 'beginner' ||
+            (c.category?.startsWith('ts-') ?? false),
     },
     core: {
         label: 'Core',
@@ -54,7 +56,7 @@ export const TRACK_CONFIG: Record<TrackId, Omit<TrackConfig, 'id'>> = {
         },
     },
     e2e: {
-        label: 'E2E',
+        label: 'App Testing',
         description: 'Full E2E Flows, POM & Real Scenarios',
         match: (c) => {
             return getTierFromCategory(c.category ?? undefined) === 'e2e';
@@ -69,7 +71,7 @@ export const SIDEBAR_GROUPS: TrackGroup[] = [
     },
     {
         title: 'Core Skills',
-        tracks: ['selectors', 'javascript'],
+        tracks: ['selectors', 'scripting'],
     },
     {
         title: 'Playwright',
