@@ -8,7 +8,7 @@
       "category": "playwright-navigation",
       "xpReward": 40,
       "status": "draft",
-      "order": 401,
+      "order": 5401,
       "title": {
         "en": "Page Navigation",
         "id": "Navigasi Halaman"
@@ -1088,7 +1088,7 @@
       "category": "playwright-waits",
       "xpReward": 50,
       "status": "draft",
-      "order": 701,
+      "order": 5701,
       "title": {
         "en": "Auto-Wait Understanding",
         "id": "Memahami Auto-Wait"
@@ -1125,7 +1125,7 @@
       "category": "playwright-waits",
       "xpReward": 55,
       "status": "draft",
-      "order": 702,
+      "order": 5702,
       "title": {
         "en": "waitForSelector",
         "id": "waitForSelector"
@@ -1162,7 +1162,7 @@
       "category": "playwright-waits",
       "xpReward": 60,
       "status": "draft",
-      "order": 703,
+      "order": 5703,
       "title": {
         "en": "waitForLoadState",
         "id": "waitForLoadState"
@@ -1199,7 +1199,7 @@
       "category": "playwright-waits",
       "xpReward": 75,
       "status": "draft",
-      "order": 704,
+      "order": 5704,
       "title": {
         "en": "waitForResponse",
         "id": "waitForResponse"
@@ -1237,7 +1237,7 @@
       "category": "playwright-waits",
       "xpReward": 85,
       "status": "draft",
-      "order": 705,
+      "order": 5705,
       "title": {
         "en": "waitForFunction",
         "id": "waitForFunction"
@@ -1275,7 +1275,7 @@
       "category": "playwright-waits",
       "xpReward": 70,
       "status": "draft",
-      "order": 706,
+      "order": 5706,
       "title": {
         "en": "Timeout Configuration",
         "id": "Konfigurasi Timeout"
@@ -1313,7 +1313,7 @@
       "category": "playwright-waits",
       "xpReward": 95,
       "status": "draft",
-      "order": 707,
+      "order": 5707,
       "title": {
         "en": "Scenario: Polling Dashboard",
         "id": "Skenario: Dashboard Polling"

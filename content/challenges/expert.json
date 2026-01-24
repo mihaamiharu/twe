@@ -8,7 +8,7 @@
       "category": "playwright-pom",
       "xpReward": 80,
       "status": "draft",
-      "order": 801,
+      "order": 5801,
       "title": {
         "en": "First Page Object",
         "id": "Page Object Pertama"
@@ -45,7 +45,7 @@
       "category": "playwright-pom",
       "xpReward": 85,
       "status": "draft",
-      "order": 802,
+      "order": 5802,
       "title": {
         "en": "Encapsulate Actions",
         "id": "Enkapsulasi Aksi"
@@ -82,7 +82,7 @@
       "category": "playwright-pom",
       "xpReward": 90,
       "status": "draft",
-      "order": 803,
+      "order": 5803,
       "title": {
         "en": "Page Components",
         "id": "Komponen Halaman"
@@ -119,7 +119,7 @@
       "category": "playwright-pom",
       "xpReward": 95,
       "status": "draft",
-      "order": 804,
+      "order": 5804,
       "title": {
         "en": "Page Navigation Pattern",
         "id": "Pola Navigasi Halaman"
@@ -157,7 +157,7 @@
       "category": "playwright-pom",
       "xpReward": 100,
       "status": "draft",
-      "order": 805,
+      "order": 5805,
       "title": {
         "en": "Base Page Class",
         "id": "Class Base Page"
@@ -195,7 +195,7 @@
       "category": "playwright-pom",
       "xpReward": 120,
       "status": "draft",
-      "order": 806,
+      "order": 5806,
       "title": {
         "en": "Scenario: Full E2E with Multi-Page POM",
         "id": "Skenario: E2E Lengkap dengan Multi-Page POM"
@@ -234,7 +234,7 @@
       "category": "playwright-data-driven",
       "xpReward": 75,
       "status": "draft",
-      "order": 901,
+      "order": 5901,
       "title": {
         "en": "Parameterized Tests",
         "id": "Tes Terparameter"
@@ -271,7 +271,7 @@
       "category": "playwright-data-driven",
       "xpReward": 80,
       "status": "draft",
-      "order": 902,
+      "order": 5902,
       "title": {
         "en": "Test Data from JSON",
         "id": "Data Tes dari JSON"
@@ -308,7 +308,7 @@
       "category": "playwright-data-driven",
       "xpReward": 85,
       "status": "draft",
-      "order": 903,
+      "order": 5903,
       "title": {
         "en": "CSV Test Data",
         "id": "Data Tes CSV"
@@ -345,7 +345,7 @@
       "category": "playwright-data-driven",
       "xpReward": 90,
       "status": "draft",
-      "order": 904,
+      "order": 5904,
       "title": {
         "en": "Dynamic Data Generation",
         "id": "Pembuatan Data Dinamis"
@@ -383,7 +383,7 @@
       "category": "playwright-data-driven",
       "xpReward": 100,
       "status": "draft",
-      "order": 905,
+      "order": 5905,
       "title": {
         "en": "Environment-Based Data",
         "id": "Data Berbasis Lingkungan"
@@ -421,7 +421,7 @@
       "category": "playwright-data-driven",
       "xpReward": 110,
       "status": "draft",
-      "order": 906,
+      "order": 5906,
       "title": {
         "en": "Scenario: Cross-Browser Data Suite",
         "id": "Skenario: Suite Data Cross-Browser"
@@ -459,7 +459,7 @@
       "category": "playwright-integration-patterns",
       "xpReward": 100,
       "status": "draft",
-      "order": 1101,
+      "order": 6101,
       "title": {
         "en": "API + UI Testing",
         "id": "Pengujian API + UI"
@@ -496,7 +496,7 @@
       "category": "playwright-integration-patterns",
       "xpReward": 110,
       "status": "draft",
-      "order": 1102,
+      "order": 6102,
       "title": {
         "en": "State Setup via API",
         "id": "Persiapan Status melalui API"
@@ -533,7 +533,7 @@
       "category": "playwright-infrastructure",
       "xpReward": 90,
       "status": "draft",
-      "order": 1001,
+      "order": 6001,
       "title": {
         "en": "Screenshot on Failure",
         "id": "Screenshot saat Gagal"
@@ -570,7 +570,7 @@
       "category": "playwright-infrastructure",
       "xpReward": 95,
       "status": "draft",
-      "order": 1002,
+      "order": 6002,
       "title": {
         "en": "Video Recording",
         "id": "Perekaman Video"
@@ -607,7 +607,7 @@
       "category": "playwright-infrastructure",
       "xpReward": 100,
       "status": "draft",
-      "order": 1003,
+      "order": 6003,
       "title": {
         "en": "Retry Logic",
         "id": "Logika Retry"
@@ -644,7 +644,7 @@
       "category": "playwright-infrastructure",
       "xpReward": 120,
       "status": "draft",
-      "order": 1004,
+      "order": 6004,
       "title": {
         "en": "Parallel Execution",
         "id": "Eksekusi Paralel"
@@ -681,7 +681,7 @@
       "category": "playwright-integration-patterns",
       "xpReward": 110,
       "status": "draft",
-      "order": 1103,
+      "order": 6103,
       "title": {
         "en": "Cross-browser Testing",
         "id": "Pengujian Cross-browser"
@@ -718,7 +718,7 @@
       "category": "playwright-integration-patterns",
       "xpReward": 100,
       "status": "draft",
-      "order": 1104,
+      "order": 6104,
       "title": {
         "en": "Mobile Viewport Testing",
         "id": "Pengujian Mobile Viewport"
@@ -756,7 +756,7 @@
       "category": "playwright-integration-patterns",
       "xpReward": 100,
       "status": "draft",
-      "order": 1105,
+      "order": 6105,
       "title": {
         "en": "CSV Processing Workflow",
         "id": "Alur Kerja Pemrosesan CSV"
@@ -794,7 +794,7 @@
       "category": "playwright-infrastructure",
       "xpReward": 115,
       "status": "draft",
-      "order": 1005,
+      "order": 6005,
       "title": {
         "en": "Scenario: Self-Healing Test Suite",
         "id": "Skenario: Suite Tes Self-Healing"
@@ -833,7 +833,7 @@
       "category": "playwright-integration-patterns",
       "xpReward": 125,
       "status": "draft",
-      "order": 1106,
+      "order": 6106,
       "title": {
         "en": "Scenario: E2E Pipeline Integration",
         "id": "Skenario: Integrasi Pipeline E2E"
