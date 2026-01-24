@@ -209,11 +209,7 @@
         "architecture"
       ],
       "relatedChallenges": [
-        "pom-login-basics",
-        "pom-navigation-flow",
-        "pom-form-validation",
-        "pom-component-reuse",
-        "pom-data-driven"
+        "pom-login-basics"
       ],
       "nextTutorialSlug": null
     }
