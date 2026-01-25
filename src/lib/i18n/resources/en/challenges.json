@@ -116,6 +116,8 @@
     "playwright-data-driven": "Data-Driven Testing",
     "playwright-infrastructure": "Test Infrastructure",
     "playwright-integration-patterns": "Integration Patterns",
+    "e2e-pom": "Page Object Model",
+    "e2e-integration": "Integration Patterns",
     "e2e-testing": "Simulations",
     "page-object-model": "Page Object Model"
   },

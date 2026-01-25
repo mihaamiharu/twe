@@ -5,7 +5,7 @@
             "slug": "pom-login-basics",
             "type": "PLAYWRIGHT",
             "difficulty": "MEDIUM",
-            "category": "page-object-model",
+            "category": "e2e-pom",
             "xpReward": 100,
             "order": 1,
             "title": {
@@ -57,7 +57,7 @@
             "slug": "pom-login-failures",
             "type": "PLAYWRIGHT",
             "difficulty": "MEDIUM",
-            "category": "page-object-model",
+            "category": "e2e-pom",
             "xpReward": 120,
             "order": 2,
             "title": {
@@ -108,7 +108,7 @@
             "slug": "pom-multi-page",
             "type": "PLAYWRIGHT",
             "difficulty": "HARD",
-            "category": "page-object-model",
+            "category": "e2e-pom",
             "xpReward": 150,
             "order": 3,
             "title": {
@@ -175,7 +175,7 @@
             "slug": "pw-api-mocking",
             "type": "PLAYWRIGHT",
             "difficulty": "HARD",
-            "category": "playwright-integration-patterns",
+            "category": "e2e-integration",
             "xpReward": 180,
             "order": 4,
             "title": {
@@ -217,7 +217,7 @@
             "slug": "pw-session-guards",
             "type": "PLAYWRIGHT",
             "difficulty": "HARD",
-            "category": "playwright-integration-patterns",
+            "category": "e2e-integration",
             "xpReward": 200,
             "order": 5,
             "title": {
