@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { executePlaywrightCode } from '@/core/executor';
 import { generatePreloadCode } from '@/core/executor/module-preloader';
 import { storage } from '@/lib/storage-adapter';
-import { defaultSelectorStyles } from './constants';
+import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type {
     ChallengePlaygroundProps,
     PlaygroundState
@@ -98,7 +98,7 @@ export function useChallengeExecution(
                     timeout: 10000,
                     existingIframe: previewIframeRef.current || undefined,
                     strictMode: challenge.type === 'PLAYWRIGHT',
-                    cssContent: defaultSelectorStyles,
+                    cssContent: challenge.tier === 'e2e' ? e2eSelectorStyles : defaultSelectorStyles,
                     files: challenge.files,
                     onNavigate: (path) => setCurrentVfsPath(path),
                     expectedState: challenge.expectedState,
