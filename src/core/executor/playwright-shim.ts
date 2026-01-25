@@ -42,6 +42,8 @@ export class MockedPlaywrightPage {
   public mouse: Mouse;
   private currentUrl: string = 'about:blank';
   private _context: BrowserContext;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private routes: any[] = [];
 
   // VFS (Virtual File System) for multi-page E2E support
   private vfs: Record<string, string> | null = null;
@@ -358,11 +360,7 @@ export class MockedPlaywrightPage {
     const iframeWindow = this.targetDocument.defaultView as any;
     if (!iframeWindow) return;
 
-    if (!iframeWindow.__MOCK_ROUTES__) {
-      iframeWindow.__MOCK_ROUTES__ = [];
-    }
-
-    iframeWindow.__MOCK_ROUTES__.push({
+    const routeEntry = {
       matcher: urlOrPredicate,
       handler: async (requestInfo: any) => {
         const route: Route = {
@@ -382,10 +380,6 @@ export class MockedPlaywrightPage {
 
         const request: APIRequest = route.request();
 
-        // We need to capture the response from the handler
-        // Since handler returns void, we depend on it calling fulfill or continue
-        // This is a bit tricky to bridge synchronously, so we'll use a Promise
-
         return new Promise<any>((resolve) => {
           // Override fulfill/continue to resolve our promise
           route.fulfill = async (response) => {
@@ -399,7 +393,14 @@ export class MockedPlaywrightPage {
           handler(route, request);
         });
       },
-    });
+    };
+
+    this.routes.push(routeEntry);
+
+    if (!iframeWindow.__MOCK_ROUTES__) {
+      iframeWindow.__MOCK_ROUTES__ = [];
+    }
+    iframeWindow.__MOCK_ROUTES__.push(routeEntry);
     /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await */
     await Promise.resolve();
   }
@@ -412,6 +413,10 @@ export class MockedPlaywrightPage {
     if (!iframeWindow || !iframeWindow.__MOCK_ROUTES__) return;
 
     // Remove matching routes
+    this.routes = this.routes.filter(
+      (r: any) => r.matcher.toString() !== urlOrPredicate.toString(),
+    );
+
     iframeWindow.__MOCK_ROUTES__ = iframeWindow.__MOCK_ROUTES__.filter(
       (r: any) => r.matcher.toString() !== urlOrPredicate.toString(),
     );
@@ -456,8 +461,11 @@ export class MockedPlaywrightPage {
 
       // Restore window.page reference for VFS navigation shim
       if (this.targetDocument.defaultView) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (this.targetDocument.defaultView as any).page = this;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const win = this.targetDocument.defaultView as any;
+        win.page = this;
+        // Re-inject active routes
+        win.__MOCK_ROUTES__ = this.routes;
       }
 
       this.currentUrl = path;
@@ -465,6 +473,7 @@ export class MockedPlaywrightPage {
       // Notify parent about navigation for URL bar update
       this.onNavigate?.(path);
 
+      // Artificial delay to allow TestApp scripts (like localStorage checks) to settle
       await this.delay(50);
       return;
     }
@@ -630,15 +639,25 @@ export class MockedPlaywrightPage {
   }
 
   async evaluate<R, Arg>(
-    pageFunction: (arg: Arg) => R | Promise<R>,
+    pageFunction: ((arg: Arg) => R | Promise<R>) | string,
     arg?: Arg,
   ): Promise<R> {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const iframeWindow = this.targetDocument.defaultView as any;
+    if (!iframeWindow) throw new Error('Iframe window not available');
+
     if (typeof pageFunction === 'function') {
-      return Promise.resolve(pageFunction(arg as Arg));
+      // Execute in the context of the iframe window
+      // Note: Arrow functions will still capture parent context, but this is the best we can do without eval
+      return Promise.resolve(pageFunction.call(iframeWindow, arg as Arg));
     }
-    // If string, we might need eval, but let's avoid it for security/complexity if possible.
-    // Playwright supports string, but mostly people use functions.
-    throw new Error('evaluate only supports functions in this shim');
+    if (typeof pageFunction === 'string') {
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      const fn = new Function('window', 'document', 'arg', `return (async () => { ${pageFunction} })(arg)`);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+      return fn(iframeWindow, this.targetDocument, arg);
+    }
+    throw new Error('evaluate only supports functions or strings');
   }
 
   async click(selector: string): Promise<void> {

@@ -86,19 +86,19 @@ export async function executePlaywrightCode(
   // This is a simple regex check, not a full AST parse, but catches most beginner mistakes.
   const forbiddenPatterns = [
     {
-      pattern: /document\.getElement/,
-      message:
-        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
-    },
-    {
-      pattern: /document\.query/,
-      message:
-        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
-    },
-    {
-      pattern: /window\.local/,
+      pattern: /\bwindow\.localStorage\b/,
       message:
         "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.localStorage...)'.",
+    },
+    {
+      pattern: /\bwindow\.sessionStorage\b/,
+      message:
+        "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.sessionStorage...)'.",
+    },
+    {
+      pattern: /\bdocument\.(getElement|query|body|cookie)\b/,
+      message:
+        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
     },
     {
       pattern: /alert\(/,
@@ -178,6 +178,19 @@ export async function executePlaywrightCode(
             const iframeDoc = iframe.contentDocument;
             if (!iframeDoc) {
               throw new Error('Could not access iframe document');
+            }
+
+            // In Playwright tests, localStorage/sessionStorage should be empty at the start of a run
+            // to ensure isolation. Since all challenges share the same origin, we clear manually.
+            try {
+              if (iframe.contentWindow) {
+                iframe.contentWindow.localStorage?.clear();
+                iframe.contentWindow.sessionStorage?.clear();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (iframe.contentWindow as any).__MOCK_ROUTES__ = [];
+              }
+            } catch (e) {
+              console.warn('Failed to clear storage:', e);
             }
 
             // Set up the HTML content
