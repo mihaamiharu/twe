@@ -7,7 +7,7 @@
             "difficulty": "MEDIUM",
             "category": "e2e-pom",
             "xpReward": 100,
-            "order": 1,
+            "order": 5000,
             "title": {
                 "en": "POM Basics: Successful Login",
                 "id": "Dasar POM: Login Berhasil"
@@ -59,7 +59,7 @@
             "difficulty": "MEDIUM",
             "category": "e2e-pom",
             "xpReward": 120,
-            "order": 2,
+            "order": 5001,
             "title": {
                 "en": "POM: Testing Failures",
                 "id": "POM: Menguji Kegagalan"
@@ -110,7 +110,7 @@
             "difficulty": "HARD",
             "category": "e2e-pom",
             "xpReward": 150,
-            "order": 3,
+            "order": 5002,
             "title": {
                 "en": "POM: Multi-Page User Journey",
                 "id": "POM: Perjalanan Pengguna Multi-Halaman"
@@ -168,91 +168,6 @@
             "tags": [
                 "pom",
                 "fluent-interface",
-                "playwright"
-            ]
-        },
-        {
-            "slug": "pw-api-mocking",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "e2e-integration",
-            "xpReward": 180,
-            "order": 4,
-            "title": {
-                "en": "API Interception & Mocking",
-                "id": "Intersepsi & Mocking API"
-            },
-            "description": {
-                "en": "Learn to use page.route() to mock API responses and test UI states independently.",
-                "id": "Pelajari cara menggunakan page.route() untuk membuat mock respons API dan menguji status UI secara independen."
-            },
-            "instructions": {
-                "en": "# API Interception & Mocking\n\nQA Engineers often use mocking to test UI logic without a backend. In Playwright, this is done using `page.route()`.\n\n## 📖 Real World Scenario\n\nWaiting for a real backend or third-party API can make tests slow and flaky. Mocking allows you to isolate your UI and test how it behaves with different data—including edge cases like server errors (500) or slow responses—without actually triggering those events on the server.\n\n## 📋 Test Case: Verify Dashboard with Mocked User Data\n\n**Preconditions**:\n- API endpoint `/api/user` will be mocked\n- Mock data: name=\"Mock User\", email=\"mock@test.com\", xp=9999\n\n**Steps**:\n1. Set up API mock for `/api/user` endpoint\n2. Navigate to dashboard (which fetches the user data)\n\n**Expected Results**:\n- User name displays \"Mock User\"\n- email displays \"mock@test.com\"\n- XP displays \"9999\"\n\n## 🎯 Your Task\nIntercept the `/api/user` request and fulfill it with mock JSON data in `tests/mock.spec.ts`.\n",
-                "id": "# Intersepsi & Mocking API\n\nQA Engineer sering menggunakan mocking untuk menguji logika UI tanpa backend. Dalam Playwright, ini dilakukan menggunakan `page.route()`.\n\n## 📖 Skenario Dunia Nyata\n\nMenunggu backend nyata atau API pihak ketiga dapat membuat pengujian menjadi lambat dan tidak stabil. Mocking memungkinkan kamu mengisolasi UI dan menguji perilakunya dengan berbagai data—termasuk kasus tepi seperti kesalahan server (500) atau respons lambat—tanpa benar-benar memicu kejadian tersebut di server.\n\n## 📋 Test Case: Verifikasi Dashboard dengan Data User Mock\n\n**Langkah-langkah**:\n1. Siapkan API mock untuk endpoint `/api/user` dengan data kustom.\n2. Navigasi ke dashboard yang memanggil API tersebut.\n\n**Hasil yang Diharapkan**:\n- Nama pengguna menampilkan \"Mock User\"\n- Email menampilkan \"mock@test.com\"\n- XP menampilkan \"9999\"\n\n## 🎯 Tugas Kamu\nIntersepsi permintaan `/api/user` dan penuhi (fulfill) dengan data JSON mock di `tests/mock.spec.ts`.\n"
-            },
-            "files": {
-                "/tests/mock.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should display mocked user data', async ({ page }) => {\n  // 1. Mock the API call\n  \n\n  // 2. Navigate to page that calls the API\n  \n\n  // 3. Assertions\n  \n});",
-                "/app/dashboard.html": "<div class='p-8'><h1 class='text-2xl font-bold mb-4'>Dashboard</h1><div class='card p-6'><div class='flex gap-2'><span class='text-gray-400'>Name:</span><span id='user-name'>Loading...</span></div><div class='flex gap-2'><span class='text-gray-400'>Email:</span><span id='user-email'>...</span></div><div class='flex gap-2'><span class='text-gray-400'>XP:</span><span id='user-xp'>0</span></div></div></div><script>fetch('/api/user').then(r=>r.json()).then(d=>{document.getElementById('user-name').textContent=d.name; document.getElementById('user-email').textContent=d.email; document.getElementById('user-xp').textContent=d.xp;})</script>"
-            },
-            "editableFiles": [
-                "/tests/mock.spec.ts"
-            ],
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should display mocked user data', async ({ page }) => {\n  // 1. Mock the API call for '/api/user'\n  \n\n  // 2. Navigate to the dashboard\n  \n\n  // 3. Verify labels display mocked values\n  \n});",
-            "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should display mocked user data', async ({ page }) => {\n  await page.route('**/api/user', async (route) => {\n    await route.fulfill({\n      contentType: 'application/json',\n      body: JSON.stringify({\n        name: 'Mock User',\n        email: 'mock@test.com',\n        xp: 9999\n      })\n    });\n  });\n  await page.goto('/app/dashboard.html');\n  await expect(page.locator('#user-name')).toHaveText('Mock User');\n  await expect(page.locator('#user-email')).toHaveText('mock@test.com');\n  await expect(page.locator('#user-xp')).toHaveText('9999');\n});",
-            "expectedState": [
-                {
-                    "selector": "#user-name",
-                    "visible": true,
-                    "containsText": "Mock User"
-                }
-            ],
-            "tags": [
-                "api-mocking",
-                "page-route",
-                "playwright"
-            ]
-        },
-        {
-            "slug": "pw-session-guards",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "e2e-integration",
-            "xpReward": 200,
-            "order": 5,
-            "title": {
-                "en": "Auth Guards & Session Management",
-                "id": "Auth Guard & Manajemen Sesi"
-            },
-            "description": {
-                "en": "Test the security of the application by verifying redirects and session cleanup after logout.",
-                "id": "Uji keamanan aplikasi dengan memverifikasi pengalihan dan pembersihan sesi setelah logout."
-            },
-            "instructions": {
-                "en": "# Auth Guards & Session Management\n\nSecurity is paramount. You must verify that protected pages redirect unauthenticated users back to login.\n\n## 📖 Real World Scenario\n\nTesting security boundaries is a key part of QA. You need to ensure that deep links to internal pages (like labels, settings, or admin panels) are protected and that logging out effectively destroys the session so a back-button or direct URL access doesn't leak user data.\n\n## 📋 Test Case: Protected Route Redirects\n\n**Steps**:\n1. Navigate directly to `/app/dashboard.html` without logging in\n\n**Expected Results**:\n- User is redirected to `/app/login.html` with an alert message\n\n## 📋 Test Case: Session Cleared After Logout\n\n**Steps**:\n1. Login, then logout\n2. Navigate back to `/app/dashboard.html`\n\n**Expected Results**:\n- User is redirected to login (session must be empty)\n\n## 🎯 Your Task\nAutomate these security scenarios in `tests/auth.spec.ts`.\n",
-                "id": "# Auth Guard & Manajemen Sesi\n\nKeamanan adalah yang utama. Kamu harus memverifikasi bahwa halaman yang dilindungi mengalihkan pengguna yang tidak terautentikasi kembali ke login.\n\n## 📖 Skenario Dunia Nyata\n\nMenguji batasan keamanan adalah bagian kunci dari QA. Kamu perlu memastikan bahwa tautan langsung ke halaman internal (seperti dashboard atau profil) dilindungi, dan bahwa proses logout benar-benar menghapus sesi sehingga akses URL langsung tidak membocorkan data pengguna.\n\n## 📋 Test Case: Pengalihan Rute Terproteksi\n\n**Langkah-langkah**:\n1. Navigasi langsung ke `/app/dashboard.html` tanpa login\n\n**Hasil yang Diharapkan**:\n- Pengguna dialihkan ke `/app/login.html` dengan pesan peringatan\n\n## 📋 Test Case: Sesi Terhapus Setelah Logout\n\n**Langkah-langkah**:\n1. Login, lalu logout\n2. Navigasi kembali ke `/app/dashboard.html`\n\n**Hasil yang Diharapkan**:\n- Pengguna dialihkan ke login (sesi harus kosong)\n\n## 🎯 Tugas Kamu\nOtomatiskan skenario keamanan ini di `tests/auth.spec.ts`.\n"
-            },
-            "files": {
-                "/tests/auth.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should redirect unauthenticated user', async ({ page }) => {\n  // 1. Navigate directly to dashboard\n  \n  // 2. Verify redirect\n  \n});\n\ntest('should clear session on logout', async ({ page }) => {\n  // 1. Manually set session\n  \n  \n  // 2. Go to dashboard and logout\n  \n  \n  // 3. Verify session is empty\n  \n});",
-                "/app/login.html": "<div class='p-8'><h1>Login</h1><p id='msg'></p></div><script>if(window.location.search.includes('error')) document.getElementById('msg').textContent='Please log in to continue'</script>",
-                "/app/dashboard.html": "<div class='p-8'><h1>Dashboard</h1><button id='logout-btn' class='button button-ghost'>Logout</button></div><script>if(!localStorage.getItem('twe_session')) window.__VFS_NAVIGATE__('/app/login.html?error=1'); document.getElementById('logout-btn').onclick=()=>{localStorage.removeItem('twe_session'); window.__VFS_NAVIGATE__('/app/login.html')}</script>"
-            },
-            "editableFiles": [
-                "/tests/auth.spec.ts"
-            ],
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should redirect unauthenticated user', async ({ page }) => {\n  // 1. Navigate directly to dashboard without session\n  \n\n  // 2. Verify user is redirected to login\n  \n});\n\ntest('should clear session on logout', async ({ page }) => {\n  // 1. Set session and verify dashboard access\n  \n\n  // 2. Perform logout\n  \n\n  // 3. Verify session is null and user is redirected\n  \n});",
-            "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should redirect unauthenticated user', async ({ page }) => {\n  await page.goto('/app/dashboard.html');\n  await expect(page).toHaveURL(/.*login/);\n});\n\ntest('should clear session on logout', async ({ page }) => {\n  await page.goto('/app/login.html');\n  await page.evaluate(() => localStorage.setItem('twe_session', '{\"username\":\"user\"}'));\n  await page.goto('/app/dashboard.html');\n  await page.click('#logout-btn');\n  const session = await page.evaluate(() => localStorage.getItem('twe_session'));\n  expect(session).toBeNull();\n});",
-            "expectedState": [
-                {
-                    "selector": "h1",
-                    "visible": true,
-                    "containsText": "Login"
-                }
-            ],
-            "tags": [
-                "security",
-                "session",
                 "playwright"
             ]
         }

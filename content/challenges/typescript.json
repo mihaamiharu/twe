@@ -7,7 +7,7 @@
             "difficulty": "EASY",
             "category": "ts-fundamentals",
             "xpReward": 20,
-            "order": 501,
+            "order": 2300,
             "title": {
                 "en": "Type Annotations (Clean Code)",
                 "id": "Anotasi Tipe (Clean Code)"
@@ -43,7 +43,7 @@
             "difficulty": "EASY",
             "category": "ts-fundamentals",
             "xpReward": 25,
-            "order": 502,
+            "order": 2301,
             "title": {
                 "en": "Function Types",
                 "id": "Tipe Fungsi"
@@ -78,7 +78,7 @@
             "difficulty": "EASY",
             "category": "ts-fundamentals",
             "xpReward": 30,
-            "order": 503,
+            "order": 2302,
             "title": {
                 "en": "Interfaces Basics",
                 "id": "Dasar Interface"
@@ -113,7 +113,7 @@
             "difficulty": "EASY",
             "category": "ts-fundamentals",
             "xpReward": 30,
-            "order": 504,
+            "order": 2303,
             "title": {
                 "en": "Union Types",
                 "id": "Tipe Union"
@@ -148,7 +148,7 @@
             "difficulty": "EASY",
             "category": "ts-fundamentals",
             "xpReward": 35,
-            "order": 505,
+            "order": 2304,
             "title": {
                 "en": "Optional Properties (Edge Case)",
                 "id": "Properti Opsional (Edge Case)"
@@ -184,7 +184,7 @@
             "difficulty": "MEDIUM",
             "category": "ts-fundamentals",
             "xpReward": 40,
-            "order": 506,
+            "order": 2305,
             "title": {
                 "en": "Type Aliases",
                 "id": "Type Alias"
@@ -219,7 +219,7 @@
             "difficulty": "EASY",
             "category": "ts-fundamentals",
             "xpReward": 25,
-            "order": 507,
+            "order": 2306,
             "title": {
                 "en": "Type Inference",
                 "id": "Inferensi Tipe"
@@ -253,7 +253,7 @@
             "difficulty": "MEDIUM",
             "category": "ts-fundamentals",
             "xpReward": 50,
-            "order": 508,
+            "order": 2307,
             "title": {
                 "en": "Generics (API Helper)",
                 "id": "Generics (API Helper)"
@@ -287,7 +287,7 @@
             "difficulty": "MEDIUM",
             "category": "ts-fundamentals",
             "xpReward": 45,
-            "order": 509,
+            "order": 2308,
             "title": {
                 "en": "Utility Types: Partial",
                 "id": "Utility Types: Partial"
@@ -322,7 +322,7 @@
             "difficulty": "HARD",
             "category": "ts-fundamentals",
             "xpReward": 60,
-            "order": 510,
+            "order": 2309,
             "title": {
                 "en": "Boss: The User Factory",
                 "id": "Boss: User Factory"
