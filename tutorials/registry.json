@@ -150,7 +150,8 @@
         "typescript",
         "fundamentals",
         "qa",
-        "automation"
+        "automation",
+        "beginner"
       ],
       "relatedChallenges": [
         "ts-type-annotations",
