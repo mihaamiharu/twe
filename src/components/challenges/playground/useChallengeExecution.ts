@@ -117,6 +117,8 @@ export function useChallengeExecution(
                 'playwright-data-driven',
                 'playwright-infrastructure',
                 'playwright-integration-patterns',
+                'playwright-navigation',
+                'playwright-locators',
             ].includes(challenge.category ?? '');
 
             if (
