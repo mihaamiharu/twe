@@ -99,7 +99,7 @@ export function EditorPanel({
                 ) : (
                     <CodeEditor
                         initialCode={challenge.starterCode}
-                        language="javascript"
+                        language={challenge.type === 'TYPESCRIPT' ? 'typescript' : 'javascript'}
                         onChange={onCodeChange}
                         onRun={onRunCode}
                         onReady={onReady}

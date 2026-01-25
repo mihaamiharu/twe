@@ -45,6 +45,8 @@ export const categoryLabels: Record<string, string> = {
   'playwright-infrastructure': '🔧 Test Infrastructure',
   'playwright-integration-patterns': '🔄 Integration Patterns',
   // Tier 5: E2E
+  'e2e-pom': '🏗️ Page Object Model',
+  'e2e-integration': '🔄 Integration Patterns',
   'e2e-testing': '🟣 E2E Testing',
 };
 

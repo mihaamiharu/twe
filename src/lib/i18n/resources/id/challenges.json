@@ -112,6 +112,8 @@
     "playwright-data-driven": "Pengujian Berbasis Data",
     "playwright-infrastructure": "Infrastruktur Pengujian",
     "playwright-integration-patterns": "Pola Integrasi",
+    "e2e-pom": "Page Object Model",
+    "e2e-integration": "Pola Integrasi",
     "e2e-testing": "Simulasi",
     "page-object-model": "Page Object Model"
   },
