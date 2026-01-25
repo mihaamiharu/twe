@@ -7,7 +7,7 @@
             "difficulty": "MEDIUM",
             "category": "e2e-pom",
             "xpReward": 100,
-            "order": 1,
+            "order": 5000,
             "title": {
                 "en": "POM Basics: Successful Login",
                 "id": "Dasar POM: Login Berhasil"
@@ -59,7 +59,7 @@
             "difficulty": "MEDIUM",
             "category": "e2e-pom",
             "xpReward": 120,
-            "order": 2,
+            "order": 5001,
             "title": {
                 "en": "POM: Testing Failures",
                 "id": "POM: Menguji Kegagalan"
@@ -110,7 +110,7 @@
             "difficulty": "HARD",
             "category": "e2e-pom",
             "xpReward": 150,
-            "order": 3,
+            "order": 5002,
             "title": {
                 "en": "POM: Multi-Page User Journey",
                 "id": "POM: Perjalanan Pengguna Multi-Halaman"
@@ -177,7 +177,7 @@
             "difficulty": "HARD",
             "category": "e2e-integration",
             "xpReward": 180,
-            "order": 4,
+            "order": 5100,
             "title": {
                 "en": "API Interception & Mocking",
                 "id": "Intersepsi & Mocking API"
@@ -219,7 +219,7 @@
             "difficulty": "HARD",
             "category": "e2e-integration",
             "xpReward": 200,
-            "order": 5,
+            "order": 5101,
             "title": {
                 "en": "Auth Guards & Session Management",
                 "id": "Auth Guard & Manajemen Sesi"
