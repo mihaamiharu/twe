@@ -34,7 +34,6 @@ export async function transpileTypeScript(code: string): Promise<string> {
         const result = await esbuild.transform(code, {
             loader: 'ts',
             target: 'es2020',
-            format: 'esm',
         });
         return result.code;
     } catch (error) {
