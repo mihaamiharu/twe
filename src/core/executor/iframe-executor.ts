@@ -86,19 +86,19 @@ export async function executePlaywrightCode(
   // This is a simple regex check, not a full AST parse, but catches most beginner mistakes.
   const forbiddenPatterns = [
     {
-      pattern: /document\.getElement/,
-      message:
-        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
-    },
-    {
-      pattern: /document\.query/,
-      message:
-        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
-    },
-    {
-      pattern: /window\.local/,
+      pattern: /\bwindow\.localStorage\b/,
       message:
         "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.localStorage...)'.",
+    },
+    {
+      pattern: /\bwindow\.sessionStorage\b/,
+      message:
+        "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.sessionStorage...)'.",
+    },
+    {
+      pattern: /\bdocument\.(getElement|query|body|cookie)\b/,
+      message:
+        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
     },
     {
       pattern: /alert\(/,
@@ -178,6 +178,19 @@ export async function executePlaywrightCode(
             const iframeDoc = iframe.contentDocument;
             if (!iframeDoc) {
               throw new Error('Could not access iframe document');
+            }
+
+            // In Playwright tests, localStorage/sessionStorage should be empty at the start of a run
+            // to ensure isolation. Since all challenges share the same origin, we clear manually.
+            try {
+              if (iframe.contentWindow) {
+                iframe.contentWindow.localStorage?.clear();
+                iframe.contentWindow.sessionStorage?.clear();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (iframe.contentWindow as any).__MOCK_ROUTES__ = [];
+              }
+            } catch (e) {
+              console.warn('Failed to clear storage:', e);
             }
 
             // Set up the HTML content
@@ -476,15 +489,31 @@ export async function executePlaywrightCode(
 
             const enhancedDocument = createEnhancedDocument(iframeDoc);
 
+            // Prepare the iframe execution environment
+            const contentWindow = iframe.contentWindow as any;
+
+            // Initialize promise tracker for async tests
+            contentWindow.__testPromises = [];
+
             // Mock test runner object (Support both test.step and standard test('name', ...))
             const testInstance = async (name: string, callback: (fixtures: any) => Promise<void>) => {
-              interceptedConsole.log(`[Test] ${name}`);
-              try {
-                await callback({ page, expect });
-              } catch (error) {
-                interceptedConsole.error(`[Test] ${name} FAILED: ${String(error)}`);
-                throw error;
+              // Create a tracking promise for this test
+              const testPromise = (async () => {
+                interceptedConsole.log(`[Test] ${name}`);
+                try {
+                  await callback({ page, expect });
+                } catch (error) {
+                  interceptedConsole.error(`[Test] ${name} FAILED: ${String(error)}`);
+                  throw error;
+                }
+              })();
+
+              // Track it so we can await it later
+              if (Array.isArray(contentWindow.__testPromises)) {
+                contentWindow.__testPromises.push(testPromise);
               }
+
+              return testPromise;
             };
             (testInstance as any).step = async (name: string, callback: () => Promise<unknown>) => {
               interceptedConsole.log(`[Step] ${name}`);
@@ -496,9 +525,6 @@ export async function executePlaywrightCode(
               }
             };
             const test = testInstance;
-
-            // Prepare the iframe execution environment
-            const contentWindow = iframe.contentWindow as any;
 
             // Inject tools into the iframe context
             contentWindow.page = page;
@@ -517,6 +543,12 @@ export async function executePlaywrightCode(
                         return (async () => {
                             try {
                                 ${executableCode}
+
+                                // Wait for all tests to complete
+                                if (window.__testPromises && Array.isArray(window.__testPromises)) {
+                                    await Promise.all(window.__testPromises);
+                                }
+
                                 if (typeof result !== "undefined") return result;
                             } catch (e) {
                                 throw e;
