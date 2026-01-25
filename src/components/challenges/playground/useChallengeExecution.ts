@@ -119,6 +119,8 @@ export function useChallengeExecution(
                 'playwright-integration-patterns',
                 'playwright-navigation',
                 'playwright-locators',
+                'e2e-pom',
+                'e2e-integration',
             ].includes(challenge.category ?? '');
 
             if (

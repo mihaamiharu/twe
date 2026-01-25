@@ -151,6 +151,8 @@ export const challenges = pgTable('challenges', {
   files: jsonb('files').$type<Record<string, string>>(), // VFS: multi-page content for E2E challenges
   editableFiles: jsonb('editable_files').$type<string[]>(), // Which files user can edit
   preloadModules: jsonb('preload_modules').$type<Record<string, { exports: string[]; source: string }>>(), // Preloaded PageObjects
+  expectedState: jsonb('expected_state').$type<any[]>(), // Automated DOM validation rules
+  solution: text('solution'), // Reference solution
 
   // Relations
   tutorialId: uuid('tutorial_id').references(() => tutorials.id, {
