@@ -476,15 +476,31 @@ export async function executePlaywrightCode(
 
             const enhancedDocument = createEnhancedDocument(iframeDoc);
 
+            // Prepare the iframe execution environment
+            const contentWindow = iframe.contentWindow as any;
+
+            // Initialize promise tracker for async tests
+            contentWindow.__testPromises = [];
+
             // Mock test runner object (Support both test.step and standard test('name', ...))
             const testInstance = async (name: string, callback: (fixtures: any) => Promise<void>) => {
-              interceptedConsole.log(`[Test] ${name}`);
-              try {
-                await callback({ page, expect });
-              } catch (error) {
-                interceptedConsole.error(`[Test] ${name} FAILED: ${String(error)}`);
-                throw error;
+              // Create a tracking promise for this test
+              const testPromise = (async () => {
+                interceptedConsole.log(`[Test] ${name}`);
+                try {
+                  await callback({ page, expect });
+                } catch (error) {
+                  interceptedConsole.error(`[Test] ${name} FAILED: ${String(error)}`);
+                  throw error;
+                }
+              })();
+
+              // Track it so we can await it later
+              if (Array.isArray(contentWindow.__testPromises)) {
+                contentWindow.__testPromises.push(testPromise);
               }
+
+              return testPromise;
             };
             (testInstance as any).step = async (name: string, callback: () => Promise<unknown>) => {
               interceptedConsole.log(`[Step] ${name}`);
@@ -496,9 +512,6 @@ export async function executePlaywrightCode(
               }
             };
             const test = testInstance;
-
-            // Prepare the iframe execution environment
-            const contentWindow = iframe.contentWindow as any;
 
             // Inject tools into the iframe context
             contentWindow.page = page;
@@ -517,6 +530,12 @@ export async function executePlaywrightCode(
                         return (async () => {
                             try {
                                 ${executableCode}
+
+                                // Wait for all tests to complete
+                                if (window.__testPromises && Array.isArray(window.__testPromises)) {
+                                    await Promise.all(window.__testPromises);
+                                }
+
                                 if (typeof result !== "undefined") return result;
                             } catch (e) {
                                 throw e;
