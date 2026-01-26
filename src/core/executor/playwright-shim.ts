@@ -614,6 +614,73 @@ export class MockedPlaywrightPage {
         }
       }
     });
+
+    // Re-attach onclick handlers for VFS pages (was missing, causing issues in multi-page challenges)
+    this._attachOnclickHandlers();
+  }
+
+  /**
+   * Manually attach onclick handlers for elements with the attribute
+   * This is required because HappyDOM/iframe.write() doesn't always 
+   * wire up inline attributes to the correctly scoped window.
+   */
+  private _attachOnclickHandlers(): void {
+    const elementsWithClick = Array.from(
+      this.targetDocument.querySelectorAll('[onclick]'),
+    );
+    elementsWithClick.forEach((el) => {
+      const handlerCode = el.getAttribute('onclick');
+      if (handlerCode) {
+        try {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+          const win = this.targetDocument.defaultView as any;
+          if (!win) return;
+
+          const windowFuncs = Object.keys(win).filter(
+            (key) =>
+              typeof win[key] === 'function' &&
+              ![
+                'fetch',
+                'setTimeout',
+                'setInterval',
+                'clearTimeout',
+                'clearInterval',
+                '__MOCK_ROUTES__',
+                '__VFS_NAVIGATE__',
+                'page'
+              ].includes(key),
+          );
+
+          const funcDestructure =
+            windowFuncs.length > 0
+              ? `const { ${windowFuncs.join(', ')} } = window;`
+              : '';
+
+          const code = `
+            const fetch = window.fetch;
+            ${funcDestructure}
+            return (function(window, document, event) {
+                try {
+                    ${handlerCode}
+                } catch(err) {
+                    console.error('Error in VFS onclick handler:', err);
+                }
+            }).call(this, window, document, event);
+          `;
+
+          // eslint-disable-next-line @typescript-eslint/no-implied-eval
+          const fn = new Function('window', 'document', 'event', code);
+
+          el.addEventListener('click', (event) => {
+            fn.call(el, win, this.targetDocument, event);
+          });
+          // Remove attribute to prevent double-execution in real browsers
+          el.removeAttribute('onclick');
+        } catch (e) {
+          console.error('Failed to attach VFS onclick handler:', e);
+        }
+      }
+    });
   }
 
   url(): string {
