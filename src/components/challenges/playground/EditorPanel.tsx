@@ -78,7 +78,7 @@ export function EditorPanel({
                                 editableFiles={challenge.editableFiles}
                                 selectedFile={selectedFile}
                                 onSelectFile={onSelectFile}
-                                className="w-44 shrink-0 border-r border-border"
+                                className="w-60 shrink-0 border-r border-border"
                             />
                         )}
                         <MultiTabEditor
