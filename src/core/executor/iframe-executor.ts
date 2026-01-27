@@ -7,39 +7,16 @@
 
 import { MockedPlaywrightPage } from './playwright-shim';
 import { logger } from '@/lib/logger';
-import type { ExpectedStateRule } from '@/lib/content.types';
-
-export interface ExecutionResult {
-  status: 'PASSED' | 'FAILED' | 'ERROR' | 'TIMEOUT';
-  output: string;
-  executionTime: number;
-  error?: string;
-  returnValue?: unknown;
-  logs?: Array<{ id: string; type: string; message: string }>;
-  assertionCount?: number;
-}
-
-export interface ExecuteOptions {
-  timeout?: number;
-  testCases?: TestCase[];
-  cssContent?: string;
-  files?: Record<string, string>; // VFS: multi-page content for E2E challenges
-  onNavigate?: (path: string) => void; // Callback for URL bar updates
-  expectedState?: ExpectedStateRule[]; // DOM validation rules
-}
-
-export interface TestCase {
-  id: string;
-  name: string;
-  validate: (page: MockedPlaywrightPage) => Promise<boolean>;
-}
-
-export interface TestCaseResult {
-  id: string;
-  name: string;
-  passed: boolean;
-  error?: string;
-}
+import { transpileTypeScript } from './typescript-transpiler';
+import {
+  type ExecutionResult,
+  type ExecuteOptions,
+  type TestCase,
+  type TestCaseResult
+} from './executor.types';
+import { createExpect } from './expect-matchers';
+import { validateExpectedState } from './dom-validator';
+import { createInterceptedConsole } from './console-interceptor';
 
 /**
  * Executes Playwright-style code in a sandboxed iframe
@@ -57,6 +34,22 @@ export async function executePlaywrightCode(
   const useExistingIframe = !!options?.existingIframe;
   const logs: Array<{ id: string; type: string; message: string }> = [];
   const strictMode = options?.strictMode !== false; // Default to true for backward compatibility
+  let executableCode = code;
+
+  // Transpile if TypeScript
+  if (options?.isTypeScript) {
+    try {
+      executableCode = await transpileTypeScript(code);
+    } catch (error) {
+      return {
+        status: 'ERROR',
+        output: error instanceof Error ? error.message : String(error),
+        executionTime: 0,
+        error: error instanceof Error ? error.message : String(error),
+        logs: [],
+      };
+    }
+  }
 
   // Determine standard log level mapping
   const getLogType = (level: string) => {
@@ -93,19 +86,19 @@ export async function executePlaywrightCode(
   // This is a simple regex check, not a full AST parse, but catches most beginner mistakes.
   const forbiddenPatterns = [
     {
-      pattern: /document\.getElement/,
-      message:
-        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
-    },
-    {
-      pattern: /document\.query/,
-      message:
-        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
-    },
-    {
-      pattern: /window\.local/,
+      pattern: /\bwindow\.localStorage\b/,
       message:
         "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.localStorage...)'.",
+    },
+    {
+      pattern: /\bwindow\.sessionStorage\b/,
+      message:
+        "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.sessionStorage...)'.",
+    },
+    {
+      pattern: /\bdocument\.(getElement|query|body|cookie)\b/,
+      message:
+        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
     },
     {
       pattern: /alert\(/,
@@ -116,7 +109,7 @@ export async function executePlaywrightCode(
 
   if (strictMode) {
     for (const { pattern, message } of forbiddenPatterns) {
-      if (pattern.test(code)) {
+      if (pattern.test(executableCode)) {
         // Check if it might be inside an evaluate block (naive check)
         // If the code line containing the pattern is not inside an evaluate, throw error
         // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
@@ -131,6 +124,12 @@ export async function executePlaywrightCode(
       }
     }
   }
+
+  // Phase 2: Strip standard Playwright imports (they are decorative in the shim)
+  executableCode = executableCode.replace(
+    /^\s*import\s+.*from\s+['"]@playwright\/test['"];?\s*$/gm,
+    '',
+  );
 
   try {
     return await new Promise((resolve) => {
@@ -179,6 +178,19 @@ export async function executePlaywrightCode(
             const iframeDoc = iframe.contentDocument;
             if (!iframeDoc) {
               throw new Error('Could not access iframe document');
+            }
+
+            // In Playwright tests, localStorage/sessionStorage should be empty at the start of a run
+            // to ensure isolation. Since all challenges share the same origin, we clear manually.
+            try {
+              if (iframe.contentWindow) {
+                iframe.contentWindow.localStorage?.clear();
+                iframe.contentWindow.sessionStorage?.clear();
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                (iframe.contentWindow as any).__MOCK_ROUTES__ = [];
+              }
+            } catch (e) {
+              console.warn('Failed to clear storage:', e);
             }
 
             // Set up the HTML content
@@ -451,70 +463,25 @@ export async function executePlaywrightCode(
             }
 
             // Create an intercepted console object that logs to our logs array
-            // Note: logCounter is shared with the logger handler above
-            const interceptedConsole = {
-              log: (...args: unknown[]) => {
-                logs.push({
-                  id: `log-${Date.now()}-${logCounter++}`,
-                  type: 'log',
-                  message: args.map((a) => String(a)).join(' '),
-                });
-              },
-              error: (...args: unknown[]) => {
-                logs.push({
-                  id: `log-${Date.now()}-${logCounter++}`,
-                  type: 'error',
-                  message: args.map((a) => String(a)).join(' '),
-                });
-              },
-              warn: (...args: unknown[]) => {
-                logs.push({
-                  id: `log-${Date.now()}-${logCounter++}`,
-                  type: 'warn',
-                  message: args.map((a) => String(a)).join(' '),
-                });
-              },
-              info: (...args: unknown[]) => {
-                logs.push({
-                  id: `log-${Date.now()}-${logCounter++}`,
-                  type: 'log',
-                  message: args.map((a) => String(a)).join(' '),
-                });
-              },
-            };
-
-            // Execute user code
-            // For JS challenges, we need to capture the 'result' variable
-            // We use eval-style declaration to make result accessible even if user uses const/let
+            const logCounterRef = { current: logCounter };
+            const interceptedConsole = createInterceptedConsole(logs, logCounterRef);
+            // Sync back the counter if needed, though logCounterRef.current handles it
 
             // Create an enhanced document wrapper with friendlier error messages
             const createEnhancedDocument = (doc: Document) => {
               const handler: ProxyHandler<Document> = {
                 get(target, prop) {
-                  // querySelector override removed to allow null returns for existence checks
-
                   if (prop === 'querySelectorAll') {
                     return (selector: string) => {
                       const elements = target.querySelectorAll(selector);
                       if (elements.length === 0) {
-                        console.warn(
-                          `Warning: No elements found for selector '${selector}'`,
-                        );
+                        console.warn(`Warning: No elements found for selector '${selector}'`);
                       }
                       return elements;
                     };
                   }
-                  // getElementById override removed to allow null returns
-
-                  // For all other properties, return the original value
-                  /* eslint-disable @typescript-eslint/no-unsafe-return */
-                  const value = target[prop as keyof Document];
-                  if (typeof value === 'function') {
-
-                    return value.bind(target);
-                  }
-                  return value;
-                  /* eslint-enable @typescript-eslint/no-unsafe-return */
+                  const value = (target as any)[prop];
+                  return typeof value === 'function' ? value.bind(target) : value;
                 },
               };
               return new Proxy(doc, handler);
@@ -522,67 +489,66 @@ export async function executePlaywrightCode(
 
             const enhancedDocument = createEnhancedDocument(iframeDoc);
 
-            // Mock test runner object
-            const test = {
-              step: async (name: string, callback: () => Promise<unknown>) => {
-                interceptedConsole.log(`[Step] ${name}`);
+            // Prepare the iframe execution environment
+            const contentWindow = iframe.contentWindow as any;
+
+            // Initialize promise tracker for async tests
+            contentWindow.__testPromises = [];
+
+            // Mock test runner object (Support both test.step and standard test('name', ...))
+            const testInstance = async (name: string, callback: (fixtures: any) => Promise<void>) => {
+              // Create a tracking promise for this test
+              const testPromise = (async () => {
+                interceptedConsole.log(`[Test] ${name}`);
                 try {
-                  await callback();
+                  await callback({ page, expect });
                 } catch (error) {
-                  interceptedConsole.error(`[Step] ${name} FAILED: ${String(error)}`);
+                  interceptedConsole.error(`[Test] ${name} FAILED: ${String(error)}`);
                   throw error;
                 }
-              },
-            };
+              })();
 
-            // Prepare the iframe execution environment
-            /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-            const contentWindow = iframe.contentWindow as any;
+              // Track it so we can await it later
+              if (Array.isArray(contentWindow.__testPromises)) {
+                contentWindow.__testPromises.push(testPromise);
+              }
+
+              return testPromise;
+            };
+            (testInstance as any).step = async (name: string, callback: () => Promise<unknown>) => {
+              interceptedConsole.log(`[Step] ${name}`);
+              try {
+                await callback();
+              } catch (error) {
+                interceptedConsole.error(`[Step] ${name} FAILED: ${String(error)}`);
+                throw error;
+              }
+            };
+            const test = testInstance;
 
             // Inject tools into the iframe context
             contentWindow.page = page;
-            // We need to inject a proxied expect that works in the iframe context but uses our matcher logic?
-            // OR we just inject the expect function.
-            // The 'expect' function we created handles logic in the parent (shim), but it's called from code.
-            // It should work fine if injected.
-
-            // Simple expect function with assertion tracking
             const { expect, getAssertionCount, getTestResults } = createExpect();
             contentWindow.expect = expect;
             contentWindow.test = test;
 
             // Inject console interceptor
-            // We can't easily replace console inside the iframe if we want to keep native behavior too?
-            // Actually, let's override it but proxy to interceptedConsole
             const originalIframeConsole = contentWindow.console;
             contentWindow.console = {
               ...originalIframeConsole,
-              log: (...args: any[]) => {
-                interceptedConsole.log(...args);
-              },
-              error: (...args: any[]) => {
-                interceptedConsole.error(...args);
-              },
-              warn: (...args: any[]) => {
-                interceptedConsole.warn(...args);
-              },
-              info: (...args: any[]) => {
-                interceptedConsole.info(...args);
-              },
+              ...interceptedConsole
             };
-            /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-
-            // Execute user code INSIDE the iframe context using eval
-            // This ensures 'Array', 'Object', 'HTMLElement' match the iframe's classes.
-            // We wrap it in an async function to handle await.
-            // We use 'return (async () => { ... })()' pattern.
-
-            // Note: 'fetch' is already patched in the iframe by the document.write() script.
 
             const wrappedCode = `
                         return (async () => {
                             try {
-                                ${code}
+                                ${executableCode}
+
+                                // Wait for all tests to complete
+                                if (window.__testPromises && Array.isArray(window.__testPromises)) {
+                                    await Promise.all(window.__testPromises);
+                                }
+
                                 if (typeof result !== "undefined") return result;
                             } catch (e) {
                                 throw e;
@@ -745,82 +711,6 @@ function formatError(error: unknown): string {
   return msg;
 }
 
-/**
- * Validate expected DOM state after code execution
- */
-function validateExpectedState(
-  doc: Document,
-  rules: ExpectedStateRule[]
-): { passed: boolean; error?: string } {
-  for (const rule of rules) {
-    const elements = doc.querySelectorAll(rule.selector);
-
-    // Check count
-    if (rule.count !== undefined && elements.length !== rule.count) {
-      return {
-        passed: false,
-        error: `Expected ${rule.count} element(s) for '${rule.selector}', found ${elements.length}`,
-      };
-    }
-
-    // Check visible (at least one element exists)
-    if (rule.visible && elements.length === 0) {
-      return {
-        passed: false,
-        error: `Expected '${rule.selector}' to be visible, but it was not found`,
-      };
-    }
-
-    // Check hidden (no elements)
-    if (rule.hidden && elements.length > 0) {
-      return {
-        passed: false,
-        error: `Expected '${rule.selector}' to be hidden, but it was visible`,
-      };
-    }
-
-    // Check containsText
-    if (rule.containsText && elements.length > 0) {
-      const text = elements[0]?.textContent || '';
-      if (!text.includes(rule.containsText)) {
-        return {
-          passed: false,
-          error: `Expected '${rule.selector}' to contain "${rule.containsText}", but got "${text.slice(0, 50)}${text.length > 50 ? '...' : ''}"`,
-        };
-      }
-    }
-
-    // Check hasAttribute
-    if (rule.hasAttribute && elements.length > 0) {
-      const el = elements[0];
-      const attrValue = el?.getAttribute(rule.hasAttribute.name);
-      if (attrValue === null) {
-        return {
-          passed: false,
-          error: `Expected '${rule.selector}' to have attribute '${rule.hasAttribute.name}'`,
-        };
-      }
-      if (rule.hasAttribute.value !== undefined) {
-        const expectedVal = rule.hasAttribute.value;
-        if (expectedVal instanceof RegExp) {
-          if (!expectedVal.test(attrValue)) {
-            return {
-              passed: false,
-              error: `Expected '${rule.selector}' attribute '${rule.hasAttribute.name}' to match ${expectedVal}`,
-            };
-          }
-        } else if (attrValue !== expectedVal) {
-          return {
-            passed: false,
-            error: `Expected '${rule.selector}' attribute '${rule.hasAttribute.name}' to be "${expectedVal}", got "${attrValue}"`,
-          };
-        }
-      }
-    }
-  }
-
-  return { passed: true };
-}
 
 /**
  * Execute code with multiple test cases
@@ -921,293 +811,6 @@ export async function executeWithTestCases(
   };
 }
 
-/**
- * Create a simple expect function for assertions
- * Returns both the expect function and assert count getter
- */
-// Define the return type explicitly to avoid circular reference
-interface ExpectResult {
-  expect: ((actual: unknown) => {
-    toBe: (expected: unknown) => void;
-    toBeVisible: () => Promise<void>;
-    toBeHidden: () => Promise<void>;
-    toHaveText: (text: string | RegExp) => Promise<void>;
-    toHaveValue: (value: string) => Promise<void>;
-    toContainText: (text: string) => Promise<void>;
-    toHaveAttribute: (name: string, value?: string | RegExp) => Promise<void>;
-    toHaveCount: (count: number) => Promise<void>;
-    not: {
-      toBeVisible: () => Promise<void>;
-      toBeHidden: () => Promise<void>;
-      toHaveText: (text: string | RegExp) => Promise<void>;
-      toContainText: (text: string) => Promise<void>;
-      toBeChecked: () => Promise<void>;
-      toBeEnabled: () => Promise<void>;
-      toBeDisabled: () => Promise<void>;
-      toBeFocused: () => Promise<void>;
-      toBeEmpty: () => Promise<void>;
-    };
-  }) & {
-    soft: (actual: unknown) => any;
-  };
-  getAssertionCount: () => number;
-  getTestResults: () => Array<{ message: string; passed: boolean }>;
-}
-
-export function createExpect(): ExpectResult {
-  let assertionCount = 0;
-  const testResults: Array<{ message: string; passed: boolean }> = [];
-
-  const incrementCount = () => {
-    assertionCount++;
-  };
-  const getAssertionCount = () => assertionCount;
-  const getTestResults = () => testResults;
-
-  /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
-  const createMatchers = (actual: any, isSoft = false, isNot = false) => {
-    const handleResult = (pass: boolean, message: string) => {
-      incrementCount();
-      // Invert if isNot is true
-      const finalPass = isNot ? !pass : pass;
-      const finalMessage = isNot ? `Not Error: ${message}` : message;
-
-      if (!finalPass) {
-        if (isSoft) {
-          const formattedMessage = finalMessage.includes('Expected')
-            ? `Soft Assertion Failed: ${finalMessage}`
-            : `Soft Assertion Failed: ${finalMessage} (Actual value did not match expected criteria)`;
-          console.error(formattedMessage);
-          testResults.push({ message: formattedMessage, passed: false });
-        } else {
-          const formattedMessage = finalMessage.includes('Expected')
-            ? `Assertion Error: ${finalMessage}`
-            : `Assertion Error: ${finalMessage} (Actual value did not match expected criteria)`;
-          throw new Error(formattedMessage);
-        }
-      }
-    };
-
-    return {
-      async toHaveText(expected: string | RegExp) {
-        let text = '';
-        if (actual && typeof actual.textContent === 'function') {
-          text = (await actual.textContent()) || '';
-        } else if (actual instanceof HTMLElement) {
-          text = actual.textContent || '';
-        } else {
-          text = String(actual);
-        }
-        const pass = expected instanceof RegExp ? expected.test(text) : text === expected;
-        handleResult(pass, `Expected text "${text}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
-      },
-
-      async toContainText(expected: string) {
-        let text = '';
-        if (actual && typeof actual.textContent === 'function') {
-          text = (await actual.textContent()) || '';
-        } else if (actual instanceof HTMLElement) {
-          text = actual.textContent || '';
-        } else {
-          text = String(actual);
-        }
-        handleResult(
-          text.includes(expected),
-          `Expected text "${text}" ${isNot ? 'NOT ' : ''}to contain "${expected}"`,
-        );
-      },
-
-      async toHaveValue(expected: string | RegExp) {
-        let value = '';
-        if (actual && typeof actual.inputValue === 'function') {
-          value = await actual.inputValue();
-        } else if (
-          actual instanceof HTMLInputElement ||
-          actual instanceof HTMLTextAreaElement ||
-          actual instanceof HTMLSelectElement
-        ) {
-          value = actual.value;
-        }
-        const pass = expected instanceof RegExp ? expected.test(value) : value === expected;
-        handleResult(pass, `Expected value "${value}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
-      },
-
-      async toHaveAttribute(name: string, value?: string | RegExp) {
-        let attrValue: string | null = null;
-        if (actual && typeof actual.getAttribute === 'function') {
-          attrValue = await actual.getAttribute(name);
-        } else if (actual instanceof HTMLElement) {
-          attrValue = actual.getAttribute(name);
-        }
-
-        if (attrValue === null) {
-          handleResult(false, `Expected attribute "${name}" to exist`);
-          return;
-        }
-
-        if (value !== undefined) {
-          const pass = value instanceof RegExp ? value.test(attrValue) : attrValue === value;
-          handleResult(pass, `Expected attribute "${name}" ${isNot ? 'NOT ' : ''}to have value "${value}", got "${attrValue}"`);
-        } else {
-          handleResult(true, '');
-        }
-      },
-
-      async toHaveCount(expected: number) {
-        let count = 0;
-        if (actual && typeof actual.count === 'function') {
-          count = await actual.count();
-        } else if (Array.isArray(actual)) {
-          count = actual.length;
-        }
-        handleResult(count === expected, `Expected count ${expected}, got ${count}`);
-      },
-
-      async toBeVisible() {
-        await Promise.resolve();
-        let visible = false;
-        if (actual && typeof actual.isVisible === 'function') {
-          visible = await actual.isVisible();
-        } else if (actual instanceof HTMLElement) {
-          visible = actual.style.display !== 'none';
-        }
-        handleResult(visible, `Expected element ${isNot ? 'NOT ' : ''}to be visible`);
-      },
-
-      async toBeChecked() {
-        await Promise.resolve();
-        let checked = false;
-        if (actual && typeof actual.isChecked === 'function') {
-          checked = await actual.isChecked();
-        }
-        handleResult(checked, `Expected element ${isNot ? 'NOT ' : ''}to be checked`);
-      },
-
-      async toBeEnabled() {
-        await Promise.resolve();
-        let disabled = false;
-        if (actual && typeof actual.isDisabled === 'function') {
-          disabled = await actual.isDisabled();
-        }
-        handleResult(!disabled, `Expected element ${isNot ? 'NOT ' : ''}to be enabled`);
-      },
-
-      async toBeDisabled() {
-        await Promise.resolve();
-        let disabled = false;
-        if (actual && typeof actual.isDisabled === 'function') {
-          disabled = await actual.isDisabled();
-        }
-        handleResult(disabled, `Expected element ${isNot ? 'NOT ' : ''}to be disabled`);
-      },
-
-      async toBeEditable() {
-        await Promise.resolve();
-        let editable = false;
-        if (actual && typeof actual.isEditable === 'function') {
-          editable = await actual.isEditable();
-        }
-        handleResult(editable, `Expected element ${isNot ? 'NOT ' : ''}to be editable`);
-      },
-
-      async toHaveTitle(expected: string | RegExp) {
-        await Promise.resolve();
-        let title = '';
-        if (actual && typeof actual.title === 'function') {
-          title = await actual.title();
-        } else if (actual && actual.targetDocument) {
-          title = actual.targetDocument.title;
-        } else if (typeof actual === 'string') {
-          title = actual;
-        }
-        const pass = expected instanceof RegExp ? expected.test(title) : title === expected;
-        handleResult(pass, `Expected title "${title}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
-      },
-
-      async toHaveURL(expected: string | RegExp) {
-        await Promise.resolve();
-        let url = '';
-        if (actual && typeof actual.url === 'function') {
-          url = actual.url();
-        } else if (typeof actual === 'string') {
-          url = actual;
-        }
-        const pass = expected instanceof RegExp ? expected.test(url) : url === expected;
-        handleResult(pass, `Expected URL "${url}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
-      },
-
-      async toHaveClass(expected: string | RegExp) {
-        let className = '';
-        if (actual && typeof actual.getAttribute === 'function') {
-          className = (await actual.getAttribute('class')) || '';
-        } else if (actual instanceof HTMLElement) {
-          className = actual.className;
-        }
-        const pass = expected instanceof RegExp ? expected.test(className) : className === expected;
-        handleResult(pass, `Expected class "${className}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
-      },
-
-      async toBeFocused() {
-        await Promise.resolve();
-        let isFocused = false;
-        if (actual && typeof actual.evaluate === 'function') {
-          isFocused = await actual.evaluate((el: any) => el === el.ownerDocument.activeElement);
-        } else if (actual instanceof HTMLElement) {
-          isFocused = actual === actual.ownerDocument.activeElement;
-        }
-        handleResult(isFocused, `Expected element ${isNot ? 'NOT ' : ''}to be focused`);
-      },
-
-      async toBeEmpty() {
-        let isEmpty = false;
-        if (actual && typeof actual.evaluate === 'function') {
-          isEmpty = await actual.evaluate((el: HTMLElement) => {
-            if (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) return !(el as HTMLInputElement).value;
-            return !el.textContent;
-          });
-        } else if (actual instanceof HTMLElement) {
-          if (['INPUT', 'TEXTAREA', 'SELECT'].includes(actual.tagName)) isEmpty = !(actual as HTMLInputElement).value;
-          else isEmpty = !actual.textContent;
-        }
-        handleResult(isEmpty, `Expected element ${isNot ? 'NOT ' : ''}to be empty`);
-      },
-
-      async toBeHidden() {
-        await Promise.resolve();
-        let visible = false;
-        if (actual && typeof actual.isVisible === 'function') {
-          visible = await actual.isVisible();
-        } else if (actual instanceof HTMLElement) {
-          visible = actual.style.display !== 'none';
-        }
-        handleResult(!visible, `Expected element ${isNot ? 'NOT ' : ''}to be hidden`);
-      },
-
-      async toBe(expected: unknown) {
-        await Promise.resolve();
-        handleResult(actual === expected, `Expected ${expected}, got ${actual}`);
-      },
-      async toEqual(expected: unknown) {
-        await Promise.resolve();
-        handleResult(JSON.stringify(actual) === JSON.stringify(expected), `Expected equal`);
-      },
-    };
-  };
-
-  const expectFunc = ((actual: any) => {
-    const matchers: any = createMatchers(actual, false, false);
-    matchers.not = createMatchers(actual, false, true);
-    return matchers;
-  }) as any;
-
-  expectFunc.soft = (actual: any) => {
-    const matchers: any = createMatchers(actual, true, false);
-    matchers.not = createMatchers(actual, true, true);
-    return matchers;
-  };
-
-  return { expect: expectFunc, getAssertionCount, getTestResults };
-}
 
 
 

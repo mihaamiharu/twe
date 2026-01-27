@@ -160,7 +160,7 @@ export interface Challenge {
 const TRACK_ICONS: Record<TrackId, React.ReactNode> = {
   all: <LayoutDashboard className="h-4 w-4" />,
   selectors: <MousePointer2 className="h-4 w-4" />,
-  javascript: <FileCode2 className="h-4 w-4" />,
+  scripting: <FileCode2 className="h-4 w-4" />,
   core: <Compass className="h-4 w-4" />,
   e2e: <Layers className="h-4 w-4" />,
 };
@@ -172,7 +172,7 @@ const ALL_TRACKS = TRACK_IDS.map((id) => ({
   icon: TRACK_ICONS[id],
 }));
 
-function ChallengesPage() {
+export function ChallengesPage() {
   const { locale } = Route.useParams();
   const { t } = useTranslation('challenges');
   const navigate = Route.useNavigate();
@@ -302,9 +302,9 @@ function ChallengesPage() {
           : "text-muted-foreground/80 hover:bg-muted/50 hover:text-foreground"
       )}
     >
-      <div className="flex items-center gap-3">
+      <div className="flex items-start gap-3 text-left">
         {track.icon}
-        <span>{track.label}</span>
+        <span className="leading-tight">{track.label}</span>
       </div>
       <Badge
         variant="secondary"
@@ -576,7 +576,7 @@ function ChallengesPage() {
 
 // --- Sub-components for Cleaner Render ---
 
-function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: any) {
+export function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: any) {
   const CardContentWrapper = (
     <Card
       className={cn(
@@ -673,7 +673,7 @@ function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: a
   );
 }
 
-function ChallengeRow({ challenge, index, config, isComingSoon, isBoss, params, t }: any) {
+export function ChallengeRow({ challenge, index, config, isComingSoon, isBoss, params, t }: any) {
   const RowContent = (
     <>
       <TableCell className="font-mono text-xs text-muted-foreground w-[60px] pl-4">

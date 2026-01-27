@@ -245,6 +245,7 @@ const TIER_FILES: ChallengeTier[] = [
   'intermediate',
   'expert',
   'e2e',
+  'typescript',
 ];
 let challengeCache: Map<string, ChallengeDefinition> = new Map();
 let challengeCacheLoaded = false;
@@ -304,6 +305,8 @@ export async function getChallengeContent(
     instructions: resolveLocale(def.instructions, locale),
     htmlContent: def.htmlContent,
     files: def.files,
+    editableFiles: def.editableFiles,
+    preloadModules: def.preloadModules,
     starterCode: def.starterCode,
     testCases: def.testCases,
     solution: def.solution,
@@ -370,6 +373,8 @@ export async function getChallengeList(
       instructions: resolveLocale(def.instructions, locale),
       htmlContent: def.htmlContent,
       files: def.files,
+      editableFiles: def.editableFiles,
+      preloadModules: def.preloadModules,
       starterCode: def.starterCode,
       tags: def.tags,
     });

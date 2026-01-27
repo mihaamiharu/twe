@@ -1,47 +1,175 @@
 {
-  "tier": "e2e",
-  "challenges": [
-    {
-      "slug": "e2e-login-flow",
-      "type": "PLAYWRIGHT",
-      "difficulty": "MEDIUM",
-      "category": "e2e-testing",
-      "xpReward": 100,
-      "order": 1,
-      "title": {
-        "en": "E2E Login Flow",
-        "id": "Alur Login E2E"
-      },
-      "description": {
-        "en": "Practice multi-page navigation by automating a complete login flow.",
-        "id": "Praktikkan navigasi multi-halaman dengan mengotomatisasi alur login lengkap."
-      },
-      "instructions": {
-        "en": "# E2E Login Flow\n\nThis challenge simulates a real-world login flow across multiple pages.\n\n## The Scenario\nYou are testing a web application with:\n- A **Home page** (`/index.html`) with a \"Login\" link\n- A **Login page** (`/login.html`) with username/password fields\n- A **Dashboard page** (`/dashboard.html`) shown after successful login\n\n## Your Task\n\n### Given\nThe browser starts on the home page at `demo.twe.local/index.html`\n\n### When\n1. Click the \"Login\" link to navigate to the login page\n2. Fill in the username field with `testuser`\n3. Fill in the password field with `password123`\n4. Click the \"Login\" button\n5. Navigate to the dashboard page\n\n### Then\nVerify the dashboard displays a welcome message containing \"Welcome\"\n\n## Hints\n- Use `page.goto('/login.html')` to navigate between VFS pages\n- Use `page.locator()` with appropriate selectors\n- Use `await expect()` assertions to verify the result\n",
-        "id": "# Alur Login E2E\n\nTantangan ini mensimulasikan alur login dunia nyata di beberapa halaman.\n\n## Skenario\nAnda menguji aplikasi web dengan:\n- **Halaman Beranda** (`/index.html`) dengan link \"Login\"\n- **Halaman Login** (`/login.html`) dengan field username/password\n- **Halaman Dashboard** (`/dashboard.html`) ditampilkan setelah login berhasil\n\n## Tugas Anda\n\n### Diberikan\nBrowser dimulai di halaman beranda di `demo.twe.local/index.html`\n\n### Ketika\n1. Klik link \"Login\" untuk navigasi ke halaman login\n2. Isi field username dengan `testuser`\n3. Isi field password dengan `password123`\n4. Klik tombol \"Login\"\n5. Navigasi ke halaman dashboard\n\n### Kemudian\nVerifikasi dashboard menampilkan pesan selamat datang yang mengandung \"Welcome\"\n"
-      },
-      "files": {
-        "/index.html": "<!DOCTYPE html>\n<html>\n<head><title>Home - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n    <div class=\"nav-links\">\n      <a href=\"/login.html\" id=\"login-link\">Login</a>\n      <a href=\"/about.html\">About</a>\n    </div>\n  </nav>\n  <main>\n    <h1>Welcome to TWE Demo App</h1>\n    <p>The premier platform for learning test automation.</p>\n    <a href=\"/login.html\" class=\"btn btn-primary\">Get Started</a>\n  </main>\n</body>\n</html>",
-        "/login.html": "<!DOCTYPE html>\n<html>\n<head><title>Login - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n  </nav>\n  <main class=\"login-container\">\n    <h1>Sign In</h1>\n    <form id=\"login-form\" action=\"/dashboard.html\">\n      <div class=\"form-group\">\n        <label for=\"username\">Username</label>\n        <input type=\"text\" id=\"username\" name=\"username\" placeholder=\"Enter username\" />\n      </div>\n      <div class=\"form-group\">\n        <label for=\"password\">Password</label>\n        <input type=\"password\" id=\"password\" name=\"password\" placeholder=\"Enter password\" />\n      </div>\n      <button type=\"submit\" id=\"login-btn\" class=\"btn btn-primary\">Login</button>\n    </form>\n    <p class=\"signup-link\">Don't have an account? <a href=\"/signup.html\">Sign up</a></p>\n  </main>\n</body>\n</html>",
-        "/dashboard.html": "<!DOCTYPE html>\n<html>\n<head><title>Dashboard - TWE Demo App</title></head>\n<body>\n  <nav class=\"navbar\">\n    <a href=\"/index.html\" class=\"logo\">TWE Demo App</a>\n    <div class=\"nav-links\">\n      <span id=\"user-greeting\">Welcome, testuser!</span>\n      <a href=\"/logout\" id=\"logout-link\">Logout</a>\n    </div>\n  </nav>\n  <main class=\"dashboard\">\n    <h1 id=\"welcome-message\">Welcome to your Dashboard</h1>\n    <div class=\"stats-grid\">\n      <div class=\"stat-card\">\n        <h3>Challenges Completed</h3>\n        <span class=\"stat-value\">12</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>XP Earned</h3>\n        <span class=\"stat-value\">1,250</span>\n      </div>\n      <div class=\"stat-card\">\n        <h3>Current Streak</h3>\n        <span class=\"stat-value\">5 days</span>\n      </div>\n    </div>\n  </main>\n</body>\n</html>"
-      },
-      "starterCode": "// E2E Login Flow Test\n// Navigate through multiple pages and verify the login flow\n\n// Step 1: Start at the home page\nawait page.goto('/index.html');\n\n// Step 2: Click the login link to go to login page\n// Your code here...\n\n// Step 3: Fill in the login form\n// Your code here...\n\n// Step 4: Submit the form (auto-redirects to dashboard)\n// Your code here...\n\n// Step 5: Verify the welcome message\n// await expect(page.locator('#welcome-message')).toContainText('Welcome');\n",
-      "testCases": [],
-      "solution": "// E2E Login Flow Test\nawait page.goto('/index.html');\nawait page.locator('#login-link').click();\nawait page.goto('/login.html');\nawait page.locator('#username').fill('testuser');\nawait page.locator('#password').fill('password123');\nawait page.locator('#login-btn').click();\n// Navigation happens automatically via form action\nawait expect(page.locator('#welcome-message')).toContainText('Welcome');",
-      "tags": [
-        "e2e",
-        "playwright",
-        "navigation",
-        "login",
-        "vfs"
-      ],
-      "expectedState": [
+    "tier": "e2e",
+    "challenges": [
         {
-          "selector": "#welcome-message",
-          "visible": true,
-          "containsText": "Welcome"
+            "slug": "pom-login-basics",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "e2e-pom",
+            "xpReward": 100,
+            "order": 5000,
+            "title": {
+                "en": "POM Basics: Successful Login",
+                "id": "Dasar POM: Login Berhasil"
+            },
+            "description": {
+                "en": "Convert a manual test case for successful login into a Page Object Model automation.",
+                "id": "Konversi test case manual untuk login berhasil menjadi otomatisasi Page Object Model."
+            },
+            "instructions": {
+                "en": "# POM Basics: Successful Login\n\nAutomate a successful login flow following a manual test case. You'll use the **Page Object Model (POM)** pattern to keep your tests clean.\n\n## 📖 Real World Scenario\n\nDirectly manipulating selectors in tests creates a maintenance nightmare when UI changes. POM abstracts these details, meaning you only update the selector in one place (the Page Object) rather than throughout your entire test suite.\n\n## 📋 Test Case: Successful Login\n\n**Preconditions**:\n- User is not logged in\n- Valid test account exists (username: `testuser`, password: `password123`)\n\n**Steps**:\n1. Navigate to the login page at `/app/login.html`\n2. Enter \"testuser\" in the username field\n3. Enter \"password123\" in the password field\n4. Click the \"Sign In\" button\n\n**Expected Results**:\n- User is redirected to `/app/dashboard.html`\n- Dashboard displays welcome message containing \"Welcome, testuser!\"\n\n## 🎯 Your Task\nConvert this test case into Playwright automation in `tests/login.spec.ts` using the provided `LoginPage` class.\n\n## 💡 Tips\n| Test Step | Playwright Method |\n|-----------|-------------------|\n| Navigate to login page | `await loginPage.goto()` |\n| Enter credentials & click | `await loginPage.login(user, pass)` |\n| Verify welcome message | `await expect(locator).toContainText(...)` |\n",
+                "id": "# Dasar POM: Login Berhasil\n\nOtomatiskan alur login yang berhasil mengikuti test case manual. Kamu akan menggunakan pola **Page Object Model (POM)** agar pengujian tetap bersih.\n\n## 📖 Skenario Dunia Nyata\n\nMemanipulasi pemilih (selectors) secara langsung dalam pengujian menciptakan mimpi buruk pemeliharaan saat UI berubah. POM mengabstraksi detail-detail ini, berarti kamu hanya perlu memperbarui pemilih di satu tempat (Page Object) daripada di seluruh rangkaian pengujian kamu.\n\n## 📋 Test Case: Login Berhasil\n\n**Langkah-langkah**:\n1. Navigasi ke halaman login di `/app/login.html`\n2. Masukkan \"testuser\" di kolom username\n3. Masukkan \"password123\" di kolom password\n4. Klik tombol \"Sign In\"\n\n**Hasil yang Diharapkan**:\n- Pengguna diarahkan ke `/app/dashboard.html`\n- Dashboard menampilkan pesan selamat datang \"Welcome, testuser!\"\n\n## 🎯 Tugas Kamu\nKonversi test case ini menjadi otomatisasi Playwright di `tests/login.spec.ts` menggunakan class `LoginPage` yang sudah disediakan.\n"
+            },
+            "files": {
+                "/tests/login.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'testuser' and 'password123'\n  \n\n  // 3. Verify success\n  \n});",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.locator('#username');\n    this.passwordInput = page.locator('#password');\n    this.loginBtn = page.locator('.button-primary');\n  }\n\n  async goto() {\n    await this.page.goto('/app/login.html');\n  }\n\n  async login(username, password) {\n    await this.usernameInput.fill(username);\n    await this.passwordInput.fill(password);\n    await this.loginBtn.click();\n  }\n}",
+                "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8 animate-in'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4'>\n      <div>\n        <label class='text-sm font-medium text-gray-400'>Username</label>\n        <input id='username' class='input mt-1' placeholder='Enter username'>\n      </div>\n      <div>\n        <label class='text-sm font-medium text-gray-400'>Password</label>\n        <input id='password' type='password' class='input mt-1' placeholder='Enter password'>\n      </div>\n      <div id='error-msg' class='error-text'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  const form = document.getElementById('login-form');\n  const userIn = document.getElementById('username');\n  const passIn = document.getElementById('password');\n  form.onsubmit = (e) => {\n    e.preventDefault();\n    if (userIn.value === 'testuser' && passIn.value === 'password123') {\n      localStorage.setItem('twe_session', JSON.stringify({ username: 'testuser' }));\n      window.__VFS_NAVIGATE__('/app/dashboard.html');\n    } else {\n      document.getElementById('error-msg').style.display = 'block';\n    }\n  };\n</script>",
+                "/app/dashboard.html": "<div class='min-h-screen p-8 animate-in'>\n  <div class='flex justify-between items-center mb-8'>\n    <h1 class='text-2xl font-bold'>Dashboard</h1>\n    <button id='logout-btn' class='button button-ghost'>Logout</button>\n  </div>\n  <div class='card p-6 glass'>\n    <h2 id='welcome-message' class='text-xl font-medium'>Loading...</h2>\n    <p class='text-gray-400 mt-2'>Welcome back to your TestApp workspace.</p>\n  </div>\n</div>\n<script>\n  const session = JSON.parse(localStorage.getItem('twe_session') || '{}');\n  if (!session.username) {\n    window.__VFS_NAVIGATE__('/app/login.html');\n  } else {\n    document.getElementById('welcome-message').textContent = `Welcome, ${session.username}!`;\n  }\n  document.getElementById('logout-btn').onclick = () => {\n    localStorage.removeItem('twe_session');\n    window.__VFS_NAVIGATE__('/app/login.html');\n  };\n</script>"
+            },
+            "editableFiles": [
+                "/tests/login.spec.ts"
+            ],
+            "preloadModules": {
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                }
+            },
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'testuser' and 'password123'\n  \n\n  // 3. Verify welcome message\n  \n});",
+            "testCases": [],
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('testuser', 'password123');\n  await expect(page.locator('#welcome-message')).toContainText('Welcome, testuser!');\n});",
+            "expectedState": [
+                {
+                    "selector": "#welcome-message",
+                    "visible": true,
+                    "containsText": "Welcome, testuser!"
+                }
+            ],
+            "tags": [
+                "pom",
+                "playwright",
+                "e2e"
+            ]
+        },
+        {
+            "slug": "pom-login-failures",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "e2e-pom",
+            "xpReward": 120,
+            "order": 5001,
+            "title": {
+                "en": "POM: Testing Failures",
+                "id": "POM: Menguji Kegagalan"
+            },
+            "description": {
+                "en": "Verify that the application correctly handles invalid login attempts and displays error messages.",
+                "id": "Verifikasi bahwa aplikasi menangani upaya login yang tidak valid dengan benar dan menampilkan pesan kesalahan."
+            },
+            "instructions": {
+                "en": "# POM: Testing Failures\n\nTesting the \"happy path\" is only half the job. In this challenge, you'll automate a negative test case to verify error handling.\n\n## 📖 Real World Scenario\n\nValidating that an application handles errors gracefully is just as critical as testing successful flows. Users will inevitably make mistakes, and your tests should ensure the system provides clear feedback and doesn't break under invalid input.\n\n## 📋 Test Case: Invalid Credentials\n\n**Steps**:\n1. Navigate to the login page at `/app/login.html`\n2. Enter \"wronguser\" in the username field\n3. Enter \"wrongpass\" in the password field\n4. Click the \"Sign In\" button\n\n**Expected Results**:\n- Error message \"Invalid username or password\" is displayed\n- User remains on the login page (`/app/login.html`)\n- Login form is still visible\n\n## 🎯 Your Task\nAutomate this negative test case in `tests/login-fail.spec.ts` using the `LoginPage` class.\n",
+                "id": "# POM: Menguji Kegagalan\n\nMenguji \"happy path\" hanyalah setengah dari pekerjaan. Dalam tantangan ini, kamu akan mengotomatiskan test case negatif untuk memverifikasi penanganan kesalahan.\n\n## 📖 Skenario Dunia Nyata\n\nMemvalidasi bahwa aplikasi menangani kesalahan dengan baik sama pentingnya dengan menguji alur yang berhasil. Pengguna pasti akan melakukan kesalahan, dan pengujian kamu harus memastikan sistem memberikan umpan balik yang jelas dan tidak rusak saat menerima input yang tidak valid.\n\n## 📋 Test Case: Kredensial Tidak Valid\n\n**Langkah-langkah**:\n1. Navigasi ke halaman login di `/app/login.html`\n2. Masukkan \"wronguser\" di kolom username\n3. Masukkan \"wrongpass\" di kolom password\n4. Klik tombol \"Sign In\"\n\n**Hasil yang Diharapkan**:\n- Pesan kesalahan \"Invalid username or password\" ditampilkan\n- Pengguna tetap berada di halaman login (`/app/login.html`)\n\n## 🎯 Tugas Kamu\nOtomatiskan test case negatif ini di `tests/login-fail.spec.ts` menggunakan class `LoginPage`.\n"
+            },
+            "files": {
+                "/tests/login-fail.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  // 1. Navigate to login\n  \n  // 2. Login with wrong credentials\n  \n  // 3. Verify error message is visible\n  \n  // 4. Verify we are still on login page\n  \n});",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.locator('#username');\n    this.passwordInput = page.locator('#password');\n    this.loginBtn = page.locator('.button-primary');\n    this.errorMessage = page.locator('#error-msg');\n  }\n\n  async goto() {\n    await this.page.goto('/app/login.html');\n  }\n\n  async login(username, password) {\n    await this.usernameInput.fill(username);\n    await this.passwordInput.fill(password);\n    await this.loginBtn.click();\n  }\n}",
+                "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4'>\n      <input id='username' class='input' placeholder='Username'>\n      <input id='password' type='password' class='input' placeholder='Password'>\n      <div id='error-msg' class='error-text'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  document.getElementById('login-form').onsubmit = (e) => {\n    e.preventDefault();\n    document.getElementById('error-msg').style.display = 'block';\n  };\n</script>"
+            },
+            "editableFiles": [
+                "/tests/login-fail.spec.ts"
+            ],
+            "preloadModules": {
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                }
+            },
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'wronguser' and 'wrongpass'\n  \n\n  // 3. Verify error message and URL\n  \n});",
+            "testCases": [],
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('wronguser', 'wrongpass');\n  \n  await expect(loginPage.errorMessage).toBeVisible();\n  await expect(page).toHaveURL('/app/login.html');\n});",
+            "expectedState": [
+                {
+                    "selector": "#error-msg",
+                    "visible": true,
+                    "containsText": "Invalid"
+                }
+            ],
+            "tags": [
+                "pom",
+                "negative-test",
+                "playwright"
+            ]
+        },
+        {
+            "slug": "pom-multi-page",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "e2e-pom",
+            "xpReward": 150,
+            "order": 5002,
+            "title": {
+                "en": "POM: Multi-Page User Journey",
+                "id": "POM: Perjalanan Pengguna Multi-Halaman"
+            },
+            "description": {
+                "en": "Chain Page Objects to automate a complete user journey from login to profile update.",
+                "id": "Rantai Page Object untuk mengotomatiskan perjalanan pengguna yang lengkap dari login hingga pembaruan profil."
+            },
+            "instructions": {
+                "en": "# POM: Multi-Page User Journey\n\nReal tests often involve multiple pages. You'll learn the **Fluent Page Object** pattern where methods return the next Page Object.\n\n## 📖 Real World Scenario\n\nEnd-to-end tests usually span across multiple features—for example, logging in, searching for a product, and completing a profile. Using the Fluent interface pattern where methods return the next page object makes your test code read naturally and simplifies navigation logic.\n\n## 📋 Test Case: Update Profile Name\n\n**Steps**:\n1. Login with valid credentials (`testuser` / `password123`)\n2. Click the \"Profile\" link in the navigation\n3. Update the display name to \"QA Tester\"\n4. Click \"Save Changes\"\n5. Navigate back to the dashboard\n\n**Expected Results**:\n- Dashboard shows the updated display name \"QA Tester\"\n\n## 🎯 Your Task\nComplete the user journey in `tests/profile.spec.ts`. Use the method chaining enabled by the Page Objects.\n",
+                "id": "# POM: Perjalanan Pengguna Multi-Halaman\n\nTes nyata sering kali melibatkan banyak halaman. Kamu akan mempelajari pola **Fluent Page Object** di mana metode mengembalikan Page Object berikutnya.\n\n## 📖 Skenario Dunia Nyata\n\nPengujian end-to-end biasanya mencakup beberapa fitur—misalnya, login, mencari produk, dan melengkapi profil. Menggunakan pola antarmuka Fluent di mana metode mengembalikan objek halaman berikutnya membuat kode pengujian kamu terbaca secara alami dan menyederhanakan logika navigasi.\n\n## 📋 Test Case: Perbarui Nama Profil\n\n**Langkah-langkah**:\n1. Login dengan kredensial valid (`testuser` / `password123`)\n2. Klik link \"Profile\" di navigasi\n3. Perbarui nama tampilan menjadi \"QA Tester\"\n4. Klik \"Save Changes\"\n5. Navigasi kembali ke dashboard\n\n**Hasil yang Diharapkan**:\n- Dashboard menampilkan nama tampilan yang diperbarui \"QA Tester\"\n\n## 🎯 Tugas Kamu\nSelesaikan perjalanan pengguna di `tests/profile.spec.ts`. Gunakan perantaian metode (method chaining) yang dimungkinkan oleh Page Objects.\n"
+            },
+            "files": {
+                "/tests/profile.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should update profile name', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  \n  // 1. Navigate and Login\n  await loginPage.goto();\n  const dashboardPage = await loginPage.login('testuser', 'password123');\n\n  // 2. Go to profile page\n  \n\n  // 3. Update name to 'QA Tester'\n  \n\n  // 4. Back to dashboard and verify name changed\n  \n});",
+                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { this.page = page; }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) {\n    await this.page.fill('#username', u);\n    await this.page.fill('#password', p);\n    await this.page.click('.button-primary');\n    return new DashboardPage(this.page);\n  }\n}",
+                "/pages/DashboardPage.ts": "export class DashboardPage {\n  constructor(page) { \n    this.page = page;\n    this.welcomeMsg = page.locator('#welcome-message');\n    this.profileLink = page.locator('#profile-link');\n  }\n  async goToProfile() {\n    await this.profileLink.click();\n    return new ProfilePage(this.page);\n  }\n}",
+                "/pages/ProfilePage.ts": "export class ProfilePage {\n  constructor(page) { \n    this.page = page;\n    this.nameInput = page.locator('#display-name');\n    this.saveBtn = page.locator('#save-btn');\n    this.dashLink = page.locator('#dash-link');\n  }\n  async updateName(name) {\n    await this.nameInput.fill(name);\n    await this.saveBtn.click();\n  }\n  async backToDashboard() {\n    await this.dashLink.click();\n    return new DashboardPage(this.page);\n  }\n}",
+                "/app/login.html": "<div class='min-h-screen flex items-center justify-center'><div class='card p-8'><h1>Login</h1><input id='username' class='input mt-2'><input id='password' type='password' class='input mt-2'><button class='button button-primary mt-4' onclick='localStorage.setItem(\"twe_session\", JSON.stringify({username:\"testuser\", name:\"testuser\"})); window.__VFS_NAVIGATE__(\"/app/dashboard.html\")'>Sign In</button></div></div>",
+                "/app/dashboard.html": "<div class='p-8'><nav class='flex gap-4 mb-8'><a id='dash-link' href='/app/dashboard.html'>Dash</a><a id='profile-link' href='/app/profile.html'>Profile</a></nav><h1>Dashboard</h1><h2 id='welcome-message'></h2></div><script>const s = JSON.parse(localStorage.getItem(\"twe_session\")||\"{}\"); document.getElementById(\"welcome-message\").textContent = \"Welcome, \" + (s.name || s.username);</script>",
+                "/app/profile.html": "<div class='p-8'><nav class='flex gap-4 mb-8'><a href='/app/dashboard.html' id='dash-link'>Dash</a></nav><h1>Profile</h1><input id='display-name' class='input mt-4'><button id='save-btn' class='button button-primary mt-4' onclick='const s = JSON.parse(localStorage.getItem(\"twe_session\")); s.name=document.getElementById(\"display-name\").value; localStorage.setItem(\"twe_session\", JSON.stringify(s))'>Save Changes</button></div>"
+            },
+            "editableFiles": [
+                "/tests/profile.spec.ts"
+            ],
+            "preloadModules": {
+                "LoginPage": {
+                    "exports": [
+                        "LoginPage"
+                    ],
+                    "source": "/pages/LoginPage.ts"
+                },
+                "DashboardPage": {
+                    "exports": [
+                        "DashboardPage"
+                    ],
+                    "source": "/pages/DashboardPage.ts"
+                },
+                "ProfilePage": {
+                    "exports": [
+                        "ProfilePage"
+                    ],
+                    "source": "/pages/ProfilePage.ts"
+                }
+            },
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should update profile name', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  \n  // 1. Navigate and Login\n  await loginPage.goto();\n  const dashboardPage = await loginPage.login('testuser', 'password123');\n\n  // 2. Navigate to the profile page\n  \n\n  // 3. Update display name to 'QA Tester'\n  \n\n  // 4. Return to dashboard and verify name change\n  \n});",
+            "testCases": [],
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should update profile name', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  const dashboardPage = await loginPage.login('testuser', 'password123');\n\n  const profilePage = await dashboardPage.goToProfile();\n  await profilePage.updateName('QA Tester');\n  \n  const dashboardAgain = await profilePage.backToDashboard();\n  await expect(dashboardAgain.welcomeMsg).toContainText('Welcome, QA Tester');\n});",
+            "expectedState": [
+                {
+                    "selector": "#welcome-message",
+                    "visible": true,
+                    "containsText": "QA Tester"
+                }
+            ],
+            "tags": [
+                "pom",
+                "fluent-interface",
+                "playwright"
+            ]
         }
-      ]
-    }
-  ]
+    ]
 }

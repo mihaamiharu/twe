@@ -88,6 +88,7 @@
     "css_selector": "CSS Selector",
     "xpath_selector": "XPath",
     "javascript": "JavaScript",
+    "typescript": "TypeScript",
     "playwright": "Playwright",
     "selector": "Selectors"
   },
@@ -95,7 +96,8 @@
     "basic": "Basic",
     "beginner": "Beginner",
     "intermediate": "Intermediate",
-    "expert": "Expert"
+    "expert": "Expert",
+    "e2e": "E2E"
   },
   "categories": {
     "css-basics": "CSS Basics",
@@ -105,6 +107,7 @@
     "js-fundamentals": "JavaScript Fundamentals",
     "js-dom": "DOM Basics",
     "js-async": "Async Basics",
+    "ts-fundamentals": "TypeScript Fundamentals",
     "playwright-navigation": "Navigation & Actions",
     "playwright-locators": "Locators",
     "playwright-assertions": "Assertions",
@@ -113,7 +116,10 @@
     "playwright-data-driven": "Data-Driven Testing",
     "playwright-infrastructure": "Test Infrastructure",
     "playwright-integration-patterns": "Integration Patterns",
-    "e2e-testing": "Simulations"
+    "e2e-pom": "Page Object Model",
+    "e2e-integration": "Integration Patterns",
+    "e2e-testing": "Simulations",
+    "page-object-model": "Page Object Model"
   },
   "labels": {
     "allTypes": "All Types",

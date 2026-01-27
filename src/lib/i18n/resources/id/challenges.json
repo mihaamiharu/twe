@@ -84,6 +84,7 @@
     "css_selector": "Selektor CSS",
     "xpath_selector": "XPath",
     "javascript": "JavaScript",
+    "typescript": "TypeScript",
     "playwright": "Playwright",
     "selector": "Selektor"
   },
@@ -91,7 +92,8 @@
     "basic": "Dasar",
     "beginner": "Pemula",
     "intermediate": "Menengah",
-    "expert": "Ahli"
+    "expert": "Ahli",
+    "e2e": "E2E"
   },
   "categories": {
     "css-basics": "Dasar CSS",
@@ -101,6 +103,7 @@
     "js-fundamentals": "Dasar JavaScript",
     "js-dom": "Dasar DOM",
     "js-async": "Dasar Async",
+    "ts-fundamentals": "Dasar TypeScript",
     "playwright-navigation": "Navigasi & Aksi",
     "playwright-locators": "Locator",
     "playwright-assertions": "Assertion",
@@ -109,7 +112,10 @@
     "playwright-data-driven": "Pengujian Berbasis Data",
     "playwright-infrastructure": "Infrastruktur Pengujian",
     "playwright-integration-patterns": "Pola Integrasi",
-    "e2e-testing": "Simulasi"
+    "e2e-pom": "Page Object Model",
+    "e2e-integration": "Pola Integrasi",
+    "e2e-testing": "Simulasi",
+    "page-object-model": "Page Object Model"
   },
   "labels": {
     "allTypes": "Semua Tipe",

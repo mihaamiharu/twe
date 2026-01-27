@@ -79,7 +79,9 @@ async function fetchStats() {
     } else if (
       category.includes('beginner') ||
       category.includes('javascript') ||
-      category.startsWith('js-')
+      category.includes('typescript') ||
+      category.startsWith('js-') ||
+      category.startsWith('ts-')
     ) {
       tiers.beginner++;
     } else if (
