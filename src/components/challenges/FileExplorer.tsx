@@ -142,10 +142,13 @@ export function FileExplorer({
                         )}
                     </div>
 
-                    <span className={cn(
-                        "text-xs font-medium truncate",
-                        isSelected ? "font-bold" : ""
-                    )}>
+                    <span
+                        className={cn(
+                            "text-xs font-medium truncate flex-1 min-w-0",
+                            isSelected ? "font-bold" : ""
+                        )}
+                        title={node.name}
+                    >
                         {node.name}
                     </span>
 
