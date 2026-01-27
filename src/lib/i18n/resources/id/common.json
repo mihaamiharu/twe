@@ -87,7 +87,7 @@
     "description": "Kuasai otomasi pengujian dengan panduan teruji dari Ekki. Skenario nyata, tanpa hambatan.",
     "product": "Produk",
     "resources": "Sumber Daya",
-    "copyright": "© {{year}} TestingWithEkki. Hak cipta dilindungi.",
+    "copyright": "© {{year}} TestingWithEkki oleh Ekki Syam. Hak cipta dilindungi.",
     "madeWith": "Dibuat dengan ❤️ untuk komunitas QA",
     "reportBug": "Laporkan Bug",
     "newsletter": {
