@@ -88,7 +88,7 @@
     "description": "Master test automation with Ekki's battle-tested guide. Real scenarios, zero friction.",
     "product": "Product",
     "resources": "Resources",
-    "copyright": "© {{year}} TestingWithEkki. All rights reserved.",
+    "copyright": "© {{year}} TestingWithEkki by Ekki Syam. All rights reserved.",
     "madeWith": "Made with ❤️ for the QA community",
     "reportBug": "Report a Bug",
     "newsletter": {
