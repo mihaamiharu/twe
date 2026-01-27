@@ -4,7 +4,8 @@
     "title": "TestingWithEkki - Pelajari Keterampilan Pengujian",
     "description": "Pelajari keterampilan pengujian melalui tutorial interaktif dan tantangan coding",
     "ogTitle": "TestingWithEkki - Kuasai Seni Otomasi",
-    "ogDescription": "Tutorial interaktif dan tantangan pengkodean untuk meningkatkan keterampilan pengujian perangkat lunak kamu."
+    "ogDescription": "Tutorial interaktif dan tantangan pengkodean untuk meningkatkan keterampilan pengujian perangkat lunak kamu.",
+    "keywords": "playwright, automation testing, qa, pengujian perangkat lunak, belajar qa automation, belajar web automation, belajar playwright, end-to-end testing, javascript testing"
   },
   "navigation": {
     "home": "Beranda",

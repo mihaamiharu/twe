@@ -56,6 +56,14 @@ export const Route = createFileRoute('/$locale/')({
         property: 'og:description',
         content: i18n.t('common:seo.ogDescription'),
       },
+      {
+        property: 'og:url',
+        content: 'https://testingwithekki.com/en',
+      },
+      {
+        property: 'og:image',
+        content: 'https://testingwithekki.com/twe-banner.png',
+      },
     ],
     links: [
       {

@@ -4,7 +4,8 @@
     "title": "TestingWithEkki - Learn Testing Skills",
     "description": "Learn testing skills through interactive tutorials and coding challenges",
     "ogTitle": "TestingWithEkki - Master the Art of Automation",
-    "ogDescription": "Interactive tutorials and coding challenges to level up your software testing skills."
+    "ogDescription": "Interactive tutorials and coding challenges to level up your software testing skills.",
+    "keywords": "playwright, automation testing, qa, software testing, learn qa automation, learn web automation, learn playwright, end-to-end testing, javascript testing"
   },
   "navigation": {
     "home": "Home",
