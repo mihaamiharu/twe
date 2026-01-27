@@ -12,11 +12,11 @@ export const Route = createFileRoute('/$locale/about')({
     head: () => ({
         meta: [
             {
-                title: `About Ekki - ${i18n.t('common:appName')}`,
+                title: `About Ekki Syam Sugiardi - ${i18n.t('common:appName')}`,
             },
             {
                 name: 'description',
-                content: 'Meet Ekki, the QA Engineer behind TestingWithEkki. A portfolio project demonstrating full-stack engineering skills.',
+                content: 'Meet Ekki Syam Sugiardi, the QA Engineer behind TestingWithEkki. A portfolio project demonstrating full-stack engineering skills.',
             },
         ],
     }),

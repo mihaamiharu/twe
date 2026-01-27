@@ -225,7 +225,7 @@ export function Footer() {
         <div className="mt-16 border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex flex-col gap-1 items-center md:items-start">
             <p className="text-xs text-muted-foreground font-medium">
-              © {new Date().getFullYear()} TestingWithEkki. All rights reserved.
+              {t('footer.copyright', { year: new Date().getFullYear() })}
             </p>
             {import.meta.env.VITE_APP_VERSION && (
               <p className="text-[10px] text-muted-foreground/50 font-mono">
