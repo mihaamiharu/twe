@@ -29,22 +29,22 @@ export const categoryLabels: Record<string, string> = {
   'xpath-basics': '📒 XPath Basics',
   'xpath-advanced': '🚀 XPath Advanced',
   'selector-comparison': '📗 CSS vs XPath',
-  // Tier 2: Beginner (JavaScript)
+  // Tier 2: Beginner (JavaScript & TypeScript)
   'js-fundamentals': '📒 JavaScript Fundamentals',
   'js-dom': '📓 DOM Basics',
   'js-async': '📔 Async Basics',
-  // Tier 3: Intermediate (Playwright Basics)
+  'ts-fundamentals': '📘 TypeScript Fundamentals',
+  // Tier 3: Intermediate (Playwright Core)
   'playwright-navigation': '🎭 Navigation & Actions',
   'playwright-locators': '🔍 Locators',
   'playwright-assertions': '✅ Assertions',
   'playwright-waits': '⏳ Wait Strategies',
-  // Tier 4: Expert (Advanced)
-  'playwright-pom': '🏗️ Page Object Model',
+  // Tier 4: Expert (Advanced Patterns)
   'playwright-data-driven': '📊 Data-Driven Testing',
   'playwright-infrastructure': '🔧 Test Infrastructure',
-  'playwright-integration-patterns': '🔄 Integration Patterns',
-  // Tier 5: E2E
-  'e2e-testing': '🟣 E2E Testing',
+  // Tier 5: E2E (App Testing)
+  'e2e-pom': '🏗️ Page Object Model',
+  'e2e-integration': '🔄 Integration Patterns',
 };
 
 export function getTierFromCategory(category?: string): string {
@@ -55,7 +55,7 @@ export function getTierFromCategory(category?: string): string {
     category.startsWith('selector')
   )
     return 'basic';
-  if (category.startsWith('js-')) return 'beginner';
+  if (category.startsWith('js-') || category.startsWith('ts-')) return 'beginner';
   if (
     category.startsWith('playwright-navigation') ||
     category.startsWith('playwright-locators') ||
@@ -64,13 +64,12 @@ export function getTierFromCategory(category?: string): string {
   )
     return 'intermediate';
   if (
-    category.startsWith('playwright-pom') ||
     category.startsWith('playwright-data') ||
-    category.startsWith('playwright-infrastructure') ||
-    category.startsWith('playwright-integration')
+    category.startsWith('playwright-infrastructure')
   )
     return 'expert';
-  if (category.startsWith('e2e-')) return 'e2e';
+  if (category.startsWith('e2e-'))
+    return 'e2e';
   return 'basic';
 }
 
@@ -79,25 +78,25 @@ export const DIFFICULTY_ORDER = { EASY: 1, MEDIUM: 2, HARD: 3 };
 
 // Define display order for categories within each tier
 export const CATEGORY_ORDER: Record<string, number> = {
-  // Basic Tier (in desired display order)
+  // Basic Tier (Selectors) - Order base: 1000
   'css-basics': 1,
   'xpath-basics': 2,
   'xpath-advanced': 3,
   'selector-comparison': 4,
-  // Beginner Tier
+  // Beginner Tier (JS/TS) - Order base: 2000
   'js-fundamentals': 1,
   'js-dom': 2,
   'js-async': 3,
-  // Intermediate Tier
+  'ts-fundamentals': 4,
+  // Intermediate Tier (Playwright Core) - Order base: 3000
   'playwright-navigation': 1,
   'playwright-locators': 2,
   'playwright-assertions': 3,
   'playwright-waits': 4,
-  // Expert Tier
-  'playwright-pom': 1,
-  'playwright-data-driven': 2,
-  'playwright-infrastructure': 3,
-  'playwright-integration-patterns': 4,
-  // E2E Tier
-  'e2e-testing': 1,
+  // Expert Tier (Advanced) - Order base: 4000
+  'playwright-data-driven': 1,
+  'playwright-infrastructure': 2,
+  // E2E Tier (App Testing) - Order base: 5000
+  'e2e-pom': 1,
+  'e2e-integration': 2,
 };

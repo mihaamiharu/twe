@@ -71,6 +71,20 @@
       "when": 1769061805538,
       "tag": "0009_add_rarity_to_achievements",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1769272121529,
+      "tag": "0010_mighty_katie_power",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1769356266544,
+      "tag": "0011_ordinary_cargill",
+      "breakpoints": true
     }
   ]
 }

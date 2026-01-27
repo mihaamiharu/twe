@@ -44,319 +44,324 @@ const CreateSubmissionSchema = z.object({
 });
 
 
-export const createSubmission = createServerFn({ method: 'POST' })
-  .inputValidator((data: unknown) => CreateSubmissionSchema.parse(data))
-  .handler(async ({ data: input }) => {
-    const { locale = 'en' } = input;
-    try {
-      // Dynamically import server-only modules
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
-      const { db } = await import('@/db');
-      const {
-        submissions,
-        challenges,
-        progress,
-        users,
-        testCases,
-        achievements,
-      } = await import('@/db/schema');
-      const { eq, and, sql, inArray } = await import('drizzle-orm');
-      const { checkLevelUp } = await import('@/lib/gamification');
-      const { checkAchievements } = await import('@/lib/achievements');
-      const { getUserStats, getEarnedAchievementIds, awardAchievements } =
-        await import('@/lib/stats');
-      const { logger } = await import('@/lib/logger');
 
-      const headers = getRequestHeaders() as Headers;
-      const session = await auth.api.getSession({ headers });
 
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          error: getErrorMessage('unauthorized', locale),
-        };
-      }
+export const challengeSubmissionHandler = async ({ data: input }: { data: z.infer<typeof CreateSubmissionSchema> }) => {
+  const { locale = 'en' } = input;
+  try {
+    // Dynamically import server-only modules
+    const { getRequestHeaders } =
+      await import('@tanstack/react-start/server');
+    const { auth } = await import('./auth.server');
+    const { db } = await import('@/db');
+    const {
+      submissions,
+      challenges,
+      progress,
+      users,
+      testCases,
+      achievements,
+    } = await import('@/db/schema');
+    const { eq, and, sql, inArray } = await import('drizzle-orm');
+    const { checkLevelUp } = await import('@/lib/gamification');
+    const { checkAchievements } = await import('@/lib/achievements');
+    const { getUserStats, getEarnedAchievementIds, awardAchievements } =
+      await import('@/lib/stats');
+    const { logger } = await import('@/lib/logger');
 
-      const userId = session.user.id;
-      const { challengeSlug, code, testResults, executionTime, isPractice } = input;
+    const headers = getRequestHeaders() as Headers;
+    const session = await auth.api.getSession({ headers });
 
-      // Practice mode: skip all DB writes and return lightweight response
-      if (isPractice) {
-        const testsTotal = testResults.length;
-        const testsPassed = testResults.filter((r) => r.passed).length;
-        const isPassed = testsPassed === testsTotal && testsTotal > 0;
+    if (!session?.user?.id) {
+      return {
+        success: false,
+        error: getErrorMessage('unauthorized', locale),
+      };
+    }
 
-        return {
-          success: true,
-          data: {
-            submission: {
-              id: 'practice',
-              isPassed,
-              testsPassed,
-              testsTotal,
-              xpEarned: 0,
-              executionTime,
-            },
-            isFirstCompletion: false,
-            isPracticeMode: true,
-            levelUp: null,
-            newAchievements: [],
-          },
-        };
-      }
+    const userId = session.user.id;
+    const { challengeSlug, code, testResults, executionTime, isPractice } = input;
 
-      // Get challenge by slug
-      let challenge = await db.query.challenges.findFirst({
-        where: eq(challenges.slug, challengeSlug),
-      });
-
-      if (!challenge) {
-        // LAZY SYNC: Check if challenge exists in filesystem
-        const { getRawChallengeContent } = await import('./content.server');
-
-        // Get raw content (with full localized objects)
-        const fsChallenge = await getRawChallengeContent(challengeSlug);
-
-        if (fsChallenge) {
-          logger.info(`[Submission] Lazy syncing challenge: ${challengeSlug}`);
-
-          // Insert challenge
-          const [newChallenge] = await db.insert(challenges).values({
-            slug: fsChallenge.slug,
-            title: fsChallenge.title as any, // Cast to any for JSONB
-            description: fsChallenge.description as any,
-            type: fsChallenge.type,
-            difficulty: fsChallenge.difficulty,
-            xpReward: fsChallenge.xpReward,
-            order: fsChallenge.order,
-            instructions: fsChallenge.instructions as any,
-            htmlContent: fsChallenge.htmlContent,
-            starterCode: fsChallenge.starterCode,
-            category: fsChallenge.category,
-            tags: fsChallenge.tags,
-            isPublished: true, // Auto-publish if found on FS during submission
-          }).returning();
-
-          // Insert test cases
-          if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
-            await db.insert(testCases).values(
-              fsChallenge.testCases.map((tc: any, index: number) => ({
-                challengeId: newChallenge.id,
-                description: tc.description,
-                input: tc.input,
-                expectedOutput: tc.expectedOutput,
-                isHidden: tc.isHidden || false,
-                order: index,
-              }))
-            );
-          }
-
-          // Use the newly created challenge
-          challenge = newChallenge;
-        } else {
-          return {
-            success: false,
-            error: getErrorMessage('challengeNotFound', locale),
-          };
-        }
-      }
-
-      // Get total test cases
-      const allTestCases = await db
-        .select({ id: testCases.id })
-        .from(testCases)
-        .where(eq(testCases.challengeId, challenge.id));
-
-      const testsTotal = allTestCases.length;
+    // Practice mode: skip all DB writes and return lightweight response
+    if (isPractice) {
+      const testsTotal = testResults.length;
       const testsPassed = testResults.filter((r) => r.passed).length;
       const isPassed = testsPassed === testsTotal && testsTotal > 0;
-
-      // Check if this is the first successful completion
-      const existingProgress = await db.query.progress.findFirst({
-        where: and(
-          eq(progress.userId, userId),
-          eq(progress.challengeId, challenge.id),
-        ),
-      });
-
-      const isFirstCompletion =
-        isPassed && (!existingProgress || !existingProgress.isCompleted);
-
-      // Calculate XP earned (only on first completion)
-      let xpEarned = 0;
-      let levelUpInfo = null;
-
-      if (isFirstCompletion) {
-        // Check if hint was used for this challenge - apply 50% XP penalty
-        const hintUsed = existingProgress?.usedHint || false;
-        const xpMultiplier = hintUsed ? 0.5 : 1;
-        xpEarned = Math.floor(challenge.xpReward * xpMultiplier);
-
-        // Get current user XP
-        const user = await db.query.users.findFirst({
-          where: eq(users.id, userId),
-        });
-
-        if (user) {
-          // Check for level up
-          levelUpInfo = checkLevelUp(user.xp, xpEarned);
-
-          // Update user XP and level
-          await db
-            .update(users)
-            .set({
-              xp: user.xp + xpEarned,
-              level: levelUpInfo.newLevel,
-              updatedAt: new Date(),
-            })
-            .where(eq(users.id, userId));
-
-          logger.info(
-            `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP${hintUsed ? ' (50% penalty for hint usage)' : ''}.`,
-          );
-
-          // Increment challenge completion count
-          await db
-            .update(challenges)
-            .set({
-              completionCount: challenge.completionCount + 1,
-            })
-            .where(eq(challenges.id, challenge.id));
-        }
-      } else if (isPassed) {
-        logger.info(
-          `[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`,
-        );
-      }
-
-      // Create submission record
-      const [submission] = await db
-        .insert(submissions)
-        .values({
-          userId,
-          challengeId: challenge.id,
-          code,
-          isPassed,
-          xpEarned,
-          executionTime,
-          testsPassed,
-          testsTotal,
-          errorMessage: testResults.find((r) => r.error)?.error,
-        })
-        .returning();
-
-      // Update or create progress record
-      if (existingProgress) {
-        await db
-          .update(progress)
-          .set({
-            isCompleted: existingProgress.isCompleted || isPassed,
-            completedAt:
-              isPassed && !existingProgress.isCompleted
-                ? new Date()
-                : existingProgress.completedAt,
-            attempts: (existingProgress.attempts || 0) + 1,
-            bestSubmissionId: isPassed
-              ? submission.id
-              : existingProgress.bestSubmissionId,
-            lastAccessedAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .where(eq(progress.id, existingProgress.id));
-      } else {
-        await db.insert(progress).values({
-          userId,
-          challengeId: challenge.id,
-          isCompleted: isPassed,
-          completedAt: isPassed ? new Date() : null,
-          attempts: 1,
-          bestSubmissionId: isPassed ? submission.id : null,
-          lastAccessedAt: new Date(),
-        });
-      }
-
-      // Check and award achievements if passed
-      let newAchievements: { id: string; name: string; icon: string }[] = [];
-      if (isPassed) {
-        try {
-          // Get real user stats from DB
-          const userStats = await getUserStats(userId);
-          const alreadyEarned = await getEarnedAchievementIds(userId);
-
-          const earnedAchievements = checkAchievements(
-            userStats,
-            alreadyEarned,
-          );
-
-          if (earnedAchievements.length > 0) {
-            // Award the achievements
-            await awardAchievements(
-              userId,
-              earnedAchievements.map((a) => a.id),
-            );
-
-            // Get localized names from DB
-            const dbAwarded = await db
-              .select({
-                id: achievements.id,
-                name: sql`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
-                icon: achievements.icon,
-              })
-              .from(achievements)
-              .where(
-                inArray(
-                  achievements.slug,
-                  earnedAchievements.map((a) => a.id),
-                ),
-              );
-
-            newAchievements = dbAwarded.map((a) => ({
-              id: a.id,
-              name: a.name as string,
-              icon: a.icon || '',
-            }));
-
-            logger.info(
-              `[Achievements] User ${userId} earned: ${newAchievements.map((a) => a.name).join(', ')}`,
-            );
-          }
-        } catch (error) {
-          logger.error('Error checking achievements:', error);
-        }
-      }
 
       return {
         success: true,
         data: {
           submission: {
-            id: submission.id,
+            id: 'practice',
             isPassed,
             testsPassed,
             testsTotal,
-            xpEarned,
+            xpEarned: 0,
             executionTime,
           },
-          isFirstCompletion,
-          levelUp: levelUpInfo?.leveledUp
-            ? {
-              oldLevel: levelUpInfo.oldLevel,
-              newLevel: levelUpInfo.newLevel,
-              levelsGained: levelUpInfo.levelsGained,
-            }
-            : null,
-          newAchievements,
+          isFirstCompletion: false,
+          isPracticeMode: true,
+          levelUp: null,
+          newAchievements: [],
         },
       };
-    } catch (error) {
-      console.error('Error submitting solution:', error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
-      };
     }
-  });
+
+    // Get challenge by slug
+    let challenge = await db.query.challenges.findFirst({
+      where: eq(challenges.slug, challengeSlug),
+    });
+
+    if (!challenge) {
+      // LAZY SYNC: Check if challenge exists in filesystem
+      const { getRawChallengeContent } = await import('./content.server');
+
+      // Get raw content (with full localized objects)
+      const fsChallenge = await getRawChallengeContent(challengeSlug);
+
+      if (fsChallenge) {
+        logger.info(`[Submission] Lazy syncing challenge: ${challengeSlug}`);
+
+        // Insert challenge
+        const [newChallenge] = await db.insert(challenges).values({
+          slug: fsChallenge.slug,
+          title: fsChallenge.title as any, // Cast to any for JSONB
+          description: fsChallenge.description as any,
+          type: fsChallenge.type,
+          difficulty: fsChallenge.difficulty,
+          xpReward: fsChallenge.xpReward,
+          order: fsChallenge.order,
+          instructions: fsChallenge.instructions as any,
+          htmlContent: fsChallenge.htmlContent,
+          starterCode: fsChallenge.starterCode,
+          category: fsChallenge.category,
+          tags: fsChallenge.tags,
+          isPublished: true, // Auto-publish if found on FS during submission
+        }).returning();
+
+        // Insert test cases
+        if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
+          await db.insert(testCases).values(
+            fsChallenge.testCases.map((tc: any, index: number) => ({
+              challengeId: newChallenge.id,
+              description: tc.description,
+              input: tc.input,
+              expectedOutput: tc.expectedOutput,
+              isHidden: tc.isHidden || false,
+              order: index,
+            }))
+          );
+        }
+
+        // Use the newly created challenge
+        challenge = newChallenge;
+      } else {
+        return {
+          success: false,
+          error: getErrorMessage('challengeNotFound', locale),
+        };
+      }
+    }
+
+    // Get total test cases
+    const allTestCases = await db
+      .select({ id: testCases.id })
+      .from(testCases)
+      .where(eq(testCases.challengeId, challenge.id));
+
+    const testsTotal = allTestCases.length;
+    const testsPassed = testResults.filter((r) => r.passed).length;
+    const isPassed = testsPassed === testsTotal && testsTotal > 0;
+
+    // Check if this is the first successful completion
+    const existingProgress = await db.query.progress.findFirst({
+      where: and(
+        eq(progress.userId, userId),
+        eq(progress.challengeId, challenge.id),
+      ),
+    });
+
+    const isFirstCompletion =
+      isPassed && (!existingProgress || !existingProgress.isCompleted);
+
+    // Calculate XP earned (only on first completion)
+    let xpEarned = 0;
+    let levelUpInfo = null;
+
+    if (isFirstCompletion) {
+      // Check if hint was used for this challenge - apply 50% XP penalty
+      const hintUsed = existingProgress?.usedHint || false;
+      const xpMultiplier = hintUsed ? 0.5 : 1;
+      xpEarned = Math.floor(challenge.xpReward * xpMultiplier);
+
+      // Get current user XP
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+
+      if (user) {
+        // Check for level up
+        levelUpInfo = checkLevelUp(user.xp, xpEarned);
+
+        // Update user XP and level
+        await db
+          .update(users)
+          .set({
+            xp: user.xp + xpEarned,
+            level: levelUpInfo.newLevel,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, userId));
+
+        logger.info(
+          `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP${hintUsed ? ' (50% penalty for hint usage)' : ''}.`,
+        );
+
+        // Increment challenge completion count
+        await db
+          .update(challenges)
+          .set({
+            completionCount: challenge.completionCount + 1,
+          })
+          .where(eq(challenges.id, challenge.id));
+      }
+    } else if (isPassed) {
+      logger.info(
+        `[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`,
+      );
+    }
+
+    // Create submission record
+    const [submission] = await db
+      .insert(submissions)
+      .values({
+        userId,
+        challengeId: challenge.id,
+        code,
+        isPassed,
+        xpEarned,
+        executionTime,
+        testsPassed,
+        testsTotal,
+        errorMessage: testResults.find((r) => r.error)?.error,
+      })
+      .returning();
+
+    // Update or create progress record
+    if (existingProgress) {
+      await db
+        .update(progress)
+        .set({
+          isCompleted: existingProgress.isCompleted || isPassed,
+          completedAt:
+            isPassed && !existingProgress.isCompleted
+              ? new Date()
+              : existingProgress.completedAt,
+          attempts: (existingProgress.attempts || 0) + 1,
+          bestSubmissionId: isPassed
+            ? submission.id
+            : existingProgress.bestSubmissionId,
+          lastAccessedAt: new Date(),
+          updatedAt: new Date(),
+        })
+        .where(eq(progress.id, existingProgress.id));
+    } else {
+      await db.insert(progress).values({
+        userId,
+        challengeId: challenge.id,
+        isCompleted: isPassed,
+        completedAt: isPassed ? new Date() : null,
+        attempts: 1,
+        bestSubmissionId: isPassed ? submission.id : null,
+        lastAccessedAt: new Date(),
+      });
+    }
+
+    // Check and award achievements if passed
+    let newAchievements: { id: string; name: string; icon: string }[] = [];
+    if (isPassed) {
+      try {
+        // Get real user stats from DB
+        const userStats = await getUserStats(userId);
+        const alreadyEarned = await getEarnedAchievementIds(userId);
+
+        const earnedAchievements = checkAchievements(
+          userStats,
+          alreadyEarned,
+        );
+
+        if (earnedAchievements.length > 0) {
+          // Award the achievements
+          await awardAchievements(
+            userId,
+            earnedAchievements.map((a) => a.id),
+          );
+
+          // Get localized names from DB
+          const dbAwarded = await db
+            .select({
+              id: achievements.id,
+              name: sql`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
+              icon: achievements.icon,
+            })
+            .from(achievements)
+            .where(
+              inArray(
+                achievements.slug,
+                earnedAchievements.map((a) => a.id),
+              ),
+            );
+
+          newAchievements = dbAwarded.map((a) => ({
+            id: a.id,
+            name: a.name as string,
+            icon: a.icon || '',
+          }));
+
+          logger.info(
+            `[Achievements] User ${userId} earned: ${newAchievements.map((a) => a.name).join(', ')}`,
+          );
+        }
+      } catch (error) {
+        logger.error('Error checking achievements:', error);
+      }
+    }
+
+    return {
+      success: true,
+      data: {
+        submission: {
+          id: submission.id,
+          isPassed,
+          testsPassed,
+          testsTotal,
+          xpEarned,
+          executionTime,
+        },
+        isFirstCompletion,
+        levelUp: levelUpInfo?.leveledUp
+          ? {
+            oldLevel: levelUpInfo.oldLevel,
+            newLevel: levelUpInfo.newLevel,
+            levelsGained: levelUpInfo.levelsGained,
+          }
+          : null,
+        newAchievements,
+      },
+    };
+  } catch (error) {
+    console.error('Error submitting solution:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+export const createSubmission = createServerFn({ method: 'POST' })
+  .inputValidator((data: unknown) => CreateSubmissionSchema.parse(data))
+  .handler(challengeSubmissionHandler);
+
 
 // ----------------------------------------------------------------------------
 // GET SUBMISSIONS (LIST)

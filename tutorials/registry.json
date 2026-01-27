@@ -140,11 +140,28 @@
         "js-async-timeout",
         "js-async-fetch"
       ],
+      "nextTutorialSlug": "typescript-for-qa"
+    },
+    {
+      "slug": "typescript-for-qa",
+      "order": 11,
+      "estimatedMinutes": 15,
+      "tags": [
+        "typescript",
+        "fundamentals",
+        "qa",
+        "automation",
+        "beginner"
+      ],
+      "relatedChallenges": [
+        "ts-type-annotations",
+        "ts-interfaces-basics"
+      ],
       "nextTutorialSlug": "playwright-architecture"
     },
     {
       "slug": "playwright-architecture",
-      "order": 11,
+      "order": 12,
       "estimatedMinutes": 10,
       "tags": [
         "playwright",
@@ -157,7 +174,7 @@
     },
     {
       "slug": "playwright-actionability",
-      "order": 12,
+      "order": 13,
       "estimatedMinutes": 10,
       "tags": [
         "playwright",
@@ -170,7 +187,7 @@
     },
     {
       "slug": "playwright-interaction-fundamentals",
-      "order": 13,
+      "order": 14,
       "estimatedMinutes": 12,
       "tags": [
         "playwright",
@@ -180,6 +197,21 @@
         "intermediate"
       ],
       "relatedChallenges": [],
+      "nextTutorialSlug": "page-object-model"
+    },
+    {
+      "slug": "page-object-model",
+      "order": 15,
+      "estimatedMinutes": 15,
+      "tags": [
+        "playwright",
+        "pom",
+        "intermediate",
+        "architecture"
+      ],
+      "relatedChallenges": [
+        "pom-login-basics"
+      ],
       "nextTutorialSlug": null
     }
   ]

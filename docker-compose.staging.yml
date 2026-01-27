@@ -1,8 +1,9 @@
 services:
   app_staging:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ghcr.io/mihaamiharu/twe:qa
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     container_name: twe-app-staging
     restart: unless-stopped
     ports:
