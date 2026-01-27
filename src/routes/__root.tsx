@@ -56,6 +56,10 @@ export const Route = createRootRouteWithContext<RootContext>()({
         content: i18n.t('common:seo.description'),
       },
       {
+        name: 'keywords',
+        content: i18n.t('common:seo.keywords'),
+      },
+      {
         property: 'og:title',
         content: i18n.t('common:seo.ogTitle'),
       },
@@ -68,8 +72,32 @@ export const Route = createRootRouteWithContext<RootContext>()({
         content: 'website',
       },
       {
+        property: 'og:site_name',
+        content: 'TestingWithEkki',
+      },
+      {
+        property: 'og:image',
+        content: 'https://testingwithekki.com/twe-banner.png',
+      },
+      {
+        property: 'og:image:width',
+        content: '1200',
+      },
+      {
+        property: 'og:image:height',
+        content: '630',
+      },
+      {
         name: 'twitter:card',
         content: 'summary_large_image',
+      },
+      {
+        name: 'twitter:site',
+        content: '@ekkisyam2310',
+      },
+      {
+        name: 'twitter:creator',
+        content: '@ekkisyam2310',
       },
       {
         name: 'twitter:title',
@@ -78,6 +106,10 @@ export const Route = createRootRouteWithContext<RootContext>()({
       {
         name: 'twitter:description',
         content: i18n.t('common:seo.ogDescription'),
+      },
+      {
+        name: 'twitter:image',
+        content: 'https://testingwithekki.com/twe-banner.png',
       },
     ],
     links: [
@@ -150,6 +182,24 @@ function RootDocument({ children }: { children: React.ReactNode }) {
                 document.documentElement.classList.add(resolved);
               })();
             `,
+          }}
+        />
+        {/* JSON-LD Organization Schema for SEO */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "TestingWithEkki",
+              "url": "https://testingwithekki.com",
+              "logo": "https://testingwithekki.com/logo-dark-new.png",
+              "sameAs": [
+                "https://x.com/ekkisyam2310",
+                "https://www.linkedin.com/in/ekkisyamsugiardi"
+              ],
+              "description": "Interactive platform for learning test automation with Playwright, JavaScript, and CSS selectors."
+            })
           }}
         />
       </head>

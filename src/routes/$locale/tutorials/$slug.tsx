@@ -29,9 +29,33 @@ import {
   TableOfContents,
   type TOCItem,
 } from '@/components/tutorials/TableOfContents';
+import i18n from '@/lib/i18n';
 
 export const Route = createFileRoute('/$locale/tutorials/$slug')({
   component: TutorialDetailPage,
+  head: ({ params }) => {
+    // Dynamic meta based on slug - the component will fetch full data
+    // For initial render, we use a reasonable fallback
+    const slug = params.slug;
+    const baseUrl = 'https://testingwithekki.com';
+
+    return {
+      meta: [
+        { title: `${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} | TestingWithEkki` },
+        { name: 'description', content: i18n.t('tutorials:page.seo.description') },
+        { property: 'og:title', content: `${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} | TestingWithEkki` },
+        { property: 'og:description', content: i18n.t('tutorials:page.seo.description') },
+        { property: 'og:url', content: `${baseUrl}/en/tutorials/${slug}` },
+        { property: 'og:image', content: `${baseUrl}/twe-banner.png` },
+      ],
+      links: [
+        { rel: 'canonical', href: `${baseUrl}/en/tutorials/${slug}` },
+        { rel: 'alternate', hrefLang: 'en', href: `${baseUrl}/en/tutorials/${slug}` },
+        { rel: 'alternate', hrefLang: 'id', href: `${baseUrl}/id/tutorials/${slug}` },
+        { rel: 'alternate', hrefLang: 'x-default', href: `${baseUrl}/en/tutorials/${slug}` },
+      ],
+    };
+  },
 });
 
 interface Tutorial {
