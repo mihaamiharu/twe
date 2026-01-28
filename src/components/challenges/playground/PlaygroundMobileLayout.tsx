@@ -5,7 +5,7 @@ import { WebComponentPreview } from '../WebComponentPreview';
 import { EditorPanel } from './EditorPanel';
 import { SelectorPanel } from './SelectorPanel';
 import { ResultsPanel } from './ResultsPanel';
-import { defaultSelectorStyles } from './constants';
+import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type { Challenge, PlaygroundState } from './types';
 import type { SelectorType } from '../SelectorInput';
 
@@ -74,7 +74,11 @@ export function PlaygroundMobileLayout({
                                     ? challenge.files[currentVfsPath] || challenge.files['/index.html'] || '<div></div>'
                                     : challenge.htmlContent || '<div></div>'
                             }
-                            cssContent={defaultSelectorStyles}
+                            cssContent={
+                                challenge.type === 'PLAYWRIGHT'
+                                    ? e2eSelectorStyles
+                                    : defaultSelectorStyles
+                            }
                             userSelector={isSelectorChallenge ? selector : undefined}
                             selectorType={selectorType as SelectorType}
                             targetSelector={challenge.targetSelector as string}
