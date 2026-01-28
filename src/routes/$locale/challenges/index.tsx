@@ -94,10 +94,41 @@ export const Route = createFileRoute('/$locale/challenges/')({
         name: 'description',
         content: i18n.t('challenges:page.seo.description'),
       },
+      {
+        property: 'og:title',
+        content: i18n.t('challenges:page.seo.title'),
+      },
+      {
+        property: 'og:description',
+        content: i18n.t('challenges:page.seo.description'),
+      },
+      {
+        property: 'og:url',
+        content: 'https://testingwithekki.com/en/challenges',
+      },
+      {
+        property: 'og:image',
+        content: 'https://testingwithekki.com/twe-banner.png',
+      },
     ],
     links: [
       {
         rel: 'canonical',
+        href: 'https://testingwithekki.com/en/challenges',
+      },
+      {
+        rel: 'alternate',
+        hrefLang: 'en',
+        href: 'https://testingwithekki.com/en/challenges',
+      },
+      {
+        rel: 'alternate',
+        hrefLang: 'id',
+        href: 'https://testingwithekki.com/id/challenges',
+      },
+      {
+        rel: 'alternate',
+        hrefLang: 'x-default',
         href: 'https://testingwithekki.com/en/challenges',
       },
     ],

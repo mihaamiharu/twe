@@ -105,10 +105,27 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
         { name: 'description', content: data.description },
         { property: 'og:title', content: title },
         { property: 'og:description', content: data.description },
+        { property: 'og:url', content: `https://testingwithekki.com/en/challenges/${data.slug}` },
+        { property: 'og:image', content: 'https://testingwithekki.com/twe-banner.png' },
       ],
       links: [
         {
           rel: 'canonical',
+          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'en',
+          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'id',
+          href: `https://testingwithekki.com/id/challenges/${data.slug}`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'x-default',
           href: `https://testingwithekki.com/en/challenges/${data.slug}`,
         },
       ],
