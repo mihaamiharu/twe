@@ -14,6 +14,15 @@ async function syncChallenges() {
         let updatedCount = 0;
         let createdCount = 0;
 
+        // Pre-fetch all existing challenges to avoid N+1 queries
+        const existingChallenges = await db.query.challenges.findMany({
+            columns: {
+                id: true,
+                slug: true
+            }
+        });
+        const existingMap = new Map(existingChallenges.map(c => [c.slug, c]));
+
         for (const item of fsChallenges) {
             const rawContent = await getRawChallengeContent(item.slug);
 
@@ -23,9 +32,7 @@ async function syncChallenges() {
             }
 
             // Check if exists in DB
-            const existing = await db.query.challenges.findFirst({
-                where: eq(challenges.slug, item.slug)
-            });
+            const existing = existingMap.get(item.slug);
 
             const challengeData = {
                 slug: rawContent.slug,
@@ -79,7 +86,6 @@ async function syncChallenges() {
                 }
                 createdCount++;
             }
-            createdCount++;
         }
 
         // 2. Handle Deletions (Unpublish content missing from FS)
