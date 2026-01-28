@@ -1,9 +1,9 @@
 import { db } from '../db';
 import { challenges, testCases } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { getRawChallengeContent, getChallengeList } from '../server/content.server';
 
-async function syncChallenges() {
+export async function syncChallenges() {
     console.log('🔄 Starting challenge sync...');
 
     try {
@@ -92,19 +92,24 @@ async function syncChallenges() {
         });
 
         let unpublishedCount = 0;
+        const toUnpublishIds: string[] = [];
 
         for (const dbChallenge of dbChallenges) {
             if (!fsSlugs.has(dbChallenge.slug)) {
                 // Challenge exists in DB but not in FS -> Unpublish
-                console.log(`🗑️  Unpublishing deleted challenge: ${dbChallenge.slug}`);
-                await db.update(challenges)
-                    .set({
-                        isPublished: false,
-                        updatedAt: new Date()
-                    })
-                    .where(eq(challenges.id, dbChallenge.id));
-                unpublishedCount++;
+                console.log(`🗑️  Marking deleted challenge for unpublish: ${dbChallenge.slug}`);
+                toUnpublishIds.push(dbChallenge.id);
             }
+        }
+
+        if (toUnpublishIds.length > 0) {
+            await db.update(challenges)
+                .set({
+                    isPublished: false,
+                    updatedAt: new Date()
+                })
+                .where(inArray(challenges.id, toUnpublishIds));
+            unpublishedCount = toUnpublishIds.length;
         }
 
         console.log(`✅ Sync Complete.`);
@@ -119,9 +124,11 @@ async function syncChallenges() {
 }
 
 // Run the sync
-syncChallenges()
-    .then(() => process.exit(0))
-    .catch((err) => {
-        console.error(err);
-        process.exit(1);
-    });
+if (import.meta.main) {
+    syncChallenges()
+        .then(() => process.exit(0))
+        .catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
+}
