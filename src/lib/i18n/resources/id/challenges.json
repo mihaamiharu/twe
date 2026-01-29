@@ -48,7 +48,9 @@
     "recommendation": "Rekomendasi:",
     "recommendationDescription": "Tantangan {{tier}} ini menggunakan konsep dari tingkat {{missingName}}.",
     "tryPrereq": "Coba {{missingName}} terlebih dahulu",
-    "shimNote": "Lingkungan latihan — menggunakan simulasi browser untuk umpan balik instan"
+    "shimNote": "Lingkungan Simulasi",
+    "shimDescription": "Berjalan di simulator berbasis browser untuk umpan balik instan. Event native dan beberapa perilaku lanjutan mungkin berbeda dari Playwright Node.js.",
+    "shimDescriptionTS": "Berjalan di simulator berbasis browser. API browser standar tersedia, tetapi modul spesifik Node.js (fs, path, dll.) tidak tersedia."
   },
   "success": {
     "title": "Tantangan Selesai!",
