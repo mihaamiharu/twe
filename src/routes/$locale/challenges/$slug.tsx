@@ -81,7 +81,7 @@ interface ServerChallengeResponse {
 
 export const Route = createFileRoute('/$locale/challenges/$slug')({
   loader: ({ context, params }) => {
-    return context.queryClient.ensureQueryData(
+    void context.queryClient.prefetchQuery(
       challengeDetailQueryOptions(params.slug, params.locale),
     );
   },
