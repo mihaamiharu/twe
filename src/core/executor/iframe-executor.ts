@@ -219,6 +219,7 @@ export async function executePlaywrightCode(
                               ${options?.cssContent || ''}
                             </style>
                             <script data-internal="true">
+                              (function() {
                                 if (window['__tweVfsPolyfillInstalled']) return;
                                 window['__tweVfsPolyfillInstalled'] = true;
 
@@ -339,6 +340,7 @@ export async function executePlaywrightCode(
                                 `
                 : ''
               }
+                              })();
                             </script>
                           </head>
                           <body>
