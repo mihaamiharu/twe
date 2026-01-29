@@ -182,12 +182,16 @@ export async function executePlaywrightCode(
 
             // In Playwright tests, localStorage/sessionStorage should be empty at the start of a run
             // to ensure isolation. Since all challenges share the same origin, we clear manually.
+            // We also initialize __APP_STATE__ for E2E app state that persists across VFS navigations.
             try {
               if (iframe.contentWindow) {
                 iframe.contentWindow.localStorage?.clear();
                 iframe.contentWindow.sessionStorage?.clear();
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                (iframe.contentWindow as any).__MOCK_ROUTES__ = [];
+                const win = iframe.contentWindow as any;
+                win.__MOCK_ROUTES__ = [];
+                // In-memory state that persists across VFS navigations within a single execution run
+                win.__APP_STATE__ = {};
               }
             } catch (e) {
               console.warn('Failed to clear storage:', e);
@@ -215,10 +219,10 @@ export async function executePlaywrightCode(
                               ${options?.cssContent || ''}
                             </style>
                             <script data-internal="true">
+                                if (window['__tweVfsPolyfillInstalled']) return;
+                                window['__tweVfsPolyfillInstalled'] = true;
+
                                 // Polyfill fetch to handle relative URLs and MOCK requests
-                                if (!window['__tweExecutorOriginalFetch']) {
-                                    window['__tweExecutorOriginalFetch'] = window.fetch;
-                                }
                                 window.fetch = function(input, init) {
                                     let url = input;
                                     if (typeof input === 'string') {
@@ -347,7 +351,7 @@ export async function executePlaywrightCode(
             // Manually execute scripts using scoped execution
             // Skip internal scripts marked with data-internal="true"
             const scripts = Array.from(
-              iframeDoc.querySelectorAll('script:not([data-internal="true"])'),
+              iframeDoc.querySelectorAll('script'),
             );
 
             scripts.forEach((script) => {
