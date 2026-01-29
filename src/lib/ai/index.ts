@@ -137,7 +137,15 @@ Aturan PENTING:
 3. Berikan contoh sintaks yang mirip tapi jangan gunakan nama variabel dari soal.
 4. Jangan basa-basi ("Hebat sekali", "Kamu sudah berusaha"). Langsung ke poin teknis.
 5. Jaga respons tetap singkat dan padat (maksimal 3 kalimat).
-6. Sertakan contoh coding singkat atau pola sintaks jika membantu memperjelas solusi.`
+6. Sertakan contoh coding singkat atau pola sintaks jika membantu memperjelas solusi.
+
+LINGKUNGAN TEKNIS (Browser Shim):
+- Kode berjalan di iframe browser, BUKAN Node.js
+- Module 'fs', 'path', 'os', 'process' TIDAK tersedia
+- Page Object (seperti LoginPage) sudah PRELOADED sebagai global — JANGAN import
+- State sesi disimpan di 'window.__APP_STATE__', bukan localStorage
+- Statement import '@playwright/test' hanya dekoratif (dihapus saat eksekusi)
+- Gunakan sintaks Playwright standar; shim akan mengemulasikannya`
         : `You are a technical QA mentor helping a student learn web testing.
 
 IMPORTANT Rules:
@@ -146,7 +154,15 @@ IMPORTANT Rules:
 3. Provide a syntax example that is consistent with the problem but uses different variable names.
 4. Skip the fluff ("Great job", "You're close"). Go straight to the technical point.
 5. Keep it concise (max 3 sentences).
-6. Include a brief code example or pattern if it helps clarify the solution.`;
+6. Include a brief code example or pattern if it helps clarify the solution.
+
+TECHNICAL ENVIRONMENT (Browser Shim):
+- Code runs in a browser iframe, NOT Node.js
+- 'fs', 'path', 'os', 'process' modules are UNAVAILABLE
+- Page Objects (e.g., LoginPage) are PRELOADED as globals — do NOT import them
+- Session state uses 'window.__APP_STATE__', not localStorage
+- The 'import from @playwright/test' statement is decorative (stripped at runtime)
+- Use standard Playwright syntax; the shim intercepts and emulates it`;
 
     return basePrompt;
 }
@@ -170,6 +186,13 @@ function buildUserPrompt(
     prompt += isIndonesian
         ? `## Instruksi Tantangan\n${instructions}\n`
         : `## Challenge Instructions\n${instructions}\n`;
+
+    // Add Technical Environment Section for PLAYWRIGHT challenges
+    if (challengeType === 'PLAYWRIGHT') {
+        prompt += isIndonesian
+            ? `\n## Catatan Lingkungan\n- \`test()\` menyediakan fixture \`{ page }\` (expect tersedia global)\n- Class Page Object sudah preloaded sebagai global (tidak perlu import)\n- \`await expect(locator).toBeVisible()\` berfungsi seperti biasa\n- Navigasi: \`await page.goto('/path')\` menggunakan Virtual File System\n- State sesi: Gunakan \`window.__APP_STATE__\` jika diperlukan (bukan localStorage)\n`
+            : `\n## Environment Notes\n- \`test()\` provides \`{ page }\` fixture (expect is available globally)\n- Page Object classes are preloaded globals (no import needed)\n- \`await expect(locator).toBeVisible()\` works as expected\n- Navigation: \`await page.goto('/path')\` uses Virtual File System\n- Session state: Use \`window.__APP_STATE__\` if needed (not localStorage)\n`;
+    }
 
     if (htmlContent) {
         prompt += isIndonesian
