@@ -360,6 +360,54 @@ export class MockedPlaywrightPage {
     const iframeWindow = this.targetDocument.defaultView as any;
     if (!iframeWindow) return;
 
+    if (!iframeWindow.__MOCK_FETCH_PATCHED__) {
+      iframeWindow.__MOCK_FETCH_PATCHED__ = true;
+      const originalFetch = iframeWindow.fetch;
+      iframeWindow.fetch = (input: any, init: any) => {
+        let url = input;
+        if (typeof input === 'string') {
+          if (input.startsWith('/')) {
+            url = 'http://localhost' + input;
+          }
+        } else if (input instanceof Request) {
+          url = input.url;
+        } else if (input && typeof input === 'object' && 'toString' in input) {
+          url = input.toString();
+        }
+
+        if (iframeWindow.__MOCK_ROUTES__) {
+          for (const route of iframeWindow.__MOCK_ROUTES__) {
+            let isMatch = false;
+            if (typeof route.matcher === 'string') {
+              isMatch = url.includes(route.matcher);
+            } else if (route.matcher instanceof RegExp) {
+              isMatch = route.matcher.test(url);
+            } else if (typeof route.matcher === 'function') {
+              try {
+                isMatch = route.matcher(new URL(url as string));
+              } catch { isMatch = false; }
+            }
+
+            if (isMatch) {
+              return route.handler({ url, method: init?.method || 'GET', headers: init?.headers, body: init?.body }).then((r: any) => {
+                if (r?.type === 'fulfill') {
+                  return Promise.resolve({
+                    ok: (r.response.status || 200) >= 200 && (r.response.status || 200) < 300,
+                    status: r.response.status || 200,
+                    json: () => Promise.resolve(r.response.json || {}),
+                    text: () => Promise.resolve(r.response.body || ''),
+                    headers: new Headers(r.response.headers as HeadersInit)
+                  });
+                }
+                return Promise.reject(new Error('Route not fulfilled'));
+              });
+            }
+          }
+        }
+        return originalFetch ? originalFetch(input, init) : Promise.resolve({ ok: false, status: 404 });
+      };
+    }
+
     const routeEntry = {
       matcher: urlOrPredicate,
       handler: async (requestInfo: any) => {
@@ -448,25 +496,34 @@ export class MockedPlaywrightPage {
         throw new Error(`Page not found in VFS: ${path}. Available pages: ${Object.keys(this.vfs).join(', ')}`);
       }
 
-      // Wrap content with necessary HTML structure
-      const wrappedHtml = this._wrapVfsContent(content);
+      // Save state that must persist across page navigations
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const oldWin = this.targetDocument.defaultView as any;
+      const preservedAppState = oldWin?.__APP_STATE__ || {};
+
+      // Wrap content with necessary HTML structure including restored state
+      const wrappedHtml = this._wrapVfsContent(content, preservedAppState);
 
       // Update iframe content
       this.targetDocument.open();
       this.targetDocument.write(wrappedHtml);
       this.targetDocument.close();
 
-      // Re-execute scripts in new content
-      this._executeScripts();
-
-      // Restore window.page reference for VFS navigation shim
+      // Restore window references BEFORE executing scripts so app scripts can access state
       if (this.targetDocument.defaultView) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const win = this.targetDocument.defaultView as any;
         win.page = this;
         // Re-inject active routes
         win.__MOCK_ROUTES__ = this.routes;
+        // Restore persisted app state across navigation (redundant but safe)
+        win.__APP_STATE__ = preservedAppState;
       }
+
+      // Re-execute scripts in new content (now with __APP_STATE__ available)
+      // We rely on document.write() to execute scripts. Manually re-executing them causes double execution 
+      // and Identifier re-declaration errors since we reuse the same Window object in VFS.
+      // this._executeScripts();
 
       this.currentUrl = path;
 
@@ -486,13 +543,21 @@ export class MockedPlaywrightPage {
   /**
    * Wrap VFS content with full HTML structure including styles and polyfills
    */
-  private _wrapVfsContent(content: string): string {
+  private _wrapVfsContent(content: string, appState: any = {}): string {
+    const appStateScript = `
+      <script>
+        // Restore persisted app state immediately
+        window.__APP_STATE__ = ${JSON.stringify(appState)};
+      </script>
+    `;
+
     return `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="utf-8">
         <base href="http://localhost/" />
+        ${appStateScript}
         <style>
           * { box-sizing: border-box; }
           body { 
@@ -503,12 +568,10 @@ export class MockedPlaywrightPage {
           ${this.cssContent || ''}
         </style>
         <script data-internal="true">
+          if (window['__tweVfsPolyfillInstalled']) return;
+          window['__tweVfsPolyfillInstalled'] = true;
+
           // Polyfill fetch to handle mock routes
-          // Polyfill fetch to handle mock routes
-          // Store original fetch if not already stored
-          if (!window['__tweShimOriginalFetch']) {
-              window['__tweShimOriginalFetch'] = window.fetch;
-          }
 
           window.fetch = function(input, init) {
             let url = input;
@@ -516,7 +579,12 @@ export class MockedPlaywrightPage {
               if (input.startsWith('/')) {
                 url = 'http://localhost' + input;
               }
+            } else if (input instanceof Request) {
+              url = input.url;
+            } else if (input && typeof input === 'object' && 'toString' in input) {
+               url = input.toString();
             }
+
             if (window.__MOCK_ROUTES__) {
               for (const route of window.__MOCK_ROUTES__) {
                 let isMatch = false;
@@ -587,7 +655,7 @@ export class MockedPlaywrightPage {
    */
   private _executeScripts(): void {
     const scripts = Array.from(
-      this.targetDocument.querySelectorAll('script:not([data-internal="true"])'),
+      this.targetDocument.querySelectorAll('script'),
     );
 
     scripts.forEach((script) => {
@@ -1473,12 +1541,8 @@ export class MockedPlaywrightPage {
   /**
    * Get inner HTML of any element
    */
-  innerHTML(selector: string): Promise<string> {
-    const element = this.targetDocument.querySelector(selector);
-    if (!element) {
-      return Promise.reject(new Error(`Element not found: ${selector}`));
-    }
-    return Promise.resolve(element.innerHTML);
+  async innerHTML(selector: string): Promise<string> {
+    return this.locator(selector).innerHTML();
   }
 
   /**
@@ -1615,6 +1679,7 @@ export class MockedPlaywrightPage {
     ): Promise<HTMLElement> => {
       const startTime = Date.now();
       while (Date.now() - startTime < timeout) {
+        strictCheck();
         const el = getElement();
         if (el) return el;
         await this.delay(100);
@@ -1633,6 +1698,7 @@ export class MockedPlaywrightPage {
       const startTime = Date.now();
 
       while (Date.now() - startTime < timeout) {
+        strictCheck();
         const el = getElement();
         if (el) {
           // If force option is set, skip visibility check
@@ -1691,8 +1757,8 @@ export class MockedPlaywrightPage {
       },
 
       textContent: async () => {
-        const el = await waitForElement().catch(() => null);
-        return el?.textContent || null;
+        const el = await waitForElement();
+        return el.textContent || null;
       },
 
       inputValue: async () => {
@@ -1777,13 +1843,13 @@ export class MockedPlaywrightPage {
       },
 
       getAttribute: async (name: string) => {
-        const el = await waitForElement().catch(() => null);
-        return el?.getAttribute(name) || null;
+        const el = await waitForElement();
+        return el.getAttribute(name);
       },
 
       innerHTML: async () => {
-        const el = await waitForElement().catch(() => null);
-        return el?.innerHTML || '';
+        const el = await waitForElement();
+        return el.innerHTML;
       },
 
       count: () => {
