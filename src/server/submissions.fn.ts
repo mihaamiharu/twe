@@ -169,7 +169,14 @@ export const challengeSubmissionHandler = async ({ data: input }: { data: z.infe
       .from(testCases)
       .where(eq(testCases.challengeId, challenge.id));
 
-    const testsTotal = allTestCases.length;
+    let testsTotal = allTestCases.length;
+
+    // If no test cases in DB (e.g. E2E or Project challenges that rely on internal assertions),
+    // use the submitted results count as the source of truth.
+    if (testsTotal === 0 && testResults.length > 0) {
+      testsTotal = testResults.length;
+    }
+
     const testsPassed = testResults.filter((r) => r.passed).length;
     const isPassed = testsPassed === testsTotal && testsTotal > 0;
 
