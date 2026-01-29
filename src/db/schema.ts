@@ -8,6 +8,7 @@ import {
   pgEnum,
   jsonb,
   index,
+  unique,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
@@ -276,7 +277,10 @@ export const userAchievements = pgTable('user_achievements', {
 
   unlockedAt: timestamp('unlocked_at').notNull().defaultNow(),
   progress: integer('progress').default(0), // For progressive achievements
-});
+}, (table) => ({
+  // Prevent duplicate user-achievement pairs
+  userAchievementUnique: unique('user_achievements_user_achievement_unique').on(table.userId, table.achievementId),
+}));
 
 // ============================================================================
 // BUG REPORTING
