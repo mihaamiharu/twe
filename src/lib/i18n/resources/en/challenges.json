@@ -52,7 +52,9 @@
     "recommendation": "Recommendation:",
     "recommendationDescription": "This {{tier}} challenge uses concepts from the {{missingName}} tier.",
     "tryPrereq": "Try {{missingName}} first",
-    "shimNote": "Practice environment — uses a browser shim for instant feedback"
+    "shimNote": "Simulated Environment",
+    "shimDescription": "Runs in a browser-based simulator for instant feedback. Native events and some advanced behaviors may differ from Node.js Playwright.",
+    "shimDescriptionTS": "Runs in a browser-based simulator. Standard browser APIs are available, but Node.js specific modules (fs, path, etc.) are not."
   },
   "success": {
     "title": "Challenge Complete!",
