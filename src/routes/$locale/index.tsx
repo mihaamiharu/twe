@@ -39,54 +39,60 @@ export const Route = createFileRoute('/$locale/')({
     }
   },
   component: HomePage,
-  head: () => ({
-    meta: [
-      {
-        title: i18n.t('common:seo.title'),
-      },
-      {
-        name: 'description',
-        content: i18n.t('common:seo.description'),
-      },
-      {
-        property: 'og:title',
-        content: i18n.t('common:seo.ogTitle'),
-      },
-      {
-        property: 'og:description',
-        content: i18n.t('common:seo.ogDescription'),
-      },
-      {
-        property: 'og:url',
-        content: 'https://testingwithekki.com/en',
-      },
-      {
-        property: 'og:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
-      },
-    ],
-    links: [
-      {
-        rel: 'canonical',
-        href: 'https://testingwithekki.com/en',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'en',
-        href: 'https://testingwithekki.com/en',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'id',
-        href: 'https://testingwithekki.com/id',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'x-default',
-        href: 'https://testingwithekki.com/en',
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    const baseUrl = 'https://testingwithekki.com';
+    const url = `${baseUrl}/${locale}`;
+
+    return {
+      meta: [
+        {
+          title: i18n.t('common:seo.title'),
+        },
+        {
+          name: 'description',
+          content: i18n.t('common:seo.description'),
+        },
+        {
+          property: 'og:title',
+          content: i18n.t('common:seo.ogTitle'),
+        },
+        {
+          property: 'og:description',
+          content: i18n.t('common:seo.ogDescription'),
+        },
+        {
+          property: 'og:url',
+          content: url,
+        },
+        {
+          property: 'og:image',
+          content: `${baseUrl}/twe-banner.png`,
+        },
+      ],
+      links: [
+        {
+          rel: 'canonical',
+          href: url,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'en',
+          href: `${baseUrl}/en`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'id',
+          href: `${baseUrl}/id`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'x-default',
+          href: `${baseUrl}/en`,
+        },
+      ],
+    };
+  },
 });
 
 function HomePage() {

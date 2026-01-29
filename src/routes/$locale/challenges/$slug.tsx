@@ -86,13 +86,39 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
     );
   },
   component: ChallengeDetailPage,
-  head: ({ loaderData }: { loaderData: ServerChallengeResponse }) => {
+  head: ({ loaderData, params }) => {
     const data = loaderData?.data;
+    const locale = params.locale || 'en';
+    const url = `https://testingwithekki.com/${locale}/challenges/${params.slug}`;
+
     if (!data) {
       return {
         meta: [
           { title: i18n.t('challenges:page.seo.title') },
           { name: 'description', content: i18n.t('challenges:page.seo.description') },
+          { property: 'og:url', content: url },
+          { property: 'og:image', content: 'https://testingwithekki.com/twe-banner.png' },
+        ],
+        links: [
+          {
+            rel: 'canonical',
+            href: url,
+          },
+          {
+            rel: 'alternate',
+            hrefLang: 'en',
+            href: `https://testingwithekki.com/en/challenges/${params.slug}`,
+          },
+          {
+            rel: 'alternate',
+            hrefLang: 'id',
+            href: `https://testingwithekki.com/id/challenges/${params.slug}`,
+          },
+          {
+            rel: 'alternate',
+            hrefLang: 'x-default',
+            href: `https://testingwithekki.com/en/challenges/${params.slug}`,
+          },
         ],
       };
     }
@@ -105,13 +131,13 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
         { name: 'description', content: data.description },
         { property: 'og:title', content: title },
         { property: 'og:description', content: data.description },
-        { property: 'og:url', content: `https://testingwithekki.com/en/challenges/${data.slug}` },
+        { property: 'og:url', content: url },
         { property: 'og:image', content: 'https://testingwithekki.com/twe-banner.png' },
       ],
       links: [
         {
           rel: 'canonical',
-          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
+          href: url,
         },
         {
           rel: 'alternate',
