@@ -7,7 +7,8 @@ import {
     Zap,
     Loader2,
     ChevronLeft,
-    ChevronRight
+    ChevronRight,
+    Info
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
@@ -78,11 +79,22 @@ export function PlaygroundHeader({
                             {challenge.xp} XP
                         </span>
                     </div>
-                    {challenge.type === 'PLAYWRIGHT' && (
-                        <p className="text-[11px] text-muted-foreground mt-0.5 flex items-center gap-1">
-                            <span className="opacity-70">ℹ️</span>
-                            {t('challenges:playground.shimNote')}
-                        </p>
+                    {(challenge.type === 'PLAYWRIGHT' || challenge.type === 'TYPESCRIPT') && (
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <div className="flex items-center gap-1 mt-0.5 cursor-help opacity-80 hover:opacity-100 transition-opacity">
+                                        <Info className="h-3 w-3 text-amber-500" />
+                                        <span className="text-[11px] text-muted-foreground border-b border-dotted border-muted-foreground/50">
+                                            {t('challenges:playground.shimNote')}
+                                        </span>
+                                    </div>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom" align="start" className="max-w-[260px] text-xs">
+                                    <p>{challenge.type === 'TYPESCRIPT' ? t('challenges:playground.shimDescriptionTS') : t('challenges:playground.shimDescription')}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
                     )}
                 </div>
             </div>
