@@ -260,7 +260,12 @@ export async function awardAchievements(
     progress: 100,
   }));
 
-  await db.insert(userAchievements).values(values);
+  await db
+    .insert(userAchievements)
+    .values(values)
+    .onConflictDoNothing({
+      target: [userAchievements.userId, userAchievements.achievementId],
+    });
 
   // 3. Calculate total XP reward and update user
   const totalXpReward = dbAchievements.reduce(
