@@ -171,9 +171,11 @@ export const challengeSubmissionHandler = async ({ data: input }: { data: z.infe
 
     let testsTotal = allTestCases.length;
 
-    // If no test cases in DB (e.g. E2E or Project challenges that rely on internal assertions),
-    // use the submitted results count as the source of truth.
-    if (testsTotal === 0 && testResults.length > 0) {
+    // If no test cases in DB, we fallback to submitted results count ONLY for Playwright/E2E challenges
+    // which use assertion-based validation rather than input/output pairs.
+    const isE2OrPlaywright = challenge.type === 'PLAYWRIGHT' || challenge.category?.includes('e2e');
+
+    if (testsTotal === 0 && testResults.length > 0 && isE2OrPlaywright) {
       testsTotal = testResults.length;
     }
 
