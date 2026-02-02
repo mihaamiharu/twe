@@ -1,0 +1,1 @@
+ALTER TABLE "progress" ADD COLUMN "hint_content" text;
