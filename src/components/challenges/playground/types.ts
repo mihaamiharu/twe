@@ -68,6 +68,7 @@ export interface ChallengePlaygroundProps {
     userId?: string;
     className?: string;
     hintUsed?: boolean; // Whether user has already used hint for this challenge
+    initialHintContent?: string | null;
 }
 
 export interface PlaygroundState {
@@ -92,6 +93,8 @@ export interface PlaygroundState {
     setIsHintDialogOpen: (open: boolean) => void;
     hintContent: string | null;
     setHintContent: (content: string | null) => void;
+    storedHint: string | null;
+    setStoredHint: (content: string | null) => void;
     hintUsed: boolean;
     setHintUsed: (used: boolean) => void;
     isMobile: boolean;

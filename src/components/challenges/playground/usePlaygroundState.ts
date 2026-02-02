@@ -12,6 +12,7 @@ export function usePlaygroundState({
     challenge,
     userId,
     hintUsed: initialHintUsed = false,
+    initialHintContent,
 }: ChallengePlaygroundProps): PlaygroundState {
     const { t, i18n } = useTranslation(['challenges', 'common']);
     const locale = i18n.language;
@@ -30,6 +31,7 @@ export function usePlaygroundState({
     // AI Hint state
     const [isHintDialogOpen, setIsHintDialogOpen] = useState(false);
     const [hintContent, setHintContent] = useState<string | null>(null);
+    const [storedHint, setStoredHint] = useState<string | null>(initialHintContent || null);
     const [hintUsed, setHintUsed] = useState(initialHintUsed);
 
     const [selectorType, setSelectorType] = useState<'css' | 'xpath'>(
@@ -150,6 +152,8 @@ export function usePlaygroundState({
         setIsHintDialogOpen,
         hintContent,
         setHintContent,
+        storedHint,
+        setStoredHint,
         hintUsed,
         setHintUsed,
         isMobile,

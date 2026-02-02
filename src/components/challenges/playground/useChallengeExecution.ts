@@ -246,6 +246,7 @@ export function useChallengeExecution(
 
             if (result.success && result.hint) {
                 setHintContent(result.hint);
+                state.setStoredHint(result.hint);
                 setHintUsed(true);
             } else if (!result.success && result.error) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
