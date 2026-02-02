@@ -238,6 +238,7 @@ export const progress = pgTable('progress', {
   attempts: integer('attempts').default(0),
   bestSubmissionId: uuid('best_submission_id').references(() => submissions.id),
   usedHint: boolean('used_hint').notNull().default(false), // Track AI hint usage for XP penalty
+  hintContent: text('hint_content'), // Store the generated hint
 
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),

@@ -70,14 +70,21 @@ export const getAIHint = createServerFn({ method: 'POST' })
                 });
             }
 
-            if (userProgress?.usedHint) {
+            // Return stored hint if available
+            if (userProgress?.usedHint && userProgress?.hintContent) {
                 return {
-                    success: false,
-                    error: locale === 'id'
-                        ? 'Kamu sudah menggunakan petunjuk untuk tantangan ini'
-                        : 'You have already used a hint for this challenge',
-                    alreadyUsed: true,
+                    success: true,
+                    hint: userProgress.hintContent,
+                    // No penalty warning needed as it's already used
                 };
+            }
+
+            if (userProgress?.usedHint) {
+                // Fallback: If marked used but no content (legacy), regenerate but warn it's "recovering"
+                // Or just let it regenerate.
+                // Current logic was preventing re-generation. Let's allow regeneration if content is missing,
+                // but we won't charge them again (already marked used).
+                // Actually, let's just proceed to generation but update the record instead of blocking.
             }
 
             // 5. Generate hint using Deepseek API
@@ -100,13 +107,14 @@ export const getAIHint = createServerFn({ method: 'POST' })
                 };
             }
 
-            // 6. Mark hint as used in progress table
+            // 6. Mark hint as used in progress table AND store content
             if (challenge) {
                 if (userProgress) {
                     await db
                         .update(progress)
                         .set({
                             usedHint: true,
+                            hintContent: hintResult.hint,
                             updatedAt: new Date(),
                         })
                         .where(eq(progress.id, userProgress.id));
@@ -116,6 +124,7 @@ export const getAIHint = createServerFn({ method: 'POST' })
                         userId,
                         challengeId: challenge.id,
                         usedHint: true,
+                        hintContent: hintResult.hint,
                         lastAccessedAt: new Date(),
                     });
                 }

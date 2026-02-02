@@ -291,6 +291,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
             attempts: progressRecord.attempts,
             lastAccessedAt: progressRecord.lastAccessedAt,
             usedHint: progressRecord.usedHint,
+            hintContent: progressRecord.hintContent,
           };
 
           if (progressRecord.bestSubmissionId) {

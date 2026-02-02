@@ -170,13 +170,15 @@ export function PlaygroundHeader({
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => (hintUsed || !userId) ? null : onOpenHintDialog()}
+                                    onClick={onOpenHintDialog}
                                     disabled={isHintPending || !userId}
                                     className={cn(
                                         'font-bold border transition-all h-8 md:h-9 px-2 md:px-3',
-                                        hintUsed || !userId
-                                            ? 'bg-amber-500/5 border-amber-500/20 text-amber-600/60 cursor-default opacity-80'
-                                            : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
+                                        hintUsed
+                                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 hover:bg-amber-500/20'
+                                            : !userId
+                                                ? 'bg-amber-500/5 border-amber-500/20 text-amber-600/60 cursor-default opacity-80'
+                                                : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
                                     )}
                                 >
                                     {isHintPending ? (
@@ -198,7 +200,7 @@ export function PlaygroundHeader({
                                 {!userId
                                     ? t('challenges:hints.loginRequired')
                                     : hintUsed
-                                        ? t('challenges:hints.alreadyUsed')
+                                        ? t('challenges:hints.showAgain', 'Show Hint Again')
                                         : t('challenges:hints.warning')
                                 }
                             </TooltipContent>
