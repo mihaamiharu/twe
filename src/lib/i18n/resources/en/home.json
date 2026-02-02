@@ -49,13 +49,13 @@
         "Waits"
       ]
     },
-    "expert": {
-      "title": "Advanced",
-      "description": "Professional patterns for production testing",
+    "e2e": {
+      "title": "E2E Testing",
+      "description": "Build complete automated test suites with professional patterns",
       "skills": [
         "Page Objects",
         "Data-Driven",
-        "CI/CD"
+        "Test Suites"
       ]
     }
   },
@@ -68,7 +68,7 @@
   "features": {
     "title": "Everything You Need to",
     "titleHighlight": "Level Up",
-    "subtitle": "A personal curriculum designed to take you from beginner to expert",
+    "subtitle": "A personal curriculum designed to take you from beginner to mastery",
     "interactiveTutorials": {
       "title": "Interactive Tutorials",
       "description": "Learn testing concepts step-by-step. I've broken down the tricky parts so you don't have to struggle."

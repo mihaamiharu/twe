@@ -243,7 +243,6 @@ const TIER_FILES: ChallengeTier[] = [
   'basic',
   'beginner',
   'intermediate',
-  'expert',
   'e2e',
   'typescript',
 ];
@@ -411,7 +410,7 @@ export async function getCachedTierTotals(): Promise<Record<string, number>> {
     basic: 0,
     beginner: 0,
     intermediate: 0,
-    expert: 0,
+    e2e: 0,
   };
 
   allChallenges.forEach((c) => {

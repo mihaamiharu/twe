@@ -174,12 +174,12 @@ function HomePage() {
       count: stats?.tiers.intermediate || 0,
     },
     {
-      tier: 'expert',
-      emoji: '🔴',
-      title: t('tiers.expert.title'),
-      description: t('tiers.expert.description'),
-      skills: t('tiers.expert.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.expert || 0,
+      tier: 'e2e',
+      emoji: '🟣',
+      title: t('tiers.e2e.title'),
+      description: t('tiers.e2e.description'),
+      skills: t('tiers.e2e.skills', { returnObjects: true }) as string[],
+      count: stats?.tiers.e2e || 0,
     },
   ];
 
