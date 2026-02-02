@@ -64,6 +64,7 @@ interface ServerChallengeResponse {
       attempts: number;
       lastAccessedAt: Date;
       usedHint: boolean;
+      hintContent?: string | null;
     } | null;
     bestSubmission?: {
       code: string;
@@ -451,6 +452,7 @@ function ChallengeDetailPage() {
           onSubmit={handleSubmit}
           userId={userId}
           hintUsed={data?.data?.userProgress?.usedHint || false}
+          initialHintContent={data?.data?.userProgress?.hintContent || null}
         />
       </div>
 
