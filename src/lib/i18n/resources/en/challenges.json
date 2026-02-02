@@ -98,8 +98,7 @@
     "basic": "Basic",
     "beginner": "Beginner",
     "intermediate": "Intermediate",
-    "expert": "Expert",
-    "e2e": "E2E"
+    "e2e": "E2E Testing"
   },
   "categories": {
     "css-basics": "CSS Basics",

@@ -22,7 +22,7 @@
     "basic": "Basic (Selectors)",
     "beginner": "Beginner (JavaScript)",
     "intermediate": "Intermediate (Playwright)",
-    "expert": "Expert (Advanced)",
+    "e2e": "E2E Testing",
     "challengeCount": "{{count}} challenges"
   },
   "milestones": {
