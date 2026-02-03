@@ -1,10 +1,11 @@
 {
   "hero": {
-    "title": "Master Test Automation",
-    "titleSuffix": "with my battle-tested guide",
-    "tagline": "Real-world challenges designed by a Senior QA Engineer.",
-    "description": "I built this platform to share the <strong>practical patterns I rely on daily</strong>. No textbooks, just the real scenarios that taught me how to test.",
-    "startLearning": "Start Learning",
+    "title": "Build Real-World Automation",
+    "titleSuffix": "with a Senior Guide",
+    "tagline": "The practical curriculum I wish I had when I started.",
+    "authorityStatement": "My career was built on the support of great mentors. This platform is my way of paying it forward.",
+    "description": "I'm giving you the <strong>hands-on, supportive environment</strong> you need to build scalable test frameworks, the exact guidance I received to go from beginner to Senior QA.",
+    "startLearning": "Solve Your First Challenge",
     "browseTutorials": "Browse Curriculum"
   },
   "stats": {
@@ -22,8 +23,8 @@
   },
   "tiers": {
     "basic": {
-      "title": "Selectors",
-      "description": "Master CSS and XPath selectors - the foundation of web testing",
+      "title": "Resilient Locators",
+      "description": "Master CSS and XPath selectors - the foundation of stable, maintainable tests",
       "skills": [
         "CSS Selectors",
         "XPath Queries",
@@ -74,7 +75,7 @@
       "description": "Learn testing concepts step-by-step. I've broken down the tricky parts so you don't have to struggle."
     },
     "playwrightChallenges": {
-      "title": "Browser Simulation",
+      "title": "Embedded Sandbox Environment",
       "description": "Practice with <strong>sandboxed scenarios</strong>. Your code runs <strong>entirely in your browser</strong> - fast, secure, and no installation."
     },
     "selectorChallenges": {
@@ -122,7 +123,7 @@
   "cta": {
     "title": "Ready to automate your first real scenario?",
     "subtitle": "Start solving practical challenges that mirror real-world applications. Free forever for individuals.",
-    "getStarted": "Start Solving",
+    "getStarted": "Start Your Journey",
     "viewLeaderboard": "See Who's Best",
     "freeToUse": "Open Source heart",
     "noCreditCard": "No strings attached",
