@@ -4,6 +4,7 @@ import { achievements, userAchievements, users } from '@/db/schema';
 import { logger } from '@/lib/logger';
 import { sql, desc } from 'drizzle-orm';
 import { getChallengeList, getTutorialList } from './content.server';
+import { getTierFromCategory } from '@/lib/constants';
 
 // In-memory cache for stats (refreshed every 24 hours)
 interface StatsCache {
@@ -15,7 +16,7 @@ interface StatsCache {
       basic: number;
       beginner: number;
       intermediate: number;
-      expert: number;
+      e2e: number;
     };
     latestAchievements: {
       achievementName: string;
@@ -65,32 +66,13 @@ async function fetchStats() {
     basic: 0,
     beginner: 0,
     intermediate: 0,
-    expert: 0,
+    e2e: 0,
   };
 
   for (const challenge of allChallenges) {
-    const category = challenge.category?.toLowerCase() || '';
-    if (
-      category.includes('basic') ||
-      category.includes('selector') ||
-      category.includes('xpath')
-    ) {
-      tiers.basic++;
-    } else if (
-      category.includes('beginner') ||
-      category.includes('javascript') ||
-      category.includes('typescript') ||
-      category.startsWith('js-') ||
-      category.startsWith('ts-')
-    ) {
-      tiers.beginner++;
-    } else if (
-      category.includes('intermediate') ||
-      category.includes('playwright')
-    ) {
-      tiers.intermediate++;
-    } else if (category.includes('expert') || category.includes('advanced')) {
-      tiers.expert++;
+    const tier = getTierFromCategory(challenge.category);
+    if (tier in tiers) {
+      tiers[tier as keyof typeof tiers]++;
     }
   }
 

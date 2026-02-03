@@ -94,8 +94,7 @@
     "basic": "Dasar",
     "beginner": "Pemula",
     "intermediate": "Menengah",
-    "expert": "Ahli",
-    "e2e": "E2E"
+    "e2e": "E2E Testing"
   },
   "categories": {
     "css-basics": "Dasar CSS",
