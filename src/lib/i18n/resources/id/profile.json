@@ -22,7 +22,7 @@
     "basic": "Dasar (Selektor)",
     "beginner": "Pemula (JavaScript)",
     "intermediate": "Menengah (Playwright)",
-    "expert": "Ahli (Lanjutan)",
+    "e2e": "E2E Testing",
     "challengeCount": "{{count}} tantangan"
   },
   "milestones": {

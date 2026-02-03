@@ -154,11 +154,10 @@ export async function getTutorialList(
   locale: string,
 ): Promise<Omit<Tutorial, 'content'>[]> {
   const registry = await loadRegistry();
-  const tutorials: Omit<Tutorial, 'content'>[] = [];
 
-  for (const entry of registry.tutorials) {
+  const tutorialPromises = registry.tutorials.map(async (entry) => {
     // Skip non-published content (default to published if no status)
-    if (entry.status && entry.status !== 'published') continue;
+    if (entry.status && entry.status !== 'published') return null;
 
     // Try to load frontmatter for title/description
     let title = entry.slug;
@@ -183,7 +182,7 @@ export async function getTutorialList(
       }
     }
 
-    tutorials.push({
+    return {
       slug: entry.slug,
       title,
       description,
@@ -191,8 +190,14 @@ export async function getTutorialList(
       estimatedMinutes: entry.estimatedMinutes,
       tags: entry.tags,
       relatedChallenges: entry.relatedChallenges,
-    });
-  }
+    };
+  });
+
+  const results = await Promise.all(tutorialPromises);
+
+  const tutorials = results.filter(
+    (t): t is Omit<Tutorial, 'content'> => t !== null,
+  );
 
   return tutorials.sort((a, b) => a.order - b.order);
 }
@@ -243,7 +248,6 @@ const TIER_FILES: ChallengeTier[] = [
   'basic',
   'beginner',
   'intermediate',
-  'expert',
   'e2e',
   'typescript',
 ];
@@ -411,7 +415,7 @@ export async function getCachedTierTotals(): Promise<Record<string, number>> {
     basic: 0,
     beginner: 0,
     intermediate: 0,
-    expert: 0,
+    e2e: 0,
   };
 
   allChallenges.forEach((c) => {

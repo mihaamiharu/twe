@@ -98,7 +98,7 @@ export function useChallengeExecution(
                     timeout: 10000,
                     existingIframe: previewIframeRef.current || undefined,
                     strictMode: challenge.type === 'PLAYWRIGHT',
-                    cssContent: challenge.tier === 'e2e' ? e2eSelectorStyles : defaultSelectorStyles,
+                    cssContent: (challenge.type === 'PLAYWRIGHT' || challenge.tier === 'e2e') ? e2eSelectorStyles : defaultSelectorStyles,
                     files: challenge.files,
                     onNavigate: (path) => setCurrentVfsPath(path),
                     expectedState: challenge.expectedState,
@@ -246,6 +246,7 @@ export function useChallengeExecution(
 
             if (result.success && result.hint) {
                 setHintContent(result.hint);
+                state.setStoredHint(result.hint);
                 setHintUsed(true);
             } else if (!result.success && result.error) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

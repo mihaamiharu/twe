@@ -16,6 +16,8 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { AnimatedCounter } from '@/components/AnimatedCounter';
+import { SelectorDemo } from '@/components/SelectorDemo';
+import { PlaywrightDemo } from '@/components/PlaywrightDemo';
 import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
 
@@ -39,54 +41,60 @@ export const Route = createFileRoute('/$locale/')({
     }
   },
   component: HomePage,
-  head: () => ({
-    meta: [
-      {
-        title: i18n.t('common:seo.title'),
-      },
-      {
-        name: 'description',
-        content: i18n.t('common:seo.description'),
-      },
-      {
-        property: 'og:title',
-        content: i18n.t('common:seo.ogTitle'),
-      },
-      {
-        property: 'og:description',
-        content: i18n.t('common:seo.ogDescription'),
-      },
-      {
-        property: 'og:url',
-        content: 'https://testingwithekki.com/en',
-      },
-      {
-        property: 'og:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
-      },
-    ],
-    links: [
-      {
-        rel: 'canonical',
-        href: 'https://testingwithekki.com/en',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'en',
-        href: 'https://testingwithekki.com/en',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'id',
-        href: 'https://testingwithekki.com/id',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'x-default',
-        href: 'https://testingwithekki.com/en',
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    const baseUrl = 'https://testingwithekki.com';
+    const url = `${baseUrl}/${locale}`;
+
+    return {
+      meta: [
+        {
+          title: i18n.t('common:seo.title'),
+        },
+        {
+          name: 'description',
+          content: i18n.t('common:seo.description'),
+        },
+        {
+          property: 'og:title',
+          content: i18n.t('common:seo.ogTitle'),
+        },
+        {
+          property: 'og:description',
+          content: i18n.t('common:seo.ogDescription'),
+        },
+        {
+          property: 'og:url',
+          content: url,
+        },
+        {
+          property: 'og:image',
+          content: `${baseUrl}/twe-banner.png`,
+        },
+      ],
+      links: [
+        {
+          rel: 'canonical',
+          href: url,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'en',
+          href: `${baseUrl}/en`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'id',
+          href: `${baseUrl}/id`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'x-default',
+          href: `${baseUrl}/en`,
+        },
+      ],
+    };
+  },
 });
 
 function HomePage() {
@@ -117,11 +125,13 @@ function HomePage() {
       icon: <Code2 className="w-10 h-10 text-primary" />,
       title: t('features.playwrightChallenges.title'),
       description: t('features.playwrightChallenges.description'),
+      demo: <PlaywrightDemo />,
     },
     {
       icon: <Target className="w-10 h-10 text-primary" />,
       title: t('features.selectorChallenges.title'),
       description: t('features.selectorChallenges.description'),
+      demo: <SelectorDemo />,
     },
     {
       icon: <Trophy className="w-10 h-10 text-primary" />,
@@ -168,12 +178,12 @@ function HomePage() {
       count: stats?.tiers.intermediate || 0,
     },
     {
-      tier: 'expert',
-      emoji: '🔴',
-      title: t('tiers.expert.title'),
-      description: t('tiers.expert.description'),
-      skills: t('tiers.expert.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.expert || 0,
+      tier: 'e2e',
+      emoji: '🟣',
+      title: t('tiers.e2e.title'),
+      description: t('tiers.e2e.description'),
+      skills: t('tiers.e2e.skills', { returnObjects: true }) as string[],
+      count: stats?.tiers.e2e || 0,
     },
   ];
 
@@ -217,13 +227,35 @@ function HomePage() {
           </h1>
 
           {/* Tagline */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-4 max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-muted-foreground mb-2 max-w-3xl mx-auto">
             {t('hero.tagline')}
           </p>
+
+          {/* Authority Statement */}
+          <p className="text-base md:text-lg text-primary/80 font-medium mb-4 max-w-2xl mx-auto">
+            {t('hero.authorityStatement')}
+          </p>
+
           <p
-            className="text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-10"
+            className="text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-6"
             dangerouslySetInnerHTML={{ __html: t('hero.description') }}
           />
+
+          {/* Trust Bar - Skills/Tools */}
+          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
+            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
+              🎭 Playwright
+            </Badge>
+            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
+              ⚡ JavaScript
+            </Badge>
+            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
+              🎯 CSS Selectors
+            </Badge>
+            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
+              🔍 XPath
+            </Badge>
+          </div>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
@@ -456,6 +488,7 @@ function HomePage() {
                   </div>
                   <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
                   <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: feature.description }} />
+                  {feature.demo && feature.demo}
                 </CardContent>
               </Card>
             ))}

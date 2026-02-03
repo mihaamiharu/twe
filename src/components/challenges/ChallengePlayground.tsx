@@ -102,7 +102,13 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
         hintUsed={state.hintUsed}
         isHintPending={hintMutation.isPending}
         onRunCode={() => void handleRunCode()}
-        onOpenHintDialog={() => state.setIsHintDialogOpen(true)}
+        onOpenHintDialog={() => {
+          if (state.storedHint) {
+            state.setHintContent(state.storedHint);
+          } else {
+            state.setIsHintDialogOpen(true);
+          }
+        }}
         onSubmit={handleSubmit}
       />
 

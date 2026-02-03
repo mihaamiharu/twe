@@ -169,7 +169,16 @@ export const challengeSubmissionHandler = async ({ data: input }: { data: z.infe
       .from(testCases)
       .where(eq(testCases.challengeId, challenge.id));
 
-    const testsTotal = allTestCases.length;
+    let testsTotal = allTestCases.length;
+
+    // If no test cases in DB, we fallback to submitted results count ONLY for Playwright/E2E challenges
+    // which use assertion-based validation rather than input/output pairs.
+    const isE2OrPlaywright = challenge.type === 'PLAYWRIGHT' || challenge.category?.includes('e2e');
+
+    if (testsTotal === 0 && testResults.length > 0 && isE2OrPlaywright) {
+      testsTotal = testResults.length;
+    }
+
     const testsPassed = testResults.filter((r) => r.passed).length;
     const isPassed = testsPassed === testsTotal && testsTotal > 0;
 
