@@ -7,7 +7,7 @@
             "difficulty": "MEDIUM",
             "category": "e2e-pom",
             "xpReward": 100,
-            "order": 5000,
+            "order": 4000,
             "title": {
                 "en": "POM Basics: Successful Login",
                 "id": "Dasar POM: Login Berhasil"
@@ -59,7 +59,7 @@
             "difficulty": "MEDIUM",
             "category": "e2e-pom",
             "xpReward": 120,
-            "order": 5001,
+            "order": 4001,
             "title": {
                 "en": "POM: Testing Failures",
                 "id": "POM: Menguji Kegagalan"
@@ -110,7 +110,7 @@
             "difficulty": "HARD",
             "category": "e2e-pom",
             "xpReward": 150,
-            "order": 5002,
+            "order": 4002,
             "title": {
                 "en": "POM: Multi-Page User Journey",
                 "id": "POM: Perjalanan Pengguna Multi-Halaman"

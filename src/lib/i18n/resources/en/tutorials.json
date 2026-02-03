@@ -20,7 +20,7 @@
     "foundations": "Foundations",
     "beginner": "Beginner",
     "intermediate": "Intermediate",
-    "advanced": "Advanced",
+    "advanced": "E2E Testing",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed"
   },
@@ -28,7 +28,7 @@
     "foundations": "Foundations Track",
     "beginner": "Beginner Track",
     "intermediate": "Intermediate Track",
-    "advanced": "Advanced Track",
+    "advanced": "E2E Track",
     "other": "Additional Tutorials"
   },
   "table": {

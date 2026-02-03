@@ -16,7 +16,7 @@
     "foundations": "Pondasi",
     "beginner": "Pemula",
     "intermediate": "Menengah",
-    "advanced": "Lanjutan",
+    "advanced": "E2E Testing",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai"
   },
@@ -24,7 +24,7 @@
     "foundations": "Jalur Pondasi",
     "beginner": "Jalur Pemula",
     "intermediate": "Jalur Menengah",
-    "advanced": "Jalur Lanjutan",
+    "advanced": "Jalur E2E",
     "other": "Tutorial Tambahan"
   },
   "table": {
