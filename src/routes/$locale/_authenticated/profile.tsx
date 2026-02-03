@@ -161,7 +161,7 @@ function ProfilePage() {
   const basicStats = getTierStats('basic');
   const beginnerStats = getTierStats('beginner');
   const intermediateStats = getTierStats('intermediate');
-  const expertStats = getTierStats('expert');
+  const e2eStats = getTierStats('e2e');
 
   return (
     <div className="min-h-screen p-6 md:p-10 page-transition">
@@ -169,19 +169,19 @@ function ProfilePage() {
         {/* Profile Header */}
         <Card className="glass-card mb-8">
           <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <Avatar className="h-24 w-24">
-                  <AvatarImage
-                    src={user.image || undefined}
-                    alt={user.name || 'User'}
-                    className="object-cover"
-                  />
-                  <AvatarFallback className="bg-primary/20 text-2xl text-primary font-medium">
-                    {(user.name || user.email).charAt(0).toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                
-                <div className="flex-1">
+            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+              <Avatar className="h-24 w-24">
+                <AvatarImage
+                  src={user.image || undefined}
+                  alt={user.name || 'User'}
+                  className="object-cover"
+                />
+                <AvatarFallback className="bg-primary/20 text-2xl text-primary font-medium">
+                  {(user.name || user.email).charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
                   <h1 className="text-3xl font-bold">
                     {user.name || t('leaderboard:table.anonymous')}
@@ -349,25 +349,25 @@ function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Tier: Expert */}
+                {/* Tier: E2E Testing */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl">🔴</span>
+                      <span className="text-xl">🟣</span>
                       <span className="font-medium">
-                        {t('profile:tierProgress.expert')}
+                        {t('profile:tierProgress.e2e')}
                       </span>
                     </div>
                     <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: expertStats.total })}
+                      {t('profile:tierProgress.challengeCount', { count: e2eStats.total })}
                     </Badge>
                   </div>
                   <Progress
-                    value={expertStats.progress}
+                    value={e2eStats.progress}
                     className="h-2"
                   />
                   <div className="text-right text-xs text-muted-foreground">
-                    {expertStats.completed} / {expertStats.total}
+                    {e2eStats.completed} / {e2eStats.total}
                   </div>
                 </div>
 

@@ -13,8 +13,7 @@ export const tierLabels: Record<
     color: 'text-orange-400/90',
     tier: 'intermediate',
   },
-  expert: { name: '🔴 Expert', color: 'text-red-400/90', tier: 'expert' },
-  e2e: { name: '🟣 E2E', color: 'text-purple-400/90', tier: 'e2e' },
+  e2e: { name: '🟣 E2E Testing', color: 'text-purple-400/90', tier: 'e2e' },
 };
 
 export const difficultyColors: Record<string, string> = {
@@ -39,12 +38,11 @@ export const categoryLabels: Record<string, string> = {
   'playwright-locators': '🔍 Locators',
   'playwright-assertions': '✅ Assertions',
   'playwright-waits': '⏳ Wait Strategies',
-  // Tier 4: Expert (Advanced Patterns)
-  'playwright-data-driven': '📊 Data-Driven Testing',
-  'playwright-infrastructure': '🔧 Test Infrastructure',
-  // Tier 5: E2E (App Testing)
+  // Tier 4: E2E Testing (App Testing)
   'e2e-pom': '🏗️ Page Object Model',
   'e2e-integration': '🔄 Integration Patterns',
+  'playwright-data-driven': '📊 Data-Driven Testing',
+  'playwright-infrastructure': '🔧 Test Infrastructure',
 };
 
 export function getTierFromCategory(category?: string): string {
@@ -65,15 +63,14 @@ export function getTierFromCategory(category?: string): string {
     return 'intermediate';
   if (
     category.startsWith('playwright-data') ||
-    category.startsWith('playwright-infrastructure')
+    category.startsWith('playwright-infrastructure') ||
+    category.startsWith('e2e-')
   )
-    return 'expert';
-  if (category.startsWith('e2e-'))
     return 'e2e';
   return 'basic';
 }
 
-export const TIER_ORDER = ['basic', 'beginner', 'intermediate', 'expert', 'e2e'];
+export const TIER_ORDER = ['basic', 'beginner', 'intermediate', 'e2e'];
 export const DIFFICULTY_ORDER = { EASY: 1, MEDIUM: 2, HARD: 3 };
 
 // Define display order for categories within each tier
@@ -93,10 +90,9 @@ export const CATEGORY_ORDER: Record<string, number> = {
   'playwright-locators': 2,
   'playwright-assertions': 3,
   'playwright-waits': 4,
-  // Expert Tier (Advanced) - Order base: 4000
-  'playwright-data-driven': 1,
-  'playwright-infrastructure': 2,
-  // E2E Tier (App Testing) - Order base: 5000
+  // E2E Tier (App Testing) - Order base: 4000
   'e2e-pom': 1,
   'e2e-integration': 2,
+  'playwright-data-driven': 3,
+  'playwright-infrastructure': 4,
 };

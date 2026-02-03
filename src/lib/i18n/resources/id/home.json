@@ -1,10 +1,11 @@
 {
   "hero": {
-    "title": "Kuasai Test Automation",
-    "titleSuffix": "dengan panduan praktis saya",
-    "tagline": "Skenario dunia nyata yang dirancang oleh Senior QA Engineer.",
-    "description": "Saya membangun platform ini untuk berbagi <strong>pola praktis yang saya andalkan setiap hari</strong>. Bukan buku teks, hanya skenario nyata yang mengajarkan saya cara menguji.",
-    "startLearning": "Mulai Belajar",
+    "title": "Bangun Automasi Dunia Nyata",
+    "titleSuffix": "bersama Senior Guide",
+    "tagline": "Kurikulum praktis yang saya harapkan ada saat saya mulai.",
+    "authorityStatement": "Karir saya dibangun atas dukungan mentor hebat. Platform ini cara saya membalas budi.",
+    "description": "Saya memberikan <strong>lingkungan suportif dan hands-on</strong> yang kamu butuhkan untuk membangun framework testing scalable. Ini bimbingan persis yang saya terima dari pemula hingga Senior QA.",
+    "startLearning": "Selesaikan Tantangan Pertamamu",
     "browseTutorials": "Lihat Kurikulum"
   },
   "stats": {
@@ -22,8 +23,8 @@
   },
   "tiers": {
     "basic": {
-      "title": "Selektor",
-      "description": "Kuasai selektor CSS dan XPath - fondasi pengujian web",
+      "title": "Locator Tangguh",
+      "description": "Kuasai selektor CSS dan XPath - fondasi tes yang stabil dan mudah dipelihara",
       "skills": [
         "Selektor CSS",
         "Query XPath",
@@ -49,13 +50,13 @@
         "Wait"
       ]
     },
-    "expert": {
-      "title": "Tingkat Lanjut",
-      "description": "Pola profesional untuk pengujian produksi",
+    "e2e": {
+      "title": "E2E Testing",
+      "description": "Bangun suite pengujian otomatis lengkap dengan pola profesional",
       "skills": [
-        "Page Object",
+        "Page Objects",
         "Data-Driven",
-        "CI/CD"
+        "Test Suites"
       ]
     }
   },
@@ -89,13 +90,13 @@
   "features": {
     "title": "Semua yang Kamu Butuhkan untuk",
     "titleHighlight": "Naik Level",
-    "subtitle": "Kurikulum personal yang dirancang untuk membawamu dari pemula ke ahli",
+    "subtitle": "Kurikulum personal yang dirancang untuk membawamu dari pemula ke pro",
     "interactiveTutorials": {
       "title": "Tutorial Interaktif",
       "description": "Pelajari konsep testing langkah demi langkah. Saya sudah memecah bagian-bagian sulit agar kamu tidak perlu berjuang."
     },
     "playwrightChallenges": {
-      "title": "Simulasi Browser",
+      "title": "Lingkungan Sandbox Terpadu",
       "description": "Latihan dengan <strong>skenario sandbox</strong>. Kode kamu berjalan <strong>sepenuhnya di browser</strong> - cepat, aman, dan tanpa instalasi."
     },
     "selectorChallenges": {

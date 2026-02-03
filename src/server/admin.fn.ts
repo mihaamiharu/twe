@@ -15,7 +15,7 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
       const { users, submissions, challenges, bugReports } = await import(
         '@/db/schema'
       );
-      const { count, desc, sql, gte, lt, and, eq } = await import('drizzle-orm');
+      const { count, desc, sql, gte, lt, and } = await import('drizzle-orm');
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const headers = getRequestHeaders();
@@ -29,18 +29,7 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
         return { success: false, error: 'Unauthorized' };
       }
 
-      // 1. Total Users
-      const userCountResult = await db.select({ value: count() }).from(users);
-      const totalUsers = userCountResult[0].value;
-
-      // 2. Total Submissions
-      const submissionCountResult = await db
-        .select({ value: count() })
-        .from(submissions);
-      const totalSubmissions = submissionCountResult[0].value;
-
-      // 3. Date ranges for growth calculation
-      const now = new Date();
+      // Date ranges for growth calculation
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       const sixtyDaysAgo = new Date();
@@ -48,126 +37,163 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      // 4. User Growth
-      const currentMonthUsers = await db
-        .select({ value: count() })
-        .from(users)
-        .where(gte(users.createdAt, thirtyDaysAgo));
+      const [
+        userCountResult,
+        submissionCountResult,
+        currentMonthUsers,
+        previousMonthUsers,
+        currentMonthSubmissions,
+        previousMonthSubmissions,
+        activeUsersResult,
+        submissionsByDate,
+        popularChallenges,
+        recentActivity,
+        userGrowthData,
+        submissionStats,
+        bugStatsResults,
+      ] = await Promise.all([
+        // 1. Total Users
+        db.select({ value: count() }).from(users),
 
-      const previousMonthUsers = await db
-        .select({ value: count() })
-        .from(users)
-        .where(
-          and(
-            gte(users.createdAt, sixtyDaysAgo),
-            lt(users.createdAt, thirtyDaysAgo),
+        // 2. Total Submissions
+        db.select({ value: count() }).from(submissions),
+
+        // 4. User Growth
+        db
+          .select({ value: count() })
+          .from(users)
+          .where(gte(users.createdAt, thirtyDaysAgo)),
+
+        db
+          .select({ value: count() })
+          .from(users)
+          .where(
+            and(
+              gte(users.createdAt, sixtyDaysAgo),
+              lt(users.createdAt, thirtyDaysAgo),
+            ),
           ),
-        );
 
-      const userGrowthPercent = previousMonthUsers[0].value > 0
-        ? ((currentMonthUsers[0].value - previousMonthUsers[0].value) / previousMonthUsers[0].value) * 100
-        : currentMonthUsers[0].value > 0 ? 100 : 0;
+        // 5. Submission Growth
+        db
+          .select({ value: count() })
+          .from(submissions)
+          .where(gte(submissions.createdAt, thirtyDaysAgo)),
 
-      // 5. Submission Growth
-      const currentMonthSubmissions = await db
-        .select({ value: count() })
-        .from(submissions)
-        .where(gte(submissions.createdAt, thirtyDaysAgo));
-
-      const previousMonthSubmissions = await db
-        .select({ value: count() })
-        .from(submissions)
-        .where(
-          and(
-            gte(submissions.createdAt, sixtyDaysAgo),
-            lt(submissions.createdAt, thirtyDaysAgo),
+        db
+          .select({ value: count() })
+          .from(submissions)
+          .where(
+            and(
+              gte(submissions.createdAt, sixtyDaysAgo),
+              lt(submissions.createdAt, thirtyDaysAgo),
+            ),
           ),
-        );
 
-      const submissionGrowthPercent = previousMonthSubmissions[0].value > 0
-        ? ((currentMonthSubmissions[0].value - previousMonthSubmissions[0].value) / previousMonthSubmissions[0].value) * 100
-        : currentMonthSubmissions[0].value > 0 ? 100 : 0;
+        // 6. Active Users (last 7 days)
+        db
+          .select({ value: count(sql`DISTINCT ${submissions.userId}`) })
+          .from(submissions)
+          .where(gte(submissions.createdAt, sevenDaysAgo)),
 
-      // 6. Active Users (last 7 days)
-      const activeUsersResult = await db
-        .select({ value: count(sql`DISTINCT ${submissions.userId}`) })
-        .from(submissions)
-        .where(gte(submissions.createdAt, sevenDaysAgo));
+        // 7. Submissions by date chart data
+        db
+          .select({
+            date: sql<string>`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`,
+            count: count(),
+          })
+          .from(submissions)
+          .where(gte(submissions.createdAt, thirtyDaysAgo))
+          .groupBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`)
+          .orderBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`),
+
+        // 8. Popular Challenges
+        db
+          .select({
+            id: challenges.id,
+            slug: challenges.slug,
+            title: challenges.title,
+            completionCount: challenges.completionCount,
+            difficulty: challenges.difficulty,
+          })
+          .from(challenges)
+          .orderBy(desc(challenges.completionCount))
+          .limit(5),
+
+        // 9. Recent Activity
+        db.query.submissions.findMany({
+          orderBy: (submissions, { desc }) => [desc(submissions.createdAt)],
+          limit: 5,
+          with: {
+            user: {
+              columns: {
+                name: true,
+                image: true,
+                email: true,
+              },
+            },
+            challenge: {
+              columns: {
+                title: true,
+                slug: true,
+              },
+            },
+          },
+        }),
+
+        // 10. User Growth chart data
+        db
+          .select({
+            date: sql<string>`to_char(${users.createdAt}, 'YYYY-MM-DD')`,
+            count: count(),
+          })
+          .from(users)
+          .where(gte(users.createdAt, thirtyDaysAgo))
+          .groupBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`)
+          .orderBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`),
+
+        // 11. Submission Success Rate
+        db
+          .select({
+            isPassed: submissions.isPassed,
+            count: count(),
+          })
+          .from(submissions)
+          .groupBy(submissions.isPassed),
+
+        // 12. Bug Stats
+        db
+          .select({
+            status: bugReports.status,
+            count: count(),
+          })
+          .from(bugReports)
+          .groupBy(bugReports.status),
+      ]);
+
+      const totalUsers = userCountResult[0].value;
+      const totalSubmissions = submissionCountResult[0].value;
+
+      const userGrowthPercent =
+        previousMonthUsers[0].value > 0
+          ? ((currentMonthUsers[0].value - previousMonthUsers[0].value) /
+              previousMonthUsers[0].value) *
+            100
+          : currentMonthUsers[0].value > 0
+            ? 100
+            : 0;
+
+      const submissionGrowthPercent =
+        previousMonthSubmissions[0].value > 0
+          ? ((currentMonthSubmissions[0].value -
+              previousMonthSubmissions[0].value) /
+              previousMonthSubmissions[0].value) *
+            100
+          : currentMonthSubmissions[0].value > 0
+            ? 100
+            : 0;
+
       const activeUsers = activeUsersResult[0].value;
-
-      // 7. Submissions by date chart data
-      const submissionsByDate = await db
-        .select({
-          date: sql<string>`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`,
-          count: count(),
-        })
-        .from(submissions)
-        .where(gte(submissions.createdAt, thirtyDaysAgo))
-        .groupBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`)
-        .orderBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`);
-
-      // 8. Popular Challenges
-      const popularChallenges = await db
-        .select({
-          id: challenges.id,
-          slug: challenges.slug,
-          title: challenges.title,
-          completionCount: challenges.completionCount,
-          difficulty: challenges.difficulty,
-        })
-        .from(challenges)
-        .orderBy(desc(challenges.completionCount))
-        .limit(5);
-
-      // 9. Recent Activity
-      const recentActivity = await db.query.submissions.findMany({
-        orderBy: (submissions, { desc }) => [desc(submissions.createdAt)],
-        limit: 5,
-        with: {
-          user: {
-            columns: {
-              name: true,
-              image: true,
-              email: true,
-            },
-          },
-          challenge: {
-            columns: {
-              title: true,
-              slug: true,
-            },
-          },
-        },
-      });
-
-      // 10. User Growth chart data
-      const userGrowthData = await db
-        .select({
-          date: sql<string>`to_char(${users.createdAt}, 'YYYY-MM-DD')`,
-          count: count(),
-        })
-        .from(users)
-        .where(gte(users.createdAt, thirtyDaysAgo))
-        .groupBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`)
-        .orderBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`);
-
-      // 11. Submission Success Rate
-      const submissionStats = await db
-        .select({
-          isPassed: submissions.isPassed,
-          count: count(),
-        })
-        .from(submissions)
-        .groupBy(submissions.isPassed);
-
-      // 12. Bug Stats
-      const bugStatsResults = await db
-        .select({
-          status: bugReports.status,
-          count: count(),
-        })
-        .from(bugReports)
-        .groupBy(bugReports.status);
 
       // Normalize Bug Stats
       const bugStats = {
