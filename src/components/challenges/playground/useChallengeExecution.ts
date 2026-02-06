@@ -5,6 +5,7 @@ import { executePlaywrightCode } from '@/core/executor';
 import { generatePreloadCode } from '@/core/executor/module-preloader';
 import { storage } from '@/lib/storage-adapter';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
+import { INJECTED_SCRIPTS, HIGHLIGHT_STYLES } from '../preview/constants';
 import type {
     ChallengePlaygroundProps,
     PlaygroundState
@@ -204,6 +205,29 @@ export function useChallengeExecution(
             setHasPassed(false);
         } finally {
             setIsRunning(false);
+
+            // Re-inject inspector scripts after execution
+            // This is necessary because executePlaywrightCode overwrites the iframe content
+            const iframe = previewIframeRef.current;
+            if (iframe?.contentDocument) {
+                const doc = iframe.contentDocument;
+
+                // Re-inject styles if not present
+                if (!doc.querySelector('style[data-twe-inspector]')) {
+                    const style = doc.createElement('style');
+                    style.setAttribute('data-twe-inspector', 'true');
+                    style.textContent = HIGHLIGHT_STYLES;
+                    doc.head?.appendChild(style);
+                }
+
+                // Re-inject scripts
+                if (!doc.querySelector('script[data-twe-inspector]')) {
+                    const script = doc.createElement('script');
+                    script.setAttribute('data-twe-inspector', 'true');
+                    script.textContent = INJECTED_SCRIPTS;
+                    doc.body?.appendChild(script);
+                }
+            }
         }
     }, [
         code,
