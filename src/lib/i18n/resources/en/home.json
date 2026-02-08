@@ -1,10 +1,10 @@
 {
   "hero": {
-    "title": "Build Real-World Automation",
-    "titleSuffix": "with a Senior Guide",
-    "tagline": "The practical curriculum I wish I had when I started.",
+    "title": "Build Modern Test Automation",
+    "titleSuffix": "without the Fluff",
+    "tagline": "The practical curriculum that bridges the gap between theory and practice.",
     "authorityStatement": "My career was built on the support of great mentors. This platform is my way of paying it forward.",
-    "description": "I'm giving you the <strong>hands-on, supportive environment</strong> you need to build scalable test frameworks, the exact guidance I received to go from beginner to Senior QA.",
+    "description": "I'm giving you the <strong>hands-on, supportive environment</strong> you need to build scalable test frameworks, focusing on the patterns used by top engineering teams.",
     "startLearning": "Solve Your First Challenge",
     "browseTutorials": "Browse Curriculum"
   },

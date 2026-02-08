@@ -4,10 +4,7 @@
         "subtitle": "Senior Software Engineer (QA)",
         "description": "Saya adalah Senior QA Engineer di <strong>Ninja Van</strong> dengan 4+ tahun pengalaman membangun framework otomasi untuk web, mobile, dan API. Saya percaya pada prinsip <strong>\"Tooling over Manual Labor\"</strong> - membangun sistem kustom yang memberdayakan tim untuk rilis dengan percaya diri sambil mencegah masalah kritis di production.",
         "connect": "Koneksi di LinkedIn",
-        "github": "Profil GitHub",
-        "youtube": "Channel YouTube",
-        "kofi": "Dukung di Ko-fi",
-        "tako": "Dukung di Tako"
+        "github": "Profil GitHub"
     },
     "philosophy": {
         "title": "Engineering Quality",
@@ -63,27 +60,33 @@
         "automation": {
             "title": "Test Automation",
             "items": [
-                "Selenium",
-                "Rest Assured",
                 "DeepEval",
+                "PyTest-BDD",
+                "PyTest",
+                "Rest Assured",
+                "Karate Framework",
+                "Appium Flutter",
+                "Selenium",
                 "Playwright",
-                "Appium Flutter"
+                "React Testing",
+                "Cucumber"
             ]
         },
         "backend": {
-            "title": "Languages & Ecosystem",
+            "title": "Languages & Backend",
             "items": [
                 "Java",
-                "SQL",
-                "TypeScript",
+                "JavaScript",
+                "Python",
                 "Go",
-                "Python"
+                "SQL",
+                "RESTful APIs"
             ]
         },
         "strategy": {
             "title": "Strategi & Metodologi",
             "items": [
-                "Shift-Left Testing",
+                "Shift-Left Strategy",
                 "Perencanaan Tes",
                 "Analisis Risiko",
                 "Agile / Scrum"
@@ -92,11 +95,12 @@
         "devops": {
             "title": "DevOps & Observability",
             "items": [
+                "Bamboo CI",
                 "Docker",
-                "CI (Bamboo)",
+                "Git",
+                "Kibana",
                 "Grafana",
-                "Datadog",
-                "Kibana"
+                "Datadog"
             ]
         }
     },
