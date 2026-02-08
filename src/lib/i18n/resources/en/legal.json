@@ -2,55 +2,101 @@
   "privacy": {
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: January 2026",
-    "intro": "TestingWithEkki (\"we\", \"us\", or \"our\") respects your privacy. This policy explains how we collect, use, and protect your information.",
+    "intro": "TestingWithEkki (\"we\", \"us\", or \"our\") is committed to protecting your personal data in compliance with the Indonesian Personal Data Protection Law (UU PDP) and other applicable regulations. This policy explains how we collect, use, process, and protect your information.",
     "sections": {
-      "noSelling": {
-        "title": "We Don't Sell Your Data",
-        "content": "We do not sell or share your personal information with advertisers or data brokers. Period."
+      "definitions": {
+        "title": "1. Definitions",
+        "items": [
+          "**Personal Data**: Any data about a person, whether identified or identifiable, individually or combined with other information.",
+          "**Data Subject**: The individual to whom the personal data attaches.",
+          "**Processing**: The collection, processing, analysis, storage, correction, display, dissemination, and/or erasure of personal data."
+        ]
+      },
+      "lawfulBasis": {
+        "title": "2. Lawful Basis for Processing",
+        "content": "We process your personal data based on the following valid legal grounds:",
+        "items": [
+          "**Consent**: You have given explicit consent for specific purposes (e.g., account creation, newsletter).",
+          "**Contractual Necessity**: Processing is necessary to provide the services you requested (e.g., tracking course progress).",
+          "**Legal Obligation**: Compliance with applicable laws and regulations in Indonesia."
+        ]
       },
       "whatWeCollect": {
-        "title": "What We Collect",
+        "title": "3. What We Collect",
         "items": [
-          "**Account Information**: Email address, username, and profile picture (if you sign up with Google/GitHub).",
-          "**Learning Progress**: Your completed challenges, tutorials, XP, and achievements.",
-          "**Technical Data**: Basic usage data like page views via Google Analytics to improve the platform."
+          "**Account Information**: Name, email address, username, and profile picture (via OAuth).",
+          "**Learning Data**: Progress on challenges, code submissions, XP, and achievements.",
+          "**Technical Data**: IP address, browser type, device information, and usage logs for security and analytics."
         ]
       },
       "howWeUse": {
-        "title": "How We Use Your Data",
+        "title": "4. How We Use and Disclose Data",
         "items": [
-          "To provide your learning experience (save progress, show leaderboard).",
-          "To send important emails (verification, password reset).",
-          "To improve the platform based on aggregate usage patterns."
+          "To provide and maintain the generic learning platform services.",
+          "To notify you about changes to our service or your account.",
+          "To monitor usage and detect technical issues.",
+          "We do **not** sell your personal data. We may share data with trusted third-party service providers (Google, Supabase) solely for operational purposes."
         ]
       },
-      "yourControl": {
-        "title": "Your Control",
+      "dataSubjectRights": {
+        "title": "5. Your Rights (Data Subject Rights)",
+        "content": "Under UU PDP, you have the right to:",
         "items": [
-          "You can update or delete your profile at any time.",
-          "You can request a full data export or deletion by contacting us.",
-          "Your email is never displayed publicly."
+          "**Access**: Request a copy of your personal data.",
+          "**Rectify**: Correct inaccurate or incomplete data.",
+          "**Erase**: Request deletion of your data (\"Right to be Forgotten\"), subject to legal retention obligations.",
+          "**Restrict**: Request restriction of processing specifically.",
+          "**Withdraw Consent**: Withdraw consent for data processing at any time."
         ]
       },
-      "thirdParties": {
-        "title": "Third-Party Services",
-        "content": "We use trusted third-party services: Google OAuth (login), Google Analytics (anonymous usage), and Supabase (database). These services have their own privacy policies."
+      "dataRetention": {
+        "title": "6. Data Retention",
+        "content": "We retain your personal data only as long as necessary to fulfill the purposes for which it was collected, including for the purposes of satisfying any legal, accounting, or reporting requirements. Typically, account data is kept until you request deletion."
       },
       "security": {
-        "title": "Data Security",
-        "content": "We use industry-standard security measures including HTTPS encryption, secure password hashing, and regular security updates."
-      },
-      "children": {
-        "title": "Children's Privacy",
-        "content": "This platform is intended for users 13 years or older. We do not knowingly collect data from children under 13."
-      },
-      "changes": {
-        "title": "Policy Changes",
-        "content": "We may update this policy occasionally. Significant changes will be announced on the platform."
+        "title": "7. Data Security",
+        "content": "We implement industry-standard security measures (encryption, access controls) to protect your data. However, no method of transmission over the Internet is 100% secure."
       },
       "contact": {
-        "title": "Contact Us",
-        "content": "Questions about privacy? Email us at ekki@testingwithekki.com"
+        "title": "8. Contact & Complaints",
+        "content": "To exercise your rights or if you have questions about this policy, please contact our Data Protection Office at: **ekki@testingwithekki.com**."
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms and Conditions",
+    "lastUpdated": "Last Updated: January 2026",
+    "intro": "Welcome to TestingWithEkki. By accessing or using our website, you agree to be bound by these Terms and Conditions.",
+    "sections": {
+      "acceptance": {
+        "title": "1. Acceptance of Terms",
+        "content": "By accessing this website, you confirm that you have read, understood, and agreed to these Terms. If you do not agree, strictly do not use this site."
+      },
+      "useLicense": {
+        "title": "2. Use License & Intellectual Property",
+        "content": "All content (tutorials, code challenges, text, graphics) is the property of TestingWithEkki or its licensors. You are granted a limited, non-exclusive license to access the material for personal, non-commercial learning purposes. You may not reproduce or redistribute the content without permission."
+      },
+      "userObligations": {
+        "title": "3. User Obligations",
+        "content": "You agree strictly NOT to:",
+        "items": [
+          "Use the platform for any illegal purpose.",
+          "Attempt to reverse engineer any software contained on the website.",
+          "Harass, abuse, or harm another person or group.",
+          "Spam or upload malicious code."
+        ]
+      },
+      "disclaimer": {
+        "title": "4. Disclaimer & Limitation of Liability",
+        "content": "The materials on TestingWithEkki are provided \"as is\". We make no warranties, expressed or implied. In no event shall TestingWithEkki be liable for any damages arising out of the use or inability to use the materials on this website."
+      },
+      "governingLaw": {
+        "title": "5. Governing Law",
+        "content": "These terms and conditions are governed by and construed in accordance with the laws of the **Republic of Indonesia**. You irrevocably submit to the exclusive jurisdiction of the courts in that location."
+      },
+      "changes": {
+        "title": "6. Changes to Terms",
+        "content": "We reserve the right to modify these terms at any time. Continued use of the website signifies your acceptance of the updated terms."
       }
     }
   },
@@ -74,11 +120,16 @@
     "booking": {
       "title": "Book a 1-1 Session",
       "description": "Prefer a live conversation? Schedule a video call to discuss testing strategies, career advice, or code reviews.",
+      "items": [
+        "Career Advice & Mentorship",
+        "Code Review & Architecture",
+        "Test Automation Strategy"
+      ],
       "cta": "Schedule on Google Calendar"
     },
     "hire": {
       "title": "Open for Opportunities",
-      "description": "Looking for a Senior QA Engineer or Test Architect? I help teams build reliable, high-quality software.",
+      "description": "Looking for a Senior QA Engineer, SDET, or Test Architect? I help teams build reliable, high-quality software.",
       "cta": "View My Resume"
     }
   }
