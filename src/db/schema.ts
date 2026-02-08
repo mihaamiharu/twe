@@ -123,9 +123,9 @@ export const verification = pgTable('verification', {
 export const tutorials = pgTable('tutorials', {
   id: uuid('id').defaultRandom().primaryKey(),
   slug: text('slug').notNull().unique(),
-  title: jsonb('title').notNull(), // { en: string, id: string }
-  description: jsonb('description').notNull(),
-  content: jsonb('content').notNull(), // Markdown content
+  title: jsonb('title').$type<Record<string, any>>().notNull(), // { en: string, id: string }
+  description: jsonb('description').$type<Record<string, any>>().notNull(),
+  content: jsonb('content').$type<Record<string, any>>().notNull(), // Markdown content
   order: integer('order').notNull(), // Display order
   estimatedMinutes: integer('estimated_minutes').notNull(),
   tags: text('tags').array(), // Array of tags
@@ -138,8 +138,8 @@ export const tutorials = pgTable('tutorials', {
 export const challenges = pgTable('challenges', {
   id: uuid('id').defaultRandom().primaryKey(),
   slug: text('slug').notNull().unique(),
-  title: jsonb('title').notNull(),
-  description: jsonb('description').notNull(),
+  title: jsonb('title').$type<Record<string, any>>().notNull(),
+  description: jsonb('description').$type<Record<string, any>>().notNull(),
   type: challengeTypeEnum('type').notNull(),
   difficulty: difficultyEnum('difficulty').notNull(),
   xpReward: integer('xp_reward').notNull(),
@@ -251,8 +251,8 @@ export const progress = pgTable('progress', {
 export const achievements = pgTable('achievements', {
   id: uuid('id').defaultRandom().primaryKey(),
   slug: text('slug').notNull().unique(),
-  name: jsonb('name').notNull(),
-  description: jsonb('description').notNull(),
+  name: jsonb('name').$type<Record<string, any>>().notNull(),
+  description: jsonb('description').$type<Record<string, any>>().notNull(),
   icon: text('icon').notNull(), // Icon name or emoji
   rarity: text('rarity').notNull().default('COMMON'), // COMMON, RARE, EPIC, LEGENDARY
   category: text('category').notNull(), // e.g., "challenges", "tutorials", "social"
