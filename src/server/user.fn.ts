@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
+import { authMiddleware } from './auth.mw';
 import {
   users,
   challenges,
@@ -56,26 +57,17 @@ const GetUserSettingsSchema = z.object({
 });
 
 export const getUserSettings = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
   .inputValidator((data: unknown) => GetUserSettingsSchema.parse(data))
   .handler(
     async ({
       data: { locale },
+      context,
     }): Promise<{ success: boolean; data?: UserData; error?: string }> => {
       try {
         // Dynamically import server-only modules
-        const { getRequestHeaders } =
-          await import('@tanstack/react-start/server');
-        const { auth } = await import('./auth.server');
 
-        const headers = getRequestHeaders() as Headers;
-        const session = await auth.api.getSession({ headers });
-
-        if (!session?.user?.id) {
-          // Return 'Unauthorized'
-          throw new Error('Unauthorized');
-        }
-
-        const userId = session.user.id;
+        const userId = context.user.id;
 
         // Get user data
         const user = await db.query.users.findFirst({
@@ -257,29 +249,22 @@ const updateUserSchema = z.object({
 });
 
 export const updateUserProfile = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((data: unknown) => updateUserSchema.parse(data))
   .handler(
     async ({
       data,
+      context,
     }: {
       data: z.infer<typeof updateUserSchema>;
+      context: { user: { id: string } };
     }): Promise<{ success: boolean; data?: any; error?: string }> => {
       try {
         const updates = data;
 
         // Dynamically import server-only modules
-        const { getRequestHeaders } =
-          await import('@tanstack/react-start/server');
-        const { auth } = await import('./auth.server');
 
-        const headers = getRequestHeaders() as Headers;
-        const session = await auth.api.getSession({ headers });
-
-        if (!session?.user?.id) {
-          throw new Error('Unauthorized');
-        }
-
-        const userId = session.user.id;
+        const userId = context.user.id;
 
         if (Object.keys(updates).length === 0) {
           throw new Error('No valid fields to update');
