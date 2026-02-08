@@ -2,12 +2,9 @@
     "hero": {
         "title": "Hi, I'm <strong>Ekki Syam Sugiardi</strong>",
         "subtitle": "Senior Software Engineer (QA)",
-        "description": "I bridge the gap between <strong>Manual Testing</strong> and <strong>Automated Engineering</strong>. With 4+ years at <strong>Ninja Van</strong>, I build custom frameworks and internal tools that empower teams to ship faster, with confidence.",
+        "description": "Senior Software Engineer (QA) with over 4 years of experience at Ninja Van. Recognized for technical versatility and a commitment to engineering mentorship. A tech-agnostic specialist who pivots between Go, Python, and Java to resolve critical bottlenecks across multiple product teams. Proven track record of scaling automation from the ground up, transitioning manual testers into automation roles, and collaborating on cost-reduction initiatives that contributed to over $60,000 in monthly savings.",
         "connect": "Connect on LinkedIn",
-        "github": "GitHub Profile",
-        "youtube": "YouTube Channel",
-        "kofi": "Support on Ko-fi",
-        "tako": "Support on Tako"
+        "github": "GitHub Profile"
     },
     "philosophy": {
         "title": "Quality Engineering",
@@ -22,8 +19,8 @@
         "conclusion": "Quality is an engineering discipline. I build the tools and frameworks that enforce reliability. Whether it's a Go backend or this React platform, I write code that solves real quality problems."
     },
     "milestones": {
-        "title": "My Journey",
-        "subtitle": "Key milestones from my engineering journey",
+        "title": "Work Experience",
+        "subtitle": "My professional journey at Ninja Van",
         "items": [
             {
                 "year": "2026",
@@ -31,81 +28,69 @@
                 "description": "Started building this platform to share knowledge and bridge the gap between manual testing and engineering. A playground for modern web tech and high-quality automation patterns."
             },
             {
-                "year": "2025",
-                "title": "AI & Cost Efficiency",
-                "description": "Built the company's first AI testing framework in a team of three for intent classification, automating 50%+ of Tier 1 support. Validated features for a major optimization initiative that improved operational efficiency and saved over $60,000 per month."
+                "year": "2024 - Present",
+                "title": "Senior Software Engineer, QA",
+                "description": "Built an AI testing framework to verify intent classification models, automating 50% of Tier 1 support tickets. Managed automation for partnership integrations (TikTok, Lazada, Shopee). Validated features for cost-reduction initiatives saving $60,000/month. Developed tools for payload decoding and config comparison. Mentored manual testers on automation."
             },
             {
-                "year": "2024",
-                "title": "Senior Engineer & Mentor",
-                "description": "Promoted to Senior QA. Identified internal team bottlenecks and engineered custom solutions: a Chrome extension for payload decoding and a config validation tool that boosted accuracy by 60%, preventing critical production failures."
-            },
-            {
-                "year": "2023",
-                "title": "Shift-Left Integration",
-                "description": "Co-developed the company's first integration testing framework using Go, empowering the team to adopt shift-left testing and accelerate defect detection by 80%."
-            },
-            {
-                "year": "2022",
-                "title": "Framework Stability",
-                "description": "Engineered a robust automation framework with <1% regression error rate. Enforced quality gates in CI/CD, eliminating recurring build failures."
+                "year": "2022 - 2024",
+                "title": "Software Engineer, QA",
+                "description": "Co-developed the company's first Go-based integration testing framework, detecting defects 80% faster. Served as cross-team automation specialist. Achieved 100% test coverage for Recovery team mobile/web/API suites. Reduced manual testing effort by 70%. Maintained <1% regression error rate. Enforced strict CI/CD quality gates."
             },
             {
                 "year": "2021",
-                "title": "Backend Intern",
-                "description": "Joined Ninja Van as a Backend Engineer Intern. Built secure RESTful APIs and data cleanup services before transitioning to specialize in Quality Engineering."
+                "title": "Backend Engineer Intern",
+                "description": "Enhanced QA environment performance by developing a data cleanup service and contributed to code quality by building secure RESTful APIs."
             }
         ]
     },
     "expertise": {
         "title": "Technical Expertise",
-        "subtitle": "My toolkit for building stable, scalable systems",
+        "subtitle": "tools and technologies I use to drive quality",
         "automation": {
             "title": "Test Automation",
             "items": [
-                "Selenium",
-                "Rest Assured",
                 "DeepEval",
+                "PyTest-BDD",
+                "PyTest",
+                "Rest Assured",
+                "Karate Framework",
+                "Appium Flutter",
+                "Selenium",
                 "Playwright",
-                "Appium Flutter"
+                "React Testing",
+                "Cucumber"
             ]
         },
         "backend": {
-            "title": "Languages & Ecosystem",
+            "title": "Languages & Backend",
             "items": [
                 "Java",
-                "SQL",
-                "TypeScript",
+                "JavaScript",
+                "Python",
                 "Go",
-                "Python"
+                "SQL",
+                "RESTful APIs"
             ]
         },
         "strategy": {
             "title": "Strategy & Methodologies",
             "items": [
-                "Shift-Left Testing",
+                "Shift-Left Strategy",
                 "Test Planning",
                 "Risk Analysis",
                 "Agile / Scrum"
             ]
         },
-        "frontend": {
-            "title": "Modern Frontend",
-            "items": [
-                "React 19",
-                "TypeScript",
-                "TanStack",
-                "Tailwind CSS"
-            ]
-        },
         "devops": {
             "title": "DevOps & Observability",
             "items": [
+                "Bamboo CI",
                 "Docker",
-                "CI (Bamboo)",
+                "Git",
+                "Kibana",
                 "Grafana",
-                "Datadog",
-                "Kibana"
+                "Datadog"
             ]
         }
     },

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, Database, Globe, Code2, Milestone, Brain, Activity, Youtube, Coffee, ExternalLink } from 'lucide-react';
+import { Github, Linkedin, Mail, Database, Globe, Code2, Milestone, Brain, Activity } from 'lucide-react';
 import i18n from '@/lib/i18n';
 import { Boop } from '@/components/ui/boop';
 
@@ -98,24 +98,6 @@ function AboutPage() {
                             <a href="https://github.com/mihaamiharu" target="_blank" rel="noopener noreferrer">
                                 <Github className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
                                 {t('about:hero.github')}
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group hover:border-red-500/50 hover:bg-red-500/5 hover:text-red-600 dark:hover:text-red-400">
-                            <a href="https://www.youtube.com/@TestingWithEkki" target="_blank" rel="noopener noreferrer">
-                                <Youtube className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.youtube')}
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group hover:border-yellow-500/50 hover:bg-yellow-500/5 hover:text-yellow-600 dark:hover:text-yellow-400">
-                            <a href="https://ko-fi.com/ekkisyam" target="_blank" rel="noopener noreferrer">
-                                <Coffee className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.kofi')}
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group hover:border-blue-500/50 hover:bg-blue-500/5 hover:text-blue-600 dark:hover:text-blue-400">
-                            <a href="https://tako.id/TestingWithEkki" target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.tako')}
                             </a>
                         </Button>
                     </div>
