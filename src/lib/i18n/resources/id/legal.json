@@ -2,55 +2,101 @@
   "privacy": {
     "title": "Kebijakan Privasi",
     "lastUpdated": "Terakhir diperbarui: Januari 2026",
-    "intro": "TestingWithEkki (\"kami\") menghargai privasi kamu. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi kamu.",
+    "intro": "TestingWithEkki (\"kami\") berkomitmen untuk melindungi data pribadi Anda sesuai dengan Undang-Undang Perlindungan Data Pribadi (UU PDP) dan peraturan yang berlaku di Indonesia. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, memproses, dan melindungi informasi Anda.",
     "sections": {
-      "noSelling": {
-        "title": "Kami Tidak Menjual Data Kamu",
-        "content": "Kami tidak menjual atau membagikan informasi pribadi kamu kepada pengiklan atau pihak ketiga. Titik."
+      "definitions": {
+        "title": "1. Definisi",
+        "items": [
+          "**Data Pribadi**: Data tentang orang perseorangan yang teridentifikasi atau dapat diidentifikasi secara tersendiri atau dikombinasi dengan informasi lainnya.",
+          "**Subjek Data**: Individu yang melekat pada data pribadi tersebut.",
+          "**Pemrosesan**: Pengumpulan, pengolahan, penganalisisan, penyimpanan, perbaikan, penampilan, penyebarluasan, dan/atau penghapusan data pribadi."
+        ]
+      },
+      "lawfulBasis": {
+        "title": "2. Dasar Hukum Pemrosesan",
+        "content": "Kami memproses data pribadi Anda berdasarkan dasar hukum yang sah berikut:",
+        "items": [
+          "**Persetujuan (Consent)**: Anda telah memberikan persetujuan eksplisit untuk tujuan tertentu (misal: pembuatan akun, newsletter).",
+          "**Pemenuhan Kontrak**: Pemrosesan diperlukan untuk menyediakan layanan yang Anda minta (misal: melacak progres kursus).",
+          "**Kewajiban Hukum**: Kepatuhan terhadap hukum dan peraturan yang berlaku di Indonesia."
+        ]
       },
       "whatWeCollect": {
-        "title": "Apa yang Kami Kumpulkan",
+        "title": "3. Data yang Kami Kumpulkan",
         "items": [
-          "**Informasi Akun**: Alamat email, username, dan foto profil (jika mendaftar dengan Google/GitHub).",
-          "**Progres Belajar**: Tantangan dan tutorial yang kamu selesaikan, XP, dan pencapaian.",
-          "**Data Teknis**: Data penggunaan dasar seperti kunjungan halaman via Google Analytics untuk meningkatkan platform."
+          "**Informasi Akun**: Nama, alamat email, username, dan foto profil (via OAuth).",
+          "**Data Pembelajaran**: Progres tantangan, submisi kode, XP, dan pencapaian.",
+          "**Data Teknis**: Alamat IP, jenis browser, informasi perangkat, dan log penggunaan untuk keamanan dan analitik."
         ]
       },
       "howWeUse": {
-        "title": "Bagaimana Kami Menggunakan Data",
+        "title": "4. Penggunaan dan Pengungkapan Data",
         "items": [
-          "Untuk menyediakan pengalaman belajar kamu (menyimpan progres, menampilkan papan peringkat).",
-          "Untuk mengirim email penting (verifikasi, reset password).",
-          "Untuk meningkatkan platform berdasarkan pola penggunaan agregat."
+          "Untuk menyediakan dan memelihara layanan platform pembelajaran.",
+          "Untuk memberi tahu Anda tentang perubahan layanan atau akun Anda.",
+          "Untuk memantau penggunaan dan mendeteksi masalah teknis.",
+          "Kami **tidak** menjual data pribadi Anda. Kami dapat membagikan data dengan penyedia layanan pihak ketiga terpercaya (Google, Supabase) semata-mata untuk tujuan operasional."
         ]
       },
-      "yourControl": {
-        "title": "Kontrol Kamu",
+      "dataSubjectRights": {
+        "title": "5. Hak Anda (Hak Subjek Data)",
+        "content": "Berdasarkan UU PDP, Anda memiliki hak untuk:",
         "items": [
-          "Kamu bisa memperbarui atau menghapus profil kamu kapan saja.",
-          "Kamu bisa meminta ekspor atau penghapusan data lengkap dengan menghubungi kami.",
-          "Email kamu tidak pernah ditampilkan secara publik."
+          "**Akses**: Meminta salinan data pribadi Anda.",
+          "**Perbaikan**: Memperbaiki data yang tidak akurat atau tidak lengkap.",
+          "**Penghapusan**: Meminta penghapusan data Anda, tunduk pada kewajiban penyimpanan hukum.",
+          "**Pembatasan**: Meminta pembatasan pemrosesan secara spesifik.",
+          "**Menarik Persetujuan**: Menarik persetujuan pemrosesan data kapan saja."
         ]
       },
-      "thirdParties": {
-        "title": "Layanan Pihak Ketiga",
-        "content": "Kami menggunakan layanan pihak ketiga terpercaya: Google OAuth (login), Google Analytics (penggunaan anonim), dan Supabase (database). Layanan ini memiliki kebijakan privasi masing-masing."
+      "dataRetention": {
+        "title": "6. Retensi Data",
+        "content": "Kami menyimpan data pribadi Anda hanya selama diperlukan untuk memenuhi tujuan pengumpulannya, termasuk untuk tujuan memenuhi persyaratan hukum, akuntansi, atau pelaporan. Biasanya, data akun disimpan sampai Anda meminta penghapusan."
       },
       "security": {
-        "title": "Keamanan Data",
-        "content": "Kami menggunakan standar keamanan industri termasuk enkripsi HTTPS, hashing password yang aman, dan pembaruan keamanan rutin."
-      },
-      "children": {
-        "title": "Privasi Anak-Anak",
-        "content": "Platform ini ditujukan untuk pengguna berusia 13 tahun ke atas. Kami tidak dengan sengaja mengumpulkan data dari anak di bawah 13 tahun."
-      },
-      "changes": {
-        "title": "Perubahan Kebijakan",
-        "content": "Kami mungkin memperbarui kebijakan ini sesekali. Perubahan signifikan akan diumumkan di platform."
+        "title": "7. Keamanan Data",
+        "content": "Kami menerapkan langkah-langkah keamanan standar industri (enkripsi, kontrol akses) untuk melindungi data Anda. Namun, tidak ada metode transmisi melalui Internet yang 100% aman."
       },
       "contact": {
-        "title": "Hubungi Kami",
-        "content": "Pertanyaan tentang privasi? Email kami di ekki@testingwithekki.com"
+        "title": "8. Kontak & Keluhan",
+        "content": "Untuk menggunakan hak Anda atau jika Anda memiliki pertanyaan tentang kebijakan ini, silakan hubungi Kantor Perlindungan Data kami di: **ekki@testingwithekki.com**."
+      }
+    }
+  },
+  "terms": {
+    "title": "Syarat dan Ketentuan",
+    "lastUpdated": "Terakhir Diperbarui: Januari 2026",
+    "intro": "Selamat datang di TestingWithEkki. Dengan mengakses atau menggunakan situs web kami, Anda setuju untuk terikat oleh Syarat dan Ketentuan ini.",
+    "sections": {
+      "acceptance": {
+        "title": "1. Penerimaan Syarat",
+        "content": "Dengan mengakses situs web ini, Anda menyatakan bahwa Anda telah membaca, memahami, dan menyetujui Syarat ini. Jika Anda tidak setuju, mohon untuk tidak menggunakan situs ini."
+      },
+      "useLicense": {
+        "title": "2. Lisensi Penggunaan & Hak Kekayaan Intelektual",
+        "content": "Semua konten (tutorial, tantangan kode, teks, grafik) adalah milik TestingWithEkki atau pemberi lisensinya. Anda diberikan lisensi terbatas dan non-eksklusif untuk mengakses materi untuk tujuan pembelajaran pribadi dan non-komersial. Anda tidak boleh mereproduksi atau mendistribusikan ulang konten tanpa izin."
+      },
+      "userObligations": {
+        "title": "3. Kewajiban Pengguna",
+        "content": "Anda setuju untuk TIDAK:",
+        "items": [
+          "Menggunakan platform untuk tujuan ilegal apa pun.",
+          "Mencoba merekayasa balik (reverse engineer) perangkat lunak apa pun yang terdapat di situs web.",
+          "Melecehkan, menyalahgunakan, atau membahayakan orang atau kelompok lain.",
+          "Spam atau mengunggah kode berbahaya."
+        ]
+      },
+      "disclaimer": {
+        "title": "4. Penafian & Batasan Tanggung Jawab",
+        "content": "Materi di TestingWithEkki disediakan \"apa adanya\". Kami tidak memberikan jaminan, tersurat maupun tersirat. Dalam keadaan apa pun TestingWithEkki tidak bertanggung jawab atas kerugian apa pun yang timbul dari penggunaan atau ketidakmampuan menggunakan materi di situs web ini."
+      },
+      "governingLaw": {
+        "title": "5. Hukum yang Berlaku",
+        "content": "Syarat dan ketentuan ini diatur dan ditafsirkan sesuai dengan hukum **Republik Indonesia**. Anda secara tidak dapat ditarik kembali tunduk pada yurisdiksi eksklusif pengadilan di lokasi tersebut."
+      },
+      "changes": {
+        "title": "6. Perubahan Syarat",
+        "content": "Kami berhak mengubah syarat ini kapan saja. Penggunaan situs web yang berkelanjutan menandakan penerimaan Anda terhadap syarat yang diperbarui."
       }
     }
   },
@@ -74,11 +120,16 @@
     "booking": {
       "title": "Booking Sesi 1-1",
       "description": "Lebih suka ngobrol langsung? Jadwalkan video call untuk diskusi strategi testing, karir, atau review kode.",
+      "items": [
+        "Saran Karir & Mentorship",
+        "Review Kode & Arsitektur",
+        "Strategi Test Automation"
+      ],
       "cta": "Jadwalkan di Google Calendar"
     },
     "hire": {
       "title": "Terbuka untuk Peluang",
-      "description": "Mencari Senior QA Engineer atau Test Architect? Saya membantu tim membangun software yang handal dan berkualitas.",
+      "description": "Mencari Senior QA Engineer, SDET, atau Test Architect? Saya membantu tim membangun software yang handal dan berkualitas.",
       "cta": "Lihat Resume Saya"
     }
   }
