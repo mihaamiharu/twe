@@ -1,33 +1,23 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { adminMiddleware } from './auth.mw';
 
 // ----------------------------------------------------------------------------
 // ADMIN STATS
 // ----------------------------------------------------------------------------
 
-export const getAdminStats = createServerFn({ method: 'GET' }).handler(
+export const getAdminStats = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(
   async () => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { users, submissions, challenges, bugReports } = await import(
         '@/db/schema'
       );
       const { count, desc, sql, gte, lt, and } = await import('drizzle-orm');
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
+      // Date ranges for growth calculation
 
       // Date ranges for growth calculation
       const thirtyDaysAgo = new Date();
@@ -248,27 +238,14 @@ export const getAdminStats = createServerFn({ method: 'GET' }).handler(
 // ADMIN USERS
 // ----------------------------------------------------------------------------
 
-export const getAdminUsers = createServerFn({ method: 'GET' }).handler(
+export const getAdminUsers = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(
   async () => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { users, submissions } = await import('@/db/schema');
       const { desc, eq, count } = await import('drizzle-orm');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const usersList = await db
         .select({
@@ -301,27 +278,13 @@ const UpdateUserStatusSchema = z.object({
 });
 
 export const updateUserStatus = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
   .inputValidator((data: unknown) => UpdateUserStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { users } = await import('@/db/schema');
       const { eq } = await import('drizzle-orm');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       await db
         .update(users)
@@ -343,25 +306,12 @@ export const updateUserStatus = createServerFn({ method: 'POST' })
 // ADMIN BUGS
 // ----------------------------------------------------------------------------
 
-export const getAdminBugs = createServerFn({ method: 'GET' }).handler(
+export const getAdminBugs = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(
   async () => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const bugs = await db.query.bugReports.findMany({
         orderBy: (bugReports, { desc }) => [desc(bugReports.createdAt)],
@@ -392,27 +342,13 @@ const UpdateBugStatusSchema = z.object({
 });
 
 export const updateBugStatus = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
   .inputValidator((data: unknown) => UpdateBugStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { bugReports } = await import('@/db/schema');
       const { eq } = await import('drizzle-orm');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       type BugReportUpdate = {
         status?: typeof input.status;
@@ -448,26 +384,13 @@ export const updateBugStatus = createServerFn({ method: 'POST' })
 // ADMIN CHALLENGES
 // ----------------------------------------------------------------------------
 
-export const getAdminChallenges = createServerFn({ method: 'GET' }).handler(
+export const getAdminChallenges = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(
   async () => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { challenges } = await import('@/db/schema');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const list = await db
         .select({
@@ -500,27 +423,13 @@ const UpdateChallengeStatusSchema = z.object({
 });
 
 export const updateChallengeStatus = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
   .inputValidator((data: unknown) => UpdateChallengeStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { challenges } = await import('@/db/schema');
       const { eq } = await import('drizzle-orm');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const existing = await db.query.challenges.findFirst({
         where: eq(challenges.id, input.id),
@@ -567,25 +476,12 @@ export const updateChallengeStatus = createServerFn({ method: 'POST' })
 // ADMIN SUBMISSIONS
 // ----------------------------------------------------------------------------
 
-export const getAdminSubmissions = createServerFn({ method: 'GET' }).handler(
+export const getAdminSubmissions = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(
   async () => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const submissionsList = await db.query.submissions.findMany({
         orderBy: (submissions, { desc }) => [desc(submissions.createdAt)],
@@ -620,26 +516,13 @@ export const getAdminSubmissions = createServerFn({ method: 'GET' }).handler(
 // ADMIN TUTORIALS
 // ----------------------------------------------------------------------------
 
-export const getAdminTutorials = createServerFn({ method: 'GET' }).handler(
+export const getAdminTutorials = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(
   async () => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { tutorials } = await import('@/db/schema');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const list = await db.select().from(tutorials).orderBy(tutorials.createdAt);
 
@@ -658,27 +541,13 @@ const UpdateTutorialStatusSchema = z.object({
 });
 
 export const updateTutorialStatus = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
   .inputValidator((data: unknown) => UpdateTutorialStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { tutorials } = await import('@/db/schema');
       const { eq } = await import('drizzle-orm');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       await db
         .update(tutorials)
@@ -700,27 +569,14 @@ export const updateTutorialStatus = createServerFn({ method: 'POST' })
 // ADMIN ACHIEVEMENTS
 // ----------------------------------------------------------------------------
 
-export const getAdminAchievements = createServerFn({ method: 'GET' }).handler(
+export const getAdminAchievements = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(
   async () => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { achievements, userAchievements } = await import('@/db/schema');
       const { count, eq, sql } = await import('drizzle-orm');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const list = await db
         .select({
@@ -752,27 +608,13 @@ export const getAdminAchievements = createServerFn({ method: 'GET' }).handler(
 // ----------------------------------------------------------------------------
 
 export const getAdminUserDetail = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
   .inputValidator((data: unknown) => z.object({ userId: z.string() }).parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { users, submissions, progress } = await import('@/db/schema');
       const { eq, desc } = await import('drizzle-orm');
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const session = await auth.api.getSession({ headers });
-
-      if (
-        !session?.user ||
-        (session.user as { role?: string }).role !== 'ADMIN'
-      ) {
-        return { success: false, error: 'Unauthorized' };
-      }
 
       const user = await db.query.users.findFirst({
         where: eq(users.id, input.userId),
