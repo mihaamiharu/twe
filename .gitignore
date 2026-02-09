@@ -25,3 +25,9 @@ allure-report/
 
 # Local deployment scripts
 scripts/deploy-local.sh
+
+# Deployment artifacts
+deployment.tar.gz
+
+# Lint reports
+lint_*.txt
