@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { z } from 'zod';
 import {
@@ -239,13 +239,14 @@ export function ChallengesPage() {
   // Derive active track
   const activeTrack = ALL_TRACKS.find(t => t.id === activeTrackId) || ALL_TRACKS[0];
 
-  const { data: challengesResponse } = useSuspenseQuery(
-    challengeListQueryOptions({
+  const { data: challengesResponse } = useQuery({
+    ...challengeListQueryOptions({
       locale,
       search: debouncedSearchQuery || undefined,
       limit: 1000,
-    })
-  );
+    }),
+    placeholderData: keepPreviousData,
+  });
 
   const challenges = challengesResponse?.data ?? [];
 
@@ -383,12 +384,12 @@ export function ChallengesPage() {
         <div className="px-2">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
             <span>Overall Progress</span>
-            <span>{Math.round((challenges.filter(c => c.isCompleted).length / challenges.length) * 100)}%</span>
+            <span>{challenges.length > 0 ? Math.round((challenges.filter(c => c.isCompleted).length / challenges.length) * 100) : 0}%</span>
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-primary transition-all duration-500"
-              style={{ width: `${(challenges.filter(c => c.isCompleted).length / challenges.length) * 100}%` }}
+              style={{ width: `${challenges.length > 0 ? (challenges.filter(c => c.isCompleted).length / challenges.length) * 100 : 0}%` }}
             />
           </div>
         </div>
