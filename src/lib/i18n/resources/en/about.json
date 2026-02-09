@@ -7,16 +7,16 @@
         "github": "GitHub Profile"
     },
     "philosophy": {
-        "title": "Quality Engineering",
-        "intro": "Quality isn't just about finding bugs. It's about designing systems that prevent them.",
-        "listIntro": "My approach builds on three pillars:",
+        "title": "Software Engineer QA",
+        "intro": "Quality is a continuous engineering effort, not a final checkpoint. I build systems that make reliability a default feature of the product.",
+        "listIntro": "My approach builds on these core pillars:",
         "list": {
-            "auth": "<strong>Tooling over Toil</strong>: Automating repetitive tasks to empower testers to focus on exploration and strategy.",
-            "code": "<strong>Shift Left</strong>: Catching issues during development, not after deployment.",
-            "adaptability": "<strong>Technical Agility</strong>: Seamlessly switching contexts - Java, Go, Python - to match the team's evolving stack and business needs.",
-            "reliability": "<strong>Force Multiplier</strong>: Stepping up during critical shortages to solve complex automation problems and keep the pipeline moving."
+            "integration": "<strong>Cross-Functional Integration</strong>: Bridging the gap between Stakeholders, PMs, and Engineering to build automated solutions that serve the entire product roadmap and business goals.",
+            "shiftLeft": "<strong>Shift-Left Strategy</strong>: Integrating quality protocols during the design and development phases to catch issues before they reach the pipeline.",
+            "agility": "<strong>Technical Agility</strong>: Seamlessly adapting across Java, Go, and Python to align with both technical architectures and evolving business needs.",
+            "multiplier": "<strong>Force Multiplier</strong>: Solving complex automation bottlenecks to keep the deployment pipeline moving at high velocity."
         },
-        "conclusion": "Quality is an engineering discipline. I build the tools and frameworks that enforce reliability. Whether it's a Go backend or this React platform, I write code that solves real quality problems."
+        "conclusion": "Quality is an engineering discipline. I build the tools and frameworks that enforce reliability. Whether it's a Go backend or a React platform, I write code that solves real quality problems."
     },
     "milestones": {
         "title": "Work Experience",
@@ -46,56 +46,106 @@
     },
     "expertise": {
         "title": "Technical Expertise",
-        "subtitle": "tools and technologies I use to drive quality",
+        "subtitle": "The engineering stack behind my software quality and automation strategy.",
         "automation": {
             "title": "Test Automation",
-            "items": [
-                "DeepEval",
-                "PyTest-BDD",
-                "PyTest",
-                "Rest Assured",
-                "Karate Framework",
-                "Appium Flutter",
-                "Selenium",
-                "Playwright",
-                "React Testing",
-                "Cucumber"
+            "groups": [
+                {
+                    "name": "Web",
+                    "items": [
+                        "Selenium",
+                        "Playwright",
+                        "React Testing"
+                    ]
+                },
+                {
+                    "name": "Mobile",
+                    "items": [
+                        "Appium Flutter"
+                    ]
+                },
+                {
+                    "name": "AI & API",
+                    "items": [
+                        "DeepEval",
+                        "Rest Assured",
+                        "Karate Framework"
+                    ]
+                },
+                {
+                    "name": "Frameworks",
+                    "items": [
+                        "PyTest",
+                        "PyTest-BDD",
+                        "Cucumber"
+                    ]
+                }
             ]
         },
         "backend": {
             "title": "Languages & Backend",
-            "items": [
-                "Java",
-                "JavaScript",
-                "Python",
-                "Go",
-                "SQL",
-                "RESTful APIs"
+            "groups": [
+                {
+                    "name": "Languages",
+                    "items": [
+                        "Java",
+                        "JavaScript",
+                        "Python",
+                        "Go"
+                    ]
+                },
+                {
+                    "name": "Data & Interface",
+                    "items": [
+                        "SQL",
+                        "RESTful APIs"
+                    ]
+                }
             ]
         },
         "strategy": {
             "title": "Strategy & Methodologies",
-            "items": [
-                "Shift-Left Strategy",
-                "Test Planning",
-                "Risk Analysis",
-                "Agile / Scrum"
+            "groups": [
+                {
+                    "name": "Quality Strategy",
+                    "items": [
+                        "Shift-Left Strategy",
+                        "Risk Analysis"
+                    ]
+                },
+                {
+                    "name": "Process",
+                    "items": [
+                        "Test Planning",
+                        "Agile / Scrum"
+                    ]
+                }
             ]
         },
         "devops": {
             "title": "DevOps & Observability",
-            "items": [
-                "Bamboo CI",
-                "Docker",
-                "Git",
-                "Kibana",
-                "Grafana",
-                "Datadog"
+            "groups": [
+                {
+                    "name": "CI/CD & Infrastructure",
+                    "items": [
+                        "Docker",
+                        "Bamboo CI",
+                        "Git"
+                    ]
+                },
+                {
+                    "name": "Observability",
+                    "items": [
+                        "Datadog",
+                        "Grafana",
+                        "Kibana"
+                    ]
+                }
             ]
         }
     },
     "contact": {
-        "title": "Looking for a QA Engineer who understands the full stack?",
+        "title": "Looking for a Software Engineer who builds quality into every layer of the stack?",
         "cta": "Get in Touch"
     }
 }

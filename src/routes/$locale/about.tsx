@@ -31,26 +31,24 @@ function AboutPage() {
         {
             category: t('about:expertise.automation.title'),
             icon: <Globe className="h-5 w-5 text-blue-500" />,
-            skills: t('about:expertise.automation.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.automation.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         },
         {
             category: t('about:expertise.backend.title'),
             icon: <Database className="h-5 w-5 text-green-500" />,
-            skills: t('about:expertise.backend.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.backend.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         },
         {
             category: t('about:expertise.strategy.title'),
             icon: <Brain className="h-5 w-5 text-purple-500" />,
-            skills: t('about:expertise.strategy.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.strategy.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         },
         {
             category: t('about:expertise.devops.title'),
             icon: <Activity className="h-5 w-5 text-orange-500" />,
-            skills: t('about:expertise.devops.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.devops.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         }
     ];
-
-
 
     return (
         <div className="min-h-screen py-20 px-6">
@@ -115,10 +113,10 @@ function AboutPage() {
                             {t('about:philosophy.listIntro')}
                         </p>
                         <ul className="list-disc list-inside space-y-2 ml-4">
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.auth') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.code') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.adaptability') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.reliability') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.integration') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.shiftLeft') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.agility') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.multiplier') }} />
                         </ul>
                         <p className="mt-4">
                             {t('about:philosophy.conclusion')}
@@ -176,7 +174,7 @@ function AboutPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {expertise.map((stack, index) => (
-                            <Card key={index} className="bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors">
+                            <Card key={index} className="bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors h-full">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-3 text-lg">
                                         <Boop rotation={15} scale={1.2} timing={200}>
@@ -185,14 +183,21 @@ function AboutPage() {
                                         {stack.category}
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="flex flex-wrap gap-2">
-                                        {stack.skills.map((skill) => (
-                                            <Badge key={skill} variant="secondary" className="hover:bg-primary/20">
-                                                {skill}
-                                            </Badge>
-                                        ))}
-                                    </div>
+                                <CardContent className="space-y-6">
+                                    {stack.groups.map((group, groupIndex) => (
+                                        <div key={groupIndex}>
+                                            <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">
+                                                {group.name}
+                                            </h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {group.items.map((skill) => (
+                                                    <Badge key={skill} variant="secondary" className="hover:bg-primary/20">
+                                                        {skill}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </CardContent>
                             </Card>
                         ))}

@@ -90,7 +90,7 @@ test('User can login successfully', async ({ page }) => {
 ```
 
 > [!TIP]
-> In our playground exercises, we often **pre-load** the Page Object classes for you. You don't need to import them—just call `new LoginPage(page)` and get started!
+> In our playground exercises, we often **pre-load** the Page Object classes for you. You don't need to import them just call `new LoginPage(page)` and get started!
 
 ---
 
