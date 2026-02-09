@@ -1,5 +1,11 @@
 import { createServerFn } from '@tanstack/react-start';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { z } from 'zod';
+import { db } from '@/db';
+import { bugReports } from '@/db/schema';
+import { logger } from '@/lib/logger';
+import { auth } from './auth.server';
+import { createGitHubIssue, formatBugReportBody } from './github.server';
 
 const BugReportSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(200),
@@ -24,16 +30,6 @@ export const createBugReport = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => BugReportSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      // Dynamically import server-only modules
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
-      const { db } = await import('@/db');
-      const { bugReports } = await import('@/db/schema');
-      const { logger } = await import('@/lib/logger');
-      const { sendBugReportNotification } =
-        await import('@/server/email.server');
-
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const headers = getRequestHeaders();
       let userId: string | null = null;
@@ -82,19 +78,24 @@ export const createBugReport = createServerFn({ method: 'POST' })
         `[BugReport] New bug report created: ${report.id} - "${title}" (${severity})`,
       );
 
-      // Send email notification to admin (non-blocking)
-      sendBugReportNotification({
-        id: report.id,
-        title: report.title,
-        severity: report.severity,
+      // Create GitHub Issue (non-blocking)
+      const issueBody = formatBugReportBody({
+        reportId: report.id,
         stepsToReproduce: report.stepsToReproduce,
         expectedBehavior: report.expectedBehavior,
         actualBehavior: report.actualBehavior,
         pageUrl: report.pageUrl,
         browserInfo: report.browserInfo,
         reporterEmail: report.reporterEmail,
+        userId: report.userId,
+      });
+
+      createGitHubIssue({
+        title: `[${report.severity}] ${report.title}`,
+        body: issueBody,
+        labels: ['bug', report.severity.toLowerCase()],
       }).catch((err) => {
-        logger.error('[BugReport] Failed to send admin notification:', err);
+        logger.error('[BugReport] Failed to create GitHub issue:', err);
       });
 
       return {
