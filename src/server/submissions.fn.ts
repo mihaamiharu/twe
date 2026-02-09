@@ -1,6 +1,25 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { authMiddleware } from './auth.mw';
+import { db } from '@/db';
+import {
+  submissions,
+  challenges,
+  progress,
+  users,
+  testCases,
+  achievements,
+} from '@/db/schema';
+import { eq, and, sql, inArray, desc } from 'drizzle-orm';
+import { checkLevelUp } from '@/lib/gamification';
+import { checkAchievements } from '@/lib/achievements';
+import {
+  getUserStats,
+  getEarnedAchievementIds,
+  awardAchievements,
+} from '@/lib/stats';
+import { logger } from '@/lib/logger';
+import { getRawChallengeContent } from './content.server';
 
 // ----------------------------------------------------------------------------
 // HELPERS
@@ -44,9 +63,6 @@ const CreateSubmissionSchema = z.object({
   locale: z.string().default('en'),
 });
 
-
-
-
 export const challengeSubmissionHandler = async ({
   data: input,
   context,
@@ -56,23 +72,6 @@ export const challengeSubmissionHandler = async ({
 }) => {
   const { locale = 'en' } = input;
   try {
-    // Dynamically import server-only modules
-    const { db } = await import('@/db');
-    const {
-      submissions,
-      challenges,
-      progress,
-      users,
-      testCases,
-      achievements,
-    } = await import('@/db/schema');
-    const { eq, and, sql, inArray } = await import('drizzle-orm');
-    const { checkLevelUp } = await import('@/lib/gamification');
-    const { checkAchievements } = await import('@/lib/achievements');
-    const { getUserStats, getEarnedAchievementIds, awardAchievements } =
-      await import('@/lib/stats');
-    const { logger } = await import('@/lib/logger');
-
     const userId = context.user.id;
     const { challengeSlug, code, testResults, executionTime, isPractice } = input;
 
@@ -108,7 +107,6 @@ export const challengeSubmissionHandler = async ({
 
     if (!challenge) {
       // LAZY SYNC: Check if challenge exists in filesystem
-      const { getRawChallengeContent } = await import('./content.server');
 
       // Get raw content (with full localized objects)
       const fsChallenge = await getRawChallengeContent(challengeSlug);
@@ -117,21 +115,24 @@ export const challengeSubmissionHandler = async ({
         logger.info(`[Submission] Lazy syncing challenge: ${challengeSlug}`);
 
         // Insert challenge
-        const [newChallenge] = await db.insert(challenges).values({
-          slug: fsChallenge.slug,
-          title: fsChallenge.title as any, // Cast to any for JSONB
-          description: fsChallenge.description as any,
-          type: fsChallenge.type,
-          difficulty: fsChallenge.difficulty,
-          xpReward: fsChallenge.xpReward,
-          order: fsChallenge.order,
-          instructions: fsChallenge.instructions as any,
-          htmlContent: fsChallenge.htmlContent,
-          starterCode: fsChallenge.starterCode,
-          category: fsChallenge.category,
-          tags: fsChallenge.tags,
-          isPublished: true, // Auto-publish if found on FS during submission
-        }).returning();
+        const [newChallenge] = await db
+          .insert(challenges)
+          .values({
+            slug: fsChallenge.slug,
+            title: fsChallenge.title as any, // Cast to any for JSONB
+            description: fsChallenge.description as any,
+            type: fsChallenge.type,
+            difficulty: fsChallenge.difficulty,
+            xpReward: fsChallenge.xpReward,
+            order: fsChallenge.order,
+            instructions: fsChallenge.instructions as any,
+            htmlContent: fsChallenge.htmlContent,
+            starterCode: fsChallenge.starterCode,
+            category: fsChallenge.category,
+            tags: fsChallenge.tags,
+            isPublished: true, // Auto-publish if found on FS during submission
+          })
+          .returning();
 
         // Insert test cases
         if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
@@ -143,7 +144,7 @@ export const challengeSubmissionHandler = async ({
               expectedOutput: tc.expectedOutput,
               isHidden: tc.isHidden || false,
               order: index,
-            }))
+            })),
           );
         }
 
@@ -167,7 +168,8 @@ export const challengeSubmissionHandler = async ({
 
     // If no test cases in DB, we fallback to submitted results count ONLY for Playwright/E2E challenges
     // which use assertion-based validation rather than input/output pairs.
-    const isE2OrPlaywright = challenge.type === 'PLAYWRIGHT' || challenge.category?.includes('e2e');
+    const isE2OrPlaywright =
+      challenge.type === 'PLAYWRIGHT' || challenge.category?.includes('e2e');
 
     if (testsTotal === 0 && testResults.length > 0 && isE2OrPlaywright) {
       testsTotal = testResults.length;
@@ -288,10 +290,7 @@ export const challengeSubmissionHandler = async ({
         const userStats = await getUserStats(userId);
         const alreadyEarned = await getEarnedAchievementIds(userId);
 
-        const earnedAchievements = checkAchievements(
-          userStats,
-          alreadyEarned,
-        );
+        const earnedAchievements = checkAchievements(userStats, alreadyEarned);
 
         if (earnedAchievements.length > 0) {
           // Award the achievements
@@ -359,13 +358,12 @@ export const challengeSubmissionHandler = async ({
       error: error instanceof Error ? error.message : 'Unknown error',
     };
   }
-}
+};
 
 export const createSubmission = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
   .inputValidator((data: unknown) => CreateSubmissionSchema.parse(data))
   .handler(challengeSubmissionHandler);
-
 
 // ----------------------------------------------------------------------------
 // GET SUBMISSIONS (LIST)
@@ -383,11 +381,6 @@ export const getSubmissions = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => GetSubmissionsSchema.parse(data))
   .handler(async ({ data: input, context }) => {
     try {
-      // Dynamically import server-only modules
-      const { db } = await import('@/db');
-      const { submissions, challenges } = await import('@/db/schema');
-      const { eq, and, desc, sql } = await import('drizzle-orm');
-
       const userId = context.user.id;
       const { challengeId, page, limit, locale } = input;
 

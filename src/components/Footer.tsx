@@ -95,7 +95,7 @@ export function Footer() {
             </p>
             <div className="flex gap-4">
               <a
-                href="https://github.com/mihaamiharu/twe"
+                href="https://github.com/mihaamiharu"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
