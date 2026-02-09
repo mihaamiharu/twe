@@ -175,7 +175,7 @@ function ContactPage() {
                         <CardFooter>
                             <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" size="lg" asChild>
                                 <a
-                                    href="/ekki-resume.pdf"
+                                    href="https://drive.google.com/file/d/1EYmOmsqR6ZrNKG7hWP672I1CMvcPBSAi/view?usp=sharing"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="gap-2"
