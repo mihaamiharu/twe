@@ -23,7 +23,7 @@ Think of JavaScript as a "Live Performance" and TypeScript as a "Rehearsal."
 
 ## 2. Basic Type Annotations (The Right Way)
 
-In TypeScript, we use a colon `:` to define a type. However, modern TS is smart—use **Inference** for simple variables and **Annotations** for complex logic.
+In TypeScript, we use a colon `:` to define a type. However, modern TS is smart use **Inference** for simple variables and **Annotations** for complex logic.
 
 ```typescript
 // Inference: TS knows these types automatically. Don't over-annotate!
