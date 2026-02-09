@@ -50,6 +50,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
 import { createBugReport } from '@/server/bug-reports.fn';
+import { showAchievementToast } from './achievement-toast';
 
 // Helper functions need to be moved or keep them here but typed correctly
 const getBugReportSchema = (t: TFunction) =>
@@ -107,6 +108,7 @@ interface BugReportDialogProps {
 export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
   const { t } = useTranslation(['bugs', 'common']);
   const [open, setOpen] = useState(false);
+  const [localSubmitting, setLocalSubmitting] = useState(false);
   const { data: auth } = useSuspenseQuery(authQueryOptions);
   const session = auth;
   const isLoggedIn = !!session?.user;
@@ -142,10 +144,14 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
 
       return response.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success(t('bugs:toast.success.title'), {
         description: t('bugs:toast.success.description'),
       });
+
+      if (data.newAchievement) {
+        showAchievementToast(data.newAchievement);
+      }
 
       // Track analytics
       trackEvent('bug_report_submitted', { title: form.getValues('title') });
@@ -161,7 +167,11 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
   });
 
   const onSubmit = (data: BugReportFormData) => {
-    submitMutation.mutate(data);
+    if (localSubmitting) return;
+    setLocalSubmitting(true);
+    submitMutation.mutate(data, {
+      onSettled: () => setLocalSubmitting(false),
+    });
   };
 
   return (
@@ -362,7 +372,7 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
             <Button
               type="submit"
               form="bug-report-form"
-              disabled={submitMutation.isPending}
+              disabled={submitMutation.isPending || localSubmitting}
               variant="destructive"
             >
               {submitMutation.isPending ? (

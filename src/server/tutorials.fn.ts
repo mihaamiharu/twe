@@ -11,6 +11,13 @@ import {
   getTutorialContent,
   getNextTutorial,
 } from './content.server';
+import { checkAchievements } from '@/lib/achievements';
+import {
+  getUserStats,
+  getEarnedAchievementIds,
+  awardAchievements,
+} from '@/lib/stats';
+import { logger } from '@/lib/logger';
 
 // Helper for localizable fields (still needed for challenges)
 const getLocalizedValue = (value: unknown, locale: string): string => {
@@ -346,26 +353,37 @@ export const completeTutorial = createServerFn({ method: 'POST' })
           return { success: false, error: 'Tutorial not found' };
         }
 
-        const [newTutorial] = await db
-          .insert(tutorials)
-          .values({
-            slug: tutorialContent.slug,
-            title: { en: tutorialContent.title, id: tutorialContent.title },
-            description: {
-              en: tutorialContent.description,
-              id: tutorialContent.description,
-            },
-            content: {
-              en: tutorialContent.content,
-              id: tutorialContent.content,
-            },
-            order: tutorialContent.order,
-            estimatedMinutes: tutorialContent.estimatedMinutes,
-            tags: tutorialContent.tags,
-            isPublished: true,
-          })
-          .returning();
-        tutorial = newTutorial;
+        try {
+          const [newTutorial] = await db
+            .insert(tutorials)
+            .values({
+              slug: tutorialContent.slug,
+              title: { en: tutorialContent.title, id: tutorialContent.title },
+              description: {
+                en: tutorialContent.description,
+                id: tutorialContent.description,
+              },
+              content: {
+                en: tutorialContent.content,
+                id: tutorialContent.content,
+              },
+              order: tutorialContent.order,
+              estimatedMinutes: tutorialContent.estimatedMinutes,
+              tags: tutorialContent.tags,
+              isPublished: true,
+            })
+            .returning();
+          tutorial = newTutorial;
+        } catch (err) {
+          // If insertion failed (likely race condition on unique slug), try to fetch it again
+          tutorial = await db.query.tutorials.findFirst({
+            where: eq(tutorials.slug, slug),
+          });
+
+          if (!tutorial) {
+            throw err; // Re-throw if legitimate error
+          }
+        }
       }
 
       // Check existing progress
@@ -413,6 +431,33 @@ export const completeTutorial = createServerFn({ method: 'POST' })
           .where(eq(users.id, userId));
       }
 
+      // Check and award achievements (for tutorials and streaks)
+      let newAchievements: { id: string; name: string; icon: string }[] = [];
+      try {
+        const userStats = await getUserStats(userId);
+        const alreadyEarned = await getEarnedAchievementIds(userId);
+        const earnedAchievements = checkAchievements(userStats, alreadyEarned);
+
+        if (earnedAchievements.length > 0) {
+          await awardAchievements(
+            userId,
+            earnedAchievements.map((a) => a.id),
+          );
+
+          newAchievements = earnedAchievements.map((a) => ({
+            id: a.id,
+            name: a.name,
+            icon: a.icon,
+          }));
+
+          logger.info(
+            `[Achievements] Tutorial completion triggered: ${earnedAchievements.map((a) => a.name).join(', ')}`,
+          );
+        }
+      } catch (error) {
+        logger.error('Error checking achievements after tutorial:', error);
+      }
+
       // Increment view/completion count
       await db
         .update(tutorials)
@@ -426,6 +471,7 @@ export const completeTutorial = createServerFn({ method: 'POST' })
         data: {
           isCompleted: true,
           xpAwarded: wasAlreadyCompleted ? 0 : 25,
+          newAchievements,
         },
       };
     } catch (error) {

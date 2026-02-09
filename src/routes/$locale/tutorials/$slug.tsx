@@ -30,6 +30,7 @@ import {
   type TOCItem,
 } from '@/components/tutorials/TableOfContents';
 import i18n from '@/lib/i18n';
+import { showAchievementToasts } from '@/components/achievement-toast';
 
 export const Route = createFileRoute('/$locale/tutorials/$slug')({
   component: TutorialDetailPage,
@@ -99,6 +100,7 @@ function TutorialDetailPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [readingProgress, setReadingProgress] = useState(0);
+  const [localSubmitting, setLocalSubmitting] = useState(false);
   const [showAuthGuard, setShowAuthGuard] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const { data: auth } = useSuspenseQuery(authQueryOptions);
@@ -128,7 +130,7 @@ function TutorialDetailPage() {
       if (!result.success) throw new Error(result.error);
       return result;
     },
-    onSuccess: async () => {
+    onSuccess: async (result) => {
       toast.success(t('tutorials:toasts.completed'));
       await queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
       await queryClient.invalidateQueries({ queryKey: ['tutorials'] });
@@ -136,8 +138,10 @@ function TutorialDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
 
-      // Achievement toasts would go here if tutorials awarded achievements
-      // Currently tutorials only award XP
+
+      if (result.data?.newAchievements && result.data.newAchievements.length > 0) {
+        showAchievementToasts(result.data.newAchievements);
+      }
     },
     onError: () => {
       toast.error(t('tutorials:toasts.failed'));
@@ -449,10 +453,16 @@ function TutorialDetailPage() {
                         setShowAuthGuard(true);
                         return;
                       }
-                      markCompleteMutation.mutate();
+                      if (localSubmitting) return;
+                      setLocalSubmitting(true);
+                      markCompleteMutation.mutate(undefined, {
+                        onSettled: () => setLocalSubmitting(false),
+                      });
                     }}
                     disabled={
-                      markCompleteMutation.isPending || displayProgress < 100
+                      markCompleteMutation.isPending ||
+                      localSubmitting ||
+                      displayProgress < 100
                     }
                   >
                     <CheckCircle2 className="h-4 w-4 mr-2" />
