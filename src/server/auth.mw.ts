@@ -26,7 +26,6 @@ export interface AuthUser {
 export interface AuthContext {
     user: AuthUser;
     userId: string;
-    // userId is redundant but kept for convenience if needed, though user.id is preferred
 }
 
 /**
@@ -38,10 +37,8 @@ export interface AuthContext {
  */
 export const authMiddleware = createMiddleware({ type: 'function' }).server(
     async ({ next }) => {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const headers = getRequestHeaders();
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const session = await auth.api.getSession({ headers });
 
         if (!session?.user?.id) {
@@ -71,10 +68,8 @@ export const authMiddleware = createMiddleware({ type: 'function' }).server(
 export const optionalAuthMiddleware = createMiddleware({
     type: 'function',
 }).server(async ({ next }) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const headers = getRequestHeaders();
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const session = await auth.api.getSession({ headers });
 
     return next({
