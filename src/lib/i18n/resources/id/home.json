@@ -32,8 +32,8 @@
       ]
     },
     "beginner": {
-      "title": "JavaScript",
-      "description": "Pelajari dasar-dasar JavaScript untuk otomasi pengujian",
+      "title": "JavaScript & TypeScript",
+      "description": "Pelajari dasar-dasar JS/TS untuk otomasi pengujian",
       "skills": [
         "Variabel & Tipe",
         "Manipulasi DOM",
