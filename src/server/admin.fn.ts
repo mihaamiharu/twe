@@ -1,6 +1,18 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { adminMiddleware } from './auth.mw';
+import { db } from '@/db';
+import {
+  users,
+  submissions,
+  challenges,
+  bugReports,
+  tutorials,
+  achievements,
+  userAchievements,
+  progress,
+} from '@/db/schema';
+import { count, desc, sql, gte, lt, and, eq } from 'drizzle-orm';
 
 // ----------------------------------------------------------------------------
 // ADMIN STATS
@@ -8,17 +20,8 @@ import { adminMiddleware } from './auth.mw';
 
 export const getAdminStats = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .handler(
-  async () => {
+  .handler(async () => {
     try {
-      const { db } = await import('@/db');
-      const { users, submissions, challenges, bugReports } = await import(
-        '@/db/schema'
-      );
-      const { count, desc, sql, gte, lt, and } = await import('drizzle-orm');
-
-      // Date ranges for growth calculation
-
       // Date ranges for growth calculation
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
@@ -167,8 +170,8 @@ export const getAdminStats = createServerFn({ method: 'GET' })
       const userGrowthPercent =
         previousMonthUsers[0].value > 0
           ? ((currentMonthUsers[0].value - previousMonthUsers[0].value) /
-              previousMonthUsers[0].value) *
-            100
+            previousMonthUsers[0].value) *
+          100
           : currentMonthUsers[0].value > 0
             ? 100
             : 0;
@@ -176,9 +179,9 @@ export const getAdminStats = createServerFn({ method: 'GET' })
       const submissionGrowthPercent =
         previousMonthSubmissions[0].value > 0
           ? ((currentMonthSubmissions[0].value -
-              previousMonthSubmissions[0].value) /
-              previousMonthSubmissions[0].value) *
-            100
+            previousMonthSubmissions[0].value) /
+            previousMonthSubmissions[0].value) *
+          100
           : currentMonthSubmissions[0].value > 0
             ? 100
             : 0;
@@ -215,10 +218,10 @@ export const getAdminStats = createServerFn({ method: 'GET' })
           recentActivity,
           userGrowth: userGrowthData,
           submissionStats: {
-            passed: submissionStats.find(s => s.isPassed)?.count || 0,
-            failed: submissionStats.find(s => !s.isPassed)?.count || 0,
+            passed: submissionStats.find((s) => s.isPassed)?.count || 0,
+            failed: submissionStats.find((s) => !s.isPassed)?.count || 0,
           },
-          bugStats
+          bugStats,
         },
       };
     } catch (ignored) {
@@ -231,8 +234,7 @@ export const getAdminStats = createServerFn({ method: 'GET' })
         error: error.message,
       };
     }
-  },
-);
+  });
 
 // ----------------------------------------------------------------------------
 // ADMIN USERS
@@ -240,13 +242,8 @@ export const getAdminStats = createServerFn({ method: 'GET' })
 
 export const getAdminUsers = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .handler(
-  async () => {
+  .handler(async () => {
     try {
-      const { db } = await import('@/db');
-      const { users, submissions } = await import('@/db/schema');
-      const { desc, eq, count } = await import('drizzle-orm');
-
       const usersList = await db
         .select({
           id: users.id,
@@ -269,8 +266,7 @@ export const getAdminUsers = createServerFn({ method: 'GET' })
       console.error('Failed to fetch users:', error);
       return { success: false, error: 'Internal Server Error' };
     }
-  },
-);
+  });
 
 const UpdateUserStatusSchema = z.object({
   id: z.string(),
@@ -282,10 +278,6 @@ export const updateUserStatus = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => UpdateUserStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { db } = await import('@/db');
-      const { users } = await import('@/db/schema');
-      const { eq } = await import('drizzle-orm');
-
       await db
         .update(users)
         .set({
@@ -308,11 +300,8 @@ export const updateUserStatus = createServerFn({ method: 'POST' })
 
 export const getAdminBugs = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .handler(
-  async () => {
+  .handler(async () => {
     try {
-      const { db } = await import('@/db');
-
       const bugs = await db.query.bugReports.findMany({
         orderBy: (bugReports, { desc }) => [desc(bugReports.createdAt)],
         with: {
@@ -332,8 +321,7 @@ export const getAdminBugs = createServerFn({ method: 'GET' })
       console.error('Failed to fetch bug reports:', error);
       return { success: false, error: 'Internal Server Error' };
     }
-  },
-);
+  });
 
 const UpdateBugStatusSchema = z.object({
   id: z.string(),
@@ -346,10 +334,6 @@ export const updateBugStatus = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => UpdateBugStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { db } = await import('@/db');
-      const { bugReports } = await import('@/db/schema');
-      const { eq } = await import('drizzle-orm');
-
       type BugReportUpdate = {
         status?: typeof input.status;
         adminNotes?: string;
@@ -386,12 +370,8 @@ export const updateBugStatus = createServerFn({ method: 'POST' })
 
 export const getAdminChallenges = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .handler(
-  async () => {
+  .handler(async () => {
     try {
-      const { db } = await import('@/db');
-      const { challenges } = await import('@/db/schema');
-
       const list = await db
         .select({
           id: challenges.id,
@@ -413,8 +393,7 @@ export const getAdminChallenges = createServerFn({ method: 'GET' })
       console.error('Failed to fetch challenges:', error);
       return { success: false, error: 'Internal Server Error' };
     }
-  },
-);
+  });
 
 const UpdateChallengeStatusSchema = z.object({
   id: z.string(),
@@ -427,10 +406,6 @@ export const updateChallengeStatus = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => UpdateChallengeStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { db } = await import('@/db');
-      const { challenges } = await import('@/db/schema');
-      const { eq } = await import('drizzle-orm');
-
       const existing = await db.query.challenges.findFirst({
         where: eq(challenges.id, input.id),
       });
@@ -478,11 +453,8 @@ export const updateChallengeStatus = createServerFn({ method: 'POST' })
 
 export const getAdminSubmissions = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .handler(
-  async () => {
+  .handler(async () => {
     try {
-      const { db } = await import('@/db');
-
       const submissionsList = await db.query.submissions.findMany({
         orderBy: (submissions, { desc }) => [desc(submissions.createdAt)],
         limit: 100, // For now, list last 100. We can add real pagination later.
@@ -509,8 +481,7 @@ export const getAdminSubmissions = createServerFn({ method: 'GET' })
       console.error('Failed to fetch submissions:', error);
       return { success: false, error: 'Internal Server Error' };
     }
-  },
-);
+  });
 
 // ----------------------------------------------------------------------------
 // ADMIN TUTORIALS
@@ -518,13 +489,12 @@ export const getAdminSubmissions = createServerFn({ method: 'GET' })
 
 export const getAdminTutorials = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .handler(
-  async () => {
+  .handler(async () => {
     try {
-      const { db } = await import('@/db');
-      const { tutorials } = await import('@/db/schema');
-
-      const list = await db.select().from(tutorials).orderBy(tutorials.createdAt);
+      const list = await db
+        .select()
+        .from(tutorials)
+        .orderBy(tutorials.createdAt);
 
       return { success: true, data: list };
     } catch (ignored) {
@@ -532,8 +502,7 @@ export const getAdminTutorials = createServerFn({ method: 'GET' })
       console.error('Failed to fetch tutorials:', error);
       return { success: false, error: 'Internal Server Error' };
     }
-  },
-);
+  });
 
 const UpdateTutorialStatusSchema = z.object({
   id: z.string(),
@@ -545,10 +514,6 @@ export const updateTutorialStatus = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => UpdateTutorialStatusSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      const { db } = await import('@/db');
-      const { tutorials } = await import('@/db/schema');
-      const { eq } = await import('drizzle-orm');
-
       await db
         .update(tutorials)
         .set({
@@ -571,13 +536,8 @@ export const updateTutorialStatus = createServerFn({ method: 'POST' })
 
 export const getAdminAchievements = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .handler(
-  async () => {
+  .handler(async () => {
     try {
-      const { db } = await import('@/db');
-      const { achievements, userAchievements } = await import('@/db/schema');
-      const { count, eq, sql } = await import('drizzle-orm');
-
       const list = await db
         .select({
           id: achievements.id,
@@ -590,7 +550,10 @@ export const getAdminAchievements = createServerFn({ method: 'GET' })
           unlockCount: sql<number>`count(${userAchievements.id})::int`,
         })
         .from(achievements)
-        .leftJoin(userAchievements, eq(achievements.id, userAchievements.achievementId))
+        .leftJoin(
+          userAchievements,
+          eq(achievements.id, userAchievements.achievementId),
+        )
         .groupBy(achievements.id)
         .orderBy(achievements.slug);
 
@@ -600,8 +563,7 @@ export const getAdminAchievements = createServerFn({ method: 'GET' })
       console.error('Failed to fetch achievements:', error);
       return { success: false, error: 'Internal Server Error' };
     }
-  },
-);
+  });
 
 // ----------------------------------------------------------------------------
 // ADMIN USER DETAIL
@@ -609,13 +571,11 @@ export const getAdminAchievements = createServerFn({ method: 'GET' })
 
 export const getAdminUserDetail = createServerFn({ method: 'GET' })
   .middleware([adminMiddleware])
-  .inputValidator((data: unknown) => z.object({ userId: z.string() }).parse(data))
+  .inputValidator((data: unknown) =>
+    z.object({ userId: z.string() }).parse(data),
+  )
   .handler(async ({ data: input }) => {
     try {
-      const { db } = await import('@/db');
-      const { users, submissions, progress } = await import('@/db/schema');
-      const { eq, desc } = await import('drizzle-orm');
-
       const user = await db.query.users.findFirst({
         where: eq(users.id, input.userId),
         with: {
@@ -627,11 +587,11 @@ export const getAdminUserDetail = createServerFn({ method: 'GET' })
                 columns: {
                   title: true,
                   slug: true,
-                }
-              }
-            }
-          }
-        }
+                },
+              },
+            },
+          },
+        },
       });
 
       if (!user) return { success: false, error: 'User not found' };
@@ -646,8 +606,8 @@ export const getAdminUserDetail = createServerFn({ method: 'GET' })
         success: true,
         data: {
           ...user,
-          progressCount: userProgress.length
-        }
+          progressCount: userProgress.length,
+        },
       };
     } catch (ignored) {
       const error = ignored as Error;

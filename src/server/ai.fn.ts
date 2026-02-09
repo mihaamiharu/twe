@@ -1,6 +1,12 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { authMiddleware } from './auth.mw';
+import { db } from '@/db';
+import { progress, challenges } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
+import { logger } from '@/lib/logger';
+import { generateHint } from '@/lib/ai';
+import { getChallengeContent } from './content.server';
 
 // ----------------------------------------------------------------------------
 // AI HINT GENERATION
@@ -18,14 +24,6 @@ export const getAIHint = createServerFn({ method: 'POST' })
     .handler(async ({ data, context }) => {
         const { challengeSlug, userAttempt, locale = 'en' } = data;
 
-        // Dynamically import server-only modules
-        const { db } = await import('@/db');
-        const { progress, challenges } = await import('@/db/schema');
-        const { eq, and } = await import('drizzle-orm');
-        const { logger } = await import('@/lib/logger');
-        const { generateHint } = await import('@/lib/ai');
-        const { getChallengeContent } = await import('./content.server');
-
         try {
             // 1. Check auth verified by middleware
             const userId = context.user.id;
@@ -41,9 +39,8 @@ export const getAIHint = createServerFn({ method: 'POST' })
             if (!challengeContent) {
                 return {
                     success: false,
-                    error: locale === 'id'
-                        ? 'Tantangan tidak ditemukan'
-                        : 'Challenge not found',
+                    error:
+                        locale === 'id' ? 'Tantangan tidak ditemukan' : 'Challenge not found',
                 };
             }
 
@@ -53,7 +50,7 @@ export const getAIHint = createServerFn({ method: 'POST' })
                 userProgress = await db.query.progress.findFirst({
                     where: and(
                         eq(progress.userId, userId),
-                        eq(progress.challengeId, challenge.id)
+                        eq(progress.challengeId, challenge.id),
                     ),
                 });
             }
@@ -76,10 +73,16 @@ export const getAIHint = createServerFn({ method: 'POST' })
             }
 
             // 5. Generate hint using Deepseek API
-            logger.info(`[AI Hint] Generating hint for challenge: ${challengeSlug}, user: ${userId}`);
+            logger.info(
+                `[AI Hint] Generating hint for challenge: ${challengeSlug}, user: ${userId}`,
+            );
 
             const hintResult = await generateHint({
-                challengeType: challengeContent.type as 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'PLAYWRIGHT' | 'JAVASCRIPT',
+                challengeType: challengeContent.type as
+                    | 'CSS_SELECTOR'
+                    | 'XPATH_SELECTOR'
+                    | 'PLAYWRIGHT'
+                    | 'JAVASCRIPT',
                 instructions: challengeContent.instructions,
                 htmlContent: challengeContent.htmlContent,
                 starterCode: challengeContent.starterCode,
@@ -123,18 +126,19 @@ export const getAIHint = createServerFn({ method: 'POST' })
             return {
                 success: true,
                 hint: hintResult.hint,
-                xpPenaltyWarning: locale === 'id'
-                    ? 'XP yang kamu dapat akan dikurangi 50% karena menggunakan petunjuk'
-                    : 'Your XP reward will be reduced by 50% for using a hint',
+                xpPenaltyWarning:
+                    locale === 'id'
+                        ? 'XP yang kamu dapat akan dikurangi 50% karena menggunakan petunjuk'
+                        : 'Your XP reward will be reduced by 50% for using a hint',
             };
-
         } catch (error) {
             logger.error('[AI Hint] Error:', error);
             return {
                 success: false,
-                error: locale === 'id'
-                    ? 'Gagal menghasilkan petunjuk. Silakan coba lagi.'
-                    : 'Failed to generate hint. Please try again.',
+                error:
+                    locale === 'id'
+                        ? 'Gagal menghasilkan petunjuk. Silakan coba lagi.'
+                        : 'Failed to generate hint. Please try again.',
             };
         }
     });

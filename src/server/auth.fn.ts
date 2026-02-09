@@ -4,6 +4,13 @@
  */
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { getRequestHeaders } from '@tanstack/react-start/server';
+import { auth } from './auth.server';
+import { db } from '@/db';
+import { users, accounts } from '@/db/schema';
+import { eq, and } from 'drizzle-orm';
+import { sendVerificationEmail } from '@/server/email.server';
+import { logger } from '@/lib/logger';
 
 export type SessionUser = {
   id: string;
@@ -23,10 +30,6 @@ export type AuthSession = {
 // Helper to update user image from Google if missing (Lazy Migration)
 async function ensureUserImage(userId: string): Promise<string | null> {
   try {
-    const { db } = await import('@/db');
-    const { users, accounts } = await import('@/db/schema');
-    const { eq, and } = await import('drizzle-orm');
-
     // Check for Google account
     const account = await db.query.accounts.findFirst({
       where: and(eq(accounts.userId, userId), eq(accounts.providerId, 'google')),
@@ -35,9 +38,14 @@ async function ensureUserImage(userId: string): Promise<string | null> {
     if (account?.idToken) {
       // Decode ID Token to get picture
       try {
-        const payload = JSON.parse(Buffer.from(account.idToken.split('.')[1], 'base64').toString());
+        const payload = JSON.parse(
+          Buffer.from(account.idToken.split('.')[1], 'base64').toString(),
+        );
         if (payload.picture) {
-          await db.update(users).set({ image: payload.picture }).where(eq(users.id, userId));
+          await db
+            .update(users)
+            .set({ image: payload.picture })
+            .where(eq(users.id, userId));
           return payload.picture as string;
         }
       } catch (e) {
@@ -53,11 +61,6 @@ async function ensureUserImage(userId: string): Promise<string | null> {
 export const getServerSession = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthSession> => {
     try {
-      // Dynamic imports for server-side
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
-
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const headers = getRequestHeaders();
 
@@ -70,8 +73,6 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
           const newImage = await ensureUserImage(session.user.id);
           if (newImage) image = newImage;
         }
-
-
 
         return {
           user: {
@@ -131,13 +132,6 @@ export const resendVerification = createServerFn({ method: 'POST' })
           cooldownRemaining: remainingSeconds,
         };
       }
-
-      // Dynamically import server dependencies
-      const { db } = await import('@/db');
-      const { users } = await import('@/db/schema');
-      const { eq } = await import('drizzle-orm');
-      const { sendVerificationEmail } = await import('@/server/email.server');
-      const { logger } = await import('@/lib/logger');
 
       // Find user by email
       const user = await db.query.users.findFirst({
