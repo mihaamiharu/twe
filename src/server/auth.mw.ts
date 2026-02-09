@@ -59,6 +59,25 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
     });
 });
 
+/**
+ * Admin middleware - ensures user has ADMIN role.
+ * Extends authMiddleware.
+ */
+export const adminMiddleware = createMiddleware()
+    .middleware([authMiddleware])
+    .server(async ({ next, context }) => {
+        if (context.user.role !== 'ADMIN') {
+            throw new Error('Unauthorized: Admin access required');
+        }
+
+        return next({
+            context: {
+                user: context.user,
+                userId: context.userId,
+            }
+        });
+    });
+
 // TODO: Add optionalAuthMiddleware once TanStack Start supports
 // middleware with union return types for optional auth scenarios.
 // For now, use getServerSession() directly for optional auth.

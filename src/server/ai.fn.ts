@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { authMiddleware } from './auth.mw';
 
 // ----------------------------------------------------------------------------
 // AI HINT GENERATION
@@ -12,13 +13,12 @@ const GetHintSchema = z.object({
 });
 
 export const getAIHint = createServerFn({ method: 'POST' })
+    .middleware([authMiddleware])
     .inputValidator((data: unknown) => GetHintSchema.parse(data))
-    .handler(async ({ data }) => {
+    .handler(async ({ data, context }) => {
         const { challengeSlug, userAttempt, locale = 'en' } = data;
 
         // Dynamically import server-only modules
-        const { getRequestHeaders } = await import('@tanstack/react-start/server');
-        const { auth } = await import('./auth.server');
         const { db } = await import('@/db');
         const { progress, challenges } = await import('@/db/schema');
         const { eq, and } = await import('drizzle-orm');
@@ -27,20 +27,8 @@ export const getAIHint = createServerFn({ method: 'POST' })
         const { getChallengeContent } = await import('./content.server');
 
         try {
-            // 1. Check auth
-            const headers = getRequestHeaders() as Headers;
-            const session = await auth.api.getSession({ headers });
-
-            if (!session?.user?.id) {
-                return {
-                    success: false,
-                    error: locale === 'id'
-                        ? 'Anda harus masuk untuk menggunakan petunjuk AI'
-                        : 'You must be signed in to use AI hints',
-                };
-            }
-
-            const userId = session.user.id;
+            // 1. Check auth verified by middleware
+            const userId = context.user.id;
 
             // 2. Get challenge from DB (to get the ID)
             const challenge = await db.query.challenges.findFirst({

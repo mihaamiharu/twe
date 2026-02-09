@@ -53,7 +53,7 @@ export function EditorPanel({
                     {t('challenges:playground.editor')}
                     {challenge.files && challenge.editableFiles && (
                         <span className="text-[10px] lowercase text-muted-foreground/60 italic">
-                            — editing {challenge.editableFiles[0].split('/').pop()}
+                              editing {challenge.editableFiles[0].split('/').pop()}
                         </span>
                     )}
                 </h3>

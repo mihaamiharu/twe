@@ -142,7 +142,7 @@ Aturan PENTING:
 LINGKUNGAN TEKNIS (Browser Shim):
 - Kode berjalan di iframe browser, BUKAN Node.js
 - Module 'fs', 'path', 'os', 'process' TIDAK tersedia
-- Page Object (seperti LoginPage) sudah PRELOADED sebagai global — JANGAN import
+- Page Object (seperti LoginPage) sudah PRELOADED sebagai global   JANGAN import
 - State sesi disimpan di 'window.__APP_STATE__', bukan localStorage
 - Statement import '@playwright/test' hanya dekoratif (dihapus saat eksekusi)
 - Gunakan sintaks Playwright standar; shim akan mengemulasikannya`
@@ -159,7 +159,7 @@ IMPORTANT Rules:
 TECHNICAL ENVIRONMENT (Browser Shim):
 - Code runs in a browser iframe, NOT Node.js
 - 'fs', 'path', 'os', 'process' modules are UNAVAILABLE
-- Page Objects (e.g., LoginPage) are PRELOADED as globals — do NOT import them
+- Page Objects (e.g., LoginPage) are PRELOADED as globals   do NOT import them
 - Session state uses 'window.__APP_STATE__', not localStorage
 - The 'import from @playwright/test' statement is decorative (stripped at runtime)
 - Use standard Playwright syntax; the shim intercepts and emulates it`;

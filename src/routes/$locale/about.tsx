@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, Database, Globe, Code2, Milestone, Brain, Activity, Youtube, Coffee, ExternalLink } from 'lucide-react';
+import { Github, Linkedin, Mail, Database, Globe, Code2, Milestone, Brain, Activity } from 'lucide-react';
 import i18n from '@/lib/i18n';
 import { Boop } from '@/components/ui/boop';
 
@@ -31,26 +31,24 @@ function AboutPage() {
         {
             category: t('about:expertise.automation.title'),
             icon: <Globe className="h-5 w-5 text-blue-500" />,
-            skills: t('about:expertise.automation.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.automation.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         },
         {
             category: t('about:expertise.backend.title'),
             icon: <Database className="h-5 w-5 text-green-500" />,
-            skills: t('about:expertise.backend.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.backend.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         },
         {
             category: t('about:expertise.strategy.title'),
             icon: <Brain className="h-5 w-5 text-purple-500" />,
-            skills: t('about:expertise.strategy.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.strategy.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         },
         {
             category: t('about:expertise.devops.title'),
             icon: <Activity className="h-5 w-5 text-orange-500" />,
-            skills: t('about:expertise.devops.items', { returnObjects: true }) as string[]
+            groups: t('about:expertise.devops.groups', { returnObjects: true }) as { name: string; items: string[] }[]
         }
     ];
-
-
 
     return (
         <div className="min-h-screen py-20 px-6">
@@ -100,24 +98,6 @@ function AboutPage() {
                                 {t('about:hero.github')}
                             </a>
                         </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group hover:border-red-500/50 hover:bg-red-500/5 hover:text-red-600 dark:hover:text-red-400">
-                            <a href="https://www.youtube.com/@TestingWithEkki" target="_blank" rel="noopener noreferrer">
-                                <Youtube className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.youtube')}
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group hover:border-yellow-500/50 hover:bg-yellow-500/5 hover:text-yellow-600 dark:hover:text-yellow-400">
-                            <a href="https://ko-fi.com/ekkisyam" target="_blank" rel="noopener noreferrer">
-                                <Coffee className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.kofi')}
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group hover:border-blue-500/50 hover:bg-blue-500/5 hover:text-blue-600 dark:hover:text-blue-400">
-                            <a href="https://tako.id/TestingWithEkki" target="_blank" rel="noopener noreferrer">
-                                <ExternalLink className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.tako')}
-                            </a>
-                        </Button>
                     </div>
                 </section>
 
@@ -133,10 +113,10 @@ function AboutPage() {
                             {t('about:philosophy.listIntro')}
                         </p>
                         <ul className="list-disc list-inside space-y-2 ml-4">
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.auth') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.code') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.adaptability') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.reliability') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.integration') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.shiftLeft') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.agility') }} />
+                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.multiplier') }} />
                         </ul>
                         <p className="mt-4">
                             {t('about:philosophy.conclusion')}
@@ -194,7 +174,7 @@ function AboutPage() {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {expertise.map((stack, index) => (
-                            <Card key={index} className="bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors">
+                            <Card key={index} className="bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors h-full">
                                 <CardHeader>
                                     <CardTitle className="flex items-center gap-3 text-lg">
                                         <Boop rotation={15} scale={1.2} timing={200}>
@@ -203,14 +183,21 @@ function AboutPage() {
                                         {stack.category}
                                     </CardTitle>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="flex flex-wrap gap-2">
-                                        {stack.skills.map((skill) => (
-                                            <Badge key={skill} variant="secondary" className="hover:bg-primary/20">
-                                                {skill}
-                                            </Badge>
-                                        ))}
-                                    </div>
+                                <CardContent className="space-y-6">
+                                    {stack.groups.map((group, groupIndex) => (
+                                        <div key={groupIndex}>
+                                            <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">
+                                                {group.name}
+                                            </h4>
+                                            <div className="flex flex-wrap gap-2">
+                                                {group.items.map((skill) => (
+                                                    <Badge key={skill} variant="secondary" className="hover:bg-primary/20">
+                                                        {skill}
+                                                    </Badge>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </CardContent>
                             </Card>
                         ))}

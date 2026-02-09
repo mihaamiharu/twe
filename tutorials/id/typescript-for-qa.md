@@ -23,7 +23,7 @@ Bayangkan JavaScript sebagai "Pertunjukan Langsung" dan TypeScript sebagai "Glad
 
 ## 2. Anotasi Tipe Dasar (Cara yang Benar)
 
-Di TypeScript, kita pakai titik dua `:` untuk mendefinisikan tipe. Namun, TS modern itu pintar—gunakan **Inference** (tebakan otomatis) untuk variabel simpel dan **Annotations** (label manual) untuk logika kompleks.
+Di TypeScript, kita pakai titik dua `:` untuk mendefinisikan tipe. Namun, TS modern itu pintar gunakan **Inference** (tebakan otomatis) untuk variabel simpel dan **Annotations** (label manual) untuk logika kompleks.
 
 ```typescript
 // Inference: TS tahu tipe ini secara otomatis. Jangan lebay kasih label!

@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { authMiddleware } from './auth.mw';
 
 // Helper for localizable fields (still needed for challenges)
 const getLocalizedValue = (value: unknown, locale: string): string => {
@@ -150,7 +151,6 @@ export const getTutorials = createServerFn({ method: 'GET' })
           tags: tutorial.tags,
           order: tutorial.order,
           viewCount: dbRecord?.viewCount || 0,
-          difficulty: tutorial.difficulty,
           isCompleted: dbRecord
             ? userProgress[dbRecord.id]?.isCompleted || false
             : false,
@@ -204,8 +204,8 @@ export const getTutorial = createServerFn({ method: 'GET' })
       const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { tutorials, progress, challenges } = await import('@/db/schema');
-      const { eq, and, asc, gt, inArray } = await import('drizzle-orm');
-      const { getTutorialContent, getTutorialList } =
+      const { eq, and, asc, inArray } = await import('drizzle-orm');
+      const { getTutorialContent } =
         await import('./content.server');
 
       // Load tutorial content from filesystem
@@ -263,7 +263,7 @@ export const getTutorial = createServerFn({ method: 'GET' })
           difficulty: c.difficulty,
           type: c.type,
           xpReward: c.xpReward,
-          category: c.category,
+          category: c.category || 'misc',
         }));
       }
 
@@ -338,25 +338,16 @@ const MarkTutorialCompleteSchema = z.object({
 });
 
 export const completeTutorial = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((data: unknown) => MarkTutorialCompleteSchema.parse(data))
-  .handler(async ({ data: input }) => {
+  .handler(async ({ data: input, context }) => {
     try {
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { tutorials, progress, users } = await import('@/db/schema');
       const { eq, and, sql } = await import('drizzle-orm');
       const { getTutorialContent } = await import('./content.server');
 
-      const headers = getRequestHeaders() as Headers;
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return { success: false, error: 'Unauthorized' };
-      }
-
-      const userId = session.user.id;
+      const userId = context.user.id;
       const { slug } = input;
 
       // Get tutorial from DB, or create it from filesystem content
