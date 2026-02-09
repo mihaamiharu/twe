@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { subscribeToNewsletter } from '@/server/newsletter.fn';
 
 interface FooterLink {
   label: string;
@@ -36,27 +37,23 @@ export function Footer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
+  // ... (inside component)
+
   async function handleNewsletterSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
-    formData.append('subject', 'Newsletter Subscription'); // Custom subject for filtering
+    const email = formData.get('email') as string;
 
     try {
-      const response = await fetch("https://formspree.io/f/mpwooodq", {
-        method: "POST",
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+      const response = await subscribeToNewsletter({ data: { email } });
 
-      if (response.ok) {
+      if (response.success) {
         setIsSuccess(true);
-        toast.success(t('footer.newsletter.success'));
+        toast.success(response.message);
       } else {
-        toast.error(t('footer.newsletter.error'));
+        toast.error(response.error || t('footer.newsletter.error'));
       }
     } catch {
       toast.error(t('footer.newsletter.error'));
