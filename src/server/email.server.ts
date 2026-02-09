@@ -316,3 +316,176 @@ export async function sendBugReportNotification(report: {
     // Don't throw - this is a notification, not critical
   }
 }
+
+/**
+ * Send newsletter confirmation email
+ */
+export async function sendNewsletterConfirmationEmail(
+  to: string,
+  token: string,
+): Promise<void> {
+  const transporter = createTransporter();
+  const appName = 'TestingWithEkki';
+  const subject = `Confirm your ${appName} subscription`;
+
+  // Use environment variable for base URL if available, otherwise default to production
+  const baseUrl = process.env.BETTER_AUTH_URL || 'https://testingwithekki.com';
+  // Check if we need to insert the locale - for now default to 'en' or handle in frontend
+  // Ideally, we'd pass locale to this function, but let's stick to 'en' as base for now
+  // and maybe redirect based on browser later, or the user can change it.
+  // Actually, let's construct a cleaner URL.
+  const confirmUrl = `${baseUrl}/en/confirm-subscription?token=${token}`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #10b981, #3b82f6); padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header h1 { color: white; margin: 0; font-size: 24px; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+        .button { display: inline-block; background: #10b981; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 20px 0; }
+        .button:hover { background: #059669; }
+        .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+        .url { word-break: break-all; color: #10b981; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📬 Newsletter Confirmation</h1>
+        </div>
+        <div class="content">
+            <h2>Almost there!</h2>
+            <p>Thanks for subscribing to the ${appName} newsletter. We just need to confirm your email address.</p>
+            
+            <div style="text-align: center;">
+                <a href="${confirmUrl}" class="button">Confirm Subscription</a>
+            </div>
+            
+            <p>Or copy and paste this link into your browser:</p>
+            <p class="url">${confirmUrl}</p>
+            
+            <p>If you didn't subscribe, you can safely ignore this email.</p>
+        </div>
+        <div class="footer">
+            <p>© ${new Date().getFullYear()} ${appName}. All rights reserved.</p>
+            <p>Learn testing skills through interactive tutorials and challenges.</p>
+        </div>
+    </div>
+</body>
+</html>
+    `;
+
+  const text = `
+Almost there!
+
+Thanks for subscribing to the ${appName} newsletter. We just need to confirm your email address.
+
+Click this link to confirm:
+${confirmUrl}
+
+If you didn't subscribe, you can safely ignore this email.
+
+---
+${appName}
+    `;
+
+  try {
+    await transporter.sendMail({
+      from: getFromAddress(),
+      to,
+      subject,
+      text,
+      html,
+    });
+    logger.info(`[Email] Newsletter confirmation sent to ${to}`);
+  } catch (error) {
+    logger.error('[Email] Failed to send newsletter confirmation:', error);
+    throw new Error('Failed to send newsletter confirmation');
+  }
+}
+
+/**
+ * Send contact form submission notification to admin
+ */
+export async function sendContactNotificationEmail(message: {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  createdAt: Date;
+}): Promise<void> {
+  const adminEmail = process.env.ADMIN_EMAIL;
+
+  if (!adminEmail) {
+    logger.info(
+      '[Email] No ADMIN_EMAIL configured, skipping contact notification',
+    );
+    return;
+  }
+
+  const transporter = createTransporter();
+  const subject = `📩 [Contact] New Message from ${message.name}`;
+
+  // Use environment variable for base URL if available
+  const baseUrl = process.env.BETTER_AUTH_URL || 'https://testingwithekki.com';
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #3b82f6; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }
+        .header h1 { color: white; margin: 0; font-size: 20px; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
+        .section { margin: 20px 0; padding: 15px; background: white; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .footer { text-align: center; color: #6b7280; font-size: 12px; margin-top: 20px; }
+        .button { display: inline-block; background: #3b82f6; color: white !important; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: 500; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📩 New Contact Message</h1>
+        </div>
+        <div class="content">
+            <p>You received a new message from the contact form.</p>
+            
+            <div class="section">
+                <p><strong>From:</strong> ${message.name} (<a href="mailto:${message.email}">${message.email}</a>)</p>
+                <p><strong>Date:</strong> ${message.createdAt.toLocaleString()}</p>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <p style="white-space: pre-wrap;">${message.message}</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="${baseUrl}/admin/messages" class="button">View in Admin Dashboard</a>
+            </div>
+        </div>
+        <div class="footer">
+            <p>TestingWithEkki Admin Notification</p>
+        </div>
+    </div>
+</body>
+</html>
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: getFromAddress(),
+      to: adminEmail,
+      replyTo: message.email,
+      subject,
+      html,
+    });
+    logger.info(`[Email] Contact notification sent to admin for message: ${message.id}`);
+  } catch (error) {
+    logger.error('[Email] Failed to send contact notification:', error);
+    // Don't throw - notification failing shouldn't break the user flow if possible
+  }
+}
