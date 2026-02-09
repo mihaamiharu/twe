@@ -1,7 +1,17 @@
-CREATE TYPE "public"."contact_message_status" AS ENUM('NEW', 'READ', 'REPLIED', 'ARCHIVED');--> statement-breakpoint
-CREATE TYPE "public"."subscriber_status" AS ENUM('PENDING', 'CONFIRMED', 'UNSUBSCRIBED');--> statement-breakpoint
-ALTER TYPE "public"."bug_report_status" ADD VALUE 'CLOSED';--> statement-breakpoint
-CREATE TABLE "contact_messages" (
+DO $$ BEGIN
+ CREATE TYPE "public"."contact_message_status" AS ENUM('NEW', 'READ', 'REPLIED', 'ARCHIVED');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."subscriber_status" AS ENUM('PENDING', 'CONFIRMED', 'UNSUBSCRIBED');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+ALTER TYPE "public"."bug_report_status" ADD VALUE IF NOT EXISTS 'CLOSED';--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "contact_messages" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
@@ -12,7 +22,7 @@ CREATE TABLE "contact_messages" (
 	"updated_at" timestamp DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
-CREATE TABLE "newsletter_subscribers" (
+CREATE TABLE IF NOT EXISTS "newsletter_subscribers" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"email" text NOT NULL,
 	"status" "subscriber_status" DEFAULT 'PENDING' NOT NULL,

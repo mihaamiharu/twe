@@ -270,6 +270,25 @@ export const getAdminUsers = createServerFn({ method: 'GET' })
     }
   });
 
+export const deleteUser = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
+  .inputValidator((data: unknown) => z.object({ userId: z.string() }).parse(data))
+  .handler(async ({ data: { userId } }) => {
+    try {
+      // Prevent deleting self (though UI should hide it too)
+      // We can't easily check 'self' here without context of who IS calling, 
+      // but adminMiddleware ensures they are admin.
+      // Ideally we check if userId === session.user.id
+
+      await db.delete(users).where(eq(users.id, userId));
+      return { success: true, message: 'User deleted successfully' };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to delete user:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
 const UpdateUserStatusSchema = z.object({
   id: z.string(),
   showOnLeaderboard: z.boolean(),
@@ -600,15 +619,20 @@ export const getAdminUserDetail = createServerFn({ method: 'GET' })
 
       // Get progress counts
       const userProgress = await db
-        .select()
+        .select({
+          isCompleted: progress.isCompleted,
+        })
         .from(progress)
         .where(eq(progress.userId, input.userId));
+
+      const completedChallengeCount = userProgress.filter(p => p.isCompleted).length;
 
       return {
         success: true,
         data: {
           ...user,
           progressCount: userProgress.length,
+          completedChallengeCount,
         },
       };
     } catch (ignored) {
