@@ -47,6 +47,20 @@ export const bugReportStatusEnum = pgEnum('bug_report_status', [
   'RESOLVED',
   'WONT_FIX',
   'CLOSED',
+  'CLOSED',
+]);
+
+export const subscriberStatusEnum = pgEnum('subscriber_status', [
+  'PENDING',
+  'CONFIRMED',
+  'UNSUBSCRIBED',
+]);
+
+export const contactMessageStatusEnum = pgEnum('contact_message_status', [
+  'NEW',
+  'READ',
+  'REPLIED',
+  'ARCHIVED',
 ]);
 
 // ============================================================================
@@ -309,6 +323,32 @@ export const bugReports = pgTable('bug_reports', {
   status: bugReportStatusEnum('status').notNull().default('NEW'),
   adminNotes: text('admin_notes'),
 
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+// ============================================================================
+// NEWSLETTER & CONTACT
+// ============================================================================
+
+export const newsletterSubscribers = pgTable('newsletter_subscribers', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: text('email').notNull().unique(),
+  status: subscriberStatusEnum('status').notNull().default('PENDING'),
+  confirmationToken: text('confirmation_token'),
+  confirmedAt: timestamp('confirmed_at'),
+  unsubscribedAt: timestamp('unsubscribed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const contactMessages = pgTable('contact_messages', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull(),
+  message: text('message').notNull(),
+  status: contactMessageStatusEnum('status').notNull().default('NEW'),
+  adminNotes: text('admin_notes'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });

@@ -9,6 +9,8 @@ import {
     History,
     Settings,
     ChevronRight,
+    Mail,
+    MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -42,6 +44,13 @@ export function AdminSidebar() {
             label: 'System',
             items: [
                 { label: 'Settings', icon: Settings, href: '/admin/settings' },
+            ],
+        },
+        {
+            label: 'Communication',
+            items: [
+                { label: 'Newsletter', icon: Mail, href: '/admin/newsletter' },
+                { label: 'Messages', icon: MessageSquare, href: '/admin/messages' },
             ],
         },
     ];
