@@ -37,6 +37,7 @@ import { Route as LocaleLeaderboardRouteImport } from './routes/$locale/leaderbo
 import { Route as LocaleForgotPasswordRouteImport } from './routes/$locale/forgot-password'
 import { Route as LocaleContactRouteImport } from './routes/$locale/contact'
 import { Route as LocaleConfirmSubscriptionRouteImport } from './routes/$locale/confirm-subscription'
+import { Route as LocaleChangelogRouteImport } from './routes/$locale/changelog'
 import { Route as LocaleAboutRouteImport } from './routes/$locale/about'
 import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authenticated'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
@@ -189,6 +190,11 @@ const LocaleConfirmSubscriptionRoute =
     path: '/confirm-subscription',
     getParentRoute: () => LocaleRoute,
   } as any)
+const LocaleChangelogRoute = LocaleChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleAboutRoute = LocaleAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -247,6 +253,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/test-sentry': typeof TestSentryRoute
   '/$locale/about': typeof LocaleAboutRoute
+  '/$locale/changelog': typeof LocaleChangelogRoute
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
@@ -285,6 +292,7 @@ export interface FileRoutesByTo {
   '/test-sentry': typeof TestSentryRoute
   '/$locale': typeof LocaleIndexRoute
   '/$locale/about': typeof LocaleAboutRoute
+  '/$locale/changelog': typeof LocaleChangelogRoute
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
@@ -325,6 +333,7 @@ export interface FileRoutesById {
   '/test-sentry': typeof TestSentryRoute
   '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
   '/$locale/about': typeof LocaleAboutRoute
+  '/$locale/changelog': typeof LocaleChangelogRoute
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/test-sentry'
     | '/$locale/about'
+    | '/$locale/changelog'
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
@@ -404,6 +414,7 @@ export interface FileRouteTypes {
     | '/test-sentry'
     | '/$locale'
     | '/$locale/about'
+    | '/$locale/changelog'
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
@@ -443,6 +454,7 @@ export interface FileRouteTypes {
     | '/test-sentry'
     | '/$locale/_authenticated'
     | '/$locale/about'
+    | '/$locale/changelog'
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
@@ -687,6 +699,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleConfirmSubscriptionRouteImport
       parentRoute: typeof LocaleRoute
     }
+    '/$locale/changelog': {
+      id: '/$locale/changelog'
+      path: '/changelog'
+      fullPath: '/$locale/changelog'
+      preLoaderRoute: typeof LocaleChangelogRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/about': {
       id: '/$locale/about'
       path: '/about'
@@ -774,6 +793,7 @@ const LocaleAuthenticatedRouteWithChildren =
 interface LocaleRouteChildren {
   LocaleAuthenticatedRoute: typeof LocaleAuthenticatedRouteWithChildren
   LocaleAboutRoute: typeof LocaleAboutRoute
+  LocaleChangelogRoute: typeof LocaleChangelogRoute
   LocaleConfirmSubscriptionRoute: typeof LocaleConfirmSubscriptionRoute
   LocaleContactRoute: typeof LocaleContactRoute
   LocaleForgotPasswordRoute: typeof LocaleForgotPasswordRoute
@@ -793,6 +813,7 @@ interface LocaleRouteChildren {
 const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleAuthenticatedRoute: LocaleAuthenticatedRouteWithChildren,
   LocaleAboutRoute: LocaleAboutRoute,
+  LocaleChangelogRoute: LocaleChangelogRoute,
   LocaleConfirmSubscriptionRoute: LocaleConfirmSubscriptionRoute,
   LocaleContactRoute: LocaleContactRoute,
   LocaleForgotPasswordRoute: LocaleForgotPasswordRoute,

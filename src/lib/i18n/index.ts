@@ -20,6 +20,8 @@ import profileEn from './resources/en/profile.json';
 import profileId from './resources/id/profile.json';
 import aboutEn from './resources/en/about.json';
 import aboutId from './resources/id/about.json';
+import changelogEn from './resources/en/changelog.json';
+import changelogId from './resources/id/changelog.json';
 
 const resources = {
   en: {
@@ -33,6 +35,7 @@ const resources = {
     legal: legalEn,
     profile: profileEn,
     about: aboutEn,
+    changelog: changelogEn,
   },
   id: {
     common: commonId,
@@ -45,6 +48,7 @@ const resources = {
     legal: legalId,
     profile: profileId,
     about: aboutId,
+    changelog: changelogId,
   },
 };
 
@@ -66,6 +70,7 @@ void i18n.use(initReactI18next).init({
     'legal',
     'profile',
     'about',
+    'changelog',
   ],
   defaultNS: 'common',
 });
