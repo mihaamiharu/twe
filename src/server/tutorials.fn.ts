@@ -1,6 +1,23 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { authMiddleware } from './auth.mw';
+import { auth } from './auth.server';
+import { db } from '@/db';
+import { tutorials, progress, challenges, users } from '@/db/schema';
+import { eq, and, inArray, asc, sql } from 'drizzle-orm';
+import {
+  getTutorialList,
+  getTutorialContent,
+  getNextTutorial,
+} from './content.server';
+import { checkAchievements } from '@/lib/achievements';
+import {
+  getUserStats,
+  getEarnedAchievementIds,
+  awardAchievements,
+} from '@/lib/stats';
+import { logger } from '@/lib/logger';
 
 // Helper for localizable fields (still needed for challenges)
 const getLocalizedValue = (value: unknown, locale: string): string => {
@@ -29,15 +46,6 @@ export const getTutorials = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => TutorialFiltersSchema.parse(data))
   .handler(async ({ data: filters }) => {
     try {
-      // Dynamically import server-only modules
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
-      const { db } = await import('@/db');
-      const { tutorials, progress } = await import('@/db/schema');
-      const { eq, and, inArray } = await import('drizzle-orm');
-      const { getTutorialList } = await import('./content.server');
-
       // Load tutorials from filesystem (content service)
       let allTutorials = await getTutorialList(filters.locale);
 
@@ -53,9 +61,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
 
       // Apply tag filter
       if (filters.tag) {
-        allTutorials = allTutorials.filter((t) =>
-          t.tags.includes(filters.tag!),
-        );
+        allTutorials = allTutorials.filter((t) => t.tags.includes(filters.tag!));
       }
 
       // Sort
@@ -103,7 +109,9 @@ export const getTutorials = createServerFn({ method: 'GET' })
         { isCompleted: boolean; readingProgress: number }
       > = {};
 
-      const headers = getRequestHeaders() as Headers;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbRecords.length > 0) {
@@ -132,10 +140,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
             }
             return acc;
           },
-          {} as Record<
-            string,
-            { isCompleted: boolean; readingProgress: number }
-          >,
+          {} as Record<string, { isCompleted: boolean; readingProgress: number }>,
         );
       }
 
@@ -198,16 +203,6 @@ export const getTutorial = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => TutorialDetailSchema.parse(data))
   .handler(async ({ data: { slug, locale } }) => {
     try {
-      // Dynamically import server-only modules
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
-      const { db } = await import('@/db');
-      const { tutorials, progress, challenges } = await import('@/db/schema');
-      const { eq, and, asc, inArray } = await import('drizzle-orm');
-      const { getTutorialContent } =
-        await import('./content.server');
-
       // Load tutorial content from filesystem
       const tutorialContent = await getTutorialContent(slug, locale);
 
@@ -270,7 +265,9 @@ export const getTutorial = createServerFn({ method: 'GET' })
       // User progress
       let userProgressData = null;
 
-      const headers = getRequestHeaders() as Headers;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbTutorial) {
@@ -291,7 +288,6 @@ export const getTutorial = createServerFn({ method: 'GET' })
       }
 
       // Next Tutorial (efficient O(1) lookup using registry)
-      const { getNextTutorial } = await import('./content.server');
       const nextTutorial = await getNextTutorial(slug, locale);
 
       return {
@@ -342,11 +338,6 @@ export const completeTutorial = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => MarkTutorialCompleteSchema.parse(data))
   .handler(async ({ data: input, context }) => {
     try {
-      const { db } = await import('@/db');
-      const { tutorials, progress, users } = await import('@/db/schema');
-      const { eq, and, sql } = await import('drizzle-orm');
-      const { getTutorialContent } = await import('./content.server');
-
       const userId = context.user.id;
       const { slug } = input;
 
@@ -362,26 +353,37 @@ export const completeTutorial = createServerFn({ method: 'POST' })
           return { success: false, error: 'Tutorial not found' };
         }
 
-        const [newTutorial] = await db
-          .insert(tutorials)
-          .values({
-            slug: tutorialContent.slug,
-            title: { en: tutorialContent.title, id: tutorialContent.title },
-            description: {
-              en: tutorialContent.description,
-              id: tutorialContent.description,
-            },
-            content: {
-              en: tutorialContent.content,
-              id: tutorialContent.content,
-            },
-            order: tutorialContent.order,
-            estimatedMinutes: tutorialContent.estimatedMinutes,
-            tags: tutorialContent.tags,
-            isPublished: true,
-          })
-          .returning();
-        tutorial = newTutorial;
+        try {
+          const [newTutorial] = await db
+            .insert(tutorials)
+            .values({
+              slug: tutorialContent.slug,
+              title: { en: tutorialContent.title, id: tutorialContent.title },
+              description: {
+                en: tutorialContent.description,
+                id: tutorialContent.description,
+              },
+              content: {
+                en: tutorialContent.content,
+                id: tutorialContent.content,
+              },
+              order: tutorialContent.order,
+              estimatedMinutes: tutorialContent.estimatedMinutes,
+              tags: tutorialContent.tags,
+              isPublished: true,
+            })
+            .returning();
+          tutorial = newTutorial;
+        } catch (err) {
+          // If insertion failed (likely race condition on unique slug), try to fetch it again
+          tutorial = await db.query.tutorials.findFirst({
+            where: eq(tutorials.slug, slug),
+          });
+
+          if (!tutorial) {
+            throw err; // Re-throw if legitimate error
+          }
+        }
       }
 
       // Check existing progress
@@ -429,6 +431,33 @@ export const completeTutorial = createServerFn({ method: 'POST' })
           .where(eq(users.id, userId));
       }
 
+      // Check and award achievements (for tutorials and streaks)
+      let newAchievements: { id: string; name: string; icon: string }[] = [];
+      try {
+        const userStats = await getUserStats(userId);
+        const alreadyEarned = await getEarnedAchievementIds(userId);
+        const earnedAchievements = checkAchievements(userStats, alreadyEarned);
+
+        if (earnedAchievements.length > 0) {
+          await awardAchievements(
+            userId,
+            earnedAchievements.map((a) => a.id),
+          );
+
+          newAchievements = earnedAchievements.map((a) => ({
+            id: a.id,
+            name: a.name,
+            icon: a.icon,
+          }));
+
+          logger.info(
+            `[Achievements] Tutorial completion triggered: ${earnedAchievements.map((a) => a.name).join(', ')}`,
+          );
+        }
+      } catch (error) {
+        logger.error('Error checking achievements after tutorial:', error);
+      }
+
       // Increment view/completion count
       await db
         .update(tutorials)
@@ -442,6 +471,7 @@ export const completeTutorial = createServerFn({ method: 'POST' })
         data: {
           isCompleted: true,
           xpAwarded: wasAlreadyCompleted ? 0 : 25,
+          newAchievements,
         },
       };
     } catch (error) {
@@ -465,10 +495,6 @@ export const incrementTutorialViewCount = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => IncrementViewCountSchema.parse(data))
   .handler(async ({ data: { slug } }) => {
     try {
-      const { db } = await import('@/db');
-      const { tutorials } = await import('@/db/schema');
-      const { eq, sql } = await import('drizzle-orm');
-
       await db
         .update(tutorials)
         .set({

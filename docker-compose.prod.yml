@@ -27,9 +27,9 @@ services:
     ports:
       - '5432:5432'
     environment:
-      POSTGRES_USER: twe_user
-      POSTGRES_PASSWORD: twe_password
-      POSTGRES_DB: twe_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
       # PostgreSQL optimizations for 4GB RAM server
       # Using 1GB shared_buffers (25% of RAM) and 3GB effective cache (75% of RAM)
       POSTGRES_SHARED_BUFFERS: 1GB

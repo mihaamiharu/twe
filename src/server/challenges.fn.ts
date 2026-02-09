@@ -1,10 +1,17 @@
 import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
+import { getRequestHeaders } from '@tanstack/react-start/server';
 import { db } from '@/db';
 import { challenges, progress, submissions } from '@/db/schema';
-import { eq, and, asc, desc, sql, gt, or, inArray } from 'drizzle-orm';
+import { eq, and, asc, desc, sql, gt, or, inArray, ilike, not } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
-import { z } from 'zod';
 import { obfuscate } from '@/lib/obfuscator';
+import { auth } from './auth.server';
+import {
+  getChallengeContent,
+  getChallengeList,
+  getTutorialContent,
+} from './content.server';
 
 // Helper for localizable fields (still needed for DB records)
 const getLocalizedValue = (value: unknown, locale: string): string => {
@@ -43,15 +50,9 @@ export const getChallenges = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeFiltersSchema.parse(data))
   .handler(async ({ data: filters }) => {
     try {
-      // Dynamically import server-only modules
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
-      const { db } = await import('@/db');
-      const { challenges, progress } = await import('@/db/schema');
-      const { eq, and, or, ilike, sql, desc, asc, not } = await import('drizzle-orm');
-
-      const headers = getRequestHeaders() as Headers;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const session = await auth.api.getSession({ headers });
       const userId = session?.user?.id;
       const locale = filters.locale;
@@ -66,7 +67,12 @@ export const getChallenges = createServerFn({ method: 'GET' })
       if (filters.type) {
         if (filters.type === 'SELECTOR') {
           // Non-null assertion safe: or() always has two conditions here
-          conditions.push(or(eq(challenges.type, 'CSS_SELECTOR'), eq(challenges.type, 'XPATH_SELECTOR'))!);
+          conditions.push(
+            or(
+              eq(challenges.type, 'CSS_SELECTOR'),
+              eq(challenges.type, 'XPATH_SELECTOR'),
+            )!,
+          );
         } else {
           conditions.push(eq(challenges.type, filters.type));
         }
@@ -85,8 +91,8 @@ export const getChallenges = createServerFn({ method: 'GET' })
             sql`${challenges.title}->>${locale} ILIKE ${searchPattern}`,
             sql`${challenges.title}->>'en' ILIKE ${searchPattern}`,
             sql`${challenges.description}->>${locale} ILIKE ${searchPattern}`,
-            sql`${challenges.description}->>'en' ILIKE ${searchPattern}`
-          )!
+            sql`${challenges.description}->>'en' ILIKE ${searchPattern}`,
+          )!,
         );
       }
 
@@ -108,7 +114,9 @@ export const getChallenges = createServerFn({ method: 'GET' })
           order: challenges.order,
           tags: challenges.tags,
           completionCount: challenges.completionCount,
-          isCompleted: userId ? sql<boolean>`${progress.isCompleted} IS TRUE` : sql<boolean>`false`,
+          isCompleted: userId
+            ? sql<boolean>`${progress.isCompleted} IS TRUE`
+            : sql<boolean>`false`,
         })
         .from(challenges)
         .where(and(...conditions))
@@ -116,20 +124,31 @@ export const getChallenges = createServerFn({ method: 'GET' })
 
       // Join Progress if user is logged in
       if (userId) {
-        query.leftJoin(progress, and(eq(progress.challengeId, challenges.id), eq(progress.userId, userId)));
+        query.leftJoin(
+          progress,
+          and(eq(progress.challengeId, challenges.id), eq(progress.userId, userId)),
+        );
       }
 
       // Apply Sort - determine orderBy clause
       const orderByClause = (() => {
         switch (filters.sortBy) {
           case 'xpReward':
-            return filters.sortOrder === 'desc' ? desc(challenges.xpReward) : asc(challenges.xpReward);
+            return filters.sortOrder === 'desc'
+              ? desc(challenges.xpReward)
+              : asc(challenges.xpReward);
           case 'difficulty':
-            return filters.sortOrder === 'desc' ? desc(challenges.difficulty) : asc(challenges.difficulty);
+            return filters.sortOrder === 'desc'
+              ? desc(challenges.difficulty)
+              : asc(challenges.difficulty);
           case 'completionCount':
-            return filters.sortOrder === 'desc' ? desc(challenges.completionCount) : asc(challenges.completionCount);
+            return filters.sortOrder === 'desc'
+              ? desc(challenges.completionCount)
+              : asc(challenges.completionCount);
           default:
-            return filters.sortOrder === 'desc' ? desc(challenges.order) : asc(challenges.order);
+            return filters.sortOrder === 'desc'
+              ? desc(challenges.order)
+              : asc(challenges.order);
         }
       })();
 
@@ -150,12 +169,12 @@ export const getChallenges = createServerFn({ method: 'GET' })
 
       return {
         success: true,
-        data: data.map(c => ({
+        data: data.map((c) => ({
           ...c,
           // Ensure tags is array
           tags: c.tags || [],
           // UI expects explicit boolean
-          isCompleted: Boolean(c.isCompleted)
+          isCompleted: Boolean(c.isCompleted),
         })),
         pagination: {
           page: filters.page,
@@ -187,13 +206,6 @@ export const getChallenge = createServerFn({ method: 'GET' })
   // @ts-expect-error TanStack Start type inference issue with complex handler return types
   .handler(async ({ data: { slug, locale } }) => {
     try {
-      // Dynamically import server-only modules
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
-      const { getChallengeContent, getChallengeList } =
-        await import('./content.server');
-
       // Load challenge content from filesystem
       const challengeContent = await getChallengeContent(slug, locale);
 
@@ -217,14 +229,16 @@ export const getChallenge = createServerFn({ method: 'GET' })
 
       // Prepare test cases from filesystem
       // Obfuscate sensitive inputs for selector challenges
-      const processedTestCases = (challengeContent.testCases || []).map((tc, index) => ({
-        id: `tc-${index}`,
-        description: tc.description,
-        input: tc.expectedOutput, // For display purposes
-        expectedOutput: tc.expectedOutput,
-        order: index,
-        isHidden: tc.isHidden,
-      }));
+      const processedTestCases = (challengeContent.testCases || []).map(
+        (tc, index) => ({
+          id: `tc-${index}`,
+          description: tc.description,
+          input: tc.expectedOutput, // For display purposes
+          expectedOutput: tc.expectedOutput,
+          order: index,
+          isHidden: tc.isHidden,
+        }),
+      );
 
       // Filter visible test cases and obfuscate
       const visibleTestCases = processedTestCases
@@ -255,7 +269,6 @@ export const getChallenge = createServerFn({ method: 'GET' })
       // Get related tutorial if specified
       let tutorialData = null;
       if (challengeContent.tutorialSlug) {
-        const { getTutorialContent } = await import('./content.server');
         const tutorial = await getTutorialContent(
           challengeContent.tutorialSlug,
           locale,
@@ -272,7 +285,9 @@ export const getChallenge = createServerFn({ method: 'GET' })
       let userProgressData = null;
       let bestSubmissionData = null;
 
-      const headers = getRequestHeaders() as Headers;
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequestHeaders();
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbChallenge) {
