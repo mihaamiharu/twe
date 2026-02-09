@@ -35,7 +35,7 @@
           "To provide and maintain the generic learning platform services.",
           "To notify you about changes to our service or your account.",
           "To monitor usage and detect technical issues.",
-          "We do **not** sell your personal data. We may share data with trusted third-party service providers (Google, Supabase) solely for operational purposes."
+          "We do **not** sell your personal data. We may share data with trusted third-party service providers (Google, Database Service, Sentry for monitoring, DeepSeek for AI hints) solely for operational purposes."
         ]
       },
       "dataSubjectRights": {
@@ -44,7 +44,7 @@
         "items": [
           "**Access**: Request a copy of your personal data.",
           "**Rectify**: Correct inaccurate or incomplete data.",
-          "**Erase**: Request deletion of your data (\"Right to be Forgotten\"), subject to legal retention obligations.",
+          "**Erase**: Request deletion of your data (\"Right to be Forgotten\") by contacting us, subject to legal retention obligations.",
           "**Restrict**: Request restriction of processing specifically.",
           "**Withdraw Consent**: Withdraw consent for data processing at any time."
         ]
@@ -59,7 +59,7 @@
       },
       "contact": {
         "title": "8. Contact & Complaints",
-        "content": "To exercise your rights or if you have questions about this policy, please contact our Data Protection Office at: **ekki@testingwithekki.com**."
+        "content": "To exercise your rights or if you have questions about this policy, please contact our Data Protection Office at: admin@testingwithekki.com."
       }
     }
   },
@@ -103,7 +103,7 @@
   "contact": {
     "title": "Contact",
     "description": "Have questions, feedback, or want to collaborate? Reach out!",
-    "email": "ekki@testingwithekki.com",
+    "email": "admin@testingwithekki.com",
     "linkedin": "https://linkedin.com/in/ekkisyam",
     "github": "https://github.com/mihaamiharu",
     "form": {
