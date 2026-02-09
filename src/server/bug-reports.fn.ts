@@ -5,7 +5,10 @@ import { db } from '@/db';
 import { bugReports } from '@/db/schema';
 import { logger } from '@/lib/logger';
 import { auth } from './auth.server';
+import { optionalAuthMiddleware } from './auth.mw';
 import { createGitHubIssue, formatBugReportBody } from './github.server';
+import { getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
+import { createRateLimitMiddleware } from './rate-limit.mw';
 
 const BugReportSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(200),
@@ -27,6 +30,14 @@ const BugReportSchema = z.object({
 });
 
 export const createBugReport = createServerFn({ method: 'POST' })
+  .middleware([
+    optionalAuthMiddleware,
+    createRateLimitMiddleware({
+      key: 'bug-report',
+      limit: 3,
+      windowMinutes: 60,
+    }),
+  ])
   .inputValidator((data: unknown) => BugReportSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
@@ -78,6 +89,25 @@ export const createBugReport = createServerFn({ method: 'POST' })
         `[BugReport] New bug report created: ${report.id} - "${title}" (${severity})`,
       );
 
+      // Award Bug Squasher achievement (only for authenticated users, first report only)
+      let newAchievement: { id: string; name: string; icon: string } | null = null;
+      if (userId) {
+        try {
+          const alreadyEarned = await getEarnedAchievementIds(userId);
+          if (!alreadyEarned.has('bug-squasher')) {
+            await awardAchievements(userId, ['bug-squasher']);
+            newAchievement = {
+              id: 'bug-squasher',
+              name: 'Bug Squasher',
+              icon: '🐞',
+            };
+            logger.info(`[Achievements] Bug Squasher awarded to user ${userId}`);
+          }
+        } catch (error) {
+          logger.error('Error awarding Bug Squasher achievement:', error);
+        }
+      }
+
       // Create GitHub Issue (non-blocking)
       const issueBody = formatBugReportBody({
         reportId: report.id,
@@ -106,6 +136,7 @@ export const createBugReport = createServerFn({ method: 'POST' })
           severity: report.severity,
           status: report.status,
           createdAt: report.createdAt,
+          newAchievement,
         },
         message:
           'Bug report submitted successfully. Thank you for your feedback!',
