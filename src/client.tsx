@@ -4,9 +4,9 @@ import { getRouter } from './router'
 
 const router = getRouter()
 
-import * as Sentry from "@sentry/react";
-import { getSentryConfig } from "./lib/sentry.config";
+// import * as Sentry from "@sentry/react";
+// import { getSentryConfig } from "./lib/sentry.config";
 
-Sentry.init(getSentryConfig());
+// Sentry.init(getSentryConfig()); // Moved to CookieConsent
 
 hydrateRoot(document, <StartClient router={router} />)

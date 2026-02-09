@@ -35,7 +35,7 @@
           "Untuk menyediakan dan memelihara layanan platform pembelajaran.",
           "Untuk memberi tahu Anda tentang perubahan layanan atau akun Anda.",
           "Untuk memantau penggunaan dan mendeteksi masalah teknis.",
-          "Kami **tidak** menjual data pribadi Anda. Kami dapat membagikan data dengan penyedia layanan pihak ketiga terpercaya (Google, Supabase) semata-mata untuk tujuan operasional."
+          "Kami **tidak** menjual data pribadi Anda. Kami dapat membagikan data dengan penyedia layanan pihak ketiga terpercaya (Google, Database Service, Sentry untuk pemantauan, DeepSeek untuk petunjuk AI) semata-mata untuk tujuan operasional."
         ]
       },
       "dataSubjectRights": {
@@ -44,7 +44,7 @@
         "items": [
           "**Akses**: Meminta salinan data pribadi Anda.",
           "**Perbaikan**: Memperbaiki data yang tidak akurat atau tidak lengkap.",
-          "**Penghapusan**: Meminta penghapusan data Anda, tunduk pada kewajiban penyimpanan hukum.",
+          "**Penghapusan**: Meminta penghapusan data Anda (\"Right to be Forgotten\") dengan menghubungi kami, tunduk pada kewajiban penyimpanan hukum.",
           "**Pembatasan**: Meminta pembatasan pemrosesan secara spesifik.",
           "**Menarik Persetujuan**: Menarik persetujuan pemrosesan data kapan saja."
         ]
@@ -59,7 +59,7 @@
       },
       "contact": {
         "title": "8. Kontak & Keluhan",
-        "content": "Untuk menggunakan hak Anda atau jika Anda memiliki pertanyaan tentang kebijakan ini, silakan hubungi Kantor Perlindungan Data kami di: **ekki@testingwithekki.com**."
+        "content": "Untuk menggunakan hak Anda atau jika Anda memiliki pertanyaan tentang kebijakan ini, silakan hubungi Kantor Perlindungan Data kami di: admin@testingwithekki.com."
       }
     }
   },

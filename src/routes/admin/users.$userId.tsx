@@ -1,7 +1,21 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getAdminUserDetail } from '@/server/admin.fn';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { getAdminUserDetail, deleteUser } from '@/server/admin.fn';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useNavigate } from '@tanstack/react-router';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose
+} from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import {
     ArrowLeft,
@@ -12,7 +26,9 @@ import {
     History,
     User as UserIcon,
     CheckCircle2,
-    XCircle
+    XCircle,
+    Trash2,
+    AlertTriangle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -30,6 +46,25 @@ export const Route = createFileRoute('/admin/users/$userId')({
 
 function UserDetailPage() {
     const { userId } = Route.useParams();
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
+    const deleteUserMutation = useMutation({
+        mutationFn: async () => {
+            const res = await deleteUser({ data: { userId } });
+            if (!res.success) throw new Error(res.error || 'Failed to delete user');
+            return res;
+        },
+        onSuccess: () => {
+            toast.success('User deleted successfully');
+            queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+            navigate({ to: '/admin/users' });
+        },
+        onError: (err) => {
+            toast.error(err.message);
+        },
+    });
 
     const { data: user, isLoading } = useQuery({
         queryKey: ['admin-user', userId],
@@ -104,6 +139,9 @@ function UserDetailPage() {
                                     <Trophy className="h-4 w-4 text-primary" />
                                 </div>
                                 <div className="text-2xl font-bold mt-2">{user.xp || 0}</div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Level {user.level || 1}
+                                </p>
                             </CardContent>
                         </Card>
                         <Card>
@@ -112,7 +150,10 @@ function UserDetailPage() {
                                     <span className="text-sm font-medium text-muted-foreground">Challenges</span>
                                     <CheckCircle2 className="h-4 w-4 text-green-500" />
                                 </div>
-                                <div className="text-2xl font-bold mt-2">{(user as any).progressCount || 0}</div>
+                                <div className="text-2xl font-bold mt-2">{user.completedChallengeCount}</div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    {user.progressCount} attempted
+                                </p>
                             </CardContent>
                         </Card>
                     </div>
@@ -169,6 +210,58 @@ function UserDetailPage() {
                     </Card>
                 </div>
             </div>
-        </div>
+
+
+            {/* Danger Zone */}
+            <Card className="border-red-500/20 bg-red-500/5">
+                <CardHeader>
+                    <div className="flex items-center gap-2 text-red-600">
+                        <AlertTriangle className="h-5 w-5" />
+                        <CardTitle className="text-lg">Danger Zone</CardTitle>
+                    </div>
+                    <CardDescription>
+                        Destructive actions for this user.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h4 className="font-medium text-sm">Delete User</h4>
+                            <p className="text-xs text-muted-foreground">
+                                Permanently delete this user and all associated data (submissions, progress, etc).
+                            </p>
+                        </div>
+                        <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="destructive" size="sm" className="gap-2">
+                                    <Trash2 className="h-4 w-4" />
+                                    Delete User
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Delete User?</DialogTitle>
+                                    <DialogDescription>
+                                        This action cannot be undone. This will permanently delete <strong>{user.name || user.email}</strong> and remove their data from our servers.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <DialogFooter>
+                                    <DialogClose asChild>
+                                        <Button variant="outline">Cancel</Button>
+                                    </DialogClose>
+                                    <Button
+                                        variant="destructive"
+                                        onClick={() => deleteUserMutation.mutate()}
+                                        disabled={deleteUserMutation.isPending}
+                                    >
+                                        {deleteUserMutation.isPending ? 'Deleting...' : 'Confirm Delete'}
+                                    </Button>
+                                </DialogFooter>
+                            </DialogContent>
+                        </Dialog>
+                    </div>
+                </CardContent>
+            </Card>
+        </div >
     );
 }

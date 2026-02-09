@@ -6,11 +6,13 @@ import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -493,6 +495,26 @@ function ProfilePage() {
             )}
           </TabsContent>
         </Tabs>
+
+        {/* Danger Zone */}
+        <Card className="border-red-500/20 bg-red-500/5 mt-8">
+          <CardHeader>
+            <CardTitle className="text-red-600 flex items-center gap-2">
+              <AlertCircle className="h-5 w-5" />
+              Danger Zone
+            </CardTitle>
+            <CardDescription>
+              Once you delete your account, there is no going back. Please be certain.
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className="flex justify-end bg-red-500/5 border-t border-red-500/10">
+            <Button variant="destructive" asChild>
+              <a href={`mailto:admin@testingwithekki.com?subject=Request Account Deletion&body=I would like to request the deletion of my account associated with this email: ${user.email}`}>
+                Request Account Deletion
+              </a>
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );
