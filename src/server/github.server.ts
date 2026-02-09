@@ -22,13 +22,13 @@ interface GitHubIssue {
 export async function createGitHubIssue(
     params: CreateIssueParams,
 ): Promise<GitHubIssue | null> {
-    const token = process.env.GITHUB_TOKEN;
-    const owner = process.env.GITHUB_OWNER;
-    const repo = process.env.GITHUB_REPO;
+    const token = process.env.GH_API_TOKEN;
+    const owner = process.env.GH_OWNER;
+    const repo = process.env.GH_REPO;
 
     if (!token || !owner || !repo) {
         logger.warn(
-            '[GitHub] Missing configuration. GITHUB_TOKEN, GITHUB_OWNER, and GITHUB_REPO are required.',
+            '[GitHub] Missing configuration. GH_API_TOKEN, GH_OWNER, and GH_REPO are required.',
         );
         return null;
     }
