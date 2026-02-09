@@ -2,28 +2,25 @@
     "hero": {
         "title": "Halo, saya <strong>Ekki Syam Sugiardi</strong>",
         "subtitle": "Senior Software Engineer (QA)",
-        "description": "Saya adalah Senior QA Engineer di <strong>Ninja Van</strong> dengan 4+ tahun pengalaman membangun framework otomasi untuk web, mobile, dan API. Saya percaya pada prinsip <strong>\"Tooling over Manual Labor\"</strong> - membangun sistem kustom yang memberdayakan tim untuk rilis dengan percaya diri sambil mencegah masalah kritis di production.",
+        "description": "Senior Software Engineer (QA) dengan pengalaman lebih dari 4 tahun di <strong>Ninja Van</strong>. Diakui karena fleksibilitas teknis dan komitmen terhadap mentorship engineering. Spesialis yang agnostik terhadap teknologi mahir menggunakan Go, Python, dan Java untuk mengatasi hambatan kritis di berbagai tim produk. Memiliki rekam jejak terbukti dalam membangun otomasi dari nol, membimbing tester manual beralih ke peran otomasi, dan berkontribusi pada inisiatif penghematan biaya yang menghasilkan lebih dari $60.000 per bulan.",
         "connect": "Koneksi di LinkedIn",
-        "github": "Profil GitHub",
-        "youtube": "Channel YouTube",
-        "kofi": "Dukung di Ko-fi",
-        "tako": "Dukung di Tako"
+        "github": "Profil GitHub"
     },
     "philosophy": {
-        "title": "Engineering Quality",
-        "intro": "Kualitas bukan sekadar checklist. Ini tentang <strong>Shift-Left</strong> dan mengambil kepemilikan atas production.",
-        "listIntro": "Saya membangun TestingWithEkki untuk menunjukkan ketelitian engineering yang sama yang saya terapkan di tempat kerja:",
+        "title": "Software Engineer QA",
+        "intro": "Kualitas adalah upaya engineering yang berkelanjutan, bukan sekadar pemeriksaan akhir. Saya membangun sistem yang menjadikan keandalan sebagai fitur standar dari produk.",
+        "listIntro": "Pendekatan saya dibangun di atas pilar-pilar utama ini:",
         "list": {
-            "auth": "<strong>Tooling over Toil</strong>: Mengotomatiskan tugas berulang agar tester bisa fokus pada eksplorasi dan strategi.",
-            "code": "<strong>Shift Left</strong>: Menemukan masalah saat pengembangan, bukan setelah deployment.",
-            "adaptability": "<strong>Ketangkasan Teknis</strong>: Beradaptasi dengan mulus antar konteks - Java, Go, Python - sesuai kebutuhan tim dan bisnis.",
-            "reliability": "<strong>Force Multiplier</strong>: Mengisi kekosongan tim saat kritis untuk memecahkan masalah otomasi kompleks dan menjaga pipeline tetap berjalan."
+            "integration": "<strong>Cross-Functional Integration</strong>: Menjembatani kesenjangan antara Stakeholder, PM, dan Engineering untuk membangun solusi otomatisasi yang melayani seluruh roadmap produk dan tujuan bisnis.",
+            "shiftLeft": "<strong>Shift-Left Strategy</strong>: Mengintegrasikan protokol kualitas selama fase desain dan pengembangan untuk menangkap masalah sebelum mencapai pipeline.",
+            "agility": "<strong>Technical Agility</strong>: Beradaptasi dengan mulus di antara Java, Go, dan Python untuk menyelaraskan dengan arsitektur teknis dan kebutuhan bisnis yang berkembang.",
+            "multiplier": "<strong>Force Multiplier</strong>: Memecahkan hambatan otomasi yang kompleks untuk menjaga pipeline deployment tetap bergerak dengan kecepatan tinggi."
         },
-        "conclusion": "Kualitas adalah disiplin engineering. Saya membangun alat dan framework yang menegakkan keandalan. Entah itu backend Go atau platform React ini, saya menulis kode untuk memecahkan masalah kualitas yang nyata."
+        "conclusion": "Kualitas adalah disiplin engineering. Saya membangun alat dan framework yang menegakkan keandalan. Entah itu backend Go atau platform React, saya menulis kode untuk memecahkan masalah kualitas yang nyata."
     },
     "milestones": {
-        "title": "Perjalanan Saya",
-        "subtitle": "Momen penting dari perjalanan engineering saya",
+        "title": "Pengalaman Kerja",
+        "subtitle": "Perjalanan profesional saya di Ninja Van",
         "items": [
             {
                 "year": "2026",
@@ -31,77 +28,88 @@
                 "description": "Mulai membangun platform ini untuk berbagi pengetahuan dan menjembatani manual testing dengan engineering. Taman bermain untuk teknologi web modern dan pola otomasi berkualitas tinggi."
             },
             {
-                "year": "2025",
-                "title": "AI & Efisiensi Operasional",
-                "description": "Bersama tim yang terdiri dari tiga orang, membangun framework testing AI pertama untuk klasifikasi intent, mengotomatiskan 50%+ support Tier 1. Memvalidasi fitur untuk inisiatif optimasi strategis yang meningkatkan efisiensi operasional dan menghemat lebih dari $60.000 per bulan."
+                "year": "2024 - Sekarang",
+                "title": "Senior Software Engineer, QA",
+                "description": "Membangun framework testing AI untuk memverifikasi model klasifikasi intent, mengotomatiskan 50% tiket support Tier 1. Mengelola otomasi untuk integrasi kemitraan (TikTok, Lazada, Shopee). Memvalidasi fitur untuk inisiatif pengurangan biaya yang menghemat $60.000/bulan. Mengembangkan alat untuk decoding payload dan perbandingan konfigurasi. Mentorship tester manual dalam hal otomasi."
             },
             {
-                "year": "2024",
-                "title": "Senior Engineer & Mentor",
-                "description": "Dipromosikan menjadi Senior QA. Mengidentifikasi kendala internal tim dan merekayasa solusi kustom: ekstensi Chrome untuk payload decoding dan alat validasi konfigurasi yang meningkatkan akurasi hingga 60%, mencegah kegagalan kritis."
-            },
-            {
-                "year": "2023",
-                "title": "Shift-Left Integration",
-                "description": "Mengembangkan framework testing integrasi pertama menggunakan Go, memungkinkan tim untuk menerapkan shift-left testing dan mempercepat deteksi defect hingga 80%."
-            },
-            {
-                "year": "2022",
-                "title": "Stabilitas Framework",
-                "description": "Membangun framework otomasi tangguh dengan tingkat error regresi <1%. Menegakkan quality gates di CI/CD, menghilangkan kegagalan build yang berulang."
+                "year": "2022 - 2024",
+                "title": "Software Engineer, QA",
+                "description": "Mengembangkan bersama framework testing integrasi berbasis Go pertama di perusahaan, mendeteksi cacat 80% lebih cepat. Bertindak sebagai spesialis otomasi lintas tim. Mencapai cakupan tes 100% untuk suite mobile/web/API tim Recovery. Mengurangi upaya pengujian manual sebesar 70%. Mempertahankan tingkat error regresi <1%. Menegakkan quality gates CI/CD yang ketat."
             },
             {
                 "year": "2021",
-                "title": "Backend Intern",
-                "description": "Bergabung dengan Ninja Van sebagai Backend Engineer Intern. Membangun RESTful API yang aman dan layanan pembersihan data sebelum beralih spesialisasi ke Quality Engineering."
+                "title": "Backend Engineer Intern",
+                "description": "Meningkatkan performa environment QA dengan mengembangkan layanan pembersihan data dan berkontribusi pada kualitas kode melalui pembangunan RESTful API yang aman."
             }
         ]
     },
     "expertise": {
         "title": "Keahlian Teknis",
-        "subtitle": "Toolkit saya untuk membangun sistem yang stabil dan skalabel",
+        "subtitle": "Fondasi teknologi di balik strategi kualitas dan otomasi saya.",
         "automation": {
             "title": "Test Automation",
-            "items": [
-                "Selenium",
-                "Rest Assured",
-                "DeepEval",
-                "Playwright",
-                "Appium Flutter"
+            "groups": [
+                {
+                    "name": "Web",
+                    "items": ["Selenium", "Playwright", "React Testing"]
+                },
+                {
+                    "name": "Mobile",
+                    "items": ["Appium Flutter"]
+                },
+                {
+                    "name": "AI & API",
+                    "items": ["DeepEval", "Rest Assured", "Karate Framework"]
+                },
+                {
+                    "name": "Frameworks",
+                    "items": ["PyTest", "PyTest-BDD", "Cucumber"]
+                }
             ]
         },
         "backend": {
-            "title": "Languages & Ecosystem",
-            "items": [
-                "Java",
-                "SQL",
-                "TypeScript",
-                "Go",
-                "Python"
+            "title": "Languages & Backend",
+            "groups": [
+                {
+                    "name": "Bahasa Pemrograman",
+                    "items": ["Java", "Javascript", "Python", "Go"]
+                },
+                {
+                    "name": "Data & Antarmuka",
+                    "items": ["SQL", "RESTful APIs"]
+                }
             ]
         },
         "strategy": {
             "title": "Strategi & Metodologi",
-            "items": [
-                "Shift-Left Testing",
-                "Perencanaan Tes",
-                "Analisis Risiko",
-                "Agile / Scrum"
+            "groups": [
+                {
+                    "name": "Strategi Kualitas",
+                    "items": ["Shift-Left Strategy", "Analisis Risiko"]
+                },
+                {
+                    "name": "Proses & Alur Kerja",
+                    "items": ["Perencanaan Tes", "Agile / Scrum"]
+                }
             ]
         },
         "devops": {
             "title": "DevOps & Observability",
-            "items": [
-                "Docker",
-                "CI (Bamboo)",
-                "Grafana",
-                "Datadog",
-                "Kibana"
+            "groups": [
+                {
+                    "name": "CI/CD & Infrastruktur",
+                    "items": ["Docker", "Bamboo CI", "Git"]
+                },
+                {
+                    "name": "Observability",
+                    "items": ["Datadog", "Grafana", "Kibana"]
+                }
             ]
         }
     },
     "contact": {
-        "title": "Mencari QA Engineer yang paham full stack?",
+        "title": "Mencari Software Engineer yang mampu menjamin kualitas di seluruh ekosistem teknologi Anda?",
         "cta": "Hubungi Saya"
     }
 }

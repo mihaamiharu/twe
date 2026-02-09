@@ -75,7 +75,7 @@ export function PlaygroundMobileLayout({
                                     : challenge.htmlContent || '<div></div>'
                             }
                             cssContent={
-                                challenge.type === 'PLAYWRIGHT'
+                                challenge.category?.startsWith('e2e')
                                     ? e2eSelectorStyles
                                     : defaultSelectorStyles
                             }

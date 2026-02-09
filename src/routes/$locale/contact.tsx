@@ -138,18 +138,12 @@ function ContactPage() {
                         </CardHeader>
                         <CardContent className="flex-1">
                             <ul className="space-y-3 text-sm text-muted-foreground">
-                                <li className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-primary" />
-                                    Career Advice & Mentorship
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-primary" />
-                                    Code Review & Architecture
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <CheckCircle className="w-4 h-4 text-primary" />
-                                    Test Automation Strategy
-                                </li>
+                                {(t('contact.booking.items', { returnObjects: true }) as string[]).map((item, i) => (
+                                    <li key={i} className="flex items-center gap-2">
+                                        <CheckCircle className="w-4 h-4 text-primary" />
+                                        {item}
+                                    </li>
+                                ))}
                             </ul>
                         </CardContent>
                         <CardFooter>

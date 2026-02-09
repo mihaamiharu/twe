@@ -1,5 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
+import { authMiddleware } from './auth.mw';
 
 // ----------------------------------------------------------------------------
 // HELPERS
@@ -46,13 +47,16 @@ const CreateSubmissionSchema = z.object({
 
 
 
-export const challengeSubmissionHandler = async ({ data: input }: { data: z.infer<typeof CreateSubmissionSchema> }) => {
+export const challengeSubmissionHandler = async ({
+  data: input,
+  context,
+}: {
+  data: z.infer<typeof CreateSubmissionSchema>;
+  context: { user: { id: string } };
+}) => {
   const { locale = 'en' } = input;
   try {
     // Dynamically import server-only modules
-    const { getRequestHeaders } =
-      await import('@tanstack/react-start/server');
-    const { auth } = await import('./auth.server');
     const { db } = await import('@/db');
     const {
       submissions,
@@ -69,17 +73,7 @@ export const challengeSubmissionHandler = async ({ data: input }: { data: z.infe
       await import('@/lib/stats');
     const { logger } = await import('@/lib/logger');
 
-    const headers = getRequestHeaders() as Headers;
-    const session = await auth.api.getSession({ headers });
-
-    if (!session?.user?.id) {
-      return {
-        success: false,
-        error: getErrorMessage('unauthorized', locale),
-      };
-    }
-
-    const userId = session.user.id;
+    const userId = context.user.id;
     const { challengeSlug, code, testResults, executionTime, isPractice } = input;
 
     // Practice mode: skip all DB writes and return lightweight response
@@ -368,6 +362,7 @@ export const challengeSubmissionHandler = async ({ data: input }: { data: z.infe
 }
 
 export const createSubmission = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
   .inputValidator((data: unknown) => CreateSubmissionSchema.parse(data))
   .handler(challengeSubmissionHandler);
 
@@ -384,28 +379,16 @@ const GetSubmissionsSchema = z.object({
 });
 
 export const getSubmissions = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
   .inputValidator((data: unknown) => GetSubmissionsSchema.parse(data))
-  .handler(async ({ data: input }) => {
+  .handler(async ({ data: input, context }) => {
     try {
       // Dynamically import server-only modules
-      const { getRequestHeaders } =
-        await import('@tanstack/react-start/server');
-      const { auth } = await import('./auth.server');
       const { db } = await import('@/db');
       const { submissions, challenges } = await import('@/db/schema');
       const { eq, and, desc, sql } = await import('drizzle-orm');
 
-      const headers = getRequestHeaders() as Headers;
-      const session = await auth.api.getSession({ headers });
-
-      if (!session?.user?.id) {
-        return {
-          success: false,
-          error: getErrorMessage('unauthorized', locale),
-        };
-      }
-
-      const userId = session.user.id;
+      const userId = context.user.id;
       const { challengeId, page, limit, locale } = input;
 
       // Build conditions
