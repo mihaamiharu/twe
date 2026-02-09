@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
 import { db } from '@/db';
-import { authMiddleware } from './auth.mw';
 import {
   users,
   challenges,
@@ -11,7 +11,8 @@ import {
 import { eq, desc, sql } from 'drizzle-orm';
 import { getUserStats } from '@/lib/stats';
 import { logger } from '@/lib/logger';
-import { z } from 'zod';
+import { authMiddleware } from './auth.mw';
+import { getCachedTierTotals } from './content.server';
 
 export type UserData = {
   id: string;
@@ -65,8 +66,6 @@ export const getUserSettings = createServerFn({ method: 'GET' })
       context,
     }): Promise<{ success: boolean; data?: UserData; error?: string }> => {
       try {
-        // Dynamically import server-only modules
-
         const userId = context.user.id;
 
         // Get user data
@@ -84,7 +83,6 @@ export const getUserSettings = createServerFn({ method: 'GET' })
         const completedTutorials = stats.tutorialsCompleted;
 
         // Calculate Tier Totals (using cached version)
-        const { getCachedTierTotals } = await import('./content.server');
         const tierTotalCounts = await getCachedTierTotals();
 
         // Get user achievements
@@ -261,8 +259,6 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
     }): Promise<{ success: boolean; data?: any; error?: string }> => {
       try {
         const updates = data;
-
-        // Dynamically import server-only modules
 
         const userId = context.user.id;
 

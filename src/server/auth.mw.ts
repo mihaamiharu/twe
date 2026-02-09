@@ -1,7 +1,7 @@
 /**
  * Composable Auth Middleware for TanStack Start
  * Follows 2026 TanStack Start middleware pattern
- * 
+ *
  * Usage:
  * export const protectedFn = createServerFn({ method: 'POST' })
  *   .middleware([authMiddleware])
@@ -10,6 +10,8 @@
  *   });
  */
 import { createMiddleware } from '@tanstack/react-start';
+import { getRequestHeaders } from '@tanstack/react-start/server';
+import { auth } from './auth.server';
 
 // Type for authenticated user context
 export interface AuthUser {
@@ -29,32 +31,61 @@ export interface AuthContext {
 /**
  * Strict auth middleware - throws if not authenticated.
  * Use for protected endpoints that require login.
- * 
+ *
  * The error is thrown and should be caught by your error boundary
  * or handled by TanStack Start's built-in error handling.
  */
-export const authMiddleware = createMiddleware().server(async ({ next }) => {
-    const { getRequestHeaders } = await import('@tanstack/react-start/server');
-    const { auth } = await import('./auth.server');
+export const authMiddleware = createMiddleware({ type: 'function' }).server(
+    async ({ next }) => {
+        const headers = getRequestHeaders();
 
-    const headers = getRequestHeaders() as Headers;
+        const session = await auth.api.getSession({ headers });
+
+        if (!session?.user?.id) {
+            throw new Error('Unauthorized');
+        }
+
+        return next({
+            context: {
+                user: {
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: session.user.name || null,
+                    image: session.user.image || null,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+                    role: (session.user as any).role || 'USER',
+                },
+                userId: session.user.id,
+            },
+        });
+    },
+);
+
+/**
+ * Optional auth middleware - does NOT throw if not authenticated.
+ * Use for public endpoints that can be enhanced with user data.
+ */
+export const optionalAuthMiddleware = createMiddleware({
+    type: 'function',
+}).server(async ({ next }) => {
+    const headers = getRequestHeaders();
+
     const session = await auth.api.getSession({ headers });
-
-    if (!session?.user?.id) {
-        throw new Error('Unauthorized');
-    }
 
     return next({
         context: {
-            user: {
-                id: session.user.id,
-                email: session.user.email,
-                name: session.user.name || null,
-                image: session.user.image || null,
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                role: (session.user as any).role || 'USER',
-            },
-            userId: session.user.id,
+            user: session?.user
+                ? {
+                    id: session.user.id,
+                    email: session.user.email,
+                    name: session.user.name || null,
+                    image: session.user.image || null,
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+                    role: (session.user as any).role || 'USER',
+                }
+                : null,
+            userId: session?.user?.id || null,
+            isAuthenticated: !!session?.user,
         },
     });
 });
@@ -63,7 +94,7 @@ export const authMiddleware = createMiddleware().server(async ({ next }) => {
  * Admin middleware - ensures user has ADMIN role.
  * Extends authMiddleware.
  */
-export const adminMiddleware = createMiddleware()
+export const adminMiddleware = createMiddleware({ type: 'function' })
     .middleware([authMiddleware])
     .server(async ({ next, context }) => {
         if (context.user.role !== 'ADMIN') {
@@ -74,11 +105,6 @@ export const adminMiddleware = createMiddleware()
             context: {
                 user: context.user,
                 userId: context.userId,
-            }
+            },
         });
     });
-
-// TODO: Add optionalAuthMiddleware once TanStack Start supports
-// middleware with union return types for optional auth scenarios.
-// For now, use getServerSession() directly for optional auth.
-
