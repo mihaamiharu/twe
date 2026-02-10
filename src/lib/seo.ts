@@ -1,4 +1,4 @@
-import { type Meta } from '@tanstack/react-router';
+// import { type Meta } from '@tanstack/react-router';
 
 export const BASE_URL = 'https://testingwithekki.com';
 
