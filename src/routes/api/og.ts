@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
-import { OgImageTemplate } from '@/components/OgImageTemplate';
+import { OgImageTemplate } from '../../components/OgImageTemplate'; // Use relative path
 
 async function loadGoogleFont(font: string, weight: number) {
     const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}`;
@@ -25,7 +25,8 @@ async function loadGoogleFont(font: string, weight: number) {
     });
 }
 
-export const Route = createFileRoute('/api/og')({
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const Route = createFileRoute('/api/og' as any)({
     server: {
         handlers: {
             GET: async ({ request }) => {
@@ -74,7 +75,8 @@ export const Route = createFileRoute('/api/og')({
                     const pngData = resvg.render();
                     const pngBuffer = pngData.asPng();
 
-                    return new Response(pngBuffer, {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument
+                    return new Response(pngBuffer as any, {
                         headers: {
                             'Content-Type': 'image/png',
                             'Cache-Control': 'public, max-age=31536000, immutable',
