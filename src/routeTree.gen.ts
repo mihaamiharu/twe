@@ -20,7 +20,6 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as LocaleIndexRouteImport } from './routes/$locale/index'
 import { Route as RobotsTxtRouteImport } from './routes/robots.txt'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
-import { Route as ApiTestRouteImport } from './routes/api/test'
 import { Route as ApiOgRouteImport } from './routes/api/og'
 import { Route as AdminTutorialsRouteImport } from './routes/admin/tutorials'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
@@ -104,11 +103,6 @@ const RobotsTxtRoute = RobotsTxtRouteImport.update({
 const DocsApiRoute = DocsApiRouteImport.update({
   id: '/docs/api',
   path: '/docs/api',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTestRoute = ApiTestRouteImport.update({
-  id: '/api/test',
-  path: '/api/test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiOgRoute = ApiOgRouteImport.update({
@@ -285,7 +279,6 @@ export interface FileRoutesByFullPath {
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
   '/api/og': typeof ApiOgRoute
-  '/api/test': typeof ApiTestRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
   '/$locale/': typeof LocaleIndexRoute
@@ -326,7 +319,6 @@ export interface FileRoutesByTo {
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
   '/api/og': typeof ApiOgRoute
-  '/api/test': typeof ApiTestRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
   '/admin': typeof AdminIndexRoute
@@ -369,7 +361,6 @@ export interface FileRoutesById {
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
   '/api/og': typeof ApiOgRoute
-  '/api/test': typeof ApiTestRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
   '/$locale/': typeof LocaleIndexRoute
@@ -413,7 +404,6 @@ export interface FileRouteTypes {
     | '/admin/submissions'
     | '/admin/tutorials'
     | '/api/og'
-    | '/api/test'
     | '/docs/api'
     | '/robots/txt'
     | '/$locale/'
@@ -454,7 +444,6 @@ export interface FileRouteTypes {
     | '/admin/submissions'
     | '/admin/tutorials'
     | '/api/og'
-    | '/api/test'
     | '/docs/api'
     | '/robots/txt'
     | '/admin'
@@ -496,7 +485,6 @@ export interface FileRouteTypes {
     | '/admin/submissions'
     | '/admin/tutorials'
     | '/api/og'
-    | '/api/test'
     | '/docs/api'
     | '/robots/txt'
     | '/$locale/'
@@ -520,7 +508,6 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TestSentryRoute: typeof TestSentryRoute
   ApiOgRoute: typeof ApiOgRoute
-  ApiTestRoute: typeof ApiTestRoute
   DocsApiRoute: typeof DocsApiRoute
   RobotsTxtRoute: typeof RobotsTxtRoute
   DocsIndexRoute: typeof DocsIndexRoute
@@ -604,13 +591,6 @@ declare module '@tanstack/react-router' {
       path: '/docs/api'
       fullPath: '/docs/api'
       preLoaderRoute: typeof DocsApiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/test': {
-      id: '/api/test'
-      path: '/api/test'
-      fullPath: '/api/test'
-      preLoaderRoute: typeof ApiTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/og': {
@@ -911,7 +891,6 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TestSentryRoute: TestSentryRoute,
   ApiOgRoute: ApiOgRoute,
-  ApiTestRoute: ApiTestRoute,
   DocsApiRoute: DocsApiRoute,
   RobotsTxtRoute: RobotsTxtRoute,
   DocsIndexRoute: DocsIndexRoute,
