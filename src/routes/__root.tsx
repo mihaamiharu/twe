@@ -24,6 +24,7 @@ import { CookieConsent } from '@/components/CookieConsent';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
+import { organizationSchema } from '@/lib/seo';
 
 // Export context type for child routes
 export interface RootContext {
@@ -112,6 +113,10 @@ export const Route = createRootRouteWithContext<RootContext>()({
         name: 'twitter:image',
         content: 'https://testingwithekki.com/twe-banner.png',
       },
+      {
+        name: 'theme-color',
+        content: '#09090b', // Zinc-950 (background color)
+      },
     ],
     links: [
       // Preload critical fonts removed to avoid warnings (loaded via CSS)
@@ -186,21 +191,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           }}
         />
         {/* JSON-LD Organization Schema for SEO */}
+        {/* JSON-LD Organization Schema for SEO */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              "name": "TestingWithEkki",
-              "url": "https://testingwithekki.com",
-              "logo": "https://testingwithekki.com/logo-dark-new.png",
-              "sameAs": [
-                "https://x.com/ekkisyam2310",
-                "https://www.linkedin.com/in/ekkisyamsugiardi"
-              ],
-              "description": "Interactive platform for learning test automation with Playwright, JavaScript, and CSS selectors."
-            })
+            __html: JSON.stringify(organizationSchema)
           }}
         />
       </head>
