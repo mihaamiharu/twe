@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestSentryRouteImport } from './routes/test-sentry'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.xml]'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as SplatRouteImport } from './routes/$'
@@ -17,9 +18,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as LocaleIndexRouteImport } from './routes/$locale/index'
-import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as RobotsTxtRouteImport } from './routes/robots.txt'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
+import { Route as ApiTestRouteImport } from './routes/api/test'
+import { Route as ApiOgRouteImport } from './routes/api/og'
 import { Route as AdminTutorialsRouteImport } from './routes/admin/tutorials'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
@@ -52,6 +54,11 @@ import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale
 const TestSentryRoute = TestSentryRouteImport.update({
   id: '/test-sentry',
   path: '/test-sentry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -89,11 +96,6 @@ const LocaleIndexRoute = LocaleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LocaleRoute,
 } as any)
-const SitemapXmlRoute = SitemapXmlRouteImport.update({
-  id: '/sitemap/xml',
-  path: '/sitemap/xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RobotsTxtRoute = RobotsTxtRouteImport.update({
   id: '/robots/txt',
   path: '/robots/txt',
@@ -102,6 +104,16 @@ const RobotsTxtRoute = RobotsTxtRouteImport.update({
 const DocsApiRoute = DocsApiRouteImport.update({
   id: '/docs/api',
   path: '/docs/api',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTestRoute = ApiTestRouteImport.update({
+  id: '/api/test',
+  path: '/api/test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiOgRoute = ApiOgRouteImport.update({
+  id: '/api/og',
+  path: '/api/og',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminTutorialsRoute = AdminTutorialsRouteImport.update({
@@ -251,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleAuthenticatedRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale/about': typeof LocaleAboutRoute
   '/$locale/changelog': typeof LocaleChangelogRoute
@@ -271,9 +284,10 @@ export interface FileRoutesByFullPath {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
+  '/api/og': typeof ApiOgRoute
+  '/api/test': typeof ApiTestRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
@@ -289,6 +303,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale': typeof LocaleIndexRoute
   '/$locale/about': typeof LocaleAboutRoute
@@ -310,9 +325,10 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
+  '/api/og': typeof ApiOgRoute
+  '/api/test': typeof ApiTestRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
@@ -330,6 +346,7 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
   '/$locale/about': typeof LocaleAboutRoute
@@ -351,9 +368,10 @@ export interface FileRoutesById {
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
+  '/api/og': typeof ApiOgRoute
+  '/api/test': typeof ApiTestRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/docs/': typeof DocsIndexRoute
@@ -373,6 +391,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/$locale'
     | '/admin'
+    | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale/about'
     | '/$locale/changelog'
@@ -393,9 +412,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/submissions'
     | '/admin/tutorials'
+    | '/api/og'
+    | '/api/test'
     | '/docs/api'
     | '/robots/txt'
-    | '/sitemap/xml'
     | '/$locale/'
     | '/admin/'
     | '/docs'
@@ -411,6 +431,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale'
     | '/$locale/about'
@@ -432,9 +453,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/submissions'
     | '/admin/tutorials'
+    | '/api/og'
+    | '/api/test'
     | '/docs/api'
     | '/robots/txt'
-    | '/sitemap/xml'
     | '/admin'
     | '/docs'
     | '/$locale/profile'
@@ -451,6 +473,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/$locale'
     | '/admin'
+    | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale/_authenticated'
     | '/$locale/about'
@@ -472,9 +495,10 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/submissions'
     | '/admin/tutorials'
+    | '/api/og'
+    | '/api/test'
     | '/docs/api'
     | '/robots/txt'
-    | '/sitemap/xml'
     | '/$locale/'
     | '/admin/'
     | '/docs/'
@@ -493,10 +517,12 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   LocaleRoute: typeof LocaleRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TestSentryRoute: typeof TestSentryRoute
+  ApiOgRoute: typeof ApiOgRoute
+  ApiTestRoute: typeof ApiTestRoute
   DocsApiRoute: typeof DocsApiRoute
   RobotsTxtRoute: typeof RobotsTxtRoute
-  SitemapXmlRoute: typeof SitemapXmlRoute
   DocsIndexRoute: typeof DocsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -508,6 +534,13 @@ declare module '@tanstack/react-router' {
       path: '/test-sentry'
       fullPath: '/test-sentry'
       preLoaderRoute: typeof TestSentryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -559,13 +592,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleIndexRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/sitemap/xml': {
-      id: '/sitemap/xml'
-      path: '/sitemap/xml'
-      fullPath: '/sitemap/xml'
-      preLoaderRoute: typeof SitemapXmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/robots/txt': {
       id: '/robots/txt'
       path: '/robots/txt'
@@ -578,6 +604,20 @@ declare module '@tanstack/react-router' {
       path: '/docs/api'
       fullPath: '/docs/api'
       preLoaderRoute: typeof DocsApiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/test': {
+      id: '/api/test'
+      path: '/api/test'
+      fullPath: '/api/test'
+      preLoaderRoute: typeof ApiTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/og': {
+      id: '/api/og'
+      path: '/api/og'
+      fullPath: '/api/og'
+      preLoaderRoute: typeof ApiOgRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/tutorials': {
@@ -868,10 +908,12 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   LocaleRoute: LocaleRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TestSentryRoute: TestSentryRoute,
+  ApiOgRoute: ApiOgRoute,
+  ApiTestRoute: ApiTestRoute,
   DocsApiRoute: DocsApiRoute,
   RobotsTxtRoute: RobotsTxtRoute,
-  SitemapXmlRoute: SitemapXmlRoute,
   DocsIndexRoute: DocsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
