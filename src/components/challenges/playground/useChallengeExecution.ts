@@ -99,7 +99,7 @@ export function useChallengeExecution(
                     timeout: 10000,
                     existingIframe: previewIframeRef.current || undefined,
                     strictMode: challenge.type === 'PLAYWRIGHT',
-                    cssContent: (challenge.type === 'PLAYWRIGHT' || challenge.tier === 'e2e') ? e2eSelectorStyles : defaultSelectorStyles,
+                    cssContent: (challenge.category?.startsWith('e2e')) ? e2eSelectorStyles : defaultSelectorStyles,
                     files: challenge.files,
                     onNavigate: (path) => setCurrentVfsPath(path),
                     expectedState: challenge.expectedState,
