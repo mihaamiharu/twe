@@ -84,7 +84,7 @@
     "achievementUnlocked": "Berhasil dibuka: {{name}}"
   },
   "footer": {
-    "description": "Kuasai otomasi pengujian dengan panduan teruji dari Ekki. Skenario nyata, tanpa hambatan.",
+    "description": "Bangun otomasi Playwright & JavaScript dengan panduan praktis teruji. Skenario nyata, tanpa setup.",
     "product": "Produk",
     "resources": "Sumber Daya",
     "copyright": "© {{year}} TestingWithEkki oleh Ekki Syam. Hak cipta dilindungi.",
