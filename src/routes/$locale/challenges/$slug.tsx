@@ -126,6 +126,52 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
 
     const title = `${data.title} (${data.difficulty === 'EASY' ? i18n.t('common:labels.easy') : data.difficulty === 'MEDIUM' ? i18n.t('common:labels.medium') : i18n.t('common:labels.hard')}) | TestingWithEkki`;
 
+    const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(data.title)}&type=Challenge&difficulty=${data.difficulty}&xp=${data.xpReward}`;
+
+    // Structured Data
+    const jsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": `https://testingwithekki.com/${locale}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Challenges",
+            "item": `https://testingwithekki.com/${locale}/challenges`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": data.title,
+            "item": url
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "LearningResource",
+        "name": data.title,
+        "description": data.description,
+        "learningResourceType": "Practice Problem",
+        "educationalLevel": data.difficulty === 'EASY' ? 'Beginner' : data.difficulty === 'MEDIUM' ? 'Intermediate' : 'Advanced',
+        "teaches": data.category || "Playwright Automation",
+        "url": url,
+        "image": ogImageUrl,
+        "author": {
+          "@type": "Organization",
+          "name": "TestingWithEkki",
+          "url": "https://testingwithekki.com"
+        }
+      }
+    ];
+
     return {
       meta: [
         { title },
@@ -133,7 +179,11 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
         { property: 'og:title', content: title },
         { property: 'og:description', content: data.description },
         { property: 'og:url', content: url },
-        { property: 'og:image', content: 'https://testingwithekki.com/twe-banner.png' },
+        { property: 'og:image', content: ogImageUrl },
+        { property: 'twitter:card', content: 'summary_large_image' },
+        { property: 'twitter:title', content: title },
+        { property: 'twitter:description', content: data.description },
+        { property: 'twitter:image', content: ogImageUrl },
       ],
       links: [
         {
@@ -156,6 +206,10 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
           href: `https://testingwithekki.com/en/challenges/${data.slug}`,
         },
       ],
+      scripts: jsonLd.map(data => ({
+        type: 'application/ld+json',
+        children: JSON.stringify(data)
+      }))
     };
   },
   pendingComponent: ChallengeSkeleton,
