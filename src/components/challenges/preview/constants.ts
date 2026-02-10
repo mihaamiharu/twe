@@ -195,6 +195,7 @@ export const INJECTED_SCRIPTS = `
     const form = e.target;
     const action = form.getAttribute('action');
     if (!action || action === '#' || action.trim() === '') {
+      e.preventDefault();
       return;
     }
     if (action.startsWith('/') || action.endsWith('.html')) {
