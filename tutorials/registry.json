@@ -212,6 +212,33 @@
       "relatedChallenges": [
         "pom-login-basics"
       ],
+      "nextTutorialSlug": "test-fixtures"
+    },
+    {
+      "slug": "test-fixtures",
+      "order": 16,
+      "estimatedMinutes": 12,
+      "tags": [
+        "playwright",
+        "fixtures",
+        "dependency-injection",
+        "intermediate"
+      ],
+      "relatedChallenges": [],
+      "nextTutorialSlug": "advanced-fixtures"
+    },
+    {
+      "slug": "advanced-fixtures",
+      "order": 17,
+      "estimatedMinutes": 15,
+      "tags": [
+        "playwright",
+        "fixtures",
+        "composition",
+        "advanced",
+        "intermediate"
+      ],
+      "relatedChallenges": [],
       "nextTutorialSlug": null
     }
   ]
