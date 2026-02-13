@@ -277,19 +277,19 @@ export function MarkdownRenderer({
               };
 
               const titles = {
-                note: 'Mental Model',
-                tip: 'Pro Tip',
-                important: 'Key Concept',
-                warning: 'Watch Out',
-                caution: 'The Trap',
+                note: 'Note',
+                tip: 'Tip',
+                important: 'Important',
+                warning: 'Warning',
+                caution: 'Caution',
               };
 
               const icons = {
-                note: '🧠',
+                note: 'ℹ️',
                 tip: '💡',
-                important: '🔑',
+                important: '❗',
                 warning: '⚠️',
-                caution: '🪤',
+                caution: '🛑',
               };
 
               return (
