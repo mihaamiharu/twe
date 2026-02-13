@@ -26,6 +26,7 @@ import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminNewsletterRouteImport } from './routes/admin/newsletter'
 import { Route as AdminMessagesRouteImport } from './routes/admin/messages'
+import { Route as AdminDebugRouteImport } from './routes/admin/debug'
 import { Route as AdminChallengesRouteImport } from './routes/admin/challenges'
 import { Route as AdminBugsRouteImport } from './routes/admin/bugs'
 import { Route as AdminAchievementsRouteImport } from './routes/admin/achievements'
@@ -133,6 +134,11 @@ const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDebugRoute = AdminDebugRouteImport.update({
+  id: '/debug',
+  path: '/debug',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminChallengesRoute = AdminChallengesRouteImport.update({
@@ -273,6 +279,7 @@ export interface FileRoutesByFullPath {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
+  '/admin/debug': typeof AdminDebugRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -313,6 +320,7 @@ export interface FileRoutesByTo {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
+  '/admin/debug': typeof AdminDebugRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -355,6 +363,7 @@ export interface FileRoutesById {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
+  '/admin/debug': typeof AdminDebugRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -398,6 +407,7 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/debug'
     | '/admin/messages'
     | '/admin/newsletter'
     | '/admin/settings'
@@ -438,6 +448,7 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/debug'
     | '/admin/messages'
     | '/admin/newsletter'
     | '/admin/settings'
@@ -479,6 +490,7 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/debug'
     | '/admin/messages'
     | '/admin/newsletter'
     | '/admin/settings'
@@ -633,6 +645,13 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/admin/messages'
       preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/debug': {
+      id: '/admin/debug'
+      path: '/debug'
+      fullPath: '/admin/debug'
+      preLoaderRoute: typeof AdminDebugRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/challenges': {
@@ -857,6 +876,7 @@ interface AdminRouteChildren {
   AdminAchievementsRoute: typeof AdminAchievementsRoute
   AdminBugsRoute: typeof AdminBugsRoute
   AdminChallengesRoute: typeof AdminChallengesRoute
+  AdminDebugRoute: typeof AdminDebugRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -871,6 +891,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAchievementsRoute: AdminAchievementsRoute,
   AdminBugsRoute: AdminBugsRoute,
   AdminChallengesRoute: AdminChallengesRoute,
+  AdminDebugRoute: AdminDebugRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
   AdminSettingsRoute: AdminSettingsRoute,
