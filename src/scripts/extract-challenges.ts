@@ -15,23 +15,23 @@ import {
   cssChallenges,
   xpathChallenges,
   comparisonChallenges,
-} from '../src/db/seed-basic-challenges';
+} from '../db/seed-basic-challenges';
 import {
   jsFundamentalsChallenges,
   domChallenges,
   asyncChallenges,
-} from '../src/db/seed-beginner-challenges';
+} from '../db/seed-beginner-challenges';
 import {
   navigationChallenges,
   locatorChallenges,
   assertionChallenges,
   waitChallenges,
-} from '../src/db/seed-intermediate-challenges';
+} from '../db/seed-intermediate-challenges';
 import {
   pomChallenges,
   dataDrivenChallenges,
   advancedPatternsChallenges,
-} from '../src/db/seed-expert-challenges';
+} from '../db/seed-expert-challenges';
 
 const CHALLENGES_DIR = join(process.cwd(), 'content', 'challenges');
 
@@ -143,7 +143,7 @@ async function extractTier(
   return allChallenges.length;
 }
 
-async function main() {
+export async function extractChallenges() {
   console.log('🔄 Extracting challenges from seeders...\n');
 
   // Basic tier (CSS/XPath)
@@ -191,6 +191,10 @@ async function main() {
 
   const total = basicCount + beginnerCount + intermediateCount + expertCount;
   console.log(`\n✨ Extraction complete! Total: ${total} challenges`);
+
+  return { success: true, count: total };
 }
 
-main().catch(console.error);
+if (import.meta.main) {
+  extractChallenges().catch(console.error);
+}
