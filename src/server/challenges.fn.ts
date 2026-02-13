@@ -90,8 +90,6 @@ export const getChallenges = createServerFn({ method: 'GET' })
           or(
             sql`${challenges.title}->>${locale} ILIKE ${searchPattern}`,
             sql`${challenges.title}->>'en' ILIKE ${searchPattern}`,
-            sql`${challenges.description}->>${locale} ILIKE ${searchPattern}`,
-            sql`${challenges.description}->>'en' ILIKE ${searchPattern}`,
           )!,
         );
       }
@@ -106,7 +104,7 @@ export const getChallenges = createServerFn({ method: 'GET' })
           id: challenges.id,
           slug: challenges.slug,
           title: sql<string>`COALESCE(${challenges.title}->>${locale}, ${challenges.title}->>'en', '')`,
-          description: sql<string>`COALESCE(${challenges.description}->>${locale}, ${challenges.description}->>'en', '')`,
+          description: sql<string>`''`,
           type: challenges.type,
           difficulty: challenges.difficulty,
           category: challenges.category,
