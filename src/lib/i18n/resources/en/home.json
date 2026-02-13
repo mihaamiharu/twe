@@ -32,8 +32,8 @@
       ]
     },
     "beginner": {
-      "title": "JavaScript",
-      "description": "Learn JavaScript fundamentals for test automation",
+      "title": "JavaScript & TypeScript",
+      "description": "Learn JS/TS fundamentals for test automation",
       "skills": [
         "Variables & Types",
         "DOM Manipulation",

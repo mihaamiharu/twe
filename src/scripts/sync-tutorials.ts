@@ -4,7 +4,7 @@ import { tutorials } from '../db/schema';
 import { eq } from 'drizzle-orm';
 import { getTutorialList, getTutorialContent } from '../server/content.server';
 
-async function syncTutorials() {
+export async function syncTutorials() {
     console.log('🔄 Starting tutorial sync...');
 
     try {
@@ -38,15 +38,7 @@ async function syncTutorials() {
                 id: idContent ? idContent.title : enContent.title
             };
 
-            const description = {
-                en: enContent.description,
-                id: idContent ? idContent.description : enContent.description
-            };
 
-            const content = {
-                en: enContent.content,
-                id: idContent ? idContent.content : enContent.content // Fallback to EN content if ID fails to load effectively (though helper handles it)
-            };
 
             // Check if exists in DB
             const existing = await db.query.tutorials.findFirst({
@@ -56,8 +48,6 @@ async function syncTutorials() {
             const tutorialData = {
                 slug: item.slug,
                 title,
-                description,
-                content,
                 order: item.order,
                 estimatedMinutes: item.estimatedMinutes,
                 tags: item.tags,
@@ -85,14 +75,19 @@ async function syncTutorials() {
 
     } catch (error) {
         console.error('❌ Sync Failed:', error);
-        process.exit(1);
+        throw error;
     }
 }
 
 // Run the sync
-syncTutorials()
-    .then(() => process.exit(0))
-    .catch((err) => {
-        console.error(err);
-        process.exit(1);
-    });
+
+
+// Run if main module
+if (import.meta.main) {
+    syncTutorials()
+        .then(() => process.exit(0))
+        .catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
+}

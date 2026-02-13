@@ -1,0 +1,19 @@
+{
+    "title": "Changelog",
+    "subtitle": "Stay up to date with the latest features and improvements",
+    "types": {
+        "feature": "New Feature",
+        "improvement": "Improvement",
+        "fix": "Bug Fix",
+        "content": "New Content"
+    },
+    "entries": [
+        {
+            "date": "2026-02-10",
+            "version": "1.0.0",
+            "type": "feature",
+            "title": "Platform Launch",
+            "description": "Welcome to TestingWithEkki! We're excited to launch the platform with comprehensive Playwright tutorials, interactive coding challenges, and a global leaderboard. Start your journey to becoming a test automation expert today."
+        }
+    ]
+}

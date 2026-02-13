@@ -3,10 +3,11 @@ import { BugReportDialog } from '@/components/BugReportDialog';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { subscribeToNewsletter } from '@/server/newsletter.fn';
 
 interface FooterLink {
   label: string;
@@ -28,35 +29,52 @@ const getFooterLinks = (locale: string) => ({
 });
 
 export function Footer() {
-  const { t } = useTranslation(['common', 'legal']);
+  const { t } = useTranslation(['common', 'legal', 'changelog']);
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+
+  // Custom footer links with dynamic logic needed for changelog
   const footerLinks = getFooterLinks(locale);
+  // Add changelog to resources
+  const resourcesLinks = [
+    ...footerLinks.resources,
+    { label: 'changelog:title', href: `/${locale}/changelog` }
+  ];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [hasNewChangelog, setHasNewChangelog] = useState(false);
+
+  useEffect(() => {
+    // Check for new changelog entries
+    const entries = t('changelog:entries', { returnObjects: true }) as Array<{ date: string }>;
+    if (Array.isArray(entries) && entries.length > 0) {
+      // Sort by date descending to get latest
+      const latestEntry = entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+      const lastSeenDate = localStorage.getItem('latestSeenChangelogDate');
+
+      // Compare dates as strings (YYYY-MM-DD) to avoid timezone issues
+      if (!lastSeenDate || latestEntry.date > lastSeenDate) {
+        setHasNewChangelog(true);
+      }
+    }
+  }, [t]);
 
   async function handleNewsletterSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
 
     const formData = new FormData(event.currentTarget);
-    formData.append('subject', 'Newsletter Subscription'); // Custom subject for filtering
+    const email = formData.get('email') as string;
 
     try {
-      const response = await fetch("https://formspree.io/f/mpwooodq", {
-        method: "POST",
-        body: formData,
-        headers: {
-          'Accept': 'application/json'
-        }
-      });
+      const response = await subscribeToNewsletter({ data: { email } });
 
-      if (response.ok) {
+      if (response.success) {
         setIsSuccess(true);
-        toast.success(t('footer.newsletter.success'));
+        toast.success(response.message);
       } else {
-        toast.error(t('footer.newsletter.error'));
+        toast.error(response.error || t('footer.newsletter.error'));
       }
     } catch {
       toast.error(t('footer.newsletter.error'));
@@ -167,13 +185,19 @@ export function Footer() {
               {t('footer.resources')}
             </h3>
             <ul className="space-y-4">
-              {footerLinks.resources.map((link) => (
+              {resourcesLinks.map((link) => (
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
+                    className="relative text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block group"
                   >
                     {t(link.label)}
+                    {link.href.includes('changelog') && hasNewChangelog && (
+                      <span className="absolute -right-3 top-0 flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                    )}
                   </Link>
                 </li>
               ))}
@@ -248,5 +272,4 @@ export function Footer() {
     </footer>
   );
 }
-
 export default Footer;

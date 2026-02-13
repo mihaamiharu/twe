@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestSentryRouteImport } from './routes/test-sentry'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.xml]'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as SplatRouteImport } from './routes/$'
@@ -17,13 +18,15 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as LocaleIndexRouteImport } from './routes/$locale/index'
-import { Route as SitemapXmlRouteImport } from './routes/sitemap.xml'
 import { Route as RobotsTxtRouteImport } from './routes/robots.txt'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
-import { Route as AdminUsersRouteImport } from './routes/admin/users'
+import { Route as ApiOgRouteImport } from './routes/api/og'
 import { Route as AdminTutorialsRouteImport } from './routes/admin/tutorials'
 import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions'
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
+import { Route as AdminNewsletterRouteImport } from './routes/admin/newsletter'
+import { Route as AdminMessagesRouteImport } from './routes/admin/messages'
+import { Route as AdminDebugRouteImport } from './routes/admin/debug'
 import { Route as AdminChallengesRouteImport } from './routes/admin/challenges'
 import { Route as AdminBugsRouteImport } from './routes/admin/bugs'
 import { Route as AdminAchievementsRouteImport } from './routes/admin/achievements'
@@ -35,8 +38,11 @@ import { Route as LocaleLoginRouteImport } from './routes/$locale/login'
 import { Route as LocaleLeaderboardRouteImport } from './routes/$locale/leaderboard'
 import { Route as LocaleForgotPasswordRouteImport } from './routes/$locale/forgot-password'
 import { Route as LocaleContactRouteImport } from './routes/$locale/contact'
+import { Route as LocaleConfirmSubscriptionRouteImport } from './routes/$locale/confirm-subscription'
+import { Route as LocaleChangelogRouteImport } from './routes/$locale/changelog'
 import { Route as LocaleAboutRouteImport } from './routes/$locale/about'
 import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authenticated'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
 import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
 import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
@@ -48,6 +54,11 @@ import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale
 const TestSentryRoute = TestSentryRouteImport.update({
   id: '/test-sentry',
   path: '/test-sentry',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRoute = AdminRouteImport.update({
@@ -85,11 +96,6 @@ const LocaleIndexRoute = LocaleIndexRouteImport.update({
   path: '/',
   getParentRoute: () => LocaleRoute,
 } as any)
-const SitemapXmlRoute = SitemapXmlRouteImport.update({
-  id: '/sitemap/xml',
-  path: '/sitemap/xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const RobotsTxtRoute = RobotsTxtRouteImport.update({
   id: '/robots/txt',
   path: '/robots/txt',
@@ -100,10 +106,10 @@ const DocsApiRoute = DocsApiRouteImport.update({
   path: '/docs/api',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminUsersRoute = AdminUsersRouteImport.update({
-  id: '/users',
-  path: '/users',
-  getParentRoute: () => AdminRoute,
+const ApiOgRoute = ApiOgRouteImport.update({
+  id: '/api/og',
+  path: '/api/og',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminTutorialsRoute = AdminTutorialsRouteImport.update({
   id: '/tutorials',
@@ -118,6 +124,21 @@ const AdminSubmissionsRoute = AdminSubmissionsRouteImport.update({
 const AdminSettingsRoute = AdminSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
+  id: '/newsletter',
+  path: '/newsletter',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/messages',
+  path: '/messages',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDebugRoute = AdminDebugRouteImport.update({
+  id: '/debug',
+  path: '/debug',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminChallengesRoute = AdminChallengesRouteImport.update({
@@ -175,6 +196,17 @@ const LocaleContactRoute = LocaleContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => LocaleRoute,
 } as any)
+const LocaleConfirmSubscriptionRoute =
+  LocaleConfirmSubscriptionRouteImport.update({
+    id: '/confirm-subscription',
+    path: '/confirm-subscription',
+    getParentRoute: () => LocaleRoute,
+  } as any)
+const LocaleChangelogRoute = LocaleChangelogRouteImport.update({
+  id: '/changelog',
+  path: '/changelog',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleAboutRoute = LocaleAboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -183,6 +215,11 @@ const LocaleAboutRoute = LocaleAboutRouteImport.update({
 const LocaleAuthenticatedRoute = LocaleAuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => LocaleRoute,
+} as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const LocaleTutorialsIndexRoute = LocaleTutorialsIndexRouteImport.update({
   id: '/tutorials/',
@@ -200,9 +237,9 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
-  id: '/$userId',
-  path: '/$userId',
-  getParentRoute: () => AdminUsersRoute,
+  id: '/users/$userId',
+  path: '/users/$userId',
+  getParentRoute: () => AdminRoute,
 } as any)
 const LocaleTutorialsSlugRoute = LocaleTutorialsSlugRouteImport.update({
   id: '/tutorials/$slug',
@@ -226,8 +263,11 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleAuthenticatedRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale/about': typeof LocaleAboutRoute
+  '/$locale/changelog': typeof LocaleChangelogRoute
+  '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
@@ -239,13 +279,15 @@ export interface FileRoutesByFullPath {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
+  '/admin/debug': typeof AdminDebugRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
-  '/admin/users': typeof AdminUsersRouteWithChildren
+  '/api/og': typeof ApiOgRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
@@ -256,13 +298,17 @@ export interface FileRoutesByFullPath {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale': typeof LocaleIndexRoute
   '/$locale/about': typeof LocaleAboutRoute
+  '/$locale/changelog': typeof LocaleChangelogRoute
+  '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
@@ -274,13 +320,15 @@ export interface FileRoutesByTo {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
+  '/admin/debug': typeof AdminDebugRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
-  '/admin/users': typeof AdminUsersRouteWithChildren
+  '/api/og': typeof ApiOgRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
@@ -290,6 +338,7 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -297,9 +346,12 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
   '/$locale/about': typeof LocaleAboutRoute
+  '/$locale/changelog': typeof LocaleChangelogRoute
+  '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
@@ -311,13 +363,15 @@ export interface FileRoutesById {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
+  '/admin/debug': typeof AdminDebugRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
   '/admin/submissions': typeof AdminSubmissionsRoute
   '/admin/tutorials': typeof AdminTutorialsRoute
-  '/admin/users': typeof AdminUsersRouteWithChildren
+  '/api/og': typeof ApiOgRoute
   '/docs/api': typeof DocsApiRoute
   '/robots/txt': typeof RobotsTxtRoute
-  '/sitemap/xml': typeof SitemapXmlRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/docs/': typeof DocsIndexRoute
@@ -328,6 +382,7 @@ export interface FileRoutesById {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/$locale/challenges/': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -336,8 +391,11 @@ export interface FileRouteTypes {
     | '/$'
     | '/$locale'
     | '/admin'
+    | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale/about'
+    | '/$locale/changelog'
+    | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
     | '/$locale/leaderboard'
@@ -349,13 +407,15 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/debug'
+    | '/admin/messages'
+    | '/admin/newsletter'
     | '/admin/settings'
     | '/admin/submissions'
     | '/admin/tutorials'
-    | '/admin/users'
+    | '/api/og'
     | '/docs/api'
     | '/robots/txt'
-    | '/sitemap/xml'
     | '/$locale/'
     | '/admin/'
     | '/docs'
@@ -366,13 +426,17 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$locale/challenges'
     | '/$locale/tutorials'
+    | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/$'
+    | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale'
     | '/$locale/about'
+    | '/$locale/changelog'
+    | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
     | '/$locale/leaderboard'
@@ -384,13 +448,15 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/debug'
+    | '/admin/messages'
+    | '/admin/newsletter'
     | '/admin/settings'
     | '/admin/submissions'
     | '/admin/tutorials'
-    | '/admin/users'
+    | '/api/og'
     | '/docs/api'
     | '/robots/txt'
-    | '/sitemap/xml'
     | '/admin'
     | '/docs'
     | '/$locale/profile'
@@ -400,15 +466,19 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$locale/challenges'
     | '/$locale/tutorials'
+    | '/admin/users'
   id:
     | '__root__'
     | '/'
     | '/$'
     | '/$locale'
     | '/admin'
+    | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale/_authenticated'
     | '/$locale/about'
+    | '/$locale/changelog'
+    | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
     | '/$locale/leaderboard'
@@ -420,13 +490,15 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
+    | '/admin/debug'
+    | '/admin/messages'
+    | '/admin/newsletter'
     | '/admin/settings'
     | '/admin/submissions'
     | '/admin/tutorials'
-    | '/admin/users'
+    | '/api/og'
     | '/docs/api'
     | '/robots/txt'
-    | '/sitemap/xml'
     | '/$locale/'
     | '/admin/'
     | '/docs/'
@@ -437,6 +509,7 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/$locale/challenges/'
     | '/$locale/tutorials/'
+    | '/admin/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -444,10 +517,11 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   LocaleRoute: typeof LocaleRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TestSentryRoute: typeof TestSentryRoute
+  ApiOgRoute: typeof ApiOgRoute
   DocsApiRoute: typeof DocsApiRoute
   RobotsTxtRoute: typeof RobotsTxtRoute
-  SitemapXmlRoute: typeof SitemapXmlRoute
   DocsIndexRoute: typeof DocsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -459,6 +533,13 @@ declare module '@tanstack/react-router' {
       path: '/test-sentry'
       fullPath: '/test-sentry'
       preLoaderRoute: typeof TestSentryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -510,13 +591,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleIndexRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/sitemap/xml': {
-      id: '/sitemap/xml'
-      path: '/sitemap/xml'
-      fullPath: '/sitemap/xml'
-      preLoaderRoute: typeof SitemapXmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/robots/txt': {
       id: '/robots/txt'
       path: '/robots/txt'
@@ -531,12 +605,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DocsApiRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/users': {
-      id: '/admin/users'
-      path: '/users'
-      fullPath: '/admin/users'
-      preLoaderRoute: typeof AdminUsersRouteImport
-      parentRoute: typeof AdminRoute
+    '/api/og': {
+      id: '/api/og'
+      path: '/api/og'
+      fullPath: '/api/og'
+      preLoaderRoute: typeof ApiOgRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/tutorials': {
       id: '/admin/tutorials'
@@ -557,6 +631,27 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/admin/settings'
       preLoaderRoute: typeof AdminSettingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/newsletter': {
+      id: '/admin/newsletter'
+      path: '/newsletter'
+      fullPath: '/admin/newsletter'
+      preLoaderRoute: typeof AdminNewsletterRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/debug': {
+      id: '/admin/debug'
+      path: '/debug'
+      fullPath: '/admin/debug'
+      preLoaderRoute: typeof AdminDebugRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/challenges': {
@@ -636,6 +731,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleContactRouteImport
       parentRoute: typeof LocaleRoute
     }
+    '/$locale/confirm-subscription': {
+      id: '/$locale/confirm-subscription'
+      path: '/confirm-subscription'
+      fullPath: '/$locale/confirm-subscription'
+      preLoaderRoute: typeof LocaleConfirmSubscriptionRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/changelog': {
+      id: '/$locale/changelog'
+      path: '/changelog'
+      fullPath: '/$locale/changelog'
+      preLoaderRoute: typeof LocaleChangelogRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/about': {
       id: '/$locale/about'
       path: '/about'
@@ -649,6 +758,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale'
       preLoaderRoute: typeof LocaleAuthenticatedRouteImport
       parentRoute: typeof LocaleRoute
+    }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/$locale/tutorials/': {
       id: '/$locale/tutorials/'
@@ -673,10 +789,10 @@ declare module '@tanstack/react-router' {
     }
     '/admin/users/$userId': {
       id: '/admin/users/$userId'
-      path: '/$userId'
+      path: '/users/$userId'
       fullPath: '/admin/users/$userId'
       preLoaderRoute: typeof AdminUsersUserIdRouteImport
-      parentRoute: typeof AdminUsersRoute
+      parentRoute: typeof AdminRoute
     }
     '/$locale/tutorials/$slug': {
       id: '/$locale/tutorials/$slug'
@@ -716,6 +832,8 @@ const LocaleAuthenticatedRouteWithChildren =
 interface LocaleRouteChildren {
   LocaleAuthenticatedRoute: typeof LocaleAuthenticatedRouteWithChildren
   LocaleAboutRoute: typeof LocaleAboutRoute
+  LocaleChangelogRoute: typeof LocaleChangelogRoute
+  LocaleConfirmSubscriptionRoute: typeof LocaleConfirmSubscriptionRoute
   LocaleContactRoute: typeof LocaleContactRoute
   LocaleForgotPasswordRoute: typeof LocaleForgotPasswordRoute
   LocaleLeaderboardRoute: typeof LocaleLeaderboardRoute
@@ -734,6 +852,8 @@ interface LocaleRouteChildren {
 const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleAuthenticatedRoute: LocaleAuthenticatedRouteWithChildren,
   LocaleAboutRoute: LocaleAboutRoute,
+  LocaleChangelogRoute: LocaleChangelogRoute,
+  LocaleConfirmSubscriptionRoute: LocaleConfirmSubscriptionRoute,
   LocaleContactRoute: LocaleContactRoute,
   LocaleForgotPasswordRoute: LocaleForgotPasswordRoute,
   LocaleLeaderboardRoute: LocaleLeaderboardRoute,
@@ -752,38 +872,34 @@ const LocaleRouteChildren: LocaleRouteChildren = {
 const LocaleRouteWithChildren =
   LocaleRoute._addFileChildren(LocaleRouteChildren)
 
-interface AdminUsersRouteChildren {
-  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
-}
-
-const AdminUsersRouteChildren: AdminUsersRouteChildren = {
-  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
-}
-
-const AdminUsersRouteWithChildren = AdminUsersRoute._addFileChildren(
-  AdminUsersRouteChildren,
-)
-
 interface AdminRouteChildren {
   AdminAchievementsRoute: typeof AdminAchievementsRoute
   AdminBugsRoute: typeof AdminBugsRoute
   AdminChallengesRoute: typeof AdminChallengesRoute
+  AdminDebugRoute: typeof AdminDebugRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminNewsletterRoute: typeof AdminNewsletterRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
   AdminSubmissionsRoute: typeof AdminSubmissionsRoute
   AdminTutorialsRoute: typeof AdminTutorialsRoute
-  AdminUsersRoute: typeof AdminUsersRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminUsersUserIdRoute: typeof AdminUsersUserIdRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAchievementsRoute: AdminAchievementsRoute,
   AdminBugsRoute: AdminBugsRoute,
   AdminChallengesRoute: AdminChallengesRoute,
+  AdminDebugRoute: AdminDebugRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminNewsletterRoute: AdminNewsletterRoute,
   AdminSettingsRoute: AdminSettingsRoute,
   AdminSubmissionsRoute: AdminSubmissionsRoute,
   AdminTutorialsRoute: AdminTutorialsRoute,
-  AdminUsersRoute: AdminUsersRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
+  AdminUsersUserIdRoute: AdminUsersUserIdRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
 }
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
@@ -793,10 +909,11 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   LocaleRoute: LocaleRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TestSentryRoute: TestSentryRoute,
+  ApiOgRoute: ApiOgRoute,
   DocsApiRoute: DocsApiRoute,
   RobotsTxtRoute: RobotsTxtRoute,
-  SitemapXmlRoute: SitemapXmlRoute,
   DocsIndexRoute: DocsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

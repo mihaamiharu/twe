@@ -338,7 +338,27 @@ export async function executePlaywrightCode(
                                     }
                                 }, true);
                                 `
-                : ''
+                : `
+                                window.addEventListener('click', function(e) {
+                                    const link = e.target.closest('a[href]');
+                                    if (link && !link.getAttribute('target')) {
+                                        const href = link.getAttribute('href');
+                                        // Block navigation for relative links or anything that would navigate the frame
+                                        // We allow anchor links (#) if they don't have a path
+                                        if (href && (href.startsWith('/') || href.startsWith('http') || (href.startsWith('#') && href.length > 1))) {
+                                           // Special case for purely local anchors?
+                                           // Actually, let's just block everything that looks like a page navigation
+                                           if (!href.startsWith('#')) {
+                                               e.preventDefault();
+                                           }
+                                        }
+                                    }
+                                }, true);
+
+                                window.addEventListener('submit', function(e) {
+                                    e.preventDefault();
+                                }, true);
+                                `
               }
                               })();
                             </script>

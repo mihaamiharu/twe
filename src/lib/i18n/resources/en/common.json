@@ -85,7 +85,7 @@
     "achievementUnlocked": "Unlocked: {{name}}"
   },
   "footer": {
-    "description": "Master test automation with Ekki's battle-tested guide. Real scenarios, zero friction.",
+    "description": "Build Playwright & JavaScript automation with practical, battle-tested guides. Real scenarios, zero setup.",
     "product": "Product",
     "resources": "Resources",
     "copyright": "© {{year}} TestingWithEkki by Ekki Syam. All rights reserved.",
