@@ -359,14 +359,6 @@ export const completeTutorial = createServerFn({ method: 'POST' })
             .values({
               slug: tutorialContent.slug,
               title: { en: tutorialContent.title, id: tutorialContent.title },
-              description: {
-                en: tutorialContent.description,
-                id: tutorialContent.description,
-              },
-              content: {
-                en: tutorialContent.content,
-                id: tutorialContent.content,
-              },
               order: tutorialContent.order,
               estimatedMinutes: tutorialContent.estimatedMinutes,
               tags: tutorialContent.tags,

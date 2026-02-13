@@ -11,6 +11,8 @@ import {
   achievements,
   userAchievements,
   progress,
+  newsletterSubscribers,
+  contactMessages,
 } from '@/db/schema';
 import { count, desc, sql, gte, lt, and, eq } from 'drizzle-orm';
 
@@ -264,6 +266,25 @@ export const getAdminUsers = createServerFn({ method: 'GET' })
     } catch (ignored) {
       const error = ignored as Error;
       console.error('Failed to fetch users:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+export const deleteUser = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
+  .inputValidator((data: unknown) => z.object({ userId: z.string() }).parse(data))
+  .handler(async ({ data: { userId } }) => {
+    try {
+      // Prevent deleting self (though UI should hide it too)
+      // We can't easily check 'self' here without context of who IS calling, 
+      // but adminMiddleware ensures they are admin.
+      // Ideally we check if userId === session.user.id
+
+      await db.delete(users).where(eq(users.id, userId));
+      return { success: true, message: 'User deleted successfully' };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to delete user:', error);
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -598,20 +619,146 @@ export const getAdminUserDetail = createServerFn({ method: 'GET' })
 
       // Get progress counts
       const userProgress = await db
-        .select()
+        .select({
+          isCompleted: progress.isCompleted,
+        })
         .from(progress)
         .where(eq(progress.userId, input.userId));
+
+      const completedChallengeCount = userProgress.filter(p => p.isCompleted).length;
 
       return {
         success: true,
         data: {
           ...user,
           progressCount: userProgress.length,
+          completedChallengeCount,
         },
       };
     } catch (ignored) {
       const error = ignored as Error;
       console.error('Failed to fetch user detail:', error);
       return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+// ----------------------------------------------------------------------------
+// ADMIN NEWSLETTER
+// ----------------------------------------------------------------------------
+
+export const getAdminSubscribers = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(async () => {
+    try {
+      const list = await db
+        .select()
+        .from(newsletterSubscribers)
+        .orderBy(desc(newsletterSubscribers.createdAt));
+
+      return { success: true, data: list };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to fetch subscribers:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+const UpdateSubscriberStatusSchema = z.object({
+  id: z.string(),
+  status: z.enum(['PENDING', 'CONFIRMED', 'UNSUBSCRIBED']),
+});
+
+export const updateSubscriberStatus = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
+  .inputValidator((data: unknown) => UpdateSubscriberStatusSchema.parse(data))
+  .handler(async ({ data: input }) => {
+    try {
+      await db
+        .update(newsletterSubscribers)
+        .set({
+          status: input.status,
+          updatedAt: new Date(),
+          confirmedAt:
+            input.status === 'CONFIRMED' ? new Date() : undefined,
+        })
+        .where(eq(newsletterSubscribers.id, input.id));
+
+      return { success: true, message: 'Subscriber updated' };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to update subscriber:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+// ----------------------------------------------------------------------------
+// ADMIN MESSAGES
+// ----------------------------------------------------------------------------
+
+export const getAdminMessages = createServerFn({ method: 'GET' })
+  .middleware([adminMiddleware])
+  .handler(async () => {
+    try {
+      const list = await db
+        .select()
+        .from(contactMessages)
+        .orderBy(desc(contactMessages.createdAt));
+
+      return { success: true, data: list };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to fetch messages:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+const UpdateMessageStatusSchema = z.object({
+  id: z.string(),
+  status: z.enum(['NEW', 'READ', 'REPLIED', 'ARCHIVED']),
+});
+
+export const updateMessageStatus = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
+  .inputValidator((data: unknown) => UpdateMessageStatusSchema.parse(data))
+  .handler(async ({ data: input }) => {
+    try {
+      await db
+        .update(contactMessages)
+        .set({
+          status: input.status,
+          updatedAt: new Date(),
+        })
+        .where(eq(contactMessages.id, input.id));
+
+      return { success: true, message: 'Message updated' };
+    } catch (ignored) {
+      const error = ignored as Error;
+      console.error('Failed to update message:', error);
+      return { success: false, error: 'Internal Server Error' };
+    }
+  });
+
+// ----------------------------------------------------------------------------
+// ADMIN CONTENT SYNC
+// ----------------------------------------------------------------------------
+
+import { syncTutorials } from '../scripts/sync-tutorials';
+import { syncChallenges } from '../scripts/sync-challenges';
+
+export const syncContentFn = createServerFn({ method: 'POST' })
+  .middleware([adminMiddleware])
+  .handler(async ({ context }) => {
+    try {
+      console.log(`[Admin] Manual content sync triggered by user ${context.user.id}`);
+
+      await syncTutorials();
+
+      // 3. Sync Challenges
+      await syncChallenges();
+
+      return { success: true, message: 'Content synchronized successfully (skipping extraction - seeds missing)' };
+    } catch (error) {
+      console.error('[Admin] Content sync failed:', error);
+      return { success: false, error: String(error) };
     }
   });

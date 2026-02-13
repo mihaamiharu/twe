@@ -1,0 +1,19 @@
+{
+    "title": "Catatan Perubahan",
+    "subtitle": "Tetap update dengan fitur terbaru dan perbaikan",
+    "types": {
+        "feature": "Fitur Baru",
+        "improvement": "Peningkatan",
+        "fix": "Perbaikan Bug",
+        "content": "Konten Baru"
+    },
+    "entries": [
+        {
+            "date": "2026-02-10",
+            "version": "1.0.0",
+            "type": "feature",
+            "title": "Peluncuran Platform",
+            "description": "Selamat datang di TestingWithEkki! Kami sangat senang meluncurkan platform ini dengan tutorial Playwright yang komprehensif, tantangan koding interaktif, dan papan peringkat global. Mulai perjalanan Anda menjadi ahli otomatisasi pengujian hari ini."
+        }
+    ]
+}

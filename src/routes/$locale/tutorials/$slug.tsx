@@ -42,14 +42,72 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
     const baseUrl = 'https://testingwithekki.com';
     const url = `${baseUrl}/${locale}/tutorials/${slug}`;
 
+    const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))}&type=Tutorial`;
+    const title = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const description = i18n.t('tutorials:page.seo.description');
+
+    // Structured Data
+    const jsonLd = [
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": `${baseUrl}/${locale}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Tutorials",
+            "item": `${baseUrl}/${locale}/tutorials`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": title,
+            "item": url
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": title,
+        "description": description,
+        "image": ogImageUrl,
+        "author": {
+          "@type": "Organization",
+          "name": "TestingWithEkki",
+          "url": baseUrl
+        },
+        "publisher": {
+          "@type": "Organization",
+          "name": "TestingWithEkki",
+          "logo": {
+            "@type": "ImageObject",
+            "url": `${baseUrl}/logo-dark-new.png`
+          }
+        },
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": url
+        }
+      }
+    ];
+
     return {
       meta: [
-        { title: `${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} | TestingWithEkki` },
-        { name: 'description', content: i18n.t('tutorials:page.seo.description') },
-        { property: 'og:title', content: `${slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} | TestingWithEkki` },
-        { property: 'og:description', content: i18n.t('tutorials:page.seo.description') },
+        { title: `${title} | TestingWithEkki` },
+        { name: 'description', content: description },
+        { property: 'og:title', content: `${title} | TestingWithEkki` },
+        { property: 'og:description', content: description },
         { property: 'og:url', content: url },
-        { property: 'og:image', content: `${baseUrl}/twe-banner.png` },
+        { property: 'og:image', content: ogImageUrl },
+        { property: 'twitter:card', content: 'summary_large_image' },
+        { property: 'twitter:image', content: ogImageUrl },
       ],
       links: [
         { rel: 'canonical', href: url },
@@ -57,6 +115,10 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
         { rel: 'alternate', hrefLang: 'id', href: `${baseUrl}/id/tutorials/${slug}` },
         { rel: 'alternate', hrefLang: 'x-default', href: `${baseUrl}/en/tutorials/${slug}` },
       ],
+      scripts: jsonLd.map(data => ({
+        type: 'application/ld+json',
+        children: JSON.stringify(data)
+      }))
     };
   },
 });

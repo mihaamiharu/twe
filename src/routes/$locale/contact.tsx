@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { submitContactMessage } from '@/server/contact.fn';
 
 export const Route = createFileRoute('/$locale/contact')({
     component: ContactPage,
@@ -18,28 +19,29 @@ function ContactPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
 
+    // ... (in component)
+
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setIsSubmitting(true);
 
         const formData = new FormData(event.currentTarget);
+        const name = formData.get('name') as string;
+        const email = formData.get('email') as string;
+        const message = formData.get('message') as string;
 
         try {
-            const response = await fetch("https://formspree.io/f/mpwooodq", {
-                method: "POST",
-                body: formData,
-                headers: {
-                    'Accept': 'application/json'
-                }
+            const response = await submitContactMessage({
+                data: { name, email, message },
             });
 
-            if (response.ok) {
+            if (response.success) {
                 setIsSuccess(true);
-                toast.success(t('contact.form.successTitle'));
+                toast.success(response.message);
             } else {
-                toast.error(t('contact.form.errorTitle'));
+                toast.error(response.error || t('contact.form.errorMessage'));
             }
-        } catch (error) {
+        } catch {
             toast.error(t('contact.form.errorMessage'));
         } finally {
             setIsSubmitting(false);

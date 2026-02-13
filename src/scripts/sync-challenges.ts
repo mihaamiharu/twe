@@ -1,10 +1,13 @@
 import { db } from '../db';
 import { challenges, testCases } from '../db/schema';
 import { eq, inArray } from 'drizzle-orm';
-import { getRawChallengeContent, getChallengeList } from '../server/content.server';
+import { getRawChallengeContent, getChallengeList, clearContentCaches } from '../server/content.server';
 
 export async function syncChallenges() {
     console.log('🔄 Starting challenge sync...');
+
+    // Clear cache to ensure we get fresh file content
+    clearContentCaches();
 
     try {
         // 1. Get all challenges from filesystem
@@ -37,19 +40,10 @@ export async function syncChallenges() {
             const challengeData = {
                 slug: rawContent.slug,
                 title: rawContent.title as any,
-                description: rawContent.description as any,
                 type: rawContent.type,
                 difficulty: rawContent.difficulty,
                 xpReward: rawContent.xpReward,
                 order: rawContent.order,
-                instructions: rawContent.instructions as any,
-                htmlContent: rawContent.htmlContent,
-                files: rawContent.files, // VFS support for multi-page E2E
-                editableFiles: rawContent.editableFiles,
-                preloadModules: rawContent.preloadModules,
-                starterCode: rawContent.starterCode,
-                solution: rawContent.solution,
-                expectedState: rawContent.expectedState,
                 category: rawContent.category,
                 tags: rawContent.tags,
                 isPublished: true,
@@ -125,7 +119,7 @@ export async function syncChallenges() {
 
     } catch (error) {
         console.error('❌ Sync Failed:', error);
-        process.exit(1);
+        throw error;
     }
 }
 

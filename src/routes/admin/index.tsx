@@ -20,6 +20,7 @@ import {
   Layout,
   ArrowUpRight,
   ArrowDownRight,
+  RefreshCw,
 } from 'lucide-react';
 import {
   BarChart,
@@ -531,6 +532,26 @@ function AdminDashboard() {
             <CardContent>
               <div className="flex items-center text-sm text-primary font-medium group-hover:underline">
                 Go to Challenges <ArrowRight className="ml-1 h-4 w-4" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        {/* System Debug */}
+        <Link to="/admin/debug" className="block group">
+          <Card className="h-full transition-colors hover:bg-muted/50 hover:border-primary/50 cursor-pointer">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <RefreshCw className="h-5 w-5 text-gray-500" />
+                System Debug
+              </CardTitle>
+              <CardDescription>
+                Sync content and view system status.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center text-sm text-primary font-medium group-hover:underline">
+                Go to Debug <ArrowRight className="ml-1 h-4 w-4" />
               </div>
             </CardContent>
           </Card>

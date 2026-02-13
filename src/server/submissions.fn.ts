@@ -120,14 +120,10 @@ export const challengeSubmissionHandler = async ({
           .values({
             slug: fsChallenge.slug,
             title: fsChallenge.title as any, // Cast to any for JSONB
-            description: fsChallenge.description as any,
             type: fsChallenge.type,
             difficulty: fsChallenge.difficulty,
             xpReward: fsChallenge.xpReward,
             order: fsChallenge.order,
-            instructions: fsChallenge.instructions as any,
-            htmlContent: fsChallenge.htmlContent,
-            starterCode: fsChallenge.starterCode,
             category: fsChallenge.category,
             tags: fsChallenge.tags,
             isPublished: true, // Auto-publish if found on FS during submission
