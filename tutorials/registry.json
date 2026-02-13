@@ -235,7 +235,6 @@
         "playwright",
         "fixtures",
         "composition",
-        "advanced",
         "intermediate"
       ],
       "relatedChallenges": [],
