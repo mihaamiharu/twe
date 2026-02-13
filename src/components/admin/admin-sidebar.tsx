@@ -11,6 +11,7 @@ import {
     ChevronRight,
     Mail,
     MessageSquare,
+    RefreshCw,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -44,6 +45,7 @@ export function AdminSidebar() {
             label: 'System',
             items: [
                 { label: 'Settings', icon: Settings, href: '/admin/settings' },
+                { label: 'System Debug', icon: RefreshCw, href: '/admin/debug' },
             ],
         },
         {
