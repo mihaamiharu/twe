@@ -19,6 +19,14 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 import type { Challenge } from './types';
@@ -161,6 +169,31 @@ export function PlaygroundHeader({
                             {t('common:navigation.tutorials')}
                         </Button>
                     </Link>
+                )}
+
+                {challenge.hints && challenge.hints.length > 0 && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="font-bold border border-border/50 text-muted-foreground hover:text-foreground h-8 md:h-9 px-2 md:px-3"
+                            >
+                                <Lightbulb className="h-4 w-4 md:mr-2 text-yellow-500" />
+                                <span className="hidden md:inline">{t('challenges:hints.title', 'Hints')}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[300px]">
+                            <DropdownMenuLabel>{t('challenges:hints.availableHints', 'Available Hints')}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {challenge.hints.map((hint, i) => (
+                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 focus:bg-muted">
+                                    <span className="font-bold mr-2 text-muted-foreground">{i + 1}.</span>
+                                    {hint}
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 )}
 
                 {!challenge.isCompleted && (
