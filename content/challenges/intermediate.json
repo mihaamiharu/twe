@@ -193,18 +193,18 @@
                 "en": [
                     "Use getByPlaceholder('Search...') and call .fill('Playwright').",
                     "Use page.keyboard.press('Enter') after filling the input.",
-                    "Verify the result using expect(page.locator('#result')).toHaveText(...)"
+                    "Verify the result using expect(page.getByText('Searching for: Playwright')).toBeVisible();"
                 ],
                 "id": [
                     "Gunakan getByPlaceholder('Search...') dan panggil .fill('Playwright').",
                     "Gunakan page.keyboard.press('Enter') setelah mengisi input.",
-                    "Verifikasi hasilnya menggunakan expect(page.locator('#result')).toHaveText(...)"
+                    "Verifikasi hasilnya menggunakan expect(page.getByText('Searching for: Playwright')).toBeVisible();"
                 ]
             },
-            "htmlContent": "<div class=\"search-box\">\n  <input type=\"text\" id=\"search\" placeholder=\"Search...\" aria-label=\"Search\" />\n  <div id=\"result\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Type term (use getByPlaceholder)\n  // 2. Press Enter\n  // 3. Verify result\n});",
+            "htmlContent": "<div class=\"search-box\">\n  <input type=\"text\" id=\"search\" placeholder=\"Search...\" aria-label=\"Search\" />\n  <div id=\"result\" aria-live=\"polite\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Type term (use getByPlaceholder)\n  // 2. Press Enter\n  // 3. Verify result (use getByText)\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  await page.getByPlaceholder('Search...').fill('Playwright');\n  await page.keyboard.press('Enter');\n  await expect(page.locator('#result')).toHaveText('Searching for: Playwright');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  await page.getByPlaceholder('Search...').fill('Playwright');\n  await page.keyboard.press('Enter');\n  await expect(page.getByText('Searching for: Playwright')).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "keyboard",
@@ -228,8 +228,8 @@
                 "id": "Picu status hover dan fokus elemen."
             },
             "instructions": {
-                "en": "# Hover & Focus\n\n## Concept\nSome elements only become visible or interactable when you hover over them with the mouse or focus on them with the keyboard. Playwright provides `hover()` and `focus()` methods to simulate these states.\n\n## Code Example\n```javascript\nawait page.hover('#menu-item');\nawait page.focus('#input-field');\n```\n\n## Real World Scenario\nNavigation menus often reveal submenus only on hover. You need to simulate this hover action to make the submenu visible before you can click anything inside it.\n\n## Your Task\n1. Hover over the \"Products\" menu (`#menu`).\n2. Verify the dropdown (`#dropdown`) becomes visible using `expect(locator).toBeVisible()`.\n",
-                "id": "# Hover & Fokus\n\n## Concept\nBeberapa elemen hanya menjadi terlihat atau dapat berinteraksi saat Anda mengarahkan mouse (hover) di atasnya atau memfokuskan keyboard pada elemen tersebut. Playwright menyediakan metode `hover()` dan `focus()` untuk mensimulasikan status ini.\n\n## Code Example\n```javascript\nawait page.hover('#menu-item');\nawait page.focus('#input-field');\n```\n\n## Real World Scenario\nMenu navigasi sering kali menampilkan submenu hanya saat di-hover. Anda perlu mensimulasikan tindakan hover ini agar submenu terlihat sebelum Anda dapat mengklik apa pun di dalamnya.\n\n## Tugas Kamu\n1. Hover di atas menu \"Products\" (`#menu`).\n2. Verifikasi dropdown (`#dropdown`) menjadi terlihat menggunakan `expect(locator).toBeVisible()`.\n"
+                "en": "# Hover & Focus\n\n## Concept\nSome elements only become visible or interactable when you hover over them with the mouse or focus on them with the keyboard. Playwright provides `hover()` and `focus()` methods to simulate these states.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nNavigation menus often reveal submenus only on hover. You need to simulate this hover action to make the submenu visible before you can click anything inside it.\n\n## Your Task\n1. Hover over the \"Products\" menu item.\n2. Verify the dropdown becomes visible by checking for the \"Laptop\" link.\n",
+                "id": "# Hover & Fokus\n\n## Concept\nBeberapa elemen hanya menjadi terlihat atau dapat berinteraksi saat Anda mengarahkan mouse (hover) di atasnya atau memfokuskan keyboard pada elemen tersebut. Playwright menyediakan metode `hover()` dan `focus()` untuk mensimulasikan status ini.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nMenu navigasi sering kali menampilkan submenu hanya saat di-hover. Anda perlu mensimulasikan tindakan hover ini agar submenu terlihat sebelum Anda dapat mengklik apa pun di dalamnya.\n\n## Tugas Kamu\n1. Hover di atas menu item \"Products\".\n2. Verifikasi dropdown menjadi terlihat dengan memeriksa link \"Laptop\".\n"
             },
             "hints": {
                 "en": [
@@ -246,7 +246,7 @@
             "htmlContent": "<div class=\"nav\">\n  <div id=\"menu\" onmouseover=\"document.getElementById('dropdown').style.display='block'\" onmouseout=\"document.getElementById('dropdown').style.display='none'\">Products</div>\n  <div id=\"dropdown\" style=\"display:none;\">\n    <a href=\"#\">Laptop</a>\n    <a href=\"#\">Phone</a>\n  </div>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('hover menu', async ({ page }) => {\n  // 1. Hover 'Products' (use getByText)\n  // 2. Verify dropdown visible\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('hover menu', async ({ page }) => {\n  await page.getByText('Products').hover();\n  await expect(page.locator('#dropdown')).toBeVisible();\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('hover menu', async ({ page }) => {\n  await page.getByText('Products').hover();\n  await expect(page.getByRole('link', { name: 'Laptop' })).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "hover",
@@ -277,18 +277,18 @@
                 "en": [
                     "Use getByLabel('Upload Resume') to find the file input.",
                     "Call .setInputFiles('resume.pdf') on the locator.",
-                    "Verify the status text with expect(locator).toHaveText(/resume.pdf/)."
+                    "Verify the status text with expect(page.getByText(/resume.pdf/)).toBeVisible();"
                 ],
                 "id": [
                     "Gunakan getByLabel('Upload Resume') untuk menemukan input file.",
                     "Panggil .setInputFiles('resume.pdf') pada locator tersebut.",
-                    "Verifikasi teks status dengan expect(locator).toHaveText(/resume.pdf/)."
+                    "Verifikasi teks status dengan expect(page.getByText(/resume.pdf/)).toBeVisible();"
                 ]
             },
             "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume:</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div id=\"status\" aria-label=\"Upload Status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.getElementById('status').textContent = 'Selected: ' + file.name;\n  });\n</script>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  // 1. Upload 'resume.pdf' to 'Upload Resume'\n  // 2. Verify status text\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');\n  await expect(page.getByLabel('Upload Status')).toHaveText(/resume.pdf/);\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');\n  await expect(page.getByText(/Selected: resume.pdf/)).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "upload",
@@ -312,8 +312,8 @@
                 "id": "Seret elemen ke zona jatuhkan."
             },
             "instructions": {
-                "en": "# Drag and Drop\n\n## Concept\nPerform complex mouse gestures easily with the `dragTo()` method. Playwright handles the sequence of mouse down, move, and up for you.\n\n## Code Example\n\n```javascript\nawait page.locator('#source').dragTo(page.locator('#target'));\n```\n\n## Real World Scenario\nKanban boards (like Trello/Jira) use drag-and-drop extensively to move tickets between columns. Testing this interaction ensures the \"drop\" event actually fires and updates the UI.\n\n## Your Task\n1. Drag the element with text `'Drag'`.\n2. Drop it into the element with text `'Zone'`.\n3. Verify the zone text (`#zone`) becomes `'Dropped!'` using `expect(locator).toHaveText(...)`.\n",
-                "id": "# Seret dan Lepas\n\n## Concept\nLakukan gerakan mouse yang kompleks dengan mudah menggunakan metode `dragTo()`. Playwright menangani urutan mouse down, move, dan up untuk Anda.\n\n## Code Example\n\n```javascript\nawait page.locator('#source').dragTo(page.locator('#target'));\n```\n\n## Real World Scenario\nPapan Kanban (seperti Trello/Jira) menggunakan seret-dan-lepas secara ekstensif untuk memindahkan tiket antar kolom. Menguji interaksi ini memastikan event \"drop\" benar-benar terjadi dan memperbarui UI.\n\n## Tugas Kamu\n1. Seret elemen dengan teks `'Drag'`.\n2. Jatuhkan ke dalam elemen dengan teks `'Zone'`.\n3. Verifikasi teks zona (`#zone`) menjadi `'Dropped!'` menggunakan `expect(locator).toHaveText(...)`.\n"
+                "en": "# Drag and Drop\n\n## Concept\nPerform complex mouse gestures easily with the `dragTo()` method. Playwright handles the sequence of mouse down, move, and up for you.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nKanban boards (like Trello/Jira) use drag-and-drop extensively to move tickets between columns. Testing this interaction ensures the \"drop\" event actually fires and updates the UI.\n\n## Your Task\n1. Drag the element with text `'Drag'`.\n2. Drop it into the element with text `'Zone'`.\n3. Verify the zone text becomes `'Dropped!'` using `expect(page.getByText('Dropped!')).toBeVisible()`.\n",
+                "id": "# Seret dan Lepas\n\n## Concept\nLakukan gerakan mouse yang kompleks dengan mudah menggunakan metode `dragTo()`. Playwright menangani urutan mouse down, move, dan up untuk Anda.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nPapan Kanban (seperti Trello/Jira) menggunakan seret-dan-lepas secara ekstensif untuk memindahkan tiket antar kolom. Menguji interaksi ini memastikan event \"drop\" benar-benar terjadi dan memperbarui UI.\n\n## Tugas Kamu\n1. Seret elemen dengan teks `'Drag'`.\n2. Jatuhkan ke dalam elemen dengan teks `'Zone'`.\n3. Verifikasi teks zona menjadi `'Dropped!'` menggunakan `expect(page.getByText('Dropped!')).toBeVisible()`.\n"
             },
             "hints": {
                 "en": [
@@ -330,7 +330,7 @@
             "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:50px;height:50px;background:blue;color:white;\">Drag</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed grey;margin-top:20px;\">Zone</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n  \n  item.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', 'dragged'));\n  zone.addEventListener('dragover', e => e.preventDefault());\n  zone.addEventListener('drop', e => {\n    e.preventDefault();\n    zone.textContent = 'Dropped!';\n    zone.style.borderColor = 'green';\n  });\n</script>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  // 1. Drag 'Drag' to 'Zone'\n  // 2. Verify zone text is 'Dropped!'\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  await page.getByText('Drag').dragTo(page.getByText('Zone'));\n  await expect(page.locator('#zone')).toHaveText('Dropped!');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  await page.getByText('Drag').dragTo(page.getByText('Zone'));\n  await expect(page.getByText('Dropped!')).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "drag",
@@ -354,25 +354,25 @@
                 "id": "Pilih elemen di dalam iframe."
             },
             "instructions": {
-                "en": "# Working with Frames\n\n## Concept\nIf content is inside an `<iframe>`, normal locators won't find it! You must first locate the frame using `frameLocator()`, and then use that frame to find elements inside it.\n\n## Code Example\n\n```javascript\n// 1. Locate the frame\nconst frame = page.frameLocator('#my-frame');\n\n// 2. Locate element inside the frame\nawait frame.locator('#btn').click();\n```\n\n## Real World Scenario\nEmbedded payment forms (like Stripe) or third-party widgets often live in iframes for security. You must switch context to interaction with them.\n\n## Your Task\n1. Locate the iframe (`#payment-frame`).\n2. Find the input inside it (`#card-number`).\n3. Fill it with `'1234'`.\n4. Verify the value using `expect(frameLocator.locator(...)).toHaveValue(...)`.\n",
-                "id": "# Bekerja dengan Frame\n\n## Concept\nJika konten berada di dalam `<iframe>`, locator normal tidak akan menemukannya! Anda harus terlebih dahulu menemukan frame tersebut menggunakan `frameLocator()`, lalu menggunakan frame tersebut untuk menemukan elemen di dalamnya.\n\n## Code Example\n\n```javascript\n// 1. Temukan frame\nconst frame = page.frameLocator('#my-frame');\n\n// 2. Temukan elemen di dalam frame\nawait frame.locator('#btn').click();\n```\n\n## Real World Scenario\nFormulir pembayaran tertanam (seperti Stripe) atau widget pihak ketiga sering kali berada dalam iframe demi keamanan. Anda harus mengganti konteks untuk berinteraksi dengan mereka.\n\n## Tugas Kamu\n1. Temukan iframe (`#payment-frame`).\n2. Temukan input di dalamnya (`#card-number`).\n3. Isi dengan `'1234'`.\n4. Verifikasi nilai menggunakan `expect(frameLocator.locator(...)).toHaveValue(...)`.\n"
+                "en": "# Working with Frames\n\n## Concept\nIf content is inside an `<iframe>`, normal locators won't find it! You must first locate the frame using `frameLocator()`, and then use that frame to find elements inside it.\n\n## Code Example\n\n```javascript\n// 1. Locate the frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Locate element by role/text inside the frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nEmbedded payment forms (like Stripe) or third-party widgets often live in iframes for security. You must switch context to interaction with them.\n\n## Your Task\n1. Locate the iframe.\n2. Find the input inside it using `getByPlaceholder('Card Number')`.\n3. Fill it with `'1234'`. \n4. Verify the value using `toHaveValue()`.\n",
+                "id": "# Bekerja dengan Frame\n\n## Concept\nJika konten berada di dalam `<iframe>`, locator normal tidak akan menemukannya! Anda harus terlebih dahulu menemukan frame tersebut menggunakan `frameLocator()`, lalu menggunakan frame tersebut untuk menemukan elemen di dalamnya.\n\n## Code Example\n\n```javascript\n// 1. Temukan frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Temukan elemen berdasarkan role/text di dalam frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nFormulir pembayaran tertanam (seperti Stripe) atau widget pihak ketiga sering kali berada dalam iframe demi keamanan. Anda harus mengganti konteks untuk berinteraksi dengan mereka.\n\n## Tugas Kamu\n1. Temukan iframe.\n2. Temukan input di dalamnya menggunakan `getByPlaceholder('Card Number')`.\n3. Isi dengan `'1234'`.\n4. Verifikasi nilai menggunakan `toHaveValue()`.\n"
             },
             "hints": {
                 "en": [
-                    "Create a frame locator using page.frameLocator('#payment-frame').",
-                    "Use that frame variable to locate '#card-number'.",
+                    "Create a frame locator using page.frameLocator('iframe').",
+                    "Use that frame variable to locate the input by its placeholder.",
                     "Call .fill('1234') on the nested locator."
                 ],
                 "id": [
-                    "Buat frame locator menggunakan page.frameLocator('#payment-frame').",
-                    "Gunakan variabel frame tersebut untuk menemukan '#card-number'.",
+                    "Buat frame locator menggunakan page.frameLocator('iframe').",
+                    "Gunakan variabel frame tersebut untuk menemukan input berdasarkan placeholder-nya.",
                     "Panggil .fill('1234') pada locator yang bersarang tersebut."
                 ]
             },
             "htmlContent": "<iframe id=\"payment-frame\" srcdoc='<input id=\"card-number\" placeholder=\"Card Number\">'></iframe>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  // 1. Frame locator\n  // 2. Fill #card-number\n  // 3. Verify value\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  const frame = page.frameLocator('#payment-frame');\n  await frame.locator('#card-number').fill('1234');\n  await expect(frame.locator('#card-number')).toHaveValue('1234');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  const frame = page.frameLocator('iframe');\n  await frame.getByPlaceholder('Card Number').fill('1234');\n  await expect(frame.getByPlaceholder('Card Number')).toHaveValue('1234');\n});",
             "tags": [
                 "playwright",
                 "frames",
@@ -807,23 +807,23 @@
                 "id": "Tangani banyak elemen secara efisien."
             },
             "instructions": {
-                "en": "# List & Items\n\n## Concept\nHandle multiple elements efficiently using methods like `count()`, `allTextContents()`, or by iterating through them. This is essential for verifying lists, search results, or tables.\n\n## Code Example\n```javascript\nconst count = await page.locator('.item').count();\nconst texts = await page.locator('.item').allTextContents();\n```\n\n## Real World Scenario\nNeed to verify if a search returned exactly 10 results? Or perhaps you need to iterate through every checkbox in a \"Bulk Edit\" table to select them all. Handling lists is essential for data-heavy tests.\n\n## Your Task\n1. Assert the number of list items (`.todo-list li`) is `5` using `expect(locator).toHaveCount(5)`.\n",
-                "id": "# Daftar & Item\n\n## Concept\nTangani banyak elemen secara efisien menggunakan metode seperti `count()`, `allTextContents()`, atau dengan melakukan iterasi. Ini penting untuk memverifikasi daftar, hasil pencarian, atau tabel.\n\n## Code Example\n```javascript\nconst count = await page.locator('.item').count();\nconst texts = await page.locator('.item').allTextContents();\n```\n\n## Real World Scenario\nPerlu memverifikasi apakah pencarian mengembalikan tepat 10 hasil? Atau mungkin Anda perlu mengulang setiap kotak centang dalam tabel \"Edit Massal\" untuk memilih semuanya. Menangani daftar sangat penting untuk pengujian berat data.\n\n## Tugas Kamu\n1. Verifikasi jumlah item dalam daftar (`.todo-list li`) adalah `5` menggunakan `expect(locator).toHaveCount(5)`.\n"
+                "en": "# List & Items\n\n## Concept\nHandle multiple elements efficiently using methods like `getByRole('listitem')` combined with `count()`, `allTextContents()`, or by iterating through them. This is essential for verifying lists, search results, or tables.\n\n## Code Example\n```javascript\nconst count = await page.getByRole('listitem').count();\nconst texts = await page.getByRole('listitem').allTextContents();\n```\n\n## Real World Scenario\nNeed to verify if a search returned exactly 10 results? Or perhaps you need to iterate through every checkbox in a \"Bulk Edit\" table to select them all. Handling lists is essential for data-heavy tests.\n\n## Your Task\n1. Assert the number of list items is `5` using `expect(page.getByRole('listitem')).toHaveCount(5)`.\n",
+                "id": "# Daftar & Item\n\n## Concept\nTangani banyak elemen secara efisien menggunakan metode seperti `getByRole('listitem')` yang digabungkan dengan `count()`, `allTextContents()`, atau dengan melakukan iterasi. Ini penting untuk memverifikasi daftar, hasil pencarian, atau tabel.\n\n## Code Example\n```javascript\nconst count = await page.getByRole('listitem').count();\nconst texts = await page.getByRole('listitem').allTextContents();\n```\n\n## Real World Scenario\nPerlu memverifikasi apakah pencarian mengembalikan tepat 10 hasil? Atau mungkin Anda perlu mengulang setiap kotak centang dalam tabel \"Edit Massal\" untuk memilih semuanya. Menangani daftar sangat penting untuk pengujian berat data.\n\n## Tugas Kamu\n1. Verifikasi jumlah item dalam daftar adalah `5` menggunakan `expect(page.getByRole('listitem')).toHaveCount(5)`.\n"
             },
             "hints": {
                 "en": [
-                    "Use page.locator('.todo-list li') to target all list items.",
+                    "Use page.getByRole('listitem') to target all list items.",
                     "Use the toHaveCount(5) matcher for direct verification."
                 ],
                 "id": [
-                    "Gunakan page.locator('.todo-list li') untuk menargetkan semua item daftar.",
+                    "Gunakan page.getByRole('listitem') untuk menargetkan semua item daftar.",
                     "Gunakan matcher toHaveCount(5) untuk verifikasi langsung."
                 ]
             },
             "htmlContent": "<ul class=\"todo-list\">\n  <li>Buy groceries</li>\n  <li>Walk the dog</li>\n  <li>Write tests</li>\n  <li>Review PRs</li>\n  <li>Deploy app</li>\n</ul>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('count items', async ({ page }) => {\n  // 1. Assert list items count is 5\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('count items', async ({ page }) => {\n  await expect(page.locator('.todo-list li')).toHaveCount(5);\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('count items', async ({ page }) => {\n  await expect(page.getByRole('listitem')).toHaveCount(5);\n});",
             "tags": [
                 "playwright",
                 "locators",
@@ -848,8 +848,8 @@
                 "id": "Gunakan locator lanjutan untuk menemukan produk dalam grid yang kompleks."
             },
             "instructions": {
-                "en": "# Scenario: Dynamic Product Grid\n\n## Concept\nTesting a dynamic product catalog requires combining multiple locator techniques. Use `filter()` to narrow down results by text or other criteria, then use locator chaining to find specific buttons within the filtered cards.\n\n## Real World Scenario\nE-commerce sites often use complex filtering. A user might search for \"Nike Shoes\", filter by \"Size 10\" and \"In Stock\", and then expect to add the specific resulting item to their cart. Tests must replicate this exact flow.\n\n## Your Task\n1. Start by selecting all product cards (`.product`).\n2. **Filter** results to find the card that contains the text \"Pro\".\n3. **Chain another filter** to ensure it also contains the text \"In Stock\" (or looks for the `.in-stock` badge).\n4. Inside that specific product card, click the \"Add to Cart\" button.\n5. Assert the confirmation message (`#msg`) is `'Added Widget Pro!'` using `toHaveText(...)`.\n",
-                "id": "# Skenario: Grid Produk Dinamis\n\n## Concept\nMenguji katalog produk dinamis memerlukan penggabungan beberapa teknik locator. Gunakan `filter()` untuk mempersempit hasil berdasarkan teks atau kriteria lain, lalu gunakan perantaian locator untuk menemukan tombol tertentu di dalam kartu yang difilter.\n\n## Real World Scenario\nSitus e-commerce sering menggunakan pemfilteran yang kompleks. Seorang pengguna mungkin mencari \"Sepatu Nike\", memfilter berdasarkan \"Ukuran 10\" dan \"Tersedia\", lalu berharap dapat menambahkan item hasil spesifik tersebut ke keranjang mereka. Pengujian harus mereplikasi alur yang persis sama ini.\n\n## Tugas Kamu\n1. Mulai dengan memilih semua kartu produk (`.product`).\n2. **Filter** hasil untuk menemukan kartu yang berisi teks \"Pro\".\n3. **Rantai filter lain** untuk memastikan kartu tersebut juga berisi teks \"In Stock\" (atau mencari badge `.in-stock`).\n4. Di dalam kartu produk spesifik tersebut, klik tombol \"Add to Cart\".\n5. Verifikasi pesan konfirmasi (`#msg`) adalah `'Added Widget Pro!'` menggunakan `toHaveText(...)`.\n"
+                "en": "# Scenario: Dynamic Product Grid\n\n## Concept\nTesting a dynamic product catalog requires combining multiple locator techniques. Use `filter()` to narrow down results by text or other criteria, then use locator chaining to find specific buttons within the filtered cards.\n\n## Real World Scenario\nE-commerce sites often use complex filtering. A user might search for \"Nike Shoes\", filter by \"Size 10\" and \"In Stock\", and then expect to add the specific resulting item to their cart. Tests must replicate this exact flow.\n\n## Your Task\n1. Start by selecting all product cards using `getByTestId` with a regex or selecting the `.product` class if needed (for this task, use `page.locator('.product')` as the base).\n2. **Filter** results to find the card that contains the heading text \"Pro\".\n3. **Chain another filter** to ensure it also contains the text \"In Stock\".\n4. Inside that specific product card, click the \"Add to Cart\" button.\n5. Assert the confirmation message is `'Added Widget Pro!'` using `toHaveText(...)` on `getByText`.\n",
+                "id": "# Skenario: Grid Produk Dinamis\n\n## Concept\nMenguji katalog produk dinamis memerlukan penggabungan beberapa teknik locator. Gunakan `filter()` untuk mempersempit hasil berdasarkan teks atau kriteria lain, lalu gunakan perantaian locator untuk menemukan tombol tertentu di dalam kartu yang difilter.\n\n## Real World Scenario\nSitus e-commerce sering menggunakan pemfilteran yang kompleks. Seorang pengguna mungkin mencari \"Sepatu Nike\", memfilter berdasarkan \"Ukuran 10\" dan \"Tersedia\", lalu berharap dapat menambahkan item hasil spesifik tersebut ke keranjang mereka. Pengujian harus mereplikasi alur yang persis sama ini.\n\n## Tugas Kamu\n1. Mulai dengan memilih semua kartu produk menggunakan `getByTestId` dengan regex atau memilih class `.product` jika diperlukan (untuk tugas ini, gunakan `page.locator('.product')` sebagai dasar).\n2. **Filter** hasil untuk menemukan kartu yang berisi teks judul \"Pro\".\n3. **Rantai filter lain** untuk memastikan kartu tersebut juga berisi teks \"In Stock\".\n4. Di dalam kartu produk spesifik tersebut, klik tombol \"Add to Cart\".\n5. Verifikasi pesan konfirmasi adalah `'Added Widget Pro!'` menggunakan `toHaveText(...)` pada `getByText`.\n"
             },
             "hints": {
                 "en": [
@@ -868,7 +868,7 @@
             "htmlContent": "<div class=\"products\">\n  <div class=\"product\" data-testid=\"product-1\">\n    <h3>Widget Basic</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-2\">\n    <h3>Widget Pro</h3>\n    <span class=\"badge in-stock\">In Stock</span>\n    <button onclick=\"document.getElementById('msg').textContent='Added Widget Pro!'\">Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-3\">\n    <h3>Widget Pro Max</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n</div>\n<div id=\"msg\"></div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('dynamic filter', async ({ page }) => {\n  // 1. Find product with 'Pro' and 'In Stock'\n  const productCard = page.locator('.product'); \n  \n  // 2. Click Add to Cart\n\n  // 3. Assert confirmation message\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('dynamic filter', async ({ page }) => {\n  const product = page.locator('.product')\n    .filter({ hasText: 'Pro' })\n    .filter({ hasText: 'In Stock' });\n  \n  await product.getByRole('button', { name: 'Add to Cart' }).click();\n  await expect(page.locator('#msg')).toHaveText('Added Widget Pro!');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('dynamic filter', async ({ page }) => {\n  const product = page.locator('.product')\n    .filter({ has: page.getByRole('heading', { name: 'Pro', exact: true }) })\n    .filter({ hasText: 'In Stock' });\n  \n  await product.getByRole('button', { name: 'Add to Cart' }).click();\n  await expect(page.getByText('Added Widget Pro!')).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "locators",
@@ -893,23 +893,23 @@
                 "id": "Asert status visibilitas elemen."
             },
             "instructions": {
-                "en": "# toBeVisible & toBeHidden\n\n## Concept\nCheck if elements are visible or hidden! Playwright's `toBeVisible()` and `toBeHidden()` assertions are the most common ways to verify the visual state of the UI.\n\n## Code Example\n```javascript\nawait expect(page.locator('#modal')).toBeVisible();\nawait expect(page.locator('.spinner')).toBeHidden();\n```\n\n## Real World Scenario\nBefore interacting with a pop-up, you must ensure it's actually there. Verifying that a \"Success\" box appears after saving, or that a \"Loading\" spinner disappears, is crucial for stable tests.\n\n## Your Task\n1. Click the \"Show Modal\" button.\n2. Assert that `#modal` is visible using `toBeVisible()`.\n",
-                "id": "# toBeVisible & toBeHidden\n\n## Concept\nPeriksa apakah elemen terlihat atau tersembunyi! Asersi `toBeVisible()` dan `toBeHidden()` dari Playwright adalah cara yang paling umum untuk memverifikasi status visual UI.\n\n## Code Example\n```javascript\nawait expect(page.locator('#modal')).toBeVisible();\nawait expect(page.locator('.spinner')).toBeHidden();\n```\n\n## Real World Scenario\nSebelum berinteraksi dengan pop-up, Anda harus memastikan pop-up itu benar-benar ada. Memverifikasi bahwa kotak \"Berhasil\" muncul setelah menyimpan, atau spinner \"Loading\" menghilang, sangat penting untuk pengujian yang stabil.\n\n## Tugas Kamu\n1. Klik tombol \"Show Modal\".\n2. Verifikasi bahwa `#modal` terlihat menggunakan `toBeVisible()`.\n"
+                "en": "# toBeVisible & toBeHidden\n\n## Concept\nCheck if elements are visible or hidden! Playwright's `toBeVisible()` and `toBeHidden()` assertions are the most common ways to verify the visual state of the UI.\n\n## Code Example\n```javascript\nawait expect(page.locator('#modal')).toBeVisible();\nawait expect(page.locator('.spinner')).toBeHidden();\n```\n\n## Real World Scenario\nBefore interacting with a pop-up, you must ensure it's actually there. Verifying that a \"Success\" box appears after saving, or that a \"Loading\" spinner disappears, is crucial for stable tests.\n\n## Your Task\n1. Click the \"Show Modal\" button using `getByRole`.\n2. Assert that the modal is visible using `toBeVisible()` on `getByText('Modal Content')`.\n",
+                "id": "# toBeVisible & toBeHidden\n\n## Concept\nPeriksa apakah elemen terlihat atau tersembunyi! Asersi `toBeVisible()` dan `toBeHidden()` dari Playwright adalah cara yang paling umum untuk memverifikasi status visual UI.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('dialog')).toBeVisible();\nawait expect(page.getByTestId('spinner')).toBeHidden();\n```\n\n## Real World Scenario\nSebelum berinteraksi dengan pop-up, Anda harus memastikan pop-up itu benar-benar ada. Memverifikasi bahwa kotak \"Berhasil\" muncul setelah menyimpan, atau spinner \"Loading\" menghilang, sangat penting untuk pengujian yang stabil.\n\n## Tugas Kamu\n1. Klik tombol \"Show Modal\" menggunakan `getByRole`.\n2. Verifikasi bahwa modal terlihat menggunakan `toBeVisible()` pada `getByText('Modal Content')`.\n"
             },
             "hints": {
                 "en": [
-                    "Target the button using its text 'Show Modal'.",
-                    "After clicking, use expect(page.locator('#modal')).toBeVisible() to verify visibility."
+                    "Target the button using page.getByRole('button', { name: 'Show Modal' }).",
+                    "After clicking, use expect(page.getByText('Modal Content')).toBeVisible() to verify visibility."
                 ],
                 "id": [
-                    "Targetkan tombol menggunakan teksnya 'Show Modal'.",
-                    "Setelah klik, gunakan expect(page.locator('#modal')).toBeVisible() untuk memverifikasi visibilitas."
+                    "Targetkan tombol menggunakan page.getByRole('button', { name: 'Show Modal' }).",
+                    "Setelah klik, gunakan expect(page.getByText('Modal Content')).toBeVisible() untuk memverifikasi visibilitas."
                 ]
             },
             "htmlContent": "<div class=\"app\">\n  <button id=\"show\" onclick=\"document.getElementById('modal').style.display = 'block'\">Show Modal</button>\n  <div id=\"modal\" style=\"display: none;\">Modal Content</div>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check visibility', async ({ page }) => {\n  // 1. Click to show modal\n  // 2. Assert modal '#modal' is visible\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check visibility', async ({ page }) => {\n  await page.getByRole('button', { name: 'Show Modal' }).click();\n  await expect(page.locator('#modal')).toBeVisible();\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check visibility', async ({ page }) => {\n  await page.getByRole('button', { name: 'Show Modal' }).click();\n  await expect(page.getByText('Modal Content')).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "assertions",
@@ -933,23 +933,23 @@
                 "id": "Asert konten teks elemen."
             },
             "instructions": {
-                "en": "# toHaveText\n\n## Concept\nValidate the text content of elements! Use `toHaveText()` for exact matches and `toContainText()` for partial matches. You can also use Regular Expressions for flexible validation.\n\n## Code Example\n```javascript\nawait expect(page.locator('h1')).toHaveText('Welcome');\nawait expect(page.locator('p')).toContainText(/hello/i);\n```\n\n## Real World Scenario\nDid the user actually log in? The easiest check is often verifying the header says \"Welcome, User\" instead of just finding an element. Text assertions confirm the *content* of the page is correct.\n\n## Your Task\n1. Assert the heading (`h1`) has the exact text \"Hello World\".\n2. Assert the paragraph (`p`) contains the text \"Playwright\".\n",
-                "id": "# toHaveText\n\n## Concept\nValidasi konten teks elemen! Gunakan `toHaveText()` untuk pencocokan eksak dan `toContainText()` untuk pencocokan parsial. Anda juga dapat menggunakan Regular Expressions untuk validasi yang fleksibel.\n\n## Code Example\n```javascript\nawait expect(page.locator('h1')).toHaveText('Welcome');\nawait expect(page.locator('p')).toContainText(/hello/i);\n```\n\n## Real World Scenario\nApakah pengguna benar-benar berhasil masuk? Pemeriksaan termudah sering kali memverifikasi header bertuliskan \"Selamat Datang, Pengguna\", bukan hanya menemukan elemen. Asersi teks mengonfirmasi *konten* halaman benar.\n\n## Tugas Kamu\n1. Verifikasi bahwa heading (`h1`) memiliki teks eksak \"Hello World\".\n2. Verifikasi bahwa paragraf (`p`) mengandung teks \"Playwright\".\n"
+                "en": "# toHaveText\n\n## Concept\nValidate the text content of elements! Use `toHaveText()` for exact matches and `toContainText()` for partial matches. You can also use Regular Expressions for flexible validation.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('heading')).toHaveText('Welcome');\nawait expect(page.getByText('hello')).toContainText(/hello/i);\n```\n\n## Real World Scenario\nDid the user actually log in? The easiest check is often verifying the header says \"Welcome, User\" instead of just finding an element. Text assertions confirm the *content* of the page is correct.\n\n## Your Task\n1. Assert the heading (`getByRole('heading')`) has the exact text \"Hello World\".\n2. Assert the paragraph (`p`) contains the text \"Playwright\".\n",
+                "id": "# toHaveText\n\n## Concept\nValidasi konten teks elemen! Gunakan `toHaveText()` untuk pencocokan eksak dan `toContainText()` untuk pencocokan parsial. Anda juga dapat menggunakan Regular Expressions untuk validasi yang fleksibel.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('heading')).toHaveText('Welcome');\nawait expect(page.getByText('hello')).toContainText(/hello/i);\n```\n\n## Real World Scenario\nApakah pengguna benar-benar berhasil masuk? Pemeriksaan termudah sering kali memverifikasi header bertuliskan \"Selamat Datang, Pengguna\", bukan hanya menemukan elemen. Asersi teks mengonfirmasi *konten* halaman benar.\n\n## Tugas Kamu\n1. Verifikasi bahwa heading (`getByRole('heading')`) memiliki teks eksak \"Hello World\".\n2. Verifikasi bahwa paragraf (`p`) mengandung teks \"Playwright\".\n"
             },
             "hints": {
                 "en": [
-                    "Use expect(page.locator('h1')).toHaveText('Hello World') for the first task.",
-                    "Use expect(page.locator('p')).toContainText('Playwright') for the second task."
+                    "Use expect(page.getByRole('heading')).toHaveText('Hello World') for the first task.",
+                    "Use expect(page.getByText(/Welcome to Playwright/)).toBeVisible() as an alternative check."
                 ],
                 "id": [
-                    "Gunakan expect(page.locator('h1')).toHaveText('Hello World') untuk tugas pertama.",
-                    "Gunakan expect(page.locator('p')).toContainText('Playwright') untuk tugas kedua."
+                    "Gunakan expect(page.getByRole('heading')).toHaveText('Hello World') untuk tugas pertama.",
+                    "Gunakan expect(page.getByText(/Welcome to Playwright/)).toBeVisible() sebagai pemeriksaan alternatif."
                 ]
             },
             "htmlContent": "<div class=\"content\">\n  <h1>Hello World</h1>\n  <p>Welcome to Playwright testing framework!</p>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('text assertions', async ({ page }) => {\n  // 1. Assert h1 has text 'Hello World'\n  // 2. Assert p contains 'Playwright'\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('text assertions', async ({ page }) => {\n  await expect(page.locator('h1')).toHaveText('Hello World');\n  await expect(page.locator('p')).toContainText('Playwright');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('text assertions', async ({ page }) => {\n  await expect(page.getByRole('heading')).toHaveText('Hello World');\n  await expect(page.getByText(/Playwright/)).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "assertions",
@@ -973,23 +973,22 @@
                 "id": "Asert nilai input field."
             },
             "instructions": {
-                "en": "# toHaveValue\n\n## Concept\nCheck the current value of input, textarea, and select elements! Unlike `toHaveText()`, which looks at the element's DOM children, `toHaveValue()` looks at the internal state of input fields.\n\n## Code Example\n```javascript\nawait expect(page.locator('#email')).toHaveValue('test@example.com');\nawait expect(page.locator('#search')).toHaveValue('');\n```\n\n## Real World Scenario\nWhen testing an \"Edit Profile\" page, you expect the form to be pre-filled with the user's existing data. Verifying these input values ensures the data fetching logic works correctly.\n\n## Your Task\n1. Fill the email input (`#email`) with `'test@example.com'`.\n2. Assert the input field has the correct value using `toHaveValue()`.\n",
-                "id": "# toHaveValue\n\n## Concept\nPeriksa nilai saat ini dari elemen input, textarea, dan select! Berbeda dengan `toHaveText()`, yang melihat anak-anak DOM elemen tersebut, `toHaveValue()` melihat status internal kolom input.\n\n## Code Example\n```javascript\nawait expect(page.locator('#email')).toHaveValue('test@example.com');\nawait expect(page.locator('#search')).toHaveValue('');\n```\n\n## Real World Scenario\nSaat menguji halaman \"Edit Profil\", Anda mengharapkan formulir diisi sebelumnya dengan data pengguna yang ada. Memverifikasi nilai input ini memastikan logika pengambilan data berfungsi dengan benar.\n\n## Tugas Kamu\n1. Isi input email (`#email`) dengan `'test@example.com'`.\n2. Verifikasi bahwa kolom input tersebut memiliki nilai yang benar menggunakan `toHaveValue()`.\n"
+                "en": "# toHaveValue\n\n## Concept\nCheck the current value of input, textarea, and select elements! Unlike `toHaveText()`, which looks at the element's DOM children, `toHaveValue()` looks at the internal state of input fields.\n\n## Code Example\n```javascript\nawait expect(page.getByLabel('Email')).toHaveValue('test@example.com');\nawait expect(page.getByPlaceholder('Search')).toHaveValue('');\n```\n\n## Real World Scenario\nKetika menguji halaman \"Edit Profil\", Anda mengharapkan formulir diisi sebelumnya dengan data pengguna yang ada. Memverifikasi nilai input ini memastikan logika pengambilan data berfungsi dengan benar.\n\n## Tugas Kamu\n1. Isi input email menggunakan `getByPlaceholder('Enter email')` dengan `'test@example.com'`.\n2. Verifikasi bahwa kolom input tersebut memiliki nilai yang benar menggunakan `toHaveValue()`.\n"
             },
             "hints": {
                 "en": [
                     "Wait for the input to be filled before asserting.",
-                    "Use expect(page.locator('#email')).toHaveValue('test@example.com') for verification."
+                    "Use expect(page.getByPlaceholder('Enter email')).toHaveValue('test@example.com') for verification."
                 ],
                 "id": [
                     "Tunggu hingga input terisi sebelum melakukan asersi.",
-                    "Gunakan expect(page.locator('#email')).toHaveValue('test@example.com') untuk verifikasi."
+                    "Gunakan expect(page.getByPlaceholder('Enter email')).toHaveValue('test@example.com') untuk verifikasi."
                 ]
             },
             "htmlContent": "<form>\n  <input type=\"email\" id=\"email\" placeholder=\"Enter email\" />\n</form>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check input value', async ({ page }) => {\n  // 1. Fill '#email'\n  // 2. Assert value\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check input value', async ({ page }) => {\n  const email = page.locator('#email');\n  await email.fill('test@example.com');\n  await expect(email).toHaveValue('test@example.com');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check input value', async ({ page }) => {\n  const email = page.getByPlaceholder('Enter email');\n  await email.fill('test@example.com');\n  await expect(email).toHaveValue('test@example.com');\n});",
             "tags": [
                 "playwright",
                 "assertions",
@@ -1014,24 +1013,24 @@
             },
             "instructions": {
                 "en": "# State Assertions\n\n## Concept\nCheck the state of interactive elements! Use assertions like `toBeChecked()`, `toBeDisabled()`, `toBeEnabled()`, and `toBeEditable()` to verify UI logic and constraints.\n\n## Code Example\n```javascript\nawait expect(page.locator('#terms')).toBeChecked();\nawait expect(page.locator('#submit')).toBeDisabled();\n```\n\n## Real World Scenario\nA \"Submit\" button is often disabled until all required fields are filled. Verifying this state change (from Disabled to Enabled) is a classic validation test.\n\n## Your Task\n1. Check the terms checkbox (`#terms`).\n2. Assert it is checked using `toBeChecked()`.\n3. Assert the submit button (`#submit`) is enabled using `toBeEnabled()`.\n",
-                "id": "# Asersi Status\n\n## Concept\nPeriksa status elemen interaktif! Gunakan asersi seperti `toBeChecked()`, `toBeDisabled()`, `toBeEnabled()`, dan `toBeEditable()` untuk memverifikasi logika dan batasan UI.\n\n## Code Example\n```javascript\nawait expect(page.locator('#terms')).toBeChecked();\nawait expect(page.locator('#submit')).toBeDisabled();\n```\n\n## Real World Scenario\nTombol \"Kirim\" sering dinonaktifkan hingga semua bidang yang wajib diisi. Memverifikasi perubahan status ini (dari Nonaktif ke Aktif) adalah tes validasi klasik.\n\n## Tugas Kamu\n1. Centang checkbox persetujuan (`#terms`).\n2. Verifikasi bahwa itu sudah dicentang menggunakan `toBeChecked()`.\n3. Verifikasi bahwa tombol submit (`#submit`) sudah aktif menggunakan `toBeEnabled()`.\n"
+                "id": "# Asersi Status\n\n## Concept\nPeriksa status elemen interaktif! Gunakan asersi seperti `toBeChecked()`, `toBeDisabled()`, `toBeEnabled()`, dan `toBeEditable()` untuk memverifikasi logika dan batasan UI.\n\n## Code Example\n```javascript\nawait expect(page.getByLabel('Accept Terms')).toBeChecked();\nawait expect(page.getByRole('button', { name: 'Submit' })).toBeDisabled();\n```\n\n## Real World Scenario\nTombol \"Kirim\" sering dinonaktifkan hingga semua bidang yang wajib diisi. Memverifikasi perubahan status ini (dari Nonaktif ke Aktif) adalah tes validasi klasik.\n\n## Tugas Kamu\n1. Centang checkbox persetujuan menggunakan `getByLabel('Accept Terms')`.\n2. Verifikasi bahwa itu sudah dicentang menggunakan `toBeChecked()`.\n3. Verifikasi bahwa tombol submit menggunakan `getByRole('button', { name: 'Submit' })` sudah aktif menggunakan `toBeEnabled()`.\n"
             },
             "hints": {
                 "en": [
-                    "Use page.check('#terms') to interact with the checkbox.",
-                    "Verify the checkbox with expect(locator).toBeChecked().",
-                    "Verify the button with expect(page.locator('#submit')).toBeEnabled()."
+                    "Use page.getByLabel('Accept Terms').check() to interact with the checkbox.",
+                    "Verify the checkbox with expect(page.getByLabel('Accept Terms')).toBeChecked().",
+                    "Verify the button with expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled()."
                 ],
                 "id": [
-                    "Gunakan page.check('#terms') untuk berinteraksi dengan checkbox.",
-                    "Verifikasi checkbox dengan expect(locator).toBeChecked().",
-                    "Verifikasi tombol dengan expect(page.locator('#submit')).toBeEnabled()."
+                    "Gunakan page.getByLabel('Accept Terms').check() untuk berinteraksi dengan checkbox.",
+                    "Verifikasi checkbox dengan expect(page.getByLabel('Accept Terms')).toBeChecked().",
+                    "Verifikasi tombol dengan expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled()."
                 ]
             },
             "htmlContent": "<form>\n  <label><input type=\"checkbox\" id=\"terms\" /> Accept Terms</label>\n  <button id=\"submit\">Submit</button>\n</form>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check states', async ({ page }) => {\n  // 1. Check checkbox\n  // 2. Assert checked\n  // 3. Assert button enabled\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check states', async ({ page }) => {\n  await page.check('#terms');\n  await expect(page.locator('#terms')).toBeChecked();\n  await expect(page.locator('#submit')).toBeEnabled();\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check states', async ({ page }) => {\n  await page.getByLabel('Accept Terms').check();\n  await expect(page.getByLabel('Accept Terms')).toBeChecked();\n  await expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled();\n});",
             "tags": [
                 "playwright",
                 "assertions",
@@ -1056,22 +1055,22 @@
             },
             "instructions": {
                 "en": "# toHaveAttribute\n\n## Concept\nCheck element attributes! Use `toHaveAttribute()` to verify technical details like image sources, link destinations, or accessibility properties.\n\n## Code Example\n```javascript\nawait expect(page.locator('a')).toHaveAttribute('href', '/home');\nawait expect(page.locator('img')).toHaveAttribute('alt');\n```\n\n## Real World Scenario\nBroken links and missing images are bad. But missing `alt` text is an accessibility violation. Attribute assertions let you verify specific technical details like these.\n\n## Your Task\n1. Assert the link (`a`) has an `href` attribute with value \"/about\".\n2. Assert the image (`img`) has an `alt` attribute (the specific value doesn't matter for this check).\n",
-                "id": "# toHaveAttribute\n\n## Concept\nPeriksa atribut elemen! Gunakan `toHaveAttribute()` untuk memverifikasi detail teknis seperti sumber gambar, tujuan tautan, atau properti aksesibilitas.\n\n## Code Example\n```javascript\nawait expect(page.locator('a')).toHaveAttribute('href', '/home');\nawait expect(page.locator('img')).toHaveAttribute('alt');\n```\n\n## Real World Scenario\nTautan rusak dan gambar yang hilang itu buruk. Tapi teks `alt` yang hilang adalah pelanggaran aksesibilitas. Asersi atribut memungkinkan Anda memverifikasi detail teknis khusus seperti ini.\n\n## Tugas Kamu\n1. Verifikasi bahwa link (`a`) memiliki atribut `href` dengan nilai \"/about\".\n2. Verifikasi bahwa gambar (`img`) memiliki atribut `alt` (nilai spesifiknya tidak menjadi masalah untuk pemeriksaan ini).\n"
+                "id": "# toHaveAttribute\n\n## Concept\nPeriksa atribut elemen! Gunakan `toHaveAttribute()` untuk memverifikasi detail teknis seperti sumber gambar, tujuan tautan, atau properti aksesibilitas.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('link')).toHaveAttribute('href', '/home');\nawait expect(page.getByRole('img')).toHaveAttribute('alt');\n```\n\n## Real World Scenario\nTautan rusak dan gambar yang hilang itu buruk. Tapi teks `alt` yang hilang adalah pelanggaran aksesibilitas. Asersi atribut memungkinkan Anda memverifikasi detail teknis khusus seperti ini.\n\n## Tugas Kamu\n1. Verifikasi bahwa link menggunakan `getByRole('link', { name: 'About Us' })` memiliki atribut `href` dengan nilai \"/about\".\n2. Verifikasi bahwa gambar menggunakan `getByRole('img')` memiliki atribut `alt`.\n"
             },
             "hints": {
                 "en": [
-                    "Use expect(page.locator('a')).toHaveAttribute('href', '/about') for the link.",
-                    "Use expect(page.locator('img')).toHaveAttribute('alt') to check existence."
+                    "Use expect(page.getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/about') for the link.",
+                    "Use expect(page.getByRole('img')).toHaveAttribute('alt') to check existence."
                 ],
                 "id": [
-                    "Gunakan expect(page.locator('a')).toHaveAttribute('href', '/about') untuk tautan tersebut.",
-                    "Gunakan expect(page.locator('img')).toHaveAttribute('alt') untuk memeriksa keberadaan atribut."
+                    "Gunakan expect(page.getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/about') untuk tautan tersebut.",
+                    "Gunakan expect(page.getByRole('img')).toHaveAttribute('alt') untuk memeriksa keberadaan atribut."
                 ]
             },
             "htmlContent": "<nav>\n  <a href=\"/about\">About Us</a>\n  <img src=\"logo.png\" alt=\"Company Logo\" />\n</nav>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check attributes', async ({ page }) => {\n  // 1. Assert href is '/about'\n  // 2. Assert alt exists\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check attributes', async ({ page }) => {\n  await expect(page.locator('a')).toHaveAttribute('href', '/about');\n  await expect(page.locator('img')).toHaveAttribute('alt');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check attributes', async ({ page }) => {\n  await expect(page.getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/about');\n  await expect(page.getByRole('img')).toHaveAttribute('alt');\n});",
             "tags": [
                 "playwright",
                 "assertions",
@@ -1111,7 +1110,7 @@
             "htmlContent": "<ul id=\"list\">\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n  <li>Item 4</li>\n</ul>\n<button id=\"add\" onclick=\"document.getElementById('list').innerHTML += '<li>New Item</li>'\">Add Item</button>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check count', async ({ page }) => {\n  // 1. Assert initial count (4)\n  // 2. Add item\n  // 3. Assert new count (5)\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check count', async ({ page }) => {\n  const items = page.locator('#list li');\n  await expect(items).toHaveCount(4);\n  await page.click('#add');\n  await expect(items).toHaveCount(5);\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('check count', async ({ page }) => {\n  const items = page.getByRole('listitem');\n  await expect(items).toHaveCount(4);\n  await page.getByRole('button', { name: 'Add Item' }).click();\n  await expect(items).toHaveCount(5);\n});",
             "tags": [
                 "playwright",
                 "assertions",
@@ -1151,7 +1150,7 @@
             "htmlContent": "<div class=\"form-status\">\n  <div id=\"name-status\" class=\"valid\">✓ Name valid</div>\n  <div id=\"email-status\" class=\"valid\">✓ Email valid</div>\n  <div id=\"pass-status\" class=\"valid\">✓ Password valid</div>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('soft assertions', async ({ page }) => {\n  // 1. Check #name-status (soft)\n  // 2. Check #email-status (soft)\n  // 3. Check #pass-status (soft)\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('soft assertions', async ({ page }) => {\n  await expect.soft(page.locator('#name-status')).toBeVisible();\n  await expect.soft(page.locator('#email-status')).toBeVisible();\n  await expect.soft(page.locator('#pass-status')).toBeVisible();\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('soft assertions', async ({ page }) => {\n  await expect.soft(page.getByText('✓ Name valid')).toBeVisible();\n  await expect.soft(page.getByText('✓ Email valid')).toBeVisible();\n  await expect.soft(page.getByText('✓ Password valid')).toBeVisible();\n});",
             "tags": [
                 "playwright",
                 "assertions",
@@ -1193,7 +1192,7 @@
             "htmlContent": "<form id=\"signup\">\n  <div class=\"field\">\n    <input type=\"email\" id=\"email\" value=\"bad-email\" />\n    <span class=\"error\" id=\"email-error\">Invalid email format</span>\n  </div>\n  <div class=\"field\">\n    <input type=\"password\" id=\"password\" placeholder=\"8+ characters\" />\n    <span class=\"hint\">Must be 8+ characters</span>\n  </div>\n  <button id=\"submit\" disabled>Register</button>\n</form>\n<script>\n  document.getElementById('email').addEventListener('input', validate);\n  document.getElementById('password').addEventListener('input', validate);\n  function validate() {\n    const email = document.getElementById('email').value;\n    const pass = document.getElementById('password').value;\n    const valid = email.includes('@') && pass.length >= 8;\n    document.getElementById('submit').disabled = !valid;\n    document.getElementById('email-error').style.display = email.includes('@') ? 'none' : 'block';\n  }\n</script>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('form validation', async ({ page }) => {\n  // 1. Assert email error is visible (initially)\n  // 2. Assert password hint is visible\n  // 3. Assert submit button is disabled\n  // 4. Fill valid email & password\n  // 5. Assert submit button is enabled\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('form validation', async ({ page }) => {\n  await expect(page.locator('#email-error')).toBeVisible();\n  await expect(page.locator('.hint')).toBeVisible();\n  await expect(page.locator('#submit')).toBeDisabled();\n  \n  await page.fill('#email', 'test@test.com');\n  await page.fill('#password', 'password123');\n  \n  await expect(page.locator('#submit')).toBeEnabled();\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('form validation', async ({ page }) => {\n  await expect(page.getByText('Invalid email format')).toBeVisible();\n  await expect(page.getByText('Must be 8+ characters')).toBeVisible();\n  await expect(page.getByRole('button', { name: 'Register' })).toBeDisabled();\n  \n  await page.getByPlaceholder('Enter email').fill('test@test.com');\n  await page.getByPlaceholder('8+ characters').fill('password123');\n  \n  await expect(page.getByRole('button', { name: 'Register' })).toBeEnabled();\n});",
             "tags": [
                 "playwright",
                 "assertions",
