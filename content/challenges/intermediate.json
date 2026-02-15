@@ -22,14 +22,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByRole('button', { name: 'Increment' }) to find the button.",
-                    "Call the .click() method three times in a row.",
-                    "Use expect(locator).toHaveText('3') to verify the final value."
+                    "Focus on finding the specific action element that performs the calculation.",
+                    "Use a locator that describes the element's purpose, like getByRole for a button.",
+                    "Call the .click() method exactly as many times as requested, then use a 'toHaveText' assertion."
                 ],
                 "id": [
-                    "Gunakan getByRole('button', { name: 'Increment' }) untuk menemukan tombol.",
-                    "Panggil metode .click() tiga kali berturut-turut.",
-                    "Gunakan expect(locator).toHaveText('3') untuk memverifikasi nilai akhir."
+                    "Fokuslah untuk menemukan elemen aksi spesifik yang melakukan perhitungan.",
+                    "Gunakan locator yang mendeskripsikan tujuan elemen, seperti getByRole untuk tombol.",
+                    "Panggil metode .click() tepat sebanyak yang diminta, lalu gunakan asersi 'toHaveText'."
                 ]
             },
             "htmlContent": "<div class=\"counter\">\n  <span id=\"count\" aria-label=\"Counter Value\">0</span>\n  <button aria-label=\"Increment\" onclick=\"document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1\">+</button>\n</div>",
@@ -64,14 +64,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByLabel('Email') and getByLabel('Password') to target the inputs.",
-                    "Use the .fill() method to enter the text.",
-                    "Verify the value using expect(locator).toHaveValue('qa@test.com')."
+                    "Identify the standard way to enter text that also clears the existing input first.",
+                    "Target the input fields using the text that matches their visual labels on the screen.",
+                    "Use .fill() for 'qa@test.com' and 'secret123', then verify the email with 'toHaveValue'."
                 ],
                 "id": [
-                    "Gunakan getByLabel('Email') dan getByLabel('Password') untuk menargetkan input.",
-                    "Gunakan metode .fill() untuk memasukkan teks.",
-                    "Verifikasi nilainya menggunakan expect(locator).toHaveValue('qa@test.com')."
+                    "Identifikasi cara standar untuk memasukkan teks yang juga menghapus input yang ada terlebih dahulu.",
+                    "Targetkan kolom input menggunakan teks yang sesuai dengan label visual mereka di layar.",
+                    "Gunakan .fill() untuk 'qa@test.com' dan 'secret123', lalu verifikasi email dengan 'toHaveValue'."
                 ]
             },
             "htmlContent": "<form class=\"login-form\">\n  <label for=\"email\">Email</label>\n  <input type=\"email\" id=\"email\" placeholder=\"Email\" />\n  <label for=\"password\">Password</label>\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n  <button type=\"submit\">Login</button>\n</form>",
@@ -107,14 +107,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByLabel('Choose Language') to find the select element.",
-                    "Call .selectOption('javascript') on the locator.",
-                    "Verify the selection with expect(locator).toHaveValue('javascript')."
+                    "Find the form element designed for picking one option from a pre-defined list.",
+                    "Use the 'selectOption' method after locating the dropdown by its associated label.",
+                    "Pass 'javascript' as the value to the selectOption method and check the result with 'toHaveValue'."
                 ],
                 "id": [
-                    "Gunakan getByLabel('Choose Language') untuk menemukan elemen select.",
-                    "Panggil .selectOption('javascript') pada locator tersebut.",
-                    "Verifikasi pilihan dengan expect(locator).toHaveValue('javascript')."
+                    "Temukan elemen formulir yang dirancang untuk memilih satu opsi dari daftar yang telah ditentukan.",
+                    "Gunakan metode 'selectOption' setelah menemukan dropdown berdasarkan label terkaitnya.",
+                    "Masukkan 'javascript' sebagai nilai ke metode selectOption dan cek hasilnya dengan 'toHaveValue'."
                 ]
             },
             "htmlContent": "<form>\n  <label for=\"language\">Choose Language:</label>\n  <select id=\"language\">\n    <option value=\"\">Select...</option>\n    <option value=\"python\">Python</option>\n    <option value=\"javascript\">JavaScript</option>\n    <option value=\"typescript\">TypeScript</option>\n  </select>\n</form>",
@@ -149,14 +149,14 @@
             },
             "hints": {
                 "en": [
-                    "Target the checkbox using getByLabel('Accept Terms & Conditions').",
-                    "Call the .check() method.",
-                    "Use expect(locator).toBeChecked() for verification."
+                    "Look for a way to ensure a selection box is marked without worrying about its current state.",
+                    "Target the label text to find the checkbox, then use the '.check()' method.",
+                    "Verify the success of the operation using the 'toBeChecked' assertion on the same locator."
                 ],
                 "id": [
-                    "Targetkan checkbox menggunakan getByLabel('Accept Terms & Conditions').",
-                    "Panggil metode .check().",
-                    "Gunakan expect(locator).toBeChecked() untuk verifikasi."
+                    "Cari cara untuk memastikan kotak pilihan ditandai tanpa mempedulikan statusnya saat ini.",
+                    "Targetkan teks label untuk menemukan kotak centang, lalu gunakan metode '.check()'.",
+                    "Verifikasi keberhasilan operasi menggunakan asersi 'toBeChecked' pada locator yang sama."
                 ]
             },
             "htmlContent": "<form>\n  <label>\n    <input type=\"checkbox\" id=\"terms\" />\n    Accept Terms & Conditions\n  </label>\n  <label>\n    <input type=\"checkbox\" id=\"newsletter\" />\n    Subscribe to Newsletter\n  </label>\n</form>",
@@ -191,14 +191,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByPlaceholder('Search...') and call .fill('Playwright').",
-                    "Use page.keyboard.press('Enter') after filling the input.",
-                    "Verify the result using expect(page.getByText('Searching for: Playwright')).toBeVisible();"
+                    "Simulate a physical user interaction where a specific key is pressed to submit the form.",
+                    "After filling the search input, use the 'page.keyboard' API to trigger the submission.",
+                    "Call page.keyboard.press('Enter') and assert that the result message is visible on the page."
                 ],
                 "id": [
-                    "Gunakan getByPlaceholder('Search...') dan panggil .fill('Playwright').",
-                    "Gunakan page.keyboard.press('Enter') setelah mengisi input.",
-                    "Verifikasi hasilnya menggunakan expect(page.getByText('Searching for: Playwright')).toBeVisible();"
+                    "Simulasikan interaksi pengguna fisik di mana kunci tertentu ditekan untuk mengirimkan formulir.",
+                    "Setelah mengisi input pencarian, gunakan API 'page.keyboard' untuk memicu pengiriman.",
+                    "Panggil page.keyboard.press('Enter') dan pastikan pesan hasilnya terlihat di halaman."
                 ]
             },
             "htmlContent": "<div class=\"search-box\">\n  <input type=\"text\" id=\"search\" placeholder=\"Search...\" aria-label=\"Search\" />\n  <div id=\"result\" aria-live=\"polite\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
@@ -233,14 +233,14 @@
             },
             "hints": {
                 "en": [
-                    "Use page.getByText('Products') to target the menu.",
-                    "Call .hover() on the locator.",
-                    "Use expect(locator).toBeVisible() on the #dropdown element."
+                    "Some menus only show their items when a user moves their mouse over a specific area.",
+                    "Use the '.hover()' method on the target menu text to reveal the hidden elements.",
+                    "Hover over 'Products', then use expect(...).toBeVisible() to check if the 'Laptop' link appeared."
                 ],
                 "id": [
-                    "Gunakan page.getByText('Products') untuk menargetkan menu.",
-                    "Panggil .hover() pada locator tersebut.",
-                    "Gunakan expect(locator).toBeVisible() pada elemen #dropdown."
+                    "Beberapa menu hanya menampilkan item mereka saat pengguna mengarahkan mouse-nya di atas area tertentu.",
+                    "Gunakan metode '.hover()' pada teks menu target untuk memunculkan elemen yang tersembunyi.",
+                    "Lakukan hover di atas 'Products', lalu gunakan expect(...).toBeVisible() untuk mengecek apakah link 'Laptop' muncul."
                 ]
             },
             "htmlContent": "<div class=\"nav\">\n  <div id=\"menu\" onmouseover=\"document.getElementById('dropdown').style.display='block'\" onmouseout=\"document.getElementById('dropdown').style.display='none'\">Products</div>\n  <div id=\"dropdown\" style=\"display:none;\">\n    <a href=\"#\">Laptop</a>\n    <a href=\"#\">Phone</a>\n  </div>\n</div>",
@@ -275,14 +275,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByLabel('Upload Resume') to find the file input.",
-                    "Call .setInputFiles('resume.pdf') on the locator.",
-                    "Verify the status text with expect(page.getByText(/resume.pdf/)).toBeVisible();"
+                    "Think about how Playwright handles file selection without needing to open a file picker window.",
+                    "Use the '.setInputFiles()' method and provide the exact filename requested in the task.",
+                    "Call setInputFiles('resume.pdf') on the file input locator and verify the status text reflects this choice."
                 ],
                 "id": [
-                    "Gunakan getByLabel('Upload Resume') untuk menemukan input file.",
-                    "Panggil .setInputFiles('resume.pdf') pada locator tersebut.",
-                    "Verifikasi teks status dengan expect(page.getByText(/resume.pdf/)).toBeVisible();"
+                    "Pikirkan tentang bagaimana Playwright menangani pemilihan file tanpa perlu membuka jendela pemilih file.",
+                    "Gunakan metode '.setInputFiles()' dan berikan nama file yang tepat sesuai permintaan dalam tugas.",
+                    "Panggil setInputFiles('resume.pdf') pada locator input file dan verifikasi teks status mencerminkan pilihan ini."
                 ]
             },
             "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume:</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div id=\"status\" aria-label=\"Upload Status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.getElementById('status').textContent = 'Selected: ' + file.name;\n  });\n</script>",
@@ -317,14 +317,14 @@
             },
             "hints": {
                 "en": [
-                    "Target the source element using getByText('Drag').",
-                    "Target the destination using getByText('Zone').",
-                    "Call source.dragTo(target)."
+                    "Imagine the sequence of picking up an item and placing it exactly where it needs to go.",
+                    "Use the '.dragTo()' method which automatically handles the complex mouse movements for you.",
+                    "Call getByText('Drag').dragTo(page.getByText('Zone')) and verify that the 'Dropped!' message is visible."
                 ],
                 "id": [
-                    "Targetkan elemen sumber menggunakan getByText('Drag').",
-                    "Targetkan tujuan menggunakan getByText('Zone').",
-                    "Panggil source.dragTo(target)."
+                    "Bayangkan urutan mengambil item dan meletakkannya tepat di tempat yang seharusnya.",
+                    "Gunakan metode '.dragTo()' yang secara otomatis menangani gerakan mouse yang kompleks untuk Kamu.",
+                    "Panggil getByText('Drag').dragTo(page.getByText('Zone')) dan pastikan pesan 'Dropped!' terlihat."
                 ]
             },
             "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:50px;height:50px;background:blue;color:white;\">Drag</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed grey;margin-top:20px;\">Zone</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n  \n  item.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', 'dragged'));\n  zone.addEventListener('dragover', e => e.preventDefault());\n  zone.addEventListener('drop', e => {\n    e.preventDefault();\n    zone.textContent = 'Dropped!';\n    zone.style.borderColor = 'green';\n  });\n</script>",
@@ -359,14 +359,14 @@
             },
             "hints": {
                 "en": [
-                    "Create a frame locator using page.frameLocator('iframe').",
-                    "Use that frame variable to locate the input by its placeholder.",
-                    "Call .fill('1234') on the nested locator."
+                    "Elements inside a sub-page (iframe) are isolated from the main page's locator searches.",
+                    "Use 'frameLocator()' to gain access to the iframe's content before trying to find the input inside it.",
+                    "Create a 'const frame = page.frameLocator('iframe');' then use frame.getByPlaceholder(...) to fill and verify."
                 ],
                 "id": [
-                    "Buat frame locator menggunakan page.frameLocator('iframe').",
-                    "Gunakan variabel frame tersebut untuk menemukan input berdasarkan placeholder-nya.",
-                    "Panggil .fill('1234') pada locator yang bersarang tersebut."
+                    "Elemen di dalam sub-halaman (iframe) terisolasi dari pencarian locator halaman utama.",
+                    "Gunakan 'frameLocator()' untuk mendapatkan akses ke konten iframe sebelum mencoba menemukan input di dalamnya.",
+                    "Buat 'const frame = page.frameLocator('iframe');' lalu gunakan frame.getByPlaceholder(...) untuk mengisi dan memverifikasi."
                 ]
             },
             "htmlContent": "<iframe id=\"payment-frame\" srcdoc='<input id=\"card-number\" placeholder=\"Card Number\">'></iframe>",
@@ -401,14 +401,14 @@
             },
             "hints": {
                 "en": [
-                    "Use page.locator('.task-row').filter({ hasText: 'Project X' }) to find the row.",
-                    "Use the row locator to find the button with getByRole('button', { name: 'Complete' }).",
-                    "Assert on the status element inside the same row."
+                    "Find a specific row by a unique piece of text it contains, then look for a button within just that row.",
+                    "Use the '.filter({ hasText: ... })' method to isolate the correct row from all other rows.",
+                    "Locate the row with 'Project X', click the 'Complete' button inside it, and verify its local status text."
                 ],
                 "id": [
-                    "Gunakan page.locator('.task-row').filter({ hasText: 'Project X' }) untuk menemukan baris.",
-                    "Gunakan locator baris tersebut untuk menemukan tombol dengan getByRole('button', { name: 'Complete' }).",
-                    "Lakukan assert pada elemen status di dalam baris yang sama."
+                    "Temukan baris spesifik berdasarkan teks unik yang dikandungnya, lalu cari tombol hanya di dalam baris tersebut.",
+                    "Gunakan metode '.filter({ hasText: ... })' untuk memisahkan baris yang benar dari semua baris lainnya.",
+                    "Temukan baris dengan 'Project X', klik tombol 'Complete' di dalamnya, dan verifikasi teks status lokalnya."
                 ]
             },
             "htmlContent": "<div class=\"app\">\n  <div class=\"task-row\">\n    <span class=\"name\">Project X</span>\n    <span class=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n  <div class=\"task-row\">\n    <span class=\"name\">Project Y</span>\n    <span class=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n</div>",
@@ -443,14 +443,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByRole('button', { name: 'Add to Cart' }) to start.",
-                    "Use getByLabel('Quantity') to find the number input.",
-                    "Final assertion: expect(page.locator('#confirmation')).toContainText('3 items (Express)')"
+                    "Chain together a series of realistic user steps: adding to cart, updating numbers, and checking out.",
+                    "Prioritize using accessibility-first locators like getByRole and getByLabel for every step of the flow.",
+                    "Add to cart, set Quantity to '3', check Express Shipping, and click Checkout. Assert the confirmation message."
                 ],
                 "id": [
-                    "Gunakan getByRole('button', { name: 'Add to Cart' }) untuk memulai.",
-                    "Gunakan getByLabel('Quantity') untuk menemukan input angka.",
-                    "Assertion akhir: expect(page.locator('#confirmation')).toContainText('3 items (Express)')"
+                    "Rangkai serangkaian langkah pengguna yang realistis: menambahkan ke keranjang, memperbarui angka, dan checkout.",
+                    "Prioritaskan penggunaan locator accessibility-first seperti getByRole dan getByLabel untuk setiap langkah alur.",
+                    "Tambahkan ke keranjang, set Quantity ke '3', centang Express Shipping, dan klik Checkout. Lakukan asersi pesan konfirmasi."
                 ]
             },
             "htmlContent": "<div class=\"shop\">\n  <div class=\"product\">\n    <h3>Widget Pro</h3>\n    <button id=\"add-btn\" onclick=\"addToCart()\">Add to Cart</button>\n  </div>\n  <div class=\"cart\" style=\"display:none;\">\n    <label for=\"qty\">Quantity</label>\n    <input type=\"number\" id=\"qty\" value=\"1\" />\n    <label><input type=\"checkbox\" id=\"express\" /> Express Shipping</label>\n    <button id=\"checkout-btn\" onclick=\"checkout()\">Checkout</button>\n  </div>\n  <div id=\"confirmation\" style=\"display:none;\"></div>\n</div>\n<script>\n  function addToCart() {\n    document.querySelector('.cart').style.display = 'block';\n    document.getElementById('add-btn').textContent = 'Added!';\n  }\n  function checkout() {\n    const qty = document.getElementById('qty').value;\n    const express = document.getElementById('express').checked;\n    document.getElementById('confirmation').style.display = 'block';\n    document.getElementById('confirmation').textContent = \n      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');\n  }\n</script>",
@@ -486,14 +486,14 @@
             },
             "hints": {
                 "en": [
-                    "Use page.locator('h1') to target the heading.",
-                    "Locators in Playwright auto-wait for the element to appear.",
-                    "Use the toHaveText() matcher for final verification."
+                    "Every automation test starts with telling the machine exactly which part of the screen to focus on.",
+                    "Use the '.locator()' method with a standard CSS selector (like a tag name or class) to find your target.",
+                    "Use page.locator('h1') and verify that it contains the expected 'Welcome' text."
                 ],
                 "id": [
-                    "Gunakan page.locator('h1') untuk menargetkan heading.",
-                    "Locator di Playwright otomatis menunggu elemen muncul.",
-                    "Gunakan matcher toHaveText() untuk verifikasi akhir."
+                    "Setiap tes otomatisasi dimulai dengan memberi tahu mesin bagian mana dari layar yang harus difokuskan.",
+                    "Gunakan metode '.locator()' dengan CSS selector standar (seperti nama tag atau class) untuk menemukan target Kamu.",
+                    "Gunakan page.locator('h1') dan verifikasi bahwa itu berisi teks 'Welcome' yang diharapkan."
                 ]
             },
             "htmlContent": "<div class=\"welcome-page\">\n  <h1>Welcome to Playwright</h1>\n  <p>The best end-to-end testing framework.</p>\n  <button id=\"start-btn\">Get Started</button>\n</div>",
@@ -529,12 +529,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByRole('button', { name: 'Sign Up' }) to find the button.",
-                    "Verify the result with expect(page.locator('#result')).toHaveText('Signed up!')"
+                    "Think about how a user looks for a 'Button' or a 'Heading' rather than a technical ID or class name.",
+                    "Use 'getByRole' to identify elements by their functional purpose and the text labels they display.",
+                    "getByRole('button', { name: 'Sign Up' }) is the most robust way to find and click this specific button."
                 ],
                 "id": [
-                    "Gunakan getByRole('button', { name: 'Sign Up' }) untuk menemukan tombol.",
-                    "Verifikasi hasilnya dengan expect(page.locator('#result')).toHaveText('Signed up!')"
+                    "Pikirkan tentang bagaimana pengguna mencari 'Button' atau 'Heading' daripada ID teknis atau nama class.",
+                    "Gunakan 'getByRole' untuk mengidentifikasi elemen berdasarkan tujuan fungsionalnya dan label teks yang mereka tampilkan.",
+                    "getByRole('button', { name: 'Sign Up' }) adalah cara paling tangguh untuk menemukan dan mengklik tombol spesifik ini."
                 ]
             },
             "htmlContent": "<div class=\"signup\">\n  <h1>Join Us</h1>\n  <button onclick=\"document.getElementById('result').textContent = 'Signed up!'\">Sign Up</button>\n  <div id=\"result\"></div>\n</div>",
@@ -569,12 +571,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByText('Click me') - by default it matches substrings.",
-                    "You don't need a tag name if the text is unique enough."
+                    "Sometimes the simplest way to find something is just by looking for the words written right on it.",
+                    "Use 'getByText' to find elements that contain a specific string or match a partial text pattern.",
+                    "getByText('Click me') will find the target element even if it's only a partial match of the full text."
                 ],
                 "id": [
-                    "Gunakan getByText('Click me') - secara default ini mencocokkan substring.",
-                    "Anda tidak memerlukan nama tag jika teksnya sudah cukup unik."
+                    "Terkadang cara termudah untuk menemukan sesuatu adalah dengan mencari kata-kata yang tertulis tepat di atasnya.",
+                    "Gunakan 'getByText' untuk menemukan elemen yang berisi string tertentu atau cocok dengan pola teks sebagian.",
+                    "getByText('Click me') akan menemukan elemen target meskipun itu hanya kecocokan sebagian dari teks lengkapnya."
                 ]
             },
             "htmlContent": "<div class=\"demo\">\n  <span class=\"clickable\" onclick=\"document.getElementById('output').textContent = 'Clicked!'\">Click me to continue</span>\n  <div id=\"output\"></div>\n</div>",
@@ -609,12 +613,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByLabel('Username') and .fill('testuser').",
-                    "The label test must match exactly by default."
+                    "Find input elements by the text of their associated visual labels.",
+                    "Use the 'getByLabel' locator which is more resilient than searching by ID or name.",
+                    "Call getByLabel('Username').fill('testuser') and then verify its value with the 'toHaveValue' assertion."
                 ],
                 "id": [
-                    "Gunakan getByLabel('Username') dan .fill('testuser').",
-                    "Teks label harus cocok secara eksak secara default."
+                    "Temukan elemen input berdasarkan teks label visual terkaitnya.",
+                    "Gunakan locator 'getByLabel' yang lebih tangguh daripada mencari berdasarkan ID atau nama.",
+                    "Panggil getByLabel('Username').fill('testuser') lalu verifikasi nilainya dengan asersi 'toHaveValue'."
                 ]
             },
             "htmlContent": "<form>\n  <label for=\"user\">Username</label>\n  <input type=\"text\" id=\"user\" />\n  \n  <label for=\"pass\">Password</label>\n  <input type=\"password\" id=\"pass\" />\n</form>",
@@ -650,14 +656,14 @@
             },
             "hints": {
                 "en": [
-                    "Use getByPlaceholder('Search...') to target the input.",
-                    "Call .fill('Playwright testing') on the locator.",
-                    "Verify the value using expect(locator).toHaveValue(...)"
+                    "Locate fields by the temporary hint text that appears inside them before you start typing.",
+                    "Use the 'getByPlaceholder' method to find the search input based on its display text.",
+                    "Fill 'Search...' with 'Playwright testing' and use 'toHaveValue' to ensure it was entered correctly."
                 ],
                 "id": [
-                    "Gunakan getByPlaceholder('Search...') untuk menargetkan input.",
-                    "Panggil .fill('Playwright testing') pada locator tersebut.",
-                    "Verifikasi nilainya menggunakan expect(locator).toHaveValue(...)"
+                    "Temukan kolom berdasarkan teks petunjuk sementara yang muncul di dalamnya sebelum Kamu mulai mengetik.",
+                    "Gunakan metode 'getByPlaceholder' untuk menemukan input pencarian berdasarkan teks tampilannya.",
+                    "Isi 'Search...' dengan 'Playwright testing' dan gunakan 'toHaveValue' untuk memastikan data dimasukkan dengan benar."
                 ]
             },
             "htmlContent": "<div class=\"search-bar\">\n  <input type=\"text\" placeholder=\"Search...\" />\n</div>",
@@ -692,12 +698,14 @@
             },
             "hints": {
                 "en": [
-                    "Use page.getByTestId('add-to-cart') to find the button.",
-                    "Verify the counter using expect(page.locator('#cart-count')).toHaveText('1')"
+                    "Use a developer-defined ID that is hidden from users but perfect for stable automation.",
+                    "Target the element using the 'getByTestId' method, which typically looks for 'data-testid' attributes.",
+                    "Locate the button with 'add-to-cart', click it, and verify the counter text with 'toHaveText'."
                 ],
                 "id": [
-                    "Gunakan page.getByTestId('add-to-cart') untuk menemukan tombol.",
-                    "Verifikasi counter menggunakan expect(page.locator('#cart-count')).toHaveText('1')"
+                    "Gunakan ID yang ditentukan pengembang yang tersembunyi dari pengguna tetapi sempurna untuk otomatisasi yang stabil.",
+                    "Targetkan elemen menggunakan metode 'getByTestId', yang biasanya mencari atribut 'data-testid'.",
+                    "Temukan tombol dengan 'add-to-cart', klik tombolnya, dan verifikasi teks counternya dengan 'toHaveText'."
                 ]
             },
             "htmlContent": "<div class=\"product\">\n  <h3>Widget Pro</h3>\n  <button data-testid=\"add-to-cart\" onclick=\"document.getElementById('cart-count').textContent = '1'\">Add to Cart</button>\n  <span id=\"cart-count\">0</span>\n</div>",
@@ -732,12 +740,14 @@
             },
             "hints": {
                 "en": [
-                    "Remember that nth() is 0-indexed, so second item is nth(1).",
-                    "Use page.locator('.menu li').nth(1) to target the item."
+                    "Select multiple elements in sequence to drill down into a specific part of the page structure.",
+                    "Combine locators or use methods like '.nth()' to pick a particular item from a list.",
+                    "Use page.locator('.menu li').nth(1) to find the 'Products' item and check its text content."
                 ],
                 "id": [
-                    "Ingat bahwa nth() menggunakan indeks mulai dari 0, jadi item kedua adalah nth(1).",
-                    "Gunakan page.locator('.menu li').nth(1) untuk menargetkan item tersebut."
+                    "Pilih beberapa elemen secara berurutan untuk mendalami bagian tertentu dari struktur halaman.",
+                    "Gabungkan locator atau gunakan metode seperti '.nth()' untuk memilih item tertentu dari daftar.",
+                    "Gunakan page.locator('.menu li').nth(1) untuk menemukan item 'Products' dan cek konten teksnya."
                 ]
             },
             "htmlContent": "<ul class=\"menu\">\n  <li>Home</li>\n  <li>Products</li>\n  <li>About</li>\n  <li>Contact</li>\n</ul>",
@@ -772,12 +782,14 @@
             },
             "hints": {
                 "en": [
-                    "Use page.frameLocator('#widget') to get the frame handle.",
-                    "Use the frame handle to locate the 'button' and click it."
+                    "When dealing with content in an iframe, you must first switch your focus to that specific internal frame.",
+                    "Use 'frameLocator()' to get a handle on the iframe, then you can find elements inside it normally.",
+                    "Define 'const frame = page.frameLocator('#widget');' then call frame.locator('button').click()."
                 ],
                 "id": [
-                    "Gunakan page.frameLocator('#widget') untuk mendapatkan handle frame.",
-                    "Gunakan handle frame tersebut untuk menemukan 'button' dan klik tombolnya."
+                    "Saat berurusan dengan konten dalam iframe, Kamu harus terlebih dahulu mengalihkan fokus ke frame internal spesifik tersebut.",
+                    "Gunakan 'frameLocator()' untuk mendapatkan handle pada iframe, lalu Kamu dapat menemukan elemen di dalamnya secara normal.",
+                    "Definisikan 'const frame = page.frameLocator('#widget');' lalu panggil frame.locator('button').click()."
                 ]
             },
             "htmlContent": "<div class=\"container\">\n  <iframe id=\"widget\" srcdoc=\"<button onclick='this.parentNode.innerHTML=&quot;Button clicked!&quot;'>Click Inside</button>\"></iframe>\n</div>",
@@ -812,12 +824,14 @@
             },
             "hints": {
                 "en": [
-                    "Use page.getByRole('listitem') to target all list items.",
-                    "Use the toHaveCount(5) matcher for direct verification."
+                    "Handle groups of similar elements (like items in a list) using specialized role-based locators.",
+                    "Use 'getByRole('listitem')' to find all list entries and check how many of them exist.",
+                    "Use expect(...).toHaveCount(5) on the listitem locator to verify the list size in one step."
                 ],
                 "id": [
-                    "Gunakan page.getByRole('listitem') untuk menargetkan semua item daftar.",
-                    "Gunakan matcher toHaveCount(5) untuk verifikasi langsung."
+                    "Tangani grup elemen serupa (seperti item dalam daftar) menggunakan locator berbasis peran (role) yang khusus.",
+                    "Gunakan 'getByRole('listitem')' untuk menemukan semua entri daftar dan cek berapa banyak yang ada.",
+                    "Gunakan expect(...).toHaveCount(5) pada locator listitem untuk memverifikasi ukuran daftar dalam satu langkah."
                 ]
             },
             "htmlContent": "<ul class=\"todo-list\">\n  <li>Buy groceries</li>\n  <li>Walk the dog</li>\n  <li>Write tests</li>\n  <li>Review PRs</li>\n  <li>Deploy app</li>\n</ul>",
@@ -853,16 +867,14 @@
             },
             "hints": {
                 "en": [
-                    "Store all product cards in a locator: page.locator('.product')",
-                    "Use .filter({ hasText: 'Pro' }) to find professional models.",
-                    "Chain another .filter({ hasText: 'In Stock' }) to ensure availability.",
-                    "Use .getByRole('button', { name: 'Add to Cart' }) inside the filtered result."
+                    "Combine several filtering techniques to find one specific product card in a complex grid.",
+                    "Use '.filter()' with different criteria (text content or child elements) to narrow down your search.",
+                    "Filter by 'Pro', then filter by 'In Stock', then click the button inside that specific result."
                 ],
                 "id": [
-                    "Simpan semua kartu produk dalam locator: page.locator('.product')",
-                    "Gunakan .filter({ hasText: 'Pro' }) untuk menemukan model profesional.",
-                    "Rantai dengan .filter({ hasText: 'In Stock' }) lainnya untuk memastikan ketersediaan.",
-                    "Gunakan .getByRole('button', { name: 'Add to Cart' }) di dalam hasil yang difilter."
+                    "Gabungkan beberapa teknik pemfilteran untuk menemukan satu kartu produk spesifik dalam grid yang kompleks.",
+                    "Gunakan '.filter()' dengan kriteria yang berbeda (konten teks atau elemen anak) untuk mempersempit pencarian Kamu.",
+                    "Filter berdasarkan 'Pro', lalu filter berdasarkan 'In Stock', lalu klik tombol di dalam hasil spesifik tersebut."
                 ]
             },
             "htmlContent": "<div class=\"products\">\n  <div class=\"product\" data-testid=\"product-1\">\n    <h3>Widget Basic</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-2\">\n    <h3>Widget Pro</h3>\n    <span class=\"badge in-stock\">In Stock</span>\n    <button onclick=\"document.getElementById('msg').textContent='Added Widget Pro!'\">Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-3\">\n    <h3>Widget Pro Max</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n</div>\n<div id=\"msg\"></div>",
@@ -898,12 +910,14 @@
             },
             "hints": {
                 "en": [
-                    "Target the button using page.getByRole('button', { name: 'Show Modal' }).",
-                    "After clicking, use expect(page.getByText('Modal Content')).toBeVisible() to verify visibility."
+                    "Verify whether an element is visually present on the screen or hidden from sight.",
+                    "Use the 'toBeVisible()' and 'toBeHidden()' assertions which handle the timing and visibility checks for you.",
+                    "Click the 'Show Modal' button, then use expect(page.getByText('Modal Content')).toBeVisible() to verify it appeared."
                 ],
                 "id": [
-                    "Targetkan tombol menggunakan page.getByRole('button', { name: 'Show Modal' }).",
-                    "Setelah klik, gunakan expect(page.getByText('Modal Content')).toBeVisible() untuk memverifikasi visibilitas."
+                    "Verifikasi apakah suatu elemen muncul secara visual di layar atau tersembunyi dari pandangan.",
+                    "Gunakan asersi 'toBeVisible()' dan 'toBeHidden()' yang menangani pengecekan waktu dan visibilitas untuk Kamu.",
+                    "Klik tombol 'Show Modal', lalu gunakan expect(page.getByText('Modal Content')).toBeVisible() untuk memverifikasi kemunculannya."
                 ]
             },
             "htmlContent": "<div class=\"app\">\n  <button id=\"show\" onclick=\"document.getElementById('modal').style.display = 'block'\">Show Modal</button>\n  <div id=\"modal\" style=\"display: none;\">Modal Content</div>\n</div>",
@@ -938,12 +952,14 @@
             },
             "hints": {
                 "en": [
-                    "Use expect(page.getByRole('heading')).toHaveText('Hello World') for the first task.",
-                    "Use expect(page.getByText(/Welcome to Playwright/)).toBeVisible() as an alternative check."
+                    "Ensure that the text displayed on the page matches exactly what you expect.",
+                    "Use 'toHaveText()' for exact comparisons or 'toContainText()' (or Regex) if you only need to match part of the message.",
+                    "Call expect(page.getByRole('heading')).toHaveText('Hello World') and check the paragraph with toContainText('Playwright')."
                 ],
                 "id": [
-                    "Gunakan expect(page.getByRole('heading')).toHaveText('Hello World') untuk tugas pertama.",
-                    "Gunakan expect(page.getByText(/Welcome to Playwright/)).toBeVisible() sebagai pemeriksaan alternatif."
+                    "Pastikan teks yang ditampilkan di halaman sesuai dengan apa yang Kamu harapkan.",
+                    "Gunakan 'toHaveText()' untuk perbandingan eksak atau 'toContainText()' (atau Regex) jika Kamu hanya perlu mencocokkan sebagian pesan.",
+                    "Panggil expect(page.getByRole('heading')).toHaveText('Hello World') dan cek paragrafnya dengan toContainText('Playwright')."
                 ]
             },
             "htmlContent": "<div class=\"content\">\n  <h1>Hello World</h1>\n  <p>Welcome to Playwright testing framework!</p>\n</div>",
@@ -977,12 +993,14 @@
             },
             "hints": {
                 "en": [
-                    "Wait for the input to be filled before asserting.",
-                    "Use expect(page.getByPlaceholder('Enter email')).toHaveValue('test@example.com') for verification."
+                    "Check the internal content of an input field, which is different from the text content of a standard element.",
+                    "Use 'toHaveValue()' to verify what has been typed into an input or selected in a dropdown.",
+                    "Fill the 'Enter email' placeholder with your test email, then call expect(...).toHaveValue('test@example.com')."
                 ],
                 "id": [
-                    "Tunggu hingga input terisi sebelum melakukan asersi.",
-                    "Gunakan expect(page.getByPlaceholder('Enter email')).toHaveValue('test@example.com') untuk verifikasi."
+                    "Cek konten internal kolom input, yang berbeda dari konten teks elemen standar.",
+                    "Gunakan 'toHaveValue()' untuk memverifikasi apa yang telah diketik ke dalam input atau dipilih dalam dropdown.",
+                    "Isi placeholder 'Enter email' dengan email pengujian Kamu, lalu panggil expect(...).toHaveValue('test@example.com')."
                 ]
             },
             "htmlContent": "<form>\n  <input type=\"email\" id=\"email\" placeholder=\"Enter email\" />\n</form>",
@@ -1017,14 +1035,14 @@
             },
             "hints": {
                 "en": [
-                    "Use page.getByLabel('Accept Terms').check() to interact with the checkbox.",
-                    "Verify the checkbox with expect(page.getByLabel('Accept Terms')).toBeChecked().",
-                    "Verify the button with expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled()."
+                    "Validate the functional state of elements, such as whether a button is clickable or a checkbox is ticked.",
+                    "Use assertions like 'toBeChecked()', 'toBeEnabled()', or 'toBeDisabled()' to verify UI logic constraints.",
+                    "Check the Terms box, assert it's checked, and then verify the Submit button has transitioned to an enabled state."
                 ],
                 "id": [
-                    "Gunakan page.getByLabel('Accept Terms').check() untuk berinteraksi dengan checkbox.",
-                    "Verifikasi checkbox dengan expect(page.getByLabel('Accept Terms')).toBeChecked().",
-                    "Verifikasi tombol dengan expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled()."
+                    "Validasi status fungsional elemen, seperti apakah tombol dapat diklik atau kotak centang dicentang.",
+                    "Gunakan asersi seperti 'toBeChecked()', 'toBeEnabled()', atau 'toBeDisabled()' untuk memverifikasi batasan logika UI.",
+                    "Centang kotak Terms, pastikan itu dicentang, lalu verifikasi tombol Submit telah beralih ke status aktif (enabled)."
                 ]
             },
             "htmlContent": "<form>\n  <label><input type=\"checkbox\" id=\"terms\" /> Accept Terms</label>\n  <button id=\"submit\">Submit</button>\n</form>",
@@ -1059,12 +1077,14 @@
             },
             "hints": {
                 "en": [
-                    "Use expect(page.getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/about') for the link.",
-                    "Use expect(page.getByRole('img')).toHaveAttribute('alt') to check existence."
+                    "Look at the underlying HTML properties of an element, such as link targets or image descriptions.",
+                    "Use 'toHaveAttribute()' to check specific properties like 'href' for links or 'alt' for images.",
+                    "Call expect(...).toHaveAttribute('href', '/about') and ensure the image has an 'alt' attribute present."
                 ],
                 "id": [
-                    "Gunakan expect(page.getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/about') untuk tautan tersebut.",
-                    "Gunakan expect(page.getByRole('img')).toHaveAttribute('alt') untuk memeriksa keberadaan atribut."
+                    "Lihat properti HTML dasar suatu elemen, seperti target tautan atau deskripsi gambar.",
+                    "Gunakan 'toHaveAttribute()' untuk mengecek properti spesifik seperti 'href' untuk tautan atau 'alt' untuk gambar.",
+                    "Panggil expect(...).toHaveAttribute('href', '/about') dan pastikan gambar memiliki atribut 'alt'."
                 ]
             },
             "htmlContent": "<nav>\n  <a href=\"/about\">About Us</a>\n  <img src=\"logo.png\" alt=\"Company Logo\" />\n</nav>",
@@ -1099,12 +1119,14 @@
             },
             "hints": {
                 "en": [
-                    "Wait for the button click to finish before asserting the new count.",
-                    "Use expect(page.locator('#list li')).toHaveCount(4) for the initial state."
+                    "Confirm that the number of items in a list or search results matches your expectations.",
+                    "Use 'toHaveCount()' on a locator that matches multiple elements to verify the total number in one go.",
+                    "Check the initial count is 4, click 'Add Item', and assert that the count has updated to 5."
                 ],
                 "id": [
-                    "Tunggu hingga klik tombol selesai sebelum melakukan asersi jumlah baru.",
-                    "Gunakan expect(page.locator('#list li')).toHaveCount(4) untuk status awal."
+                    "Konfirmasikan bahwa jumlah item dalam daftar atau hasil pencarian sesuai dengan ekspektasi Kamu.",
+                    "Gunakan 'toHaveCount()' pada locator yang cocok dengan beberapa elemen untuk memverifikasi jumlah total sekaligus.",
+                    "Cek jumlah awal adalah 4, klik 'Add Item', dan pastikan jumlahnya telah diperbarui menjadi 5."
                 ]
             },
             "htmlContent": "<ul id=\"list\">\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n  <li>Item 4</li>\n</ul>\n<button id=\"add\" onclick=\"document.getElementById('list').innerHTML += '<li>New Item</li>'\">Add Item</button>",
@@ -1139,12 +1161,14 @@
             },
             "hints": {
                 "en": [
-                    "Wrap each assertion with expect.soft(locator).toBeVisible().",
-                    "Soft assertions are great for validating multiple independent UI elements at once."
+                    "Collect multiple verification errors at once instead of letting the first failure stop the entire test.",
+                    "Use 'expect.soft()' for non-critical checks so that the rest of your assertions still run.",
+                    "Wrap your status checks in expect.soft(...).toBeVisible() to report all missing elements in a single run."
                 ],
                 "id": [
-                    "Bungkus setiap asersi dengan expect.soft(locator).toBeVisible().",
-                    "Soft assertion sangat bagus untuk memvalidasi beberapa elemen UI independen sekaligus."
+                    "Kumpulkan beberapa kesalahan verifikasi sekaligus daripada membiarkan kegagalan pertama menghentikan seluruh pengujian.",
+                    "Gunakan 'expect.soft()' untuk pemeriksaan non-kritis sehingga sisa asersi Kamu tetap berjalan.",
+                    "Bungkus pemeriksaan status Kamu dalam expect.soft(...).toBeVisible() untuk melaporkan semua elemen yang hilang dalam satu proses."
                 ]
             },
             "htmlContent": "<div class=\"form-status\">\n  <div id=\"name-status\" class=\"valid\">✓ Name valid</div>\n  <div id=\"email-status\" class=\"valid\">✓ Email valid</div>\n  <div id=\"pass-status\" class=\"valid\">✓ Password valid</div>\n</div>",
@@ -1179,14 +1203,14 @@
             },
             "hints": {
                 "en": [
-                    "Email field in HTML already has a bad-email value, so the error should be present.",
-                    "The validate() script in HTML handles the logic for showing/hiding errors and enabling the button.",
-                    "Fill both fields accurately to trigger the 'enabled' state."
+                    "Manage a complex form validation suite that involves multiple states and dependent UI changes.",
+                    "Combine visibility, text, and state assertions to prove the form guides the user correctly through the process.",
+                    "Check initial errors, verify the button starts as disabled, fill valid data, and assert the button becomes enabled."
                 ],
                 "id": [
-                    "Field email di HTML sudah memiliki nilai bad-email, jadi error seharusnya sudah muncul.",
-                    "Script validate() di HTML menangani logika untuk menampilkan/menyembunyikan error dan mengaktifkan tombol.",
-                    "Isi kedua field dengan akurat untuk memicu status 'aktif'."
+                    "Kelola suite validasi formulir kompleks yang melibatkan beberapa status dan perubahan UI yang dependen.",
+                    "Gabungkan asersi visibilitas, teks, dan status untuk membuktikan formulir memandu pengguna dengan benar melalui proses tersebut.",
+                    "Cek kesalahan awal, verifikasi tombol dimulai sebagai dinonaktifkan (disabled), isi data yang valid, dan pastikan tombol menjadi aktif (enabled)."
                 ]
             },
             "htmlContent": "<form id=\"signup\">\n  <div class=\"field\">\n    <input type=\"email\" id=\"email\" value=\"bad-email\" />\n    <span class=\"error\" id=\"email-error\">Invalid email format</span>\n  </div>\n  <div class=\"field\">\n    <input type=\"password\" id=\"password\" placeholder=\"8+ characters\" />\n    <span class=\"hint\">Must be 8+ characters</span>\n  </div>\n  <button id=\"submit\" disabled>Register</button>\n</form>\n<script>\n  document.getElementById('email').addEventListener('input', validate);\n  document.getElementById('password').addEventListener('input', validate);\n  function validate() {\n    const email = document.getElementById('email').value;\n    const pass = document.getElementById('password').value;\n    const valid = email.includes('@') && pass.length >= 8;\n    document.getElementById('submit').disabled = !valid;\n    document.getElementById('email-error').style.display = email.includes('@') ? 'none' : 'block';\n  }\n</script>",

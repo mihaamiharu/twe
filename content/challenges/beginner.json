@@ -22,14 +22,14 @@
             },
             "hints": {
                 "en": [
-                    "Use 'const' for testName and 'let' for passCount.",
-                    "To increment, use 'passCount = passCount + 1' or 'passCount++'.",
-                    "The Variable 'result' is already declared, just assign passCount to it."
+                    "Think about which variable should be constant and which one changes (const vs let).",
+                    "Use the increment operator (++) or 'variable = variable + 1' for the count.",
+                    "Assign your final count to the pre-declared 'result' variable."
                 ],
                 "id": [
-                    "Gunakan 'const' untuk testName dan 'let' untuk passCount.",
-                    "Untuk menambahkan nilai, gunakan 'passCount = passCount + 1' atau 'passCount++'.",
-                    "Variabel 'result' sudah dideklarasikan, cukup assign passCount ke dalamnya."
+                    "Pikirkan variabel mana yang harus konstan dan mana yang berubah (const vs let).",
+                    "Gunakan operator inkremen (++) atau 'variable = variable + 1' untuk hitungannya.",
+                    "Assign hasil hitungan akhir Kamu ke variabel 'result' yang sudah tersedia."
                 ]
             },
             "htmlContent": "<div class=\"test-runner\">\n  <h3>Test Runner</h3>\n  <p>Running tests...</p>\n</div>",
@@ -70,14 +70,14 @@
             },
             "hints": {
                 "en": [
-                    "Initialize the array using square brackets: const testCredentials = [...];",
-                    "Use the .push('superadmin') method to add the new username.",
-                    "Access the length using testCredentials.length."
+                    "Recall how to define an array with initial values using square brackets [].",
+                    "Look for an array method like .push() to add an element to the end.",
+                    "Use the .length property to count the items in your array."
                 ],
                 "id": [
-                    "Inisialisasi array menggunakan kurung siku: const testCredentials = [...];",
-                    "Gunakan metode .push('superadmin') untuk menambahkan username baru.",
-                    "Akses panjangnya menggunakan testCredentials.length."
+                    "Ingat kembali cara mendefinisikan array dengan nilai awal menggunakan kurung siku [].",
+                    "Cari metode array seperti .push() untuk menambah elemen di akhir.",
+                    "Gunakan properti .length untuk menghitung jumlah item di array Kamu."
                 ]
             },
             "htmlContent": "<div class=\"test-data\">\n  <h3>Test Data Manager</h3>\n  <ul id=\"credentials-list\"></ul>\n</div>",
@@ -118,14 +118,14 @@
             },
             "hints": {
                 "en": [
-                    "Define the object using curly braces: const testUser = { ... };",
-                    "To increment, use testUser.loginCount = testUser.loginCount + 1 or testUser.loginCount++;",
-                    "Assign the updated value to result: result = testUser.loginCount;"
+                    "Use curly braces {} to group the user's properties (email, isActive, loginCount).",
+                    "You can update a property value using dot notation, e.g., 'object.property = newValue'.",
+                    "To increase the count, you can use 'testUser.loginCount++' before assigning it to 'result'."
                 ],
                 "id": [
-                    "Definisikan object menggunakan kurung kurawal: const testUser = { ... };",
-                    "Untuk menambahkan nilai, gunakan testUser.loginCount = testUser.loginCount + 1 atau testUser.loginCount++;",
-                    "Simpan nilai yang sudah diperbarui ke result: result = testUser.loginCount;"
+                    "Gunakan kurung kurawal {} untuk mengelompokkan properti user (email, isActive, loginCount).",
+                    "Kamu bisa memperbarui nilai properti menggunakan dot notation, contoh: 'object.properti = nilaiBaru'.",
+                    "Untuk menambah hitungan, Kamu bisa menggunakan 'testUser.loginCount++' sebelum menyimpannya ke 'result'."
                 ]
             },
             "htmlContent": "<div class=\"user-profile\">\n  <h3>User Profile</h3>\n  <div id=\"user-info\"></div>\n</div>",
@@ -166,16 +166,14 @@
             },
             "hints": {
                 "en": [
-                    "Use an if-else if-else structure.",
-                    "The first condition should be passCount === totalTests.",
-                    "The second condition should be passCount > 0.",
-                    "Make sure to assign the strings 'ALL_PASSED', 'PARTIAL', or 'ALL_FAILED' to the 'result' variable."
+                    "You'll need three branches of logic: one for perfect, one for partial, and one for none.",
+                    "Use '===' for exact equality and '>' for greater than checks.",
+                    "Make sure your string values exactly match 'ALL_PASSED', 'PARTIAL', or 'ALL_FAILED'."
                 ],
                 "id": [
-                    "Gunakan struktur if-else if-else.",
-                    "Kondisi pertama haruslah passCount === totalTests.",
-                    "Kondisi kedua haruslah passCount > 0.",
-                    "Pastikan untuk me-assign string 'ALL_PASSED', 'PARTIAL', atau 'ALL_FAILED' ke variabel 'result'."
+                    "Kamu butuh tiga cabang logika: satu untuk sukses semua, satu untuk sebagian, dan satu untuk gagal semua.",
+                    "Gunakan '===' untuk cek kesamaan persis dan '>' untuk cek lebih besar dari.",
+                    "Pastikan nilai string Kamu tepat sama dengan 'ALL_PASSED', 'PARTIAL', atau 'ALL_FAILED'."
                 ]
             },
             "htmlContent": "<div class=\"test-status\">\n  <h3>Test Results</h3>\n  <div id=\"status-display\"></div>\n</div>",
@@ -216,14 +214,14 @@
             },
             "hints": {
                 "en": [
-                    "Use a for...of loop to iterate through the scores array: for (const score of scores) { ... }.",
-                    "Inside the loop, use an if statement to check if score >= 80.",
-                    "Increment the 'result' variable whenever a score is 80 or above."
+                    "Use a 'for...of' loop to look at every single score in the array one by one.",
+                    "Inside the loop, use an 'if' statement to verify your condition against each score.",
+                    "Look for scores that are 80 or higher (score >= 80) and increment 'result' each time."
                 ],
                 "id": [
-                    "Gunakan for...of loop untuk mengitari array scores: for (const score of scores) { ... }.",
-                    "Di dalam loop, gunakan pernyataan if untuk mengecek apakah score >= 80.",
-                    "Tambahkan nilai variabel 'result' setiap kali score bernilai 80 atau lebih."
+                    "Gunakan loop 'for...of' untuk melihat setiap skor di dalam array satu per satu.",
+                    "Di dalam loop, gunakan pernyataan 'if' untuk memverifikasi kondisi Kamu terhadap setiap skor.",
+                    "Cari skor yang bernilai 80 atau lebih (score >= 80) dan tambahkan 1 ke 'result' setiap kali ketemu."
                 ]
             },
             "htmlContent": "<div class=\"score-analyzer\">\n  <h3>Score Analysis</h3>\n  <div id=\"pass-count\"></div>\n</div>",
@@ -264,14 +262,14 @@
             },
             "hints": {
                 "en": [
-                    "Define the function: function calculatePassRate(passed, total) { ... }.",
-                    "Return the calculated value: return (passed / total) * 100;",
-                    "Call the function and assign its result to the 'result' variable."
+                    "Define a block of code (function) that calculates a percentage when given two numbers.",
+                    "The pattern is 'function name(param1, param2) { return ... }'.",
+                    "Divide the 'passed' count by the 'total', then multiply by 100 to get the rate."
                 ],
                 "id": [
-                    "Definisikan fungsi: function calculatePassRate(passed, total) { ... }.",
-                    "Kembalikan nilai yang dihitung: return (passed / total) * 100;",
-                    "Panggil fungsi tersebut dan assign hasilnya ke variabel 'result'."
+                    "Definisikan blok kode (fungsi) yang menghitung persentase saat diberikan dua angka.",
+                    "Polanya adalah 'function nama(param1, param2) { return ... }'.",
+                    "Bagi jumlah 'passed' dengan 'total', lalu kalikan dengan 100 untuk mendapatkan rate-nya."
                 ]
             },
             "htmlContent": "<div class=\"calculator\">\n  <h3>Pass Rate Calculator</h3>\n  <div id=\"rate-display\"></div>\n</div>",
@@ -312,14 +310,14 @@
             },
             "hints": {
                 "en": [
-                    "isPositive arrow function: const isPositive = n => n > 0;",
-                    "square arrow function: const square = n => n * n;",
-                    "Calculate result using square(8)."
+                    "Use the shorter '=>' syntax to define your logic in a more modern way.",
+                    "For simple one-line calculations, you can omit the 'return' keyword and curly braces.",
+                    "Define both 'isPositive' and 'square', then apply 'square' to the number 8."
                 ],
                 "id": [
-                    "isPositive arrow function: const isPositive = n => n > 0;",
-                    "square arrow function: const square = n => n * n;",
-                    "Hitung result menggunakan square(8)."
+                    "Gunakan sintaks '=>' yang lebih pendek untuk mendefinisikan logika Kamu dengan cara lebih modern.",
+                    "Untuk kalkulasi satu baris yang sederhana, Kamu bisa menghilangkan kata kunci 'return' dan kurung kurawal.",
+                    "Definisikan 'isPositive' dan 'square', lalu jalankan 'square' pada angka 8."
                 ]
             },
             "htmlContent": "<div class=\"function-demo\">\n  <h3>Arrow Functions</h3>\n</div>",
@@ -360,14 +358,14 @@
             },
             "hints": {
                 "en": [
-                    "First, use .filter(t => t.status === 'passed') to get only passed tests.",
-                    "Then, access the .length property of the filtered array.",
-                    "Assign that length to the 'result' variable."
+                    "Think about which array method helps you *keep* only the items that meet a condition.",
+                    "You can chain your filter method directly or use '.length' on the result.",
+                    "Filter for 'status === \"passed\"' and store the length of that new collection."
                 ],
                 "id": [
-                    "Pertama, gunakan .filter(t => t.status === 'passed') untuk mendapatkan hanya tes yang lulus.",
-                    "Kemudian, akses properti .length dari array yang sudah difilter tersebut.",
-                    "Assign panjang (length) tersebut ke variabel 'result'."
+                    "Pikirkan metode array mana yang membantu Kamu *menyisihkan* hanya item yang memenuhi kondisi.",
+                    "Kamu bisa menyambung metode filter secara langsung atau menggunakan '.length' pada hasilnya.",
+                    "Filter untuk 'status === \"passed\"' dan simpan panjang (length) dari koleksi baru tersebut."
                 ]
             },
             "htmlContent": "<div class=\"results-processor\">\n  <h3>Results Processor</h3>\n</div>",
@@ -409,16 +407,14 @@
             },
             "hints": {
                 "en": [
-                    "Use .trim() to remove whitespace: const cleaned = rawMessage.trim();.",
-                    "Use .split(':') to break the string at the colon.",
-                    "The second element of the split array ([1]) will be the error code.",
-                    "Remember to .trim() the error code again if there are spaces around it."
+                    "Think about how to remove redundant spaces and break the string into parts using a divider.",
+                    "Combine .trim() for cleanup and .split(':') to isolate the specific text you need.",
+                    "Access the second element of your split array ([1]) and trim it one last time if needed."
                 ],
                 "id": [
-                    "Gunakan .trim() untuk menghapus spasi: const cleaned = rawMessage.trim();.",
-                    "Gunakan .split(':') untuk memecah string pada tanda titik dua.",
-                    "Elemen kedua dari array hasil split ([1]) adalah kode errornya.",
-                    "Jangan lupa untuk me-.trim() kode error tersebut lagi jika masih ada spasi di sekitarnya."
+                    "Pikirkan cara menghapus spasi yang tidak perlu dan memecah string menjadi bagian-bagian menggunakan pembagi.",
+                    "Gabungkan .trim() untuk pembersihan dan .split(':') untuk mengisolasi teks spesifik yang Kamu butuh.",
+                    "Akses elemen kedua dari array hasil split ([1]) dan trim sekali lagi jika diperlukan."
                 ]
             },
             "htmlContent": "<div class=\"error-parser\">\n  <h3>Error Parser</h3>\n</div>",
@@ -459,14 +455,14 @@
             },
             "hints": {
                 "en": [
-                    "Object destructuring: const { duration, status } = testResult;.",
-                    "Use a conditional (if or ternary) to check status === 'passed'.",
-                    "result = status === 'passed' ? duration : 0;"
+                    "Use the object property names directly inside curly braces {} to extract them (testResult).",
+                    "Once you have the 'status', use a conditional statement to decide the final 'result'.",
+                    "A ternary operator like 'status === \"passed\" ? duration : 0' is a clean way to solve this."
                 ],
                 "id": [
-                    "Destructuring objek: const { duration, status } = testResult;.",
-                    "Gunakan kondisional (if atau ternary) untuk mengecek status === 'passed'.",
-                    "result = status === 'passed' ? duration : 0;"
+                    "Gunakan nama properti objek secara langsung di dalam kurung kurawal {} untuk mengekstraknya (testResult).",
+                    "Setelah Kamu punya 'status', gunakan pernyataan kondisional untuk menentukan 'result' akhirnya.",
+                    "Operator ternary seperti 'status === \"passed\" ? duration : 0' adalah cara bersih untuk menyelesaikan ini."
                 ]
             },
             "htmlContent": "<div class=\"test-result\">\n  <h3>Test Result</h3>\n</div>",
@@ -507,16 +503,14 @@
             },
             "hints": {
                 "en": [
-                    "You can chain the methods: const count = users.filter(...).map(...).length;.",
-                    "The filter should check u.status === 'active'.",
-                    "The map should extract u.email.",
-                    "Finally, get the .length of the resulting array."
+                    "Combine multiple array methods in a row (chaining) to process the 'users' list efficiently.",
+                    "First use .filter() for the 'active' status, then .map() to get only the emails.",
+                    "Finally, use the .length property on the resulting collection to get the total count."
                 ],
                 "id": [
-                    "Kamu bisa merantai (chain) metode: const count = users.filter(...).map(...).length;.",
-                    "Filter harus mengecek u.status === 'active'.",
-                    "Map harus mengekstrak u.email.",
-                    "Terakhir, ambil .length dari array hasilnya."
+                    "Gabungkan beberapa metode array secara berurutan (chaining) untuk memproses daftar 'users' secara efisien.",
+                    "Pertama gunakan .filter() untuk status 'active', lalu .map() untuk mengambil email saja.",
+                    "Terakhir, gunakan properti .length pada koleksi hasilnya untuk mendapatkan jumlah total."
                 ]
             },
             "htmlContent": "<div class=\"test-generator\">\n  <h3>Test Data Generator</h3>\n  <div id=\"output\"></div>\n</div>",
@@ -557,14 +551,14 @@
             },
             "hints": {
                 "en": [
-                    "Use document.querySelector('#title') to get the h1.",
-                    "Use document.querySelectorAll('.item') to get all list items.",
-                    "The NodeList returned by querySelectorAll has a .length property."
+                    "Use the specific document methods for finding one unique element vs multiple elements.",
+                    "Remember that an ID selector uses '#' and a class selector uses '.' as a prefix.",
+                    "The multi-selection method returns a collection with a .length property to give you the count."
                 ],
                 "id": [
-                    "Gunakan document.querySelector('#title') untuk mengambil h1.",
-                    "Gunakan document.querySelectorAll('.item') untuk mengambil semua item daftar.",
-                    "NodeList yang dikembalikan oleh querySelectorAll memiliki properti .length."
+                    "Gunakan metode dokumen spesifik untuk mencari satu elemen unik vs banyak elemen.",
+                    "Ingat bahwa pemilih ID menggunakan '#' dan pemilih class menggunakan '.' sebagai awalan.",
+                    "Metode seleksi banyak mengembalikan koleksi dengan properti .length untuk memberikan Kamu hitungannya."
                 ]
             },
             "htmlContent": "<div class=\"shopping-list\">\n  <h1 id=\"title\">My Shopping List</h1>\n  <ul>\n    <li class=\"item\">Apples</li>\n    <li class=\"item\">Bananas</li>\n    <li class=\"item\">Oranges</li>\n    <li class=\"item\">Milk</li>\n  </ul>\n</div>",
@@ -605,14 +599,14 @@
             },
             "hints": {
                 "en": [
-                    "Use document.querySelector('.price').textContent to get the price string.",
-                    "Use document.querySelector('#quantity').value to get the input value.",
-                    "Convert both to numbers using Number() or parseInt() before multiplying."
+                    "Look for properties that give you the visible inner text vs the value currently in a field.",
+                    "You'll need 'textContent' for labels or spans and '.value' for input type elements.",
+                    "Since these values are usually strings, use Number() or parseInt() before doing math."
                 ],
                 "id": [
-                    "Gunakan document.querySelector('.price').textContent untuk mengambil string harga.",
-                    "Gunakan document.querySelector('#quantity').value untuk mengambil nilai input.",
-                    "Ubah keduanya menjadi angka menggunakan Number() atau parseInt() sebelum dikalikan."
+                    "Cari properti yang memberikan teks yang terlihat di dalam vs nilai yang saat ini ada di suatu kolom.",
+                    "Kamu butuh 'textContent' untuk label atau span dan '.value' untuk elemen tipe input.",
+                    "Karena nilai-nilai ini biasanya string, gunakan Number() atau parseInt() sebelum melakukan perhitungan."
                 ]
             },
             "htmlContent": "<div class=\"product\">\n  <h2>Premium Widget</h2>\n  <span class=\"price\">25</span>\n  <label>Quantity: <input type=\"number\" id=\"quantity\" value=\"4\" /></label>\n</div>",
@@ -702,16 +696,14 @@
             },
             "hints": {
                 "en": [
-                    "Use document.querySelector('.active') to find the starting point.",
-                    "Access its parent with .parentElement.",
-                    "Access all children of that parent using the .children property (it's an array-like object).",
-                    "Store the .length of the children collection in 'result'."
+                    "Start by finding the element that already has a specific marker (class).",
+                    "Move 'up' to the parent element, then look 'down' at its collection of child elements.",
+                    "Use .parentElement and .children, then check the .length of that children collection."
                 ],
                 "id": [
-                    "Gunakan document.querySelector('.active') untuk menemukan titik awal.",
-                    "Akses induknya dengan .parentElement.",
-                    "Akses semua anak dari induk tersebut menggunakan properti .children (ini adalah objek array-like).",
-                    "Simpan properti .length dari koleksi anak tersebut ke dalam 'result'."
+                    "Mulai dengan menemukan elemen yang sudah memiliki penanda spesifik (class).",
+                    "Pindah 'ke atas' ke elemen induknya, lalu lihat 'ke bawah' pada koleksi elemen anaknya.",
+                    "Gunakan .parentElement dan .children, lalu cek .length dari koleksi anak tersebut."
                 ]
             },
             "htmlContent": "<nav class=\"tabs\">\n  <button class=\"tab\">Home</button>\n  <button class=\"tab active\">Products</button>\n  <button class=\"tab\">About</button>\n  <button class=\"tab\">Contact</button>\n</nav>",
@@ -752,16 +744,14 @@
             },
             "hints": {
                 "en": [
-                    "Select the button: const btn = document.querySelector('#increment');.",
-                    "Call btn.click() three separate times.",
-                    "The count updates in the #count element. Get its .textContent.",
-                    "Convert the textContent to a Number before storing in 'result'."
+                    "Find the button and think about how to trigger its primary action programmatically.",
+                    "You'll need to call the .click() method on the button multiple times as requested.",
+                    "The counter updates elsewhere in the DOM; grab its textContent and convert it to a Number."
                 ],
                 "id": [
-                    "Pilih tombol: const btn = document.querySelector('#increment');.",
-                    "Panggil btn.click() tiga kali secara terpisah.",
-                    "Jumlahnya diperbarui di elemen #count. Ambil .textContent-nya.",
-                    "Ubah textContent-nya menjadi Number sebelum disimpan ke 'result'."
+                    "Temukan tombolnya dan pikirkan cara memicu aksi utamanya secara programmatik.",
+                    "Kamu perlu memanggil metode .click() pada tombol tersebut beberapa kali sesuai permintaan.",
+                    "Penghitungnya diperbarui di bagian lain DOM; ambil textContent-nya dan ubah menjadi Number."
                 ]
             },
             "htmlContent": "<div class=\"counter-app\">\n  <span id=\"count\">0</span>\n  <button id=\"increment\" onclick=\"document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1\">+1</button>\n</div>",
@@ -802,16 +792,14 @@
             },
             "hints": {
                 "en": [
-                    "Set the username value: document.querySelector('#username').value = 'testuser';",
-                    "Set the password value: document.querySelector('#password').value = 'secret123';",
-                    "Set the checked state: document.querySelector('#remember').checked = true;",
-                    "Concatenate using template literals or '+': result = usernameVal + ':' + passwordVal;"
+                    "Find the inputs and checkbox, then manipulate them by setting their specific properties.",
+                    "Use '.value' for the text and password fields, and '.checked' for the remember checkbox.",
+                    "Combine both input values into a single string using a colon ':' as a separator."
                 ],
                 "id": [
-                    "Set nilai username: document.querySelector('#username').value = 'testuser';",
-                    "Set nilai password: document.querySelector('#password').value = 'secret123';",
-                    "Set status centang: document.querySelector('#remember').checked = true;",
-                    "Gabungkan menggunakan template literal atau '+': result = usernameVal + ':' + passwordVal;"
+                    "Temukan input dan checkbox, lalu manipulasi dengan mengatur properti spesifik mereka.",
+                    "Gunakan '.value' untuk kolom teks dan password, serta '.checked' untuk kotak centang ingat saya.",
+                    "Gabungkan kedua nilai input menjadi satu string menggunakan titik dua ':' sebagai pemisah."
                 ]
             },
             "htmlContent": "<form class=\"login-form\">\n  <input type=\"text\" id=\"username\" placeholder=\"Username\" />\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n  <label><input type=\"checkbox\" id=\"remember\" /> Remember me</label>\n</form>",
@@ -852,14 +840,14 @@
             },
             "hints": {
                 "en": [
-                    "Select the table body rows: const rows = document.querySelectorAll('tbody tr');.",
-                    "Loop through rows and get the third cell: row.cells[2].textContent.",
-                    "Convert the cell text to a Number and add it to a running total."
+                    "Iterate through the rows of the table's main body (tbody) to collect the data.",
+                    "For each row, pick out the specific entry (cell) for the 'Amount' column.",
+                    "Get row.cells[2].textContent, convert it to a Number, and add it to your running total."
                 ],
                 "id": [
-                    "Pilih baris body tabel: const rows = document.querySelectorAll('tbody tr');.",
-                    "Iterasi barisnya dan ambil sel ketiga: row.cells[2].textContent.",
-                    "Ubah teks sel menjadi Number dan tambahkan ke total akumulasi."
+                    "Iterasi melalui baris-baris dari body utama tabel (tbody) untuk mengumpulkan data.",
+                    "Untuk setiap baris, ambil entri spesifik (cell) untuk kolom 'Amount'.",
+                    "Ambil row.cells[2].textContent, ubah menjadi Number, dan tambahkan ke total akumulasi Kamu."
                 ]
             },
             "htmlContent": "<table class=\"orders\">\n  <thead><tr><th>Order</th><th>Customer</th><th>Amount</th></tr></thead>\n  <tbody>\n    <tr><td>001</td><td>Alice</td><td>150</td></tr>\n    <tr><td>002</td><td>Bob</td><td>200</td></tr>\n    <tr><td>003</td><td>Carol</td><td>75</td></tr>\n    <tr><td>004</td><td>Dave</td><td>125</td></tr>\n  </tbody>\n</table>",
@@ -900,14 +888,14 @@
             },
             "hints": {
                 "en": [
-                    "Use document.querySelector('#header'), document.querySelector('#footer'), and document.querySelector('#sidebar').",
-                    "Check each for null: if (el !== null) { count++; }.",
-                    "Return the final count."
+                    "Use document.querySelector() for each ID: '#header', '#footer', and '#sidebar'.",
+                    "Check if each returned element is not null to determine its existence.",
+                    "Increment a counter for each existing element and store the final count in 'result'."
                 ],
                 "id": [
-                    "Gunakan document.querySelector('#header'), document.querySelector('#footer'), dan document.querySelector('#sidebar').",
-                    "Cek masing-masing apakah null: if (el !== null) { count++; }.",
-                    "Kembalikan jumlah akhirnya."
+                    "Gunakan document.querySelector() untuk setiap ID: '#header', '#footer', dan '#sidebar'.",
+                    "Periksa apakah setiap elemen yang dikembalikan tidak null untuk menentukan keberadaannya.",
+                    "Tambahkan penghitung untuk setiap elemen yang ada dan simpan jumlah akhirnya di 'result'."
                 ]
             },
             "htmlContent": "<div class=\"page\">\n  <header id=\"header\">Header Content</header>\n  <main id=\"content\">Main Content</main>\n  <footer id=\"footer\">Footer Content</footer>\n</div>",
@@ -948,14 +936,14 @@
             },
             "hints": {
                 "en": [
-                    "Select all cards: document.querySelectorAll('.stat-card').",
-                    "Iterate cards and find the one where card.querySelector('.label').textContent === 'Total Sales'.",
-                    "Extract .value text, remove commas (val.replace(/,/g, '')), and convert to Number."
+                    "Scan all the stat cards to find the specific one with the target label.",
+                    "Use a loop to check the text inside each card's label before extracting the value.",
+                    "Clean any formatting (like commas) from the value text before converting it to a Number."
                 ],
                 "id": [
-                    "Pilih semua kartu: document.querySelectorAll('.stat-card').",
-                    "Iterasi kartu-kartu tersebut dan cari yang card.querySelector('.label').textContent === 'Total Sales'.",
-                    "Ekstrak teks .value, hapus koma (val.replace(/,/g, '')), dan ubah menjadi Number."
+                    "Pindai semua kartu statistik untuk menemukan kartu spesifik dengan label target.",
+                    "Gunakan loop untuk mengecek teks di dalam label setiap kartu sebelum mengekstrak nilainya.",
+                    "Bersihkan format apa pun (seperti koma) dari teks nilai sebelum mengubahnya menjadi Number."
                 ]
             },
             "htmlContent": "<div class=\"dashboard\">\n  <h3>Sales Dashboard</h3>\n  <div class=\"stats-grid\">\n    <div class=\"stat-card\">\n      <span class=\"label\">Active Users</span>\n      <span class=\"value\">1,234</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Total Sales</span>\n      <span class=\"value\">5,678</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Pending Orders</span>\n      <span class=\"value\">42</span>\n    </div>\n    <div class=\"stat-card\">\n      <span class=\"label\">Revenue</span>\n      <span class=\"value\">$98,765</span>\n    </div>\n  </div>\n</div>",
@@ -997,14 +985,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the new Promise constructor: new Promise((resolve, reject) => { ... }).",
-                    "Inside the executor function, call resolve(42);.",
-                    "Assign the result of new Promise(...) to result."
+                    "Wrap your value in a Promise object that finishes ('resolves') immediately.",
+                    "Use the 'new Promise((resolve, reject) => { ... })' syntax to get started.",
+                    "Call the 'resolve' function with the number 42 as its primary argument."
                 ],
                 "id": [
-                    "Gunakan konstruktor new Promise: new Promise((resolve, reject) => { ... }).",
-                    "Di dalam fungsi eksekutor, panggil resolve(42);.",
-                    "Simpan hasil dari new Promise(...) ke dalam result."
+                    "Bungkus nilai Kamu dalam objek Promise yang selesai ('resolve') segera.",
+                    "Gunakan sintaks 'new Promise((resolve, reject) => { ... })' untuk mulai.",
+                    "Panggil fungsi 'resolve' dengan angka 42 sebagai argumen utamanya."
                 ]
             },
             "htmlContent": "<div class=\"promise-demo\">\n  <h3>Promise Demo</h3>\n</div>",
@@ -1045,16 +1033,14 @@
             },
             "hints": {
                 "en": [
-                    "Define the function: async function doubleValue() { ... }.",
-                    "Inside, use await: const val = await getValue();.",
-                    "Return val * 2.",
-                    "Don't forget to assign the final result: const result = await doubleValue();."
+                    "Imagine writing asynchronous code that reads just like a simple list of sequential instructions.",
+                    "Define your logic as an 'async' function, and use the 'await' keyword for the time-consuming step.",
+                    "Wait for getValue() to produce a result, then work with that value before returning it."
                 ],
                 "id": [
-                    "Definisikan fungsi: async function doubleValue() { ... }.",
-                    "Di dalamnya, gunakan await: const val = await getValue();.",
-                    "Kembalikan val * 2.",
-                    "Jangan lupa untuk menyimpan hasil akhirnya: const result = await doubleValue();."
+                    "Bayangkan menulis kode asinkron yang terbaca seperti daftar instruksi sekuensial yang sederhana.",
+                    "Definisikan logika Kamu sebagai fungsi 'async', dan gunakan kata kunci 'await' untuk langkah yang memakan waktu.",
+                    "Tunggu getValue() menghasilkan hasil, lalu olah nilai tersebut sebelum mengembalikannya."
                 ]
             },
             "htmlContent": "<div class=\"async-demo\">\n  <h3>Async/Await</h3>\n</div>",
@@ -1095,16 +1081,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the try { ... } catch (e) { ... } block inside your async function.",
-                    "Put await riskyOperation() inside the try block.",
-                    "Return 'fallback' from the catch block.",
-                    "Execute your function and assign the result to 'result'."
+                    "Use a protective wrapper around your code to prevent it from crashing when something goes wrong.",
+                    "The standard pattern is a 'try { ... } catch (error) { ... }' block inside your async function.",
+                    "Put the 'await riskyOperation()' call inside the try block, and return a fallback string in the catch block."
                 ],
                 "id": [
-                    "Gunakan blok try { ... } catch (e) { ... } di dalam fungsi async kamu.",
-                    "Letakkan await riskyOperation() di dalam blok try.",
-                    "Kembalikan 'fallback' dari blok catch.",
-                    "Jalankan fungsi kamu dan simpan hasilnya di 'result'."
+                    "Gunakan pembungkus pelindung di sekitar kode Kamu untuk mencegahnya crash saat terjadi kesalahan.",
+                    "Pola standarnya adalah blok 'try { ... } catch (error) { ... }' di dalam fungsi async Kamu.",
+                    "Letakkan panggilan 'await riskyOperation()' di dalam blok try, dan kembalikan string fallback di blok catch."
                 ]
             },
             "htmlContent": "<div class=\"error-demo\">\n  <h3>Error Handling</h3>\n</div>",
@@ -1145,14 +1129,14 @@
             },
             "hints": {
                 "en": [
-                    "Call Promise.all([getA(), getB(), getC()]).",
-                    "Await the result: const [a, b, c] = await Promise.all(...).",
-                    "Sum them up: result = a + b + c;."
+                    "Think about running multiple independent tasks at the exact same time instead of waiting for each one.",
+                    "Pass an array of your task calls into Promise.all() to trigger them all together.",
+                    "Use destructuring like 'const [a, b, c] = await Promise.all(...)' to access the results efficiently."
                 ],
                 "id": [
-                    "Panggil Promise.all([getA(), getB(), getC()]).",
-                    "Await hasilnya: const [a, b, c] = await Promise.all(...).",
-                    "Jumlahkan hasilnya: result = a + b + c;."
+                    "Pikirkan tentang menjalankan beberapa tugas independen pada waktu yang sama daripada menunggu satu per satu.",
+                    "Masukkan array dari panggilan tugas Kamu ke dalam Promise.all() untuk memicu semuanya bersamaan.",
+                    "Gunakan destrukturisasi seperti 'const [a, b, c] = await Promise.all(...)' untuk mengakses hasilnya secara efisien."
                 ]
             },
             "htmlContent": "<div class=\"parallel-demo\">\n  <h3>Parallel Execution</h3>\n</div>",
@@ -1194,16 +1178,14 @@
             },
             "hints": {
                 "en": [
-                    "Create an async function 'retry(fn, max)' or use a simple loop.",
-                    "Inside try, await flakyOperation(); and return or break.",
-                    "Inside catch, just continue the loop unless it's the last attempt.",
-                    "Make sure you await the retry call: await retry();."
+                    "Implement a mechanism that gives a 'flaky' or slow action another chance to succeed.",
+                    "Use a loop to repeat the try...catch logic until you reach the maximum allowed tries.",
+                    "Make sure you await the risky call inside the loop and track the total number of attempts."
                 ],
                 "id": [
-                    "Buat fungsi async 'retry(fn, max)' atau gunakan perulangan sederhana.",
-                    "Di dalam try, await flakyOperation(); dan return atau break.",
-                    "Di dalam catch, cukup lanjutkan perulangan kecuali jika itu adalah percobaan terakhir.",
-                    "Pastikan Anda melakukan await pada panggilan retry: await retry();."
+                    "Implementasikan mekanisme yang memberikan tindakan yang 'tidak stabil' atau lambat kesempatan lain untuk berhasil.",
+                    "Gunakan loop untuk mengulang logika try...catch sampai Kamu mencapai batas maksimal percobaan.",
+                    "Pastikan Kamu melakukan await pada panggilan berisiko di dalam loop dan lacak jumlah total percobaannya."
                 ]
             },
             "htmlContent": "<div class=\"patterns-demo\">\n  <h3>Testing Patterns</h3>\n</div>",
@@ -1245,14 +1227,14 @@
             },
             "hints": {
                 "en": [
-                    "Combine users, orders, and products fetching: Promise.all([getUsers(), getOrders(), getProducts()]).",
-                    "Await and destructure: const [u, o, p] = await Promise.all(...).",
-                    "Calculate total length: result = u.length + o.length + p.length;."
+                    "Load all the required collections simultaneously to minimize the total loading time.",
+                    "Chain your parallel data fetch with a calculation that sums up the count of items in each list.",
+                    "Map the result of Promise.all() to their .length property and sum them for the final count."
                 ],
                 "id": [
-                    "Gabungkan pengambilan users, orders, dan products: Promise.all([getUsers(), getOrders(), getProducts()]).",
-                    "Await dan destrukturisasi: const [u, o, p] = await Promise.all(...).",
-                    "Hitung total panjang: result = u.length + o.length + p.length;."
+                    "Muat semua koleksi yang diperlukan secara bersamaan untuk meminimalkan waktu pemuatan total.",
+                    "Hubungkan pengambilan data paralel Kamu dengan perhitungan yang menjumlahkan item di setiap daftar.",
+                    "Petakan hasil dari Promise.all() ke properti .length mereka dan jumlahkan untuk hitungan akhir."
                 ]
             },
             "htmlContent": "<div class=\"api-aggregator\">\n  <h3>API Data Aggregator</h3>\n  <div id=\"output\"></div>\n</div>",

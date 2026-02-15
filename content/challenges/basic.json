@@ -22,12 +22,14 @@
             },
             "hints": {
                 "en": [
-                    "IDs always start with a hash symbol (#).",
-                    "Classes always start with a dot (.)."
+                    "Stable identifiers like IDs and Classes are the most reliable ways to find elements.",
+                    "Use the '#' symbol for IDs and the '.' symbol for Classes in your CSS selectors.",
+                    "Identify the unique 'login-btn' ID and target it using the '#login-btn' selector."
                 ],
                 "id": [
-                    "ID selalu dimulai dengan simbol tagar (#).",
-                    "Class selalu dimulai dengan titik (.)."
+                    "Identifier stabil seperti ID dan Class adalah cara paling andal untuk menemukan elemen.",
+                    "Gunakan simbol '#' untuk ID dan simbol '.' untuk Class dalam selector CSS Kamu.",
+                    "Identifikasi ID unik 'login-btn' dan targetkan menggunakan selector '#login-btn'."
                 ]
             },
             "htmlContent": "<div class=\"login-wrapper\">\n  <h1>System Login</h1>\n  <form class=\"login-form\">\n    <div class=\"input-group\">\n      <input type=\"text\" id=\"username\" placeholder=\"Username\" />\n    </div>\n    <div class=\"input-group\">\n      <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n    </div>\n    <div class=\"actions\">\n      <button type=\"submit\" id=\"login-btn\" class=\"btn btn-primary\">Login</button>\n      <a href=\"#\" class=\"forgot-link\">Forgot Password?</a>\n    </div>\n  </form>\n</div>",
@@ -72,12 +74,14 @@
             },
             "hints": {
                 "en": [
-                    "There is no special symbol for tags.",
-                    "Just use the tag name itself (e.g., div, p, span)."
+                    "Sometimes you want to find all elements of a certain type, like all buttons or all text blocks.",
+                    "Tag name selectors use the raw HTML tag (like div, p, or a) without any prefix symbols.",
+                    "Use the 'p' tag selector to find the paragraph containing the welcome message."
                 ],
                 "id": [
-                    "Tidak ada simbol khusus untuk tag.",
-                    "Gunakan nama tag itu sendiri (contoh: div, p, span)."
+                    "Terkadang Kamu ingin menemukan semua elemen tipe tertentu, seperti semua tombol atau semua blok teks.",
+                    "Selector nama tag menggunakan tag HTML mentah (seperti div, p, atau a) tanpa simbol awalan apa pun.",
+                    "Gunakan selector tag 'p' untuk menemukan paragraf yang berisi pesan selamat datang."
                 ]
             },
             "htmlContent": "<div class=\"welcome-card\">\n  <h2>Welcome Aboard</h2>\n  <p>Thank you for joining our platform. We are excited to see what you build!</p>\n  <button class=\"btn\">Get Started</button>\n</div>",
@@ -121,12 +125,14 @@
             },
             "hints": {
                 "en": [
-                    "Combine them without spaces.",
-                    "Pattern: tag.className"
+                    "Combine a tag and a class together to narrow down your search to a specific type of element.",
+                    "Chain the tag name and class name directly together without any spaces between them.",
+                    "Construct the selector 'div.error' to find the specific error message div."
                 ],
                 "id": [
-                    "Gabungkan tanpa spasi.",
-                    "Pola: tag.namaClass"
+                    "Gabungkan tag dan class bersama-sama untuk mempersempit pencarian Kamu ke tipe elemen tertentu.",
+                    "Rantai nama tag dan nama class secara langsung tanpa spasi di antara keduanya.",
+                    "Buat selector 'div.error' untuk menemukan div pesan kesalahan yang spesifik."
                 ]
             },
             "htmlContent": "<div class=\"notification-area\">\n  <div class=\"msg success\">Update successful</div>\n  \n  <!-- Target -->\n  <div class=\"msg error\">Connection failed</div>\n  \n  <form>\n    <label>Username <span class=\"error\">*</span></label>\n    <input type=\"text\" />\n  </form>\n</div>",
@@ -170,12 +176,14 @@
             },
             "hints": {
                 "en": [
-                    "Chain all classes without spaces.",
-                    "Order doesn't matter, but tag name must be first."
+                    "Create a unique 'fingerprint' for an element by chaining multiple classes and its tag name.",
+                    "List every class an element has, each starting with a dot, appended directly to the tag name.",
+                    "Use 'button.btn.primary.large' to target the specific Sign Up button in the layout."
                 ],
                 "id": [
-                    "Rangkai semua class tanpa spasi.",
-                    "Urutan tidak masalah, tapi nama tag harus di depan."
+                    "Buat 'sidik jari' unik untuk sebuah elemen dengan merangkai beberapa class dan nama tag-nya.",
+                    "Daftarkan setiap class yang dimiliki elemen, masing-masing dimulai dengan titik, ditambahkan langsung ke nama tag.",
+                    "Gunakan 'button.btn.primary.large' untuk menargetkan tombol Sign Up spesifik dalam tata letak."
                 ]
             },
             "htmlContent": "<div class=\"legacy-wrapper\">\n  <div class=\"top-bar\">\n    <button class=\"btn small\">Login</button>\n    <button class=\"btn primary small\">Stats</button>\n    <div class=\"primary large\">Background Task</div>\n  </div>\n  \n  <section class=\"hero-section\">\n    <h1>Start your journey</h1>\n    <!-- This is your target -->\n    <button class=\"btn primary large\">Sign Up</button>\n  </section>\n  \n  <div class=\"footer\">\n    <button class=\"btn large text-only\">Back to Top</button>\n  </div>\n</div>",
@@ -219,12 +227,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the greater-than symbol (>).",
-                    "Format: parent > child"
+                    "Navigate the family tree of elements by specifying parent-child relationships.",
+                    "Use the '>' symbol to find only the immediate children, rather than all descendants deep inside.",
+                    "Select all direct 'li' children of the '.nav-menu' using '.nav-menu > li'."
                 ],
                 "id": [
-                    "Gunakan simbol lebih besar dari (>).",
-                    "Format: orangtua > anak"
+                    "Jelajahi silsilah keluarga elemen dengan menentukan hubungan orang tua-anak.",
+                    "Gunakan simbol '>' untuk menemukan hanya anak langsung, bukan semua keturunan yang jauh di dalam.",
+                    "Pilih semua anak 'li' langsung dari '.nav-menu' menggunakan '.nav-menu > li'."
                 ]
             },
             "htmlContent": "<nav class=\"main-nav\">\n  <ul class=\"nav-menu\">\n    <!-- These are direct children -->\n    <li class=\"nav-item\">Home</li>\n    <li class=\"nav-item\">\n      Products\n      <!-- Nested Dropdown -->\n      <ul class=\"submenu\">\n        <li>Electronics (Do not select)</li>\n        <li>Books (Do not select)</li>\n      </ul>\n    </li>\n    <li class=\"nav-item\">Contact</li>\n  </ul>\n</nav>",
@@ -268,12 +278,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the plus symbol (+).",
-                    "Format: element + nextElement"
+                    "Find an element by its relationship to its neighbors if it doesn't have an ID itself.",
+                    "The '+' operator finds the element that is placed immediately after another element at the same level.",
+                    "Use 'h1 + p' to select the subtitle that follows the main heading."
                 ],
                 "id": [
-                    "Gunakan simbol plus (+).",
-                    "Format: elemen + elemenBerikutnya"
+                    "Temukan elemen melalui hubungannya dengan tetangganya jika elemen itu sendiri tidak memiliki ID.",
+                    "Operator '+' menemukan elemen yang ditempatkan tepat setelah elemen lain pada tingkat yang sama.",
+                    "Gunakan 'h1 + p' untuk memilih subtitle yang mengikuti heading utama."
                 ]
             },
             "htmlContent": "<article class=\"blog-post\">\n  <h1 class=\"post-title\">The Future of Web Testing</h1>\n  \n  <!-- Target -->\n  <p class=\"subtitle\">Why selectors specificy matters more than ever.</p>\n  \n  <p class=\"content\">Web testing has evolved significantly...</p>\n</article>",
@@ -317,12 +329,14 @@
             },
             "hints": {
                 "en": [
-                    "Use spaces to drill down.",
-                    "Path: .profile-card (space) .card-content (space) span"
+                    "When a page has multiple identical components, you must specify the exact path to distinguish them.",
+                    "Use spaces to drill down into the hierarchy (e.g., .parent .child .grandchild).",
+                    "Follow the path from '.profile-card' down to '.card-content' and finally to the 'span' element."
                 ],
                 "id": [
-                    "Gunakan spasi untuk melacak ke dalam.",
-                    "Path: .profile-card (spasi) .card-content (spasi) span"
+                    "Ketika sebuah halaman memiliki beberapa komponen yang identik, Kamu harus menentukan jalur yang tepat untuk membedakannya.",
+                    "Gunakan spasi untuk masuk lebih dalam ke hierarki (contoh: .parent .child .grandchild).",
+                    "Ikuti jalur dari '.profile-card' masuk ke '.card-content' dan terakhir ke elemen 'span'."
                 ]
             },
             "htmlContent": "<div class=\"layout\">\n  <div class=\"profile-card\">\n    <div class=\"card-header\">\n      <h3>User Profile</h3>\n    </div>\n    <div class=\"card-content\">\n      <!-- Target -->\n      <span>Premium Member</span>\n    </div>\n  </div>\n  \n  <div class=\"footer\">\n    <div class=\"footer-content\">\n      <span>Copyright 2024</span>\n    </div>\n  </div>\n</div>",
@@ -366,12 +380,14 @@
             },
             "hints": {
                 "en": [
-                    "Follow the path step by step.",
-                    "Use spaces between each level of hierarchy."
+                    "Structural selectors are more resilient than text-based ones, especially in applications that support multiple languages.",
+                    "Chain your selectors with spaces to follow the HTML hierarchy step-by-step from a unique ID.",
+                    "Target '#user-menu', then find '.dropdown-list', then its '.action-item', and finally the 'a' tag."
                 ],
                 "id": [
-                    "Ikuti path-nya langkah demi langkah.",
-                    "Gunakan spasi di antara tiap level hierarki."
+                    "Selector struktural lebih tangguh daripada selector berbasis teks, terutama dalam aplikasi yang mendukung banyak bahasa.",
+                    "Rangkai selector Kamu dengan spasi untuk mengikuti hierarki HTML langkah demi langkah dari ID yang unik.",
+                    "Targetkan '#user-menu', lalu temukan '.dropdown-list', lalu '.action-item' di dalamnya, dan terakhir tag 'a'."
                 ]
             },
             "htmlContent": "<nav class=\"navbar\">\n  <ul class=\"nav-root\">\n    <li>Home</li>\n    <li id=\"user-menu\">\n      My Account\n      <ul class=\"dropdown-list\">\n        <li>Settings</li>\n        <li>Billing</li>\n        <li class=\"action-item\">\n          <!-- Target -->\n          <a href=\"/logout\">Logout</a>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</nav>",
@@ -415,12 +431,14 @@
             },
             "hints": {
                 "en": [
-                    "Use square brackets [ ].",
-                    "Format: [attribute=\"value\"]"
+                    "Sometimes the most reliable way to find an element is by its functional attributes, like its type or name.",
+                    "Use square brackets to target an attribute and its value, such as [attribute=\"value\"].",
+                    "Locate the email field using the selector '[type=\"email\"]' to distinguish it from other inputs."
                 ],
                 "id": [
-                    "Gunakan kurung siku [ ].",
-                    "Format: [atribut=\"nilai\"]"
+                    "Terkadang cara paling andal untuk menemukan elemen adalah melalui atribut fungsionalnya, seperti tipe atau namanya.",
+                    "Gunakan kurung siku untuk menargetkan atribut dan nilainya, seperti [attribute=\"value\"].",
+                    "Temukan kolom email menggunakan selector '[type=\"email\"]' untuk membedakannya dari input lainnya."
                 ]
             },
             "htmlContent": "<form class=\"contact-form\">\n  <div class=\"row\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"fullname\" />\n  </div>\n  <div class=\"row\">\n    <label>Email Address</label>\n    <input type=\"email\" name=\"email\" />\n  </div>\n  <button>Send</button>\n</form>",
@@ -463,12 +481,14 @@
             },
             "hints": {
                 "en": [
-                    "Append the pseudo-class with a colon (:).",
-                    "Example: element:state"
+                    "Use CSS pseudo-classes to verify the state of an element, such as whether it's currently considered invalid by the browser.",
+                    "The ':invalid' pseudo-class targets fields that fail the browser's built-in validation rules.",
+                    "Append ':invalid' to your input selector to specifically target the field that has a formatting error."
                 ],
                 "id": [
-                    "Tambahkan pseudo-class dengan titik dua (:).",
-                    "Contoh: elemen:status"
+                    "Gunakan pseudo-class CSS untuk memverifikasi status suatu elemen, seperti apakah elemen tersebut saat ini dianggap tidak valid oleh browser.",
+                    "Pseudo-class ':invalid' menargetkan kolom yang gagal dalam aturan validasi bawaan browser.",
+                    "Tambahkan ':invalid' ke selector input Kamu untuk secara spesifik menargetkan kolom yang memiliki kesalahan format."
                 ]
             },
             "htmlContent": "<form class=\"login-form\">\n  <div class=\"form-group\">\n    <label>Email</label>\n    <input type=\"email\" value=\"not-an-email\" required /> <!-- This is invalid -->\n    <span class=\"error-text\">Please enter a valid email</span>\n  </div>\n  <div class=\"form-group\">\n    <label>Password</label>\n    <input type=\"password\" value=\"secret123\" required /> <!-- This is valid -->\n  </div>\n</form>",
@@ -512,12 +532,14 @@
             },
             "hints": {
                 "en": [
-                    "Chain the selectors: .class.class:not(.excluded)",
-                    "Put the excluded class inside the parenthesis."
+                    "The ':not()' pseudo-class allows you to exclude specific elements that match a certain criteria from your selection.",
+                    "Chain the negation to your other classes (e.g., .item:not(.hidden)) to filter your results.",
+                    "Use '.user-card.active:not(.suspended)' to select only active users who are not currently suspended."
                 ],
                 "id": [
-                    "Rangkai selector-nya: .class.class:not(.excluded)",
-                    "Masukkan class yang dikecualikan di dalam kurung."
+                    "Pseudo-class ':not()' memungkinkan Kamu untuk mengecualikan elemen tertentu yang cocok dengan kriteria tertentu dari seleksi Kamu.",
+                    "Rantai negasi ke class Kamu yang lain (contoh: .item:not(.hidden)) untuk memfilter hasil Kamu.",
+                    "Gunakan '.user-card.active:not(.suspended)' untuk memilih hanya pengguna aktif yang saat ini tidak ditangguhkan (suspended)."
                 ]
             },
             "htmlContent": "<div class=\"user-list\">\n  <!-- This one is active AND suspended. Ignore it. -->\n  <div class=\"user-card active suspended\">\n    <h3>Bad Actor</h3>\n    <span class=\"badge\">Suspended</span>\n  </div>\n\n  <!-- This is your target. Active, healthy user. -->\n  <div class=\"user-card active\">\n    <h3>Good User</h3>\n    <span class=\"badge\">Active</span>\n  </div>\n\n  <div class=\"user-card inactive\">\n    <h3>Old User</h3>\n  </div>\n</div>",
@@ -561,14 +583,14 @@
             },
             "hints": {
                 "en": [
-                    "Start with the attribute selector [type=\"tel\"]",
-                    "Chain :optional",
-                    "Chain :not(:disabled)"
+                    "Combine attributes and states to find highly specific elements in complex, dynamic forms.",
+                    "Chain attribute selectors with state pseudo-classes like ':optional' and ':not(:disabled)'.",
+                    "Construct the selector 'input[type=\"tel\":optional:not(:disabled)]' with proper chaining."
                 ],
                 "id": [
-                    "Mulai dengan selector atribut [type=\"tel\"]",
-                    "Rangkai dengan :optional",
-                    "Rangkai dengan :not(:disabled)"
+                    "Gabungkan atribut dan status untuk menemukan elemen yang sangat spesifik dalam formulir dinamis yang kompleks.",
+                    "Rantai selector atribut dengan pseudo-class status seperti ':optional' dan ':not(:disabled)'.",
+                    "Buat selector 'input[type=\"tel\"]:optional:not(:disabled)' dengan perangkaian yang benar."
                 ]
             },
             "htmlContent": "<form class=\"complex-form\">\n  <div class=\"row\">\n    <input type=\"text\" placeholder=\"Name\" required />\n  </div>\n  \n  <div class=\"row\">\n    <!-- Target -->\n    <input type=\"tel\" placeholder=\"Phone (Optional)\" />\n  </div>\n  \n  <div class=\"row\">\n    <input type=\"tel\" placeholder=\"Fax (Disabled)\" disabled />\n  </div>\n  \n  <div class=\"row\">\n    <input type=\"email\" placeholder=\"Email\" required class=\"focus\" />\n  </div>\n</form>",
@@ -612,12 +634,14 @@
             },
             "hints": {
                 "en": [
-                    "Pass the number 3 inside the parenthesis.",
-                    "Format: tag:nth-child(n)"
+                    "When you have multiple identical siblings, you can select one specifically by its numerical position.",
+                    "Use the ':nth-child(n)' pseudo-class where 'n' is the 1-based index of the element among its siblings.",
+                    "Target the third 'li' element in the features list by using the selector 'li:nth-child(3)'."
                 ],
                 "id": [
-                    "Masukkan angka 3 di dalam tanda kurung.",
-                    "Format: tag:nth-child(n)"
+                    "Ketika Kamu memiliki beberapa saudara kandung (siblings) yang identik, Kamu dapat memilih satu secara khusus berdasarkan posisi numeriknya.",
+                    "Gunakan pseudo-class ':nth-child(n)' di mana 'n' adalah indeks berbasis 1 dari elemen di antara saudara kandungnya.",
+                    "Targetkan elemen 'li' ketiga dalam daftar fitur dengan menggunakan selector 'li:nth-child(3)'."
                 ]
             },
             "htmlContent": "<ul class=\"features\">\n  <li>Fast Performance</li>\n  <li>Secure by Default</li>\n  <!-- Target -->\n  <li>Cloud Sync</li>\n  <li>Offline Mode</li>\n</ul>",
@@ -660,12 +684,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the number 2.",
-                    "Format: tag:nth-of-type(n)"
+                    "Be careful with mixed content types; ':nth-child' counts every element, while ':nth-of-type' only counts elements of that specific tag.",
+                    "Use ':nth-of-type(n)' when you want to find the n-th paragraph regardless of any images or headers in between.",
+                    "Select the second paragraph in the article by using 'p:nth-of-type(2)'."
                 ],
                 "id": [
-                    "Gunakan angka 2.",
-                    "Format: tag:nth-of-type(n)"
+                    "Hati-hati dengan tipe konten campuran; ':nth-child' menghitung setiap elemen, sedangkan ':nth-of-type' hanya menghitung elemen dari tag spesifik tersebut.",
+                    "Gunakan ':nth-of-type(n)' ketika Kamu ingin menemukan paragraf ke-n tanpa mempedulikan gambar atau heading di antaranya.",
+                    "Pilih paragraf kedua dalam artikel dengan menggunakan 'p:nth-of-type(2)'."
                 ]
             },
             "htmlContent": "<article>\n  <h1>The News</h1>\n  <img src=\"banner.jpg\" />\n  \n  <p>Introductory paragraph.</p>\n  \n  <!-- Target -->\n  <p>The main details of the story.</p>\n  \n  <div class=\"ad\">Advertisement</div>\n</article>",
@@ -708,12 +734,14 @@
             },
             "hints": {
                 "en": [
-                    "Space between tr and td means 'inside'.",
-                    "Use nth-child for both row and column."
+                    "Navigate complex tables by selecting the specific row and then drilling down into the specific column you need.",
+                    "Combine row and column indices using child or descendant selectors (e.g., tr:nth-child(2) td:nth-child(3)).",
+                    "Target the 'Pending' status by finding the second 'tr' in the body and then the third 'td' inside it."
                 ],
                 "id": [
-                    "Spasi di antara tr dan td berarti 'di dalam'.",
-                    "Gunakan nth-child untuk baris dan kolom."
+                    "Navigasi tabel yang kompleks dengan memilih baris tertentu dan kemudian masuk ke kolom spesifik yang Kamu butuhkan.",
+                    "Gabungkan indeks baris dan kolom menggunakan selector anak atau keturunan (contoh: tr:nth-child(2) td:nth-child(3)).",
+                    "Targetkan status 'Pending' dengan menemukan 'tr' kedua di dalam body dan kemudian 'td' ketiga di dalamnya."
                 ]
             },
             "htmlContent": "<table class=\"user-table\">\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Email</th>\n      <th>Status</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Alice Johnson</td>\n      <td>alice@example.com</td>\n      <td>Active</td>\n    </tr>\n    <tr>\n      <td>Bob Smith</td>\n      <td>bob@example.com</td>\n      <!-- Target -->\n      <td>Pending</td>\n    </tr>\n    <tr>\n      <td>Carol White</td>\n      <td>carol@example.com</td>\n      <td>Active</td>\n    </tr>\n  </tbody>\n</table>",
@@ -758,14 +786,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the keyword 'odd' inside nth-child.",
-                    "Chain :last-child for the cell.",
-                    "End with the button tag."
+                    "Use pattern matching keywords like 'odd' or 'even' to interact with groups of elements in a structured grid or list.",
+                    "Combine ':nth-child(odd)' with structural pseudo-classes like ':last-child' to reach the correct cell in every other row.",
+                    "Follow the path: 'tr:nth-child(odd)' -> 'td:last-child' -> 'button'."
                 ],
                 "id": [
-                    "Gunakan kata kunci 'odd' di dalam nth-child.",
-                    "Rangkai :last-child untuk sel tersebut.",
-                    "Akhiri dengan tag button."
+                    "Gunakan kata kunci pencocokan pola seperti 'odd' (ganjil) atau 'even' (genap) untuk berinteraksi dengan grup elemen dalam grid atau daftar yang terstruktur.",
+                    "Gabungkan ':nth-child(odd)' dengan pseudo-class struktural seperti ':last-child' untuk mencapai sel yang benar di setiap baris lainnya.",
+                    "Ikuti jalur: 'tr:nth-child(odd)' -> 'td:last-child' -> 'button'."
                 ]
             },
             "htmlContent": "<table class=\"data-grid\">\n  <tbody>\n    <!-- Row 1 (Odd) -->\n    <tr>\n      <td>User 1</td>\n      <td>2024-01-01</td>\n      <td class=\"actions\"><button>Edit</button></td>\n    </tr>\n    <!-- Row 2 (Even) -->\n    <tr class=\"spacer\">\n      <td colspan=\"3\">Details...</td>\n    </tr>\n    <!-- Row 3 (Odd) -->\n    <tr>\n      <td>User 2</td>\n      <td>2024-01-02</td>\n      <td class=\"actions\"><button>Edit</button></td>\n    </tr>\n  </tbody>\n</table>",
@@ -810,12 +838,14 @@
             },
             "hints": {
                 "en": [
-                    "First find the 2nd li item.",
-                    "Then space, then find .del class."
+                    "Ignore random, auto-generated IDs and instead rely on the stable structure of the page to find your target.",
+                    "Use a structural anchor (like the second list item) to provide a stable starting point for finding inner elements.",
+                    "Find the second 'li', then use a space to select the '.del' button that lives inside it."
                 ],
                 "id": [
-                    "Temukan item li ke-2 terlebih dahulu.",
-                    "Lalu spasi, lalu temukan class .del."
+                    "Abaikan ID acak yang dibuat secara otomatis dan sebagai gantinya andalkan struktur halaman yang stabil untuk menemukan target Kamu.",
+                    "Gunakan jangkar struktural (seperti item daftar kedua) untuk memberikan titik awal yang stabil dalam menemukan elemen di dalamnya.",
+                    "Temukan 'li' kedua, lalu gunakan spasi untuk memilih tombol '.del' yang berada di dalamnya."
                 ]
             },
             "htmlContent": "<ul class=\"items\">\n  <li>\n    <span>Item A</span>\n    <button class=\"del\">Delete</button>\n  </li>\n  <li>\n    <span>Item B</span>\n    <!-- Target -->\n    <button class=\"del\">Delete</button>\n  </li>\n  <li>\n    <span>Item C</span>\n    <button class=\"del\">Delete</button>\n  </li>\n</ul>",
@@ -858,12 +888,14 @@
             },
             "hints": {
                 "en": [
-                    "Start with double slash //",
-                    "Then the tag name: //tagname"
+                    "XPath is a powerful fallback when CSS selectors are insufficient for complex traversals.",
+                    "Relative XPaths start with '//' and can find elements anywhere in the document tree.",
+                    "Write a relative path to target the button directly using the expression '//button'."
                 ],
                 "id": [
-                    "Mulai dengan garis miring ganda //",
-                    "Lalu nama tag: //namatag"
+                    "XPath adalah cadangan yang kuat ketika selector CSS tidak cukup untuk penelusuran yang kompleks.",
+                    "XPath relatif dimulai dengan '//' dan dapat menemukan elemen di mana saja dalam pohon dokumen.",
+                    "Tulis jalur relatif untuk menargetkan tombol secara langsung menggunakan ekspresi '//button'."
                 ]
             },
             "htmlContent": "<div class=\"contact-page\">\n  <h1>Contact Us</h1>\n  <form id=\"contact-form\">\n    <input type=\"text\" name=\"name\" placeholder=\"Your Name\" />\n    <input type=\"email\" name=\"email\" placeholder=\"Your Email\" />\n    <textarea name=\"message\" placeholder=\"Your Message\"></textarea>\n    <button type=\"submit\">Send Message</button>\n  </form>\n</div>",
@@ -908,12 +940,14 @@
             },
             "hints": {
                 "en": [
-                    "Start with //input",
-                    "Add predicates in brackets: [@type=\"value\"]"
+                    "Find elements by their specific properties using the '@' symbol to reference attributes.",
+                    "Attributes are matched inside square brackets, such as //input[@type=\"password\"].",
+                    "Locate the password field by writing the expression '//input[@type=\"password\"]'."
                 ],
                 "id": [
-                    "Mulai dengan //input",
-                    "Tambahkan predikat dalam kurung: [@type=\"value\"]"
+                    "Temukan elemen melalui properti spesifiknya menggunakan simbol '@' untuk mereferensikan atribut.",
+                    "Atribut dicocokkan di dalam kurung siku, seperti //input[@type=\"password\"].",
+                    "Temukan kolom kata sandi dengan menulis ekspresi '//input[@type=\"password\"]'."
                 ]
             },
             "htmlContent": "<div class=\"login-container\">\n  <h2>Sign In</h2>\n  <form>\n    <div class=\"field\">\n      <input type=\"text\" name=\"username\" placeholder=\"Username\" />\n    </div>\n    <div class=\"field\">\n      <input type=\"password\" name=\"password\" placeholder=\"Password\" />\n    </div>\n    <div class=\"field\">\n      <input type=\"checkbox\" name=\"remember\" id=\"remember\" />\n      <label for=\"remember\">Remember me</label>\n    </div>\n    <button type=\"submit\">Login</button>\n  </form>\n</div>",
@@ -958,12 +992,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the equals sign for exact match.",
-                    "Format: //tag[text()=\"Exact Text\"]"
+                    "XPath allows you to select elements based on the exact text they display, which is very useful for buttons and links.",
+                    "Use the 'text()' function inside a predicate to match the content: //tag[text()=\"Exact Text\"].",
+                    "Find the button containing the exact text \"Add to Cart\" using '//button[text()=\"Add to Cart\"]'."
                 ],
                 "id": [
-                    "Gunakan tanda sama dengan untuk pencocokan tepat.",
-                    "Format: //tag[text()=\"Teks Tepat\"]"
+                    "XPath memungkinkan Kamu untuk memilih elemen berdasarkan teks tepat yang mereka tampilkan, yang sangat berguna untuk tombol dan tautan.",
+                    "Gunakan fungsi 'text()' di dalam predikat untuk mencocokkan konten: //tag[text()=\"Teks Tepat\"].",
+                    "Temukan tombol yang berisi teks tepat \"Add to Cart\" menggunakan '//button[text()=\"Add to Cart\"]'."
                 ]
             },
             "htmlContent": "<div class=\"product-card\">\n  <img src=\"/product.jpg\" alt=\"Wireless Headphones\" />\n  <h3>Wireless Headphones</h3>\n  <p class=\"price\">$99.99</p>\n  <div class=\"actions\">\n    <button class=\"btn outline\">View Details</button>\n    <button class=\"btn primary\">Add to Cart</button>\n  </div>\n</div>",
@@ -1008,12 +1044,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the contains function.",
-                    "Format: contains(@attribute, \"partial_value\")"
+                    "Use partial matching when attributes or text are dynamic or when you only need to match part of a value.",
+                    "The 'contains()' function checks for a substring within an attribute: [contains(@attribute, \"value\")].",
+                    "Target the div whose class contains the word \"error\" using '//div[contains(@class, \"error\")]'."
                 ],
                 "id": [
-                    "Gunakan fungsi contains.",
-                    "Format: contains(@atribut, \"nilai_sebagian\")"
+                    "Gunakan pencocokan parsial ketika atribut atau teks bersifat dinamis atau ketika Kamu hanya perlu mencocokkan sebagian nilai.",
+                    "Fungsi 'contains()' mengecek substring di dalam sebuah atribut: [contains(@attribute, \"value\")].",
+                    "Targetkan div yang class-nya mengandung kata \"error\" menggunakan '//div[contains(@class, \"error\")]'."
                 ]
             },
             "htmlContent": "<form class=\"registration-form\">\n  <div class=\"form-group\">\n    <input type=\"email\" class=\"input\" placeholder=\"Email\" />\n    <div class=\"message error-message\">Please enter a valid email address</div>\n  </div>\n  <div class=\"form-group\">\n    <input type=\"password\" class=\"input\" placeholder=\"Password\" />\n    <div class=\"message hint-message\">Password must be at least 8 characters</div>\n  </div>\n  <div class=\"form-group\">\n    <input type=\"password\" class=\"input\" placeholder=\"Confirm Password\" />\n    <div class=\"message success-message\">Passwords match!</div>\n  </div>\n  <button type=\"submit\">Register</button>\n</form>",
@@ -1059,12 +1097,14 @@
             },
             "hints": {
                 "en": [
-                    "Use // to go deep inside the form.",
-                    "Chain the selectors: //form[...]//button[...]"
+                    "Layer your search criteria—triangulate—to find specific elements in complex or messy code structures.",
+                    "Chain multiple conditions together, such as finding a button inside a specific form: //form[...]//button[...].",
+                    "Select the 'Sign In' button within the login form using '//form[contains(@class, \"login\")]//button[text()=\"Sign In\"]'."
                 ],
                 "id": [
-                    "Gunakan // untuk mencari jauh ke dalam form.",
-                    "Rangkai selectornya: //form[...]//button[...]"
+                    "Lapisi kriteria pencarian Kamu—triangulasi—untuk menemukan elemen spesifik dalam struktur kode yang kompleks atau berantakan.",
+                    "Rantai beberapa kondisi bersama-sama, seperti menemukan tombol di dalam formulir tertentu: //form[...]//button[...].",
+                    "Pilih tombol 'Sign In' di dalam formulir login menggunakan '//form[contains(@class, \"login\")]//button[text()=\"Sign In\"]'."
                 ]
             },
             "htmlContent": "<div class=\"page-wrapper\">\n  <header>\n    <nav class=\"main-nav\">\n      <button id=\"nav-btn-12345\" class=\"btn nav-btn\">Menu</button>\n      <button id=\"nav-btn-67890\" class=\"btn nav-btn\">Sign Up</button>\n    </nav>\n  </header>\n  \n  <main class=\"content\">\n    <form id=\"form-abc123\" class=\"form login-form\">\n      <h2>Welcome Back</h2>\n      <div class=\"field\">\n        <input type=\"email\" id=\"input-xyz789\" class=\"input\" placeholder=\"Email\" />\n      </div>\n      <div class=\"field\">\n        <input type=\"password\" id=\"input-xyz790\" class=\"input\" placeholder=\"Password\" />\n      </div>\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn secondary\">Forgot Password</button>\n        <button type=\"submit\" class=\"btn primary\">Sign In</button>\n      </div>\n    </form>\n  </main>\n</div>",
@@ -1109,12 +1149,14 @@
             },
             "hints": {
                 "en": [
-                    "Find the child first: //a[text()=\"Settings\"]",
-                    "Append /.. or /parent::li"
+                    "Unlike CSS, XPath allows you to move UP the tree to find parent or ancestor elements of your current selection.",
+                    "Use '/parent::tag' for the immediate parent or '/ancestor::tag' to search further up the hierarchy.",
+                    "Find the 'Settings' link first, then traverse to its parent list item using '//a[text()=\"Settings\"]/parent::li'."
                 ],
                 "id": [
-                    "Temukan anak elemennya dulu: //a[text()=\"Settings\"]",
-                    "Tambahkan /.. atau /parent::li"
+                    "Berbeda dengan CSS, XPath memungkinkan Kamu untuk berpindah ke ATAS pohon untuk menemukan elemen parent atau leluhur dari seleksi Kamu saat ini.",
+                    "Gunakan '/parent::tag' untuk induk langsung atau '/ancestor::tag' untuk mencari lebih jauh ke atas hierarki.",
+                    "Temukan tautan 'Settings' terlebih dahulu, lalu telusuri ke item daftar induknya menggunakan '//a[text()=\"Settings\"]/parent::li'."
                 ]
             },
             "htmlContent": "<nav class=\"sidebar\">\n  <ul class=\"menu\">\n    <li class=\"menu-item\">\n      <a href=\"/dashboard\">Dashboard</a>\n    </li>\n    <li class=\"menu-item\">\n      <a href=\"/profile\">Profile</a>\n    </li>\n    <li class=\"menu-item active\">\n      <a href=\"/settings\">Settings</a>\n    </li>\n    <li class=\"menu-item\">\n      <a href=\"/logout\">Logout</a>\n    </li>\n  </ul>\n</nav>",
@@ -1160,12 +1202,14 @@
             },
             "hints": {
                 "en": [
-                    "Find the label first: //label[text()=\"Username\"]",
-                    "Append /following-sibling::input"
+                    "Select elements based on the neighbors that come after them at the same level of the document tree.",
+                    "The '/following-sibling::tag' axis finds the element that appears next to your current one among its siblings.",
+                    "Locate the 'Username' label, then select the input field immediately after it using the 'following-sibling' axis."
                 ],
                 "id": [
-                    "Temukan labelnya dulu: //label[text()=\"Username\"]",
-                    "Tambahkan /following-sibling::input"
+                    "Pilih elemen berdasarkan tetangga yang muncul setelahnya pada tingkat yang sama dari pohon dokumen.",
+                    "Sumbu '/following-sibling::tag' menemukan elemen yang muncul di sebelah elemen Kamu saat ini di antara saudara kandungnya.",
+                    "Temukan label 'Username', lalu pilih kolom input tepat setelahnya menggunakan sumbu 'following-sibling'."
                 ]
             },
             "htmlContent": "<form class=\"user-form\">\n  <div class=\"field-row\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"fullname\" placeholder=\"John Doe\" />\n  </div>\n  <div class=\"field-row\">\n    <label>Username</label>\n    <input type=\"text\" name=\"username\" placeholder=\"johndoe\" />\n  </div>\n  <div class=\"field-row\">\n    <label>Phone</label>\n    <input type=\"tel\" name=\"phone\" placeholder=\"+1 234 567 890\" />\n  </div>\n</form>",
@@ -1210,12 +1254,14 @@
             },
             "hints": {
                 "en": [
-                    "Find the error span first: //span[@class=\"error\"]",
-                    "Append /preceding-sibling::label"
+                    "Look backwards in the document tree to find elements that appear before your current one at the same level.",
+                    "Use the '/preceding-sibling::tag' axis to select a neighbor that comes before your current anchor element.",
+                    "Select the error span first, then find the label preceding it using '//span[@class=\"error\"]/preceding-sibling::label'."
                 ],
                 "id": [
-                    "Temukan span error dulu: //span[@class=\"error\"]",
-                    "Tambahkan /preceding-sibling::label"
+                    "Lihat ke belakang dalam pohon dokumen untuk menemukan elemen yang muncul sebelum elemen Kamu saat ini pada tingkat yang sama.",
+                    "Gunakan sumbu '/preceding-sibling::tag' untuk memilih tetangga yang muncul sebelum elemen jangkar Kamu saat ini.",
+                    "Pilih span error terlebih dahulu, lalu temukan label yang mendahuluinya menggunakan '//span[@class=\"error\"]/preceding-sibling::label'."
                 ]
             },
             "htmlContent": "<form class=\"registration-form\">\n  <div class=\"field-group\">\n    <label>Email Address</label>\n    <input type=\"email\" name=\"email\" />\n    <span class=\"hint\">We'll never share your email</span>\n  </div>\n  <div class=\"field-group\">\n    <label>Password</label>\n    <input type=\"password\" name=\"password\" />\n    <span class=\"error\">Password must be at least 8 characters</span>\n  </div>\n  <div class=\"field-group\">\n    <label>Confirm Password</label>\n    <input type=\"password\" name=\"confirm\" />\n  </div>\n</form>",
@@ -1260,14 +1306,14 @@
             },
             "hints": {
                 "en": [
-                    "Find error: //span[text()=\"Invalid email format\"]",
-                    "Go Up: /ancestor::div",
-                    "Go Down: //input"
+                    "Combine up-and-down traversals to navigate between related elements that are not direct neighbors.",
+                    "Traverse to a common ancestor using '/ancestor::tag', then drill back down to the specific target element.",
+                    "Follow the path: '//span[text()=\"Invalid email format\"]' -> '/ancestor::div' -> '//input'."
                 ],
                 "id": [
-                    "Temukan error: //span[text()=\"Format email tidak valid\"]",
-                    "Naik: /ancestor::div",
-                    "Turun: //input"
+                    "Gabungkan penelusuran ke atas dan ke bawah untuk menavigasi di antara elemen terkait yang bukan tetangga langsung.",
+                    "Telusuri ke leluhur umum menggunakan '/ancestor::tag', lalu masuk kembali ke elemen target spesifik.",
+                    "Ikuti jalur: '//span[text()=\"Format email tidak valid\"]' -> '/ancestor::div' -> '//input'."
                 ]
             },
             "htmlContent": "<form class=\"checkout-form\">\n  <div class=\"form-field\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"name\" value=\"John Doe\" />\n    <span class=\"validation valid\">✓ Looks good</span>\n  </div>\n  <div class=\"form-field has-error\">\n    <label>Email</label>\n    <input type=\"email\" name=\"email\" value=\"invalid-email\" />\n    <span class=\"validation error\">Invalid email format</span>\n  </div>\n  <div class=\"form-field\">\n    <label>Phone</label>\n    <input type=\"tel\" name=\"phone\" value=\"+1234567890\" />\n    <span class=\"validation valid\">✓ Valid number</span>\n  </div>\n</form>",
@@ -1313,12 +1359,14 @@
             },
             "hints": {
                 "en": [
-                    "Use 'and' between attributes.",
-                    "Structure: //tag[@attr1=\"val1\" and contains(@attr2, \"val2\")]"
+                    "Use logical operators to combine multiple search criteria for more precise and robust element selection.",
+                    "Join attributes or function results using the 'and' or 'or' keywords inside your predicate square brackets.",
+                    "Select the button that has a submit type AND a class containing 'primary' using '//button[@type=\"submit\" and contains(@class, \"primary\")]'."
                 ],
                 "id": [
-                    "Gunakan 'and' di antara atribut.",
-                    "Struktur: //tag[@attr1=\"val1\" and contains(@attr2, \"val2\")]"
+                    "Gunakan operator logika untuk menggabungkan beberapa kriteria pencarian demi seleksi elemen yang lebih presisi dan tangguh.",
+                    "Gabungkan atribut atau hasil fungsi menggunakan kata kunci 'and' atau 'or' di dalam kurung siku predikat Kamu.",
+                    "Pilih tombol yang memiliki tipe submit DAN class yang mengandung 'primary' menggunakan '//button[@type=\"submit\" and contains(@class, \"primary\")]'."
                 ]
             },
             "htmlContent": "<div class=\"dialog\">\n  <h2>Confirm Action</h2>\n  <p>Are you sure you want to proceed?</p>\n  <div class=\"dialog-actions\">\n    <button type=\"button\" class=\"btn secondary\">Cancel</button>\n    <button type=\"button\" class=\"btn danger\">Delete</button>\n    <button type=\"submit\" class=\"btn primary\">Confirm</button>\n  </div>\n</div>",
@@ -1365,12 +1413,14 @@
             },
             "hints": {
                 "en": [
-                    "Use square brackets for indexing.",
-                    "Function `last()` returns the last index."
+                    "Select elements based on their numerical order in the page or within a specific container.",
+                    "Use index numbers (starting at 1) or the 'last()' function inside square brackets (e.g., //li[last()]).",
+                    "Target the very last item in the navigation list by using the selector '//ul/li[last()]'."
                 ],
                 "id": [
-                    "Gunakan kurung siku untuk indeks.",
-                    "Fungsi `last()` mengembalikan indeks terakhir."
+                    "Pilih elemen berdasarkan urutan numeriknya di halaman atau di dalam kontainer tertentu.",
+                    "Gunakan nomor indeks (dimulai dari 1) atau fungsi 'last()' di dalam kurung siku (contoh: //li[last()]).",
+                    "Targetkan item terakhir dalam daftar navigasi dengan menggunakan selector '//ul/li[last()]'."
                 ]
             },
             "htmlContent": "<nav class=\"top-nav\">\n  <ul class=\"nav-list\">\n    <li><a href=\"/\">Home</a></li>\n    <li><a href=\"/products\">Products</a></li>\n    <li><a href=\"/services\">Services</a></li>\n    <li><a href=\"/about\">About</a></li>\n    <li><a href=\"/contact\">Contact</a></li>\n  </ul>\n</nav>",
@@ -1416,12 +1466,14 @@
             },
             "hints": {
                 "en": [
-                    "Use parentheses: normalize-space()",
-                    "Equals string: =\"Value\""
+                    "Strip away inconsistent whitespace or hidden characters from text content to make your selectors more resilient.",
+                    "The 'normalize-space()' function collapses multiple spaces into one and removes leading/trailing padding.",
+                    "Match the 'Save Changes' button even with extra padding by using '//button[normalize-space()=\"Save Changes\"]'."
                 ],
                 "id": [
-                    "Gunakan tanda kurung: normalize-space()",
-                    "Sama dengan string: =\"Value\""
+                    "Bersihkan spasi putih yang tidak konsisten atau karakter tersembunyi dari konten teks untuk membuat selector Kamu lebih tangguh.",
+                    "Fungsi 'normalize-space()' menggabungkan beberapa spasi menjadi satu dan menghapus padding di awal/akhir.",
+                    "Cocokkan tombol 'Save Changes' meskipun memiliki padding tambahan menggunakan '//button[normalize-space()=\"Save Changes\"]'."
                 ]
             },
             "htmlContent": "<div class=\"form-actions\">\n  <button type=\"button\" class=\"btn\">\n    Cancel\n  </button>\n  <button type=\"button\" class=\"btn secondary\">\n    Save Draft\n  </button>\n  <button type=\"submit\" class=\"btn primary\">\n    Save Changes\n  </button>\n</div>",
@@ -1467,12 +1519,14 @@
             },
             "hints": {
                 "en": [
-                    "Find row first: //tr[td[text()=\"Value\"]]",
-                    "Append column index: /td[4]"
+                    "Find a specific row based on the data it contains, then navigate to a different column within that same row.",
+                    "Use a parent tr to group your criteria: //tr[td[text()=\"OrderID\"]]/td[column_index].",
+                    "Select the row for 'ORD-002', then target its 4th column (the status cell) using '//tr[td[text()=\"ORD-002\"]]/td[4]'."
                 ],
                 "id": [
-                    "Temukan baris dulu: //tr[td[text()=\"Value\"]]",
-                    "Tambahkan indeks kolom: /td[4]"
+                    "Temukan baris spesifik berdasarkan data yang dikandungnya, lalu navigasikan ke kolom yang berbeda dalam baris yang sama.",
+                    "Gunakan parent tr untuk mengelompokkan kriteria Kamu: //tr[td[text()=\"OrderID\"]]/td[indeks_kolom].",
+                    "Pilih baris untuk 'ORD-002', lalu targetkan kolom ke-4 (sel status) menggunakan '//tr[td[text()=\"ORD-002\"]]/td[4]'."
                 ]
             },
             "htmlContent": "<table class=\"orders-table\">\n  <thead>\n    <tr>\n      <th>Order ID</th>\n      <th>Customer</th>\n      <th>Amount</th>\n      <th>Status</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>ORD-001</td>\n      <td>Alice Johnson</td>\n      <td>$150.00</td>\n      <td class=\"status shipped\">Shipped</td>\n    </tr>\n    <tr>\n      <td>ORD-002</td>\n      <td>Bob Smith</td>\n      <td>$89.99</td>\n      <td class=\"status pending\">Pending</td>\n    </tr>\n    <tr>\n      <td>ORD-003</td>\n      <td>Carol White</td>\n      <td>$220.50</td>\n      <td class=\"status delivered\">Delivered</td>\n    </tr>\n  </tbody>\n</table>",
@@ -1518,12 +1572,14 @@
             },
             "hints": {
                 "en": [
-                    "Find start node: //h3[text()=\"Product A\"]",
-                    "Jump forward: /following::button[1]"
+                    "Jump to elements anywhere in the document that appear after your current anchor, even if they aren't directly related or nested.",
+                    "The 'following::' axis creates a flat list of all nodes that come after your starting point.",
+                    "Start from the 'Product A' header, then jump to the first button that follows it: '//h3[text()=\"Product A\"]/following::button[1]'."
                 ],
                 "id": [
-                    "Temukan node awal: //h3[text()=\"Product A\"]",
-                    "Lompat ke depan: /following::button[1]"
+                    "Lompat ke elemen mana pun di dokumen yang muncul setelah jangkar Kamu saat ini, meskipun elemen tersebut tidak terkait langsung atau bersarang.",
+                    "Sumbu 'following::' membuat daftar datar dari semua node yang muncul setelah titik awal Kamu.",
+                    "Mulai dari header 'Product A', lalu lompat ke tombol pertama yang mengikutinya: '//h3[text()=\"Product A\"]/following::button[1]'."
                 ]
             },
             "htmlContent": "<div class=\"product-list\">\n  <div class=\"header-section\">\n    <h3>Product A</h3>\n    <span class=\"badge\">New</span>\n  </div>\n  <div class=\"details-section\">\n    <p>Price: $10</p>\n  </div>\n  <div class=\"actions-section\">\n    <button class=\"btn\">View</button>\n    <button class=\"btn\">Edit</button>\n  </div>\n  \n  <hr>\n\n  <div class=\"header-section\">\n    <h3>Product B</h3>\n  </div>\n  <div class=\"actions-section\">\n    <button class=\"btn\">View</button>\n    <button class=\"btn\">Edit</button>\n  </div>\n</div>",
@@ -1568,14 +1624,14 @@
             },
             "hints": {
                 "en": [
-                    "Find row first with multiple conditions.",
-                    "Structure: //tr[condition1 and condition2]",
-                    "Then drill down: //button"
+                    "Master complex admin tables by combining multiple row conditions (triangulation) to find the exact button you need.",
+                    "Chain your row criteria with the 'and' operator within the tr brackets: //tr[td[...] and td[...] ].",
+                    "Select the 'Delete' button in the row for 'John Doe' who is an 'Admin' using '//tr[td[text()=\"John Doe\"] and td[text()=\"Admin\"]]//button[text()=\"Delete\"]'."
                 ],
                 "id": [
-                    "Temukan baris dulu dengan beberapa kondisi.",
-                    "Struktur: //tr[kondisi1 and kondisi2]",
-                    "Lalu telusuri ke bawah: //button"
+                    "Kuasai tabel admin yang kompleks dengan menggabungkan beberapa kondisi baris (triangulasi) untuk menemukan tombol tepat yang Kamu butuhkan.",
+                    "Rantai kriteria baris Kamu dengan operator 'and' di dalam kurung tr: //tr[td[...] and td[...] ].",
+                    "Pilih tombol 'Delete' dalam baris untuk 'John Doe' yang merupakan 'Admin' menggunakan '//tr[td[text()=\"John Doe\"] and td[text()=\"Admin\"]]//button[text()=\"Delete\"]'."
                 ]
             },
             "htmlContent": "<table class=\"admin-users-table\">\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Email</th>\n      <th>Role</th>\n      <th>Status</th>\n      <th>Actions</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Alice Smith</td>\n      <td>alice@example.com</td>\n      <td>Admin</td>\n      <td class=\"status active\">Active</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n    <tr>\n      <td>John Doe</td>\n      <td>john.editor@example.com</td>\n      <td>Editor</td>\n      <td class=\"status active\">Active</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n    <tr>\n      <td>John Doe</td>\n      <td>john.admin@example.com</td>\n      <td>Admin</td>\n      <td class=\"status active\">Active</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n    <tr>\n      <td>Bob Wilson</td>\n      <td>bob@example.com</td>\n      <td>Viewer</td>\n      <td class=\"status inactive\">Inactive</td>\n      <td class=\"actions\">\n        <button class=\"btn edit\">Edit</button>\n        <button class=\"btn delete\">Delete</button>\n      </td>\n    </tr>\n  </tbody>\n</table>",
@@ -1621,12 +1677,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the hash symbol for IDs: #idName",
-                    "It's the shortest possible selector here."
+                    "Understand that most elements can be targeted by multiple selector types; choosing the right one depends on the context.",
+                    "IDs are unique and stable, making them the superior choice for CSS selectors whenever they are available.",
+                    "Simplify your work by targeting the search button using its unique '#search-btn' ID selector."
                 ],
                 "id": [
-                    "Gunakan simbol tagar untuk ID: #idName",
-                    "Ini adalah selector terpendek di sini."
+                    "Pahami bahwa sebagian besar elemen dapat ditargetkan oleh beberapa tipe selector; memilih yang tepat tergantung pada konteksnya.",
+                    "ID bersifat unik dan stabil, menjadikannya pilihan utama untuk selector CSS kapan pun tersedia.",
+                    "Sederhanakan pekerjaan Kamu dengan menargetkan tombol pencarian menggunakan selector ID '#search-btn' yang unik."
                 ]
             },
             "htmlContent": "<header class=\"main-header\">\n  <div class=\"logo\">MySite</div>\n  <form class=\"search-form\">\n    <input type=\"text\" placeholder=\"Search...\" class=\"search-input\" />\n    <button type=\"submit\" id=\"search-btn\" class=\"btn search-btn\">Search</button>\n  </form>\n  <nav class=\"user-nav\">\n    <button class=\"btn\">Login</button>\n  </nav>\n</header>",
@@ -1671,14 +1729,14 @@
             },
             "hints": {
                 "en": [
-                    "You need to check text visible to user.",
-                    "Use `.//text()` to check text in children too.",
-                    "Example: //div[contains(., \"Out of Stock\")]"
+                    "While CSS is usually preferred, XPath becomes essential when you need to select elements based on their visible text content.",
+                    "Use XPath's ability to check for specific text inside a container or its children to find elements that lack stable attributes.",
+                    "Target the product card that specifically says \"Out of Stock\" using the expression '//div[contains(@class, \"product-card\") and .//text()[contains(., \"Out of Stock\")]]'."
                 ],
                 "id": [
-                    "Kamu perlu memeriksa teks yang terlihat oleh pengguna.",
-                    "Gunakan `.//text()` untuk memeriksa teks di anak elemen juga.",
-                    "Contoh: //div[contains(., \"Out of Stock\")]"
+                    "Meskipun CSS biasanya lebih disukai, XPath menjadi penting ketika Kamu perlu memilih elemen berdasarkan konten teks yang terlihat.",
+                    "Gunakan kemampuan XPath untuk mengecek teks tertentu di dalam kontainer atau anak-anaknya untuk menemukan elemen yang tidak memiliki atribut stabil.",
+                    "Targetkan kartu produk yang secara spesifik bertuliskan \"Out of Stock\" menggunakan ekspresi '//div[contains(@class, \"product-card\") and .//text()[contains(., \"Out of Stock\")]]'."
                 ]
             },
             "htmlContent": "<div class=\"products-grid\">\n  <div class=\"product-card\">\n    <h3>Wireless Mouse</h3>\n    <p class=\"price\">$29.99</p>\n    <span class=\"stock in-stock\">In Stock</span>\n    <button class=\"btn\">Add to Cart</button>\n  </div>\n  <div class=\"product-card\">\n    <h3>Mechanical Keyboard</h3>\n    <p class=\"price\">$89.99</p>\n    <span class=\"stock out-of-stock\">Out of Stock</span>\n    <button class=\"btn\" disabled>Unavailable</button>\n  </div>\n  <div class=\"product-card\">\n    <h3>USB Hub</h3>\n    <p class=\"price\">$19.99</p>\n    <span class=\"stock in-stock\">In Stock</span>\n    <button class=\"btn\">Add to Cart</button>\n  </div>\n</div>",
@@ -1724,12 +1782,14 @@
             },
             "hints": {
                 "en": [
-                    "Use the ID selector.",
-                    "It starts with a hash #."
+                    "Choose selectors that allow the browser to find elements quickly, especially in large and complex applications.",
+                    "Prioritize ID and Class selectors over tag names and universal XPath traversals to keep your test suites running fast.",
+                    "Use the '#submit-btn' ID selector as it is the fastest and most stable way to target the submit button."
                 ],
                 "id": [
-                    "Gunakan selector ID.",
-                    "Dimulai dengan tagar #."
+                    "Pilih selector yang memungkinkan browser menemukan elemen dengan cepat, terutama dalam aplikasi yang besar dan kompleks.",
+                    "Prioritaskan selector ID dan Class daripada nama tag dan penelusuran XPath universal untuk menjaga suite pengujian Kamu tetap berjalan cepat.",
+                    "Gunakan selector ID '#submit-btn' karena ini adalah cara tercepat dan paling stabil untuk menargetkan tombol submit."
                 ]
             },
             "htmlContent": "<form id=\"contact-form\" class=\"form contact-form modern-design\">\n  <div class=\"form-group\">\n    <input type=\"text\" id=\"name-field\" data-testid=\"name\" class=\"input\" placeholder=\"Name\" />\n  </div>\n  <div class=\"form-group\">\n    <input type=\"email\" id=\"email-field\" data-testid=\"email\" class=\"input\" placeholder=\"Email\" />\n  </div>\n  <div class=\"form-group\">\n    <textarea id=\"message-field\" data-testid=\"message\" class=\"input textarea\" placeholder=\"Message\"></textarea>\n  </div>\n  <div class=\"form-actions\">\n    <button type=\"reset\" id=\"reset-btn\" class=\"btn secondary\">Clear</button>\n    <button type=\"submit\" id=\"submit-btn\" data-testid=\"submit\" class=\"btn primary\">Send Message</button>\n  </div>\n</form>",
@@ -1774,12 +1834,14 @@
             },
             "hints": {
                 "en": [
-                    "Start with the data attribute selector: [data-product-id=\"...\"]",
-                    "Combine with a class for the button: .remove"
+                    "Apply a balanced strategy: use IDs for speed, data attributes for stability, and XPath only when text matching is required.",
+                    "Data attributes (like 'data-product-id') provide a contract between developers and testers that is less likely to break during UI changes.",
+                    "Select the 'Remove' button within the specific product card by combining its data attribute and button class: '[data-product-id=\"prod-101\"] .remove'."
                 ],
                 "id": [
-                    "Mulai dengan selector atribut data: [data-product-id=\"...\"]",
-                    "Gabungkan dengan class untuk tombol: .remove"
+                    "Terapkan strategi yang seimbang: gunakan ID untuk kecepatan, atribut data untuk stabilitas, dan XPath hanya ketika pencocokan teks diperlukan.",
+                    "Atribut data (seperti 'data-product-id') memberikan kontrak antara pengembang dan penguji yang kemungkinannya kecil untuk rusak saat terjadi perubahan UI.",
+                    "Pilih tombol 'Remove' di dalam kartu produk tertentu dengan menggabungkan atribut data dan class tombolnya: '[data-product-id=\"prod-101\"] .remove'."
                 ]
             },
             "htmlContent": "<div class=\"shopping-cart\">\n  <h2>Your Cart (2 items)</h2>\n  \n  <div class=\"cart-item\" data-product-id=\"prod-101\">\n    <img src=\"/mouse.jpg\" alt=\"Wireless Mouse\" />\n    <div class=\"item-details\">\n      <h3 class=\"product-name\">Wireless Mouse</h3>\n      <span class=\"price\">$29.99</span>\n      <span class=\"quantity\">Qty: 1</span>\n    </div>\n    <div class=\"item-actions\">\n      <button class=\"btn update\">Update</button>\n      <button class=\"btn remove\">Remove</button>\n    </div>\n  </div>\n  \n  <div class=\"cart-item\" data-product-id=\"prod-202\">\n    <img src=\"/keyboard.jpg\" alt=\"Mechanical Keyboard\" />\n    <div class=\"item-details\">\n      <h3 class=\"product-name\">Mechanical Keyboard</h3>\n      <span class=\"price\">$89.99</span>\n      <span class=\"quantity\">Qty: 1</span>\n    </div>\n    <div class=\"item-actions\">\n      <button class=\"btn update\">Update</button>\n      <button class=\"btn remove\">Remove</button>\n    </div>\n  </div>\n  \n  <div class=\"cart-summary\">\n    <span class=\"total\">Total: $119.98</span>\n    <button class=\"btn checkout\">Checkout</button>\n  </div>\n</div>",

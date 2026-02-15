@@ -22,14 +22,14 @@
             },
             "hints": {
                 "en": [
-                    "Inference: const x = 'val' (no annotation).",
-                    "Explicit: const x: number = 10;.",
-                    "Assign passCount to result."
+                    "Understand when TypeScript can figure out types on its own versus when you need to be explicit.",
+                    "Use implicit inference for direct value assignments; use explicit annotations like ': number' for declarations or contracts.",
+                    "Declare `testId = \"TC-001\"` (inferred) and `let passCount: number = 10` (explicit)."
                 ],
                 "id": [
-                    "Inference: const x = 'val' (tanpa anotasi).",
-                    "Eksplisit: const x: number = 10;.",
-                    "Simpan passCount ke result."
+                    "Pahami kapan TypeScript dapat menentukan tipe sendiri versus kapan Anda harus eksplisit.",
+                    "Gunakan inferensi implisit untuk penetapan nilai langsung; gunakan anotasi eksplisit seperti ': number' untuk deklarasi atau kontrak.",
+                    "Deklarasikan `testId = \"TC-001\"` (terinferensi) dan `let passCount: number = 10` (eksplisit)."
                 ]
             },
             "htmlContent": "<div class=\"test-runner\">\n  <h3>Clean Code Check</h3>\n  <div id=\"analysis\">Analyzing verbosity...</div>\n</div>",
@@ -70,14 +70,14 @@
             },
             "hints": {
                 "en": [
-                    "Define: function formatScore(score: number): string { ... }.",
-                    "Use template literals: `Score: ${score}`.",
-                    "Call it: result = formatScore(85);"
+                    "Learn how to strictly define what a function accepts as input and what it must return as output.",
+                    "Define parameter types inside parentheses and return types after a colon following the parentheses.",
+                    "Use `function formatScore(score: number): string { return \\`Score: \\${score}\\`; }` then assign its call to `result`."
                 ],
                 "id": [
-                    "Definisi: function formatScore(score: number): string { ... }.",
-                    "Gunakan template literal: `Score: ${score}`.",
-                    "Panggil: result = formatScore(85);"
+                    "Pelajari cara mendefinisikan secara ketat apa yang diterima fungsi sebagai input dan apa yang harus dikembalikan sebagai output.",
+                    "Definisikan tipe parameter di dalam kurung dan tipe return setelah titik dua yang mengikuti tanda kurung.",
+                    "Gunakan `function formatScore(score: number): string { return \\`Score: \\${score}\\`; }` lalu simpan hasil panggilannya ke `result`."
                 ]
             },
             "htmlContent": "<div class=\"scoreboard\">\n  <h3>Game Stats</h3>\n  <div id=\"display\">Waiting for score...</div>\n</div>",
@@ -117,14 +117,14 @@
             },
             "hints": {
                 "en": [
-                    "Interface: interface TestResult { ... }.",
-                    "Object: const currentTest: TestResult = { ... }.",
-                    "Access property: result = currentTest.duration;."
+                    "Create reusable blueprints that define the exact shape and properties an object must follow.",
+                    "Use the 'interface' keyword followed by curly braces containing property names and their types.",
+                    "Define `interface TestResult { testName: string; duration: number; }` and create an object `currentTest` that implements it."
                 ],
                 "id": [
-                    "Interface: interface TestResult { ... }.",
-                    "Objek: const currentTest: TestResult = { ... }.",
-                    "Akses properti: result = currentTest.duration;."
+                    "Buat cetak biru yang dapat digunakan kembali yang mendefinisikan bentuk dan properti tepat yang harus diikuti oleh sebuah objek.",
+                    "Gunakan kata kunci 'interface' diikuti oleh kurung kurawal yang berisi nama properti dan tipenya.",
+                    "Definisikan `interface TestResult { testName: string; duration: number; }` dan buat objek `currentTest` yang mengimplementasikannya."
                 ]
             },
             "htmlContent": "<div class=\"structure-viewer\">\n  <h3>Object Blueprint</h3>\n  <div id=\"output\">Waiting for object...</div>\n</div>",
@@ -164,14 +164,14 @@
             },
             "hints": {
                 "en": [
-                    "Define: type Priority = 'high' | 'medium' | 'low';.",
-                    "Object Task: const task = { priority: 'high' };.",
-                    "result = task.priority;"
+                    "Allow a variable to hold one of several specific, allowed values to prevent typos and invalid states.",
+                    "Use the pipe `|` symbol between literal strings or types to create a flexible yet safe combined type.",
+                    "Create `type Priority = \"high\" | \"medium\" | \"low\"` and ensure your object property matches one of these literals."
                 ],
                 "id": [
-                    "Definisikan: type Priority = 'high' | 'medium' | 'low';.",
-                    "Objek Task: const task = { priority: 'high' };.",
-                    "result = task.priority;"
+                    "Izinkan variabel untuk menampung salah satu dari beberapa nilai spesifik yang diizinkan untuk mencegah typo dan status yang tidak valid.",
+                    "Gunakan simbol pipe `|` di antara literal string atau tipe untuk membuat tipe gabungan yang fleksibel namun aman.",
+                    "Buat `type Priority = \"high\" | \"medium\" | \"low\"` dan pastikan properti objek Kamu cocok dengan salah satu literal ini."
                 ]
             },
             "htmlContent": "<div class=\"status-pill\">\n  <span class=\"badge high\">HIGH</span>\n  <span class=\"badge medium\">MEDIUM</span>\n  <span class=\"badge low\">LOW</span>\n</div>",
@@ -211,14 +211,14 @@
             },
             "hints": {
                 "en": [
-                    "Interface: interface AppConfig { apiUrl: string; retryLimit?: number; }.",
-                    "Config Object: const myConfig: AppConfig = { ... }.",
-                    "Strict Check: result = myConfig.retryLimit !== undefined ? myConfig.retryLimit : -1;."
+                    "Safely handle properties that might not exist, especially when dealing with numeric values like 0.",
+                    "Append a `?` to property names in interfaces, and always use strict checks (e.g., `!== undefined`) to avoid \"falsy 0\" bugs.",
+                    "Define `retryLimit?: number` and verify its existence with `myConfig.retryLimit !== undefined` before assigning it to `result`."
                 ],
                 "id": [
-                    "Interface: interface AppConfig { apiUrl: string; retryLimit?: number; }.",
-                    "Objek Config: const myConfig: AppConfig = { ... }.",
-                    "Pengecekan Ketat: result = myConfig.retryLimit !== undefined ? myConfig.retryLimit : -1;."
+                    "Tangani secara aman properti yang mungkin tidak ada, terutama saat berurusan dengan nilai numerik seperti 0.",
+                    "Tambahkan tanda `?` ke nama properti dalam interface, dan selalu gunakan pengecekan ketat (misalnya, `!== undefined`) untuk menghindari bug \"falsy 0\".",
+                    "Definisikan `retryLimit?: number` dan verifikasi keberadaannya dengan `myConfig.retryLimit !== undefined` sebelum menyimpannya ke `result`."
                 ]
             },
             "htmlContent": "<div class=\"config-viewer\">\n  <h3>Config Debugger</h3>\n  <div id=\"json\">Reading config...</div>\n</div>",
@@ -259,14 +259,14 @@
             },
             "hints": {
                 "en": [
-                    "Tuple alias: type Coordinate = [number, number];.",
-                    "Variable: const pos: Coordinate = [10, 20];.",
-                    "Access: result = pos[0] + pos[1];."
+                    "Give descriptive names to complex types like Tuples to make your code more readable and self-documenting.",
+                    "Use the 'type' keyword to define a name for a shape, such as a coordinate tuple `[number, number]`.",
+                    "Access tuple elements using zero-based indices like `pos[0]` and `pos[1]` after defining `type Coordinate = [number, number]`."
                 ],
                 "id": [
-                    "Tuple alias: type Coordinate = [number, number];.",
-                    "Variabel: const pos: Coordinate = [10, 20];.",
-                    "Akses: result = pos[0] + pos[1];."
+                    "Berikan nama deskriptif untuk tipe yang kompleks seperti Tuple agar kode Kamu lebih mudah dibaca dan mendokumentasikan diri sendiri.",
+                    "Gunakan kata kunci 'type' untuk mendefinisikan nama bagi suatu bentuk, seperti tuple koordinat `[number, number]`.",
+                    "Akses elemen tuple menggunakan indeks barbasis nol seperti `pos[0]` dan `pos[1]` setelah mendefinisikan `type Coordinate = [number, number]`."
                 ]
             },
             "htmlContent": "<div class=\"geo-tracker\">\n  <h3>GPS Tracker</h3>\n  <div id=\"location\">Searching signal...</div>\n</div>",
@@ -306,14 +306,14 @@
             },
             "hints": {
                 "en": [
-                    "Declare: const message = 'Inferred'; (no annotation).",
-                    "Use typeof: result = typeof message;.",
-                    "The expected result is the string 'string'."
+                    "Rely on TypeScript's ability to automatically detect types from initial values to keep code clean and concise.",
+                    "Omit explicit type annotations when assigning a value immediately; TypeScript will lock in the type automatically.",
+                    "Declare `const message = \"Inferred\"` and use the `typeof` operator to check its detected type."
                 ],
                 "id": [
-                    "Deklarasikan: const message = 'Inferred'; (tanpa anotasi).",
-                    "Gunakan typeof: result = typeof message;.",
-                    "Hasil yang diharapkan adalah string 'string'."
+                    "Andalkan kemampuan TypeScript untuk mendeteksi tipe secara otomatis dari nilai awal agar kode tetap bersih dan ringkas.",
+                    "Lewati anotasi tipe eksplisit saat menetapkan nilai secara langsung; TypeScript akan mengunci tipenya secara otomatis.",
+                    "Deklarasikan `const message = \"Inferred\"` dan gunakan operator `typeof` untuk mengecek tipe yang terdeteksi."
                 ]
             },
             "htmlContent": "<div class=\"code-inspector\">\n  <h3>Variable Inspector</h3>\n  <div id=\"analysis\">Hover to infer...</div>\n</div>",
@@ -352,14 +352,14 @@
             },
             "hints": {
                 "en": [
-                    "Function: function parseResponse<T>(data: T): T { return data; }.",
-                    "Interface: interface LoginResponse { token: string; }.",
-                    "Execution: const res = parseResponse<LoginResponse>({ token: 'abc-123' }); result = res.token;."
+                    "Write flexible, reusable code that can work with any data type by using placeholders like `<T>`.",
+                    "Create a function that accepts and returns a type `<T>`, then specify the actual interface (e.g., `<LoginResponse>`) when calling it.",
+                    "Pass an object matching `LoginResponse` into your generic `parseResponse<T>` function to safely extract the token."
                 ],
                 "id": [
-                    "Fungsi: function parseResponse<T>(data: T): T { return data; }.",
-                    "Interface: interface LoginResponse { token: string; }.",
-                    "Eksekusi: const res = parseResponse<LoginResponse>({ token: 'abc-123' }); result = res.token;."
+                    "Tulis kode yang fleksibel dan reusable yang dapat bekerja dengan tipe data apa pun menggunakan placeholder seperti `<T>`.",
+                    "Buat fungsi yang menerima dan mengembalikan tipe `<T>`, lalu tentukan interface yang sebenarnya (misalnya, `<LoginResponse>`) saat memanggilnya.",
+                    "Masukkan objek yang sesuai dengan `LoginResponse` ke dalam fungsi generic `parseResponse<T>` Kamu untuk mengekstrak token secara aman."
                 ]
             },
             "starterCode": "// 1. Generic function parseResponse<T>\n// Your code here\n\n// 2. Interface LoginResponse\n// Your code here\n\n// 3. Call it with token \"abc-123\"\n// Your code here\n\n// 4. Assign token to result\n// Your code here",
@@ -398,16 +398,14 @@
             },
             "hints": {
                 "en": [
-                    "Interface: interface FullReport { title: string; passed: number; failed: number; }.",
-                    "Alias: type DraftReport = Partial<FullReport>;.",
-                    "Object: const myDraft: DraftReport = { passed: 5 };.",
-                    "result = myDraft.passed;"
+                    "Easily create variations of existing types, such as making every property in a large interface optional at once.",
+                    "Use the `Partial<T>` built-in utility type to transform a strict interface into a flexible \"draft\" shape.",
+                    "Define `type DraftReport = Partial<FullReport>` to create an object that only needs a subset of the original properties."
                 ],
                 "id": [
-                    "Interface: interface FullReport { title: string; passed: number; failed: number; }.",
-                    "Alias: type DraftReport = Partial<FullReport>;.",
-                    "Objek: const myDraft: DraftReport = { passed: 5 };.",
-                    "result = myDraft.passed;"
+                    "Buat variasi dari tipe yang sudah ada dengan mudah, seperti membuat setiap properti dalam interface yang besar menjadi opsional sekaligus.",
+                    "Gunakan utility type bawaan `Partial<T>` untuk mengubah interface yang ketat menjadi bentuk \"draft\" yang fleksibel.",
+                    "Definisikan `type DraftReport = Partial<FullReport>` untuk membuat objek yang hanya membutuhkan sebagian dari properti aslinya."
                 ]
             },
             "htmlContent": "<div class=\"patch-tool\">\n  <h3>Data Patcher</h3>\n  <div id=\"payload\">Ready to patch...</div>\n</div>",
@@ -447,16 +445,14 @@
             },
             "hints": {
                 "en": [
-                    "Interface: interface User { id: number; email: string; role: 'admin' | 'guest'; }.",
-                    "Factory: const createUser = (id: number, role?: 'admin' | 'guest'): User => ({ id, role: role ?? 'guest', email: ... });.",
-                    "Email Template: `user_${id}@test.com`.",
-                    "Execution: result = createUser(5, 'admin').email;"
+                    "Combine multiple TypeScript features—interfaces, unions, and default values—to build a professional data generator.",
+                    "Use the Nullish Coalescing operator `??` to handle optional parameters and template literals for dynamic string creation.",
+                    "Build a user object with an ID-based email and a role that defaults to \"guest\" if not specified."
                 ],
                 "id": [
-                    "Interface: interface User { id: number; email: string; role: 'admin' | 'guest'; }.",
-                    "Factory: const createUser = (id: number, role?: 'admin' | 'guest'): User => ({ id, role: role ?? 'guest', email: ... });.",
-                    "Template Email: `user_${id}@test.com`.",
-                    "Eksekusi: result = createUser(5, 'admin').email;"
+                    "Gabungkan beberapa fitur TypeScript—interface, union, dan nilai default—untuk membangun generator data profesional.",
+                    "Gunakan operator Nullish Coalescing `??` untuk menangani parameter opsional dan template literal untuk pembuatan string dinamis.",
+                    "Bangun objek pengguna dengan email berbasis ID dan role yang memiliki default \"guest\" jika tidak tentukan."
                 ]
             },
             "htmlContent": "<div class=\"boss-battle\">\n  <h3>🏭 PRO FACTORY</h3>\n  <div id=\"output\">Initializing...</div>\n</div>",

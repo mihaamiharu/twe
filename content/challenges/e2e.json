@@ -22,14 +22,14 @@
             },
             "hints": {
                 "en": [
-                    "Navigate: await loginPage.goto();",
-                    "Login: await loginPage.login('testuser', 'password123');",
-                    "Assert: await expect(page.getByRole('heading', { name: /Welcome/ })).toContainText('Welcome, testuser!');"
+                    "Organize your test code by separating page interactions into dedicated classes to improve maintainability and reuse.",
+                    "Create a new instance of your Page Object (e.g., `new LoginPage(page)`) and call its high-level methods for navigation and action.",
+                    "Use `await loginPage.goto()` then `await loginPage.login(...)` before asserting the welcome message is visible."
                 ],
                 "id": [
-                    "Navigasi: await loginPage.goto();",
-                    "Login: await loginPage.login('testuser', 'password123');",
-                    "Assert: await expect(page.getByRole('heading', { name: /Welcome/ })).toContainText('Welcome, testuser!');"
+                    "Atur kode pengujian Kamu dengan memisahkan interaksi halaman ke dalam class khusus untuk meningkatkan pemeliharaan dan penggunaan kembali.",
+                    "Buat instance baru dari Page Object Kamu (misalnya, `new LoginPage(page)`) dan panggil metode tingkat tingginya untuk navigasi dan aksi.",
+                    "Gunakan `await loginPage.goto()` lalu `await loginPage.login(...)` sebelum memberikan asersi bahwa pesan selamat datang terlihat."
                 ]
             },
             "files": {
@@ -86,16 +86,14 @@
             },
             "hints": {
                 "en": [
-                    "Navigate: await loginPage.goto();",
-                    "Login: await loginPage.login('wronguser', 'wrongpass');",
-                    "Assert Error: await expect(loginPage.errorMessage).toBeVisible();",
-                    "Assert URL: await expect(page).toHaveURL('/app/login.html');"
+                    "Test how your application handles mistakes by verifying that error messages appear correctly when invalid data is entered.",
+                    "Expose common elements like error messages as properties on your Page Object class for easy and reliable assertions.",
+                    "Login with invalid credentials and verify `loginPage.errorMessage` is visible while the URL remains on the login page."
                 ],
                 "id": [
-                    "Navigasi: await loginPage.goto();",
-                    "Login: await loginPage.login('wronguser', 'wrongpass');",
-                    "Assert Error: await expect(loginPage.errorMessage).toBeVisible();",
-                    "Assert URL: await expect(page).toHaveURL('/app/login.html');"
+                    "Uji bagaimana aplikasi Kamu menangani kesalahan dengan memverifikasi bahwa pesan error muncul dengan benar saat data yang tidak valid dimasukkan.",
+                    "Sediakan elemen umum seperti pesan error sebagai properti pada class Page Object Kamu untuk asersi yang mudah dan andal.",
+                    "Login dengan kredensial yang tidak valid dan verifikasi bahwa `loginPage.errorMessage` terlihat sementara URL tetap berada di halaman login."
                 ]
             },
             "files": {
@@ -151,16 +149,14 @@
             },
             "hints": {
                 "en": [
-                    "Chain: const dashboard = await loginPage.login(...);",
-                    "Go to Profile: const profile = await dashboard.goToProfile();",
-                    "Update & Back: await profile.updateName(...); const dashAgain = await profile.backToDashboard();",
-                    "Verify: await expect(dashAgain.welcomeMsg).toContainText('QA Tester');"
+                    "Model complex user flows by allowing page methods to return the next page object, creating a natural, fluent script.",
+                    "Chain your method calls (e.g., `dashboard.goToProfile()`) to navigate across multiple sections of the application within a single test.",
+                    "Store the result of `loginPage.login(...)` as `dashboardPage`, then use it to navigate to the profile and update the name."
                 ],
                 "id": [
-                    "Rantai: const dashboard = await loginPage.login(...);",
-                    "Ke Profil: const profile = await dashboard.goToProfile();",
-                    "Update & Kembali: await profile.updateName(...); const dashAgain = await profile.backToDashboard();",
-                    "Verifikasi: await expect(dashAgain.welcomeMsg).toContainText('QA Tester');"
+                    "Modelkan alur pengguna yang kompleks dengan membiarkan metode halaman mengembalikan objek halaman berikutnya, menciptakan skrip yang alami dan lancar.",
+                    "Rantai panggilan metode Kamu (misalnya, `dashboard.goToProfile()`) untuk menavigasi di berbagai bagian aplikasi dalam satu pengujian.",
+                    "Simpan hasil dari `loginPage.login(...)` sebagai `dashboardPage`, lalu gunakan untuk menavigasi ke profil dan memperbarui nama."
                 ]
             },
             "files": {
