@@ -125,8 +125,8 @@
                     "Pattern: tag.className"
                 ],
                 "id": [
-                    "Combine them without spaces.",
-                    "Pattern: tag.className"
+                    "Gabungkan tanpa spasi.",
+                    "Pola: tag.namaClass"
                 ]
             },
             "htmlContent": "<div class=\"notification-area\">\n  <div class=\"msg success\">Update successful</div>\n  \n  <!-- Target -->\n  <div class=\"msg error\">Connection failed</div>\n  \n  <form>\n    <label>Username <span class=\"error\">*</span></label>\n    <input type=\"text\" />\n  </form>\n</div>",
@@ -174,8 +174,8 @@
                     "Order doesn't matter, but tag name must be first."
                 ],
                 "id": [
-                    "Chain all classes without spaces.",
-                    "Order doesn't matter, but tag name must be first."
+                    "Rangkai semua class tanpa spasi.",
+                    "Urutan tidak masalah, tapi nama tag harus di depan."
                 ]
             },
             "htmlContent": "<div class=\"legacy-wrapper\">\n  <div class=\"top-bar\">\n    <button class=\"btn small\">Login</button>\n    <button class=\"btn primary small\">Stats</button>\n    <div class=\"primary large\">Background Task</div>\n  </div>\n  \n  <section class=\"hero-section\">\n    <h1>Start your journey</h1>\n    <!-- This is your target -->\n    <button class=\"btn primary large\">Sign Up</button>\n  </section>\n  \n  <div class=\"footer\">\n    <button class=\"btn large text-only\">Back to Top</button>\n  </div>\n</div>",
@@ -223,8 +223,8 @@
                     "Format: parent > child"
                 ],
                 "id": [
-                    "Use the greater-than symbol (>).",
-                    "Format: parent > child"
+                    "Gunakan simbol lebih besar dari (>).",
+                    "Format: orangtua > anak"
                 ]
             },
             "htmlContent": "<nav class=\"main-nav\">\n  <ul class=\"nav-menu\">\n    <!-- These are direct children -->\n    <li class=\"nav-item\">Home</li>\n    <li class=\"nav-item\">\n      Products\n      <!-- Nested Dropdown -->\n      <ul class=\"submenu\">\n        <li>Electronics (Do not select)</li>\n        <li>Books (Do not select)</li>\n      </ul>\n    </li>\n    <li class=\"nav-item\">Contact</li>\n  </ul>\n</nav>",
@@ -272,8 +272,8 @@
                     "Format: element + nextElement"
                 ],
                 "id": [
-                    "Use the plus symbol (+).",
-                    "Format: element + nextElement"
+                    "Gunakan simbol plus (+).",
+                    "Format: elemen + elemenBerikutnya"
                 ]
             },
             "htmlContent": "<article class=\"blog-post\">\n  <h1 class=\"post-title\">The Future of Web Testing</h1>\n  \n  <!-- Target -->\n  <p class=\"subtitle\">Why selectors specificy matters more than ever.</p>\n  \n  <p class=\"content\">Web testing has evolved significantly...</p>\n</article>",
@@ -321,8 +321,8 @@
                     "Path: .profile-card (space) .card-content (space) span"
                 ],
                 "id": [
-                    "Use spaces to drill down.",
-                    "Path: .profile-card (space) .card-content (space) span"
+                    "Gunakan spasi untuk melacak ke dalam.",
+                    "Path: .profile-card (spasi) .card-content (spasi) span"
                 ]
             },
             "htmlContent": "<div class=\"layout\">\n  <div class=\"profile-card\">\n    <div class=\"card-header\">\n      <h3>User Profile</h3>\n    </div>\n    <div class=\"card-content\">\n      <!-- Target -->\n      <span>Premium Member</span>\n    </div>\n  </div>\n  \n  <div class=\"footer\">\n    <div class=\"footer-content\">\n      <span>Copyright 2024</span>\n    </div>\n  </div>\n</div>",
@@ -370,8 +370,8 @@
                     "Use spaces between each level of hierarchy."
                 ],
                 "id": [
-                    "Follow the path step by step.",
-                    "Use spaces between each level of hierarchy."
+                    "Ikuti path-nya langkah demi langkah.",
+                    "Gunakan spasi di antara tiap level hierarki."
                 ]
             },
             "htmlContent": "<nav class=\"navbar\">\n  <ul class=\"nav-root\">\n    <li>Home</li>\n    <li id=\"user-menu\">\n      My Account\n      <ul class=\"dropdown-list\">\n        <li>Settings</li>\n        <li>Billing</li>\n        <li class=\"action-item\">\n          <!-- Target -->\n          <a href=\"/logout\">Logout</a>\n        </li>\n      </ul>\n    </li>\n  </ul>\n</nav>",
@@ -419,8 +419,8 @@
                     "Format: [attribute=\"value\"]"
                 ],
                 "id": [
-                    "Use square brackets [ ].",
-                    "Format: [attribute=\"value\"]"
+                    "Gunakan kurung siku [ ].",
+                    "Format: [atribut=\"nilai\"]"
                 ]
             },
             "htmlContent": "<form class=\"contact-form\">\n  <div class=\"row\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"fullname\" />\n  </div>\n  <div class=\"row\">\n    <label>Email Address</label>\n    <input type=\"email\" name=\"email\" />\n  </div>\n  <button>Send</button>\n</form>",
@@ -467,8 +467,8 @@
                     "Example: element:state"
                 ],
                 "id": [
-                    "Append the pseudo-class with a colon (:).",
-                    "Example: element:state"
+                    "Tambahkan pseudo-class dengan titik dua (:).",
+                    "Contoh: elemen:status"
                 ]
             },
             "htmlContent": "<form class=\"login-form\">\n  <div class=\"form-group\">\n    <label>Email</label>\n    <input type=\"email\" value=\"not-an-email\" required /> <!-- This is invalid -->\n    <span class=\"error-text\">Please enter a valid email</span>\n  </div>\n  <div class=\"form-group\">\n    <label>Password</label>\n    <input type=\"password\" value=\"secret123\" required /> <!-- This is valid -->\n  </div>\n</form>",
@@ -516,8 +516,8 @@
                     "Put the excluded class inside the parenthesis."
                 ],
                 "id": [
-                    "Chain the selectors: .class.class:not(.excluded)",
-                    "Put the excluded class inside the parenthesis."
+                    "Rangkai selector-nya: .class.class:not(.excluded)",
+                    "Masukkan class yang dikecualikan di dalam kurung."
                 ]
             },
             "htmlContent": "<div class=\"user-list\">\n  <!-- This one is active AND suspended. Ignore it. -->\n  <div class=\"user-card active suspended\">\n    <h3>Bad Actor</h3>\n    <span class=\"badge\">Suspended</span>\n  </div>\n\n  <!-- This is your target. Active, healthy user. -->\n  <div class=\"user-card active\">\n    <h3>Good User</h3>\n    <span class=\"badge\">Active</span>\n  </div>\n\n  <div class=\"user-card inactive\">\n    <h3>Old User</h3>\n  </div>\n</div>",
@@ -566,9 +566,9 @@
                     "Chain :not(:disabled)"
                 ],
                 "id": [
-                    "Start with the attribute selector [type=\"tel\"]",
-                    "Chain :optional",
-                    "Chain :not(:disabled)"
+                    "Mulai dengan selector atribut [type=\"tel\"]",
+                    "Rangkai dengan :optional",
+                    "Rangkai dengan :not(:disabled)"
                 ]
             },
             "htmlContent": "<form class=\"complex-form\">\n  <div class=\"row\">\n    <input type=\"text\" placeholder=\"Name\" required />\n  </div>\n  \n  <div class=\"row\">\n    <!-- Target -->\n    <input type=\"tel\" placeholder=\"Phone (Optional)\" />\n  </div>\n  \n  <div class=\"row\">\n    <input type=\"tel\" placeholder=\"Fax (Disabled)\" disabled />\n  </div>\n  \n  <div class=\"row\">\n    <input type=\"email\" placeholder=\"Email\" required class=\"focus\" />\n  </div>\n</form>",
@@ -616,7 +616,7 @@
                     "Format: tag:nth-child(n)"
                 ],
                 "id": [
-                    "Pass the number 3 inside the parenthesis.",
+                    "Masukkan angka 3 di dalam tanda kurung.",
                     "Format: tag:nth-child(n)"
                 ]
             },
@@ -664,7 +664,7 @@
                     "Format: tag:nth-of-type(n)"
                 ],
                 "id": [
-                    "Use the number 2.",
+                    "Gunakan angka 2.",
                     "Format: tag:nth-of-type(n)"
                 ]
             },
@@ -712,8 +712,8 @@
                     "Use nth-child for both row and column."
                 ],
                 "id": [
-                    "Space between tr and td means 'inside'.",
-                    "Use nth-child for both row and column."
+                    "Spasi di antara tr dan td berarti 'di dalam'.",
+                    "Gunakan nth-child untuk baris dan kolom."
                 ]
             },
             "htmlContent": "<table class=\"user-table\">\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Email</th>\n      <th>Status</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Alice Johnson</td>\n      <td>alice@example.com</td>\n      <td>Active</td>\n    </tr>\n    <tr>\n      <td>Bob Smith</td>\n      <td>bob@example.com</td>\n      <!-- Target -->\n      <td>Pending</td>\n    </tr>\n    <tr>\n      <td>Carol White</td>\n      <td>carol@example.com</td>\n      <td>Active</td>\n    </tr>\n  </tbody>\n</table>",
@@ -763,9 +763,9 @@
                     "End with the button tag."
                 ],
                 "id": [
-                    "Use the keyword 'odd' inside nth-child.",
-                    "Chain :last-child for the cell.",
-                    "End with the button tag."
+                    "Gunakan kata kunci 'odd' di dalam nth-child.",
+                    "Rangkai :last-child untuk sel tersebut.",
+                    "Akhiri dengan tag button."
                 ]
             },
             "htmlContent": "<table class=\"data-grid\">\n  <tbody>\n    <!-- Row 1 (Odd) -->\n    <tr>\n      <td>User 1</td>\n      <td>2024-01-01</td>\n      <td class=\"actions\"><button>Edit</button></td>\n    </tr>\n    <!-- Row 2 (Even) -->\n    <tr class=\"spacer\">\n      <td colspan=\"3\">Details...</td>\n    </tr>\n    <!-- Row 3 (Odd) -->\n    <tr>\n      <td>User 2</td>\n      <td>2024-01-02</td>\n      <td class=\"actions\"><button>Edit</button></td>\n    </tr>\n  </tbody>\n</table>",
@@ -814,8 +814,8 @@
                     "Then space, then find .del class."
                 ],
                 "id": [
-                    "First find the 2nd li item.",
-                    "Then space, then find .del class."
+                    "Temukan item li ke-2 terlebih dahulu.",
+                    "Lalu spasi, lalu temukan class .del."
                 ]
             },
             "htmlContent": "<ul class=\"items\">\n  <li>\n    <span>Item A</span>\n    <button class=\"del\">Delete</button>\n  </li>\n  <li>\n    <span>Item B</span>\n    <!-- Target -->\n    <button class=\"del\">Delete</button>\n  </li>\n  <li>\n    <span>Item C</span>\n    <button class=\"del\">Delete</button>\n  </li>\n</ul>",
@@ -862,8 +862,8 @@
                     "Then the tag name: //tagname"
                 ],
                 "id": [
-                    "Start with double slash //",
-                    "Then the tag name: //tagname"
+                    "Mulai dengan garis miring ganda //",
+                    "Lalu nama tag: //namatag"
                 ]
             },
             "htmlContent": "<div class=\"contact-page\">\n  <h1>Contact Us</h1>\n  <form id=\"contact-form\">\n    <input type=\"text\" name=\"name\" placeholder=\"Your Name\" />\n    <input type=\"email\" name=\"email\" placeholder=\"Your Email\" />\n    <textarea name=\"message\" placeholder=\"Your Message\"></textarea>\n    <button type=\"submit\">Send Message</button>\n  </form>\n</div>",
@@ -912,8 +912,8 @@
                     "Add predicates in brackets: [@type=\"value\"]"
                 ],
                 "id": [
-                    "Start with //input",
-                    "Add predicates in brackets: [@type=\"value\"]"
+                    "Mulai dengan //input",
+                    "Tambahkan predikat dalam kurung: [@type=\"value\"]"
                 ]
             },
             "htmlContent": "<div class=\"login-container\">\n  <h2>Sign In</h2>\n  <form>\n    <div class=\"field\">\n      <input type=\"text\" name=\"username\" placeholder=\"Username\" />\n    </div>\n    <div class=\"field\">\n      <input type=\"password\" name=\"password\" placeholder=\"Password\" />\n    </div>\n    <div class=\"field\">\n      <input type=\"checkbox\" name=\"remember\" id=\"remember\" />\n      <label for=\"remember\">Remember me</label>\n    </div>\n    <button type=\"submit\">Login</button>\n  </form>\n</div>",
@@ -962,8 +962,8 @@
                     "Format: //tag[text()=\"Exact Text\"]"
                 ],
                 "id": [
-                    "Use the equals sign for exact match.",
-                    "Format: //tag[text()=\"Exact Text\"]"
+                    "Gunakan tanda sama dengan untuk pencocokan tepat.",
+                    "Format: //tag[text()=\"Teks Tepat\"]"
                 ]
             },
             "htmlContent": "<div class=\"product-card\">\n  <img src=\"/product.jpg\" alt=\"Wireless Headphones\" />\n  <h3>Wireless Headphones</h3>\n  <p class=\"price\">$99.99</p>\n  <div class=\"actions\">\n    <button class=\"btn outline\">View Details</button>\n    <button class=\"btn primary\">Add to Cart</button>\n  </div>\n</div>",
@@ -1012,8 +1012,8 @@
                     "Format: contains(@attribute, \"partial_value\")"
                 ],
                 "id": [
-                    "Use the contains function.",
-                    "Format: contains(@attribute, \"partial_value\")"
+                    "Gunakan fungsi contains.",
+                    "Format: contains(@atribut, \"nilai_sebagian\")"
                 ]
             },
             "htmlContent": "<form class=\"registration-form\">\n  <div class=\"form-group\">\n    <input type=\"email\" class=\"input\" placeholder=\"Email\" />\n    <div class=\"message error-message\">Please enter a valid email address</div>\n  </div>\n  <div class=\"form-group\">\n    <input type=\"password\" class=\"input\" placeholder=\"Password\" />\n    <div class=\"message hint-message\">Password must be at least 8 characters</div>\n  </div>\n  <div class=\"form-group\">\n    <input type=\"password\" class=\"input\" placeholder=\"Confirm Password\" />\n    <div class=\"message success-message\">Passwords match!</div>\n  </div>\n  <button type=\"submit\">Register</button>\n</form>",
@@ -1063,8 +1063,8 @@
                     "Chain the selectors: //form[...]//button[...]"
                 ],
                 "id": [
-                    "Use // to go deep inside the form.",
-                    "Chain the selectors: //form[...]//button[...]"
+                    "Gunakan // untuk mencari jauh ke dalam form.",
+                    "Rangkai selectornya: //form[...]//button[...]"
                 ]
             },
             "htmlContent": "<div class=\"page-wrapper\">\n  <header>\n    <nav class=\"main-nav\">\n      <button id=\"nav-btn-12345\" class=\"btn nav-btn\">Menu</button>\n      <button id=\"nav-btn-67890\" class=\"btn nav-btn\">Sign Up</button>\n    </nav>\n  </header>\n  \n  <main class=\"content\">\n    <form id=\"form-abc123\" class=\"form login-form\">\n      <h2>Welcome Back</h2>\n      <div class=\"field\">\n        <input type=\"email\" id=\"input-xyz789\" class=\"input\" placeholder=\"Email\" />\n      </div>\n      <div class=\"field\">\n        <input type=\"password\" id=\"input-xyz790\" class=\"input\" placeholder=\"Password\" />\n      </div>\n      <div class=\"actions\">\n        <button type=\"button\" class=\"btn secondary\">Forgot Password</button>\n        <button type=\"submit\" class=\"btn primary\">Sign In</button>\n      </div>\n    </form>\n  </main>\n</div>",
@@ -1113,8 +1113,8 @@
                     "Append /.. or /parent::li"
                 ],
                 "id": [
-                    "Find the child first: //a[text()=\"Settings\"]",
-                    "Append /.. or /parent::li"
+                    "Temukan anak elemennya dulu: //a[text()=\"Settings\"]",
+                    "Tambahkan /.. atau /parent::li"
                 ]
             },
             "htmlContent": "<nav class=\"sidebar\">\n  <ul class=\"menu\">\n    <li class=\"menu-item\">\n      <a href=\"/dashboard\">Dashboard</a>\n    </li>\n    <li class=\"menu-item\">\n      <a href=\"/profile\">Profile</a>\n    </li>\n    <li class=\"menu-item active\">\n      <a href=\"/settings\">Settings</a>\n    </li>\n    <li class=\"menu-item\">\n      <a href=\"/logout\">Logout</a>\n    </li>\n  </ul>\n</nav>",
@@ -1164,8 +1164,8 @@
                     "Append /following-sibling::input"
                 ],
                 "id": [
-                    "Find the label first: //label[text()=\"Username\"]",
-                    "Append /following-sibling::input"
+                    "Temukan labelnya dulu: //label[text()=\"Username\"]",
+                    "Tambahkan /following-sibling::input"
                 ]
             },
             "htmlContent": "<form class=\"user-form\">\n  <div class=\"field-row\">\n    <label>Full Name</label>\n    <input type=\"text\" name=\"fullname\" placeholder=\"John Doe\" />\n  </div>\n  <div class=\"field-row\">\n    <label>Username</label>\n    <input type=\"text\" name=\"username\" placeholder=\"johndoe\" />\n  </div>\n  <div class=\"field-row\">\n    <label>Phone</label>\n    <input type=\"tel\" name=\"phone\" placeholder=\"+1 234 567 890\" />\n  </div>\n</form>",
@@ -1214,8 +1214,8 @@
                     "Append /preceding-sibling::label"
                 ],
                 "id": [
-                    "Find the error span first: //span[@class=\"error\"]",
-                    "Append /preceding-sibling::label"
+                    "Temukan span error dulu: //span[@class=\"error\"]",
+                    "Tambahkan /preceding-sibling::label"
                 ]
             },
             "htmlContent": "<form class=\"registration-form\">\n  <div class=\"field-group\">\n    <label>Email Address</label>\n    <input type=\"email\" name=\"email\" />\n    <span class=\"hint\">We'll never share your email</span>\n  </div>\n  <div class=\"field-group\">\n    <label>Password</label>\n    <input type=\"password\" name=\"password\" />\n    <span class=\"error\">Password must be at least 8 characters</span>\n  </div>\n  <div class=\"field-group\">\n    <label>Confirm Password</label>\n    <input type=\"password\" name=\"confirm\" />\n  </div>\n</form>",
@@ -1265,7 +1265,7 @@
                     "Go Down: //input"
                 ],
                 "id": [
-                    "Find error: //span[text()=\"Invalid email format\"]",
+                    "Temukan error: //span[text()=\"Format email tidak valid\"]",
                     "Naik: /ancestor::div",
                     "Turun: //input"
                 ]

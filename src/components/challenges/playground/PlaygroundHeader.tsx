@@ -4,6 +4,7 @@ import {
     Send,
     BookOpen,
     Lightbulb,
+    Sparkles,
     Zap,
     Loader2,
     ChevronLeft,
@@ -217,7 +218,7 @@ export function PlaygroundHeader({
                                     {isHintPending ? (
                                         <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
                                     ) : (
-                                        <Lightbulb className="h-4 w-4 md:mr-2" />
+                                        <Sparkles className="h-4 w-4 md:mr-2" />
                                     )}
                                     <span className="hidden md:inline">
                                         {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}

@@ -369,6 +369,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
           category: challengeContent.category,
           xpReward: challengeContent.xpReward,
           order: challengeContent.order,
+          hints: challengeContent.hints,
           htmlContent: challengeContent.htmlContent,
           files: challengeContent.files,
           editableFiles: challengeContent.editableFiles,
