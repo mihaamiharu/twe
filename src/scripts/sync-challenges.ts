@@ -46,6 +46,7 @@ export async function syncChallenges() {
                 order: rawContent.order,
                 category: rawContent.category,
                 tags: rawContent.tags,
+                hints: rawContent.hints as any, // Sync hints
                 isPublished: true,
                 updatedAt: new Date()
             };

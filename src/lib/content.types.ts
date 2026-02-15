@@ -20,6 +20,11 @@ export interface LocalizedString {
   id?: string;
 }
 
+export interface LocalizedArray {
+  en: string[];
+  id?: string[];
+}
+
 // =============================================================================
 // TUTORIAL TYPES
 // =============================================================================
@@ -115,6 +120,7 @@ export interface ChallengeDefinition {
   title: LocalizedString;
   description: LocalizedString;
   instructions: LocalizedString;
+  hints?: LocalizedArray;
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
   editableFiles?: string[]; // Which files user can edit (default: all)
@@ -152,6 +158,7 @@ export interface Challenge {
   title: string;
   description: string;
   instructions: string;
+  hints?: string[];
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
   editableFiles?: string[]; // Which files user can edit (default: all)

@@ -47,7 +47,6 @@ export const bugReportStatusEnum = pgEnum('bug_report_status', [
   'RESOLVED',
   'WONT_FIX',
   'CLOSED',
-  'CLOSED',
 ]);
 
 export const subscriberStatusEnum = pgEnum('subscriber_status', [
@@ -164,6 +163,7 @@ export const challenges = pgTable('challenges', {
   // Metadata
   category: text('category'), // e.g., 'css-basics', 'xpath-basics', 'css-advanced'
   tags: text('tags').array(),
+  hints: jsonb('hints').$type<Record<string, string[]>>(), // Progressive hints for the challenge (Localized)
   isPublished: boolean('is_published').notNull().default(false),
   completionCount: integer('completion_count').notNull().default(0),
 
