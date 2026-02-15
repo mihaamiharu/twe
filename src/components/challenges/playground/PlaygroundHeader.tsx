@@ -184,13 +184,13 @@ export function PlaygroundHeader({
                                 <span className="hidden md:inline">{t('challenges:hints.title', 'Hints')}</span>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[300px]">
+                        <DropdownMenuContent align="end" className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto">
                             <DropdownMenuLabel>{t('challenges:hints.availableHints', 'Available Hints')}</DropdownMenuLabel>
                             <DropdownMenuSeparator />
                             {challenge.hints.map((hint, i) => (
-                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 focus:bg-muted">
-                                    <span className="font-bold mr-2 text-muted-foreground">{i + 1}.</span>
-                                    {hint}
+                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 items-start focus:bg-accent focus:text-accent-foreground">
+                                    <span className="font-bold mr-2 text-muted-foreground shrink-0 mt-0.5">{i + 1}.</span>
+                                    <span className="flex-1">{hint}</span>
                                 </DropdownMenuItem>
                             ))}
                         </DropdownMenuContent>
