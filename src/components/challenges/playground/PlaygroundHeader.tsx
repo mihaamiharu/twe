@@ -4,6 +4,7 @@ import {
     Send,
     BookOpen,
     Lightbulb,
+    Sparkles,
     Zap,
     Loader2,
     ChevronLeft,
@@ -19,6 +20,14 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 import type { Challenge } from './types';
@@ -163,6 +172,31 @@ export function PlaygroundHeader({
                     </Link>
                 )}
 
+                {challenge.hints && challenge.hints.length > 0 && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="font-bold border border-border/50 text-muted-foreground hover:text-foreground h-8 md:h-9 px-2 md:px-3"
+                            >
+                                <Lightbulb className="h-4 w-4 md:mr-2 text-yellow-500" />
+                                <span className="hidden md:inline">{t('challenges:hints.title', 'Hints')}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto">
+                            <DropdownMenuLabel>{t('challenges:hints.availableHints', 'Available Hints')}</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            {challenge.hints.map((hint, i) => (
+                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 items-start focus:bg-accent focus:text-accent-foreground">
+                                    <span className="font-bold mr-2 text-muted-foreground shrink-0 mt-0.5">{i + 1}.</span>
+                                    <span className="flex-1">{hint}</span>
+                                </DropdownMenuItem>
+                            ))}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
+
                 {!challenge.isCompleted && (
                     <TooltipProvider>
                         <Tooltip>
@@ -184,7 +218,7 @@ export function PlaygroundHeader({
                                     {isHintPending ? (
                                         <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
                                     ) : (
-                                        <Lightbulb className="h-4 w-4 md:mr-2" />
+                                        <Sparkles className="h-4 w-4 md:mr-2" />
                                     )}
                                     <span className="hidden md:inline">
                                         {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}

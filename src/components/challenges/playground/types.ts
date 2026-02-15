@@ -18,6 +18,7 @@ export interface Challenge {
     difficulty: 'Easy' | 'Medium' | 'Hard';
     xp: number;
     instructions: string;
+    hints?: string[];
     starterCode: string;
     htmlContent?: string;
     targetSelector?: string | string[];

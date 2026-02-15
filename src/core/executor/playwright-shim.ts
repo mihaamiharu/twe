@@ -70,7 +70,14 @@ export class MockedPlaywrightPage {
       cssContent?: string;
     },
   ): void {
-    this.vfs = files;
+    // Normalize keys to ensure they start with /
+    const normalizedFiles: Record<string, string> = {};
+    for (const [key, value] of Object.entries(files)) {
+      const normalizedKey = key.startsWith('/') ? key : '/' + key;
+      // eslint-disable-next-line security/detect-object-injection
+      normalizedFiles[normalizedKey] = value;
+    }
+    this.vfs = normalizedFiles;
     this.onNavigate = options?.onNavigate;
     this.cssContent = options?.cssContent;
   }
