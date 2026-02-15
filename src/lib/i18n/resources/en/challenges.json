@@ -85,6 +85,9 @@
     "freeTierNote": "Note: AI service uses a free tier. If it's busy, please wait a minute.",
     "title": "Tips",
     "availableHints": "Available Tips",
+    "revealFirst": "Reveal First Tip",
+    "revealNext": "Reveal Next Tip",
+    "noneAvailable": "No specific tips available for this challenge.",
     "penalty": "-50% XP"
   },
   "types": {

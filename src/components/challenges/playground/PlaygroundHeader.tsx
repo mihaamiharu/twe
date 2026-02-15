@@ -9,7 +9,8 @@ import {
     Loader2,
     ChevronLeft,
     ChevronRight,
-    Info
+    Info,
+    Eye
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
@@ -45,6 +46,8 @@ interface PlaygroundHeaderProps {
     onRunCode: () => void;
     onOpenHintDialog: () => void;
     onSubmit: () => void;
+    revealedHintsCount: number;
+    setRevealedHintsCount: (count: number) => void;
 }
 
 export function PlaygroundHeader({
@@ -60,6 +63,8 @@ export function PlaygroundHeader({
     onRunCode,
     onOpenHintDialog,
     onSubmit,
+    revealedHintsCount,
+    setRevealedHintsCount,
 }: PlaygroundHeaderProps) {
     const { t } = useTranslation(['challenges', 'common']);
 
@@ -185,14 +190,54 @@ export function PlaygroundHeader({
                             </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto">
-                            <DropdownMenuLabel>{t('challenges:hints.availableHints', 'Available Hints')}</DropdownMenuLabel>
+                            <DropdownMenuLabel className="flex items-center justify-between">
+                                <span>{t('challenges:hints.availableHints', 'Available Hints')}</span>
+                                <Badge variant="secondary" className="text-[10px] bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
+                                    {revealedHintsCount} / {challenge.hints.length}
+                                </Badge>
+                            </DropdownMenuLabel>
                             <DropdownMenuSeparator />
-                            {challenge.hints.map((hint, i) => (
-                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 items-start focus:bg-accent focus:text-accent-foreground">
-                                    <span className="font-bold mr-2 text-muted-foreground shrink-0 mt-0.5">{i + 1}.</span>
-                                    <span className="flex-1">{hint}</span>
+
+                            {/* Revealed Hints */}
+                            {challenge.hints.slice(0, revealedHintsCount).map((hint, i) => (
+                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 items-start focus:bg-accent focus:text-accent-foreground border-b border-border/10 last:border-0">
+                                    <div className="flex flex-col gap-1 w-full">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-bold text-[10px] uppercase text-amber-600">
+                                                {i === 0 ? 'Concept' : i === 1 ? 'Syntax' : 'Code'}
+                                            </span>
+                                        </div>
+                                        <span className="flex-1 leading-relaxed text-foreground">{hint}</span>
+                                    </div>
                                 </DropdownMenuItem>
                             ))}
+
+                            {/* Reveal Button */}
+                            {revealedHintsCount < challenge.hints.length && (
+                                <div className="p-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full text-xs font-bold bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20 text-amber-700 h-9"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setRevealedHintsCount(revealedHintsCount + 1);
+                                        }}
+                                    >
+                                        <Eye className="h-3 w-3 mr-2" />
+                                        {revealedHintsCount === 0
+                                            ? t('challenges:hints.revealFirst', 'Reveal First Tip')
+                                            : t('challenges:hints.revealNext', 'Reveal Next Tip')}
+                                    </Button>
+                                </div>
+                            )}
+
+                            {challenge.hints.length === 0 && (
+                                <div className="p-8 text-center text-muted-foreground text-xs italic">
+                                    {t('challenges:hints.noneAvailable', 'No specific tips available for this challenge.')}
+                                </div>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )}
