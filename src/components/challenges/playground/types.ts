@@ -117,6 +117,8 @@ export interface PlaygroundState {
     setPreviewValidation: (validation: { isValid: boolean; matchCount: number } | null) => void;
     currentVfsPath: string;
     setCurrentVfsPath: (path: string) => void;
+    revealedHintsCount: number;
+    setRevealedHintsCount: (count: number) => void;
 
     // Derived
     isCodeChallenge: boolean;
