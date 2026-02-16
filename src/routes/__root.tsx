@@ -25,6 +25,7 @@ import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
 import { organizationSchema } from '@/lib/seo';
+import { getConsent } from '@/server/consent.fn';
 
 // Export context type for child routes
 export interface RootContext {
@@ -44,7 +45,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
     let consent: 'granted' | 'denied' | null = null;
 
     if (typeof document !== 'undefined') {
-      // Client-side: read from cookie or localStorage (legacy)
+      // Client-side: read from cookie
       const cookieValue = document.cookie
         .split('; ')
         .find((row) => row.startsWith('twe-consent='))
@@ -52,26 +53,10 @@ export const Route = createRootRouteWithContext<RootContext>()({
       
       if (cookieValue === 'granted' || cookieValue === 'denied') {
         consent = cookieValue as 'granted' | 'denied';
-      } else {
-        // Fallback for migration
-        const stored = localStorage.getItem('twe-consent');
-        if (stored === 'granted' || stored === 'denied') {
-          consent = stored as 'granted' | 'denied';
-        }
       }
     } else {
-      // Server-side: read from headers
-      const { getRequestHeaders } = await import('@tanstack/react-start/server');
-      const headers = getRequestHeaders();
-      const cookieHeader = headers.get('cookie');
-      const cookieValue = cookieHeader
-        ?.split('; ')
-        .find((row) => row.startsWith('twe-consent='))
-        ?.split('=')[1];
-      
-      if (cookieValue === 'granted' || cookieValue === 'denied') {
-        consent = cookieValue as 'granted' | 'denied';
-      }
+      // Server-side: read via Server Function
+      consent = await getConsent();
     }
 
     return { auth, consent };

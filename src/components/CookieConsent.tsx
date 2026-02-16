@@ -20,39 +20,19 @@ export function CookieConsent({ onConsentChange, initialConsent }: CookieConsent
         if (initialConsent === 'granted' || initialConsent === 'denied') {
             onConsentChange(initialConsent);
             
-            // Migrate to cookie if it's only in localStorage
-            if (typeof document !== 'undefined' && !document.cookie.includes('twe-consent=')) {
-                const storedConsent = localStorage.getItem('twe-consent');
-                if (storedConsent === 'granted' || storedConsent === 'denied') {
-                    document.cookie = `twe-consent=${storedConsent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
-                }
-            }
-
             if (initialConsent === 'granted' && !Sentry.isInitialized()) {
                 Sentry.init(getSentryConfig());
             }
             return;
         }
 
-        // Otherwise check local state
-        const storedConsent = localStorage.getItem('twe-consent');
-        if (storedConsent === 'granted' || storedConsent === 'denied') {
-            onConsentChange(storedConsent as 'granted' | 'denied');
-            // Ensure cookie is set for migration
-            document.cookie = `twe-consent=${storedConsent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
-            
-            if (storedConsent === 'granted' && !Sentry.isInitialized()) {
-                Sentry.init(getSentryConfig());
-            }
-        } else {
-            setIsVisible(true);
-            onConsentChange(null);
-        }
+        // If no initial consent, show the popup
+        setIsVisible(true);
+        onConsentChange(null);
     }, [onConsentChange, initialConsent]);
 
     const handleAccept = () => {
         const consent = 'granted';
-        localStorage.setItem('twe-consent', consent);
         document.cookie = `twe-consent=${consent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
         onConsentChange(consent);
         if (!Sentry.isInitialized()) {
@@ -63,7 +43,6 @@ export function CookieConsent({ onConsentChange, initialConsent }: CookieConsent
 
     const handleDecline = () => {
         const consent = 'denied';
-        localStorage.setItem('twe-consent', consent);
         document.cookie = `twe-consent=${consent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
         onConsentChange(consent);
         setIsVisible(false);
