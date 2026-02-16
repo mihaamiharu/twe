@@ -41,7 +41,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "1",
+            "solution": "const testName = \"Login Test\";\nlet passCount = 0;\npassCount++;\nconst result = passCount;",
             "tags": [
                 "javascript",
                 "variables",
@@ -89,7 +89,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "4",
+            "solution": "const testCredentials = [\"admin\", \"user\", \"guest\"];\ntestCredentials.push(\"superadmin\");\nconst result = testCredentials.length;",
             "tags": [
                 "javascript",
                 "arrays",
@@ -137,7 +137,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "6",
+            "solution": "const testUser = {\n    email: \"test@example.com\",\n    isActive: true,\n    loginCount: 5\n};\ntestUser.loginCount++;\nconst result = testUser.loginCount;",
             "tags": [
                 "javascript",
                 "objects",
@@ -185,7 +185,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "PARTIAL",
+            "solution": "// Given values (don't modify)\nconst passCount = 5;\nconst totalTests = 10;\n\n// Write your if-else logic here\nlet result;\n\nif (passCount === totalTests) {\n    result = \"ALL_PASSED\";\n} else if (passCount > 0) {\n    result = \"PARTIAL\";\n} else {\n    result = \"ALL_FAILED\";\n}",
             "tags": [
                 "javascript",
                 "conditionals",
@@ -233,7 +233,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "4",
+            "solution": "// Given test scores\nconst scores = [95, 72, 88, 65, 91, 78, 83, 69];\n\n// Count how many scores are 80 or above\nlet result = 0;\n\nfor (const score of scores) {\n    if (score >= 80) {\n        result++;\n    }\n}",
             "tags": [
                 "javascript",
                 "loops",
@@ -281,7 +281,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "70",
+            "solution": "function calculatePassRate(passed, total) {\n    return (passed / total) * 100;\n}\nconst result = calculatePassRate(7, 10);",
             "tags": [
                 "javascript",
                 "functions",
@@ -329,7 +329,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "64",
+            "solution": "const isPositive = n => n > 0;\nconst square = n => n * n;\nconst result = square(8);",
             "tags": [
                 "javascript",
                 "arrow-functions",
@@ -377,7 +377,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "3",
+            "solution": "const testResults = [\n    { name: \"Login\", status: \"passed\" },\n    { name: \"Signup\", status: \"failed\" },\n    { name: \"Profile\", status: \"passed\" },\n    { name: \"Settings\", status: \"passed\" },\n    { name: \"Logout\", status: \"failed\" }\n];\nconst passedTests = testResults.filter(t => t.status === \"passed\");\nconst result = passedTests.length;",
             "tags": [
                 "javascript",
                 "array-methods",
@@ -426,7 +426,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "AUTH_FAILED",
+            "solution": "const rawMessage = \"   Error: AUTH_FAILED   \";\nconst trimmed = rawMessage.trim();\nconst parts = trimmed.split(\": \");\nconst result = parts[1];",
             "tags": [
                 "javascript",
                 "strings",
@@ -474,7 +474,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "250",
+            "solution": "const testResult = {\n    testName: \"API Response Time\",\n    duration: 250,\n    status: \"passed\",\n    timestamp: \"2024-01-15T10:30:00\"\n};\nconst { testName, duration, status } = testResult;\nconst result = status === \"passed\" ? duration : 0;",
             "tags": [
                 "javascript",
                 "destructuring",
@@ -522,7 +522,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "3",
+            "solution": "const users = [\n    { name: \"Alice\", email: \"alice@test.com\", status: \"active\" },\n    { name: \"Bob\", email: \"bob@test.com\", status: \"inactive\" },\n    { name: \"Carol\", email: \"carol@test.com\", status: \"active\" },\n    { name: \"Dave\", email: \"dave@test.com\", status: \"active\" }\n];\nconst activeEmails = users\n    .filter(user => user.status === \"active\")\n    .map(user => user.email);\nconst result = activeEmails.length;",
             "tags": [
                 "javascript",
                 "scenario",
@@ -570,7 +570,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "4",
+            "solution": "const titleElement = document.querySelector('#title');\nconst items = document.querySelectorAll('.item');\nconst result = items.length;",
             "tags": [
                 "javascript",
                 "dom",
@@ -618,7 +618,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "100",
+            "solution": "const priceText = document.querySelector('.price').textContent;\nconst quantity = document.querySelector('#quantity').value;\nconst result = Number(priceText) * Number(quantity);",
             "tags": [
                 "javascript",
                 "dom",
@@ -666,7 +666,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "3",
+            "solution": "const checkboxes = document.querySelectorAll('input[type=\"checkbox\"]');\nlet result = 0;\nfor (const checkbox of checkboxes) {\n    if (checkbox.checked) {\n        result++;\n    }\n}",
             "tags": [
                 "javascript",
                 "dom",
@@ -715,7 +715,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "4",
+            "solution": "const activeTab = document.querySelector('.active');\nconst parent = activeTab.parentElement;\nconst result = parent.children.length;",
             "tags": [
                 "javascript",
                 "dom",
@@ -763,7 +763,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "3",
+            "solution": "const button = document.querySelector('#increment');\nbutton.click();\nbutton.click();\nbutton.click();\nconst result = Number(document.querySelector('#count').textContent);",
             "tags": [
                 "javascript",
                 "dom",
@@ -811,7 +811,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "testuser:secret123",
+            "solution": "document.querySelector('#username').value = 'testuser';\ndocument.querySelector('#password').value = 'secret123';\ndocument.querySelector('#remember').checked = true;\nconst username = document.querySelector('#username').value;\nconst password = document.querySelector('#password').value;\nconst result = username + ':' + password;",
             "tags": [
                 "javascript",
                 "dom",
@@ -859,7 +859,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "550",
+            "solution": "const tbody = document.querySelector('tbody');\nif (!tbody) throw new Error('tbody not found');\nlet result = 0;\nconst rows = tbody.querySelectorAll('tr');\nfor (const row of rows) {\n    const amount = Number(row.querySelectorAll('td')[2].textContent);\n    result += amount;\n}",
             "tags": [
                 "javascript",
                 "dom",
@@ -907,7 +907,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "2",
+            "solution": "const hasHeader = document.querySelector('#header') !== null;\nconst hasFooter = document.querySelector('#footer') !== null;\nconst hasSidebar = document.querySelector('#sidebar') !== null;\nconst result = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0) + (hasSidebar ? 1 : 0);",
             "tags": [
                 "javascript",
                 "dom",
@@ -955,7 +955,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "5678",
+            "solution": "const cards = document.querySelectorAll('.stat-card');\nlet totalSalesValue = 0;\nfor (const card of cards) {\n    const label = card.querySelector('.label').textContent;\n    if (label === 'Total Sales') {\n        const valueText = card.querySelector('.value').textContent;\n        totalSalesValue = Number(valueText.replace(',', ''));\n    }\n}\nconst result = totalSalesValue;",
             "tags": [
                 "javascript",
                 "dom",
@@ -1004,7 +1004,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "42",
+            "solution": "const myPromise = new Promise((resolve, reject) => {\n    resolve(42);\n});\nlet result;\nresult = await myPromise;",
             "tags": [
                 "javascript",
                 "async",
@@ -1052,7 +1052,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "42",
+            "solution": "const getValue = () => Promise.resolve(21);\nasync function doubleValue() {\n    const value = await getValue();\n    return value * 2;\n}\nconst result = await doubleValue();",
             "tags": [
                 "javascript",
                 "async",
@@ -1100,7 +1100,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "fallback",
+            "solution": "const riskyOperation = () => Promise.reject(new Error('Network failed'));\nasync function safeOperation() {\n    try {\n        const data = await riskyOperation();\n        return data;\n    } catch (error) {\n        return 'fallback';\n    }\n}\nconst result = await safeOperation();",
             "tags": [
                 "javascript",
                 "async",
@@ -1148,7 +1148,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "42",
+            "solution": "const getA = () => Promise.resolve(10);\nconst getB = () => Promise.resolve(20);\nconst getC = () => Promise.resolve(12);\nconst [a, b, c] = await Promise.all([getA(), getB(), getC()]);\nconst result = a + b + c;",
             "tags": [
                 "javascript",
                 "async",
@@ -1197,7 +1197,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "3",
+            "solution": "let attempts = 0;\nconst flakyOperation = () => {\n    attempts++;\n    if (attempts < 3) {\n        return Promise.reject(new Error('Flaky!'));\n    }\n    return Promise.resolve('success');\n};\nasync function retry(fn, maxAttempts = 3) {\n    for (let i = 0; i < maxAttempts; i++) {\n        try {\n            return await fn();\n        } catch (e) {\n            if (i === maxAttempts - 1) throw e;\n        }\n    }\n}\nawait retry(flakyOperation);\nconst result = attempts;",
             "tags": [
                 "javascript",
                 "async",
@@ -1246,7 +1246,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "12",
+            "solution": "const getUsers = () => Promise.resolve([1, 2, 3, 4, 5]);\nconst getOrders = () => Promise.resolve([101, 102, 103]);\nconst getProducts = () => Promise.resolve([201, 202, 203, 204]);\n\nasync function aggregateData() {\n    try {\n        const [users, orders, products] = await Promise.all([\n            getUsers(),\n            getOrders(),\n            getProducts()\n        ]);\n        return users.length + orders.length + products.length;\n    } catch (error) {\n        return 0;\n    }\n}\nconst result = await aggregateData();",
             "tags": [
                 "javascript",
                 "async",
