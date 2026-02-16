@@ -88,6 +88,7 @@
     "revealFirst": "Reveal First Tip",
     "revealNext": "Reveal Next Tip",
     "noneAvailable": "No specific tips available for this challenge.",
+    "unlockPrereq": "Reveal all tips first to unlock AI help.",
     "penalty": "-50% XP"
   },
   "types": {

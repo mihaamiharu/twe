@@ -84,6 +84,7 @@
     "revealFirst": "Buka Tips Pertama",
     "revealNext": "Buka Tips Berikutnya",
     "noneAvailable": "Tidak ada tips khusus untuk tantangan ini.",
+    "unlockPrereq": "Buka semua tips terlebih dahulu untuk menggunakan bantuan AI.",
     "penalty": "-50% XP"
   },
   "types": {
