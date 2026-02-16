@@ -17,6 +17,7 @@ export interface HintRequest {
     starterCode?: string;
     userAttempt?: string;
     locale?: string;
+    staticHints?: string[];
 }
 
 export interface HintResponse {
@@ -30,7 +31,7 @@ export interface HintResponse {
  * The hint guides the user without revealing the exact solution.
  */
 export async function generateHint(request: HintRequest): Promise<HintResponse> {
-    const { challengeType, instructions, htmlContent, starterCode, userAttempt, locale = 'en' } = request;
+    const { challengeType, instructions, htmlContent, starterCode, userAttempt, locale = 'en', staticHints } = request;
 
     const client = getClient();
     if (!client) {
@@ -43,7 +44,7 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
     // Optimization: Keep system prompt static for DeepSeek caching. 
     // Pass 'challengeType' to user prompt instead.
     const systemPrompt = getSystemPrompt(locale);
-    const userPrompt = buildUserPrompt(challengeType, instructions, htmlContent, starterCode, userAttempt, locale);
+    const userPrompt = buildUserPrompt(challengeType, instructions, htmlContent, starterCode, userAttempt, locale, staticHints);
 
     console.log('[AI Debug] System Prompt:', systemPrompt);
     console.log('[AI Debug] User Prompt:', userPrompt);
@@ -173,7 +174,8 @@ function buildUserPrompt(
     htmlContent?: string,
     starterCode?: string,
     userAttempt?: string,
-    locale?: string
+    locale?: string,
+    staticHints?: string[]
 ): string {
     const isIndonesian = locale === 'id';
     const readableType = challengeType.replace('_', ' ');
@@ -192,6 +194,12 @@ function buildUserPrompt(
         prompt += isIndonesian
             ? `\n## Catatan Lingkungan\n- \`test()\` menyediakan fixture \`{ page }\` (expect tersedia global)\n- Class Page Object sudah preloaded sebagai global (tidak perlu import)\n- \`await expect(locator).toBeVisible()\` berfungsi seperti biasa\n- Navigasi: \`await page.goto('/path')\` menggunakan Virtual File System\n- State sesi: Gunakan \`window.__APP_STATE__\` jika diperlukan (bukan localStorage)\n`
             : `\n## Environment Notes\n- \`test()\` provides \`{ page }\` fixture (expect is available globally)\n- Page Object classes are preloaded globals (no import needed)\n- \`await expect(locator).toBeVisible()\` works as expected\n- Navigation: \`await page.goto('/path')\` uses Virtual File System\n- Session state: Use \`window.__APP_STATE__\` if needed (not localStorage)\n`;
+    }
+
+    if (staticHints && staticHints.length > 0) {
+        prompt += isIndonesian
+            ? `\n## Petunjuk yang Sudah Diberikan\nSiswa sudah membaca petunjuk statis berikut:\n${staticHints.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nJANGAN mengulangi informasi dari petunjuk di atas. Berikan bantuan yang lebih mendalam atau spesifik berdasarkan kode mereka.`
+            : `\n## Already Provided Hints\nThe student has already read these static hints:\n${staticHints.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nDO NOT repeat information from the hints above. Provide more in-depth or specific assistance based on their code.`;
     }
 
     if (htmlContent) {

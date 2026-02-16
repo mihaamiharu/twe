@@ -10,7 +10,6 @@ import type { LogEntry } from '../ConsoleOutput';
 
 export function usePlaygroundState({
     challenge,
-    userId,
     hintUsed: initialHintUsed = false,
     initialHintContent,
 }: ChallengePlaygroundProps): PlaygroundState {
@@ -37,6 +36,8 @@ export function usePlaygroundState({
     const [selectorType, setSelectorType] = useState<'css' | 'xpath'>(
         challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css',
     );
+
+    const [revealedHintsCount, setRevealedHintsCount] = useState(0);
 
     // Layout state
     const [isMobile, setIsMobile] = useState(false);
@@ -85,6 +86,7 @@ export function usePlaygroundState({
         setPreviewValidation(null);
         setHintContent(null);
         setHintUsed(initialHintUsed);
+        setRevealedHintsCount(0);
 
         if (challenge.files) {
             setFileContents({ ...challenge.files });
@@ -175,6 +177,8 @@ export function usePlaygroundState({
         setPreviewValidation,
         currentVfsPath,
         setCurrentVfsPath,
+        revealedHintsCount,
+        setRevealedHintsCount,
         isCodeChallenge,
         isSelectorChallenge,
         extraLibs,

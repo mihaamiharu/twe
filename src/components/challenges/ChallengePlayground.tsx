@@ -110,6 +110,8 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
           }
         }}
         onSubmit={handleSubmit}
+        revealedHintsCount={state.revealedHintsCount}
+        setRevealedHintsCount={state.setRevealedHintsCount}
       />
 
       {/* Persistent Goal Bar */}

@@ -162,11 +162,17 @@ export const resendVerification = createServerFn({ method: 'POST' })
       const verificationUrl = `${baseUrl}/api/auth/verify-email?token=${token}&callbackURL=/login`;
 
       // Send the verification email
-      await sendVerificationEmail(
+      // Fire and forget email sending
+      sendVerificationEmail(
         user.email,
         verificationUrl,
         user.name || undefined,
-      );
+      ).catch((error) => {
+        console.error(
+          '[Auth] Background resend verification email failed:',
+          error,
+        );
+      });
 
       // Update rate limit
       rateLimitMap.set(normalizedEmail, now);

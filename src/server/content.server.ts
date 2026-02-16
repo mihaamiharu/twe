@@ -17,6 +17,7 @@ import type {
   ChallengeFilters,
   ChallengeTier,
   LocalizedString,
+  LocalizedArray,
 } from '@/lib/content.types';
 
 // =============================================================================
@@ -32,6 +33,17 @@ const CHALLENGES_DIR = join(CONTENT_ROOT, 'content', 'challenges');
  */
 function resolveLocale(value: LocalizedString, locale: string): string {
   return value[locale as keyof LocalizedString] || value.en || '';
+}
+
+/**
+ * Resolve a localized array to the requested locale with fallback to English
+ */
+function resolveLocaleArray(
+  value: LocalizedArray | undefined,
+  locale: string,
+): string[] {
+  if (!value) return [];
+  return value[locale as keyof LocalizedArray] || value.en || [];
 }
 
 /**
@@ -307,6 +319,7 @@ export async function getChallengeContent(
     title: resolveLocale(def.title, locale),
     description: resolveLocale(def.description, locale),
     instructions: resolveLocale(def.instructions, locale),
+    hints: resolveLocaleArray(def.hints, locale),
     htmlContent: def.htmlContent,
     files: def.files,
     editableFiles: def.editableFiles,

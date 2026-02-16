@@ -4,11 +4,13 @@ import {
     Send,
     BookOpen,
     Lightbulb,
+    Sparkles,
     Zap,
     Loader2,
     ChevronLeft,
     ChevronRight,
-    Info
+    Info,
+    Eye
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +21,14 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from '@/components/ui/tooltip';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 import type { Challenge } from './types';
@@ -36,6 +46,8 @@ interface PlaygroundHeaderProps {
     onRunCode: () => void;
     onOpenHintDialog: () => void;
     onSubmit: () => void;
+    revealedHintsCount: number;
+    setRevealedHintsCount: (count: number) => void;
 }
 
 export function PlaygroundHeader({
@@ -51,6 +63,8 @@ export function PlaygroundHeader({
     onRunCode,
     onOpenHintDialog,
     onSubmit,
+    revealedHintsCount,
+    setRevealedHintsCount,
 }: PlaygroundHeaderProps) {
     const { t } = useTranslation(['challenges', 'common']);
 
@@ -163,50 +177,127 @@ export function PlaygroundHeader({
                     </Link>
                 )}
 
-                {!challenge.isCompleted && (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={onOpenHintDialog}
-                                    disabled={isHintPending || !userId}
-                                    className={cn(
-                                        'font-bold border transition-all h-8 md:h-9 px-2 md:px-3',
-                                        hintUsed
-                                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 hover:bg-amber-500/20'
-                                            : !userId
-                                                ? 'bg-amber-500/5 border-amber-500/20 text-amber-600/60 cursor-default opacity-80'
-                                                : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
-                                    )}
-                                >
-                                    {isHintPending ? (
-                                        <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
-                                    ) : (
-                                        <Lightbulb className="h-4 w-4 md:mr-2" />
-                                    )}
-                                    <span className="hidden md:inline">
-                                        {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}
-                                    </span>
-                                    {!hintUsed && (
-                                        <Badge variant="secondary" className="hidden md:flex ml-2 bg-amber-500/20 text-amber-700 text-xs">
-                                            {t('challenges:hints.penalty')}
-                                        </Badge>
-                                    )}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                {!userId
-                                    ? t('challenges:hints.loginRequired')
-                                    : hintUsed
-                                        ? t('challenges:hints.showAgain', 'Show Hint Again')
-                                        : t('challenges:hints.warning')
-                                }
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
+                {challenge.hints && challenge.hints.length > 0 && (
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                className="font-bold border border-border/50 text-muted-foreground hover:text-foreground h-8 md:h-9 px-2 md:px-3"
+                            >
+                                <Lightbulb className="h-4 w-4 md:mr-2 text-yellow-500" />
+                                <span className="hidden md:inline">{t('challenges:hints.title', 'Hints')}</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto">
+                            <DropdownMenuLabel className="flex items-center justify-between">
+                                <span>{t('challenges:hints.availableHints', 'Available Hints')}</span>
+                                <Badge variant="secondary" className="text-[10px] bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
+                                    {revealedHintsCount} / {challenge.hints.length}
+                                </Badge>
+                            </DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+
+                            {/* Revealed Hints */}
+                            {challenge.hints.slice(0, revealedHintsCount).map((hint, i) => (
+                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 items-start focus:bg-accent focus:text-accent-foreground border-b border-border/10 last:border-0">
+                                    <div className="flex flex-col gap-1 w-full">
+                                        <div className="flex items-center gap-2">
+                                            <span className="font-bold text-[10px] uppercase text-amber-600">
+                                                {i === 0 ? 'Concept' : i === 1 ? 'Syntax' : 'Code'}
+                                            </span>
+                                        </div>
+                                        <span className="flex-1 leading-relaxed text-foreground">{hint}</span>
+                                    </div>
+                                </DropdownMenuItem>
+                            ))}
+
+                            {/* Reveal Button */}
+                            {revealedHintsCount < challenge.hints.length && (
+                                <div className="p-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full text-xs font-bold bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20 text-amber-700 h-9"
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setRevealedHintsCount(revealedHintsCount + 1);
+                                        }}
+                                    >
+                                        <Eye className="h-3 w-3 mr-2" />
+                                        {revealedHintsCount === 0
+                                            ? t('challenges:hints.revealFirst', 'Reveal First Tip')
+                                            : t('challenges:hints.revealNext', 'Reveal Next Tip')}
+                                    </Button>
+                                </div>
+                            )}
+
+                            {challenge.hints.length === 0 && (
+                                <div className="p-8 text-center text-muted-foreground text-xs italic">
+                                    {t('challenges:hints.noneAvailable', 'No specific tips available for this challenge.')}
+                                </div>
+                            )}
+
+                            {!challenge.isCompleted && (
+                                <>
+                                    <DropdownMenuSeparator />
+                                    <div className="p-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                onOpenHintDialog();
+                                            }}
+                                            disabled={isHintPending || !userId || revealedHintsCount < (challenge.hints?.length || 0)}
+                                            className={cn(
+                                                'w-full justify-start font-bold h-9 px-3 transition-all',
+                                                hintUsed
+                                                    ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20'
+                                                    : !userId
+                                                        ? 'opacity-50 cursor-not-allowed'
+                                                        : revealedHintsCount < (challenge.hints?.length || 0)
+                                                            ? 'opacity-40 cursor-not-allowed'
+                                                            : 'text-amber-600 hover:bg-amber-500/10 hover:text-amber-700',
+                                            )}
+                                        >
+                                            <div className="flex items-center justify-between w-full">
+                                                <div className="flex items-center">
+                                                    {isHintPending ? (
+                                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                    ) : (
+                                                        <Sparkles className="h-4 w-4 mr-2" />
+                                                    )}
+                                                    <span className="text-xs">
+                                                        {hintUsed ? t('challenges:hints.showAgain', 'Show AI Hint Again') : t('challenges:hints.button')}
+                                                    </span>
+                                                </div>
+                                                {revealedHintsCount < (challenge.hints?.length || 0) ? (
+                                                    <Badge variant="outline" className="text-[9px] uppercase border-muted-foreground/30 text-muted-foreground">
+                                                        Locked
+                                                    </Badge>
+                                                ) : !hintUsed && (
+                                                    <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 text-[10px]">
+                                                        {t('challenges:hints.penalty')}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </Button>
+
+                                        {revealedHintsCount < (challenge.hints?.length || 0) && (
+                                            <p className="text-[10px] text-muted-foreground px-3 mt-1 italic">
+                                                {t('challenges:hints.unlockPrereq', 'Reveal all tips first to unlock AI help.')}
+                                            </p>
+                                        )}
+                                    </div>
+                                </>
+                            )}
+                        </DropdownMenuContent>
+                    </DropdownMenu>
                 )}
+
 
                 <TooltipProvider>
                     <Tooltip>

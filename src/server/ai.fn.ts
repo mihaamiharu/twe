@@ -16,6 +16,7 @@ const GetHintSchema = z.object({
     challengeSlug: z.string().min(1),
     userAttempt: z.string().optional(),
     locale: z.string().default('en'),
+    staticHints: z.array(z.string()).optional(),
 });
 
 export const getAIHint = createServerFn({ method: 'POST' })
@@ -88,6 +89,7 @@ export const getAIHint = createServerFn({ method: 'POST' })
                 starterCode: challengeContent.starterCode,
                 userAttempt,
                 locale,
+                staticHints: data.staticHints,
             });
 
             if (!hintResult.success) {
