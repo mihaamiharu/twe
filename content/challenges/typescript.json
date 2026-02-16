@@ -41,7 +41,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "10",
+            "solution": "const testId = \"TC-001\";\nlet passCount: number = 10;\nconst result = passCount;",
             "tags": [
                 "typescript",
                 "beginner",
@@ -89,7 +89,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "Score: 85",
+            "solution": "function formatScore(score: number): string {\n  return `Score: ${score}`;\n}\nconst result = formatScore(85);",
             "tags": [
                 "typescript",
                 "functions",
@@ -136,7 +136,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "120",
+            "solution": "interface TestResult {\n  testName: string;\n  duration: number;\n}\nconst currentTest: TestResult = {\n  testName: \"Login Flow\",\n  duration: 120\n};\nconst result = currentTest.duration;",
             "tags": [
                 "typescript",
                 "interfaces",
@@ -183,7 +183,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "high",
+            "solution": "type Priority = \"high\" | \"medium\" | \"low\";\nconst task = {\n  priority: \"high\" as Priority\n};\nconst result = task.priority;",
             "tags": [
                 "typescript",
                 "union-types",
@@ -230,7 +230,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "0",
+            "solution": "interface AppConfig {\n  apiUrl: string;\n  retryLimit?: number;\n}\nconst myConfig: AppConfig = {\n  apiUrl: \"https://api.test.com\",\n  retryLimit: 0\n};\nconst result = myConfig.retryLimit !== undefined ? myConfig.retryLimit : -1;",
             "tags": [
                 "typescript",
                 "interfaces",
@@ -278,7 +278,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "30",
+            "solution": "type Coordinate = [number, number];\nconst pos: Coordinate = [10, 20];\nconst result = pos[0] + pos[1];",
             "tags": [
                 "typescript",
                 "type-aliases",
@@ -325,7 +325,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "string",
+            "solution": "const message = \"Inferred\";\nconst result = typeof message;",
             "tags": [
                 "typescript",
                 "inference"
@@ -370,7 +370,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "abc-123",
+            "solution": "function parseResponse<T>(data: T): T {\n  return data;\n}\ninterface LoginResponse {\n  token: string;\n}\nconst response = parseResponse<LoginResponse>({ token: \"abc-123\" });\nconst result = response.token;",
             "tags": [
                 "typescript",
                 "generics",
@@ -417,7 +417,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "5",
+            "solution": "interface FullReport {\n  title: string;\n  passed: number;\n  failed: number;\n}\ntype DraftReport = Partial<FullReport>;\nconst myDraft: DraftReport = { passed: 5 };\nconst result = myDraft.passed;",
             "tags": [
                 "typescript",
                 "utility-types",
@@ -464,7 +464,7 @@
                     "isHidden": false
                 }
             ],
-            "solution": "user_5@test.com",
+            "solution": "interface User {\n  id: number;\n  email: string;\n  role: \"admin\" | \"guest\";\n}\nfunction createUser(id: number, role?: \"admin\" | \"guest\"): User {\n  return {\n    id,\n    email: `user_${id}@test.com`,\n    role: role ?? \"guest\"\n  };\n}\nconst user = createUser(5, \"admin\");\nconst result = user.email;",
             "tags": [
                 "typescript",
                 "boss",

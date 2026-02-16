@@ -19,106 +19,74 @@ This document contains the **official solutions** for all coding challenges, ext
 ### pw-click-actions - Click Actions
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('click counter', async ({ page }) => {
-  const button = page.getByRole('button', { name: 'Increment' });
-  await button.click();
-  await button.click();
-  await button.click();
-  await expect(page.getByLabel('Counter Value')).toHaveText('3');
-});
+await page.click('#increment');
+await page.click('#increment');
+await page.click('#increment');
+const result = await page.locator('#count').textContent();
 ```
 
 ### pw-fill-type - Fill & Type
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('fill form', async ({ page }) => {
-  await page.getByLabel('Email').fill('qa@test.com');
-  await page.getByLabel('Password').fill('secret123');
-  await expect(page.getByLabel('Email')).toHaveValue('qa@test.com');
-});
+await page.fill('#email', 'qa@test.com');
+await page.fill('#password', 'secret123');
+const result = await page.locator('#email').inputValue();
 ```
 
 ### pw-select-dropdowns - Select Dropdowns
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('select language', async ({ page }) => {
-  await page.getByLabel('Choose Language').selectOption('javascript');
-  await expect(page.getByLabel('Choose Language')).toHaveValue('javascript');
-});
+await page.selectOption('#language', 'javascript');
+const val = await page.locator('#language').inputValue();
+const result = val;
 ```
 
 ### pw-checkbox-radio - Checkbox & Radio
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('check terms', async ({ page }) => {
-  await page.getByLabel('Accept Terms & Conditions').check();
-  await expect(page.getByLabel('Accept Terms & Conditions')).toBeChecked();
-});
+await page.check('#terms');
+const checked = await page.isChecked('#terms');
+const result = checked;
 ```
 
 ### pw-keyboard-actions - Keyboard Actions
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('search with keyboard', async ({ page }) => {
-  await page.getByPlaceholder('Search...').fill('Playwright');
-  await page.keyboard.press('Enter');
-  await expect(page.getByText('Searching for: Playwright')).toBeVisible();
-});
+await page.fill('#search', 'Playwright');
+await page.press('#search', 'Enter');
+const result = await page.locator('#results').textContent();
 ```
 
 ### pw-hover-focus - Hover & Focus
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('hover menu', async ({ page }) => {
-  await page.getByText('Products').hover();
-  await expect(page.getByRole('link', { name: 'Laptop' })).toBeVisible();
-});
+await page.hover('#menu-btn');
+const result = await page.locator('#dropdown').textContent();
 ```
 
 ### pw-file-upload - File Upload
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('upload file', async ({ page }) => {
-  await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');
-  await expect(page.getByText(/Selected: resume.pdf/)).toBeVisible();
+await page.locator('#file-input').setInputFiles({
+    name: 'test-report.pdf',
+    mimeType: 'application/pdf',
+    buffer: new ArrayBuffer(0) // Mock buffer
 });
+const result = await page.locator('#filename').textContent();
 ```
 
 ### pw-drag-drop - Drag and Drop
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('drag and drop', async ({ page }) => {
-  await page.getByText('Drag').dragTo(page.getByText('Zone'));
-  await expect(page.getByText('Dropped!')).toBeVisible();
-});
+await page.locator('#item-a').dragTo(page.locator('#dropzone'));
+const result = await page.locator('#dropzone').textContent();
 ```
 
 ### pw-iframes - Working with Frames
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('iframe input', async ({ page }) => {
-  const frame = page.frameLocator('iframe');
-  await frame.getByPlaceholder('Card Number').fill('1234');
-  await expect(frame.getByPlaceholder('Card Number')).toHaveValue('1234');
-});
+const frame = page.frameLocator('#embed');
+const result = await frame.locator('#frame-content').textContent();
 ```
 
 ### pw-dynamic-table - Dynamic Tables
@@ -136,15 +104,11 @@ test('dynamic table', async ({ page }) => {
 ### pw-actions-boss - Scenario: E-Commerce Checkout
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('checkout flow', async ({ page }) => {
-  await page.getByRole('button', { name: 'Add to Cart' }).click();
-  await page.getByLabel('Quantity').fill('3');
-  await page.getByLabel('Express Shipping').check();
-  await page.getByRole('button', { name: 'Checkout' }).click();
-  await expect(page.locator('#confirmation')).toContainText('3 items (Express)');
-});
+await page.click('#add-btn');
+await page.fill('#qty', '3');
+await page.check('#express');
+await page.click('#checkout-btn');
+const result = await page.locator('#confirmation').textContent();
 ```
 
 ### pw-locator-intro - Introduction to Locators
@@ -160,203 +124,138 @@ test('find heading', async ({ page }) => {
 ### pw-get-by-role - getByRole
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('click element', async ({ page }) => {
-  await page.getByRole('button', { name: 'Sign Up' }).click();
-  await expect(page.locator('#result')).toHaveText('Signed up!');
-});
+const signUpBtn = page.getByRole('button', { name: 'Sign Up' });
+await signUpBtn.click();
+const result = await page.locator('#result').textContent();
 ```
 
 ### pw-get-by-text - getByText
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('find and click by text', async ({ page }) => {
-  await page.getByText('Click me').click();
-  await expect(page.locator('#output')).toHaveText('Clicked!');
-});
+const element = page.getByText('Click me');
+await element.click();
+const result = await page.locator('#output').textContent();
 ```
 
 ### pw-get-by-label - getByLabel
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('fill by label', async ({ page }) => {
-  await page.getByLabel('Username').fill('testuser');
-  await page.getByLabel('Password').fill('secret');
-  await expect(page.locator('#user')).toHaveValue('testuser');
-});
+await page.getByLabel('Username').fill('testuser');
+await page.getByLabel('Password').fill('secret123');
+const result = await page.getByLabel('Username').inputValue();
 ```
 
 ### pw-get-by-placeholder - getByPlaceholder
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('fill by placeholder', async ({ page }) => {
-  await page.getByPlaceholder('Search...').fill('Playwright testing');
-  await expect(page.locator('.search-bar input')).toHaveValue('Playwright testing');
-});
+await page.getByPlaceholder('Search...').fill('Playwright testing');
+const result = await page.getByPlaceholder('Search...').inputValue();
 ```
 
 ### pw-get-by-testid - getByTestId
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('click by testid', async ({ page }) => {
-  await page.getByTestId('add-to-cart').click();
-  await expect(page.locator('#cart-count')).toHaveText('1');
-});
+await page.getByTestId('add-to-cart').click();
+const result = await page.locator('#cart-count').textContent();
 ```
 
 ### pw-locator-chaining - Locator Chaining
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('chaining locators', async ({ page }) => {
-  await expect(page.locator('.menu li').nth(1)).toHaveText('Products');
-});
+const secondItem = page.locator('.menu li').nth(1);
+const result = await secondItem.textContent();
 ```
 
 ### pw-frame-locators - Frame Locators
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('frame interaction', async ({ page }) => {
-  const frame = page.frameLocator('#widget');
-  await frame.locator('button').click();
-  await expect(frame.locator('body')).toHaveText('Button clicked!');
-});
+const frame = page.frameLocator('#widget');
+await frame.locator('button').click();
+const result = await frame.locator('body').textContent();
 ```
 
 ### pw-list-items - List & Items
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('count items', async ({ page }) => {
-  await expect(page.getByRole('listitem')).toHaveCount(5);
-});
+const items = page.locator('.todo-list li');
+const count = await items.count();
+const result = String(count);
 ```
 
 ### pw-locators-boss - Scenario: Dynamic Product Grid
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('dynamic filter', async ({ page }) => {
-  const product = page.locator('.product')
-    .filter({ has: page.getByRole('heading', { name: 'Pro', exact: true }) })
-    .filter({ hasText: 'In Stock' });
-  
-  await product.getByRole('button', { name: 'Add to Cart' }).click();
-  await expect(page.getByText('Added Widget Pro!')).toBeVisible();
-});
+// Filter is not supported in shim, use nth(1) to target second product (Pro)
+const productCard = page.locator('.product').nth(1);
+await productCard.locator('button').click();
+const result = await page.locator('#msg').textContent();
 ```
 
 ### pw-to-be-visible - toBeVisible & toBeHidden
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('check visibility', async ({ page }) => {
-  await page.getByRole('button', { name: 'Show Modal' }).click();
-  await expect(page.getByText('Modal Content')).toBeVisible();
-});
+await page.click('#show');
+await expect(page.locator('#modal')).toBeVisible();
 ```
 
 ### pw-to-have-text - toHaveText
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('text assertions', async ({ page }) => {
-  await expect(page.getByRole('heading')).toHaveText('Hello World');
-  await expect(page.getByText(/Playwright/)).toBeVisible();
-});
+await expect(page.locator('h1')).toHaveText('Hello World');
+await expect(page.locator('p')).toContainText('Playwright');
 ```
 
 ### pw-to-have-value - toHaveValue
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('check input value', async ({ page }) => {
-  const email = page.getByPlaceholder('Enter email');
-  await email.fill('test@example.com');
-  await expect(email).toHaveValue('test@example.com');
-});
+await page.fill('#email', 'qa@test.com');
+await expect(page.locator('#email')).toHaveValue('qa@test.com');
 ```
 
 ### pw-state-assertions - State Assertions
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('check states', async ({ page }) => {
-  await page.getByLabel('Accept Terms').check();
-  await expect(page.getByLabel('Accept Terms')).toBeChecked();
-  await expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled();
-});
+await page.check('#terms');
+await expect(page.locator('#terms')).toBeChecked();
+await expect(page.locator('#submit')).toBeEnabled();
 ```
 
 ### pw-to-have-attribute - toHaveAttribute
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('check attributes', async ({ page }) => {
-  await expect(page.getByRole('link', { name: 'About Us' })).toHaveAttribute('href', '/about');
-  await expect(page.getByRole('img')).toHaveAttribute('alt');
-});
+await expect(page.locator('a')).toHaveAttribute('href', '/about');
+await expect(page.locator('img')).toHaveAttribute('alt', 'Company Logo');
 ```
 
 ### pw-to-have-count - toHaveCount
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('check count', async ({ page }) => {
-  const items = page.getByRole('listitem');
-  await expect(items).toHaveCount(4);
-  await page.getByRole('button', { name: 'Add Item' }).click();
-  await expect(items).toHaveCount(5);
-});
+await expect(page.locator('#list li')).toHaveCount(4);
+await page.click('#add');
+await expect(page.locator('#list li')).toHaveCount(5);
 ```
 
 ### pw-soft-assertions - Soft Assertions
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('soft assertions', async ({ page }) => {
-  await expect.soft(page.getByText('✓ Name valid')).toBeVisible();
-  await expect.soft(page.getByText('✓ Email valid')).toBeVisible();
-  await expect.soft(page.getByText('✓ Password valid')).toBeVisible();
-});
+await expect.soft(page.locator('#name-status')).toContainText('valid');
+await expect.soft(page.locator('#email-status')).toContainText('valid');
+await expect.soft(page.locator('#pass-status')).toContainText('valid');
 ```
 
 ### pw-assertions-boss - Scenario: Form Validation Suite
 
 ```javascript
-import { test, expect } from '@playwright/test';
-
-test('form validation', async ({ page }) => {
-  await expect(page.getByText('Invalid email format')).toBeVisible();
-  await expect(page.getByText('Must be 8+ characters')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Register' })).toBeDisabled();
-  
-  await page.getByPlaceholder('Enter email').fill('test@test.com');
-  await page.getByPlaceholder('8+ characters').fill('password123');
-  
-  await expect(page.getByRole('button', { name: 'Register' })).toBeEnabled();
-});
+// Trigger input to ensure validation logic runs
+await page.fill('#email', '');
+await expect(page.locator('#email-error')).toBeVisible();
+await expect(page.locator('#submit')).toBeDisabled();
+await page.fill('#email', 'user@example.com');
+await page.fill('#password', 'password123');
+// toBeHidden is not supported by the shim, so we check manually
+const visible = await page.locator('#email-error').isVisible();
+if (visible) throw new Error('Expected email error to be hidden');
+await expect(page.locator('#submit')).toBeEnabled();
 ```
 
 ---
@@ -416,157 +315,319 @@ test('should update profile name', async ({ page }) => {
 ### js-variables-types - Variables & Types
 
 ```javascript
-1
+const testName = "Login Test";
+let passCount = 0;
+passCount++;
+const result = passCount;
 ```
 
 ### js-arrays-test-data - Arrays for Test Data
 
 ```javascript
-4
+const testCredentials = ["admin", "user", "guest"];
+testCredentials.push("superadmin");
+const result = testCredentials.length;
 ```
 
 ### js-objects-for-tests - Objects for Tests
 
 ```javascript
-6
+const testUser = {
+    email: "test@example.com",
+    isActive: true,
+    loginCount: 5
+};
+testUser.loginCount++;
+const result = testUser.loginCount;
 ```
 
 ### js-if-else-logic - If-Else Logic
 
 ```javascript
-PARTIAL
+// Given values (don't modify)
+const passCount = 5;
+const totalTests = 10;
+
+// Write your if-else logic here
+let result;
+
+if (passCount === totalTests) {
+    result = "ALL_PASSED";
+} else if (passCount > 0) {
+    result = "PARTIAL";
+} else {
+    result = "ALL_FAILED";
+}
 ```
 
 ### js-loops-testing - Loops in Testing
 
 ```javascript
-4
+// Given test scores
+const scores = [95, 72, 88, 65, 91, 78, 83, 69];
+
+// Count how many scores are 80 or above
+let result = 0;
+
+for (const score of scores) {
+    if (score >= 80) {
+        result++;
+    }
+}
 ```
 
 ### js-functions-basics - Functions Basics
 
 ```javascript
-70
+function calculatePassRate(passed, total) {
+    return (passed / total) * 100;
+}
+const result = calculatePassRate(7, 10);
 ```
 
 ### js-arrow-functions - Arrow Functions
 
 ```javascript
-64
+const isPositive = n => n > 0;
+const square = n => n * n;
+const result = square(8);
 ```
 
 ### js-array-methods - Array Methods
 
 ```javascript
-3
+const testResults = [
+    { name: "Login", status: "passed" },
+    { name: "Signup", status: "failed" },
+    { name: "Profile", status: "passed" },
+    { name: "Settings", status: "passed" },
+    { name: "Logout", status: "failed" }
+];
+const passedTests = testResults.filter(t => t.status === "passed");
+const result = passedTests.length;
 ```
 
 ### js-string-methods - String Methods
 
 ```javascript
-AUTH_FAILED
+const rawMessage = "   Error: AUTH_FAILED   ";
+const trimmed = rawMessage.trim();
+const parts = trimmed.split(": ");
+const result = parts[1];
 ```
 
 ### js-destructuring - Destructuring
 
 ```javascript
-250
+const testResult = {
+    testName: "API Response Time",
+    duration: 250,
+    status: "passed",
+    timestamp: "2024-01-15T10:30:00"
+};
+const { testName, duration, status } = testResult;
+const result = status === "passed" ? duration : 0;
 ```
 
 ### js-fundamentals-boss - Scenario: Test Data Generator
 
 ```javascript
-3
+const users = [
+    { name: "Alice", email: "alice@test.com", status: "active" },
+    { name: "Bob", email: "bob@test.com", status: "inactive" },
+    { name: "Carol", email: "carol@test.com", status: "active" },
+    { name: "Dave", email: "dave@test.com", status: "active" }
+];
+const activeEmails = users
+    .filter(user => user.status === "active")
+    .map(user => user.email);
+const result = activeEmails.length;
 ```
 
 ### dom-queryselector-vs-all - querySelector vs querySelectorAll
 
 ```javascript
-4
+const titleElement = document.querySelector('#title');
+const items = document.querySelectorAll('.item');
+const result = items.length;
 ```
 
 ### dom-element-properties - Get Element Properties
 
 ```javascript
-100
+const priceText = document.querySelector('.price').textContent;
+const quantity = document.querySelector('#quantity').value;
+const result = Number(priceText) * Number(quantity);
 ```
 
 ### dom-check-element-state - Check Element State
 
 ```javascript
-3
+const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+let result = 0;
+for (const checkbox of checkboxes) {
+    if (checkbox.checked) {
+        result++;
+    }
+}
 ```
 
 ### dom-parent-child-navigation - Parent/Child Navigation
 
 ```javascript
-4
+const activeTab = document.querySelector('.active');
+const parent = activeTab.parentElement;
+const result = parent.children.length;
 ```
 
 ### dom-event-listeners - Event Listeners
 
 ```javascript
-3
+const button = document.querySelector('#increment');
+button.click();
+button.click();
+button.click();
+const result = Number(document.querySelector('#count').textContent);
 ```
 
 ### dom-form-interaction - Form Interaction
 
 ```javascript
-testuser:secret123
+document.querySelector('#username').value = 'testuser';
+document.querySelector('#password').value = 'secret123';
+document.querySelector('#remember').checked = true;
+const username = document.querySelector('#username').value;
+const password = document.querySelector('#password').value;
+const result = username + ':' + password;
 ```
 
 ### dom-table-data-extraction - Table Data Extraction
 
 ```javascript
-550
+const tbody = document.querySelector('tbody');
+if (!tbody) throw new Error('tbody not found');
+let result = 0;
+const rows = tbody.querySelectorAll('tr');
+for (const row of rows) {
+    const amount = Number(row.querySelectorAll('td')[2].textContent);
+    result += amount;
+}
 ```
 
 ### dom-wait-for-element - Wait for Element
 
 ```javascript
-2
+const hasHeader = document.querySelector('#header') !== null;
+const hasFooter = document.querySelector('#footer') !== null;
+const hasSidebar = document.querySelector('#sidebar') !== null;
+const result = (hasHeader ? 1 : 0) + (hasFooter ? 1 : 0) + (hasSidebar ? 1 : 0);
 ```
 
 ### dom-boss - Scenario: Dashboard Scraper
 
 ```javascript
-5678
+const cards = document.querySelectorAll('.stat-card');
+let totalSalesValue = 0;
+for (const card of cards) {
+    const label = card.querySelector('.label').textContent;
+    if (label === 'Total Sales') {
+        const valueText = card.querySelector('.value').textContent;
+        totalSalesValue = Number(valueText.replace(',', ''));
+    }
+}
+const result = totalSalesValue;
 ```
 
 ### async-understanding-promises - Understanding Promises
 
 ```javascript
-42
+const myPromise = new Promise((resolve, reject) => {
+    resolve(42);
+});
+let result;
+result = await myPromise;
 ```
 
 ### async-await-basics - Async/Await Basics
 
 ```javascript
-42
+const getValue = () => Promise.resolve(21);
+async function doubleValue() {
+    const value = await getValue();
+    return value * 2;
+}
+const result = await doubleValue();
 ```
 
 ### async-error-handling - Async Error Handling
 
 ```javascript
-fallback
+const riskyOperation = () => Promise.reject(new Error('Network failed'));
+async function safeOperation() {
+    try {
+        const data = await riskyOperation();
+        return data;
+    } catch (error) {
+        return 'fallback';
+    }
+}
+const result = await safeOperation();
 ```
 
 ### async-parallel-execution - Parallel Async Operations
 
 ```javascript
-42
+const getA = () => Promise.resolve(10);
+const getB = () => Promise.resolve(20);
+const getC = () => Promise.resolve(12);
+const [a, b, c] = await Promise.all([getA(), getB(), getC()]);
+const result = a + b + c;
 ```
 
 ### async-testing-patterns - Async Testing Patterns
 
 ```javascript
-3
+let attempts = 0;
+const flakyOperation = () => {
+    attempts++;
+    if (attempts < 3) {
+        return Promise.reject(new Error('Flaky!'));
+    }
+    return Promise.resolve('success');
+};
+async function retry(fn, maxAttempts = 3) {
+    for (let i = 0; i < maxAttempts; i++) {
+        try {
+            return await fn();
+        } catch (e) {
+            if (i === maxAttempts - 1) throw e;
+        }
+    }
+}
+await retry(flakyOperation);
+const result = attempts;
 ```
 
 ### async-boss - Scenario: API Data Aggregator
 
 ```javascript
-12
+const getUsers = () => Promise.resolve([1, 2, 3, 4, 5]);
+const getOrders = () => Promise.resolve([101, 102, 103]);
+const getProducts = () => Promise.resolve([201, 202, 203, 204]);
+
+async function aggregateData() {
+    try {
+        const [users, orders, products] = await Promise.all([
+            getUsers(),
+            getOrders(),
+            getProducts()
+        ]);
+        return users.length + orders.length + products.length;
+    } catch (error) {
+        return 0;
+    }
+}
+const result = await aggregateData();
 ```
 
 ---
@@ -576,61 +637,116 @@ fallback
 ### ts-type-annotations - Type Annotations (Clean Code)
 
 ```typescript
-10
+const testId = "TC-001";
+let passCount: number = 10;
+const result = passCount;
 ```
 
 ### ts-function-types - Function Types
 
 ```typescript
-Score: 85
+function formatScore(score: number): string {
+  return `Score: ${score}`;
+}
+const result = formatScore(85);
 ```
 
 ### ts-interfaces-basics - Interfaces Basics
 
 ```typescript
-120
+interface TestResult {
+  testName: string;
+  duration: number;
+}
+const currentTest: TestResult = {
+  testName: "Login Flow",
+  duration: 120
+};
+const result = currentTest.duration;
 ```
 
 ### ts-union-types - Union Types
 
 ```typescript
-high
+type Priority = "high" | "medium" | "low";
+const task = {
+  priority: "high" as Priority
+};
+const result = task.priority;
 ```
 
 ### ts-optional-properties - Optional Properties (Edge Case)
 
 ```typescript
-0
+interface AppConfig {
+  apiUrl: string;
+  retryLimit?: number;
+}
+const myConfig: AppConfig = {
+  apiUrl: "https://api.test.com",
+  retryLimit: 0
+};
+const result = myConfig.retryLimit !== undefined ? myConfig.retryLimit : -1;
 ```
 
 ### ts-type-aliases - Type Aliases
 
 ```typescript
-30
+type Coordinate = [number, number];
+const pos: Coordinate = [10, 20];
+const result = pos[0] + pos[1];
 ```
 
 ### ts-type-inference - Type Inference
 
 ```typescript
-string
+const message = "Inferred";
+const result = typeof message;
 ```
 
 ### ts-generics-intro - Generics (API Helper)
 
 ```typescript
-abc-123
+function parseResponse<T>(data: T): T {
+  return data;
+}
+interface LoginResponse {
+  token: string;
+}
+const response = parseResponse<LoginResponse>({ token: "abc-123" });
+const result = response.token;
 ```
 
 ### ts-utility-types - Utility Types: Partial
 
 ```typescript
-5
+interface FullReport {
+  title: string;
+  passed: number;
+  failed: number;
+}
+type DraftReport = Partial<FullReport>;
+const myDraft: DraftReport = { passed: 5 };
+const result = myDraft.passed;
 ```
 
 ### ts-fundamentals-boss - Boss: The User Factory
 
 ```typescript
-user_5@test.com
+interface User {
+  id: number;
+  email: string;
+  role: "admin" | "guest";
+}
+function createUser(id: number, role?: "admin" | "guest"): User {
+  return {
+    id,
+    email: `user_${id}@test.com`,
+    role: role ?? "guest"
+  };
+}
+const user = createUser(5, "admin");
+const result = user.email;
 ```
 
 ---
