@@ -478,7 +478,8 @@ export async function executePlaywrightCode(
             });
 
             // Create mocked page object
-            const page = new MockedPlaywrightPage(iframeDoc);
+            const actionTimeout = Math.min(5000, Math.max(2000, timeout - 2000));
+            const page = new MockedPlaywrightPage(iframeDoc, { timeout: actionTimeout });
 
             // Set up VFS for multi-page E2E challenges
             if (options?.files) {
@@ -554,7 +555,12 @@ export async function executePlaywrightCode(
 
             // Inject tools into the iframe context
             contentWindow.page = page;
-            const { expect, getAssertionCount, getTestResults } = createExpect();
+
+            // Standardize timeouts: assertions/actions should fail before the global execution timeout
+            // to provide clear error messages instead of a generic "Process timed out".
+            const assertionTimeout = Math.min(5000, Math.max(2000, timeout - 2000));
+            const { expect, getAssertionCount, getTestResults } = createExpect({ timeout: assertionTimeout });
+
             contentWindow.expect = expect;
             contentWindow.test = test;
 
