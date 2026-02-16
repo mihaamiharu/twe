@@ -22,7 +22,6 @@ export function useChallengeExecution(
     const {
         code,
         selector,
-        selectorType,
         fileContents,
         testResults,
         setTestResults,
@@ -43,7 +42,6 @@ export function useChallengeExecution(
         setHintUsed,
         t,
         locale,
-        isRunning,
         hasPassed,
         isCodeChallenge,
         isSelectorChallenge
@@ -111,18 +109,10 @@ export function useChallengeExecution(
             let outputMessage = result.output;
 
             const hasExpectedState = (challenge.expectedState?.length ?? 0) > 0;
-            const isAssertionChallenge = [
-                'playwright-assertions',
-                'page-object-model',
-                'playwright-pom',
-                'playwright-data-driven',
-                'playwright-infrastructure',
-                'playwright-integration-patterns',
-                'playwright-navigation',
-                'playwright-locators',
-                'e2e-pom',
-                'e2e-integration',
-            ].includes(challenge.category ?? '');
+            // All Playwright challenges that aren't checking specific DOM state side-effects
+            // generally require assertions to happen in the test code to be considered valid.
+            const isAssertionChallenge =
+                challenge.type === 'PLAYWRIGHT' && !hasExpectedState;
 
             if (
                 isAssertionChallenge &&
@@ -162,7 +152,7 @@ export function useChallengeExecution(
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
                     outputMessage =
                         actual === undefined
-                            ? t('challenges:playground.jsUndefined')
+                            ? `${t('challenges:playground.jsUndefined')} (Did you forget to assign your answer to 'result'?)`
                             : t('challenges:playground.jsMismatch');
                     result.status = 'FAILED';
                 } else {
@@ -262,6 +252,7 @@ export function useChallengeExecution(
                     challengeSlug: challenge.slug,
                     userAttempt: currentCode || undefined,
                     locale,
+                    staticHints: challenge.hints?.slice(0, state.revealedHintsCount),
                 },
             });
         },

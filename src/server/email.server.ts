@@ -11,17 +11,15 @@ import nodemailer from 'nodemailer';
 import { logger } from '@/lib/logger';
 
 // Create reusable transporter
-const createTransporter = () => {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST || 'smtp.gmail.com',
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASSWORD,
-    },
-  });
-};
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: Number(process.env.SMTP_PORT) || 587,
+  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
+  },
+});
 
 // Get sender address
 const getFromAddress = () => {
@@ -36,8 +34,6 @@ export async function sendVerificationEmail(
   verificationUrl: string,
   userName?: string,
 ): Promise<void> {
-  const transporter = createTransporter();
-
   const appName = 'TestingWithEkki';
   const subject = `Verify your ${appName} account`;
 
@@ -125,8 +121,6 @@ export async function sendPasswordResetEmail(
   resetUrl: string,
   userName?: string,
 ): Promise<void> {
-  const transporter = createTransporter();
-
   const appName = 'TestingWithEkki';
   const subject = `Reset your ${appName} password`;
 
@@ -232,8 +226,6 @@ export async function sendBugReportNotification(report: {
     return;
   }
 
-  const transporter = createTransporter();
-
   const severityEmoji =
     {
       CRITICAL: '🔴',
@@ -324,7 +316,6 @@ export async function sendNewsletterConfirmationEmail(
   to: string,
   token: string,
 ): Promise<void> {
-  const transporter = createTransporter();
   const appName = 'TestingWithEkki';
   const subject = `Confirm your ${appName} subscription`;
 
@@ -427,7 +418,6 @@ export async function sendContactNotificationEmail(message: {
     return;
   }
 
-  const transporter = createTransporter();
   const subject = `📩 [Contact] New Message from ${message.name}`;
 
   // Use environment variable for base URL if available

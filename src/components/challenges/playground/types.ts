@@ -18,6 +18,7 @@ export interface Challenge {
     difficulty: 'Easy' | 'Medium' | 'Hard';
     xp: number;
     instructions: string;
+    hints?: string[];
     starterCode: string;
     htmlContent?: string;
     targetSelector?: string | string[];
@@ -116,6 +117,8 @@ export interface PlaygroundState {
     setPreviewValidation: (validation: { isValid: boolean; matchCount: number } | null) => void;
     currentVfsPath: string;
     setCurrentVfsPath: (path: string) => void;
+    revealedHintsCount: number;
+    setRevealedHintsCount: (count: number) => void;
 
     // Derived
     isCodeChallenge: boolean;

@@ -49,6 +49,7 @@ interface ServerChallengeResponse {
     preloadModules?: Record<string, { exports: string[]; source: string }>;
     starterCode?: string;
     tags?: string[];
+    hints?: string[];
     completionCount: number;
     tutorial?: { slug: string; title: string } | null;
     testCases: {
@@ -307,6 +308,7 @@ function ChallengeDetailPage() {
           input: tc.input,
           expectedOutput: tc.expectedOutput,
         })),
+        hints: data.data.hints,
         category: data.data.category,
         isCompleted: data.data.userProgress?.isCompleted || false,
         tutorial: data.data.tutorial,
