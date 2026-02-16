@@ -1282,15 +1282,21 @@ export class MockedPlaywrightPage {
       // Filter by name if provided
       if (options?.name) {
         elements = elements.filter((el) => {
-          const text = el.textContent || el.getAttribute('aria-label') || '';
+          // Playwright name matching for roles:
+          // 1. aria-label wins
+          // 2. aria-labelledby (not yet supported)
+          // 3. text content (subtree)
+          const ariaLabel = el.getAttribute('aria-label');
+          const textContent = (el.textContent || '').trim();
+          const name = ariaLabel || textContent;
+
           if (options.name instanceof RegExp) {
-            return options.name.test(text);
+            return options.name.test(name);
           }
+          const searchName = options.name as string;
           return options.exact
-            ? text.trim() === options.name
-            : text
-              .toLowerCase()
-              .includes((options.name as string).toLowerCase());
+            ? name === searchName
+            : name.toLowerCase().includes(searchName.toLowerCase());
         });
       }
 
@@ -1382,17 +1388,18 @@ export class MockedPlaywrightPage {
    */
   getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator {
     return this.createLocator(() => {
-      const labels = Array.from(this.targetDocument.querySelectorAll('label'));
       const matchingElements: HTMLElement[] = [];
 
+      // 1. Search via <label> elements
+      const labels = Array.from(this.targetDocument.querySelectorAll('label'));
       for (const label of labels) {
-        const labelText = label.textContent || '';
+        const labelText = (label.textContent || '').trim();
         let matches = false;
 
         if (text instanceof RegExp) {
           matches = text.test(labelText);
         } else if (options?.exact) {
-          matches = labelText.trim() === text;
+          matches = labelText === text;
         } else {
           matches = labelText.toLowerCase().includes(text.toLowerCase());
         }
@@ -1408,6 +1415,25 @@ export class MockedPlaywrightPage {
             const input = label.querySelector('input, textarea, select');
             if (input) matchingElements.push(input as HTMLElement);
           }
+        }
+      }
+
+      // 2. Search via aria-label attribute (Playwright support)
+      const ariaLabeled = Array.from(this.targetDocument.querySelectorAll('[aria-label]'));
+      for (const el of ariaLabeled) {
+        const ariaLabel = el.getAttribute('aria-label') || '';
+        let matches = false;
+
+        if (text instanceof RegExp) {
+          matches = text.test(ariaLabel);
+        } else if (options?.exact) {
+          matches = ariaLabel === text;
+        } else {
+          matches = ariaLabel.toLowerCase().includes(text.toLowerCase());
+        }
+
+        if (matches && !matchingElements.includes(el as HTMLElement)) {
+          matchingElements.push(el as HTMLElement);
         }
       }
 
