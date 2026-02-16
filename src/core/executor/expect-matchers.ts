@@ -332,6 +332,107 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
                 }, options);
             },
 
+            async toBeTruthy() {
+                await Promise.resolve();
+                handleResult(!!actual, `Expected value ${isNot ? 'NOT ' : ''}to be truthy, got ${actual}`);
+            },
+
+            async toBeFalsy() {
+                await Promise.resolve();
+                handleResult(!actual, `Expected value ${isNot ? 'NOT ' : ''}to be falsy, got ${actual}`);
+            },
+
+            async toBeNull() {
+                await Promise.resolve();
+                handleResult(actual === null, `Expected value ${isNot ? 'NOT ' : ''}to be null, got ${actual}`);
+            },
+
+            async toBeUndefined() {
+                await Promise.resolve();
+                handleResult(actual === undefined, `Expected value ${isNot ? 'NOT ' : ''}to be undefined, got ${actual}`);
+            },
+
+            async toBeDefined() {
+                await Promise.resolve();
+                handleResult(actual !== undefined, `Expected value ${isNot ? 'NOT ' : ''}to be defined`);
+            },
+
+            async toBeGreaterThan(expected: number) {
+                await Promise.resolve();
+                handleResult(actual > expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be greater than ${expected}`);
+            },
+
+            async toBeGreaterThanOrEqual(expected: number) {
+                await Promise.resolve();
+                handleResult(actual >= expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be greater than or equal to ${expected}`);
+            },
+
+            async toBeLessThan(expected: number) {
+                await Promise.resolve();
+                handleResult(actual < expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be less than ${expected}`);
+            },
+
+            async toBeLessThanOrEqual(expected: number) {
+                await Promise.resolve();
+                handleResult(actual <= expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be less than or equal to ${expected}`);
+            },
+
+            async toBeCloseTo(expected: number, precision = 2) {
+                await Promise.resolve();
+                const pass = Math.abs(actual - expected) < Math.pow(10, -precision) / 2;
+                handleResult(pass, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be close to ${expected} with precision ${precision}`);
+            },
+
+            async toContain(expected: any) {
+                await Promise.resolve();
+                let pass = false;
+                if (Array.isArray(actual) || typeof actual === 'string') {
+                    pass = actual.includes(expected);
+                } else if (actual instanceof Set || actual instanceof Map) {
+                    pass = actual.has(expected);
+                }
+                handleResult(pass, `Expected ${actual} ${isNot ? 'NOT ' : ''}to contain ${expected}`);
+            },
+
+            async toHaveLength(expected: number) {
+                await Promise.resolve();
+                const length = actual?.length ?? (actual?.size ?? 0);
+                handleResult(length === expected, `Expected length ${expected}, got ${length}`);
+            },
+
+            async toMatch(expected: string | RegExp) {
+                await Promise.resolve();
+                const pass = expected instanceof RegExp ? expected.test(String(actual)) : String(actual).includes(expected);
+                handleResult(pass, `Expected "${actual}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
+            },
+
+            async toHaveProperty(path: string, value?: any) {
+                await Promise.resolve();
+                // Simple dot-notation path resolver
+                const parts = path.split('.');
+                let current = actual;
+                let found = true;
+                for (const part of parts) {
+                    if (current === null || current === undefined || typeof current !== 'object' || !(part in current)) {
+                        found = false;
+                        break;
+                    }
+                    current = current[part];
+                }
+
+                if (!found) {
+                    handleResult(false, `Property "${path}" not found`);
+                    return;
+                }
+
+                if (value !== undefined) {
+                    const pass = JSON.stringify(current) === JSON.stringify(value);
+                    handleResult(pass, `Expected property "${path}" to equal ${JSON.stringify(value)}, got ${JSON.stringify(current)}`);
+                } else {
+                    handleResult(true, `Property "${path}" exists`);
+                }
+            },
+
             async toBe(expected: unknown) {
                 await Promise.resolve();
                 handleResult(actual === expected, `Expected ${expected}, got ${actual}`);
