@@ -12,5 +12,4 @@ export interface CodeEditorProps {
     showMinimap?: boolean;
     className?: string;
     extraLibs?: { content: string; filePath?: string }[];
-    enableSuggestions?: boolean;
 }
