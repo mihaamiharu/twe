@@ -7,31 +7,54 @@ import { Link, useParams } from '@tanstack/react-router';
 
 interface CookieConsentProps {
     onConsentChange: (consent: 'granted' | 'denied' | null) => void;
+    initialConsent?: 'granted' | 'denied' | null;
 }
 
-export function CookieConsent({ onConsentChange }: CookieConsentProps) {
+export function CookieConsent({ onConsentChange, initialConsent }: CookieConsentProps) {
     const { locale } = useParams({ strict: false });
     const currentLocale = locale || 'en';
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
-        const storedConsent = localStorage.getItem('twe-consent');
-        if (storedConsent === 'granted') {
-            onConsentChange('granted');
-            if (!Sentry.isInitialized()) {
+        // If we have initial consent from SSR/Context, we don't need to show the popup
+        if (initialConsent === 'granted' || initialConsent === 'denied') {
+            onConsentChange(initialConsent);
+            
+            // Migrate to cookie if it's only in localStorage
+            if (typeof document !== 'undefined' && !document.cookie.includes('twe-consent=')) {
+                const storedConsent = localStorage.getItem('twe-consent');
+                if (storedConsent === 'granted' || storedConsent === 'denied') {
+                    document.cookie = `twe-consent=${storedConsent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+                }
+            }
+
+            if (initialConsent === 'granted' && !Sentry.isInitialized()) {
                 Sentry.init(getSentryConfig());
             }
-        } else if (storedConsent === 'denied') {
-            onConsentChange('denied');
+            return;
+        }
+
+        // Otherwise check local state
+        const storedConsent = localStorage.getItem('twe-consent');
+        if (storedConsent === 'granted' || storedConsent === 'denied') {
+            onConsentChange(storedConsent as 'granted' | 'denied');
+            // Ensure cookie is set for migration
+            document.cookie = `twe-consent=${storedConsent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+            
+            if (storedConsent === 'granted' && !Sentry.isInitialized()) {
+                Sentry.init(getSentryConfig());
+            }
         } else {
             setIsVisible(true);
             onConsentChange(null);
         }
-    }, [onConsentChange]);
+    }, [onConsentChange, initialConsent]);
 
     const handleAccept = () => {
-        localStorage.setItem('twe-consent', 'granted');
-        onConsentChange('granted');
+        const consent = 'granted';
+        localStorage.setItem('twe-consent', consent);
+        document.cookie = `twe-consent=${consent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+        onConsentChange(consent);
         if (!Sentry.isInitialized()) {
             Sentry.init(getSentryConfig());
         }
@@ -39,8 +62,10 @@ export function CookieConsent({ onConsentChange }: CookieConsentProps) {
     };
 
     const handleDecline = () => {
-        localStorage.setItem('twe-consent', 'denied');
-        onConsentChange('denied');
+        const consent = 'denied';
+        localStorage.setItem('twe-consent', consent);
+        document.cookie = `twe-consent=${consent}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+        onConsentChange(consent);
         setIsVisible(false);
     };
 

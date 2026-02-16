@@ -30,6 +30,7 @@ import { organizationSchema } from '@/lib/seo';
 export interface RootContext {
   auth?: AuthSession;
   queryClient: QueryClient;
+  consent?: 'granted' | 'denied' | null;
 }
 
 import { DefaultErrorComponent } from "@/components/DefaultErrorComponent";
@@ -39,7 +40,41 @@ export const Route = createRootRouteWithContext<RootContext>()({
   beforeLoad: async ({ context }) => {
     // Optimization: Check cache first to avoid blocking every navigation
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);
-    return { auth };
+
+    let consent: 'granted' | 'denied' | null = null;
+
+    if (typeof document !== 'undefined') {
+      // Client-side: read from cookie or localStorage (legacy)
+      const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('twe-consent='))
+        ?.split('=')[1];
+      
+      if (cookieValue === 'granted' || cookieValue === 'denied') {
+        consent = cookieValue as 'granted' | 'denied';
+      } else {
+        // Fallback for migration
+        const stored = localStorage.getItem('twe-consent');
+        if (stored === 'granted' || stored === 'denied') {
+          consent = stored as 'granted' | 'denied';
+        }
+      }
+    } else {
+      // Server-side: read from headers
+      const { getRequestHeaders } = await import('@tanstack/react-start/server');
+      const headers = getRequestHeaders();
+      const cookieHeader = headers.get('cookie');
+      const cookieValue = cookieHeader
+        ?.split('; ')
+        .find((row) => row.startsWith('twe-consent='))
+        ?.split('=')[1];
+      
+      if (cookieValue === 'granted' || cookieValue === 'denied') {
+        consent = cookieValue as 'granted' | 'denied';
+      }
+    }
+
+    return { auth, consent };
   },
   head: () => ({
     meta: [
@@ -229,7 +264,12 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const auth = context?.auth;
   const location = useLocation();
   const preloadedImageRef = useRef<string | null>(null);
-  const [consent, setConsent] = useState<'granted' | 'denied' | null>(null);
+  const [consent, setConsent] = useState<'granted' | 'denied' | null>(context?.consent || null);
+
+  // Sync consent state if it changes via CookieConsent component
+  const handleConsentChange = (newConsent: 'granted' | 'denied' | null) => {
+    setConsent(newConsent);
+  };
 
   // Preload the avatar image to prevent flicker
   // This runs once when we have the user's image URL
@@ -251,7 +291,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       {consent === 'granted' && <GoogleAnalytics measurementId={auth?.gaMeasurementId} />}
-      <CookieConsent onConsentChange={setConsent} />
+      <CookieConsent onConsentChange={handleConsentChange} initialConsent={consent} />
       <div className="flex flex-col min-h-screen">
         <Header session={auth || null} />
         <main className="flex-1">
