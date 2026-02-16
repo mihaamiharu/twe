@@ -112,7 +112,6 @@ export function EditorPanel({
                         className="h-full"
                         key={`${challenge.id}-${resetCount}`}
                         extraLibs={extraLibs}
-                        enableSuggestions={challenge.type === 'PLAYWRIGHT'}
                     />
                 )}
             </div>
