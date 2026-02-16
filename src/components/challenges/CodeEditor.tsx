@@ -26,6 +26,7 @@ export function CodeEditor(props: CodeEditorProps) {
     height = '400px',
     showMinimap = true,
     className,
+    enableSuggestions = false,
   } = props;
 
   const { resolvedTheme } = useTheme();
@@ -99,11 +100,11 @@ export function CodeEditor(props: CodeEditorProps) {
           autoClosingBrackets: 'always',
           autoClosingQuotes: 'always',
 
-          // Clean IntelliSense (as requested in original file)
-          suggestOnTriggerCharacters: false,
-          quickSuggestions: false,
-          snippetSuggestions: 'none',
-          parameterHints: { enabled: false },
+          // IntelliSense: enabled for Playwright challenges, disabled for others
+          suggestOnTriggerCharacters: enableSuggestions,
+          quickSuggestions: enableSuggestions,
+          snippetSuggestions: enableSuggestions ? 'inline' : 'none',
+          parameterHints: { enabled: enableSuggestions },
           hover: { enabled: true },
           contextmenu: true,
         }}
