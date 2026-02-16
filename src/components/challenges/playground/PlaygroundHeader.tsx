@@ -238,54 +238,66 @@ export function PlaygroundHeader({
                                     {t('challenges:hints.noneAvailable', 'No specific tips available for this challenge.')}
                                 </div>
                             )}
+
+                            {!challenge.isCompleted && (
+                                <>
+                                    <DropdownMenuSeparator />
+                                    <div className="p-2">
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                e.stopPropagation();
+                                                onOpenHintDialog();
+                                            }}
+                                            disabled={isHintPending || !userId || revealedHintsCount < (challenge.hints?.length || 0)}
+                                            className={cn(
+                                                'w-full justify-start font-bold h-9 px-3 transition-all',
+                                                hintUsed
+                                                    ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20'
+                                                    : !userId
+                                                        ? 'opacity-50 cursor-not-allowed'
+                                                        : revealedHintsCount < (challenge.hints?.length || 0)
+                                                            ? 'opacity-40 cursor-not-allowed'
+                                                            : 'text-amber-600 hover:bg-amber-500/10 hover:text-amber-700',
+                                            )}
+                                        >
+                                            <div className="flex items-center justify-between w-full">
+                                                <div className="flex items-center">
+                                                    {isHintPending ? (
+                                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                    ) : (
+                                                        <Sparkles className="h-4 w-4 mr-2" />
+                                                    )}
+                                                    <span className="text-xs">
+                                                        {hintUsed ? t('challenges:hints.showAgain', 'Show AI Hint Again') : t('challenges:hints.button')}
+                                                    </span>
+                                                </div>
+                                                {revealedHintsCount < (challenge.hints?.length || 0) ? (
+                                                    <Badge variant="outline" className="text-[9px] uppercase border-muted-foreground/30 text-muted-foreground">
+                                                        Locked
+                                                    </Badge>
+                                                ) : !hintUsed && (
+                                                    <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 text-[10px]">
+                                                        {t('challenges:hints.penalty')}
+                                                    </Badge>
+                                                )}
+                                            </div>
+                                        </Button>
+
+                                        {revealedHintsCount < (challenge.hints?.length || 0) && (
+                                            <p className="text-[10px] text-muted-foreground px-3 mt-1 italic">
+                                                {t('challenges:hints.unlockPrereq', 'Reveal all tips first to unlock AI help.')}
+                                            </p>
+                                        )}
+                                    </div>
+                                </>
+                            )}
                         </DropdownMenuContent>
                     </DropdownMenu>
                 )}
 
-                {!challenge.isCompleted && (
-                    <TooltipProvider>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={onOpenHintDialog}
-                                    disabled={isHintPending || !userId}
-                                    className={cn(
-                                        'font-bold border transition-all h-8 md:h-9 px-2 md:px-3',
-                                        hintUsed
-                                            ? 'bg-amber-500/10 border-amber-500/30 text-amber-600 hover:bg-amber-500/20'
-                                            : !userId
-                                                ? 'bg-amber-500/5 border-amber-500/20 text-amber-600/60 cursor-default opacity-80'
-                                                : 'border-amber-500/50 text-amber-600 hover:bg-amber-500/10 hover:border-amber-500',
-                                    )}
-                                >
-                                    {isHintPending ? (
-                                        <Loader2 className="h-4 w-4 md:mr-2 animate-spin" />
-                                    ) : (
-                                        <Sparkles className="h-4 w-4 md:mr-2" />
-                                    )}
-                                    <span className="hidden md:inline">
-                                        {hintUsed ? t('challenges:hints.used') : t('challenges:hints.button')}
-                                    </span>
-                                    {!hintUsed && (
-                                        <Badge variant="secondary" className="hidden md:flex ml-2 bg-amber-500/20 text-amber-700 text-xs">
-                                            {t('challenges:hints.penalty')}
-                                        </Badge>
-                                    )}
-                                </Button>
-                            </TooltipTrigger>
-                            <TooltipContent>
-                                {!userId
-                                    ? t('challenges:hints.loginRequired')
-                                    : hintUsed
-                                        ? t('challenges:hints.showAgain', 'Show Hint Again')
-                                        : t('challenges:hints.warning')
-                                }
-                            </TooltipContent>
-                        </Tooltip>
-                    </TooltipProvider>
-                )}
 
                 <TooltipProvider>
                     <Tooltip>

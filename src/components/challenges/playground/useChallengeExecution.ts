@@ -22,7 +22,6 @@ export function useChallengeExecution(
     const {
         code,
         selector,
-        selectorType,
         fileContents,
         testResults,
         setTestResults,
@@ -43,7 +42,6 @@ export function useChallengeExecution(
         setHintUsed,
         t,
         locale,
-        isRunning,
         hasPassed,
         isCodeChallenge,
         isSelectorChallenge
@@ -254,6 +252,7 @@ export function useChallengeExecution(
                     challengeSlug: challenge.slug,
                     userAttempt: currentCode || undefined,
                     locale,
+                    staticHints: challenge.hints?.slice(0, state.revealedHintsCount),
                 },
             });
         },
