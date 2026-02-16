@@ -554,7 +554,7 @@ export async function executePlaywrightCode(
 
             // Inject tools into the iframe context
             contentWindow.page = page;
-            const { expect, getAssertionCount, getTestResults } = createExpect();
+            const { expect, getAssertionCount, getTestResults } = createExpect({ timeout });
             contentWindow.expect = expect;
             contentWindow.test = test;
 
