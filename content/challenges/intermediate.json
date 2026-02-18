@@ -416,7 +416,7 @@
             "htmlContent": "<div class=\"products\">\n  <div class=\"product\" data-testid=\"product-1\">\n    <h3>Widget Basic</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-2\">\n    <h3>Widget Pro</h3>\n    <span class=\"badge in-stock\">In Stock</span>\n    <button onclick=\"document.getElementById('msg').textContent='Added Widget Pro!'\">Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-3\">\n    <h3>Widget Pro Max</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n</div>\n<div id=\"msg\"></div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('dynamic filter', async ({ page }) => {\n  // 1. Find product with 'Pro' and 'In Stock'\n  const productCard = page.locator('.product'); \n  \n  // 2. Click Add to Cart\n\n  // 3. Assert confirmation message\n});",
             "testCases": [],
-            "solution": "const row = page.locator('.product').filter({ hasText: 'Widget Pro' });\nawait row.getByRole('button', { name: 'Add to Cart' }).click();\nawait expect(page.locator('#msg')).toContainText('Added Widget Pro');",
+            "solution": "const row = page.locator('.product').filter({ hasText: 'Widget Pro' }).filter({ hasText: 'In Stock' });\nawait row.getByRole('button', { name: 'Add to Cart' }).click();\nawait expect(page.locator('#msg')).toContainText('Added Widget Pro');",
             "tags": [
                 "playwright",
                 "locators",
@@ -1087,14 +1087,15 @@
                     "Panggil getByText('Drag').dragTo(page.getByText('Zone')) dan pastikan pesan 'Dropped!' terlihat."
                 ]
             },
-            "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:50px;height:50px;background:blue;color:white;\">Drag</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed grey;margin-top:20px;\">Zone</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n  \n  item.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', 'dragged'));\n  zone.addEventListener('dragover', e => e.preventDefault());\n  zone.addEventListener('drop', e => {\n    e.preventDefault();\n    zone.textContent = 'Dropped!';\n    zone.style.borderColor = 'green';\n  });\n</script>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  // 1. Drag 'Drag' to 'Zone'\n  // 2. Verify zone text is 'Dropped!'\n});",
+            "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:100px;height:100px;background:#3b82f6;color:white;display:flex;align-items:center;justify-content:center;cursor:grab;user-select:none;\">Drag Me</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed #9ca3af;margin-top:20px;display:flex;align-items:center;justify-content:center;\">Drop Here</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n  \n  item.addEventListener('dragstart', e => {\n    e.dataTransfer.setData('text/plain', 'dragged');\n    e.dataTransfer.effectAllowed = 'move';\n  });\n  zone.addEventListener('dragover', e => {\n    e.preventDefault();\n    e.dataTransfer.dropEffect = 'move';\n  });\n  zone.addEventListener('drop', e => {\n    e.preventDefault();\n    const data = e.dataTransfer.getData('text/plain');\n    if (data === 'dragged') {\n      zone.textContent = 'Dropped!';\n      zone.style.backgroundColor = '#10b981';\n      zone.style.color = 'white';\n      zone.style.border = 'none';\n    }\n  });\n</script>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  // 1. Drag 'Drag Me' to 'Drop Here'\n  // 2. Verify zone text is 'Dropped!'\n});",
             "testCases": [],
-            "solution": "await page.getByText('Drag').dragTo(page.getByText('Zone'));\nawait expect(page.getByText('Dropped!')).toBeVisible();",
+            "solution": "await page.getByText('Drag Me').dragTo(page.getByText('Drop Here'));\nawait expect(page.getByText('Dropped!')).toBeVisible();",
             "tags": [
                 "playwright",
                 "drag",
                 "drop",
+                "actions",
                 "intermediate"
             ]
         },
