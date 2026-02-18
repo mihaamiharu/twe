@@ -802,7 +802,7 @@
                     "Gabungkan kedua nilai input menjadi satu string menggunakan titik dua ':' sebagai pemisah."
                 ]
             },
-            "htmlContent": "<form class=\"login-form\">\n  <input type=\"text\" id=\"username\" placeholder=\"Username\" />\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n  <label><input type=\"checkbox\" id=\"remember\" /> Remember me</label>\n</form>",
+            "htmlContent": "<form class=\"login-form\" autocomplete=\"off\">\n  <input type=\"text\" id=\"username\" placeholder=\"Username\" autocomplete=\"off\" />\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" autocomplete=\"new-password\" />\n  <label><input type=\"checkbox\" id=\"remember\" /> Remember me</label>\n</form>",
             "starterCode": "// 1. Set username to \"testuser\"\n// Your code here\n\n// 2. Set password to \"secret123\"\n// Your code here\n\n// 3. Set remember to checked\n// Your code here\n\n// 4. Concatenate username + \":\" + password into result\n// Your code here",
             "testCases": [
                 {
