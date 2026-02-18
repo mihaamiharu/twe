@@ -89,7 +89,7 @@ const result = String(count);
 ### pw-locators-boss - Scenario: Dynamic Product Grid
 
 ```javascript
-const row = page.locator('.product').filter({ hasText: 'Widget Pro' });
+const row = page.locator('.product').filter({ hasText: 'Widget Pro' }).filter({ hasText: 'In Stock' });
 await row.getByRole('button', { name: 'Add to Cart' }).click();
 await expect(page.locator('#msg')).toContainText('Added Widget Pro');
 ```
@@ -217,7 +217,7 @@ await expect(page.locator('#status')).toContainText('resume.pdf');
 ### pw-drag-drop - Drag and Drop
 
 ```javascript
-await page.getByText('Drag').dragTo(page.getByText('Zone'));
+await page.getByText('Drag Me').dragTo(page.getByText('Drop Here'));
 await expect(page.getByText('Dropped!')).toBeVisible();
 ```
 

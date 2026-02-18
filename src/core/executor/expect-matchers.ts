@@ -15,6 +15,7 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
 
     const incrementCount = () => {
         assertionCount++;
+        // console.log(`[Expect] Assertion count incremented to ${assertionCount}`); 
     };
     const getAssertionCount = () => assertionCount;
     const getTestResults = () => testResults;
@@ -55,33 +56,50 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
             let lastResult: { pass: boolean; message: string } | null = null;
 
             while (Date.now() - startTime < timeout) {
-                const result = await assertion();
-                // Invert if isNot is true
-                const finalPass = isNot ? !result.pass : result.pass;
-                if (finalPass) {
-                    handleResult(true, result.message);
-                    return;
+                try {
+                    const result = await assertion();
+                    // Invert if isNot is true
+                    const finalPass = isNot ? !result.pass : result.pass;
+                    if (finalPass) {
+                        handleResult(true, result.message);
+                        return;
+                    }
+                    lastResult = result;
+                } catch (e) {
+                    // Ignore transient errors during polling (e.g. element detached)
+                    lastResult = { pass: false, message: e instanceof Error ? e.message : String(e) };
                 }
-                lastResult = result;
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
 
             // Timeout reached, fail with last result
-            const finalResult = lastResult || await assertion();
-            handleResult(isNot ? !finalResult.pass : finalResult.pass, finalResult.message);
+            if (!lastResult) {
+                try {
+                    lastResult = await assertion();
+                } catch (e) {
+                    lastResult = { pass: false, message: e instanceof Error ? e.message : String(e) };
+                }
+            }
+            handleResult(isNot ? !lastResult.pass : lastResult.pass, lastResult.message);
         };
 
         return {
             async toHaveText(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let text = '';
-                    if (actual && typeof actual.textContent === 'function') {
-                        text = (await actual.textContent()) || '';
-                    } else if (actual instanceof HTMLElement) {
-                        text = actual.textContent || '';
-                    } else {
-                        text = String(actual);
+                    try {
+                        if (actual && typeof actual.textContent === 'function') {
+                            text = (await actual.textContent()) || '';
+                        } else if (actual instanceof HTMLElement) {
+                            text = actual.textContent || '';
+                        } else {
+                            text = String(actual || '');
+                        }
+                    } catch (e) {
+                        // Element might be missing
+                        text = '';
                     }
+
                     const pass = expected instanceof RegExp ? expected.test(text) : text === expected;
                     return {
                         pass,
@@ -90,16 +108,29 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
                 }, options);
             },
 
-            async toContainText(expected: string, options?: { timeout?: number }) {
+            async toContainText(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let text = '';
-                    if (actual && typeof actual.textContent === 'function') {
-                        text = (await actual.textContent()) || '';
-                    } else if (actual instanceof HTMLElement) {
-                        text = actual.textContent || '';
-                    } else {
-                        text = String(actual);
+                    try {
+                        if (actual && typeof actual.textContent === 'function') {
+                            text = (await actual.textContent()) || '';
+                        } else if (actual instanceof HTMLElement) {
+                            text = actual.textContent || '';
+                        } else {
+                            text = String(actual || '');
+                        }
+                    } catch (e) {
+                        text = '';
                     }
+
+                    // Handle RegExp for toContainText (uncommon but possible)
+                    if (expected instanceof RegExp) {
+                        return {
+                            pass: expected.test(text),
+                            message: `Expected text "${text}" ${isNot ? 'NOT ' : ''}to contain regex "${expected}"`
+                        };
+                    }
+
                     return {
                         pass: text.includes(expected),
                         message: `Expected text "${text}" ${isNot ? 'NOT ' : ''}to contain "${expected}"`
@@ -110,15 +141,20 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
             async toHaveValue(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let value = '';
-                    if (actual && typeof actual.inputValue === 'function') {
-                        value = await actual.inputValue();
-                    } else if (
-                        actual instanceof HTMLInputElement ||
-                        actual instanceof HTMLTextAreaElement ||
-                        actual instanceof HTMLSelectElement
-                    ) {
-                        value = actual.value;
+                    try {
+                        if (actual && typeof actual.inputValue === 'function') {
+                            value = (await actual.inputValue()) || '';
+                        } else if (
+                            actual instanceof HTMLInputElement ||
+                            actual instanceof HTMLTextAreaElement ||
+                            actual instanceof HTMLSelectElement
+                        ) {
+                            value = actual.value || '';
+                        }
+                    } catch {
+                        value = '';
                     }
+
                     const pass = expected instanceof RegExp ? expected.test(value) : value === expected;
                     return {
                         pass,
@@ -130,10 +166,14 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
             async toHaveAttribute(name: string, value?: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let attrValue: string | null = null;
-                    if (actual && typeof actual.getAttribute === 'function') {
-                        attrValue = await actual.getAttribute(name);
-                    } else if (actual instanceof HTMLElement) {
-                        attrValue = actual.getAttribute(name);
+                    try {
+                        if (actual && typeof actual.getAttribute === 'function') {
+                            attrValue = await actual.getAttribute(name);
+                        } else if (actual instanceof HTMLElement) {
+                            attrValue = actual.getAttribute(name);
+                        }
+                    } catch {
+                        attrValue = null;
                     }
 
                     if (attrValue === null) {
