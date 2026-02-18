@@ -16,101 +16,6 @@ This document contains the **official solutions** for all coding challenges, ext
 
 ## Intermediate Tier
 
-### pw-click-actions - Click Actions
-
-```javascript
-await page.click('#increment');
-await page.click('#increment');
-await page.click('#increment');
-const result = await page.locator('#count').textContent();
-```
-
-### pw-fill-type - Fill & Type
-
-```javascript
-await page.fill('#email', 'qa@test.com');
-await page.fill('#password', 'secret123');
-const result = await page.locator('#email').inputValue();
-```
-
-### pw-select-dropdowns - Select Dropdowns
-
-```javascript
-await page.selectOption('#language', 'javascript');
-const val = await page.locator('#language').inputValue();
-const result = val;
-```
-
-### pw-checkbox-radio - Checkbox & Radio
-
-```javascript
-await page.check('#terms');
-const checked = await page.isChecked('#terms');
-const result = checked;
-```
-
-### pw-keyboard-actions - Keyboard Actions
-
-```javascript
-await page.fill('#search', 'Playwright');
-await page.press('#search', 'Enter');
-const result = await page.locator('#results').textContent();
-```
-
-### pw-hover-focus - Hover & Focus
-
-```javascript
-await page.hover('#menu-btn');
-const result = await page.locator('#dropdown').textContent();
-```
-
-### pw-file-upload - File Upload
-
-```javascript
-await page.locator('#file-input').setInputFiles({
-    name: 'test-report.pdf',
-    mimeType: 'application/pdf',
-    buffer: new ArrayBuffer(0) // Mock buffer
-});
-const result = await page.locator('#filename').textContent();
-```
-
-### pw-drag-drop - Drag and Drop
-
-```javascript
-await page.locator('#item-a').dragTo(page.locator('#dropzone'));
-const result = await page.locator('#dropzone').textContent();
-```
-
-### pw-iframes - Working with Frames
-
-```javascript
-const frame = page.frameLocator('#embed');
-const result = await frame.locator('#frame-content').textContent();
-```
-
-### pw-dynamic-table - Dynamic Tables
-
-```javascript
-import { test, expect } from '@playwright/test';
-
-test('dynamic table', async ({ page }) => {
-  const row = page.locator('.task-row').filter({ hasText: 'Project X' });
-  await row.getByRole('button', { name: 'Complete' }).click();
-  await expect(row.locator('.status')).toHaveText('Done');
-});
-```
-
-### pw-actions-boss - Scenario: E-Commerce Checkout
-
-```javascript
-await page.click('#add-btn');
-await page.fill('#qty', '3');
-await page.check('#express');
-await page.click('#checkout-btn');
-const result = await page.locator('#confirmation').textContent();
-```
-
 ### pw-locator-intro - Introduction to Locators
 
 ```javascript
@@ -124,17 +29,15 @@ test('find heading', async ({ page }) => {
 ### pw-get-by-role - getByRole
 
 ```javascript
-const signUpBtn = page.getByRole('button', { name: 'Sign Up' });
-await signUpBtn.click();
-const result = await page.locator('#result').textContent();
+await page.getByRole('button', { name: 'Sign Up' }).click();
+await expect(page.locator('#result')).toHaveText('Signed up!');
 ```
 
 ### pw-get-by-text - getByText
 
 ```javascript
-const element = page.getByText('Click me');
-await element.click();
-const result = await page.locator('#output').textContent();
+await page.getByText('Click me').click();
+await expect(page.locator('#output')).toHaveText('Clicked!');
 ```
 
 ### pw-get-by-label - getByLabel
@@ -142,28 +45,29 @@ const result = await page.locator('#output').textContent();
 ```javascript
 await page.getByLabel('Username').fill('testuser');
 await page.getByLabel('Password').fill('secret123');
-const result = await page.getByLabel('Username').inputValue();
+await expect(page.getByLabel('Username')).toHaveValue('testuser');
 ```
 
 ### pw-get-by-placeholder - getByPlaceholder
 
 ```javascript
 await page.getByPlaceholder('Search...').fill('Playwright testing');
-const result = await page.getByPlaceholder('Search...').inputValue();
+await expect(page.getByPlaceholder('Search...')).toHaveValue('Playwright testing');
 ```
 
 ### pw-get-by-testid - getByTestId
 
 ```javascript
 await page.getByTestId('add-to-cart').click();
-const result = await page.locator('#cart-count').textContent();
+await expect(page.locator('#cart-count')).toHaveText('1');
 ```
 
 ### pw-locator-chaining - Locator Chaining
 
 ```javascript
-const secondItem = page.locator('.menu li').nth(1);
-const result = await secondItem.textContent();
+const list = page.locator('.menu');
+const secondItem = list.locator('li').nth(1);
+await expect(secondItem).toHaveText('Products');
 ```
 
 ### pw-frame-locators - Frame Locators
@@ -171,7 +75,7 @@ const result = await secondItem.textContent();
 ```javascript
 const frame = page.frameLocator('#widget');
 await frame.locator('button').click();
-const result = await frame.locator('body').textContent();
+await expect(frame.locator('body')).toContainText('Clicked');
 ```
 
 ### pw-list-items - List & Items
@@ -185,10 +89,9 @@ const result = String(count);
 ### pw-locators-boss - Scenario: Dynamic Product Grid
 
 ```javascript
-// Filter is not supported in shim, use nth(1) to target second product (Pro)
-const productCard = page.locator('.product').nth(1);
-await productCard.locator('button').click();
-const result = await page.locator('#msg').textContent();
+const row = page.locator('.product').filter({ hasText: 'Widget Pro' });
+await row.getByRole('button', { name: 'Add to Cart' }).click();
+await expect(page.locator('#msg')).toContainText('Added Widget Pro');
 ```
 
 ### pw-to-be-visible - toBeVisible & toBeHidden
@@ -256,6 +159,96 @@ await page.fill('#password', 'password123');
 const visible = await page.locator('#email-error').isVisible();
 if (visible) throw new Error('Expected email error to be hidden');
 await expect(page.locator('#submit')).toBeEnabled();
+```
+
+### pw-click-actions - Click Actions
+
+```javascript
+await page.getByRole('button', { name: 'Increment' }).click();
+await page.getByRole('button', { name: 'Increment' }).click();
+await page.getByRole('button', { name: 'Increment' }).click();
+await expect(page.getByLabel('Counter Value')).toHaveText('3');
+```
+
+### pw-fill-type - Fill & Type
+
+```javascript
+await page.getByLabel('Email').fill('qa@test.com');
+await page.getByLabel('Password').fill('secret123');
+await expect(page.getByLabel('Email')).toHaveValue('qa@test.com');
+```
+
+### pw-select-dropdowns - Select Dropdowns
+
+```javascript
+await page.getByLabel('Choose Language:').selectOption('javascript');
+await expect(page.getByLabel('Choose Language:')).toHaveValue('javascript');
+```
+
+### pw-checkbox-radio - Checkbox & Radio
+
+```javascript
+await page.getByLabel('Accept Terms & Conditions').check();
+await expect(page.getByLabel('Accept Terms & Conditions')).toBeChecked();
+```
+
+### pw-keyboard-actions - Keyboard Actions
+
+```javascript
+await page.getByPlaceholder('Search...').fill('Playwright');
+await page.keyboard.press('Enter');
+await expect(page.locator('#result')).toHaveText('Searching for: Playwright');
+```
+
+### pw-hover-focus - Hover & Focus
+
+```javascript
+await page.getByText('Products').hover();
+await expect(page.locator('#dropdown')).toBeVisible();
+```
+
+### pw-file-upload - File Upload
+
+```javascript
+await page.getByLabel('Upload Resume:').setInputFiles('resume.pdf');
+await expect(page.locator('#status')).toContainText('resume.pdf');
+```
+
+### pw-drag-drop - Drag and Drop
+
+```javascript
+await page.getByText('Drag').dragTo(page.getByText('Zone'));
+await expect(page.getByText('Dropped!')).toBeVisible();
+```
+
+### pw-iframes - Working with Frames
+
+```javascript
+const frame = page.frameLocator('#payment-frame');
+await frame.getByPlaceholder('Card Number').fill('1234');
+await expect(frame.getByPlaceholder('Card Number')).toHaveValue('1234');
+```
+
+### pw-dynamic-table - Dynamic Tables
+
+```javascript
+import { test, expect } from '@playwright/test';
+
+test('dynamic table', async ({ page }) => {
+  const row = page.locator('.task-row').filter({ hasText: 'Project X' });
+  await row.getByRole('button', { name: 'Complete' }).click();
+  await expect(row.locator('.status')).toHaveText('Done');
+});
+```
+
+### pw-actions-boss - Scenario: E-Commerce Checkout
+
+```javascript
+await page.getByRole('button', { name: 'Add to Cart' }).click();
+await page.getByLabel('Quantity').fill('3');
+await page.getByLabel('Express Shipping').check();
+await page.getByRole('button', { name: 'Checkout' }).click();
+await expect(page.locator('#confirmation')).toContainText('3 items (Express)');
 ```
 
 ---
