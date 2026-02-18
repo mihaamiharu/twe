@@ -36,25 +36,43 @@ export interface TestCaseResult {
 
 export interface ExpectResult {
     expect: ((actual: unknown) => {
-        toBe: (expected: unknown) => void;
-        toBeVisible: () => Promise<void>;
-        toBeHidden: () => Promise<void>;
-        toHaveText: (text: string | RegExp) => Promise<void>;
-        toHaveValue: (value: string) => Promise<void>;
-        toContainText: (text: string) => Promise<void>;
-        toHaveAttribute: (name: string, value?: string | RegExp) => Promise<void>;
-        toHaveCount: (count: number) => Promise<void>;
-        not: {
-            toBeVisible: () => Promise<void>;
-            toBeHidden: () => Promise<void>;
-            toHaveText: (text: string | RegExp) => Promise<void>;
-            toContainText: (text: string) => Promise<void>;
-            toBeChecked: () => Promise<void>;
-            toBeEnabled: () => Promise<void>;
-            toBeDisabled: () => Promise<void>;
-            toBeFocused: () => Promise<void>;
-            toBeEmpty: () => Promise<void>;
-        };
+        // Generic Assertions
+        toBe: (expected: unknown) => Promise<void>;
+        toEqual: (expected: unknown) => Promise<void>;
+        toBeTruthy: () => Promise<void>;
+        toBeFalsy: () => Promise<void>;
+        toBeNull: () => Promise<void>;
+        toBeUndefined: () => Promise<void>;
+        toBeDefined: () => Promise<void>;
+        toBeGreaterThan: (expected: number) => Promise<void>;
+        toBeGreaterThanOrEqual: (expected: number) => Promise<void>;
+        toBeLessThan: (expected: number) => Promise<void>;
+        toBeLessThanOrEqual: (expected: number) => Promise<void>;
+        toBeCloseTo: (expected: number, precision?: number) => Promise<void>;
+        toContain: (expected: any) => Promise<void>;
+        toHaveLength: (expected: number) => Promise<void>;
+        toMatch: (expected: string | RegExp) => Promise<void>;
+        toHaveProperty: (path: string, value?: any) => Promise<void>;
+
+        // Locator Assertions
+        toBeVisible: (options?: { timeout?: number }) => Promise<void>;
+        toBeHidden: (options?: { timeout?: number }) => Promise<void>;
+        toHaveText: (text: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toHaveValue: (value: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toContainText: (text: string, options?: { timeout?: number }) => Promise<void>;
+        toHaveAttribute: (name: string, value?: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toHaveCount: (count: number, options?: { timeout?: number }) => Promise<void>;
+        toBeChecked: (options?: { timeout?: number }) => Promise<void>;
+        toBeEnabled: (options?: { timeout?: number }) => Promise<void>;
+        toBeDisabled: (options?: { timeout?: number }) => Promise<void>;
+        toBeEditable: (options?: { timeout?: number }) => Promise<void>;
+        toBeFocused: (options?: { timeout?: number }) => Promise<void>;
+        toBeEmpty: (options?: { timeout?: number }) => Promise<void>;
+        toHaveTitle: (title: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toHaveURL: (url: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toHaveClass: (className: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+
+        not: any; // Simplified for brevity in type definition, implementation handles it
     }) & {
         soft: (actual: unknown) => any;
     };
