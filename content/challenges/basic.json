@@ -32,7 +32,7 @@
                     "Identifikasi ID unik 'login-btn' dan targetkan menggunakan selector '#login-btn'."
                 ]
             },
-            "htmlContent": "<div class=\"login-wrapper\">\n  <h1>System Login</h1>\n  <form class=\"login-form\">\n    <div class=\"input-group\">\n      <input type=\"text\" id=\"username\" placeholder=\"Username\" />\n    </div>\n    <div class=\"input-group\">\n      <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n    </div>\n    <div class=\"actions\">\n      <button type=\"submit\" id=\"login-btn\" class=\"btn btn-primary\">Login</button>\n      <a href=\"#\" class=\"forgot-link\">Forgot Password?</a>\n    </div>\n  </form>\n</div>",
+            "htmlContent": "<div class=\"login-wrapper\">\n  <h1>System Login</h1>\n  <form class=\"login-form\" autocomplete=\"off\">\n    <div class=\"input-group\">\n      <input type=\"text\" id=\"username\" placeholder=\"Username\" autocomplete=\"off\" />\n    </div>\n    <div class=\"input-group\">\n      <input type=\"password\" id=\"password\" placeholder=\"Password\" autocomplete=\"new-password\" />\n    </div>\n    <div class=\"actions\">\n      <button type=\"submit\" id=\"login-btn\" class=\"btn btn-primary\">Login</button>\n      <a href=\"#\" class=\"forgot-link\">Forgot Password?</a>\n    </div>\n  </form>\n</div>",
             "starterCode": "",
             "testCases": [
                 {
@@ -491,7 +491,7 @@
                     "Tambahkan ':invalid' ke selector input Kamu untuk secara spesifik menargetkan kolom yang memiliki kesalahan format."
                 ]
             },
-            "htmlContent": "<form class=\"login-form\">\n  <div class=\"form-group\">\n    <label>Email</label>\n    <input type=\"email\" value=\"not-an-email\" required /> <!-- This is invalid -->\n    <span class=\"error-text\">Please enter a valid email</span>\n  </div>\n  <div class=\"form-group\">\n    <label>Password</label>\n    <input type=\"password\" value=\"secret123\" required /> <!-- This is valid -->\n  </div>\n</form>",
+            "htmlContent": "<form class=\"login-form\" autocomplete=\"off\">\n  <div class=\"form-group\">\n    <label>Email</label>\n    <input type=\"email\" value=\"not-an-email\" required autocomplete=\"off\" /> <!-- This is invalid -->\n    <span class=\"error-text\">Please enter a valid email</span>\n  </div>\n  <div class=\"form-group\">\n    <label>Password</label>\n    <input type=\"password\" value=\"secret123\" required autocomplete=\"new-password\" /> <!-- This is valid -->\n  </div>\n</form>",
             "starterCode": "",
             "testCases": [
                 {
