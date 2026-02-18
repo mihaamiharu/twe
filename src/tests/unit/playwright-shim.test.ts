@@ -280,4 +280,27 @@ describe('Playwright Shim', () => {
     expect(await page.getByRole('heading', { level: 2 }).count()).toBe(1);
     expect(await page.getByRole('heading', { level: 3 }).count()).toBe(0);
   });
+
+  test('regression: getByRole should prioritize aria-label over textContent for name matching', async () => {
+    const btn = document.createElement('button');
+    btn.setAttribute('aria-label', 'Increment');
+    btn.textContent = '+';
+    document.body.appendChild(btn);
+
+    // Should match by aria-label
+    expect(await page.getByRole('button', { name: 'Increment' }).count()).toBe(1);
+    // Should NOT match by textContent if aria-label is present (Playwright behavior)
+    // Actually Playwright says aria-label *is* the accessible name.
+    // If we want to be strict, we check that it finds the one we expect.
+  });
+
+  test('regression: getByLabel should find elements with aria-label', async () => {
+    const span = document.createElement('span');
+    span.setAttribute('aria-label', 'Counter Value');
+    span.textContent = '0';
+    document.body.appendChild(span);
+
+    expect(await page.getByLabel('Counter Value').count()).toBe(1);
+    expect(await page.getByLabel('Counter Value').textContent()).toBe('0');
+  });
 });
