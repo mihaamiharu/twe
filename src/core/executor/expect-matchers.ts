@@ -484,16 +484,31 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
         };
     };
 
+    const createProxy = (matchers: any) => {
+        return new Proxy(matchers, {
+            get(target, prop, receiver) {
+                if (prop in target) {
+                    return Reflect.get(target, prop, receiver);
+                }
+                const propStr = String(prop);
+                if (propStr === 'then' || propStr === 'toString' || propStr === 'toJSON') return undefined;
+
+                // Suggest closest match? For now just generic error
+                throw new Error(`expect(...).${propStr} is not a valid matcher.`);
+            }
+        });
+    };
+
     const expectFunc = ((actual: any) => {
         const matchers: any = createMatchers(actual, false, false);
-        matchers.not = createMatchers(actual, false, true);
-        return matchers;
+        matchers.not = createProxy(createMatchers(actual, false, true));
+        return createProxy(matchers);
     }) as any;
 
     expectFunc.soft = (actual: any) => {
         const matchers: any = createMatchers(actual, true, false);
-        matchers.not = createMatchers(actual, true, true);
-        return matchers;
+        matchers.not = createProxy(createMatchers(actual, true, true));
+        return createProxy(matchers);
     };
 
     return { expect: expectFunc, getAssertionCount, getTestResults };
