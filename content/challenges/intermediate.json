@@ -2,476 +2,12 @@
     "tier": "intermediate",
     "challenges": [
         {
-            "slug": "pw-click-actions",
-            "type": "PLAYWRIGHT",
-            "difficulty": "MEDIUM",
-            "category": "playwright-navigation",
-            "xpReward": 45,
-            "order": 3000,
-            "title": {
-                "en": "Click Actions",
-                "id": "Aksi Klik"
-            },
-            "description": {
-                "en": "Master different types of click interactions.",
-                "id": "Kuasai berbagai jenis interaksi klik."
-            },
-            "instructions": {
-                "en": "# Click Actions\n\n## Concept\nPlaywright provides the `click()` method to interact with elements. It automatically waits for the element to be visible and stable before clicking. Use `getByRole` for more resilient tests.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Submit' }).click();\nawait page.locator('.menu').click();\n```\n\n## Real World Scenario\nAlmost every interaction involves clicking. Whether it's submitting a form, adding an item to a shopping cart, or closing a modal dialog, reliable click actions are the heartbeat of E2E testing.\n\n## Your Task\n1. Click the increment button (`+`) 3 times.\n2. Verify the counter text is `'3'` using `expect(locator).toHaveText(...)`.\n",
-                "id": "# Aksi Klik\n\n## Concept\nPlaywright menyediakan metode `click()` untuk berinteraksi dengan elemen. Metode ini secara otomatis menunggu elemen menjadi terlihat dan stabil sebelum diklik. Gunakan `getByRole` untuk pengujian yang lebih tangguh.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Submit' }).click();\nawait page.locator('.menu').click();\n```\n\n## Real World Scenario\nHampir setiap interaksi melibatkan klik. Baik itu mengirimkan formulir, menambahkan item ke keranjang belanja, atau menutup dialog modal, tindakan klik yang andal adalah detak jantung pengujian E2E.\n\n## Tugas Kamu\n1. Klik tombol increment (`+`) sebanyak 3 kali.\n2. Verifikasi teks counter adalah `'3'` menggunakan `expect(locator).toHaveText(...)`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Focus on finding the specific action element that performs the calculation.",
-                    "Use a locator that describes the element's purpose, like getByRole for a button.",
-                    "Call the .click() method exactly as many times as requested, then use a 'toHaveText' assertion."
-                ],
-                "id": [
-                    "Fokuslah untuk menemukan elemen aksi spesifik yang melakukan perhitungan.",
-                    "Gunakan locator yang mendeskripsikan tujuan elemen, seperti getByRole untuk tombol.",
-                    "Panggil metode .click() tepat sebanyak yang diminta, lalu gunakan asersi 'toHaveText'."
-                ]
-            },
-            "htmlContent": "<div class=\"counter\">\n  <span id=\"count\" aria-label=\"Counter Value\">0</span>\n  <button aria-label=\"Increment\" onclick=\"document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1\">+</button>\n</div>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('click counter', async ({ page }) => {\n  // 1. Click button 3 times (use getByRole)\n  // 2. Verify count is 3\n});",
-            "testCases": [],
-            "solution": "await page.click('#increment');\nawait page.click('#increment');\nawait page.click('#increment');\nconst result = await page.locator('#count').textContent();",
-            "tags": [
-                "playwright",
-                "click",
-                "actions",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-fill-type",
-            "type": "PLAYWRIGHT",
-            "difficulty": "MEDIUM",
-            "category": "playwright-navigation",
-            "xpReward": 50,
-            "order": 3001,
-            "title": {
-                "en": "Fill & Type",
-                "id": "Isi & Ketik"
-            },
-            "description": {
-                "en": "Input text into form fields.",
-                "id": "Masukkan teks ke dalam field formulir."
-            },
-            "instructions": {
-                "en": "# Fill & Type\n\n## Concept\nTwo ways to enter text in Playwright! The `fill()` method is the most common way to enter text. it clears the field and types the new value. It works with all types of input and textarea elements.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Email').fill('test@example.com');\n```\n\n## Real World Scenario\nLogin forms are the most common test case. You need to precisely enter a username and password. Using labels ensures accessibility and robust tests.\n\n## Your Task\n1. Fill the **Email** field with `'qa@test.com'`.\n2. Fill the **Password** field with `'secret123'`.\n3. Verify the email field has the value `'qa@test.com'` using `expect(locator).toHaveValue(...)`.\n",
-                "id": "# Isi & Ketik\n\n## Concept\nDua cara untuk memasukkan teks di Playwright! Metode `fill()` adalah cara yang paling umum untuk memasukkan teks. Metode ini menghapus isi field dan mengetikkan nilai baru. Ini berfungsi untuk semua jenis elemen input dan textarea.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Email').fill('test@example.com');\n```\n\n## Real World Scenario\nFormulir login adalah kasus uji yang paling umum. Anda harus memasukkan nama pengguna dan kata sandi dengan tepat. Menggunakan label memastikan aksesibilitas dan pengujian yang kuat.\n\n## Tugas Kamu\n1. Isi kolom **Email** dengan `'qa@test.com'`.\n2. Isi kolom **Password** dengan `'secret123'`.\n3. Verifikasi kolom email memiliki nilai `'qa@test.com'` menggunakan `expect(locator).toHaveValue(...)`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Identify the standard way to enter text that also clears the existing input first.",
-                    "Target the input fields using the text that matches their visual labels on the screen.",
-                    "Use .fill() for 'qa@test.com' and 'secret123', then verify the email with 'toHaveValue'."
-                ],
-                "id": [
-                    "Identifikasi cara standar untuk memasukkan teks yang juga menghapus input yang ada terlebih dahulu.",
-                    "Targetkan kolom input menggunakan teks yang sesuai dengan label visual mereka di layar.",
-                    "Gunakan .fill() untuk 'qa@test.com' dan 'secret123', lalu verifikasi email dengan 'toHaveValue'."
-                ]
-            },
-            "htmlContent": "<form class=\"login-form\">\n  <label for=\"email\">Email</label>\n  <input type=\"email\" id=\"email\" placeholder=\"Email\" />\n  <label for=\"password\">Password</label>\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n  <button type=\"submit\">Login</button>\n</form>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill form', async ({ page }) => {\n  // 1. Fill email (use getByLabel)\n  // 2. Fill password (use getByLabel)\n  // 3. Verify email value\n});",
-            "testCases": [],
-            "solution": "await page.fill('#email', 'qa@test.com');\nawait page.fill('#password', 'secret123');\nconst result = await page.locator('#email').inputValue();",
-            "tags": [
-                "playwright",
-                "fill",
-                "type",
-                "forms",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-select-dropdowns",
-            "type": "PLAYWRIGHT",
-            "difficulty": "MEDIUM",
-            "category": "playwright-navigation",
-            "xpReward": 55,
-            "order": 3002,
-            "title": {
-                "en": "Select Dropdowns",
-                "id": "Pilih Dropdown"
-            },
-            "description": {
-                "en": "Work with select elements and dropdowns.",
-                "id": "Bekerja dengan elemen select dan dropdown."
-            },
-            "instructions": {
-                "en": "# Select Dropdowns\n\n## Concept\nPlaywright makes dropdown selection easy with the `selectOption()` method. You can select by value, label, or index.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Country').selectOption('usa');\n```\n\n## Real World Scenario\nE-commerce checkouts often require selecting a Country or Shipping Method from a dropdown.\n\n## Your Task\n1. Select `'javascript'` from the **Choose Language** dropdown.\n2. Verify the dropdown value is `'javascript'` using `expect(locator).toHaveValue(...)`.\n",
-                "id": "# Pilih Dropdown\n\n## Concept\nPlaywright membuat pemilihan dropdown menjadi mudah dengan metode `selectOption()`. Anda dapat memilih berdasarkan value, label, atau index.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Country').selectOption('usa');\n```\n\n## Real World Scenario\nCheckout e-commerce seringkali mengharuskan memilih Negara atau Metode Pengiriman dari dropdown.\n\n## Tugas Kamu\n1. Pilih `'javascript'` dari dropdown **Choose Language**.\n2. Verifikasi nilai dropdown adalah `'javascript'` menggunakan `expect(locator).toHaveValue(...)`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Find the form element designed for picking one option from a pre-defined list.",
-                    "Use the 'selectOption' method after locating the dropdown by its associated label.",
-                    "Pass 'javascript' as the value to the selectOption method and check the result with 'toHaveValue'."
-                ],
-                "id": [
-                    "Temukan elemen formulir yang dirancang untuk memilih satu opsi dari daftar yang telah ditentukan.",
-                    "Gunakan metode 'selectOption' setelah menemukan dropdown berdasarkan label terkaitnya.",
-                    "Masukkan 'javascript' sebagai nilai ke metode selectOption dan cek hasilnya dengan 'toHaveValue'."
-                ]
-            },
-            "htmlContent": "<form>\n  <label for=\"language\">Choose Language:</label>\n  <select id=\"language\">\n    <option value=\"\">Select...</option>\n    <option value=\"python\">Python</option>\n    <option value=\"javascript\">JavaScript</option>\n    <option value=\"typescript\">TypeScript</option>\n  </select>\n</form>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('select language', async ({ page }) => {\n  // 1. Select 'javascript' (use getByLabel)\n  // 2. Verify value\n});",
-            "testCases": [],
-            "solution": "await page.selectOption('#language', 'javascript');\nconst val = await page.locator('#language').inputValue();\nconst result = val;",
-            "tags": [
-                "playwright",
-                "select",
-                "dropdown",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-checkbox-radio",
-            "type": "PLAYWRIGHT",
-            "difficulty": "MEDIUM",
-            "category": "playwright-navigation",
-            "xpReward": 55,
-            "order": 3003,
-            "title": {
-                "en": "Checkbox & Radio",
-                "id": "Checkbox & Radio"
-            },
-            "description": {
-                "en": "Toggle checkboxes and radio buttons.",
-                "id": "Ubah status checkbox dan tombol radio."
-            },
-            "instructions": {
-                "en": "# Checkbox & Radio\n\n## Concept\nUse `check()` and `uncheck()` to toggle checkboxes and radio buttons. These methods ensure the element is in the desired state, regardless of its previous status.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('I agree').check();\nawait page.getByLabel('Newsletter').uncheck();\n```\n\n## Real World Scenario\nBefore a user can create an account, they must almost always tick the \"I agree to Terms & Conditions\" box.\n\n## Your Task\n1. Check the **Accept Terms & Conditions** checkbox.\n2. Verify it is checked using `expect(locator).toBeChecked()`.\n",
-                "id": "# Checkbox & Radio\n\n## Concept\nGunakan `check()` dan `uncheck()` untuk mengubah status checkbox dan tombol radio. Metode ini memastikan elemen berada dalam status yang diinginkan, apapun status sebelumnya.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('I agree').check();\nawait page.getByLabel('Newsletter').uncheck();\n```\n\n## Real World Scenario\nSebelum pengguna dapat membuat akun, mereka hampir selalu harus mencentang kotak \"Saya setuju dengan Syarat & Ketentuan\".\n\n## Tugas Kamu\n1. Centang checkbox **Accept Terms & Conditions**.\n2. Verifikasi bahwa itu sudah dicentang menggunakan `expect(locator).toBeChecked()`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Look for a way to ensure a selection box is marked without worrying about its current state.",
-                    "Target the label text to find the checkbox, then use the '.check()' method.",
-                    "Verify the success of the operation using the 'toBeChecked' assertion on the same locator."
-                ],
-                "id": [
-                    "Cari cara untuk memastikan kotak pilihan ditandai tanpa mempedulikan statusnya saat ini.",
-                    "Targetkan teks label untuk menemukan kotak centang, lalu gunakan metode '.check()'.",
-                    "Verifikasi keberhasilan operasi menggunakan asersi 'toBeChecked' pada locator yang sama."
-                ]
-            },
-            "htmlContent": "<form>\n  <label>\n    <input type=\"checkbox\" id=\"terms\" />\n    Accept Terms & Conditions\n  </label>\n  <label>\n    <input type=\"checkbox\" id=\"newsletter\" />\n    Subscribe to Newsletter\n  </label>\n</form>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check terms', async ({ page }) => {\n  // 1. Check terms (use getByLabel)\n  // 2. Verify checked state\n});",
-            "testCases": [],
-            "solution": "await page.check('#terms');\nconst checked = await page.isChecked('#terms');\nconst result = checked;",
-            "tags": [
-                "playwright",
-                "checkbox",
-                "radio",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-keyboard-actions",
-            "type": "PLAYWRIGHT",
-            "difficulty": "MEDIUM",
-            "category": "playwright-navigation",
-            "xpReward": 60,
-            "order": 3004,
-            "title": {
-                "en": "Keyboard Actions",
-                "id": "Aksi Keyboard"
-            },
-            "description": {
-                "en": "Simulate keyboard events like Enter, Escape, and typing.",
-                "id": "Simulasikan event keyboard seperti Enter, Escape, dan mengetik."
-            },
-            "instructions": {
-                "en": "# Keyboard Actions\n\n## Concept\nPlaywright allows you to simulate keyboard events with `page.keyboard`. You can press specific keys, combinations, or even type natural sequences of characters.\n\n## Code Example\n\n```javascript\nawait page.keyboard.press('Enter');\nawait page.keyboard.press('Control+C');\n```\n\n## Real World Scenario\nSubmitting a search bar often happens by pressing \"Enter\" rather than clicking a button. Testing this behavior ensures the \"natural\" user flow works.\n\n## Your Task\n1. Type `'Playwright'` into the search input (use `getByPlaceholder`).\n2. Press `'Enter'` using the keyboard.\n3. Verify the result text (`#result`) is `'Searching for: Playwright'` using `expect(locator).toHaveText(...)`.\n",
-                "id": "# Aksi Keyboard\n\n## Concept\nPlaywright memungkinkan Anda mensimulasikan event keyboard dengan `page.keyboard`. Anda dapat menekan tombol tertentu, kombinasi tombol, atau bahkan mengetik urutan karakter yang alami.\n\n## Code Example\n\n```javascript\nawait page.keyboard.press('Enter');\nawait page.keyboard.press('Control+C');\n```\n\n## Real World Scenario\nMengirimkan bilah pencarian sering kali dilakukan dengan menekan \"Enter\" daripada mengklik tombol. Menguji perilaku ini memastikan alur pengguna yang \"alami\" berfungsi.\n\n## Tugas Kamu\n1. Ketik `'Playwright'` ke dalam input pencarian (gunakan `getByPlaceholder`).\n2. Tekan `'Enter'` menggunakan keyboard.\n3. Verifikasi teks hasil (`#result`) adalah `'Searching for: Playwright'` menggunakan `expect(locator).toHaveText(...)`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Simulate a physical user interaction where a specific key is pressed to submit the form.",
-                    "After filling the search input, use the 'page.keyboard' API to trigger the submission.",
-                    "Call page.keyboard.press('Enter') and assert that the result message is visible on the page."
-                ],
-                "id": [
-                    "Simulasikan interaksi pengguna fisik di mana kunci tertentu ditekan untuk mengirimkan formulir.",
-                    "Setelah mengisi input pencarian, gunakan API 'page.keyboard' untuk memicu pengiriman.",
-                    "Panggil page.keyboard.press('Enter') dan pastikan pesan hasilnya terlihat di halaman."
-                ]
-            },
-            "htmlContent": "<div class=\"search-box\">\n  <input type=\"text\" id=\"search\" placeholder=\"Search...\" aria-label=\"Search\" />\n  <div id=\"result\" aria-live=\"polite\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Type term (use getByPlaceholder)\n  // 2. Press Enter\n  // 3. Verify result (use getByText)\n});",
-            "testCases": [],
-            "solution": "await page.fill('#search', 'Playwright');\nawait page.press('#search', 'Enter');\nconst result = await page.locator('#results').textContent();",
-            "tags": [
-                "playwright",
-                "keyboard",
-                "input",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-hover-focus",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "playwright-navigation",
-            "xpReward": 60,
-            "order": 3005,
-            "title": {
-                "en": "Hover & Focus",
-                "id": "Hover & Fokus"
-            },
-            "description": {
-                "en": "Trigger hover states and element focus.",
-                "id": "Picu status hover dan fokus elemen."
-            },
-            "instructions": {
-                "en": "# Hover & Focus\n\n## Concept\nSome elements only become visible or interactable when you hover over them with the mouse or focus on them with the keyboard. Playwright provides `hover()` and `focus()` methods to simulate these states.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nNavigation menus often reveal submenus only on hover. You need to simulate this hover action to make the submenu visible before you can click anything inside it.\n\n## Your Task\n1. Hover over the \"Products\" menu item.\n2. Verify the dropdown becomes visible by checking for the \"Laptop\" link.\n",
-                "id": "# Hover & Fokus\n\n## Concept\nBeberapa elemen hanya menjadi terlihat atau dapat berinteraksi saat Anda mengarahkan mouse (hover) di atasnya atau memfokuskan keyboard pada elemen tersebut. Playwright menyediakan metode `hover()` dan `focus()` untuk mensimulasikan status ini.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nMenu navigasi sering kali menampilkan submenu hanya saat di-hover. Anda perlu mensimulasikan tindakan hover ini agar submenu terlihat sebelum Anda dapat mengklik apa pun di dalamnya.\n\n## Tugas Kamu\n1. Hover di atas menu item \"Products\".\n2. Verifikasi dropdown menjadi terlihat dengan memeriksa link \"Laptop\".\n"
-            },
-            "hints": {
-                "en": [
-                    "Some menus only show their items when a user moves their mouse over a specific area.",
-                    "Use the '.hover()' method on the target menu text to reveal the hidden elements.",
-                    "Hover over 'Products', then use expect(...).toBeVisible() to check if the 'Laptop' link appeared."
-                ],
-                "id": [
-                    "Beberapa menu hanya menampilkan item mereka saat pengguna mengarahkan mouse-nya di atas area tertentu.",
-                    "Gunakan metode '.hover()' pada teks menu target untuk memunculkan elemen yang tersembunyi.",
-                    "Lakukan hover di atas 'Products', lalu gunakan expect(...).toBeVisible() untuk mengecek apakah link 'Laptop' muncul."
-                ]
-            },
-            "htmlContent": "<div class=\"nav\">\n  <div id=\"menu\" onmouseover=\"document.getElementById('dropdown').style.display='block'\" onmouseout=\"document.getElementById('dropdown').style.display='none'\">Products</div>\n  <div id=\"dropdown\" style=\"display:none;\">\n    <a href=\"#\">Laptop</a>\n    <a href=\"#\">Phone</a>\n  </div>\n</div>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('hover menu', async ({ page }) => {\n  // 1. Hover 'Products' (use getByText)\n  // 2. Verify dropdown visible\n});",
-            "testCases": [],
-            "solution": "await page.hover('#menu-btn');\nconst result = await page.locator('#dropdown').textContent();",
-            "tags": [
-                "playwright",
-                "hover",
-                "focus",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-file-upload",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "playwright-navigation",
-            "xpReward": 70,
-            "order": 3006,
-            "title": {
-                "en": "File Upload",
-                "id": "Unggah File"
-            },
-            "description": {
-                "en": "Handle file inputs and uploads.",
-                "id": "Tangani input file dan unggahan."
-            },
-            "instructions": {
-                "en": "# File Upload\n\n## Concept\nPlaywright intercepts file choosers automatically! You can use the `setInputFiles()` method to select one or more files for an input element.\n\n## Code Example\n\n```javascript\n// Select a single file\nawait page.getByLabel('Upload File').setInputFiles('file.txt');\n\n// Select multiple files\nawait page.getByLabel('Upload File').setInputFiles(['file1.txt', 'file2.txt']);\n```\n\n> [!NOTE]\n\nPlaywright creates a virtual file for you when you pass a string path.\n\n## Real World Scenario\nUploading a profile picture or a document is a common feature. Playwright abstracts the OS file picker, allowing you to convert file paths directly into input events.\n\n## Your Task\n1. Upload a file named `'resume.pdf'` to the **Upload Resume** input.\n2. Verify the status text (`#status`) contains `'resume.pdf'` using `expect(locator).toHaveText(...)`.\n",
-                "id": "# Unggah File\n\n## Concept\nPlaywright menangani pemilih file secara otomatis! Anda dapat menggunakan metode `setInputFiles()` untuk memilih satu atau beberapa file untuk elemen input.\n\n## Code Example\n\n```javascript\n// Pilih satu file\nawait page.getByLabel('Upload File').setInputFiles('file.txt');\n\n// Pilih beberapa file\nawait page.getByLabel('Upload File').setInputFiles(['file1.txt', 'file2.txt']);\n```\n\n> [!NOTE]\n\nPlaywright membuat file virtual untuk Anda saat Anda memberikan path string.\n\n## Real World Scenario\nMengunggah gambar profil atau dokumen adalah fitur umum. Playwright mengabstraksi pemilih file OS, memungkinkan Anda untuk mengubah path file secara langsung menjadi event input.\n\n## Tugas Kamu\n1. Unggah file bernama `'resume.pdf'` ke input **Upload Resume**.\n2. Verifikasi teks status (`#status`) berisi `'resume.pdf'` menggunakan `expect(locator).toHaveText(...)`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Think about how Playwright handles file selection without needing to open a file picker window.",
-                    "Use the '.setInputFiles()' method and provide the exact filename requested in the task.",
-                    "Call setInputFiles('resume.pdf') on the file input locator and verify the status text reflects this choice."
-                ],
-                "id": [
-                    "Pikirkan tentang bagaimana Playwright menangani pemilihan file tanpa perlu membuka jendela pemilih file.",
-                    "Gunakan metode '.setInputFiles()' dan berikan nama file yang tepat sesuai permintaan dalam tugas.",
-                    "Panggil setInputFiles('resume.pdf') pada locator input file dan verifikasi teks status mencerminkan pilihan ini."
-                ]
-            },
-            "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume:</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div id=\"status\" aria-label=\"Upload Status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.getElementById('status').textContent = 'Selected: ' + file.name;\n  });\n</script>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  // 1. Upload 'resume.pdf' to 'Upload Resume'\n  // 2. Verify status text\n});",
-            "testCases": [],
-            "solution": "await page.locator('#file-input').setInputFiles({\n    name: 'test-report.pdf',\n    mimeType: 'application/pdf',\n    buffer: new ArrayBuffer(0) // Mock buffer\n});\nconst result = await page.locator('#filename').textContent();",
-            "tags": [
-                "playwright",
-                "upload",
-                "files",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-drag-drop",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "playwright-navigation",
-            "xpReward": 75,
-            "order": 3007,
-            "title": {
-                "en": "Drag and Drop",
-                "id": "Seret dan Lepas"
-            },
-            "description": {
-                "en": "Drag elements to drop zones.",
-                "id": "Seret elemen ke zona jatuhkan."
-            },
-            "instructions": {
-                "en": "# Drag and Drop\n\n## Concept\nPerform complex mouse gestures easily with the `dragTo()` method. Playwright handles the sequence of mouse down, move, and up for you.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nKanban boards (like Trello/Jira) use drag-and-drop extensively to move tickets between columns. Testing this interaction ensures the \"drop\" event actually fires and updates the UI.\n\n## Your Task\n1. Drag the element with text `'Drag'`.\n2. Drop it into the element with text `'Zone'`.\n3. Verify the zone text becomes `'Dropped!'` using `expect(page.getByText('Dropped!')).toBeVisible()`.\n",
-                "id": "# Seret dan Lepas\n\n## Concept\nLakukan gerakan mouse yang kompleks dengan mudah menggunakan metode `dragTo()`. Playwright menangani urutan mouse down, move, dan up untuk Anda.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nPapan Kanban (seperti Trello/Jira) menggunakan seret-dan-lepas secara ekstensif untuk memindahkan tiket antar kolom. Menguji interaksi ini memastikan event \"drop\" benar-benar terjadi dan memperbarui UI.\n\n## Tugas Kamu\n1. Seret elemen dengan teks `'Drag'`.\n2. Jatuhkan ke dalam elemen dengan teks `'Zone'`.\n3. Verifikasi teks zona menjadi `'Dropped!'` menggunakan `expect(page.getByText('Dropped!')).toBeVisible()`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Imagine the sequence of picking up an item and placing it exactly where it needs to go.",
-                    "Use the '.dragTo()' method which automatically handles the complex mouse movements for you.",
-                    "Call getByText('Drag').dragTo(page.getByText('Zone')) and verify that the 'Dropped!' message is visible."
-                ],
-                "id": [
-                    "Bayangkan urutan mengambil item dan meletakkannya tepat di tempat yang seharusnya.",
-                    "Gunakan metode '.dragTo()' yang secara otomatis menangani gerakan mouse yang kompleks untuk Kamu.",
-                    "Panggil getByText('Drag').dragTo(page.getByText('Zone')) dan pastikan pesan 'Dropped!' terlihat."
-                ]
-            },
-            "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:50px;height:50px;background:blue;color:white;\">Drag</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed grey;margin-top:20px;\">Zone</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n  \n  item.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', 'dragged'));\n  zone.addEventListener('dragover', e => e.preventDefault());\n  zone.addEventListener('drop', e => {\n    e.preventDefault();\n    zone.textContent = 'Dropped!';\n    zone.style.borderColor = 'green';\n  });\n</script>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  // 1. Drag 'Drag' to 'Zone'\n  // 2. Verify zone text is 'Dropped!'\n});",
-            "testCases": [],
-            "solution": "await page.locator('#item-a').dragTo(page.locator('#dropzone'));\nconst result = await page.locator('#dropzone').textContent();",
-            "tags": [
-                "playwright",
-                "drag",
-                "drop",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-iframes",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "playwright-navigation",
-            "xpReward": 75,
-            "order": 3008,
-            "title": {
-                "en": "Working with Frames",
-                "id": "Bekerja dengan Frame"
-            },
-            "description": {
-                "en": "Select elements inside iframes.",
-                "id": "Pilih elemen di dalam iframe."
-            },
-            "instructions": {
-                "en": "# Working with Frames\n\n## Concept\nIf content is inside an `<iframe>`, normal locators won't find it! You must first locate the frame using `frameLocator()`, and then use that frame to find elements inside it.\n\n## Code Example\n\n```javascript\n// 1. Locate the frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Locate element by role/text inside the frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nEmbedded payment forms (like Stripe) or third-party widgets often live in iframes for security. You must switch context to interaction with them.\n\n## Your Task\n1. Locate the iframe.\n2. Find the input inside it using `getByPlaceholder('Card Number')`.\n3. Fill it with `'1234'`. \n4. Verify the value using `toHaveValue()`.\n",
-                "id": "# Bekerja dengan Frame\n\n## Concept\nJika konten berada di dalam `<iframe>`, locator normal tidak akan menemukannya! Anda harus terlebih dahulu menemukan frame tersebut menggunakan `frameLocator()`, lalu menggunakan frame tersebut untuk menemukan elemen di dalamnya.\n\n## Code Example\n\n```javascript\n// 1. Temukan frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Temukan elemen berdasarkan role/text di dalam frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nFormulir pembayaran tertanam (seperti Stripe) atau widget pihak ketiga sering kali berada dalam iframe demi keamanan. Anda harus mengganti konteks untuk berinteraksi dengan mereka.\n\n## Tugas Kamu\n1. Temukan iframe.\n2. Temukan input di dalamnya menggunakan `getByPlaceholder('Card Number')`.\n3. Isi dengan `'1234'`.\n4. Verifikasi nilai menggunakan `toHaveValue()`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Elements inside a sub-page (iframe) are isolated from the main page's locator searches.",
-                    "Use 'frameLocator()' to gain access to the iframe's content before trying to find the input inside it.",
-                    "Create a 'const frame = page.frameLocator('iframe');' then use frame.getByPlaceholder(...) to fill and verify."
-                ],
-                "id": [
-                    "Elemen di dalam sub-halaman (iframe) terisolasi dari pencarian locator halaman utama.",
-                    "Gunakan 'frameLocator()' untuk mendapatkan akses ke konten iframe sebelum mencoba menemukan input di dalamnya.",
-                    "Buat 'const frame = page.frameLocator('iframe');' lalu gunakan frame.getByPlaceholder(...) untuk mengisi dan memverifikasi."
-                ]
-            },
-            "htmlContent": "<iframe id=\"payment-frame\" srcdoc='<input id=\"card-number\" placeholder=\"Card Number\">'></iframe>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  // 1. Frame locator\n  // 2. Fill #card-number\n  // 3. Verify value\n});",
-            "testCases": [],
-            "solution": "const frame = page.frameLocator('#embed');\nconst result = await frame.locator('#frame-content').textContent();",
-            "tags": [
-                "playwright",
-                "frames",
-                "iframes",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-dynamic-table",
-            "type": "PLAYWRIGHT",
-            "difficulty": "MEDIUM",
-            "category": "playwright-navigation",
-            "xpReward": 90,
-            "order": 3009,
-            "title": {
-                "en": "Dynamic Tables",
-                "id": "Tabel Dinamis"
-            },
-            "description": {
-                "en": "Find a row by text and interact with its internals.",
-                "id": "Temukan baris berdasarkan teks dan berinteraksi dengan bagian dalamnya."
-            },
-            "instructions": {
-                "en": "# Dynamic Tables\n\n## Concept\nWhen dealing with dynamic data, you often need to find a container (like a table row) that contains specific text, and then find an interactive element inside that container using `filter()`.\n\n## Code Example\n\n```javascript\nconst row = page.locator('tr').filter({ hasText: 'Alice' });\nawait row.locator('.edit-btn').click();\n```\n\n## Real World Scenario\nAdmin dashboards often list users or orders. You can't just click the \"third edit button\" because sorting might change. You need to find the *user named Alice* and click *her* edit button.\n\n## Your Task\n1. Find the row containing \"Project X\" (`.task-row`).\n2. Click the \"Complete\" button inside that row.\n3. Verify the row status (`.status`) becomes `'Done'` using `expect(locator).toHaveText(...)`.\n",
-                "id": "# Tabel Dinamis\n\n## Concept\nSaat berurusan dengan data dinamis, Anda sering kali perlu menemukan kontainer (seperti baris tabel) yang berisi teks tertentu, lalu menemukan elemen interaktif di dalam kontainer tersebut menggunakan `filter()`.\n\n## Code Example\n\n```javascript\nconst row = page.locator('tr').filter({ hasText: 'Alice' });\nawait row.locator('.edit-btn').click();\n```\n\n## Real World Scenario\nDasbor admin sering mencantumkan pengguna atau pesanan. Anda tidak bisa hanya mengklik \"tombol edit ketiga\" karena penyortiran mungkin berubah. Anda perlu menemukan *pengguna bernama Alice* dan mengklik tombol edit *miliknya*.\n\n## Tugas Kamu\n1. Temukan baris yang berisi \"Project X\" (`.task-row`).\n2. Klik tombol \"Complete\" di dalam baris itu.\n3. Verifikasi status baris (`.status`) menjadi `'Done'` menggunakan `expect(locator).toHaveText(...)`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Find a specific row by a unique piece of text it contains, then look for a button within just that row.",
-                    "Use the '.filter({ hasText: ... })' method to isolate the correct row from all other rows.",
-                    "Locate the row with 'Project X', click the 'Complete' button inside it, and verify its local status text."
-                ],
-                "id": [
-                    "Temukan baris spesifik berdasarkan teks unik yang dikandungnya, lalu cari tombol hanya di dalam baris tersebut.",
-                    "Gunakan metode '.filter({ hasText: ... })' untuk memisahkan baris yang benar dari semua baris lainnya.",
-                    "Temukan baris dengan 'Project X', klik tombol 'Complete' di dalamnya, dan verifikasi teks status lokalnya."
-                ]
-            },
-            "htmlContent": "<div class=\"app\">\n  <div class=\"task-row\">\n    <span class=\"name\">Project X</span>\n    <span class=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n  <div class=\"task-row\">\n    <span class=\"name\">Project Y</span>\n    <span class=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n</div>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  // 1. Find row with 'Project X'\n  // 2. Click Complete\n  // 3. Verify status is 'Done'\n});",
-            "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  const row = page.locator('.task-row').filter({ hasText: 'Project X' });\n  await row.getByRole('button', { name: 'Complete' }).click();\n  await expect(row.locator('.status')).toHaveText('Done');\n});",
-            "tags": [
-                "playwright",
-                "tables",
-                "filter",
-                "intermediate"
-            ]
-        },
-        {
-            "slug": "pw-actions-boss",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "playwright-navigation",
-            "xpReward": 100,
-            "order": 3010,
-            "title": {
-                "en": "Scenario: E-Commerce Checkout",
-                "id": "Skenario: Checkout E-Commerce"
-            },
-            "description": {
-                "en": "Complete a full checkout flow using accessibility-first locators.",
-                "id": "Selesaikan alur checkout lengkap menggunakan locator berbasis aksesibilitas."
-            },
-            "instructions": {
-                "en": "# Scenario: E-Commerce Checkout\n\n## Concept\nA complete E2E flow involves chaining multiple interactions: finding elements, entering data, and verifying the final outcome. Using accessibility-first locators (`getByRole`, `getByLabel`) makes these flows more resilient to UI changes.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Purchase' }).click();\nawait page.getByLabel('Address').fill('123 Main St');\nawait expect(page.locator('#receipt')).toBeVisible();\n```\n\n## Real World Scenario\nUsing explicit IDs makes tests brittle. If a developer changes `#qty` to `#quantity-input`, your test fails. But if they remove the \"Quantity\" label, *users* can't use the form either. Testing against the label ensures the app is usable.\n\n## Your Task\n1.  **Add to Cart**: Click the button with name \"Add to Cart\".\n2.  **Update Qty**: Fill the input labeled \"Quantity\" with `'3'`.\n3.  **Shipping**: Check the checkbox labeled \"Express Shipping\".\n4.  **Checkout**: Click the button named \"Checkout\".\n5.  **Verify**: Confirm the confirmation message (`#confirmation`) contains `'3 items (Express)'`.\n",
-                "id": "# Skenario: Checkout E-Commerce\n\n## Concept\nAlur E2E yang lengkap melibatkan perangkaian beberapa interaksi: menemukan elemen, memasukkan data, dan memverifikasi hasil akhir. Menggunakan locator berbasis aksesibilitas (`getByRole`, `getByLabel`) membuat alur ini lebih tangguh terhadap perubahan UI.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Purchase' }).click();\nawait page.getByLabel('Address').fill('123 Main St');\nawait expect(page.locator('#receipt')).toBeVisible();\n```\n\n## Real World Scenario\nMenggunakan ID eksplisit membuat pengujian menjadi rapuh. Jika pengembang mengubah `#qty` menjadi `#quantity-input`, pengujian Anda gagal. Namun jika mereka menghapus label \"Quantity\", *pengguna* juga tidak dapat menggunakan formulir tersebut. Pengujian terhadap label memastikan aplikasi dapat digunakan.\n\n## Tugas Kamu\n1.  **Add to Cart**: Klik tombol dengan nama \"Add to Cart\".\n2.  **Update Qty**: Isi input berlabel \"Quantity\" dengan `'3'`.\n3.  **Shipping**: Centang checkbox berlabel \"Express Shipping\".\n4.  **Checkout**: Klik tombol bernama \"Checkout\".\n5.  **Verifikasi**: Konfirmasikan pesan konfirmasi (`#confirmation`) berisi `'3 items (Express)'`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Chain together a series of realistic user steps: adding to cart, updating numbers, and checking out.",
-                    "Prioritize using accessibility-first locators like getByRole and getByLabel for every step of the flow.",
-                    "Add to cart, set Quantity to '3', check Express Shipping, and click Checkout. Assert the confirmation message."
-                ],
-                "id": [
-                    "Rangkai serangkaian langkah pengguna yang realistis: menambahkan ke keranjang, memperbarui angka, dan checkout.",
-                    "Prioritaskan penggunaan locator accessibility-first seperti getByRole dan getByLabel untuk setiap langkah alur.",
-                    "Tambahkan ke keranjang, set Quantity ke '3', centang Express Shipping, dan klik Checkout. Lakukan asersi pesan konfirmasi."
-                ]
-            },
-            "htmlContent": "<div class=\"shop\">\n  <div class=\"product\">\n    <h3>Widget Pro</h3>\n    <button id=\"add-btn\" onclick=\"addToCart()\">Add to Cart</button>\n  </div>\n  <div class=\"cart\" style=\"display:none;\">\n    <label for=\"qty\">Quantity</label>\n    <input type=\"number\" id=\"qty\" value=\"1\" />\n    <label><input type=\"checkbox\" id=\"express\" /> Express Shipping</label>\n    <button id=\"checkout-btn\" onclick=\"checkout()\">Checkout</button>\n  </div>\n  <div id=\"confirmation\" style=\"display:none;\"></div>\n</div>\n<script>\n  function addToCart() {\n    document.querySelector('.cart').style.display = 'block';\n    document.getElementById('add-btn').textContent = 'Added!';\n  }\n  function checkout() {\n    const qty = document.getElementById('qty').value;\n    const express = document.getElementById('express').checked;\n    document.getElementById('confirmation').style.display = 'block';\n    document.getElementById('confirmation').textContent = \n      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');\n  }\n</script>",
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('checkout flow', async ({ page }) => {\n  // 1. Click \"Add to Cart\" (getByRole)\n  // 2. Fill \"Quantity\" to \"3\" (getByLabel)\n  // 3. Check \"Express Shipping\" (getByLabel)\n  // 4. Click \"Checkout\" (getByRole)\n  // 5. Verify confirmation text\n});",
-            "testCases": [],
-            "solution": "await page.click('#add-btn');\nawait page.fill('#qty', '3');\nawait page.check('#express');\nawait page.click('#checkout-btn');\nconst result = await page.locator('#confirmation').textContent();",
-            "tags": [
-                "playwright",
-                "scenario",
-                "boss",
-                "checkout",
-                "intermediate"
-            ]
-        },
-        {
             "slug": "pw-locator-intro",
             "type": "PLAYWRIGHT",
             "difficulty": "EASY",
             "category": "playwright-locators",
             "xpReward": 35,
-            "order": 3100,
+            "order": 3000,
             "title": {
                 "en": "Introduction to Locators",
                 "id": "Pengenalan Locator"
@@ -481,8 +17,8 @@
                 "id": "Pelajari dasar-dasar menemukan elemen dengan locator Playwright."
             },
             "instructions": {
-                "en": "# Introduction to Locators\n\n## Concept\nLocators are the heart of Playwright testing. They tell Playwright which element to interact with. The `page.locator()` method is the most fundamental way to find elements using CSS selectors, IDs, classes, or tags.\n\n## Code Example\n```javascript\n// By CSS selector\npage.locator('#submit-btn')     // By ID\npage.locator('.primary-btn')    // By class\npage.locator('button')          // By tag\n```\n\n## Real World Scenario\nBefore you can click a \"Buy Now\" button or read an error message, you must first tell your script *where* it is. Finding elements reliably is 80% of the automation battle.\n\n## Your Task\n1. Find the heading element using `page.locator('h1')`\n2. Assert it has text `'Welcome to Playwright'` using `expect(locator).toHaveText(...)`\n",
-                "id": "# Pengenalan Locator\n\n## Concept\nLocator adalah jantung dari pengujian Playwright. Mereka memberitahu Playwright elemen mana yang harus berinteraksi. Metode `page.locator()` adalah cara paling fundamental untuk menemukan elemen menggunakan CSS selector, ID, class, atau tag.\n\n## Code Example\n```javascript\n// Dengan CSS selector\npage.locator('#submit-btn')     // Berdasarkan ID\npage.locator('.primary-btn')    // Berdasarkan class\npage.locator('button')          // Berdasarkan tag\n```\n\n## Real World Scenario\nSebelum Anda dapat mengklik tombol \"Beli Sekarang\" atau membaca pesan kesalahan, Anda harus memberi tahu skrip Anda *di mana* tombol itu berada. Menemukan elemen dengan andal adalah 80% dari pertempuran otomatisasi.\n\n## Tugas Kamu\n1. Temukan elemen heading menggunakan `page.locator('h1')`\n2. Verifikasi teksnya adalah `'Welcome to Playwright'` menggunakan `expect(locator).toHaveText(...)`\n"
+                "en": "# Introduction to Locators\n\n## Concept\nLocators are the heart of Playwright testing. They tell Playwright which element to interact with. The `page.locator()` method is the most fundamental way to find elements using CSS selectors, IDs, classes, or tags.\n\n## Validation (The feedback loop)\nTo confirm a locator works, we use \"Assertions\". The most basic check is verifying if an element is visible.\n\n```javascript\nawait expect(page.locator(\"h1\")).toBeVisible();\n```\n\n## Code Example\n```javascript\n// By CSS selector\npage.locator('#submit-btn')     // By ID\npage.locator('.primary-btn')    // By class\npage.locator('button')          // By tag\n```\n\n## Real World Scenario\nBefore you can click a \"Buy Now\" button or read an error message, you must first tell your script *where* it is. Finding elements reliably is 80% of the automation battle.\n\n## Your Task\n1. Find the heading element using `page.locator('h1')`\n2. Assert it has text `'Welcome to Playwright'` using `expect(locator).toHaveText(...)`\n",
+                "id": "# Pengenalan Locator\n\n## Concept\nLocator adalah jantung dari pengujian Playwright. Mereka memberitahu Playwright elemen mana yang harus berinteraksi. Metode `page.locator()` adalah cara paling fundamental untuk menemukan elemen menggunakan CSS selector, ID, class, atau tag.\n\n## Validasi (Umpan Balik)\nUntuk mengonfirmasi bahwa locator berfungsi, kita menggunakan \"Asersi\". Pemeriksaan paling dasar adalah memverifikasi apakah suatu elemen terlihat.\n\n```javascript\nawait expect(page.locator(\"h1\")).toBeVisible();\n```\n\n## Code Example\n```javascript\n// Dengan CSS selector\npage.locator('#submit-btn')     // Berdasarkan ID\npage.locator('.primary-btn')    // Berdasarkan class\npage.locator('button')          // Berdasarkan tag\n```\n\n## Real World Scenario\nSebelum Anda dapat mengklik tombol \"Beli Sekarang\" atau membaca pesan kesalahan, Anda harus memberi tahu skrip Anda *di mana* tombol itu berada. Menemukan elemen dengan andal adalah 80% dari pertempuran otomatisasi.\n\n## Tugas Kamu\n1. Temukan elemen heading menggunakan `page.locator('h1')`\n2. Verifikasi teksnya adalah `'Welcome to Playwright'` menggunakan `expect(locator).toHaveText(...)`\n"
             },
             "hints": {
                 "en": [
@@ -514,7 +50,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 50,
-            "order": 3101,
+            "order": 3001,
             "title": {
                 "en": "getByRole",
                 "id": "getByRole"
@@ -542,7 +78,7 @@
             "htmlContent": "<div class=\"signup\">\n  <h1>Join Us</h1>\n  <button onclick=\"document.getElementById('result').textContent = 'Signed up!'\">Sign Up</button>\n  <div id=\"result\"></div>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('click element', async ({ page }) => {\n  // 1. Find button using getByRole\n  // 2. Click it\n  // 3. Assert #result has text 'Signed up!'\n});",
             "testCases": [],
-            "solution": "const signUpBtn = page.getByRole('button', { name: 'Sign Up' });\nawait signUpBtn.click();\nconst result = await page.locator('#result').textContent();",
+            "solution": "await page.getByRole('button', { name: 'Sign Up' }).click();\nawait expect(page.locator('#result')).toHaveText('Signed up!');",
             "tags": [
                 "playwright",
                 "locators",
@@ -556,7 +92,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 50,
-            "order": 3102,
+            "order": 3002,
             "title": {
                 "en": "getByText",
                 "id": "getByText"
@@ -584,7 +120,7 @@
             "htmlContent": "<div class=\"demo\">\n  <span class=\"clickable\" onclick=\"document.getElementById('output').textContent = 'Clicked!'\">Click me to continue</span>\n  <div id=\"output\"></div>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('find and click by text', async ({ page }) => {\n  // 1. Find by text 'Click me' (substring)\n  // 2. Click it\n  // 3. Assert #output is 'Clicked!'\n});",
             "testCases": [],
-            "solution": "const element = page.getByText('Click me');\nawait element.click();\nconst result = await page.locator('#output').textContent();",
+            "solution": "await page.getByText('Click me').click();\nawait expect(page.locator('#output')).toHaveText('Clicked!');",
             "tags": [
                 "playwright",
                 "locators",
@@ -598,7 +134,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 55,
-            "order": 3103,
+            "order": 3003,
             "title": {
                 "en": "getByLabel",
                 "id": "getByLabel"
@@ -626,7 +162,7 @@
             "htmlContent": "<form>\n  <label for=\"user\">Username</label>\n  <input type=\"text\" id=\"user\" />\n  \n  <label for=\"pass\">Password</label>\n  <input type=\"password\" id=\"pass\" />\n</form>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill by label', async ({ page }) => {\n  // 1. Fill 'Username' with 'testuser'\n  // 2. Fill 'Password'\n  // 3. Assert #user has value 'testuser'\n});",
             "testCases": [],
-            "solution": "await page.getByLabel('Username').fill('testuser');\nawait page.getByLabel('Password').fill('secret123');\nconst result = await page.getByLabel('Username').inputValue();",
+            "solution": "await page.getByLabel('Username').fill('testuser');\nawait page.getByLabel('Password').fill('secret123');\nawait expect(page.getByLabel('Username')).toHaveValue('testuser');",
             "tags": [
                 "playwright",
                 "locators",
@@ -641,7 +177,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 55,
-            "order": 3104,
+            "order": 3004,
             "title": {
                 "en": "getByPlaceholder",
                 "id": "getByPlaceholder"
@@ -669,7 +205,7 @@
             "htmlContent": "<div class=\"search-bar\">\n  <input type=\"text\" placeholder=\"Search...\" />\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill by placeholder', async ({ page }) => {\n  // 1. Fill input with 'Playwright testing'\n  // 2. Assert value\n});",
             "testCases": [],
-            "solution": "await page.getByPlaceholder('Search...').fill('Playwright testing');\nconst result = await page.getByPlaceholder('Search...').inputValue();",
+            "solution": "await page.getByPlaceholder('Search...').fill('Playwright testing');\nawait expect(page.getByPlaceholder('Search...')).toHaveValue('Playwright testing');",
             "tags": [
                 "playwright",
                 "locators",
@@ -683,7 +219,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 60,
-            "order": 3105,
+            "order": 3005,
             "title": {
                 "en": "getByTestId",
                 "id": "getByTestId"
@@ -711,7 +247,7 @@
             "htmlContent": "<div class=\"product\">\n  <h3>Widget Pro</h3>\n  <button data-testid=\"add-to-cart\" onclick=\"document.getElementById('cart-count').textContent = '1'\">Add to Cart</button>\n  <span id=\"cart-count\">0</span>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('click by testid', async ({ page }) => {\n  // 1. Click button (testid='add-to-cart')\n  // 2. Assert cart count is '1'\n});",
             "testCases": [],
-            "solution": "await page.getByTestId('add-to-cart').click();\nconst result = await page.locator('#cart-count').textContent();",
+            "solution": "await page.getByTestId('add-to-cart').click();\nawait expect(page.locator('#cart-count')).toHaveText('1');",
             "tags": [
                 "playwright",
                 "locators",
@@ -725,7 +261,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 70,
-            "order": 3106,
+            "order": 3006,
             "title": {
                 "en": "Locator Chaining",
                 "id": "Perantaian Locator"
@@ -753,7 +289,7 @@
             "htmlContent": "<ul class=\"menu\">\n  <li>Home</li>\n  <li>Products</li>\n  <li>About</li>\n  <li>Contact</li>\n</ul>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('chaining locators', async ({ page }) => {\n  // 1. Get second item using nth(1)\n  // 2. Assert text is 'Products'\n});",
             "testCases": [],
-            "solution": "const secondItem = page.locator('.menu li').nth(1);\nconst result = await secondItem.textContent();",
+            "solution": "const list = page.locator('.menu');\nconst secondItem = list.locator('li').nth(1);\nawait expect(secondItem).toHaveText('Products');",
             "tags": [
                 "playwright",
                 "locators",
@@ -767,7 +303,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 80,
-            "order": 3107,
+            "order": 3007,
             "title": {
                 "en": "Frame Locators",
                 "id": "Locator Frame"
@@ -795,7 +331,7 @@
             "htmlContent": "<div class=\"container\">\n  <iframe id=\"widget\" srcdoc=\"<button onclick='this.parentNode.innerHTML=&quot;Button clicked!&quot;'>Click Inside</button>\"></iframe>\n</div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('frame interaction', async ({ page }) => {\n  // 1. Access iframe\n  // 2. Click button inside\n  // 3. Assert body text is 'Button clicked!'\n});",
             "testCases": [],
-            "solution": "const frame = page.frameLocator('#widget');\nawait frame.locator('button').click();\nconst result = await frame.locator('body').textContent();",
+            "solution": "const frame = page.frameLocator('#widget');\nawait frame.locator('button').click();\nawait expect(frame.locator('body')).toContainText('Clicked');",
             "tags": [
                 "playwright",
                 "locators",
@@ -809,7 +345,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-locators",
             "xpReward": 75,
-            "order": 3108,
+            "order": 3008,
             "title": {
                 "en": "List & Items",
                 "id": "Daftar & Item"
@@ -852,7 +388,7 @@
             "difficulty": "HARD",
             "category": "playwright-locators",
             "xpReward": 90,
-            "order": 3109,
+            "order": 3009,
             "title": {
                 "en": "Scenario: Dynamic Product Grid",
                 "id": "Skenario: Grid Produk Dinamis"
@@ -880,7 +416,7 @@
             "htmlContent": "<div class=\"products\">\n  <div class=\"product\" data-testid=\"product-1\">\n    <h3>Widget Basic</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-2\">\n    <h3>Widget Pro</h3>\n    <span class=\"badge in-stock\">In Stock</span>\n    <button onclick=\"document.getElementById('msg').textContent='Added Widget Pro!'\">Add to Cart</button>\n  </div>\n  <div class=\"product\" data-testid=\"product-3\">\n    <h3>Widget Pro Max</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </div>\n</div>\n<div id=\"msg\"></div>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('dynamic filter', async ({ page }) => {\n  // 1. Find product with 'Pro' and 'In Stock'\n  const productCard = page.locator('.product'); \n  \n  // 2. Click Add to Cart\n\n  // 3. Assert confirmation message\n});",
             "testCases": [],
-            "solution": "// Filter is not supported in shim, use nth(1) to target second product (Pro)\nconst productCard = page.locator('.product').nth(1);\nawait productCard.locator('button').click();\nconst result = await page.locator('#msg').textContent();",
+            "solution": "const row = page.locator('.product').filter({ hasText: 'Widget Pro' }).filter({ hasText: 'In Stock' });\nawait row.getByRole('button', { name: 'Add to Cart' }).click();\nawait expect(page.locator('#msg')).toContainText('Added Widget Pro');",
             "tags": [
                 "playwright",
                 "locators",
@@ -895,7 +431,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-assertions",
             "xpReward": 45,
-            "order": 3200,
+            "order": 3100,
             "title": {
                 "en": "toBeVisible & toBeHidden",
                 "id": "toBeVisible & toBeHidden"
@@ -937,7 +473,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-assertions",
             "xpReward": 50,
-            "order": 3201,
+            "order": 3101,
             "title": {
                 "en": "toHaveText",
                 "id": "toHaveText"
@@ -979,7 +515,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-assertions",
             "xpReward": 50,
-            "order": 3202,
+            "order": 3102,
             "title": {
                 "en": "toHaveValue",
                 "id": "toHaveValue"
@@ -1020,7 +556,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-assertions",
             "xpReward": 55,
-            "order": 3203,
+            "order": 3103,
             "title": {
                 "en": "State Assertions",
                 "id": "Asersi Status"
@@ -1062,7 +598,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-assertions",
             "xpReward": 60,
-            "order": 3204,
+            "order": 3104,
             "title": {
                 "en": "toHaveAttribute",
                 "id": "toHaveAttribute"
@@ -1104,7 +640,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-assertions",
             "xpReward": 65,
-            "order": 3205,
+            "order": 3105,
             "title": {
                 "en": "toHaveCount",
                 "id": "toHaveCount"
@@ -1146,7 +682,7 @@
             "difficulty": "MEDIUM",
             "category": "playwright-assertions",
             "xpReward": 70,
-            "order": 3206,
+            "order": 3106,
             "title": {
                 "en": "Soft Assertions",
                 "id": "Soft Assertions"
@@ -1188,7 +724,7 @@
             "difficulty": "HARD",
             "category": "playwright-assertions",
             "xpReward": 85,
-            "order": 3207,
+            "order": 3107,
             "title": {
                 "en": "Scenario: Form Validation Suite",
                 "id": "Skenario: Suite Validasi Formulir"
@@ -1222,6 +758,471 @@
                 "assertions",
                 "scenario",
                 "boss",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-click-actions",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "playwright-navigation",
+            "xpReward": 45,
+            "order": 3200,
+            "title": {
+                "en": "Click Actions",
+                "id": "Aksi Klik"
+            },
+            "description": {
+                "en": "Master different types of click interactions.",
+                "id": "Kuasai berbagai jenis interaksi klik."
+            },
+            "instructions": {
+                "en": "# Click Actions\n\n## Concept\nPlaywright provides the `click()` method to interact with elements. It automatically waits for the element to be visible and stable before clicking. Use `getByRole` for more resilient tests.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Submit' }).click();\nawait page.locator('.menu').click();\n```\n\n## Real World Scenario\nAlmost every interaction involves clicking. Whether it's submitting a form, adding an item to a shopping cart, or closing a modal dialog, reliable click actions are the heartbeat of E2E testing.\n\n## Your Task\n1. Click the increment button (`+`) 3 times.\n2. Verify the counter text is `'3'` using `expect(locator).toHaveText(...)`.\n",
+                "id": "# Aksi Klik\n\n## Concept\nPlaywright menyediakan metode `click()` untuk berinteraksi dengan elemen. Metode ini secara otomatis menunggu elemen menjadi terlihat dan stabil sebelum diklik. Gunakan `getByRole` untuk pengujian yang lebih tangguh.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Submit' }).click();\nawait page.locator('.menu').click();\n```\n\n## Real World Scenario\nHampir setiap interaksi melibatkan klik. Baik itu mengirimkan formulir, menambahkan item ke keranjang belanja, atau menutup dialog modal, tindakan klik yang andal adalah detak jantung pengujian E2E.\n\n## Tugas Kamu\n1. Klik tombol increment (`+`) sebanyak 3 kali.\n2. Verifikasi teks counter adalah `'3'` menggunakan `expect(locator).toHaveText(...)`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Focus on finding the specific action element that performs the calculation.",
+                    "Use a locator that describes the element's purpose, like getByRole for a button.",
+                    "Call the .click() method exactly as many times as requested, then use a 'toHaveText' assertion."
+                ],
+                "id": [
+                    "Fokuslah untuk menemukan elemen aksi spesifik yang melakukan perhitungan.",
+                    "Gunakan locator yang mendeskripsikan tujuan elemen, seperti getByRole untuk tombol.",
+                    "Panggil metode .click() tepat sebanyak yang diminta, lalu gunakan asersi 'toHaveText'."
+                ]
+            },
+            "htmlContent": "<div class=\"counter\">\n  <span id=\"count\" aria-label=\"Counter Value\">0</span>\n  <button aria-label=\"Increment\" onclick=\"document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1\">+</button>\n</div>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('click counter', async ({ page }) => {\n  // 1. Click button 3 times (use getByRole)\n  // 2. Verify count is 3\n});",
+            "testCases": [],
+            "solution": "await page.getByRole('button', { name: 'Increment' }).click();\nawait page.getByRole('button', { name: 'Increment' }).click();\nawait page.getByRole('button', { name: 'Increment' }).click();\nawait expect(page.getByLabel('Counter Value')).toHaveText('3');",
+            "tags": [
+                "playwright",
+                "click",
+                "actions",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-fill-type",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "playwright-navigation",
+            "xpReward": 50,
+            "order": 3201,
+            "title": {
+                "en": "Fill & Type",
+                "id": "Isi & Ketik"
+            },
+            "description": {
+                "en": "Input text into form fields.",
+                "id": "Masukkan teks ke dalam field formulir."
+            },
+            "instructions": {
+                "en": "# Fill & Type\n\n## Concept\nTwo ways to enter text in Playwright! The `fill()` method is the most common way to enter text. it clears the field and types the new value. It works with all types of input and textarea elements.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Email').fill('test@example.com');\n```\n\n## Real World Scenario\nLogin forms are the most common test case. You need to precisely enter a username and password. Using labels ensures accessibility and robust tests.\n\n## Your Task\n1. Fill the **Email** field with `'qa@test.com'`.\n2. Fill the **Password** field with `'secret123'`.\n3. Verify the email field has the value `'qa@test.com'` using `expect(locator).toHaveValue(...)`.\n",
+                "id": "# Isi & Ketik\n\n## Concept\nDua cara untuk memasukkan teks di Playwright! Metode `fill()` adalah cara yang paling umum untuk memasukkan teks. Metode ini menghapus isi field dan mengetikkan nilai baru. Ini berfungsi untuk semua jenis elemen input dan textarea.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Email').fill('test@example.com');\n```\n\n## Real World Scenario\nFormulir login adalah kasus uji yang paling umum. Anda harus memasukkan nama pengguna dan kata sandi dengan tepat. Menggunakan label memastikan aksesibilitas dan pengujian yang kuat.\n\n## Tugas Kamu\n1. Isi kolom **Email** dengan `'qa@test.com'`.\n2. Isi kolom **Password** dengan `'secret123'`.\n3. Verifikasi kolom email memiliki nilai `'qa@test.com'` menggunakan `expect(locator).toHaveValue(...)`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Identify the standard way to enter text that also clears the existing input first.",
+                    "Target the input fields using the text that matches their visual labels on the screen.",
+                    "Use .fill() for 'qa@test.com' and 'secret123', then verify the email with 'toHaveValue'."
+                ],
+                "id": [
+                    "Identifikasi cara standar untuk memasukkan teks yang juga menghapus input yang ada terlebih dahulu.",
+                    "Targetkan kolom input menggunakan teks yang sesuai dengan label visual mereka di layar.",
+                    "Gunakan .fill() untuk 'qa@test.com' dan 'secret123', lalu verifikasi email dengan 'toHaveValue'."
+                ]
+            },
+            "htmlContent": "<form class=\"login-form\" autocomplete=\"off\">\n  <label for=\"email\">Email</label>\n  <input type=\"email\" id=\"email\" placeholder=\"Email\" autocomplete=\"off\" />\n  <label for=\"password\">Password</label>\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" autocomplete=\"new-password\" />\n  <button type=\"submit\">Login</button>\n</form>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill form', async ({ page }) => {\n  // 1. Fill email (use getByLabel)\n  // 2. Fill password (use getByLabel)\n  // 3. Verify email value\n});",
+            "testCases": [],
+            "solution": "await page.getByLabel('Email').fill('qa@test.com');\nawait page.getByLabel('Password').fill('secret123');\nawait expect(page.getByLabel('Email')).toHaveValue('qa@test.com');",
+            "tags": [
+                "playwright",
+                "fill",
+                "type",
+                "forms",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-select-dropdowns",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "playwright-navigation",
+            "xpReward": 55,
+            "order": 3202,
+            "title": {
+                "en": "Select Dropdowns",
+                "id": "Pilih Dropdown"
+            },
+            "description": {
+                "en": "Work with select elements and dropdowns.",
+                "id": "Bekerja dengan elemen select dan dropdown."
+            },
+            "instructions": {
+                "en": "# Select Dropdowns\n\n## Concept\nPlaywright makes dropdown selection easy with the `selectOption()` method. You can select by value, label, or index.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Country').selectOption('usa');\n```\n\n## Real World Scenario\nE-commerce checkouts often require selecting a Country or Shipping Method from a dropdown.\n\n## Your Task\n1. Select `'javascript'` from the **Choose Language** dropdown.\n2. Verify the dropdown value is `'javascript'` using `expect(locator).toHaveValue(...)`.\n",
+                "id": "# Pilih Dropdown\n\n## Concept\nPlaywright membuat pemilihan dropdown menjadi mudah dengan metode `selectOption()`. Anda dapat memilih berdasarkan value, label, atau index.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Country').selectOption('usa');\n```\n\n## Real World Scenario\nCheckout e-commerce seringkali mengharuskan memilih Negara atau Metode Pengiriman dari dropdown.\n\n## Tugas Kamu\n1. Pilih `'javascript'` dari dropdown **Choose Language**.\n2. Verifikasi nilai dropdown adalah `'javascript'` menggunakan `expect(locator).toHaveValue(...)`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Find the form element designed for picking one option from a pre-defined list.",
+                    "Use the 'selectOption' method after locating the dropdown by its associated label.",
+                    "Pass 'javascript' as the value to the selectOption method and check the result with 'toHaveValue'."
+                ],
+                "id": [
+                    "Temukan elemen formulir yang dirancang untuk memilih satu opsi dari daftar yang telah ditentukan.",
+                    "Gunakan metode 'selectOption' setelah menemukan dropdown berdasarkan label terkaitnya.",
+                    "Masukkan 'javascript' sebagai nilai ke metode selectOption dan cek hasilnya dengan 'toHaveValue'."
+                ]
+            },
+            "htmlContent": "<form>\n  <label for=\"language\">Choose Language:</label>\n  <select id=\"language\">\n    <option value=\"\">Select...</option>\n    <option value=\"python\">Python</option>\n    <option value=\"javascript\">JavaScript</option>\n    <option value=\"typescript\">TypeScript</option>\n  </select>\n</form>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('select language', async ({ page }) => {\n  // 1. Select 'javascript' (use getByLabel)\n  // 2. Verify value\n});",
+            "testCases": [],
+            "solution": "await page.getByLabel('Choose Language:').selectOption('javascript');\nawait expect(page.getByLabel('Choose Language:')).toHaveValue('javascript');",
+            "tags": [
+                "playwright",
+                "select",
+                "dropdown",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-checkbox-radio",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "playwright-navigation",
+            "xpReward": 55,
+            "order": 3203,
+            "title": {
+                "en": "Checkbox & Radio",
+                "id": "Checkbox & Radio"
+            },
+            "description": {
+                "en": "Toggle checkboxes and radio buttons.",
+                "id": "Ubah status checkbox dan tombol radio."
+            },
+            "instructions": {
+                "en": "# Checkbox & Radio\n\n## Concept\nUse `check()` and `uncheck()` to toggle checkboxes and radio buttons. These methods ensure the element is in the desired state, regardless of its previous status.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('I agree').check();\nawait page.getByLabel('Newsletter').uncheck();\n```\n\n## Real World Scenario\nBefore a user can create an account, they must almost always tick the \"I agree to Terms & Conditions\" box.\n\n## Your Task\n1. Check the **Accept Terms & Conditions** checkbox.\n2. Verify it is checked using `expect(locator).toBeChecked()`.\n",
+                "id": "# Checkbox & Radio\n\n## Concept\nGunakan `check()` dan `uncheck()` untuk mengubah status checkbox dan tombol radio. Metode ini memastikan elemen berada dalam status yang diinginkan, apapun status sebelumnya.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('I agree').check();\nawait page.getByLabel('Newsletter').uncheck();\n```\n\n## Real World Scenario\nSebelum pengguna dapat membuat akun, mereka hampir selalu harus mencentang kotak \"Saya setuju dengan Syarat & Ketentuan\".\n\n## Tugas Kamu\n1. Centang checkbox **Accept Terms & Conditions**.\n2. Verifikasi bahwa itu sudah dicentang menggunakan `expect(locator).toBeChecked()`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Look for a way to ensure a selection box is marked without worrying about its current state.",
+                    "Target the label text to find the checkbox, then use the '.check()' method.",
+                    "Verify the success of the operation using the 'toBeChecked' assertion on the same locator."
+                ],
+                "id": [
+                    "Cari cara untuk memastikan kotak pilihan ditandai tanpa mempedulikan statusnya saat ini.",
+                    "Targetkan teks label untuk menemukan kotak centang, lalu gunakan metode '.check()'.",
+                    "Verifikasi keberhasilan operasi menggunakan asersi 'toBeChecked' pada locator yang sama."
+                ]
+            },
+            "htmlContent": "<form>\n  <label>\n    <input type=\"checkbox\" id=\"terms\" />\n    Accept Terms & Conditions\n  </label>\n  <label>\n    <input type=\"checkbox\" id=\"newsletter\" />\n    Subscribe to Newsletter\n  </label>\n</form>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check terms', async ({ page }) => {\n  // 1. Check terms (use getByLabel)\n  // 2. Verify checked state\n});",
+            "testCases": [],
+            "solution": "await page.getByLabel('Accept Terms & Conditions').check();\nawait expect(page.getByLabel('Accept Terms & Conditions')).toBeChecked();",
+            "tags": [
+                "playwright",
+                "checkbox",
+                "radio",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-keyboard-actions",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "playwright-navigation",
+            "xpReward": 60,
+            "order": 3204,
+            "title": {
+                "en": "Keyboard Actions",
+                "id": "Aksi Keyboard"
+            },
+            "description": {
+                "en": "Simulate keyboard events like Enter, Escape, and typing.",
+                "id": "Simulasikan event keyboard seperti Enter, Escape, dan mengetik."
+            },
+            "instructions": {
+                "en": "# Keyboard Actions\n\n## Concept\nPlaywright allows you to simulate keyboard events with `page.keyboard`. You can press specific keys, combinations, or even type natural sequences of characters.\n\n## Code Example\n\n```javascript\nawait page.keyboard.press('Enter');\nawait page.keyboard.press('Control+C');\n```\n\n## Real World Scenario\nSubmitting a search bar often happens by pressing \"Enter\" rather than clicking a button. Testing this behavior ensures the \"natural\" user flow works.\n\n## Your Task\n1. Type `'Playwright'` into the search input (use `getByPlaceholder`).\n2. Press `'Enter'` using the keyboard.\n3. Verify the result text (`#result`) is `'Searching for: Playwright'` using `expect(locator).toHaveText(...)`.\n",
+                "id": "# Aksi Keyboard\n\n## Concept\nPlaywright memungkinkan Anda mensimulasikan event keyboard dengan `page.keyboard`. Anda dapat menekan tombol tertentu, kombinasi tombol, atau bahkan mengetik urutan karakter yang alami.\n\n## Code Example\n\n```javascript\nawait page.keyboard.press('Enter');\nawait page.keyboard.press('Control+C');\n```\n\n## Real World Scenario\nMengirimkan bilah pencarian sering kali dilakukan dengan menekan \"Enter\" daripada mengklik tombol. Menguji perilaku ini memastikan alur pengguna yang \"alami\" berfungsi.\n\n## Tugas Kamu\n1. Ketik `'Playwright'` ke dalam input pencarian (gunakan `getByPlaceholder`).\n2. Tekan `'Enter'` menggunakan keyboard.\n3. Verifikasi teks hasil (`#result`) adalah `'Searching for: Playwright'` menggunakan `expect(locator).toHaveText(...)`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Simulate a physical user interaction where a specific key is pressed to submit the form.",
+                    "After filling the search input, use the 'page.keyboard' API to trigger the submission.",
+                    "Call page.keyboard.press('Enter') and assert that the result message is visible on the page."
+                ],
+                "id": [
+                    "Simulasikan interaksi pengguna fisik di mana kunci tertentu ditekan untuk mengirimkan formulir.",
+                    "Setelah mengisi input pencarian, gunakan API 'page.keyboard' untuk memicu pengiriman.",
+                    "Panggil page.keyboard.press('Enter') dan pastikan pesan hasilnya terlihat di halaman."
+                ]
+            },
+            "htmlContent": "<div class=\"search-box\">\n  <input type=\"text\" id=\"search\" placeholder=\"Search...\" aria-label=\"Search\" />\n  <div id=\"result\" aria-live=\"polite\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Type term (use getByPlaceholder)\n  // 2. Press Enter\n  // 3. Verify result (use getByText)\n});",
+            "testCases": [],
+            "solution": "await page.getByPlaceholder('Search...').fill('Playwright');\nawait page.keyboard.press('Enter');\nawait expect(page.locator('#result')).toHaveText('Searching for: Playwright');",
+            "tags": [
+                "playwright",
+                "keyboard",
+                "input",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-hover-focus",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "playwright-navigation",
+            "xpReward": 60,
+            "order": 3205,
+            "title": {
+                "en": "Hover & Focus",
+                "id": "Hover & Fokus"
+            },
+            "description": {
+                "en": "Trigger hover states and element focus.",
+                "id": "Picu status hover dan fokus elemen."
+            },
+            "instructions": {
+                "en": "# Hover & Focus\n\n## Concept\nSome elements only become visible or interactable when you hover over them with the mouse or focus on them with the keyboard. Playwright provides `hover()` and `focus()` methods to simulate these states.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nNavigation menus often reveal submenus only on hover. You need to simulate this hover action to make the submenu visible before you can click anything inside it.\n\n## Your Task\n1. Hover over the \"Products\" menu item.\n2. Verify the dropdown becomes visible by checking for the \"Laptop\" link.\n",
+                "id": "# Hover & Fokus\n\n## Concept\nBeberapa elemen hanya menjadi terlihat atau dapat berinteraksi saat Anda mengarahkan mouse (hover) di atasnya atau memfokuskan keyboard pada elemen tersebut. Playwright menyediakan metode `hover()` dan `focus()` untuk mensimulasikan status ini.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nMenu navigasi sering kali menampilkan submenu hanya saat di-hover. Anda perlu mensimulasikan tindakan hover ini agar submenu terlihat sebelum Anda dapat mengklik apa pun di dalamnya.\n\n## Tugas Kamu\n1. Hover di atas menu item \"Products\".\n2. Verifikasi dropdown menjadi terlihat dengan memeriksa link \"Laptop\".\n"
+            },
+            "hints": {
+                "en": [
+                    "Some menus only show their items when a user moves their mouse over a specific area.",
+                    "Use the '.hover()' method on the target menu text to reveal the hidden elements.",
+                    "Hover over 'Products', then use expect(...).toBeVisible() to check if the 'Laptop' link appeared."
+                ],
+                "id": [
+                    "Beberapa menu hanya menampilkan item mereka saat pengguna mengarahkan mouse-nya di atas area tertentu.",
+                    "Gunakan metode '.hover()' pada teks menu target untuk memunculkan elemen yang tersembunyi.",
+                    "Lakukan hover di atas 'Products', lalu gunakan expect(...).toBeVisible() untuk mengecek apakah link 'Laptop' muncul."
+                ]
+            },
+            "htmlContent": "<div class=\"nav\">\n  <div id=\"menu\" onmouseover=\"document.getElementById('dropdown').style.display='block'\" onmouseout=\"document.getElementById('dropdown').style.display='none'\">Products</div>\n  <div id=\"dropdown\" style=\"display:none;\">\n    <a href=\"#\">Laptop</a>\n    <a href=\"#\">Phone</a>\n  </div>\n</div>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('hover menu', async ({ page }) => {\n  // 1. Hover 'Products' (use getByText)\n  // 2. Verify dropdown visible\n});",
+            "testCases": [],
+            "solution": "await page.getByText('Products').hover();\nawait expect(page.locator('#dropdown')).toBeVisible();",
+            "tags": [
+                "playwright",
+                "hover",
+                "focus",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-file-upload",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "playwright-navigation",
+            "xpReward": 70,
+            "order": 3206,
+            "title": {
+                "en": "File Upload",
+                "id": "Unggah File"
+            },
+            "description": {
+                "en": "Handle file inputs and uploads.",
+                "id": "Tangani input file dan unggahan."
+            },
+            "instructions": {
+                "en": "# File Upload\n\n## Concept\nPlaywright intercepts file choosers automatically! You can use the `setInputFiles()` method to select one or more files for an input element.\n\n## Code Example\n\n```javascript\n// Select a single file\nawait page.getByLabel('Upload File').setInputFiles('file.txt');\n\n// Select multiple files\nawait page.getByLabel('Upload File').setInputFiles(['file1.txt', 'file2.txt']);\n```\n\n> [!NOTE]\n\nPlaywright creates a virtual file for you when you pass a string path.\n\n## Real World Scenario\nUploading a profile picture or a document is a common feature. Playwright abstracts the OS file picker, allowing you to convert file paths directly into input events.\n\n## Your Task\n1. Upload a file named `'resume.pdf'` to the **Upload Resume** input.\n2. Verify the status text (`#status`) contains `'resume.pdf'` using `expect(locator).toHaveText(...)`.\n",
+                "id": "# Unggah File\n\n## Concept\nPlaywright menangani pemilih file secara otomatis! Anda dapat menggunakan metode `setInputFiles()` untuk memilih satu atau beberapa file untuk elemen input.\n\n## Code Example\n\n```javascript\n// Pilih satu file\nawait page.getByLabel('Upload File').setInputFiles('file.txt');\n\n// Pilih beberapa file\nawait page.getByLabel('Upload File').setInputFiles(['file1.txt', 'file2.txt']);\n```\n\n> [!NOTE]\n\nPlaywright membuat file virtual untuk Anda saat Anda memberikan path string.\n\n## Real World Scenario\nMengunggah gambar profil atau dokumen adalah fitur umum. Playwright mengabstraksi pemilih file OS, memungkinkan Anda untuk mengubah path file secara langsung menjadi event input.\n\n## Tugas Kamu\n1. Unggah file bernama `'resume.pdf'` ke input **Upload Resume**.\n2. Verifikasi teks status (`#status`) berisi `'resume.pdf'` menggunakan `expect(locator).toHaveText(...)`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Think about how Playwright handles file selection without needing to open a file picker window.",
+                    "Use the '.setInputFiles()' method and provide the exact filename requested in the task.",
+                    "Call setInputFiles('resume.pdf') on the file input locator and verify the status text reflects this choice."
+                ],
+                "id": [
+                    "Pikirkan tentang bagaimana Playwright menangani pemilihan file tanpa perlu membuka jendela pemilih file.",
+                    "Gunakan metode '.setInputFiles()' dan berikan nama file yang tepat sesuai permintaan dalam tugas.",
+                    "Panggil setInputFiles('resume.pdf') pada locator input file dan verifikasi teks status mencerminkan pilihan ini."
+                ]
+            },
+            "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume:</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div id=\"status\" aria-label=\"Upload Status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.getElementById('status').textContent = 'Selected: ' + file.name;\n  });\n</script>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  // 1. Upload 'resume.pdf' to 'Upload Resume'\n  // 2. Verify status text\n});",
+            "testCases": [],
+            "solution": "await page.getByLabel('Upload Resume:').setInputFiles('resume.pdf');\nawait expect(page.locator('#status')).toContainText('resume.pdf');",
+            "tags": [
+                "playwright",
+                "upload",
+                "files",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-drag-drop",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "playwright-navigation",
+            "xpReward": 75,
+            "order": 3207,
+            "title": {
+                "en": "Drag and Drop",
+                "id": "Seret dan Lepas"
+            },
+            "description": {
+                "en": "Drag elements to drop zones.",
+                "id": "Seret elemen ke zona jatuhkan."
+            },
+            "instructions": {
+                "en": "# Drag and Drop\n\n## Concept\nPerform complex mouse gestures easily with the `dragTo()` method. Playwright handles the sequence of mouse down, move, and up for you.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nKanban boards (like Trello/Jira) use drag-and-drop extensively to move tickets between columns. Testing this interaction ensures the \"drop\" event actually fires and updates the UI.\n\n## Your Task\n1. Drag the element with text `'Drag'`.\n2. Drop it into the element with text `'Zone'`.\n3. Verify the zone text becomes `'Dropped!'` using `expect(page.getByText('Dropped!')).toBeVisible()`.\n",
+                "id": "# Seret dan Lepas\n\n## Concept\nLakukan gerakan mouse yang kompleks dengan mudah menggunakan metode `dragTo()`. Playwright menangani urutan mouse down, move, dan up untuk Anda.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nPapan Kanban (seperti Trello/Jira) menggunakan seret-dan-lepas secara ekstensif untuk memindahkan tiket antar kolom. Menguji interaksi ini memastikan event \"drop\" benar-benar terjadi dan memperbarui UI.\n\n## Tugas Kamu\n1. Seret elemen dengan teks `'Drag'`.\n2. Jatuhkan ke dalam elemen dengan teks `'Zone'`.\n3. Verifikasi teks zona menjadi `'Dropped!'` menggunakan `expect(page.getByText('Dropped!')).toBeVisible()`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Imagine the sequence of picking up an item and placing it exactly where it needs to go.",
+                    "Use the '.dragTo()' method which automatically handles the complex mouse movements for you.",
+                    "Call getByText('Drag').dragTo(page.getByText('Zone')) and verify that the 'Dropped!' message is visible."
+                ],
+                "id": [
+                    "Bayangkan urutan mengambil item dan meletakkannya tepat di tempat yang seharusnya.",
+                    "Gunakan metode '.dragTo()' yang secara otomatis menangani gerakan mouse yang kompleks untuk Kamu.",
+                    "Panggil getByText('Drag').dragTo(page.getByText('Zone')) dan pastikan pesan 'Dropped!' terlihat."
+                ]
+            },
+            "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:100px;height:100px;background:#3b82f6;color:white;display:flex;align-items:center;justify-content:center;cursor:grab;user-select:none;\">Drag Me</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed #9ca3af;margin-top:20px;display:flex;align-items:center;justify-content:center;\">Drop Here</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n  \n  item.addEventListener('dragstart', e => {\n    e.dataTransfer.setData('text/plain', 'dragged');\n    e.dataTransfer.effectAllowed = 'move';\n  });\n  zone.addEventListener('dragover', e => {\n    e.preventDefault();\n    e.dataTransfer.dropEffect = 'move';\n  });\n  zone.addEventListener('drop', e => {\n    e.preventDefault();\n    const data = e.dataTransfer.getData('text/plain');\n    if (data === 'dragged') {\n      zone.textContent = 'Dropped!';\n      zone.style.backgroundColor = '#10b981';\n      zone.style.color = 'white';\n      zone.style.border = 'none';\n    }\n  });\n</script>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  // 1. Drag 'Drag Me' to 'Drop Here'\n  // 2. Verify zone text is 'Dropped!'\n});",
+            "testCases": [],
+            "solution": "await page.getByText('Drag Me').dragTo(page.getByText('Drop Here'));\nawait expect(page.getByText('Dropped!')).toBeVisible();",
+            "tags": [
+                "playwright",
+                "drag",
+                "drop",
+                "actions",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-iframes",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "playwright-navigation",
+            "xpReward": 75,
+            "order": 3208,
+            "title": {
+                "en": "Working with Frames",
+                "id": "Bekerja dengan Frame"
+            },
+            "description": {
+                "en": "Select elements inside iframes.",
+                "id": "Pilih elemen di dalam iframe."
+            },
+            "instructions": {
+                "en": "# Working with Frames\n\n## Concept\nIf content is inside an `<iframe>`, normal locators won't find it! You must first locate the frame using `frameLocator()`, and then use that frame to find elements inside it.\n\n## Code Example\n\n```javascript\n// 1. Locate the frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Locate element by role/text inside the frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nEmbedded payment forms (like Stripe) or third-party widgets often live in iframes for security. You must switch context to interaction with them.\n\n## Your Task\n1. Locate the iframe.\n2. Find the input inside it using `getByPlaceholder('Card Number')`.\n3. Fill it with `'1234'`. \n4. Verify the value using `toHaveValue()`.\n",
+                "id": "# Bekerja dengan Frame\n\n## Concept\nJika konten berada di dalam `<iframe>`, locator normal tidak akan menemukannya! Anda harus terlebih dahulu menemukan frame tersebut menggunakan `frameLocator()`, lalu menggunakan frame tersebut untuk menemukan elemen di dalamnya.\n\n## Code Example\n\n```javascript\n// 1. Temukan frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Temukan elemen berdasarkan role/text di dalam frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nFormulir pembayaran tertanam (seperti Stripe) atau widget pihak ketiga sering kali berada dalam iframe demi keamanan. Anda harus mengganti konteks untuk berinteraksi dengan mereka.\n\n## Tugas Kamu\n1. Temukan iframe.\n2. Temukan input di dalamnya menggunakan `getByPlaceholder('Card Number')`.\n3. Isi dengan `'1234'`.\n4. Verifikasi nilai menggunakan `toHaveValue()`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Elements inside a sub-page (iframe) are isolated from the main page's locator searches.",
+                    "Use 'frameLocator()' to gain access to the iframe's content before trying to find the input inside it.",
+                    "Create a 'const frame = page.frameLocator('iframe');' then use frame.getByPlaceholder(...) to fill and verify."
+                ],
+                "id": [
+                    "Elemen di dalam sub-halaman (iframe) terisolasi dari pencarian locator halaman utama.",
+                    "Gunakan 'frameLocator()' untuk mendapatkan akses ke konten iframe sebelum mencoba menemukan input di dalamnya.",
+                    "Buat 'const frame = page.frameLocator('iframe');' lalu gunakan frame.getByPlaceholder(...) untuk mengisi dan memverifikasi."
+                ]
+            },
+            "htmlContent": "<iframe id=\"payment-frame\" srcdoc='<input id=\"card-number\" placeholder=\"Card Number\">'></iframe>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  // 1. Frame locator\n  // 2. Fill #card-number\n  // 3. Verify value\n});",
+            "testCases": [],
+            "solution": "const frame = page.frameLocator('#payment-frame');\nawait frame.getByPlaceholder('Card Number').fill('1234');\nawait expect(frame.getByPlaceholder('Card Number')).toHaveValue('1234');",
+            "tags": [
+                "playwright",
+                "frames",
+                "iframes",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-dynamic-table",
+            "type": "PLAYWRIGHT",
+            "difficulty": "MEDIUM",
+            "category": "playwright-navigation",
+            "xpReward": 90,
+            "order": 3209,
+            "title": {
+                "en": "Dynamic Tables",
+                "id": "Tabel Dinamis"
+            },
+            "description": {
+                "en": "Find a row by text and interact with its internals.",
+                "id": "Temukan baris berdasarkan teks dan berinteraksi dengan bagian dalamnya."
+            },
+            "instructions": {
+                "en": "# Dynamic Tables\n\n## Concept\nWhen dealing with dynamic data, you often need to find a container (like a table row) that contains specific text, and then find an interactive element inside that container using `filter()`.\n\n## Code Example\n\n```javascript\nconst row = page.locator('tr').filter({ hasText: 'Alice' });\nawait row.locator('.edit-btn').click();\n```\n\n## Real World Scenario\nAdmin dashboards often list users or orders. You can't just click the \"third edit button\" because sorting might change. You need to find the *user named Alice* and click *her* edit button.\n\n## Your Task\n1. Find the row containing \"Project X\" (`.task-row`).\n2. Click the \"Complete\" button inside that row.\n3. Verify the row status (`.status`) becomes `'Done'` using `expect(locator).toHaveText(...)`.\n",
+                "id": "# Tabel Dinamis\n\n## Concept\nSaat berurusan dengan data dinamis, Anda sering kali perlu menemukan kontainer (seperti baris tabel) yang berisi teks tertentu, lalu menemukan elemen interaktif di dalam kontainer tersebut menggunakan `filter()`.\n\n## Code Example\n\n```javascript\nconst row = page.locator('tr').filter({ hasText: 'Alice' });\nawait row.locator('.edit-btn').click();\n```\n\n## Real World Scenario\nDasbor admin sering mencantumkan pengguna atau pesanan. Anda tidak bisa hanya mengklik \"tombol edit ketiga\" karena penyortiran mungkin berubah. Anda perlu menemukan *pengguna bernama Alice* dan mengklik tombol edit *miliknya*.\n\n## Tugas Kamu\n1. Temukan baris yang berisi \"Project X\" (`.task-row`).\n2. Klik tombol \"Complete\" di dalam baris itu.\n3. Verifikasi status baris (`.status`) menjadi `'Done'` menggunakan `expect(locator).toHaveText(...)`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Find a specific row by a unique piece of text it contains, then look for a button within just that row.",
+                    "Use the '.filter({ hasText: ... })' method to isolate the correct row from all other rows.",
+                    "Locate the row with 'Project X', click the 'Complete' button inside it, and verify its local status text."
+                ],
+                "id": [
+                    "Temukan baris spesifik berdasarkan teks unik yang dikandungnya, lalu cari tombol hanya di dalam baris tersebut.",
+                    "Gunakan metode '.filter({ hasText: ... })' untuk memisahkan baris yang benar dari semua baris lainnya.",
+                    "Temukan baris dengan 'Project X', klik tombol 'Complete' di dalamnya, dan verifikasi teks status lokalnya."
+                ]
+            },
+            "htmlContent": "<div class=\"app\">\n  <div class=\"task-row\">\n    <span class=\"name\">Project X</span>\n    <span class=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n  <div class=\"task-row\">\n    <span class=\"name\">Project Y</span>\n    <span class=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n</div>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  // 1. Find row with 'Project X'\n  // 2. Click Complete\n  // 3. Verify status is 'Done'\n});",
+            "testCases": [],
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  const row = page.locator('.task-row').filter({ hasText: 'Project X' });\n  await row.getByRole('button', { name: 'Complete' }).click();\n  await expect(row.locator('.status')).toHaveText('Done');\n});",
+            "tags": [
+                "playwright",
+                "tables",
+                "filter",
+                "intermediate"
+            ]
+        },
+        {
+            "slug": "pw-actions-boss",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "playwright-navigation",
+            "xpReward": 100,
+            "order": 3210,
+            "title": {
+                "en": "Scenario: E-Commerce Checkout",
+                "id": "Skenario: Checkout E-Commerce"
+            },
+            "description": {
+                "en": "Complete a full checkout flow using accessibility-first locators.",
+                "id": "Selesaikan alur checkout lengkap menggunakan locator berbasis aksesibilitas."
+            },
+            "instructions": {
+                "en": "# Scenario: E-Commerce Checkout\n\n## Concept\nA complete E2E flow involves chaining multiple interactions: finding elements, entering data, and verifying the final outcome. Using accessibility-first locators (`getByRole`, `getByLabel`) makes these flows more resilient to UI changes.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Purchase' }).click();\nawait page.getByLabel('Address').fill('123 Main St');\nawait expect(page.locator('#receipt')).toBeVisible();\n```\n\n## Real World Scenario\nUsing explicit IDs makes tests brittle. If a developer changes `#qty` to `#quantity-input`, your test fails. But if they remove the \"Quantity\" label, *users* can't use the form either. Testing against the label ensures the app is usable.\n\n## Your Task\n1.  **Add to Cart**: Click the button with name \"Add to Cart\".\n2.  **Update Qty**: Fill the input labeled \"Quantity\" with `'3'`.\n3.  **Shipping**: Check the checkbox labeled \"Express Shipping\".\n4.  **Checkout**: Click the button named \"Checkout\".\n5.  **Verify**: Confirm the confirmation message (`#confirmation`) contains `'3 items (Express)'`.\n",
+                "id": "# Skenario: Checkout E-Commerce\n\n## Concept\nAlur E2E yang lengkap melibatkan perangkaian beberapa interaksi: menemukan elemen, memasukkan data, dan memverifikasi hasil akhir. Menggunakan locator berbasis aksesibilitas (`getByRole`, `getByLabel`) membuat alur ini lebih tangguh terhadap perubahan UI.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Purchase' }).click();\nawait page.getByLabel('Address').fill('123 Main St');\nawait expect(page.locator('#receipt')).toBeVisible();\n```\n\n## Real World Scenario\nMenggunakan ID eksplisit membuat pengujian menjadi rapuh. Jika pengembang mengubah `#qty` menjadi `#quantity-input`, pengujian Anda gagal. Namun jika mereka menghapus label \"Quantity\", *pengguna* juga tidak dapat menggunakan formulir tersebut. Pengujian terhadap label memastikan aplikasi dapat digunakan.\n\n## Tugas Kamu\n1.  **Add to Cart**: Klik tombol dengan nama \"Add to Cart\".\n2.  **Update Qty**: Isi input berlabel \"Quantity\" dengan `'3'`.\n3.  **Shipping**: Centang checkbox berlabel \"Express Shipping\".\n4.  **Checkout**: Klik tombol bernama \"Checkout\".\n5.  **Verifikasi**: Konfirmasikan pesan konfirmasi (`#confirmation`) berisi `'3 items (Express)'`.\n"
+            },
+            "hints": {
+                "en": [
+                    "Chain together a series of realistic user steps: adding to cart, updating numbers, and checking out.",
+                    "Prioritize using accessibility-first locators like getByRole and getByLabel for every step of the flow.",
+                    "Add to cart, set Quantity to '3', check Express Shipping, and click Checkout. Assert the confirmation message."
+                ],
+                "id": [
+                    "Rangkai serangkaian langkah pengguna yang realistis: menambahkan ke keranjang, memperbarui angka, dan checkout.",
+                    "Prioritaskan penggunaan locator accessibility-first seperti getByRole dan getByLabel untuk setiap langkah alur.",
+                    "Tambahkan ke keranjang, set Quantity ke '3', centang Express Shipping, dan klik Checkout. Lakukan asersi pesan konfirmasi."
+                ]
+            },
+            "htmlContent": "<div class=\"shop\">\n  <div class=\"product\">\n    <h3>Widget Pro</h3>\n    <button id=\"add-btn\" onclick=\"addToCart()\">Add to Cart</button>\n  </div>\n  <div class=\"cart\" style=\"display:none;\">\n    <label for=\"qty\">Quantity</label>\n    <input type=\"number\" id=\"qty\" value=\"1\" />\n    <label><input type=\"checkbox\" id=\"express\" /> Express Shipping</label>\n    <button id=\"checkout-btn\" onclick=\"checkout()\">Checkout</button>\n  </div>\n  <div id=\"confirmation\" style=\"display:none;\"></div>\n</div>\n<script>\n  function addToCart() {\n    document.querySelector('.cart').style.display = 'block';\n    document.getElementById('add-btn').textContent = 'Added!';\n  }\n  function checkout() {\n    const qty = document.getElementById('qty').value;\n    const express = document.getElementById('express').checked;\n    document.getElementById('confirmation').style.display = 'block';\n    document.getElementById('confirmation').textContent = \n      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');\n  }\n</script>",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('checkout flow', async ({ page }) => {\n  // 1. Click \"Add to Cart\" (getByRole)\n  // 2. Fill \"Quantity\" to \"3\" (getByLabel)\n  // 3. Check \"Express Shipping\" (getByLabel)\n  // 4. Click \"Checkout\" (getByRole)\n  // 5. Verify confirmation text\n});",
+            "testCases": [],
+            "solution": "await page.getByRole('button', { name: 'Add to Cart' }).click();\nawait page.getByLabel('Quantity').fill('3');\nawait page.getByLabel('Express Shipping').check();\nawait page.getByRole('button', { name: 'Checkout' }).click();\nawait expect(page.locator('#confirmation')).toContainText('3 items (Express)');",
+            "tags": [
+                "playwright",
+                "scenario",
+                "boss",
+                "checkout",
                 "intermediate"
             ]
         }
