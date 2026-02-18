@@ -834,7 +834,7 @@
                     "Gunakan .fill() untuk 'qa@test.com' dan 'secret123', lalu verifikasi email dengan 'toHaveValue'."
                 ]
             },
-            "htmlContent": "<form class=\"login-form\">\n  <label for=\"email\">Email</label>\n  <input type=\"email\" id=\"email\" placeholder=\"Email\" />\n  <label for=\"password\">Password</label>\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" />\n  <button type=\"submit\">Login</button>\n</form>",
+            "htmlContent": "<form class=\"login-form\" autocomplete=\"off\">\n  <label for=\"email\">Email</label>\n  <input type=\"email\" id=\"email\" placeholder=\"Email\" autocomplete=\"off\" />\n  <label for=\"password\">Password</label>\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" autocomplete=\"new-password\" />\n  <button type=\"submit\">Login</button>\n</form>",
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill form', async ({ page }) => {\n  // 1. Fill email (use getByLabel)\n  // 2. Fill password (use getByLabel)\n  // 3. Verify email value\n});",
             "testCases": [],
             "solution": "await page.getByLabel('Email').fill('qa@test.com');\nawait page.getByLabel('Password').fill('secret123');\nawait expect(page.getByLabel('Email')).toHaveValue('qa@test.com');",
