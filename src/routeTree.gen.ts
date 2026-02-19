@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TestSentryRouteImport } from './routes/test-sentry'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.xml]'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.txt]'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as LocaleRouteImport } from './routes/$locale'
 import { Route as SplatRouteImport } from './routes/$'
@@ -18,7 +19,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DocsIndexRouteImport } from './routes/docs/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as LocaleIndexRouteImport } from './routes/$locale/index'
-import { Route as RobotsTxtRouteImport } from './routes/robots.txt'
 import { Route as DocsApiRouteImport } from './routes/docs/api'
 import { Route as ApiOgRouteImport } from './routes/api/og'
 import { Route as AdminTutorialsRouteImport } from './routes/admin/tutorials'
@@ -61,6 +61,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -95,11 +100,6 @@ const LocaleIndexRoute = LocaleIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => LocaleRoute,
-} as any)
-const RobotsTxtRoute = RobotsTxtRouteImport.update({
-  id: '/robots/txt',
-  path: '/robots/txt',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const DocsApiRoute = DocsApiRouteImport.update({
   id: '/docs/api',
@@ -263,6 +263,7 @@ export interface FileRoutesByFullPath {
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleAuthenticatedRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale/about': typeof LocaleAboutRoute
@@ -287,7 +288,6 @@ export interface FileRoutesByFullPath {
   '/admin/tutorials': typeof AdminTutorialsRoute
   '/api/og': typeof ApiOgRoute
   '/docs/api': typeof DocsApiRoute
-  '/robots/txt': typeof RobotsTxtRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
@@ -303,6 +303,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$': typeof SplatRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale': typeof LocaleIndexRoute
@@ -328,7 +329,6 @@ export interface FileRoutesByTo {
   '/admin/tutorials': typeof AdminTutorialsRoute
   '/api/og': typeof ApiOgRoute
   '/docs/api': typeof DocsApiRoute
-  '/robots/txt': typeof RobotsTxtRoute
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
@@ -346,6 +346,7 @@ export interface FileRoutesById {
   '/$': typeof SplatRoute
   '/$locale': typeof LocaleRouteWithChildren
   '/admin': typeof AdminRouteWithChildren
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/test-sentry': typeof TestSentryRoute
   '/$locale/_authenticated': typeof LocaleAuthenticatedRouteWithChildren
@@ -371,7 +372,6 @@ export interface FileRoutesById {
   '/admin/tutorials': typeof AdminTutorialsRoute
   '/api/og': typeof ApiOgRoute
   '/docs/api': typeof DocsApiRoute
-  '/robots/txt': typeof RobotsTxtRoute
   '/$locale/': typeof LocaleIndexRoute
   '/admin/': typeof AdminIndexRoute
   '/docs/': typeof DocsIndexRoute
@@ -391,6 +391,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/$locale'
     | '/admin'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale/about'
@@ -415,7 +416,6 @@ export interface FileRouteTypes {
     | '/admin/tutorials'
     | '/api/og'
     | '/docs/api'
-    | '/robots/txt'
     | '/$locale/'
     | '/admin/'
     | '/docs'
@@ -431,6 +431,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/$'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale'
@@ -456,7 +457,6 @@ export interface FileRouteTypes {
     | '/admin/tutorials'
     | '/api/og'
     | '/docs/api'
-    | '/robots/txt'
     | '/admin'
     | '/docs'
     | '/$locale/profile'
@@ -473,6 +473,7 @@ export interface FileRouteTypes {
     | '/$'
     | '/$locale'
     | '/admin'
+    | '/robots.txt'
     | '/sitemap.xml'
     | '/test-sentry'
     | '/$locale/_authenticated'
@@ -498,7 +499,6 @@ export interface FileRouteTypes {
     | '/admin/tutorials'
     | '/api/og'
     | '/docs/api'
-    | '/robots/txt'
     | '/$locale/'
     | '/admin/'
     | '/docs/'
@@ -517,11 +517,11 @@ export interface RootRouteChildren {
   SplatRoute: typeof SplatRoute
   LocaleRoute: typeof LocaleRouteWithChildren
   AdminRoute: typeof AdminRouteWithChildren
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TestSentryRoute: typeof TestSentryRoute
   ApiOgRoute: typeof ApiOgRoute
   DocsApiRoute: typeof DocsApiRoute
-  RobotsTxtRoute: typeof RobotsTxtRoute
   DocsIndexRoute: typeof DocsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
@@ -540,6 +540,13 @@ declare module '@tanstack/react-router' {
       path: '/sitemap.xml'
       fullPath: '/sitemap.xml'
       preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -590,13 +597,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/$locale/'
       preLoaderRoute: typeof LocaleIndexRouteImport
       parentRoute: typeof LocaleRoute
-    }
-    '/robots/txt': {
-      id: '/robots/txt'
-      path: '/robots/txt'
-      fullPath: '/robots/txt'
-      preLoaderRoute: typeof RobotsTxtRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/docs/api': {
       id: '/docs/api'
@@ -909,11 +909,11 @@ const rootRouteChildren: RootRouteChildren = {
   SplatRoute: SplatRoute,
   LocaleRoute: LocaleRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TestSentryRoute: TestSentryRoute,
   ApiOgRoute: ApiOgRoute,
   DocsApiRoute: DocsApiRoute,
-  RobotsTxtRoute: RobotsTxtRoute,
   DocsIndexRoute: DocsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }

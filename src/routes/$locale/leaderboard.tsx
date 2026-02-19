@@ -7,6 +7,7 @@ import { Trophy, Crown, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { leaderboardQueryOptions } from '@/lib/leaderboard.query';
+import { createSeoHead } from '@/lib/seo';
 
 interface LeaderboardEntry {
   id: string;
@@ -59,6 +60,15 @@ export const Route = createFileRoute('/$locale/leaderboard')({
     return activePromise;
   },
   component: LeaderboardPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Leaderboard | TestingWithEkki',
+      description: 'See who tops the charts! View the all-time and monthly leaderboard for TestingWithEkki challenges.',
+      path: '/leaderboard',
+      locale,
+    });
+  },
 });
 
 function LeaderboardPage() {

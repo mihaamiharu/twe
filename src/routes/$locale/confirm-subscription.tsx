@@ -5,6 +5,7 @@ import { CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { z } from 'zod';
+import { createSeoHead } from '@/lib/seo';
 
 const searchSchema = z.object({
     token: z.string().optional(),
@@ -13,6 +14,16 @@ const searchSchema = z.object({
 export const Route = createFileRoute('/$locale/confirm-subscription')({
     validateSearch: searchSchema,
     component: ConfirmSubscriptionPage,
+    head: ({ params }) => {
+        const locale = params.locale || 'en';
+        return createSeoHead({
+            title: 'Confirm Subscription | TestingWithEkki',
+            description: 'Confirm your newsletter subscription for TestingWithEkki.',
+            path: '/confirm-subscription',
+            locale,
+            noIndex: true,
+        });
+    },
 });
 
 function ConfirmSubscriptionPage() {

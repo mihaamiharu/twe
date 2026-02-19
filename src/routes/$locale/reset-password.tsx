@@ -20,9 +20,20 @@ import {
 } from '@/components/ui/card';
 import { KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/reset-password')({
   component: ResetPasswordPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Reset Password | TestingWithEkki',
+      description: 'Set a new password for your TestingWithEkki account.',
+      path: '/reset-password',
+      locale,
+      noIndex: true,
+    });
+  },
 });
 
 function ResetPasswordPage() {
@@ -252,8 +263,8 @@ function ResetPasswordPage() {
                 autoComplete="new-password"
                 className={cn(
                   confirmPassword &&
-                    password !== confirmPassword &&
-                    'border-destructive',
+                  password !== confirmPassword &&
+                  'border-destructive',
                 )}
               />
               {confirmPassword && password !== confirmPassword && (

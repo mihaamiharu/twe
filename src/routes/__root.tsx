@@ -50,7 +50,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
         .split('; ')
         .find((row) => row.startsWith('twe-consent='))
         ?.split('=')[1];
-      
+
       if (cookieValue === 'granted' || cookieValue === 'denied') {
         consent = cookieValue as 'granted' | 'denied';
       }
@@ -163,6 +163,12 @@ export const Route = createRootRouteWithContext<RootContext>()({
         href: appCss,
       },
     ],
+    scripts: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify(organizationSchema),
+      },
+    ],
   }),
 
   component: RootComponent,
@@ -210,14 +216,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             `,
           }}
         />
-        {/* JSON-LD Organization Schema for SEO */}
-        {/* JSON-LD Organization Schema for SEO */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema)
-          }}
-        />
+        {/* JSON-LD Organization Schema now managed via head.scripts */}
       </head>
       <body className="scrollbar-thin" suppressHydrationWarning>
         <QueryClientProvider client={queryClient}>

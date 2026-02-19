@@ -62,6 +62,7 @@ import {
   type TrackId,
 } from '@/config/tracks';
 import i18n from '@/lib/i18n';
+import { createSeoHead } from '@/lib/seo';
 
 // --- Search Params Schema ---
 const ChallengesSearchSchema = z.object({
@@ -85,54 +86,15 @@ export const Route = createFileRoute('/$locale/challenges/')({
     );
   },
   component: ChallengesPage,
-  head: () => ({
-    meta: [
-      {
-        title: i18n.t('challenges:page.seo.title'),
-      },
-      {
-        name: 'description',
-        content: i18n.t('challenges:page.seo.description'),
-      },
-      {
-        property: 'og:title',
-        content: i18n.t('challenges:page.seo.title'),
-      },
-      {
-        property: 'og:description',
-        content: i18n.t('challenges:page.seo.description'),
-      },
-      {
-        property: 'og:url',
-        content: 'https://testingwithekki.com/en/challenges',
-      },
-      {
-        property: 'og:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
-      },
-    ],
-    links: [
-      {
-        rel: 'canonical',
-        href: 'https://testingwithekki.com/en/challenges',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'en',
-        href: 'https://testingwithekki.com/en/challenges',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'id',
-        href: 'https://testingwithekki.com/id/challenges',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'x-default',
-        href: 'https://testingwithekki.com/en/challenges',
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: i18n.t('challenges:page.seo.title'),
+      description: i18n.t('challenges:page.seo.description'),
+      path: '/challenges',
+      locale,
+    });
+  },
 });
 
 // --- Configuration ---

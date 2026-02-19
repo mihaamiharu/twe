@@ -1,9 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/privacy')({
   component: PrivacyPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Privacy Policy | TestingWithEkki',
+      description: 'Privacy Policy for TestingWithEkki — how we collect, use, and protect your data.',
+      path: '/privacy',
+      locale,
+    });
+  },
 });
 
 function PrivacyPage() {

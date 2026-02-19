@@ -4,9 +4,19 @@ import { MarkdownRenderer } from '@/components/MarkdownRenderer';
 import { Rocket, Sparkles, Bug, FileText, Calendar, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/changelog')({
     component: ChangelogPage,
+    head: ({ params }) => {
+        const locale = params.locale || 'en';
+        return createSeoHead({
+            title: 'Changelog | TestingWithEkki',
+            description: 'Latest updates, new features, improvements, and bug fixes for TestingWithEkki platform.',
+            path: '/changelog',
+            locale,
+        });
+    },
 });
 
 type EntryType = 'feature' | 'improvement' | 'fix' | 'content';

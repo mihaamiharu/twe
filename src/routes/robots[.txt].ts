@@ -8,6 +8,8 @@ export const Route = createFileRoute('/robots.txt' as any)({
                 return new Response(
                     `User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
 
 Sitemap: https://testingwithekki.com/sitemap.xml`,
                     {

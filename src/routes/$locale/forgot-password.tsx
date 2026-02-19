@@ -14,9 +14,20 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/forgot-password')({
   component: ForgotPasswordPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Forgot Password | TestingWithEkki',
+      description: 'Reset your TestingWithEkki password.',
+      path: '/forgot-password',
+      locale,
+      noIndex: true,
+    });
+  },
 });
 
 function ForgotPasswordPage() {
