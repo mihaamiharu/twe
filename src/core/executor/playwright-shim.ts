@@ -1472,25 +1472,24 @@ export class MockedPlaywrightPage {
 
     for (const cont of containers) {
       const contMatches = Array.from(cont.querySelectorAll(selector)) as HTMLElement[];
+      logger.debug(`[getByRole] Querying selector "${selector}" in container <${(cont as HTMLElement).tagName || 'Document'}> found ${contMatches.length} elements`);
       matches.push(...contMatches);
     }
 
     let filteredMatches = matches;
 
-    if (options?.name) {
-      filteredMatches = filteredMatches.filter((el) => {
+    filteredMatches = filteredMatches.filter((el) => {
         const name = this._getAccessibleName(el);
         const normalizedName = this._normalizeText(name);
 
-        logger.debug(`[getByRole] Checking element <${el.tagName}>`, {
+        logger.debug(`[getByRole] check <${el.tagName}>`, {
             role,
-            elementText: name,
-            normalizedText: normalizedName,
-            searchName: options.name,
-            match: options.name instanceof RegExp ? options.name.test(name) : 'string match'
+            text: name,
+            search: options?.name,
+            match: options?.name instanceof RegExp ? options.name.test(name) : 'string match'
         });
 
-        if (options.name instanceof RegExp) {
+        if (options?.name instanceof RegExp) {
           return options.name.test(name) || options.name.test(normalizedName);
         }
 
