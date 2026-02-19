@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CodeEditor } from '../CodeEditor';
 import { FileExplorer } from '../FileExplorer';
@@ -48,15 +48,20 @@ export function EditorPanel({
     return (
         <div className="flex flex-col h-full">
             <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/5 shrink-0">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-blue-500"></div>
-                    {t('challenges:playground.editor')}
-                    {challenge.files && challenge.editableFiles && (
-                        <span className="text-[10px] lowercase text-muted-foreground/60 italic">
-                              editing {challenge.editableFiles[0].split('/').pop()}
-                        </span>
+                <div className="flex flex-col gap-0.5 min-w-0">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                        <div className="h-2 w-2 rounded-full bg-blue-500"></div>
+                        {t('challenges:playground.editor')}
+                    </h3>
+                    {isMobile && challenge.targetSelector && (
+                        <div className="flex items-center gap-2 mt-1">
+                            <Badge variant="outline" className="text-[10px] h-5 px-1.5 py-0 font-mono bg-primary/5 text-primary border-primary/20 truncate max-w-[200px]">
+                                <Search className="h-2.5 w-2.5 mr-1" />
+                                {challenge.targetSelector}
+                            </Badge>
+                        </div>
                     )}
-                </h3>
+                </div>
                 <div className="flex items-center gap-2">
                     <Button
                         variant="ghost"
