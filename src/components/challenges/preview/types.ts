@@ -22,8 +22,6 @@ export interface WebComponentPreviewProps {
     files?: Record<string, string>;
     currentPath?: string;
     onNavigate?: (path: string) => void;
-    /** When true, prevents the preview from overwriting iframe content (used during code execution) */
-    isExecuting?: boolean;
 }
 
 export type ViewMode = 'preview' | 'source';
