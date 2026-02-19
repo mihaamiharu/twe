@@ -12,13 +12,10 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
     let assertionCount = 0;
     const testResults: Array<{ message: string; passed: boolean }> = [];
     const defaultTimeout = options?.timeout ?? 5000;
-    let isDestroyed = false;
-
-    const cleanup = () => { isDestroyed = true; };
 
     const incrementCount = () => {
-        if (isDestroyed) return;
         assertionCount++;
+        // console.log(`[Expect] Assertion count incremented to ${assertionCount}`); 
     };
     const getAssertionCount = () => assertionCount;
     const getTestResults = () => testResults;
@@ -59,7 +56,6 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
             let lastResult: { pass: boolean; message: string } | null = null;
 
             while (Date.now() - startTime < timeout) {
-                if (isDestroyed) return;
                 try {
                     const result = await assertion();
                     // Invert if isNot is true
@@ -75,8 +71,6 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
                 }
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
-
-            if (isDestroyed) return;
 
             // Timeout reached, fail with last result
             if (!lastResult) {
@@ -523,5 +517,5 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
         return createProxy(matchers);
     };
 
-    return { expect: expectFunc, getAssertionCount, getTestResults, cleanup };
+    return { expect: expectFunc, getAssertionCount, getTestResults };
 }
