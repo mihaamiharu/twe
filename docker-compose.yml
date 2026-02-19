@@ -66,26 +66,6 @@ services:
       timeout: 5s
       retries: 5
 
-  postgres_staging:
-    image: postgres:15-alpine
-    container_name: twe-postgres-staging
-    restart: unless-stopped
-    ports:
-      - '5434:5432'
-    environment:
-      POSTGRES_USER: twe_staging
-      POSTGRES_PASSWORD: twe_password
-      POSTGRES_DB: twe_staging
-    volumes:
-      - postgres_staging_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U twe_staging -d twe_staging']
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
 volumes:
   postgres_data:
-    driver: local
-  postgres_staging_data:
     driver: local
