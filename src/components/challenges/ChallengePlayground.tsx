@@ -118,10 +118,10 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       <PlaygroundGoalBar description={challenge.description} />
 
       {/* Main content - uses Skeleton until ready */}
-      <div className="flex-1 overflow-hidden relative">
+      <div className="flex-1 overflow-hidden relative flex flex-col">
         <div
           className={cn(
-            "w-full h-full transition-opacity duration-300",
+            "flex-1 flex flex-col min-h-0 transition-opacity duration-300",
             state.isLayoutReady ? "opacity-100" : "opacity-0 invisible"
           )}
         >

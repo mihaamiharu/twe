@@ -15,7 +15,7 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
 
     const incrementCount = () => {
         assertionCount++;
-        // console.log(`[Expect] Assertion count incremented to ${assertionCount}`); 
+        console.log(`[Expect] Assertion count incremented to ${assertionCount}`);
     };
     const getAssertionCount = () => assertionCount;
     const getTestResults = () => testResults;
