@@ -578,8 +578,8 @@ export async function executePlaywrightCode(
                                 ${executableCode}
 
                                 // Wait for all tests to complete
-                                if (window.__testPromises && Array.isArray(window.__testPromises)) {
-                                    await Promise.all(window.__testPromises);
+                                if (window.__testPromises && typeof window.__testPromises.length === 'number') {
+                                    await Promise.all(Array.from(window.__testPromises));
                                 }
 
                                 if (typeof result !== "undefined") return result;
