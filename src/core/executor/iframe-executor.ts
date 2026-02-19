@@ -677,7 +677,6 @@ export async function executePlaywrightCode(
               executionTime,
               error: errorMessage,
               logs,
-              assertionCount: getAssertionCount(),
             });
           }
         };
