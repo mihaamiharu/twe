@@ -80,12 +80,6 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
                     lastResult = { pass: false, message: e instanceof Error ? e.message : String(e) };
                 }
             }
-            
-            // Should we fail if lastResult is still null? (Shouldn't happen with logic above)
-            if (!lastResult) {
-                 lastResult = { pass: false, message: `Assertion timed out after ${timeout}ms` };
-            }
-
             handleResult(isNot ? !lastResult.pass : lastResult.pass, lastResult.message);
         };
 

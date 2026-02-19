@@ -707,21 +707,8 @@ export async function executePlaywrightCode(
         };
 
         if (useExistingIframe) {
-          // Reload existing iframe to ensure clean state before execution
-          const runWithReload = async () => {
-              if (iframe.contentWindow) {
-                  await new Promise<void>((resolve) => {
-                      const timer = setTimeout(resolve, 1000); // Safety timeout
-                      iframe.onload = () => {
-                          clearTimeout(timer);
-                          resolve();
-                      };
-                      iframe.contentWindow!.location.reload();
-                  });
-              }
-              await executeCode();
-          };
-          void runWithReload();
+          // Execute immediately for existing iframe
+          void executeCode();
         } else {
           // Wait for iframe to be ready
           iframe.onload = executeCode;
