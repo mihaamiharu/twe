@@ -31,3 +31,9 @@ deployment.tar.gz
 
 # Lint reports
 lint_*.txt
+
+# Sensitive credentials
+rclone-backup.conf
+
+# VPS Access Guide
+vps_access_guide.md

@@ -17,13 +17,17 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - prod_net
 
   postgres:
     image: postgres:15-alpine
     container_name: twe-postgres
     restart: unless-stopped
-    ports:
-      - '5432:5432'
+    # No ports exposed — app connects via Docker internal network
+    # For debug access: uncomment and use localhost only
+    # ports:
+    #   - '127.0.0.1:5432:5432'
     env_file:
       - .env.production
     # environment:
@@ -60,7 +64,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - prod_net
 
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  prod_net:
+    driver: bridge
