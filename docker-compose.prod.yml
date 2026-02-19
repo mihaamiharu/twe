@@ -26,18 +26,11 @@ services:
     restart: unless-stopped
     ports:
       - '5432:5432'
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-      # PostgreSQL optimizations for 4GB RAM server
-      # Using 1GB shared_buffers (25% of RAM) and 3GB effective cache (75% of RAM)
-      POSTGRES_SHARED_BUFFERS: 1GB
-      POSTGRES_EFFECTIVE_CACHE_SIZE: 3GB
-      POSTGRES_MAINTENANCE_WORK_MEM: 256MB
-      POSTGRES_WORK_MEM: 16MB
-      POSTGRES_WAL_BUFFERS: 8MB
-      POSTGRES_MAX_CONNECTIONS: 100
+    env_file:
+      - .env.production
+    # environment:
+    #   Variables are loaded from .env.production via env_file
+    #   Standard postgres image uses POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB name directly
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command:
