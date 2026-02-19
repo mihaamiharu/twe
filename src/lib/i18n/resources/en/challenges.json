@@ -35,6 +35,7 @@
     "preview": "Target Preview",
     "editor": "Editor",
     "results": "Results",
+    "files": "Explorer",
     "console": "Console",
     "resetCode": "Reset Code",
     "testSelector": "Test Selector",
