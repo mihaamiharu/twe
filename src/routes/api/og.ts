@@ -84,11 +84,13 @@ export const Route = createFileRoute('/api/og' as any)({
                     });
                 } catch (error) {
                     console.error('[OG] Error generating image:', error);
-                    // Fallback to text error or default image redirect?
-                    // For now, return JSON error for debugging
-                    return new Response(JSON.stringify({ error: 'Failed to generate image', details: String(error) }), {
-                        status: 500,
-                        headers: { 'Content-Type': 'application/json' }
+                    // Fallback: Redirect to static banner image
+                    return new Response(null, {
+                        status: 302,
+                        headers: {
+                            'Location': '/twe-banner.png',
+                            'Cache-Control': 'no-cache', // Don't cache the redirect itself heavily
+                        },
                     });
                 }
             }
