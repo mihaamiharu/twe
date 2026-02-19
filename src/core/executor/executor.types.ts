@@ -78,5 +78,4 @@ export interface ExpectResult {
     };
     getAssertionCount: () => number;
     getTestResults: () => Array<{ message: string; passed: boolean }>;
-    cleanup: () => void;
 }

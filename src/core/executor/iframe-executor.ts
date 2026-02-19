@@ -560,22 +560,10 @@ export async function executePlaywrightCode(
             // Standardize timeouts: assertions/actions should fail before the global execution timeout
             // to provide clear error messages instead of a generic "Process timed out".
             const assertionTimeout = Math.min(5000, Math.max(2000, timeout - 2000));
-            const expectResult = createExpect({ timeout: assertionTimeout });
-            const { expect, getAssertionCount, getTestResults, cleanup } = expectResult;
+            const { expect, getAssertionCount, getTestResults } = createExpect({ timeout: assertionTimeout });
 
             contentWindow.expect = expect;
             contentWindow.test = test;
-
-            // ... (rest of setup)
-
-            // ... (execution)
-            try {
-               // ...
-            } catch (error) {
-               // ...
-            } finally {
-               if (cleanup) cleanup();
-            }
 
             // Inject console interceptor
             const originalIframeConsole = contentWindow.console;
@@ -670,8 +658,6 @@ export async function executePlaywrightCode(
               }
             }
 
-            if (cleanup) cleanup();
-            
             resolve({
               status: 'PASSED',
               output: 'All steps completed successfully',
@@ -682,9 +668,7 @@ export async function executePlaywrightCode(
             });
           } catch (error) {
             const executionTime = Date.now() - startTime;
-            if (cleanup) cleanup();
-            
-            // ... existing cleanup if any ...
+            cleanup();
 
             const errorMessage = formatError(error);
             resolve({
