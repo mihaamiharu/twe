@@ -109,6 +109,7 @@ export function PlaygroundDesktopLayout({
                                 showControls={true}
                                 height="100%"
                                 iframeRef={previewIframeRef}
+                                isExecuting={state.isRunning}
                                 files={challenge.files}
                                 currentPath={currentVfsPath}
                                 onNavigate={(path) => setCurrentVfsPath(path)}
