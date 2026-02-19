@@ -1482,6 +1482,14 @@ export class MockedPlaywrightPage {
         const name = this._getAccessibleName(el);
         const normalizedName = this._normalizeText(name);
 
+        logger.debug(`[getByRole] Checking element <${el.tagName}>`, {
+            role,
+            elementText: name,
+            normalizedText: normalizedName,
+            searchName: options.name,
+            match: options.name instanceof RegExp ? options.name.test(name) : 'string match'
+        });
+
         if (options.name instanceof RegExp) {
           return options.name.test(name) || options.name.test(normalizedName);
         }
