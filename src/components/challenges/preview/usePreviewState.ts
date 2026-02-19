@@ -22,6 +22,7 @@ export function usePreviewState(
         onValidationChange,
         onNavigate,
         targetSelectorType = 'css',
+        isExecuting = false,
     } = props;
 
     const [zoom, setZoom] = useState(100);
@@ -76,9 +77,12 @@ export function usePreviewState(
     }, [htmlContent, cssContent, targetElementId, targetSelector]);
 
     // Effect: Update iframe content when HTML/CSS or viewMode changes
+    // IMPORTANT: Skip writing when execution is active to prevent race conditions
+    // where this effect would overwrite the iframe content that the executor just set up.
     useEffect(() => {
         const iframe = iframeRef.current;
         if (!iframe || viewMode !== 'preview') return;
+        if (isExecuting) return; // Do NOT overwrite during execution
 
         const doc = iframe.contentDocument || iframe.contentWindow?.document;
         if (doc) {
@@ -86,7 +90,7 @@ export function usePreviewState(
             doc.write(getFullIframeDocument());
             doc.close();
         }
-    }, [getFullIframeDocument, viewMode, iframeRef]);
+    }, [getFullIframeDocument, viewMode, iframeRef, isExecuting]);
 
     // Effect: Listen for messages from the iframe
     useEffect(() => {
