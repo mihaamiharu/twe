@@ -42,5 +42,10 @@ COPY --from=prerelease /usr/src/app/tsconfig.json .
 # expose port 3000
 EXPOSE 3000/tcp
 
+# Run as non-root user for security
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
+RUN chown -R appuser:appgroup /usr/src/app
+USER appuser
+
 # run the app
 ENTRYPOINT [ "bun", "run", "scripts/server.ts" ]
