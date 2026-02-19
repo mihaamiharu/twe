@@ -126,8 +126,9 @@ export async function executePlaywrightCode(
   }
 
   // Phase 2: Strip standard Playwright imports (they are decorative in the shim)
+  // We use a robust regex to handle multi-line imports and various spacing
   executableCode = executableCode.replace(
-    /^\s*import\s+.*from\s+['"]@playwright\/test['"];?\s*$/gm,
+    /^\s*import\s+[\s\S]+?from\s+['"]@playwright\/test['"];?/gm,
     '',
   );
 
