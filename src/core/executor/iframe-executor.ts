@@ -193,37 +193,12 @@ export async function executePlaywrightCode(
                 win.__MOCK_ROUTES__ = [];
                 // In-memory state that persists across VFS navigations within a single execution run
                 win.__APP_STATE__ = {};
-                
-                // Aggressive cleanup for persistence issues (e.g. pw-keyboard-actions)
-                // Remove all DOM elements first
-                if (win.document && win.document.body) {
-                    win.document.body.innerHTML = '';
-                }
-                
-                // Clear all own properties of window that are not native (naive attempt)
-                // This is risky but effective for user-defined globals like 'runCount'
-                // We'll just clear specific known problem areas or rely on document.write doing its job
-                // plus the manual clearing above. 
-                
-                // If the user attaches listeners to `window` (window.addEventListener), they PERSIST
-                // across document.write(). We can't easily remove them without a reload.
-                // WE WILL FORCE A RELOAD IF IT IS A REUSED IFRAME? 
-                // No, that's too slow.
-                
-                // Instead, let's try to overwrite the listeners if we can, or just accept that
-                // window-level listeners are persistent and warn?
-                // OR: clone the iframe node? 
-                
-                // Let's try deep clearing knowns.
               }
             } catch (e) {
               console.warn('Failed to clear storage:', e);
             }
 
             // Set up the HTML content
-            try {
-                 iframeDoc.close(); // Ensure previous stream is closed?
-            } catch (e) { /* ignore */ }
             iframeDoc.open();
 
             // NOTE: Console interception is done AFTER iframeDoc.close() below
