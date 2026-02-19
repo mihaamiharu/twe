@@ -490,17 +490,11 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
                 if (prop in target) {
                     return Reflect.get(target, prop, receiver);
                 }
-                if (typeof prop === 'symbol') return undefined;
-
                 const propStr = String(prop);
-                if (['then', 'catch', 'finally', 'toJSON'].includes(propStr)) return undefined;
+                if (propStr === 'then' || propStr === 'toString' || propStr === 'toJSON') return undefined;
 
-                // Only throw for likely assertions (starting with 'to')
-                if (propStr.startsWith('to')) {
-                    // Suggest closest match? For now just generic error
-                    throw new Error(`expect(...).${propStr} is not a valid matcher.`);
-                }
-                return undefined;
+                // Suggest closest match? For now just generic error
+                throw new Error(`expect(...).${propStr} is not a valid matcher.`);
             }
         });
     };
