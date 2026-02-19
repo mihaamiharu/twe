@@ -1468,13 +1468,14 @@ export class MockedPlaywrightPage {
   ): HTMLElement[] {
     const selector = ROLE_TO_TAG[role] || `[role="${role}"]`;
     const containers = Array.isArray(container) ? container : [container];
-    const matches: HTMLElement[] = [];
+    const matchesSet = new Set<HTMLElement>();
 
     for (const cont of containers) {
-      const contMatches = Array.from(cont.querySelectorAll(selector)) as HTMLElement[];
-      matches.push(...contMatches);
+      const contMatches = cont.querySelectorAll(selector);
+      contMatches.forEach((el) => matchesSet.add(el as HTMLElement));
     }
 
+    const matches = Array.from(matchesSet);
     let filteredMatches = matches;
 
     if (options?.name) {
@@ -1482,11 +1483,16 @@ export class MockedPlaywrightPage {
         const name = this._getAccessibleName(el);
         const normalizedName = this._normalizeText(name);
 
-        if (options.name instanceof RegExp) {
-          return options.name.test(name) || options.name.test(normalizedName);
+        const isRegex = (val: any): val is RegExp => {
+          return val && (val instanceof RegExp || Object.prototype.toString.call(val) === '[object RegExp]');
+        };
+
+        if (isRegex(options.name)) {
+          const regex = options.name as RegExp;
+          return regex.test(name) || regex.test(normalizedName);
         }
 
-        const searchName = options.name as string;
+        const searchName = String(options.name);
         const normalizedSearchName = this._normalizeText(searchName);
 
         if (options.exact) {
