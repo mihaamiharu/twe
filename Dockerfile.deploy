@@ -22,7 +22,7 @@ ENV HOST=0.0.0.0
 EXPOSE 3000
 
 # Run as non-root user for security
-RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 RUN chown -R appuser:appgroup /app
 USER appuser
 
