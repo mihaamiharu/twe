@@ -37,7 +37,7 @@ export function IframeContainer({
 
             {/* Source View Fallback */}
             {viewMode === 'source' && (
-                <div className="w-full h-full">
+                <div className="absolute inset-0">
                     <CodeEditor
                         initialCode={htmlContent}
                         language="html"
