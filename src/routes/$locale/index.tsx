@@ -22,6 +22,7 @@ import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '@/lib/i18n';
+import { createSeoHead, websiteSchema } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/')({
   loader: async ({ context }) => {
@@ -43,57 +44,13 @@ export const Route = createFileRoute('/$locale/')({
   component: HomePage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
-    const baseUrl = 'https://testingwithekki.com';
-    const url = `${baseUrl}/${locale}`;
-
-    return {
-      meta: [
-        {
-          title: i18n.t('common:seo.title'),
-        },
-        {
-          name: 'description',
-          content: i18n.t('common:seo.description'),
-        },
-        {
-          property: 'og:title',
-          content: i18n.t('common:seo.ogTitle'),
-        },
-        {
-          property: 'og:description',
-          content: i18n.t('common:seo.ogDescription'),
-        },
-        {
-          property: 'og:url',
-          content: url,
-        },
-        {
-          property: 'og:image',
-          content: `${baseUrl}/twe-banner.png`,
-        },
-      ],
-      links: [
-        {
-          rel: 'canonical',
-          href: url,
-        },
-        {
-          rel: 'alternate',
-          hrefLang: 'en',
-          href: `${baseUrl}/en`,
-        },
-        {
-          rel: 'alternate',
-          hrefLang: 'id',
-          href: `${baseUrl}/id`,
-        },
-        {
-          rel: 'alternate',
-          hrefLang: 'x-default',
-          href: `${baseUrl}/en`,
-        },
-      ],
-    };
+    return createSeoHead({
+      title: i18n.t('common:seo.title'),
+      description: i18n.t('common:seo.description'),
+      path: '/',
+      locale,
+      jsonLd: [websiteSchema],
+    });
   },
 });
 

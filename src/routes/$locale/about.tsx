@@ -6,20 +6,35 @@ import { Badge } from '@/components/ui/badge';
 import { Github, Linkedin, Mail, Database, Globe, Code2, Milestone, Brain, Activity } from 'lucide-react';
 import i18n from '@/lib/i18n';
 import { Boop } from '@/components/ui/boop';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/about')({
     component: AboutPage,
-    head: () => ({
-        meta: [
-            {
-                title: `About Ekki Syam Sugiardi - ${i18n.t('common:appName')}`,
-            },
-            {
-                name: 'description',
-                content: 'Meet Ekki Syam Sugiardi, the QA Engineer behind TestingWithEkki. A portfolio project demonstrating full-stack engineering skills.',
-            },
-        ],
-    }),
+    head: ({ params }) => {
+        const locale = params.locale || 'en';
+        return createSeoHead({
+            title: `About Ekki Syam Sugiardi | TestingWithEkki`,
+            description: 'Meet Ekki Syam Sugiardi, the QA Engineer behind TestingWithEkki. A portfolio project demonstrating full-stack engineering skills.',
+            path: '/about',
+            locale,
+            jsonLd: [
+                {
+                    "@context": "https://schema.org",
+                    "@type": "ProfilePage",
+                    "mainEntity": {
+                        "@type": "Person",
+                        "name": "Ekki Syam Sugiardi",
+                        "jobTitle": "QA Engineer",
+                        "url": "https://testingwithekki.com",
+                        "sameAs": [
+                            "https://www.linkedin.com/in/ekkisyamsugiardi",
+                            "https://github.com/mihaamiharu"
+                        ]
+                    }
+                }
+            ],
+        });
+    },
 });
 
 function AboutPage() {

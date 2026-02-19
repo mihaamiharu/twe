@@ -34,6 +34,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from '@/lib/useDebounce';
 import i18n from '@/lib/i18n';
+import { createSeoHead } from '@/lib/seo';
 
 // --- Search Params Schema ---
 const TutorialsSearchSchema = z.object({
@@ -56,54 +57,15 @@ export const Route = createFileRoute('/$locale/tutorials/')({
     );
   },
   component: TutorialsPage,
-  head: () => ({
-    meta: [
-      {
-        title: i18n.t('tutorials:page.seo.title'),
-      },
-      {
-        name: 'description',
-        content: i18n.t('tutorials:page.seo.description'),
-      },
-      {
-        property: 'og:title',
-        content: i18n.t('tutorials:page.seo.title'),
-      },
-      {
-        property: 'og:description',
-        content: i18n.t('tutorials:page.seo.description'),
-      },
-      {
-        property: 'og:url',
-        content: 'https://testingwithekki.com/en/tutorials',
-      },
-      {
-        property: 'og:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
-      },
-    ],
-    links: [
-      {
-        rel: 'canonical',
-        href: 'https://testingwithekki.com/en/tutorials',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'en',
-        href: 'https://testingwithekki.com/en/tutorials',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'id',
-        href: 'https://testingwithekki.com/id/tutorials',
-      },
-      {
-        rel: 'alternate',
-        hrefLang: 'x-default',
-        href: 'https://testingwithekki.com/en/tutorials',
-      },
-    ],
-  }),
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: i18n.t('tutorials:page.seo.title'),
+      description: i18n.t('tutorials:page.seo.description'),
+      path: '/tutorials',
+      locale,
+    });
+  },
 });
 
 const difficulties = ['all', 'foundations', 'beginner', 'intermediate', 'advanced'] as const;

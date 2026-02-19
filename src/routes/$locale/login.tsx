@@ -7,6 +7,7 @@ import {
 import { LoginForm } from '@/components/auth';
 import type { RootContext } from '../__root';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/login')({
   beforeLoad: ({ context, params }) => {
@@ -19,6 +20,16 @@ export const Route = createFileRoute('/$locale/login')({
     }
   },
   component: LoginPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Sign In | TestingWithEkki',
+      description: 'Sign in to your TestingWithEkki account to track your progress and earn XP.',
+      path: '/login',
+      locale,
+      noIndex: true,
+    });
+  },
 });
 
 

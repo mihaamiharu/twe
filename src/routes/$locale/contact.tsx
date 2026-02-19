@@ -9,9 +9,19 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { submitContactMessage } from '@/server/contact.fn';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/contact')({
     component: ContactPage,
+    head: ({ params }) => {
+        const locale = params.locale || 'en';
+        return createSeoHead({
+            title: 'Contact | TestingWithEkki',
+            description: 'Get in touch with Ekki Syam Sugiardi. Send a message, book a 1-on-1 session, or explore hiring opportunities.',
+            path: '/contact',
+            locale,
+        });
+    },
 });
 
 function ContactPage() {

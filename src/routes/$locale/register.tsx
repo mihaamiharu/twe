@@ -7,6 +7,7 @@ import {
 import { RegisterForm } from '@/components/auth';
 import type { RootContext } from '../__root';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/register')({
   beforeLoad: ({ context, params }) => {
@@ -19,6 +20,16 @@ export const Route = createFileRoute('/$locale/register')({
     }
   },
   component: RegisterPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Create Account | TestingWithEkki',
+      description: 'Create a free TestingWithEkki account to start learning test automation.',
+      path: '/register',
+      locale,
+      noIndex: true,
+    });
+  },
 });
 
 
