@@ -191,20 +191,22 @@ export function PlaygroundMobileLayout({
                                     />
                                 </div>
                             )}
-                            <div className="flex-1 min-h-0 flex flex-col">
-                                <EditorPanel
-                                    challenge={challenge}
-                                    state={state}
-                                    isMobile={true}
-                                    onRunCode={handleRunCode}
-                                    onReset={handleReset}
-                                    onFileChange={handleFileChange}
-                                    onSelectFile={handleSelectFile}
-                                    onCloseFile={handleCloseFile}
-                                    onCodeChange={(code) => state.setCode(code)}
-                                    onReady={() => state.setIsLayoutReady(true)}
-                                />
-                            </div>
+                            {!isSelectorChallenge && (
+                                <div className="flex-1 min-h-0 flex flex-col">
+                                    <EditorPanel
+                                        challenge={challenge}
+                                        state={state}
+                                        isMobile={true}
+                                        onRunCode={handleRunCode}
+                                        onReset={handleReset}
+                                        onFileChange={handleFileChange}
+                                        onSelectFile={handleSelectFile}
+                                        onCloseFile={handleCloseFile}
+                                        onCodeChange={(code) => state.setCode(code)}
+                                        onReady={() => state.setIsLayoutReady(true)}
+                                    />
+                                </div>
+                            )}
                         </div>
                     </TabsContent>
 
