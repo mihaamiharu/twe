@@ -1,16 +1,11 @@
-import {
-  getTutorialContent,
-  clearContentCaches,
-} from '@/server/content.server';
+import { getTutorialContent, clearContentCaches } from '@/server/content.server';
 
 const SLUG = 'test-fixtures';
 const LOCALE = 'en';
 const ITERATIONS = 1000;
 
 async function benchmark() {
-  console.log(
-    `Benchmarking getTutorialContent for slug: ${SLUG}, locale: ${LOCALE}`,
-  );
+  console.log(`Benchmarking getTutorialContent for slug: ${SLUG}, locale: ${LOCALE}`);
   console.log(`Iterations: ${ITERATIONS}`);
 
   // Warmup (load registry etc)

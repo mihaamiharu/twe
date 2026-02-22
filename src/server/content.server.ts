@@ -10,7 +10,6 @@ import { join } from 'path';
 import type {
   Tutorial,
   TutorialRegistry,
-  TutorialRegistryEntry,
   Challenge,
   ChallengeDefinition,
   ChallengeTierFile,
@@ -98,7 +97,7 @@ function parseFrontmatter(content: string): {
 // =============================================================================
 
 let registryCache: TutorialRegistry | null = null;
-let tutorialContentCache: Map<string, Tutorial> = new Map();
+const tutorialContentCache = new Map<string, Tutorial>();
 
 /**
  * Load the tutorial registry (cached)
@@ -135,21 +134,19 @@ export async function getTutorialContent(
 
     // Try requested locale first, then fallback to 'en'
     let content: string;
-    let usedLocale = locale;
 
     try {
       const filePath = join(TUTORIALS_DIR, locale, `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     } catch {
       // Fallback to English
-      usedLocale = 'en';
       const filePath = join(TUTORIALS_DIR, 'en', `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     }
 
     const { meta, content: markdownContent } = parseFrontmatter(content);
 
-    const tutorial: Tutorial = {
+    const result: Tutorial = {
       slug: entry.slug,
       title: meta.title || slug,
       description: meta.description || '',
@@ -160,8 +157,8 @@ export async function getTutorialContent(
       relatedChallenges: entry.relatedChallenges,
     };
 
-    tutorialContentCache.set(cacheKey, tutorial);
-    return tutorial;
+    tutorialContentCache.set(cacheKey, result);
+    return result;
   } catch (error) {
     console.error(`[ContentService] Failed to load tutorial: ${slug}`, error);
     return null;
@@ -421,10 +418,10 @@ import { getTierFromCategory } from '@/lib/constants';
  */
 export function clearContentCaches(): void {
   registryCache = null;
+  tutorialContentCache.clear();
   challengeCache = new Map();
   challengeCacheLoaded = false;
   tierTotalCache = null;
-  tutorialContentCache.clear();
 }
 
 /**
