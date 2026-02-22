@@ -284,6 +284,19 @@ function HomePage() {
             </div>
           </div>
         </div>
+
+        {/* Sponsors Section */}
+        <div className="relative z-10 mt-20 border-t border-border/40 pt-10">
+          <p className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-6">
+            Supported By
+          </p>
+          <div className="flex justify-center items-center gap-8">
+            <a href="https://www.jetorbit.com" target="_blank" rel="noopener noreferrer" className="group">
+              <img src="https://www.jetorbit.com/wp-content/uploads/2017/08/logo2-e1502849686952.png" alt="Jetorbit" className="h-10 md:h-12 object-contain transition-all duration-300 opacity-30 group-hover:opacity-100 brightness-0 group-hover:brightness-100 dark:invert" />
+            </a>
+          </div>
+        </div>
+
         {/* Animated Wave Separator */}
         <WaveSeparator />
       </section>
