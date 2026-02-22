@@ -20,26 +20,43 @@
     },
     "milestones": {
         "title": "Pengalaman Kerja",
-        "subtitle": "Perjalanan profesional saya di Ninja Van",
+        "subtitle": "Perjalanan profesional dan dampak saya",
         "items": [
             {
                 "year": "2026",
                 "title": "TestingWithEkki",
-                "description": "Mulai membangun platform ini untuk berbagi pengetahuan dan menjembatani manual testing dengan engineering. Taman bermain untuk teknologi web modern dan pola otomasi berkualitas tinggi."
+                "description": [
+                    "Mulai membangun platform ini untuk berbagi pengetahuan dan menjembatani manual testing dengan engineering.",
+                    "Taman bermain untuk teknologi web modern dan pola otomasi berkualitas tinggi."
+                ]
             },
             {
                 "year": "2024 - Sekarang",
-                "title": "Senior Software Engineer, QA",
-                "description": "Membangun framework testing AI untuk memverifikasi model klasifikasi intent, mengotomatiskan 50% tiket support Tier 1. Mengelola otomasi untuk integrasi kemitraan (TikTok, Lazada, Shopee). Memvalidasi fitur untuk inisiatif pengurangan biaya yang menghemat $60.000/bulan. Mengembangkan alat untuk decoding payload dan perbandingan konfigurasi. Mentorship tester manual dalam hal otomasi."
+                "title": "Senior Software Engineer, QA di Ninja Van",
+                "description": [
+                    "Membangun framework testing AI dengan tim beranggotakan tiga orang menggunakan PyTest dan DeepEval untuk memverifikasi model klasifikasi intent dan auto-resolusi yang non-deterministik di dalam Salesforce. Pekerjaan ini memvalidasi fungsi inti dari platform yang dirancang untuk mengotomatiskan lebih dari 50% tiket support Tier 1.",
+                    "Mengelola otomasi pengujian dan verifikasi (API & Webhooks) untuk integrasi kemitraan (TikTok, Lazada, Shopee).",
+                    "Memodernisasi tumpukan otomasi web dengan berkontribusi pada migrasi dari Selenium ke Playwright.",
+                    "Memvalidasi fitur untuk inisiatif pengurangan biaya yang menghemat $60.000/bulan.",
+                    "Mengembangkan alat untuk decoding payload dan perbandingan konfigurasi.",
+                    "Mentorship tester manual dalam hal otomasi."
+                ]
             },
             {
                 "year": "2022 - 2024",
-                "title": "Software Engineer, QA",
-                "description": "Mengembangkan bersama framework testing integrasi berbasis Go pertama di perusahaan, mendeteksi cacat 80% lebih cepat. Bertindak sebagai spesialis otomasi lintas tim. Mencapai cakupan tes 100% untuk suite mobile/web/API tim Recovery. Mengurangi upaya pengujian manual sebesar 70%. Mempertahankan tingkat error regresi <1%. Menegakkan quality gates CI/CD yang ketat."
+                "title": "Software Engineer, QA di Ninja Van",
+                "description": [
+                    "Mengembangkan bersama framework testing integrasi berbasis Go pertama di perusahaan, mendeteksi cacat 80% lebih cepat.",
+                    "Bertindak sebagai spesialis otomasi lintas tim.",
+                    "Mencapai cakupan tes 100% untuk suite mobile/web/API tim Recovery.",
+                    "Mengurangi upaya pengujian manual sebesar 70%.",
+                    "Mempertahankan tingkat error regresi <1%.",
+                    "Menegakkan quality gates CI/CD yang ketat."
+                ]
             },
             {
                 "year": "2021",
-                "title": "Backend Engineer Intern",
+                "title": "Backend Engineer Intern di Ninja Van",
                 "description": "Meningkatkan performa environment QA dengan mengembangkan layanan pembersihan data dan berkontribusi pada kualitas kode melalui pembangunan RESTful API yang aman."
             }
         ]

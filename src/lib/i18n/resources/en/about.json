@@ -20,26 +20,43 @@
     },
     "milestones": {
         "title": "Work Experience",
-        "subtitle": "My professional journey at Ninja Van",
+        "subtitle": "My professional journey and impact",
         "items": [
             {
                 "year": "2026",
                 "title": "TestingWithEkki",
-                "description": "Started building this platform to share knowledge and bridge the gap between manual testing and engineering. A playground for modern web tech and high-quality automation patterns."
+                "description": [
+                    "Started building this platform to share knowledge and bridge the gap between manual testing and engineering.",
+                    "A playground for modern web tech and high-quality automation patterns."
+                ]
             },
             {
                 "year": "2024 - Present",
-                "title": "Senior Software Engineer, QA",
-                "description": "Built an AI testing framework to verify intent classification models, automating 50% of Tier 1 support tickets. Managed automation for partnership integrations (TikTok, Lazada, Shopee). Validated features for cost-reduction initiatives saving $60,000/month. Developed tools for payload decoding and config comparison. Mentored manual testers on automation."
+                "title": "Senior Software Engineer, QA at Ninja Van",
+                "description": [
+                    "Built an AI testing framework with a three-person team using PyTest and DeepEval to verify non-deterministic intent classification and auto-resolution models within Salesforce. This work validated the core functions of a platform designed to automate more than 50% of Tier 1 support tickets.",
+                    "Managed automated testing and verification (API & Webhooks) for partnership integrations (TikTok, Lazada, Shopee).",
+                    "Modernized the web automation stack by contributing to the migration from Selenium to Playwright.",
+                    "Validated features for cost-reduction initiatives saving $60,000/month.",
+                    "Developed tools for payload decoding and config comparison.",
+                    "Mentored manual testers on automation."
+                ]
             },
             {
                 "year": "2022 - 2024",
-                "title": "Software Engineer, QA",
-                "description": "Co-developed the company's first Go-based integration testing framework, detecting defects 80% faster. Served as cross-team automation specialist. Achieved 100% test coverage for Recovery team mobile/web/API suites. Reduced manual testing effort by 70%. Maintained <1% regression error rate. Enforced strict CI/CD quality gates."
+                "title": "Software Engineer, QA at Ninja Van",
+                "description": [
+                    "Co-developed the company's first Go-based integration testing framework, detecting defects 80% faster.",
+                    "Served as cross-team automation specialist.",
+                    "Achieved 100% test coverage for Recovery team mobile/web/API suites.",
+                    "Reduced manual testing effort by 70%.",
+                    "Maintained <1% regression error rate.",
+                    "Enforced strict CI/CD quality gates."
+                ]
             },
             {
                 "year": "2021",
-                "title": "Backend Engineer Intern",
+                "title": "Backend Engineer Intern at Ninja Van",
                 "description": "Enhanced QA environment performance by developing a data cleanup service and contributed to code quality by building secure RESTful APIs."
             }
         ]

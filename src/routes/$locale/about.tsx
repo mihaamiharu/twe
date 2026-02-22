@@ -39,7 +39,7 @@ export const Route = createFileRoute('/$locale/about')({
 
 function AboutPage() {
     const { t } = useTranslation(['about', 'common']);
-    const milestones = t('about:milestones.items', { returnObjects: true }) as Array<{ year: string; title: string; description: string }>;
+    const milestones = t('about:milestones.items', { returnObjects: true }) as Array<{ year: string; title: string; description: string | string[] }>;
     // Hardcoded for now as it's personal content, could move to i18n later if needed
 
     const expertise = [
@@ -169,9 +169,17 @@ function AboutPage() {
                                             <CardTitle className="text-lg">{milestone.title}</CardTitle>
                                         </CardHeader>
                                         <CardContent>
-                                            <p className="text-muted-foreground leading-relaxed">
-                                                {milestone.description}
-                                            </p>
+                                            {Array.isArray(milestone.description) ? (
+                                                <ul className="list-disc list-outside ml-4 space-y-2 text-muted-foreground leading-relaxed">
+                                                    {milestone.description.map((point, i) => (
+                                                        <li key={i}>{point}</li>
+                                                    ))}
+                                                </ul>
+                                            ) : (
+                                                <p className="text-muted-foreground leading-relaxed">
+                                                    {milestone.description}
+                                                </p>
+                                            )}
                                         </CardContent>
                                     </Card>
                                 </div>
