@@ -98,6 +98,7 @@ function parseFrontmatter(content: string): {
 // =============================================================================
 
 let registryCache: TutorialRegistry | null = null;
+let tutorialContentCache: Map<string, Tutorial> = new Map();
 
 /**
  * Load the tutorial registry (cached)
@@ -118,6 +119,11 @@ export async function getTutorialContent(
   slug: string,
   locale: string,
 ): Promise<Tutorial | null> {
+  const cacheKey = `${locale}:${slug}`;
+  if (tutorialContentCache.has(cacheKey)) {
+    return tutorialContentCache.get(cacheKey)!;
+  }
+
   try {
     const registry = await loadRegistry();
     const entry = registry.tutorials.find((t) => t.slug === slug);
@@ -143,7 +149,7 @@ export async function getTutorialContent(
 
     const { meta, content: markdownContent } = parseFrontmatter(content);
 
-    return {
+    const tutorial: Tutorial = {
       slug: entry.slug,
       title: meta.title || slug,
       description: meta.description || '',
@@ -153,6 +159,9 @@ export async function getTutorialContent(
       tags: entry.tags,
       relatedChallenges: entry.relatedChallenges,
     };
+
+    tutorialContentCache.set(cacheKey, tutorial);
+    return tutorial;
   } catch (error) {
     console.error(`[ContentService] Failed to load tutorial: ${slug}`, error);
     return null;
@@ -415,6 +424,7 @@ export function clearContentCaches(): void {
   challengeCache = new Map();
   challengeCacheLoaded = false;
   tierTotalCache = null;
+  tutorialContentCache.clear();
 }
 
 /**
