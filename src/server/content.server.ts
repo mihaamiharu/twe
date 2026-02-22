@@ -10,7 +10,6 @@ import { join } from 'path';
 import type {
   Tutorial,
   TutorialRegistry,
-  TutorialRegistryEntry,
   Challenge,
   ChallengeDefinition,
   ChallengeTierFile,
@@ -98,6 +97,7 @@ function parseFrontmatter(content: string): {
 // =============================================================================
 
 let registryCache: TutorialRegistry | null = null;
+const tutorialContentCache = new Map<string, Tutorial>();
 
 /**
  * Load the tutorial registry (cached)
@@ -118,6 +118,11 @@ export async function getTutorialContent(
   slug: string,
   locale: string,
 ): Promise<Tutorial | null> {
+  const cacheKey = `${locale}:${slug}`;
+  if (tutorialContentCache.has(cacheKey)) {
+    return tutorialContentCache.get(cacheKey)!;
+  }
+
   try {
     const registry = await loadRegistry();
     const entry = registry.tutorials.find((t) => t.slug === slug);
@@ -129,21 +134,19 @@ export async function getTutorialContent(
 
     // Try requested locale first, then fallback to 'en'
     let content: string;
-    let usedLocale = locale;
 
     try {
       const filePath = join(TUTORIALS_DIR, locale, `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     } catch {
       // Fallback to English
-      usedLocale = 'en';
       const filePath = join(TUTORIALS_DIR, 'en', `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     }
 
     const { meta, content: markdownContent } = parseFrontmatter(content);
 
-    return {
+    const result: Tutorial = {
       slug: entry.slug,
       title: meta.title || slug,
       description: meta.description || '',
@@ -153,6 +156,9 @@ export async function getTutorialContent(
       tags: entry.tags,
       relatedChallenges: entry.relatedChallenges,
     };
+
+    tutorialContentCache.set(cacheKey, result);
+    return result;
   } catch (error) {
     console.error(`[ContentService] Failed to load tutorial: ${slug}`, error);
     return null;
@@ -412,6 +418,7 @@ import { getTierFromCategory } from '@/lib/constants';
  */
 export function clearContentCaches(): void {
   registryCache = null;
+  tutorialContentCache.clear();
   challengeCache = new Map();
   challengeCacheLoaded = false;
   tierTotalCache = null;
