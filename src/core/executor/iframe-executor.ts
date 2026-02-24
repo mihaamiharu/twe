@@ -479,8 +479,14 @@ export async function executePlaywrightCode(
             });
 
             // Create mocked page object
-            const actionTimeout = Math.min(5000, Math.max(2000, timeout - 2000));
-            const page = new MockedPlaywrightPage(iframeDoc, { timeout: actionTimeout });
+            const remainingBudget = Math.max(0, (startTime + timeout) - Date.now());
+            const globalDeadline = startTime + timeout - 500; // 500ms safety buffer for cleanup
+            
+            const actionTimeout = Math.min(5000, Math.max(2000, remainingBudget - 1000));
+            const page = new MockedPlaywrightPage(iframeDoc, { 
+                timeout: actionTimeout,
+                deadline: globalDeadline 
+            });
 
             // Set up VFS for multi-page E2E challenges
             if (options?.files) {
@@ -559,8 +565,11 @@ export async function executePlaywrightCode(
 
             // Standardize timeouts: assertions/actions should fail before the global execution timeout
             // to provide clear error messages instead of a generic "Process timed out".
-            const assertionTimeout = Math.min(5000, Math.max(2000, timeout - 2000));
-            const { expect, getAssertionCount, getTestResults } = createExpect({ timeout: assertionTimeout });
+            const assertionTimeout = Math.min(5000, Math.max(2000, remainingBudget - 1000));
+            const { expect, getAssertionCount, getTestResults } = createExpect({ 
+                timeout: assertionTimeout,
+                deadline: globalDeadline
+            });
 
             contentWindow.expect = expect;
             contentWindow.test = test;

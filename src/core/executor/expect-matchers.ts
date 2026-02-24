@@ -8,10 +8,11 @@ import type { ExpectResult } from './executor.types';
  * Create a simple expect function for assertions
  * Returns both the expect function and assert count getter
  */
-export function createExpect(options?: { timeout?: number }): ExpectResult {
+export function createExpect(options?: { timeout?: number; deadline?: number }): ExpectResult {
     let assertionCount = 0;
     const testResults: Array<{ message: string; passed: boolean }> = [];
     const defaultTimeout = options?.timeout ?? 5000;
+    const globalDeadline = options?.deadline;
 
     const incrementCount = () => {
         assertionCount++;
@@ -49,13 +50,18 @@ export function createExpect(options?: { timeout?: number }): ExpectResult {
          */
         const poll = async (
             assertion: () => Promise<{ pass: boolean; message: string }> | { pass: boolean; message: string },
-            options?: { timeout?: number }
+            options?: { timeout?: number; deadline?: number }
         ) => {
             const timeout = options?.timeout ?? defaultTimeout;
+            const pollDeadline = options?.deadline ?? globalDeadline;
             const startTime = Date.now();
             let lastResult: { pass: boolean; message: string } | null = null;
 
             while (Date.now() - startTime < timeout) {
+                // If we have a global or specific deadline, don't exceed it
+                if (pollDeadline && Date.now() >= pollDeadline) {
+                    break;
+                }
                 try {
                     const result = await assertion();
                     // Invert if isNot is true
