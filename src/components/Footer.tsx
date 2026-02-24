@@ -248,7 +248,7 @@ export function Footer() {
         {/* Sponsors Banner */}
         <div className="mt-16 pt-8 border-t border-border/40 flex flex-col items-center justify-center gap-4">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {t('footer.sponsoredBy', 'Sponsored By')}
+            {t('footer.sponsoredBy', 'Supported By')}
           </p>
           <div className="flex items-center justify-center">
             <a href="https://www.jetorbit.com" target="_blank" rel="noopener noreferrer" className="group">
