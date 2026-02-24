@@ -17,6 +17,8 @@ export interface ActionOptions {
     force?: boolean;
     /** Do not wait for the action to complete before continuing. */
     noWaitAfter?: boolean;
+    /** Absolute timestamp (ms) to force early timeout. */
+    deadline?: number;
 }
 
 /**
@@ -230,4 +232,6 @@ export interface FrameLocator {
 export interface WaitOptions {
     timeout?: number;
     state?: 'visible' | 'hidden' | 'attached' | 'detached';
+    /** Absolute timestamp (ms) to force early timeout. */
+    deadline?: number;
 }

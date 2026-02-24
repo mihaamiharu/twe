@@ -37,6 +37,7 @@ import type {
 export class MockedPlaywrightPage {
   private targetDocument: Document;
   private defaultTimeout: number;
+  private globalDeadline?: number;
   public request: APIRequestContext;
   public keyboard: Keyboard;
   public mouse: Mouse;
@@ -51,9 +52,10 @@ export class MockedPlaywrightPage {
   private onNavigate?: (path: string) => void;
   private cssContent?: string;
 
-  constructor(iframeDocument: Document, options?: { timeout?: number }) {
+  constructor(iframeDocument: Document, options?: { timeout?: number; deadline?: number }) {
     this.targetDocument = iframeDocument;
     this.defaultTimeout = options?.timeout || 5000;
+    this.globalDeadline = options?.deadline;
     this.request = this._createAPIRequestContext();
     this._context = this._createBrowserContext();
     this.keyboard = this._createKeyboard();
@@ -998,10 +1000,14 @@ export class MockedPlaywrightPage {
     options?: WaitOptions,
   ): Promise<void> {
     const timeout = options?.timeout || this.defaultTimeout;
+    const deadline = options?.deadline || this.globalDeadline;
     const state = options?.state || 'visible';
     const startTime = Date.now();
 
     while (Date.now() - startTime < timeout) {
+      if (deadline && Date.now() >= deadline) {
+        break;
+      }
       const element = this.targetDocument.querySelector(
         selector,
       ) as HTMLElement;
@@ -1835,6 +1841,9 @@ export class MockedPlaywrightPage {
     ): Promise<HTMLElement> => {
       const startTime = Date.now();
       while (Date.now() - startTime < timeout) {
+        if (this.globalDeadline && Date.now() >= this.globalDeadline) {
+          break;
+        }
         strictCheck();
         const el = getElement();
         if (el) return el;
@@ -1851,9 +1860,13 @@ export class MockedPlaywrightPage {
       options?: ActionOptions,
     ): Promise<HTMLElement> => {
       const timeout = options?.timeout ?? this.defaultTimeout;
+      const deadline = options?.deadline ?? this.globalDeadline;
       const startTime = Date.now();
 
       while (Date.now() - startTime < timeout) {
+        if (deadline && Date.now() >= deadline) {
+          break;
+        }
         strictCheck();
         const el = getElement();
         if (el) {
