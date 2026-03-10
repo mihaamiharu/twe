@@ -215,7 +215,7 @@ PORT=3000
 npm create @tanstack/start@latest
 
 # Set up PostgreSQL with Docker
-docker-compose up -d
+podman compose up -d
 
 # Initialize Drizzle
 npx drizzle-kit generate
