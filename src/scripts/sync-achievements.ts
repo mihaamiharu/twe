@@ -155,9 +155,11 @@ async function syncAchievements() {
 }
 
 // Run the sync
-syncAchievements()
-    .then(() => process.exit(0))
-    .catch((err) => {
-        console.error(err);
-        process.exit(1);
-    });
+if (import.meta.main) {
+    syncAchievements()
+        .then(() => process.exit(0))
+        .catch((err) => {
+            console.error(err);
+            process.exit(1);
+        });
+}
