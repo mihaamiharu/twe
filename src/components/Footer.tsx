@@ -245,17 +245,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Sponsors Banner */}
-        <div className="mt-16 pt-8 border-t border-border/40 flex flex-col items-center justify-center gap-4">
-          <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-            {t('footer.sponsoredBy', 'Supported By')}
-          </p>
-          <div className="flex items-center justify-center">
-            <a href="https://www.jetorbit.com" target="_blank" rel="noopener noreferrer" className="group">
-              <img src="https://www.jetorbit.com/wp-content/uploads/2017/08/logo2-e1502849686952.png" alt="Jetorbit" className="h-8 object-contain transition-all duration-300 opacity-30 group-hover:opacity-100 brightness-0 group-hover:brightness-100 dark:invert" />
-            </a>
-          </div>
-        </div>
+
 
         {/* Bottom Bar */}
         <div className="mt-8 border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
