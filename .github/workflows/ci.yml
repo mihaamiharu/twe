@@ -48,6 +48,8 @@ jobs:
         env:
           DATABASE_URL: "postgresql://twe_test:twe_password@localhost:5433/twe_test"
         run: bun run db:push -- --force
+
+      - name: Run Integration Tests
         env:
           TEST_DATABASE_URL: "postgresql://twe_test:twe_password@localhost:5433/twe_test"
         run: bun run test:integration
