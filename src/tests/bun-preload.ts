@@ -104,6 +104,18 @@ mock.module('@/lib/storage-adapter', () => ({
     }
 }));
 
+mock.module('@/components/ui/dialog', () => {
+    const React = require('react');
+    return {
+        Dialog: ({ open, children }: any) => open ? React.createElement('div', { 'data-testid': 'dialog-root' }, children) : null,
+        DialogContent: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-content' }, children),
+        DialogHeader: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-header' }, children),
+        DialogFooter: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-footer' }, children),
+        DialogTitle: ({ children }: any) => React.createElement('h2', { 'data-testid': 'dialog-title' }, children),
+        DialogDescription: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-description' }, children),
+    };
+});
+
 mock.module("@/components/ui/dropdown-menu", () => {
     const React = require('react');
     return {
