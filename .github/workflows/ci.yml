@@ -42,7 +42,7 @@ jobs:
         # Warning only — ESLint errors don't block CI
 
       - name: Run Unit Tests with Coverage
-        run: bun run test:unit --coverage --coverage-reporter=lcov --coverage-reporter=html --coverage-dir=./coverage
+        run: bun run test:unit --coverage --coverage-reporter=lcov --coverage-dir=./coverage
 
       - name: Push Database Schema
         env:
