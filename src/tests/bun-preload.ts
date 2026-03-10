@@ -2,6 +2,17 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator';
 import { mock } from 'bun:test';
 
 GlobalRegistrator.register();
+
+// Prevent real HTTP calls from HappyDOM's fetch polyfill (e.g. from <script>fetch('/api/data')</script> in iframe HTML)
+// Without this, HappyDOM throws `NetworkError: ECONNREFUSED` which causes bun to exit with code 1
+// even when the test that caused the fetch is skipped or already completed.
+(globalThis as any).fetch = async (url: string) => {
+    return new Response(JSON.stringify({ mocked: true, url }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
+};
+
 process.env.DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
 process.env.TEST_DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
 process.env.BETTER_AUTH_SECRET = "dummy_secret_for_tests_1234567890";
