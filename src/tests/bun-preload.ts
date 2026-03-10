@@ -4,6 +4,10 @@ import { mock } from 'bun:test';
 GlobalRegistrator.register();
 process.env.DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
 process.env.TEST_DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
+process.env.BETTER_AUTH_SECRET = "dummy_secret_for_tests_1234567890";
+process.env.BETTER_AUTH_URL = "http://localhost:3000";
+process.env.GOOGLE_CLIENT_ID = "dummy_google_id";
+process.env.GOOGLE_CLIENT_SECRET = "dummy_google_secret";
 
 import * as React from 'react';
 

@@ -110,12 +110,9 @@ export async function executePlaywrightCode(
   ];
 
   if (strictMode) {
+    const codeToTest = executableCode.trim();
     for (const { pattern, message } of forbiddenPatterns) {
-      if (pattern.test(executableCode)) {
-        // Check if it might be inside an evaluate block (naive check)
-        // If the code line containing the pattern is not inside an evaluate, throw error
-        // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
-        // Actually, let's just return a FAILED result immediately to teach the user.
+      if (pattern.test(codeToTest)) {
         return {
           status: 'FAILED',
           output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
@@ -586,15 +583,21 @@ export async function executePlaywrightCode(
             const wrappedCode = `
                         return (async () => {
                             try {
-                                ${executableCode}
+                                const result = (async () => {
+                                    ${executableCode}
+                                })();
+                                
+                                const finalResult = await result;
 
                                 // Wait for all tests to complete
                                 if (window.__testPromises && Array.isArray(window.__testPromises)) {
                                     await Promise.all(window.__testPromises);
                                 }
 
-                                if (typeof result !== "undefined") return result;
+                                window.__returnValue = finalResult;
+                                return finalResult;
                             } catch (e) {
+                                window.__executionError = e.message || String(e);
                                 throw e;
                             }
                         })();
@@ -624,8 +627,7 @@ export async function executePlaywrightCode(
                 'console',
                 wrappedCode,
               );
-              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-              returnValue = await fallbackFn(
+              await fallbackFn(
                 page,
                 expect,
                 test,
@@ -633,9 +635,10 @@ export async function executePlaywrightCode(
                 enhancedDocument,
                 contentWindow.console,
               );
+              returnValue = (contentWindow as any).__returnValue;
               /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
             }
-
+            
             const executionTime = Date.now() - startTime;
             cleanup();
 
