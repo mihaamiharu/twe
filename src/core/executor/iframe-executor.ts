@@ -62,6 +62,7 @@ export async function executePlaywrightCode(
   // This redirects [Action] click logs from DevTools to the User Console UI
   let logCounter = 0;
   logger.setHandler((level, message, args) => {
+    // console.log('[DEBUG] Handler intercepted:', level, message);
     // Basic formatting for args
     const argsStr = args.length ? ' ' + args.map(String).join(' ') : '';
     logs.push({
@@ -74,10 +75,11 @@ export async function executePlaywrightCode(
   // Patch HTML content for specific challenges where happy-dom needs checking
   // e.g. pw-wait-for-response uses relative fetch which fails in happy-dom
   let finalHtml = htmlContent;
-  if (htmlContent.includes("fetch('/api/data')")) {
+  const fetchRegex = /fetch\(('|")\/api\/data('|")\)/;
+  if (htmlContent.match(fetchRegex)) {
     finalHtml = htmlContent.replace(
-      "fetch('/api/data')",
-      "fetch('http://localhost/api/data')",
+      fetchRegex,
+      "fetch($1http://localhost/api/data$1)",
     );
   }
 
@@ -728,7 +730,7 @@ function formatError(error: unknown): string {
   if (msg.includes('Element not found')) {
     return `${msg}\n\n💡 Tip: Check if your selector matches the HTML structure in the Preview tab.`;
   }
-  if (msg.includes('Timeout waiting')) {
+  if (msg.includes('Timeout') && msg.includes('waiting')) {
     return `${msg}\n\n💡 Tip: The element might not be visible yet, or the operation took too long.`;
   }
   if (msg.includes('is not defined')) {

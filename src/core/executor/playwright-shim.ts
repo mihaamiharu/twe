@@ -394,26 +394,55 @@ export class MockedPlaywrightPage {
             } else if (typeof route.matcher === 'function') {
               try {
                 isMatch = route.matcher(new URL(url as string));
-              } catch { isMatch = false; }
+              } catch {
+                isMatch = false;
+              }
             }
 
             if (isMatch) {
-              return route.handler({ url, method: init?.method || 'GET', headers: init?.headers, body: init?.body }).then((r: any) => {
-                if (r?.type === 'fulfill') {
-                  return Promise.resolve({
-                    ok: (r.response.status || 200) >= 200 && (r.response.status || 200) < 300,
-                    status: r.response.status || 200,
-                    json: () => Promise.resolve(r.response.json || {}),
-                    text: () => Promise.resolve(r.response.body || ''),
-                    headers: new Headers(r.response.headers as HeadersInit)
-                  });
-                }
-                return Promise.reject(new Error('Route not fulfilled'));
-              });
+              return route
+                .handler({
+                  url,
+                  method: init?.method || 'GET',
+                  headers: init?.headers,
+                  body: init?.body,
+                })
+                .then((r: any) => {
+                  if (r?.type === 'fulfill') {
+                    return Promise.resolve({
+                      ok:
+                        (r.response.status || 200) >= 200 &&
+                        (r.response.status || 200) < 300,
+                      status: r.response.status || 200,
+                      statusText: r.response.statusText || 'OK',
+                      json: () =>
+                        Promise.resolve(
+                          r.response.json ||
+                            (r.response.body ? JSON.parse(r.response.body) : {}),
+                        ),
+                      text: () =>
+                        Promise.resolve(
+                          r.response.body || JSON.stringify(r.response.json || {}),
+                        ),
+                      arrayBuffer: () =>
+                        Promise.resolve(
+                          new TextEncoder().encode(
+                            r.response.body || JSON.stringify(r.response.json || {}),
+                          ).buffer,
+                        ),
+                      headers: new Headers(
+                        (r.response.headers as HeadersInit) || {},
+                      ),
+                    });
+                  }
+                  return Promise.reject(new Error('Route not fulfilled'));
+                });
             }
           }
         }
-        return originalFetch ? originalFetch(input, init) : Promise.resolve({ ok: false, status: 404 });
+        return originalFetch
+          ? originalFetch(input, init)
+          : Promise.resolve({ ok: false, status: 404 });
       };
     }
 
@@ -809,7 +838,11 @@ export class MockedPlaywrightPage {
     await this.waitForSelector(selector, { state: 'visible' });
 
     const element = this.targetDocument.querySelector(selector) as HTMLElement;
-    if (!element) throw createShimError('element_not_found', { selector, action: 'click' });
+    if (!element)
+      throw createShimError('element_not_found', { selector, action: 'click' });
+
+    logger.debug(`[Action] click selector: ${selector}`);
+    await this._highlight(element);
     element.click();
   }
 
@@ -1170,7 +1203,7 @@ export class MockedPlaywrightPage {
             const roleSelector = `[role="${role}"]`;
             let elements = Array.from(
               doc.querySelectorAll(roleSelector),
-            );
+            ) as HTMLElement[];
             if (options?.name) {
               elements = elements.filter((el) => {
                 const text =
@@ -1305,6 +1338,18 @@ export class MockedPlaywrightPage {
   ): Locator {
     return this.createLocator(() =>
       this._findByPlaceholder(this.targetDocument, text, options),
+    );
+  }
+
+  getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator {
+    return this.createLocator(() =>
+      this._findByAltText(this.targetDocument, text, options),
+    );
+  }
+
+  getByTitle(text: string | RegExp, options?: { exact?: boolean }): Locator {
+    return this.createLocator(() =>
+      this._findByTitle(this.targetDocument, text, options),
     );
   }
 
@@ -1713,6 +1758,70 @@ export class MockedPlaywrightPage {
     return matches;
   }
 
+  private _findByAltText(
+    container: HTMLElement | Document | HTMLElement[],
+    text: string | RegExp,
+    options?: { exact?: boolean },
+  ): HTMLElement[] {
+    const containers = Array.isArray(container) ? container : [container];
+    const matches: HTMLElement[] = [];
+
+    for (const cont of containers) {
+      const elements = Array.from(cont.querySelectorAll('[alt]')) as HTMLElement[];
+      const contMatches = elements.filter((el) => {
+        const alt = el.getAttribute('alt') || '';
+        const normalizedAlt = this._normalizeText(alt);
+
+        if (text instanceof RegExp) return text.test(alt) || text.test(normalizedAlt);
+
+        const searchText = text as string;
+        const normalizedSearchText = this._normalizeText(searchText);
+
+        if (options?.exact) {
+          return alt === searchText || normalizedAlt === normalizedSearchText;
+        }
+        return (
+          alt.toLowerCase().includes(searchText.toLowerCase()) ||
+          normalizedAlt.toLowerCase().includes(normalizedSearchText.toLowerCase())
+        );
+      });
+      matches.push(...contMatches);
+    }
+    return matches;
+  }
+
+  private _findByTitle(
+    container: HTMLElement | Document | HTMLElement[],
+    text: string | RegExp,
+    options?: { exact?: boolean },
+  ): HTMLElement[] {
+    const containers = Array.isArray(container) ? container : [container];
+    const matches: HTMLElement[] = [];
+
+    for (const cont of containers) {
+      const elements = Array.from(cont.querySelectorAll('[title]')) as HTMLElement[];
+      const contMatches = elements.filter((el) => {
+        const title = el.getAttribute('title') || '';
+        const normalizedTitle = this._normalizeText(title);
+
+        if (text instanceof RegExp) return text.test(title) || text.test(normalizedTitle);
+
+        const searchText = text as string;
+        const normalizedSearchText = this._normalizeText(searchText);
+
+        if (options?.exact) {
+          return title === searchText || normalizedTitle === normalizedSearchText;
+        }
+        return (
+          title.toLowerCase().includes(searchText.toLowerCase()) ||
+          normalizedTitle.toLowerCase().includes(normalizedSearchText.toLowerCase())
+        );
+      });
+      matches.push(...contMatches);
+    }
+    return matches;
+  }
+
   // Private Helpers
   // ============================================
 
@@ -1744,12 +1853,41 @@ export class MockedPlaywrightPage {
   }
 
   private _createAPIRequestContext(): APIRequestContext {
+    const fetchWithIframe = async (url: string, init?: any) => {
+      const win = this.targetDocument.defaultView as any;
+      if (win && win.fetch) {
+        const resp = await win.fetch(url, init);
+        return {
+          ok: () => resp.ok,
+          status: () => resp.status,
+          statusText: () => resp.statusText || 'OK',
+          headers: () => {
+            const h: Record<string, string> = {};
+            if (resp.headers && typeof resp.headers.forEach === 'function') {
+              resp.headers.forEach((v: string, k: string) => { h[k] = v; });
+            }
+            return h;
+          },
+          json: () => typeof resp.json === 'function' ? resp.json() : Promise.resolve(resp.json || {}),
+          text: () => typeof resp.text === 'function' ? resp.text() : Promise.resolve(resp.text || ''),
+          body: () => {
+             if (typeof resp.arrayBuffer === 'function') {
+                return resp.arrayBuffer().then((ab: ArrayBuffer) => Buffer.from(ab));
+             }
+             return Promise.resolve(Buffer.from(resp.text || ''));
+          },
+          url: () => url,
+        } as APIResponse;
+      }
+      return this._mockResponse();
+    };
+
     return {
-      get: () => Promise.resolve(this._mockResponse()),
-      post: () => Promise.resolve(this._mockResponse()),
-      put: () => Promise.resolve(this._mockResponse()),
-      delete: () => Promise.resolve(this._mockResponse()),
-      fetch: () => Promise.resolve(this._mockResponse()),
+      get: (url, options) => fetchWithIframe(url, { ...options, method: 'GET' }),
+      post: (url, options) => fetchWithIframe(url, { ...options, method: 'POST' }),
+      put: (url, options) => fetchWithIframe(url, { ...options, method: 'PUT' }),
+      delete: (url, options) => fetchWithIframe(url, { ...options, method: 'DELETE' }),
+      fetch: (url, options) => fetchWithIframe(url as string, options),
       storageState: () => Promise.resolve({ cookies: [], origins: [] }),
       newContext: () => Promise.resolve(this._createAPIRequestContext()),
     };
@@ -1808,9 +1946,6 @@ export class MockedPlaywrightPage {
     };
 
     // Expose finder for internal cross-locator delegation (e.g. frameLocator)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    (this as any).finder = getFilteredElements;
-
     const getElement = (): HTMLElement | null => {
       const elements = getFilteredElements();
       if (elements.length === 0) return null;
@@ -1884,6 +2019,10 @@ export class MockedPlaywrightPage {
     };
 
     const locator: Locator = {
+      // Expose finder for internal cross-locator delegation
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      finder: getFilteredElements as any,
+      
       click: async (options?: ClickOptions) => {
         await this.delay(50);
         strictCheck();
@@ -1926,6 +2065,27 @@ export class MockedPlaywrightPage {
       textContent: async () => {
         const el = await waitForElement();
         return el.textContent || null;
+      },
+
+      allAttributes: async () => {
+        const el = await waitForElement();
+        const attrs: Record<string, string> = {};
+        for (let i = 0; i < el.attributes.length; i++) {
+          const attr = el.attributes[i];
+          attrs[attr.name] = attr.value;
+        }
+        return attrs;
+      },
+
+      boundingBox: async () => {
+        const el = await waitForElement();
+        const rect = el.getBoundingClientRect();
+        return {
+          x: rect.x,
+          y: rect.y,
+          width: rect.width,
+          height: rect.height,
+        };
       },
 
       inputValue: async () => {
@@ -2298,6 +2458,18 @@ export class MockedPlaywrightPage {
       ) => {
         return this.createLocator(() =>
           this._findByPlaceholder(getFilteredElements(), text, options),
+        );
+      },
+
+      getByAltText: (text: string | RegExp, options?: { exact?: boolean }) => {
+        return this.createLocator(() =>
+          this._findByAltText(getFilteredElements(), text, options),
+        );
+      },
+
+      getByTitle: (text: string | RegExp, options?: { exact?: boolean }) => {
+        return this.createLocator(() =>
+          this._findByTitle(getFilteredElements(), text, options),
         );
       },
 

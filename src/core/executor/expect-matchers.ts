@@ -154,9 +154,10 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         } else if (
                             actual instanceof HTMLInputElement ||
                             actual instanceof HTMLTextAreaElement ||
-                            actual instanceof HTMLSelectElement
+                            actual instanceof HTMLSelectElement ||
+                            actual instanceof HTMLButtonElement
                         ) {
-                            value = actual.value || '';
+                            value = (actual as any).value || '';
                         }
                     } catch {
                         value = '';
@@ -233,6 +234,8 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     let checked = false;
                     if (actual && typeof actual.isChecked === 'function') {
                         checked = await actual.isChecked();
+                    } else if (actual instanceof HTMLInputElement || actual instanceof HTMLTextAreaElement) {
+                        checked = (actual as any).checked || false;
                     }
                     return {
                         pass: checked,
@@ -246,6 +249,8 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     let disabled = false;
                     if (actual && typeof actual.isDisabled === 'function') {
                         disabled = await actual.isDisabled();
+                    } else if (actual instanceof HTMLElement) {
+                        disabled = (actual as any).disabled || false;
                     }
                     return {
                         pass: !disabled,
@@ -259,6 +264,8 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     let disabled = false;
                     if (actual && typeof actual.isDisabled === 'function') {
                         disabled = await actual.isDisabled();
+                    } else if (actual instanceof HTMLElement) {
+                        disabled = (actual as any).disabled || false;
                     }
                     return {
                         pass: disabled,
@@ -272,6 +279,8 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     let editable = false;
                     if (actual && typeof actual.isEditable === 'function') {
                         editable = await actual.isEditable();
+                    } else if (actual instanceof HTMLInputElement || actual instanceof HTMLTextAreaElement) {
+                        editable = !(actual as any).readOnly && !(actual as any).disabled;
                     }
                     return {
                         pass: editable,
@@ -326,6 +335,40 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     return {
                         pass,
                         message: `Expected class "${className}" ${isNot ? 'NOT ' : ''}to match "${expected}"`
+                    };
+                }, options);
+            },
+
+            async toHaveCSS(name: string, value: string | RegExp, options?: { timeout?: number }) {
+                await poll(async () => {
+                    let cssValue = '';
+                    if (actual && typeof actual.evaluate === 'function') {
+                        cssValue = await actual.evaluate((el: HTMLElement, name: string) => {
+                            return window.getComputedStyle(el).getPropertyValue(name);
+                        }, name);
+                    } else if (actual instanceof HTMLElement) {
+                        cssValue = window.getComputedStyle(actual).getPropertyValue(name);
+                    }
+                    const pass = value instanceof RegExp ? value.test(cssValue) : cssValue === value;
+                    return {
+                        pass,
+                        message: `Expected CSS property "${name}" to be "${value}", got "${cssValue}"`
+                    };
+                }, options);
+            },
+
+            async toHaveJSProperty(name: string, value: any, options?: { timeout?: number }) {
+                await poll(async () => {
+                    let propValue: any = undefined;
+                    if (actual && typeof actual.evaluate === 'function') {
+                        propValue = await actual.evaluate((el: any, name: string) => el[name], name);
+                    } else if (actual) {
+                        propValue = (actual as any)[name];
+                    }
+                    const pass = JSON.stringify(propValue) === JSON.stringify(value);
+                    return {
+                        pass,
+                        message: `Expected JS property "${name}" to be ${JSON.stringify(value)}, got ${JSON.stringify(propValue)}`
                     };
                 }, options);
             },
