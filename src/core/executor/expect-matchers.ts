@@ -64,10 +64,11 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 }
                 try {
                     const result = await assertion();
-                    // Invert if isNot is true
+                    // Invert if isNot is true to determine if we should stop polling
                     const finalPass = isNot ? !result.pass : result.pass;
                     if (finalPass) {
-                        handleResult(true, result.message);
+                        // Pass the raw result to handleResult, it will invert it again properly
+                        handleResult(result.pass, result.message);
                         return;
                     }
                     lastResult = result;
@@ -86,7 +87,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     lastResult = { pass: false, message: e instanceof Error ? e.message : String(e) };
                 }
             }
-            handleResult(isNot ? !lastResult.pass : lastResult.pass, lastResult.message);
+            handleResult(lastResult.pass, lastResult.message);
         };
 
         return {

@@ -1,0 +1,61 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: twe_test
+          POSTGRES_PASSWORD: twe_password
+          POSTGRES_DB: twe_test
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run ESLint
+        run: bun run lint
+        continue-on-error: true # Warning only
+
+      - name: Run Unit Tests with Coverage
+        run: bun run test:unit --coverage
+
+      - name: Push Database Schema
+        env:
+          DATABASE_URL: "postgresql://twe_test:twe_password@localhost:5433/twe_test"
+        run: bun run db:push -- --force
+        env:
+          TEST_DATABASE_URL: "postgresql://twe_test:twe_password@localhost:5433/twe_test"
+        run: bun run test:integration
+
+      - name: Upload Coverage Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 14

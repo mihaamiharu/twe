@@ -530,9 +530,7 @@ export class MockedPlaywrightPage {
       }
 
       // Re-execute scripts in new content (now with __APP_STATE__ available)
-      // We rely on document.write() to execute scripts. Manually re-executing them causes double execution 
-      // and Identifier re-declaration errors since we reuse the same Window object in VFS.
-      // this._executeScripts();
+      this._executeScripts();
 
       this.currentUrl = path;
 

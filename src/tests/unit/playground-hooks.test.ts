@@ -4,12 +4,6 @@ import { usePlaygroundState } from '@/components/challenges/playground/usePlaygr
 // import { useChallengeExecution } from '@/components/challenges/playground/useChallengeExecution'; // Will test later if time permits
 
 // Mock i18n
-mock.module('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => key,
-        i18n: { language: 'en' },
-    }),
-}));
 
 // Mock type-generator
 mock.module('@/core/type-generator', () => ({

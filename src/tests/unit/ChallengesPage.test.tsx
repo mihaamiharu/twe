@@ -4,44 +4,8 @@ import * as router from '@tanstack/react-router';
 import * as query from '@tanstack/react-query';
 
 // Mutable mock state
-let mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
-const mockNavigate = mock(() => Promise.resolve());
-
-// Mock dependencies
-mock.module('@tanstack/react-router', () => ({
-    createFileRoute: () => () => ({
-        useParams: () => ({ locale: 'en' }),
-        useSearch: () => mockSearchParams,
-        useNavigate: () => mockNavigate,
-    }),
-    Link: ({ children, to, params, className }: any) => (
-        <a href={to} data-params={JSON.stringify(params)} className={className}>
-            {children}
-        </a>
-    ),
-    isRedirect: () => false,
-    redirect: () => { },
-    Outlet: () => null,
-    useRouter: () => ({}),
-    useMatch: () => ({}),
-}));
-
-mock.module('@tanstack/react-query', () => ({
-    useSuspenseQuery: mock(),
-}));
-
-mock.module('react-i18next', () => ({
-    useTranslation: () => ({
-        t: (key: string) => {
-            const parts = key.split('.');
-            return parts[parts.length - 1];
-        },
-    }),
-    initReactI18next: {
-        type: '3rdParty',
-        init: () => { },
-    },
-}));
+globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+globalThis.mockNavigate = mock(() => Promise.resolve());
 
 describe('ChallengesPage', () => {
     // Mock Data
@@ -91,11 +55,11 @@ describe('ChallengesPage', () => {
     ];
 
     beforeEach(() => {
-        mock.restore();
-        mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+
+        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
 
         // Setup query mock with SEARCH filtering simulation
-        (query.useSuspenseQuery as any).mockImplementation((options: any) => {
+        (query.useQuery as any).mockImplementation((options: any) => {
             const filters = options.queryKey?.[1];
             const searchQuery = filters?.search?.toLowerCase();
 
@@ -130,7 +94,7 @@ describe('ChallengesPage', () => {
     });
 
     it('should filter by track (selectors)', async () => {
-        mockSearchParams = { ...mockSearchParams, track: 'selectors' };
+        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, track: 'selectors' };
 
         await renderPage();
 
@@ -143,7 +107,7 @@ describe('ChallengesPage', () => {
     it('should filter by search query', async () => {
         // Set query in params. Component syncs this to useDebounce state, passing it to query options.
         // Our smart mock catches the query option updates.
-        mockSearchParams = { ...mockSearchParams, q: 'Playwright' };
+        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, q: 'Playwright' };
 
         await renderPage();
 
@@ -153,7 +117,7 @@ describe('ChallengesPage', () => {
     });
 
     it('should hide completed challenges', async () => {
-        mockSearchParams = { ...mockSearchParams, hideCompleted: true };
+        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, hideCompleted: true };
 
         await renderPage();
 
@@ -163,7 +127,7 @@ describe('ChallengesPage', () => {
     });
 
     it('should switch to list view', async () => {
-        mockSearchParams = { ...mockSearchParams, view: 'list' };
+        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, view: 'list' };
 
         await renderPage();
 
@@ -180,7 +144,7 @@ describe('ChallengesPage', () => {
         expect((searchInput as HTMLInputElement).value).toBe('New Search');
     });
     it('should show empty state when no matches found', async () => {
-        mockSearchParams = { ...mockSearchParams, q: 'NonExistent' };
+        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, q: 'NonExistent' };
         await renderPage();
 
         expect(screen.getByText(/no challenges found/i)).toBeTruthy();

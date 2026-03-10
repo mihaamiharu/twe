@@ -112,7 +112,10 @@ describe('Challenge Flow Integration', () => {
             isPractice: false
         };
 
-        const result: any = await challengeSubmissionHandler({ data: input });
+        const result: any = await challengeSubmissionHandler({ 
+            data: input,
+            context: { user: { id: testUserId } }
+        });
 
         expect(result.success).toBe(true);
         expect(result.data.isFirstCompletion).toBe(true);
@@ -140,7 +143,10 @@ describe('Challenge Flow Integration', () => {
             isPractice: false
         };
 
-        const result: any = await challengeSubmissionHandler({ data: input });
+        const result: any = await challengeSubmissionHandler({ 
+            data: input,
+            context: { user: { id: testUserId } }
+        });
 
         expect(result.success).toBe(true); // Request success, but submission failed
         expect(result.data.submission.isPassed).toBe(false);

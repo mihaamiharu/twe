@@ -4,9 +4,6 @@ import { ResetConfirmDialog } from '@/components/challenges/playground/ResetConf
 import { HintConfirmDialog } from '@/components/challenges/playground/HintConfirmDialog';
 
 // Mock dependencies
-mock.module('react-i18next', () => ({
-    useTranslation: () => ({ t: (k: string) => k }),
-}));
 
 mock.module('lucide-react', () => ({
     AlertCircle: () => <svg data-testid="alert-icon" />,

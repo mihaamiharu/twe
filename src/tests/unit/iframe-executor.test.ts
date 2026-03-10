@@ -30,7 +30,7 @@ describe('createExpect', () => {
         const page = new MockedPlaywrightPage(document);
 
         try {
-            await shimExpect(page.locator('div')).not.toBeVisible();
+            await shimExpect(page.locator('div')).not.toBeVisible({ timeout: 100 });
             throw new Error('Should have failed');
         } catch (e: any) {
             expect(e.message).toContain('Expected element NOT to be visible');
@@ -40,7 +40,7 @@ describe('createExpect', () => {
     test('should pass hidden assertion with not negation', async () => {
         const page = new MockedPlaywrightPage(document);
         // No div exists
-        await shimExpect(page.locator('div')).toBeHidden();
+        await shimExpect(page.locator('div')).toBeHidden({ timeout: 100 });
     });
 
     test('should pass text assertion with not negation', async () => {
@@ -49,7 +49,7 @@ describe('createExpect', () => {
         document.body.appendChild(div);
         const page = new MockedPlaywrightPage(document);
 
-        await shimExpect(page.locator('div')).not.toHaveText('Goodbye');
+        await shimExpect(page.locator('div')).not.toHaveText('Goodbye', { timeout: 100 });
     });
 
     test('should fail text assertion with not negation when it matches', async () => {
@@ -59,7 +59,7 @@ describe('createExpect', () => {
         const page = new MockedPlaywrightPage(document);
 
         try {
-            await shimExpect(page.locator('div')).not.toHaveText('Hello');
+            await shimExpect(page.locator('div')).not.toHaveText('Hello', { timeout: 100 });
             throw new Error('Should have failed');
         } catch (e: any) {
             expect(e.message).toContain('Expected text "Hello" NOT to match "Hello"');
@@ -74,7 +74,7 @@ describe('createExpect', () => {
         const page = new MockedPlaywrightPage(document);
 
         // Soft assertion fails but doesn't throw
-        await e.soft(page.locator('div')).not.toHaveText('Hello');
+        await e.soft(page.locator('div')).not.toHaveText('Hello', { timeout: 100 });
 
         const results = getTestResults();
         expect(results.length).toBe(1);
