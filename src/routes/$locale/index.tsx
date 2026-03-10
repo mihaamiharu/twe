@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { WaveSeparator } from '@/components/ui/wave-separator';
@@ -54,8 +54,10 @@ export const Route = createFileRoute('/$locale/')({
   },
 });
 
+const routeApi = getRouteApi('/$locale/');
+
 function HomePage() {
-  const { locale } = Route.useParams();
+  const { locale } = routeApi.useParams();
   const { t } = useTranslation('home');
   // Fetch real stats from Server Function
   const { data: statsData, isLoading: statsLoading } = useQuery({

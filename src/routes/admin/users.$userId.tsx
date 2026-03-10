@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getAdminUserDetail, deleteUser } from '@/server/admin.fn';
@@ -44,8 +44,10 @@ export const Route = createFileRoute('/admin/users/$userId')({
     component: UserDetailPage,
 });
 
+const routeApi = getRouteApi('/admin/users/$userId');
+
 function UserDetailPage() {
-    const { userId } = Route.useParams();
+    const { userId } = routeApi.useParams();
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);

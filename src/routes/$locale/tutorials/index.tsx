@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { z } from 'zod';
@@ -70,13 +70,15 @@ export const Route = createFileRoute('/$locale/tutorials/')({
 
 const difficulties = ['all', 'foundations', 'beginner', 'intermediate', 'advanced'] as const;
 
+const routeApi = getRouteApi('/$locale/tutorials/');
+
 function TutorialsPage() {
-  const { locale } = Route.useParams();
+  const { locale } = routeApi.useParams();
   const { t } = useTranslation('tutorials');
-  const navigate = Route.useNavigate();
+  const navigate = routeApi.useNavigate();
 
   // URL-based State
-  const { q, difficulty, view, hideCompleted } = Route.useSearch();
+  const { q, difficulty, view, hideCompleted } = routeApi.useSearch();
   const selectedDifficulty = difficulty;
   const viewMode = view;
 

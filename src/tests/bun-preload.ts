@@ -2,6 +2,8 @@ import { GlobalRegistrator } from '@happy-dom/global-registrator';
 import { mock } from 'bun:test';
 
 GlobalRegistrator.register();
+process.env.DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
+process.env.TEST_DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
 
 import * as React from 'react';
 
@@ -45,6 +47,11 @@ mock.module('@tanstack/react-router', () => ({
     redirect: () => { },
     Outlet: () => null,
     createFileRoute: () => () => ({
+        useParams: () => ({ locale: 'en' }),
+        useSearch: () => globalThis.mockSearchParams,
+        useNavigate: () => globalThis.mockNavigate,
+    }),
+    getRouteApi: () => ({
         useParams: () => ({ locale: 'en' }),
         useSearch: () => globalThis.mockSearchParams,
         useNavigate: () => globalThis.mockNavigate,
@@ -115,7 +122,10 @@ mock.module('@monaco-editor/react', () => {
                 onChange: (e: any) => onChange?.(e.target.value)
             });
         },
-        loader: { init: () => Promise.resolve() }
+        loader: { 
+            init: () => Promise.resolve(),
+            config: () => {}
+        }
     };
 });
 
