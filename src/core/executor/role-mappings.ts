@@ -46,4 +46,5 @@ export const ROLE_TO_TAG: Record<string, string> = {
     menu: '[role="menu"]',
     menuitem: '[role="menuitem"]',
     progressbar: 'progress, [role="progressbar"]',
+    meter: 'meter, [role="meter"]',
 };

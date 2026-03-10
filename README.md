@@ -61,7 +61,7 @@ SMTP_PASS=your-email-password
 ### 3. Start Database
 
 ```bash
-docker compose up -d
+podman compose up -d
 ```
 
 ### 4. Run Migrations
@@ -161,9 +161,9 @@ _Starts `postgres_test`, runs all tests, and stops the container cleanup regardl
 If you want to keep the test database running:
 
 ```bash
-docker compose up -d postgres_test
+podman compose up -d postgres_test
 bun test
-# docker compose stop postgres_test
+# podman compose stop postgres_test
 ```
 
 ## 🎮 Challenge Types

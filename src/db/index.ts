@@ -5,15 +5,17 @@ import * as dotenv from 'dotenv';
 
 dotenv.config();
 
-// Check if DATABASE_URL is set
-if (!process.env.DATABASE_URL) {
+// Check if DATABASE_URL or TEST_DATABASE_URL is set
+if (!process.env.DATABASE_URL && !process.env.TEST_DATABASE_URL) {
   throw new Error(
-    'DATABASE_URL environment variable is not set. Please check your .env file.',
+    'Neither DATABASE_URL nor TEST_DATABASE_URL environment variable is set. Please check your environment configuration.',
   );
 }
 
 // Create PostgreSQL connection
-const connectionString = process.env.DATABASE_URL;
+const connectionString = (process.env.NODE_ENV === 'test' && process.env.TEST_DATABASE_URL) 
+  ? process.env.TEST_DATABASE_URL 
+  : process.env.DATABASE_URL!;
 
 // Detect if using Supabase (requires prepare: false for PgBouncer)
 const isSupabase = connectionString.includes('supabase.com');

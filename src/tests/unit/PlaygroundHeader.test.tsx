@@ -3,13 +3,7 @@ import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { PlaygroundHeader } from '@/components/challenges/playground/PlaygroundHeader';
 
 // Mock dependencies
-mock.module('@tanstack/react-router', () => ({
-    Link: ({ children, to }: any) => <a href={to}>{children}</a>,
-}));
 
-mock.module('react-i18next', () => ({
-    useTranslation: () => ({ t: (k: string) => k }),
-}));
 
 mock.module('lucide-react', () => ({
     Play: () => <svg data-testid="play-icon" />,
@@ -30,8 +24,14 @@ mock.module('@/components/ui/tooltip', () => ({
 }));
 
 describe('PlaygroundHeader', () => {
+    const mockOnRunCode = mock(() => Promise.resolve());
+    const mockOnOpenHintDialog = mock();
+    const mockOnSubmit = mock();
+
     beforeEach(() => {
-        mock.restore();
+        mockOnRunCode.mockClear();
+        mockOnOpenHintDialog.mockClear();
+        mockOnSubmit.mockClear();
     });
 
     afterEach(cleanup);
@@ -44,6 +44,7 @@ describe('PlaygroundHeader', () => {
             description: 'desc',
             type: 'JAVASCRIPT',
             difficulty: 'EASY',
+            hints: ['Hint 1'],
         } as any,
         locale: 'en',
         userId: 'user1',
@@ -53,9 +54,11 @@ describe('PlaygroundHeader', () => {
         hasPassed: false,
         hintUsed: false,
         isHintPending: false,
-        onRunCode: mock(),
-        onOpenHintDialog: mock(),
-        onSubmit: mock(),
+        revealedHintsCount: 0,
+        setRevealedHintsCount: () => {},
+        onRunCode: mockOnRunCode,
+        onOpenHintDialog: mockOnOpenHintDialog,
+        onSubmit: mockOnSubmit,
     };
 
     it('should render challenge title', () => {
@@ -100,7 +103,7 @@ describe('PlaygroundHeader', () => {
     });
 
     it('should render hint button', () => {
-        render(<PlaygroundHeader {...mockProps} />);
+        render(<PlaygroundHeader {...mockProps} revealedHintsCount={1} />);
 
         // Text: challenges:hints.button
         const hintBtnSpan = screen.getByText('challenges:hints.button');

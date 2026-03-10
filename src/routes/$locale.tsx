@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect, getRouteApi } from '@tanstack/react-router';
 import { I18nProvider } from '@/components/I18nProvider';
 import { isValidLocale, fallbackLng } from '@/lib/i18n/settings';
 import i18n from '@/lib/i18n';
@@ -24,8 +24,10 @@ export const Route = createFileRoute('/$locale')({
   component: LocaleLayout,
 });
 
+const routeApi = getRouteApi('/$locale');
+
 function LocaleLayout() {
-  const { locale } = Route.useParams();
+  const { locale } = routeApi.useParams();
 
   return (
     <I18nProvider locale={locale}>

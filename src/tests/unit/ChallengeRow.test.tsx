@@ -3,37 +3,13 @@ import { render, screen, cleanup } from '@testing-library/react';
 import * as router from '@tanstack/react-router';
 
 // Mock dependencies
-mock.module('@tanstack/react-router', () => ({
-    Link: ({ children, to, params, className }: any) => (
-        <a href={to} data-params={JSON.stringify(params)} className={className}>
-            {children}
-        </a>
-    ),
-    createFileRoute: () => () => ({
-        useParams: () => ({ locale: 'en' }),
-        useSearch: () => ({ track: 'all' }),
-        useNavigate: () => (() => Promise.resolve()),
-    }),
-    isRedirect: () => false,
-    redirect: () => { },
-    Outlet: () => null,
-    useRouter: () => ({}),
-    useMatch: () => ({}),
-}));
 
-mock.module('framer-motion', () => ({
-    motion: {
-        tr: ({ children, className, ...props }: any) => <tr className={className} {...props}>{children}</tr>,
-        div: ({ children }: any) => <div>{children}</div>
-    },
-    AnimatePresence: ({ children }: any) => <>{children}</>,
-}));
 
 describe('ChallengeRow', () => {
     let ChallengeRow: any;
 
     beforeEach(async () => {
-        mock.restore();
+
         const module = await import('@/routes/$locale/challenges/index');
         ChallengeRow = module.ChallengeRow;
     });

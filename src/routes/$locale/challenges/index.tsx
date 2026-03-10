@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { z } from 'zod';
@@ -165,13 +165,15 @@ const ALL_TRACKS = TRACK_IDS.map((id) => ({
   icon: TRACK_ICONS[id],
 }));
 
+const routeApi = getRouteApi('/$locale/challenges/');
+
 export function ChallengesPage() {
-  const { locale } = Route.useParams();
+  const { locale } = routeApi.useParams();
   const { t } = useTranslation('challenges');
-  const navigate = Route.useNavigate();
+  const navigate = routeApi.useNavigate();
 
   // URL-based State
-  const { track, q, hideCompleted, view, tier } = Route.useSearch();
+  const { track, q, hideCompleted, view, tier } = routeApi.useSearch();
   const activeTrackId = track as TrackId;
   const viewMode = view;
 

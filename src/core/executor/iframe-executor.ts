@@ -62,6 +62,7 @@ export async function executePlaywrightCode(
   // This redirects [Action] click logs from DevTools to the User Console UI
   let logCounter = 0;
   logger.setHandler((level, message, args) => {
+    // console.log('[DEBUG] Handler intercepted:', level, message);
     // Basic formatting for args
     const argsStr = args.length ? ' ' + args.map(String).join(' ') : '';
     logs.push({
@@ -74,10 +75,11 @@ export async function executePlaywrightCode(
   // Patch HTML content for specific challenges where happy-dom needs checking
   // e.g. pw-wait-for-response uses relative fetch which fails in happy-dom
   let finalHtml = htmlContent;
-  if (htmlContent.includes("fetch('/api/data')")) {
+  const fetchRegex = /fetch\(('|")\/api\/data('|")\)/;
+  if (htmlContent.match(fetchRegex)) {
     finalHtml = htmlContent.replace(
-      "fetch('/api/data')",
-      "fetch('http://localhost/api/data')",
+      fetchRegex,
+      "fetch($1http://localhost/api/data$1)",
     );
   }
 
@@ -108,12 +110,9 @@ export async function executePlaywrightCode(
   ];
 
   if (strictMode) {
+    const codeToTest = executableCode.trim();
     for (const { pattern, message } of forbiddenPatterns) {
-      if (pattern.test(executableCode)) {
-        // Check if it might be inside an evaluate block (naive check)
-        // If the code line containing the pattern is not inside an evaluate, throw error
-        // Ideally we'd use AST, but for now we'll just warn if it looks suspicious
-        // Actually, let's just return a FAILED result immediately to teach the user.
+      if (pattern.test(codeToTest)) {
         return {
           status: 'FAILED',
           output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
@@ -584,15 +583,21 @@ export async function executePlaywrightCode(
             const wrappedCode = `
                         return (async () => {
                             try {
-                                ${executableCode}
+                                const result = (async () => {
+                                    ${executableCode}
+                                })();
+                                
+                                const finalResult = await result;
 
                                 // Wait for all tests to complete
                                 if (window.__testPromises && Array.isArray(window.__testPromises)) {
                                     await Promise.all(window.__testPromises);
                                 }
 
-                                if (typeof result !== "undefined") return result;
+                                window.__returnValue = finalResult;
+                                return finalResult;
                             } catch (e) {
+                                window.__executionError = e.message || String(e);
                                 throw e;
                             }
                         })();
@@ -622,8 +627,7 @@ export async function executePlaywrightCode(
                 'console',
                 wrappedCode,
               );
-              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
-              returnValue = await fallbackFn(
+              await fallbackFn(
                 page,
                 expect,
                 test,
@@ -631,9 +635,10 @@ export async function executePlaywrightCode(
                 enhancedDocument,
                 contentWindow.console,
               );
+              returnValue = (contentWindow as any).__returnValue;
               /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
             }
-
+            
             const executionTime = Date.now() - startTime;
             cleanup();
 
@@ -728,7 +733,7 @@ function formatError(error: unknown): string {
   if (msg.includes('Element not found')) {
     return `${msg}\n\n💡 Tip: Check if your selector matches the HTML structure in the Preview tab.`;
   }
-  if (msg.includes('Timeout waiting')) {
+  if (msg.includes('Timeout') && msg.includes('waiting')) {
     return `${msg}\n\n💡 Tip: The element might not be visible yet, or the operation took too long.`;
   }
   if (msg.includes('is not defined')) {

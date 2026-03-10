@@ -59,8 +59,11 @@ export interface ExpectResult {
         toBeHidden: (options?: { timeout?: number }) => Promise<void>;
         toHaveText: (text: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveValue: (value: string | RegExp, options?: { timeout?: number }) => Promise<void>;
-        toContainText: (text: string, options?: { timeout?: number }) => Promise<void>;
+        toContainText: (text: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveAttribute: (name: string, value?: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toHaveClass: (className: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toHaveCSS: (name: string, value: string | RegExp, options?: { timeout?: number }) => Promise<void>;
+        toHaveJSProperty: (name: string, value: any, options?: { timeout?: number }) => Promise<void>;
         toHaveCount: (count: number, options?: { timeout?: number }) => Promise<void>;
         toBeChecked: (options?: { timeout?: number }) => Promise<void>;
         toBeEnabled: (options?: { timeout?: number }) => Promise<void>;
@@ -70,7 +73,6 @@ export interface ExpectResult {
         toBeEmpty: (options?: { timeout?: number }) => Promise<void>;
         toHaveTitle: (title: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveURL: (url: string | RegExp, options?: { timeout?: number }) => Promise<void>;
-        toHaveClass: (className: string | RegExp, options?: { timeout?: number }) => Promise<void>;
 
         not: any; // Simplified for brevity in type definition, implementation handles it
     }) & {

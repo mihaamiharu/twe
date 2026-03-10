@@ -19,12 +19,6 @@ mock.module('@/lib/storage-adapter', () => ({
     },
 }));
 
-mock.module('@tanstack/react-query', () => ({
-    useMutation: () => ({
-        mutate: mock(),
-        isPending: false,
-    }),
-}));
 
 mock.module('sonner', () => ({
     toast: {
@@ -32,9 +26,6 @@ mock.module('sonner', () => ({
     },
 }));
 
-mock.module('react-i18next', () => ({
-    useTranslation: () => ({ t: (k: string) => k }),
-}));
 
 describe('useChallengeExecution', () => {
     const mockState = {
@@ -83,7 +74,7 @@ describe('useChallengeExecution', () => {
     const mockIframe = { current: null };
 
     beforeEach(() => {
-        mock.restore();
+
     });
 
     it('should run code successfully', async () => {

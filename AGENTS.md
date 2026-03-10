@@ -1,4 +1,4 @@
-# AGENTS.md
+# AGENTS.md (Updated 2026)
 
 This file contains guidelines for agentic coding assistants working in this repository.
 
@@ -6,295 +6,136 @@ This file contains guidelines for agentic coding assistants working in this repo
 
 ### Build & Dev
 
-- `npm run dev` - Start development server on port 3000
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
+* `bun run dev` - Start development server (Nitro + Vite)
+* `bun run build` - Build for production
+* `bun run preview` - Preview production build
 
 ### Testing
 
-- `bun test` - Run all tests
-- `bun test path/to/test.ts` - Run a single test file
-- `npm run test:unit` - Run unit tests only
-- `npm run test:integration` - Run integration tests (requires test DB)
-- `npm run test:ci` - Run all tests in CI environment
-- `npm run test:e2e` - Run E2E tests (Playwright, auto-starts postgres)
-- `npm run test:e2e:stop` - Stop postgres container
-- `npm run test:e2e:report` - Generate and open Allure report
+* `bun test` - Run unit/logic tests
+* `bun run test:e2e` - Run Playwright tests (Playwright now handles orchestration)
 
-### Linting & Formatting
+### Database (Drizzle ORM v1.0+)
 
-- `npm run lint` - Check code with ESLint
-- `npm run lint:fix` - Fix auto-fixable ESLint issues
-- `npm run format` - Format code with Prettier
+We use `podman` by default for local environment infrastructure.
 
-### Database
+* `bun run db:push` - Sync schema to DB (Development)
+* `bun run db:migrate` - Execute production migrations
+* `bun run db:studio` - Open Drizzle Studio
 
-- `npm run db:generate` - Generate Drizzle migrations
-- `npm run db:migrate` - Run database migrations
-- `npm run db:push` - Push schema changes to database
-- `npm run db:seed` - Seed database with challenges from JSON files
-- `npm run db:studio` - Open Drizzle Studio
+---
 
-## AI & LLM Integration (DeepSeek)
+## TanStack Start Architecture & Conventions
 
-### Token Efficiency ("Static-First" Rule)
+### 1. File-Based Routing & SSR
 
-Since DeepSeek uses **Automatic Prefix Caching**, you must order messages to maximize cache hits.
+TanStack Start uses **isomorphic loaders**. By default, it performs SSR on the initial request and behaves like a client-side SPA for subsequent navigations.
 
-**Rule**: "Always keep system instructions and project-wide context at the very top of the prompt. Do not rephrase the system instructions between turns."
-
-**Why**: DeepSeek only caches from the top down. If the first few tokens change (e.g., dynamic context in the system prompt), it breaks the cache for everything below it, increasing costs and latency.
-
-**Implementation**:
-
-1. **System Message**: Keep it completely static (e.g., "You are a QA mentor..."). Do NOT include dynamic values like `challengeType` or user names here.
-2. **User Message**: Start with the dynamic context (e.g., "Context: Challenge is CSS Selectors...").
-
-## TanStack Start Project Structure & Conventions
-
-### File-Based Routing (TanStack Router)
-
-TanStack Start uses file-based routing:
-
-- **Routes Directory**: `src/routes/` - File paths become routes
-- **Pattern**: Files ending in `.tsx` or `.ts` are auto-registered as routes
-- **Authenticated Routes**: Protected routes go in `src/routes/$locale/_authenticated.tsx`
-- **Admin Routes**: Admin routes go in `src/routes/admin/`
-- **API Routes**: API routes go in `src/routes/api/auth/` and `src/routes/api/auth/`
-
-**Route Patterns**:
+* **Selective SSR**: You can disable SSR for specific routes (e.g., heavy dashboards) using the `ssr` flag:
 
 ```ts
-// File-based route
-import { createFileRoute } from '@tanstack/react-router';
-
-export const Route = createFileRoute('/')({
-  component: () => <div>Home</div>,
+export const Route = createFileRoute('/dashboard')({
+  ssr: false, // Disables SSR for this route
+  component: DashboardComponent,
 });
 ```
 
-### Server Functions (TanStack Start API)
+### 2. Composable Middleware (New in 2026)
 
-**Create API Endpoints**:
+Middleware is now the standard for Auth and Logging. There are two types: **Request Middleware** (all requests) and **Server Function Middleware** (logic-specific).
 
 ```ts
-import { createServerFn } from '@tanstack/react-start/server';
+import { createMiddleware } from '@tanstack/react-start';
 
-export const myApiFn = createServerFn({ method: 'POST' })
-  .inputValidator((input: { email: string }) => input)
-  .handler(async ({ data }) => {
-    return { success: true, data };
+// 1. Define reusable middleware
+const authMiddleware = createMiddleware().server(async ({ next, context }) => {
+  const session = await getSession(); // Your auth logic
+  if (!session) throw new Error('Unauthorized');
+  return next({ context: { user: session.user } });
+});
+
+// 2. Apply to Server Functions
+export const deleteChallenge = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware]) // Infers 'user' into context
+  .handler(async ({ context }) => {
+     const userId = context.user.id;
+     // ...
   });
 ```
 
-### Content Management (Filesystem-based)
+### 3. Server Functions (Replacement for tRPC/API)
 
-- **Challenges**: `content/challenges/` - JSON files for challenge data
-- **Tutorials**: `tutorials/` - Markdown files for tutorial content
-- **Loading**: `src/server/content.server.ts` - Loads content from JSON files
+Use `createServerFn` for all data mutations and sensitive queries.
 
-### Database (Drizzle ORM)
-
-**Imports**: Use `@/db` alias for database operations:
+* **Always** use `.validator()` with Zod for input safety.
+* **Context**: Access DB or Auth via `context` injected by middleware.
 
 ```ts
-import { db } from '@/db';
-import { users, challenges } from '@/db/schema';
-```
-
-**Queries**: Use Drizzle query patterns:
-
-```ts
-const user = await db.query.users.findFirst({
-  where: eq(users.id, userId),
-  with: { challenges: true },
-});
-```
-
-**Relations**: Defined in `src/db/schema.ts`:
-
-```ts
-import { relations } from '@/db/schema';
-```
-
-### State Management
-
-**Authentication** (Better-Auth):
-
-```ts
-import { auth } from '@/lib/auth.server';
-const session = await auth.api.getSession({ headers });
-```
-
-**Client Data Fetching** (TanStack Query):
-
-```ts
-import { useQuery } from '@tanstack/react-query';
-
-function MyComponent() {
-  const { data } = useQuery({
-    queryKey: ['my-data'],
-    queryFn: () => fetch('/api/data'),
-  });
-  const data = data.data;
-  return data;
-}
-```
-
-**Return Pattern**:
-
-```ts
-type Result<T> = { success: true; data: T } | { success: false; error: string };
-```
-
-**Search & Filtering**:
-When implementing live search or filtering, **Avoid `useSuspenseQuery`** as it triggers suspense boundaries (flickering) on every keystroke.
-Instead, use `useQuery` with `placeholderData: keepPreviousData`:
-
-```ts
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-
-const { data } = useQuery({
-  queryKey: ['items', search],
-  queryFn: () => fetchItems(search),
-  placeholderData: keepPreviousData, // Keeps old data visible while fetching
-});
-```
-
-### React Components
-
-- **Use `cn()` from `@/lib/utils` for className merging**
-- **Follow shadcn/ui patterns** for component structure
-- **Use `React.ComponentProps` for forwarding props**
-
-```ts
-function MyComponent({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('base-classes', className)} {...props}>...</div>;
-}
-```
-
-### Data Tables (TanStack Table)
-
-**Use TanStack Table** (`@tanstack/react-table`) for:
-
-- Complex datasets requiring **sorting, filtering, or pagination**.
-- Data grids with mixed content types or row selection.
-
-**Avoid** for simple, small, or static lists where a simple `.map()` is sufficient.
-
-**Implementation Pattern**:
-
-- Define columns using `createColumnHelper`.
-- Decouple data logic (hooks) from UI rendering.
-- Integrate with `shadcn/ui` Table components for styling.
-
-### Testing Guidelines
-
-- **Bun test framework**: Import from `'bun/test'`: `describe`, `it`, `expect`
-- **Unit tests**: Use `--preload ./src/tests/bun-preload.ts`
-- **Integration tests**: Use `src/tests/integration/setup.ts` for DB setup
-
-```ts
-import { describe, it, expect } from 'bun:test';
-
-describe('myFunction', () => {
-  it('should return correct value', () => {
-    const result = myFunction('input');
-    expect(result).toBe('expected');
-  });
-});
-```
-
-### Validation (Zod)
-
-**Runtime validation**:
-
-```ts
+import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
-export const mySchema = z.object({
-  email: z.string().email(),
-  age: z.number().min(0),
+export const updateXp = createServerFn({ method: 'POST' })
+  .validator(z.object({ amount: z.number() }))
+  .handler(async ({ data, context }) => {
+    // context.user is available if authMiddleware is used
+    return { success: true, newTotal: 100 };
+  });
+```
+
+### 4. URL-First State (Search & Filtering)
+
+Avoid local `useState` for filters. Use **Typesafe Search Params** to ensure filters are shareable and SEO-friendly.
+
+* **Validation**: Define the schema in the route.
+* **Navigation**: Use `Maps` to update params.
+
+```ts
+export const Route = createFileRoute('/challenges/')({
+  validateSearch: z.object({
+    search: z.string().optional(),
+    track: z.enum(['all', 'selectors', 'js']).fallback('all'),
+  }),
 });
 
-export type MyInput = z.infer<typeof mySchema>;
+function ChallengesPage() {
+  const { search, track } = Route.useSearch();
+  const navigate = Route.useNavigate();
+
+  const handleSearch = (val: string) => {
+    navigate({ search: (prev) => ({ ...prev, search: val }) });
+  };
+}
 ```
 
-### Logging
+### 5. Client Data Fetching (TanStack Query)
 
-Use the structured logger from `@/lib/logger`:
+For high-frequency UI updates (like live search), use `useQuery` with `placeholderData`.
 
 ```ts
-import { logger } from '@/lib/logger';
-
-logger.debug('Debug message', { context: 'data' });
-logger.info('Info message');
-logger.warn('Warning message');
-logger.error('Error message', error);
+const { data } = useQuery({
+  queryKey: ['challenges', search],
+  queryFn: () => fetchChallenges(search),
+  placeholderData: (prev) => prev, // Standard 2026 pattern to prevent flickering
+});
 ```
 
-### Internationalization (i18next)
+### 6. Project Directory Structure
 
-- **Use `useTranslation`** from 'react-i18next'
-- **Translation keys**: `'namespace:key'`
-- **Namespace files**: `src/locales/`
+* `src/routes/` - File-based routes (standard)
+* `src/server/` - All `.fn.ts` (Server Functions) and `.mw.ts` (Middleware)
+* `src/components/ui/` - Shadcn/ui atomic components
+* `src/db/` - Drizzle schemas and client config
 
-```ts
-import { useTranslation } from 'react-i18next';
+---
 
-const { t } = useTranslation('common');
-const text = t('navigation.login');
-```
+## Best Practices for Agents
 
-## Project Structure Notes
+1. **No Any**: Use `z.infer` for all Server Function inputs/outputs.
+2. **Prefer Server Functions**: Only use `api/` routes for external webhooks or non-React consumers.
+3. **Optimistic Updates**: Always implement optimistic UI logic in TanStack Query mutations for a "zero-latency" feel.
+4. **Isomorphic Logic**: Keep logic inside `loader` or `Server Functions`. Avoid `useEffect` for data fetching.
+5. **Environment Run**: We default to `podman local` rather than traditional `docker` when standing up services.
 
-- `src/components/` - React components, organized by feature
-- `src/lib/` - Utilities and shared logic
-- `src/server/` - Server functions (`.fn.ts` files`)
-- `src/db/` - Database schema and connection
-- `src/routes/` - TanStack Router file-based routes
-- `src/tests/` - Unit and integration tests
-- `e2e/` - Playwright end-to-end tests
-- `content/` - Challenge content (JSON)
-- `tutorials/` - Tutorial markdown files
+---
 
-## TanStack Start Technology Stack
-
-### Core Frameworks
-
-| Technology      | Purpose                                               |
-| --------------- | ----------------------------------------------------- |
-| TanStack Start  | Meta-framework (Vite + React Router + Query + Server) |
-| TanStack Router | File-based routing (v1+)                              |
-| TanStack Query  | Client state management                               |
-| Drizzle ORM     | Type-safe SQL                                         |
-| Better-Auth     | Authentication                                        |
-| Playwright      | E2E testing                                           |
-| Drizzle Studio  | Database GUI                                          |
-
-### Integration Points
-
-**TanStack Router → Routes**: Auto-generated routes from `src/routes/`
-**Better-Auth → Server Functions**: `createServerFn()` for API routes
-**TanStack Query → React Hooks**: `useQuery()` for component data
-**Drizzle ORM → Database**: `@/db` for database access
-
-## Development Workflow
-
-1. **Start Development**:
-
-   ```bash
-   npm run dev
-   ```
-
-2. **Run Tests**:
-
-   ```bash
-   npm run test:e2e    # Runs E2E tests with Allure report
-   ```
-
-3. **Generate Report**:
-
-   ```bash
-   npm run test:e2e:report    # Opens Allure HTML report
-   ```
+[This video covers the complete 10-hour deep dive into TanStack Start](https://www.youtube.com/watch?v=FsIASz_Uvd0), including the exact 2026 patterns for Server Functions, Middleware, and the new SSR architecture discussed above.

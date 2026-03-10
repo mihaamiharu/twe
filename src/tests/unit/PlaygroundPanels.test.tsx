@@ -51,9 +51,6 @@ mock.module('@/components/challenges/ConsoleOutput', () => ({
 }));
 
 // Mock i18n
-mock.module('react-i18next', () => ({
-    useTranslation: () => ({ t: (k: string) => k }),
-}));
 
 describe('Playground Panels', () => {
     afterEach(cleanup);

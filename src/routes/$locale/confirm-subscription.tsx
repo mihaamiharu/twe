@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { confirmSubscription } from '@/server/newsletter.fn';
 import { CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
@@ -26,9 +26,11 @@ export const Route = createFileRoute('/$locale/confirm-subscription')({
     },
 });
 
+const routeApi = getRouteApi('/$locale/confirm-subscription');
+
 function ConfirmSubscriptionPage() {
-    const { token } = Route.useSearch();
-    const { locale } = Route.useParams();
+    const { token } = routeApi.useSearch();
+    const { locale } = routeApi.useParams();
 
     const { data, isLoading, error } = useQuery({
         queryKey: ['confirm-subscription', token],
