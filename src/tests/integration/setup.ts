@@ -21,8 +21,11 @@ export async function truncateTables() {
   const tables = [
     'progress',
     'user_achievements',
+    'submissions',
     'users',
+    'test_cases',
     'challenges',
+    'tutorials',
     'achievements',
   ];
   for (const table of tables) {
