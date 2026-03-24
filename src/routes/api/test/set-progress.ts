@@ -3,6 +3,14 @@ import { db } from '@/db';
 import { users, progress, submissions, challenges, tutorials } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { requireTestEnv } from '@/server/test-env.server';
+import { z } from 'zod';
+
+const setProgressSchema = z.object({
+  email: z.string().email(),
+  type: z.enum(['challenge', 'tutorial']),
+  slug: z.string(),
+  xp: z.number().optional().default(10),
+});
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Route = createFileRoute('/api/test/set-progress' as any)({
@@ -13,24 +21,14 @@ export const Route = createFileRoute('/api/test/set-progress' as any)({
         if (errorResponse) return errorResponse;
 
         try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const body = await request.json();
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          const { email, type, slug, xp = 10 } = body as { email?: string; type?: string; slug?: string; xp?: number };
-
-          if (!email || !type || !slug) {
+          const parsed = setProgressSchema.safeParse(await request.json());
+          if (!parsed.success) {
             return new Response(
-              JSON.stringify({ error: 'Email, type, and slug are required' }),
+              JSON.stringify({ error: 'Invalid payload', details: parsed.error }),
               { status: 400, headers: { 'Content-Type': 'application/json' } }
             );
           }
-
-          if (type !== 'challenge' && type !== 'tutorial') {
-            return new Response(
-              JSON.stringify({ error: 'Type must be "challenge" or "tutorial"' }),
-              { status: 400, headers: { 'Content-Type': 'application/json' } }
-            );
-          }
+          const { email, type, slug, xp } = parsed.data;
 
           const userRecord = await db.query.users.findFirst({ where: eq(users.email, email) });
           if (!userRecord) {

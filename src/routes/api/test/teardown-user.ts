@@ -3,6 +3,11 @@ import { db } from '@/db';
 import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { requireTestEnv } from '@/server/test-env.server';
+import { z } from 'zod';
+
+const teardownSchema = z.object({
+  email: z.string().email(),
+});
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const Route = createFileRoute('/api/test/teardown-user' as any)({
@@ -13,18 +18,15 @@ export const Route = createFileRoute('/api/test/teardown-user' as any)({
         if (errorResponse) return errorResponse;
 
         try {
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-          const body = await request.json();
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-          if (!body.email || typeof body.email !== 'string') {
+          const body = teardownSchema.safeParse(await request.json());
+          if (!body.success) {
             return new Response(
-              JSON.stringify({ error: 'Valid email is required' }),
+              JSON.stringify({ error: 'Valid email is required', details: body.error }),
               { status: 400, headers: { 'Content-Type': 'application/json' } }
             );
           }
 
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
-          await db.delete(users).where(eq(users.email, body.email));
+          await db.delete(users).where(eq(users.email, body.data.email));
 
           return new Response(
             JSON.stringify({ success: true, message: 'User torn down completely' }),
