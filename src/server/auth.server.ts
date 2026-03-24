@@ -48,7 +48,7 @@ export const auth = betterAuth({
   // Disable email verification in development/staging for easier testing
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: process.env.NODE_ENV === 'production',
+    requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION === 'true' || process.env.NODE_ENV === 'production',
     sendResetPassword: async ({ user, url }) => {
       // Fire and forget email sending to avoid blocking the user flow
       sendPasswordResetEmail(user.email, url, user.name || undefined).catch(
@@ -64,7 +64,7 @@ export const auth = betterAuth({
 
   // Email verification configuration
   emailVerification: {
-    sendOnSignUp: process.env.NODE_ENV === 'production',
+    sendOnSignUp: process.env.REQUIRE_EMAIL_VERIFICATION === 'true' || process.env.NODE_ENV === 'production',
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       // Fire and forget email sending to avoid blocking the user flow

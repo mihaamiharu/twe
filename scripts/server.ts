@@ -8,7 +8,8 @@ import { getSentryConfig } from "../src/lib/sentry.config";
 
 Sentry.init(getSentryConfig());
 
-console.log(`🚀 Production server starting on port ${PORT}...`);
+const env = process.env.NODE_ENV || 'development';
+console.log(`🚀 ${env.charAt(0).toUpperCase() + env.slice(1)} server starting on port ${PORT}...`);
 
 Bun.serve({
     port: PORT,
