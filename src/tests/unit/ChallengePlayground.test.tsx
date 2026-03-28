@@ -57,7 +57,8 @@ describe('ChallengePlayground', () => {
         spyOn(stateHook, 'usePlaygroundState').mockReturnValue(mockState as any);
         spyOn(execHook, 'useChallengeExecution').mockReturnValue(mockExecution as any);
 
-        mock.module('@/components/challenges/playground/Header/PlaygroundHeader', () => ({
+        void mock.module(
+'@/components/challenges/playground/Header/PlaygroundHeader', () => ({
             PlaygroundHeader: ({ challenge, onRunCode }: any) => (
                 <div data-testid="header">
                     {challenge.title}
@@ -66,39 +67,48 @@ describe('ChallengePlayground', () => {
             )
         }));
 
-        mock.module('@/components/challenges/playground/layouts/PlaygroundDesktopLayout', () => ({
+        void mock.module(
+'@/components/challenges/playground/layouts/PlaygroundDesktopLayout', () => ({
             PlaygroundDesktopLayout: () => <div data-testid="desktop-layout">Desktop Layout</div>
         }));
 
-        mock.module('@/components/challenges/playground/layouts/PlaygroundMobileLayout', () => ({
+        void mock.module(
+'@/components/challenges/playground/layouts/PlaygroundMobileLayout', () => ({
             PlaygroundMobileLayout: () => <div data-testid="mobile-layout">Mobile Layout</div>
         }));
 
-        mock.module('@/components/challenges/playground/practice-mode-banner', () => ({
+        void mock.module(
+'@/components/challenges/playground/practice-mode-banner', () => ({
             PracticeModeBanner: () => <div data-testid="practice-banner">Practice Mode</div>
         }));
 
-        mock.module('@/components/challenges/playground/playground-goal-bar', () => ({
+        void mock.module(
+'@/components/challenges/playground/playground-goal-bar', () => ({
             PlaygroundGoalBar: ({ description }: any) => <div data-testid="goal-bar">{description}</div>
         }));
 
-        mock.module('@/components/challenges/playground/loading-overlay', () => ({
+        void mock.module(
+'@/components/challenges/playground/loading-overlay', () => ({
             LoadingOverlay: () => <div data-testid="loading-overlay">Loading...</div>
         }));
 
-        mock.module('@/components/challenges/playground/hint-confirm-dialog', () => ({
+        void mock.module(
+'@/components/challenges/playground/hint-confirm-dialog', () => ({
             HintConfirmDialog: () => null
         }));
 
-        mock.module('@/components/challenges/playground/reset-confirm-dialog', () => ({
+        void mock.module(
+'@/components/challenges/playground/reset-confirm-dialog', () => ({
             ResetConfirmDialog: ({ open }: any) => open ? <div data-testid="reset-dialog">Reset Dialog</div> : null
         }));
 
-        mock.module('@/components/challenges/playground/hint-display-panel', () => ({
+        void mock.module(
+'@/components/challenges/playground/hint-display-panel', () => ({
             HintDisplayPanel: () => null
         }));
 
-        mock.module('@/core/executor', () => ({
+        void mock.module(
+'@/core/executor', () => ({
             executePlaywrightCode: mock(() => Promise.resolve({ status: 'PASSED' }))
         }));
     });

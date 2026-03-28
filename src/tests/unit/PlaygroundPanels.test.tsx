@@ -5,7 +5,8 @@ import { SelectorPanel } from '@/components/challenges/playground/selector-panel
 import { ResultsPanel } from '@/components/challenges/playground/results-panel';
 
 // Mock dependencies
-mock.module('@/components/challenges/code-editor', () => ({
+void mock.module(
+'@/components/challenges/code-editor', () => ({
     CodeEditor: ({ initialCode, onChange }: any) => (
         <textarea
             data-testid="code-editor"
@@ -15,15 +16,18 @@ mock.module('@/components/challenges/code-editor', () => ({
     ),
 }));
 
-mock.module('@/components/challenges/file-explorer', () => ({
+void mock.module(
+'@/components/challenges/file-explorer', () => ({
     FileExplorer: () => <div data-testid="file-explorer">File Explorer</div>,
 }));
 
-mock.module('@/components/challenges/multi-tab-editor', () => ({
+void mock.module(
+'@/components/challenges/multi-tab-editor', () => ({
     MultiTabEditor: () => <div data-testid="multi-tab-editor">Multi Tab Editor</div>,
 }));
 
-mock.module('@/components/challenges/selector-input', () => ({
+void mock.module(
+'@/components/challenges/selector-input', () => ({
     SelectorInput: ({ value, onChange, onValidate, defaultType }: any) => (
         <div data-testid="selector-input">
             <input
@@ -36,7 +40,8 @@ mock.module('@/components/challenges/selector-input', () => ({
     ),
 }));
 
-mock.module('@/components/challenges/test-results', () => ({
+void mock.module(
+'@/components/challenges/test-results', () => ({
     TestResults: ({ results }: any) => (
         <div data-testid="test-results">
             {results.map((r: any) => (
@@ -46,7 +51,8 @@ mock.module('@/components/challenges/test-results', () => ({
     ),
 }));
 
-mock.module('@/components/challenges/console-output', () => ({
+void mock.module(
+'@/components/challenges/console-output', () => ({
     ConsoleOutput: () => <div data-testid="console-output">Console Output</div>,
 }));
 

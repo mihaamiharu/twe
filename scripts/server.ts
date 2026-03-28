@@ -1,4 +1,4 @@
-// @ts-ignore
+// @ts-expect-error - dist import is untyped
 import server from '../dist/server/server.js';
 
 const PORT = process.env.PORT || 3000;
@@ -46,7 +46,7 @@ Bun.serve({
 
         // SSR fallback to TanStack Start handler
         try {
-            return await server.fetch(req);
+            return await (server as any).fetch(req);
         } catch (error) {
             Sentry.captureException(error);
             console.error('SSR Error:', error);

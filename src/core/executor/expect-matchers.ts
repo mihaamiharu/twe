@@ -363,7 +363,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     if (actual && typeof actual.evaluate === 'function') {
                         propValue = await actual.evaluate((el: any, name: string) => el[name], name);
                     } else if (actual) {
-                        propValue = (actual as any)[name];
+                        propValue = (actual)[name];
                     }
                     const pass = JSON.stringify(propValue) === JSON.stringify(value);
                     return {

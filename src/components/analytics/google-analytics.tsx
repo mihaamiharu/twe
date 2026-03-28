@@ -22,7 +22,7 @@ export function GoogleAnalytics({ measurementId }: { measurementId?: string }) {
 
     // Define gtag if it doesn't exist
     if (!window.gtag) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       window.gtag = function () {
         // eslint-disable-next-line prefer-rest-params
         window.dataLayer.push(arguments);

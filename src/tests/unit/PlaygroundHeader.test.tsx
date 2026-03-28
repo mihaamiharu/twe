@@ -5,7 +5,8 @@ import { PlaygroundHeader } from '@/components/challenges/playground/playground-
 // Mock dependencies
 
 
-mock.module('lucide-react', () => ({
+void mock.module(
+'lucide-react', () => ({
     Play: () => <svg data-testid="play-icon" />,
     Send: () => <svg data-testid="send-icon" />,
     BookOpen: () => <svg data-testid="book-icon" />,
@@ -16,7 +17,8 @@ mock.module('lucide-react', () => ({
     ChevronRight: () => <svg data-testid="right-icon" />,
 }));
 
-mock.module('@/components/ui/tooltip', () => ({
+void mock.module(
+'@/components/ui/tooltip', () => ({
     Tooltip: ({ children }: any) => <>{children}</>,
     TooltipTrigger: ({ children }: any) => <>{children}</>,
     TooltipContent: ({ children }: any) => <div data-testid="tooltip-content">{children}</div>,

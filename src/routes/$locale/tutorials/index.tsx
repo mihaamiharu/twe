@@ -133,7 +133,7 @@ function TutorialsPage() {
       );
       if (tag) {
         // Explicitly cast tag to string to avoid typescript error since we just checked it
-        const key = (tag as string).toLowerCase();
+        const key = (tag).toLowerCase();
         if (groups[key]) groups[key].push(t);
         else groups['other'].push(t);
       } else {

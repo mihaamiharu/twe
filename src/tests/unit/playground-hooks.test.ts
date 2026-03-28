@@ -6,7 +6,8 @@ import { usePlaygroundState } from '@/components/challenges/playground/use-playg
 // Mock i18n
 
 // Mock type-generator
-mock.module('@/core/type-generator', () => ({
+void mock.module(
+'@/core/type-generator', () => ({
     generateTypeDefinitions: () => '',
 }));
 

@@ -51,7 +51,7 @@ export const auth = betterAuth({
     requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION === 'true' || process.env.NODE_ENV === 'production',
     sendResetPassword: async ({ user, url }) => {
       // Fire and forget email sending to avoid blocking the user flow
-      sendPasswordResetEmail(user.email, url, user.name || undefined).catch(
+      void sendPasswordResetEmail(user.email, url, user.name || undefined).catch(
         (error) => {
           console.error(
             '[Auth] Background password reset email failed:',
@@ -68,7 +68,7 @@ export const auth = betterAuth({
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
       // Fire and forget email sending to avoid blocking the user flow
-      sendVerificationEmail(user.email, url, user.name || undefined).catch(
+      void sendVerificationEmail(user.email, url, user.name || undefined).catch(
         (error) => {
           console.error('[Auth] Background verification email failed:', error);
         },

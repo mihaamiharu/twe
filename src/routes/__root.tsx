@@ -52,7 +52,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
         ?.split('=')[1];
 
       if (cookieValue === 'granted' || cookieValue === 'denied') {
-        consent = cookieValue as 'granted' | 'denied';
+        consent = cookieValue;
       }
     } else {
       // Server-side: read via Server Function

@@ -1,26 +1,30 @@
-import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
+import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { renderHook, act } from '@testing-library/react';
 import { useChallengeExecution } from '@/components/challenges/playground/use-challenge-execution';
 import * as executor from '@/core/executor';
 import * as storage from '@/lib/storage-adapter';
 
 // Mock dependencies
-mock.module('@/core/executor', () => ({
+void mock.module(
+'@/core/executor', () => ({
     executePlaywrightCode: mock(),
 }));
 
-mock.module('@/core/executor/module-preloader', () => ({
+void mock.module(
+'@/core/executor/module-preloader', () => ({
     generatePreloadCode: () => '',
 }));
 
-mock.module('@/lib/storage-adapter', () => ({
+void mock.module(
+'@/lib/storage-adapter', () => ({
     storage: {
         removeItem: mock(() => Promise.resolve()),
     },
 }));
 
 
-mock.module('sonner', () => ({
+void mock.module(
+'sonner', () => ({
     toast: {
         error: mock(),
     },
@@ -169,7 +173,7 @@ describe('useChallengeExecution', () => {
         });
 
         // Check cleanup
-        expect(storage.storage.removeItem).toHaveBeenCalled();
+        expect((storage.storage.removeItem as any)).toHaveBeenCalled();
         expect(mockState.setCode).toHaveBeenCalledWith(expect.any(String)); // starterCode
         expect(mockState.setHasPassed).toHaveBeenCalledWith(false);
         expect(mockState.setTestResults).toHaveBeenCalledWith([]);

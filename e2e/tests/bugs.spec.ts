@@ -29,7 +29,7 @@ test.describe('Bug Reporting Flow', () => {
     // Check if dialog appeared, if not, try the user menu (header)
     try {
       await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
-    } catch (e) {
+    } catch {
       // Click avatar to open menu
       await page
         .locator('header')

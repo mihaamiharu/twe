@@ -71,7 +71,7 @@ describe('Playwright Shim VFS (Multi-page Support)', () => {
     await page.goto('/about.html');
     
     const iframe = document.querySelector('iframe')!;
-    // @ts-ignore
+    // @ts-expect-error - reaching into iframe window
     expect((iframe.contentWindow as any).aboutLoaded).toBe(true);
   });
 
@@ -86,7 +86,7 @@ describe('Playwright Shim VFS (Multi-page Support)', () => {
     const btn = iframe.contentDocument?.getElementById('btn');
     btn?.click();
     
-    // @ts-ignore
+    // @ts-expect-error - reaching into iframe window
     expect((iframe.contentWindow as any).clicked).toBe(true);
   });
 

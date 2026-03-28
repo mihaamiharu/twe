@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { db } from '@/db';
 import { challenges, progress, submissions } from '@/db/schema';
-import { eq, and, asc, desc, sql, gt, or, inArray, ilike, not } from 'drizzle-orm';
+import { eq, and, asc, desc, sql, or } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { obfuscate } from '@/lib/obfuscator';
 import { auth } from './auth.server';
@@ -12,13 +12,6 @@ import {
   getChallengeList,
   getTutorialContent,
 } from './content.server';
-
-// Helper for localizable fields (still needed for DB records)
-const getLocalizedValue = (value: unknown, locale: string): string => {
-  if (!value || typeof value !== 'object') return '';
-  const obj = value as Record<string, string>;
-  return obj[locale] || obj['en'] || '';
-};
 
 // ----------------------------------------------------------------------------
 // GET CHALLENGES (LIST) - NOW USING FILESYSTEM

@@ -96,7 +96,7 @@ function ConfirmSubscriptionPage() {
                         {isLoading
                             ? 'Please wait while we confirm your subscription.'
                             : error
-                                ? (error as Error).message
+                                ? (error).message
                                 : 'Thank you for subscribing to the TestingWithEkki newsletter. You will now receive updates on new tutorials and challenges.'}
                     </CardDescription>
                 </CardHeader>

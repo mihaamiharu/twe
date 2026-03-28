@@ -113,7 +113,7 @@ describe('E2E Test Support APIs', () => {
 
   describe('Set & Reset Progress APIs', () => {
     test('sets challenge progress correctly and grants XP', async () => {
-      // @ts-ignore
+      // @ts-expect-error - reaching into internal handlers
       const handler = setProgressRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 });
       
@@ -136,12 +136,12 @@ describe('E2E Test Support APIs', () => {
 
     test('resets all challenge progress and resets user XP', async () => {
       // Setup: set progress first
-      // @ts-ignore
+      // @ts-expect-error - reaching into internal handlers
       const setHandler = setProgressRoute.options.server.handlers.POST;
       await setHandler({ request: buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 }) });
       
       // Reset
-      // @ts-ignore
+      // @ts-expect-error - reaching into internal handlers
       const resetHandler = resetRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL, type: 'challenge' }); // null slug means all 
       const res = await resetHandler({ request: req });
