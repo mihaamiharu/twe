@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { RotateCcw, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { CodeEditor } from '../CodeEditor';
-import { FileExplorer } from '../FileExplorer';
-import { MultiTabEditor } from '../MultiTabEditor';
+import { CodeEditor } from '../code-editor';
+import { FileExplorer } from '../file-explorer';
+import { MultiTabEditor } from '../multi-tab-editor';
 import type { Challenge, PlaygroundState } from './types';
 
 interface EditorPanelProps {

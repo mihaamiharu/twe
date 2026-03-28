@@ -16,10 +16,10 @@ import {
 } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
-import { UserMenu } from '@/components/UserMenu';
+import { UserMenu } from '@/components/user-menu';
 import { signOut } from '@/lib/auth.client';
-import { BugReportDialog } from '@/components/BugReportDialog';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
+import { BugReportDialog } from '@/components/bug-report-dialog';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 

@@ -1,7 +1,7 @@
 // Layout Components
-export { Header } from './Header';
-export { Footer } from './Footer';
-export { Spinner, LoadingOverlay, LoadingPage } from './Spinner';
+export { Header } from './header';
+export { Footer } from './footer';
+export { Spinner, LoadingOverlay, LoadingPage } from './spinner';
 
 // Auth Components
 export { LoginForm, RegisterForm, GoogleOAuthButton } from './auth';

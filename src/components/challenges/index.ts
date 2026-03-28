@@ -4,32 +4,32 @@
  * Export all challenge-related components.
  */
 
-export { CodeEditor } from './CodeEditor';
-export type { CodeEditorProps } from './CodeEditor';
+export { CodeEditor } from './code-editor';
+export type { CodeEditorProps } from './code-editor';
 
-export { SelectorInput } from './SelectorInput';
+export { SelectorInput } from './selector-input';
 export type {
   SelectorInputProps,
   SelectorType,
   SelectorValidationResult,
-} from './SelectorInput';
+} from './selector-input';
 
-export { WebComponentPreview } from './WebComponentPreview';
-export type { WebComponentPreviewProps } from './WebComponentPreview';
+export { WebComponentPreview } from './web-component-preview';
+export type { WebComponentPreviewProps } from './web-component-preview';
 
-export { TestResults } from './TestResults';
-export type { TestResult, TestResultsProps } from './TestResults';
+export { TestResults } from './test-results';
+export type { TestResult, TestResultsProps } from './test-results';
 
-export * from './ChallengeSkeleton';
-export { ChallengeCard } from './ChallengeCard';
+export * from './challenge-skeleton';
+export { ChallengeCard } from './challenge-card';
 export type {
   ChallengeCardProps,
   ChallengeType,
   Difficulty,
-} from './ChallengeCard';
+} from './challenge-card';
 
-export { ChallengePlayground } from './ChallengePlayground';
+export { ChallengePlayground } from './challenge-playground';
 export type {
   Challenge,
   ChallengePlaygroundProps,
-} from './ChallengePlayground';
+} from './challenge-playground';

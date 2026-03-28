@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { MarkdownRenderer } from '@/components/markdown-renderer';
 import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/terms')({

@@ -67,7 +67,7 @@ export const deleteChallenge = createServerFn({ method: 'POST' })
 
 Use `createServerFn` for all data mutations and sensitive queries.
 
-* **Always** use `.validator()` with Zod for input safety.
+* **Always** use `.inputValidator()` with Zod for input safety.
 * **Context**: Access DB or Auth via `context` injected by middleware.
 
 ```ts
@@ -75,7 +75,7 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
 export const updateXp = createServerFn({ method: 'POST' })
-  .validator(z.object({ amount: z.number() }))
+  .inputValidator(z.object({ amount: z.number() }))
   .handler(async ({ data, context }) => {
     // context.user is available if authMiddleware is used
     return { success: true, newTotal: 100 };

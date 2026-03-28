@@ -10,8 +10,8 @@ import type {
     ChallengePlaygroundProps,
     PlaygroundState
 } from './types';
-import type { TestResult } from '../TestResults';
-import type { SelectorType } from '../SelectorInput';
+import type { TestResult } from '../test-results';
+import type { SelectorType } from '../selector-input';
 
 export function useChallengeExecution(
     state: PlaygroundState,

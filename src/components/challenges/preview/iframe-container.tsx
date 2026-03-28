@@ -1,4 +1,4 @@
-import { CodeEditor } from '../CodeEditor';
+import { CodeEditor } from '../code-editor';
 import type { ViewMode } from './types';
 
 interface IframeContainerProps {

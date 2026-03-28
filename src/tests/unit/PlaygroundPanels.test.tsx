@@ -1,11 +1,11 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import { EditorPanel } from '@/components/challenges/playground/EditorPanel';
-import { SelectorPanel } from '@/components/challenges/playground/SelectorPanel';
-import { ResultsPanel } from '@/components/challenges/playground/ResultsPanel';
+import { EditorPanel } from '@/components/challenges/playground/editor-panel';
+import { SelectorPanel } from '@/components/challenges/playground/selector-panel';
+import { ResultsPanel } from '@/components/challenges/playground/results-panel';
 
 // Mock dependencies
-mock.module('@/components/challenges/CodeEditor', () => ({
+mock.module('@/components/challenges/code-editor', () => ({
     CodeEditor: ({ initialCode, onChange }: any) => (
         <textarea
             data-testid="code-editor"
@@ -15,15 +15,15 @@ mock.module('@/components/challenges/CodeEditor', () => ({
     ),
 }));
 
-mock.module('@/components/challenges/FileExplorer', () => ({
+mock.module('@/components/challenges/file-explorer', () => ({
     FileExplorer: () => <div data-testid="file-explorer">File Explorer</div>,
 }));
 
-mock.module('@/components/challenges/MultiTabEditor', () => ({
+mock.module('@/components/challenges/multi-tab-editor', () => ({
     MultiTabEditor: () => <div data-testid="multi-tab-editor">Multi Tab Editor</div>,
 }));
 
-mock.module('@/components/challenges/SelectorInput', () => ({
+mock.module('@/components/challenges/selector-input', () => ({
     SelectorInput: ({ value, onChange, onValidate, defaultType }: any) => (
         <div data-testid="selector-input">
             <input
@@ -36,7 +36,7 @@ mock.module('@/components/challenges/SelectorInput', () => ({
     ),
 }));
 
-mock.module('@/components/challenges/TestResults', () => ({
+mock.module('@/components/challenges/test-results', () => ({
     TestResults: ({ results }: any) => (
         <div data-testid="test-results">
             {results.map((r: any) => (
@@ -46,7 +46,7 @@ mock.module('@/components/challenges/TestResults', () => ({
     ),
 }));
 
-mock.module('@/components/challenges/ConsoleOutput', () => ({
+mock.module('@/components/challenges/console-output', () => ({
     ConsoleOutput: () => <div data-testid="console-output">Console Output</div>,
 }));
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import { PlaygroundHeader } from '@/components/challenges/playground/PlaygroundHeader';
+import { PlaygroundHeader } from '@/components/challenges/playground/playground-header';
 
 // Mock dependencies
 

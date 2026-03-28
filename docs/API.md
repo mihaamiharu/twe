@@ -12,8 +12,8 @@ Following the 2026 TanStack Start conventions, we use `createServerFn` for all d
 
 ### Key Concepts
 
-1. **RPC over REST**: Instead of `fetch(/api/resource)`, UI components import Server Functions directly (e.g., `import { getChallenges } from '~/server/challenges.fn'`) and call them. TanStack Start handles the network serialization automatically.
-2. **Type Safety**: Inputs and outputs are strictly typed using Zod validations (`validator(z.object({...}))`). There is no need for external Swagger docs to know the API schema.
+1. **RPC over REST**: Instead of `fetch(/api/resource)`, UI components import Server Functions directly (e.g., `import { getChallenges } from '@/server/challenges.fn'`) and call them. TanStack Start handles the network serialization automatically.
+2. **Type Safety**: Inputs and outputs are strictly typed using Zod validations (`inputValidator(z.object({...}))`). There is no need for external Swagger docs to know the API schema.
 3. **Middleware**: Authentication, Rate Limiting, and Logging are injected securely on the server via Composable Middleware (`src/server/*.mw.ts`), injecting context directly into the handlers.
 
 ### Directory Structure
@@ -35,17 +35,17 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 
 export const getChallengeDetails = createServerFn({ method: 'GET' })
-  .validator(z.object({ slug: z.string() }))
+  .inputValidator(z.object({ slug: z.string() }))
   .handler(async ({ data }) => {
     // Database logic here
     return { title: '...', description: '...' };
   });
 ```
 
-**Client Usage (`src/routes/challenges/$slug.tsx`)**
+**Client Usage (`src/routes/$locale/challenges/$slug.tsx`)**
 ```ts
 import { useQuery } from '@tanstack/react-query';
-import { getChallengeDetails } from '~/server/challenges.fn';
+import { getChallengeDetails } from '@/server/challenges.fn';
 
 function ChallengePage({ slug }) {
   const { data } = useQuery({

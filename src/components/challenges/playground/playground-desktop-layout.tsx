@@ -2,14 +2,14 @@ import { useTranslation } from 'react-i18next';
 import { GripVertical } from 'lucide-react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { WebComponentPreview } from '../WebComponentPreview';
-import { EditorPanel } from './EditorPanel';
-import { SelectorPanel } from './SelectorPanel';
-import { ResultsPanel } from './ResultsPanel';
+import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { WebComponentPreview } from '../web-component-preview';
+import { EditorPanel } from './editor-panel';
+import { SelectorPanel } from './selector-panel';
+import { ResultsPanel } from './results-panel';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type { Challenge, PlaygroundState } from './types';
-import type { SelectorType } from '../SelectorInput';
+import type { SelectorType } from '../selector-input';
 
 interface PlaygroundDesktopLayoutProps {
     challenge: Challenge;

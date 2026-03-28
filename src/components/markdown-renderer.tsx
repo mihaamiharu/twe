@@ -9,7 +9,7 @@ import json from 'highlight.js/lib/languages/json';
 import typescript from 'highlight.js/lib/languages/typescript';
 
 import { cn } from '@/lib/utils';
-import { CodeBlock } from '@/components/CodeBlock';
+import { CodeBlock } from '@/components/code-block';
 
 // Import custom theme-aware highlight.js styles
 import '@/styles/highlight-github.css';

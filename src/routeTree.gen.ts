@@ -26,7 +26,6 @@ import { Route as AdminSubmissionsRouteImport } from './routes/admin/submissions
 import { Route as AdminSettingsRouteImport } from './routes/admin/settings'
 import { Route as AdminNewsletterRouteImport } from './routes/admin/newsletter'
 import { Route as AdminMessagesRouteImport } from './routes/admin/messages'
-import { Route as AdminDebugRouteImport } from './routes/admin/debug'
 import { Route as AdminChallengesRouteImport } from './routes/admin/challenges'
 import { Route as AdminBugsRouteImport } from './routes/admin/bugs'
 import { Route as AdminAchievementsRouteImport } from './routes/admin/achievements'
@@ -45,6 +44,10 @@ import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authe
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
 import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
 import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
+import { Route as ApiTestTeardownUserRouteImport } from './routes/api/test/teardown-user'
+import { Route as ApiTestSetProgressRouteImport } from './routes/api/test/set-progress'
+import { Route as ApiTestSeedUserRouteImport } from './routes/api/test/seed-user'
+import { Route as ApiTestResetProgressRouteImport } from './routes/api/test/reset-progress'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
@@ -134,11 +137,6 @@ const AdminNewsletterRoute = AdminNewsletterRouteImport.update({
 const AdminMessagesRoute = AdminMessagesRouteImport.update({
   id: '/messages',
   path: '/messages',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminDebugRoute = AdminDebugRouteImport.update({
-  id: '/debug',
-  path: '/debug',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminChallengesRoute = AdminChallengesRouteImport.update({
@@ -231,6 +229,26 @@ const LocaleChallengesIndexRoute = LocaleChallengesIndexRouteImport.update({
   path: '/challenges/',
   getParentRoute: () => LocaleRoute,
 } as any)
+const ApiTestTeardownUserRoute = ApiTestTeardownUserRouteImport.update({
+  id: '/api/test/teardown-user',
+  path: '/api/test/teardown-user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTestSetProgressRoute = ApiTestSetProgressRouteImport.update({
+  id: '/api/test/set-progress',
+  path: '/api/test/set-progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTestSeedUserRoute = ApiTestSeedUserRouteImport.update({
+  id: '/api/test/seed-user',
+  path: '/api/test/seed-user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiTestResetProgressRoute = ApiTestResetProgressRouteImport.update({
+  id: '/api/test/reset-progress',
+  path: '/api/test/reset-progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -280,7 +298,6 @@ export interface FileRoutesByFullPath {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
-  '/admin/debug': typeof AdminDebugRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -296,6 +313,10 @@ export interface FileRoutesByFullPath {
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/test/reset-progress': typeof ApiTestResetProgressRoute
+  '/api/test/seed-user': typeof ApiTestSeedUserRoute
+  '/api/test/set-progress': typeof ApiTestSetProgressRoute
+  '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
@@ -321,7 +342,6 @@ export interface FileRoutesByTo {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
-  '/admin/debug': typeof AdminDebugRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -336,6 +356,10 @@ export interface FileRoutesByTo {
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/test/reset-progress': typeof ApiTestResetProgressRoute
+  '/api/test/seed-user': typeof ApiTestSeedUserRoute
+  '/api/test/set-progress': typeof ApiTestSetProgressRoute
+  '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
@@ -364,7 +388,6 @@ export interface FileRoutesById {
   '/admin/achievements': typeof AdminAchievementsRoute
   '/admin/bugs': typeof AdminBugsRoute
   '/admin/challenges': typeof AdminChallengesRoute
-  '/admin/debug': typeof AdminDebugRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/settings': typeof AdminSettingsRoute
@@ -380,6 +403,10 @@ export interface FileRoutesById {
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/test/reset-progress': typeof ApiTestResetProgressRoute
+  '/api/test/seed-user': typeof ApiTestSeedUserRoute
+  '/api/test/set-progress': typeof ApiTestSetProgressRoute
+  '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges/': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
@@ -408,7 +435,6 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
-    | '/admin/debug'
     | '/admin/messages'
     | '/admin/newsletter'
     | '/admin/settings'
@@ -424,6 +450,10 @@ export interface FileRouteTypes {
     | '/$locale/tutorials/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
+    | '/api/test/reset-progress'
+    | '/api/test/seed-user'
+    | '/api/test/set-progress'
+    | '/api/test/teardown-user'
     | '/$locale/challenges'
     | '/$locale/tutorials'
     | '/admin/users'
@@ -449,7 +479,6 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
-    | '/admin/debug'
     | '/admin/messages'
     | '/admin/newsletter'
     | '/admin/settings'
@@ -464,6 +493,10 @@ export interface FileRouteTypes {
     | '/$locale/tutorials/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
+    | '/api/test/reset-progress'
+    | '/api/test/seed-user'
+    | '/api/test/set-progress'
+    | '/api/test/teardown-user'
     | '/$locale/challenges'
     | '/$locale/tutorials'
     | '/admin/users'
@@ -491,7 +524,6 @@ export interface FileRouteTypes {
     | '/admin/achievements'
     | '/admin/bugs'
     | '/admin/challenges'
-    | '/admin/debug'
     | '/admin/messages'
     | '/admin/newsletter'
     | '/admin/settings'
@@ -507,6 +539,10 @@ export interface FileRouteTypes {
     | '/$locale/tutorials/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
+    | '/api/test/reset-progress'
+    | '/api/test/seed-user'
+    | '/api/test/set-progress'
+    | '/api/test/teardown-user'
     | '/$locale/challenges/'
     | '/$locale/tutorials/'
     | '/admin/users/'
@@ -524,6 +560,10 @@ export interface RootRouteChildren {
   DocsApiRoute: typeof DocsApiRoute
   DocsIndexRoute: typeof DocsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiTestResetProgressRoute: typeof ApiTestResetProgressRoute
+  ApiTestSeedUserRoute: typeof ApiTestSeedUserRoute
+  ApiTestSetProgressRoute: typeof ApiTestSetProgressRoute
+  ApiTestTeardownUserRoute: typeof ApiTestTeardownUserRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -645,13 +685,6 @@ declare module '@tanstack/react-router' {
       path: '/messages'
       fullPath: '/admin/messages'
       preLoaderRoute: typeof AdminMessagesRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/debug': {
-      id: '/admin/debug'
-      path: '/debug'
-      fullPath: '/admin/debug'
-      preLoaderRoute: typeof AdminDebugRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/challenges': {
@@ -780,6 +813,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleChallengesIndexRouteImport
       parentRoute: typeof LocaleRoute
     }
+    '/api/test/teardown-user': {
+      id: '/api/test/teardown-user'
+      path: '/api/test/teardown-user'
+      fullPath: '/api/test/teardown-user'
+      preLoaderRoute: typeof ApiTestTeardownUserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/test/set-progress': {
+      id: '/api/test/set-progress'
+      path: '/api/test/set-progress'
+      fullPath: '/api/test/set-progress'
+      preLoaderRoute: typeof ApiTestSetProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/test/seed-user': {
+      id: '/api/test/seed-user'
+      path: '/api/test/seed-user'
+      fullPath: '/api/test/seed-user'
+      preLoaderRoute: typeof ApiTestSeedUserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/test/reset-progress': {
+      id: '/api/test/reset-progress'
+      path: '/api/test/reset-progress'
+      fullPath: '/api/test/reset-progress'
+      preLoaderRoute: typeof ApiTestResetProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -876,7 +937,6 @@ interface AdminRouteChildren {
   AdminAchievementsRoute: typeof AdminAchievementsRoute
   AdminBugsRoute: typeof AdminBugsRoute
   AdminChallengesRoute: typeof AdminChallengesRoute
-  AdminDebugRoute: typeof AdminDebugRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
   AdminSettingsRoute: typeof AdminSettingsRoute
@@ -891,7 +951,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAchievementsRoute: AdminAchievementsRoute,
   AdminBugsRoute: AdminBugsRoute,
   AdminChallengesRoute: AdminChallengesRoute,
-  AdminDebugRoute: AdminDebugRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
   AdminSettingsRoute: AdminSettingsRoute,
@@ -916,6 +975,10 @@ const rootRouteChildren: RootRouteChildren = {
   DocsApiRoute: DocsApiRoute,
   DocsIndexRoute: DocsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiTestResetProgressRoute: ApiTestResetProgressRoute,
+  ApiTestSeedUserRoute: ApiTestSeedUserRoute,
+  ApiTestSetProgressRoute: ApiTestSetProgressRoute,
+  ApiTestTeardownUserRoute: ApiTestTeardownUserRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

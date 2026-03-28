@@ -29,7 +29,7 @@ interface LeaderboardEntry {
 
 // --- Search Params Schema ---
 const LeaderboardSearchSchema = z.object({
-  period: z.enum(['all', 'monthly']).optional().default('all'),
+  period: z.enum(['all', 'monthly']).optional(),
 });
 
 export const Route = createFileRoute('/$locale/leaderboard')({
@@ -80,7 +80,8 @@ function LeaderboardPage() {
   const navigate = Route.useNavigate();
 
   // URL-based State
-  const { period } = Route.useSearch();
+  const searchParams = Route.useSearch();
+  const period = searchParams.period ?? 'all';
 
   const { data: leaderboardData } = useSuspenseQuery(
     leaderboardQueryOptions({ page: 1, limit: 50, period, locale }),

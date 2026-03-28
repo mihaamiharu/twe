@@ -15,9 +15,9 @@ import {
   ArrowRight,
   CheckCircle,
 } from 'lucide-react';
-import { AnimatedCounter } from '@/components/AnimatedCounter';
-import { SelectorDemo } from '@/components/SelectorDemo';
-import { PlaywrightDemo } from '@/components/PlaywrightDemo';
+import { AnimatedCounter } from '@/components/animated-counter';
+import { SelectorDemo } from '@/components/selector-demo';
+import { PlaywrightDemo } from '@/components/playwright-demo';
 import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
 

@@ -1,6 +1,6 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { renderHook, act } from '@testing-library/react';
-import { useChallengeExecution } from '@/components/challenges/playground/useChallengeExecution';
+import { useChallengeExecution } from '@/components/challenges/playground/use-challenge-execution';
 import * as executor from '@/core/executor';
 import * as storage from '@/lib/storage-adapter';
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, mock, beforeEach } from 'bun:test';
 import { renderHook, act } from '@testing-library/react';
-import { usePlaygroundState } from '@/components/challenges/playground/usePlaygroundState';
-// import { useChallengeExecution } from '@/components/challenges/playground/useChallengeExecution'; // Will test later if time permits
+import { usePlaygroundState } from '@/components/challenges/playground/use-playground-state';
+// import { useChallengeExecution } from '@/components/challenges/playground/use-challenge-execution'; // Will test later if time permits
 
 // Mock i18n
 

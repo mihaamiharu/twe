@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { MarkdownRenderer } from '@/components/markdown-renderer';
 import { Rocket, Sparkles, Bug, FileText, Calendar, Tag } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect } from 'react';

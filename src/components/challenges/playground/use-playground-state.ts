@@ -5,8 +5,8 @@ import type {
     ChallengePlaygroundProps,
     PlaygroundState
 } from './types';
-import type { TestResult } from '../TestResults';
-import type { LogEntry } from '../ConsoleOutput';
+import type { TestResult } from '../test-results';
+import type { LogEntry } from '../console-output';
 
 export function usePlaygroundState({
     challenge,
