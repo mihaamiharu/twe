@@ -37,3 +37,7 @@ rclone-backup.conf
 
 # VPS Access Guide
 vps_access_guide.md
+
+# Agent and Conductor local data
+.agent/mihaamiharu/
+conductor/
