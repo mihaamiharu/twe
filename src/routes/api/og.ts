@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
-import { OgImageTemplate } from '../../components/OgImageTemplate'; // Use relative path
+import { OgImageTemplate } from '../../components/og-image-template'; // Use relative path
 
 async function loadGoogleFont(font: string, weight: number) {
     const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}`;
