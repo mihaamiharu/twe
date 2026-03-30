@@ -39,7 +39,9 @@ jobs:
 
       - name: Run ESLint
         run: bun run lint || true
-        # Warning only — ESLint errors don't block CI
+
+      - name: Run Production Build
+        run: bun run build
 
       - name: Run Unit Tests with Coverage
         run: bun run test:unit --coverage --coverage-reporter=lcov --coverage-dir=./coverage
