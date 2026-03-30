@@ -1,10 +1,10 @@
 import { describe, it, expect, mock, beforeEach, afterEach, spyOn } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import { ChallengePlayground } from '@/components/challenges/ChallengePlayground';
+import { ChallengePlayground } from '@/components/challenges/challenge-playground';
 import * as executor from '@/core/executor';
 import { ThemeProvider } from '@/components/theme-provider';
-import * as stateHook from '@/components/challenges/playground/usePlaygroundState';
-import * as execHook from '@/components/challenges/playground/useChallengeExecution';
+import * as stateHook from '@/components/challenges/playground/use-playground-state';
+import * as execHook from '@/components/challenges/playground/use-challenge-execution';
 
 const renderWithTheme = (ui: React.ReactElement) => {
     return render(
@@ -57,7 +57,8 @@ describe('ChallengePlayground', () => {
         spyOn(stateHook, 'usePlaygroundState').mockReturnValue(mockState as any);
         spyOn(execHook, 'useChallengeExecution').mockReturnValue(mockExecution as any);
 
-        mock.module('@/components/challenges/playground/Header/PlaygroundHeader', () => ({
+        void mock.module(
+'@/components/challenges/playground/Header/PlaygroundHeader', () => ({
             PlaygroundHeader: ({ challenge, onRunCode }: any) => (
                 <div data-testid="header">
                     {challenge.title}
@@ -66,39 +67,48 @@ describe('ChallengePlayground', () => {
             )
         }));
 
-        mock.module('@/components/challenges/playground/layouts/PlaygroundDesktopLayout', () => ({
+        void mock.module(
+'@/components/challenges/playground/layouts/PlaygroundDesktopLayout', () => ({
             PlaygroundDesktopLayout: () => <div data-testid="desktop-layout">Desktop Layout</div>
         }));
 
-        mock.module('@/components/challenges/playground/layouts/PlaygroundMobileLayout', () => ({
+        void mock.module(
+'@/components/challenges/playground/layouts/PlaygroundMobileLayout', () => ({
             PlaygroundMobileLayout: () => <div data-testid="mobile-layout">Mobile Layout</div>
         }));
 
-        mock.module('@/components/challenges/playground/PracticeModeBanner', () => ({
+        void mock.module(
+'@/components/challenges/playground/practice-mode-banner', () => ({
             PracticeModeBanner: () => <div data-testid="practice-banner">Practice Mode</div>
         }));
 
-        mock.module('@/components/challenges/playground/PlaygroundGoalBar', () => ({
+        void mock.module(
+'@/components/challenges/playground/playground-goal-bar', () => ({
             PlaygroundGoalBar: ({ description }: any) => <div data-testid="goal-bar">{description}</div>
         }));
 
-        mock.module('@/components/challenges/playground/LoadingOverlay', () => ({
+        void mock.module(
+'@/components/challenges/playground/loading-overlay', () => ({
             LoadingOverlay: () => <div data-testid="loading-overlay">Loading...</div>
         }));
 
-        mock.module('@/components/challenges/playground/HintConfirmDialog', () => ({
+        void mock.module(
+'@/components/challenges/playground/hint-confirm-dialog', () => ({
             HintConfirmDialog: () => null
         }));
 
-        mock.module('@/components/challenges/playground/ResetConfirmDialog', () => ({
+        void mock.module(
+'@/components/challenges/playground/reset-confirm-dialog', () => ({
             ResetConfirmDialog: ({ open }: any) => open ? <div data-testid="reset-dialog">Reset Dialog</div> : null
         }));
 
-        mock.module('@/components/challenges/playground/HintDisplayPanel', () => ({
+        void mock.module(
+'@/components/challenges/playground/hint-display-panel', () => ({
             HintDisplayPanel: () => null
         }));
 
-        mock.module('@/core/executor', () => ({
+        void mock.module(
+'@/core/executor', () => ({
             executePlaywrightCode: mock(() => Promise.resolve({ status: 'PASSED' }))
         }));
     });

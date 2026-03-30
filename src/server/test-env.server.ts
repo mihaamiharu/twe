@@ -1,4 +1,3 @@
-import { db } from '@/db';
 
 export function requireTestEnv(request: Request) {
   // 1. Must be running in test environment

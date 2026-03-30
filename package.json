@@ -13,7 +13,6 @@
     "test:e2e": "podman-compose up -d postgres && sleep 5 && npx playwright test",
     "test:e2e:stop": "podman-compose stop postgres",
     "test:e2e:report": "allure generate allure-results --clean && allure open",
-    "test:legacy": "bun test src/tests/verify-challenges.test.tsx --preload ./src/tests/setup.ts --dom",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",

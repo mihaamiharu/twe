@@ -15,12 +15,12 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import { NotFound } from '@/components/NotFound';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
+import { NotFound } from '@/components/not-found';
+import { Header } from '@/components/header';
+import { Footer } from '@/components/footer';
 import { ThemeProvider } from '@/components/theme-provider';
-import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics';
-import { CookieConsent } from '@/components/CookieConsent';
+import { GoogleAnalytics } from '@/components/analytics/google-analytics';
+import { CookieConsent } from '@/components/cookie-consent';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
@@ -34,7 +34,7 @@ export interface RootContext {
   consent?: 'granted' | 'denied' | null;
 }
 
-import { DefaultErrorComponent } from "@/components/DefaultErrorComponent";
+import { DefaultErrorComponent } from "@/components/default-error-component";
 
 export const Route = createRootRouteWithContext<RootContext>()({
   defaultErrorComponent: DefaultErrorComponent,
@@ -52,7 +52,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
         ?.split('=')[1];
 
       if (cookieValue === 'granted' || cookieValue === 'denied') {
-        consent = cookieValue as 'granted' | 'denied';
+        consent = cookieValue;
       }
     } else {
       // Server-side: read via Server Function

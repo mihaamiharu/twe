@@ -58,7 +58,7 @@ export class ChallengesPage extends BasePage {
           this.selectorInput.waitFor({ state: 'visible', timeout: 5000 }),
         ]);
         isSelectorChallenge = await this.selectorInput.isVisible();
-      } catch (e) {
+      } catch {
         // Fallback
       }
     }
@@ -105,12 +105,11 @@ export class ChallengesPage extends BasePage {
       // This is the most robust way to ensure a fresh editor state
       await this.page.evaluate(() => {
         try {
-          // @ts-ignore - Monaco might be on window
           const editor = (window as any).monaco?.editor?.getModels()?.[0];
           if (editor) {
             editor.setValue('');
           }
-        } catch (e) {
+        } catch {
           // Silent fail
         }
       });

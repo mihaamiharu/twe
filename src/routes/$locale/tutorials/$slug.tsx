@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MarkdownRenderer } from '@/components/MarkdownRenderer';
+import { MarkdownRenderer } from '@/components/markdown-renderer';
 import {
   AlertCircle,
   ArrowLeft,
@@ -24,11 +24,11 @@ import { toast } from 'sonner';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
-import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
+import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import {
   TableOfContents,
   type TOCItem,
-} from '@/components/tutorials/TableOfContents';
+} from '@/components/tutorials/table-of-contents';
 import i18n from '@/lib/i18n';
 import { showAchievementToasts } from '@/components/achievement-toast';
 

@@ -20,7 +20,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { signOut } from '@/lib/auth.client';
-import { BugReportDialog } from '@/components/BugReportDialog';
+import { BugReportDialog } from '@/components/bug-report-dialog';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { type AuthSession } from '@/server/auth.fn';
 

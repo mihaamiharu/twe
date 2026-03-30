@@ -635,8 +635,8 @@ export async function executePlaywrightCode(
                 enhancedDocument,
                 contentWindow.console,
               );
-              returnValue = (contentWindow as any).__returnValue;
-              /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+              returnValue = (contentWindow).__returnValue;
+               
             }
             
             const executionTime = Date.now() - startTime;

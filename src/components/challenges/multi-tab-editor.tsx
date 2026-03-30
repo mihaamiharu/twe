@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { X, Lock, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { CodeEditor } from './CodeEditor';
+import { CodeEditor } from './code-editor';
 
 interface MultiTabEditorProps {
     files: Record<string, string>;

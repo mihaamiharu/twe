@@ -140,7 +140,7 @@ export const confirmSubscription = createServerFn({ method: 'POST' })
 
 export const unsubscribeFromNewsletter = createServerFn({ method: 'POST' })
     .inputValidator((data: unknown) => z.object({ token: z.string() }).parse(data))
-    .handler(async ({ data: { token } }) => {
+    .handler(() => {
         // Note: In a real app, we'd include an unsubscribe token in every email.
         // For now, we'll implement the backend logic but since we're not sending broadcast emails yet,
         // we don't have a persistent unsubscribe token mechanism in the schema (we only have confirmationToken).

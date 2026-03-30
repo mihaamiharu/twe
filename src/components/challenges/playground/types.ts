@@ -1,5 +1,5 @@
-import { TestResult } from '../TestResults';
-import { LogEntry } from '../ConsoleOutput';
+import { TestResult } from '../test-results';
+import { LogEntry } from '../console-output';
 
 export type ChallengeType =
     | 'JAVASCRIPT'

@@ -22,7 +22,8 @@ process.env.GOOGLE_CLIENT_SECRET = "dummy_google_secret";
 
 import * as React from 'react';
 
-mock.module('framer-motion', () => ({
+void mock.module(
+'framer-motion', () => ({
     motion: {
         div: React.forwardRef(({ children, className, ...props }: any, ref) => {
             const domProps = { ...props, ref };
@@ -51,7 +52,8 @@ mock.module('framer-motion', () => ({
 globalThis.mockSearchParams = {};
 globalThis.mockNavigate = mock(() => Promise.resolve());
 
-mock.module('@tanstack/react-router', () => ({
+void mock.module(
+'@tanstack/react-router', () => ({
     Link: ({ children, params, search, to, activeProps, partiallyActive, className, ...props }: any) => {
         return React.createElement('a', { href: to || 'mock-link', className, 'data-params': JSON.stringify(params), ...props }, children);
     },
@@ -73,7 +75,8 @@ mock.module('@tanstack/react-router', () => ({
     }),
 }));
 
-mock.module('@tanstack/react-query', () => {
+void mock.module(
+'@tanstack/react-query', () => {
     const { mock } = require('bun:test');
     return {
         useQuery: mock(),
@@ -90,7 +93,8 @@ mock.module('@tanstack/react-query', () => {
     };
 });
 
-mock.module('react-i18next', () => ({
+void mock.module(
+'react-i18next', () => ({
     useTranslation: () => ({
         t: (key: string) => key,
         i18n: { language: 'en', changeLanguage: () => new Promise(() => {}) }
@@ -101,12 +105,14 @@ mock.module('react-i18next', () => ({
     },
 }));
 
-mock.module('next-themes', () => ({
+void mock.module(
+'next-themes', () => ({
     useTheme: () => ({ theme: 'dark', setTheme: () => {} }),
     ThemeProvider: ({ children }: any) => React.createElement(React.Fragment, null, children),
 }));
 
-mock.module('@/lib/storage-adapter', () => ({
+void mock.module(
+'@/lib/storage-adapter', () => ({
     storage: {
         getItem: () => Promise.resolve(null),
         setItem: () => Promise.resolve(),
@@ -115,7 +121,8 @@ mock.module('@/lib/storage-adapter', () => ({
     }
 }));
 
-mock.module('@/components/ui/dialog', () => {
+void mock.module(
+'@/components/ui/dialog', () => {
     const React = require('react');
     return {
         Dialog: ({ open, children }: any) => open ? React.createElement('div', { 'data-testid': 'dialog-root' }, children) : null,
@@ -127,7 +134,8 @@ mock.module('@/components/ui/dialog', () => {
     };
 });
 
-mock.module("@/components/ui/dropdown-menu", () => {
+void mock.module(
+"@/components/ui/dropdown-menu", () => {
     const React = require('react');
     return {
         DropdownMenu: ({ children }: any) => React.createElement(React.Fragment, null, children),
@@ -139,7 +147,8 @@ mock.module("@/components/ui/dropdown-menu", () => {
     };
 });
 
-mock.module('@monaco-editor/react', () => {
+void mock.module(
+'@monaco-editor/react', () => {
     const React = require('react');
     return {
         default: ({ defaultValue, value, onChange }: any) => {

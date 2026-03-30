@@ -66,10 +66,10 @@ import { createSeoHead } from '@/lib/seo';
 
 // --- Search Params Schema ---
 const ChallengesSearchSchema = z.object({
-  track: z.enum(TRACK_IDS).optional().default('all'),
+  track: z.enum(TRACK_IDS).optional(),
   q: z.string().optional(),
-  hideCompleted: z.coerce.boolean().optional().default(false),
-  view: z.enum(['grid', 'list']).optional().default('grid'),
+  hideCompleted: z.coerce.boolean().optional(),
+  view: z.enum(['grid', 'list']).optional(),
   tier: z.string().optional(),
 });
 
@@ -173,9 +173,12 @@ export function ChallengesPage() {
   const navigate = routeApi.useNavigate();
 
   // URL-based State
-  const { track, q, hideCompleted, view, tier } = routeApi.useSearch();
-  const activeTrackId = track as TrackId;
-  const viewMode = view;
+  const searchParams = routeApi.useSearch();
+  const q = searchParams.q;
+  const hideCompleted = searchParams.hideCompleted ?? false;
+  const tier = searchParams.tier;
+  const activeTrackId = (searchParams.track || 'all') as TrackId;
+  const viewMode = searchParams.view || 'grid';
 
   // Local state for search input (debounced to URL)
   const [searchInput, setSearchInput] = useState(q ?? '');

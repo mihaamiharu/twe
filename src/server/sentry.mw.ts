@@ -15,13 +15,13 @@ export const sentryMiddleware = createMiddleware().server(async ({ next, context
 
     try {
         // If we have a user in context (from auth middleware), add it to Sentry scope
-        /* @ts-ignore - context type is dynamic */
-        if (context.auth?.user) {
+        // @ts-expect-error - context is dynamic
+        if ((context as any).auth?.user) {
             Sentry.setUser({
-                /* @ts-ignore - context type is dynamic */
-                id: context.auth.user.id,
-                /* @ts-ignore - context type is dynamic */
-                email: context.auth.user.email,
+                // @ts-expect-error - context is dynamic
+                id: (context as any).auth.user.id,
+                // @ts-expect-error - context is dynamic
+                email: (context as any).auth.user.email,
             });
         }
 

@@ -1,4 +1,4 @@
 // Auth Components
-export { LoginForm } from './LoginForm';
-export { RegisterForm } from './RegisterForm';
-export { GoogleOAuthButton } from './GoogleOAuthButton';
+export { LoginForm } from './login-form';
+export { RegisterForm } from './register-form';
+export { GoogleOAuthButton } from './google-oauth-button';

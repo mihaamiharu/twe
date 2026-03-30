@@ -39,9 +39,9 @@ import { createSeoHead } from '@/lib/seo';
 // --- Search Params Schema ---
 const TutorialsSearchSchema = z.object({
   q: z.string().optional(),
-  difficulty: z.enum(['all', 'foundations', 'beginner', 'intermediate', 'advanced']).optional().default('all'),
-  view: z.enum(['grid', 'list']).optional().default('grid'),
-  hideCompleted: z.coerce.boolean().optional().default(false),
+  difficulty: z.enum(['all', 'foundations', 'beginner', 'intermediate', 'advanced']).optional(),
+  view: z.enum(['grid', 'list']).optional(),
+  hideCompleted: z.coerce.boolean().optional(),
 });
 
 export const Route = createFileRoute('/$locale/tutorials/')({
@@ -78,9 +78,11 @@ function TutorialsPage() {
   const navigate = routeApi.useNavigate();
 
   // URL-based State
-  const { q, difficulty, view, hideCompleted } = routeApi.useSearch();
-  const selectedDifficulty = difficulty;
-  const viewMode = view;
+  const searchParams = routeApi.useSearch();
+  const q = searchParams.q;
+  const selectedDifficulty = searchParams.difficulty || 'all';
+  const viewMode = searchParams.view || 'grid';
+  const hideCompleted = searchParams.hideCompleted ?? false;
 
   // Local state for search input (debounced to URL)
   const [searchInput, setSearchInput] = useState(q ?? '');
@@ -131,7 +133,7 @@ function TutorialsPage() {
       );
       if (tag) {
         // Explicitly cast tag to string to avoid typescript error since we just checked it
-        const key = (tag as string).toLowerCase();
+        const key = (tag).toLowerCase();
         if (groups[key]) groups[key].push(t);
         else groups['other'].push(t);
       } else {

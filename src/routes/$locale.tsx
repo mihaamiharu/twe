@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect, getRouteApi } from '@tanstack/react-router';
-import { I18nProvider } from '@/components/I18nProvider';
+import { I18nProvider } from '@/components/i18n-provider';
 import { isValidLocale, fallbackLng } from '@/lib/i18n/settings';
 import i18n from '@/lib/i18n';
 

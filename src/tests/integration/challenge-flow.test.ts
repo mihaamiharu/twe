@@ -7,11 +7,13 @@ import { eq } from 'drizzle-orm';
 // Mock dependencies
 const testUserId = '00000000-0000-0000-0000-000000000001';
 
-mock.module('@tanstack/react-start/server', () => ({
+void mock.module(
+'@tanstack/react-start/server', () => ({
     getRequestHeaders: () => new Headers(),
 }));
 
-mock.module('../../server/auth.server', () => ({
+void mock.module(
+'../../server/auth.server', () => ({
     auth: {
         api: {
             getSession: async () => ({
@@ -23,7 +25,8 @@ mock.module('../../server/auth.server', () => ({
 }));
 
 // Mock logger to avoid noise
-mock.module('@/lib/logger', () => ({
+void mock.module(
+'@/lib/logger', () => ({
     logger: {
         info: () => { },
         error: () => { },
@@ -32,7 +35,8 @@ mock.module('@/lib/logger', () => ({
 }));
 
 // Mock content server for lazy sync (optional)
-mock.module('../../server/content.server', () => ({
+void mock.module(
+'../../server/content.server', () => ({
     getRawChallengeContent: async (slug: string) => {
         if (slug === 'test-challenge') {
             return {

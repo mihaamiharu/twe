@@ -10,8 +10,8 @@ import type {
     ChallengePlaygroundProps,
     PlaygroundState
 } from './types';
-import type { TestResult } from '../TestResults';
-import type { SelectorType } from '../SelectorInput';
+import type { TestResult } from '../test-results';
+import type { SelectorType } from '../selector-input';
 
 export function useChallengeExecution(
     state: PlaygroundState,
@@ -82,7 +82,7 @@ export function useChallengeExecution(
 
             let preloadCode = '';
             if (challenge.preloadModules) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+                 
                 preloadCode = generatePreloadCode({
                     modules: challenge.preloadModules,
                     files: challenge.files || {}
@@ -125,7 +125,7 @@ export function useChallengeExecution(
                         "No assertions were called. Write assertions like: await expect(locator).toHaveText('...');";
                     result.status = 'FAILED';
                 } else {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     outputMessage = t('challenges:playground.correct');
                 }
             }
@@ -148,21 +148,21 @@ export function useChallengeExecution(
                     String(actual) !== String(expectedValue)
                 ) {
                     validationPassed = false;
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     outputMessage =
                         actual === undefined
                             ? `${t('challenges:playground.jsUndefined')} (Did you forget to assign your answer to 'result'?)`
                             : t('challenges:playground.jsMismatch');
                     result.status = 'FAILED';
                 } else {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     outputMessage = `${t('challenges:playground.correct')} Result is ${String(actual)}`;
                 }
             }
 
             const testResult: TestResult = {
                 id: 'main',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                 name: t('challenges:playground.results'),
                 passed: validationPassed,
                 error: !validationPassed ? result.error || outputMessage : undefined,
@@ -184,7 +184,7 @@ export function useChallengeExecution(
             setTestResults([
                 {
                     id: 'error',
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     name: t('challenges:playground.executionError'),
                     passed: false,
                     error:
@@ -263,7 +263,7 @@ export function useChallengeExecution(
                 state.setStoredHint(result.hint);
                 setHintUsed(true);
             } else if (!result.success && result.error) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 toast.error(t('challenges:hints.errorTitle', 'Hint Generation Failed'), {
                     description: result.error,
                 });
@@ -272,9 +272,9 @@ export function useChallengeExecution(
         onError: (error) => {
             console.error('[AI Hint] Error:', error);
             setIsHintDialogOpen(false);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             toast.error(t('challenges:hints.errorTitle', 'Error'), {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                 description: t('challenges:hints.errorGeneric', 'Something went wrong. Please try again.'),
             });
         },
@@ -316,7 +316,7 @@ export function useChallengeExecution(
                     id: 'selector',
                     name: 'Selector Validation',
                     passed: false,
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     error: t('challenges:playground.selectorMismatch'),
                 },
             ]);

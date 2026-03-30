@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
-import { GoogleOAuthButton } from '@/components/auth/GoogleOAuthButton';
+import { GoogleOAuthButton } from '@/components/auth/google-oauth-button';
 
 interface LoginFormProps {
   onSuccess?: () => void;

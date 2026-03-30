@@ -16,7 +16,7 @@ This document serves as the **source of truth** for development patterns, archit
   - **React Query**: Use standard `useQuery` / `useMutation` hooks in components, calling Server Functions.
 - **Server Functions (RPC)**:
   - **DO NOT** create standard REST API routes in `src/routes/api` unless absolutely necessary (e.g., webhooks).
-  - **DO** create Server Functions in `src/lib/*.fn.ts`.
+  - **DO** create Server Functions in `src/server/*.fn.ts`.
   - **Pattern**:
 
     ```typescript
@@ -24,7 +24,7 @@ This document serves as the **source of truth** for development patterns, archit
     import { getWebRequest } from 'vinxi/http';
 
     export const myAction = createServerFn({ method: 'POST' })
-      .validator((data: MyInput) => data)
+      .inputValidator((data: MyInput) => data)
       .handler(async ({ data }) => {
         // Logic
       });
@@ -39,7 +39,7 @@ This document serves as the **source of truth** for development patterns, archit
   1.  Edit `src/db/schema.ts`.
   2.  `bun run db:generate` (creates SQL).
   3.  `bun run db:migrate` (applies SQL).
-- **Access Pattern**: All DB access happens in `*.fn.ts` files (Server Functions) or `src/db/*.ts` scripts. Never import `db` directly in client components.
+- **Access Pattern**: All DB access happens in `src/server/*.fn.ts` files (Server Functions) or `src/db/*.ts` scripts. Never import `db` directly in client components.
 
 ### Authentication
 
@@ -69,8 +69,11 @@ src/
 │   └── ...
 ├── db/                 # Database configuration & seeding
 ├── lib/
-│   ├── *.fn.ts         # Server Functions (Backend Logic)
 │   ├── *.client.ts     # Client-side only logic
+│   └── ...
+├── server/
+│   ├── *.fn.ts         # Server Functions (Backend Logic)
+│   ├── *.mw.ts         # Middleware
 │   └── ...
 ├── routes/             # TanStack Router pages
 └── styles/             # Global CSS
@@ -111,7 +114,7 @@ This project **does not** run Playwright on the server. It mocks it in the brows
 When implementing a new feature:
 
 1.  **DB Change?** -> Modify `schema.ts`, run `db:generate`, `db:migrate`.
-2.  **Backend Logic?** -> Create/Update `src/lib/*.fn.ts`.
+2.  **Backend Logic?** -> Create/Update `src/server/*.fn.ts`.
 3.  **UI Component?** -> Check `components/ui` first. If custom, create in `components/`.
 4.  **New Challenge Type?** -> Update `playwright-shim.ts` if it requires new API support.
 5.  **Verify**: Run `bun run dev` and test manually.

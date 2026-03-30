@@ -92,7 +92,7 @@ describe('Challenge Integrity & Solutions', () => {
                             const expectedOutput = testCase.expectedOutput;
 
                             let expectedSelector = '';
-                            let targetId = undefined;
+                            const targetId = undefined;
 
                             if (typeof expectedOutput === 'object') {
                                 if (expectedOutput.selector) {

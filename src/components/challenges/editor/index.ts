@@ -1,4 +1,4 @@
 export * from './types';
 export * from './themes';
-export * from './useEditorPersistence';
-export * from './useMonacoSetup';
+export * from './use-editor-persistence';
+export * from './use-monaco-setup';

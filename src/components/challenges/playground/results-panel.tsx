@@ -2,8 +2,8 @@ import { useTranslation } from 'react-i18next';
 import { Loader2, Play } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { TestResults } from '../TestResults';
-import { ConsoleOutput } from '../ConsoleOutput';
+import { TestResults } from '../test-results';
+import { ConsoleOutput } from '../console-output';
 import type { Challenge, PlaygroundState } from './types';
 
 interface ResultsPanelProps {

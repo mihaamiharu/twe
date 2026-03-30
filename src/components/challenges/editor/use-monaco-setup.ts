@@ -19,12 +19,13 @@ export function useMonacoSetup(
     // Configure Monaco loader on client side
     useEffect(() => {
         if (!monacoConfigured && typeof window !== 'undefined') {
-            import('monaco-editor').then((monaco) => {
+            void import('monaco-editor').then((monaco) => {
                 loader.config({ monaco });
                 monacoConfigured = true;
             });
         }
     }, []);
+
 
     // Update theme dynamically
     useEffect(() => {

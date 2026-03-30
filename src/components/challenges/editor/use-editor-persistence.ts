@@ -31,13 +31,13 @@ export function useEditorPersistence(
 
                 const storagePromise = storage.getItem(storageKey);
 
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                 
                 const saved = await Promise.race([storagePromise, timeoutPromise]);
 
                 if (mounted) {
                     if (saved !== null) {
-                        setCode(saved as string);
-                        onChangeRef.current?.(saved as string);
+                        setCode(saved);
+                        onChangeRef.current?.(saved);
                     }
                     setIsStorageLoaded(true);
                 }

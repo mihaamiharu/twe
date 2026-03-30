@@ -17,7 +17,7 @@ function TestSentryPage() {
     const triggerServerError = async () => {
         try {
             await testServerError();
-        } catch (err) {
+        } catch {
             // We expect this to fail, but we want to know if the server (middleware) caught it.
             // The middleware re-throws, so we catch it here to show user.
             setServerError('Server error triggered! Check Bun project in Sentry.');
@@ -49,7 +49,7 @@ function TestSentryPage() {
                         This triggers a server function that throws an error.
                         Check your <b>Bun</b> project in Sentry.
                     </p>
-                    <Button variant="outline" onClick={triggerServerError}>
+                    <Button variant="outline" onClick={() => void triggerServerError()}>
                         Throw Server Error
                     </Button>
                     {serverError && <p className="mt-2 text-green-600 font-medium">{serverError}</p>}

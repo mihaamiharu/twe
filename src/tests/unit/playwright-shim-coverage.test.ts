@@ -88,7 +88,7 @@ describe('Playwright Shim Coverage Expansion', () => {
             // Trigger request
             void page.request.get('http://localhost/api/data');
 
-            const response = (await waitPromise) as any;
+            const response = (await waitPromise);
             expect(response.url()).toContain('/api/data');
         });
     });

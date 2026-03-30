@@ -43,7 +43,7 @@ export class MockedPlaywrightPage {
   public mouse: Mouse;
   private currentUrl: string = 'about:blank';
   private _context: BrowserContext;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   private routes: any[] = [];
 
   // VFS (Virtual File System) for multi-page E2E support
@@ -299,7 +299,7 @@ export class MockedPlaywrightPage {
   async on(event: string, handler: (dialog: Dialog) => void): Promise<void> {
     if (event === 'dialog') {
       // Register global handler that iframe logic can call
-      /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await */
+      /* eslint-disable @typescript-eslint/require-await */
       const iframeWindow = this.targetDocument.defaultView as any;
       if (!iframeWindow) return;
 
@@ -325,7 +325,7 @@ export class MockedPlaywrightPage {
           });
         };
       }
-      /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await */
+      /* eslint-enable @typescript-eslint/require-await */
     }
     await Promise.resolve();
   }
@@ -365,7 +365,7 @@ export class MockedPlaywrightPage {
   ): Promise<void> {
     // Register route in global registry on the iframe window
     // The iframe fetch polyfill will read from this
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await */
+    /* eslint-disable @typescript-eslint/require-await */
     const iframeWindow = this.targetDocument.defaultView as any;
     if (!iframeWindow) return;
 
@@ -487,14 +487,14 @@ export class MockedPlaywrightPage {
       iframeWindow.__MOCK_ROUTES__ = [];
     }
     iframeWindow.__MOCK_ROUTES__.push(routeEntry);
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-return, @typescript-eslint/require-await */
+    /* eslint-enable @typescript-eslint/require-await */
     await Promise.resolve();
   }
 
   async unroute(
     urlOrPredicate: string | RegExp | ((url: URL) => boolean),
   ): Promise<void> {
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+     
     const iframeWindow = this.targetDocument.defaultView as any;
     if (!iframeWindow || !iframeWindow.__MOCK_ROUTES__) return;
 
@@ -506,7 +506,7 @@ export class MockedPlaywrightPage {
     iframeWindow.__MOCK_ROUTES__ = iframeWindow.__MOCK_ROUTES__.filter(
       (r: any) => r.matcher.toString() !== urlOrPredicate.toString(),
     );
-    /* eslint-enable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+     
     await Promise.resolve();
   }
 
@@ -535,7 +535,7 @@ export class MockedPlaywrightPage {
       }
 
       // Save state that must persist across page navigations
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const oldWin = this.targetDocument.defaultView as any;
       const preservedAppState = oldWin?.__APP_STATE__ || {};
 
@@ -549,7 +549,7 @@ export class MockedPlaywrightPage {
 
       // Restore window references BEFORE executing scripts so app scripts can access state
       if (this.targetDocument.defaultView) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const win = this.targetDocument.defaultView as any;
         win.page = this;
         // Re-inject active routes
@@ -699,7 +699,7 @@ export class MockedPlaywrightPage {
     scripts.forEach((script) => {
       if (script.textContent) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+           
           const win = this.targetDocument.defaultView as any;
           if (!win) return;
 
@@ -713,7 +713,7 @@ export class MockedPlaywrightPage {
               }
             }).call(window, window, document);
           `);
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+           
           fn(win, this.targetDocument);
         } catch (e) {
           console.error('Failed to execute VFS script:', e);
@@ -738,7 +738,7 @@ export class MockedPlaywrightPage {
       const handlerCode = el.getAttribute('onclick');
       if (handlerCode) {
         try {
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
+           
           const win = this.targetDocument.defaultView as any;
           if (!win) return;
 
@@ -815,7 +815,7 @@ export class MockedPlaywrightPage {
     pageFunction: ((arg: Arg) => R | Promise<R>) | string,
     arg?: Arg,
   ): Promise<R> {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     const iframeWindow = this.targetDocument.defaultView as any;
     if (!iframeWindow) throw new Error('Iframe window not available');
 
@@ -827,7 +827,7 @@ export class MockedPlaywrightPage {
     if (typeof pageFunction === 'string') {
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
       const fn = new Function('window', 'document', 'arg', `return (async () => { ${pageFunction} })(arg)`);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+       
       return fn(iframeWindow, this.targetDocument, arg);
     }
     throw new Error('evaluate only supports functions or strings');
@@ -1203,7 +1203,7 @@ export class MockedPlaywrightPage {
             const roleSelector = `[role="${role}"]`;
             let elements = Array.from(
               doc.querySelectorAll(roleSelector),
-            ) as HTMLElement[];
+            );
             if (options?.name) {
               elements = elements.filter((el) => {
                 const text =
@@ -1537,7 +1537,7 @@ export class MockedPlaywrightPage {
         };
 
         if (isRegex(options.name)) {
-          const regex = options.name as RegExp;
+          const regex = options.name;
           return regex.test(name) || regex.test(normalizedName);
         }
 
@@ -1601,7 +1601,7 @@ export class MockedPlaywrightPage {
   ): HTMLElement[] {
     const containers = Array.isArray(container)
       ? (container as (HTMLElement | Document)[])
-      : [container as HTMLElement | Document];
+      : [container];
     const matches: HTMLElement[] = [];
 
     for (const cont of containers) {
@@ -1617,7 +1617,7 @@ export class MockedPlaywrightPage {
         if (text instanceof RegExp) {
           isMatch = text.test(content) || text.test(normalizedContent);
         } else {
-          const searchText = text as string;
+          const searchText = text;
           const normalizedSearchText = this._normalizeText(searchText);
 
           if (options?.exact) {
@@ -1671,7 +1671,7 @@ export class MockedPlaywrightPage {
         if (text instanceof RegExp) {
           matches = text.test(labelText) || text.test(normalizedLabelText);
         } else {
-          const searchText = text as string;
+          const searchText = text;
           const normalizedSearchText = this._normalizeText(searchText);
           if (options?.exact) {
             matches = labelText === searchText || normalizedLabelText === normalizedSearchText;
@@ -1704,7 +1704,7 @@ export class MockedPlaywrightPage {
         if (text instanceof RegExp) {
           matches = text.test(ariaLabel) || text.test(normalizedAriaLabel);
         } else {
-          const searchText = text as string;
+          const searchText = text;
           const normalizedSearchText = this._normalizeText(searchText);
           if (options?.exact) {
             matches = ariaLabel === searchText || normalizedAriaLabel === normalizedSearchText;
@@ -1733,7 +1733,7 @@ export class MockedPlaywrightPage {
     const matches: HTMLElement[] = [];
 
     for (const cont of containers) {
-      const inputs = Array.from(cont.querySelectorAll('[placeholder]')) as HTMLElement[];
+      const inputs = Array.from(cont.querySelectorAll('[placeholder]'));
       const contMatches = inputs.filter((el) => {
         const ph = el.getAttribute('placeholder') || '';
         const normalizedPh = this._normalizeText(ph);
@@ -1742,7 +1742,7 @@ export class MockedPlaywrightPage {
           return text.test(ph) || text.test(normalizedPh);
         }
 
-        const searchText = text as string;
+        const searchText = text;
         const normalizedSearchText = this._normalizeText(searchText);
 
         if (options?.exact) {
@@ -1767,14 +1767,14 @@ export class MockedPlaywrightPage {
     const matches: HTMLElement[] = [];
 
     for (const cont of containers) {
-      const elements = Array.from(cont.querySelectorAll('[alt]')) as HTMLElement[];
+      const elements = Array.from(cont.querySelectorAll('[alt]'));
       const contMatches = elements.filter((el) => {
         const alt = el.getAttribute('alt') || '';
         const normalizedAlt = this._normalizeText(alt);
 
         if (text instanceof RegExp) return text.test(alt) || text.test(normalizedAlt);
 
-        const searchText = text as string;
+        const searchText = text;
         const normalizedSearchText = this._normalizeText(searchText);
 
         if (options?.exact) {
@@ -1799,14 +1799,14 @@ export class MockedPlaywrightPage {
     const matches: HTMLElement[] = [];
 
     for (const cont of containers) {
-      const elements = Array.from(cont.querySelectorAll('[title]')) as HTMLElement[];
+      const elements = Array.from(cont.querySelectorAll('[title]'));
       const contMatches = elements.filter((el) => {
         const title = el.getAttribute('title') || '';
         const normalizedTitle = this._normalizeText(title);
 
         if (text instanceof RegExp) return text.test(title) || text.test(normalizedTitle);
 
-        const searchText = text as string;
+        const searchText = text;
         const normalizedSearchText = this._normalizeText(searchText);
 
         if (options?.exact) {
@@ -1887,7 +1887,7 @@ export class MockedPlaywrightPage {
       post: (url, options) => fetchWithIframe(url, { ...options, method: 'POST' }),
       put: (url, options) => fetchWithIframe(url, { ...options, method: 'PUT' }),
       delete: (url, options) => fetchWithIframe(url, { ...options, method: 'DELETE' }),
-      fetch: (url, options) => fetchWithIframe(url as string, options),
+      fetch: (url, options) => fetchWithIframe(url, options),
       storageState: () => Promise.resolve({ cookies: [], origins: [] }),
       newContext: () => Promise.resolve(this._createAPIRequestContext()),
     };
@@ -2020,7 +2020,7 @@ export class MockedPlaywrightPage {
 
     const locator: Locator = {
       // Expose finder for internal cross-locator delegation
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       finder: getFilteredElements as any,
       
       click: async (options?: ClickOptions) => {
@@ -2393,13 +2393,13 @@ export class MockedPlaywrightPage {
             // We need access to the 'has' locator's finder.
             // We cast to any to access the internal finder if possible.
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
+             
             const hasLocatorAny = options.has as any;
             let hasElements: HTMLElement[] = [];
 
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+             
             if (typeof hasLocatorAny.finder === 'function') {
-              // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+               
               hasElements = hasLocatorAny.finder();
             } else {
               // Fallback: If passed a locator from outside the shim or different structure

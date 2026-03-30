@@ -64,7 +64,9 @@ describe('Expect Matchers (Final Push)', () => {
         try {
             // This should fail quickly due to deadline
             await expect(async () => ({ pass: false, message: 'fail' })).toBeTruthy();
-        } catch (e) {}
+        } catch {
+            // Logic
+        }
     });
 });
 

@@ -21,7 +21,7 @@ import {
   AlertTriangle,
   Loader2,
 } from 'lucide-react';
-import type { ChallengeType } from './ChallengePlayground';
+import type { ChallengeType } from './challenge-playground';
 
 export interface TestResult {
   id: string;

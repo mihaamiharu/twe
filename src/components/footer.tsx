@@ -1,5 +1,5 @@
 import { Github, Linkedin, Youtube, Coffee, ExternalLink, Bug, Loader2, CheckCircle } from 'lucide-react';
-import { BugReportDialog } from '@/components/BugReportDialog';
+import { BugReportDialog } from '@/components/bug-report-dialog';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';

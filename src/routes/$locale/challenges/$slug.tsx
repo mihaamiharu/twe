@@ -13,18 +13,18 @@ import {
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
 import { ChallengePlayground, type Challenge, ChallengeSkeleton } from '@/components/challenges';
-import { ChallengeSuccessDialog } from '@/components/challenges/ChallengeSuccessDialog';
+import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { type TestResult } from '@/components/challenges/TestResults';
+import { type TestResult } from '@/components/challenges/test-results';
 import { createSubmission } from '@/server/submissions.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
-import { AuthGuardDialog } from '@/components/auth/AuthGuardDialog';
+import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 

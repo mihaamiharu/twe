@@ -78,4 +78,4 @@ async function checkSecurity() {
   console.log('Result:', result.returnValue);
 }
 
-checkSecurity();
+void checkSecurity();

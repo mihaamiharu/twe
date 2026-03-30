@@ -1,4 +1,4 @@
-import { ChallengeSkeleton } from '../ChallengeSkeleton';
+import { ChallengeSkeleton } from '../challenge-skeleton';
 
 export function LoadingOverlay() {
     return (

@@ -4,15 +4,15 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { BookOpen, Play, Search, Code2, Info, CheckCircle2, Folder } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MarkdownRenderer } from '@/components/MarkdownRenderer';
-import { WebComponentPreview } from '../WebComponentPreview';
-import { EditorPanel } from './EditorPanel';
-import { SelectorPanel } from './SelectorPanel';
-import { ResultsPanel } from './ResultsPanel';
-import { FileExplorer } from '../FileExplorer';
+import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { WebComponentPreview } from '../web-component-preview';
+import { EditorPanel } from './editor-panel';
+import { SelectorPanel } from './selector-panel';
+import { ResultsPanel } from './results-panel';
+import { FileExplorer } from '../file-explorer';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type { Challenge, PlaygroundState } from './types';
-import type { SelectorType } from '../SelectorInput';
+import type { SelectorType } from '../selector-input';
 import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
