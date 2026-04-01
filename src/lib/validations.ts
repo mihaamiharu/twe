@@ -34,6 +34,11 @@ export const localizedStringSchema = z.object({
   id: z.string().optional(),
 });
 
+export const localizedArraySchema = z.object({
+  en: z.array(z.string()).min(1, 'English content is required'),
+  id: z.array(z.string()).optional(),
+});
+
 export const challengeTypeSchema = z.enum([
   'CSS_SELECTOR',
   'XPATH_SELECTOR',
@@ -64,6 +69,7 @@ export const expectedStateRuleSchema = z.object({
 });
 
 export type LocalizedString = z.infer<typeof localizedStringSchema>;
+export type LocalizedArray = z.infer<typeof localizedArraySchema>;
 export type ChallengeType = z.infer<typeof challengeTypeSchema>;
 export type ChallengeDifficulty = z.infer<typeof challengeDifficultySchema>;
 export type TestCaseDefinition = z.infer<typeof testCaseDefinitionSchema>;
