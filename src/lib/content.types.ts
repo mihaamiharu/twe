@@ -2,32 +2,43 @@
  * Content Types for Filesystem-Driven Content Management
  *
  * These types define the structure of tutorials and challenges
- * when loaded from the filesystem (JSON/Markdown).
+ * defined when loaded from the filesystem (JSON/Markdown).
  */
 
-// =============================================================================
-// CONTENT STATUS
-// =============================================================================
+ import {
+   type LocalizedString,
+   type ChallengeType,
+   type ChallengeDifficulty,
+   type TestCaseDefinition,
+   type ExpectedStateRule,
+ } from './validations';
 
-export type ContentStatus = 'published' | 'draft' | 'coming_soon';
+ export type {
+   LocalizedString,
+   ChallengeType,
+   ChallengeDifficulty,
+   TestCaseDefinition,
+   ExpectedStateRule,
+ };
+ // =============================================================================
+ // CONTENT STATUS
+ // =============================================================================
 
-// =============================================================================
-// LOCALIZED CONTENT
-// =============================================================================
+ export type ContentStatus = 'published' | 'draft' | 'coming_soon';
 
-export interface LocalizedString {
-  en: string;
-  id?: string;
-}
+ // =============================================================================
+ // LOCALIZED CONTENT
+ // =============================================================================
 
-export interface LocalizedArray {
+ export interface LocalizedArray {
   en: string[];
   id?: string[];
-}
+ }
 
-// =============================================================================
-// TUTORIAL TYPES
-// =============================================================================
+ // =============================================================================
+ // TUTORIAL TYPES
+ // =============================================================================
+
 
 /**
  * Tutorial metadata from registry.json
@@ -75,36 +86,7 @@ export interface Tutorial {
 // CHALLENGE TYPES
 // =============================================================================
 
-export type ChallengeType =
-  | 'CSS_SELECTOR'
-  | 'XPATH_SELECTOR'
-  | 'JAVASCRIPT'
-  | 'TYPESCRIPT'
-  | 'PLAYWRIGHT';
-export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e' | 'pom' | 'typescript';
-
-/**
- * Test case definition in challenge JSON
- */
-export interface TestCaseDefinition {
-  description: string;
-  input?: unknown;
-  expectedOutput: unknown;
-  isHidden?: boolean;
-}
-
-/**
- * Expected state rule for DOM validation after code execution
- */
-export interface ExpectedStateRule {
-  selector: string;
-  visible?: boolean;
-  hidden?: boolean;
-  containsText?: string;
-  hasAttribute?: { name: string; value?: string | RegExp };
-  count?: number;
-}
 
 /**
  * Challenge definition from tier JSON files

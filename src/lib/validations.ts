@@ -29,6 +29,46 @@ export const signInSchema = z.object({
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 
+export const localizedStringSchema = z.object({
+  en: z.string().min(1, 'English content is required'),
+  id: z.string().optional(),
+});
+
+export const challengeTypeSchema = z.enum([
+  'CSS_SELECTOR',
+  'XPATH_SELECTOR',
+  'JAVASCRIPT',
+  'TYPESCRIPT',
+  'PLAYWRIGHT',
+]);
+
+export const challengeDifficultySchema = z.enum(['EASY', 'MEDIUM', 'HARD']);
+
+export const testCaseDefinitionSchema = z.object({
+  description: z.string(),
+  input: z.unknown().optional(),
+  expectedOutput: z.unknown(),
+  isHidden: z.boolean().optional(),
+});
+
+export const expectedStateRuleSchema = z.object({
+  selector: z.string(),
+  visible: z.boolean().optional(),
+  hidden: z.boolean().optional(),
+  containsText: z.string().optional(),
+  hasAttribute: z.object({
+    name: z.string(),
+    value: z.union([z.string(), z.instanceof(RegExp)]).optional(),
+  }).optional(),
+  count: z.number().optional(),
+});
+
+export type LocalizedString = z.infer<typeof localizedStringSchema>;
+export type ChallengeType = z.infer<typeof challengeTypeSchema>;
+export type ChallengeDifficulty = z.infer<typeof challengeDifficultySchema>;
+export type TestCaseDefinition = z.infer<typeof testCaseDefinitionSchema>;
+export type ExpectedStateRule = z.infer<typeof expectedStateRuleSchema>;
+
 // Validation helper
 export function validateInput<T>(
   schema: z.ZodSchema<T>,

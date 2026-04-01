@@ -3,6 +3,11 @@ import {
   signUpSchema,
   signInSchema,
   validateInput,
+  localizedStringSchema,
+  challengeTypeSchema,
+  challengeDifficultySchema,
+  testCaseDefinitionSchema,
+  expectedStateRuleSchema,
 } from '../../lib/validations';
 
 describe('Validations', () => {
@@ -104,6 +109,115 @@ describe('Validations', () => {
       if (result.success) {
         expect(result.data).toEqual(data);
       }
+    });
+  });
+
+  describe('localizedStringSchema', () => {
+    it('should validate valid English string', () => {
+      const result = localizedStringSchema.safeParse({ en: 'Hello' });
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate valid English and Indonesian string', () => {
+      const result = localizedStringSchema.safeParse({ en: 'Hello', id: 'Halo' });
+      expect(result.success).toBe(true);
+    });
+
+    it('should fail if English is missing', () => {
+      const result = localizedStringSchema.safeParse({ id: 'Halo' });
+      expect(result.success).toBe(false);
+    });
+
+    it('should fail if English is empty', () => {
+      const result = localizedStringSchema.safeParse({ en: '' });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('challengeTypeSchema', () => {
+    it('should validate valid types', () => {
+      const types = ['CSS_SELECTOR', 'XPATH_SELECTOR', 'JAVASCRIPT', 'TYPESCRIPT', 'PLAYWRIGHT'];
+      types.forEach(type => {
+        expect(challengeTypeSchema.safeParse(type).success).toBe(true);
+      });
+    });
+
+    it('should fail on invalid type', () => {
+      expect(challengeTypeSchema.safeParse('INVALID').success).toBe(false);
+    });
+  });
+
+  describe('challengeDifficultySchema', () => {
+    it('should validate valid difficulties', () => {
+      const difficulties = ['EASY', 'MEDIUM', 'HARD'];
+      difficulties.forEach(difficulty => {
+        expect(challengeDifficultySchema.safeParse(difficulty).success).toBe(true);
+      });
+    });
+
+    it('should fail on invalid difficulty', () => {
+      expect(challengeDifficultySchema.safeParse('INSANE').success).toBe(false);
+    });
+  });
+
+  describe('testCaseDefinitionSchema', () => {
+    it('should validate valid test case', () => {
+      const result = testCaseDefinitionSchema.safeParse({
+        description: 'Test description',
+        expectedOutput: 'Expected',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate complete test case', () => {
+      const result = testCaseDefinitionSchema.safeParse({
+        description: 'Test description',
+        input: 'Input',
+        expectedOutput: 'Expected',
+        isHidden: true,
+      });
+      expect(result.success).toBe(true);
+    });
+  });
+
+  describe('expectedStateRuleSchema', () => {
+    it('should validate simple selector rule', () => {
+      const result = expectedStateRuleSchema.safeParse({
+        selector: '.btn',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate complex rule', () => {
+      const result = expectedStateRuleSchema.safeParse({
+        selector: '.btn',
+        visible: true,
+        containsText: 'Submit',
+        count: 1,
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate hasAttribute rule', () => {
+      const result = expectedStateRuleSchema.safeParse({
+        selector: 'input',
+        hasAttribute: {
+          name: 'type',
+          value: 'text',
+        },
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate hasAttribute rule with RegExp', () => {
+      const result = expectedStateRuleSchema.safeParse({
+        selector: 'input',
+        hasAttribute: {
+          name: 'class',
+          value: /form-control/,
+        },
+      });
+      expect(result.success).toBe(true);
     });
   });
 });
