@@ -9,8 +9,7 @@ const teardownSchema = z.object({
   email: z.string().email(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Route = createFileRoute('/api/test/teardown-user' as any)({
+export const Route = createFileRoute('/api/test/teardown-user')({
   server: {
     handlers: {
       POST: async ({ request }) => {

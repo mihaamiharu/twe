@@ -19,6 +19,10 @@ import {
   awardAchievements,
 } from '@/lib/stats';
 import { logger } from '@/lib/logger';
+import {
+  type LocalizedString,
+  type TestCaseDefinition,
+} from '@/lib/validations';
 import { getRawChallengeContent } from './content.server';
 
 // ----------------------------------------------------------------------------
@@ -55,7 +59,7 @@ const CreateSubmissionSchema = z.object({
     z.object({
       testCaseId: z.string().uuid().optional(),
       passed: z.boolean(),
-      output: z.any().optional(),
+      output: z.unknown().optional(),
       error: z.string().optional(),
     }),
   ),
@@ -119,7 +123,7 @@ export const challengeSubmissionHandler = async ({
           .insert(challenges)
           .values({
             slug: fsChallenge.slug,
-            title: fsChallenge.title as any, // Cast to any for JSONB
+            title: fsChallenge.title as LocalizedString,
             type: fsChallenge.type,
             difficulty: fsChallenge.difficulty,
             xpReward: fsChallenge.xpReward,
@@ -133,7 +137,7 @@ export const challengeSubmissionHandler = async ({
         // Insert test cases
         if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
           await db.insert(testCases).values(
-            fsChallenge.testCases.map((tc: any, index: number) => ({
+            fsChallenge.testCases.map((tc: TestCaseDefinition, index: number) => ({
               challengeId: newChallenge.id,
               description: tc.description,
               input: tc.input,

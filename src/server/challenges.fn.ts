@@ -12,6 +12,10 @@ import {
   getChallengeList,
   getTutorialContent,
 } from './content.server';
+import {
+  type ChallengeListItem,
+  type Challenge as ChallengeDetail,
+} from '@/lib/content.types';
 
 // ----------------------------------------------------------------------------
 // GET CHALLENGES (LIST) - NOW USING FILESYSTEM
@@ -41,7 +45,20 @@ const ChallengeFiltersSchema = z.object({
 
 export const getChallenges = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeFiltersSchema.parse(data))
-  .handler(async ({ data: filters }) => {
+  .handler(
+    async ({
+      data: filters,
+    }): Promise<{
+      success: boolean;
+      data?: ChallengeListItem[];
+      pagination?: {
+        page: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+      };
+      error?: string;
+    }> => {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const headers = getRequestHeaders();
@@ -194,8 +211,10 @@ const ChallengeDetailSchema = z.object({
 
 export const getChallenge = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
-  // @ts-expect-error TanStack Start type inference issue with complex handler return types
-  .handler(async ({ data: { slug, locale } }) => {
+  .handler(
+    async ({
+      data: { slug, locale },
+    }): Promise<{ success: boolean; data?: ChallengeDetail; error?: string }> => {
     try {
       // Load challenge content from filesystem
       const challengeContent = await getChallengeContent(slug, locale);

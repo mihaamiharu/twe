@@ -18,12 +18,18 @@ export default tseslint.config(
     rules: {
       '@typescript-eslint/only-throw-error': 'off',
       'security/detect-object-injection': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
   {
     // Specific overrides for tests to allow looser typing for mocking
-    files: ['src/tests/**/*.ts', 'src/tests/**/*.tsx', 'e2e/**/*.ts'],
+    files: [
+      'src/tests/**/*.ts',
+      'src/tests/**/*.tsx',
+      'src/**/*.test.ts',
+      'src/**/*.test.tsx',
+      'e2e/**/*.ts',
+    ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',
@@ -47,7 +53,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-member-access': 'warn',
       '@typescript-eslint/no-unsafe-call': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
   {

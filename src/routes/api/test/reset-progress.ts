@@ -11,8 +11,7 @@ const resetSchema = z.object({
   slug: z.string().nullable().optional(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Route = createFileRoute('/api/test/reset-progress' as any)({
+export const Route = createFileRoute('/api/test/reset-progress')({
   server: {
     handlers: {
       POST: async ({ request }) => {

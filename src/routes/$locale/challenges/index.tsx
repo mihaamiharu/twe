@@ -53,6 +53,7 @@ import {
   CATEGORY_ORDER,
 } from '@/lib/constants';
 import { useTranslation } from 'react-i18next';
+import { type TFunction } from 'i18next';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import {
@@ -63,6 +64,7 @@ import {
 } from '@/config/tracks';
 import i18n from '@/lib/i18n';
 import { createSeoHead } from '@/lib/seo';
+import { type ChallengeListItem } from '@/lib/content.types';
 
 // --- Search Params Schema ---
 const ChallengesSearchSchema = z.object({
@@ -129,21 +131,6 @@ const challengeTypeConfig: Record<
 const isBossChallenge = (challenge: Challenge) => {
   return challenge.slug.includes('boss');
 };
-
-export interface Challenge {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  type: string;
-  difficulty: string;
-  category: string | null;
-  xpReward: number;
-  order: number;
-  completionCount: number;
-  isCompleted: boolean;
-  tags: string[] | null;
-}
 
 // --- Sidebar / Tracks Configuration ---
 
@@ -575,7 +562,37 @@ export function ChallengesPage() {
 
 // --- Sub-components for Cleaner Render ---
 
-export function ChallengeCard({ challenge, config, isComingSoon, isBoss, params, t }: any) {
+interface ChallengeConfig {
+  color: string;
+  icon: React.ReactNode;
+  label: string;
+}
+
+interface ChallengeConfig {
+  difficultyColors: Record<string, string>;
+  challengeTypeConfig: Record<
+    string,
+    { color: string; icon: React.ReactNode; label: string }
+  >;
+}
+
+interface ChallengeCardProps {
+  challenge: ChallengeListItem;
+  config: ChallengeConfig;
+  isComingSoon?: boolean;
+  isBoss?: boolean;
+  params: { locale: string; slug: string };
+  t: TFunction;
+}
+
+export function ChallengeCard({
+  challenge,
+  config,
+  isComingSoon,
+  isBoss,
+  params,
+  t,
+}: ChallengeCardProps) {
   const CardContentWrapper = (
     <Card
       className={cn(
@@ -672,7 +689,25 @@ export function ChallengeCard({ challenge, config, isComingSoon, isBoss, params,
   );
 }
 
-export function ChallengeRow({ challenge, index, config, isComingSoon, isBoss, params, t }: any) {
+interface ChallengeRowProps {
+  challenge: ChallengeListItem;
+  index: number;
+  config: ChallengeConfig;
+  isComingSoon?: boolean;
+  isBoss?: boolean;
+  params: { locale: string; slug: string };
+  t: TFunction;
+}
+
+export function ChallengeRow({
+  challenge,
+  index,
+  config,
+  isComingSoon,
+  isBoss,
+  params,
+  t,
+}: ChallengeRowProps) {
   const RowContent = (
     <>
       <TableCell className="font-mono text-xs text-muted-foreground w-[60px] pl-4">

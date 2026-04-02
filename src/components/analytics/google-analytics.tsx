@@ -3,10 +3,8 @@ import { useLocation } from '@tanstack/react-router';
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dataLayer: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    gtag: (...args: any[]) => void;
+    dataLayer: unknown[];
+    gtag: (command: string, ...args: unknown[]) => void;
   }
 }
 

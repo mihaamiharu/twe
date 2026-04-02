@@ -15,6 +15,7 @@ import {
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { DataTablePagination } from '@/components/admin/data-table-pagination';
+import { type Achievement } from '@/lib/content.types';
 
 export const Route = createFileRoute('/admin/achievements')({
     component: AchievementsManager,
@@ -30,7 +31,7 @@ function AchievementsManager() {
         queryFn: async () => {
             const res = await getAdminAchievements();
             if (!res.success) throw new Error(res.error || 'Failed to fetch achievements');
-            return res.data;
+            return res.data as Achievement[];
         },
     });
 
@@ -39,7 +40,7 @@ function AchievementsManager() {
         const query = searchQuery.toLowerCase().trim();
         if (!query) return achievements;
         return achievements.filter((a) =>
-            a.name.toLowerCase().includes(query) ||
+            a.name.en.toLowerCase().includes(query) ||
             a.slug.toLowerCase().includes(query)
         );
     }, [achievements, searchQuery]);
@@ -112,10 +113,10 @@ function AchievementsManager() {
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-semibold text-sm">
-                                                        {(ach.name as any).en || ach.name}
+                                                        {ach.name.en}
                                                     </span>
                                                     <span className="text-[10px] text-muted-foreground line-clamp-1 max-w-[300px]">
-                                                        {(ach.description as any).en || ach.description}
+                                                        {ach.description.en}
                                                     </span>
                                                 </div>
                                             </div>

@@ -20,7 +20,6 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { DataTablePagination } from '@/components/admin/data-table-pagination';
@@ -31,10 +30,30 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { type LocalizedString } from '@/lib/content.types';
 
 export const Route = createFileRoute('/admin/submissions')({
     component: SubmissionsManager,
 });
+
+interface AdminSubmission {
+    id: string;
+    createdAt: Date | string;
+    isPassed: boolean;
+    executionTime: number | null;
+    xpEarned: number;
+    testsPassed: number;
+    testsTotal: number;
+    user: {
+        name: string | null;
+        email: string | null;
+        image: string | null;
+    } | null;
+    challenge: {
+        title: LocalizedString;
+        slug: string;
+    } | null;
+}
 
 function SubmissionsManager() {
     const [searchQuery, setSearchQuery] = useState('');
@@ -47,19 +66,24 @@ function SubmissionsManager() {
         queryFn: async () => {
             const res = await getAdminSubmissions();
             if (!res.success) throw new Error(res.error || 'Failed to fetch submissions');
-            return res.data;
+            return res.data as AdminSubmission[];
         },
     });
 
     const filteredSubmissions = useMemo(() => {
         if (!submissions) return [];
 
+        const query = searchQuery.toLowerCase().trim();
+
         return submissions.filter((sub) => {
+            const challengeTitle = sub.challenge?.title.en.toLowerCase() || '';
+            const userName = sub.user?.name?.toLowerCase() || '';
+            const userEmail = sub.user?.email?.toLowerCase() || '';
+
             const matchesSearch =
-                sub.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                sub.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (typeof sub.challenge?.title === 'string' && sub.challenge.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (typeof sub.challenge?.title === 'object' && sub.challenge.title.en.toLowerCase().includes(searchQuery.toLowerCase()));
+                userName.includes(query) ||
+                userEmail.includes(query) ||
+                challengeTitle.includes(query);
 
             const matchesStatus =
                 statusFilter === 'ALL' ||
@@ -105,7 +129,7 @@ function SubmissionsManager() {
                     <Filter className="h-4 w-4 text-muted-foreground" />
                     <Select
                         value={statusFilter}
-                        onValueChange={(v: any) => setStatusFilter(v)}
+                        onValueChange={(v: 'ALL' | 'PASSED' | 'FAILED') => setStatusFilter(v)}
                     >
                         <SelectTrigger className="w-[150px]">
                             <SelectValue placeholder="Status" />
@@ -163,7 +187,7 @@ function SubmissionsManager() {
                                         <TableCell>
                                             <div className="flex flex-col">
                                                 <span className="text-sm font-medium">
-                                                    {typeof sub.challenge?.title === 'object' ? sub.challenge.title.en : sub.challenge?.title}
+                                                    {sub.challenge?.title.en || 'Unknown Challenge'}
                                                 </span>
                                                 <span className="text-[10px] text-muted-foreground font-mono">
                                                     {sub.challenge?.slug}

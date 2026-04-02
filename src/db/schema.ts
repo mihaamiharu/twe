@@ -206,6 +206,7 @@ export const submissions = pgTable('submissions', {
 
   code: text('code').notNull(), // User's submitted code
   isPassed: boolean('is_passed').notNull(),
+  isCorrect: boolean('is_correct').notNull().default(true),
   xpEarned: integer('xp_earned').notNull().default(0),
 
   // Execution details
