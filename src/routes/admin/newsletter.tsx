@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminSubscribers, updateSubscriberStatus } from '@/server/admin.fn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Download, Mail } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import {
     Table,
     TableBody,

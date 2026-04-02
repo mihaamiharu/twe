@@ -4,11 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import {
-    Settings as SettingsIcon,
     Globe,
     Lock,
-    Bell,
-    Database,
     RefreshCw,
     ShieldAlert
 } from 'lucide-react';

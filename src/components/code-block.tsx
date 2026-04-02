@@ -30,7 +30,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
       setIsCopied(true);
       toast.success('Code copied to clipboard');
       setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast.error('Failed to copy code');
     }
   };

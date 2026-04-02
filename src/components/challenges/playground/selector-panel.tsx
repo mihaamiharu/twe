@@ -4,17 +4,15 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { SelectorInput, type SelectorType } from '../selector-input';
-import type { Challenge, PlaygroundState } from './types';
+import type { PlaygroundState } from './types';
 
 interface SelectorPanelProps {
-    challenge: Challenge;
     state: PlaygroundState;
     onSelectorChange: (value: string, type: SelectorType) => void;
     onValidate: () => void;
 }
 
 export function SelectorPanel({
-    challenge,
     state,
     onSelectorChange,
     onValidate,

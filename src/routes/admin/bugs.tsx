@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminBugs, updateBugStatus } from '@/server/admin.fn';
 import { Card, CardContent } from '@/components/ui/card';
@@ -15,7 +15,7 @@ import {
 import { Link } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,

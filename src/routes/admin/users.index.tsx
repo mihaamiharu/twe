@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminUsers, updateUserStatus } from '@/server/admin.fn';
 import { Card, CardContent } from '@/components/ui/card';

@@ -32,7 +32,7 @@ function ConfirmSubscriptionPage() {
     const { token } = routeApi.useSearch();
     const { locale } = routeApi.useParams();
 
-    const { data, isLoading, error } = useQuery({
+    const { isLoading, error } = useQuery({
         queryKey: ['confirm-subscription', token],
         queryFn: async () => {
             if (!token) throw new Error('No token provided');
