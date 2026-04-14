@@ -14,7 +14,7 @@ console.log(`🚀 ${env.charAt(0).toUpperCase() + env.slice(1)} server starting 
 Bun.serve({
     port: PORT,
     async fetch(req) {
-        const url = new URL(req.url);
+        const url = new URL(req.url, `http://localhost:${PORT}`);
         const path = url.pathname;
 
         // Security: basic directory traversal protection
