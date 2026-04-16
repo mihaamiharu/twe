@@ -256,7 +256,15 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
     }: {
       data: z.infer<typeof updateUserSchema>;
       context: { user: { id: string } };
-    }): Promise<{ success: boolean; data?: any; error?: string }> => {
+    }): Promise<{
+      success: boolean;
+      data?: {
+        name: string | null;
+        profileVisibility: 'PUBLIC' | 'PRIVATE';
+        showOnLeaderboard: boolean;
+      };
+      error?: string;
+    }> => {
       try {
         const updates = data;
 

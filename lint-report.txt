@@ -1,0 +1,663 @@
+
+> lint
+> eslint .
+
+
+/Users/ekkisyam/Learn/twe/.agent/skills/writing-skills/render-graphs.js
+  0:0  error  Parsing error: /Users/ekkisyam/Learn/twe/.agent/skills/writing-skills/render-graphs.js was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/Users/ekkisyam/Learn/twe/e2e/pages/ProfilePage.ts
+  38:33  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+
+/Users/ekkisyam/Learn/twe/e2e/tests/challenges.spec.ts
+  10:30  warning  Found readFileSync from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  19:27  warning  Async arrow function has no 'await' expression                             @typescript-eslint/require-await
+
+/Users/ekkisyam/Learn/twe/e2e/tests/hide-completed.spec.ts
+  11:30  warning  Found readFileSync from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  32:26  warning  Variable Assigned to Object Injection Sink                                 security/detect-object-injection
+  44:15  warning  'checkIcon' is assigned a value but never used                             @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/e2e/tests/id-scenarios.spec.ts
+  32:62  warning  'page' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/e2e/tests/leaderboard.spec.ts
+   1:16  warning  'expect' is defined but never used  @typescript-eslint/no-unused-vars
+  12:47  warning  'page' is defined but never used    @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/e2e/tests/tutorials.spec.ts
+  14:42  warning  'page' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/scripts/performance/load-test.js
+  0:0  error  Parsing error: /Users/ekkisyam/Learn/twe/scripts/performance/load-test.js was not found by the project service. Consider either including it in the tsconfig.json or including it in allowDefaultProject
+
+/Users/ekkisyam/Learn/twe/scripts/server.ts
+  49:13  error  Unsafe return of a value of type `any`         @typescript-eslint/no-unsafe-return
+  49:26  error  Unsafe call of a(n) `any` typed value          @typescript-eslint/no-unsafe-call
+  49:37  error  Unexpected any. Specify a different type       @typescript-eslint/no-explicit-any
+  49:42  error  Unsafe member access .fetch on an `any` value  @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/editor/use-monaco-setup.ts
+   41:13  error  Unsafe assignment of an error typed value                                          @typescript-eslint/no-unsafe-assignment
+   44:13  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+   44:20  error  Unsafe member access .languages on an `error` typed value                          @typescript-eslint/no-unsafe-member-access
+   45:17  error  Unsafe assignment of an error typed value                                          @typescript-eslint/no-unsafe-assignment
+   45:32  error  Unsafe member access .languages on an `error` typed value                          @typescript-eslint/no-unsafe-member-access
+   46:17  error  Unsafe assignment of an error typed value                                          @typescript-eslint/no-unsafe-assignment
+   46:32  error  Unsafe member access .languages on an `error` typed value                          @typescript-eslint/no-unsafe-member-access
+   48:17  error  Unsafe assignment of an error typed value                                          @typescript-eslint/no-unsafe-assignment
+   48:42  error  Unsafe member access .languages on an `error` typed value                          @typescript-eslint/no-unsafe-member-access
+   56:13  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+   56:20  error  Unsafe member access .languages on an `error` typed value                          @typescript-eslint/no-unsafe-member-access
+   57:13  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+   57:20  error  Unsafe member access .languages on an `error` typed value                          @typescript-eslint/no-unsafe-member-access
+   60:13  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+   60:20  error  Unsafe member access .editor on an `error` typed value                             @typescript-eslint/no-unsafe-member-access
+   61:13  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+   61:20  error  Unsafe member access .editor on an `error` typed value                             @typescript-eslint/no-unsafe-member-access
+   62:13  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+   62:20  error  Unsafe member access .editor on an `error` typed value                             @typescript-eslint/no-unsafe-member-access
+   68:38  error  Unsafe member access .KeyMod on an `error` typed value                             @typescript-eslint/no-unsafe-member-access
+   68:62  error  Unsafe member access .KeyCode on an `error` typed value                            @typescript-eslint/no-unsafe-member-access
+   76:38  error  Unsafe member access .KeyMod on an `error` typed value                             @typescript-eslint/no-unsafe-member-access
+   76:62  error  Unsafe member access .KeyCode on an `error` typed value                            @typescript-eslint/no-unsafe-member-access
+  111:30  error  Unsafe argument of type error typed assigned to a parameter of type `IDisposable`  @typescript-eslint/no-unsafe-argument
+  111:30  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+  111:77  error  Unsafe member access .addExtraLib on an `error` typed value                        @typescript-eslint/no-unsafe-member-access
+  112:30  error  Unsafe argument of type error typed assigned to a parameter of type `IDisposable`  @typescript-eslint/no-unsafe-argument
+  112:30  error  Unsafe call of a(n) `error` type typed value                                       @typescript-eslint/no-unsafe-call
+  112:77  error  Unsafe member access .addExtraLib on an `error` typed value                        @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/file-explorer.tsx
+  53:22  warning  Generic Object Injection Sink                     security/detect-object-injection
+  57:21  warning  Generic Object Injection Sink                     security/detect-object-injection
+  64:27  warning  Generic Object Injection Sink                     security/detect-object-injection
+  75:22  warning  Generic Object Injection Sink                     security/detect-object-injection
+  89:15  error    'hasChildren' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/multi-tab-editor.tsx
+   34:5   error    'height' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  121:34  warning  Generic Object Injection Sink                security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/playground/editor-panel.tsx
+  44:9  error  'isLayoutReady' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/playground/hint-display-panel.tsx
+  46:72  error  'children' may use Object's default stringification format ('[object Object]') when stringified  @typescript-eslint/no-base-to-string
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/playground/playground-desktop-layout.tsx
+   93:43  warning  Generic Object Injection Sink                                                      security/detect-object-injection
+  137:39  error    Promise-returning function provided to attribute where a void return was expected  @typescript-eslint/no-misused-promises
+  160:39  error    Promise-returning function provided to attribute where a void return was expected  @typescript-eslint/no-misused-promises
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/playground/playground-mobile-layout.tsx
+  160:76  error    Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  169:55  error    Promise-returning function provided to attribute where a void return was expected                                                                                   @typescript-eslint/no-misused-promises
+  198:51  error    Promise-returning function provided to attribute where a void return was expected                                                                                   @typescript-eslint/no-misused-promises
+  218:51  warning  Generic Object Injection Sink                                                                                                                                       security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/playground/selector-panel.tsx
+  17:5  error  'challenge' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/preview/use-preview-state.ts
+    6:5   error  'PreviewState' is defined but never used                                                       @typescript-eslint/no-unused-vars
+    7:5   error  'SelectorType' is defined but never used                                                       @typescript-eslint/no-unused-vars
+   94:19  error  Unsafe assignment of an `any` value                                                            @typescript-eslint/no-unsafe-assignment
+   97:26  error  Unsafe member access .type on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+   99:38  error  Unsafe argument of type `any` assigned to a parameter of type `string`                         @typescript-eslint/no-unsafe-argument
+   99:43  error  Unsafe member access .path on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+  102:39  error  Unsafe argument of type `any` assigned to a parameter of type `SetStateAction<string | null>`  @typescript-eslint/no-unsafe-argument
+  102:44  error  Unsafe member access .path on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+  106:25  error  Unsafe assignment of an `any` value                                                            @typescript-eslint/no-unsafe-assignment
+  106:39  error  Unsafe member access .isValid on an `any` value                                                @typescript-eslint/no-unsafe-member-access
+  107:25  error  Unsafe assignment of an `any` value                                                            @typescript-eslint/no-unsafe-assignment
+  107:42  error  Unsafe member access .matchCount on an `any` value                                             @typescript-eslint/no-unsafe-member-access
+  111:34  error  Unsafe argument of type `any` assigned to a parameter of type `string`                         @typescript-eslint/no-unsafe-argument
+  111:39  error  Unsafe member access .path on an `any` value                                                   @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/components/challenges/test-results.tsx
+  40:3   error  'ChallengeType' is an 'error' type that acts as 'any' and overrides all other types in this union type  @typescript-eslint/no-redundant-type-constituents
+  95:28  error  Computed name [challengeType || 'DEFAULT'] resolves to an `error` typed value                           @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/components/code-block.tsx
+  33:14  error  'err' is defined but never used                                                    @typescript-eslint/no-unused-vars
+  47:19  error  Promise-returning function provided to attribute where a void return was expected  @typescript-eslint/no-misused-promises
+
+/Users/ekkisyam/Learn/twe/src/components/default-error-component.tsx
+  12:35  error  'Home' is defined but never used                                                                                                                                    @typescript-eslint/no-unused-vars
+  55:29  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/components/gamification/achievement-badge.tsx
+  59:34  warning  Function Call Object Injection Sink  security/detect-object-injection
+  68:30  warning  Generic Object Injection Sink        security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/components/gamification/xp-progress-bar.tsx
+  60:59  warning  Function Call Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/components/i18n-provider.tsx
+  28:5  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  33:7  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/components/language-switcher.tsx
+  57:14  warning  Generic Object Injection Sink  security/detect-object-injection
+  69:37  warning  Generic Object Injection Sink  security/detect-object-injection
+  70:14  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/components/markdown-renderer.tsx
+  171:30  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  222:30  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  235:21  warning  Generic Object Injection Sink               security/detect-object-injection
+  249:19  warning  Generic Object Injection Sink               security/detect-object-injection
+  299:21  warning  Function Call Object Injection Sink         security/detect-object-injection
+  303:48  warning  Generic Object Injection Sink               security/detect-object-injection
+  304:22  warning  Generic Object Injection Sink               security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/components/playwright-demo.tsx
+  29:20  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/components/spinner.tsx
+  19:9  warning  Function Call Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/core/executor/executor.types.ts
+  52:31  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  66:49  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  77:14  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ekkisyam/Learn/twe/src/core/executor/expect-matchers.ts
+  105:30  error    'e' is defined but never used                                           @typescript-eslint/no-unused-vars
+  129:30  error    'e' is defined but never used                                           @typescript-eslint/no-unused-vars
+  311:37  error    Async arrow function has no 'await' expression                          @typescript-eslint/require-await
+  364:86  warning  Generic Object Injection Sink                                           security/detect-object-injection
+  366:37  warning  Generic Object Injection Sink                                           security/detect-object-injection
+  480:44  error    Unsafe argument of type `any` assigned to a parameter of type `string`  @typescript-eslint/no-unsafe-argument
+  510:31  warning  Generic Object Injection Sink                                           security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/core/executor/iframe-executor.ts
+  191:23  error    Unsafe assignment of an `any` value                                                                                          @typescript-eslint/no-unsafe-assignment
+  192:21  error    Unsafe member access .__MOCK_ROUTES__ on an `any` value                                                                      @typescript-eslint/no-unsafe-member-access
+  194:21  error    Unsafe member access .__APP_STATE__ on an `any` value                                                                        @typescript-eslint/no-unsafe-member-access
+  516:25  error    Unsafe assignment of an `any` value                                                                                          @typescript-eslint/no-unsafe-assignment
+  516:33  warning  Variable Assigned to Object Injection Sink                                                                                   security/detect-object-injection
+  516:44  error    Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  516:49  error    Unsafe member access [prop] on an `any` value                                                                                @typescript-eslint/no-unsafe-member-access
+  517:19  error    Unsafe return of a value of type `any`                                                                                       @typescript-eslint/no-unsafe-return
+  517:56  error    Unsafe call of a(n) `any` typed value                                                                                        @typescript-eslint/no-unsafe-call
+  517:62  error    Unsafe member access .bind on an `any` value                                                                                 @typescript-eslint/no-unsafe-member-access
+  526:19  error    Unsafe assignment of an `any` value                                                                                          @typescript-eslint/no-unsafe-assignment
+  526:59  error    Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  529:27  error    Unsafe member access .__testPromises on an `any` value                                                                       @typescript-eslint/no-unsafe-member-access
+  532:76  error    Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  545:47  error    Unsafe member access .__testPromises on an `any` value                                                                       @typescript-eslint/no-unsafe-member-access
+  546:17  error    Unsafe call of a(n) `any` typed value                                                                                        @typescript-eslint/no-unsafe-call
+  546:31  error    Unsafe member access .__testPromises on an `any` value                                                                       @typescript-eslint/no-unsafe-member-access
+  551:30  error    Unexpected any. Specify a different type                                                                                     @typescript-eslint/no-explicit-any
+  551:35  error    Unsafe member access .step on an `any` value                                                                                 @typescript-eslint/no-unsafe-member-access
+  563:27  error    Unsafe member access .page on an `any` value                                                                                 @typescript-eslint/no-unsafe-member-access
+  573:27  error    Unsafe member access .expect on an `any` value                                                                               @typescript-eslint/no-unsafe-member-access
+  574:27  error    Unsafe member access .test on an `any` value                                                                                 @typescript-eslint/no-unsafe-member-access
+  577:19  error    Unsafe assignment of an `any` value                                                                                          @typescript-eslint/no-unsafe-assignment
+  577:57  error    Unsafe member access .console on an `any` value                                                                              @typescript-eslint/no-unsafe-member-access
+  578:13  error    Unsafe assignment of an `any` value                                                                                          @typescript-eslint/no-unsafe-assignment
+  578:27  error    Unsafe member access .console on an `any` value                                                                              @typescript-eslint/no-unsafe-member-access
+  608:38  error    Unsafe member access .eval on an `any` value                                                                                 @typescript-eslint/no-unsafe-member-access
+  630:21  error    Unsafe call of a(n) `Function` typed value                                                                                   @typescript-eslint/no-unsafe-call
+  636:31  error    Unsafe member access .console on an `any` value                                                                              @typescript-eslint/no-unsafe-member-access
+  638:15  error    Unsafe assignment of an `any` value                                                                                          @typescript-eslint/no-unsafe-assignment
+  638:45  error    Unsafe member access .__returnValue on an `any` value                                                                        @typescript-eslint/no-unsafe-member-access
+  723:23  error    Unsafe argument of type `any` assigned to a parameter of type `(level: LogLevel, message: string, args: unknown[]) => void`  @typescript-eslint/no-unsafe-argument
+
+/Users/ekkisyam/Learn/twe/src/core/executor/playwright-shim.ts
+   421:59  error    Unsafe argument of type `any` assigned to a parameter of type `string`              @typescript-eslint/no-unsafe-argument
+   430:29  error    Unsafe argument of type `any` assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+   745:43  error    Unsafe argument of type `any` assigned to a parameter of type `{}`                  @typescript-eslint/no-unsafe-argument
+   747:22  warning  Generic Object Injection Sink                                                       security/detect-object-injection
+  1518:22  warning  Generic Object Injection Sink                                                       security/detect-object-injection
+  1867:64  warning  Generic Object Injection Sink                                                       security/detect-object-injection
+  2074:24  warning  Variable Assigned to Object Injection Sink                                          security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/core/executor/repro_esbuild.ts
+  26:1  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/core/executor/repro_wrapper.test.ts
+   9:11  warning  'interceptedConsole' is assigned a value but never used                 @typescript-eslint/no-unused-vars
+  13:13  error    Unnecessary try/catch wrapper                                           no-useless-catch
+  28:5   error    Unexpected `await` of a non-Promise (non-"Thenable") value              @typescript-eslint/await-thenable
+  47:54  warning  'expect' is defined but never used                                      @typescript-eslint/no-unused-vars
+  61:54  warning  'expect' is defined but never used                                      @typescript-eslint/no-unused-vars
+  72:47  warning  Promise returned in function argument where a void return was expected  @typescript-eslint/no-misused-promises
+
+/Users/ekkisyam/Learn/twe/src/core/executor/shim-errors.ts
+  106:22  warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  113:15  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  113:20  error    Unsafe member access .type on an `any` value      @typescript-eslint/no-unsafe-member-access
+  114:15  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  114:20  error    Unsafe member access .selector on an `any` value  @typescript-eslint/no-unsafe-member-access
+  115:15  error    Unexpected any. Specify a different type          @typescript-eslint/no-explicit-any
+  115:20  error    Unsafe member access .action on an `any` value    @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/core/executor/shim.types.ts
+  172:24  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ekkisyam/Learn/twe/src/core/executor/typescript-transpiler.test.ts
+  2:31  warning  'initEsbuild' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/core/type-generator.ts
+  138:29  warning  Variable Assigned to Object Injection Sink        security/detect-object-injection
+  144:28  warning  Found non-literal argument to RegExp Constructor  security/detect-non-literal-regexp
+
+/Users/ekkisyam/Learn/twe/src/db/audit-db.ts
+  45:12  warning  Generic Object Injection Sink                                                                    security/detect-object-injection
+  45:22  warning  Generic Object Injection Sink                                                                    security/detect-object-injection
+  46:7   warning  Generic Object Injection Sink                                                                    security/detect-object-injection
+  56:47  error    Unsafe call of a(n) `error` type typed value                                                     @typescript-eslint/no-unsafe-call
+  83:32  error    't.title' will use Object's default stringification format ('[object Object]') when stringified  @typescript-eslint/no-base-to-string
+  83:32  error    Invalid type "{ en: string; id?: string | undefined; }" of template literal expression           @typescript-eslint/restrict-template-expressions
+
+/Users/ekkisyam/Learn/twe/src/db/check-migrations-status.ts
+  23:1  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/db/cleanup-legacy-challenges.ts
+  38:35  error  'c.title' will use Object's default stringification format ('[object Object]') when stringified  @typescript-eslint/no-base-to-string
+  38:35  error  Invalid type "{ en: string; id?: string | undefined; }" of template literal expression           @typescript-eslint/restrict-template-expressions
+
+/Users/ekkisyam/Learn/twe/src/db/fix-duplicate-title.ts
+  28:17  error  Unsafe call of a(n) `error` type typed value               @typescript-eslint/no-unsafe-call
+  28:34  error  Unsafe member access .substring on an `error` typed value  @typescript-eslint/no-unsafe-member-access
+  32:9   error  Unsafe assignment of an error typed value                  @typescript-eslint/no-unsafe-assignment
+  35:9   error  Unsafe call of a(n) `error` type typed value               @typescript-eslint/no-unsafe-call
+  35:24  error  Unsafe member access .includes on an `error` typed value   @typescript-eslint/no-unsafe-member-access
+  36:7   error  Unsafe assignment of an error typed value                  @typescript-eslint/no-unsafe-assignment
+  36:24  error  Unsafe call of a(n) `error` type typed value               @typescript-eslint/no-unsafe-call
+  36:39  error  Unsafe member access .replace on an `error` typed value    @typescript-eslint/no-unsafe-member-access
+  44:9   error  Unsafe call of a(n) `error` type typed value               @typescript-eslint/no-unsafe-call
+  44:24  error  Unsafe member access .includes on an `error` typed value   @typescript-eslint/no-unsafe-member-access
+  45:7   error  Unsafe assignment of an error typed value                  @typescript-eslint/no-unsafe-assignment
+  45:24  error  Unsafe call of a(n) `error` type typed value               @typescript-eslint/no-unsafe-call
+  45:39  error  Unsafe member access .replace on an `error` typed value    @typescript-eslint/no-unsafe-member-access
+  55:19  error  Unsafe call of a(n) `error` type typed value               @typescript-eslint/no-unsafe-call
+  55:36  error  Unsafe member access .substring on an `error` typed value  @typescript-eslint/no-unsafe-member-access
+  63:9   error  Unsafe assignment of an error typed value                  @typescript-eslint/no-unsafe-assignment
+  70:17  error  Unsafe call of a(n) `error` type typed value               @typescript-eslint/no-unsafe-call
+  70:32  error  Unsafe member access .substring on an `error` typed value  @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/db/run-manual-migration.ts
+  13:28  warning  Found readFile from package "fs/promises" with non literal argument at index 0                                                                                      security/detect-non-literal-fs-filename
+  35:1   error    Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/db/verify-parity.ts
+  111:1  error  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/lib/gamification.ts
+  81:17  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+  93:10  warning  Generic Object Injection Sink               security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/lib/stats.ts
+   62:5   warning  Generic Object Injection Sink  security/detect-object-injection
+   62:31  warning  Generic Object Injection Sink  security/detect-object-injection
+  176:30  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/lib/validations.ts
+  94:10  warning  Generic Object Injection Sink  security/detect-object-injection
+  95:7   warning  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/routes/$locale/_authenticated/profile.tsx
+  157:23  warning  Generic Object Injection Sink  security/detect-object-injection
+  158:19  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/routes/$locale/challenges/$slug.tsx
+   41:11   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+   77:27   error  Unsafe member access .title on an `error` typed value                                                         @typescript-eslint/no-unsafe-member-access
+   77:42   error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+   77:102  error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+   79:87   error  Unsafe argument of type error typed assigned to a parameter of type `string | number | boolean`               @typescript-eslint/no-unsafe-argument
+   79:92   error  Unsafe member access .title on an `error` typed value                                                         @typescript-eslint/no-unsafe-member-access
+   79:133  error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+   79:155  error  Unsafe member access .xpReward on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  102:13   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  102:26   error  Unsafe member access .title on an `error` typed value                                                         @typescript-eslint/no-unsafe-member-access
+  110:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  110:22   error  Unsafe member access .title on an `error` typed value                                                         @typescript-eslint/no-unsafe-member-access
+  111:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  111:29   error  Unsafe member access .description on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  113:34   error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+  113:76   error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+  114:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  114:25   error  Unsafe member access .category on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  128:32   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  128:46   error  Unsafe member access .description on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  130:39   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  130:53   error  Unsafe member access .description on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  135:44   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  135:58   error  Unsafe member access .description on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  146:67   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  151:67   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  156:67   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  199:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  200:22   error  Unsafe member access .testCases on an `error` typed value                                                     @typescript-eslint/no-unsafe-member-access
+  201:5    error  Unsafe return of a value of type error                                                                        @typescript-eslint/no-unsafe-return
+  201:12   error  Unsafe call of a(n) `error` type typed value                                                                  @typescript-eslint/no-unsafe-call
+  201:22   error  Unsafe member access .testCases on an `error` typed value                                                     @typescript-eslint/no-unsafe-member-access
+  202:24   error  Unsafe member access .input on an `any` value                                                                 @typescript-eslint/no-unsafe-member-access
+  212:7    error  Unsafe return of a value of type `any`                                                                        @typescript-eslint/no-unsafe-return
+  217:19   error  Unsafe member access .testCases on an `error` typed value                                                     @typescript-eslint/no-unsafe-member-access
+  220:20   error  'PlaygroundChallenge' is an 'error' type that acts as 'any' and overrides all other types in this union type  @typescript-eslint/no-redundant-type-constituents
+  223:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  223:23   error  Unsafe member access .id on an `error` typed value                                                            @typescript-eslint/no-unsafe-member-access
+  224:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  224:25   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  225:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  225:26   error  Unsafe member access .title on an `error` typed value                                                         @typescript-eslint/no-unsafe-member-access
+  226:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  226:32   error  Unsafe member access .description on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  227:9    error  Unsafe assignment of an `any` value                                                                           @typescript-eslint/no-unsafe-assignment
+  227:25   error  Unsafe member access .type on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  227:33   error  Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  229:21   error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+  231:25   error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+  234:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  234:23   error  Unsafe member access .xpReward on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  235:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  235:33   error  Unsafe member access .instructions on an `error` typed value                                                  @typescript-eslint/no-unsafe-member-access
+  236:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  236:26   error  Unsafe member access .hints on an `error` typed value                                                         @typescript-eslint/no-unsafe-member-access
+  237:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  237:32   error  Unsafe member access .htmlContent on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  238:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  238:26   error  Unsafe member access .files on an `error` typed value                                                         @typescript-eslint/no-unsafe-member-access
+  239:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  239:34   error  Unsafe member access .editableFiles on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  240:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  240:35   error  Unsafe member access .preloadModules on an `error` typed value                                                @typescript-eslint/no-unsafe-member-access
+  241:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  241:32   error  Unsafe member access .starterCode on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  243:26   error  Unsafe member access .length on an `error` typed value                                                        @typescript-eslint/no-unsafe-member-access
+  246:44   error  Unsafe member access [0] on an `error` typed value                                                            @typescript-eslint/no-unsafe-member-access
+  253:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  253:20   error  Unsafe call of a(n) `error` type typed value                                                                  @typescript-eslint/no-unsafe-call
+  253:30   error  Unsafe member access .map on an `error` typed value                                                           @typescript-eslint/no-unsafe-member-access
+  254:11   error  Unsafe assignment of an `any` value                                                                           @typescript-eslint/no-unsafe-assignment
+  254:18   error  Unsafe member access .id on an `any` value                                                                    @typescript-eslint/no-unsafe-member-access
+  255:11   error  Unsafe assignment of an `any` value                                                                           @typescript-eslint/no-unsafe-assignment
+  255:20   error  Unsafe member access .description on an `any` value                                                           @typescript-eslint/no-unsafe-member-access
+  256:11   error  Unsafe assignment of an `any` value                                                                           @typescript-eslint/no-unsafe-assignment
+  256:21   error  Unsafe member access .input on an `any` value                                                                 @typescript-eslint/no-unsafe-member-access
+  257:11   error  Unsafe assignment of an `any` value                                                                           @typescript-eslint/no-unsafe-assignment
+  257:30   error  Unsafe member access .expectedOutput on an `any` value                                                        @typescript-eslint/no-unsafe-member-access
+  259:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  259:29   error  Unsafe member access .category on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  260:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  260:32   error  Unsafe member access .userProgress on an `error` typed value                                                  @typescript-eslint/no-unsafe-member-access
+  261:29   error  Unsafe member access .tutorial on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  262:11   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  262:27   error  Unsafe member access .tutorial on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  263:11   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  263:28   error  Unsafe member access .tutorial on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  265:34   error  Unsafe member access .nextChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  266:11   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  266:27   error  Unsafe member access .nextChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  267:11   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  267:28   error  Unsafe member access .nextChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  269:34   error  Unsafe member access .prevChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  270:11   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  270:27   error  Unsafe member access .prevChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  271:11   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  271:28   error  Unsafe member access .prevChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  328:13   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  328:29   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  329:13   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  329:35   error  Unsafe member access .difficulty on an `error` typed value                                                    @typescript-eslint/no-unsafe-member-access
+  387:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  387:34   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  389:9    error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  389:31   error  Unsafe member access .isCompleted on an `error` typed value                                                   @typescript-eslint/no-unsafe-member-access
+  430:30   error  Unsafe member access .tutorial on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  435:41   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  435:57   error  Unsafe member access .tutorial on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  444:44   error  Unsafe member access .tutorial on an `error` typed value                                                      @typescript-eslint/no-unsafe-member-access
+  462:16   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  462:26   error  Unsafe member access .id on an `error` typed value                                                            @typescript-eslint/no-unsafe-member-access
+  463:22   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  466:21   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  466:33   error  Unsafe member access .userProgress on an `error` typed value                                                  @typescript-eslint/no-unsafe-member-access
+  467:31   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  467:43   error  Unsafe member access .userProgress on an `error` typed value                                                  @typescript-eslint/no-unsafe-member-access
+  473:19   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  473:19   error  Unsafe call of a(n) `error` type typed value                                                                  @typescript-eslint/no-unsafe-call
+  473:29   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+  481:25   error  Unsafe member access .nextChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  486:37   error  Unsafe assignment of an error typed value                                                                     @typescript-eslint/no-unsafe-assignment
+  486:53   error  Unsafe member access .nextChallenge on an `error` typed value                                                 @typescript-eslint/no-unsafe-member-access
+  486:68   error  Unsafe member access .slug on an `error` typed value                                                          @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/routes/$locale/challenges/index.tsx
+  132:3   error    Unsafe return of a value of type error                                                    @typescript-eslint/no-unsafe-return
+  132:10  error    Unsafe call of a(n) `error` type typed value                                              @typescript-eslint/no-unsafe-call
+  132:20  error    Unsafe member access .slug on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  150:6   warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  152:9   warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  189:5   error    Definition for rule 'react-hooks/exhaustive-deps' was not found                           react-hooks/exhaustive-deps
+  213:30  error    Unsafe argument of type error typed assigned to a parameter of type `ChallengeLike`       @typescript-eslint/no-unsafe-argument
+  216:30  error    Unsafe member access .isCompleted on an `error` typed value                               @typescript-eslint/no-unsafe-member-access
+  219:39  error    Unsafe argument of type error typed assigned to a parameter of type `string | undefined`  @typescript-eslint/no-unsafe-argument
+  219:41  error    Unsafe member access .category on an `error` typed value                                  @typescript-eslint/no-unsafe-member-access
+  231:12  warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  232:9   warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  234:7   warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  239:7   warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  239:41  error    Unsafe member access .order on an `error` typed value                                     @typescript-eslint/no-unsafe-member-access
+  239:51  error    Unsafe member access .order on an `error` typed value                                     @typescript-eslint/no-unsafe-member-access
+  257:25  warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  258:25  warning  Generic Object Injection Sink                                                             security/detect-object-injection
+  494:62  error    Computed name [challenge.type] resolves to an `error` typed value                         @typescript-eslint/no-unsafe-member-access
+  494:72  error    Unsafe member access .type on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  495:33  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  495:48  error    Unsafe call of a(n) `error` type typed value                                              @typescript-eslint/no-unsafe-call
+  495:58  error    Unsafe member access .tags on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  496:33  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  500:36  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  500:46  error    Unsafe member access .slug on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  501:42  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  505:39  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  506:49  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  506:65  error    Unsafe member access .slug on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  531:66  error    Computed name [challenge.type] resolves to an `error` typed value                         @typescript-eslint/no-unsafe-member-access
+  531:76  error    Unsafe member access .type on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  532:37  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  532:52  error    Unsafe call of a(n) `error` type typed value                                              @typescript-eslint/no-unsafe-call
+  532:62  error    Unsafe member access .tags on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  533:37  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  537:40  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  537:50  error    Unsafe member access .slug on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+  538:46  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  542:43  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  543:53  error    Unsafe assignment of an error typed value                                                 @typescript-eslint/no-unsafe-assignment
+  543:69  error    Unsafe member access .slug on an `error` typed value                                      @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/routes/$locale/confirm-subscription.tsx
+  35:13  error  'data' is assigned a value but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/routes/$locale/contact.tsx
+  94:44  error  Promise-returning function provided to attribute where a void return was expected  @typescript-eslint/no-misused-promises
+
+/Users/ekkisyam/Learn/twe/src/routes/$locale/reset-password.tsx
+  146:5  warning  Potential timing attack, left side: true  security/detect-possible-timing-attacks
+
+/Users/ekkisyam/Learn/twe/src/routes/$locale/tutorials/index.tsx
+  137:13  warning  Generic Object Injection Sink               security/detect-object-injection
+  137:26  warning  Generic Object Injection Sink               security/detect-object-injection
+  263:33  warning  Variable Assigned to Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/bugs.tsx
+   1:27  warning  'redirect' is defined but never used   @typescript-eslint/no-unused-vars
+  18:29  warning  'useEffect' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/challenges.tsx
+  1:27  warning  'redirect' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/index.tsx
+    1:27   warning  'redirect' is defined but never used           @typescript-eslint/no-unused-vars
+  332:149  error    Unsafe return of a value of type `any`         @typescript-eslint/no-unsafe-return
+  332:149  warning  Unsafe call of a(n) `any` typed value          @typescript-eslint/no-unsafe-call
+  332:149  warning  Unsafe call of a(n) `any` typed value          @typescript-eslint/no-unsafe-call
+  332:149  warning  Unsafe call of a(n) `any` typed value          @typescript-eslint/no-unsafe-call
+  332:151  warning  Unsafe member access .split on an `any` value  @typescript-eslint/no-unsafe-member-access
+  332:162  warning  Unsafe member access .slice on an `any` value  @typescript-eslint/no-unsafe-member-access
+  332:171  warning  Unsafe member access .join on an `any` value   @typescript-eslint/no-unsafe-member-access
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/newsletter.tsx
+  6:31  warning  'Mail' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/settings.tsx
+   7:17  warning  'SettingsIcon' is defined but never used  @typescript-eslint/no-unused-vars
+  10:5   warning  'Bell' is defined but never used          @typescript-eslint/no-unused-vars
+  11:5   warning  'Database' is defined but never used      @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/tutorials.tsx
+   5:10  warning  'Badge' is defined but never used                                                                                                                                   @typescript-eslint/no-unused-vars
+   6:10  warning  'BookOpen' is defined but never used                                                                                                                                @typescript-eslint/no-unused-vars
+  63:13  error    Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/users.$userId.tsx
+  29:5   warning  'XCircle' is defined but never used                                                                                                                                 @typescript-eslint/no-unused-vars
+  63:13  error    Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  64:13  error    Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+
+/Users/ekkisyam/Learn/twe/src/routes/admin/users.index.tsx
+  1:27  warning  'redirect' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/scripts/generate-solutions-doc.ts
+  20:19  warning  Found readdirSync from package "node:fs" with non literal argument at index 0    security/detect-non-literal-fs-filename
+  29:36  warning  Found readFileSync from package "node:fs" with non literal argument at index 0   security/detect-non-literal-fs-filename
+  69:5   warning  Found writeFileSync from package "node:fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+
+/Users/ekkisyam/Learn/twe/src/server/auth.fn.ts
+  65:13  error  Unsafe assignment of an error typed value  @typescript-eslint/no-unsafe-assignment
+  66:51  error  Unsafe assignment of an error typed value  @typescript-eslint/no-unsafe-assignment
+
+/Users/ekkisyam/Learn/twe/src/server/auth.server.ts
+  52:5  error  Async method 'sendResetPassword' has no 'await' expression      @typescript-eslint/require-await
+  69:5  error  Async method 'sendVerificationEmail' has no 'await' expression  @typescript-eslint/require-await
+
+/Users/ekkisyam/Learn/twe/src/server/consent.fn.ts
+  17:16  error  This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+/Users/ekkisyam/Learn/twe/src/server/content.server.ts
+   13:3   error    'TutorialRegistryEntry' is defined but never used                               @typescript-eslint/no-unused-vars
+  109:25  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  136:23  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  139:7   error    'usedLocale' is assigned a value but never used                                 @typescript-eslint/no-unused-vars
+  141:23  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  180:29  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  188:31  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  238:27  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  244:29  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  278:29  warning  Found readFile from package "fs/promises" with non literal argument at index 0  security/detect-non-literal-fs-filename
+  436:9   warning  Generic Object Injection Sink                                                   security/detect-object-injection
+  437:7   warning  Generic Object Injection Sink                                                   security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/server/rate-limit.mw.ts
+  81:15  error  Unsafe assignment of an error typed value                                      @typescript-eslint/no-unsafe-assignment
+  85:39  error  Unsafe member access .id on an `error` typed value                             @typescript-eslint/no-unsafe-member-access
+  87:48  error  Unsafe argument of type error typed assigned to a parameter of type `Headers`  @typescript-eslint/no-unsafe-argument
+
+/Users/ekkisyam/Learn/twe/src/server/submissions.fn.ts
+   47:10  warning  Generic Object Injection Sink                                                      security/detect-object-injection
+   47:10  warning  Generic Object Injection Sink                                                      security/detect-object-injection
+   47:37  warning  Generic Object Injection Sink                                                      security/detect-object-injection
+  126:20  error    This assertion is unnecessary since it does not change the type of the expression  @typescript-eslint/no-unnecessary-type-assertion
+
+/Users/ekkisyam/Learn/twe/src/server/test-sentry.fn.ts
+  6:23  error  Async arrow function has no 'await' expression  @typescript-eslint/require-await
+
+/Users/ekkisyam/Learn/twe/src/server/tutorials.fn.ts
+  26:10  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/tests/bun-preload.ts
+    9:49   warning  Async arrow function has no 'await' expression  @typescript-eslint/require-await
+   30:112  warning  Generic Object Injection Sink                   security/detect-object-injection
+   35:112  warning  Generic Object Injection Sink                   security/detect-object-injection
+   40:112  warning  Generic Object Injection Sink                   security/detect-object-injection
+   45:112  warning  Generic Object Injection Sink                   security/detect-object-injection
+   57:32   warning  'search' is defined but never used              @typescript-eslint/no-unused-vars
+   57:44   warning  'activeProps' is defined but never used         @typescript-eslint/no-unused-vars
+   57:57   warning  'partiallyActive' is defined but never used     @typescript-eslint/no-unused-vars
+   80:22   error    A `require()` style import is forbidden         @typescript-eslint/no-require-imports
+  126:19   error    A `require()` style import is forbidden         @typescript-eslint/no-require-imports
+  139:19   error    A `require()` style import is forbidden         @typescript-eslint/no-require-imports
+  152:19   error    A `require()` style import is forbidden         @typescript-eslint/no-require-imports
+
+/Users/ekkisyam/Learn/twe/src/tests/integration/challenge-flow.test.ts
+   2:43  warning  'submissions' is defined but never used                          @typescript-eslint/no-unused-vars
+  19:13  warning  Async method 'getSession' has no 'await' expression              @typescript-eslint/require-await
+  40:5   warning  Async method 'getRawChallengeContent' has no 'await' expression  @typescript-eslint/require-await
+
+/Users/ekkisyam/Learn/twe/src/tests/integration/test-api.test.ts
+    3:40  warning  'progress' is defined but never used                                                                                 @typescript-eslint/no-unused-vars
+    3:50  warning  'submissions' is defined but never used                                                                              @typescript-eslint/no-unused-vars
+   28:21  warning  Async arrow function has no 'await' expression                                                                       @typescript-eslint/require-await
+   41:12  warning  'insertedUser' is assigned a value but never used                                                                    @typescript-eslint/no-unused-vars
+   78:7   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+   87:7   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  102:7   error    Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/ChallengeCard.test.tsx
+  1:32  warning  'mock' is defined but never used    @typescript-eslint/no-unused-vars
+  3:13  warning  'router' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/ChallengePlayground.test.tsx
+    4:13  warning  'executor' is defined but never used            @typescript-eslint/no-unused-vars
+  144:58  warning  Async arrow function has no 'await' expression  @typescript-eslint/require-await
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/ChallengeRow.test.tsx
+  1:32  warning  'mock' is defined but never used    @typescript-eslint/no-unused-vars
+  3:13  warning  'router' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/ChallengesPage.test.tsx
+  3:13  warning  'router' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/PlaygroundPanels.test.tsx
+  1:38  warning  'beforeEach' is defined but never used  @typescript-eslint/no-unused-vars
+  2:26  warning  'fireEvent' is defined but never used   @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/challenge-solutions.test.ts
+  44:25  warning  Found readFileSync from package "fs" with non literal argument at index 0  security/detect-non-literal-fs-filename
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/content.server.test.ts
+  19:16  warning  Generic Object Injection Sink  security/detect-object-injection
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/coverage_expansion.test.ts
+  67:22  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/expect-matchers.test.ts
+  66:35  warning  Async arrow function has no 'await' expression  @typescript-eslint/require-await
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/playground-hooks.test.ts
+  1:38  warning  'beforeEach' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/playwright-shim-coverage.test.ts
+    1:52  warning  'spyOn' is defined but never used                                                                                                                                   @typescript-eslint/no-unused-vars
+   35:17  warning  'mouseOver' is assigned a value but never used                                                                                                                      @typescript-eslint/no-unused-vars
+  265:17  warning  'dialogMsg' is assigned a value but never used                                                                                                                      @typescript-eslint/no-unused-vars
+  266:13  warning  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  266:31  warning  Promise returned in function argument where a void return was expected                                                                                              @typescript-eslint/no-misused-promises
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/playwright-shim-vfs.test.ts
+  93:62  warning  Async arrow function has no 'await' expression  @typescript-eslint/require-await
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/shim-errors.test.ts
+  2:45  warning  'ShimErrorType' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/typescript-transpiler.test.ts
+   4:1   warning  Promises must be awaited, end with a call to .catch, end with a call to .then with a rejection handler or be explicitly marked as ignored with the `void` operator  @typescript-eslint/no-floating-promises
+  27:25  error    A `require()` style import is forbidden                                                                                                                             @typescript-eslint/no-require-imports
+
+/Users/ekkisyam/Learn/twe/src/tests/unit/useChallengeExecution.test.ts
+  176:17  error  A method that is not declared with `this: void` may cause unintentional scoping of `this` when separated from its object.
+Consider using an arrow function or explicitly `.bind()`ing the method to avoid calling the method with an unintended `this` value. 
+If a function does not access `this`, it can be annotated with `this: void`  @typescript-eslint/unbound-method
+
+✖ 475 problems (330 errors, 145 warnings)
+  2 errors and 0 warnings potentially fixable with the `--fix` option.
+

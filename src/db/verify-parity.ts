@@ -1,5 +1,25 @@
 import { db } from './index';
 import { sql } from 'drizzle-orm';
+import { type LocalizedString } from '@/lib/validations';
+
+interface TutorialRow {
+  slug: string;
+  title: LocalizedString;
+  description: LocalizedString;
+  content: LocalizedString;
+}
+
+interface ChallengeRow {
+  slug: string;
+  title: LocalizedString;
+  instructions: LocalizedString;
+}
+
+interface AchievementRow {
+  slug: string;
+  name: LocalizedString;
+  description: LocalizedString;
+}
 
 // This is a simplified version of the seeder data for verification
 // In a real scenario, we might want to import the actual seeder data arrays if exported
@@ -10,11 +30,11 @@ async function verifyParity() {
   try {
     // 1. Verify Tutorials
     console.log('--- Tutorials ---');
-    const dbTutorials = await db.execute(
+    const dbTutorials = await db.execute<TutorialRow>(
       sql`SELECT slug, title, description, content FROM tutorials`,
     );
     // Note: For tutorials, content matches the markdown file content
-    for (const row of dbTutorials as any[]) {
+    for (const row of dbTutorials) {
       if (typeof row.title !== 'object' || !row.title.en) {
         console.error(
           `❌ Tutorial ${row.slug}: Title is not a valid JSONB object with "en" key.`,
@@ -32,10 +52,10 @@ async function verifyParity() {
 
     // 2. Verify Challenges
     console.log('\n--- Challenges ---');
-    const dbChallenges = await db.execute(
+    const dbChallenges = await db.execute<ChallengeRow>(
       sql`SELECT slug, title, instructions FROM challenges`,
     );
-    for (const row of dbChallenges as any[]) {
+    for (const row of dbChallenges) {
       if (typeof row.title !== 'object' || !row.title.en) {
         console.error(
           `❌ Challenge ${row.slug}: Title is not a valid JSONB object with "en" key.`,
@@ -53,10 +73,10 @@ async function verifyParity() {
 
     // 3. Verify Achievements
     console.log('\n--- Achievements ---');
-    const dbAchievements = await db.execute(
+    const dbAchievements = await db.execute<AchievementRow>(
       sql`SELECT slug, name, description FROM achievements`,
     );
-    for (const row of dbAchievements as any[]) {
+    for (const row of dbAchievements) {
       if (typeof row.name !== 'object' || !row.name.en) {
         console.error(
           `❌ Achievement ${row.slug}: Name is not a valid JSONB object with "en" key.`,

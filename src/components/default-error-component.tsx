@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { AlertCircle, RefreshCcw, Home } from 'lucide-react';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/react';
 

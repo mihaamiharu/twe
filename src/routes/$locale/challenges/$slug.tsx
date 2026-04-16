@@ -12,7 +12,7 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { ChallengePlayground, type Challenge, ChallengeSkeleton } from '@/components/challenges';
+import { ChallengePlayground, type Challenge as PlaygroundChallenge, ChallengeSkeleton } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -29,57 +29,6 @@ import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 
 import i18n from '@/lib/i18n';
-
-interface ServerChallengeResponse {
-  success: boolean;
-  data?: {
-    id: string;
-    slug: string;
-    title: string;
-    description: string;
-    instructions: string;
-    type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';
-    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-    category: string;
-    xpReward: number;
-    order: number;
-    htmlContent?: string;
-    files?: Record<string, string>;
-    editableFiles?: string[];
-    preloadModules?: Record<string, { exports: string[]; source: string }>;
-    starterCode?: string;
-    tags?: string[];
-    hints?: string[];
-    completionCount: number;
-    tutorial?: { slug: string; title: string } | null;
-    testCases: {
-      id: string;
-      description: string;
-      input: unknown;
-      expectedOutput: unknown;
-      isHidden?: boolean;
-    }[];
-    hiddenTestCaseCount: number;
-    userProgress?: {
-      isCompleted: boolean;
-      attempts: number;
-      lastAccessedAt: Date;
-      usedHint: boolean;
-      hintContent?: string | null;
-    } | null;
-    bestSubmission?: {
-      code: string;
-      isPassed: boolean;
-      xpEarned: number;
-      testsPassed: number;
-      testsTotal: number;
-      executionTime: number;
-    } | null;
-    nextChallenge?: { slug: string; title: string } | null;
-    prevChallenge?: { slug: string; title: string } | null;
-  };
-  error?: string;
-}
 
 export const Route = createFileRoute('/$locale/challenges/$slug')({
   loader: ({ context, params }) => {
@@ -237,9 +186,7 @@ function ChallengeDetailPage() {
     data: challengeData,
   } = useSuspenseQuery(challengeDetailQueryOptions(slug, locale));
 
-  // Rename for compatibility with existing code
-  // Rename for compatibility with existing code
-  const data = challengeData as ServerChallengeResponse;
+  const data = challengeData;
 
 
 
@@ -270,14 +217,14 @@ function ChallengeDetailPage() {
   }, [data?.data?.testCases]);
 
   // Transform API response to Challenge type expected by ChallengePlayground
-  const challenge: Challenge | null =
+  const challenge: PlaygroundChallenge | null =
     data && data.success && data.data
       ? {
         id: data.data.id,
         slug: data.data.slug,
         title: data.data.title,
         description: data.data.description,
-        type: data.data.type,
+        type: data.data.type as any,
         difficulty:
           data.data.difficulty === 'EASY'
             ? 'Easy'
@@ -286,6 +233,7 @@ function ChallengeDetailPage() {
               : 'Hard',
         xp: data.data.xpReward,
         instructions: data.data.instructions,
+        hints: data.data.hints || [],
         htmlContent: data.data.htmlContent || '',
         files: data.data.files,
         editableFiles: data.data.editableFiles,
@@ -308,12 +256,20 @@ function ChallengeDetailPage() {
           input: tc.input,
           expectedOutput: tc.expectedOutput,
         })),
-        hints: data.data.hints,
         category: data.data.category,
         isCompleted: data.data.userProgress?.isCompleted || false,
-        tutorial: data.data.tutorial,
-        nextChallenge: data.data.nextChallenge,
-        prevChallenge: data.data.prevChallenge,
+        tutorial: data.data.tutorial ? {
+          slug: data.data.tutorial.slug,
+          title: data.data.tutorial.title
+        } : undefined,
+        nextChallenge: data.data.nextChallenge ? {
+          slug: data.data.nextChallenge.slug,
+          title: data.data.nextChallenge.title
+        } : undefined,
+        prevChallenge: data.data.prevChallenge ? {
+          slug: data.data.prevChallenge.slug,
+          title: data.data.prevChallenge.title
+        } : undefined,
       }
       : null;
 

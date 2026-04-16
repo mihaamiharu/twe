@@ -26,7 +26,6 @@ import {
     History,
     User as UserIcon,
     CheckCircle2,
-    XCircle,
     Trash2,
     AlertTriangle
 } from 'lucide-react';

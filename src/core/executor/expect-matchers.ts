@@ -72,9 +72,9 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         return;
                     }
                     lastResult = result;
-                } catch (e) {
+                } catch (_e) {
                     // Ignore transient errors during polling (e.g. element detached)
-                    lastResult = { pass: false, message: e instanceof Error ? e.message : String(e) };
+                    lastResult = { pass: false, message: _e instanceof Error ? _e.message : String(_e) };
                 }
                 await new Promise(resolve => setTimeout(resolve, 100));
             }
@@ -83,8 +83,8 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             if (!lastResult) {
                 try {
                     lastResult = await assertion();
-                } catch (e) {
-                    lastResult = { pass: false, message: e instanceof Error ? e.message : String(e) };
+                } catch (_e) {
+                    lastResult = { pass: false, message: _e instanceof Error ? _e.message : String(_e) };
                 }
             }
             handleResult(lastResult.pass, lastResult.message);
@@ -102,7 +102,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         } else {
                             text = String(actual || '');
                         }
-                    } catch (e) {
+                    } catch {
                         // Element might be missing
                         text = '';
                     }
@@ -126,7 +126,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         } else {
                             text = String(actual || '');
                         }
-                    } catch (e) {
+                    } catch {
                         text = '';
                     }
 

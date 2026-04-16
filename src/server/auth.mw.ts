@@ -37,7 +37,7 @@ export interface AuthContext {
  */
 export const authMiddleware = createMiddleware({ type: 'function' }).server(
     async ({ next }) => {
-        const headers = getRequestHeaders();
+        const headers = getRequestHeaders() as unknown as Headers;
 
         const session = await auth.api.getSession({ headers });
 
@@ -52,8 +52,8 @@ export const authMiddleware = createMiddleware({ type: 'function' }).server(
                     email: session.user.email,
                     name: session.user.name || null,
                     image: session.user.image || null,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                    role: (session.user as any).role || 'USER',
+                    // Cast to include role from additionalFields
+                    role: (session.user as { role?: string }).role || 'USER',
                 },
                 userId: session.user.id,
             },
@@ -68,7 +68,7 @@ export const authMiddleware = createMiddleware({ type: 'function' }).server(
 export const optionalAuthMiddleware = createMiddleware({
     type: 'function',
 }).server(async ({ next }) => {
-    const headers = getRequestHeaders();
+    const headers = getRequestHeaders() as unknown as Headers;
 
     const session = await auth.api.getSession({ headers });
 
@@ -80,8 +80,8 @@ export const optionalAuthMiddleware = createMiddleware({
                     email: session.user.email,
                     name: session.user.name || null,
                     image: session.user.image || null,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                    role: (session.user as any).role || 'USER',
+                    // Cast to include role from additionalFields
+                    role: (session.user as { role?: string }).role || 'USER',
                 }
                 : null,
             userId: session?.user?.id || null,

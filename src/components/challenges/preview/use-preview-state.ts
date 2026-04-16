@@ -2,9 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { HIGHLIGHT_STYLES, INJECTED_SCRIPTS } from './constants';
 import type {
     WebComponentPreviewProps,
-    ViewMode,
-    PreviewState,
-    SelectorType
+    ViewMode
 } from './types';
 
 export function usePreviewState(

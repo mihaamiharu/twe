@@ -8,13 +8,13 @@ import { EditorPanel } from './editor-panel';
 import { SelectorPanel } from './selector-panel';
 import { ResultsPanel } from './results-panel';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
-import type { Challenge, PlaygroundState } from './types';
+import type { Challenge, PlaygroundState, PlaygroundExecution } from './types';
 import type { SelectorType } from '../selector-input';
 
 interface PlaygroundDesktopLayoutProps {
     challenge: Challenge;
     state: PlaygroundState;
-    execution: any;
+    execution: PlaygroundExecution;
     previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
     userId?: string;
 }

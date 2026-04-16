@@ -2,32 +2,43 @@
  * Content Types for Filesystem-Driven Content Management
  *
  * These types define the structure of tutorials and challenges
- * when loaded from the filesystem (JSON/Markdown).
+ * defined when loaded from the filesystem (JSON/Markdown).
  */
 
-// =============================================================================
-// CONTENT STATUS
-// =============================================================================
+ import {
+   type LocalizedString,
+   type ChallengeType,
+   type ChallengeDifficulty,
+   type TestCaseDefinition,
+   type ExpectedStateRule,
+ } from './validations';
 
-export type ContentStatus = 'published' | 'draft' | 'coming_soon';
+ export type {
+   LocalizedString,
+   ChallengeType,
+   ChallengeDifficulty,
+   TestCaseDefinition,
+   ExpectedStateRule,
+ };
+ // =============================================================================
+ // CONTENT STATUS
+ // =============================================================================
 
-// =============================================================================
-// LOCALIZED CONTENT
-// =============================================================================
+ export type ContentStatus = 'published' | 'draft' | 'coming_soon';
 
-export interface LocalizedString {
-  en: string;
-  id?: string;
-}
+ // =============================================================================
+ // LOCALIZED CONTENT
+ // =============================================================================
 
-export interface LocalizedArray {
+ export interface LocalizedArray {
   en: string[];
   id?: string[];
-}
+ }
 
-// =============================================================================
-// TUTORIAL TYPES
-// =============================================================================
+ // =============================================================================
+ // TUTORIAL TYPES
+ // =============================================================================
+
 
 /**
  * Tutorial metadata from registry.json
@@ -75,36 +86,7 @@ export interface Tutorial {
 // CHALLENGE TYPES
 // =============================================================================
 
-export type ChallengeType =
-  | 'CSS_SELECTOR'
-  | 'XPATH_SELECTOR'
-  | 'JAVASCRIPT'
-  | 'TYPESCRIPT'
-  | 'PLAYWRIGHT';
-export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e' | 'pom' | 'typescript';
-
-/**
- * Test case definition in challenge JSON
- */
-export interface TestCaseDefinition {
-  description: string;
-  input?: unknown;
-  expectedOutput: unknown;
-  isHidden?: boolean;
-}
-
-/**
- * Expected state rule for DOM validation after code execution
- */
-export interface ExpectedStateRule {
-  selector: string;
-  visible?: boolean;
-  hidden?: boolean;
-  containsText?: string;
-  hasAttribute?: { name: string; value?: string | RegExp };
-  count?: number;
-}
 
 /**
  * Challenge definition from tier JSON files
@@ -147,7 +129,8 @@ export interface ChallengeTierFile {
 /**
  * Challenge with localized strings resolved (for UI consumption)
  */
-export interface Challenge {
+export interface BaseChallenge {
+  id?: string;
   slug: string;
   type: ChallengeType;
   difficulty: ChallengeDifficulty;
@@ -176,6 +159,50 @@ export interface Challenge {
   isCompleted?: boolean;
 }
 
+/**
+ * Challenge item for list views (lighter weight)
+ */
+export interface ChallengeListItem {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  type: ChallengeType;
+  difficulty: ChallengeDifficulty;
+  category: string;
+  xpReward: number;
+  order: number;
+  tags: string[];
+  completionCount: number;
+  isCompleted: boolean;
+}
+
+/**
+ * Complete challenge detail with related data (from getChallenge)
+ */
+export interface Challenge extends BaseChallenge {
+  id: string;
+  hiddenTestCaseCount: number;
+  tutorial?: { slug: string; title: string } | null;
+  userProgress?: {
+    isCompleted: boolean;
+    attempts: number;
+    lastAccessedAt: Date;
+    usedHint: boolean;
+    hintContent?: string | null;
+  } | null;
+  bestSubmission?: {
+    code: string;
+    isPassed: boolean;
+    xpEarned: number;
+    testsPassed: number;
+    testsTotal: number;
+    executionTime: number;
+  } | null;
+  nextChallenge?: { slug: string; title: string } | null;
+  prevChallenge?: { slug: string; title: string } | null;
+}
+
 // =============================================================================
 // CONTENT SERVICE TYPES
 // =============================================================================
@@ -193,4 +220,37 @@ export interface ChallengeFilters {
   tier?: ChallengeTier;
   category?: string;
   search?: string;
+}
+
+// =============================================================================
+// GAMIFICATION TYPES
+// =============================================================================
+
+export type AchievementRarity = 'COMMON' | 'RARE' | 'EPIC' | 'LEGENDARY';
+
+export interface Achievement {
+  id: string;
+  slug: string;
+  name: LocalizedString;
+  description: LocalizedString;
+  icon: string;
+  rarity: AchievementRarity;
+  category: string;
+  requirementType: string;
+  requirementValue: number;
+  xpReward: number;
+  isSecret: boolean;
+  createdAt: Date;
+  // Joined fields
+  unlockCount?: number;
+}
+
+export interface UserAchievement {
+  id: string;
+  userId: string;
+  achievementId: string;
+  unlockedAt: Date;
+  progress: number;
+  // Joined fields
+  achievement?: Achievement;
 }

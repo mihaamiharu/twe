@@ -18,6 +18,21 @@ export type AnalyticsEvent =
   | { name: 'user_logged_in'; params: Record<string, never> };
 
 /**
+ * Type definition for Google Analytics gtag function
+ */
+type GTag = (
+  command: 'event',
+  eventName: string,
+  eventParams?: Record<string, unknown>,
+) => void;
+
+declare global {
+  interface Window {
+    gtag?: GTag;
+  }
+}
+
+/**
  * Track an analytics event
  *
  * @example
@@ -31,8 +46,7 @@ export function trackEvent<T extends AnalyticsEvent['name']>(
   // Check if gtag is available (only in browser with GA loaded)
   if (typeof window === 'undefined') return;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const gtag = (window as any).gtag;
+  const gtag = window.gtag;
   if (typeof gtag !== 'function') {
     // GA not loaded, skip tracking
     if (import.meta.env.DEV) {
@@ -41,8 +55,7 @@ export function trackEvent<T extends AnalyticsEvent['name']>(
     return;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-  gtag('event', eventName, params);
+  gtag('event', eventName, params as Record<string, unknown>);
 }
 
 /**
@@ -51,11 +64,9 @@ export function trackEvent<T extends AnalyticsEvent['name']>(
 export function trackPageView(path: string, title: string): void {
   if (typeof window === 'undefined') return;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-  const gtag = (window as any).gtag;
+  const gtag = window.gtag;
   if (typeof gtag !== 'function') return;
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
   gtag('event', 'page_view', {
     page_path: path,
     page_title: title,

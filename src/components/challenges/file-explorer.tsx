@@ -86,7 +86,6 @@ export function FileExplorer({
         const isExpanded = expandedFolders[node.path];
         const isSelected = selectedFile === node.path;
         const isEditable = editableFiles.includes(node.path);
-        const hasChildren = node.type === 'folder' && node.children && Object.keys(node.children).length > 0;
 
         if (node.path === '') {
             // Don't render root itself, only children

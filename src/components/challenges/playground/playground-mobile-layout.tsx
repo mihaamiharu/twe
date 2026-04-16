@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { BookOpen, Play, Search, Code2, Info, CheckCircle2, Folder } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
@@ -11,16 +10,15 @@ import { SelectorPanel } from './selector-panel';
 import { ResultsPanel } from './results-panel';
 import { FileExplorer } from '../file-explorer';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
-import type { Challenge, PlaygroundState } from './types';
+import type { Challenge, PlaygroundState, PlaygroundExecution } from './types';
 import type { SelectorType } from '../selector-input';
-import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 
 interface PlaygroundMobileLayoutProps {
     challenge: Challenge;
     state: PlaygroundState;
-    execution: any; // Result from useChallengeExecution hook
-    previewIframeRef: React.RefObject<HTMLIFrameElement>;
+    execution: PlaygroundExecution; // Result from useChallengeExecution hook
+    previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export function PlaygroundMobileLayout({

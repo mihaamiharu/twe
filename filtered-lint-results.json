@@ -1,0 +1,419 @@
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/components/challenges/file-explorer.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'hasChildren' is assigned a value but never used.",
+      "line": 89,
+      "column": 15,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 89,
+      "endColumn": 26
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/components/challenges/multi-tab-editor.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'height' is assigned a value but never used.",
+      "line": 34,
+      "column": 5,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 34,
+      "endColumn": 11
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/components/challenges/playground/editor-panel.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'isLayoutReady' is assigned a value but never used.",
+      "line": 44,
+      "column": 9,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 44,
+      "endColumn": 22
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/components/challenges/playground/selector-panel.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'challenge' is defined but never used.",
+      "line": 17,
+      "column": 5,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 17,
+      "endColumn": 14
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/components/challenges/preview/use-preview-state.ts",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'PreviewState' is defined but never used.",
+      "line": 6,
+      "column": 5,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 6,
+      "endColumn": 17
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'SelectorType' is defined but never used.",
+      "line": 7,
+      "column": 5,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 7,
+      "endColumn": 17
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/components/code-block.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'err' is defined but never used.",
+      "line": 33,
+      "column": 14,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 33,
+      "endColumn": 17
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/components/default-error-component.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'Home' is defined but never used.",
+      "line": 12,
+      "column": 35,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 12,
+      "endColumn": 39
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/core/executor/expect-matchers.ts",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'e' is defined but never used.",
+      "line": 105,
+      "column": 30,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 105,
+      "endColumn": 31
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'e' is defined but never used.",
+      "line": 129,
+      "column": 30,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 129,
+      "endColumn": 31
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/core/executor/repro_wrapper.test.ts",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'interceptedConsole' is assigned a value but never used.",
+      "line": 9,
+      "column": 11,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 9,
+      "endColumn": 29
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'expect' is defined but never used.",
+      "line": 47,
+      "column": 54,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 47,
+      "endColumn": 60
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'expect' is defined but never used.",
+      "line": 61,
+      "column": 54,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 61,
+      "endColumn": 60
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/core/executor/typescript-transpiler.test.ts",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'initEsbuild' is defined but never used.",
+      "line": 2,
+      "column": 31,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 2,
+      "endColumn": 42
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/$locale/confirm-subscription.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'data' is assigned a value but never used.",
+      "line": 35,
+      "column": 13,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 35,
+      "endColumn": 17
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/bugs.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'redirect' is defined but never used.",
+      "line": 1,
+      "column": 27,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 1,
+      "endColumn": 35
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'useEffect' is defined but never used.",
+      "line": 18,
+      "column": 29,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 18,
+      "endColumn": 38
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/challenges.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'redirect' is defined but never used.",
+      "line": 1,
+      "column": 27,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 1,
+      "endColumn": 35
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/index.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'redirect' is defined but never used.",
+      "line": 1,
+      "column": 27,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 1,
+      "endColumn": 35
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/newsletter.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'Mail' is defined but never used.",
+      "line": 6,
+      "column": 31,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 6,
+      "endColumn": 35
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/settings.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'SettingsIcon' is defined but never used.",
+      "line": 7,
+      "column": 17,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 7,
+      "endColumn": 29
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'Bell' is defined but never used.",
+      "line": 10,
+      "column": 5,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 10,
+      "endColumn": 9
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'Database' is defined but never used.",
+      "line": 11,
+      "column": 5,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 11,
+      "endColumn": 13
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/tutorials.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'Badge' is defined but never used.",
+      "line": 5,
+      "column": 10,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 5,
+      "endColumn": 15
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'BookOpen' is defined but never used.",
+      "line": 6,
+      "column": 10,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 6,
+      "endColumn": 18
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/users.$userId.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'XCircle' is defined but never used.",
+      "line": 29,
+      "column": 5,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 29,
+      "endColumn": 12
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/routes/admin/users.index.tsx",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 1,
+      "message": "'redirect' is defined but never used.",
+      "line": 1,
+      "column": 27,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 1,
+      "endColumn": 35
+    }
+  ]
+}
+{
+  "filePath": "/Users/ekkisyam/Learn/twe/src/server/content.server.ts",
+  "messages": [
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'TutorialRegistryEntry' is defined but never used.",
+      "line": 13,
+      "column": 3,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 13,
+      "endColumn": 24
+    },
+    {
+      "ruleId": "@typescript-eslint/no-unused-vars",
+      "severity": 2,
+      "message": "'usedLocale' is assigned a value but never used.",
+      "line": 139,
+      "column": 7,
+      "nodeType": null,
+      "messageId": "unusedVar",
+      "endLine": 139,
+      "endColumn": 17
+    }
+  ]
+}

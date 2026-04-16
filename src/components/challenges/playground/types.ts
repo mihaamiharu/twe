@@ -1,3 +1,4 @@
+import { UseMutationResult } from '@tanstack/react-query';
 import { TestResult } from '../test-results';
 import { LogEntry } from '../console-output';
 
@@ -8,6 +9,13 @@ export type ChallengeType =
     | 'CSS_SELECTOR'
     | 'XPATH_SELECTOR'
     | 'SELECTOR';
+
+export interface AIHintResponse {
+    success: boolean;
+    hint?: string;
+    error?: string;
+    xpPenaltyWarning?: string;
+}
 
 export interface Challenge {
     id: string;
@@ -123,7 +131,24 @@ export interface PlaygroundState {
     // Derived
     isCodeChallenge: boolean;
     isSelectorChallenge: boolean;
-    extraLibs?: any; // Type from generateTypeDefinitions
+    extraLibs?: {
+        content: string;
+        filePath: string;
+    }[];
     locale: string;
-    t: any; // i18n t function
+    t: (key: string, ...args: unknown[]) => string; // Flexible t function type
+}
+
+export interface PlaygroundExecution {
+    handleRunCode: () => Promise<void>;
+    handleValidateSelector: () => void;
+    handleReset: () => void;
+    confirmReset: () => Promise<void>;
+    handleSubmit: () => void;
+    handleSelectorChange: (selector: string, type: 'css' | 'xpath') => void;
+    handleFileChange: (path: string, newCode: string) => void;
+    handleSelectFile: (path: string) => void;
+    handleCloseFile: (path: string) => void;
+    handlePreviewValidation: (validation: { isValid: boolean; matchCount: number } | null) => void;
+    hintMutation: UseMutationResult<AIHintResponse, Error, void, unknown>;
 }

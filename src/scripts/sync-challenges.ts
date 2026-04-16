@@ -2,6 +2,7 @@ import { db } from '../db';
 import { challenges, testCases } from '../db/schema';
 import { eq, inArray } from 'drizzle-orm';
 import { getRawChallengeContent, getChallengeList, clearContentCaches } from '../server/content.server';
+import { type TestCaseDefinition } from '../lib/content.types';
 
 export async function syncChallenges() {
     console.log('🔄 Starting challenge sync...');
@@ -39,14 +40,14 @@ export async function syncChallenges() {
 
             const challengeData = {
                 slug: rawContent.slug,
-                title: rawContent.title as any,
+                title: rawContent.title,
                 type: rawContent.type,
                 difficulty: rawContent.difficulty,
                 xpReward: rawContent.xpReward,
                 order: rawContent.order,
                 category: rawContent.category,
                 tags: rawContent.tags,
-                hints: rawContent.hints as any, // Sync hints
+                hints: rawContent.hints, // Sync hints
                 isPublished: true,
                 updatedAt: new Date()
             };
@@ -69,7 +70,7 @@ export async function syncChallenges() {
                 // Insert test cases for new challenge
                 if (rawContent.testCases && rawContent.testCases.length > 0) {
                     await db.insert(testCases).values(
-                        rawContent.testCases.map((tc: any, index: number) => ({
+                        rawContent.testCases.map((tc: TestCaseDefinition, index: number) => ({
                             challengeId: newChallenge.id,
                             description: tc.description,
                             input: tc.input,

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { loader, type OnMount, type Monaco } from '@monaco-editor/react';
+import { loader, type OnMount } from '@monaco-editor/react';
 import type { editor, IDisposable } from 'monaco-editor';
 import { storage } from '@/lib/storage-adapter';
 import { CUSTOM_DARK_THEME, CUSTOM_LIGHT_THEME } from './themes';
@@ -13,7 +13,7 @@ export function useMonacoSetup(
 ) {
     const { onRun, storageKey, onReady, extraLibs } = props;
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-    const monacoRef = useRef<Monaco | null>(null);
+    const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
     const [isMounted, setIsMounted] = useState(false);
 
     // Configure Monaco loader on client side

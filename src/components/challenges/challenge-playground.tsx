@@ -27,7 +27,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
 
   // Initialize state and execution logic
   const state = usePlaygroundState(props);
-  const previewIframeRef = useRef<HTMLIFrameElement>(null);
+  const previewIframeRef = useRef<HTMLIFrameElement | null>(null);
   const execution = useChallengeExecution(state, props, previewIframeRef);
 
   const {

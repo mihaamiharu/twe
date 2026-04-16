@@ -41,7 +41,6 @@ export function EditorPanel({
         openFiles,
         resetCount,
         extraLibs,
-        isLayoutReady
     } = state;
 
     const isMultiFile = challenge.files && Object.keys(challenge.files).length > 1;

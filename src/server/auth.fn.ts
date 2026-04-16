@@ -40,35 +40,32 @@ async function ensureUserImage(userId: string): Promise<string | null> {
       try {
         const payload = JSON.parse(
           Buffer.from(account.idToken.split('.')[1], 'base64').toString(),
-        );
+        ) as { picture?: string };
+
         if (payload.picture) {
           await db
             .update(users)
             .set({ image: payload.picture })
             .where(eq(users.id, userId));
-          return payload.picture as string;
+          return payload.picture;
         }
-      } catch (e) {
+      } catch {
         // Ignore decoding errors
       }
     }
-  } catch (error) {
+    } catch (error) {
     console.error('[Auth] Failed to lazy update user image:', error);
-  }
-  return null;
-}
+    }
+    return null;
+    }
 
-export const getServerSession = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<AuthSession> => {
+    export const getServerSession = createServerFn({ method: 'GET' }).handler(
+    async (): Promise<AuthSession> => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const headers = getRequestHeaders();
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       const session = await auth.api.getSession({ headers });
 
-      if (session?.user) {
-        let image = session.user.image;
+      if (session?.user) {        let image = session.user.image;
         if (!image) {
           const newImage = await ensureUserImage(session.user.id);
           if (newImage) image = newImage;
@@ -81,8 +78,8 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             name: session.user.name || null,
             image: image || null,
             emailVerified: session.user.emailVerified || false,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-            role: (session.user as any).role || 'USER',
+            // Cast to include role from additionalFields
+            role: (session.user as { role?: string }).role || 'USER',
           },
           isAuthenticated: true,
           gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,

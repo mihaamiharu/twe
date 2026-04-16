@@ -11,6 +11,7 @@ import {
   unique,
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
+import { type LocalizedString, type LocalizedArray } from '@/lib/validations';
 
 // ============================================================================
 // ENUMS
@@ -136,7 +137,7 @@ export const verification = pgTable('verification', {
 export const tutorials = pgTable('tutorials', {
   id: uuid('id').defaultRandom().primaryKey(),
   slug: text('slug').notNull().unique(),
-  title: jsonb('title').$type<Record<string, any>>().notNull(), // { en: string, id: string }
+  title: jsonb('title').$type<LocalizedString>().notNull(), // { en: string, id: string }
   order: integer('order').notNull(), // Display order
   estimatedMinutes: integer('estimated_minutes').notNull(),
   tags: text('tags').array(), // Array of tags
@@ -149,7 +150,7 @@ export const tutorials = pgTable('tutorials', {
 export const challenges = pgTable('challenges', {
   id: uuid('id').defaultRandom().primaryKey(),
   slug: text('slug').notNull().unique(),
-  title: jsonb('title').$type<Record<string, any>>().notNull(),
+  title: jsonb('title').$type<LocalizedString>().notNull(),
   type: challengeTypeEnum('type').notNull(),
   difficulty: difficultyEnum('difficulty').notNull(),
   xpReward: integer('xp_reward').notNull(),
@@ -163,7 +164,7 @@ export const challenges = pgTable('challenges', {
   // Metadata
   category: text('category'), // e.g., 'css-basics', 'xpath-basics', 'css-advanced'
   tags: text('tags').array(),
-  hints: jsonb('hints').$type<Record<string, string[]>>(), // Progressive hints for the challenge (Localized)
+  hints: jsonb('hints').$type<LocalizedArray>(), // Progressive hints for the challenge (Localized)
   isPublished: boolean('is_published').notNull().default(false),
   completionCount: integer('completion_count').notNull().default(0),
 
@@ -205,6 +206,7 @@ export const submissions = pgTable('submissions', {
 
   code: text('code').notNull(), // User's submitted code
   isPassed: boolean('is_passed').notNull(),
+  isCorrect: boolean('is_correct').notNull().default(true),
   xpEarned: integer('xp_earned').notNull().default(0),
 
   // Execution details
@@ -252,8 +254,8 @@ export const progress = pgTable('progress', {
 export const achievements = pgTable('achievements', {
   id: uuid('id').defaultRandom().primaryKey(),
   slug: text('slug').notNull().unique(),
-  name: jsonb('name').$type<Record<string, any>>().notNull(),
-  description: jsonb('description').$type<Record<string, any>>().notNull(),
+  name: jsonb('name').$type<LocalizedString>().notNull(),
+  description: jsonb('description').$type<LocalizedString>().notNull(),
   icon: text('icon').notNull(), // Icon name or emoji
   rarity: text('rarity').notNull().default('COMMON'), // COMMON, RARE, EPIC, LEGENDARY
   category: text('category').notNull(), // e.g., "challenges", "tutorials", "social"

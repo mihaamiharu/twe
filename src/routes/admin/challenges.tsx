@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminChallengesQueryOptions } from '@/lib/admin.query';
 import { updateChallengeStatus } from '@/server/admin.fn';
