@@ -3,6 +3,15 @@ import { mock } from 'bun:test';
 
 GlobalRegistrator.register();
 
+// HappyDOM Polyfill: Ensure standard error constructors exist on the global window
+// This prevents "TypeError: undefined is not a constructor" during internal HappyDOM parsers
+if (typeof (globalThis as any).SyntaxError === 'undefined') {
+    (globalThis as any).SyntaxError = SyntaxError;
+}
+if (typeof (globalThis as any).Error === 'undefined') {
+    (globalThis as any).Error = Error;
+}
+
 // Prevent real HTTP calls from HappyDOM's fetch polyfill (e.g. from <script>fetch('/api/data')</script> in iframe HTML)
 // Without this, HappyDOM throws `NetworkError: ECONNREFUSED` which causes bun to exit with code 1
 // even when the test that caused the fetch is skipped or already completed.
