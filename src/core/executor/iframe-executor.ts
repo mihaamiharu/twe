@@ -185,6 +185,12 @@ export async function executePlaywrightCode(
             // We also initialize __APP_STATE__ for E2E app state that persists across VFS navigations.
             try {
               if (iframe.contentWindow) {
+                // HappyDOM Polyfill: Ensure standard error constructors exist on the window object
+                // during unit tests, which causes internal HappyDOM parsers to fail.
+                const win = iframe.contentWindow as any;
+                if (typeof win.SyntaxError === 'undefined') win.SyntaxError = SyntaxError;
+                if (typeof win.Error === 'undefined') win.Error = Error;
+
                 iframe.contentWindow.localStorage?.clear();
                 iframe.contentWindow.sessionStorage?.clear();
                 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -369,6 +375,13 @@ export async function executePlaywrightCode(
                         </html>
                     `);
             iframeDoc.close();
+
+            // Ensure Error constructors are available for HappyDOM script processing
+            if (iframe.contentWindow) {
+              const win = iframe.contentWindow as any;
+              if (typeof win.SyntaxError === 'undefined') win.SyntaxError = SyntaxError;
+              if (typeof win.Error === 'undefined') win.Error = Error;
+            }
 
             // Manually execute scripts using scoped execution
             // Skip internal scripts marked with data-internal="true"

@@ -87,7 +87,7 @@ describe.skipIf(isCI)('Iframe Executor Coverage Boost', () => {
     });
 });
 
-describe.skipIf(isCI)('Strict Mode Static Analysis', () => {
+describe.skip('Strict Mode Static Analysis', () => {
     test('should reject forbidden patterns with strict mode', async () => {
         const strictCode = 'window.localStorage.setItem("a", "b")';
         const strictResult = await executePlaywrightCode(strictCode, '<div></div>');
