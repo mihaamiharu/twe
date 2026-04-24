@@ -54,6 +54,15 @@ export class MockedPlaywrightPage {
 
   constructor(iframeDocument: Document, options?: { timeout?: number; deadline?: number }) {
     this.targetDocument = iframeDocument;
+    
+    // HappyDOM Polyfill: Ensure standard error constructors exist on the window/defaultView
+    // This prevents "undefined is not a constructor" errors during internal DOM parsing/queries.
+    const win = iframeDocument.defaultView as any;
+    if (win) {
+        if (typeof win.SyntaxError === 'undefined') win.SyntaxError = SyntaxError;
+        if (typeof win.Error === 'undefined') win.Error = Error;
+    }
+
     this.defaultTimeout = options?.timeout || 5000;
     this.globalDeadline = options?.deadline;
     this.request = this._createAPIRequestContext();
@@ -549,8 +558,12 @@ export class MockedPlaywrightPage {
 
       // Restore window references BEFORE executing scripts so app scripts can access state
       if (this.targetDocument.defaultView) {
-         
         const win = this.targetDocument.defaultView as any;
+        
+        // HappyDOM Polyfill: Ensure standard error constructors exist on the window/defaultView
+        if (typeof win.SyntaxError === 'undefined') win.SyntaxError = SyntaxError;
+        if (typeof win.Error === 'undefined') win.Error = Error;
+
         win.page = this;
         // Re-inject active routes
         win.__MOCK_ROUTES__ = this.routes;
@@ -1173,6 +1186,14 @@ export class MockedPlaywrightPage {
       index: number,
     ): FrameLocator => {
       const getFrameDoc = (): Document | null => {
+        // HappyDOM Polyfill: Ensure standard error constructors exist on the window/defaultView
+        // This prevents "undefined is not a constructor" errors during internal DOM parsing/queries.
+        const win = this.targetDocument.defaultView as any;
+        if (win) {
+            if (typeof win.SyntaxError === 'undefined') win.SyntaxError = SyntaxError;
+            if (typeof win.Error === 'undefined') win.Error = Error;
+        }
+
         const frames = this.targetDocument.querySelectorAll(frameSelector);
         let targetIndex = index;
         if (index < 0) {
@@ -1181,7 +1202,15 @@ export class MockedPlaywrightPage {
         // eslint-disable-next-line security/detect-object-injection
         const frame = frames[targetIndex] as HTMLIFrameElement;
         if (!frame) return null;
-        return frame.contentDocument || frame.contentWindow?.document || null;
+        
+        const doc = frame.contentDocument || frame.contentWindow?.document || null;
+        if (doc && doc.defaultView) {
+            const fWin = doc.defaultView as any;
+            if (typeof fWin.SyntaxError === 'undefined') fWin.SyntaxError = SyntaxError;
+            if (typeof fWin.Error === 'undefined') fWin.Error = Error;
+        }
+
+        return doc;
       };
 
       return {
