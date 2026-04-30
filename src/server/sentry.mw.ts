@@ -1,5 +1,31 @@
 import { createMiddleware } from '@tanstack/react-start';
 import { getSentryConfig } from '../lib/sentry.config';
+import type * as Sentry from '@sentry/bun';
+
+interface SentryContext {
+    user?: {
+        id: string;
+        email: string;
+        name: string | null;
+        image: string | null;
+        role: string | null;
+    } | null;
+}
+
+/**
+ * Attach user context to Sentry if available
+ */
+export function attachSentryUserContext(
+    context: SentryContext,
+    Sentry: typeof Sentry,
+) {
+    if (context.user) {
+        Sentry.setUser({
+            id: context.user.id,
+            email: context.user.email,
+        });
+    }
+}
 
 /**
  * Middleware to attach user context to Sentry and capture errors
@@ -14,16 +40,7 @@ export const sentryMiddleware = createMiddleware().server(async ({ next, context
     }
 
     try {
-        // If we have a user in context (from auth middleware), add it to Sentry scope
-        // @ts-expect-error - context is dynamic
-        if ((context as any).auth?.user) {
-            Sentry.setUser({
-                // @ts-expect-error - context is dynamic
-                id: (context as any).auth.user.id,
-                // @ts-expect-error - context is dynamic
-                email: (context as any).auth.user.email,
-            });
-        }
+        attachSentryUserContext(context as unknown as SentryContext, Sentry);
 
         const result = await next();
         return result;
