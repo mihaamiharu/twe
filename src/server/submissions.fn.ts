@@ -20,6 +20,7 @@ import {
 } from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { getRawChallengeContent } from './content.server';
+import { ensureEntityInDb } from './ensure-entity-in-db';
 
 // ----------------------------------------------------------------------------
 // HELPERS
@@ -106,47 +107,48 @@ export const challengeSubmissionHandler = async ({
     });
 
     if (!challenge) {
-      // LAZY SYNC: Check if challenge exists in filesystem
+      challenge = await ensureEntityInDb({
+        slug: challengeSlug,
+        findExisting: (slug) =>
+          db.query.challenges.findFirst({
+            where: eq(challenges.slug, slug),
+          }),
+        fetchContent: (slug) => getRawChallengeContent(slug),
+        insert: async (fsChallenge) => {
+          const [newChallenge] = await db
+            .insert(challenges)
+            .values({
+              slug: fsChallenge.slug,
+              title: fsChallenge.title as any,
+              type: fsChallenge.type,
+              difficulty: fsChallenge.difficulty,
+              xpReward: fsChallenge.xpReward,
+              order: fsChallenge.order,
+              category: fsChallenge.category,
+              tags: fsChallenge.tags,
+              isPublished: true,
+            })
+            .returning();
 
-      // Get raw content (with full localized objects)
-      const fsChallenge = await getRawChallengeContent(challengeSlug);
+          if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
+            await db.insert(testCases).values(
+              fsChallenge.testCases.map((tc: any, index: number) => ({
+                challengeId: newChallenge.id,
+                description: tc.description,
+                input: tc.input,
+                expectedOutput: tc.expectedOutput,
+                isHidden: tc.isHidden || false,
+                order: index,
+              })),
+            );
+          }
 
-      if (fsChallenge) {
-        logger.info(`[Submission] Lazy syncing challenge: ${challengeSlug}`);
+          return newChallenge;
+        },
+        logger,
+      });
 
-        // Insert challenge
-        const [newChallenge] = await db
-          .insert(challenges)
-          .values({
-            slug: fsChallenge.slug,
-            title: fsChallenge.title as any, // Cast to any for JSONB
-            type: fsChallenge.type,
-            difficulty: fsChallenge.difficulty,
-            xpReward: fsChallenge.xpReward,
-            order: fsChallenge.order,
-            category: fsChallenge.category,
-            tags: fsChallenge.tags,
-            isPublished: true, // Auto-publish if found on FS during submission
-          })
-          .returning();
-
-        // Insert test cases
-        if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
-          await db.insert(testCases).values(
-            fsChallenge.testCases.map((tc: any, index: number) => ({
-              challengeId: newChallenge.id,
-              description: tc.description,
-              input: tc.input,
-              expectedOutput: tc.expectedOutput,
-              isHidden: tc.isHidden || false,
-              order: index,
-            })),
-          );
-        }
-
-        // Use the newly created challenge
-        challenge = newChallenge;
-      } else {
+      if (!challenge) {
         return {
           success: false,
           error: getErrorMessage('challengeNotFound', locale),
