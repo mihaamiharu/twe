@@ -59,6 +59,7 @@ void mock.module(
     },
     useRouter: () => ({}),
     useMatch: () => ({}),
+    useParams: () => ({ locale: 'en' }),
     RouterProvider: () => null,
     isRedirect: () => false,
     redirect: () => { },

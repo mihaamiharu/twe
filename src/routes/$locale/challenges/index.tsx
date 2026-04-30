@@ -13,22 +13,28 @@ import {
 } from '@/components/ui/table';
 import {
   Code,
+  Trophy,
+  Zap,
+  CheckCircle2,
   Palette,
   Route as RouteIcon,
   LayoutGrid,
   List,
   Search,
+  Lock,
+  Swords,
   LayoutDashboard,
   Layers,
   Box,
   Compass,
   Menu,
+  ChevronRight,
   MousePointer2,
   FileCode2,
 } from 'lucide-react';
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   useDebounce,
 } from '@/lib/useDebounce';
