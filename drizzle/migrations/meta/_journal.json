@@ -8,6 +8,13 @@
       "when": 1771172369897,
       "tag": "0000_goofy_echo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777518110107,
+      "tag": "0001_deep_lord_tyger",
+      "breakpoints": true
     }
   ]
 }
