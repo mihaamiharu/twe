@@ -27,6 +27,7 @@ import { trackEvent } from '@/lib/analytics';
 import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
+import { transformChallengeResponse } from '@/lib/transform-challenge-response';
 
 import i18n from '@/lib/i18n';
 
@@ -270,52 +271,10 @@ function ChallengeDetailPage() {
   }, [data?.data?.testCases]);
 
   // Transform API response to Challenge type expected by ChallengePlayground
-  const challenge: Challenge | null =
-    data && data.success && data.data
-      ? {
-        id: data.data.id,
-        slug: data.data.slug,
-        title: data.data.title,
-        description: data.data.description,
-        type: data.data.type,
-        difficulty:
-          data.data.difficulty === 'EASY'
-            ? 'Easy'
-            : data.data.difficulty === 'MEDIUM'
-              ? 'Medium'
-              : 'Hard',
-        xp: data.data.xpReward,
-        instructions: data.data.instructions,
-        htmlContent: data.data.htmlContent || '',
-        files: data.data.files,
-        editableFiles: data.data.editableFiles,
-        preloadModules: data.data.preloadModules,
-        starterCode: data.data.starterCode || '',
-        targetSelector: (() => {
-          if (!testCases.length) return '';
-
-          // Try to find selector in the first test case input
-          const firstTestInput = testCases[0].input as {
-            selector?: string;
-            xpath?: string;
-          };
-          return firstTestInput?.selector || firstTestInput?.xpath || '';
-        })(),
-
-        testCases: testCases.map((tc) => ({
-          id: tc.id,
-          name: tc.description,
-          input: tc.input,
-          expectedOutput: tc.expectedOutput,
-        })),
-        hints: data.data.hints,
-        category: data.data.category,
-        isCompleted: data.data.userProgress?.isCompleted || false,
-        tutorial: data.data.tutorial,
-        nextChallenge: data.data.nextChallenge,
-        prevChallenge: data.data.prevChallenge,
-      }
-      : null;
+  const challenge = transformChallengeResponse(
+    data?.success && data.data ? data.data : null,
+    testCases,
+  );
 
   const submitMutation = useMutation({
     mutationFn: async (submissionData: {

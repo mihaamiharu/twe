@@ -33,3 +33,9 @@ export type {
   Challenge,
   ChallengePlaygroundProps,
 } from './challenge-playground';
+
+export { ChallengeListCard } from './challenge-list-card';
+export type { ChallengeListCardProps } from './challenge-list-card';
+
+export { ChallengeListRow } from './challenge-list-row';
+export type { ChallengeListRowProps } from './challenge-list-row';

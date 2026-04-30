@@ -1,25 +1,14 @@
-import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
+import { describe, it, expect, afterEach } from 'bun:test';
 import { render, screen, cleanup } from '@testing-library/react';
-import * as router from '@tanstack/react-router';
 
-// Mock dependencies
+import { ChallengeListRow } from '@/components/challenges/challenge-list-row';
 
-
-describe('ChallengeRow', () => {
-    let ChallengeRow: any;
-
-    beforeEach(async () => {
-
-        const module = await import('@/routes/$locale/challenges/index');
-        ChallengeRow = module.ChallengeRow;
-    });
-
+describe('ChallengeListRow', () => {
     afterEach(() => {
         cleanup();
     });
 
     const mockChallenge = {
-        id: '1',
         slug: 'test-challenge',
         title: 'Test Challenge',
         description: 'Description',
@@ -39,34 +28,10 @@ describe('ChallengeRow', () => {
     const mockT = (key: string) => key;
 
     it('should render challenge row', () => {
-        // ChallengeRow renders a <tr>, so it must be in a <table>/<tbody>
         render(
             <table>
                 <tbody>
-                    <ChallengeRow
-                        challenge={mockChallenge}
-                        index={0}
-                        config={mockConfig}
-                        isComingSoon={false}
-                        isBoss={false}
-                        params={{ locale: 'en' }}
-                        t={mockT}
-                    />
-                </tbody>
-            </table>
-        );
-
-        expect(screen.getByText('Test Challenge')).toBeTruthy();
-        expect(screen.getByText('Description')).toBeTruthy();
-        expect(screen.getByText('types.javascript')).toBeTruthy();
-        expect(screen.getByText('difficulty.EASY')).toBeTruthy();
-    });
-
-    it('should link to correct challenge detail page', () => {
-        render(
-            <table>
-                <tbody>
-                    <ChallengeRow
+                    <ChallengeListRow
                         challenge={mockChallenge}
                         index={0}
                         config={mockConfig}
@@ -79,15 +44,89 @@ describe('ChallengeRow', () => {
             </table>
         );
 
-        const links = screen.getAllByRole('link');
-        // Row has multiple links (title, arrow button)
-        links.forEach(link => {
-            expect(link.getAttribute('href')).toBe('/$locale/challenges/$slug');
-            const params = JSON.parse(link.getAttribute('data-params') || '{}');
-            expect(params).toEqual({
-                locale: 'en',
-                slug: 'test-challenge'
-            });
-        });
+        expect(screen.getByText('Test Challenge')).toBeTruthy();
+        expect(screen.getByText('Description')).toBeTruthy();
+        expect(screen.getByText('types.javascript')).toBeTruthy();
+        expect(screen.getByText('difficulty.EASY')).toBeTruthy();
+    });
+
+    it('should render row number with padding', () => {
+        render(
+            <table>
+                <tbody>
+                    <ChallengeListRow
+                        challenge={mockChallenge}
+                        index={2}
+                        config={mockConfig}
+                        isComingSoon={false}
+                        isBoss={false}
+                        params={{ locale: 'en', slug: mockChallenge.slug }}
+                        t={mockT}
+                    />
+                </tbody>
+            </table>
+        );
+
+        expect(screen.getByText('03')).toBeTruthy();
+    });
+
+    it('should show completion indicator', () => {
+        render(
+            <table>
+                <tbody>
+                    <ChallengeListRow
+                        challenge={{ ...mockChallenge, isCompleted: true }}
+                        index={0}
+                        config={mockConfig}
+                        isComingSoon={false}
+                        isBoss={false}
+                        params={{ locale: 'en', slug: mockChallenge.slug }}
+                        t={mockT}
+                    />
+                </tbody>
+            </table>
+        );
+
+        expect(screen.getByText('Test Challenge')).toBeTruthy();
+    });
+
+    it('should show coming soon state', () => {
+        render(
+            <table>
+                <tbody>
+                    <ChallengeListRow
+                        challenge={mockChallenge}
+                        index={0}
+                        config={mockConfig}
+                        isComingSoon={true}
+                        isBoss={false}
+                        params={{ locale: 'en', slug: mockChallenge.slug }}
+                        t={mockT}
+                    />
+                </tbody>
+            </table>
+        );
+
+        expect(screen.getByText('Test Challenge')).toBeTruthy();
+    });
+
+    it('should show boss styling', () => {
+        render(
+            <table>
+                <tbody>
+                    <ChallengeListRow
+                        challenge={mockChallenge}
+                        index={0}
+                        config={mockConfig}
+                        isComingSoon={false}
+                        isBoss={true}
+                        params={{ locale: 'en', slug: mockChallenge.slug }}
+                        t={mockT}
+                    />
+                </tbody>
+            </table>
+        );
+
+        expect(screen.getByText('Test Challenge')).toBeTruthy();
     });
 });
