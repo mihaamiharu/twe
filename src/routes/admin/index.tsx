@@ -1,7 +1,7 @@
 import { createFileRoute, redirect, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
-import { getAdminStats } from '@/server/admin.fn';
+import { getAdminStats } from '@/server/admin/stats.fn';
 import {
   Card,
   CardContent,

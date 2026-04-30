@@ -12,6 +12,7 @@
 import { createMiddleware } from '@tanstack/react-start';
 import { getRequestHeaders } from '@tanstack/react-start/server';
 import { auth } from './auth.server';
+import { mapSessionToUser } from './map-session-to-user';
 
 // Type for authenticated user context
 export interface AuthUser {
@@ -45,16 +46,11 @@ export const authMiddleware = createMiddleware({ type: 'function' }).server(
             throw new Error('Unauthorized');
         }
 
+        const user = mapSessionToUser(session);
+
         return next({
             context: {
-                user: {
-                    id: session.user.id,
-                    email: session.user.email,
-                    name: session.user.name || null,
-                    image: session.user.image || null,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                    role: (session.user as any).role || 'USER',
-                },
+                user: user!,
                 userId: session.user.id,
             },
         });
@@ -72,18 +68,11 @@ export const optionalAuthMiddleware = createMiddleware({
 
     const session = await auth.api.getSession({ headers });
 
+    const user = mapSessionToUser(session);
+
     return next({
         context: {
-            user: session?.user
-                ? {
-                    id: session.user.id,
-                    email: session.user.email,
-                    name: session.user.name || null,
-                    image: session.user.image || null,
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-                    role: (session.user as any).role || 'USER',
-                }
-                : null,
+            user,
             userId: session?.user?.id || null,
             isAuthenticated: !!session?.user,
         },

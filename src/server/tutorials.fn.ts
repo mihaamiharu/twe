@@ -18,6 +18,7 @@ import {
   awardAchievements,
 } from '@/lib/stats';
 import { logger } from '@/lib/logger';
+import { ensureEntityInDb } from './ensure-entity-in-db';
 
 // Helper for localizable fields (still needed for challenges)
 const getLocalizedValue = (value: unknown, locale: string): string => {
@@ -347,34 +348,35 @@ export const completeTutorial = createServerFn({ method: 'POST' })
       });
 
       if (!tutorial) {
-        // Tutorial not in DB yet - create it from filesystem
-        const tutorialContent = await getTutorialContent(slug, 'en');
-        if (!tutorialContent) {
+        tutorial = await ensureEntityInDb({
+          slug,
+          findExisting: (s) =>
+            db.query.tutorials.findFirst({
+              where: eq(tutorials.slug, s),
+            }),
+          fetchContent: (s) => getTutorialContent(s, 'en'),
+          insert: async (tutorialContent) =>
+            (
+              await db
+                .insert(tutorials)
+                .values({
+                  slug: tutorialContent.slug,
+                  title: {
+                    en: tutorialContent.title,
+                    id: tutorialContent.title,
+                  },
+                  order: tutorialContent.order,
+                  estimatedMinutes: tutorialContent.estimatedMinutes,
+                  tags: tutorialContent.tags,
+                  isPublished: true,
+                })
+                .returning()
+            )[0],
+          logger,
+        });
+
+        if (!tutorial) {
           return { success: false, error: 'Tutorial not found' };
-        }
-
-        try {
-          const [newTutorial] = await db
-            .insert(tutorials)
-            .values({
-              slug: tutorialContent.slug,
-              title: { en: tutorialContent.title, id: tutorialContent.title },
-              order: tutorialContent.order,
-              estimatedMinutes: tutorialContent.estimatedMinutes,
-              tags: tutorialContent.tags,
-              isPublished: true,
-            })
-            .returning();
-          tutorial = newTutorial;
-        } catch (err) {
-          // If insertion failed (likely race condition on unique slug), try to fetch it again
-          tutorial = await db.query.tutorials.findFirst({
-            where: eq(tutorials.slug, slug),
-          });
-
-          if (!tutorial) {
-            throw err; // Re-throw if legitimate error
-          }
         }
       }
 

@@ -214,7 +214,9 @@ export const submissions = pgTable('submissions', {
   errorMessage: text('error_message'),
 
   createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  userIdIdx: index('idx_submissions_user_id').on(table.userId),
+}));
 
 export const progress = pgTable('progress', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -243,7 +245,9 @@ export const progress = pgTable('progress', {
 
   createdAt: timestamp('created_at').notNull().defaultNow(),
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
-});
+}, (table) => ({
+  userIdIdx: index('idx_progress_user_id').on(table.userId),
+}));
 
 // ============================================================================
 // GAMIFICATION TABLES

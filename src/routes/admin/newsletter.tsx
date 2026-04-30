@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAdminSubscribers, updateSubscriberStatus } from '@/server/admin.fn';
+import { getAdminSubscribers, updateSubscriberStatus } from '@/server/admin/newsletter.fn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Download, Mail } from 'lucide-react';

@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getAdminBugs, updateBugStatus } from '@/server/admin.fn';
+import { getAdminBugs, updateBugStatus } from '@/server/admin/bugs.fn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
