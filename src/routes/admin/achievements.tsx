@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { getAdminAchievements } from '@/server/admin.fn';
+import { getAdminAchievements } from '@/server/admin/achievements.fn';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Award, Search, Users, ShieldCheck } from 'lucide-react';

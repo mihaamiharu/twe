@@ -1,7 +1,7 @@
 import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getAdminUserDetail, deleteUser } from '@/server/admin.fn';
+import { getAdminUserDetail, deleteUser } from '@/server/admin/users.fn';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { useNavigate } from '@tanstack/react-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

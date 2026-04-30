@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getAdminChallenges } from '@/server/admin.fn';
+import { getAdminChallenges } from '@/server/admin/challenges.fn';
 
 export const adminChallengesQueryOptions = queryOptions({
     queryKey: ['admin-challenges'],
