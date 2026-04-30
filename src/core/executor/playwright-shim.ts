@@ -11,6 +11,9 @@ import { logger } from '@/lib/logger';
 
 import { ROLE_TO_TAG } from './role-mappings';
 import { createShimError } from './shim-errors';
+import { attachOnclickHandlers } from './attach-onclick-handlers';
+import { createRouteFetchWrapper } from './route-fetch-mock';
+import { generateVfsNavigationTemplate } from './iframe-template';
 import type {
   FilePayload,
   Locator,
@@ -372,78 +375,10 @@ export class MockedPlaywrightPage {
     if (!iframeWindow.__MOCK_FETCH_PATCHED__) {
       iframeWindow.__MOCK_FETCH_PATCHED__ = true;
       const originalFetch = iframeWindow.fetch;
-      iframeWindow.fetch = (input: any, init: any) => {
-        let url = input;
-        if (typeof input === 'string') {
-          if (input.startsWith('/')) {
-            url = 'http://localhost' + input;
-          }
-        } else if (input instanceof Request) {
-          url = input.url;
-        } else if (input && typeof input === 'object' && 'toString' in input) {
-          url = input.toString();
-        }
-
-        if (iframeWindow.__MOCK_ROUTES__) {
-          for (const route of iframeWindow.__MOCK_ROUTES__) {
-            let isMatch = false;
-            if (typeof route.matcher === 'string') {
-              isMatch = url.includes(route.matcher);
-            } else if (route.matcher instanceof RegExp) {
-              isMatch = route.matcher.test(url);
-            } else if (typeof route.matcher === 'function') {
-              try {
-                isMatch = route.matcher(new URL(url as string));
-              } catch {
-                isMatch = false;
-              }
-            }
-
-            if (isMatch) {
-              return route
-                .handler({
-                  url,
-                  method: init?.method || 'GET',
-                  headers: init?.headers,
-                  body: init?.body,
-                })
-                .then((r: any) => {
-                  if (r?.type === 'fulfill') {
-                    return Promise.resolve({
-                      ok:
-                        (r.response.status || 200) >= 200 &&
-                        (r.response.status || 200) < 300,
-                      status: r.response.status || 200,
-                      statusText: r.response.statusText || 'OK',
-                      json: () =>
-                        Promise.resolve(
-                          r.response.json ||
-                            (r.response.body ? JSON.parse(r.response.body) : {}),
-                        ),
-                      text: () =>
-                        Promise.resolve(
-                          r.response.body || JSON.stringify(r.response.json || {}),
-                        ),
-                      arrayBuffer: () =>
-                        Promise.resolve(
-                          new TextEncoder().encode(
-                            r.response.body || JSON.stringify(r.response.json || {}),
-                          ).buffer,
-                        ),
-                      headers: new Headers(
-                        (r.response.headers as HeadersInit) || {},
-                      ),
-                    });
-                  }
-                  return Promise.reject(new Error('Route not fulfilled'));
-                });
-            }
-          }
-        }
-        return originalFetch
-          ? originalFetch(input, init)
-          : Promise.resolve({ ok: false, status: 404 });
-      };
+      iframeWindow.fetch = createRouteFetchWrapper(
+        originalFetch,
+        () => this.targetDocument.defaultView as (Window & Record<string, unknown>) | undefined,
+      );
     }
 
     const routeEntry = {
@@ -580,112 +515,11 @@ export class MockedPlaywrightPage {
    * Wrap VFS content with full HTML structure including styles and polyfills
    */
   private _wrapVfsContent(content: string, appState: any = {}): string {
-    const appStateScript = `
-      <script>
-        // Restore persisted app state immediately
-        window.__APP_STATE__ = ${JSON.stringify(appState)};
-      </script>
-    `;
-
-    return `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <base href="http://localhost/" />
-        ${appStateScript}
-        <style>
-          * { box-sizing: border-box; }
-          body { 
-            font-family: system-ui, sans-serif; 
-            padding: 16px;
-            margin: 0;
-          }
-          ${this.cssContent || ''}
-        </style>
-        <script data-internal="true">
-          (function() {
-            if (window['__tweVfsPolyfillInstalled']) return;
-            window['__tweVfsPolyfillInstalled'] = true;
-
-            // Polyfill fetch to handle mock routes
-
-            window.fetch = function(input, init) {
-              let url = input;
-              if (typeof input === 'string') {
-                if (input.startsWith('/')) {
-                  url = 'http://localhost' + input;
-                }
-              } else if (input instanceof Request) {
-                url = input.url;
-              } else if (input && typeof input === 'object' && 'toString' in input) {
-                 url = input.toString();
-              }
-
-              if (window.__MOCK_ROUTES__) {
-                for (const route of window.__MOCK_ROUTES__) {
-                  let isMatch = false;
-                  if (typeof route.matcher === 'string') {
-                    isMatch = url.includes(route.matcher);
-                  } else if (route.matcher instanceof RegExp) {
-                    isMatch = route.matcher.test(url);
-                  }
-                  if (isMatch) {
-                    return route.handler({ url, method: init?.method || 'GET' }).then(r => {
-                      if (r?.type === 'fulfill') {
-                        return Promise.resolve({
-                          ok: (r.response.status || 200) >= 200 && (r.response.status || 200) < 300,
-                        status: r.response.status || 200,
-                        json: () => Promise.resolve(r.response.json || {}),
-                        text: () => Promise.resolve(r.response.body || '')
-                      });
-                    }
-                    return Promise.reject(new Error('Route not fulfilled'));
-                  });
-                }
-              }
-            }
-            return Promise.resolve({ ok: true, status: 404, json: () => Promise.resolve({}) });
-          };
-
-          // Define VFS Navigation Helper
-          window.__VFS_NAVIGATE__ = function(path) {
-            // console.log('[VFS] Navigating to ' + path);
-            if (window.page) {
-                window.page.goto(path).catch(e => console.error('Navigation failed:', e));
-            } else {
-                console.error('window.page not found for VFS navigation');
-            }
-          };
-
-          // Handle navigation for VFS
-          window.addEventListener('click', function(e) {
-            const link = e.target.closest('a[href]');
-            if (link && !link.getAttribute('target')) {
-              const href = link.getAttribute('href');
-              if (href && (href.startsWith('/') || href.endsWith('.html'))) {
-                e.preventDefault();
-                // VFS navigation will be handled by the shim via location change detection
-                window.__VFS_NAVIGATE__ && window.__VFS_NAVIGATE__(href);
-              }
-            }
-          }, true);
-
-          // Handle form submission for VFS
-          window.addEventListener('submit', function(e) {
-            const form = e.target;
-            const action = form.getAttribute('action');
-            if (action && (action.startsWith('/') || action.endsWith('.html'))) {
-              e.preventDefault();
-              window.__VFS_NAVIGATE__ && window.__VFS_NAVIGATE__(action);
-            }
-          }, true);
-          })();
-        </script>
-      </head>
-      <body>${content}</body>
-      </html>
-    `;
+    return generateVfsNavigationTemplate({
+      bodyContent: content,
+      cssContent: this.cssContent,
+      appState: appState || {},
+    });
   }
 
   /**
@@ -727,65 +561,18 @@ export class MockedPlaywrightPage {
 
   /**
    * Manually attach onclick handlers for elements with the attribute
-   * This is required because HappyDOM/iframe.write() doesn't always 
+   * This is required because HappyDOM/iframe.write() doesn't always
    * wire up inline attributes to the correctly scoped window.
    */
   private _attachOnclickHandlers(): void {
-    const elementsWithClick = Array.from(
-      this.targetDocument.querySelectorAll('[onclick]'),
-    );
-    elementsWithClick.forEach((el) => {
-      const handlerCode = el.getAttribute('onclick');
-      if (handlerCode) {
-        try {
-           
-          const win = this.targetDocument.defaultView as any;
-          if (!win) return;
+    const win = this.targetDocument.defaultView;
+    if (!win) return;
 
-          const windowFuncs = Object.keys(win).filter(
-            (key) =>
-              typeof win[key] === 'function' &&
-              ![
-                'fetch',
-                'setTimeout',
-                'setInterval',
-                'clearTimeout',
-                'clearInterval',
-                '__MOCK_ROUTES__',
-                '__VFS_NAVIGATE__',
-                'page'
-              ].includes(key),
-          );
-
-          const funcDestructure =
-            windowFuncs.length > 0
-              ? `const { ${windowFuncs.join(', ')} } = window;`
-              : '';
-
-          const code = `
-            const fetch = window.fetch;
-            ${funcDestructure}
-            return (function(window, document, event) {
-                try {
-                    ${handlerCode}
-                } catch(err) {
-                    console.error('Error in VFS onclick handler:', err);
-                }
-            }).call(this, window, document, event);
-          `;
-
-          // eslint-disable-next-line @typescript-eslint/no-implied-eval
-          const fn = new Function('window', 'document', 'event', code);
-
-          el.addEventListener('click', (event) => {
-            fn.call(el, win, this.targetDocument, event);
-          });
-          // Remove attribute to prevent double-execution in real browsers
-          el.removeAttribute('onclick');
-        } catch (e) {
-          console.error('Failed to attach VFS onclick handler:', e);
-        }
-      }
+    attachOnclickHandlers({
+      document: this.targetDocument,
+      window: win as Window & Record<string, unknown>,
+      excludeKeys: ['__MOCK_ROUTES__', '__VFS_NAVIGATE__', 'page'],
+      errorPrefix: 'VFS',
     });
   }
 

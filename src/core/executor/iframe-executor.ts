@@ -17,6 +17,8 @@ import {
 import { createExpect } from './expect-matchers';
 import { validateExpectedState } from './dom-validator';
 import { createInterceptedConsole } from './console-interceptor';
+import { attachOnclickHandlers } from './attach-onclick-handlers';
+import { generateIframeTemplate } from './iframe-template';
 
 /**
  * Executes Playwright-style code in a sandboxed iframe
@@ -203,171 +205,16 @@ export async function executePlaywrightCode(
             // NOTE: Console interception is done AFTER iframeDoc.close() below
             // to ensure we intercept the final document's console object
 
-            iframeDoc.write(`
-                        <!DOCTYPE html>
-                        <html>
-                          <head>
-                            <meta charset="utf-8">
-                            <base href="http://localhost/" />
-                            <style>
-                              * { box-sizing: border-box; }
-                              body { 
-                                font-family: system-ui, sans-serif; 
-                                padding: 16px;
-                                margin: 0;
-                              }
-                              ${options?.cssContent || ''}
-                            </style>
-                            <script data-internal="true">
-                              (function() {
-                                if (window['__tweVfsPolyfillInstalled']) return;
-                                window['__tweVfsPolyfillInstalled'] = true;
+            const htmlTemplate = generateIframeTemplate({
+              bodyContent: finalHtml,
+              cssContent: options?.cssContent,
+              filesEnabled: !!options?.files,
+              includeAlertPolyfill: true,
+              includeFunctionMatcher: true,
+              includeWildcardSupport: true,
+            });
 
-                                // Polyfill fetch to handle relative URLs and MOCK requests
-                                window.fetch = function(input, init) {
-                                    let url = input;
-                                    if (typeof input === 'string') {
-                                        if (input.startsWith('/')) {
-                                            url = 'http://localhost' + input;
-                                        } else if (input.startsWith('http')) {
-                                            url = input;
-                                        }
-                                    }
-
-                                    if (window.__MOCK_ROUTES__) {
-                                        for (const route of window.__MOCK_ROUTES__) {
-                                            let isMatch = false;
-                                            if (typeof route.matcher === 'string') {
-                                                if (route.matcher.includes('*')) {
-                                                    const regex = new RegExp(route.matcher.replace(/\\*/g, '.*'));
-                                                    isMatch = regex.test(url);
-                                                } else {
-                                                    isMatch = url.includes(route.matcher);
-                                                }
-                                            } else if (route.matcher instanceof RegExp) {
-                                                isMatch = route.matcher.test(url);
-                                            } else if (typeof route.matcher === 'function') {
-                                                try {
-                                                    isMatch = route.matcher(new URL(url));
-                                                } catch {
-                                                    isMatch = false;
-                                                }
-                                            }
-
-                                            if (isMatch) {
-                                                console.log('Mocking fetch via page.route to ' + url);
-                                                const requestInfo = {
-                                                    url,
-                                                    method: init?.method || 'GET',
-                                                    headers: init?.headers || {},
-                                                    body: init?.body
-                                                };
-
-                                                return route.handler(requestInfo).then(result => {
-                                                    if (result && result.type === 'fulfill') {
-                                                        const resp = result.response;
-                                                        return Promise.resolve({
-                                                            ok: (resp.status || 200) >= 200 && (resp.status || 200) < 300,
-                                                            status: resp.status || 200,
-                                                            json: () => Promise.resolve(resp.json || JSON.parse(typeof resp.body === 'string' ? resp.body : '{}')),
-                                                            text: () => Promise.resolve(typeof resp.body === 'string' ? resp.body : JSON.stringify(resp.json || {})),
-                                                            headers: new Headers(resp.headers || {'content-type': 'application/json'})
-                                                        });
-                                                    }
-                                                    return Promise.reject(new Error('Route handler did not fulfill'));
-                                                });
-                                            }
-                                        }
-                                    }
-
-                                    if (typeof url === 'string' && url.includes('/api/data')) {
-                                        return Promise.resolve({
-                                            ok: true,
-                                            status: 200,
-                                            json: () => Promise.resolve({ success: true, count: 5 }),
-                                            text: () => Promise.resolve('{"success":true}'),
-                                            headers: new Headers({'content-type': 'application/json'})
-                                        });
-                                    }
-                                    
-                                    return Promise.resolve({
-                                        ok: true,
-                                        status: 404,
-                                        json: () => Promise.resolve({}),
-                                        text: () => Promise.resolve('Not Found')
-                                    });
-                                };
-
-                                    window.alert = function(message) {
-                                    console.log('[Dialog] alert: ' + message);
-                                    if (window.__MOCK_DIALOG_HANDLER__) {
-                                        window.__MOCK_DIALOG_HANDLER__('alert', message);
-                                    }
-                                };
-                                
-                                // VFS Navigation Shim for Initial Render
-                                // (Only active if files/VFS is enabled)
-                                ${options?.files
-                ? `
-                                window.__VFS_NAVIGATE__ = function(path) {
-                                    console.log('[VFS] Navigating to ' + path);
-                                    if (window.page) {
-                                        window.page.goto(path).catch(e => console.error('Navigation failed:', e));
-                                    } else {
-                                        console.error('window.page not found for VFS navigation');
-                                    }
-                                };
-
-                                window.addEventListener('click', function(e) {
-                                    const link = e.target.closest('a[href]');
-                                    if (link && !link.getAttribute('target')) {
-                                        const href = link.getAttribute('href');
-                                        if (href && (href.startsWith('/') || href.endsWith('.html'))) {
-                                            e.preventDefault();
-                                            window.__VFS_NAVIGATE__(href);
-                                        }
-                                    }
-                                }, true);
-
-                                window.addEventListener('submit', function(e) {
-                                    const form = e.target;
-                                    const action = form.getAttribute('action');
-                                    if (action && (action.startsWith('/') || action.endsWith('.html'))) {
-                                        e.preventDefault();
-                                        window.__VFS_NAVIGATE__(action);
-                                    }
-                                }, true);
-                                `
-                : `
-                                window.addEventListener('click', function(e) {
-                                    const link = e.target.closest('a[href]');
-                                    if (link && !link.getAttribute('target')) {
-                                        const href = link.getAttribute('href');
-                                        // Block navigation for relative links or anything that would navigate the frame
-                                        // We allow anchor links (#) if they don't have a path
-                                        if (href && (href.startsWith('/') || href.startsWith('http') || (href.startsWith('#') && href.length > 1))) {
-                                           // Special case for purely local anchors?
-                                           // Actually, let's just block everything that looks like a page navigation
-                                           if (!href.startsWith('#')) {
-                                               e.preventDefault();
-                                           }
-                                        }
-                                    }
-                                }, true);
-
-                                window.addEventListener('submit', function(e) {
-                                    e.preventDefault();
-                                }, true);
-                                `
-              }
-                              })();
-                            </script>
-                          </head>
-                          <body>
-                            ${finalHtml}
-                          </body>
-                        </html>
-                    `);
+            iframeDoc.write(htmlTemplate);
             iframeDoc.close();
 
             // Manually execute scripts using scoped execution
@@ -419,63 +266,13 @@ export async function executePlaywrightCode(
 
             // Manually attach onclick handlers using scoped execution
             // This works around HappyDOM limitation where inline event handlers don't verify consistently
-            const elementsWithClick = Array.from(
-              iframeDoc.querySelectorAll('[onclick]'),
-            );
-            elementsWithClick.forEach((el) => {
-              const handlerCode = el.getAttribute('onclick');
-              if (handlerCode) {
-                try {
-                  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-                  const win = iframe.contentWindow as any;
-                  const doc = iframe.contentDocument;
-                  if (!win || !doc) return;
-
-                  // Extract function names from window that were defined in script tags
-                  // and create local references for them
-                  const windowFuncs = Object.keys(win).filter(
-                    (key) =>
-                      // eslint-disable-next-line security/detect-object-injection
-                      typeof win[key] === 'function' &&
-                      ![
-                        'fetch',
-                        'setTimeout',
-                        'setInterval',
-                        'clearTimeout',
-                        'clearInterval',
-                      ].includes(key),
-                  );
-                  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument */
-                  const funcDestructure =
-                    windowFuncs.length > 0
-                      ? `const { ${windowFuncs.join(', ')} } = window;`
-                      : '';
-
-                  const code = `
-                                    const fetch = window.fetch;
-                                    ${funcDestructure}
-                                    return (function(window, document, event) {
-                                        try {
-                                            ${handlerCode}
-                                        } catch(err) {
-                                            console.error('Error in onclick handler:', err);
-                                        }
-                                    }).call(this, window, document, event);
-                                `;
-
-                  // eslint-disable-next-line @typescript-eslint/no-implied-eval
-                  const fn = new Function('window', 'document', 'event', code);
-
-                  el.addEventListener('click', (event) => {
-                    fn.call(el, win, doc, event);
-                  });
-                  // Remove attribute to prevent double-execution if HappyDOM ever fixes this
-                  el.removeAttribute('onclick');
-                } catch (e) {
-                  console.error('Failed to attach onclick shim:', e);
-                }
-              }
-            });
+            const iframeWindow = iframe.contentWindow;
+            if (iframeWindow) {
+              attachOnclickHandlers({
+                document: iframeDoc,
+                window: iframeWindow as Window & Record<string, unknown>,
+              });
+            }
 
             // Create mocked page object
             const remainingBudget = Math.max(0, (startTime + timeout) - Date.now());
