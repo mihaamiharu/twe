@@ -62,12 +62,13 @@ export const Route = createRootRouteWithContext<RootContext>()({
 
     return { auth, consent, pathname: location.pathname };
   },
-  head: ({ context }) => {
+  head: ({ context }: any) => {
     const isQa = typeof window !== 'undefined' 
       ? window.location.hostname.startsWith('qa.')
       : false; // Server-side detection handled by header injection in scripts/server.ts
 
-    const pathname = context.pathname || '/';
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const pathname = (context?.pathname as string) || '/';
     const canonicalUrl = getCanonicalUrl(pathname);
     const alternateLinks = getAlternateLinks(pathname);
 
