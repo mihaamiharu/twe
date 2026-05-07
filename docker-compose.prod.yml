@@ -67,6 +67,18 @@ services:
     networks:
       - prod_net
 
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: twe-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+    depends_on:
+      - app
+    networks:
+      - prod_net
+
 volumes:
   postgres_data:
     driver: local
