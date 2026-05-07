@@ -46,7 +46,22 @@ Bun.serve({
 
         // SSR fallback to TanStack Start handler
         try {
-            return await (server as any).fetch(req);
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            const response = (await (server as any).fetch(req)) as Response;
+            const host = req.headers.get('host');
+
+            if (host?.startsWith('qa.')) {
+                // For QA subdomain, ensure no indexing by creating a new response with the header
+                const headers = new Headers(response.headers);
+                headers.set('X-Robots-Tag', 'noindex, nofollow');
+                return new Response(response.body, {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers,
+                });
+            }
+
+            return response;
         } catch (error) {
             Sentry.captureException(error);
             console.error('SSR Error:', error);
