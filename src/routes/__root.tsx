@@ -32,13 +32,14 @@ export interface RootContext {
   auth?: AuthSession;
   queryClient: QueryClient;
   consent?: 'granted' | 'denied' | null;
+  pathname?: string;
 }
 
 import { DefaultErrorComponent } from "@/components/default-error-component";
 
 export const Route = createRootRouteWithContext<RootContext>()({
   defaultErrorComponent: DefaultErrorComponent,
-  beforeLoad: async ({ context }) => {
+  beforeLoad: async ({ context, location }) => {
     // Optimization: Check cache first to avoid blocking every navigation
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);
 
@@ -59,19 +60,17 @@ export const Route = createRootRouteWithContext<RootContext>()({
       consent = await getConsent();
     }
 
-    return { auth, consent };
+    return { auth, consent, pathname: location.pathname };
   },
-  head: (args) => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-    const location = (args as any).location;
+  head: ({ context }: any) => {
     const isQa = typeof window !== 'undefined' 
       ? window.location.hostname.startsWith('qa.')
       : false; // Server-side detection handled by header injection in scripts/server.ts
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const canonicalUrl = getCanonicalUrl(location.pathname as string);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const alternateLinks = getAlternateLinks(location.pathname as string);
+    const pathname = (context?.pathname as string) || '/';
+    const canonicalUrl = getCanonicalUrl(pathname);
+    const alternateLinks = getAlternateLinks(pathname);
 
     const meta: any[] = [
       {
