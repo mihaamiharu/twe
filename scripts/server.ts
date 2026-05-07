@@ -51,13 +51,15 @@ Bun.serve({
             const host = req.headers.get('host');
 
             if (host?.startsWith('qa.')) {
-                // For QA subdomain, ensure no indexing by creating a new response with the header
-                const headers = new Headers(response.headers);
-                headers.set('X-Robots-Tag', 'noindex, nofollow');
+                // For QA subdomain, ensure no indexing
+                // We create a new response to add headers without potentially locking the original stream
+                const newHeaders = new Headers(response.headers);
+                newHeaders.set('X-Robots-Tag', 'noindex, nofollow');
+                
                 return new Response(response.body, {
                     status: response.status,
                     statusText: response.statusText,
-                    headers,
+                    headers: newHeaders,
                 });
             }
 
