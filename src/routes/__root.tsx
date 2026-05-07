@@ -24,7 +24,7 @@ import { CookieConsent } from '@/components/cookie-consent';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
-import { organizationSchema } from '@/lib/seo';
+import { organizationSchema, getCanonicalUrl, getAlternateLinks } from '@/lib/seo';
 import { getConsent } from '@/server/consent.fn';
 
 // Export context type for child routes
@@ -61,10 +61,17 @@ export const Route = createRootRouteWithContext<RootContext>()({
 
     return { auth, consent };
   },
-  head: () => {
+  head: (args) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+    const location = (args as any).location;
     const isQa = typeof window !== 'undefined' 
       ? window.location.hostname.startsWith('qa.')
       : false; // Server-side detection handled by header injection in scripts/server.ts
+
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const canonicalUrl = getCanonicalUrl(location.pathname as string);
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    const alternateLinks = getAlternateLinks(location.pathname as string);
 
     const meta: any[] = [
       {
@@ -143,6 +150,12 @@ export const Route = createRootRouteWithContext<RootContext>()({
     return {
       meta,
       links: [
+      { rel: 'canonical', href: canonicalUrl },
+      ...alternateLinks.map(link => ({
+        rel: link.rel,
+        hrefLang: link.hrefLang,
+        href: link.href,
+      })),
       // Preload critical fonts removed to avoid warnings (loaded via CSS)
       // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
       // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
