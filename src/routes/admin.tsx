@@ -18,4 +18,12 @@ export const Route = createFileRoute('/admin')({
             <Outlet />
         </AdminLayout>
     ),
+    head: () => ({
+        meta: [
+            {
+                name: 'robots',
+                content: 'noindex, nofollow',
+            },
+        ],
+    }),
 });

@@ -61,21 +61,18 @@ export const Route = createRootRouteWithContext<RootContext>()({
 
     return { auth, consent };
   },
-  head: () => ({
-    meta: [
+  head: () => {
+    const isQa = typeof window !== 'undefined' 
+      ? window.location.hostname.startsWith('qa.')
+      : false; // Server-side detection handled by header injection in scripts/server.ts
+
+    const meta: any[] = [
       {
         charSet: 'utf-8',
       },
       {
         name: 'viewport',
         content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: i18n.t('common:seo.title'),
-      },
-      {
-        name: 'description',
-        content: i18n.t('common:seo.description'),
       },
       {
         name: 'keywords',
@@ -137,8 +134,15 @@ export const Route = createRootRouteWithContext<RootContext>()({
         name: 'theme-color',
         content: '#09090b', // Zinc-950 (background color)
       },
-    ],
-    links: [
+    ];
+
+    if (isQa) {
+      meta.push({ name: 'robots', content: 'noindex, nofollow' });
+    }
+
+    return {
+      meta,
+      links: [
       // Preload critical fonts removed to avoid warnings (loaded via CSS)
       // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
       // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
@@ -168,8 +172,9 @@ export const Route = createRootRouteWithContext<RootContext>()({
         type: 'application/ld+json',
         children: JSON.stringify(organizationSchema),
       },
-    ],
-  }),
+    ]
+    }
+  },
 
   component: RootComponent,
   shellComponent: RootDocument,
