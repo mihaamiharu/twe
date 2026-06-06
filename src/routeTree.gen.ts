@@ -42,6 +42,7 @@ import { Route as LocaleChangelogRouteImport } from './routes/$locale/changelog'
 import { Route as LocaleAboutRouteImport } from './routes/$locale/about'
 import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authenticated'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
+import { Route as LocaleWorkshopsIndexRouteImport } from './routes/$locale/workshops/index'
 import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
 import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
 import { Route as ApiTestTeardownUserRouteImport } from './routes/api/test/teardown-user'
@@ -53,6 +54,8 @@ import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$user
 import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
 import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
 import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
+import { Route as LocaleWorkshopsWorkshopSlugIndexRouteImport } from './routes/$locale/workshops/$workshopSlug/index'
+import { Route as LocaleWorkshopsWorkshopSlugModuleSlugRouteImport } from './routes/$locale/workshops/$workshopSlug/$moduleSlug'
 
 const TestSentryRoute = TestSentryRouteImport.update({
   id: '/test-sentry',
@@ -219,6 +222,11 @@ const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AdminRoute,
 } as any)
+const LocaleWorkshopsIndexRoute = LocaleWorkshopsIndexRouteImport.update({
+  id: '/workshops/',
+  path: '/workshops/',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleTutorialsIndexRoute = LocaleTutorialsIndexRouteImport.update({
   id: '/tutorials/',
   path: '/tutorials/',
@@ -275,6 +283,18 @@ const LocaleAuthenticatedProfileRoute =
     path: '/profile',
     getParentRoute: () => LocaleAuthenticatedRoute,
   } as any)
+const LocaleWorkshopsWorkshopSlugIndexRoute =
+  LocaleWorkshopsWorkshopSlugIndexRouteImport.update({
+    id: '/workshops/$workshopSlug/',
+    path: '/workshops/$workshopSlug/',
+    getParentRoute: () => LocaleRoute,
+  } as any)
+const LocaleWorkshopsWorkshopSlugModuleSlugRoute =
+  LocaleWorkshopsWorkshopSlugModuleSlugRouteImport.update({
+    id: '/workshops/$workshopSlug/$moduleSlug',
+    path: '/workshops/$workshopSlug/$moduleSlug',
+    getParentRoute: () => LocaleRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -319,7 +339,10 @@ export interface FileRoutesByFullPath {
   '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
+  '/$locale/workshops': typeof LocaleWorkshopsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/$locale/workshops/$workshopSlug/$moduleSlug': typeof LocaleWorkshopsWorkshopSlugModuleSlugRoute
+  '/$locale/workshops/$workshopSlug': typeof LocaleWorkshopsWorkshopSlugIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -362,7 +385,10 @@ export interface FileRoutesByTo {
   '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
+  '/$locale/workshops': typeof LocaleWorkshopsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/$locale/workshops/$workshopSlug/$moduleSlug': typeof LocaleWorkshopsWorkshopSlugModuleSlugRoute
+  '/$locale/workshops/$workshopSlug': typeof LocaleWorkshopsWorkshopSlugIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -409,7 +435,10 @@ export interface FileRoutesById {
   '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges/': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
+  '/$locale/workshops/': typeof LocaleWorkshopsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/$locale/workshops/$workshopSlug/$moduleSlug': typeof LocaleWorkshopsWorkshopSlugModuleSlugRoute
+  '/$locale/workshops/$workshopSlug/': typeof LocaleWorkshopsWorkshopSlugIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -456,7 +485,10 @@ export interface FileRouteTypes {
     | '/api/test/teardown-user'
     | '/$locale/challenges'
     | '/$locale/tutorials'
+    | '/$locale/workshops'
     | '/admin/users'
+    | '/$locale/workshops/$workshopSlug/$moduleSlug'
+    | '/$locale/workshops/$workshopSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -499,7 +531,10 @@ export interface FileRouteTypes {
     | '/api/test/teardown-user'
     | '/$locale/challenges'
     | '/$locale/tutorials'
+    | '/$locale/workshops'
     | '/admin/users'
+    | '/$locale/workshops/$workshopSlug/$moduleSlug'
+    | '/$locale/workshops/$workshopSlug'
   id:
     | '__root__'
     | '/'
@@ -545,7 +580,10 @@ export interface FileRouteTypes {
     | '/api/test/teardown-user'
     | '/$locale/challenges/'
     | '/$locale/tutorials/'
+    | '/$locale/workshops/'
     | '/admin/users/'
+    | '/$locale/workshops/$workshopSlug/$moduleSlug'
+    | '/$locale/workshops/$workshopSlug/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -799,6 +837,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/$locale/workshops/': {
+      id: '/$locale/workshops/'
+      path: '/workshops'
+      fullPath: '/$locale/workshops'
+      preLoaderRoute: typeof LocaleWorkshopsIndexRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/tutorials/': {
       id: '/$locale/tutorials/'
       path: '/tutorials'
@@ -876,6 +921,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleAuthenticatedProfileRouteImport
       parentRoute: typeof LocaleAuthenticatedRoute
     }
+    '/$locale/workshops/$workshopSlug/': {
+      id: '/$locale/workshops/$workshopSlug/'
+      path: '/workshops/$workshopSlug'
+      fullPath: '/$locale/workshops/$workshopSlug'
+      preLoaderRoute: typeof LocaleWorkshopsWorkshopSlugIndexRouteImport
+      parentRoute: typeof LocaleRoute
+    }
+    '/$locale/workshops/$workshopSlug/$moduleSlug': {
+      id: '/$locale/workshops/$workshopSlug/$moduleSlug'
+      path: '/workshops/$workshopSlug/$moduleSlug'
+      fullPath: '/$locale/workshops/$workshopSlug/$moduleSlug'
+      preLoaderRoute: typeof LocaleWorkshopsWorkshopSlugModuleSlugRouteImport
+      parentRoute: typeof LocaleRoute
+    }
   }
 }
 
@@ -908,6 +967,9 @@ interface LocaleRouteChildren {
   LocaleTutorialsSlugRoute: typeof LocaleTutorialsSlugRoute
   LocaleChallengesIndexRoute: typeof LocaleChallengesIndexRoute
   LocaleTutorialsIndexRoute: typeof LocaleTutorialsIndexRoute
+  LocaleWorkshopsIndexRoute: typeof LocaleWorkshopsIndexRoute
+  LocaleWorkshopsWorkshopSlugModuleSlugRoute: typeof LocaleWorkshopsWorkshopSlugModuleSlugRoute
+  LocaleWorkshopsWorkshopSlugIndexRoute: typeof LocaleWorkshopsWorkshopSlugIndexRoute
 }
 
 const LocaleRouteChildren: LocaleRouteChildren = {
@@ -928,6 +990,10 @@ const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleTutorialsSlugRoute: LocaleTutorialsSlugRoute,
   LocaleChallengesIndexRoute: LocaleChallengesIndexRoute,
   LocaleTutorialsIndexRoute: LocaleTutorialsIndexRoute,
+  LocaleWorkshopsIndexRoute: LocaleWorkshopsIndexRoute,
+  LocaleWorkshopsWorkshopSlugModuleSlugRoute:
+    LocaleWorkshopsWorkshopSlugModuleSlugRoute,
+  LocaleWorkshopsWorkshopSlugIndexRoute: LocaleWorkshopsWorkshopSlugIndexRoute,
 }
 
 const LocaleRouteWithChildren =

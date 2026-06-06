@@ -345,6 +345,59 @@ export const contactMessages = pgTable('contact_messages', {
 });
 
 // ============================================================================
+// WORKSHOPS (Guided Learning)
+// ============================================================================
+
+export const workshops = pgTable('workshops', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  slug: text('slug').notNull().unique(),
+  title: jsonb('title').$type<Record<string, any>>().notNull(),
+  description: jsonb('description').$type<Record<string, any>>().notNull(),
+  repoUrl: text('repo_url').notNull(),
+  order: integer('order').notNull(),
+  tags: text('tags').array(),
+  isPublished: boolean('is_published').notNull().default(false),
+  viewCount: integer('view_count').notNull().default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const workshopModules = pgTable('workshop_modules', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  workshopId: uuid('workshop_id')
+    .notNull()
+    .references(() => workshops.id, { onDelete: 'cascade' }),
+  slug: text('slug').notNull().unique(),
+  title: jsonb('title').$type<Record<string, any>>().notNull(),
+  description: jsonb('description').$type<Record<string, any>>(),
+  videoUrl: text('video_url'), // YouTube URL or ID
+  branchName: text('branch_name').notNull(),
+  order: integer('order').notNull(),
+  xpReward: integer('xp_reward').notNull().default(100),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+});
+
+export const workshopProgress = pgTable('workshop_progress', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  workshopId: uuid('workshop_id')
+    .notNull()
+    .references(() => workshops.id, { onDelete: 'cascade' }),
+  moduleId: uuid('module_id')
+    .notNull()
+    .references(() => workshopModules.id, { onDelete: 'cascade' }),
+  isCompleted: boolean('is_completed').notNull().default(false),
+  completedAt: timestamp('completed_at'),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  userModuleUnique: unique('workshop_progress_user_module_unique').on(table.userId, table.moduleId),
+}));
+
+// ============================================================================
 // RELATIONS
 // ============================================================================
 
@@ -355,6 +408,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   progress: many(progress),
   achievements: many(userAchievements),
   bugReports: many(bugReports),
+  workshopProgress: many(workshopProgress),
 }));
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({
@@ -445,5 +499,33 @@ export const bugReportsRelations = relations(bugReports, ({ one }) => ({
   user: one(users, {
     fields: [bugReports.userId],
     references: [users.id],
+  }),
+}));
+
+export const workshopsRelations = relations(workshops, ({ many }) => ({
+  modules: many(workshopModules),
+  progress: many(workshopProgress),
+}));
+
+export const workshopModulesRelations = relations(workshopModules, ({ one, many }) => ({
+  workshop: one(workshops, {
+    fields: [workshopModules.workshopId],
+    references: [workshops.id],
+  }),
+  progress: many(workshopProgress),
+}));
+
+export const workshopProgressRelations = relations(workshopProgress, ({ one }) => ({
+  user: one(users, {
+    fields: [workshopProgress.userId],
+    references: [users.id],
+  }),
+  workshop: one(workshops, {
+    fields: [workshopProgress.workshopId],
+    references: [workshops.id],
+  }),
+  module: one(workshopModules, {
+    fields: [workshopProgress.moduleId],
+    references: [workshopModules.id],
   }),
 }));

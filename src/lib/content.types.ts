@@ -26,6 +26,55 @@ export interface LocalizedArray {
 }
 
 // =============================================================================
+// WORKSHOP TYPES
+// =============================================================================
+
+export interface WorkshopModuleRegistryEntry {
+  slug: string;
+  order: number;
+  videoUrl?: string;
+  branchName: string;
+  xpReward?: number;
+  status?: ContentStatus;
+}
+
+export interface WorkshopRegistryEntry {
+  slug: string;
+  title: LocalizedString;
+  description: LocalizedString;
+  order: number;
+  repoUrl: string;
+  tags: string[];
+  status?: ContentStatus;
+  modules: WorkshopModuleRegistryEntry[];
+}
+
+export interface WorkshopRegistry {
+  workshops: WorkshopRegistryEntry[];
+}
+
+export interface WorkshopModule {
+  slug: string;
+  title: string;
+  description: string;
+  content: string;
+  videoUrl?: string;
+  branchName: string;
+  order: number;
+  xpReward: number;
+}
+
+export interface Workshop {
+  slug: string;
+  title: string;
+  description: string;
+  repoUrl: string;
+  order: number;
+  tags: string[];
+  modules: WorkshopModule[];
+}
+
+// =============================================================================
 // TUTORIAL TYPES
 // =============================================================================
 

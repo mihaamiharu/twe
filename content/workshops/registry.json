@@ -1,0 +1,31 @@
+{
+  "workshops": [
+    {
+      "slug": "testing-with-playwright",
+      "title": { "en": "End-to-End Testing with Playwright" },
+      "description": { "en": "Learn how to write robust end-to-end tests using Playwright." },
+      "order": 1,
+      "repoUrl": "https://github.com/testingwithekki/playwright-workshop",
+      "tags": ["playwright", "e2e"],
+      "status": "published",
+      "modules": [
+        {
+          "slug": "getting-started",
+          "order": 1,
+          "videoUrl": "https://www.youtube.com/watch?v=Jv2D3vA9x90",
+          "branchName": "01-getting-started",
+          "xpReward": 100,
+          "status": "published"
+        },
+        {
+          "slug": "writing-your-first-test",
+          "order": 2,
+          "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+          "branchName": "02-first-test",
+          "xpReward": 150,
+          "status": "published"
+        }
+      ]
+    }
+  ]
+}

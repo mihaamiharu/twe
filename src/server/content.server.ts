@@ -18,6 +18,9 @@ import type {
   ChallengeTier,
   LocalizedString,
   LocalizedArray,
+  Workshop,
+  WorkshopRegistry,
+  WorkshopModule,
 } from '@/lib/content.types';
 
 // =============================================================================
@@ -27,6 +30,7 @@ import type {
 const CONTENT_ROOT = process.cwd();
 const TUTORIALS_DIR = join(CONTENT_ROOT, 'tutorials');
 const CHALLENGES_DIR = join(CONTENT_ROOT, 'content', 'challenges');
+const WORKSHOPS_DIR = join(CONTENT_ROOT, 'content', 'workshops');
 
 /**
  * Resolve a localized string to the requested locale with fallback to English
@@ -91,6 +95,112 @@ function parseFrontmatter(content: string): {
   }
 
   return { meta, content: body.trim() };
+}
+
+// =============================================================================
+// WORKSHOP LOADING
+// =============================================================================
+
+let workshopRegistryCache: WorkshopRegistry | null = null;
+
+export async function loadWorkshopRegistry(): Promise<WorkshopRegistry> {
+  if (workshopRegistryCache) return workshopRegistryCache;
+  const registryPath = join(WORKSHOPS_DIR, 'registry.json');
+  try {
+    const content = await readFile(registryPath, 'utf-8');
+    workshopRegistryCache = JSON.parse(content) as WorkshopRegistry;
+    return workshopRegistryCache;
+  } catch (err) {
+    console.error('[ContentService] Could not load workshop registry:', err);
+    return { workshops: [] };
+  }
+}
+
+export async function getWorkshopList(locale: string = 'en'): Promise<Omit<Workshop, 'modules'>[]> {
+  const registry = await loadWorkshopRegistry();
+  return registry.workshops
+    .filter(w => !w.status || w.status === 'published')
+    .map(w => ({
+      slug: w.slug,
+      title: resolveLocale(w.title, locale),
+      description: resolveLocale(w.description, locale),
+      repoUrl: w.repoUrl,
+      order: w.order,
+      tags: w.tags,
+    }))
+    .sort((a, b) => a.order - b.order);
+}
+
+export async function getWorkshopContent(slug: string, locale: string = 'en'): Promise<Workshop | null> {
+  const registry = await loadWorkshopRegistry();
+  const entry = registry.workshops.find(w => w.slug === slug);
+  if (!entry || (entry.status && entry.status !== 'published')) return null;
+
+  const modulesPromises = entry.modules.map(async m => {
+    let content = '';
+    let title = m.slug;
+    let description = '';
+    try {
+      const filePath = join(WORKSHOPS_DIR, locale, slug, `${m.slug}.md`);
+      const fileContent = await readFile(filePath, 'utf-8');
+      const { meta, content: body } = parseFrontmatter(fileContent);
+      content = body;
+      title = meta.title || m.slug;
+      description = meta.description || '';
+    } catch {
+      try {
+        const filePath = join(WORKSHOPS_DIR, 'en', slug, `${m.slug}.md`);
+        const fileContent = await readFile(filePath, 'utf-8');
+        const { meta, content: body } = parseFrontmatter(fileContent);
+        content = body;
+        title = meta.title || m.slug;
+        description = meta.description || '';
+      } catch {
+        // Fallback if no file exists
+      }
+    }
+
+    return {
+      slug: m.slug,
+      title,
+      description,
+      content,
+      videoUrl: m.videoUrl,
+      branchName: m.branchName,
+      order: m.order,
+      xpReward: m.xpReward || 100,
+    };
+  });
+
+  const modules = await Promise.all(modulesPromises);
+  modules.sort((a, b) => a.order - b.order);
+
+  return {
+    slug: entry.slug,
+    title: resolveLocale(entry.title, locale),
+    description: resolveLocale(entry.description, locale),
+    repoUrl: entry.repoUrl,
+    order: entry.order,
+    tags: entry.tags,
+    modules,
+  };
+}
+
+export async function getWorkshopModuleContent(
+  workshopSlug: string,
+  moduleSlug: string,
+  locale: string = 'en'
+): Promise<{ workshop: Omit<Workshop, 'modules'>; module: WorkshopModule } | null> {
+  const workshop = await getWorkshopContent(workshopSlug, locale);
+  if (!workshop) return null;
+  const mod = workshop.modules.find(m => m.slug === moduleSlug);
+  if (!mod) return null;
+  const { modules, ...workshopMeta } = workshop;
+  return { workshop: workshopMeta, module: mod };
+}
+
+export function clearWorkshopCache(): void {
+  workshopRegistryCache = null;
 }
 
 // =============================================================================
