@@ -33,7 +33,7 @@ export const forgetPassword = async ({
   }
 
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return -- bypass type checks for untyped library returns -- bypass type checks for untyped library returns
   return response.json();
 };
 

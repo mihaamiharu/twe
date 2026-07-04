@@ -21,7 +21,7 @@ export function mapSessionToUser(session: Session | null): AuthUser | null {
         email: session.user.email,
         name: session.user.name || null,
         image: session.user.image || null,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API, @typescript-eslint/no-unsafe-member-access
         role: (session.user as any).role || 'USER',
     };
 }

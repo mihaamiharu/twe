@@ -41,13 +41,13 @@ export const createBugReport = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => BugReportSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
       const headers = getRequestHeaders();
       let userId: string | null = null;
       let userEmail: string | null = null;
 
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
         const session = await auth.api.getSession({ headers });
         userId = session?.user?.id || null;
         userEmail = session?.user?.email || null;

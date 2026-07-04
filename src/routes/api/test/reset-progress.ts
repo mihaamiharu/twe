@@ -11,7 +11,7 @@ const resetSchema = z.object({
   slug: z.string().nullable().optional(),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API
 export const Route = createFileRoute('/api/test/reset-progress' as any)({
   server: {
     handlers: {

@@ -110,9 +110,9 @@ export const getTutorials = createServerFn({ method: 'GET' })
         { isCompleted: boolean; readingProgress: number }
       > = {};
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
       const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbRecords.length > 0) {
@@ -266,9 +266,9 @@ export const getTutorial = createServerFn({ method: 'GET' })
       // User progress
       let userProgressData = null;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
       const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbTutorial) {

@@ -53,7 +53,7 @@ class Logger {
     if (isProd && !config.enableInProd && level !== 'error') {
       return false;
     }
-    // eslint-disable-next-line security/detect-object-injection
+    // eslint-disable-next-line security/detect-object-injection -- safe dynamic key lookup -- safe dynamic key lookup
     return LOG_LEVELS[level] >= LOG_LEVELS[config.level];
   }
 
@@ -80,7 +80,7 @@ class Logger {
       error: 'color: #ef4444; font-weight: bold', // red-500
     };
 
-    // eslint-disable-next-line security/detect-object-injection
+    // eslint-disable-next-line security/detect-object-injection -- safe dynamic key lookup -- safe dynamic key lookup
     return [`%c${prefix}`, styles[level], message];
   }
 

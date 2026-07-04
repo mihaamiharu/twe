@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API
 export const Route = createFileRoute('/robots.txt' as any)({
     server: {
         handlers: {

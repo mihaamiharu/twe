@@ -67,7 +67,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
       ? window.location.hostname.startsWith('qa.')
       : false; // Server-side detection handled by header injection in scripts/server.ts
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- dynamic window context property lookup -- dynamic window context property lookup
     const pathname = (context?.pathname as string) || '/';
     const canonicalUrl = getCanonicalUrl(pathname);
     const alternateLinks = getAlternateLinks(pathname);

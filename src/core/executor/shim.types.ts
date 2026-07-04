@@ -2,7 +2,7 @@
 export interface FilePayload {
     name: string;
     mimeType: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API
     buffer: any;
 }
 

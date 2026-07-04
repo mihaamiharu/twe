@@ -3,9 +3,9 @@ import { useLocation } from '@tanstack/react-router';
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API
     dataLayer: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API
     gtag: (...args: any[]) => void;
   }
 }
@@ -24,7 +24,7 @@ export function GoogleAnalytics({ measurementId }: { measurementId?: string }) {
     if (!window.gtag) {
        
       window.gtag = function () {
-        // eslint-disable-next-line prefer-rest-params
+        // eslint-disable-next-line prefer-rest-params -- standard Google Analytics boilerplate -- standard Google Analytics boilerplate
         window.dataLayer.push(arguments);
       };
     }

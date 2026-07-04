@@ -67,7 +67,7 @@ export function attachOnclickHandlers(options: AttachOnclickHandlersOptions): vo
         }).call(this, window, document, event);
       `;
 
-      // eslint-disable-next-line @typescript-eslint/no-implied-eval
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval -- dynamic code string execution inside sandbox
       const fn = new Function('window', 'document', 'event', code);
 
       el.addEventListener('click', (event) => {

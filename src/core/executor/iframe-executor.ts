@@ -189,7 +189,7 @@ export async function executePlaywrightCode(
               if (iframe.contentWindow) {
                 iframe.contentWindow.localStorage?.clear();
                 iframe.contentWindow.sessionStorage?.clear();
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API
                 const win = iframe.contentWindow as any;
                 win.__MOCK_ROUTES__ = [];
                 // In-memory state that persists across VFS navigations within a single execution run
@@ -226,7 +226,7 @@ export async function executePlaywrightCode(
             scripts.forEach((script) => {
               if (script.textContent) {
                 try {
-                  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
+                  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any -- dynamic values from sandbox context */
                   const win = iframe.contentWindow as any;
                   const doc = iframe.contentDocument;
                   if (!win || !doc) return;
@@ -254,9 +254,9 @@ export async function executePlaywrightCode(
                                     }).call(window, window, document);
                                 `;
 
-                  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+                  // eslint-disable-next-line @typescript-eslint/no-implied-eval -- dynamic code string execution inside sandbox
                   const fn = new Function('window', 'document', code);
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- dynamic call on sandboxed execution context
                   fn(win, doc);
                 } catch (e) {
                   console.error('Failed to execute script shim:', e);
@@ -403,7 +403,7 @@ export async function executePlaywrightCode(
 
             let returnValue;
             if (typeof contentWindow.eval === 'function') {
-              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
+              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access -- dynamic calls and properties inside sandbox */
               returnValue = await contentWindow.eval(
                 `(function() { ${wrappedCode} })()`,
               );
@@ -414,7 +414,7 @@ export async function executePlaywrightCode(
               console.warn(
                 'iframe.contentWindow.eval not supported, falling back to new Function() in parent context.',
               );
-              // eslint-disable-next-line @typescript-eslint/no-implied-eval
+              // eslint-disable-next-line @typescript-eslint/no-implied-eval -- dynamic code string execution inside sandbox
               const fallbackFn = new Function(
                 'page',
                 'expect',
@@ -516,7 +516,7 @@ export async function executePlaywrightCode(
       }
     });
   } finally {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API
     logger.setHandler(null as any);
   }
 }
@@ -605,7 +605,7 @@ export async function executeWithTestCases(
     const page = new MockedPlaywrightPage(iframe.contentDocument!, { timeout });
 
     // Run user code first
-    // eslint-disable-next-line @typescript-eslint/no-implied-eval
+    // eslint-disable-next-line @typescript-eslint/no-implied-eval -- dynamic code string execution inside sandbox
     const userFunction = new Function(
       'page',
       'expect',
@@ -613,7 +613,7 @@ export async function executeWithTestCases(
       return (async () => { ${code} })();
     `,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- dynamic call on sandboxed execution context
     await userFunction(page, createExpect());
 
     // Run test cases

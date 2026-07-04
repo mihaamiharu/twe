@@ -21,7 +21,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
     const getAssertionCount = () => assertionCount;
     const getTestResults = () => testResults;
 
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
+    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return -- dynamic matcher assertions */
     const createMatchers = (actual: any, isSoft = false, isNot = false) => {
         const handleResult = (pass: boolean, message: string) => {
             incrementCount();

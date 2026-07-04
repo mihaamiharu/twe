@@ -103,7 +103,7 @@ export function ChallengeCard({
   const { t } = useTranslation(['challenges', 'common']);
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
-  // eslint-disable-next-line security/detect-object-injection
+  // eslint-disable-next-line security/detect-object-injection -- safe dynamic key lookup -- safe dynamic key lookup
   const diffStyle = difficultyStyles[difficulty];
 
   return (
@@ -141,7 +141,7 @@ export function ChallengeCard({
                 'transition-colors duration-300',
               )}
             >
-              {/* eslint-disable-next-line security/detect-object-injection */}
+              {/* eslint-disable-next-line security/detect-object-injection -- safe dynamic key lookup */}
               {typeIcons[type]}
             </div>
 

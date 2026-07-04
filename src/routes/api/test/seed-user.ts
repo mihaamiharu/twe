@@ -16,7 +16,7 @@ export async function fetchWithHeaders(url: string, init?: RequestInit) {
   return fetch(url, init);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API
 export const Route = createFileRoute('/api/test/seed-user' as any)({
   server: {
     handlers: {

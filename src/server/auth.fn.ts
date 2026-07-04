@@ -61,10 +61,10 @@ async function ensureUserImage(userId: string): Promise<string | null> {
 export const getServerSession = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthSession> => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
       const headers = getRequestHeaders();
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment -- dynamic values from sandbox execution context
       const session = await auth.api.getSession({ headers });
 
       if (session?.user) {
@@ -81,7 +81,7 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             name: session.user.name || null,
             image: image || null,
             emailVerified: session.user.emailVerified || false,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
             role: (session.user as any).role || 'USER',
           },
           isAuthenticated: true,
