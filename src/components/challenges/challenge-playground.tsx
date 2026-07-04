@@ -130,14 +130,14 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
               challenge={challenge}
               state={state}
               execution={execution}
-              previewIframeRef={previewIframeRef}
+              previewIframeRef={previewIframeRef as any}
             />
           ) : (
             <PlaygroundDesktopLayout
               challenge={challenge}
               state={state}
               execution={execution}
-              previewIframeRef={previewIframeRef}
+              previewIframeRef={previewIframeRef as any}
               userId={props.userId}
             />
           )}

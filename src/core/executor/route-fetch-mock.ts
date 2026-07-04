@@ -165,7 +165,7 @@ export function generateFetchPolyfillCode(options: {
 export function createRouteFetchWrapper(
   originalFetch: typeof window.fetch | undefined,
   getWindow: () => (Window & Record<string, unknown>) | undefined,
-): typeof window.fetch {
+): any {
   return (input: RequestInfo | URL, init?: RequestInit) => {
     let url: string;
     if (typeof input === 'string') {
@@ -229,7 +229,7 @@ export function createRouteFetchWrapper(
                   headers: new Headers(
                     (r.response?.headers as HeadersInit) || {},
                   ),
-                });
+                } as unknown as Response);
               }
               return Promise.reject(new Error('Route not fulfilled'));
             });

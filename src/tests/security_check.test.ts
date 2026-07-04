@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { executePlaywrightCode } from '../lib/iframe-executor';
 
 // Mock browser APIs

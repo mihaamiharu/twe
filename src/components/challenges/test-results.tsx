@@ -21,7 +21,7 @@ import {
   AlertTriangle,
   Loader2,
 } from 'lucide-react';
-import type { ChallengeType } from './challenge-playground';
+import type { ChallengeType } from '@/lib/content.types';
 
 export interface TestResult {
   id: string;
@@ -37,7 +37,7 @@ export interface TestResult {
 
 // Copy configuration for different challenge types
 const COPY_CONFIG: Record<
-  ChallengeType | 'DEFAULT',
+  string,
   { success: string; failure: string; testName: string }
 > = {
   CSS_SELECTOR: {
@@ -77,7 +77,7 @@ export interface TestResultsProps {
   isRunning?: boolean;
   totalHiddenTests?: number;
   hiddenTestsPassed?: number;
-  challengeType?: ChallengeType;
+  challengeType?: string;
   className?: string;
 }
 

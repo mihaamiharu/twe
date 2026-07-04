@@ -4,7 +4,7 @@ import { createExpect } from './expect-matchers';
 
 // Mock implementation of the IFrame Executor logic
 async function simulateExecutor(userCodeFn: (test: any, expect: any) => void) {
-    const { expect, getAssertionCount, cleanup } = createExpect({ timeout: 100 });
+    const { expect, getAssertionCount } = createExpect({ timeout: 100 });
     const contentWindow: any = { __testPromises: [] };
     const interceptedConsole = { error: (msg: string) => console.error(msg) };
 
@@ -33,11 +33,9 @@ async function simulateExecutor(userCodeFn: (test: any, expect: any) => void) {
             await Promise.all(contentWindow.__testPromises);
         }
 
-        cleanup();
         return { status: 'PASSED', count: getAssertionCount() };
     } catch (e) {
         console.error('Executor Caught Error:', e);
-        cleanup();
         return { status: 'FAILED', count: getAssertionCount(), error: e };
     }
 }

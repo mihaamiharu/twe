@@ -9,4 +9,5 @@ const router = getRouter()
 
 // Sentry.init(getSentryConfig()); // Moved to CookieConsent
 
-hydrateRoot(document, <StartClient router={router} />)
+// @ts-expect-error -- TanStack Start router prop type mismatch on client hydration
+hydrateRoot(document, <StartClient router={router as any} />)

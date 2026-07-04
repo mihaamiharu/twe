@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
+import { cn } from '@/lib/utils';
 import { z } from 'zod';
 import {
   Card,
@@ -412,74 +413,60 @@ function TutorialCard({
   locale: string;
 }) {
   const { t } = useTranslation('tutorials');
+
+  const tintMap: Record<string, string> = {
+    'FOUNDATIONS': 'bg-notion-lavender',
+    'BEGINNER': 'bg-notion-mint',
+    'INTERMEDIATE': 'bg-notion-yellow',
+    'ADVANCED': 'bg-notion-rose',
+  };
+
+  const tint = tutorial.difficulty ? tintMap[tutorial.difficulty] : 'bg-white';
+
   return (
     <Link
       to="/$locale/tutorials/$slug"
       params={{ locale, slug: tutorial.slug }}
       className="group"
     >
-      <Card className="h-full glass-card hover:border-brand-teal/50 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-brand-teal/10 relative overflow-hidden border border-border flex flex-col mx-auto w-full">
+      <div className={cn(
+        "h-full rounded-[12px] border border-transparent p-6 transition-all duration-200 hover:shadow-lg flex flex-col",
+        tint
+      )}>
         {/* Completed Badge */}
         {tutorial.isCompleted && (
-          <div className="absolute top-0 right-0 p-2 bg-green-500/10 rounded-bl-lg border-l border-b border-green-500/20 z-10">
-            <div className="flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              {t('card.completed')}
-            </div>
+          <div className="flex items-center gap-1 text-[12px] font-bold text-[#1aae39] mb-4">
+            <CheckCircle2 className="h-4 w-4" />
+            {t('card.completed')}
           </div>
         )}
-        <CardHeader>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 rounded-lg bg-brand-teal/10 text-brand-teal">
-              <BookOpen className="h-5 w-5" />
-            </div>
-            {tutorial.tags && tutorial.tags.length > 0 && (
-              <Badge
-                variant="secondary"
-                className="border-transparent bg-secondary/50 text-secondary-foreground"
-              >
+        
+        <div className="flex items-center gap-2 mb-4">
+           {tutorial.tags && tutorial.tags.length > 0 && (
+              <span className="px-2 py-0.5 bg-white/50 rounded-[4px] text-[12px] font-bold text-[#37352f] border border-[#0000000a]">
                 {tutorial.tags[0]}
-              </Badge>
-            )}
-          </div>
-          <CardTitle className="group-hover:text-brand-teal transition-colors text-xl leading-tight">
-            {tutorial.title}
-          </CardTitle>
-          <CardDescription className="line-clamp-3 mt-2 text-base">
-            {tutorial.description}
-          </CardDescription>
-        </CardHeader>
-        {/* Spacer to push content to bottom if needed */}
-        <div className="flex-grow" />
-        <CardContent className="mt-auto pt-0">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground border-t border-border/50 pt-4">
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">
-                {tutorial.estimatedMinutes} min
               </span>
-            </div>
-            {tutorial.difficulty && (
-              <div className="flex items-center gap-1.5 capitalize ml-auto">
-                <span
-                  className={
-                    tutorial.difficulty === 'FOUNDATIONS'
-                      ? 'text-purple-500'
-                      : tutorial.difficulty === 'BEGINNER'
-                        ? 'text-green-500'
-                        : tutorial.difficulty === 'INTERMEDIATE'
-                          ? 'text-yellow-500'
-                          : 'text-red-500'
-                  }
-                >
-                  ●
-                </span>
-                {tutorial.difficulty.toLowerCase()}
-              </div>
             )}
+        </div>
+
+        <h3 className="text-[20px] font-bold leading-[1.2] mb-3 group-hover:text-notion-purple transition-colors">
+          {tutorial.title}
+        </h3>
+        
+        <p className="text-[14px] text-[#37352f] line-clamp-3 mb-6 leading-[1.5]">
+          {tutorial.description}
+        </p>
+
+        <div className="mt-auto pt-4 border-t border-[#0000000a] flex items-center justify-between text-[13px] font-medium text-[#787671]">
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-4 w-4" />
+            <span>{tutorial.estimatedMinutes} min</span>
           </div>
-        </CardContent>
-      </Card>
+          {tutorial.difficulty && (
+            <span className="capitalize">{tutorial.difficulty.toLowerCase()}</span>
+          )}
+        </div>
+      </div>
     </Link>
   );
 }

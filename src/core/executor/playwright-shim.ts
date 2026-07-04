@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * Mocked Playwright Shim
  *

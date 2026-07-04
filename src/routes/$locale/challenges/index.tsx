@@ -65,10 +65,10 @@ const ChallengesSearchSchema = z.object({
   tier: z.string().optional(),
 });
 
-export const Route = createFileRoute('/$locale/challenges/')({
+export const Route = createFileRoute('/$locale/challenges/' as any)({
   validateSearch: ChallengesSearchSchema,
   loaderDeps: ({ search: { q } }) => ({ q }),
-  loader: ({ context, params, deps: { q } }) => {
+  loader: ({ context, params, deps: { q } }: any) => {
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
@@ -78,7 +78,7 @@ export const Route = createFileRoute('/$locale/challenges/')({
     );
   },
   component: ChallengesPage,
-  head: ({ params }) => {
+  head: ({ params }: any) => {
     const locale = params.locale || 'en';
     return createSeoHead({
       title: i18n.t('challenges:page.seo.title'),
@@ -181,7 +181,7 @@ export function ChallengesPage() {
   const updateSearch = (updates: Partial<z.infer<typeof ChallengesSearchSchema>>) => {
     void navigate({
       to: '.',
-      search: (prev) => ({ ...prev, ...updates }),
+      search: (prev: any) => ({ ...prev, ...updates }),
       replace: true,
     });
   };
@@ -504,7 +504,6 @@ export function ChallengesPage() {
                             <ChallengeListCard
                               key={challenge.slug}
                               challenge={challenge}
-                              index={idx}
                               config={config}
                               isComingSoon={!!isComingSoon}
                               isBoss={isBoss}

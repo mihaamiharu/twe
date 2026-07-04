@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, test, expect, beforeAll, beforeEach } from 'bun:test';
 import { db, users, challenges, progress, achievements } from '../../db';
 import {

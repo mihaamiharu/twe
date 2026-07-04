@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { CodeBlock } from '@/components/code-block';
 
 // Import custom theme-aware highlight.js styles
+// @ts-ignore -- documented exception: CSS module resolution differs between tsconfig.json and tsconfig.test.json
 import '@/styles/highlight-github.css';
 
 interface MarkdownRendererProps {

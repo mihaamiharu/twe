@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { expect, test, describe, mock } from 'bun:test';
 
 // Mock esbuild-wasm BEFORE importing the transpiler

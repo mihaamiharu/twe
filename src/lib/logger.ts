@@ -49,7 +49,7 @@ class Logger {
   private shouldLog(level: LogLevel): boolean {
     // In production, suppress unless enabled
     // Safe check for PROD in case it's undefined
-    const isProd = env.PROD === true;
+    const isProd = !!env.PROD;
     if (isProd && !config.enableInProd && level !== 'error') {
       return false;
     }

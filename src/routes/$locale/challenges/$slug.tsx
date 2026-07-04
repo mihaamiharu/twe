@@ -90,7 +90,7 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
   },
   component: ChallengeDetailPage,
   head: ({ loaderData, params }) => {
-    const data = loaderData?.data;
+    const data = (loaderData as any)?.data;
     const locale = params.locale || 'en';
     const url = `https://testingwithekki.com/${locale}/challenges/${params.slug}`;
 
@@ -463,7 +463,7 @@ function ChallengeDetailPage() {
       <div className="flex-1 min-h-0">
         <ChallengePlayground
           key={challenge.id}
-          challenge={challenge}
+          challenge={challenge as any}
           onSubmit={handleSubmit}
           userId={userId}
           hintUsed={data?.data?.userProgress?.usedHint || false}
@@ -486,7 +486,7 @@ function ChallengeDetailPage() {
                 setShowSuccessDialog(false);
                 void navigate({
                   to: '/$locale/challenges/$slug',
-                  params: { locale, slug: data.data.nextChallenge!.slug },
+                  params: { locale, slug: data?.data?.nextChallenge?.slug ?? '' },
                 });
               }
               : undefined

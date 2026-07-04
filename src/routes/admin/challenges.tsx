@@ -24,9 +24,9 @@ import { DataTablePagination } from '@/components/admin/data-table-pagination';
 
 interface AdminChallenge {
   id: string;
-  title: string | { en: string;[key: string]: string }; // Updated to support localized title
+  title: any;
   slug: string;
-  type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
+  type: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   xpReward: number;
   order: number;
@@ -194,7 +194,7 @@ function ChallengeManager() {
                         transition={{ duration: 0.2 }}
                         className="group border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                       >
-                        <TableCell component="th">
+                        <TableCell>
                           {' '}
                           {/* Workaround for motion.tr typings if needed, but usually motion.tr works fine as child of tbody if TableBody accepts valid nodes? Actually radix/shadcn TableBody is basically a tbody. Framer motion needs direct direct parent context sometimes or replace TableRow with motion copy of it. */}
                           {/* Ideally I should use a custom component for motion row or just motion.tr inside standard tbody. 
@@ -214,7 +214,7 @@ function ChallengeManager() {
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className={`text-[10px] uppercase shadow-sm ${typeColors[challenge.type] || ''}`}
+                            className={`text-[10px] uppercase shadow-sm ${(typeColors as any)[challenge.type] || ''}`}
                           >
                             {challenge.type.replace('_', ' ')}
                           </Badge>

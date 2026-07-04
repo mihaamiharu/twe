@@ -5,7 +5,7 @@
  */
 
 export { CodeEditor } from './code-editor';
-export type { CodeEditorProps } from './code-editor';
+export type { CodeEditorProps } from './editor';
 
 export { SelectorInput } from './selector-input';
 export type {
@@ -15,7 +15,7 @@ export type {
 } from './selector-input';
 
 export { WebComponentPreview } from './web-component-preview';
-export type { WebComponentPreviewProps } from './web-component-preview';
+export type { WebComponentPreviewProps } from './preview';
 
 export { TestResults } from './test-results';
 export type { TestResult, TestResultsProps } from './test-results';
@@ -30,9 +30,9 @@ export type {
 
 export { ChallengePlayground } from './challenge-playground';
 export type {
-  Challenge,
   ChallengePlaygroundProps,
-} from './challenge-playground';
+} from './playground/types';
+export type { Challenge } from '@/lib/content.types';
 
 export { ChallengeListCard } from './challenge-list-card';
 export type { ChallengeListCardProps } from './challenge-list-card';

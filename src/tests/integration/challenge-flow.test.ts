@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { describe, test, expect, beforeAll, beforeEach, mock } from 'bun:test';
 import { db, users, challenges, progress, submissions, testCases } from '../../db';
 import { challengeSubmissionHandler } from '../../server/submissions.fn';

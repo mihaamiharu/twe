@@ -55,11 +55,15 @@ function SubmissionsManager() {
         if (!submissions) return [];
 
         return submissions.filter((sub) => {
+            const challengeTitle = sub.challenge?.title;
+            const titleStr = typeof challengeTitle === 'string' ? challengeTitle : '';
+            const titleEn = typeof challengeTitle === 'object' && challengeTitle && 'en' in challengeTitle && typeof (challengeTitle as any).en === 'string' ? (challengeTitle as any).en : '';
+
             const matchesSearch =
                 sub.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 sub.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (typeof sub.challenge?.title === 'string' && sub.challenge.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (typeof sub.challenge?.title === 'object' && sub.challenge.title.en.toLowerCase().includes(searchQuery.toLowerCase()));
+                titleStr.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                titleEn.toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesStatus =
                 statusFilter === 'ALL' ||

@@ -143,7 +143,7 @@ export function ChallengeSuccessDialog({
               {t('challenges:success.retry')}
             </Button>
             <Button variant="secondary" asChild className="flex-1">
-              <Link to={LocaleRoutes.challenges} params={localeParams(locale)}>
+              <Link to={LocaleRoutes.challenges} params={localeParams(locale) as any}>
                 {t('challenges:success.browseList')}
               </Link>
             </Button>

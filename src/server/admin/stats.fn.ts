@@ -166,8 +166,7 @@ export const getAdminStats = createServerFn({ method: 'GET' })
 
       bugStatsResults.forEach((stat) => {
         if (stat.status) {
-          // @ts-expect-error - dynamic assignment
-          bugStats[stat.status] = stat.count;
+          bugStats[stat.status as keyof typeof bugStats] = stat.count;
         }
       });
 

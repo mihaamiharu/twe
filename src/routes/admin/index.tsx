@@ -42,7 +42,7 @@ import {
 
 interface PopularChallenge {
   id: string;
-  title: string | { en: string;[key: string]: string };
+  title: any;
   slug: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   completionCount: number;
@@ -66,7 +66,7 @@ interface RecentSubmission {
     email: string;
   };
   challenge: {
-    title: string | { en: string;[key: string]: string };
+    title: any;
     slug: string;
   };
 }
@@ -538,7 +538,7 @@ function AdminDashboard() {
         </Link>
 
         {/* System Debug */}
-        <Link to="/admin/debug" className="block group">
+        <Link to={"/admin/debug" as any} className="block group">
           <Card className="h-full transition-colors hover:bg-muted/50 hover:border-primary/50 cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

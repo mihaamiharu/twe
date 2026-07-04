@@ -38,7 +38,7 @@ export interface RootContext {
 import { DefaultErrorComponent } from "@/components/default-error-component";
 
 export const Route = createRootRouteWithContext<RootContext>()({
-  defaultErrorComponent: DefaultErrorComponent,
+  errorComponent: DefaultErrorComponent,
   beforeLoad: async ({ context, location }) => {
     // Optimization: Check cache first to avoid blocking every navigation
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);

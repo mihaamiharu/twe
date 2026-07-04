@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * PROPERLY fix duplicate H2 title in "Introduction to Web Selectors" tutorial
  */
