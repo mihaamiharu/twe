@@ -75,7 +75,7 @@ describe('E2E Test Support APIs', () => {
 
   describe('Security Gates', () => {
     test('rejects request without correct secret header', async () => {
-      // @ts-ignore - reaching into internal options
+      // @ts-expect-error -- reaching into TanStack Router internals for direct mock testing
       const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL }, 'wrong-secret');
       
@@ -84,7 +84,7 @@ describe('E2E Test Support APIs', () => {
     });
 
     test('rejects request if NODE_ENV is not test', async () => {
-      // @ts-ignore 
+      // @ts-expect-error -- reaching into TanStack Router internals for direct mock testing
       const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       
@@ -99,7 +99,7 @@ describe('E2E Test Support APIs', () => {
 
   describe('Teardown User API', () => {
     test('successfully deletes an existing user', async () => {
-      // @ts-ignore 
+      // @ts-expect-error -- reaching into TanStack Router internals for direct mock testing
       const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       
