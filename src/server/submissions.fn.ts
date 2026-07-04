@@ -107,7 +107,7 @@ export const challengeSubmissionHandler = async ({
     });
 
     if (!challenge) {
-      challenge = await ensureEntityInDb({
+      challenge = (await ensureEntityInDb({
         slug: challengeSlug,
         findExisting: (slug) =>
           db.query.challenges.findFirst({
@@ -146,7 +146,7 @@ export const challengeSubmissionHandler = async ({
           return newChallenge;
         },
         logger,
-      });
+      })) || undefined;
 
       if (!challenge) {
         return {

@@ -10,7 +10,7 @@ export const getConsent = createServerFn({ method: 'GET' }).handler(
 
       const cookieValue = cookieHeader
         .split('; ')
-        .find((row) => row.startsWith('twe-consent='))
+        .find((row: string) => row.startsWith('twe-consent='))
         ?.split('=')[1];
 
       if (cookieValue === 'granted' || cookieValue === 'denied') {

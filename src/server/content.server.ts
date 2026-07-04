@@ -10,7 +10,6 @@ import { join } from 'path';
 import type {
   Tutorial,
   TutorialRegistry,
-  TutorialRegistryEntry,
   Challenge,
   ChallengeDefinition,
   ChallengeTierFile,
@@ -129,14 +128,12 @@ export async function getTutorialContent(
 
     // Try requested locale first, then fallback to 'en'
     let content: string;
-    let usedLocale = locale;
 
     try {
       const filePath = join(TUTORIALS_DIR, locale, `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     } catch {
       // Fallback to English
-      usedLocale = 'en';
       const filePath = join(TUTORIALS_DIR, 'en', `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     }
@@ -167,7 +164,7 @@ export async function getTutorialList(
 ): Promise<Omit<Tutorial, 'content'>[]> {
   const registry = await loadRegistry();
 
-  const tutorialPromises = registry.tutorials.map(async (entry) => {
+  const tutorialPromises = registry.tutorials.map(async (entry): Promise<Omit<Tutorial, 'content'> | null> => {
     // Skip non-published content (default to published if no status)
     if (entry.status && entry.status !== 'published') return null;
 

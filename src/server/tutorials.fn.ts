@@ -348,7 +348,7 @@ export const completeTutorial = createServerFn({ method: 'POST' })
       });
 
       if (!tutorial) {
-        tutorial = await ensureEntityInDb({
+        tutorial = (await ensureEntityInDb({
           slug,
           findExisting: (s) =>
             db.query.tutorials.findFirst({
@@ -373,7 +373,7 @@ export const completeTutorial = createServerFn({ method: 'POST' })
                 .returning()
             )[0],
           logger,
-        });
+        })) || undefined;
 
         if (!tutorial) {
           return { success: false, error: 'Tutorial not found' };
