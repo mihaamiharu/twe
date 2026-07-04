@@ -72,6 +72,10 @@ export default tseslint.config(
       'vite.config.ts',
       'eslint.config.js',
       'src/routeTree.gen.ts',
+      '.agent/**',
+      '.agents/**',
+      '.claude/**',
+      'scripts/**',
     ],
   },
 );
