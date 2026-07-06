@@ -24,7 +24,7 @@ import { DataTablePagination } from '@/components/admin/data-table-pagination';
 
 interface AdminChallenge {
   id: string;
-  title: any;
+  title: unknown;
   slug: string;
   type: string;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
@@ -41,6 +41,19 @@ export const Route = createFileRoute('/admin/challenges')({
   component: ChallengeManager,
 });
 
+function getLocalizedText(value: unknown): string {
+  if (
+    typeof value === 'object' &&
+    value !== null &&
+    'en' in value &&
+    typeof value.en === 'string'
+  ) {
+    return value.en;
+  }
+
+  return typeof value === 'string' ? value : '';
+}
+
 function ChallengeManager() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -55,7 +68,7 @@ function ChallengeManager() {
     const result = query
       ? challenges.filter(
         (c: AdminChallenge) => {
-          const title = typeof c.title === 'object' ? c.title?.en || '' : c.title;
+          const title = getLocalizedText(c.title);
           return title.toLowerCase().includes(query) ||
             c.slug?.toLowerCase().includes(query)
         }
@@ -166,7 +179,7 @@ function ChallengeManager() {
                       challenge.tags?.includes('coming-soon');
 
                     // Badge Colors
-                    const typeColors = {
+                    const typeColors: Record<string, string> = {
                       JAVASCRIPT:
                         'bg-yellow-500/10 text-yellow-600 border-yellow-500/20 dark:text-yellow-400',
                       PLAYWRIGHT:
@@ -204,7 +217,7 @@ function ChallengeManager() {
                                                    */}
                           <div className="flex flex-col py-2">
                             <span className="font-medium text-sm group-hover:text-primary transition-colors">
-                              {typeof challenge.title === 'object' ? challenge.title?.en : challenge.title}
+                              {getLocalizedText(challenge.title)}
                             </span>
                             <span className="text-xs text-muted-foreground font-mono">
                               {challenge.slug}
@@ -214,7 +227,7 @@ function ChallengeManager() {
                         <TableCell>
                           <Badge
                             variant="outline"
-                            className={`text-[10px] uppercase shadow-sm ${(typeColors as any)[challenge.type] || ''}`}
+                            className={`text-[10px] uppercase shadow-sm ${typeColors[challenge.type] || ''}`}
                           >
                             {challenge.type.replace('_', ' ')}
                           </Badge>

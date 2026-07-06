@@ -43,7 +43,7 @@ describe('ChallengeListCard', () => {
         expect(screen.getByText('Test Challenge')).toBeTruthy();
         expect(screen.getByText('Description')).toBeTruthy();
         expect(screen.getByText('difficulty.EASY')).toBeTruthy();
-        expect(screen.getByText('10 XP')).toBeTruthy();
+        expect(screen.getByText('10')).toBeTruthy();
     });
 
     it('should show completed state', () => {

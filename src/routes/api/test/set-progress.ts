@@ -12,7 +12,6 @@ const setProgressSchema = z.object({
   xp: z.number().optional().default(10),
 });
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API
 export const Route = createFileRoute('/api/test/set-progress' as any)({
   server: {
     handlers: {

@@ -3,6 +3,6 @@
   "compilerOptions": {
     "types": ["bun-types"]
   },
-  "include": ["src/tests/**/*", "e2e/**/*"],
+  "include": ["src/vite-env.d.ts", "src/tests/**/*", "e2e/**/*"],
   "exclude": []
 }

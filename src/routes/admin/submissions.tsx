@@ -36,6 +36,19 @@ export const Route = createFileRoute('/admin/submissions')({
     component: SubmissionsManager,
 });
 
+function getEnglishText(value: unknown): string {
+    if (
+        typeof value === 'object' &&
+        value !== null &&
+        'en' in value &&
+        typeof value.en === 'string'
+    ) {
+        return value.en;
+    }
+
+    return '';
+}
+
 function SubmissionsManager() {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'ALL' | 'PASSED' | 'FAILED'>('ALL');
@@ -57,7 +70,7 @@ function SubmissionsManager() {
         return submissions.filter((sub) => {
             const challengeTitle = sub.challenge?.title;
             const titleStr = typeof challengeTitle === 'string' ? challengeTitle : '';
-            const titleEn = typeof challengeTitle === 'object' && challengeTitle && 'en' in challengeTitle && typeof (challengeTitle as any).en === 'string' ? (challengeTitle as any).en : '';
+            const titleEn = getEnglishText(challengeTitle);
 
             const matchesSearch =
                 sub.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||

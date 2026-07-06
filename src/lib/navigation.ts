@@ -11,6 +11,7 @@ import type { Locale } from '@/lib/i18n/settings';
  * Helper type for locale-aware route parameters
  */
 export interface LocaleParams {
+  [key: string]: string;
   locale: Locale;
 }
 

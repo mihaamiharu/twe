@@ -538,7 +538,7 @@ function AdminDashboard() {
         </Link>
 
         {/* System Debug */}
-        <Link to={"/admin/debug" as any} className="block group">
+        <a href="/admin/debug" className="block group">
           <Card className="h-full transition-colors hover:bg-muted/50 hover:border-primary/50 cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -555,7 +555,7 @@ function AdminDashboard() {
               </div>
             </CardContent>
           </Card>
-        </Link>
+        </a>
       </div>
     </div>
   );

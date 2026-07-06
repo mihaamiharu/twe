@@ -81,7 +81,7 @@ export function createRateLimitMiddleware(options: {
         const headers = getRequestHeaders();
 
         // We try to get userId from context (if authMiddleware ran before this)
-        // @ts-expect-error - context is unknown here, but we check safely
+        // @ts-expect-error -- context is unknown here, but we check safely
         const userId = context?.user?.id as string | undefined;
 
         const identifier = getClientIdentifier(headers, userId);

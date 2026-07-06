@@ -12,7 +12,8 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { ChallengePlayground, type Challenge, ChallengeSkeleton } from '@/components/challenges';
+import { ChallengePlayground, ChallengeSkeleton } from '@/components/challenges';
+import type { Challenge } from '@/components/challenges/playground/types';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -90,7 +91,7 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
   },
   component: ChallengeDetailPage,
   head: ({ loaderData, params }) => {
-    const data = (loaderData as any)?.data;
+    const data = (loaderData as ServerChallengeResponse | undefined)?.data;
     const locale = params.locale || 'en';
     const url = `https://testingwithekki.com/${locale}/challenges/${params.slug}`;
 
@@ -463,7 +464,7 @@ function ChallengeDetailPage() {
       <div className="flex-1 min-h-0">
         <ChallengePlayground
           key={challenge.id}
-          challenge={challenge as any}
+          challenge={challenge as Challenge}
           onSubmit={handleSubmit}
           userId={userId}
           hintUsed={data?.data?.userProgress?.usedHint || false}

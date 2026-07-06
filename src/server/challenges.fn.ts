@@ -194,7 +194,7 @@ const ChallengeDetailSchema = z.object({
 
 export const getChallenge = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
-  // @ts-expect-error TanStack Start type inference issue with complex handler return types
+  // @ts-expect-error -- TanStack Start type inference issue with complex handler return types
   .handler(async ({ data: { slug, locale } }) => {
     try {
       // Load challenge content from filesystem

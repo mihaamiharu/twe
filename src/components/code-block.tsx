@@ -1,5 +1,5 @@
 import { Check, Copy } from 'lucide-react';
-import { useState } from 'react';
+import { isValidElement, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -15,8 +15,8 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
   const getTextContent = (node: React.ReactNode): string => {
     if (typeof node === 'string') return node;
     if (Array.isArray(node)) return node.map(getTextContent).join('');
-    if (typeof node === 'object' && node !== null && 'props' in node) {
-      return getTextContent((node as any).props.children);
+    if (isValidElement<{ children?: React.ReactNode }>(node)) {
+      return getTextContent(node.props.children);
     }
     return '';
   };

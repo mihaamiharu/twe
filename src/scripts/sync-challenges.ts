@@ -2,6 +2,7 @@ import { db } from '../db';
 import { challenges, testCases } from '../db/schema';
 import { eq, inArray } from 'drizzle-orm';
 import { getRawChallengeContent, getChallengeList, clearContentCaches } from '../server/content.server';
+import type { LocalizedArray, LocalizedString } from '../lib/content.types';
 
 export async function syncChallenges() {
     console.log('🔄 Starting challenge sync...');
@@ -39,14 +40,14 @@ export async function syncChallenges() {
 
             const challengeData = {
                 slug: rawContent.slug,
-                title: rawContent.title as any,
+                title: rawContent.title as LocalizedString,
                 type: rawContent.type,
                 difficulty: rawContent.difficulty,
                 xpReward: rawContent.xpReward,
                 order: rawContent.order,
                 category: rawContent.category,
                 tags: rawContent.tags,
-                hints: rawContent.hints as any, // Sync hints
+                hints: rawContent.hints as Record<string, string[]> | undefined, // Sync hints
                 isPublished: true,
                 updatedAt: new Date()
             };

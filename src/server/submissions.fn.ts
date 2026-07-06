@@ -21,6 +21,7 @@ import {
 import { logger } from '@/lib/logger';
 import { getRawChallengeContent } from './content.server';
 import { ensureEntityInDb } from './ensure-entity-in-db';
+import type { LocalizedString } from '@/lib/content.types';
 
 // ----------------------------------------------------------------------------
 // HELPERS
@@ -119,7 +120,7 @@ export const challengeSubmissionHandler = async ({
             .insert(challenges)
             .values({
               slug: fsChallenge.slug,
-              title: fsChallenge.title as any,
+              title: fsChallenge.title as LocalizedString,
               type: fsChallenge.type,
               difficulty: fsChallenge.difficulty,
               xpReward: fsChallenge.xpReward,

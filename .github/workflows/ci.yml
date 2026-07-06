@@ -43,6 +43,9 @@ jobs:
       - name: Run Typecheck
         run: bun run typecheck
 
+      - name: Run Suppression Guardrails
+        run: bun run check-suppressions
+
       - name: Run Production Build
         run: bun run build
 

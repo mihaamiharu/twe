@@ -20,6 +20,19 @@ export const Route = createFileRoute('/admin/achievements')({
     component: AchievementsManager,
 });
 
+function getLocalizedText(value: unknown): string {
+    if (
+        typeof value === 'object' &&
+        value !== null &&
+        'en' in value &&
+        typeof value.en === 'string'
+    ) {
+        return value.en;
+    }
+
+    return typeof value === 'string' ? value : '';
+}
+
 function AchievementsManager() {
     const [searchQuery, setSearchQuery] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
@@ -112,10 +125,10 @@ function AchievementsManager() {
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-semibold text-sm">
-                                                        {(ach.name as any).en || ach.name}
+                                                        {getLocalizedText(ach.name)}
                                                     </span>
                                                     <span className="text-[10px] text-muted-foreground line-clamp-1 max-w-[300px]">
-                                                        {(ach.description as any).en || ach.description}
+                                                        {getLocalizedText(ach.description)}
                                                     </span>
                                                 </div>
                                             </div>

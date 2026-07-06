@@ -25,8 +25,7 @@ async function loadGoogleFont(font: string, weight: number) {
     });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API
-export const Route = createFileRoute('/api/og' as any)({
+export const Route = createFileRoute('/api/og')({
     server: {
         handlers: {
             GET: async ({ request }) => {
@@ -75,8 +74,7 @@ export const Route = createFileRoute('/api/og' as any)({
                     const pngData = resvg.render();
                     const pngBuffer = pngData.asPng();
 
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API -- untyped external data or library API, @typescript-eslint/no-unsafe-argument
-                    return new Response(pngBuffer as any, {
+                    return new Response(pngBuffer as BodyInit, {
                         headers: {
                             'Content-Type': 'image/png',
                             'Cache-Control': 'public, max-age=31536000, immutable',

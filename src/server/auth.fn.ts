@@ -74,6 +74,10 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
           if (newImage) image = newImage;
         }
 
+        const sessionUser = session.user as typeof session.user & {
+          role?: string | null;
+        };
+
         return {
           user: {
             id: session.user.id,
@@ -81,8 +85,7 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             name: session.user.name || null,
             image: image || null,
             emailVerified: session.user.emailVerified || false,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any -- untyped external data or library API, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-            role: (session.user as any).role || 'USER',
+            role: sessionUser.role || 'USER',
           },
           isAuthenticated: true,
           gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,

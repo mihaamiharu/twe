@@ -1,6 +1,19 @@
 import { db } from './index';
 import { sql } from 'drizzle-orm';
 
+type ParityRow = {
+  slug?: unknown;
+  title?: unknown;
+  description?: unknown;
+  content?: unknown;
+  instructions?: unknown;
+  name?: unknown;
+};
+
+function hasEnglishValue(value: unknown) {
+  return typeof value === 'object' && value !== null && 'en' in value;
+}
+
 // This is a simplified version of the seeder data for verification
 // In a real scenario, we might want to import the actual seeder data arrays if exported
 async function verifyParity() {
@@ -14,14 +27,14 @@ async function verifyParity() {
       sql`SELECT slug, title, description, content FROM tutorials`,
     );
     // Note: For tutorials, content matches the markdown file content
-    for (const row of dbTutorials as any[]) {
-      if (typeof row.title !== 'object' || !row.title.en) {
+    for (const row of dbTutorials as unknown as ParityRow[]) {
+      if (!hasEnglishValue(row.title)) {
         console.error(
           `❌ Tutorial ${row.slug}: Title is not a valid JSONB object with "en" key.`,
         );
         hasError = true;
       }
-      if (typeof row.content !== 'object' || !row.content.en) {
+      if (!hasEnglishValue(row.content)) {
         console.error(
           `❌ Tutorial ${row.slug}: Content is not a valid JSONB object with "en" key.`,
         );
@@ -35,14 +48,14 @@ async function verifyParity() {
     const dbChallenges = await db.execute(
       sql`SELECT slug, title, instructions FROM challenges`,
     );
-    for (const row of dbChallenges as any[]) {
-      if (typeof row.title !== 'object' || !row.title.en) {
+    for (const row of dbChallenges as unknown as ParityRow[]) {
+      if (!hasEnglishValue(row.title)) {
         console.error(
           `❌ Challenge ${row.slug}: Title is not a valid JSONB object with "en" key.`,
         );
         hasError = true;
       }
-      if (typeof row.instructions !== 'object' || !row.instructions.en) {
+      if (!hasEnglishValue(row.instructions)) {
         console.error(
           `❌ Challenge ${row.slug}: Instructions is not a valid JSONB object with "en" key.`,
         );
@@ -56,14 +69,14 @@ async function verifyParity() {
     const dbAchievements = await db.execute(
       sql`SELECT slug, name, description FROM achievements`,
     );
-    for (const row of dbAchievements as any[]) {
-      if (typeof row.name !== 'object' || !row.name.en) {
+    for (const row of dbAchievements as unknown as ParityRow[]) {
+      if (!hasEnglishValue(row.name)) {
         console.error(
           `❌ Achievement ${row.slug}: Name is not a valid JSONB object with "en" key.`,
         );
         hasError = true;
       }
-      if (typeof row.description !== 'object' || !row.description.en) {
+      if (!hasEnglishValue(row.description)) {
         console.error(
           `❌ Achievement ${row.slug}: Description is not a valid JSONB object with "en" key.`,
         );

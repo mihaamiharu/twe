@@ -1,0 +1,553 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TWE (The Web Engineer) API",
+    "version": "1.0.0",
+    "description": "API documentation for TWE, including TanStack Start Server Functions and Auth endpoints. Note: Server functions are typically accessed via internal RPC-like mechanisms, but are documented here as REST endpoints for clarity."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000",
+      "description": "Local Development Server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "UserData": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "email": { "type": "string" },
+          "name": { "type": "string", "nullable": true },
+          "image": { "type": "string", "nullable": true },
+          "xp": { "type": "number" },
+          "level": { "type": "number" },
+          "stats": {
+            "type": "object",
+            "properties": {
+              "completedChallenges": { "type": "number" },
+              "completedTutorials": { "type": "number" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/_server/user/getUserSettings": {
+      "get": {
+        "summary": "Get User Settings & Profile",
+        "tags": ["User"],
+        "parameters": [
+          {
+            "name": "locale",
+            "in": "query",
+            "schema": { "type": "string", "default": "en" },
+            "description": "Language locale"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User Data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "$ref": "#/components/schemas/UserData" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/_server/user/updateUserProfile": {
+      "post": {
+        "summary": "Update User Profile",
+        "tags": ["User"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "profileVisibility": { "type": "string", "enum": ["PUBLIC", "PRIVATE"] },
+                  "showOnLeaderboard": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/_server/leaderboard/getLeaderboard": {
+      "get": {
+        "summary": "Get Leaderboard",
+        "tags": ["Leaderboard"],
+        "parameters": [
+          { "name": "page", "in": "query", "schema": { "type": "number", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "number", "default": 50, "maximum": 100 } },
+          { "name": "period", "in": "query", "schema": { "type": "string", "enum": ["all", "monthly", "weekly"], "default": "all" } },
+          { "name": "locale", "in": "query", "schema": { "type": "string", "default": "en" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Leaderboard Data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": { "type": "array", "items": { "type": "object" } },
+                    "pagination": { "type": "object" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/_server/admin/getAdminStats": {
+      "get": {
+        "summary": "Get Admin Stats",
+        "tags": ["Admin"],
+        "responses": {
+          "200": {
+            "description": "Admin Stats",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/_server/admin/getAdminUsers": {
+      "get": {
+        "summary": "Get Admin Users List",
+        "tags": ["Admin"],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": { "application/json": { "schema": { "type": "object" } } }
+          }
+        }
+      }
+    },
+    "/_server/admin/updateUserStatus": {
+      "post": {
+        "summary": "Update User Status (Admin)",
+        "tags": ["Admin"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id", "showOnLeaderboard"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "showOnLeaderboard": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      }
+    },
+    "/_server/admin/getAdminBugs": {
+      "get": {
+        "summary": "Get Bug Reports",
+        "tags": ["Admin"],
+        "responses": { "200": { "description": "Bug list" } }
+      }
+    },
+    "/_server/admin/updateBugStatus": {
+      "post": {
+        "summary": "Update Bug Status",
+        "tags": ["Admin"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "status": { "type": "string", "enum": ["OPEN", "IN_PROGRESS", "RESOLVED", "CLOSED"] },
+                  "adminNotes": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/_server/admin/getAdminChallenges": {
+      "get": {
+        "summary": "Get All Challenges (Admin)",
+        "tags": ["Admin"],
+        "responses": { "200": { "description": "Challenge list" } }
+      }
+    },
+    "/_server/admin/updateChallengeStatus": {
+      "post": {
+        "summary": "Update Challenge Status",
+        "tags": ["Admin"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "isPublished": { "type": "boolean" },
+                  "isComingSoon": { "type": "boolean" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/_server/auth/getServerSession": {
+      "get": {
+        "summary": "Get Current Session",
+        "tags": ["Auth"],
+        "responses": {
+          "200": {
+            "description": "Session Data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user": { "$ref": "#/components/schemas/UserData" },
+                    "isAuthenticated": { "type": "boolean" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/_server/auth/resendVerification": {
+      "post": {
+        "summary": "Resend Verification Email",
+        "tags": ["Auth"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/_server/submissions/createSubmission": {
+      "post": {
+        "summary": "Create/Submit Solution",
+        "tags": ["Submissions"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["challengeSlug", "code", "testResults"],
+                "properties": {
+                  "challengeSlug": { "type": "string" },
+                  "code": { "type": "string" },
+                  "isPractice": { "type": "boolean", "default": false },
+                  "executionTime": { "type": "number" },
+                  "locale": { "type": "string", "default": "en" },
+                  "testResults": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["passed"],
+                      "properties": {
+                        "testCaseId": { "type": "string" },
+                        "passed": { "type": "boolean" },
+                        "output": { "type": "object" },
+                        "error": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Submission Result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                       "type": "object",
+                       "properties": {
+                         "submission": { "type": "object" },
+                         "isFirstCompletion": { "type": "boolean" },
+                         "levelUp": { "type": "object", "nullable": true },
+                         "newAchievements": { "type": "array", "items": { "type": "object" } }
+                       }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/_server/submissions/getSubmissions": {
+      "get": {
+        "summary": "Get User Submissions",
+        "tags": ["Submissions"],
+        "parameters": [
+          { "name": "challengeId", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "number", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "number", "default": 10 } },
+          { "name": "locale", "in": "query", "schema": { "type": "string", "default": "en" } }
+        ],
+        "responses": { "200": { "description": "List of submissions" } }
+      }
+    },
+    "/_server/challenges/getChallenges": {
+      "get": {
+        "summary": "Get Challenges List",
+        "tags": ["Challenges"],
+        "parameters": [
+          { "name": "locale", "in": "query", "schema": { "type": "string", "default": "en" } },
+          { "name": "type", "in": "query", "schema": { "type": "string", "enum": ["JAVASCRIPT", "PLAYWRIGHT", "CSS_SELECTOR", "XPATH_SELECTOR", "SELECTOR"] } },
+          { "name": "difficulty", "in": "query", "schema": { "type": "string", "enum": ["EASY", "MEDIUM", "HARD"] } },
+          { "name": "category", "in": "query", "schema": { "type": "string" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "number", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "number", "default": 50 } },
+          { "name": "sortBy", "in": "query", "schema": { "type": "string", "default": "order" } },
+          { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "asc" } }
+        ],
+        "responses": {
+          "200": { "description": "List of challenges" }
+        }
+      }
+    },
+    "/_server/challenges/getChallenge": {
+      "get": {
+        "summary": "Get Challenge Detail",
+        "tags": ["Challenges"],
+        "parameters": [
+          { "name": "slug", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "locale", "in": "query", "schema": { "type": "string", "default": "en" } }
+        ],
+        "responses": { "200": { "description": "Challenge detail" } }
+      }
+    },
+    "/_server/tutorials/getTutorials": {
+      "get": {
+        "summary": "Get Tutorials List",
+        "tags": ["Tutorials"],
+        "parameters": [
+          { "name": "locale", "in": "query", "schema": { "type": "string", "default": "en" } },
+          { "name": "search", "in": "query", "schema": { "type": "string" } },
+          { "name": "tag", "in": "query", "schema": { "type": "string" } },
+          { "name": "page", "in": "query", "schema": { "type": "number", "default": 1 } },
+          { "name": "limit", "in": "query", "schema": { "type": "number", "default": 20 } },
+          { "name": "sortBy", "in": "query", "schema": { "type": "string", "default": "order" } },
+          { "name": "sortOrder", "in": "query", "schema": { "type": "string", "default": "asc" } }
+        ],
+        "responses": { "200": { "description": "List of tutorials" } }
+      }
+    },
+    "/_server/tutorials/getTutorial": {
+      "get": {
+        "summary": "Get Tutorial Detail",
+        "tags": ["Tutorials"],
+        "parameters": [
+          { "name": "slug", "in": "query", "required": true, "schema": { "type": "string" } },
+          { "name": "locale", "in": "query", "schema": { "type": "string", "default": "en" } }
+        ],
+        "responses": { "200": { "description": "Tutorial detail" } }
+      }
+    },
+    "/_server/tutorials/completeTutorial": {
+      "post": {
+        "summary": "Mark Tutorial as Complete",
+        "tags": ["Tutorials"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["slug"],
+                "properties": {
+                  "slug": { "type": "string" },
+                  "locale": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "data": {
+                       "type": "object",
+                       "properties": {
+                         "isCompleted": { "type": "boolean" },
+                         "xpAwarded": { "type": "number" }
+                       }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/_server/tutorials/incrementTutorialViewCount": {
+      "post": {
+        "summary": "Increment Tutorial View Count",
+        "tags": ["Tutorials"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["slug"],
+                "properties": {
+                  "slug": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Success" } }
+      }
+    },
+    "/_server/dashboard/getDashboardStats": {
+      "get": {
+        "summary": "Get Dashboard Stats",
+        "tags": ["Dashboard"],
+        "responses": { "200": { "description": "Dashboard stats" } }
+      }
+    },
+    "/_server/bug-reports/createBugReport": {
+      "post": {
+        "summary": "Create Bug Report",
+        "tags": ["Bug Reports"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["title", "severity", "stepsToReproduce", "expectedBehavior", "actualBehavior"],
+                "properties": {
+                  "title": { "type": "string" },
+                  "severity": { "type": "string", "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW"] },
+                  "stepsToReproduce": { "type": "string" },
+                  "expectedBehavior": { "type": "string" },
+                  "actualBehavior": { "type": "string" },
+                  "pageUrl": { "type": "string" },
+                  "browserInfo": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Created report" } }
+      }
+    },
+    "/_server/ai/getAIHint": {
+      "post": {
+        "summary": "Get AI Hint",
+        "tags": ["AI"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["challengeSlug"],
+                "properties": {
+                  "challengeSlug": { "type": "string" },
+                  "userAttempt": { "type": "string" },
+                  "locale": { "type": "string", "default": "en" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI Hint result",
+             "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": { "type": "boolean" },
+                    "hint": { "type": "string" },
+                    "xpPenaltyWarning": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/*": {
+      "post": {
+        "summary": "BetterAuth Endpoints",
+         "description": "Standard BetterAuth endpoints",
+        "tags": ["Auth"]
+      }
+    }
+  }
+}

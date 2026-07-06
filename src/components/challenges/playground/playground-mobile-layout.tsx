@@ -20,7 +20,7 @@ interface PlaygroundMobileLayoutProps {
     challenge: Challenge;
     state: PlaygroundState;
     execution: any; // Result from useChallengeExecution hook
-    previewIframeRef: React.RefObject<HTMLIFrameElement>;
+    previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export function PlaygroundMobileLayout({
