@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { CheckCircle2, Trophy, Zap, Swords } from 'lucide-react';
+import { Trophy, Zap, Swords } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -12,6 +12,7 @@ import {
 import { cn } from '@/lib/utils';
 import { difficultyColors } from '@/lib/constants';
 import type { TFunction } from 'i18next';
+import { ChallengeStateIndicator } from './challenge-state-indicator';
 
 export interface ChallengeListCardProps {
   challenge: {
@@ -44,13 +45,19 @@ export function ChallengeListCard({
   params,
   t,
 }: ChallengeListCardProps) {
+  const state = isComingSoon
+    ? 'locked'
+    : challenge.isCompleted
+      ? 'completed'
+      : 'available';
+
   const CardContentWrapper = (
     <Card
       className={cn(
         "h-full transition-all duration-200 overflow-hidden border-border/50",
         isComingSoon ? "opacity-60 bg-muted/20" : "hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 bg-card/50 hover:bg-card",
         isBoss && !isComingSoon && "border-red-500/20 bg-red-500/5 hover:border-red-500/40 hover:shadow-red-500/10",
-        challenge.isCompleted && !isComingSoon && "bg-green-500/5 border-green-500/20"
+        challenge.isCompleted && !isComingSoon && "bg-emerald-600/5 border-emerald-600/20"
       )}
     >
       <CardHeader className="p-5 pb-3 space-y-3">
@@ -65,11 +72,7 @@ export function ChallengeListCard({
             {config.icon}
             <span className="ml-1.5">{t(`types.${challenge.type.toLowerCase()}`)}</span>
           </Badge>
-          {challenge.isCompleted && !isComingSoon && (
-            <div className="h-6 w-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-600 shrink-0">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-            </div>
-          )}
+          <ChallengeStateIndicator state={state} className="shrink-0" />
         </div>
 
         <div className="space-y-1.5">
@@ -81,7 +84,7 @@ export function ChallengeListCard({
             {challenge.title}
           </CardTitle>
           <CardDescription className="text-xs line-clamp-2 min-h-[2.5em]">
-            {challenge.description}
+            {challenge.description || t('labels.scenarioReady')}
           </CardDescription>
         </div>
       </CardHeader>
@@ -93,7 +96,7 @@ export function ChallengeListCard({
           </Badge>
 
           {!isComingSoon && (
-            <div className="flex items-center gap-3 text-xs font-medium">
+            <div className="flex items-center gap-3 text-xs font-medium" aria-label={t('labels.rewardsAndCompletions')}>
               <div className="flex items-center gap-1 text-muted-foreground/70">
                 <Trophy className="h-3.5 w-3.5" />
                 <span>{challenge.completionCount}</span>

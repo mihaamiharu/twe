@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from '@/lib/utils';
 import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
+import { ChallengeStateIndicator } from '../challenge-state-indicator';
 import type { Challenge } from './types';
 
 interface PlaygroundHeaderProps {
@@ -82,6 +83,7 @@ export function PlaygroundHeader({
                         >
                             {t(`challenges:difficulty.${challenge.difficulty.toUpperCase()}`)}
                         </Badge>
+                        <ChallengeStateIndicator state={challenge.isCompleted ? 'completed' : 'available'} />
                         <Badge
                             variant="outline"
                             className="font-bold border-border/50 bg-background"

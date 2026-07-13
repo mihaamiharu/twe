@@ -1,6 +1,6 @@
 {
   "page": {
-    "title": "Tantangan",
+    "title": "Tantangan Pengujian Perangkat Lunak",
     "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
     "overallProgress": "Progres Keseluruhan",
     "notFound": "Tantangan Tidak Ditemukan",
@@ -12,12 +12,54 @@
     "clear": "Bersihkan",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai",
-    "searchPlaceholder": "Cari tantangan..."
+    "searchPlaceholder": "Cari tantangan...",
+    "status": "Status",
+    "difficulty": "Kesulitan",
+    "view": "Tampilan",
+    "gridView": "Tampilan grid",
+    "listView": "Tampilan daftar",
+    "statusAll": "Semua quest"
   },
   "difficulty": {
     "EASY": "Mudah",
     "MEDIUM": "Sedang",
     "HARD": "Sulit"
+  },
+  "states": {
+    "available": "Tersedia",
+    "completed": "Selesai",
+    "locked": "Segera hadir",
+    "active": "Sedang dikerjakan",
+    "passed": "Lulus",
+    "failed": "Perlu diperbaiki"
+  },
+  "board": {
+    "eyebrow": "Papan Quest",
+    "description": "Pilih tantangan software testing praktis, jalankan pekerjaanmu, dan pelajari umpan balik teknis yang jelas.",
+    "sidebarDescription": "Katalog berpandu untuk latihan software testing.",
+    "trackNavigation": "Jalur tantangan",
+    "openTracks": "Buka jalur tantangan",
+    "challengeCount": "Tantangan",
+    "resultsCount_one": "{{count}} quest ditemukan",
+    "resultsCount_other": "{{count}} quest ditemukan",
+    "categoryLabel": "Skenario latihan",
+    "itemsCount_one": "{{count}} quest",
+    "itemsCount_other": "{{count}} quest"
+  },
+  "tracks": {
+    "all": { "label": "Semua tantangan" },
+    "selectors": { "label": "Selektor" },
+    "scripting": { "label": "JavaScript & TypeScript" },
+    "core": { "label": "Pengujian inti" },
+    "e2e": { "label": "Pengujian aplikasi" }
+  },
+  "groups": {
+    "Core Skills": "Keahlian inti",
+    "Playwright": "Playwright"
+  },
+  "empty": {
+    "title": "Tidak ada quest yang cocok",
+    "description": "Coba kata kunci lain atau hapus salah satu filter."
   },
   "toasts": {
     "comingSoon": "Tantangan ini akan segera hadir!",
@@ -130,6 +172,12 @@
     "completed": "selesai",
     "rank": "Peringkat",
     "challenge": "Tantangan",
+    "type": "Tipe",
+    "difficulty": "Kesulitan",
+    "open": "Buka",
+    "openChallenge": "Buka {{title}}",
+    "scenarioReady": "Skenario testing praktis",
+    "rewardsAndCompletions": "Hadiah dan penyelesaian",
     "stats": "Statistik",
     "creatingNew": "Membuat tantangan baru...",
     "craftingScenarios": "Saya sedang menyusun skenario baru berdasarkan bug nyata yang saya temukan. Cek kembali segera!"

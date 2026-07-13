@@ -31,8 +31,8 @@ export function SelectorPanel({
     return (
         <div className="space-y-4">
             <div className="space-y-2">
-                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90 italic">
-                    <div className="h-6 w-6 rounded-full bg-brand-teal flex items-center justify-center text-xs font-bold text-black border-2 border-border hard-shadow-sm">
+                <h3 className="text-sm font-bold flex items-center gap-2 text-foreground/90">
+                    <div className="h-6 w-6 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary border border-primary/25">
                         1
                     </div>
                     {t('challenges:playground.step1')}
@@ -52,7 +52,7 @@ export function SelectorPanel({
                                 size="sm"
                                 onClick={onValidate}
                                 disabled={isRunning || !selector}
-                                className="font-bold border border-border bg-brand-teal hover:bg-brand-teal/90 text-black dark:text-black transition-all"
+                                className="font-bold transition-all"
                             >
                                 {isRunning ? (
                                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -67,7 +67,7 @@ export function SelectorPanel({
                                     className={cn(
                                         'flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all',
                                         hasPassed
-                                            ? 'bg-green-500/10 text-green-600 border border-green-500/30'
+                                            ? 'bg-emerald-600/10 text-emerald-700 border border-emerald-600/30 dark:text-emerald-300'
                                             : 'bg-red-500/10 text-red-600 border border-red-500/30',
                                     )}
                                 >

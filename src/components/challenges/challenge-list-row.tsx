@@ -1,11 +1,12 @@
 import { Link } from '@tanstack/react-router';
-import { CheckCircle2, Zap, Lock, Swords, ChevronRight } from 'lucide-react';
+import { Zap, Swords, ChevronRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { TableCell } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { difficultyColors } from '@/lib/constants';
 import type { TFunction } from 'i18next';
+import { ChallengeStateIndicator } from './challenge-state-indicator';
 
 export interface ChallengeListRowProps {
   challenge: {
@@ -38,23 +39,42 @@ export function ChallengeListRow({
   params,
   t,
 }: ChallengeListRowProps) {
+  const state = isComingSoon
+    ? 'locked'
+    : challenge.isCompleted
+      ? 'completed'
+      : 'available';
+
+  const title = (
+    <>
+      {challenge.title}
+      {isBoss && <Swords className="h-3 w-3" />}
+    </>
+  );
+
   const RowContent = (
     <>
       <TableCell className="font-mono text-xs text-muted-foreground w-[60px] pl-4">
         <div className="flex items-center gap-2">
           {String(index + 1).padStart(2, '0')}
-          {challenge.isCompleted && <CheckCircle2 className="h-3 w-3 text-green-500" />}
         </div>
       </TableCell>
       <TableCell className="w-full min-w-[300px]">
         <div className="flex flex-col">
-          <Link to="/$locale/challenges/$slug" params={params} className={cn("font-medium text-sm flex items-center gap-2 w-fit hover:underline decoration-primary/50 underline-offset-4", isBoss && "text-red-500")}>
-            {challenge.title}
-            {isBoss && <Swords className="h-3 w-3" />}
-            {isComingSoon && <Lock className="h-3 w-3 text-muted-foreground" />}
-          </Link>
-          <span className="text-xs text-muted-foreground mt-0.5">{challenge.description}</span>
+          {isComingSoon ? (
+            <span className={cn("font-medium text-sm flex items-center gap-2 w-fit", isBoss && "text-red-500")}>
+              {title}
+            </span>
+          ) : (
+            <Link to="/$locale/challenges/$slug" params={params} className={cn("font-medium text-sm flex items-center gap-2 w-fit hover:underline decoration-primary/50 underline-offset-4", isBoss && "text-red-500")}>
+              {title}
+            </Link>
+          )}
+          <span className="text-xs text-muted-foreground mt-0.5">{challenge.description || t('labels.scenarioReady')}</span>
         </div>
+      </TableCell>
+      <TableCell className="w-[110px]">
+        <ChallengeStateIndicator state={state} />
       </TableCell>
       <TableCell className="w-[120px]">
         <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0.5 gap-1 font-normal w-fit", isComingSoon ? "opacity-50" : "", config.color, "bg-transparent border-current/20")}>
@@ -72,9 +92,15 @@ export function ChallengeListRow({
       </TableCell>
 
       <TableCell className="w-[40px] px-2">
-        <Link to="/$locale/challenges/$slug" params={params} className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-muted transition-colors">
-          <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
-        </Link>
+        {isComingSoon ? (
+          <span className="flex items-center justify-center h-8 w-8" aria-label={t('states.locked')}>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/30" />
+          </span>
+        ) : (
+          <Link to="/$locale/challenges/$slug" params={params} className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-muted transition-colors" aria-label={t('labels.openChallenge', { title: challenge.title })}>
+            <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
+          </Link>
+        )}
       </TableCell>
     </>
   );

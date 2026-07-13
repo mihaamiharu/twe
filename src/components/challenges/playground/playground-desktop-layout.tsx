@@ -3,6 +3,7 @@ import { GripVertical } from 'lucide-react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { TechnicalSurface } from '@/components/cozy-quest';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
 import { SelectorPanel } from './selector-panel';
@@ -78,7 +79,7 @@ export function PlaygroundDesktopLayout({
                         className="flex-1 overflow-auto p-6 focus-visible:ring-0"
                     >
                         <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:border prose-pre:border-border">
-                            <MarkdownRenderer content={challenge.instructions} />
+                            <MarkdownRenderer content={challenge.instructions} variant="challenge" />
                         </div>
                     </TabsContent>
 
@@ -129,6 +130,7 @@ export function PlaygroundDesktopLayout({
             <Panel minSize={30} className="flex flex-col bg-background relative z-0">
                 <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
                     {isCodeChallenge ? (
+                        <TechnicalSurface className="m-3 flex min-h-0 flex-1 flex-col overflow-hidden p-0">
                         <EditorPanel
                             challenge={challenge}
                             state={state}
@@ -142,24 +144,27 @@ export function PlaygroundDesktopLayout({
                             onCodeChange={(code) => state.setCode(code)}
                             onReady={() => state.setIsLayoutReady(true)}
                         />
+                        </TechnicalSurface>
                     ) : (
+                        <TechnicalSurface className="m-3 flex min-h-0 flex-1 flex-col overflow-hidden p-0">
                         <SelectorPanel
                             challenge={challenge}
                             state={state}
                             onSelectorChange={handleSelectorChange}
                             onValidate={handleValidateSelector}
                         />
+                        </TechnicalSurface>
                     )}
                 </div>
 
                 {isCodeChallenge && (
-                    <div className="h-[40%] flex flex-col shrink-0 border-t border-border">
+                    <TechnicalSurface className="m-3 mt-0 h-[40%] shrink-0 overflow-hidden p-0">
                         <ResultsPanel
                             challenge={challenge}
                             state={state}
                             onRunCode={handleRunCode}
                         />
-                    </div>
+                    </TechnicalSurface>
                 )}
             </Panel>
         </PanelGroup>

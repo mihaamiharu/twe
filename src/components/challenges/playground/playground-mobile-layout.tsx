@@ -5,6 +5,7 @@ import { BookOpen, Play, Search, Code2, Info, CheckCircle2, Folder } from 'lucid
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { TechnicalSurface } from '@/components/cozy-quest';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
 import { SelectorPanel } from './selector-panel';
@@ -102,7 +103,7 @@ export function PlaygroundMobileLayout({
                                 </SheetHeader>
                                 <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-10 scrollbar-thin">
                                     <div className="prose prose-sm dark:prose-invert max-w-none">
-                                        <MarkdownRenderer content={challenge.instructions} />
+                                        <MarkdownRenderer content={challenge.instructions} variant="challenge" />
                                     </div>
                                 </div>
                             </SheetContent>
@@ -165,11 +166,13 @@ export function PlaygroundMobileLayout({
                                         </Button>
                                     </div>
                                     <div className="flex-1 overflow-auto p-4 bg-muted/5">
+                                        <TechnicalSurface className="h-full overflow-hidden p-0">
                                         <ResultsPanel
                                             challenge={challenge}
                                             state={state}
                                             onRunCode={handleRunCode}
                                         />
+                                        </TechnicalSurface>
                                     </div>
                                 </SheetContent>
                             </Sheet>
@@ -182,17 +185,17 @@ export function PlaygroundMobileLayout({
                     <TabsContent value="workspace" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden overflow-hidden">
                         <div className="flex-1 flex flex-col min-h-0">
                             {isSelectorChallenge && (
-                                <div className="px-4 py-2 border-b bg-muted/5 shrink-0">
+                                <TechnicalSurface className="mx-4 my-2 overflow-hidden p-0">
                                     <SelectorPanel
                                         challenge={challenge}
                                         state={state}
                                         onSelectorChange={handleSelectorChange}
                                         onValidate={handleValidateSelector}
                                     />
-                                </div>
+                                </TechnicalSurface>
                             )}
                             {!isSelectorChallenge && (
-                                <div className="flex-1 min-h-0 flex flex-col">
+                                <TechnicalSurface className="m-3 flex min-h-0 flex-1 flex-col overflow-hidden p-0">
                                     <EditorPanel
                                         challenge={challenge}
                                         state={state}
@@ -205,7 +208,7 @@ export function PlaygroundMobileLayout({
                                         onCodeChange={(code) => state.setCode(code)}
                                         onReady={() => state.setIsLayoutReady(true)}
                                     />
-                                </div>
+                                </TechnicalSurface>
                             )}
                         </div>
                     </TabsContent>

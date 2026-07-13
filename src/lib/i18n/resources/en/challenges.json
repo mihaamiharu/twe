@@ -1,6 +1,6 @@
 {
   "page": {
-    "title": "Challenges",
+    "title": "Software Testing Challenges",
     "subtitle": "Practice your CSS and XPath selectors with real-world scenarios.",
     "seo": {
       "title": "Coding Challenges | TestingWithEkki",
@@ -16,12 +16,54 @@
     "clear": "Clear",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed",
-    "searchPlaceholder": "Search challenges..."
+    "searchPlaceholder": "Search challenges...",
+    "status": "Status",
+    "difficulty": "Difficulty",
+    "view": "View",
+    "gridView": "Grid view",
+    "listView": "List view",
+    "statusAll": "All quests"
   },
   "difficulty": {
     "EASY": "Easy",
     "MEDIUM": "Medium",
     "HARD": "Hard"
+  },
+  "states": {
+    "available": "Available",
+    "completed": "Completed",
+    "locked": "Coming soon",
+    "active": "In progress",
+    "passed": "Passed",
+    "failed": "Needs attention"
+  },
+  "board": {
+    "eyebrow": "Quest Board",
+    "description": "Choose a practical software testing challenge, run your work, and learn from clear technical feedback.",
+    "sidebarDescription": "A guided catalogue for software testing practice.",
+    "trackNavigation": "Challenge tracks",
+    "openTracks": "Open challenge tracks",
+    "challengeCount": "Challenges",
+    "resultsCount_one": "{{count}} quest found",
+    "resultsCount_other": "{{count}} quests found",
+    "categoryLabel": "Practice scenarios",
+    "itemsCount_one": "{{count}} quest",
+    "itemsCount_other": "{{count}} quests"
+  },
+  "tracks": {
+    "all": { "label": "All challenges" },
+    "selectors": { "label": "Selectors" },
+    "scripting": { "label": "JavaScript & TypeScript" },
+    "core": { "label": "Core testing" },
+    "e2e": { "label": "App testing" }
+  },
+  "groups": {
+    "Core Skills": "Core skills",
+    "Playwright": "Playwright"
+  },
+  "empty": {
+    "title": "No matching quests",
+    "description": "Try a different search term or clear one of the filters."
   },
   "toasts": {
     "comingSoon": "This challenge is coming soon!",
@@ -134,6 +176,12 @@
     "completed": "completed",
     "rank": "Rank",
     "challenge": "Challenge",
+    "type": "Type",
+    "difficulty": "Difficulty",
+    "open": "Open",
+    "openChallenge": "Open {{title}}",
+    "scenarioReady": "Practical testing scenario",
+    "rewardsAndCompletions": "Rewards and completions",
     "stats": "Stats",
     "creatingNew": "Creating new challenges...",
     "craftingScenarios": "I'm crafting new scenarios based on real bugs I've found. Check back soon!"

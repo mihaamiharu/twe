@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 interface CodeBlockProps extends React.HTMLAttributes<HTMLElement> {
   children?: React.ReactNode;
   className?: string;
-  variant?: 'default' | 'tutorial';
+  variant?: 'default' | 'tutorial' | 'challenge';
 }
 
 export function CodeBlock({
@@ -48,7 +48,7 @@ export function CodeBlock({
     <div
       className={cn(
         'group relative overflow-hidden',
-        variant === 'tutorial'
+        variant === 'tutorial' || variant === 'challenge'
           ? 'rounded-[calc(0.75rem-2px)] bg-background'
           : 'my-4 rounded-lg border border-border bg-muted',
       )}
@@ -76,7 +76,7 @@ export function CodeBlock({
         <code
           className={cn(
             'block min-w-max text-sm font-mono',
-            variant === 'tutorial' ? 'whitespace-pre' : 'whitespace-pre-wrap',
+            variant === 'tutorial' || variant === 'challenge' ? 'whitespace-pre' : 'whitespace-pre-wrap',
             className,
           )}
           {...props}
@@ -87,7 +87,7 @@ export function CodeBlock({
     </div>
   );
 
-  return variant === 'tutorial' ? (
+  return variant === 'tutorial' || variant === 'challenge' ? (
     <TechnicalSurface className="my-6 overflow-hidden p-0">
       {content}
     </TechnicalSurface>

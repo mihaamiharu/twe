@@ -66,8 +66,8 @@ const COPY_CONFIG: Record<
     testName: 'Selector Verification',
   },
   DEFAULT: {
-    success: 'Mission Accomplished!',
-    failure: 'Refinement Needed',
+    success: 'Validation passed',
+    failure: 'Validation needs attention',
     testName: 'Test Case',
   },
 };
@@ -141,12 +141,12 @@ export function TestResults({
     return (
       <div
         className={cn(
-          'p-8 rounded-xl border-2 border-black bg-muted/10 border-dashed text-center flex flex-col items-center justify-center h-full min-h-[160px] animate-fade-in',
+          'p-8 rounded-lg border border-dashed border-border bg-muted/10 text-center flex flex-col items-center justify-center h-full min-h-[160px] animate-fade-in',
           className,
         )}
       >
-        <div className="bg-brand-teal/20 p-4 rounded-full mb-3 border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-          <Clock className="h-6 w-6 text-black" />
+        <div className="bg-primary/10 p-4 rounded-full mb-3 border border-primary/25">
+          <Clock className="h-6 w-6 text-primary" />
         </div>
         <h3 className="text-base font-bold text-foreground mb-1">
           Ready to Validate
@@ -161,14 +161,14 @@ export function TestResults({
   return (
     <div
       className={cn(
-        'rounded-xl border-2 border-black bg-white dark:bg-slate-950 overflow-hidden animate-fade-in hard-shadow-sm',
+        'rounded-lg border border-border bg-background overflow-hidden animate-fade-in',
         className,
       )}
     >
       {/* Header with Summary */}
       <div
         className={cn(
-          'px-4 py-4 border-b-2 border-black flex items-center justify-between',
+          'px-4 py-4 border-b border-border flex items-center justify-between',
           allPassed ? 'bg-green-500/10' : 'bg-destructive/10',
         )}
       >
@@ -199,7 +199,7 @@ export function TestResults({
               variant="ghost"
               size="sm"
               onClick={expandAll}
-              className="h-8 text-xs font-bold border border-black/10 hover:border-black/20"
+              className="h-8 text-xs font-bold border border-border"
             >
               Expand Failed
             </Button>
@@ -209,7 +209,7 @@ export function TestResults({
               variant="ghost"
               size="sm"
               onClick={collapseAll}
-              className="h-8 text-xs font-bold border border-black/10 hover:border-black/20"
+              className="h-8 text-xs font-bold border border-border"
             >
               Collapse All
             </Button>
@@ -282,7 +282,7 @@ export function TestResults({
             {expandedTests.has(result.id) && result.error && (
               <div className="px-4 pb-4 pt-0 ml-7 space-y-4">
                 {/* Error Message */}
-                <div className="p-4 rounded-xl bg-destructive/5 border-2 border-black hard-shadow-xs">
+                <div className="p-4 rounded-lg bg-destructive/5 border border-destructive/25">
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-1" />
                     <pre className="text-sm text-destructive font-bold font-mono whitespace-pre-wrap break-words leading-relaxed">
@@ -296,7 +296,7 @@ export function TestResults({
                   result.output !== undefined) && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {result.expected !== undefined && (
-                        <div className="p-3 rounded-lg bg-green-500/5 border-2 border-green-500/20">
+                        <div className="p-3 rounded-lg bg-emerald-600/5 border border-emerald-600/20">
                           <div className="text-xs font-bold text-green-600 mb-2 uppercase tracking-tight">
                             Expected
                           </div>

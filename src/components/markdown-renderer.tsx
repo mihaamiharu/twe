@@ -20,7 +20,7 @@ import '@/styles/highlight-github.css';
 interface MarkdownRendererProps {
   content: string;
   className?: string;
-  variant?: 'default' | 'tutorial';
+  variant?: 'default' | 'tutorial' | 'challenge';
 }
 
 const extractText = (node: React.ReactNode): string => {
@@ -41,6 +41,7 @@ export function MarkdownRenderer({
 }: MarkdownRendererProps) {
   const { t } = useTranslation('tutorials');
   const isTutorial = variant === 'tutorial';
+  const usesTechnicalBlocks = variant === 'tutorial' || variant === 'challenge';
 
   return (
     <div
@@ -150,7 +151,7 @@ export function MarkdownRenderer({
                 </div>
               );
 
-              return isTutorial ? (
+              return usesTechnicalBlocks ? (
                 <TechnicalSurface className="my-6 overflow-hidden p-0">
                   {preview}
                 </TechnicalSurface>
@@ -326,7 +327,7 @@ export function MarkdownRenderer({
                   role="note"
                   className={cn(
                     'my-6 rounded-xl border-l-4 p-4',
-                    isTutorial
+                    usesTechnicalBlocks
                       ? {
                           note: 'border-[color:var(--quest-teal)] bg-accent/35 text-foreground',
                           tip: 'border-[color:var(--quest-success)] bg-[color:var(--quest-success)]/10 text-foreground',
@@ -375,7 +376,7 @@ export function MarkdownRenderer({
               <div
                 className="overflow-x-auto scrollbar-thin"
                 role="region"
-                aria-label={isTutorial ? t('table.scrollableLabel') : undefined}
+                aria-label={usesTechnicalBlocks ? t('table.scrollableLabel') : undefined}
                 tabIndex={0}
               >
                 <table className="w-full min-w-[36rem] border-collapse">
@@ -384,7 +385,7 @@ export function MarkdownRenderer({
               </div>
             );
 
-            return isTutorial ? (
+            return usesTechnicalBlocks ? (
               <TechnicalSurface className="my-6 overflow-hidden p-0">
                 {table}
               </TechnicalSurface>

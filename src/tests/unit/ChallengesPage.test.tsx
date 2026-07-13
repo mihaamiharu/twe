@@ -4,7 +4,7 @@ import * as router from '@tanstack/react-router';
 import * as query from '@tanstack/react-query';
 
 // Mutable mock state
-globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined, difficulty: undefined, status: undefined };
 globalThis.mockNavigate = mock(() => Promise.resolve());
 
 describe('ChallengesPage', () => {
@@ -56,7 +56,7 @@ describe('ChallengesPage', () => {
 
     beforeEach(() => {
 
-        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined, difficulty: undefined, status: undefined };
 
         // Setup query mock with SEARCH filtering simulation
         (query.useQuery as any).mockImplementation((options: any) => {
@@ -138,7 +138,7 @@ describe('ChallengesPage', () => {
     it('should update search params when typing in search box', async () => {
         await renderPage();
 
-        const searchInput = screen.getByPlaceholderText('Search challenges...');
+        const searchInput = screen.getByPlaceholderText('filters.searchPlaceholder');
         fireEvent.change(searchInput, { target: { value: 'New Search' } });
 
         expect((searchInput as HTMLInputElement).value).toBe('New Search');
@@ -147,7 +147,7 @@ describe('ChallengesPage', () => {
         globalThis.mockSearchParams = { ...globalThis.mockSearchParams, q: 'NonExistent' };
         await renderPage();
 
-        expect(screen.getByText(/no challenges found/i)).toBeTruthy();
+        expect(screen.getByText('empty.title')).toBeTruthy();
         // Should show clear filter button or link
         expect(screen.getByRole('button', { name: /clear/i })).toBeTruthy();
     });

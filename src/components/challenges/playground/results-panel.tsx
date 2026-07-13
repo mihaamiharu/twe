@@ -28,7 +28,7 @@ export function ResultsPanel({
     } = state;
 
     return (
-        <div className="flex flex-col h-full bg-white dark:bg-slate-950">
+        <div className="flex flex-col h-full bg-[var(--surface-technical)]">
             <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/10 shrink-0">
                 <div className="flex items-center gap-1">
                     <button
@@ -36,7 +36,7 @@ export function ResultsPanel({
                         className={cn(
                             'px-3 py-1 text-xs font-bold rounded-md transition-colors',
                             resultsTab === 'results'
-                                ? 'bg-brand-teal/20 text-brand-teal-dark'
+                                ? 'bg-primary/15 text-primary'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
                         )}
                     >
@@ -47,7 +47,7 @@ export function ResultsPanel({
                         className={cn(
                             'px-3 py-1 text-xs font-bold rounded-md transition-colors',
                             resultsTab === 'console'
-                                ? 'bg-brand-teal/20 text-brand-teal-dark'
+                                ? 'bg-primary/15 text-primary'
                                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
                         )}
                     >
@@ -64,7 +64,7 @@ export function ResultsPanel({
                     size="sm"
                     onClick={onRunCode}
                     disabled={isRunning}
-                    className="h-7 text-xs font-bold bg-brand-teal text-black hover:bg-brand-teal/90"
+                    className="h-7 text-xs font-bold"
                 >
                     {isRunning ? (
                         <Loader2 className="h-3 w-3 animate-spin mr-1" />

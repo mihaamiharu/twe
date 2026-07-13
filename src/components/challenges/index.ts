@@ -39,3 +39,12 @@ export type { ChallengeListCardProps } from './challenge-list-card';
 
 export { ChallengeListRow } from './challenge-list-row';
 export type { ChallengeListRowProps } from './challenge-list-row';
+
+export { ChallengeStateIndicator } from './challenge-state-indicator';
+export type { ChallengeState } from './challenge-state-indicator';
+
+export { QuestBoardFilters } from './quest-board-filters';
+export type {
+  ChallengeFilterDifficulty,
+  ChallengeFilterStatus,
+} from './quest-board-filters';
