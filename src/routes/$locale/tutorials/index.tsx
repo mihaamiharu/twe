@@ -239,6 +239,7 @@ function TutorialsPage() {
                               key={tutorial.slug}
                               tutorial={tutorial}
                               locale={locale}
+                              headingLevel={3}
                             />
                           ))}
                         </div>

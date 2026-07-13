@@ -50,7 +50,7 @@ export function TableOfContents({
                 }
               }}
               className={cn(
-                '-ml-px block border-l-2 pl-4 transition-all duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
+                '-ml-px flex min-h-11 items-center border-l-2 py-2 pl-4 transition-all duration-200 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50',
                 activeId === item.id
                   ? 'border-primary font-semibold text-primary'
                   : 'border-transparent text-muted-foreground hover:border-border',

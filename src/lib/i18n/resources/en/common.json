@@ -27,7 +27,9 @@
     "aboutConcept": "Our Journey"
   },
   "actions": {
+    "openMenu": "Open menu",
     "closeMenu": "Close menu",
+    "skipToContent": "Skip to content",
     "submit": "Submit",
     "cancel": "Cancel",
     "save": "Save",

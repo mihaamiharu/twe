@@ -129,12 +129,12 @@ export function Footer() {
             <p className="text-sm leading-6 text-muted-foreground">
               {t('footer.description')}
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3">
               <a
                 href="https://github.com/mihaamiharu"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="GitHub"
               >
                 <Github className="h-5 w-5" />
@@ -143,7 +143,7 @@ export function Footer() {
                 href="https://www.linkedin.com/in/ekkisyamsugiardi/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="h-5 w-5" />
@@ -152,7 +152,7 @@ export function Footer() {
                 href="https://www.youtube.com/@TestingWithEkki"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="YouTube"
               >
                 <Youtube className="h-5 w-5" />
@@ -161,7 +161,7 @@ export function Footer() {
                 href="https://ko-fi.com/ekkisyam"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="Ko-fi"
               >
                 <Coffee className="h-5 w-5" />
@@ -170,7 +170,7 @@ export function Footer() {
                 href="https://tako.id/TestingWithEkki"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
+                className="flex size-11 items-center justify-center rounded-full border border-border bg-muted/40 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="Tako"
               >
                 <ExternalLink className="h-5 w-5" />
@@ -188,7 +188,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="inline-block text-sm text-foreground/80 transition-colors hover:text-primary"
+                    className="inline-flex min-h-11 items-center text-sm text-foreground/80 transition-colors hover:text-primary"
                   >
                     {t(link.label)}
                   </Link>
@@ -207,7 +207,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="group relative inline-block text-sm text-foreground/80 transition-colors hover:text-primary"
+                    className="group relative inline-flex min-h-11 items-center text-sm text-foreground/80 transition-colors hover:text-primary"
                   >
                     {t(link.label)}
                     {link.href.includes('changelog') && hasNewChangelog && (

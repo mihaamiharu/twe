@@ -56,6 +56,10 @@ export function FieldGuideFilters({
     selectedStage !== 'all' ||
     Boolean(selectedTopic) ||
     hideCompleted;
+  const activeFilterCount = [
+    selectedStage !== 'all',
+    Boolean(selectedTopic),
+  ].filter(Boolean).length;
 
   const stageControls = (compact = false) => (
     <div
@@ -170,7 +174,7 @@ export function FieldGuideFilters({
             </div>
           </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border/70 pt-4">
+          <div className="mt-4 hidden flex-wrap items-center gap-2 border-t border-border/70 pt-4 lg:flex">
             <span className="mr-1 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
               {t('filters.topics')}
             </span>
@@ -210,9 +214,18 @@ export function FieldGuideFilters({
           <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground lg:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button type="button" variant="outline" className="rounded-xl">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 rounded-xl"
+                >
                   <Filter className="mr-2 size-4" aria-hidden="true" />
                   {t('filters.filterGuides')}
+                  {activeFilterCount > 0 && (
+                    <span className="ml-1 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-bold text-primary">
+                      {activeFilterCount}
+                    </span>
+                  )}
                 </Button>
               </SheetTrigger>
               <SheetContent
@@ -226,6 +239,45 @@ export function FieldGuideFilters({
                   </SheetDescription>
                 </SheetHeader>
                 <div className="mt-6">{stageControls(true)}</div>
+                <div className="mt-6 border-t border-border pt-5">
+                  <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+                    {t('filters.topics')}
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {topics.map((topic) => {
+                      const active = selectedTopic === topic;
+                      return (
+                        <button
+                          key={topic}
+                          type="button"
+                          aria-pressed={active}
+                          onClick={() =>
+                            onTopicChange(active ? undefined : topic)
+                          }
+                          className={cn(
+                            'min-h-11 rounded-full border px-3 text-left text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30',
+                            active
+                              ? 'border-primary bg-primary text-primary-foreground'
+                              : 'border-border bg-background text-muted-foreground hover:border-primary/45 hover:text-foreground',
+                          )}
+                        >
+                          {topic}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {hasFilters && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="mt-4"
+                      onClick={onClearFilters}
+                    >
+                      <X className="mr-1 size-3.5" aria-hidden="true" />
+                      {t('filters.clear')}
+                    </Button>
+                  )}
+                </div>
               </SheetContent>
             </Sheet>
             <span aria-live="polite">

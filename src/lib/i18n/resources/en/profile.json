@@ -14,7 +14,7 @@
   },
   "stats": {
     "tutorials": "Tutorials completed",
-    "challenges": "Quests completed",
+    "challenges": "Challenges completed",
     "totalXp": "Total XP",
     "achievements": "Badges earned"
   },
@@ -22,12 +22,12 @@
     "eyebrow": "Suggested activity",
     "title": "Recommended next step",
     "open": "Open challenge",
-    "completeTitle": "Quest Board complete",
+    "completeTitle": "All challenges complete",
     "completeDescription": "You have completed every available challenge. Explore the board for future additions."
   },
   "paths": {
     "eyebrow": "Challenge tier progress",
-    "title": "Adventure Paths",
+    "title": "Challenge progress",
     "description": "Track your completed testing challenges across each learning tier.",
     "progressValue": "{{completed}} / {{total}} challenges · {{percent}}%",
     "status": {

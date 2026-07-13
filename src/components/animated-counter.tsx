@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 
 interface AnimatedCounterProps {
   value: number;
@@ -17,6 +18,7 @@ export function AnimatedCounter({
 }: AnimatedCounterProps) {
   const [count, setCount] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
+  const prefersReducedMotion = usePrefersReducedMotion();
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -38,6 +40,10 @@ export function AnimatedCounter({
 
   useEffect(() => {
     if (!isVisible) return;
+    if (prefersReducedMotion) {
+      setCount(value);
+      return;
+    }
 
     let startTime: number;
     let animationFrame: number;
@@ -62,7 +68,7 @@ export function AnimatedCounter({
         cancelAnimationFrame(animationFrame);
       }
     };
-  }, [isVisible, value, duration]);
+  }, [isVisible, value, duration, prefersReducedMotion]);
 
   return (
     <span ref={ref} className={className}>

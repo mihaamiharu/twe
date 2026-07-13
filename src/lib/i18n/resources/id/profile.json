@@ -14,7 +14,7 @@
   },
   "stats": {
     "tutorials": "Tutorial selesai",
-    "challenges": "Quest selesai",
+    "challenges": "Tantangan selesai",
     "totalXp": "Total XP",
     "achievements": "Lencana didapat"
   },
@@ -22,12 +22,12 @@
     "eyebrow": "Aktivitas disarankan",
     "title": "Langkah berikutnya",
     "open": "Buka tantangan",
-    "completeTitle": "Quest Board selesai",
+    "completeTitle": "Semua tantangan selesai",
     "completeDescription": "Kamu telah menyelesaikan semua tantangan yang tersedia. Jelajahi papan untuk tambahan berikutnya."
   },
   "paths": {
     "eyebrow": "Progres tingkat tantangan",
-    "title": "Adventure Paths",
+    "title": "Progres tantangan",
     "description": "Lacak tantangan testing yang sudah selesai di setiap tingkat pembelajaran.",
     "progressValue": "{{completed}} / {{total}} tantangan · {{percent}}%",
     "status": {

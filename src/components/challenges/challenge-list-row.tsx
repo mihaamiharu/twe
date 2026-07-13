@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { difficultyColors } from '@/lib/constants';
 import type { TFunction } from 'i18next';
 import { ChallengeStateIndicator } from './challenge-state-indicator';
+import { usePrefersReducedMotion } from '@/lib/use-prefers-reduced-motion';
 
 export interface ChallengeListRowProps {
   challenge: {
@@ -22,7 +23,6 @@ export interface ChallengeListRowProps {
   config: {
     color: string;
     icon: React.ReactNode;
-    label: string;
   };
   isComingSoon: boolean;
   isBoss: boolean;
@@ -39,6 +39,7 @@ export function ChallengeListRow({
   params,
   t,
 }: ChallengeListRowProps) {
+  const prefersReducedMotion = usePrefersReducedMotion();
   const state = isComingSoon
     ? 'locked'
     : challenge.isCompleted
@@ -62,42 +63,83 @@ export function ChallengeListRow({
       <TableCell className="w-full min-w-[300px]">
         <div className="flex flex-col">
           {isComingSoon ? (
-            <span className={cn("font-medium text-sm flex items-center gap-2 w-fit", isBoss && "text-red-500")}>
+            <span
+              className={cn(
+                'font-medium text-sm flex items-center gap-2 w-fit',
+                isBoss && 'text-red-500',
+              )}
+            >
               {title}
             </span>
           ) : (
-            <Link to="/$locale/challenges/$slug" params={params} className={cn("font-medium text-sm flex items-center gap-2 w-fit hover:underline decoration-primary/50 underline-offset-4", isBoss && "text-red-500")}>
+            <Link
+              to="/$locale/challenges/$slug"
+              params={params}
+              className={cn(
+                'font-medium text-sm flex items-center gap-2 w-fit hover:underline decoration-primary/50 underline-offset-4',
+                isBoss && 'text-red-500',
+              )}
+            >
               {title}
             </Link>
           )}
-          <span className="text-xs text-muted-foreground mt-0.5">{challenge.description || t('labels.scenarioReady')}</span>
+          <span className="text-xs text-muted-foreground mt-0.5">
+            {challenge.description || t('labels.scenarioReady')}
+          </span>
         </div>
       </TableCell>
       <TableCell className="w-[110px]">
         <ChallengeStateIndicator state={state} />
       </TableCell>
       <TableCell className="w-[120px]">
-        <Badge variant="outline" className={cn("text-[10px] px-1.5 py-0.5 gap-1 font-normal w-fit", isComingSoon ? "opacity-50" : "", config.color, "bg-transparent border-current/20")}>
+        <Badge
+          variant="outline"
+          className={cn(
+            'text-[10px] px-1.5 py-0.5 gap-1 font-normal w-fit',
+            isComingSoon ? 'opacity-50' : '',
+            config.color,
+            'bg-transparent border-current/20',
+          )}
+        >
           {config.icon}
           {t(`types.${challenge.type.toLowerCase()}`)}
         </Badge>
       </TableCell>
       <TableCell className="w-[80px]">
-        <span className={cn("text-xs font-medium px-2 py-0.5 rounded-full", difficultyColors[challenge.difficulty])}>
+        <span
+          className={cn(
+            'text-xs font-medium px-2 py-0.5 rounded-full',
+            difficultyColors[challenge.difficulty],
+          )}
+        >
           {t(`difficulty.${challenge.difficulty}`)}
         </span>
       </TableCell>
       <TableCell className="w-[80px] text-right font-medium text-amber-500 tabular-nums text-xs">
-        {isComingSoon ? '-' : <span className="flex items-center justify-end gap-1"><Zap className="h-3 w-3" /> {challenge.xpReward}</span>}
+        {isComingSoon ? (
+          '-'
+        ) : (
+          <span className="flex items-center justify-end gap-1">
+            <Zap className="h-3 w-3" /> {challenge.xpReward}
+          </span>
+        )}
       </TableCell>
 
       <TableCell className="w-[40px] px-2">
         {isComingSoon ? (
-          <span className="flex items-center justify-center h-8 w-8" aria-label={t('states.locked')}>
+          <span
+            className="flex items-center justify-center h-8 w-8"
+            aria-label={t('states.locked')}
+          >
             <ChevronRight className="h-4 w-4 text-muted-foreground/30" />
           </span>
         ) : (
-          <Link to="/$locale/challenges/$slug" params={params} className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-muted transition-colors" aria-label={t('labels.openChallenge', { title: challenge.title })}>
+          <Link
+            to="/$locale/challenges/$slug"
+            params={params}
+            className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-muted transition-colors"
+            aria-label={t('labels.openChallenge', { title: challenge.title })}
+          >
             <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
           </Link>
         )}
@@ -108,9 +150,10 @@ export function ChallengeListRow({
   if (isComingSoon) {
     return (
       <motion.tr
-        initial={{ opacity: 0, x: -10 }}
+        initial={prefersReducedMotion ? false : { opacity: 0, x: -10 }}
         animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: -10 }}
+        exit={prefersReducedMotion ? undefined : { opacity: 0, x: -10 }}
+        transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
         className="opacity-50 cursor-not-allowed hover:bg-transparent border-b transition-colors"
         style={{ display: 'table-row' }}
       >
@@ -121,9 +164,10 @@ export function ChallengeListRow({
 
   return (
     <motion.tr
-      initial={{ opacity: 0, x: -10 }}
+      initial={prefersReducedMotion ? false : { opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -10 }}
+      exit={prefersReducedMotion ? undefined : { opacity: 0, x: -10 }}
+      transition={{ duration: prefersReducedMotion ? 0 : 0.2 }}
       className="group hover:bg-muted/50 transition-colors border-b"
       style={{ display: 'table-row' }}
     >

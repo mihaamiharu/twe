@@ -35,7 +35,7 @@ import { createSeoHead, websiteSchema } from '@/lib/seo';
 export const Route = createFileRoute('/$locale/')({
   loader: async ({ context }) => {
     if (context?.queryClient) {
-      await context.queryClient.ensureQueryData({
+      return context.queryClient.ensureQueryData({
         queryKey: ['homepage-stats'],
         queryFn: async () => {
           const result = await getDashboardStats();
@@ -67,6 +67,7 @@ function HomePage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('home');
   const { t: tCommon } = useTranslation('common');
+  const initialStats = routeApi.useLoaderData();
   const { data: stats } = useQuery({
     queryKey: ['homepage-stats'],
     queryFn: async () => {
@@ -77,6 +78,7 @@ function HomePage() {
       return result.data;
     },
     staleTime: 1000 * 60 * 5,
+    initialData: initialStats,
   });
 
   const features = [
@@ -187,11 +189,15 @@ function HomePage() {
   ];
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <main className="min-h-screen overflow-hidden">
       <section className="relative pb-16 pt-8 sm:pt-12 lg:pb-24 lg:pt-16">
         <PageContainer width="wide">
           <IllustratedPanel
             imageSrc="/images/cozy-quest/home-hero.webp"
+            imageWidth={1662}
+            imageHeight={946}
+            imageLoading="eager"
+            imageFetchPriority="high"
             className="min-h-[42rem] lg:min-h-[39rem]"
             imageClassName="object-[68%_center]"
           >
@@ -412,6 +418,9 @@ function HomePage() {
         <PageContainer>
           <IllustratedPanel
             imageSrc="/images/cozy-quest/home-cta.webp"
+            imageWidth={1823}
+            imageHeight={863}
+            imageLoading="lazy"
             className="min-h-[30rem]"
             imageClassName="object-[68%_center]"
           >
@@ -454,7 +463,7 @@ function HomePage() {
           </IllustratedPanel>
         </PageContainer>
       </section>
-    </div>
+    </main>
   );
 }
 

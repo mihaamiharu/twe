@@ -27,7 +27,9 @@
     "aboutConcept": "Perjalanan Kami"
   },
   "actions": {
+    "openMenu": "Buka menu",
     "closeMenu": "Tutup menu",
+    "skipToContent": "Lewati ke konten",
     "submit": "Kirim",
     "cancel": "Batal",
     "save": "Simpan",

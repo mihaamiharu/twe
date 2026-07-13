@@ -5,12 +5,20 @@ interface IllustratedPanelProps extends ComponentProps<'div'> {
   imageSrc: string;
   imageAlt?: string;
   imageClassName?: string;
+  imageWidth?: number;
+  imageHeight?: number;
+  imageLoading?: 'eager' | 'lazy';
+  imageFetchPriority?: 'high' | 'low' | 'auto';
 }
 
 export function IllustratedPanel({
   imageSrc,
   imageAlt = '',
   imageClassName,
+  imageWidth,
+  imageHeight,
+  imageLoading = 'lazy',
+  imageFetchPriority,
   className,
   children,
   ...props
@@ -26,6 +34,11 @@ export function IllustratedPanel({
       <img
         src={imageSrc}
         alt={imageAlt}
+        width={imageWidth}
+        height={imageHeight}
+        loading={imageLoading}
+        decoding="async"
+        fetchPriority={imageFetchPriority}
         className={cn(
           'absolute inset-0 h-full w-full object-cover',
           imageClassName,

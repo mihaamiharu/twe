@@ -376,7 +376,9 @@ export function MarkdownRenderer({
               <div
                 className="overflow-x-auto scrollbar-thin"
                 role="region"
-                aria-label={usesTechnicalBlocks ? t('table.scrollableLabel') : undefined}
+                aria-label={
+                  usesTechnicalBlocks ? t('table.scrollableLabel') : undefined
+                }
                 tabIndex={0}
               >
                 <table className="w-full min-w-[36rem] border-collapse">
@@ -406,15 +408,20 @@ export function MarkdownRenderer({
           // Horizontal rule
           hr: () => <hr className="border-border my-8" />,
           // Images
-          img: ({ src, alt }) => (
-            <img
-              src={src}
-              alt={alt}
-              loading="lazy"
-              decoding="async"
-              className="rounded-lg my-4 max-w-full h-auto"
-            />
-          ),
+          img: ({ src, alt }) => {
+            const isTutorialImage = src?.startsWith('/images/tutorials/');
+            return (
+              <img
+                src={src}
+                alt={alt}
+                width={isTutorialImage ? 1024 : undefined}
+                height={isTutorialImage ? 1024 : undefined}
+                loading="lazy"
+                decoding="async"
+                className="rounded-lg my-4 max-w-full h-auto"
+              />
+            );
+          },
         }}
       >
         {content}

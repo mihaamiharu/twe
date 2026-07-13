@@ -297,11 +297,21 @@ function AppLayout({ children }: { children: React.ReactNode }) {
       />
       <div className="flex flex-col min-h-screen">
         <Header session={auth || null} />
-        <main className="flex-1">
+        <a
+          href="#main-content"
+          className="sr-only fixed left-4 top-4 z-[60] rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-lg focus:not-sr-only focus:outline-none focus:ring-4 focus:ring-ring/40"
+        >
+          {i18n.t('common:actions.skipToContent')}
+        </a>
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="flex-1 focus:outline-none"
+        >
           <Suspense fallback={<div className="min-h-[50vh]" />}>
             {children}
           </Suspense>
-        </main>
+        </div>
         {!isChallengeDetail && <Footer />}
         <Toaster position="top-right" theme="system" closeButton />
       </div>

@@ -10,11 +10,16 @@ import {
   Menu,
   Trophy,
   User,
-  X,
   LayoutDashboard,
   Info,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { UserMenu } from '@/components/user-menu';
 import { signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/bug-report-dialog';
@@ -95,7 +100,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   };
 
   return (
-    <>
+    <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
       <header
         className={cn(
           'sticky top-0 z-40 w-full border-b transition-all duration-200',
@@ -191,167 +196,140 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               )}
 
               {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="lg:hidden"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label="Toggle menu"
-                aria-expanded={isMobileMenuOpen}
-                aria-controls="mobile-navigation"
-              >
-                {isMobileMenuOpen ? (
-                  <X className="h-5 w-5" />
-                ) : (
+              <SheetTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-11 lg:hidden"
+                  aria-label={t('common:actions.openMenu')}
+                >
                   <Menu className="h-5 w-5" />
-                )}
-              </Button>
+                </Button>
+              </SheetTrigger>
             </div>
           </div>
         </div>
       </header>
 
-      {/* Scroll Listener Space for Fixed/Sticky Header if needed in future */}
-
-      {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 flex flex-col lg:hidden">
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
-
-          {/* Menu panel */}
-          <nav
-            id="mobile-navigation"
-            className="relative flex h-full w-full max-w-[22rem] flex-1 flex-col border-r border-border bg-card p-5 shadow-2xl animate-in slide-in-from-left"
-            aria-label={t('common:navigation.mobile')}
-          >
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2">
-                <img src="/logo-icon.svg" alt="" className="size-9" />
-                <span className="text-lg font-bold">TestingWithEkki</span>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMobileMenuOpen(false)}
-                aria-label={t('common:actions.closeMenu')}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-
-            <div className="space-y-1 flex-1">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  params={link.params}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 rounded-xl p-3 text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground"
-                  activeProps={{
-                    className: 'bg-secondary font-medium text-primary',
-                  }}
-                >
-                  <link.icon className="h-5 w-5" />
-                  <span className="flex flex-col">
-                    <span className="font-semibold">{link.label}</span>
-                    <span className="text-xs text-muted-foreground">
-                      {link.concept}
-                    </span>
-                  </span>
-                </Link>
-              ))}
-
-              <div className="my-6 border-t border-border/50" />
-
-              {isAuthenticated && user ? (
-                <>
-                  <Link
-                    to={LocaleRoutes.profile}
-                    params={localeParams(locale)}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                  >
-                    <User className="h-5 w-5" />
-                    {t('common:navigation.profile')}
-                  </Link>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
-                    >
-                      <LayoutDashboard className="h-5 w-5" />
-                      Admin Dashboard
-                    </Link>
-                  )}
-                  <div className="px-3 py-2">
-                    <BugReportDialog
-                      trigger={
-                        <button className="flex items-center gap-3 w-full py-1 text-muted-foreground hover:text-foreground transition-colors">
-                          <Bug className="h-5 w-5" />
-                          {t('bugs:dialog.trigger')}
-                        </button>
-                      }
-                    />
-                  </div>
-
-                  <div className="mt-auto pt-4">
-                    <button
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        void handleSignOut();
-                      }}
-                      className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      {t('common:navigation.logout')}
-                    </button>
-                  </div>
-                </>
-              ) : (
-                !isAuthPage && (
-                  <div className="space-y-3 mt-4">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      asChild
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Link
-                        to={LocaleRoutes.login}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:navigation.login')}
-                      </Link>
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      asChild
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Link
-                        to={LocaleRoutes.register}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:actions.startLearning')}
-                      </Link>
-                    </Button>
-                  </div>
-                )
-              )}
-            </div>
-
-            <div className="mt-4 flex gap-4 border-t border-border/60 pt-4">
-              <LanguageSwitcher />
-            </div>
-          </nav>
+      <SheetContent
+        side="left"
+        className="flex w-full max-w-[22rem] flex-col border-border bg-card p-5 lg:hidden"
+      >
+        <SheetTitle className="sr-only">
+          {t('common:navigation.mobile')}
+        </SheetTitle>
+        <div className="mb-8 flex items-center gap-2 pr-8">
+          <img src="/logo-icon.svg" alt="" className="size-9" />
+          <span className="text-lg font-bold">TestingWithEkki</span>
         </div>
-      )}
-    </>
+        <nav
+          className="flex flex-1 flex-col"
+          aria-label={t('common:navigation.mobile')}
+        >
+          <div className="space-y-1">
+            {navLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                params={link.params}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-3 rounded-xl p-3 text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground"
+                activeProps={{
+                  className: 'bg-secondary font-medium text-primary',
+                }}
+              >
+                <link.icon className="h-5 w-5" />
+                <span className="flex flex-col">
+                  <span className="font-semibold">{link.label}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {link.concept}
+                  </span>
+                </span>
+              </Link>
+            ))}
+
+            <div className="my-6 border-t border-border/50" />
+
+            {isAuthenticated && user ? (
+              <>
+                <Link
+                  to={LocaleRoutes.profile}
+                  params={localeParams(locale)}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                >
+                  <User className="h-5 w-5" />
+                  {t('common:navigation.profile')}
+                </Link>
+                {isAdmin && (
+                  <Link
+                    to="/admin"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
+                  >
+                    <LayoutDashboard className="h-5 w-5" />
+                    Admin Dashboard
+                  </Link>
+                )}
+                <div className="px-3 py-2">
+                  <BugReportDialog
+                    trigger={
+                      <button className="flex min-h-11 w-full items-center gap-3 text-muted-foreground transition-colors hover:text-foreground">
+                        <Bug className="h-5 w-5" />
+                        {t('bugs:dialog.trigger')}
+                      </button>
+                    }
+                  />
+                </div>
+
+                <div className="mt-auto pt-4">
+                  <button
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      void handleSignOut();
+                    }}
+                    className="flex min-h-11 w-full items-center gap-3 rounded-lg p-3 text-destructive transition-colors hover:bg-destructive/10"
+                  >
+                    <LogOut className="h-5 w-5" />
+                    {t('common:navigation.logout')}
+                  </button>
+                </div>
+              </>
+            ) : (
+              !isAuthPage && (
+                <div className="space-y-3 mt-4">
+                  <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    asChild
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Link to={LocaleRoutes.login} params={localeParams(locale)}>
+                      {t('common:navigation.login')}
+                    </Link>
+                  </Button>
+                  <Button
+                    className="w-full justify-start"
+                    asChild
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Link
+                      to={LocaleRoutes.register}
+                      params={localeParams(locale)}
+                    >
+                      {t('common:actions.startLearning')}
+                    </Link>
+                  </Button>
+                </div>
+              )
+            )}
+          </div>
+          <div className="mt-auto flex gap-4 border-t border-border/60 pt-4">
+            <LanguageSwitcher />
+          </div>
+        </nav>
+      </SheetContent>
+    </Sheet>
   );
 }
 

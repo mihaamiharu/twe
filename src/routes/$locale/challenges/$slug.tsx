@@ -12,7 +12,10 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { ChallengePlayground, type Challenge, ChallengeSkeleton } from '@/components/challenges';
+import {
+  ChallengePlayground,
+  ChallengeSkeleton,
+} from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -39,7 +42,12 @@ interface ServerChallengeResponse {
     title: string;
     description: string;
     instructions: string;
-    type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';
+    type:
+      | 'JAVASCRIPT'
+      | 'PLAYWRIGHT'
+      | 'CSS_SELECTOR'
+      | 'XPATH_SELECTOR'
+      | 'SELECTOR';
     difficulty: 'EASY' | 'MEDIUM' | 'HARD';
     category: string;
     xpReward: number;
@@ -98,9 +106,15 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
       return {
         meta: [
           { title: i18n.t('challenges:page.seo.title') },
-          { name: 'description', content: i18n.t('challenges:page.seo.description') },
+          {
+            name: 'description',
+            content: i18n.t('challenges:page.seo.description'),
+          },
           { property: 'og:url', content: url },
-          { property: 'og:image', content: 'https://testingwithekki.com/twe-banner.png' },
+          {
+            property: 'og:image',
+            content: 'https://testingwithekki.com/twe-banner.png',
+          },
         ],
         links: [
           {
@@ -133,45 +147,50 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
     // Structured Data
     const jsonLd = [
       {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
           {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": `https://testingwithekki.com/${locale}`
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `https://testingwithekki.com/${locale}`,
           },
           {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Challenges",
-            "item": `https://testingwithekki.com/${locale}/challenges`
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Challenges',
+            item: `https://testingwithekki.com/${locale}/challenges`,
           },
           {
-            "@type": "ListItem",
-            "position": 3,
-            "name": data.title,
-            "item": url
-          }
-        ]
+            '@type': 'ListItem',
+            position: 3,
+            name: data.title,
+            item: url,
+          },
+        ],
       },
       {
-        "@context": "https://schema.org",
-        "@type": "LearningResource",
-        "name": data.title,
-        "description": data.description,
-        "learningResourceType": "Practice Problem",
-        "educationalLevel": data.difficulty === 'EASY' ? 'Beginner' : data.difficulty === 'MEDIUM' ? 'Intermediate' : 'Advanced',
-        "teaches": data.category || "Playwright Automation",
-        "url": url,
-        "image": ogImageUrl,
-        "author": {
-          "@type": "Organization",
-          "name": "TestingWithEkki",
-          "url": "https://testingwithekki.com"
-        }
-      }
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        name: data.title,
+        description: data.description,
+        learningResourceType: 'Practice Problem',
+        educationalLevel:
+          data.difficulty === 'EASY'
+            ? 'Beginner'
+            : data.difficulty === 'MEDIUM'
+              ? 'Intermediate'
+              : 'Advanced',
+        teaches: data.category || 'Playwright Automation',
+        url: url,
+        image: ogImageUrl,
+        author: {
+          '@type': 'Organization',
+          name: 'TestingWithEkki',
+          url: 'https://testingwithekki.com',
+        },
+      },
     ];
 
     return {
@@ -208,18 +227,14 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
           href: `https://testingwithekki.com/en/challenges/${data.slug}`,
         },
       ],
-      scripts: jsonLd.map(data => ({
+      scripts: jsonLd.map((data) => ({
         type: 'application/ld+json',
-        children: JSON.stringify(data)
-      }))
+        children: JSON.stringify(data),
+      })),
     };
   },
   pendingComponent: ChallengeSkeleton,
 });
-
-
-
-
 
 function ChallengeDetailPage() {
   const { locale, slug } = useParams({ from: '/$locale/challenges/$slug' });
@@ -234,16 +249,13 @@ function ChallengeDetailPage() {
     levelUp?: { newLevel: number; title: string };
   } | null>(null);
 
-  const {
-    data: challengeData,
-  } = useSuspenseQuery(challengeDetailQueryOptions(slug, locale));
+  const { data: challengeData } = useSuspenseQuery(
+    challengeDetailQueryOptions(slug, locale),
+  );
 
   // Rename for compatibility with existing code
   // Rename for compatibility with existing code
   const data = challengeData as ServerChallengeResponse;
-
-
-
 
   const { data: auth } = useSuspenseQuery(authQueryOptions);
   const sessionData = auth; // Alias for compatibility
@@ -310,9 +322,9 @@ function ChallengeDetailPage() {
           achievements: response.data.newAchievements || [],
           levelUp: response.data.levelUp
             ? {
-              newLevel: response.data.levelUp.newLevel,
-              title: getLevelTitle(response.data.levelUp.newLevel),
-            }
+                newLevel: response.data.levelUp.newLevel,
+                title: getLevelTitle(response.data.levelUp.newLevel),
+              }
             : undefined,
         });
         setShowSuccessDialog(true);
@@ -320,8 +332,8 @@ function ChallengeDetailPage() {
         toast.success(t('common:messages.challengeCompleted'), {
           description: response.data.newAchievements?.length
             ? t('common:messages.achievementUnlocked', {
-              name: response.data.newAchievements[0].name,
-            })
+                name: response.data.newAchievements[0].name,
+              })
             : undefined,
         });
 
@@ -410,10 +422,9 @@ function ChallengeDetailPage() {
     [challenge, submitMutation, sessionData, locale, t],
   );
 
-
   if (!challenge) {
     return (
-      <div className="min-h-screen p-6 md:p-10">
+      <main className="min-h-screen p-6 md:p-10">
         <div className="max-w-4xl mx-auto">
           <Card className="glass-card">
             <CardContent className="py-12 text-center">
@@ -454,12 +465,12 @@ function ChallengeDetailPage() {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col">
+    <main className="h-[calc(100vh-4rem)] flex flex-col">
       <div className="flex-1 min-h-0">
         <ChallengePlayground
           key={challenge.id}
@@ -483,12 +494,12 @@ function ChallengeDetailPage() {
           onNextChallenge={
             data?.data?.nextChallenge
               ? () => {
-                setShowSuccessDialog(false);
-                void navigate({
-                  to: '/$locale/challenges/$slug',
-                  params: { locale, slug: data.data.nextChallenge!.slug },
-                });
-              }
+                  setShowSuccessDialog(false);
+                  void navigate({
+                    to: '/$locale/challenges/$slug',
+                    params: { locale, slug: data.data.nextChallenge!.slug },
+                  });
+                }
               : undefined
           }
         />
@@ -500,6 +511,6 @@ function ChallengeDetailPage() {
         title={t('auth:guard.title')}
         description={t('auth:guard.description')}
       />
-    </div>
+    </main>
   );
 }

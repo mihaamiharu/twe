@@ -8,9 +8,14 @@ import { getTutorialStage, type TutorialListItem } from './tutorial-types';
 interface TutorialCardProps {
   tutorial: TutorialListItem;
   locale: string;
+  headingLevel?: 2 | 3;
 }
 
-export function TutorialCard({ tutorial, locale }: TutorialCardProps) {
+export function TutorialCard({
+  tutorial,
+  locale,
+  headingLevel = 2,
+}: TutorialCardProps) {
   const { t } = useTranslation('tutorials');
   const stage = getTutorialStage(tutorial.tags);
   const topic = tutorial.tags.find((tag) => tag.toLowerCase() !== stage);
@@ -47,9 +52,15 @@ export function TutorialCard({ tutorial, locale }: TutorialCardProps) {
           />
         </div>
 
-        <h2 className="relative mt-6 font-display text-2xl font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
-          {tutorial.title}
-        </h2>
+        {headingLevel === 2 ? (
+          <h2 className="relative mt-6 font-display text-2xl font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
+            {tutorial.title}
+          </h2>
+        ) : (
+          <h3 className="relative mt-6 font-display text-2xl font-semibold leading-tight text-foreground transition-colors group-hover:text-primary">
+            {tutorial.title}
+          </h3>
+        )}
         <p className="relative mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground">
           {tutorial.description}
         </p>
