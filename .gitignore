@@ -34,6 +34,7 @@ lint_*.txt
 
 # Sensitive credentials
 rclone-backup.conf
+twe_prod_backup.sql
 
 # VPS Access Guide
 vps_access_guide.md
@@ -41,3 +42,4 @@ vps_access_guide.md
 # Agent and Conductor local data
 .agent/mihaamiharu/
 conductor/
+.vscode/mcp.json

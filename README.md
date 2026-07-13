@@ -20,7 +20,7 @@ A gamified platform for learning QA testing skills through interactive tutorials
 ### Prerequisites
 
 - [Bun](https://bun.sh/) (v1.0+) or Node.js (v22+)
-- [Docker](https://www.docker.com/) (for PostgreSQL)
+- [Podman](https://podman.io/) (recommended) or PostgreSQL 15+ (for the local database)
 - [Git](https://git-scm.com/)
 
 ### 1. Clone & Install
@@ -41,7 +41,7 @@ Edit `.env` with your values:
 
 ```env
 # Database
-DATABASE_URL=postgresql://postgres:password@localhost:5432/twe
+DATABASE_URL="postgresql://twe_user:twe_password@127.0.0.1:5432/twe_db"
 
 # BetterAuth
 BETTER_AUTH_SECRET=your-secret-key-here
@@ -58,17 +58,46 @@ SMTP_USER=your-email@example.com
 SMTP_PASS=your-email-password
 ```
 
-### 3. Start Database
+### 3. Create a Local Database
+
+Use one local database approach. Do not point local development at a staging or production database.
+
+#### Option A: Podman (recommended)
 
 ```bash
-podman compose up -d
+podman compose up -d postgres
 ```
 
-### 4. Run Migrations
+This starts the database defined in `docker-compose.yml` as `twe_db` on port `5432`.
+
+#### Option B: Existing Local PostgreSQL
+
+If PostgreSQL is already running locally, create an isolated database for this checkout instead of reusing an old project database. Run the following only if the `twe_user` role does not already exist:
+
+```bash
+psql -U <postgres-admin> -d postgres -c "CREATE ROLE twe_user LOGIN PASSWORD 'twe_password';"
+```
+
+Then create the database and update `DATABASE_URL` in `.env` to use it:
+
+```bash
+createdb -U <postgres-admin> -O twe_user twe_local
+```
+
+```env
+DATABASE_URL="postgresql://twe_user:twe_password@127.0.0.1:5432/twe_local"
+```
+
+If port `5432` is already occupied, use the existing local PostgreSQL instance or choose a different host port for the Podman container and make `DATABASE_URL` match it.
+
+### 4. Migrate and Seed the Database
 
 ```bash
 bun run db:migrate
+bun run db:sync
 ```
+
+`db:sync` loads filesystem content and achievement metadata used by the homepage.
 
 ### 5. Start Development Server
 
@@ -76,7 +105,18 @@ bun run db:migrate
 bun run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000/en](http://localhost:3000/en) in your browser.
+
+### Local Database Troubleshooting
+
+| Symptom                                                          | Cause                                                                                                           | Resolution                                                                                         |
+| ---------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `connect ECONNREFUSED 127.0.0.1:5434`                            | `.env` points to a stale or staging-only port.                                                                  | Use the port of your local database—by default `5432`—and restart `bun run dev`.                   |
+| `operator does not exist: text ->> unknown`                      | The application is using an older database schema where translated fields are stored as text rather than JSONB. | Create a fresh local database, run `bun run db:migrate`, then run `bun run db:sync`.               |
+| Missing tables or `relation ... does not exist`                  | The local database has not been migrated.                                                                       | On a fresh local database, run `bun run db:migrate` and `bun run db:sync`.                         |
+| Existing database has tables but no `__drizzle_migrations` table | The schema was created manually or with `db:push`; its migration history is unknown.                            | Do not run `db:migrate` against it. Create a new local database and migrate that database instead. |
+
+For migration commands, ensure `DIRECT_URL` is unset or points to the same local database: Drizzle uses `DIRECT_URL` before `DATABASE_URL` when it is set.
 
 ## 📦 Tech Stack
 

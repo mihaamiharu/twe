@@ -1,0 +1,13 @@
+{
+  "servers": {
+    "plane": {
+      "url": "https://mcp.plane.so/http/api-key/mcp",
+      "type": "http",
+      "headers": {
+        "authorization": "Bearer PLANE_PAT_GOES_HERE",
+        "x-api-key": "PLANE_PAT_GOES_HERE",
+        "x-workspace-slug": "testing-with-ekki"
+      }
+    }
+  }
+}
