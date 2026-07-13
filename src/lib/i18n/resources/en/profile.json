@@ -5,11 +5,92 @@
     "progressTo": "Progress to Level {{level}}",
     "settings": "Settings"
   },
+  "journal": {
+    "eyebrow": "Dashboard · Adventure Journal",
+    "title": "Adventure Journal",
+    "description": "Your software testing progress, next steps, and earned milestones.",
+    "testerProfile": "Tester Profile",
+    "summary": "Learning summary"
+  },
   "stats": {
-    "tutorials": "Tutorials",
-    "challenges": "Challenges",
+    "tutorials": "Tutorials completed",
+    "challenges": "Quests completed",
     "totalXp": "Total XP",
-    "achievements": "Achievements"
+    "achievements": "Badges earned"
+  },
+  "recommendation": {
+    "eyebrow": "Suggested activity",
+    "title": "Recommended next step",
+    "open": "Open challenge",
+    "completeTitle": "Quest Board complete",
+    "completeDescription": "You have completed every available challenge. Explore the board for future additions."
+  },
+  "paths": {
+    "eyebrow": "Challenge tier progress",
+    "title": "Adventure Paths",
+    "description": "Track your completed testing challenges across each learning tier.",
+    "progressValue": "{{completed}} / {{total}} challenges · {{percent}}%",
+    "status": {
+      "completed": "Completed",
+      "inProgress": "In progress",
+      "notStarted": "Not started"
+    }
+  },
+  "topics": {
+    "eyebrow": "Testing topic progress",
+    "title": "Progress by topic",
+    "progressValue": "{{completed}} / {{total}} · {{percent}}%"
+  },
+  "streak": {
+    "eyebrow": "Learning rhythm",
+    "title": "Learning streak",
+    "current": "{{count}} days",
+    "days": "{{count}} days",
+    "description": "Based on days with completed testing challenges.",
+    "longest": "Longest streak"
+  },
+  "continue": {
+    "eyebrow": "Field Guide",
+    "title": "Continue learning",
+    "minutes": "{{count}} min read",
+    "open": "Open tutorial",
+    "completeTitle": "Field Guide complete",
+    "completeDescription": "You have completed every published tutorial."
+  },
+  "activity": {
+    "eyebrow": "Journal entries",
+    "title": "Recent activity",
+    "challenge": "Challenge completed",
+    "achievement": "Badge unlocked",
+    "emptyTitle": "Your journal is ready",
+    "empty": "Complete a tutorial or challenge to record your first learning activity."
+  },
+  "achievements": {
+    "recentEyebrow": "Latest stamps",
+    "recentTitle": "Recent achievements",
+    "collectionEyebrow": "Badge collection",
+    "collectionTitle": "Earned badges",
+    "collectionCount": "{{count}} earned",
+    "emptyTitle": "No badges yet",
+    "emptyDescription": "Complete tutorials and challenges to earn your first badge.",
+    "unlocked": "Unlocked",
+    "earnedOn": "Earned {{date}}"
+  },
+  "milestones": {
+    "eyebrow": "Experience trail",
+    "title": "XP milestones",
+    "reached": "Reached",
+    "notReached": "Not reached"
+  },
+  "account": {
+    "title": "Account actions",
+    "description": "Request permanent deletion of your TestingWithEkki account.",
+    "delete": "Request account deletion"
+  },
+  "states": {
+    "errorTitle": "We could not load your journal",
+    "errorDescription": "Please try again in a moment.",
+    "retry": "Try again"
   },
   "tabs": {
     "progress": "Tier Progress",
@@ -24,17 +105,5 @@
     "intermediate": "Intermediate (Playwright)",
     "e2e": "E2E Testing",
     "challengeCount": "{{count}} challenges"
-  },
-  "milestones": {
-    "title": "XP Milestones"
-  },
-  "activity": {
-    "title": "Recent Activity",
-    "description": "Your latest learning progress",
-    "empty": "No recent activity yet. Start learning!"
-  },
-  "achievements": {
-    "empty": "No achievements yet. Complete challenges to earn badges!",
-    "available": "{{count}} badges available to unlock"
   }
 }

@@ -7,12 +7,23 @@ import {
   userAchievements,
   achievements,
   submissions,
+  progress,
+  tutorials,
 } from '@/db/schema';
-import { eq, desc, sql } from 'drizzle-orm';
+import { and, eq, desc, sql } from 'drizzle-orm';
 import { getUserStats } from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { authMiddleware } from './auth.mw';
-import { getCachedTierTotals } from './content.server';
+import {
+  getCachedTierTotals,
+  getChallengeList,
+  getTutorialList,
+} from './content.server';
+import {
+  getChallengeTypeTotals,
+  selectContinueTutorial,
+  selectRecommendedChallenge,
+} from '@/lib/adventure-journal';
 
 export type UserData = {
   id: string;
@@ -51,6 +62,24 @@ export type UserData = {
     xp: number;
     date: string;
   }[];
+  journal: {
+    currentStreak: number;
+    longestStreak: number;
+    challengeTypeTotalCounts: Record<string, number>;
+    recommendedChallenge: {
+      slug: string;
+      title: string;
+      type: string;
+      difficulty: string;
+      xpReward: number;
+    } | null;
+    continueTutorial: {
+      slug: string;
+      title: string;
+      estimatedMinutes: number;
+      tags: string[];
+    } | null;
+  };
 };
 
 const GetUserSettingsSchema = z.object({
@@ -85,42 +114,79 @@ export const getUserSettings = createServerFn({ method: 'GET' })
         // Calculate Tier Totals (using cached version)
         const tierTotalCounts = await getCachedTierTotals();
 
-        // Get user achievements
-        const userAchievementsList = await db
-          .select({
-            id: achievements.id,
-            slug: achievements.slug,
-            name: sql<string>`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
-            description: sql<string>`COALESCE(${achievements.description}->>${locale}, ${achievements.description}->>'en', '')`,
-            icon: achievements.icon,
-            category: achievements.category,
-            xpReward: achievements.xpReward,
-            unlockedAt: userAchievements.unlockedAt,
-          })
-          .from(userAchievements)
-          .innerJoin(
-            achievements,
-            eq(userAchievements.achievementId, achievements.id),
-          )
-          .where(eq(userAchievements.userId, userId))
-          .orderBy(desc(userAchievements.unlockedAt));
+        const [
+          userAchievementsList,
+          recentSubmissions,
+          completedChallengeRows,
+          completedTutorialRows,
+          challengeList,
+          tutorialList,
+        ] = await Promise.all([
+          db
+            .select({
+              id: achievements.id,
+              slug: achievements.slug,
+              name: sql<string>`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
+              description: sql<string>`COALESCE(${achievements.description}->>${locale}, ${achievements.description}->>'en', '')`,
+              icon: achievements.icon,
+              category: achievements.category,
+              xpReward: achievements.xpReward,
+              unlockedAt: userAchievements.unlockedAt,
+            })
+            .from(userAchievements)
+            .innerJoin(
+              achievements,
+              eq(userAchievements.achievementId, achievements.id),
+            )
+            .where(eq(userAchievements.userId, userId))
+            .orderBy(desc(userAchievements.unlockedAt)),
+          db
+            .select({
+              id: submissions.id,
+              challengeId: submissions.challengeId,
+              challengeTitle: sql<string>`COALESCE(${challenges.title}->>${locale}, ${challenges.title}->>'en', '')`,
+              challengeSlug: challenges.slug,
+              isPassed: submissions.isPassed,
+              xpEarned: submissions.xpEarned,
+              createdAt: submissions.createdAt,
+            })
+            .from(submissions)
+            .innerJoin(challenges, eq(submissions.challengeId, challenges.id))
+            .where(eq(submissions.userId, userId))
+            .orderBy(desc(submissions.createdAt))
+            .limit(10),
+          db
+            .select({ slug: challenges.slug })
+            .from(progress)
+            .innerJoin(challenges, eq(progress.challengeId, challenges.id))
+            .where(
+              and(eq(progress.userId, userId), eq(progress.isCompleted, true)),
+            ),
+          db
+            .select({ slug: tutorials.slug })
+            .from(progress)
+            .innerJoin(tutorials, eq(progress.tutorialId, tutorials.id))
+            .where(
+              and(eq(progress.userId, userId), eq(progress.isCompleted, true)),
+            ),
+          getChallengeList(locale),
+          getTutorialList(locale),
+        ]);
 
-        // Get recent submissions (last 5)
-        const recentSubmissions = await db
-          .select({
-            id: submissions.id,
-            challengeId: submissions.challengeId,
-            challengeTitle: sql<string>`COALESCE(${challenges.title}->>${locale}, ${challenges.title}->>'en', '')`,
-            challengeSlug: challenges.slug,
-            isPassed: submissions.isPassed,
-            xpEarned: submissions.xpEarned,
-            createdAt: submissions.createdAt,
-          })
-          .from(submissions)
-          .innerJoin(challenges, eq(submissions.challengeId, challenges.id))
-          .where(eq(submissions.userId, userId))
-          .orderBy(desc(submissions.createdAt))
-          .limit(10);
+        const completedChallengeSlugs = new Set(
+          completedChallengeRows.map((row) => row.slug),
+        );
+        const completedTutorialSlugs = new Set(
+          completedTutorialRows.map((row) => row.slug),
+        );
+        const recommendedChallenge = selectRecommendedChallenge(
+          challengeList,
+          completedChallengeSlugs,
+        );
+        const continueTutorial = selectContinueTutorial(
+          tutorialList,
+          completedTutorialSlugs,
+        );
 
         // Heatmap logic removed
 
@@ -228,6 +294,29 @@ export const getUserSettings = createServerFn({ method: 'GET' })
             })),
 
             recentActivity: activity,
+
+            journal: {
+              currentStreak: stats.currentStreak,
+              longestStreak: stats.longestStreak,
+              challengeTypeTotalCounts: getChallengeTypeTotals(challengeList),
+              recommendedChallenge: recommendedChallenge
+                ? {
+                    slug: recommendedChallenge.slug,
+                    title: recommendedChallenge.title,
+                    type: recommendedChallenge.type,
+                    difficulty: recommendedChallenge.difficulty,
+                    xpReward: recommendedChallenge.xpReward,
+                  }
+                : null,
+              continueTutorial: continueTutorial
+                ? {
+                    slug: continueTutorial.slug,
+                    title: continueTutorial.title,
+                    estimatedMinutes: continueTutorial.estimatedMinutes,
+                    tags: continueTutorial.tags,
+                  }
+                : null,
+            },
           },
         };
       } catch (error) {

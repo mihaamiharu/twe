@@ -32,26 +32,26 @@ test.describe('Expanded Application Scenarios', () => {
     await dashboardPage.verifyStats();
 
     // Check if featured challenges are present
-    const section = dashboardPage.page
-      .locator('section')
-      .filter({
-        has: dashboardPage.page.getByRole('heading', {
-          name: /Featured Challenges/i,
-        }),
-      });
+    const section = dashboardPage.page.locator('section').filter({
+      has: dashboardPage.page.getByRole('heading', {
+        name: /Featured Challenges/i,
+      }),
+    });
     const challenges = section.locator('a.glass-card');
     await expect(challenges).toHaveCount(3);
   });
 
-  test('Profile: should display user information and tabs', async ({
-    page,
-  }) => {
+  test('Profile: should display the Adventure Journal', async ({ page }) => {
     await profilePage.goto();
     console.log('Profile URL:', page.url());
     await profilePage.verifyProfileVisible();
 
-    // Basic check for tabs
-    await expect(profilePage.tabsList).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /recommended next step/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /adventure paths/i }),
+    ).toBeVisible();
 
     // Ensure user name matches expectation (case-insensitive or regex)
     await expect(profilePage.userName).toContainText(/kikkawa23/i);

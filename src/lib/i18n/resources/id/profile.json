@@ -5,11 +5,92 @@
     "progressTo": "Kemajuan ke Level {{level}}",
     "settings": "Pengaturan"
   },
+  "journal": {
+    "eyebrow": "Dasbor · Adventure Journal",
+    "title": "Adventure Journal",
+    "description": "Progres pengujian perangkat lunak, langkah berikutnya, dan pencapaian kamu.",
+    "testerProfile": "Profil Tester",
+    "summary": "Ringkasan pembelajaran"
+  },
   "stats": {
-    "tutorials": "Tutorial",
-    "challenges": "Tantangan",
+    "tutorials": "Tutorial selesai",
+    "challenges": "Quest selesai",
     "totalXp": "Total XP",
-    "achievements": "Pencapaian"
+    "achievements": "Lencana didapat"
+  },
+  "recommendation": {
+    "eyebrow": "Aktivitas disarankan",
+    "title": "Langkah berikutnya",
+    "open": "Buka tantangan",
+    "completeTitle": "Quest Board selesai",
+    "completeDescription": "Kamu telah menyelesaikan semua tantangan yang tersedia. Jelajahi papan untuk tambahan berikutnya."
+  },
+  "paths": {
+    "eyebrow": "Progres tingkat tantangan",
+    "title": "Adventure Paths",
+    "description": "Lacak tantangan testing yang sudah selesai di setiap tingkat pembelajaran.",
+    "progressValue": "{{completed}} / {{total}} tantangan · {{percent}}%",
+    "status": {
+      "completed": "Selesai",
+      "inProgress": "Sedang dikerjakan",
+      "notStarted": "Belum dimulai"
+    }
+  },
+  "topics": {
+    "eyebrow": "Progres topik testing",
+    "title": "Progres berdasarkan topik",
+    "progressValue": "{{completed}} / {{total}} · {{percent}}%"
+  },
+  "streak": {
+    "eyebrow": "Ritme belajar",
+    "title": "Streak belajar",
+    "current": "{{count}} hari",
+    "days": "{{count}} hari",
+    "description": "Berdasarkan hari dengan tantangan testing yang selesai.",
+    "longest": "Streak terpanjang"
+  },
+  "continue": {
+    "eyebrow": "Field Guide",
+    "title": "Lanjut belajar",
+    "minutes": "{{count}} menit baca",
+    "open": "Buka tutorial",
+    "completeTitle": "Field Guide selesai",
+    "completeDescription": "Kamu telah menyelesaikan semua tutorial yang diterbitkan."
+  },
+  "activity": {
+    "eyebrow": "Catatan jurnal",
+    "title": "Aktivitas terbaru",
+    "challenge": "Tantangan selesai",
+    "achievement": "Lencana terbuka",
+    "emptyTitle": "Jurnal kamu siap",
+    "empty": "Selesaikan tutorial atau tantangan untuk mencatat aktivitas belajar pertama kamu."
+  },
+  "achievements": {
+    "recentEyebrow": "Stempel terbaru",
+    "recentTitle": "Pencapaian terbaru",
+    "collectionEyebrow": "Koleksi lencana",
+    "collectionTitle": "Lencana yang didapat",
+    "collectionCount": "{{count}} didapat",
+    "emptyTitle": "Belum ada lencana",
+    "emptyDescription": "Selesaikan tutorial dan tantangan untuk mendapatkan lencana pertama kamu.",
+    "unlocked": "Terbuka",
+    "earnedOn": "Didapat {{date}}"
+  },
+  "milestones": {
+    "eyebrow": "Jejak pengalaman",
+    "title": "Pencapaian XP",
+    "reached": "Tercapai",
+    "notReached": "Belum tercapai"
+  },
+  "account": {
+    "title": "Tindakan akun",
+    "description": "Ajukan penghapusan permanen akun TestingWithEkki kamu.",
+    "delete": "Ajukan penghapusan akun"
+  },
+  "states": {
+    "errorTitle": "Kami tidak dapat memuat jurnal kamu",
+    "errorDescription": "Silakan coba lagi sebentar lagi.",
+    "retry": "Coba lagi"
   },
   "tabs": {
     "progress": "Progres Tingkat",
@@ -24,17 +105,5 @@
     "intermediate": "Menengah (Playwright)",
     "e2e": "E2E Testing",
     "challengeCount": "{{count}} tantangan"
-  },
-  "milestones": {
-    "title": "Pencapaian XP"
-  },
-  "activity": {
-    "title": "Aktivitas Terbaru",
-    "description": "Kemajuan pembelajaran terbaru kamu",
-    "empty": "Belum ada aktivitas terbaru. Mulai belajar!"
-  },
-  "achievements": {
-    "empty": "Belum ada pencapaian. Selesaikan tantangan untuk mendapatkan lencana!",
-    "available": "{{count}} lencana tersedia untuk dibuka"
   }
 }

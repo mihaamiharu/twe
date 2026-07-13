@@ -6,21 +6,20 @@ export class ProfilePage extends BasePage {
   readonly userName: Locator;
   readonly userLevel: Locator;
   readonly xpProgress: Locator;
-  readonly settingsButton: Locator;
   readonly statsCards: Locator;
-  readonly tabsList: Locator;
+  readonly journalHeading: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.avatar = page.locator(
-      '.flex-col.md\\:flex-row.items-start.md\\:items-center.gap-6 >> .h-24.w-24',
-    );
-    this.userName = page.getByRole('heading', { level: 1 });
-    this.userLevel = page.locator('.badge, .bg-primary\\/20');
-    this.xpProgress = page.locator('.progress, .h-2');
-    this.settingsButton = page.getByRole('link', { name: /settings/i });
-    this.statsCards = page.locator('.glass-card.card-hover');
-    this.tabsList = page.getByRole('tablist');
+    this.avatar = page.locator('main [data-slot="avatar"]').first();
+    this.journalHeading = page.getByRole('heading', {
+      level: 1,
+      name: /adventure journal/i,
+    });
+    this.userName = page.getByRole('heading', { level: 2 }).first();
+    this.userLevel = page.getByText(/level \d+/i).first();
+    this.xpProgress = page.getByRole('progressbar').first();
+    this.statsCards = page.locator('main section[aria-label] > div');
   }
 
   async goto(locale: string = 'en') {
@@ -29,13 +28,8 @@ export class ProfilePage extends BasePage {
 
   async verifyProfileVisible() {
     // Wait for the skeleton to disappear or the username to appear with a longer timeout
-    await expect(this.userName).toBeVisible({ timeout: 15000 });
+    await expect(this.journalHeading).toBeVisible({ timeout: 15000 });
+    await expect(this.userName).toBeVisible();
     await expect(this.avatar).toBeVisible();
-  }
-
-  async switchTab(tabName: 'progress' | 'activity' | 'achievements') {
-    await this.page
-      .getByRole('tab', { name: new RegExp(tabName, 'i') })
-      .click();
   }
 }

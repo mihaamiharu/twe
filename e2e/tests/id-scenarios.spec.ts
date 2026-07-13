@@ -29,7 +29,7 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
     await expect(page).toHaveURL(/.*\/id\/.*/);
   });
 
-  test('ID Tutorials: should list tutorials in ID', async ({ page }) => {
+  test('ID Tutorials: should list tutorials in ID', async () => {
     await tutorialsPage.gotoList('id');
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
     // Check for "Mulai Belajar" or similar ID-specific text if applicable
@@ -43,7 +43,8 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
   test('ID Profile: should display profile in ID context', async ({ page }) => {
     await profilePage.goto('id');
     await profilePage.verifyProfileVisible();
-    // Tabs in ID: "Progress", "Aktivitas", "Pencapaian"
-    await expect(page.getByRole('tab', { name: /Pencapaian/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /lencana yang didapat/i }),
+    ).toBeVisible();
   });
 });

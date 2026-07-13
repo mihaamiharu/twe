@@ -6,12 +6,27 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
-import type { Achievement, UserStats } from '@/lib/achievements';
+import type {
+  Achievement,
+  AchievementCriteria,
+  UserStats,
+} from '@/lib/achievements';
 import { getAchievementProgress } from '@/lib/achievements';
 import { Lock, Check, Zap } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+type AchievementDisplay = {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  xpReward: number;
+  criteria?: AchievementCriteria;
+};
 
 export interface AchievementBadgeProps {
-  achievement: Achievement;
+  achievement: AchievementDisplay;
   earned?: boolean;
   earnedAt?: Date;
   stats?: UserStats;
@@ -31,7 +46,11 @@ export function AchievementBadge({
   className,
   style,
 }: AchievementBadgeProps) {
-  const progress = stats ? getAchievementProgress(achievement, stats) : null;
+  const { t, i18n } = useTranslation('profile');
+  const progress =
+    stats && achievement.criteria
+      ? getAchievementProgress(achievement as Achievement, stats)
+      : null;
 
   const sizeClasses = {
     sm: 'p-2',
@@ -48,10 +67,10 @@ export function AchievementBadge({
   return (
     <Card
       className={cn(
-        'glass-card relative overflow-hidden transition-all',
+        'relative overflow-hidden transition-all',
         earned
-          ? 'border-yellow-500/30 bg-yellow-500/5'
-          : 'opacity-70 grayscale',
+          ? 'border-[color:var(--quest-gold)]/45 bg-[color:var(--quest-gold)]/10'
+          : 'opacity-70 grayscale border-border bg-card',
         className,
       )}
       style={style}
@@ -62,10 +81,12 @@ export function AchievementBadge({
           <div
             className={cn(
               'flex-shrink-0 flex items-center justify-center rounded-lg bg-muted/50 p-2',
-              earned ? 'bg-yellow-500/20' : '',
+              earned ? 'bg-[color:var(--quest-gold)]/20' : '',
             )}
           >
-            <span className={iconSizes[size]}>{achievement.icon}</span>
+            <span className={iconSizes[size]} aria-hidden="true">
+              {achievement.icon}
+            </span>
           </div>
 
           {/* Content */}
@@ -80,7 +101,10 @@ export function AchievementBadge({
                 {achievement.name}
               </h3>
               {earned ? (
-                <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-[color:var(--quest-success)]">
+                  <Check className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                  {t('achievements.unlocked')}
+                </span>
               ) : (
                 <Lock className="h-3 w-3 text-muted-foreground flex-shrink-0" />
               )}
@@ -97,8 +121,8 @@ export function AchievementBadge({
 
             {/* XP Reward */}
             <div className="flex items-center gap-1 mt-1">
-              <Zap className="h-3 w-3 text-accent" />
-              <span className="text-xs text-accent">
+              <Zap className="h-3 w-3 text-primary" aria-hidden="true" />
+              <span className="text-xs text-primary">
                 +{achievement.xpReward} XP
               </span>
             </div>
@@ -116,7 +140,9 @@ export function AchievementBadge({
             {/* Earned date */}
             {earned && earnedAt && (
               <p className="text-xs text-muted-foreground mt-2">
-                Earned {earnedAt.toLocaleDateString()}
+                {t('achievements.earnedOn', {
+                  date: earnedAt.toLocaleDateString(i18n.language),
+                })}
               </p>
             )}
           </div>
@@ -128,7 +154,7 @@ export function AchievementBadge({
           className={cn(
             'absolute top-2 right-2',
             earned
-              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+              ? 'bg-[color:var(--quest-gold)]/15 text-foreground border-[color:var(--quest-gold)]/35'
               : 'bg-muted',
           )}
         >

@@ -1,521 +1,744 @@
-import { createFileRoute, useParams } from '@tanstack/react-router';
-
-import { useTranslation } from 'react-i18next';
+import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  AlertCircle,
+  ArrowRight,
+  Award,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  Code2,
+  Compass,
+  Flame,
+  Map,
+  RotateCcw,
+  Target,
+  Trophy,
+  Zap,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
 import { Skeleton } from '@/components/ui/skeleton';
 import {
-  Award,
-  BookOpen,
-  Code,
-
-  Zap,
-  AlertCircle,
-} from 'lucide-react';
-import { getXPForLevel } from '@/lib/gamification';
-import { getUserSettings } from '@/server/user.fn';
-
+  CTAButton,
+  PageContainer,
+  PaperSurface,
+  SectionHeading,
+  StatPill,
+} from '@/components/cozy-quest';
 import { AchievementBadge } from '@/components/gamification/achievement-badge';
-import { Achievement } from '@/lib/achievements';
+import { XPProgressBar } from '@/components/gamification/xp-progress-bar';
+import { getLevelTitle } from '@/lib/gamification';
+import { getUserSettings, type UserData } from '@/server/user.fn';
 
 export const Route = createFileRoute('/$locale/_authenticated/profile')({
   component: ProfilePage,
 });
 
-interface UserProfile {
-  id: string;
-  name: string | null;
-  email: string;
-  image?: string;
-  createdAt: Date;
-  xp: number;
-  level: number;
-  xpProgress: number;
-  xpNeeded: number;
-  xpProgressPercentage: number;
-  profileVisibility: 'PUBLIC' | 'PRIVATE';
-  showOnLeaderboard: boolean;
-  stats: {
-    completedChallenges: number;
-    completedTutorials: number;
-    achievementsCount: number;
-    challengesByType: Record<string, number>;
-    challengesByTier: Record<string, number>;
-    tierTotalCounts: Record<string, number>;
-  };
-  earnedAchievements: (Achievement & { unlockedAt: Date })[];
-  recentActivity: {
-    type: 'challenge' | 'achievement';
-    title: string;
-    xp: number;
-    date: string;
-  }[];
-  heatmapData: {
-    date: string;
-    count: number;
-  }[];
-}
+type ProfileResponse =
+  | { success: true; data: UserData }
+  | { success: false; error?: string };
 
-interface ProfileResponse {
-  success: boolean;
-  data?: UserProfile;
-  error?: string;
-}
+const tierKeys = ['basic', 'beginner', 'intermediate', 'e2e'] as const;
+const topicConfig = [
+  { key: 'CSS_SELECTOR', label: 'css_selector' },
+  { key: 'XPATH_SELECTOR', label: 'xpath_selector' },
+  { key: 'JAVASCRIPT', label: 'javascript' },
+  { key: 'TYPESCRIPT', label: 'typescript' },
+  { key: 'PLAYWRIGHT', label: 'playwright' },
+] as const;
 
 function ProfilePage() {
   const { locale } = useParams({ from: '/$locale/_authenticated/profile' });
-  const { t } = useTranslation(['profile', 'leaderboard', 'common']);
-  // Auth is guaranteed by _authenticated parent route
-  const { data, isLoading, error } = useQuery<ProfileResponse, Error>({
+  const { t } = useTranslation([
+    'profile',
+    'leaderboard',
+    'common',
+    'challenges',
+  ]);
+  const { data, isLoading, error, refetch } = useQuery<ProfileResponse, Error>({
     queryKey: ['profile'],
-    queryFn: async (): Promise<ProfileResponse> => {
+    queryFn: async () => {
       const result = await getUserSettings({ data: { locale } });
       if (!result.success || !result.data) {
-        return {
-          success: false,
-          error: result.error || 'Failed to fetch profile',
-        };
+        return { success: false, error: result.error };
       }
-      // Cast the result.data to UserProfile
-      return {
-        success: true,
-        data: result.data as UserProfile,
-      };
+      return { success: true, data: result.data };
     },
   });
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen p-6 md:p-10">
-        <div className="max-w-6xl mx-auto">
-          <Card className="glass-card mb-8">
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                <Skeleton className="h-24 w-24 rounded-full" />
-                <div className="flex-1 space-y-3">
-                  <Skeleton className="h-8 w-48" />
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-2 w-full max-w-md" />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[1, 2, 3, 4].map((i) => (
-              <Card key={i} className="glass-card">
-                <CardContent className="p-6 text-center">
-                  <Skeleton className="h-8 w-8 mx-auto mb-2" />
-                  <Skeleton className="h-6 w-12 mx-auto mb-1" />
-                  <Skeleton className="h-4 w-20 mx-auto" />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <JournalLoading />;
 
-  // Error state
-  if (error || !data?.success || !data?.data) {
+  if (error || !data?.success) {
+    const responseError = data && !data.success ? data.error : undefined;
     return (
-      <div className="min-h-screen p-6 md:p-10 flex items-center justify-center">
-        <div className="text-center">
-          <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h3 className="text-lg font-semibold mb-2">
-            {t('common:messages.error')}
-          </h3>
-          <p className="text-muted-foreground">{t('common:messages.retry')}</p>
-        </div>
-      </div>
+      <main className="min-h-screen py-10 sm:py-14">
+        <PageContainer width="narrow">
+          <PaperSurface className="px-6 py-14 text-center" texture={false}>
+            <AlertCircle
+              className="mx-auto size-10 text-destructive"
+              aria-hidden="true"
+            />
+            <h1 className="mt-4 font-display text-3xl font-semibold">
+              {t('profile:states.errorTitle')}
+            </h1>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+              {responseError ||
+                error?.message ||
+                t('profile:states.errorDescription')}
+            </p>
+            <Button className="mt-6" onClick={() => void refetch()}>
+              <RotateCcw className="mr-2 size-4" aria-hidden="true" />
+              {t('profile:states.retry')}
+            </Button>
+          </PaperSurface>
+        </PageContainer>
+      </main>
     );
   }
 
   const user = data.data;
-  const xpToNext = getXPForLevel(user.level + 1);
-  const currentLevelXp = getXPForLevel(user.level);
-  const progressXp = user.xp - currentLevelXp;
-  const neededXp = xpToNext - currentLevelXp;
-  const levelProgress = neededXp > 0 ? (progressXp / neededXp) * 100 : 100;
-
-  // Helper for safe access
-  const getTierStats = (tier: string) => {
-    const completed = user.stats.challengesByTier?.[tier] || 0;
-    const total = user.stats.tierTotalCounts?.[tier] || 0;
-    const progress = total > 0 ? (completed / total) * 100 : 0;
-    return { completed, total, progress };
-  };
-
-  const basicStats = getTierStats('basic');
-  const beginnerStats = getTierStats('beginner');
-  const intermediateStats = getTierStats('intermediate');
-  const e2eStats = getTierStats('e2e');
+  const levelTitle = t(`common:levelTitles.${getLevelTitle(user.level)}`);
+  const recentAchievements = user.earnedAchievements.slice(0, 3);
 
   return (
-    <div className="min-h-screen p-6 md:p-10 page-transition">
-      <div className="max-w-6xl mx-auto">
-        {/* Profile Header */}
-        <Card className="glass-card mb-8">
-          <CardContent className="p-8">
-            <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-              <Avatar className="h-24 w-24">
-                <AvatarImage
-                  src={user.image || undefined}
-                  alt={user.name || 'User'}
-                  className="object-cover"
-                />
-                <AvatarFallback className="bg-primary/20 text-2xl text-primary font-medium">
-                  {(user.name || user.email).charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
-
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <h1 className="text-3xl font-bold">
+    <main className="min-h-screen py-8 sm:py-10 lg:py-12">
+      <PageContainer width="wide">
+        <PaperSurface className="relative overflow-hidden px-6 py-8 sm:px-10 sm:py-10">
+          <div
+            aria-hidden="true"
+            className="absolute -right-14 -top-16 size-56 rounded-full border-[18px] border-accent/25"
+          />
+          <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)] lg:items-end">
+            <div>
+              <SectionHeading
+                as="h1"
+                align="left"
+                eyebrow={t('profile:journal.eyebrow')}
+                title={t('profile:journal.title')}
+                description={t('profile:journal.description')}
+              />
+              <div className="mt-7 flex items-center gap-4">
+                <Avatar className="size-16 border-2 border-primary/20 sm:size-20">
+                  <AvatarImage
+                    src={user.image}
+                    alt={user.name || user.email}
+                    className="object-cover"
+                  />
+                  <AvatarFallback className="bg-primary/10 text-xl font-bold text-primary">
+                    {(user.name || user.email).charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="min-w-0">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                    {t('profile:journal.testerProfile')}
+                  </p>
+                  <h2 className="truncate text-2xl font-bold sm:text-3xl">
                     {user.name || t('leaderboard:table.anonymous')}
-                  </h1>
-                  <Badge className="bg-primary/20 text-primary">
-                    {t('profile:header.level', { level: user.level })}
-                  </Badge>
-                </div>
-                <p className="text-muted-foreground mb-4">{user.email}</p>
-
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {t('profile:header.progressTo', {
-                        level: user.level + 1,
-                      })}
-                    </span>
-                    <span className="font-medium">
-                      {progressXp} / {neededXp} XP
-                    </span>
-                  </div>
-                  <Progress value={levelProgress} className="h-2" />
+                  </h2>
+                  <p className="truncate text-sm text-muted-foreground">
+                    {user.email}
+                  </p>
                 </div>
               </div>
-
-
             </div>
-          </CardContent>
-        </Card>
+            <div className="rounded-2xl border border-border bg-background/70 p-5">
+              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+                <Badge
+                  variant="secondary"
+                  className="gap-1.5 px-3 py-1 text-sm"
+                >
+                  <Trophy className="size-4" aria-hidden="true" />
+                  {t('profile:header.level', { level: user.level })}
+                </Badge>
+                <span className="text-sm font-semibold text-muted-foreground">
+                  {levelTitle}
+                </span>
+              </div>
+              <XPProgressBar totalXP={user.xp} size="lg" />
+            </div>
+          </div>
+        </PaperSurface>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="glass-card card-hover">
-            <CardContent className="p-6 text-center">
-              <BookOpen className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold">
-                {user.stats.completedTutorials}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {t('profile:stats.tutorials')}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card card-hover">
-            <CardContent className="p-6 text-center">
-              <Code className="h-8 w-8 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold">
-                {user.stats.completedChallenges}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {t('profile:stats.challenges')}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card card-hover">
-            <CardContent className="p-6 text-center">
-              <Zap className="h-8 w-8 text-accent mx-auto mb-2" />
-              <div className="text-2xl font-bold">
-                {user.xp.toLocaleString()}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {t('profile:stats.totalXp')}
-              </div>
-            </CardContent>
-          </Card>
-          <Card className="glass-card card-hover">
-            <CardContent className="p-6 text-center">
-              <Award className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-              <div className="text-2xl font-bold">
-                {user.stats.achievementsCount}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {t('profile:stats.achievements')}
-              </div>
-            </CardContent>
-          </Card>
+        <section
+          className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4"
+          aria-label={t('profile:journal.summary')}
+        >
+          <StatPill
+            value={user.stats.completedTutorials}
+            label={t('profile:stats.tutorials')}
+          />
+          <StatPill
+            value={user.stats.completedChallenges}
+            label={t('profile:stats.challenges')}
+          />
+          <StatPill
+            value={user.xp.toLocaleString()}
+            label={t('profile:stats.totalXp')}
+          />
+          <StatPill
+            value={user.stats.achievementsCount}
+            label={t('profile:stats.achievements')}
+          />
+        </section>
+
+        <div className="mt-7 grid gap-6 lg:grid-cols-12">
+          <div className="space-y-6 lg:col-span-8">
+            <RecommendationCard user={user} locale={locale} />
+            <AdventurePaths user={user} />
+            <TopicProgress user={user} />
+            <RecentActivity user={user} />
+          </div>
+          <aside className="space-y-6 lg:col-span-4">
+            <StreakCard user={user} />
+            <ContinueLearningCard user={user} locale={locale} />
+            <RecentAchievements achievements={recentAchievements} />
+          </aside>
         </div>
 
-        {/* Tabs */}
-        <Tabs defaultValue="progress">
-          <TabsList>
-            <TabsTrigger value="progress">
-              {t('profile:tabs.progress')}
-            </TabsTrigger>
-            <TabsTrigger value="activity">
-              {t('profile:tabs.activity')}
-            </TabsTrigger>
-            <TabsTrigger value="achievements">
-              {t('profile:tabs.achievements')}
-            </TabsTrigger>
-          </TabsList>
+        <BadgeCollection achievements={user.earnedAchievements} />
+        <XpMilestones xp={user.xp} />
 
-          <TabsContent value="progress" className="mt-6">
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle>{t('profile:tierProgress.title')}</CardTitle>
-                <CardDescription>
-                  {t('profile:tierProgress.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {/* Tier: Basic */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">🟢</span>
-                      <span className="font-medium">
-                        {t('profile:tierProgress.basic')}
-                      </span>
-                    </div>
-                    <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: basicStats.total })}
-                    </Badge>
-                  </div>
-                  <Progress
-                    value={basicStats.progress}
-                    className="h-2"
-                  />
-                  <div className="text-right text-xs text-muted-foreground">
-                    {basicStats.completed} / {basicStats.total}
-                  </div>
-                </div>
-
-                {/* Tier: Beginner */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">🟡</span>
-                      <span className="font-medium">
-                        {t('profile:tierProgress.beginner')}
-                      </span>
-                    </div>
-                    <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: beginnerStats.total })}
-                    </Badge>
-                  </div>
-                  <Progress
-                    value={beginnerStats.progress}
-                    className="h-2"
-                  />
-                  <div className="text-right text-xs text-muted-foreground">
-                    {beginnerStats.completed} / {beginnerStats.total}
-                  </div>
-                </div>
-
-                {/* Tier: Intermediate */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">🟠</span>
-                      <span className="font-medium">
-                        {t('profile:tierProgress.intermediate')}
-                      </span>
-                    </div>
-                    <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: intermediateStats.total })}
-                    </Badge>
-                  </div>
-                  <Progress
-                    value={intermediateStats.progress}
-                    className="h-2"
-                  />
-                  <div className="text-right text-xs text-muted-foreground">
-                    {intermediateStats.completed} / {intermediateStats.total}
-                  </div>
-                </div>
-
-                {/* Tier: E2E Testing */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-xl">🟣</span>
-                      <span className="font-medium">
-                        {t('profile:tierProgress.e2e')}
-                      </span>
-                    </div>
-                    <Badge variant="secondary">
-                      {t('profile:tierProgress.challengeCount', { count: e2eStats.total })}
-                    </Badge>
-                  </div>
-                  <Progress
-                    value={e2eStats.progress}
-                    className="h-2"
-                  />
-                  <div className="text-right text-xs text-muted-foreground">
-                    {e2eStats.completed} / {e2eStats.total}
-                  </div>
-                </div>
-
-                {/* XP Milestones */}
-                <div className="mt-8 pt-6 border-t border-border">
-                  <h4 className="font-medium mb-4 flex items-center gap-2">
-                    <Zap className="h-4 w-4 text-accent" />
-                    {t('profile:milestones.title')}
-                  </h4>
-                  <div className="flex flex-wrap gap-2">
-                    {[100, 500, 1000, 2500, 5000].map((milestone) => (
-                      <Badge
-                        key={milestone}
-                        variant={
-                          (user.xp ?? 0) >= milestone ? 'default' : 'outline'
-                        }
-                        className={
-                          (user.xp ?? 0) >= milestone
-                            ? 'bg-accent text-accent-foreground'
-                            : 'opacity-50'
-                        }
-                      >
-                        {(user.xp ?? 0) >= milestone ? '✓' : ''}{' '}
-                        {milestone.toLocaleString()} XP
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="activity" className="mt-6">
-            <Card className="glass-card">
-              <CardHeader>
-                <CardTitle>{t('profile:activity.title')}</CardTitle>
-                <CardDescription>
-                  {t('profile:activity.description')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="mt-6 ml-[18px]">
-                  {!user.recentActivity || user.recentActivity.length === 0 ? (
-                    <div className="text-center py-12 text-muted-foreground ml-[-18px]">
-                      <Code className="h-10 w-10 mx-auto mb-3 opacity-30" />
-                      <p>{t('profile:activity.empty')}</p>
-                    </div>
-                  ) : (
-                    <div className="border-l-2 border-primary/20 space-y-8 pl-8 pb-2">
-                      {user.recentActivity.map((activity, index) => (
-                        <div key={index} className="relative group">
-                          {/* Timeline Node */}
-                          <div
-                            className={
-                              'absolute -left-[41px] top-0 h-6 w-6 rounded-full border-4 border-background flex items-center justify-center ' +
-                              (activity.type === 'challenge'
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-accent text-accent-foreground')
-                            }
-                          >
-                            {activity.type === 'challenge' ? (
-                              <Code className="h-3 w-3" />
-                            ) : (
-                              <Award className="h-3 w-3" />
-                            )}
-                          </div>
-
-                          {/* Content Card */}
-                          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-4 rounded-lg bg-card/50 border border-border/50 hover:bg-muted/30 transition-colors">
-                            <div className="space-y-1">
-                              <h4 className="font-semibold text-sm leading-none">
-                                {activity.title}
-                              </h4>
-                              <p className="text-xs text-muted-foreground">
-                                {activity.date}
-                              </p>
-                            </div>
-                            <Badge
-                              variant="secondary"
-                              className="w-fit font-mono text-xs"
-                            >
-                              +{activity.xp} XP
-                            </Badge>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="achievements" className="mt-6">
-            {!user.earnedAchievements ||
-              user.earnedAchievements.length === 0 ? (
-              <Card className="glass-card">
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>{t('profile:achievements.empty')}</p>
-                  <p className="text-sm mt-2">
-                    {t('profile:achievements.available', { count: 30 })}
-                  </p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {user.earnedAchievements.map((achievement, index) => (
-                  <AchievementBadge
-                    key={index}
-                    achievement={{
-                      ...achievement,
-                      key: achievement.id,
-                      criteria: { type: 'count', target: 1 }, // Dummy criteria
-                    }}
-                    earned
-                    earnedAt={new Date(achievement.unlockedAt)}
-                    className="animate-scale-in"
-                    style={{ animationDelay: `${index * 50}ms` }}
-                  />
-                ))}
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-
-        {/* Danger Zone */}
-        <Card className="border-red-500/20 bg-red-500/5 mt-8">
-          <CardHeader>
-            <CardTitle className="text-red-600 flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              Danger Zone
-            </CardTitle>
-            <CardDescription>
-              Once you delete your account, there is no going back. Please be certain.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="flex justify-end bg-red-500/5 border-t border-red-500/10">
+        <PaperSurface
+          className="mt-8 border-destructive/30 bg-destructive/5"
+          texture={false}
+        >
+          <div className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="flex items-center gap-2 font-semibold text-destructive">
+                <AlertCircle className="size-5" aria-hidden="true" />
+                {t('profile:account.title')}
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {t('profile:account.description')}
+              </p>
+            </div>
             <Button variant="destructive" asChild>
-              <a href={`mailto:admin@testingwithekki.com?subject=Request Account Deletion&body=I would like to request the deletion of my account associated with this email: ${user.email}`}>
-                Request Account Deletion
+              <a
+                href={`mailto:admin@testingwithekki.com?subject=Request Account Deletion&body=I would like to request the deletion of my account associated with this email: ${user.email}`}
+              >
+                {t('profile:account.delete')}
               </a>
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+        </PaperSurface>
+      </PageContainer>
+    </main>
+  );
+}
+
+function RecommendationCard({
+  user,
+  locale,
+}: {
+  user: UserData;
+  locale: string;
+}) {
+  const { t } = useTranslation(['profile', 'common', 'challenges']);
+  const challenge = user.journal.recommendedChallenge;
+  return (
+    <PaperSurface className="p-6 sm:p-7">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('profile:recommendation.eyebrow')}
+          </p>
+          <h2 className="mt-2 font-display text-2xl font-semibold">
+            {t('profile:recommendation.title')}
+          </h2>
+        </div>
+        <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+          <Target className="size-5" aria-hidden="true" />
+        </span>
       </div>
+      {challenge ? (
+        <div className="mt-5 flex flex-col gap-4 rounded-xl border border-border bg-background/65 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="min-w-0">
+            <h3 className="font-semibold">{challenge.title}</h3>
+            <div className="mt-2 flex flex-wrap gap-2 text-xs">
+              <Badge variant="secondary">
+                {t(`challenges:types.${challenge.type.toLowerCase()}`)}
+              </Badge>
+              <Badge variant="outline">
+                {t(`common:labels.${challenge.difficulty.toLowerCase()}`)}
+              </Badge>
+              <span className="inline-flex items-center gap-1 font-semibold text-primary">
+                <Zap className="size-3.5" aria-hidden="true" />
+                {challenge.xpReward} XP
+              </span>
+            </div>
+          </div>
+          <CTAButton asChild className="shrink-0">
+            <Link
+              to="/$locale/challenges/$slug"
+              params={{ locale, slug: challenge.slug }}
+            >
+              {t('profile:recommendation.open')}
+              <ArrowRight className="size-4" />
+            </Link>
+          </CTAButton>
+        </div>
+      ) : (
+        <JournalEmpty
+          icon={CheckCircle2}
+          title={t('profile:recommendation.completeTitle')}
+          description={t('profile:recommendation.completeDescription')}
+          action={
+            <Button variant="outline" asChild>
+              <Link to="/$locale/challenges" params={{ locale }}>
+                {t('common:actions.viewAll')}
+              </Link>
+            </Button>
+          }
+        />
+      )}
+    </PaperSurface>
+  );
+}
+
+function AdventurePaths({ user }: { user: UserData }) {
+  const { t } = useTranslation('profile');
+  return (
+    <PaperSurface className="p-6" texture={false}>
+      <div className="flex items-start gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Map className="size-5" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('paths.eyebrow')}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            {t('paths.title')}
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {t('paths.description')}
+          </p>
+        </div>
+      </div>
+      <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        {tierKeys.map((tier) => {
+          const completed = user.stats.challengesByTier[tier] || 0;
+          const total = user.stats.tierTotalCounts[tier] || 0;
+          const percent = total ? Math.round((completed / total) * 100) : 0;
+          const status =
+            completed === total && total > 0
+              ? 'completed'
+              : completed > 0
+                ? 'inProgress'
+                : 'notStarted';
+          return (
+            <div
+              key={tier}
+              className="rounded-xl border border-border bg-card p-4"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <h3 className="font-semibold">{t(`tierProgress.${tier}`)}</h3>
+                <Badge variant="outline">{t(`paths.status.${status}`)}</Badge>
+              </div>
+              <Progress
+                value={percent}
+                className="mt-4"
+                aria-label={t(`tierProgress.${tier}`)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={percent}
+                aria-valuetext={t('paths.progressValue', {
+                  completed,
+                  total,
+                  percent,
+                })}
+              />
+              <p className="mt-2 text-right text-xs font-semibold tabular-nums text-muted-foreground">
+                {t('paths.progressValue', { completed, total, percent })}
+              </p>
+            </div>
+          );
+        })}
+      </div>
+    </PaperSurface>
+  );
+}
+
+function TopicProgress({ user }: { user: UserData }) {
+  const { t } = useTranslation(['profile', 'challenges']);
+  return (
+    <PaperSurface className="p-6" texture={false}>
+      <div className="flex items-start gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+          <Compass className="size-5" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('profile:topics.eyebrow')}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            {t('profile:topics.title')}
+          </h2>
+        </div>
+      </div>
+      <div className="mt-6 space-y-4">
+        {topicConfig.map((topic) => {
+          const completed = user.stats.challengesByType[topic.key] || 0;
+          const total = user.journal.challengeTypeTotalCounts[topic.key] || 0;
+          const percent = total ? Math.round((completed / total) * 100) : 0;
+          return (
+            <div key={topic.key}>
+              <div className="flex items-center justify-between gap-3 text-sm">
+                <span className="font-semibold">
+                  {t(`challenges:types.${topic.label}`)}
+                </span>
+                <span className="tabular-nums text-muted-foreground">
+                  {t('profile:topics.progressValue', {
+                    completed,
+                    total,
+                    percent,
+                  })}
+                </span>
+              </div>
+              <Progress
+                value={percent}
+                className="mt-2"
+                aria-label={t(`challenges:types.${topic.label}`)}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={percent}
+              />
+            </div>
+          );
+        })}
+      </div>
+    </PaperSurface>
+  );
+}
+
+function StreakCard({ user }: { user: UserData }) {
+  const { t } = useTranslation('profile');
+  return (
+    <PaperSurface className="p-6">
+      <span className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--quest-clay)]/15 text-[color:var(--quest-clay)]">
+        <Flame className="size-5" aria-hidden="true" />
+      </span>
+      <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-primary">
+        {t('streak.eyebrow')}
+      </p>
+      <h2 className="mt-1 font-display text-2xl font-semibold">
+        {t('streak.title')}
+      </h2>
+      <p className="mt-4 text-4xl font-bold tabular-nums text-primary">
+        {t('streak.current', { count: user.journal.currentStreak })}
+      </p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {t('streak.description')}
+      </p>
+      <div className="mt-5 border-t border-border pt-4 text-sm">
+        <span className="text-muted-foreground">{t('streak.longest')}</span>
+        <span className="float-right font-semibold tabular-nums">
+          {t('streak.days', { count: user.journal.longestStreak })}
+        </span>
+      </div>
+    </PaperSurface>
+  );
+}
+
+function ContinueLearningCard({
+  user,
+  locale,
+}: {
+  user: UserData;
+  locale: string;
+}) {
+  const { t } = useTranslation(['profile', 'common']);
+  const tutorial = user.journal.continueTutorial;
+  return (
+    <PaperSurface className="p-6">
+      <div className="flex items-start gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <BookOpen className="size-5" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('profile:continue.eyebrow')}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            {t('profile:continue.title')}
+          </h2>
+        </div>
+      </div>
+      {tutorial ? (
+        <>
+          <h3 className="mt-5 font-semibold">{tutorial.title}</h3>
+          <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <Clock className="size-3.5" aria-hidden="true" />
+              {t('profile:continue.minutes', {
+                count: tutorial.estimatedMinutes,
+              })}
+            </span>
+            {tutorial.tags.slice(0, 2).map((tag) => (
+              <Badge key={tag} variant="secondary">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+          <CTAButton variant="outline" asChild className="mt-5 w-full">
+            <Link
+              to="/$locale/tutorials/$slug"
+              params={{ locale, slug: tutorial.slug }}
+            >
+              {t('profile:continue.open')}
+              <ArrowRight className="size-4" />
+            </Link>
+          </CTAButton>
+        </>
+      ) : (
+        <JournalEmpty
+          icon={CheckCircle2}
+          title={t('profile:continue.completeTitle')}
+          description={t('profile:continue.completeDescription')}
+          action={
+            <Button variant="outline" className="mt-4 w-full" asChild>
+              <Link to="/$locale/tutorials" params={{ locale }}>
+                {t('common:actions.browseTutorials')}
+              </Link>
+            </Button>
+          }
+        />
+      )}
+    </PaperSurface>
+  );
+}
+
+function RecentAchievements({
+  achievements,
+}: {
+  achievements: UserData['earnedAchievements'];
+}) {
+  const { t } = useTranslation('profile');
+  return (
+    <PaperSurface className="p-6">
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--quest-gold)]/15 text-foreground">
+          <Award className="size-5" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('achievements.recentEyebrow')}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            {t('achievements.recentTitle')}
+          </h2>
+        </div>
+      </div>
+      {achievements.length ? (
+        <div className="mt-5 space-y-3">
+          {achievements.map((achievement) => (
+            <AchievementBadge
+              key={achievement.id}
+              achievement={achievement}
+              earned
+              earnedAt={new Date(achievement.unlockedAt)}
+              size="sm"
+              showProgress={false}
+            />
+          ))}
+        </div>
+      ) : (
+        <JournalEmpty
+          icon={Award}
+          title={t('achievements.emptyTitle')}
+          description={t('achievements.emptyDescription')}
+        />
+      )}
+    </PaperSurface>
+  );
+}
+
+function RecentActivity({ user }: { user: UserData }) {
+  const { t } = useTranslation('profile');
+  return (
+    <PaperSurface className="p-6" texture={false}>
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Code2 className="size-5" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('activity.eyebrow')}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            {t('activity.title')}
+          </h2>
+        </div>
+      </div>
+      {user.recentActivity.length ? (
+        <ol className="mt-6 space-y-3">
+          {user.recentActivity.map((activity, index) => (
+            <li
+              key={`${activity.title}-${index}`}
+              className="flex items-center justify-between gap-4 rounded-xl border border-border bg-card p-4"
+            >
+              <div className="min-w-0">
+                <p className="font-semibold">{activity.title}</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {activity.type === 'challenge'
+                    ? t('activity.challenge')
+                    : t('activity.achievement')}{' '}
+                  · {activity.date}
+                </p>
+              </div>
+              <Badge variant="secondary" className="font-mono">
+                +{activity.xp} XP
+              </Badge>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <JournalEmpty
+          icon={Code2}
+          title={t('activity.emptyTitle')}
+          description={t('activity.empty')}
+        />
+      )}
+    </PaperSurface>
+  );
+}
+
+function BadgeCollection({
+  achievements,
+}: {
+  achievements: UserData['earnedAchievements'];
+}) {
+  const { t } = useTranslation('profile');
+  return (
+    <section className="mt-8" aria-labelledby="badge-collection">
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('achievements.collectionEyebrow')}
+          </p>
+          <h2
+            id="badge-collection"
+            className="mt-1 font-display text-3xl font-semibold"
+          >
+            {t('achievements.collectionTitle')}
+          </h2>
+        </div>
+        <Badge variant="secondary">
+          {t('achievements.collectionCount', { count: achievements.length })}
+        </Badge>
+      </div>
+      {achievements.length ? (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {achievements.map((achievement) => (
+            <AchievementBadge
+              key={achievement.id}
+              achievement={achievement}
+              earned
+              earnedAt={new Date(achievement.unlockedAt)}
+              showProgress={false}
+            />
+          ))}
+        </div>
+      ) : (
+        <PaperSurface className="px-6 py-12" texture={false}>
+          <JournalEmpty
+            icon={Award}
+            title={t('achievements.emptyTitle')}
+            description={t('achievements.emptyDescription')}
+          />
+        </PaperSurface>
+      )}
+    </section>
+  );
+}
+
+function XpMilestones({ xp }: { xp: number }) {
+  const { t } = useTranslation('profile');
+  const milestones = [100, 500, 1000, 2500, 5000];
+  return (
+    <PaperSurface className="mt-8 p-6" texture={false}>
+      <div className="flex items-center gap-3">
+        <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Zap className="size-5" aria-hidden="true" />
+        </span>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+            {t('milestones.eyebrow')}
+          </p>
+          <h2 className="mt-1 font-display text-2xl font-semibold">
+            {t('milestones.title')}
+          </h2>
+        </div>
+      </div>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {milestones.map((milestone) => {
+          const reached = xp >= milestone;
+          return (
+            <Badge
+              key={milestone}
+              variant={reached ? 'default' : 'outline'}
+              className="gap-1.5 px-3 py-1.5"
+            >
+              <CheckCircle2 className="size-3.5" aria-hidden="true" />
+              {milestone.toLocaleString()} XP ·{' '}
+              {t(reached ? 'milestones.reached' : 'milestones.notReached')}
+            </Badge>
+          );
+        })}
+      </div>
+    </PaperSurface>
+  );
+}
+
+function JournalEmpty({
+  icon: Icon,
+  title,
+  description,
+  action,
+}: {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="mt-5 text-center">
+      <Icon
+        className="mx-auto size-8 text-muted-foreground/70"
+        aria-hidden="true"
+      />
+      <h3 className="mt-3 font-semibold">{title}</h3>
+      <p className="mx-auto mt-1 max-w-md text-sm leading-6 text-muted-foreground">
+        {description}
+      </p>
+      {action}
     </div>
   );
 }
+
+function JournalLoading() {
+  return (
+    <main className="min-h-screen py-8 sm:py-10" aria-busy="true">
+      <PageContainer width="wide">
+        <span className="sr-only">Loading profile</span>
+        <Skeleton className="h-72 rounded-[1.25rem]" />
+        <div className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[1, 2, 3, 4].map((item) => (
+            <Skeleton key={item} className="h-28 rounded-2xl" />
+          ))}
+        </div>
+        <div className="mt-7 grid gap-6 lg:grid-cols-12">
+          <Skeleton className="h-[38rem] rounded-[1.25rem] lg:col-span-8" />
+          <Skeleton className="h-[38rem] rounded-[1.25rem] lg:col-span-4" />
+        </div>
+      </PageContainer>
+    </main>
+  );
+}
+
+export default ProfilePage;

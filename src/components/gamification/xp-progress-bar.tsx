@@ -29,6 +29,7 @@ export function XPProgressBar({
     [progress.currentLevel],
   );
   const title = t(`common:levelTitles.${titleKey}`);
+  const levelRange = progress.nextLevelXP - progress.currentLevelXP;
 
   const sizeClasses = {
     sm: 'h-1.5',
@@ -42,7 +43,10 @@ export function XPProgressBar({
         <div className="flex items-center justify-between text-sm">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 font-semibold">
-              <Star className="h-4 w-4 text-yellow-400" />
+              <Star
+                className="h-4 w-4 text-[color:var(--quest-gold)]"
+                aria-hidden="true"
+              />
               <span>
                 {t('common:labels.level')} {progress.currentLevel}
               </span>
@@ -50,23 +54,28 @@ export function XPProgressBar({
             <span className="text-muted-foreground">{title}</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
-            <Zap className="h-3 w-3 text-accent" />
+            <Zap className="h-3 w-3 text-primary" aria-hidden="true" />
             <span>{formatXP(totalXP)} XP</span>
           </div>
         </div>
       )}
 
       <div className="relative">
-        <Progress value={progress.progress} className={cn(sizeClasses[size])} />
+        <Progress
+          value={progress.progress}
+          className={cn(sizeClasses[size])}
+          aria-label={`${t('common:labels.level')} ${progress.currentLevel}`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(progress.progress)}
+          aria-valuetext={`${formatXP(progress.xpInCurrentLevel)} of ${formatXP(levelRange)} XP`}
+        />
         {showDetails && (
           <div className="flex justify-between text-xs text-muted-foreground mt-1">
-            <span>{formatXP(progress.xpInCurrentLevel)} XP</span>
             <span>
-              {t('challenges:success.xpToNext', {
-                xp: formatXP(progress.nextLevelXP - progress.currentLevelXP),
-                defaultValue: `${formatXP(progress.nextLevelXP - progress.currentLevelXP)} XP to next`,
-              })}
+              {formatXP(progress.xpInCurrentLevel)} / {formatXP(levelRange)} XP
             </span>
+            <span>{Math.round(progress.progress)}%</span>
           </div>
         )}
       </div>
