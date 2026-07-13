@@ -101,9 +101,9 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md glass-card">
+    <Card className="w-full max-w-md border-border bg-card shadow-[0_20px_50px_rgba(73,62,45,0.1)]">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold gradient-text">
+        <CardTitle className="font-display text-2xl font-semibold">
           {t('auth:login.title')}
         </CardTitle>
         <CardDescription>{t('auth:login.description')}</CardDescription>
@@ -132,9 +132,13 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
               disabled={isLoading}
               autoComplete="email"
               className={cn(errors.email && 'border-destructive')}
+              aria-invalid={Boolean(errors.email)}
+              aria-describedby={errors.email ? 'email-error' : undefined}
             />
             {errors.email && (
-              <p className="text-sm text-destructive">{errors.email}</p>
+              <p id="email-error" className="text-sm text-destructive">
+                {errors.email}
+              </p>
             )}
           </div>
 
@@ -159,9 +163,13 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
               disabled={isLoading}
               autoComplete="current-password"
               className={cn(errors.password && 'border-destructive')}
+              aria-invalid={Boolean(errors.password)}
+              aria-describedby={errors.password ? 'password-error' : undefined}
             />
             {errors.password && (
-              <p className="text-sm text-destructive">{errors.password}</p>
+              <p id="password-error" className="text-sm text-destructive">
+                {errors.password}
+              </p>
             )}
           </div>
         </CardContent>
@@ -169,7 +177,13 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
         <CardFooter className="flex flex-col gap-4 pt-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              <>
+                <span
+                  className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                  aria-hidden="true"
+                />
+                <span className="sr-only">{t('common:messages.loading')}</span>
+              </>
             ) : (
               t('common:actions.signIn')
             )}

@@ -35,7 +35,9 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const locale = params.locale || 'en';
   const isAuthPage =
     location.pathname.includes('/login') ||
-    location.pathname.includes('/register');
+    location.pathname.includes('/register') ||
+    location.pathname.includes('/forgot-password') ||
+    location.pathname.includes('/reset-password');
 
   // Handle scroll effect
   useEffect(() => {

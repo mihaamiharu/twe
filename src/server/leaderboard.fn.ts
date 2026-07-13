@@ -1,6 +1,12 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
-import { users, progress, achievements, userAchievements, submissions } from '@/db/schema';
+import {
+  users,
+  progress,
+  achievements,
+  userAchievements,
+  submissions,
+} from '@/db/schema';
 import { logger } from '@/lib/logger';
 import { desc, eq, and, sql, inArray, like } from 'drizzle-orm';
 import { z } from 'zod';
@@ -21,17 +27,6 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         eq(users.showOnLeaderboard, true),
         sql`${users.xp} > 0`,
       ];
-
-      // Get total count
-      const [countResult] = await db
-        .select({ count: sql<number>`count(*)::int` })
-        .from(users)
-        .where(and(...conditions));
-
-      const total = countResult?.count || 0;
-
-      // Get leaderboard with pagination
-      const offset = (filters.page - 1) * filters.limit;
 
       // Calculate start of current month
       const startOfMonth = new Date();
@@ -56,9 +51,27 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
       )`;
 
       // Define the score column based on period
-      const scoreColumn = filters.period === 'monthly'
-        ? sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})`
-        : users.xp;
+      const scoreColumn =
+        filters.period === 'monthly'
+          ? sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})`
+          : users.xp;
+
+      const rankingConditions = and(
+        ...conditions,
+        filters.period === 'monthly'
+          ? sql`(${monthlySubmissionsXp} + ${monthlyAchievementsXp}) > 0`
+          : undefined,
+      );
+
+      // Count the same membership set as the paginated query. This matters for
+      // monthly pages, where users with only historical XP are intentionally absent.
+      const [countResult] = await db
+        .select({ count: sql<number>`count(*)::int` })
+        .from(users)
+        .where(rankingConditions);
+
+      const total = countResult?.count || 0;
+      const offset = (filters.page - 1) * filters.limit;
 
       const leaderboard = await db
         .select({
@@ -78,15 +91,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
           )`,
         })
         .from(users)
-        .where(
-          and(
-            ...conditions,
-            // If monthly, ensure they have some monthly XP
-            filters.period === 'monthly'
-              ? sql`(${monthlySubmissionsXp} + ${monthlyAchievementsXp}) > 0`
-              : undefined
-          )
-        )
+        .where(rankingConditions)
         .orderBy(desc(scoreColumn), desc(users.level))
         .limit(filters.limit)
         .offset(offset);
@@ -133,8 +138,6 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         displayName: user.name || 'Anonymous',
         badges: userBadgesMap.get(user.id) || [],
       }));
-
-
 
       return {
         success: true,

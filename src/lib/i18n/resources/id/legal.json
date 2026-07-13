@@ -115,7 +115,11 @@
       "successTitle": "Pesan Terkirim!",
       "successMessage": "Terima kasih telah menghubungi! Saya akan segera membalasnya.",
       "errorTitle": "Error",
-      "errorMessage": "Terjadi kesalahan. Silakan coba lagi nanti."
+      "errorMessage": "Terjadi kesalahan. Silakan coba lagi nanti.",
+      "sendAnother": "Kirim pesan lain",
+      "namePlaceholder": "Budi Santoso",
+      "emailPlaceholder": "budi@contoh.com",
+      "messagePlaceholder": "Ceritakan kebutuhan atau pertanyaanmu..."
     },
     "booking": {
       "title": "Booking Sesi 1-1",
@@ -132,5 +136,16 @@
       "description": "Mencari Senior QA Engineer, SDET, atau Test Architect? Saya membantu tim membangun software yang handal dan berkualitas.",
       "cta": "Lihat Resume Saya"
     }
+  },
+  "subscription": {
+    "invalidTitle": "Tautan konfirmasi tidak valid",
+    "invalidDescription": "Tautan konfirmasi ini tidak ada atau sudah tidak berlaku.",
+    "loadingTitle": "Mengonfirmasi langgananmu",
+    "loadingDescription": "Tunggu sebentar saat kami memverifikasi permintaanmu.",
+    "errorTitle": "Kami tidak dapat mengonfirmasi langgananmu",
+    "errorDescription": "Tautan mungkin kedaluwarsa atau sudah digunakan. Coba berlangganan lagi.",
+    "successTitle": "Langganan dikonfirmasi",
+    "successDescription": "Terima kasih telah berlangganan. Kamu akan menerima pembaruan tutorial dan tantangan baru.",
+    "successAction": "Jelajahi Panduan Lapangan"
   }
 }

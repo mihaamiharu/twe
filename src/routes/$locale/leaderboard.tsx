@@ -1,53 +1,68 @@
 import { createFileRoute, Link, useParams } from '@tanstack/react-router';
-import { useTranslation } from 'react-i18next';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Crown, Shield } from 'lucide-react';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Crown,
+  Medal,
+  RotateCcw,
+  Shield,
+  Trophy,
+} from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  CTAButton,
+  PageContainer,
+  PaperSurface,
+  SectionHeading,
+  StatePanel,
+} from '@/components/cozy-quest';
 import { cn } from '@/lib/utils';
 import { leaderboardQueryOptions } from '@/lib/leaderboard.query';
 import { createSeoHead } from '@/lib/seo';
+
+type Period = 'all' | 'monthly';
 
 interface LeaderboardEntry {
   id: string;
   name: string | null;
   image: string | null;
   xp: number;
-  monthlyXp?: number; // Added monthly XP
+  monthlyXp: number;
   level: number;
-  createdAt: Date | null;
   challengesCompleted: number;
   rank: number;
-  displayName: string;
-  badges: {
-    name: string;
-    icon: string;
-    slug: string;
-  }[];
+  badges: Array<{ name: string; icon: string; slug: string }>;
 }
 
-// --- Search Params Schema ---
 const LeaderboardSearchSchema = z.object({
   period: z.enum(['all', 'monthly']).optional(),
+  page: z.coerce.number().int().min(1).optional(),
 });
 
 export const Route = createFileRoute('/$locale/leaderboard')({
   validateSearch: LeaderboardSearchSchema,
-  loaderDeps: ({ search: { period } }) => ({ period }),
-  loader: async ({ context, params, deps: { period } }) => {
-    // Prefetch specific period first (priority)
+  loaderDeps: ({ search }) => ({
+    period: (search.period ?? 'all') as Period,
+    page: search.page ?? 1,
+  }),
+  loader: async ({ context, params, deps: { period, page } }) => {
     const activePromise = context.queryClient.ensureQueryData(
       leaderboardQueryOptions({
         period,
         locale: params.locale,
-        page: 1,
+        page,
         limit: 50,
       }),
     );
 
-    // Prefetch the other one in background for instant tab switch
-    const otherPeriod = period === 'all' ? 'monthly' : 'all';
+    const otherPeriod: Period = period === 'all' ? 'monthly' : 'all';
     void context.queryClient.prefetchQuery(
       leaderboardQueryOptions({
         period: otherPeriod,
@@ -59,356 +74,472 @@ export const Route = createFileRoute('/$locale/leaderboard')({
 
     return activePromise;
   },
+  pendingComponent: LeaderboardLoading,
   component: LeaderboardPage,
-  head: ({ params }) => {
-    const locale = params.locale || 'en';
-    return createSeoHead({
+  head: ({ params }) =>
+    createSeoHead({
       title: 'Leaderboard | TestingWithEkki',
-      description: 'See who tops the charts! View the all-time and monthly leaderboard for TestingWithEkki challenges.',
+      description:
+        'See all-time and monthly XP rankings for TestingWithEkki challenges.',
       path: '/leaderboard',
-      locale,
-    });
-  },
+      locale: params.locale || 'en',
+    }),
 });
 
 function LeaderboardPage() {
   const { locale } = useParams({ from: '/$locale/leaderboard' });
   const { t } = useTranslation(['leaderboard', 'common']);
   const { auth } = Route.useRouteContext();
-  const session = auth;
-  const isAuthenticated = !!session?.user;
   const navigate = Route.useNavigate();
-
-  // URL-based State
-  const searchParams = Route.useSearch();
-  const period = searchParams.period ?? 'all';
-
-  const { data: leaderboardData } = useSuspenseQuery(
-    leaderboardQueryOptions({ page: 1, limit: 50, period, locale }),
+  const { period: requestedPeriod, page: requestedPage } = Route.useSearch();
+  const period: Period = requestedPeriod ?? 'all';
+  const page = requestedPage ?? 1;
+  const query = useSuspenseQuery(
+    leaderboardQueryOptions({ page, limit: 50, period, locale }),
   );
 
-  const users: LeaderboardEntry[] = leaderboardData?.data ?? [];
+  if (!query.data.success) {
+    return (
+      <main className="min-h-screen py-10 sm:py-14">
+        <PageContainer width="narrow">
+          <PaperSurface className="px-6 py-14 sm:px-10" texture={false}>
+            <StatePanel
+              icon={RotateCcw}
+              tone="danger"
+              title={t('error.title')}
+              description={query.data.error || t('error.description')}
+              actions={
+                <Button onClick={() => void query.refetch()}>
+                  <RotateCcw className="size-4" aria-hidden="true" />
+                  {t('common:actions.tryAgain')}
+                </Button>
+              }
+            />
+          </PaperSurface>
+        </PageContainer>
+      </main>
+    );
+  }
 
-  const TopThree = users.slice(0, 3);
-  const RestUsers = users.slice(3);
+  const users = query.data.data as LeaderboardEntry[];
+  const pagination = query.data.pagination;
+  const isAuthenticated = Boolean(auth?.user);
+  const currentUserId = auth?.user?.id;
+  const podium = page === 1 ? users.slice(0, 3) : [];
+  const rows = page === 1 ? users.slice(3) : users;
 
-  // Animation delay utility
-  const getDelay = (index: number) => ({ animationDelay: `${index * 50}ms` });
+  const setPeriod = (nextPeriod: Period) => {
+    void navigate({
+      to: '.',
+      search: { period: nextPeriod, page: 1 },
+      replace: true,
+    });
+  };
+
+  const setPage = (nextPage: number) => {
+    void navigate({
+      to: '.',
+      search: { period, page: nextPage },
+      replace: true,
+    });
+  };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 relative overflow-hidden bg-background">
-      {/* Background decoration - softer gradient */}
-      <div className="absolute top-0 left-0 w-full h-[400px] bg-gradient-to-b from-primary/5 to-transparent -z-10" />
-
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-black tracking-tight flex items-center justify-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
-            <span className="text-primary">~</span>
-            {t('leaderboard:header.title')}
-          </h1>
-          <p className="text-muted-foreground text-lg animate-in fade-in slide-in-from-top-4 duration-700 delay-100">
-            {t('leaderboard:header.subtitle')}
-          </p>
-        </div>
+    <main className="min-h-screen py-8 sm:py-10 lg:py-12">
+      <PageContainer width="wide">
+        <PaperSurface className="relative overflow-hidden px-6 py-8 sm:px-10 sm:py-10">
+          <div
+            aria-hidden="true"
+            className="absolute -right-16 -top-16 size-56 rounded-full border-[18px] border-[color:var(--quest-gold)]/20"
+          />
+          <SectionHeading
+            as="h1"
+            eyebrow={t('header.eyebrow')}
+            title={t('header.title')}
+            description={t('header.subtitle')}
+          />
+        </PaperSurface>
 
         <Tabs
-          value={period === 'all' ? 'all-time' : 'monthly'}
-          className="space-y-8"
-          onValueChange={(val) => {
-            void navigate({
-              to: '.',
-              search: { period: val === 'monthly' ? 'monthly' : 'all' },
-              replace: true,
-            });
-          }}
+          value={period}
+          onValueChange={(value) => setPeriod(value as Period)}
+          className="mt-6 gap-6"
         >
           <div className="flex justify-center">
-            <TabsList className="bg-muted/30 p-1 h-12 rounded-2xl animate-in fade-in zoom-in-50 duration-500 delay-200">
-              <TabsTrigger
-                value="all-time"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
-              >
-                {t('leaderboard:tabs.allTime')}
-              </TabsTrigger>
-              <TabsTrigger
-                value="monthly"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
-              >
-                {t('leaderboard:tabs.thisMonth')}
-              </TabsTrigger>
+            <TabsList aria-label={t('tabs.label')}>
+              <TabsTrigger value="all">{t('tabs.allTime')}</TabsTrigger>
+              <TabsTrigger value="monthly">{t('tabs.thisMonth')}</TabsTrigger>
             </TabsList>
           </div>
 
-          <TabsContent
-            value={period === 'all' ? 'all-time' : 'monthly'}
-            className="space-y-8"
-          >
-            {users.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500">
-                <div className="h-20 w-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-4">
-                  <Trophy className="h-10 w-10 text-muted-foreground/30" />
+          {users.length === 0 ? (
+            <PaperSurface className="px-6 py-14 sm:px-10" texture={false}>
+              <StatePanel
+                icon={Trophy}
+                title={t('table.emptyState')}
+                description={t('table.emptyDescription')}
+                actions={
+                  <CTAButton asChild>
+                    <Link to="/$locale/challenges" params={{ locale }}>
+                      {t('emptyAction')}
+                    </Link>
+                  </CTAButton>
+                }
+              />
+            </PaperSurface>
+          ) : (
+            <>
+              {podium.length > 0 && (
+                <section aria-labelledby="podium-heading">
+                  <h2 id="podium-heading" className="sr-only">
+                    {t('podium.label')}
+                  </h2>
+                  <ol className="grid gap-4 md:grid-cols-3 md:items-end">
+                    {podium.map((user) => (
+                      <li
+                        key={user.id}
+                        className={cn(
+                          user.rank === 1 && 'md:order-2 md:-mt-6',
+                          user.rank === 2 && 'md:order-1',
+                          user.rank === 3 && 'md:order-3',
+                        )}
+                      >
+                        <PodiumEntry
+                          user={user}
+                          period={period}
+                          isAuthenticated={isAuthenticated}
+                          isCurrentUser={currentUserId === user.id}
+                        />
+                      </li>
+                    ))}
+                  </ol>
+                </section>
+              )}
+
+              <PaperSurface className="overflow-hidden p-0" texture={false}>
+                <div className="border-b border-border bg-secondary/45 px-4 py-3 sm:px-6">
+                  <h2 className="font-display text-xl font-semibold">
+                    {t('table.title')}
+                  </h2>
                 </div>
-                <h3 className="text-xl font-bold mb-2">
-                  {t('leaderboard:table.emptyState')}
-                </h3>
-                <p className="text-muted-foreground max-w-xs">
-                  {t('leaderboard:table.emptyDescription', {
-                    defaultValue: 'No one has climbed the leaderboard yet. Be the first!',
-                  })}
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Top 3 Podium - Compact & Floating */}
-                {TopThree.length > 0 && (
-                  <div className="relative pt-10 pb-4">
-                    {/* Glow effect for rank 1 */}
-                    <div className="absolute left-1/2 top-4 -translate-x-1/2 w-64 h-64 bg-accent/20 blur-[80px] rounded-full -z-10" />
-
-                    <div
-                      className={cn(
-                        'flex flex-col md:flex-row gap-4 items-end justify-center',
-                        TopThree.length === 1 ? 'max-w-xs mx-auto' : ''
-                      )}
-                    >
-                      {TopThree.length === 1 ? (
-                        <div className="animate-in fade-in zoom-in-75 duration-500 delay-300">
-                          <PodiumCard
-                            user={TopThree[0]}
-                            rank={1}
-                            isCenter
-                            isAuthenticated={isAuthenticated}
-                            displayXp={period === 'monthly' ? TopThree[0].monthlyXp : TopThree[0].xp}
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          {/* Rank 2 (Left) */}
-                          <div className="order-2 md:order-1 w-full md:w-auto flex justify-center animate-in fade-in slide-in-from-right-8 duration-500 delay-400">
-                            {TopThree[1] ? (
-                              <PodiumCard
-                                user={TopThree[1]}
-                                rank={2}
-                                isAuthenticated={isAuthenticated}
-                                displayXp={period === 'monthly' ? TopThree[1].monthlyXp : TopThree[1].xp}
-                              />
-                            ) : (
-                              <div className="w-[200px]" />
-                            )}
-                          </div>
-
-                          {/* Rank 1 (Center) */}
-                          <div className="order-1 md:order-2 w-full md:w-auto flex justify-center -mt-8 mb-4 md:mb-8 z-10 animate-in fade-in zoom-in-75 duration-500 delay-300">
-                            <PodiumCard
-                              user={TopThree[0]}
-                              rank={1}
-                              isCenter
-                              isAuthenticated={isAuthenticated}
-                              displayXp={period === 'monthly' ? TopThree[0].monthlyXp : TopThree[0].xp}
-                            />
-                          </div>
-
-                          {/* Rank 3 (Right) */}
-                          <div className="order-3 w-full md:w-auto flex justify-center animate-in fade-in slide-in-from-left-8 duration-500 delay-500">
-                            {TopThree[2] ? (
-                              <PodiumCard
-                                user={TopThree[2]}
-                                rank={3}
-                                isAuthenticated={isAuthenticated}
-                                displayXp={period === 'monthly' ? TopThree[2].monthlyXp : TopThree[2].xp}
-                              />
-                            ) : (
-                              <div className="hidden md:block w-[200px]" />
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Rest of Leaderboard - List View */}
-                <div
-                  className="bg-muted/10 rounded-3xl p-2 md:p-6 space-y-2"
+                <ol
                   data-testid="leaderboard-list"
+                  className="divide-y divide-border"
+                  start={rows[0]?.rank || 1}
                 >
-                  {RestUsers.map((user, index) => (
-                    <div
+                  {rows.map((user) => (
+                    <LeaderboardRow
                       key={user.id}
-                      data-testid="leaderboard-item"
-                      style={getDelay(index)}
-                      className={cn(
-                        'group flex items-center gap-4 p-3 md:p-4 rounded-2xl bg-card border border-border/40 hover:border-border transition-all hover:translate-x-1 hover:shadow-md animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards',
-                        !isAuthenticated && 'opacity-60 blur-[1px]'
-                      )}
-                    >
-                      {/* Rank */}
-                      <div className="flex-none w-8 md:w-12 flex justify-center">
-                        <div className="h-8 w-8 rounded-full bg-accent/10 text-accent font-black flex items-center justify-center text-sm transition-transform group-hover:scale-110">
-                          {index + 4}
-                        </div>
-                      </div>
-
-                      {/* Avatar */}
-                      <div className="flex-none">
-                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-muted overflow-hidden transition-transform group-hover:rotate-3">
-                          {isAuthenticated ? (
-                            user.image ? (
-                              <img
-                                src={user.image}
-                                alt={user.name || ''}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center bg-primary/5 text-primary font-bold">
-                                {(user.name || 'A')[0].toUpperCase()}
-                              </div>
-                            )
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">?</div>
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold truncate">
-                            {isAuthenticated ? user.name || t('leaderboard:table.anonymous') : t('leaderboard:table.hiddenUser')}
-                          </span>
-                          {/* Badges inline on mobile, hidden on very small screens */}
-                          <div className="flex -space-x-1">
-                            {user.badges.slice(0, 3).map((badge, i) => (
-                              <div key={i} className="h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center text-[10px]" title={badge.name}>
-                                {badge.icon}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="text-xs text-muted-foreground font-medium flex items-center gap-2">
-                          <span>{t('common:labels.level')} {user.level}</span>
-                          <span className="w-1 h-1 rounded-full bg-border" />
-                          <span>{user.challengesCompleted} {t('leaderboard:table.challenges')}</span>
-                        </div>
-                      </div>
-
-                      {/* XP */}
-                      <div className="flex-none text-right">
-                        <div className="font-black text-primary">
-                          {((period === 'monthly' ? user.monthlyXp : user.xp) || 0).toLocaleString()} <span className="text-xs text-muted-foreground font-medium">XP</span>
-                        </div>
-                      </div>
-                    </div>
+                      user={user}
+                      period={period}
+                      isAuthenticated={isAuthenticated}
+                      isCurrentUser={currentUserId === user.id}
+                    />
                   ))}
+                </ol>
+                <LeaderboardPagination
+                  page={pagination.page}
+                  totalPages={pagination.totalPages}
+                  total={pagination.total}
+                  onPageChange={setPage}
+                />
+              </PaperSurface>
 
-                  {RestUsers.length === 0 && (
-                    <div className="text-center p-8 text-muted-foreground animate-in fade-in zoom-in-95 duration-500">
-                      {t('leaderboard:table.emptyState')}
-                    </div>
-                  )}
-
-                  {!isAuthenticated && (
-                    <div className="mt-8 text-center p-8 bg-card/50 backdrop-blur-sm rounded-3xl border border-dashed border-border relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-                      <div className="relative z-10 max-w-md mx-auto space-y-4">
-                        <Shield className="h-12 w-12 text-primary mx-auto opacity-50" />
-                        <h3 className="text-xl font-bold">{t('leaderboard:gating.title')}</h3>
-                        <p className="text-muted-foreground">{t('leaderboard:gating.description')}</p>
-                        <Link to="/$locale/login" params={{ locale }} search={{ redirect: '/leaderboard' }}>
-                          <Button size="lg" className="rounded-xl px-8 font-bold hover:scale-105 transition-transform">
-                            {t('leaderboard:gating.button')}
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </TabsContent>
+              {!isAuthenticated && (
+                <PaperSurface
+                  className="border-dashed px-6 py-10 text-center"
+                  texture={false}
+                >
+                  <Shield
+                    className="mx-auto size-9 text-primary"
+                    aria-hidden="true"
+                  />
+                  <h2 className="mt-4 font-display text-2xl font-semibold">
+                    {t('gating.title')}
+                  </h2>
+                  <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                    {t('gating.description')}
+                  </p>
+                  <CTAButton asChild className="mt-6">
+                    <Link
+                      to="/$locale/login"
+                      params={{ locale }}
+                      search={{ redirect: '/leaderboard' }}
+                    >
+                      {t('gating.button')}
+                    </Link>
+                  </CTAButton>
+                </PaperSurface>
+              )}
+            </>
+          )}
         </Tabs>
+      </PageContainer>
+    </main>
+  );
+}
+
+function PodiumEntry({
+  user,
+  period,
+  isAuthenticated,
+  isCurrentUser,
+}: {
+  user: LeaderboardEntry;
+  period: Period;
+  isAuthenticated: boolean;
+  isCurrentUser: boolean;
+}) {
+  const { t } = useTranslation(['leaderboard', 'common']);
+  const score = period === 'monthly' ? user.monthlyXp : user.xp;
+  const crown = user.rank === 1;
+
+  return (
+    <PaperSurface
+      data-testid="leaderboard-podium-item"
+      aria-current={isCurrentUser || undefined}
+      className={cn(
+        'relative p-5',
+        crown &&
+          'border-[color:var(--quest-gold)]/70 shadow-[0_18px_42px_rgba(200,163,93,0.18)]',
+        isCurrentUser &&
+          'ring-2 ring-primary ring-offset-2 ring-offset-background',
+      )}
+      texture={false}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <RankMarker rank={user.rank} />
+        {crown && (
+          <Crown
+            className="size-6 text-[color:var(--quest-gold)]"
+            aria-label={t('podium.firstPlace')}
+          />
+        )}
       </div>
+      <div className="mt-5 flex items-center gap-3">
+        <UserAvatar user={user} isAuthenticated={isAuthenticated} />
+        <div className="min-w-0">
+          <p
+            className={cn(
+              'truncate text-lg font-bold',
+              !isAuthenticated && 'blur-[3px]',
+            )}
+          >
+            {isAuthenticated
+              ? user.name || t('table.anonymous')
+              : t('table.hiddenUser')}
+          </p>
+          {isCurrentUser && <Badge className="mt-1">{t('table.you')}</Badge>}
+        </div>
+      </div>
+      <p className="mt-5 text-2xl font-bold tabular-nums text-primary">
+        {score.toLocaleString()}{' '}
+        <span className="text-sm font-semibold">XP</span>
+      </p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {t('common:labels.level')} {user.level} ·{' '}
+        {t('table.challengesCount', { count: user.challengesCompleted })}
+      </p>
+      <AchievementBadges badges={user.badges} />
+    </PaperSurface>
+  );
+}
+
+function LeaderboardRow({
+  user,
+  period,
+  isAuthenticated,
+  isCurrentUser,
+}: {
+  user: LeaderboardEntry;
+  period: Period;
+  isAuthenticated: boolean;
+  isCurrentUser: boolean;
+}) {
+  const { t } = useTranslation(['leaderboard', 'common']);
+  const score = period === 'monthly' ? user.monthlyXp : user.xp;
+
+  return (
+    <li
+      data-testid="leaderboard-item"
+      aria-current={isCurrentUser || undefined}
+      className={cn(
+        'grid grid-cols-[auto_minmax(0,1fr)_auto] gap-x-3 gap-y-3 px-4 py-4 sm:grid-cols-[3.5rem_minmax(0,1fr)_auto_auto] sm:items-center sm:gap-5 sm:px-6',
+        isCurrentUser && 'bg-primary/8 shadow-[inset_4px_0_0_var(--primary)]',
+      )}
+    >
+      <RankMarker rank={user.rank} />
+      <div className="flex min-w-0 items-center gap-3">
+        <UserAvatar user={user} isAuthenticated={isAuthenticated} />
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <p
+              className={cn(
+                'truncate font-bold',
+                !isAuthenticated && 'blur-[3px]',
+              )}
+            >
+              {isAuthenticated
+                ? user.name || t('table.anonymous')
+                : t('table.hiddenUser')}
+            </p>
+            {isCurrentUser && <Badge>{t('table.you')}</Badge>}
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {t('common:labels.level')} {user.level} ·{' '}
+            {t('table.challengesCount', { count: user.challengesCompleted })}
+          </p>
+        </div>
+      </div>
+      <AchievementBadges badges={user.badges} className="hidden sm:flex" />
+      <p className="text-right font-bold tabular-nums text-primary">
+        {score.toLocaleString()}{' '}
+        <span className="text-xs font-semibold">XP</span>
+      </p>
+      <AchievementBadges
+        badges={user.badges}
+        className="col-span-3 sm:hidden"
+      />
+    </li>
+  );
+}
+
+function RankMarker({ rank }: { rank: number }) {
+  const markerClass =
+    rank === 1
+      ? 'bg-[color:var(--quest-gold)]/20 text-foreground'
+      : rank === 2
+        ? 'bg-secondary text-foreground'
+        : rank === 3
+          ? 'bg-[color:var(--quest-clay)]/15 text-foreground'
+          : 'bg-muted text-muted-foreground';
+
+  return (
+    <span
+      className={cn(
+        'flex size-10 shrink-0 items-center justify-center rounded-xl font-mono-tech text-sm font-bold',
+        markerClass,
+      )}
+    >
+      <Medal className="mr-1 size-3.5" aria-hidden="true" />
+      {rank}
+    </span>
+  );
+}
+
+function UserAvatar({
+  user,
+  isAuthenticated,
+}: {
+  user: LeaderboardEntry;
+  isAuthenticated: boolean;
+}) {
+  const { t } = useTranslation('leaderboard');
+  const name = isAuthenticated
+    ? user.name || t('table.anonymous')
+    : t('table.hiddenUser');
+  return (
+    <Avatar className="size-11 border border-border bg-secondary">
+      {isAuthenticated && user.image && (
+        <AvatarImage src={user.image} alt={name} className="object-cover" />
+      )}
+      <AvatarFallback className="bg-secondary font-bold text-primary">
+        {isAuthenticated ? name.charAt(0).toUpperCase() : '?'}
+      </AvatarFallback>
+    </Avatar>
+  );
+}
+
+function AchievementBadges({
+  badges,
+  className,
+}: {
+  badges: LeaderboardEntry['badges'];
+  className?: string;
+}) {
+  const { t } = useTranslation('leaderboard');
+  if (!badges.length) return null;
+  return (
+    <div
+      className={cn('mt-4 flex flex-wrap gap-1.5', className)}
+      aria-label={t('table.badgesLabel')}
+    >
+      {badges.slice(0, 3).map((badge) => (
+        <Badge
+          key={badge.slug}
+          variant="secondary"
+          title={badge.name}
+          aria-label={badge.name}
+        >
+          <span aria-hidden="true">{badge.icon}</span>
+          <span className="sr-only">{badge.name}</span>
+        </Badge>
+      ))}
     </div>
   );
 }
 
-function PodiumCard({
-  user,
-  rank,
-  isCenter = false,
-  isAuthenticated = false,
-  displayXp,
+function LeaderboardPagination({
+  page,
+  totalPages,
+  total,
+  onPageChange,
 }: {
-  user: LeaderboardEntry;
-  rank: number;
-  isCenter?: boolean;
-  isAuthenticated?: boolean;
-  displayXp?: number;
+  page: number;
+  totalPages: number;
+  total: number;
+  onPageChange: (page: number) => void;
 }) {
-  const { t } = useTranslation(['leaderboard', 'common']);
-
-  // Compact styling
-  // Rank 1 gets special teal accent, others are more muted
-  const accentColor = rank === 1 ? 'text-teal-400' : rank === 2 ? 'text-slate-400' : 'text-amber-700';
-
-  const displayName = isAuthenticated
-    ? user.name || t('leaderboard:table.anonymous')
-    : t('leaderboard:table.hiddenUser');
-  const displayAvatar = isAuthenticated ? user.image : null;
-  const xpToShow = displayXp !== undefined ? displayXp : user.xp;
-
+  const { t } = useTranslation('leaderboard');
+  if (totalPages <= 1) return null;
   return (
-    <div
-      data-testid="leaderboard-podium-item"
-      className={cn(
-        'relative bg-card rounded-3xl p-4 flex flex-row items-center gap-4 transition-all hover:-translate-y-1',
-        isCenter ? 'ring-2 ring-teal-500/20 shadow-lg shadow-teal-500/10 min-w-[280px]' : 'border border-border/50 min-w-[240px] opacity-90',
-      )}
+    <nav
+      className="flex flex-col gap-3 border-t border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+      aria-label={t('pagination.label')}
     >
-      {/* Rank Badge */}
-      <div className={cn(
-        "absolute -top-3 -left-3 h-8 w-8 rounded-full flex items-center justify-center font-black text-sm shadow-sm z-10",
-        rank === 1 ? "bg-teal-500 text-black" : "bg-card border border-border text-muted-foreground"
-      )}>
-        {rank}
+      <p className="text-sm text-muted-foreground">
+        {t('pagination.summary', { page, totalPages, total })}
+      </p>
+      <div className="flex gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === 1}
+          onClick={() => onPageChange(page - 1)}
+        >
+          <ChevronLeft className="size-4" aria-hidden="true" />
+          {t('pagination.previous')}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === totalPages}
+          onClick={() => onPageChange(page + 1)}
+        >
+          {t('pagination.next')}
+          <ChevronRight className="size-4" aria-hidden="true" />
+        </Button>
       </div>
+    </nav>
+  );
+}
 
-      {isCenter && (
-        <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce">
-          <Crown className="h-8 w-8 text-teal-400 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
+function LeaderboardLoading() {
+  return (
+    <main className="min-h-screen py-8 sm:py-10" aria-busy="true">
+      <PageContainer width="wide">
+        <span className="sr-only">Loading leaderboard</span>
+        <Skeleton className="h-56 rounded-[1.25rem]" />
+        <div className="mt-6 flex justify-center">
+          <Skeleton className="h-11 w-56 rounded-xl" />
         </div>
-      )}
-
-      {/* Avatar - Compact */}
-      <div className={cn(
-        "h-16 w-16 rounded-2xl overflow-hidden flex-none",
-        rank === 1 ? "ring-2 ring-offset-2 ring-offset-card ring-teal-500" : ""
-      )}>
-        {displayAvatar ? (
-          <img src={displayAvatar} alt={displayName} className="h-full w-full object-cover" />
-        ) : (
-          <div className="h-full w-full bg-muted flex items-center justify-center text-xl font-bold">
-            {isAuthenticated ? (user.name?.[0] || '?') : '?'}
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className={cn("font-bold text-lg truncate", !isAuthenticated && "blur-[2px]")}>
-          {displayName}
-        </div>
-        <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-          <span className={cn("font-bold", accentColor)}>{xpToShow.toLocaleString()}</span> XP
-        </div>
-        {/* Badges */}
-        <div className="flex -space-x-1 mt-1">
-          {user.badges.slice(0, 2).map((b, i) => (
-            <div key={i} className="h-4 w-4 bg-background rounded-full border border-border flex items-center justify-center text-[8px]">
-              {b.icon}
-            </div>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {[1, 2, 3].map((item) => (
+            <Skeleton key={item} className="h-48 rounded-[1.25rem]" />
           ))}
         </div>
-      </div>
-    </div>
+        <Skeleton className="mt-6 h-80 rounded-[1.25rem]" />
+      </PageContainer>
+    </main>
   );
 }

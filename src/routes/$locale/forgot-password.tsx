@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/card';
 import { ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
 import { createSeoHead } from '@/lib/seo';
+import { AuthPageShell } from '@/components/auth';
 
 export const Route = createFileRoute('/$locale/forgot-password')({
   component: ForgotPasswordPage,
@@ -65,8 +66,12 @@ function ForgotPasswordPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+      <AuthPageShell
+        eyebrow={t('journey.eyebrow')}
+        title={t('journey.title')}
+        description={t('journey.description')}
+      >
+        <Card className="w-full max-w-md border-border bg-card shadow-[0_20px_50px_rgba(73,62,45,0.1)]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 p-3 rounded-full bg-green-500/10 w-fit">
               <CheckCircle2 className="h-8 w-8 text-green-500" />
@@ -100,18 +105,22 @@ function ForgotPasswordPage() {
             </Link>
           </CardFooter>
         </Card>
-      </div>
+      </AuthPageShell>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <Card className="w-full max-w-md glass-card">
+    <AuthPageShell
+      eyebrow={t('journey.eyebrow')}
+      title={t('journey.title')}
+      description={t('journey.description')}
+    >
+      <Card className="w-full max-w-md border-border bg-card shadow-[0_20px_50px_rgba(73,62,45,0.1)]">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 p-3 rounded-full bg-primary/10 w-fit">
             <Mail className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="font-display text-2xl font-semibold">
             {t('auth:forgotPassword.title')}
           </CardTitle>
           <CardDescription>
@@ -126,7 +135,10 @@ function ForgotPasswordPage() {
         >
           <CardContent className="space-y-4">
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div
+                role="alert"
+                className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
+              >
                 {error}
               </div>
             )}
@@ -149,7 +161,15 @@ function ForgotPasswordPage() {
           <CardFooter className="flex flex-col gap-4">
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <>
+                  <span
+                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                    aria-hidden="true"
+                  />
+                  <span className="sr-only">
+                    {t('common:messages.loading')}
+                  </span>
+                </>
               ) : (
                 t('auth:forgotPassword.sendButton')
               )}
@@ -166,6 +186,6 @@ function ForgotPasswordPage() {
           </CardFooter>
         </form>
       </Card>
-    </div>
+    </AuthPageShell>
   );
 }

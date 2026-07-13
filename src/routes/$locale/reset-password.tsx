@@ -21,6 +21,7 @@ import {
 import { KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createSeoHead } from '@/lib/seo';
+import { AuthPageShell } from '@/components/auth';
 
 export const Route = createFileRoute('/$locale/reset-password')({
   component: ResetPasswordPage,
@@ -54,8 +55,12 @@ function ResetPasswordPage() {
   // Handle error from URL (e.g., INVALID_TOKEN)
   if (errorParam) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+      <AuthPageShell
+        eyebrow={t('journey.eyebrow')}
+        title={t('journey.title')}
+        description={t('journey.description')}
+      >
+        <Card className="w-full max-w-md border-border bg-card shadow-[0_20px_50px_rgba(73,62,45,0.1)]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 p-3 rounded-full bg-destructive/10 w-fit">
               <AlertCircle className="h-8 w-8 text-destructive" />
@@ -86,15 +91,19 @@ function ResetPasswordPage() {
             </Link>
           </CardFooter>
         </Card>
-      </div>
+      </AuthPageShell>
     );
   }
 
   // No token in URL
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+      <AuthPageShell
+        eyebrow={t('journey.eyebrow')}
+        title={t('journey.title')}
+        description={t('journey.description')}
+      >
+        <Card className="w-full max-w-md border-border bg-card shadow-[0_20px_50px_rgba(73,62,45,0.1)]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 p-3 rounded-full bg-destructive/10 w-fit">
               <AlertCircle className="h-8 w-8 text-destructive" />
@@ -125,7 +134,7 @@ function ResetPasswordPage() {
             </Link>
           </CardFooter>
         </Card>
-      </div>
+      </AuthPageShell>
     );
   }
 
@@ -175,8 +184,12 @@ function ResetPasswordPage() {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+      <AuthPageShell
+        eyebrow={t('journey.eyebrow')}
+        title={t('journey.title')}
+        description={t('journey.description')}
+      >
+        <Card className="w-full max-w-md border-border bg-card shadow-[0_20px_50px_rgba(73,62,45,0.1)]">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 p-3 rounded-full bg-green-500/10 w-fit">
               <CheckCircle2 className="h-8 w-8 text-green-500" />
@@ -196,18 +209,22 @@ function ResetPasswordPage() {
             </Link>
           </CardFooter>
         </Card>
-      </div>
+      </AuthPageShell>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <Card className="w-full max-w-md glass-card">
+    <AuthPageShell
+      eyebrow={t('journey.eyebrow')}
+      title={t('journey.title')}
+      description={t('journey.description')}
+    >
+      <Card className="w-full max-w-md border-border bg-card shadow-[0_20px_50px_rgba(73,62,45,0.1)]">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 p-3 rounded-full bg-primary/10 w-fit">
             <KeyRound className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="font-display text-2xl font-semibold">
             {t('auth:resetPassword.title')}
           </CardTitle>
           <CardDescription>
@@ -222,7 +239,10 @@ function ResetPasswordPage() {
         >
           <CardContent className="space-y-4">
             {error && (
-              <div className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">
+              <div
+                role="alert"
+                className="rounded-md bg-destructive/10 p-3 text-sm text-destructive"
+              >
                 {error}
               </div>
             )}
@@ -241,9 +261,18 @@ function ResetPasswordPage() {
                 className={cn(
                   password && password.length < 8 && 'border-amber-500',
                 )}
+                aria-invalid={Boolean(password && password.length < 8)}
+                aria-describedby={
+                  password && password.length < 8
+                    ? 'password-length-error'
+                    : undefined
+                }
               />
               {password && password.length < 8 && (
-                <p className="text-xs text-amber-500">
+                <p
+                  id="password-length-error"
+                  className="text-xs text-amber-500"
+                >
                   {t('auth:errors.passwordMinLength')}
                 </p>
               )}
@@ -263,12 +292,23 @@ function ResetPasswordPage() {
                 autoComplete="new-password"
                 className={cn(
                   confirmPassword &&
-                  password !== confirmPassword &&
-                  'border-destructive',
+                    password !== confirmPassword &&
+                    'border-destructive',
                 )}
+                aria-invalid={Boolean(
+                  confirmPassword && password !== confirmPassword,
+                )}
+                aria-describedby={
+                  confirmPassword && password !== confirmPassword
+                    ? 'password-match-error'
+                    : undefined
+                }
               />
               {confirmPassword && password !== confirmPassword && (
-                <p className="text-xs text-destructive">
+                <p
+                  id="password-match-error"
+                  className="text-xs text-destructive"
+                >
                   {t('auth:errors.passwordMismatch')}
                 </p>
               )}
@@ -278,7 +318,15 @@ function ResetPasswordPage() {
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <>
+                  <span
+                    className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
+                    aria-hidden="true"
+                  />
+                  <span className="sr-only">
+                    {t('common:messages.loading')}
+                  </span>
+                </>
               ) : (
                 t('common:actions.resetPassword')
               )}
@@ -286,6 +334,6 @@ function ResetPasswordPage() {
           </CardFooter>
         </form>
       </Card>
-    </div>
+    </AuthPageShell>
   );
 }

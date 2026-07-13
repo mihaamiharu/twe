@@ -1,124 +1,123 @@
 import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { confirmSubscription } from '@/server/newsletter.fn';
-import { CheckCircle, XCircle, Loader2, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { useTranslation } from 'react-i18next';
+import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { z } from 'zod';
+import { confirmSubscription } from '@/server/newsletter.fn';
+import { Button } from '@/components/ui/button';
+import {
+  CTAButton,
+  PageContainer,
+  PaperSurface,
+  StatePanel,
+} from '@/components/cozy-quest';
 import { createSeoHead } from '@/lib/seo';
 
-const searchSchema = z.object({
-    token: z.string().optional(),
-});
+const searchSchema = z.object({ token: z.string().optional() });
 
 export const Route = createFileRoute('/$locale/confirm-subscription')({
-    validateSearch: searchSchema,
-    component: ConfirmSubscriptionPage,
-    head: ({ params }) => {
-        const locale = params.locale || 'en';
-        return createSeoHead({
-            title: 'Confirm Subscription | TestingWithEkki',
-            description: 'Confirm your newsletter subscription for TestingWithEkki.',
-            path: '/confirm-subscription',
-            locale,
-            noIndex: true,
-        });
-    },
+  validateSearch: searchSchema,
+  component: ConfirmSubscriptionPage,
+  head: ({ params }) =>
+    createSeoHead({
+      title: 'Confirm Subscription | TestingWithEkki',
+      description: 'Confirm your newsletter subscription for TestingWithEkki.',
+      path: '/confirm-subscription',
+      locale: params.locale || 'en',
+      noIndex: true,
+    }),
 });
 
 const routeApi = getRouteApi('/$locale/confirm-subscription');
 
 function ConfirmSubscriptionPage() {
-    const { token } = routeApi.useSearch();
-    const { locale } = routeApi.useParams();
+  const { token } = routeApi.useSearch();
+  const { locale } = routeApi.useParams();
+  const { t } = useTranslation(['legal', 'common']);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['confirm-subscription', token],
+    queryFn: async () => {
+      if (!token) throw new Error('No token provided');
+      const result = await confirmSubscription({ data: { token } });
+      if (!result.success)
+        throw new Error(result.error || 'Failed to confirm subscription');
+      return result;
+    },
+    enabled: Boolean(token),
+    retry: false,
+  });
 
-    const { data, isLoading, error } = useQuery({
-        queryKey: ['confirm-subscription', token],
-        queryFn: async () => {
-            if (!token) throw new Error('No token provided');
-            const res = await confirmSubscription({ data: { token } });
-            if (!res.success) throw new Error(res.error || 'Failed to confirm subscription');
-            return res;
-        },
-        enabled: !!token,
-        retry: false,
-    });
-
-    if (!token) {
-        return (
-            <div className="min-h-[60vh] flex items-center justify-center p-4">
-                <Card className="w-full max-w-md text-center">
-                    <CardHeader>
-                        <div className="mx-auto w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center mb-4">
-                            <XCircle className="w-6 h-6 text-yellow-600" />
-                        </div>
-                        <CardTitle>Invalid Link</CardTitle>
-                        <CardDescription>
-                            This confirmation link appears to be invalid or missing a token.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardFooter className="justify-center">
-                        <Button asChild>
-                            <Link to="/">Return Home</Link>
-                        </Button>
-                    </CardFooter>
-                </Card>
-            </div>
-        );
+  const state = !token
+    ? 'invalid'
+    : isLoading
+      ? 'loading'
+      : error
+        ? 'error'
+        : data
+          ? 'success'
+          : 'loading';
+  const content = (() => {
+    switch (state) {
+      case 'invalid':
+        return {
+          icon: XCircle,
+          tone: 'danger' as const,
+          title: t('subscription.invalidTitle'),
+          description: t('subscription.invalidDescription'),
+        };
+      case 'error':
+        return {
+          icon: XCircle,
+          tone: 'danger' as const,
+          title: t('subscription.errorTitle'),
+          description: error?.message || t('subscription.errorDescription'),
+        };
+      case 'success':
+        return {
+          icon: CheckCircle2,
+          tone: 'success' as const,
+          title: t('subscription.successTitle'),
+          description: t('subscription.successDescription'),
+        };
+      default:
+        return {
+          icon: Loader2,
+          tone: 'neutral' as const,
+          title: t('subscription.loadingTitle'),
+          description: t('subscription.loadingDescription'),
+        };
     }
+  })();
 
-    return (
-        <div className="min-h-[60vh] flex items-center justify-center p-4">
-            <Card className="w-full max-w-md text-center shadow-lg border-primary/10">
-                <CardHeader>
-                    {isLoading ? (
-                        <div className="mx-auto w-12 h-12 flex items-center justify-center mb-4">
-                            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-                        </div>
-                    ) : error ? (
-                        <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-                            <XCircle className="w-6 h-6 text-red-600" />
-                        </div>
-                    ) : (
-                        <div className="mx-auto w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mb-4">
-                            <CheckCircle className="w-6 h-6 text-green-600" />
-                        </div>
-                    )}
-
-                    <CardTitle>
-                        {isLoading
-                            ? 'Verifying...'
-                            : error
-                                ? 'Verification Failed'
-                                : 'Subscription Confirmed!'}
-                    </CardTitle>
-                    <CardDescription>
-                        {isLoading
-                            ? 'Please wait while we confirm your subscription.'
-                            : error
-                                ? (error).message
-                                : 'Thank you for subscribing to the TestingWithEkki newsletter. You will now receive updates on new tutorials and challenges.'}
-                    </CardDescription>
-                </CardHeader>
-
-                {!isLoading && (
-                    <CardContent>
-                        {error ? (
-                            <p className="text-sm text-muted-foreground">
-                                The link may have expired or was already used. Please try subscribing again.
-                            </p>
-                        ) : null}
-                    </CardContent>
-                )}
-
-                <CardFooter className="justify-center">
-                    <Button asChild className="gap-2">
-                        <Link to={`/${locale}/tutorials`}>
-                            Explore Tutorials <ArrowRight className="w-4 h-4" />
-                        </Link>
-                    </Button>
-                </CardFooter>
-            </Card>
-        </div>
-    );
+  return (
+    <main className="min-h-[calc(100vh-4.5rem)] py-12 sm:py-20">
+      <PageContainer width="narrow">
+        <PaperSurface className="px-6 py-14 sm:px-10" texture>
+          <StatePanel
+            icon={content.icon}
+            tone={content.tone}
+            busy={state === 'loading'}
+            title={content.title}
+            description={content.description}
+            actions={
+              state !== 'loading' &&
+              (state === 'success' ? (
+                <CTAButton asChild>
+                  <Link to="/$locale/tutorials" params={{ locale }}>
+                    {t('subscription.successAction')}
+                  </Link>
+                </CTAButton>
+              ) : (
+                <Button asChild>
+                  <Link to="/$locale" params={{ locale }}>
+                    {t('common:actions.goHome')}
+                  </Link>
+                </Button>
+              ))
+            }
+          />
+        </PaperSurface>
+      </PageContainer>
+    </main>
+  );
 }

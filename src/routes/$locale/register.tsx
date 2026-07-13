@@ -5,6 +5,8 @@ import {
   useParams,
 } from '@tanstack/react-router';
 import { RegisterForm } from '@/components/auth';
+import { AuthPageShell } from '@/components/auth';
+import { useTranslation } from 'react-i18next';
 import type { RootContext } from '../__root';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { createSeoHead } from '@/lib/seo';
@@ -24,7 +26,8 @@ export const Route = createFileRoute('/$locale/register')({
     const locale = params.locale || 'en';
     return createSeoHead({
       title: 'Create Account | TestingWithEkki',
-      description: 'Create a free TestingWithEkki account to start learning test automation.',
+      description:
+        'Create a free TestingWithEkki account to start learning test automation.',
       path: '/register',
       locale,
       noIndex: true,
@@ -32,15 +35,18 @@ export const Route = createFileRoute('/$locale/register')({
   },
 });
 
-
-
 function RegisterPage() {
   const { locale } = useParams({ from: '/$locale/register' });
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <div className="w-full max-w-md space-y-6 animate-fade-in relative z-10">
+    <AuthPageShell
+      eyebrow={t('journey.eyebrow')}
+      title={t('journey.title')}
+      description={t('journey.description')}
+    >
+      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-2 duration-300">
         <RegisterForm
           onLoginClick={() => {
             void navigate({
@@ -48,9 +54,9 @@ function RegisterPage() {
               params: localeParams(locale),
             });
           }}
-        // No onSuccess needed as RegisterForm handles the "Check Email" state internally
+          // No onSuccess needed as RegisterForm handles the "Check Email" state internally
         />
       </div>
-    </div>
+    </AuthPageShell>
   );
 }

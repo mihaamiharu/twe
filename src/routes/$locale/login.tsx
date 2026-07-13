@@ -5,6 +5,8 @@ import {
   useParams,
 } from '@tanstack/react-router';
 import { LoginForm } from '@/components/auth';
+import { AuthPageShell } from '@/components/auth';
+import { useTranslation } from 'react-i18next';
 import type { RootContext } from '../__root';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { createSeoHead } from '@/lib/seo';
@@ -24,7 +26,8 @@ export const Route = createFileRoute('/$locale/login')({
     const locale = params.locale || 'en';
     return createSeoHead({
       title: 'Sign In | TestingWithEkki',
-      description: 'Sign in to your TestingWithEkki account to track your progress and earn XP.',
+      description:
+        'Sign in to your TestingWithEkki account to track your progress and earn XP.',
       path: '/login',
       locale,
       noIndex: true,
@@ -32,11 +35,10 @@ export const Route = createFileRoute('/$locale/login')({
   },
 });
 
-
-
 function LoginPage() {
   const { locale } = useParams({ from: '/$locale/login' });
   const navigate = useNavigate();
+  const { t } = useTranslation('auth');
 
   const handleLoginSuccess = () => {
     // Redirect to original path if available, otherwise home
@@ -51,8 +53,12 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+    <AuthPageShell
+      eyebrow={t('journey.eyebrow')}
+      title={t('journey.title')}
+      description={t('journey.description')}
+    >
+      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-2 duration-300">
         <LoginForm
           onSuccess={handleLoginSuccess}
           onRegisterClick={() => {
@@ -63,6 +69,6 @@ function LoginPage() {
           }}
         />
       </div>
-    </div>
+    </AuthPageShell>
   );
 }

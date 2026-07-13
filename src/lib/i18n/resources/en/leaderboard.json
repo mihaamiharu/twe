@@ -1,29 +1,42 @@
 {
   "header": {
-    "title": "Hall of Fame",
-    "subtitle": "The elite testers mastering the art of automation."
+    "eyebrow": "Hall of Testers",
+    "title": "Leaderboard",
+    "subtitle": "Track the testers earning experience through practical challenges."
   },
   "tabs": {
-    "allTime": "All Time",
-    "thisMonth": "This Month"
+    "label": "Leaderboard period",
+    "allTime": "All time",
+    "thisMonth": "This month"
+  },
+  "podium": {
+    "label": "Top testers",
+    "firstPlace": "First place"
   },
   "table": {
-    "hiddenUser": "Hidden User",
+    "title": "Rankings",
+    "hiddenUser": "Hidden tester",
     "anonymous": "Anonymous",
-    "challengesCount": "{{count}} challenges",
-    "challenges": "challenges",
-    "emptyState": "No other runners yet. Invite your friends!"
+    "you": "You",
+    "badgesLabel": "Earned boss badges",
+    "challengesCount": "{{count}} completed challenges",
+    "emptyState": "No testers are ranked here yet",
+    "emptyDescription": "Complete a challenge and opt in to the leaderboard to start the trail."
   },
+  "emptyAction": "Explore challenges",
   "gating": {
-    "title": "Join the Elite",
-    "description": "Sign in to see full rankings, track your own progress, and earn unique badges.",
-    "button": "Sign In to Compete"
+    "title": "Sign in to see the full hall",
+    "description": "View tester names, follow your own progress, and earn badges as you learn.",
+    "button": "Sign in to continue"
   },
-  "monthly": {
-    "comingSoon": "Monthly Rankings Coming Soon",
-    "description": "Compete for the monthly crown in the next season update!"
+  "pagination": {
+    "label": "Leaderboard pagination",
+    "summary": "Page {{page}} of {{totalPages}} · {{total}} testers",
+    "previous": "Previous",
+    "next": "Next"
   },
   "error": {
-    "description": "Unable to load the leaderboard at this time."
+    "title": "The rankings are unavailable",
+    "description": "We could not load the leaderboard right now. Please try again."
   }
 }

@@ -50,7 +50,9 @@
     "signUp": "Daftar",
     "backToSignIn": "Kembali ke Masuk",
     "signInNow": "Masuk Sekarang",
-    "resetPassword": "Atur Ulang Kata Sandi"
+    "resetPassword": "Atur Ulang Kata Sandi",
+    "goHome": "Ke Beranda",
+    "browseFieldGuide": "Buka Panduan Lapangan"
   },
   "breadcrumbs": {
     "label": "Jejak navigasi"
@@ -111,10 +113,16 @@
     }
   },
   "notFound": {
-    "title": "Kamu berada dalam Mode Headless",
-    "description": "Konten ada di sini, tetapi kamu tidak dapat melihatnya karena viewport kamu disetel ke headless: true. Percayalah, pengujian berjalan di latar belakang.",
-    "backHome": "Beralih ke Mode Headed (Kembali ke Beranda)",
-    "tip": "Tip: Coba jalankan dengan flag --headed lain kali"
+    "title": "Rute ini tersesat dari jalur",
+    "description": "Halaman yang kamu minta tidak ditemukan. Jalur belajar lainnya tetap tersedia.",
+    "backHome": "Ke Beranda",
+    "tip": "Pemeriksaan rute: halaman yang diharapkan tidak ditemukan."
+  },
+  "states": {
+    "errorTitle": "Terjadi kesalahan",
+    "errorDescription": "Kami tidak dapat memuat halaman ini. Coba lagi atau kembali ke halaman sebelumnya.",
+    "errorDetails": "Detail teknis",
+    "loading": "Memuat konten"
   },
   "auth": {
     "signInToSubmit": "Masuk untuk Mengirim",

@@ -1,132 +1,152 @@
 {
-    "hero": {
-        "title": "Halo, saya <strong>Ekki Syam Sugiardi</strong>",
-        "subtitle": "Senior Software Engineer (QA)",
-        "description": "Senior Software Engineer (QA) dengan pengalaman lebih dari 4 tahun di <strong>Ninja Van</strong>. Diakui karena fleksibilitas teknis dan komitmen terhadap mentorship engineering. Spesialis yang agnostik terhadap teknologi mahir menggunakan Go, Python, dan Java untuk mengatasi hambatan kritis di berbagai tim produk. Memiliki rekam jejak terbukti dalam membangun otomasi dari nol, membimbing tester manual beralih ke peran otomasi, dan berkontribusi pada inisiatif penghematan biaya yang menghasilkan lebih dari $60.000 per bulan.",
-        "connect": "Koneksi di LinkedIn",
-        "github": "Profil GitHub"
+  "hero": {
+    "eyebrow": "Tentang Ekki",
+    "title": "Halo, saya <strong>Ekki Syam Sugiardi</strong>",
+    "subtitle": "Senior Software Engineer (QA)",
+    "description": "Senior Software Engineer (QA) dengan pengalaman lebih dari 4 tahun di <strong>Ninja Van</strong>. Diakui karena fleksibilitas teknis dan komitmen terhadap mentorship engineering. Spesialis yang agnostik terhadap teknologi mahir menggunakan Go, Python, dan Java untuk mengatasi hambatan kritis di berbagai tim produk. Memiliki rekam jejak terbukti dalam membangun otomasi dari nol, membimbing tester manual beralih ke peran otomasi, dan berkontribusi pada inisiatif penghematan biaya yang menghasilkan lebih dari $60.000 per bulan.",
+    "connect": "Koneksi di LinkedIn",
+    "github": "Profil GitHub"
+  },
+  "philosophy": {
+    "eyebrow": "Filosofi testing",
+    "title": "Software Engineer QA",
+    "intro": "Kualitas adalah upaya engineering yang berkelanjutan, bukan sekadar pemeriksaan akhir. Saya membangun sistem yang menjadikan keandalan sebagai fitur standar dari produk.",
+    "listIntro": "Pendekatan saya dibangun di atas pilar-pilar utama ini:",
+    "list": {
+      "integration": "<strong>Cross-Functional Integration</strong>: Menjembatani kesenjangan antara Stakeholder, PM, dan Engineering untuk membangun solusi otomatisasi yang melayani seluruh roadmap produk dan tujuan bisnis.",
+      "shiftLeft": "<strong>Shift-Left Strategy</strong>: Mengintegrasikan protokol kualitas selama fase desain dan pengembangan untuk menangkap masalah sebelum mencapai pipeline.",
+      "agility": "<strong>Technical Agility</strong>: Beradaptasi dengan mulus di antara Java, Go, dan Python untuk menyelaraskan dengan arsitektur teknis dan kebutuhan bisnis yang berkembang.",
+      "multiplier": "<strong>Force Multiplier</strong>: Memecahkan hambatan otomasi yang kompleks untuk menjaga pipeline deployment tetap bergerak dengan kecepatan tinggi."
     },
-    "philosophy": {
-        "title": "Software Engineer QA",
-        "intro": "Kualitas adalah upaya engineering yang berkelanjutan, bukan sekadar pemeriksaan akhir. Saya membangun sistem yang menjadikan keandalan sebagai fitur standar dari produk.",
-        "listIntro": "Pendekatan saya dibangun di atas pilar-pilar utama ini:",
-        "list": {
-            "integration": "<strong>Cross-Functional Integration</strong>: Menjembatani kesenjangan antara Stakeholder, PM, dan Engineering untuk membangun solusi otomatisasi yang melayani seluruh roadmap produk dan tujuan bisnis.",
-            "shiftLeft": "<strong>Shift-Left Strategy</strong>: Mengintegrasikan protokol kualitas selama fase desain dan pengembangan untuk menangkap masalah sebelum mencapai pipeline.",
-            "agility": "<strong>Technical Agility</strong>: Beradaptasi dengan mulus di antara Java, Go, dan Python untuk menyelaraskan dengan arsitektur teknis dan kebutuhan bisnis yang berkembang.",
-            "multiplier": "<strong>Force Multiplier</strong>: Memecahkan hambatan otomasi yang kompleks untuk menjaga pipeline deployment tetap bergerak dengan kecepatan tinggi."
-        },
-        "conclusion": "Kualitas adalah disiplin engineering. Saya membangun alat dan framework yang menegakkan keandalan. Entah itu backend Go atau platform React, saya menulis kode untuk memecahkan masalah kualitas yang nyata."
-    },
-    "milestones": {
-        "title": "Pengalaman Kerja",
-        "subtitle": "Perjalanan profesional dan dampak saya",
-        "items": [
-            {
-                "year": "2026",
-                "title": "TestingWithEkki",
-                "description": [
-                    "Mulai membangun platform ini untuk berbagi pengetahuan dan menjembatani manual testing dengan engineering.",
-                    "Taman bermain untuk teknologi web modern dan pola otomasi berkualitas tinggi."
-                ]
-            },
-            {
-                "year": "2024 - Sekarang",
-                "title": "Senior Software Engineer, QA di Ninja Van",
-                "description": [
-                    "Membangun framework testing AI dengan tim beranggotakan tiga orang menggunakan PyTest dan DeepEval untuk memverifikasi model klasifikasi intent dan auto-resolusi yang non-deterministik di dalam Salesforce. Pekerjaan ini memvalidasi fungsi inti dari platform yang dirancang untuk mengotomatiskan lebih dari 50% tiket support Tier 1.",
-                    "Mengelola otomasi pengujian dan verifikasi (API & Webhooks) untuk integrasi kemitraan (TikTok, Lazada, Shopee).",
-                    "Memodernisasi tumpukan otomasi web dengan berkontribusi pada migrasi dari Selenium ke Playwright.",
-                    "Memvalidasi fitur untuk inisiatif pengurangan biaya yang menghemat $60.000/bulan.",
-                    "Mengembangkan alat untuk decoding payload dan perbandingan konfigurasi.",
-                    "Mentorship tester manual dalam hal otomasi."
-                ]
-            },
-            {
-                "year": "2022 - 2024",
-                "title": "Software Engineer, QA di Ninja Van",
-                "description": [
-                    "Mengembangkan bersama framework testing integrasi berbasis Go pertama di perusahaan, mendeteksi cacat 80% lebih cepat.",
-                    "Bertindak sebagai spesialis otomasi lintas tim.",
-                    "Mencapai cakupan tes 100% untuk suite mobile/web/API tim Recovery.",
-                    "Mengurangi upaya pengujian manual sebesar 70%.",
-                    "Mempertahankan tingkat error regresi <1%.",
-                    "Menegakkan quality gates CI/CD yang ketat."
-                ]
-            },
-            {
-                "year": "2021",
-                "title": "Backend Engineer Intern di Ninja Van",
-                "description": "Meningkatkan performa environment QA dengan mengembangkan layanan pembersihan data dan berkontribusi pada kualitas kode melalui pembangunan RESTful API yang aman."
-            }
+    "conclusion": "Kualitas adalah disiplin engineering. Saya membangun alat dan framework yang menegakkan keandalan. Entah itu backend Go atau platform React, saya menulis kode untuk memecahkan masalah kualitas yang nyata."
+  },
+  "milestones": {
+    "eyebrow": "Perjalanan karier",
+    "title": "Pengalaman Kerja",
+    "subtitle": "Perjalanan profesional dan dampak saya",
+    "items": [
+      {
+        "year": "2026",
+        "title": "TestingWithEkki",
+        "description": [
+          "Mulai membangun platform ini untuk berbagi pengetahuan dan menjembatani manual testing dengan engineering.",
+          "Taman bermain untuk teknologi web modern dan pola otomasi berkualitas tinggi."
         ]
-    },
-    "expertise": {
-        "title": "Keahlian Teknis",
-        "subtitle": "Fondasi teknologi di balik strategi kualitas dan otomasi saya.",
-        "automation": {
-            "title": "Test Automation",
-            "groups": [
-                {
-                    "name": "Web",
-                    "items": ["Selenium", "Playwright", "React Testing"]
-                },
-                {
-                    "name": "Mobile",
-                    "items": ["Appium Flutter"]
-                },
-                {
-                    "name": "AI & API",
-                    "items": ["DeepEval", "Rest Assured", "Karate Framework"]
-                },
-                {
-                    "name": "Frameworks",
-                    "items": ["PyTest", "PyTest-BDD", "Cucumber"]
-                }
-            ]
+      },
+      {
+        "year": "2024 - Sekarang",
+        "title": "Senior Software Engineer, QA di Ninja Van",
+        "description": [
+          "Membangun framework testing AI dengan tim beranggotakan tiga orang menggunakan PyTest dan DeepEval untuk memverifikasi model klasifikasi intent dan auto-resolusi yang non-deterministik di dalam Salesforce. Pekerjaan ini memvalidasi fungsi inti dari platform yang dirancang untuk mengotomatiskan lebih dari 50% tiket support Tier 1.",
+          "Mengelola otomasi pengujian dan verifikasi (API & Webhooks) untuk integrasi kemitraan (TikTok, Lazada, Shopee).",
+          "Memodernisasi tumpukan otomasi web dengan berkontribusi pada migrasi dari Selenium ke Playwright.",
+          "Memvalidasi fitur untuk inisiatif pengurangan biaya yang menghemat $60.000/bulan.",
+          "Mengembangkan alat untuk decoding payload dan perbandingan konfigurasi.",
+          "Mentorship tester manual dalam hal otomasi."
+        ]
+      },
+      {
+        "year": "2022 - 2024",
+        "title": "Software Engineer, QA di Ninja Van",
+        "description": [
+          "Mengembangkan bersama framework testing integrasi berbasis Go pertama di perusahaan, mendeteksi cacat 80% lebih cepat.",
+          "Bertindak sebagai spesialis otomasi lintas tim.",
+          "Mencapai cakupan tes 100% untuk suite mobile/web/API tim Recovery.",
+          "Mengurangi upaya pengujian manual sebesar 70%.",
+          "Mempertahankan tingkat error regresi <1%.",
+          "Menegakkan quality gates CI/CD yang ketat."
+        ]
+      },
+      {
+        "year": "2021",
+        "title": "Backend Engineer Intern di Ninja Van",
+        "description": "Meningkatkan performa environment QA dengan mengembangkan layanan pembersihan data dan berkontribusi pada kualitas kode melalui pembangunan RESTful API yang aman."
+      }
+    ]
+  },
+  "expertise": {
+    "eyebrow": "Keahlian dan pengalaman",
+    "title": "Keahlian Teknis",
+    "subtitle": "Fondasi teknologi di balik strategi kualitas dan otomasi saya.",
+    "automation": {
+      "title": "Test Automation",
+      "groups": [
+        {
+          "name": "Web",
+          "items": ["Selenium", "Playwright", "React Testing"]
         },
-        "backend": {
-            "title": "Languages & Backend",
-            "groups": [
-                {
-                    "name": "Bahasa Pemrograman",
-                    "items": ["Java", "Javascript", "Python", "Go"]
-                },
-                {
-                    "name": "Data & Antarmuka",
-                    "items": ["SQL", "RESTful APIs"]
-                }
-            ]
+        {
+          "name": "Mobile",
+          "items": ["Appium Flutter"]
         },
-        "strategy": {
-            "title": "Strategi & Metodologi",
-            "groups": [
-                {
-                    "name": "Strategi Kualitas",
-                    "items": ["Shift-Left Strategy", "Analisis Risiko"]
-                },
-                {
-                    "name": "Proses & Alur Kerja",
-                    "items": ["Perencanaan Tes", "Agile / Scrum"]
-                }
-            ]
+        {
+          "name": "AI & API",
+          "items": ["DeepEval", "Rest Assured", "Karate Framework"]
         },
-        "devops": {
-            "title": "DevOps & Observability",
-            "groups": [
-                {
-                    "name": "CI/CD & Infrastruktur",
-                    "items": ["Docker", "Bamboo CI", "Git"]
-                },
-                {
-                    "name": "Observability",
-                    "items": ["Datadog", "Grafana", "Kibana"]
-                }
-            ]
+        {
+          "name": "Frameworks",
+          "items": ["PyTest", "PyTest-BDD", "Cucumber"]
         }
+      ]
     },
-    "contact": {
-        "title": "Mencari Software Engineer yang mampu menjamin kualitas di seluruh ekosistem teknologi Anda?",
-        "cta": "Hubungi Saya"
+    "backend": {
+      "title": "Languages & Backend",
+      "groups": [
+        {
+          "name": "Bahasa Pemrograman",
+          "items": ["Java", "Javascript", "Python", "Go"]
+        },
+        {
+          "name": "Data & Antarmuka",
+          "items": ["SQL", "RESTful APIs"]
+        }
+      ]
+    },
+    "strategy": {
+      "title": "Strategi & Metodologi",
+      "groups": [
+        {
+          "name": "Strategi Kualitas",
+          "items": ["Shift-Left Strategy", "Analisis Risiko"]
+        },
+        {
+          "name": "Proses & Alur Kerja",
+          "items": ["Perencanaan Tes", "Agile / Scrum"]
+        }
+      ]
+    },
+    "devops": {
+      "title": "DevOps & Observability",
+      "groups": [
+        {
+          "name": "CI/CD & Infrastruktur",
+          "items": ["Docker", "Bamboo CI", "Git"]
+        },
+        {
+          "name": "Observability",
+          "items": ["Datadog", "Grafana", "Kibana"]
+        }
+      ]
     }
+  },
+  "contact": {
+    "title": "Mencari Software Engineer yang mampu menjamin kualitas di seluruh ekosistem teknologi Anda?",
+    "cta": "Hubungi Saya"
+  },
+  "project": {
+    "eyebrow": "Proyek unggulan",
+    "cta": "Jelajahi Panduan Lapangan"
+  },
+  "impact": {
+    "title": "Dampak terpilih",
+    "items": [
+      { "value": ">50%", "label": "target otomasi support Tier 1" },
+      {
+        "value": "$60K",
+        "label": "inisiatif penghematan bulanan yang divalidasi"
+      },
+      { "value": "80%", "label": "deteksi cacat lebih cepat" },
+      { "value": "70%", "label": "pengurangan usaha testing manual" }
+    ]
+  }
 }

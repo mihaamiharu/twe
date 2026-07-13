@@ -1,29 +1,42 @@
 {
   "header": {
-    "title": "Para Suhu",
-    "subtitle": "Barisan para suhu yang berhasil menaklukkan tantangan."
+    "eyebrow": "Hall of Testers",
+    "title": "Leaderboard",
+    "subtitle": "Lihat para tester yang mengumpulkan pengalaman melalui tantangan praktis."
   },
   "tabs": {
-    "allTime": "All Time",
-    "thisMonth": "Bulan Ini"
+    "label": "Periode leaderboard",
+    "allTime": "Sepanjang waktu",
+    "thisMonth": "Bulan ini"
+  },
+  "podium": {
+    "label": "Tester teratas",
+    "firstPlace": "Peringkat pertama"
   },
   "table": {
-    "hiddenUser": "User Privat",
+    "title": "Peringkat",
+    "hiddenUser": "Tester tersembunyi",
     "anonymous": "Anonim",
-    "challengesCount": "{{count}} tantangan",
-    "challenges": "tantangan",
-    "emptyState": "Belum ada runner di sini. Ajak temanmu buat berkompetisi!"
+    "you": "Kamu",
+    "badgesLabel": "Lencana boss yang diperoleh",
+    "challengesCount": "{{count}} tantangan selesai",
+    "emptyState": "Belum ada tester yang masuk peringkat",
+    "emptyDescription": "Selesaikan tantangan dan ikut leaderboard untuk memulai perjalananmu."
   },
+  "emptyAction": "Lihat tantangan",
   "gating": {
-    "title": "Masuk Circle Para Suhu",
-    "description": "Login untuk akses ranking lengkap, pantau progress, dan klaim badge eksklusif.",
-    "button": "Login untuk Adu Skill"
+    "title": "Masuk untuk melihat hall lengkap",
+    "description": "Lihat nama tester, pantau progresmu, dan dapatkan lencana saat belajar.",
+    "button": "Masuk untuk melanjutkan"
   },
-  "monthly": {
-    "comingSoon": "Ranking Bulanan Segera Hadir",
-    "description": "Siapkan strategi terbaik untuk rebut posisi puncak di season depan!"
+  "pagination": {
+    "label": "Paginasi leaderboard",
+    "summary": "Halaman {{page}} dari {{totalPages}} · {{total}} tester",
+    "previous": "Sebelumnya",
+    "next": "Berikutnya"
   },
   "error": {
-    "description": "Leaderboard gagal dimuat. Coba cek koneksi internet atau balik lagi nanti."
+    "title": "Peringkat tidak tersedia",
+    "description": "Kami belum dapat memuat leaderboard. Silakan coba lagi."
   }
 }

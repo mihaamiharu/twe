@@ -1,168 +1,149 @@
 {
-    "hero": {
-        "title": "Hi, I'm <strong>Ekki Syam Sugiardi</strong>",
-        "subtitle": "Senior Software Engineer (QA)",
-        "description": "Senior Software Engineer (QA) with over 4 years of experience at Ninja Van. Recognized for technical versatility and a commitment to engineering mentorship. A tech-agnostic specialist who pivots between Go, Python, and Java to resolve critical bottlenecks across multiple product teams. Proven track record of scaling automation from the ground up, transitioning manual testers into automation roles, and collaborating on cost-reduction initiatives that contributed to over $60,000 in monthly savings.",
-        "connect": "Connect on LinkedIn",
-        "github": "GitHub Profile"
+  "hero": {
+    "eyebrow": "About Ekki",
+    "title": "Hi, I'm <strong>Ekki Syam Sugiardi</strong>",
+    "subtitle": "Senior Software Engineer (QA)",
+    "description": "Senior Software Engineer (QA) with over 4 years of experience at Ninja Van. Recognized for technical versatility and a commitment to engineering mentorship. A tech-agnostic specialist who pivots between Go, Python, and Java to resolve critical bottlenecks across multiple product teams. Proven track record of scaling automation from the ground up, transitioning manual testers into automation roles, and collaborating on cost-reduction initiatives that contributed to over $60,000 in monthly savings.",
+    "connect": "Connect on LinkedIn",
+    "github": "GitHub Profile"
+  },
+  "philosophy": {
+    "eyebrow": "Testing philosophy",
+    "title": "Software Engineer QA",
+    "intro": "Quality is a continuous engineering effort, not a final checkpoint. I build systems that make reliability a default feature of the product.",
+    "listIntro": "My approach builds on these core pillars:",
+    "list": {
+      "integration": "<strong>Cross-Functional Integration</strong>: Bridging the gap between Stakeholders, PMs, and Engineering to build automated solutions that serve the entire product roadmap and business goals.",
+      "shiftLeft": "<strong>Shift-Left Strategy</strong>: Integrating quality protocols during the design and development phases to catch issues before they reach the pipeline.",
+      "agility": "<strong>Technical Agility</strong>: Seamlessly adapting across Java, Go, and Python to align with both technical architectures and evolving business needs.",
+      "multiplier": "<strong>Force Multiplier</strong>: Solving complex automation bottlenecks to keep the deployment pipeline moving at high velocity."
     },
-    "philosophy": {
-        "title": "Software Engineer QA",
-        "intro": "Quality is a continuous engineering effort, not a final checkpoint. I build systems that make reliability a default feature of the product.",
-        "listIntro": "My approach builds on these core pillars:",
-        "list": {
-            "integration": "<strong>Cross-Functional Integration</strong>: Bridging the gap between Stakeholders, PMs, and Engineering to build automated solutions that serve the entire product roadmap and business goals.",
-            "shiftLeft": "<strong>Shift-Left Strategy</strong>: Integrating quality protocols during the design and development phases to catch issues before they reach the pipeline.",
-            "agility": "<strong>Technical Agility</strong>: Seamlessly adapting across Java, Go, and Python to align with both technical architectures and evolving business needs.",
-            "multiplier": "<strong>Force Multiplier</strong>: Solving complex automation bottlenecks to keep the deployment pipeline moving at high velocity."
-        },
-        "conclusion": "Quality is an engineering discipline. I build the tools and frameworks that enforce reliability. Whether it's a Go backend or a React platform, I write code that solves real quality problems."
-    },
-    "milestones": {
-        "title": "Work Experience",
-        "subtitle": "My professional journey and impact",
-        "items": [
-            {
-                "year": "2026",
-                "title": "TestingWithEkki",
-                "description": [
-                    "Started building this platform to share knowledge and bridge the gap between manual testing and engineering.",
-                    "A playground for modern web tech and high-quality automation patterns."
-                ]
-            },
-            {
-                "year": "2024 - Present",
-                "title": "Senior Software Engineer, QA at Ninja Van",
-                "description": [
-                    "Built an AI testing framework with a three-person team using PyTest and DeepEval to verify non-deterministic intent classification and auto-resolution models within Salesforce. This work validated the core functions of a platform designed to automate more than 50% of Tier 1 support tickets.",
-                    "Managed automated testing and verification (API & Webhooks) for partnership integrations (TikTok, Lazada, Shopee).",
-                    "Modernized the web automation stack by contributing to the migration from Selenium to Playwright.",
-                    "Validated features for cost-reduction initiatives saving $60,000/month.",
-                    "Developed tools for payload decoding and config comparison.",
-                    "Mentored manual testers on automation."
-                ]
-            },
-            {
-                "year": "2022 - 2024",
-                "title": "Software Engineer, QA at Ninja Van",
-                "description": [
-                    "Co-developed the company's first Go-based integration testing framework, detecting defects 80% faster.",
-                    "Served as cross-team automation specialist.",
-                    "Achieved 100% test coverage for Recovery team mobile/web/API suites.",
-                    "Reduced manual testing effort by 70%.",
-                    "Maintained <1% regression error rate.",
-                    "Enforced strict CI/CD quality gates."
-                ]
-            },
-            {
-                "year": "2021",
-                "title": "Backend Engineer Intern at Ninja Van",
-                "description": "Enhanced QA environment performance by developing a data cleanup service and contributed to code quality by building secure RESTful APIs."
-            }
+    "conclusion": "Quality is an engineering discipline. I build the tools and frameworks that enforce reliability. Whether it's a Go backend or a React platform, I write code that solves real quality problems."
+  },
+  "milestones": {
+    "eyebrow": "Career journey",
+    "title": "Work Experience",
+    "subtitle": "My professional journey and impact",
+    "items": [
+      {
+        "year": "2026",
+        "title": "TestingWithEkki",
+        "description": [
+          "Started building this platform to share knowledge and bridge the gap between manual testing and engineering.",
+          "A playground for modern web tech and high-quality automation patterns."
         ]
-    },
-    "expertise": {
-        "title": "Technical Expertise",
-        "subtitle": "The engineering stack behind my software quality and automation strategy.",
-        "automation": {
-            "title": "Test Automation",
-            "groups": [
-                {
-                    "name": "Web",
-                    "items": [
-                        "Selenium",
-                        "Playwright",
-                        "React Testing"
-                    ]
-                },
-                {
-                    "name": "Mobile",
-                    "items": [
-                        "Appium Flutter"
-                    ]
-                },
-                {
-                    "name": "AI & API",
-                    "items": [
-                        "DeepEval",
-                        "Rest Assured",
-                        "Karate Framework"
-                    ]
-                },
-                {
-                    "name": "Frameworks",
-                    "items": [
-                        "PyTest",
-                        "PyTest-BDD",
-                        "Cucumber"
-                    ]
-                }
-            ]
+      },
+      {
+        "year": "2024 - Present",
+        "title": "Senior Software Engineer, QA at Ninja Van",
+        "description": [
+          "Built an AI testing framework with a three-person team using PyTest and DeepEval to verify non-deterministic intent classification and auto-resolution models within Salesforce. This work validated the core functions of a platform designed to automate more than 50% of Tier 1 support tickets.",
+          "Managed automated testing and verification (API & Webhooks) for partnership integrations (TikTok, Lazada, Shopee).",
+          "Modernized the web automation stack by contributing to the migration from Selenium to Playwright.",
+          "Validated features for cost-reduction initiatives saving $60,000/month.",
+          "Developed tools for payload decoding and config comparison.",
+          "Mentored manual testers on automation."
+        ]
+      },
+      {
+        "year": "2022 - 2024",
+        "title": "Software Engineer, QA at Ninja Van",
+        "description": [
+          "Co-developed the company's first Go-based integration testing framework, detecting defects 80% faster.",
+          "Served as cross-team automation specialist.",
+          "Achieved 100% test coverage for Recovery team mobile/web/API suites.",
+          "Reduced manual testing effort by 70%.",
+          "Maintained <1% regression error rate.",
+          "Enforced strict CI/CD quality gates."
+        ]
+      },
+      {
+        "year": "2021",
+        "title": "Backend Engineer Intern at Ninja Van",
+        "description": "Enhanced QA environment performance by developing a data cleanup service and contributed to code quality by building secure RESTful APIs."
+      }
+    ]
+  },
+  "expertise": {
+    "eyebrow": "Skills and experience",
+    "title": "Technical Expertise",
+    "subtitle": "The engineering stack behind my software quality and automation strategy.",
+    "automation": {
+      "title": "Test Automation",
+      "groups": [
+        {
+          "name": "Web",
+          "items": ["Selenium", "Playwright", "React Testing"]
         },
-        "backend": {
-            "title": "Languages & Backend",
-            "groups": [
-                {
-                    "name": "Languages",
-                    "items": [
-                        "Java",
-                        "JavaScript",
-                        "Python",
-                        "Go"
-                    ]
-                },
-                {
-                    "name": "Data & Interface",
-                    "items": [
-                        "SQL",
-                        "RESTful APIs"
-                    ]
-                }
-            ]
+        {
+          "name": "Mobile",
+          "items": ["Appium Flutter"]
         },
-        "strategy": {
-            "title": "Strategy & Methodologies",
-            "groups": [
-                {
-                    "name": "Quality Strategy",
-                    "items": [
-                        "Shift-Left Strategy",
-                        "Risk Analysis"
-                    ]
-                },
-                {
-                    "name": "Process",
-                    "items": [
-                        "Test Planning",
-                        "Agile / Scrum"
-                    ]
-                }
-            ]
+        {
+          "name": "AI & API",
+          "items": ["DeepEval", "Rest Assured", "Karate Framework"]
         },
-        "devops": {
-            "title": "DevOps & Observability",
-            "groups": [
-                {
-                    "name": "CI/CD & Infrastructure",
-                    "items": [
-                        "Docker",
-                        "Bamboo CI",
-                        "Git"
-                    ]
-                },
-                {
-                    "name": "Observability",
-                    "items": [
-                        "Datadog",
-                        "Grafana",
-                        "Kibana"
-                    ]
-                }
-            ]
+        {
+          "name": "Frameworks",
+          "items": ["PyTest", "PyTest-BDD", "Cucumber"]
         }
+      ]
     },
-    "contact": {
-        "title": "Looking for a Software Engineer who builds quality into every layer of the stack?",
-        "cta": "Get in Touch"
+    "backend": {
+      "title": "Languages & Backend",
+      "groups": [
+        {
+          "name": "Languages",
+          "items": ["Java", "JavaScript", "Python", "Go"]
+        },
+        {
+          "name": "Data & Interface",
+          "items": ["SQL", "RESTful APIs"]
+        }
+      ]
+    },
+    "strategy": {
+      "title": "Strategy & Methodologies",
+      "groups": [
+        {
+          "name": "Quality Strategy",
+          "items": ["Shift-Left Strategy", "Risk Analysis"]
+        },
+        {
+          "name": "Process",
+          "items": ["Test Planning", "Agile / Scrum"]
+        }
+      ]
+    },
+    "devops": {
+      "title": "DevOps & Observability",
+      "groups": [
+        {
+          "name": "CI/CD & Infrastructure",
+          "items": ["Docker", "Bamboo CI", "Git"]
+        },
+        {
+          "name": "Observability",
+          "items": ["Datadog", "Grafana", "Kibana"]
+        }
+      ]
     }
+  },
+  "contact": {
+    "title": "Looking for a Software Engineer who builds quality into every layer of the stack?",
+    "cta": "Get in Touch"
+  },
+  "project": {
+    "eyebrow": "Featured project",
+    "cta": "Explore the Field Guide"
+  },
+  "impact": {
+    "title": "Selected impact",
+    "items": [
+      { "value": ">50%", "label": "Tier 1 support automation target" },
+      { "value": "$60K", "label": "monthly savings initiatives validated" },
+      { "value": "80%", "label": "faster defect detection" },
+      { "value": "70%", "label": "less manual testing effort" }
+    ]
+  }
 }

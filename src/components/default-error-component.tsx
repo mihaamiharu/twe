@@ -1,66 +1,68 @@
 import { useQueryErrorResetBoundary } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
-import { AlertCircle, RefreshCcw, Home } from 'lucide-react';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import * as Sentry from '@sentry/react';
+import {
+  PageContainer,
+  PaperSurface,
+  StatePanel,
+} from '@/components/cozy-quest';
+import { Button } from '@/components/ui/button';
 
 export function DefaultErrorComponent({ error }: { error: Error }) {
-    const router = useRouter();
-    const queryErrorResetBoundary = useQueryErrorResetBoundary();
+  const router = useRouter();
+  const queryErrorResetBoundary = useQueryErrorResetBoundary();
+  const { t } = useTranslation('common');
 
-    useEffect(() => {
-        // Log the error to Sentry when the error boundary catches it
-        Sentry.captureException(error);
-    }, [error]);
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
 
-    return (
-        <div className="flex min-h-[80vh] items-center justify-center p-4">
-            <Card className="w-full max-w-md border-destructive/50 bg-destructive/5 dark:bg-destructive/10">
-                <CardHeader className="text-center">
-                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10 text-destructive dark:bg-destructive/20">
-                        <AlertCircle className="h-6 w-6" />
-                    </div>
-                    <CardTitle className="text-xl">Something went wrong</CardTitle>
-                    <CardDescription>
-                        An unexpected error occurred while rendering this page.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent className="text-center text-sm text-muted-foreground">
-                    <p className="mb-2 font-mono text-xs bg-muted/50 p-2 rounded max-h-32 overflow-auto text-left">
-                        {error.message || 'Unknown error'}
-                    </p>
-                </CardContent>
-                <CardFooter className="flex justify-center gap-4">
-                    <Button
-                        variant="outline"
-                        onClick={() => {
-                            router.history.go(-1);
-                        }}
-                    >
-                        Go Back
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            // Invalidate all queries and reload the page
-                            queryErrorResetBoundary.reset();
-                            router.invalidate();
-                            window.location.reload();
-                        }}
-                    >
-                        <RefreshCcw className="mr-2 h-4 w-4" />
-                        Try Again
-                    </Button>
-                </CardFooter>
-            </Card>
-        </div>
-    );
+  return (
+    <main className="min-h-[80vh] py-12 sm:py-20">
+      <PageContainer width="narrow">
+        <PaperSurface
+          className="border-destructive/30 px-6 py-14 sm:px-10"
+          texture={false}
+        >
+          <StatePanel
+            icon={AlertCircle}
+            tone="danger"
+            title={t('states.errorTitle')}
+            description={t('states.errorDescription')}
+            details={
+              <details className="rounded-xl border border-border bg-background/70 p-3 text-left">
+                <summary className="cursor-pointer text-sm font-semibold text-foreground">
+                  {t('states.errorDetails')}
+                </summary>
+                <p className="mt-3 max-h-32 overflow-auto font-mono-tech text-xs leading-5 text-muted-foreground">
+                  {error.message || 'Unknown error'}
+                </p>
+              </details>
+            }
+            actions={
+              <>
+                <Button variant="outline" onClick={() => router.history.go(-1)}>
+                  {t('actions.back')}
+                </Button>
+                <Button
+                  onClick={() => {
+                    queryErrorResetBoundary.reset();
+                    void router
+                      .invalidate()
+                      .finally(() => window.location.reload());
+                  }}
+                >
+                  <RefreshCcw className="size-4" aria-hidden="true" />
+                  {t('actions.tryAgain')}
+                </Button>
+              </>
+            }
+          />
+        </PaperSurface>
+      </PageContainer>
+    </main>
+  );
 }

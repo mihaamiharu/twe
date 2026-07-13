@@ -51,7 +51,9 @@
     "signUp": "Sign Up",
     "backToSignIn": "Back to Sign In",
     "signInNow": "Sign In Now",
-    "resetPassword": "Reset Password"
+    "resetPassword": "Reset Password",
+    "goHome": "Go Home",
+    "browseFieldGuide": "Browse Field Guide"
   },
   "breadcrumbs": {
     "label": "Breadcrumb"
@@ -112,10 +114,16 @@
     }
   },
   "notFound": {
-    "title": "You are in Headless Mode",
-    "description": "The content is here, but you can't see it because your viewport is set to headless: true. Trust us, the tests are passing in the background.",
-    "backHome": "Switch to Headed Mode (Go Home)",
-    "tip": "Tip: Try running with --headed flag next time"
+    "title": "This route wandered off the trail",
+    "description": "The page you requested could not be found. The rest of the learning path is still here.",
+    "backHome": "Go Home",
+    "tip": "Route check: expected page was not found."
+  },
+  "states": {
+    "errorTitle": "Something went wrong",
+    "errorDescription": "We could not load this page. You can try again or return to the previous page.",
+    "errorDetails": "Technical details",
+    "loading": "Loading content"
   },
   "auth": {
     "signInToSubmit": "Sign in to Submit",

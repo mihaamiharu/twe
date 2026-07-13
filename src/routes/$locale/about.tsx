@@ -1,248 +1,334 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  ArrowRight,
+  Brain,
+  BriefcaseBusiness,
+  Code2,
+  Database,
+  Globe,
+  Github,
+  Linkedin,
+  Mail,
+  MapPinned,
+  Sparkles,
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, Database, Globe, Code2, Milestone, Brain, Activity } from 'lucide-react';
-import i18n from '@/lib/i18n';
-import { Boop } from '@/components/ui/boop';
+import { Button } from '@/components/ui/button';
+import {
+  CTAButton,
+  PageContainer,
+  PaperSurface,
+  SectionHeading,
+  StatPill,
+} from '@/components/cozy-quest';
 import { createSeoHead } from '@/lib/seo';
 
+interface Milestone {
+  year: string;
+  title: string;
+  description: string | string[];
+}
+
+interface ExpertiseGroup {
+  name: string;
+  items: string[];
+}
+
+interface ImpactItem {
+  value: string;
+  label: string;
+}
+
 export const Route = createFileRoute('/$locale/about')({
-    component: AboutPage,
-    head: ({ params }) => {
-        const locale = params.locale || 'en';
-        return createSeoHead({
-            title: `About Ekki Syam Sugiardi | TestingWithEkki`,
-            description: 'Meet Ekki Syam Sugiardi, the QA Engineer behind TestingWithEkki. A portfolio project demonstrating full-stack engineering skills.',
-            path: '/about',
-            locale,
-            jsonLd: [
-                {
-                    "@context": "https://schema.org",
-                    "@type": "ProfilePage",
-                    "mainEntity": {
-                        "@type": "Person",
-                        "name": "Ekki Syam Sugiardi",
-                        "jobTitle": "QA Engineer",
-                        "url": "https://testingwithekki.com",
-                        "sameAs": [
-                            "https://www.linkedin.com/in/ekkisyamsugiardi",
-                            "https://github.com/mihaamiharu"
-                        ]
-                    }
-                }
+  component: AboutPage,
+  head: ({ params }) =>
+    createSeoHead({
+      title: 'About Ekki Syam Sugiardi | TestingWithEkki',
+      description:
+        'Meet Ekki Syam Sugiardi, the QA Engineer behind TestingWithEkki. A portfolio project demonstrating full-stack engineering skills.',
+      path: '/about',
+      locale: params.locale || 'en',
+      jsonLd: [
+        {
+          '@context': 'https://schema.org',
+          '@type': 'ProfilePage',
+          mainEntity: {
+            '@type': 'Person',
+            name: 'Ekki Syam Sugiardi',
+            jobTitle: 'QA Engineer',
+            url: 'https://testingwithekki.com',
+            sameAs: [
+              'https://www.linkedin.com/in/ekkisyamsugiardi',
+              'https://github.com/mihaamiharu',
             ],
-        });
-    },
+          },
+        },
+      ],
+    }),
 });
 
 function AboutPage() {
-    const { t } = useTranslation(['about', 'common']);
-    const milestones = t('about:milestones.items', { returnObjects: true }) as Array<{ year: string; title: string; description: string | string[] }>;
-    // Hardcoded for now as it's personal content, could move to i18n later if needed
+  const { t } = useTranslation(['about', 'common']);
+  const { locale } = useParams({ from: '/$locale/about' });
+  const milestones = t('milestones.items', {
+    returnObjects: true,
+  }) as Milestone[];
+  const impacts = t('impact.items', { returnObjects: true }) as ImpactItem[];
+  const [project, ...career] = milestones;
+  const expertise = [
+    { key: 'automation', icon: Globe },
+    { key: 'backend', icon: Database },
+    { key: 'strategy', icon: Brain },
+    { key: 'devops', icon: Code2 },
+  ] as const;
 
-    const expertise = [
-        {
-            category: t('about:expertise.automation.title'),
-            icon: <Globe className="h-5 w-5 text-blue-500" />,
-            groups: t('about:expertise.automation.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        },
-        {
-            category: t('about:expertise.backend.title'),
-            icon: <Database className="h-5 w-5 text-green-500" />,
-            groups: t('about:expertise.backend.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        },
-        {
-            category: t('about:expertise.strategy.title'),
-            icon: <Brain className="h-5 w-5 text-purple-500" />,
-            groups: t('about:expertise.strategy.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        },
-        {
-            category: t('about:expertise.devops.title'),
-            icon: <Activity className="h-5 w-5 text-orange-500" />,
-            groups: t('about:expertise.devops.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        }
-    ];
-
-    return (
-        <div className="min-h-screen py-20 px-6">
-            <div className="max-w-4xl mx-auto space-y-16">
-
-                {/* Hero Section */}
-                <section className="text-center space-y-6">
-                    <div className="mx-auto w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl mb-8">
-                        {/* Using a placeholder if user image isn't available, or maybe the authenticated user's image if logged in? 
-                 Better to use a generic avatar or just the initials for now if no specific image is provided. 
-                 Actually, let's look for an avatar or just use initials style. 
-                 Since this is "Ekki", maybe I should use a specific asset if it exists, or just a nice placeholder. 
-                 I'll use a text avatar for now to be safe. */}
-                        <img
-                            src="/me.small.jpg"
-                            alt="Ekki"
-                            className="w-full h-full object-cover"
-                            width={128}
-                            height={128}
-                            loading="eager"
-                            fetchPriority="high"
-                        />
-                    </div>
-
-                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                        <span dangerouslySetInnerHTML={{ __html: t('about:hero.title') }} />
-                    </h1>
-
-                    <h2 className="text-2xl md:text-3xl font-medium text-muted-foreground">
-                        {t('about:hero.subtitle')}
-                    </h2>
-
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: t('about:hero.description') }}
-                    />
-
-                    <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-                        <Button asChild size="lg" className="rounded-full group">
-                            <a href="https://www.linkedin.com/in/ekkisyamsugiardi/" target="_blank" rel="noopener noreferrer">
-                                <Linkedin className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.connect')}
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group">
-                            <a href="https://github.com/mihaamiharu" target="_blank" rel="noopener noreferrer">
-                                <Github className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.github')}
-                            </a>
-                        </Button>
-                    </div>
-                </section>
-
-                {/* The "Why" Section */}
-                <section className="glass-card p-8 md:p-12 rounded-3xl border border-primary/10 bg-gradient-to-br from-card to-primary/5">
-                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                        <Code2 className="h-6 w-6 text-primary" />
-                        {t('about:philosophy.title')}
-                    </h3>
-                    <div className="space-y-4 text-muted-foreground leading-relaxed">
-                        <p dangerouslySetInnerHTML={{ __html: t('about:philosophy.intro') }} />
-                        <p>
-                            {t('about:philosophy.listIntro')}
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 ml-4">
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.integration') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.shiftLeft') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.agility') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.multiplier') }} />
-                        </ul>
-                        <p className="mt-4">
-                            {t('about:philosophy.conclusion')}
-                        </p>
-                    </div>
-                </section>
-
-                {/* Milestones / Journey */}
-                <section>
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
-                            <Milestone className="h-6 w-6 text-primary" />
-                            {t('about:milestones.title')}
-                        </h3>
-                        <p className="text-muted-foreground">{t('about:milestones.subtitle')}</p>
-                    </div>
-
-                    <div className="relative border-l border-border ml-3.5 md:ml-1/2 space-y-12 pb-4">
-                        {milestones.map((milestone, index) => (
-                            <div key={index} className="relative pl-8 md:pl-0">
-                                {/* Dot on the line */}
-                                <div className="absolute -left-[5px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
-
-                                <div className="flex flex-col md:flex-row gap-4 md:gap-12 group">
-                                    {/* Year - distinct styling */}
-                                    <div className="md:w-32 md:text-right shrink-0">
-                                        <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-sm">
-                                            {milestone.year}
-                                        </span>
-                                    </div>
-
-                                    {/* Content card */}
-                                    <Card className="flex-1 transition-all hover:bg-card/50 hover:border-primary/50 relative -top-4 md:-top-5">
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">{milestone.title}</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            {Array.isArray(milestone.description) ? (
-                                                <ul className="list-disc list-outside ml-4 space-y-2 text-muted-foreground leading-relaxed">
-                                                    {milestone.description.map((point, i) => (
-                                                        <li key={i}>{point}</li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-muted-foreground leading-relaxed">
-                                                    {milestone.description}
-                                                </p>
-                                            )}
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Tech Stack */}
-                <section>
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl font-bold mb-2">{t('about:expertise.title')}</h3>
-                        <p className="text-muted-foreground">{t('about:expertise.subtitle')}</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {expertise.map((stack, index) => (
-                            <Card key={index} className="bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors h-full">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-3 text-lg">
-                                        <Boop rotation={15} scale={1.2} timing={200}>
-                                            {stack.icon}
-                                        </Boop>
-                                        {stack.category}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-6">
-                                    {stack.groups.map((group, groupIndex) => (
-                                        <div key={groupIndex}>
-                                            <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">
-                                                {group.name}
-                                            </h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {group.items.map((skill) => (
-                                                    <Badge key={skill} variant="secondary" className="hover:bg-primary/20">
-                                                        {skill}
-                                                    </Badge>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </section>
-
-
-
-                {/* Contact/Ending */}
-                <section className="text-center pt-10 border-t border-border">
-                    <p className="text-xl font-medium mb-6">
-                        {t('about:contact.title')}
-                    </p>
-                    <Button asChild size="lg" className="h-12 px-8 text-lg">
-                        <Link to="/$locale/contact" params={{ locale: i18n.language }}>
-                            <Mail className="mr-2 h-5 w-5" />
-                            {t('about:contact.cta')}
-                        </Link>
-                    </Button>
-                </section>
-
+  return (
+    <main className="min-h-screen py-8 sm:py-10 lg:py-12">
+      <PageContainer width="wide">
+        <PaperSurface className="relative overflow-hidden px-6 py-8 sm:px-10 sm:py-12">
+          <div
+            aria-hidden="true"
+            className="absolute -right-16 -top-16 size-64 rounded-full border-[22px] border-accent/30"
+          />
+          <div className="relative grid gap-8 lg:grid-cols-[12rem_minmax(0,1fr)] lg:items-center">
+            <img
+              src="/me.small.jpg"
+              alt="Ekki Syam Sugiardi"
+              className="mx-auto size-32 rounded-[2rem] border-4 border-background object-cover shadow-[0_16px_36px_rgba(73,62,45,0.16)] lg:size-44"
+              width={176}
+              height={176}
+              fetchPriority="high"
+            />
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                {t('hero.eyebrow')}
+              </p>
+              <h1
+                className="mt-2 font-display text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl"
+                dangerouslySetInnerHTML={{ __html: t('hero.title') }}
+              />
+              <p className="mt-3 text-lg font-semibold text-primary">
+                {t('hero.subtitle')}
+              </p>
+              <p
+                className="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground sm:text-base"
+                dangerouslySetInnerHTML={{ __html: t('hero.description') }}
+              />
+              <div className="mt-6 flex flex-wrap gap-3">
+                <CTAButton asChild>
+                  <a
+                    href="https://www.linkedin.com/in/ekkisyamsugiardi/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Linkedin className="size-4" aria-hidden="true" />
+                    {t('hero.connect')}
+                  </a>
+                </CTAButton>
+                <Button variant="outline" size="lg" asChild>
+                  <a
+                    href="https://github.com/mihaamiharu"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Github className="size-4" aria-hidden="true" />
+                    {t('hero.github')}
+                  </a>
+                </Button>
+              </div>
             </div>
-        </div >
-    );
+          </div>
+        </PaperSurface>
+
+        <section
+          className="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4"
+          aria-label={t('impact.title')}
+        >
+          {impacts.map((impact) => (
+            <StatPill
+              key={impact.label}
+              value={impact.value}
+              label={impact.label}
+            />
+          ))}
+        </section>
+
+        <section className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(20rem,0.75fr)]">
+          <PaperSurface className="p-6 sm:p-8">
+            <div className="flex items-start gap-3">
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Code2 className="size-5" aria-hidden="true" />
+              </span>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                  {t('philosophy.eyebrow')}
+                </p>
+                <h2 className="mt-1 font-display text-2xl font-semibold">
+                  {t('philosophy.title')}
+                </h2>
+              </div>
+            </div>
+            <div className="mt-6 space-y-4 text-sm leading-7 text-muted-foreground sm:text-base">
+              <p dangerouslySetInnerHTML={{ __html: t('philosophy.intro') }} />
+              <p>{t('philosophy.listIntro')}</p>
+              <ul className="space-y-3">
+                {(
+                  ['integration', 'shiftLeft', 'agility', 'multiplier'] as const
+                ).map((key) => (
+                  <li key={key} className="flex gap-3">
+                    <Sparkles
+                      className="mt-1 size-4 shrink-0 text-primary"
+                      aria-hidden="true"
+                    />
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: t(`philosophy.list.${key}`),
+                      }}
+                    />
+                  </li>
+                ))}
+              </ul>
+              <p>{t('philosophy.conclusion')}</p>
+            </div>
+          </PaperSurface>
+
+          {project && (
+            <PaperSurface className="p-6 sm:p-8" texture={false}>
+              <span className="flex size-10 items-center justify-center rounded-xl bg-[color:var(--quest-gold)]/15 text-foreground">
+                <MapPinned className="size-5" aria-hidden="true" />
+              </span>
+              <p className="mt-5 text-xs font-bold uppercase tracking-[0.16em] text-primary">
+                {t('project.eyebrow')}
+              </p>
+              <h2 className="mt-1 font-display text-2xl font-semibold">
+                {project.title}
+              </h2>
+              <div className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
+                {(Array.isArray(project.description)
+                  ? project.description
+                  : [project.description]
+                ).map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
+              <Button className="mt-6 w-full" variant="outline" asChild>
+                <Link to="/$locale/tutorials" params={{ locale }}>
+                  {t('project.cta')}{' '}
+                  <ArrowRight className="size-4" aria-hidden="true" />
+                </Link>
+              </Button>
+            </PaperSurface>
+          )}
+        </section>
+
+        <section className="mt-12" aria-label={t('milestones.title')}>
+          <SectionHeading
+            as="h2"
+            eyebrow={t('milestones.eyebrow')}
+            title={t('milestones.title')}
+            description={t('milestones.subtitle')}
+          />
+          <ol className="relative mx-auto mt-8 max-w-5xl space-y-5 border-l border-border pl-6 sm:pl-8">
+            {career.map((milestone) => (
+              <li
+                key={`${milestone.year}-${milestone.title}`}
+                className="relative"
+              >
+                <span
+                  aria-hidden="true"
+                  className="absolute -left-[2.1rem] top-6 size-4 rounded-full border-4 border-background bg-primary sm:-left-[2.6rem]"
+                />
+                <PaperSurface className="p-5 sm:p-6" texture={false}>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Badge variant="secondary">{milestone.year}</Badge>
+                    <h3 className="font-display text-xl font-semibold">
+                      {milestone.title}
+                    </h3>
+                  </div>
+                  <div className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
+                    {Array.isArray(milestone.description) ? (
+                      <ul className="space-y-2">
+                        {milestone.description.map((item) => (
+                          <li key={item} className="flex gap-2">
+                            <span
+                              aria-hidden="true"
+                              className="mt-2 size-1.5 shrink-0 rounded-full bg-primary"
+                            />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p>{milestone.description}</p>
+                    )}
+                  </div>
+                </PaperSurface>
+              </li>
+            ))}
+          </ol>
+        </section>
+
+        <section className="mt-12" aria-label={t('expertise.title')}>
+          <SectionHeading
+            as="h2"
+            eyebrow={t('expertise.eyebrow')}
+            title={t('expertise.title')}
+            description={t('expertise.subtitle')}
+          />
+          <div className="mt-8 grid gap-4 md:grid-cols-2">
+            {expertise.map(({ key, icon: Icon }) => {
+              const groups = t(`expertise.${key}.groups`, {
+                returnObjects: true,
+              }) as ExpertiseGroup[];
+              return (
+                <PaperSurface key={key} className="p-6" texture={false}>
+                  <div className="flex items-center gap-3">
+                    <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                      <Icon className="size-5" aria-hidden="true" />
+                    </span>
+                    <h3 className="font-display text-xl font-semibold">
+                      {t(`expertise.${key}.title`)}
+                    </h3>
+                  </div>
+                  <div className="mt-5 space-y-5">
+                    {groups.map((group) => (
+                      <div key={group.name}>
+                        <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
+                          {group.name}
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {group.items.map((item) => (
+                            <Badge key={item} variant="secondary">
+                              {item}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </PaperSurface>
+              );
+            })}
+          </div>
+        </section>
+
+        <PaperSurface className="mt-12 px-6 py-10 text-center sm:px-10" texture>
+          <BriefcaseBusiness
+            className="mx-auto size-8 text-primary"
+            aria-hidden="true"
+          />
+          <h2 className="mx-auto mt-4 max-w-2xl font-display text-2xl font-semibold sm:text-3xl">
+            {t('contact.title')}
+          </h2>
+          <CTAButton asChild className="mt-6">
+            <Link to="/$locale/contact" params={{ locale }}>
+              <Mail className="size-4" aria-hidden="true" />
+              {t('contact.cta')}
+            </Link>
+          </CTAButton>
+        </PaperSurface>
+      </PageContainer>
+    </main>
+  );
 }

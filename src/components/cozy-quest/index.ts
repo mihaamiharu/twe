@@ -5,5 +5,6 @@ export { PaperSurface } from './paper-surface';
 export { ProgressTrail, type ProgressTrailItem } from './progress-trail';
 export { QuestCard } from './quest-card';
 export { SectionHeading } from './section-heading';
+export { StatePanel } from './state-panel';
 export { StatPill } from './stat-pill';
 export { TechnicalSurface } from './technical-surface';

@@ -115,7 +115,11 @@
       "successTitle": "Message Sent!",
       "successMessage": "Thanks for reaching out! I'll get back to you soon.",
       "errorTitle": "Error",
-      "errorMessage": "Something went wrong. Please try again later."
+      "errorMessage": "Something went wrong. Please try again later.",
+      "sendAnother": "Send another message",
+      "namePlaceholder": "Jane Doe",
+      "emailPlaceholder": "jane@example.com",
+      "messagePlaceholder": "Tell me about your inquiry..."
     },
     "booking": {
       "title": "Book a 1-1 Session",
@@ -132,5 +136,16 @@
       "description": "Looking for a Senior QA Engineer, SDET, or Test Architect? I help teams build reliable, high-quality software.",
       "cta": "View My Resume"
     }
+  },
+  "subscription": {
+    "invalidTitle": "Invalid confirmation link",
+    "invalidDescription": "This confirmation link is missing or no longer valid.",
+    "loadingTitle": "Confirming your subscription",
+    "loadingDescription": "Please wait while we verify your request.",
+    "errorTitle": "We could not confirm your subscription",
+    "errorDescription": "The link may have expired or was already used. Please try subscribing again.",
+    "successTitle": "Subscription confirmed",
+    "successDescription": "Thank you for subscribing. You will receive updates on new tutorials and challenges.",
+    "successAction": "Explore the Field Guide"
   }
 }

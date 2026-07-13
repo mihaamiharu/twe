@@ -9,7 +9,12 @@ test.describe('Leaderboard', () => {
     await leaderboardPage.goto();
   });
 
-  test('should display leaderboard', async ({ page }) => {
+  test('should display leaderboard', async () => {
     await leaderboardPage.verifyLeaderboardVisible();
+  });
+
+  test('should retain the monthly period in the URL', async ({ page }) => {
+    await leaderboardPage.showMonthlyRankings();
+    await expect(page).toHaveURL(/period=monthly/);
   });
 });

@@ -47,10 +47,12 @@ export function AuthGuardDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="border-border bg-card">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <LogIn className="h-5 w-5 text-primary" />
+          <DialogTitle className="flex items-center gap-2 font-display text-2xl font-semibold">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <LogIn className="h-5 w-5" />
+            </span>
             {displayTitle}
           </DialogTitle>
         </DialogHeader>
