@@ -461,6 +461,29 @@ body {
   @apply prose-a:text-accent prose-a:no-underline hover:prose-a:underline;
 }
 
+/* Field Guide articles stay neutral and highly legible. Decorative paper is
+   reserved for the surrounding layout; technical blocks opt into their own
+   surface through the tutorial Markdown variant. */
+.tutorial-reading {
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.tutorial-reading > h1 {
+  display: none;
+}
+
+.tutorial-reading :where(h2, h3) {
+  font-family: var(--font-sans);
+  letter-spacing: -0.02em;
+}
+
+.tutorial-reading :where(th, td) {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

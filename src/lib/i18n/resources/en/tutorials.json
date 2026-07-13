@@ -2,6 +2,12 @@
   "page": {
     "title": "Tutorials",
     "subtitle": "Walk through core concepts with me, step-by-step.",
+    "eyebrow": "Testing Field Guide",
+    "fieldGuideDescription": "Choose a path, follow the clues, and build practical testing instincts one guide at a time.",
+    "learningStage": "Learning stage",
+    "readingEyebrow": "Field Guide entry",
+    "resultCount_one": "{{count}} guide found",
+    "resultCount_other": "{{count}} guides found",
     "seo": {
       "title": "Interactive Playwright Tutorials | TestingWithEkki",
       "description": "Step-by-step guides for mastering software testing. Learn Playwright, end-to-end testing strategies, and best practices."
@@ -22,7 +28,13 @@
     "intermediate": "Intermediate",
     "advanced": "E2E Testing",
     "hideCompleted": "Hide Completed",
-    "showCompleted": "Show Completed"
+    "showCompleted": "Show Completed",
+    "guideSections": "Guide sections",
+    "topics": "Topics",
+    "clear": "Clear filters",
+    "searchLabel": "Search the Field Guide",
+    "filterGuides": "Filter guides",
+    "filterDescription": "Choose a learning stage to narrow the Field Guide."
   },
   "tracks": {
     "foundations": "Foundations Track",
@@ -36,18 +48,40 @@
     "description": "Description",
     "tags": "Tags",
     "time": "Time",
-    "status": "Status"
+    "status": "Status",
+    "scrollableLabel": "Scrollable table"
   },
   "card": {
     "estimatedTime": "{{minutes}} min read",
     "estimatedTimeShort": "{{minutes}} min",
     "startTutorial": "Start Tutorial",
     "continueTutorial": "Continue",
-    "completed": "Done"
+    "completed": "Done",
+    "reviewTutorial": "Review guide",
+    "guideNumber": "Guide {{number}}",
+    "openTutorial": "Open {{title}}"
   },
   "view": {
     "grid": "Grid View",
-    "list": "List View"
+    "list": "List View",
+    "label": "Tutorial view"
+  },
+  "progress": {
+    "notStarted": "Not started",
+    "inProgress": "{{percent}}% read",
+    "completed": "Completed"
+  },
+  "code": {
+    "copy": "Copy code",
+    "copied": "Code copied",
+    "copyFailed": "Could not copy code"
+  },
+  "callouts": {
+    "note": "Note",
+    "tip": "Tip",
+    "important": "Important",
+    "warning": "Warning",
+    "caution": "Caution"
   },
   "sidebar": {
     "progress": "Your Progress",

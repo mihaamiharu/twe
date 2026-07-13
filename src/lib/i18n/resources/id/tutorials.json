@@ -2,6 +2,12 @@
   "page": {
     "title": "Tutorial",
     "subtitle": "Pelajari konsep inti bersama saya, langkah demi langkah.",
+    "eyebrow": "Panduan Lapangan Testing",
+    "fieldGuideDescription": "Pilih jalur, ikuti petunjuknya, dan bangun naluri testing praktis satu panduan demi satu panduan.",
+    "learningStage": "Tahap belajar",
+    "readingEyebrow": "Entri panduan lapangan",
+    "resultCount_one": "{{count}} panduan ditemukan",
+    "resultCount_other": "{{count}} panduan ditemukan",
     "searchPlaceholder": "Cari tutorial...",
     "noResults": "Tutorial tidak ditemukan",
     "tryDifferentSearch": "Coba kata kunci pencarian lain",
@@ -18,7 +24,13 @@
     "intermediate": "Menengah",
     "advanced": "E2E Testing",
     "hideCompleted": "Sembunyikan Selesai",
-    "showCompleted": "Tampilkan Selesai"
+    "showCompleted": "Tampilkan Selesai",
+    "guideSections": "Bagian panduan",
+    "topics": "Topik",
+    "clear": "Hapus filter",
+    "searchLabel": "Cari di Panduan Lapangan",
+    "filterGuides": "Filter panduan",
+    "filterDescription": "Pilih tahap belajar untuk mempersempit Panduan Lapangan."
   },
   "tracks": {
     "foundations": "Jalur Pondasi",
@@ -32,18 +44,40 @@
     "description": "Deskripsi",
     "tags": "Tag",
     "time": "Waktu",
-    "status": "Status"
+    "status": "Status",
+    "scrollableLabel": "Tabel yang dapat digulir"
   },
   "card": {
     "estimatedTime": "{{minutes}} menit baca",
     "estimatedTimeShort": "{{minutes}} mnt",
     "startTutorial": "Mulai Tutorial",
     "continueTutorial": "Lanjutkan",
-    "completed": "Selesai"
+    "completed": "Selesai",
+    "reviewTutorial": "Tinjau panduan",
+    "guideNumber": "Panduan {{number}}",
+    "openTutorial": "Buka {{title}}"
   },
   "view": {
     "grid": "Tampilan Grid",
-    "list": "Tampilan Daftar"
+    "list": "Tampilan Daftar",
+    "label": "Tampilan tutorial"
+  },
+  "progress": {
+    "notStarted": "Belum dimulai",
+    "inProgress": "{{percent}}% dibaca",
+    "completed": "Selesai"
+  },
+  "code": {
+    "copy": "Salin kode",
+    "copied": "Kode disalin",
+    "copyFailed": "Kode tidak dapat disalin"
+  },
+  "callouts": {
+    "note": "Catatan",
+    "tip": "Tips",
+    "important": "Penting",
+    "warning": "Peringatan",
+    "caution": "Perhatian"
   },
   "sidebar": {
     "progress": "Progres Kamu",

@@ -52,6 +52,9 @@
     "signInNow": "Masuk Sekarang",
     "resetPassword": "Atur Ulang Kata Sandi"
   },
+  "breadcrumbs": {
+    "label": "Jejak navigasi"
+  },
   "labels": {
     "difficulty": "Tingkat Kesulitan",
     "xp": "XP",

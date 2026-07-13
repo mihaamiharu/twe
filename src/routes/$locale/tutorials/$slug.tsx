@@ -1,101 +1,90 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createFileRoute,
-  useParams,
-  useNavigate,
   Link,
+  useNavigate,
+  useParams,
 } from '@tanstack/react-router';
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
+import { AlertCircle, ArrowLeft, Clock, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTutorial, completeTutorial } from '@/server/tutorials.fn';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { MarkdownRenderer } from '@/components/markdown-renderer';
-import {
-  AlertCircle,
-  ArrowLeft,
-  ArrowRight,
-  CheckCircle2,
-  Clock,
-} from 'lucide-react';
-import { toast } from 'sonner';
-import { useState, useRef, useEffect, useMemo } from 'react';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { authQueryOptions } from '@/lib/auth.query';
 import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
+import {
+  PageContainer,
+  PaperSurface,
+  SectionHeading,
+} from '@/components/cozy-quest';
+import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { showAchievementToasts } from '@/components/achievement-toast';
 import {
   TableOfContents,
   type TOCItem,
 } from '@/components/tutorials/table-of-contents';
+import { TutorialProgressPanel } from '@/components/tutorials/tutorial-progress-panel';
+import { authQueryOptions } from '@/lib/auth.query';
+import { extractTutorialHeadings } from '@/lib/tutorial-headings';
 import i18n from '@/lib/i18n';
-import { showAchievementToasts } from '@/components/achievement-toast';
+import { getTutorial, completeTutorial } from '@/server/tutorials.fn';
 
 export const Route = createFileRoute('/$locale/tutorials/$slug')({
   component: TutorialDetailPage,
   head: ({ params }) => {
-    // Dynamic meta based on slug - the component will fetch full data
-    // For initial render, we use a reasonable fallback
     const slug = params.slug;
     const locale = params.locale || 'en';
     const baseUrl = 'https://testingwithekki.com';
     const url = `${baseUrl}/${locale}/tutorials/${slug}`;
-
-    const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))}&type=Tutorial`;
-    const title = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const title = slug
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (character) => character.toUpperCase());
     const description = i18n.t('tutorials:page.seo.description');
-
-    // Structured Data
+    const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(title)}&type=Tutorial`;
     const jsonLd = [
       {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
           {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": `${baseUrl}/${locale}`
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `${baseUrl}/${locale}`,
           },
           {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Tutorials",
-            "item": `${baseUrl}/${locale}/tutorials`
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Tutorials',
+            item: `${baseUrl}/${locale}/tutorials`,
           },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": title,
-            "item": url
-          }
-        ]
+          { '@type': 'ListItem', position: 3, name: title, item: url },
+        ],
       },
       {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": title,
-        "description": description,
-        "image": ogImageUrl,
-        "author": {
-          "@type": "Organization",
-          "name": "TestingWithEkki",
-          "url": baseUrl
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description,
+        image: ogImageUrl,
+        author: {
+          '@type': 'Organization',
+          name: 'TestingWithEkki',
+          url: baseUrl,
         },
-        "publisher": {
-          "@type": "Organization",
-          "name": "TestingWithEkki",
-          "logo": {
-            "@type": "ImageObject",
-            "url": `${baseUrl}/logo-dark-new.png`
-          }
+        publisher: {
+          '@type': 'Organization',
+          name: 'TestingWithEkki',
+          logo: { '@type': 'ImageObject', url: `${baseUrl}/logo-dark-new.png` },
         },
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": url
-        }
-      }
+        mainEntityOfPage: { '@type': 'WebPage', '@id': url },
+      },
     ];
 
     return {
@@ -111,14 +100,26 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
       ],
       links: [
         { rel: 'canonical', href: url },
-        { rel: 'alternate', hrefLang: 'en', href: `${baseUrl}/en/tutorials/${slug}` },
-        { rel: 'alternate', hrefLang: 'id', href: `${baseUrl}/id/tutorials/${slug}` },
-        { rel: 'alternate', hrefLang: 'x-default', href: `${baseUrl}/en/tutorials/${slug}` },
+        {
+          rel: 'alternate',
+          hrefLang: 'en',
+          href: `${baseUrl}/en/tutorials/${slug}`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'id',
+          href: `${baseUrl}/id/tutorials/${slug}`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'x-default',
+          href: `${baseUrl}/en/tutorials/${slug}`,
+        },
       ],
-      scripts: jsonLd.map(data => ({
+      scripts: jsonLd.map((data) => ({
         type: 'application/ld+json',
-        children: JSON.stringify(data)
-      }))
+        children: JSON.stringify(data),
+      })),
     };
   },
 });
@@ -131,21 +132,12 @@ interface Tutorial {
   content: string;
   estimatedMinutes: number;
   tags: string[] | null;
-  viewCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  isPublished: boolean;
-  order: number;
-  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   userProgress: {
     isCompleted: boolean;
     readingProgress: number | null;
     lastAccessedAt: Date;
   } | null;
-  nextTutorial: {
-    slug: string;
-    title: string;
-  } | null;
+  nextTutorial: { slug: string; title: string } | null;
   challenges: Array<{
     slug: string;
     title: string;
@@ -158,34 +150,32 @@ interface Tutorial {
 
 function TutorialDetailPage() {
   const { locale, slug } = useParams({ from: '/$locale/tutorials/$slug' });
-  const { t } = useTranslation(['tutorials', 'common']);
+  const { t } = useTranslation(['tutorials', 'common', 'challenges', 'auth']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [readingProgress, setReadingProgress] = useState(0);
   const [localSubmitting, setLocalSubmitting] = useState(false);
   const [showAuthGuard, setShowAuthGuard] = useState(false);
+  const [activeId, setActiveId] = useState('');
   const contentRef = useRef<HTMLDivElement>(null);
-  const { data: auth } = useSuspenseQuery(authQueryOptions);
-  const sessionData = auth; // Alias for compatibility
+  const progressRef = useRef(0);
+  const hasScrolledRef = useRef(false);
+  const { data: sessionData } = useSuspenseQuery(authQueryOptions);
 
   const {
     data: tutorialData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['tutorial', slug],
+    queryKey: ['tutorial', locale, slug],
     queryFn: async () => {
-      if (!slug) throw new Error('Tutorial slug is required');
       const result = await getTutorial({ data: { slug, locale } });
       if (!result.success) throw new Error(result.error);
       return result.data as Tutorial;
     },
   });
 
-  // Rename for compatibility
   const tutorial = tutorialData;
-
-  // Mark as complete mutation
   const markCompleteMutation = useMutation({
     mutationFn: async () => {
       const result = await completeTutorial({ data: { slug, locale } });
@@ -194,534 +184,286 @@ function TutorialDetailPage() {
     },
     onSuccess: async (result) => {
       toast.success(t('tutorials:toasts.completed'));
-      await queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
-      await queryClient.invalidateQueries({ queryKey: ['tutorials'] });
-      await queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['tutorial', locale, slug] }),
+        queryClient.invalidateQueries({ queryKey: ['tutorials'] }),
+        queryClient.invalidateQueries({ queryKey: ['user', 'me'] }),
+        queryClient.invalidateQueries({ queryKey: ['profile'] }),
+        queryClient.invalidateQueries({ queryKey: ['leaderboard'] }),
+      ]);
 
-
-      if (result.data?.newAchievements && result.data.newAchievements.length > 0) {
+      if (result.data?.newAchievements?.length) {
         showAchievementToasts(result.data.newAchievements);
       }
     },
-    onError: () => {
-      toast.error(t('tutorials:toasts.failed'));
-    },
+    onError: () => toast.error(t('tutorials:toasts.failed')),
   });
 
-  // Progress is tracked client-side only, saved to DB only on "Complete" click
-
-  // Use a ref to track progress for the event listener without re-binding
-  const progressRef = useRef(readingProgress);
-  // Track if user has actively scrolled (to prevent premature progress on page load)
-  const hasScrolledRef = useRef(false);
-
-  // Sync ref with state
   useEffect(() => {
     progressRef.current = readingProgress;
   }, [readingProgress]);
 
-  // Track window scroll for reading progress
   useEffect(() => {
-    // Don't update progress if tutorial is already completed or user not logged in
-    if (tutorial?.userProgress?.isCompleted || !sessionData?.user) {
-      return;
-    }
+    if (tutorial?.userProgress?.isCompleted || !sessionData?.user) return;
 
-    let scrollListenerAttached = false;
-
-    const handleWindowScroll = () => {
-      if (!contentRef.current) return;
-
-      // Extra safety: if scroll position is inherited from previous page, ignore
-      // This handles the race condition during SPA navigation
-      if (!hasScrolledRef.current) {
-        // Only start tracking after user has scrolled at least 50px from 0
-        if (window.scrollY > 50) {
-          hasScrolledRef.current = true;
-        } else {
-          return; // Don't calculate progress yet - user hasn't scrolled
-        }
-      }
-
+    let attached = false;
+    const updateProgress = () => {
       const element = contentRef.current;
+      if (!element) return;
+
+      if (!hasScrolledRef.current) {
+        if (window.scrollY <= 50) return;
+        hasScrolledRef.current = true;
+      }
+
       const rect = element.getBoundingClientRect();
-      const windowHeight = window.innerHeight;
-
-      // Calculate distance from top of content to bottom of viewport
       const totalHeight = element.offsetHeight;
-      const scrolled = Math.max(0, windowHeight - (rect.top + 100));
-
+      const scrolled = Math.max(0, window.innerHeight - (rect.top + 100));
       let progress = Math.min(100, Math.round((scrolled / totalHeight) * 100));
+      if (rect.bottom <= window.innerHeight + 100) progress = 100;
 
-      // Force 100% if we've reached the bottom of the content
-      if (rect.bottom <= windowHeight + 100) {
-        progress = 100;
-      }
-
-      // Only update local state if progress is genuinely increasing
-      if (progress > progressRef.current) {
-        setReadingProgress(progress);
-      }
+      if (progress > progressRef.current) setReadingProgress(progress);
     };
 
-    // Delay attaching the scroll listener to let the page settle after SPA navigation
-    // This prevents the listener from firing with stale scrollY from the previous page
-    const timeouts: { main?: ReturnType<typeof setTimeout>; retry?: ReturnType<typeof setTimeout> } = {};
-
-    timeouts.main = setTimeout(() => {
-      // Only attach if we're at the top of the page (scroll reset completed)
-      if (window.scrollY === 0) {
-        hasScrolledRef.current = false;
-        window.addEventListener('scroll', handleWindowScroll);
-        scrollListenerAttached = true;
-      } else {
-        // If still not at top, try again shortly
-        timeouts.retry = setTimeout(() => {
-          hasScrolledRef.current = false;
-          window.addEventListener('scroll', handleWindowScroll);
-          scrollListenerAttached = true;
-        }, 200);
-      }
+    const timeout = window.setTimeout(() => {
+      hasScrolledRef.current = false;
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      attached = true;
     }, 300);
 
     return () => {
-      if (timeouts.main) {
-        clearTimeout(timeouts.main);
-      }
-      if (timeouts.retry) {
-        clearTimeout(timeouts.retry);
-      }
-      if (scrollListenerAttached) {
-        window.removeEventListener('scroll', handleWindowScroll);
-      }
+      window.clearTimeout(timeout);
+      if (attached) window.removeEventListener('scroll', updateProgress);
     };
-  }, [tutorial?.id, sessionData?.user, tutorial?.userProgress?.isCompleted]);
+  }, [sessionData?.user, tutorial?.id, tutorial?.userProgress?.isCompleted]);
 
-  // Reset progress and scroll to top when slug changes
   useEffect(() => {
     setReadingProgress(0);
-    progressRef.current = 0; // Also reset the ref immediately
-    hasScrolledRef.current = false; // Reset scroll tracking
-    window.scrollTo(0, 0); // Force scroll to top
-    if (contentRef.current) {
-      contentRef.current.scrollTop = 0;
-    }
+    progressRef.current = 0;
+    hasScrolledRef.current = false;
+    window.scrollTo(0, 0);
   }, [slug]);
 
-  // Get display progress - always 100% for completed tutorials
-  // Use nullish coalescing (??) so that 0 is not treated as falsy
-  const displayProgress = tutorial?.userProgress?.isCompleted
-    ? 100
-    : (readingProgress ?? tutorial?.userProgress?.readingProgress ?? 0);
-
-  // Parse TOC
-  const toc = useMemo<TOCItem[]>(() => {
-    if (!tutorial?.content) return [];
-
-    const lines = tutorial.content.split('\n');
-    const items: TOCItem[] = [];
-    const slugify = (text: string) =>
-      text.toLowerCase().replace(/[^\w]+/g, '-');
-
-    // Simple regex to find headers in code blocks to ignore them
-    let inCodeBlock = false;
-
-    lines.forEach((line) => {
-      if (line.trim().startsWith('```')) {
-        inCodeBlock = !inCodeBlock;
-        return;
-      }
-
-      if (inCodeBlock) return;
-
-      const h2Match = line.match(/^##\s+(.+)$/);
-      const h3Match = line.match(/^###\s+(.+)$/);
-
-      if (h2Match) {
-        items.push({ id: slugify(h2Match[1]), text: h2Match[1], level: 2 });
-      } else if (h3Match) {
-        items.push({ id: slugify(h3Match[1]), text: h3Match[1], level: 3 });
-      }
-    });
-
-    return items;
-  }, [tutorial?.content]);
-
-  const [activeId, setActiveId] = useState<string>('');
+  const toc = useMemo<TOCItem[]>(
+    () => (tutorial?.content ? extractTutorialHeadings(tutorial.content) : []),
+    [tutorial?.content],
+  );
 
   useEffect(() => {
+    const contentElement = contentRef.current;
+    if (!contentElement) return;
+
     const observer = new IntersectionObserver(
       (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-          }
-        });
+        for (const entry of entries) {
+          if (entry.isIntersecting) setActiveId(entry.target.id);
+        }
       },
       { rootMargin: '-100px 0px -66% 0px' },
     );
 
-    const headings = document.querySelectorAll('h2, h3');
-    headings.forEach((h) => observer.observe(h));
-
+    contentElement
+      .querySelectorAll('h2, h3')
+      .forEach((heading) => observer.observe(heading));
     return () => observer.disconnect();
   }, [tutorial?.content]);
 
-  // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen p-6 md:p-10">
-        <div className="max-w-4xl mx-auto">
-          <Skeleton className="h-8 w-32 mb-8" />
-          <Skeleton className="h-12 w-3/4 mb-4" />
-          <Skeleton className="h-6 w-full mb-2" />
-          <Skeleton className="h-6 w-5/6 mb-8" />
-          <div className="space-y-4">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-32 w-full" />
-          </div>
-        </div>
-      </div>
+      <main className="min-h-screen py-10 sm:py-14">
+        <PageContainer width="wide" className="max-w-5xl">
+          <Skeleton className="h-9 w-40" />
+          <Skeleton className="mt-8 h-72 w-full rounded-[1.25rem]" />
+          <Skeleton className="mt-8 h-96 w-full rounded-[1.25rem]" />
+        </PageContainer>
+      </main>
     );
   }
 
-  // Error state
   if (error || !tutorial) {
     return (
-      <div className="min-h-screen p-6 md:p-10">
-        <div className="max-w-4xl mx-auto">
+      <main className="min-h-screen py-10 sm:py-14">
+        <PageContainer width="narrow">
           <Link to="/$locale/tutorials" params={{ locale }}>
-            <Button variant="ghost" className="mb-8">
-              <ArrowLeft className="h-4 w-4 mr-2" />
+            <Button variant="ghost" className="rounded-xl">
+              <ArrowLeft className="mr-2 size-4" aria-hidden="true" />
               {t('common:actions.backToTutorials')}
             </Button>
           </Link>
-          <div className="text-center py-12">
-            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
+          <PaperSurface className="mt-6 px-6 py-14 text-center">
+            <AlertCircle
+              className="mx-auto size-10 text-destructive"
+              aria-hidden="true"
+            />
+            <h1 className="mt-4 font-display text-3xl font-semibold text-foreground">
               {t('tutorials:page.notFound')}
-            </h3>
-            <p className="text-muted-foreground mb-6">
+            </h1>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-muted-foreground">
               {error?.message || t('tutorials:page.notFoundDescription')}
             </p>
-            <Link to="/$locale/tutorials" params={{ locale }}>
-              <Button>{t('common:actions.browseTutorials')}</Button>
-            </Link>
-          </div>
-        </div>
-      </div>
+          </PaperSurface>
+        </PageContainer>
+      </main>
     );
   }
 
   const isCompleted = tutorial.userProgress?.isCompleted || false;
+  const displayProgress = isCompleted
+    ? 100
+    : Math.max(readingProgress, tutorial.userProgress?.readingProgress ?? 0);
+  const primaryTag = tutorial.tags?.[0];
+
+  const handleComplete = () => {
+    if (!sessionData?.user) {
+      setShowAuthGuard(true);
+      return;
+    }
+    if (localSubmitting) return;
+    setLocalSubmitting(true);
+    markCompleteMutation.mutate(undefined, {
+      onSettled: () => setLocalSubmitting(false),
+    });
+  };
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-6xl mx-auto">
-        {/* Back button - larger icon */}
-        <Link to="/$locale/tutorials" params={{ locale }}>
-          <Button variant="ghost" className="mb-8">
-            <ArrowLeft className="h-5 w-5 mr-2" />
+    <main className="min-h-screen py-8 sm:py-10 lg:py-12">
+      <PageContainer width="wide">
+        <nav aria-label={t('common:breadcrumbs.label')}>
+          <Link
+            to="/$locale/tutorials"
+            params={{ locale }}
+            className="inline-flex items-center gap-2 rounded-xl px-2 py-2 text-sm font-semibold text-muted-foreground transition hover:text-primary focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30"
+          >
+            <ArrowLeft className="size-4" aria-hidden="true" />
             {t('common:actions.backToTutorials')}
-          </Button>
-        </Link>
+          </Link>
+        </nav>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content - No card wrapper, let it breathe */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Redesigned Header */}
-            <div className="flex flex-col items-center text-center space-y-8 mb-12 pt-8">
-              {/* Tags & Meta */}
-              <div className="flex items-center gap-3">
-                {tutorial.tags?.[0] && (
-                  <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-bold tracking-wider uppercase">
-                    {tutorial.tags[0]}
-                  </div>
-                )}
-                <div className="text-sm text-muted-foreground flex items-center gap-1">
-                  <span>
-                    {t('card.estimatedTime', {
-                      minutes: tutorial.estimatedMinutes,
-                    })}
-                  </span>
-                </div>
-              </div>
-
-              {/* Title */}
-              <h1
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight max-w-4xl"
-              >
-                {tutorial.title}
-              </h1>
-
-              {/* Description */}
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-                {tutorial.description}
-              </p>
+        <PaperSurface className="relative mt-4 overflow-hidden px-6 py-9 sm:px-10 sm:py-12">
+          <div
+            aria-hidden="true"
+            className="absolute -right-10 -top-12 size-52 rounded-full border-[18px] border-accent/20"
+          />
+          <div className="relative">
+            <div className="flex flex-wrap items-center gap-2">
+              {primaryTag && <Badge variant="secondary">{primaryTag}</Badge>}
+              <span className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Clock className="size-4" aria-hidden="true" />
+                {t('tutorials:card.estimatedTime', {
+                  minutes: tutorial.estimatedMinutes,
+                })}
+              </span>
             </div>
+            <SectionHeading
+              as="h1"
+              align="left"
+              eyebrow={t('tutorials:page.readingEyebrow')}
+              title={tutorial.title}
+              description={tutorial.description}
+              className="mt-6"
+            />
+          </div>
+        </PaperSurface>
 
-            {/* Content - Direct on page, no card container */}
+        {toc.length > 0 && (
+          <TableOfContents
+            mode="inline"
+            headers={toc}
+            activeId={activeId}
+            className="mt-5 lg:hidden"
+          />
+        )}
+
+        <div className="mt-8 grid gap-8 lg:grid-cols-12 lg:gap-10">
+          <article className="min-w-0 lg:col-span-8">
             <div
               ref={contentRef}
-              className="prose prose-lg dark:prose-invert max-w-none scroll-smooth"
-              style={{
-                lineHeight: '1.8',
-              }}
+              className="rounded-[1.25rem] border border-border bg-card px-5 py-7 shadow-[0_16px_40px_rgba(73,62,45,0.06)] sm:px-8 sm:py-10 lg:px-10"
             >
-              <MarkdownRenderer content={tutorial.content} />
+              <MarkdownRenderer content={tutorial.content} variant="tutorial" />
             </div>
-          </div>
+          </article>
 
-          {/* Progress Sidebar - Sticky positioning with top offset for header */}
-          <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
-            {/* Table of Contents - Only show if there are items */}
+          <aside className="space-y-5 lg:col-span-4 lg:sticky lg:top-24 lg:self-start">
             {toc.length > 0 && (
-              <div className="hidden lg:block mb-6">
+              <PaperSurface className="hidden p-5 lg:block">
                 <TableOfContents headers={toc} activeId={activeId} />
-              </div>
+              </PaperSurface>
             )}
+            <TutorialProgressPanel
+              displayProgress={displayProgress}
+              estimatedMinutes={tutorial.estimatedMinutes}
+              isCompleted={isCompleted}
+              isPending={markCompleteMutation.isPending || localSubmitting}
+              onComplete={handleComplete}
+              nextTutorial={tutorial.nextTutorial}
+              onNext={() => {
+                if (!tutorial.nextTutorial) return;
+                void navigate({
+                  to: '/$locale/tutorials/$slug',
+                  params: { locale, slug: tutorial.nextTutorial.slug },
+                });
+              }}
+            />
 
-            {/* Progress Card */}
-            <Card className="glass-card shadow-lg">
-              <CardHeader>
-                <CardTitle className="text-base flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-                  {t('tutorials:sidebar.progress')}
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Progress Bar */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">
-                      {t('tutorials:sidebar.reading')}
-                    </span>
-                    <span className="font-semibold text-primary">
-                      {displayProgress}%
-                    </span>
+            {tutorial.challenges.length > 0 && (
+              <PaperSurface className="p-5">
+                <div className="flex items-center gap-2">
+                  <span className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Sparkles className="size-4" aria-hidden="true" />
+                  </span>
+                  <div>
+                    <h2 className="font-display text-xl font-semibold text-foreground">
+                      {t('tutorials:sidebar.challengesTitle')}
+                    </h2>
+                    <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+                      {t('tutorials:sidebar.challengesDescription')}
+                    </p>
                   </div>
-                  <Progress value={displayProgress} className="h-3" />
                 </div>
-
-                {/* Mark as Complete Button */}
-                {!isCompleted ? (
-                  <Button
-                    className="w-full shadow-md hover:shadow-lg transition-shadow"
-                    onClick={() => {
-                      if (!sessionData?.user) {
-                        setShowAuthGuard(true);
-                        return;
-                      }
-                      if (localSubmitting) return;
-                      setLocalSubmitting(true);
-                      markCompleteMutation.mutate(undefined, {
-                        onSettled: () => setLocalSubmitting(false),
-                      });
-                    }}
-                    disabled={
-                      markCompleteMutation.isPending ||
-                      localSubmitting ||
-                      displayProgress < 100
-                    }
-                  >
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                    {markCompleteMutation.isPending
-                      ? t('common:messages.saving')
-                      : displayProgress < 100
-                        ? t('tutorials:sidebar.readToComplete')
-                        : t('tutorials:sidebar.completeAndContinue')}
-                  </Button>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="text-sm font-semibold text-green-500">
-                        {t('tutorials:sidebar.completedTitle')}
-                      </span>
-                    </div>
-                    {tutorial.nextTutorial && (
-                      <Button
-                        className="w-full h-auto py-3 whitespace-normal"
-                        onClick={() => {
-                          void navigate({
-                            to: '/$locale/tutorials/$slug',
-                            params: {
-                              locale,
-                              slug: tutorial.nextTutorial!.slug,
-                            },
-                          });
-                        }}
-                      >
-                        <span className="flex-1 px-1">
-                          {t('tutorials:sidebar.nextLabel', {
-                            title: tutorial.nextTutorial.title,
-                          })}
+                <div className="mt-4 space-y-2.5">
+                  {tutorial.challenges.map((challenge) => (
+                    <Link
+                      key={challenge.slug}
+                      to="/$locale/challenges/$slug"
+                      params={{ locale, slug: challenge.slug }}
+                      className="block rounded-xl border border-border bg-background p-3 transition hover:border-primary/45 hover:bg-primary/5 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring/30"
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="font-semibold text-foreground">
+                          {challenge.title}
                         </span>
-                        <ArrowRight className="h-4 w-4 ml-2 shrink-0" />
-                      </Button>
-                    )}
-                  </div>
-                )}
-
-                {/* Stats - Consolidated here only */}
-                <div className="pt-4 border-t space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Clock className="h-4 w-4" />
-                      <span>{t('tutorials:sidebar.duration')}</span>
-                    </div>
-                    <span className="font-medium">
-                      {t('tutorials:card.estimatedTimeShort', {
-                        minutes: tutorial.estimatedMinutes,
-                      })}
-                    </span>
-                  </div>
-                  {isCompleted && (
-                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
-                      <CheckCircle2 className="h-4 w-4" />
-                      <span className="font-medium">
-                        {t('tutorials:sidebar.statusCompleted')}
-                      </span>
-                    </div>
-                  )}
+                        <Badge
+                          variant={
+                            challenge.difficulty === 'EASY'
+                              ? 'secondary'
+                              : challenge.difficulty === 'MEDIUM'
+                                ? 'default'
+                                : 'destructive'
+                          }
+                          className="shrink-0 text-[10px]"
+                        >
+                          {t(`challenges:difficulty.${challenge.difficulty}`)}
+                        </Badge>
+                      </div>
+                      <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                        <span>
+                          {t(
+                            `challenges:types.${challenge.type.toLowerCase()}`,
+                          )}
+                        </span>
+                        <span className="font-semibold text-primary">
+                          +{challenge.xpReward} XP
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Linked Challenges List */}
-            {tutorial.challenges && tutorial.challenges.length > 0 && (
-              <Card className="glass-card shadow-lg border-primary/20">
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                    {t('tutorials:sidebar.challengesTitle')}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    {t('tutorials:sidebar.challengesDescription')}
-                  </p>
-                  <div
-                    className="space-y-3 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"
-                    style={{
-                      maskImage:
-                        'linear-gradient(to bottom, black 90%, transparent 100%)',
-                      WebkitMaskImage:
-                        'linear-gradient(to bottom, black 90%, transparent 100%)',
-                    }}
-                  >
-                    {tutorial.challenges.map((challenge) => (
-                      <Link
-                        key={challenge.slug}
-                        to="/$locale/challenges/$slug"
-                        params={{ locale, slug: challenge.slug }}
-                        className="block p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium group-hover:text-primary transition-colors">
-                            {challenge.title}
-                          </span>
-                          <Badge
-                            variant={
-                              challenge.difficulty === 'EASY'
-                                ? 'secondary'
-                                : challenge.difficulty === 'MEDIUM'
-                                  ? 'default'
-                                  : 'destructive'
-                            }
-                            className="text-[10px] h-5 px-1.5"
-                          >
-                            {t(`challenges:difficulty.${challenge.difficulty}`)}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            {t(
-                              `challenges:types.${challenge.type.toLowerCase()}`,
-                            )}
-                          </span>
-                          <span>{challenge.xpReward} XP</span>
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+              </PaperSurface>
             )}
-          </div>
+          </aside>
         </div>
-      </div>
-
-      {/* Custom styles for better code snippet readability */}
-      <style>{`
-                    /* Hide H1 in markdown since we show title separately */
-                    .prose h1 {
-                        display: none;
-                    }
-                    
-                    /* Better text contrast for dark mode */
-                    .prose {
-                        color: hsl(var(--foreground) / 0.95);
-                    }
-                    
-                    .prose p {
-                        color: hsl(var(--foreground) / 0.85);
-                    }
-
-                    .prose code {
-                        background-color: hsl(var(--muted));
-                        color: hsl(var(--foreground));
-                        padding: 0.2em 0.4em;
-                        border-radius: 0.25rem;
-                        font-weight: 600;
-                        font-size: 0.9em;
-                    }
-
-                    .prose pre {
-                        background-color: hsl(var(--muted));
-                        border: 1px solid hsl(var(--border));
-                    }
-
-                    .prose pre code {
-                        background-color: transparent;
-                        padding: 0;
-                        font-weight: 400;
-                    }
-
-                    /* Table headers - Bold and dark for contrast */
-                    .prose thead th {
-                        font-weight: 700;
-                        color: hsl(var(--foreground));
-                        background-color: hsl(var(--muted));
-                        border-bottom: 2px solid hsl(var(--border));
-                    }
-
-                    .prose tbody td {
-                        border-bottom: 1px solid hsl(var(--border));
-                    }
-                    
-                    /* Smooth scrollbar for sidebar */
-                    .custom-scrollbar::-webkit-scrollbar {
-                        width: 4px;
-                    }
-
-                    .custom-scrollbar::-webkit-scrollbar-track {
-                        background: transparent;
-                    }
-                    
-                    .custom-scrollbar::-webkit-scrollbar-thumb {
-                        background: hsl(var(--primary) / 0.1);
-                        border-radius: 4px;
-                    }
-                    
-                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-                        background: hsl(var(--primary) / 0.3);
-                    }
-                `}</style>
+      </PageContainer>
 
       <AuthGuardDialog
         open={showAuthGuard}
@@ -729,6 +471,6 @@ function TutorialDetailPage() {
         title={t('auth:guard.title')}
         description={t('auth:guard.description')}
       />
-    </div>
+    </main>
   );
 }

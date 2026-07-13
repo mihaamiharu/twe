@@ -53,6 +53,9 @@
     "signInNow": "Sign In Now",
     "resetPassword": "Reset Password"
   },
+  "breadcrumbs": {
+    "label": "Breadcrumb"
+  },
   "labels": {
     "difficulty": "Difficulty",
     "xp": "XP",

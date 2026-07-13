@@ -7,8 +7,11 @@ import xquery from 'highlight.js/lib/languages/xquery';
 import bash from 'highlight.js/lib/languages/bash'; // Often good for CLI commands
 import json from 'highlight.js/lib/languages/json';
 import typescript from 'highlight.js/lib/languages/typescript';
+import { useTranslation } from 'react-i18next';
 
+import { TechnicalSurface } from '@/components/cozy-quest';
 import { cn } from '@/lib/utils';
+import { slugifyTutorialHeading } from '@/lib/tutorial-headings';
 import { CodeBlock } from '@/components/code-block';
 
 // Import custom theme-aware highlight.js styles
@@ -17,6 +20,7 @@ import '@/styles/highlight-github.css';
 interface MarkdownRendererProps {
   content: string;
   className?: string;
+  variant?: 'default' | 'tutorial';
 }
 
 const extractText = (node: React.ReactNode): string => {
@@ -33,11 +37,16 @@ const extractText = (node: React.ReactNode): string => {
 export function MarkdownRenderer({
   content,
   className,
+  variant = 'default',
 }: MarkdownRendererProps) {
+  const { t } = useTranslation('tutorials');
+  const isTutorial = variant === 'tutorial';
+
   return (
     <div
       className={cn(
-        'prose prose-lg max-w-none dark:prose-invert',
+        'prose prose-lg max-w-none',
+        isTutorial && 'tutorial-reading',
         className,
       )}
     >
@@ -66,11 +75,11 @@ export function MarkdownRenderer({
           ),
           h2: ({ children }) => {
             const text = extractText(children);
-            const id = text.toLowerCase().replace(/[^\w]+/g, '-');
+            const id = slugifyTutorialHeading(text);
             return (
               <h2
                 id={id}
-                className="text-2xl font-semibold text-foreground mb-3 mt-6 border-b border-border pb-2 scroll-mt-24"
+                className="mb-3 mt-8 scroll-mt-24 border-b border-border pb-2 text-2xl font-semibold text-foreground"
               >
                 {children}
               </h2>
@@ -78,11 +87,11 @@ export function MarkdownRenderer({
           },
           h3: ({ children }) => {
             const text = extractText(children);
-            const id = text.toLowerCase().replace(/[^\w]+/g, '-');
+            const id = slugifyTutorialHeading(text);
             return (
               <h3
                 id={id}
-                className="text-xl font-medium text-foreground mb-2 mt-4 scroll-mt-24"
+                className="mb-2 mt-6 scroll-mt-24 text-xl font-semibold text-foreground"
               >
                 {children}
               </h3>
@@ -90,7 +99,14 @@ export function MarkdownRenderer({
           },
           // Paragraph styling
           p: ({ children }) => (
-            <p className="text-muted-foreground leading-7 mb-4">{children}</p>
+            <p
+              className={cn(
+                'mb-4 leading-7',
+                isTutorial ? 'text-foreground/85' : 'text-muted-foreground',
+              )}
+            >
+              {children}
+            </p>
           ),
           // Code blocks
           pre: ({ children }) => <div className="not-prose">{children}</div>,
@@ -99,7 +115,12 @@ export function MarkdownRenderer({
             if (isInline) {
               return (
                 <code
-                  className="bg-muted px-1.5 py-0.5 rounded text-primary text-sm font-mono border border-border/50 before:content-none after:content-none"
+                  className={cn(
+                    'rounded border border-border/60 px-1.5 py-0.5 font-mono text-sm before:content-none after:content-none',
+                    isTutorial
+                      ? 'bg-secondary/75 text-foreground'
+                      : 'bg-muted text-primary',
+                  )}
                   {...props}
                 >
                   {children}
@@ -113,7 +134,7 @@ export function MarkdownRenderer({
 
             if (language === 'html-preview') {
               const src = extractText(children).trim();
-              return (
+              const preview = (
                 <div className="my-6 rounded-lg border-2 border-border overflow-hidden bg-background">
                   <div className="bg-muted/50 px-4 py-2 border-b border-border text-xs font-mono text-muted-foreground flex items-center justify-between">
                     <span>Preview: {src}</span>
@@ -128,10 +149,18 @@ export function MarkdownRenderer({
                   />
                 </div>
               );
+
+              return isTutorial ? (
+                <TechnicalSurface className="my-6 overflow-hidden p-0">
+                  {preview}
+                </TechnicalSurface>
+              ) : (
+                preview
+              );
             }
 
             return (
-              <CodeBlock className={codeClassName} {...props}>
+              <CodeBlock variant={variant} className={codeClassName} {...props}>
                 {children}
               </CodeBlock>
             );
@@ -293,20 +322,43 @@ export function MarkdownRenderer({
               };
 
               return (
-                <div
+                <aside
+                  role="note"
                   className={cn(
-                    'my-6 p-4 rounded-lg border-l-4',
-                    styles[alertType],
+                    'my-6 rounded-xl border-l-4 p-4',
+                    isTutorial
+                      ? {
+                          note: 'border-[color:var(--quest-teal)] bg-accent/35 text-foreground',
+                          tip: 'border-[color:var(--quest-success)] bg-[color:var(--quest-success)]/10 text-foreground',
+                          important:
+                            'border-[color:var(--quest-gold)] bg-[color:var(--quest-gold)]/12 text-foreground',
+                          warning:
+                            'border-[color:var(--quest-clay)] bg-[color:var(--quest-clay)]/12 text-foreground',
+                          caution:
+                            'border-destructive bg-destructive/10 text-foreground',
+                        }[alertType]
+                      : styles[alertType],
                   )}
                 >
                   <div className="font-bold flex items-center gap-2 mb-2 select-none">
-                    <span className="text-xl">{icons[alertType]}</span>
-                    {titles[alertType]}
+                    <span className="text-xl" aria-hidden="true">
+                      {icons[alertType]}
+                    </span>
+                    {isTutorial
+                      ? t(`callouts.${alertType}`)
+                      : titles[alertType]}
                   </div>
-                  <div className="text-muted-foreground/90 space-y-2">
+                  <div
+                    className={cn(
+                      'space-y-2',
+                      isTutorial
+                        ? 'text-foreground/85'
+                        : 'text-muted-foreground/90',
+                    )}
+                  >
                     {content}
                   </div>
-                </div>
+                </aside>
               );
             }
 
@@ -318,11 +370,30 @@ export function MarkdownRenderer({
             );
           },
           // Tables
-          table: ({ children }) => (
-            <div className="overflow-x-auto my-6 rounded-xl border-2 border-border">
-              <table className="w-full border-collapse">{children}</table>
-            </div>
-          ),
+          table: ({ children }) => {
+            const table = (
+              <div
+                className="overflow-x-auto scrollbar-thin"
+                role="region"
+                aria-label={isTutorial ? t('table.scrollableLabel') : undefined}
+                tabIndex={0}
+              >
+                <table className="w-full min-w-[36rem] border-collapse">
+                  {children}
+                </table>
+              </div>
+            );
+
+            return isTutorial ? (
+              <TechnicalSurface className="my-6 overflow-hidden p-0">
+                {table}
+              </TechnicalSurface>
+            ) : (
+              <div className="my-6 overflow-hidden rounded-xl border-2 border-border">
+                {table}
+              </div>
+            );
+          },
           th: ({ children }) => (
             <th className="border border-border/50 bg-muted/50 px-6 py-3 text-left font-semibold">
               {children}
