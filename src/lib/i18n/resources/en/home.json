@@ -1,5 +1,6 @@
 {
   "hero": {
+    "eyebrow": "Cozy Quest Learning",
     "title": "Build Modern Test Automation",
     "titleSuffix": "without the Fluff",
     "tagline": "The practical curriculum that bridges the gap between theory and practice.",
@@ -15,58 +16,46 @@
     "learning": "Continuous Learning"
   },
   "careerPath": {
+    "eyebrow": "Adventure Paths",
     "title": "Your",
     "titleHighlight": "Curriculum",
     "subtitle": "A structured path from selector basics to advanced automation architectures.",
     "tier": "Phase",
-    "challenges": "scenarios"
+    "challenges": "scenarios",
+    "comingSoon": "Coming soon"
   },
   "tiers": {
     "basic": {
       "title": "Resilient Locators",
       "description": "Master CSS and XPath selectors - the foundation of stable, maintainable tests",
-      "skills": [
-        "CSS Selectors",
-        "XPath Queries",
-        "Element Targeting"
-      ]
+      "skills": ["CSS Selectors", "XPath Queries", "Element Targeting"]
     },
     "beginner": {
       "title": "JavaScript & TypeScript",
       "description": "Learn JS/TS fundamentals for test automation",
-      "skills": [
-        "Variables & Types",
-        "DOM Manipulation",
-        "Async/Await"
-      ]
+      "skills": ["Variables & Types", "DOM Manipulation", "Async/Await"]
     },
     "intermediate": {
       "title": "Playwright",
       "description": "Build real automated tests with Playwright",
-      "skills": [
-        "Navigation",
-        "Locators",
-        "Assertions",
-        "Waits"
-      ]
+      "skills": ["Navigation", "Locators", "Assertions", "Waits"]
     },
     "e2e": {
       "title": "E2E Testing",
       "description": "Build complete automated test suites with professional patterns",
-      "skills": [
-        "Page Objects",
-        "Data-Driven",
-        "Test Suites"
-      ]
+      "skills": ["Page Objects", "Data-Driven", "Test Suites"]
     }
   },
   "featuredChallenges": {
+    "eyebrow": "Quest Board",
     "title": "Solve a",
     "titleHighlight": "Real Problem",
     "subtitle": "Start coding immediately. No setup required.",
-    "viewAll": "View All Challenges"
+    "viewAll": "View All Challenges",
+    "questLabel": "Testing quest"
   },
   "features": {
+    "eyebrow": "Your Field Kit",
     "title": "Everything You Need to",
     "titleHighlight": "Level Up",
     "subtitle": "A personal curriculum designed to take you from beginner to mastery",
@@ -96,6 +85,7 @@
     }
   },
   "howItWorks": {
+    "eyebrow": "A Clear Route Forward",
     "title": "How It",
     "titleHighlight": "Works",
     "step1": {
@@ -121,6 +111,7 @@
     "authorRole": "Creator of TestingWithEkki"
   },
   "cta": {
+    "eyebrow": "Your Next Checkpoint",
     "title": "Ready to automate your first real scenario?",
     "subtitle": "Start solving practical challenges that mirror real-world applications. Free forever for individuals.",
     "getStarted": "Start Your Journey",

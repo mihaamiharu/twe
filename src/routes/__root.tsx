@@ -11,10 +11,7 @@ import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NotFound } from '@/components/not-found';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -24,7 +21,11 @@ import { CookieConsent } from '@/components/cookie-consent';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
-import { organizationSchema, getCanonicalUrl, getAlternateLinks } from '@/lib/seo';
+import {
+  organizationSchema,
+  getCanonicalUrl,
+  getAlternateLinks,
+} from '@/lib/seo';
 import { getConsent } from '@/server/consent.fn';
 
 // Export context type for child routes
@@ -35,7 +36,7 @@ export interface RootContext {
   pathname?: string;
 }
 
-import { DefaultErrorComponent } from "@/components/default-error-component";
+import { DefaultErrorComponent } from '@/components/default-error-component';
 
 export const Route = createRootRouteWithContext<RootContext>()({
   defaultErrorComponent: DefaultErrorComponent,
@@ -63,9 +64,10 @@ export const Route = createRootRouteWithContext<RootContext>()({
     return { auth, consent, pathname: location.pathname };
   },
   head: ({ context }: any) => {
-    const isQa = typeof window !== 'undefined' 
-      ? window.location.hostname.startsWith('qa.')
-      : false; // Server-side detection handled by header injection in scripts/server.ts
+    const isQa =
+      typeof window !== 'undefined'
+        ? window.location.hostname.startsWith('qa.')
+        : false; // Server-side detection handled by header injection in scripts/server.ts
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     const pathname = (context?.pathname as string) || '/';
@@ -138,7 +140,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
       },
       {
         name: 'theme-color',
-        content: '#09090b', // Zinc-950 (background color)
+        content: '#F7F2E7',
       },
     ];
 
@@ -149,43 +151,40 @@ export const Route = createRootRouteWithContext<RootContext>()({
     return {
       meta,
       links: [
-      { rel: 'canonical', href: canonicalUrl },
-      ...alternateLinks.map(link => ({
-        rel: link.rel,
-        hrefLang: link.hrefLang,
-        href: link.href,
-      })),
-      // Preload critical fonts removed to avoid warnings (loaded via CSS)
-      // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-      // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-      // Deferred loading for Lora (reading font - not critical for LCP)
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
-      {
-        rel: 'icon',
-        href: '/logo-icon.svg',
-        type: 'image/svg+xml',
-      },
-      {
-        rel: 'apple-touch-icon',
-        href: '/logo-icon.svg',
-      },
-      {
-        rel: 'manifest',
-        href: '/manifest.json',
-      },
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-    scripts: [
-      {
-        type: 'application/ld+json',
-        children: JSON.stringify(organizationSchema),
-      },
-    ]
-    }
+        { rel: 'canonical', href: canonicalUrl },
+        ...alternateLinks.map((link) => ({
+          rel: link.rel,
+          hrefLang: link.hrefLang,
+          href: link.href,
+        })),
+        // Preload critical fonts removed to avoid warnings (loaded via CSS)
+        // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+        // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+        {
+          rel: 'icon',
+          href: '/logo-icon.svg',
+          type: 'image/svg+xml',
+        },
+        {
+          rel: 'apple-touch-icon',
+          href: '/logo-icon.svg',
+        },
+        {
+          rel: 'manifest',
+          href: '/manifest.json',
+        },
+        {
+          rel: 'stylesheet',
+          href: appCss,
+        },
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(organizationSchema),
+        },
+      ],
+    };
   },
 
   component: RootComponent,
@@ -223,12 +222,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const theme = localStorage.getItem('twe-theme') || 'system';
-                let resolved = theme;
-                if (theme === 'system') {
-                  resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-                }
-                document.documentElement.classList.add(resolved);
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
               })();
             `,
           }}
@@ -265,7 +260,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const auth = context?.auth;
   const location = useLocation();
   const preloadedImageRef = useRef<string | null>(null);
-  const [consent, setConsent] = useState<'granted' | 'denied' | null>(context?.consent || null);
+  const [consent, setConsent] = useState<'granted' | 'denied' | null>(
+    context?.consent || null,
+  );
 
   // Sync consent state if it changes via CookieConsent component
   const handleConsentChange = (newConsent: 'granted' | 'denied' | null) => {
@@ -291,8 +288,13 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {consent === 'granted' && <GoogleAnalytics measurementId={auth?.gaMeasurementId} />}
-      <CookieConsent onConsentChange={handleConsentChange} initialConsent={consent} />
+      {consent === 'granted' && (
+        <GoogleAnalytics measurementId={auth?.gaMeasurementId} />
+      )}
+      <CookieConsent
+        onConsentChange={handleConsentChange}
+        initialConsent={consent}
+      />
       <div className="flex flex-col min-h-screen">
         <Header session={auth || null} />
         <main className="flex-1">

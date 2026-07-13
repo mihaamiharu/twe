@@ -11,7 +11,10 @@
   font-weight: 400;
   font-display: swap;
   src: url('/fonts/outfit-latin-400.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -20,7 +23,10 @@
   font-weight: 500;
   font-display: swap;
   src: url('/fonts/outfit-latin-500.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -29,7 +35,10 @@
   font-weight: 600;
   font-display: swap;
   src: url('/fonts/outfit-latin-600.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -38,7 +47,10 @@
   font-weight: 700;
   font-display: swap;
   src: url('/fonts/outfit-latin-700.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -47,7 +59,22 @@
   font-weight: 400;
   font-display: swap;
   src: url('/fonts/fira-code-latin-400.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Lora';
+  font-style: normal;
+  font-weight: 600 700;
+  font-display: swap;
+  src: url('/fonts/lora-latin-600-700.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 
 @font-face {
@@ -56,7 +83,10 @@
   font-weight: 500;
   font-display: swap;
   src: url('/fonts/fira-code-latin-500.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 
 @theme {
@@ -96,13 +126,21 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /* Fonts */
-  --font-sans: 'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans:
+    'Outfit', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Lora', Georgia, 'Times New Roman', serif;
   --font-reading: 'Lora', Georgia, 'Times New Roman', serif;
   --font-mono: 'Fira Code', monospace;
 
-  /* Custom Brand Colors */
-  --color-brand-teal: #14b8a6;
-  --color-brand-blue: #0ea5e9;
+  /* Cozy Quest brand colors */
+  --color-brand-teal: #5f918b;
+  --color-brand-blue: #5f918b;
+  --color-quest-forest: #526a4a;
+  --color-quest-teal: #5f918b;
+  --color-quest-gold: #c8a35d;
+  --color-quest-clay: #b77a61;
+  --color-quest-success: #668458;
 
   /* Animations */
   --animate-accordion-down: accordion-down 0.2s ease-out;
@@ -155,93 +193,72 @@
   }
 }
 
-/* Base Variables - Light Mode (Technical Paper) */
+/* Cozy Quest Learning — warm daytime camp */
 :root {
-  --radius: 0.375rem;
-  /* 6px - Slightly closer to squared */
+  --radius: 0.75rem;
 
   /* Fonts */
   --font-sans: 'Outfit', system-ui, sans-serif;
+  --font-display: 'Lora', Georgia, serif;
   --font-reading: 'Lora', serif;
   --font-mono: 'Fira Code', monospace;
 
-  /* Paper White / Ink */
-  --background: hsl(210 20% 98%);
-  /* Cool white */
-  --foreground: hsl(220 15% 10%);
-  /* Ink Black */
+  --background: #f7f2e7;
+  --foreground: #2d2a24;
+  --card: #fffdf7;
+  --card-foreground: #2d2a24;
+  --popover: #fffdf7;
+  --popover-foreground: #2d2a24;
+  --primary: #526a4a;
+  --primary-foreground: #fffdf7;
+  --secondary: #eae3d5;
+  --secondary-foreground: #2d2a24;
+  --muted: #eae3d5;
+  --muted-foreground: #625c52;
+  --accent: #b9d1cc;
+  --accent-foreground: #22332f;
+  --destructive: #a45e55;
+  --destructive-foreground: #fffdf7;
+  --border: #cfc4ae;
+  --input: #cfc4ae;
+  --ring: #526a4a;
 
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(220 15% 10%);
-
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(220 15% 10%);
-
-  /* Primary: Bold Technical Blue/Black */
-  --primary: hsl(220 15% 10%);
-  --primary-foreground: hsl(210 20% 98%);
-
-  /* Secondary: Subtle Grey */
-  --secondary: hsl(210 10% 92%);
-  --secondary-foreground: hsl(220 15% 10%);
-
-  /* Muted: Technical Grey */
-  --muted: hsl(210 10% 94%);
-  --muted-foreground: hsl(220 10% 45%);
-
-  /* Accent: Electric Teal */
-  --accent: hsl(170 100% 35%);
-  --accent-foreground: hsl(0 0% 100%);
-
-  /* Destructive */
-  --destructive: hsl(0 84.2% 60.2%);
-  --destructive-foreground: hsl(0 0% 98%);
-
-  /* Borders: Crisper */
-  --border: hsl(220 15% 88%);
-  --input: hsl(220 15% 88%);
-
-  --ring: hsl(220 15% 10%);
-
-  --shadow-strength: 0px;
+  --quest-forest: #526a4a;
+  --quest-teal: #5f918b;
+  --quest-gold: #c8a35d;
+  --quest-clay: #b77a61;
+  --quest-success: #668458;
+  --surface-paper: #fffdf7;
+  --surface-paper-muted: #eee7da;
+  --surface-technical: #f8fafc;
+  --surface-technical-muted: #eef2f6;
+  --technical-foreground: #20242a;
+  --technical-border: #cad1d8;
 }
 
-/* Dark Mode (Gunmetal & Electric) */
+/* Phase 1 intentionally ships one theme. Keep the selector compatible so a
+   persisted preference cannot flash the retired gunmetal palette. */
 .dark {
-  /* Deep Gunmetal */
-  --background: hsl(225 15% 6%);
-  --foreground: hsl(210 20% 98%);
-
-  --card: hsl(225 15% 8%);
-  --card-foreground: hsl(210 20% 98%);
-
-  --popover: hsl(225 15% 8%);
-  --popover-foreground: hsl(210 20% 98%);
-
-  /* Primary: White (High Contrast) */
-  --primary: hsl(210 20% 98%);
-  --primary-foreground: hsl(225 15% 6%);
-
-  /* Secondary: Darker Gunmetal */
-  --secondary: hsl(225 15% 12%);
-  --secondary-foreground: hsl(210 20% 98%);
-
-  /* Muted */
-  --muted: hsl(225 15% 12%);
-  --muted-foreground: hsl(215 15% 65%);
-
-  /* Accent: Electric Teal Neon */
-  --accent: hsl(168 85% 52%);
-  --accent-foreground: hsl(225 15% 6%);
-
-  --destructive: hsl(0 62.8% 30.6%);
-  --destructive-foreground: hsl(0 0% 98%);
-
-  /* Borders: Subtle Technical Lines */
-  --border: hsl(225 15% 16%);
-  --input: hsl(225 15% 16%);
-
-  --ring: hsl(168 85% 52%);
+  color-scheme: light;
+  --background: #f7f2e7;
+  --foreground: #2d2a24;
+  --card: #fffdf7;
+  --card-foreground: #2d2a24;
+  --popover: #fffdf7;
+  --popover-foreground: #2d2a24;
+  --primary: #526a4a;
+  --primary-foreground: #fffdf7;
+  --secondary: #eae3d5;
+  --secondary-foreground: #2d2a24;
+  --muted: #eae3d5;
+  --muted-foreground: #625c52;
+  --accent: #b9d1cc;
+  --accent-foreground: #22332f;
+  --destructive: #a45e55;
+  --destructive-foreground: #fffdf7;
+  --border: #cfc4ae;
+  --input: #cfc4ae;
+  --ring: #526a4a;
 }
 
 /* Base Styles */
@@ -249,27 +266,19 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Noise Texture Overlay */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  z-index: 50;
-  opacity: 0.03;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
-
-.dark body::before {
-  opacity: 0.05;
-  /* Slightly more visible in dark mode */
-}
-
 body {
   background-color: var(--color-background);
+  background-image:
+    radial-gradient(
+      circle at 12% 8%,
+      rgb(200 163 93 / 0.09),
+      transparent 24rem
+    ),
+    radial-gradient(
+      circle at 88% 30%,
+      rgb(95 145 139 / 0.08),
+      transparent 28rem
+    );
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -283,6 +292,102 @@ body {
   letter-spacing: -0.02em;
 }
 
+.font-display {
+  font-family: var(--font-display);
+}
+
+.gradient-text {
+  color: var(--primary);
+  background: linear-gradient(120deg, var(--quest-forest), var(--quest-teal));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hard-shadow,
+.hard-shadow-sm,
+.hard-shadow-xs {
+  box-shadow: 0 8px 22px rgb(73 62 45 / 0.08);
+}
+
+.animate-physics {
+  transition-property:
+    color, background-color, border-color, box-shadow, transform;
+  transition-duration: 180ms;
+}
+
+.paper-surface {
+  position: relative;
+}
+
+.paper-surface::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.18;
+  background-image: radial-gradient(
+    rgb(82 106 74 / 0.18) 0.55px,
+    transparent 0.55px
+  );
+  background-size: 11px 11px;
+  mask-image: linear-gradient(to bottom right, black, transparent 70%);
+}
+
+.technical-surface {
+  --background: var(--surface-technical);
+  --foreground: var(--technical-foreground);
+  --card: var(--surface-technical);
+  --card-foreground: var(--technical-foreground);
+  --muted: var(--surface-technical-muted);
+  --muted-foreground: #5c6570;
+  --border: var(--technical-border);
+  --input: var(--technical-border);
+  --primary: #334155;
+  --primary-foreground: #f8fafc;
+  --color-background: var(--surface-technical);
+  --color-foreground: var(--technical-foreground);
+  --color-card: var(--surface-technical);
+  --color-card-foreground: var(--technical-foreground);
+  --color-muted: var(--surface-technical-muted);
+  --color-muted-foreground: #5c6570;
+  --color-border: var(--technical-border);
+  --color-input: var(--technical-border);
+  --color-primary: #334155;
+  --color-primary-foreground: #f8fafc;
+  color: var(--technical-foreground);
+  border-color: var(--technical-border);
+  background: var(--surface-technical);
+}
+
+.cozy-footer {
+  --foreground: #fffdf7;
+  --muted-foreground: #d8d1c3;
+  --primary: #e0c27d;
+  --primary-foreground: #2d2a24;
+  --secondary: #465a47;
+  --secondary-foreground: #fffdf7;
+  --muted: #465a47;
+  --accent: #5f7560;
+  --accent-foreground: #fffdf7;
+  --border: #697a67;
+  --input: #7b8978;
+  --background: #fffdf7;
+  --color-foreground: #fffdf7;
+  --color-muted-foreground: #d8d1c3;
+  --color-primary: #e0c27d;
+  --color-primary-foreground: #2d2a24;
+  --color-secondary: #465a47;
+  --color-secondary-foreground: #fffdf7;
+  --color-muted: #465a47;
+  --color-accent: #5f7560;
+  --color-accent-foreground: #fffdf7;
+  --color-border: #697a67;
+  --color-input: #7b8978;
+  --color-background: #fffdf7;
+}
+
 /* Refined Glassmorphism */
 .glass {
   background: color-mix(in srgb, var(--background) 70%, transparent);
@@ -292,11 +397,9 @@ body {
 }
 
 .glass-card {
-  background: color-mix(in srgb, var(--card) 60%, transparent);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: color-mix(in srgb, var(--card) 94%, transparent);
   border: 1px solid var(--border);
-  @apply rounded-lg shadow-sm;
+  @apply rounded-xl shadow-sm;
 }
 
 /* Technical Interactive Elements */
@@ -311,8 +414,17 @@ body {
 /* Technical Grid */
 .bg-grid-small {
   background-size: 20px 20px;
-  background-image: linear-gradient(to right, color-mix(in srgb, var(--color-border) 30%, transparent) 1px, transparent 1px),
-    linear-gradient(to bottom, color-mix(in srgb, var(--color-border) 30%, transparent) 1px, transparent 1px);
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--color-border) 30%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--color-border) 30%, transparent) 1px,
+      transparent 1px
+    );
 }
 
 /* Scrollbar */
@@ -347,4 +459,19 @@ body {
   @apply prose-code:font-mono prose-code:text-sm prose-code:bg-secondary prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:before:content-none prose-code:after:content-none;
   @apply prose-pre:bg-secondary/50 prose-pre:border prose-pre:border-border;
   @apply prose-a:text-accent prose-a:no-underline hover:prose-a:underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }

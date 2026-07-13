@@ -1,4 +1,13 @@
-import { Github, Linkedin, Youtube, Coffee, ExternalLink, Bug, Loader2, CheckCircle } from 'lucide-react';
+import {
+  Github,
+  Linkedin,
+  Youtube,
+  Coffee,
+  ExternalLink,
+  Bug,
+  Loader2,
+  CheckCircle,
+} from 'lucide-react';
 import { BugReportDialog } from '@/components/bug-report-dialog';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
@@ -38,7 +47,7 @@ export function Footer() {
   // Add changelog to resources
   const resourcesLinks = [
     ...footerLinks.resources,
-    { label: 'changelog:title', href: `/${locale}/changelog` }
+    { label: 'changelog:title', href: `/${locale}/changelog` },
   ];
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -47,10 +56,14 @@ export function Footer() {
 
   useEffect(() => {
     // Check for new changelog entries
-    const entries = t('changelog:entries', { returnObjects: true }) as Array<{ date: string }>;
+    const entries = t('changelog:entries', { returnObjects: true }) as Array<{
+      date: string;
+    }>;
     if (Array.isArray(entries) && entries.length > 0) {
       // Sort by date descending to get latest
-      const latestEntry = entries.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+      const latestEntry = entries.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+      )[0];
       const lastSeenDate = localStorage.getItem('latestSeenChangelogDate');
 
       // Compare dates as strings (YYYY-MM-DD) to avoid timezone issues
@@ -60,7 +73,9 @@ export function Footer() {
     }
   }, [t]);
 
-  async function handleNewsletterSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function handleNewsletterSubmit(
+    event: React.FormEvent<HTMLFormElement>,
+  ) {
     event.preventDefault();
     setIsSubmitting(true);
 
@@ -84,7 +99,15 @@ export function Footer() {
   }
 
   return (
-    <footer className="min-h-[280px] lg:min-h-[260px] border-t border-border/40 bg-zinc-50/50 dark:bg-zinc-950/50 backdrop-blur-xl transition-colors duration-300">
+    <footer className="cozy-footer relative min-h-[280px] overflow-hidden border-t border-primary/20 bg-[#344435] text-foreground lg:min-h-[260px]">
+      <div
+        className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#c8a35d]/70 to-transparent"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -right-16 -top-24 size-72 rounded-full border border-[#fffdf7]/10"
+        aria-hidden="true"
+      />
       <div className="max-w-7xl mx-auto px-6 py-12 lg:px-8 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-8">
           {/* Brand Section */}
@@ -95,16 +118,11 @@ export function Footer() {
               className="flex items-center gap-2 group w-fit"
             >
               <img
-                src="/logo-dark.svg"
-                alt="Logo"
-                className="h-8 w-8 hidden dark:block transition-opacity"
+                src="/logo-icon.svg"
+                alt=""
+                className="h-9 w-9 transition-transform group-hover:-rotate-3"
               />
-              <img
-                src="/logo-light.svg"
-                alt="Logo"
-                className="h-8 w-8 block dark:hidden transition-opacity"
-              />
-              <span className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70 group-hover:to-primary transition-all">
+              <span className="text-xl font-bold tracking-tight text-foreground transition-colors group-hover:text-primary">
                 TestingWithEkki
               </span>
             </Link>
@@ -116,7 +134,7 @@ export function Footer() {
                 href="https://github.com/mihaamiharu"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="GitHub"
               >
                 <Github className="h-5 w-5" />
@@ -125,7 +143,7 @@ export function Footer() {
                 href="https://www.linkedin.com/in/ekkisyamsugiardi/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="h-5 w-5" />
@@ -134,7 +152,7 @@ export function Footer() {
                 href="https://www.youtube.com/@TestingWithEkki"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="YouTube"
               >
                 <Youtube className="h-5 w-5" />
@@ -143,7 +161,7 @@ export function Footer() {
                 href="https://ko-fi.com/ekkisyam"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="Ko-fi"
               >
                 <Coffee className="h-5 w-5" />
@@ -152,7 +170,7 @@ export function Footer() {
                 href="https://tako.id/TestingWithEkki"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-2 rounded-full bg-muted/50 text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all border border-transparent hover:border-primary/20"
+                className="rounded-full border border-border bg-muted/40 p-2 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted hover:text-primary"
                 aria-label="Tako"
               >
                 <ExternalLink className="h-5 w-5" />
@@ -170,7 +188,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block"
+                    className="inline-block text-sm text-foreground/80 transition-colors hover:text-primary"
                   >
                     {t(link.label)}
                   </Link>
@@ -189,7 +207,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     to={link.href}
-                    className="relative text-sm text-foreground/80 hover:text-primary hover:translate-x-1 transition-all inline-block group"
+                    className="group relative inline-block text-sm text-foreground/80 transition-colors hover:text-primary"
                   >
                     {t(link.label)}
                     {link.href.includes('changelog') && hasNewChangelog && (
@@ -215,22 +233,38 @@ export function Footer() {
             {isSuccess ? (
               <div className="flex items-center gap-2 text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
                 <CheckCircle className="h-5 w-5" />
-                <span className="text-sm font-medium">{t('footer.newsletter.success')}</span>
+                <span className="text-sm font-medium">
+                  {t('footer.newsletter.success')}
+                </span>
               </div>
             ) : (
-              <form onSubmit={(e) => void handleNewsletterSubmit(e)} className="space-y-3">
+              <form
+                onSubmit={(e) => void handleNewsletterSubmit(e)}
+                className="space-y-3"
+              >
                 <div className="relative">
                   <Input
                     type="email"
                     name="email"
                     required
                     placeholder={t('footer.newsletter.placeholder')}
-                    className="bg-background/50 pr-10"
+                    className="border-border bg-[#fffdf7] pr-10 text-[#2d2a24] placeholder:text-[#6f695e]"
                   />
                   {/* Honeypot */}
-                  <input type="text" name="_gotcha" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
+                  <input
+                    type="text"
+                    name="_gotcha"
+                    style={{ display: 'none' }}
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
                 </div>
-                <Button type="submit" size="sm" className="w-full" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -244,8 +278,6 @@ export function Footer() {
             )}
           </div>
         </div>
-
-
 
         {/* Bottom Bar */}
         <div className="mt-8 border-t border-border/40 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">

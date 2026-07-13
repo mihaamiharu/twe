@@ -1,5 +1,6 @@
 {
   "hero": {
+    "eyebrow": "Belajar dengan Cozy Quest",
     "title": "Bangun Test Automation Modern",
     "titleSuffix": "Tanpa Basa-basi",
     "tagline": "Kurikulum praktis yang menjembatani teori dan praktik.",
@@ -15,56 +16,43 @@
     "learning": "Pembelajaran"
   },
   "careerPath": {
+    "eyebrow": "Jalur Petualangan",
     "title": "Kurikulum",
     "titleHighlight": "Kamu",
     "subtitle": "Jalur terstruktur dari dasar selektor hingga arsitektur otomasi tingkat lanjut.",
     "tier": "Fase",
-    "challenges": "skenario"
+    "challenges": "skenario",
+    "comingSoon": "Segera hadir"
   },
   "tiers": {
     "basic": {
       "title": "Locator Tangguh",
       "description": "Kuasai selektor CSS dan XPath - fondasi tes yang stabil dan mudah dipelihara",
-      "skills": [
-        "Selektor CSS",
-        "Query XPath",
-        "Penargetan Elemen"
-      ]
+      "skills": ["Selektor CSS", "Query XPath", "Penargetan Elemen"]
     },
     "beginner": {
       "title": "JavaScript & TypeScript",
       "description": "Pelajari dasar-dasar JS/TS untuk otomasi pengujian",
-      "skills": [
-        "Variabel & Tipe",
-        "Manipulasi DOM",
-        "Async/Await"
-      ]
+      "skills": ["Variabel & Tipe", "Manipulasi DOM", "Async/Await"]
     },
     "intermediate": {
       "title": "Playwright",
       "description": "Buat tes otomatis nyata dengan Playwright",
-      "skills": [
-        "Navigasi",
-        "Locator",
-        "Assertion",
-        "Wait"
-      ]
+      "skills": ["Navigasi", "Locator", "Assertion", "Wait"]
     },
     "e2e": {
       "title": "E2E Testing",
       "description": "Bangun suite pengujian otomatis lengkap dengan pola profesional",
-      "skills": [
-        "Page Objects",
-        "Data-Driven",
-        "Test Suites"
-      ]
+      "skills": ["Page Objects", "Data-Driven", "Test Suites"]
     }
   },
   "featuredChallenges": {
+    "eyebrow": "Papan Quest",
     "title": "Selesaikan",
     "titleHighlight": "Masalah Nyata",
     "subtitle": "Mulai coding langsung. Tanpa setup.",
     "viewAll": "Lihat Semua Tantangan",
+    "questLabel": "Quest pengujian",
     "challenge1": {
       "badge": "MUDAH",
       "xp": "+10 XP",
@@ -88,6 +76,7 @@
     }
   },
   "features": {
+    "eyebrow": "Perlengkapan Belajarmu",
     "title": "Semua yang Kamu Butuhkan untuk",
     "titleHighlight": "Naik Level",
     "subtitle": "Kurikulum personal yang dirancang untuk membawamu dari pemula ke pro",
@@ -117,6 +106,7 @@
     }
   },
   "howItWorks": {
+    "eyebrow": "Rute yang Jelas",
     "title": "Cara",
     "titleHighlight": "Kerjanya",
     "step1": {
@@ -142,6 +132,7 @@
     "authorRole": "Creator of TestingWithEkki"
   },
   "cta": {
+    "eyebrow": "Checkpoint Berikutnya",
     "title": "Siap mengotomasi skenario nyata pertamamu?",
     "subtitle": "Mulai selesaikan tantangan praktis yang mencerminkan aplikasi dunia nyata. Gratis selamanya untuk individu.",
     "getStarted": "Mulai Gratis",

@@ -1,32 +1,39 @@
-import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
+import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { WaveSeparator } from '@/components/ui/wave-separator';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useTranslation } from 'react-i18next';
 import {
-  Zap,
-  BookOpen,
-  Code2,
-  Trophy,
-  Target,
-  Sparkles,
   ArrowRight,
-  CheckCircle,
+  BookOpen,
+  CheckCircle2,
+  Code2,
+  Compass,
+  Sparkles,
+  Target,
+  Trophy,
+  Zap,
 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { AnimatedCounter } from '@/components/animated-counter';
 import { SelectorDemo } from '@/components/selector-demo';
 import { PlaywrightDemo } from '@/components/playwright-demo';
+import {
+  CTAButton,
+  IllustratedPanel,
+  PageContainer,
+  PaperSurface,
+  ProgressTrail,
+  QuestCard,
+  SectionHeading,
+  StatPill,
+  TechnicalSurface,
+  type ProgressTrailItem,
+} from '@/components/cozy-quest';
 import { getDashboardStats } from '@/server/dashboard.fn';
-import { useTranslation } from 'react-i18next';
-
 import i18n from '@/lib/i18n';
 import { createSeoHead, websiteSchema } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/')({
   loader: async ({ context }) => {
-    // Prefetch stats for SSR
     if (context?.queryClient) {
       await context.queryClient.ensureQueryData({
         queryKey: ['homepage-stats'],
@@ -59,8 +66,8 @@ const routeApi = getRouteApi('/$locale/');
 function HomePage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('home');
-  // Fetch real stats from Server Function
-  const { data: statsData, isLoading: statsLoading } = useQuery({
+  const { t: tCommon } = useTranslation('common');
+  const { data: stats } = useQuery({
     queryKey: ['homepage-stats'],
     queryFn: async () => {
       const result = await getDashboardStats();
@@ -69,66 +76,61 @@ function HomePage() {
       }
       return result.data;
     },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    staleTime: 1000 * 60 * 5,
   });
-
-  const stats = statsData;
 
   const features = [
     {
-      icon: <BookOpen className="w-10 h-10 text-primary" />,
+      icon: BookOpen,
       title: t('features.interactiveTutorials.title'),
       description: t('features.interactiveTutorials.description'),
     },
     {
-      icon: <Code2 className="w-10 h-10 text-primary" />,
+      icon: Code2,
       title: t('features.playwrightChallenges.title'),
       description: t('features.playwrightChallenges.description'),
       demo: <PlaywrightDemo />,
     },
     {
-      icon: <Target className="w-10 h-10 text-primary" />,
+      icon: Target,
       title: t('features.selectorChallenges.title'),
       description: t('features.selectorChallenges.description'),
       demo: <SelectorDemo />,
     },
     {
-      icon: <Trophy className="w-10 h-10 text-primary" />,
+      icon: Trophy,
       title: t('features.gamification.title'),
       description: t('features.gamification.description'),
     },
     {
-      icon: <Zap className="w-10 h-10 text-primary" />,
+      icon: Zap,
       title: t('features.instantFeedback.title'),
       description: t('features.instantFeedback.description'),
     },
     {
-      icon: <Sparkles className="w-10 h-10 text-primary" />,
+      icon: Sparkles,
       title: t('features.trackProgress.title'),
       description: t('features.trackProgress.description'),
     },
   ];
 
-  const learningPath = [
+  const learningPath: ProgressTrailItem[] = [
     {
-      tier: 'basic',
-      emoji: '🟢',
+      id: 'basic',
       title: t('tiers.basic.title'),
       description: t('tiers.basic.description'),
       skills: t('tiers.basic.skills', { returnObjects: true }) as string[],
       count: stats?.tiers.basic || 0,
     },
     {
-      tier: 'beginner',
-      emoji: '🟡',
+      id: 'beginner',
       title: t('tiers.beginner.title'),
       description: t('tiers.beginner.description'),
       skills: t('tiers.beginner.skills', { returnObjects: true }) as string[],
       count: stats?.tiers.beginner || 0,
     },
     {
-      tier: 'intermediate',
-      emoji: '🟠',
+      id: 'intermediate',
       title: t('tiers.intermediate.title'),
       description: t('tiers.intermediate.description'),
       skills: t('tiers.intermediate.skills', {
@@ -137,8 +139,7 @@ function HomePage() {
       count: stats?.tiers.intermediate || 0,
     },
     {
-      tier: 'e2e',
-      emoji: '🟣',
+      id: 'e2e',
       title: t('tiers.e2e.title'),
       description: t('tiers.e2e.description'),
       skills: t('tiers.e2e.skills', { returnObjects: true }) as string[],
@@ -170,389 +171,291 @@ function HomePage() {
     },
   ];
 
+  const steps = [
+    {
+      title: t('howItWorks.step1.title'),
+      description: t('howItWorks.step1.description'),
+    },
+    {
+      title: t('howItWorks.step2.title'),
+      description: t('howItWorks.step2.description'),
+    },
+    {
+      title: t('howItWorks.step3.title'),
+      description: t('howItWorks.step3.description'),
+    },
+  ];
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section with Technical Grid */}
-      <section className="relative py-24 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-grid-small [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background"></div>
+    <div className="min-h-screen overflow-hidden">
+      <section className="relative pb-16 pt-8 sm:pt-12 lg:pb-24 lg:pt-16">
+        <PageContainer width="wide">
+          <IllustratedPanel
+            imageSrc="/images/cozy-quest/home-hero.webp"
+            className="min-h-[42rem] lg:min-h-[39rem]"
+            imageClassName="object-[68%_center]"
+          >
+            <div className="flex min-h-[42rem] max-w-2xl flex-col justify-center px-6 py-12 sm:px-10 lg:min-h-[39rem] lg:px-16">
+              <div className="mb-5 flex w-fit items-center gap-2 rounded-full border border-primary/25 bg-card/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-primary shadow-sm backdrop-blur-sm">
+                <Compass className="size-4" />
+                {t('hero.eyebrow')}
+              </div>
+              <h1 className="font-display text-4xl font-semibold leading-[1.08] text-foreground sm:text-5xl lg:text-6xl">
+                <span className="gradient-text">{t('hero.title')}</span>{' '}
+                {t('hero.titleSuffix')}
+              </h1>
+              <p className="mt-6 max-w-xl text-lg font-medium leading-8 text-foreground/80 sm:text-xl">
+                {t('hero.tagline')}
+              </p>
+              <p className="mt-4 max-w-xl text-base font-semibold leading-7 text-primary">
+                {t('hero.authorityStatement')}
+              </p>
+              <p
+                className="mt-3 max-w-xl text-base leading-7 text-muted-foreground"
+                dangerouslySetInnerHTML={{ __html: t('hero.description') }}
+              />
 
-        <div className="relative max-w-5xl mx-auto">
-          {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="gradient-text">{t('hero.title')}</span>
-            <br />
-            {t('hero.titleSuffix')}
-          </h1>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {['Playwright', 'JavaScript', 'CSS Selectors', 'XPath'].map(
+                  (skill) => (
+                    <Badge
+                      key={skill}
+                      variant="secondary"
+                      className="border border-border bg-card/80 px-3 py-1 text-sm backdrop-blur-sm"
+                    >
+                      {skill}
+                    </Badge>
+                  ),
+                )}
+              </div>
 
-          {/* Tagline */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-2 max-w-3xl mx-auto">
-            {t('hero.tagline')}
-          </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <CTAButton asChild>
+                  <Link to="/$locale/challenges" params={{ locale }}>
+                    {t('hero.startLearning')}
+                    <ArrowRight className="size-5" />
+                  </Link>
+                </CTAButton>
+                <CTAButton variant="outline" asChild>
+                  <Link to="/$locale/tutorials" params={{ locale }}>
+                    {t('hero.browseTutorials')}
+                  </Link>
+                </CTAButton>
+              </div>
+            </div>
+          </IllustratedPanel>
 
-          {/* Authority Statement */}
-          <p className="text-base md:text-lg text-primary/80 font-medium mb-4 max-w-2xl mx-auto">
-            {t('hero.authorityStatement')}
-          </p>
+          <div className="relative z-20 -mt-8 grid grid-cols-2 gap-3 px-3 sm:grid-cols-4 sm:px-8 lg:mx-auto lg:max-w-4xl">
+            <StatPill
+              value={
+                <AnimatedCounter value={stats?.challenges || 0} suffix="+" />
+              }
+              label={t('stats.challenges')}
+            />
+            <StatPill
+              value={<AnimatedCounter value={stats?.tutorials || 0} />}
+              label={t('stats.tutorials')}
+            />
+            <StatPill
+              value={<AnimatedCounter value={stats?.achievements || 0} />}
+              label={t('stats.achievements')}
+            />
+            <StatPill value="∞" label={t('stats.learning')} />
+          </div>
+        </PageContainer>
+      </section>
 
-          <p
-            className="text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-6"
-            dangerouslySetInnerHTML={{ __html: t('hero.description') }}
+      <section className="border-y border-border/70 bg-secondary/45 py-20 lg:py-28">
+        <PageContainer width="wide">
+          <SectionHeading
+            eyebrow={t('careerPath.eyebrow')}
+            title={
+              <>
+                {t('careerPath.title')}{' '}
+                <span className="text-primary">
+                  {t('careerPath.titleHighlight')}
+                </span>
+              </>
+            }
+            description={t('careerPath.subtitle')}
           />
-
-          {/* Trust Bar - Skills/Tools */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🎭 Playwright
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              ⚡ JavaScript
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🎯 CSS Selectors
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🔍 XPath
-            </Badge>
+          <div className="mt-14">
+            <ProgressTrail
+              items={learningPath}
+              stageLabel={t('careerPath.tier')}
+              countLabel={t('careerPath.challenges')}
+              comingSoonLabel={t('careerPath.comingSoon')}
+            />
           </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link to="/$locale/challenges" params={{ locale }}>
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 rounded-xl border-2 border-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
-              >
-                {t('hero.startLearning')}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
-            <Link to="/$locale/tutorials" params={{ locale }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-muted"
-              >
-                {t('hero.browseTutorials')}
-              </Button>
-            </Link>
-          </div>
-
-          {/* Dynamic Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-16 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.challenges || 0} suffix="+" />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.challenges')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-12 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.tutorials || 0} />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.tutorials')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-12 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.achievements || 0} />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.achievements')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                ∞
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.learning')}
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-        {/* Animated Wave Separator */}
-        <WaveSeparator />
+        </PageContainer>
       </section>
 
-      {/* Learning Path Section */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('careerPath.title')}{' '}
-              <span className="gradient-text">
-                {t('careerPath.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('careerPath.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {learningPath.map((tier, index) => (
-              <Card
-                key={tier.tier}
-                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 relative overflow-hidden group"
-              >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-3xl grayscale-[0.5]">{tier.emoji}</span>
-                    <div>
-                      <div className="text-sm text-muted-foreground font-bold">
-                        Phase {index + 1}
-                      </div>
-                      <h3 className="text-xl font-bold">{tier.title}</h3>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {tier.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {tier.skills.map((skill) => (
-                      <Badge
-                        key={skill}
-                        variant="secondary"
-                        className="text-xs font-medium border border-border"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="text-sm font-bold text-primary">
-                    {tier.count > 0 ? (
-                      `${tier.count} ${t('careerPath.challenges')}`
-                    ) : (
-                      <Badge variant="outline" className="text-xs border-dashed border-muted-foreground text-muted-foreground">
-                        Coming Soon
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Challenges */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('featuredChallenges.title')}{' '}
-              <span className="gradient-text">
-                {t('featuredChallenges.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              {t('featuredChallenges.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <section className="py-20 lg:py-28">
+        <PageContainer>
+          <SectionHeading
+            eyebrow={t('featuredChallenges.eyebrow')}
+            title={
+              <>
+                {t('featuredChallenges.title')}{' '}
+                <span className="text-primary">
+                  {t('featuredChallenges.titleHighlight')}
+                </span>
+              </>
+            }
+            description={t('featuredChallenges.subtitle')}
+          />
+          <div className="mt-12 grid gap-5 md:grid-cols-3">
             {featuredChallenges.map((challenge) => (
-              <Link
+              <QuestCard
                 key={challenge.slug}
-                to="/$locale/challenges/$slug"
-                params={{ locale, slug: challenge.slug }}
-              >
-                <Card className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge
-                        className="font-bold border-2"
-                        variant={
-                          challenge.difficulty === 'EASY'
-                            ? 'secondary'
-                            : challenge.difficulty === 'MEDIUM'
-                              ? 'default'
-                              : 'destructive'
-                        }
-                      >
-                        {challenge.difficulty}
-                      </Badge>
-                      <span className="text-sm text-primary font-bold">
-                        +{challenge.xp} XP
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">
-                      {challenge.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground font-medium">
-                      {challenge.type}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
+                {...challenge}
+                locale={locale}
+                questLabel={t('featuredChallenges.questLabel')}
+                difficultyLabel={tCommon(
+                  `labels.${challenge.difficulty.toLowerCase()}`,
+                )}
+              />
             ))}
           </div>
-
-          <div className="text-center mt-8">
-            <Link to="/$locale/challenges" params={{ locale }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="rounded-xl border-2"
-              >
-                {t('featuredChallenges.viewAll')}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('features.title')}{' '}
-              <span className="gradient-text">
-                {t('features.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('features.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <Card
-                key={index}
-                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10"
-              >
-                <CardContent className="p-6">
-                  <div className="mb-4 p-3 bg-primary/10 rounded-xl w-fit border-2 border-primary/20">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: feature.description }} />
-                  {feature.demo && feature.demo}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* How It Works Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('howItWorks.title')}{' '}
-              <span className="gradient-text">
-                {t('howItWorks.titleHighlight')}
-              </span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                step: '1',
-                title: t('howItWorks.step1.title'),
-                description: t('howItWorks.step1.description'),
-              },
-              {
-                step: '2',
-                title: t('howItWorks.step2.title'),
-                description: t('howItWorks.step2.description'),
-              },
-              {
-                step: '3',
-                title: t('howItWorks.step3.title'),
-                description: t('howItWorks.step3.description'),
-              },
-            ].map((item) => (
-              <div key={item.step} className="text-center group">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl font-bold text-primary">
-                    {item.step}
-                  </span>
-                </div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="glass-card p-12 rounded-3xl border-2 border-primary/20">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('cta.title')}
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              {t('cta.subtitle')}
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div className="mt-9 text-center">
+            <CTAButton variant="outline" asChild>
               <Link to="/$locale/challenges" params={{ locale }}>
-                <Button
-                  size="lg"
-                  className="text-lg px-8 rounded-xl border-2 border-primary shadow-lg shadow-primary/20"
-                >
-                  {t('cta.getStarted')}
-                </Button>
+                {t('featuredChallenges.viewAll')}
+                <ArrowRight className="size-4" />
               </Link>
-              <Link to="/$locale/leaderboard" params={{ locale }}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-lg px-8 rounded-xl border-2"
-                >
-                  {t('cta.viewLeaderboard')}
-                </Button>
-              </Link>
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground font-medium">
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.freeToUse')}
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.noCreditCard')}
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.learnAtOwnPace')}
-              </span>
-            </div>
+            </CTAButton>
           </div>
-        </div>
+        </PageContainer>
+      </section>
+
+      <section className="border-y border-border/70 bg-secondary/35 py-20 lg:py-28">
+        <PageContainer width="wide">
+          <SectionHeading
+            eyebrow={t('features.eyebrow')}
+            title={
+              <>
+                {t('features.title')}{' '}
+                <span className="text-primary">
+                  {t('features.titleHighlight')}
+                </span>
+              </>
+            }
+            description={t('features.subtitle')}
+          />
+          <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {features.map((feature) => {
+              const Icon = feature.icon;
+              return (
+                <PaperSurface
+                  key={feature.title}
+                  className="flex h-full flex-col p-6"
+                >
+                  <div className="flex size-12 items-center justify-center rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+                    <Icon className="size-6" />
+                  </div>
+                  <h3 className="relative mt-5 font-display text-xl font-semibold">
+                    {feature.title}
+                  </h3>
+                  <p
+                    className="relative mt-2 leading-7 text-muted-foreground"
+                    dangerouslySetInnerHTML={{ __html: feature.description }}
+                  />
+                  {feature.demo && (
+                    <TechnicalSurface className="relative mt-auto p-2 pt-0">
+                      {feature.demo}
+                    </TechnicalSurface>
+                  )}
+                </PaperSurface>
+              );
+            })}
+          </div>
+        </PageContainer>
+      </section>
+
+      <section className="py-20 lg:py-28">
+        <PageContainer>
+          <SectionHeading
+            eyebrow={t('howItWorks.eyebrow')}
+            title={
+              <>
+                {t('howItWorks.title')}{' '}
+                <span className="text-primary">
+                  {t('howItWorks.titleHighlight')}
+                </span>
+              </>
+            }
+          />
+          <ol className="relative mt-14 grid gap-8 md:grid-cols-3">
+            <div
+              className="absolute left-[16.666%] right-[16.666%] top-7 hidden border-t-2 border-dashed border-primary/25 md:block"
+              aria-hidden="true"
+            />
+            {steps.map((step, index) => (
+              <li key={step.title} className="relative text-center">
+                <div className="relative z-10 mx-auto flex size-14 items-center justify-center rounded-full border-4 border-background bg-primary font-display text-xl font-semibold text-primary-foreground shadow-sm">
+                  {index + 1}
+                </div>
+                <h3 className="mt-5 font-display text-xl font-semibold">
+                  {step.title}
+                </h3>
+                <p
+                  className="mt-2 leading-7 text-muted-foreground"
+                  dangerouslySetInnerHTML={{ __html: step.description }}
+                />
+              </li>
+            ))}
+          </ol>
+        </PageContainer>
+      </section>
+
+      <section className="pb-20 lg:pb-28">
+        <PageContainer>
+          <IllustratedPanel
+            imageSrc="/images/cozy-quest/home-cta.webp"
+            className="min-h-[30rem]"
+            imageClassName="object-[68%_center]"
+          >
+            <div className="flex min-h-[30rem] max-w-2xl flex-col justify-center px-6 py-12 sm:px-10 lg:px-14">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                {t('cta.eyebrow')}
+              </p>
+              <h2 className="mt-3 font-display text-3xl font-semibold leading-tight sm:text-4xl">
+                {t('cta.title')}
+              </h2>
+              <p className="mt-4 max-w-xl text-lg leading-7 text-muted-foreground">
+                {t('cta.subtitle')}
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <CTAButton asChild>
+                  <Link to="/$locale/challenges" params={{ locale }}>
+                    {t('cta.getStarted')}
+                    <ArrowRight className="size-4" />
+                  </Link>
+                </CTAButton>
+                <CTAButton variant="outline" asChild>
+                  <Link to="/$locale/leaderboard" params={{ locale }}>
+                    {t('cta.viewLeaderboard')}
+                  </Link>
+                </CTAButton>
+              </div>
+              <div className="mt-8 flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-foreground/75">
+                {[
+                  t('cta.freeToUse'),
+                  t('cta.noCreditCard'),
+                  t('cta.learnAtOwnPace'),
+                ].map((benefit) => (
+                  <span key={benefit} className="flex items-center gap-2">
+                    <CheckCircle2 className="size-4 text-primary" />
+                    {benefit}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </IllustratedPanel>
+        </PageContainer>
       </section>
     </div>
   );
 }
+
+export default HomePage;

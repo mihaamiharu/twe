@@ -14,7 +14,6 @@ import {
   LayoutDashboard,
   Info,
 } from 'lucide-react';
-import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/user-menu';
 import { signOut } from '@/lib/auth.client';
@@ -22,7 +21,6 @@ import { BugReportDialog } from '@/components/bug-report-dialog';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
-
 
 export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const user = session?.user;
@@ -48,36 +46,37 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-
-
   // Dynamic nav links based on locale
   const navLinks = [
     {
       to: LocaleRoutes.tutorials,
       params: localeParams(locale),
       label: t('common:navigation.tutorials'),
+      concept: t('common:navigation.tutorialsConcept'),
       icon: BookOpen,
     },
     {
       to: LocaleRoutes.challenges,
       params: localeParams(locale),
       label: t('common:navigation.challenges'),
+      concept: t('common:navigation.challengesConcept'),
       icon: Code,
     },
     {
       to: LocaleRoutes.leaderboard,
       params: localeParams(locale),
       label: t('common:navigation.leaderboard'),
+      concept: t('common:navigation.leaderboardConcept'),
       icon: Trophy,
     },
     {
       to: LocaleRoutes.about,
       params: localeParams(locale),
       label: t('common:navigation.about'),
+      concept: t('common:navigation.aboutConcept'),
       icon: Info,
     },
   ];
-
 
   const handleSignOut = async () => {
     try {
@@ -97,56 +96,57 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     <>
       <header
         className={cn(
-          'sticky top-0 z-40 w-full transition-all duration-200 border-b',
+          'sticky top-0 z-40 w-full border-b transition-all duration-200',
           scrolled
-            ? 'bg-background/80 backdrop-blur-md border-border/40 shadow-sm'
-            : 'bg-background/0 border-transparent',
+            ? 'border-border bg-card/95 shadow-[0_10px_28px_rgba(73,62,45,0.08)] backdrop-blur-md'
+            : 'border-border/70 bg-background/92 backdrop-blur-sm',
         )}
         style={{
           paddingRight: 'var(--removed-body-scroll-bar-size, 0px)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-[4.5rem] items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-6 xl:gap-8">
               <Link
                 to={LocaleRoutes.home}
                 params={localeParams(locale)}
                 className="flex items-center gap-2 group"
               >
-                {/* Dark Mode Logo */}
                 <img
-                  src="/logo-dark.svg"
-                  alt="Logo"
-                  className="h-8 w-8 hidden dark:block group-hover:scale-105 transition-all"
+                  src="/logo-icon.svg"
+                  alt=""
+                  className="h-9 w-9 transition-transform group-hover:-rotate-3 group-hover:scale-105"
                 />
-                {/* Light Mode Logo */}
-                <img
-                  src="/logo-light.svg"
-                  alt="Logo"
-                  className="h-8 w-8 block dark:hidden group-hover:scale-105 transition-all"
-                />
-                <span className="text-xl font-bold font-sans tracking-tight text-foreground group-hover:text-primary transition-colors">
+                <span className="text-lg font-bold tracking-tight text-foreground transition-colors group-hover:text-primary sm:text-xl">
                   TestingWithEkki
-                  <span className="text-primary animate-pulse">.</span>
+                  <span className="text-primary">.</span>
                 </span>
               </Link>
 
-              <nav className="hidden md:flex items-center gap-1">
+              <nav
+                className="hidden items-center gap-1 lg:flex"
+                aria-label={t('common:navigation.primary')}
+              >
                 {navLinks.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground"
+                    className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground"
                     activeProps={{
                       className:
-                        'text-primary bg-primary/5 hover:bg-primary/10 font-semibold shadow-sm ring-1 ring-border/20',
+                        'bg-secondary text-primary shadow-sm ring-1 ring-border/70',
                     }}
                   >
                     <link.icon className="h-4 w-4" />
-                    {link.label}
+                    <span className="flex flex-col leading-none">
+                      <span className="font-semibold">{link.label}</span>
+                      <span className="mt-1 hidden text-[10px] uppercase tracking-[0.12em] text-muted-foreground xl:block">
+                        {link.concept}
+                      </span>
+                    </span>
                   </Link>
                 ))}
               </nav>
@@ -154,17 +154,21 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
             {/* Right side */}
             <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-1 mr-2">
+              <div className="mr-1 hidden items-center sm:flex">
                 <LanguageSwitcher />
-                <ThemeToggle />
               </div>
 
               {isAuthenticated && user ? (
                 <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
-                  <div className="hidden md:flex items-center gap-2">
-                    <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+                  <div className="hidden items-center gap-2 lg:flex">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      className="text-muted-foreground hover:text-foreground"
+                    >
                       <Link
                         to={LocaleRoutes.login}
                         params={localeParams(locale)}
@@ -188,9 +192,11 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="lg:hidden"
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 aria-label="Toggle menu"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-navigation"
               >
                 {isMobileMenuOpen ? (
                   <X className="h-5 w-5" />
@@ -207,7 +213,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex flex-col">
+        <div className="fixed inset-0 z-50 flex flex-col lg:hidden">
           {/* Backdrop */}
           <div
             className="fixed inset-0 bg-background/80 backdrop-blur-sm"
@@ -215,14 +221,22 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
           />
 
           {/* Menu panel */}
-          <nav className="relative flex-1 bg-background border-r border-border/50 max-w-[80vw] w-full p-4 animate-slide-in-left shadow-2xl flex flex-col h-full">
-
+          <nav
+            id="mobile-navigation"
+            className="relative flex h-full w-full max-w-[22rem] flex-1 flex-col border-r border-border bg-card p-5 shadow-2xl animate-in slide-in-from-left"
+            aria-label={t('common:navigation.mobile')}
+          >
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-2">
-                {/* Mobile Logo Rep */}
-                <span className="font-bold text-lg">TestingWithEkki</span>
+                <img src="/logo-icon.svg" alt="" className="size-9" />
+                <span className="text-lg font-bold">TestingWithEkki</span>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label={t('common:actions.closeMenu')}
+              >
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -234,14 +248,18 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                   to={link.to}
                   params={link.params}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+                  className="flex items-center gap-3 rounded-xl p-3 text-muted-foreground transition-colors hover:bg-secondary/70 hover:text-foreground"
                   activeProps={{
-                    className:
-                      'text-primary bg-primary/5 font-medium border-l-2 border-primary rounded-l-none pl-3',
+                    className: 'bg-secondary font-medium text-primary',
                   }}
                 >
                   <link.icon className="h-5 w-5" />
-                  {link.label}
+                  <span className="flex flex-col">
+                    <span className="font-semibold">{link.label}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {link.concept}
+                    </span>
+                  </span>
                 </Link>
               ))}
 
@@ -325,9 +343,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               )}
             </div>
 
-            <div className="mt-4 pt-4 border-t border-border/50 flex gap-4">
+            <div className="mt-4 flex gap-4 border-t border-border/60 pt-4">
               <LanguageSwitcher />
-              <ThemeToggle />
             </div>
           </nav>
         </div>

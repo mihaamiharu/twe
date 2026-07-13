@@ -8,19 +8,26 @@
     "keywords": "playwright, automation testing, qa, pengujian perangkat lunak, belajar qa automation, belajar web automation, belajar playwright, end-to-end testing, javascript testing"
   },
   "navigation": {
+    "primary": "Navigasi utama",
+    "mobile": "Navigasi mobile",
     "home": "Beranda",
     "challenges": "Tantangan",
+    "challengesConcept": "Papan Quest",
     "tutorials": "Tutorial",
+    "tutorialsConcept": "Panduan Lapangan",
     "leaderboard": "Leaderboard",
+    "leaderboardConcept": "Hall of Testers",
     "login": "Masuk",
     "register": "Daftar",
     "profile": "Profil",
     "logout": "Keluar",
     "admin": "Admin",
     "settings": "Pengaturan",
-    "about": "Tentang"
+    "about": "Tentang",
+    "aboutConcept": "Perjalanan Kami"
   },
   "actions": {
+    "closeMenu": "Tutup menu",
     "submit": "Kirim",
     "cancel": "Batal",
     "save": "Simpan",

@@ -8,19 +8,26 @@
     "keywords": "playwright, automation testing, qa, software testing, learn qa automation, learn web automation, learn playwright, end-to-end testing, javascript testing"
   },
   "navigation": {
+    "primary": "Primary navigation",
+    "mobile": "Mobile navigation",
     "home": "Home",
     "challenges": "Challenges",
+    "challengesConcept": "Quest Board",
     "tutorials": "Tutorials",
+    "tutorialsConcept": "Field Guide",
     "leaderboard": "Leaderboard",
+    "leaderboardConcept": "Hall of Testers",
     "login": "Login",
     "register": "Register",
     "profile": "Profile",
     "logout": "Logout",
     "admin": "Admin",
     "settings": "Settings",
-    "about": "About"
+    "about": "About",
+    "aboutConcept": "Our Journey"
   },
   "actions": {
+    "closeMenu": "Close menu",
     "submit": "Submit",
     "cancel": "Cancel",
     "save": "Save",

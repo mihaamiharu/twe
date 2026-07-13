@@ -24,67 +24,21 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 const THEME_KEY = 'twe-theme';
 
-function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') return 'dark';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light';
-}
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Use consistent default values for SSR to prevent hydration mismatch
-  // The actual localStorage value will be synced in useEffect
-  const [theme, setThemeState] = useState<Theme>('system');
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
-
-  // Sync with localStorage after mount to prevent hydration mismatch
-  useEffect(() => {
-    const stored = localStorage.getItem(THEME_KEY) as Theme;
-    if (stored && stored !== theme) {
-      setThemeState(stored);
-    }
-  }, []);
+  // Phase 1 intentionally presents one cohesive daytime theme. The provider
+  // contract remains intact so Night Camp can be restored without a rewrite.
+  const [theme, setThemeState] = useState<Theme>('light');
+  const resolvedTheme = 'light' as const;
 
   useEffect(() => {
     const root = window.document.documentElement;
-
-    // Remove both classes first
     root.classList.remove('light', 'dark');
-
-    // Determine actual theme
-    let actualTheme: 'light' | 'dark';
-    if (theme === 'system') {
-      actualTheme = getSystemTheme();
-    } else {
-      actualTheme = theme;
-    }
-
-    // Apply theme
-    root.classList.add(actualTheme);
-    setResolvedTheme(actualTheme);
-  }, [theme]);
-
-  // Listen for system theme changes
-  useEffect(() => {
-    if (theme !== 'system') return;
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    const handleChange = (e: MediaQueryListEvent) => {
-      const root = window.document.documentElement;
-      root.classList.remove('light', 'dark');
-      const newTheme = e.matches ? 'dark' : 'light';
-      root.classList.add(newTheme);
-      setResolvedTheme(newTheme);
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+    root.classList.add('light');
+  }, []);
 
   const setTheme = (newTheme: Theme) => {
     localStorage.setItem(THEME_KEY, newTheme);
-    setThemeState(newTheme);
+    setThemeState('light');
   };
 
   return (
