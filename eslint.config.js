@@ -23,7 +23,7 @@ export default tseslint.config(
   },
   {
     // Specific overrides for tests to allow looser typing for mocking
-    files: ['src/tests/**/*.ts', 'src/tests/**/*.tsx', 'e2e/**/*.ts'],
+    files: ['src/tests/**/*.ts', 'src/tests/**/*.tsx'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-unsafe-assignment': 'off',

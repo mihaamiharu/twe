@@ -109,14 +109,6 @@ Run unit and integration tests using Bun's built-in test runner:
 bun test
 ```
 
-### End-to-End (E2E) Tests
-
-We use Playwright for E2E testing. This requires the Docker container to be running.
-
-```bash
-bun run test:e2e
-```
-
 ## 🧹 Linting & Formatting
 
 Before submitting a PR, please run the linter and formatter:

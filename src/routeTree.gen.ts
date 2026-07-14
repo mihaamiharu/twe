@@ -44,10 +44,6 @@ import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authe
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
 import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
 import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
-import { Route as ApiTestTeardownUserRouteImport } from './routes/api/test/teardown-user'
-import { Route as ApiTestSetProgressRouteImport } from './routes/api/test/set-progress'
-import { Route as ApiTestSeedUserRouteImport } from './routes/api/test/seed-user'
-import { Route as ApiTestResetProgressRouteImport } from './routes/api/test/reset-progress'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
 import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
@@ -229,26 +225,6 @@ const LocaleChallengesIndexRoute = LocaleChallengesIndexRouteImport.update({
   path: '/challenges/',
   getParentRoute: () => LocaleRoute,
 } as any)
-const ApiTestTeardownUserRoute = ApiTestTeardownUserRouteImport.update({
-  id: '/api/test/teardown-user',
-  path: '/api/test/teardown-user',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTestSetProgressRoute = ApiTestSetProgressRouteImport.update({
-  id: '/api/test/set-progress',
-  path: '/api/test/set-progress',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTestSeedUserRoute = ApiTestSeedUserRouteImport.update({
-  id: '/api/test/seed-user',
-  path: '/api/test/seed-user',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiTestResetProgressRoute = ApiTestResetProgressRouteImport.update({
-  id: '/api/test/reset-progress',
-  path: '/api/test/reset-progress',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -313,10 +289,6 @@ export interface FileRoutesByFullPath {
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/test/reset-progress': typeof ApiTestResetProgressRoute
-  '/api/test/seed-user': typeof ApiTestSeedUserRoute
-  '/api/test/set-progress': typeof ApiTestSetProgressRoute
-  '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
@@ -356,10 +328,6 @@ export interface FileRoutesByTo {
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/test/reset-progress': typeof ApiTestResetProgressRoute
-  '/api/test/seed-user': typeof ApiTestSeedUserRoute
-  '/api/test/set-progress': typeof ApiTestSetProgressRoute
-  '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
@@ -403,10 +371,6 @@ export interface FileRoutesById {
   '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/test/reset-progress': typeof ApiTestResetProgressRoute
-  '/api/test/seed-user': typeof ApiTestSeedUserRoute
-  '/api/test/set-progress': typeof ApiTestSetProgressRoute
-  '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
   '/$locale/challenges/': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
@@ -450,10 +414,6 @@ export interface FileRouteTypes {
     | '/$locale/tutorials/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
-    | '/api/test/reset-progress'
-    | '/api/test/seed-user'
-    | '/api/test/set-progress'
-    | '/api/test/teardown-user'
     | '/$locale/challenges'
     | '/$locale/tutorials'
     | '/admin/users'
@@ -493,10 +453,6 @@ export interface FileRouteTypes {
     | '/$locale/tutorials/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
-    | '/api/test/reset-progress'
-    | '/api/test/seed-user'
-    | '/api/test/set-progress'
-    | '/api/test/teardown-user'
     | '/$locale/challenges'
     | '/$locale/tutorials'
     | '/admin/users'
@@ -539,10 +495,6 @@ export interface FileRouteTypes {
     | '/$locale/tutorials/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
-    | '/api/test/reset-progress'
-    | '/api/test/seed-user'
-    | '/api/test/set-progress'
-    | '/api/test/teardown-user'
     | '/$locale/challenges/'
     | '/$locale/tutorials/'
     | '/admin/users/'
@@ -560,10 +512,6 @@ export interface RootRouteChildren {
   DocsApiRoute: typeof DocsApiRoute
   DocsIndexRoute: typeof DocsIndexRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiTestResetProgressRoute: typeof ApiTestResetProgressRoute
-  ApiTestSeedUserRoute: typeof ApiTestSeedUserRoute
-  ApiTestSetProgressRoute: typeof ApiTestSetProgressRoute
-  ApiTestTeardownUserRoute: typeof ApiTestTeardownUserRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -813,34 +761,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleChallengesIndexRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/api/test/teardown-user': {
-      id: '/api/test/teardown-user'
-      path: '/api/test/teardown-user'
-      fullPath: '/api/test/teardown-user'
-      preLoaderRoute: typeof ApiTestTeardownUserRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/test/set-progress': {
-      id: '/api/test/set-progress'
-      path: '/api/test/set-progress'
-      fullPath: '/api/test/set-progress'
-      preLoaderRoute: typeof ApiTestSetProgressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/test/seed-user': {
-      id: '/api/test/seed-user'
-      path: '/api/test/seed-user'
-      fullPath: '/api/test/seed-user'
-      preLoaderRoute: typeof ApiTestSeedUserRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/test/reset-progress': {
-      id: '/api/test/reset-progress'
-      path: '/api/test/reset-progress'
-      fullPath: '/api/test/reset-progress'
-      preLoaderRoute: typeof ApiTestResetProgressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -975,10 +895,6 @@ const rootRouteChildren: RootRouteChildren = {
   DocsApiRoute: DocsApiRoute,
   DocsIndexRoute: DocsIndexRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiTestResetProgressRoute: ApiTestResetProgressRoute,
-  ApiTestSeedUserRoute: ApiTestSeedUserRoute,
-  ApiTestSetProgressRoute: ApiTestSetProgressRoute,
-  ApiTestTeardownUserRoute: ApiTestTeardownUserRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

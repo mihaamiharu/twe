@@ -46,7 +46,6 @@ Challenges and tutorials are authored in JSON/Markdown (`content/challenges/`, `
 - `bun run db:studio`: Open Drizzle Studio for DB exploration.
 - `bun run test`: Run unit and logic tests.
 - `bun run test:integration`: Run DB-dependent tests (requires Docker).
-- `bun run test:e2e`: Run Playwright tests for the platform itself.
 
 ### Environment Setup
 - Copy `.env.example` to `.env`.
