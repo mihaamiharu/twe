@@ -40,6 +40,5 @@ twe_prod_backup.sql
 vps_access_guide.md
 
 # Agent and Conductor local data
-.agent/mihaamiharu/
 conductor/
 .vscode/mcp.json

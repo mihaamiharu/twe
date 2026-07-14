@@ -67,4 +67,3 @@ Challenges and tutorials are authored in JSON/Markdown (`content/challenges/`, `
 - **Server Functions**: Prefer Server Functions over REST APIs (`src/routes/api/`).
 - **Playwright Shim**: If a challenge needs a new Playwright method, implement it in `src/core/executor/playwright-shim.ts`.
 - **Optimistic UI**: Implement optimistic updates in TanStack Query for a "zero-latency" feel.
-- **Documentation**: Refer to `docs/ARCHITECTURE.md` for deep dives into the execution engine.

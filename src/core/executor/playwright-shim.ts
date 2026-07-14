@@ -3,8 +3,6 @@
  *
  * A client-side compatibility layer that mimics Playwright's API.
  * Runs entirely in the browser using DOM APIs.
- *
- * Based on: docs/TDD.md Section 5.2
  */
 
 import { logger } from '@/lib/logger';

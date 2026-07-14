@@ -1,12 +1,6 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useTheme } from '@/components/theme-provider';
-import {
-  FileText,
-  Code,
-  BookOpen,
-  GitBranch,
-  ExternalLink,
-} from 'lucide-react';
+import { Code } from 'lucide-react';
 
 export const Route = createFileRoute('/docs/')({
   component: DocsIndexPage,
@@ -18,28 +12,6 @@ const docLinks = [
     description: 'Interactive Swagger UI for exploring our REST API endpoints',
     href: '/docs/api',
     icon: Code,
-    internal: true,
-  },
-  {
-    title: 'Product Requirements',
-    description: 'PRD - Features, user flows, and product vision',
-    href: 'https://github.com/mihaamiharu/twe/blob/main/docs/PRD.md',
-    icon: FileText,
-    internal: false,
-  },
-  {
-    title: 'Technical Design',
-    description: 'TDD - Architecture, database schema, and technical decisions',
-    href: 'https://github.com/mihaamiharu/twe/blob/main/docs/TDD.md',
-    icon: GitBranch,
-    internal: false,
-  },
-  {
-    title: 'Challenge Progression',
-    description: 'Learning path from Manual QA to Automation Engineer',
-    href: 'https://github.com/mihaamiharu/twe/blob/main/docs/challenge_progression.md',
-    icon: BookOpen,
-    internal: false,
   },
 ];
 
@@ -90,19 +62,10 @@ function DocsIndexPage() {
         <div className="grid md:grid-cols-2 gap-6 mb-16">
           {docLinks.map((doc) => {
             const Icon = doc.icon;
-            const LinkComponent = doc.internal ? Link : 'a';
-            const linkProps = doc.internal
-              ? { to: doc.href }
-              : {
-                  href: doc.href,
-                  target: '_blank',
-                  rel: 'noopener noreferrer',
-                };
-
             return (
-              <LinkComponent
+              <Link
                 key={doc.title}
-                {...linkProps}
+                to={doc.href}
                 className={`group p-6 rounded-xl border transition-all hover:shadow-lg ${
                   isDark
                     ? 'bg-card border-border hover:border-primary/50'
@@ -120,16 +83,13 @@ function DocsIndexPage() {
                       <h2 className="text-lg font-semibold group-hover:text-primary transition-colors">
                         {doc.title}
                       </h2>
-                      {!doc.internal && (
-                        <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                      )}
                     </div>
                     <p className="text-muted-foreground text-sm mt-1">
                       {doc.description}
                     </p>
                   </div>
                 </div>
-              </LinkComponent>
+              </Link>
             );
           })}
         </div>

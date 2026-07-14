@@ -2,7 +2,6 @@
  * Gamification System
  *
  * XP calculation, leveling, and rewards system.
- * Based on: docs/TDD.md Section 5.3
  */
 
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';

@@ -247,15 +247,6 @@ The platform includes **96 challenges** across 4 progressive tiers:
 | Intermediate | 29    | Playwright Actions, Locators, Assertions |
 | Expert       | 21    | Page Object Model, Data-Driven Testing   |
 
-## 📄 Documentation
-
-See the `/docs` folder for detailed documentation:
-
-- [PRD.md](./docs/PRD.md) - Product Requirements
-- [TDD.md](./docs/TDD.md) - Technical Design
-- [github_issues.md](./docs/github_issues.md) - Issue Breakdown
-- [app_flows.md](./docs/app_flows.md) - User Flow Diagrams
-
 ## 🤝 Contributing
 
 1. Fork the repository
