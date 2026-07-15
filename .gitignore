@@ -22,6 +22,7 @@ lint-results.json
 
 # Local deployment scripts
 scripts/deploy-local.sh
+scripts/migrate-to-new-vps.sh
 
 # Deployment artifacts
 deployment.tar.gz
