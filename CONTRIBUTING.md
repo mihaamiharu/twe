@@ -9,7 +9,7 @@ TestingWithEkki is a platform built for QA engineers to learn modern testing ski
 You will need the following tools installed:
 
 - **[Bun](https://bun.sh/)** (v1.0+): Our package manager and runtime.
-- **[Docker](https://www.docker.com/)** or **Podman**: Required for the local PostgreSQL database.
+- **[Podman](https://podman.io/docs/installation)** with WSL 2 and Docker Compose: Required for the local PostgreSQL database. Podman Desktop is optional.
 - **Git**: Version control.
 
 ## 🚀 Local Development Setup
@@ -29,22 +29,23 @@ You will need the following tools installed:
 
 3. **Set up environment variables**
 
-   ```bash
-   cp .env.example .env
+   ```powershell
+   Copy-Item .env.example .env
    ```
 
    > **Note**: You may need to adjust `DATABASE_URL` in `.env` if your local Docker setup differs.
 
 4. **Start the database**
 
-   ```bash
-   docker compose up -d
+   ```powershell
+   podman compose up -d --wait postgres
    ```
 
 5. **Run database migrations**
 
    ```bash
    bun run db:migrate
+   bun run db:sync
    ```
 
 6. **Start the development server**

@@ -20,8 +20,19 @@ A gamified platform for learning QA testing skills through interactive tutorials
 ### Prerequisites
 
 - [Bun](https://bun.sh/) (v1.0+) or Node.js (v22+)
-- [Docker](https://www.docker.com/) (for PostgreSQL)
+- [Podman](https://podman.io/docs/installation) with WSL 2 and Docker Compose (for PostgreSQL; Podman Desktop is optional)
 - [Git](https://git-scm.com/)
+
+On Windows, install the command-line tools and create the Podman machine:
+
+```powershell
+winget install RedHat.Podman
+winget install Docker.DockerCompose
+podman machine init --cpus 4 --memory 4096 --disk-size 40
+podman machine start
+```
+
+If a Podman machine already exists, only run `podman machine start`.
 
 ### 1. Clone & Install
 
@@ -33,8 +44,8 @@ bun install
 
 ### 2. Environment Setup
 
-```bash
-cp .env.example .env
+```powershell
+Copy-Item .env.example .env
 ```
 
 Edit `.env` with your values:
@@ -60,14 +71,15 @@ SMTP_PASS=your-email-password
 
 ### 3. Start Database
 
-```bash
-podman compose up -d
+```powershell
+podman compose up -d --wait postgres
 ```
 
 ### 4. Run Migrations
 
 ```bash
 bun run db:migrate
+bun run db:sync
 ```
 
 ### 5. Start Development Server
@@ -122,17 +134,10 @@ src/
 bun run dev        # Start development server
 bun run build      # Build for production
 bun run start      # Start production server
-bun run test       # Run tests (Vitest)
+bun run test       # Run tests (Bun Test)
 bun run db:migrate # Run database migrations
+bun run db:sync    # Sync tutorials, challenges, and achievements
 bun run db:studio  # Open Drizzle Studio
-
-# Seed scripts (ordered by difficulty)
-bun run db:seed:tutorials     # Seed tutorials
-bun run db:seed:basic         # Basic challenges (selectors)
-bun run db:seed:beginner      # Beginner challenges (JS/DOM)
-bun run db:seed:intermediate  # Intermediate (Playwright)
-bun run db:seed:expert        # Expert challenges
-bun run db:seed:achievements  # Seed achievements
 ```
 
 ## 🧪 Testing & CI/CD
@@ -161,7 +166,7 @@ _Starts `postgres_test`, runs all tests, and stops the container cleanup regardl
 If you want to keep the test database running:
 
 ```bash
-podman compose up -d postgres_test
+podman compose up -d --wait postgres_test
 bun test
 # podman compose stop postgres_test
 ```
