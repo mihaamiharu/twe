@@ -293,4 +293,42 @@ describe('AI-assisted QA course progress contract', () => {
       ),
     ).toBe('course:ai-assisted-qa-workflow:01-requirements');
   });
+
+  it('records checkpoint 3 through the existing self-attested completion contract', async () => {
+    const content = await getCourseContent(
+      AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      'id',
+    );
+    const checkpoint = content?.checkpoints.find(
+      (candidate) => candidate.slug === '03-test-writing',
+    );
+
+    expect(checkpoint).toBeTruthy();
+    if (!checkpoint) throw new Error('Expected test-writing checkpoint');
+
+    const parsed = courseCheckpointCompletionInputSchema.parse({
+      courseSlug: AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      locale: 'id',
+      checkpointSlug: checkpoint.slug,
+      completionId: checkpoint.completionAction.id,
+      reflectionId: checkpoint.reflectionId,
+      exerciseConfirmed: true,
+      reflectionConfirmed: true,
+    });
+    const first = applyCourseUnitCompletion(
+      initialState,
+      { kind: 'checkpoint', id: parsed.checkpointSlug },
+      checkpointSlugs,
+    );
+    const duplicate = applyCourseUnitCompletion(
+      first.state,
+      { kind: 'checkpoint', id: parsed.checkpointSlug },
+      checkpointSlugs,
+    );
+
+    expect(parsed.checkpointSlug).toBe('03-test-writing');
+    expect(first.xpAwarded).toBe(COURSE_CHECKPOINT_XP);
+    expect(duplicate.wasAlreadyCompleted).toBe(true);
+    expect(duplicate.xpAwarded).toBe(0);
+  });
 });

@@ -156,6 +156,65 @@ Focused verification passed:
 - The seeded failure and quality-decision exercise are clearly explained.
 - The capstone requires evidence from the complete workflow.
 
+#### [x] QA-020-02 — AI-assisted test design
+
+**Outcome:** A learner can use AI to propose candidate test scenarios, critique
+coverage, and prioritize a defensible test design without treating AI output as
+the answer.
+
+**Acceptance criteria:**
+
+- The Indonesian checkpoint uses the stable `02-test-design` slug beneath the authenticated course route.
+- The page includes the typed objective, written lesson, portable AI activity, local exercise, evidence checklist, reflection, and self-attested completion action.
+- The next checkpoint is linked at the stable `03-test-writing` path.
+- Video remains planned metadata only; no embeds, uploads, review, CI, or new persistence are added.
+
+**Implementation decision:** The existing authenticated checkpoint route now
+allowlists `02-test-design` alongside checkpoint 1 and selects the checkpoint
+from the route parameter. The existing typed content loader, progress contract,
+completion mutation, and shared checkpoint page remain the source of truth.
+
+**Verification:** Focused route, content, and component tests cover the stable
+Indonesian slug, checkpoint-2 content, planned-video state, self-attestation
+gating, and the next-checkpoint link.
+
+#### [x] QA-020-03 — Test writing
+
+**Outcome:** A learner can turn prioritized scenarios into clear, observable test cases and automation candidates.
+
+**Acceptance criteria:**
+
+- The Indonesian checkpoint uses the stable `03-test-writing` slug beneath the authenticated course route.
+- The page includes the typed objective, written lesson, scenario-to-test-case AI activity, local exercise, automation-candidate guidance, evidence, reflection, and self-attested completion action.
+- The next checkpoint is linked at the stable `04-automation` path.
+- Video remains planned metadata only; no embeds, uploads, review, CI, or new persistence are added.
+
+**Implementation decision:** The existing parameter-driven checkpoint route
+allowlists `03-test-writing`, selects the checkpoint from the typed Indonesian
+content document, and reuses the shared renderer, generic confirmation labels,
+progress contract, and completion mutation.
+
+**Verification:** Focused route, content, component, and completion tests cover
+the stable slug, checkpoint-specific SEO metadata, test-writing content,
+self-attestation gating, next-checkpoint navigation, and idempotent existing
+progress behavior.
+
+#### [ ] QA-020-04 — Playwright automation
+
+**Outcome:** A learner can implement selected test cases as a small Playwright + TypeScript suite.
+
+#### [ ] QA-020-05 — Test execution and evidence
+
+**Outcome:** A learner can run the suite locally and capture sanitized execution evidence.
+
+#### [ ] QA-020-06 — Failure triage
+
+**Outcome:** A learner can classify a failed check and record evidence-backed hypotheses for test, product, environment, or data causes.
+
+#### [ ] QA-020-07 — Quality decision and capstone
+
+**Outcome:** A learner can verify a fix or communicate a defect, then make a risk-based quality decision in the capstone.
+
 ### [ ] QA-021 — Add course navigation and progress display
 
 **Outcome:** Learners can move through the course and understand their progress.

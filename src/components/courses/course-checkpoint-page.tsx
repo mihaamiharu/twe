@@ -104,7 +104,7 @@ function CourseCheckpointPage({ course, locale }: CourseCheckpointPageProps) {
   return (
     <main
       className="min-h-screen bg-background px-4 py-8 md:px-8 md:py-12"
-      data-testid="course-checkpoint-01-requirements"
+      data-testid={`course-checkpoint-${checkpoint.slug}`}
     >
       <div className="mx-auto max-w-6xl space-y-8">
         <header className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 hard-shadow md:p-10">
