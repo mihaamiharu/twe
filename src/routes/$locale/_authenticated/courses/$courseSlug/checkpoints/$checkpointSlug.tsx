@@ -11,6 +11,7 @@ import { getCourseOverview } from '@/server/course-progress.fn';
 export const REQUIREMENTS_CHECKPOINT_SLUG = '01-requirements' as const;
 export const TEST_DESIGN_CHECKPOINT_SLUG = '02-test-design' as const;
 export const TEST_WRITING_CHECKPOINT_SLUG = '03-test-writing' as const;
+export const AUTOMATION_CHECKPOINT_SLUG = '04-automation' as const;
 
 export const COURSE_CHECKPOINT_ROUTE =
   '/$locale/_authenticated/courses/$courseSlug/checkpoints/$checkpointSlug' as const;
@@ -25,7 +26,8 @@ export function isSupportedCourseCheckpointParams(
     courseSlug === AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG &&
     (checkpointSlug === REQUIREMENTS_CHECKPOINT_SLUG ||
       checkpointSlug === TEST_DESIGN_CHECKPOINT_SLUG ||
-      checkpointSlug === TEST_WRITING_CHECKPOINT_SLUG)
+      checkpointSlug === TEST_WRITING_CHECKPOINT_SLUG ||
+      checkpointSlug === AUTOMATION_CHECKPOINT_SLUG)
   );
 }
 
@@ -46,6 +48,14 @@ export function getCourseCheckpointSeoMetadata(checkpointSlug: string): {
       title: 'Checkpoint 3: Test Writing | TestingWithEkki',
       description:
         'Ubah skenario prioritas menjadi test case yang jelas, dapat diamati, dan memiliki kandidat otomasi.',
+    };
+  }
+
+  if (checkpointSlug === AUTOMATION_CHECKPOINT_SLUG) {
+    return {
+      title: 'Checkpoint 4: Playwright Automation | TestingWithEkki',
+      description:
+        'Implementasikan test case terpilih dengan Playwright dan TypeScript menggunakan locator, assertion, dan struktur test yang maintainable.',
     };
   }
 

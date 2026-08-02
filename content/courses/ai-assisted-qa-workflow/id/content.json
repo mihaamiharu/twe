@@ -408,7 +408,7 @@
         "durationMinutes": 10,
         "focus": "Memilih locator, action, assertion, dan struktur test yang menjaga niat pengujian tetap terlihat."
       },
-      "writtenLesson": "## Fokus\n\nOtomasi adalah cara menjalankan pemeriksaan yang sudah dirancang, bukan pengganti test design.\n\n## Konsep inti\n\nGunakan locator yang bermakna, action yang minimal, dan web-first assertion. Biarkan AI membantu syntax, tetapi QA memeriksa apakah kode benar-benar menguji risiko.",
+      "writtenLesson": "## Fokus\n\nOtomasi adalah cara menjalankan pemeriksaan yang sudah dirancang, bukan pengganti test design. Pilih test case yang memiliki risiko jelas dan hasil yang dapat diamati.\n\n## Playwright + TypeScript fundamentals\n\nTest Playwright menggabungkan test suite, test case, page, action, dan assertion. TypeScript membantu menjaga bentuk data, nama helper, dan konfigurasi tetap jelas; Playwright menyediakan locator dan web-first assertion yang menunggu kondisi UI secara tepat.\n\n## Locator, assertion, dan struktur yang maintainable\n\nGunakan locator yang bermakna, action yang minimal, dan assertion terhadap hasil yang terlihat pengguna. Pisahkan setup bersama dari langkah test, beri nama test sesuai perilaku, dan hindari selector rapuh atau timeout manual. Biarkan AI membantu syntax, tetapi QA memeriksa apakah kode benar-benar menguji risiko.",
       "aiActivity": {
         "goal": "Meminta AI mengubah test case menjadi starter test lalu memeriksa selector, assertion, dan asumsi yang dibuat.",
         "prompt": "Buat starter test Playwright + TypeScript dari test case ini. Gunakan locator yang tahan perubahan, assertion web-first, dan jangan melakukan booking. Jelaskan asumsi setiap selector serta bagian yang perlu diverifikasi manual.",
@@ -425,7 +425,7 @@
         "instructions": [
           "Siapkan environment Node.js LTS, npm, Playwright, dan TypeScript.",
           "Implementasikan subset test case dengan locator dan assertion yang dapat dipertanggungjawabkan.",
-          "Jalankan pemeriksaan lokal tanpa mengirim booking atau data pribadi."
+          "Jalankan pemeriksaan Playwright hanya di companion repository pada mesinmu tanpa mengirim booking atau data pribadi; TestingWithEkki tidak menjalankan live Playwright."
         ],
         "expectedArtifacts": [
           "tests/scheduling.spec.ts",

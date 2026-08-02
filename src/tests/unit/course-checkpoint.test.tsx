@@ -10,6 +10,7 @@ import {
   COURSE_CHECKPOINT_ROUTE,
   getCourseCheckpointSeoMetadata,
   isSupportedCourseCheckpointParams,
+  AUTOMATION_CHECKPOINT_SLUG,
   REQUIREMENTS_CHECKPOINT_SLUG,
   TEST_DESIGN_CHECKPOINT_SLUG,
   TEST_WRITING_CHECKPOINT_SLUG,
@@ -84,9 +85,9 @@ describe('AI-assisted QA requirements checkpoint', () => {
       isSupportedCourseCheckpointParams(
         'id',
         AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
-        '04-automation',
+        AUTOMATION_CHECKPOINT_SLUG,
       ),
-    ).toBe(false);
+    ).toBe(true);
     expect(
       isSupportedCourseCheckpointParams(
         'id',
@@ -103,6 +104,13 @@ describe('AI-assisted QA requirements checkpoint', () => {
       title: 'Checkpoint 3: Test Writing | TestingWithEkki',
       description:
         'Ubah skenario prioritas menjadi test case yang jelas, dapat diamati, dan memiliki kandidat otomasi.',
+    });
+    expect(
+      getCourseCheckpointSeoMetadata(AUTOMATION_CHECKPOINT_SLUG),
+    ).toEqual({
+      title: 'Checkpoint 4: Playwright Automation | TestingWithEkki',
+      description:
+        'Implementasikan test case terpilih dengan Playwright dan TypeScript menggunakan locator, assertion, dan struktur test yang maintainable.',
     });
   });
 
@@ -271,6 +279,129 @@ describe('AI-assisted QA test-writing checkpoint', () => {
     expect(completeButton.disabled).toBe(true);
     fireEvent.click(reflectionConfirmation);
     expect(completeButton.disabled).toBe(false);
+  });
+});
+
+describe('AI-assisted QA Playwright automation checkpoint', () => {
+  let course: CourseCheckpointData;
+
+  beforeAll(async () => {
+    const [manifest, content] = await Promise.all([
+      getCourseManifest(AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG, 'id'),
+      getCourseContent(AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG, 'id'),
+    ]);
+
+    if (!manifest || !content) {
+      throw new Error('Expected Indonesian automation checkpoint content');
+    }
+
+    const checkpoint = content.checkpoints.find(
+      (candidate) => candidate.slug === AUTOMATION_CHECKPOINT_SLUG,
+    );
+
+    if (!checkpoint) {
+      throw new Error('Expected the automation checkpoint');
+    }
+
+    course = {
+      manifest,
+      content,
+      checkpoint,
+      completed: false,
+    };
+  });
+
+  afterEach(cleanup);
+
+  it('renders the typed automation lesson and links to checkpoint 5', () => {
+    render(<CourseCheckpointPage course={course} locale="id" />);
+
+    expect(screen.getByTestId('course-checkpoint-04-automation')).toBeTruthy();
+    expect(
+      screen.getByTestId('course-checkpoint-written-lesson').textContent,
+    ).toMatch(/Playwright \+ TypeScript|maintainable/i);
+    expect(
+      screen.getByTestId('course-checkpoint-ai-activity').textContent,
+    ).toContain(course.checkpoint.aiActivity.prompt);
+    expect(
+      screen.getByTestId('course-checkpoint-local-exercise').textContent,
+    ).toContain('tests/scheduling.spec.ts');
+    expect(
+      screen.getByTestId('course-checkpoint-evidence').textContent,
+    ).toContain(course.checkpoint.evidenceChecklist[0]);
+    expect(
+      screen.getByTestId('course-checkpoint-reflection').textContent,
+    ).toContain(course.checkpoint.reflectionPrompts[0]);
+    expect(
+      screen.getByTestId('course-checkpoint-completion').textContent,
+    ).toContain(course.checkpoint.completionAction.requirements[0]);
+    expect(
+      screen.getByTestId('course-checkpoint-video').querySelector('iframe'),
+    ).toBeNull();
+    expect(
+      screen.getByTestId('course-checkpoint-next-link').getAttribute('href'),
+    ).toBe(`/id/courses/${course.manifest.slug}/checkpoints/05-execution`);
+  });
+
+  it('keeps completion self-attested and gated by exercise and reflection confirmations', () => {
+    render(<CourseCheckpointPage course={course} locale="id" />);
+
+    const completeButton = screen.getByTestId('course-checkpoint-complete');
+    const exerciseConfirmation = screen.getByTestId(
+      'course-checkpoint-exercise-confirmation',
+    );
+    const reflectionConfirmation = screen.getByTestId(
+      'course-checkpoint-reflection-confirmation',
+    );
+
+    expect(completeButton.disabled).toBe(true);
+    fireEvent.click(exerciseConfirmation);
+    expect(completeButton.disabled).toBe(true);
+    fireEvent.click(reflectionConfirmation);
+    expect(completeButton.disabled).toBe(false);
+  });
+});
+
+describe('automation checkpoint content contract', () => {
+  it('covers Playwright fundamentals, maintainable checks, and local evidence', async () => {
+    const content = await getCourseContent(
+      AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      'id',
+    );
+    const checkpoint = content?.checkpoints.find(
+      (candidate) => candidate.slug === AUTOMATION_CHECKPOINT_SLUG,
+    );
+
+    expect(checkpoint).toBeTruthy();
+    expect(checkpoint?.order).toBe(4);
+    expect(checkpoint?.writtenLesson).toMatch(
+      /Playwright \+ TypeScript|locator|assertion|maintainable/i,
+    );
+    expect(checkpoint?.aiActivity.prompt).toMatch(
+      /Playwright \+ TypeScript|locator|assertion/i,
+    );
+    expect(checkpoint?.aiActivity.prompt).not.toMatch(
+      /ChatGPT|Claude|Copilot/i,
+    );
+    expect(checkpoint?.localExercise.repositoryPaths).toEqual([
+      '04-automation',
+      'tests/',
+    ]);
+    expect(checkpoint?.localExercise.expectedArtifacts).toEqual([
+      'tests/scheduling.spec.ts',
+      'automation-decision-log.md',
+    ]);
+    expect(checkpoint?.localExercise.instructions.join(' ')).toMatch(
+      /companion repository|Playwright/i,
+    );
+    expect(checkpoint?.evidenceChecklist.join(' ')).toMatch(
+      /ditelusuri|dijalankan ulang/i,
+    );
+    expect(checkpoint?.reflectionPrompts.length).toBeGreaterThan(0);
+    expect(checkpoint?.completionAction).toMatchObject({
+      id: 'ai-assisted-qa-workflow.checkpoints.04-automation.completion',
+      selfAttested: true,
+    });
   });
 });
 

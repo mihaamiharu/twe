@@ -199,9 +199,21 @@ the stable slug, checkpoint-specific SEO metadata, test-writing content,
 self-attestation gating, next-checkpoint navigation, and idempotent existing
 progress behavior.
 
-#### [ ] QA-020-04 — Playwright automation
+#### [x] QA-020-04 — Playwright automation
 
 **Outcome:** A learner can implement selected test cases as a small Playwright + TypeScript suite.
+
+**Implementation decision:** The existing parameterized checkpoint route now
+allowlists `04-automation` and provides checkpoint-specific SEO metadata. The
+page reuses the typed Indonesian content loader, shared renderer, existing
+self-attested completion contract, and the stable link to `05-execution`.
+Playwright execution remains local to the companion repository; TestingWithEkki
+does not run live browser automation or receive artifacts.
+
+**Verification:** Focused route, content, component, and completion tests cover
+the stable slug, automation-specific metadata and lesson, locator/assertion and
+maintainability guidance, local exercise and evidence contract, self-attestation
+gating, next-checkpoint navigation, and idempotent existing progress behavior.
 
 #### [ ] QA-020-05 — Test execution and evidence
 
