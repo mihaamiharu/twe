@@ -53,6 +53,7 @@ import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$user
 import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
 import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
 import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
+import { Route as LocaleAuthenticatedCoursesCourseSlugRouteImport } from './routes/$locale/_authenticated/courses/$courseSlug'
 
 const TestSentryRoute = TestSentryRouteImport.update({
   id: '/test-sentry',
@@ -275,6 +276,12 @@ const LocaleAuthenticatedProfileRoute =
     path: '/profile',
     getParentRoute: () => LocaleAuthenticatedRoute,
   } as any)
+const LocaleAuthenticatedCoursesCourseSlugRoute =
+  LocaleAuthenticatedCoursesCourseSlugRouteImport.update({
+    id: '/courses/$courseSlug',
+    path: '/courses/$courseSlug',
+    getParentRoute: () => LocaleAuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -320,6 +327,7 @@ export interface FileRoutesByFullPath {
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/$locale/courses/$courseSlug': typeof LocaleAuthenticatedCoursesCourseSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -363,6 +371,7 @@ export interface FileRoutesByTo {
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
+  '/$locale/courses/$courseSlug': typeof LocaleAuthenticatedCoursesCourseSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -410,6 +419,7 @@ export interface FileRoutesById {
   '/$locale/challenges/': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
+  '/$locale/_authenticated/courses/$courseSlug': typeof LocaleAuthenticatedCoursesCourseSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -457,6 +467,7 @@ export interface FileRouteTypes {
     | '/$locale/challenges'
     | '/$locale/tutorials'
     | '/admin/users'
+    | '/$locale/courses/$courseSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -500,6 +511,7 @@ export interface FileRouteTypes {
     | '/$locale/challenges'
     | '/$locale/tutorials'
     | '/admin/users'
+    | '/$locale/courses/$courseSlug'
   id:
     | '__root__'
     | '/'
@@ -546,6 +558,7 @@ export interface FileRouteTypes {
     | '/$locale/challenges/'
     | '/$locale/tutorials/'
     | '/admin/users/'
+    | '/$locale/_authenticated/courses/$courseSlug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -876,15 +889,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleAuthenticatedProfileRouteImport
       parentRoute: typeof LocaleAuthenticatedRoute
     }
+    '/$locale/_authenticated/courses/$courseSlug': {
+      id: '/$locale/_authenticated/courses/$courseSlug'
+      path: '/courses/$courseSlug'
+      fullPath: '/$locale/courses/$courseSlug'
+      preLoaderRoute: typeof LocaleAuthenticatedCoursesCourseSlugRouteImport
+      parentRoute: typeof LocaleAuthenticatedRoute
+    }
   }
 }
 
 interface LocaleAuthenticatedRouteChildren {
   LocaleAuthenticatedProfileRoute: typeof LocaleAuthenticatedProfileRoute
+  LocaleAuthenticatedCoursesCourseSlugRoute: typeof LocaleAuthenticatedCoursesCourseSlugRoute
 }
 
 const LocaleAuthenticatedRouteChildren: LocaleAuthenticatedRouteChildren = {
   LocaleAuthenticatedProfileRoute: LocaleAuthenticatedProfileRoute,
+  LocaleAuthenticatedCoursesCourseSlugRoute:
+    LocaleAuthenticatedCoursesCourseSlugRoute,
 }
 
 const LocaleAuthenticatedRouteWithChildren =

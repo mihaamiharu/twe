@@ -49,6 +49,11 @@ export const courseCapstoneCompletionInputSchema = z.object({
   capstoneId: z.literal('ai-assisted-qa-workflow.capstone'),
 });
 
+export const courseOverviewInputSchema = z.object({
+  courseSlug: z.string().min(1),
+  locale: z.string().min(1),
+});
+
 export type CourseCheckpointCompletionInput = z.infer<
   typeof courseCheckpointCompletionInputSchema
 >;
@@ -56,6 +61,8 @@ export type CourseCheckpointCompletionInput = z.infer<
 export type CourseCapstoneCompletionInput = z.infer<
   typeof courseCapstoneCompletionInputSchema
 >;
+
+export type CourseOverviewInput = z.infer<typeof courseOverviewInputSchema>;
 
 /** Build the deterministic hidden tutorial slug used by course progress. */
 export function getCourseProgressTutorialSlug(

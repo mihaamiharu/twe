@@ -57,7 +57,7 @@ self-attestation only and does not read AI or human review state.
 
 ## Phase 1 — Learner vertical slice
 
-### [ ] QA-010 — Build the course overview page
+### [x] QA-010 — Build the course overview page
 
 **Outcome:** A learner can understand the course and start the recommended sequence.
 
@@ -66,6 +66,13 @@ self-attestation only and does not read AI or human review state.
 - The Indonesian overview shows audience, outcome, prerequisites, seven checkpoints, capstone, and setup requirements.
 - The page links to Start Here and each checkpoint.
 - The page is protected according to the existing course access decision.
+
+**Implementation decision:** The overview is served at
+`/id/courses/ai-assisted-qa-workflow` beneath the existing authenticated locale
+layout. It loads Indonesian manifest/content and existing progress through
+`getCourseOverview`, uses a `#start-here` orientation section, and exposes
+checkpoint links only; detail pages remain deferred to QA-012 onward. English
+course content is not used as a fallback.
 
 ### [ ] QA-011 — Build Start Here orientation
 

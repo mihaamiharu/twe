@@ -1,0 +1,22 @@
+{
+  "overview": {
+    "language": "Kursus berbahasa Indonesia",
+    "targetAudience": "Untuk siapa",
+    "outcome": "Hasil belajar",
+    "prerequisites": "Prasyarat yang disarankan",
+    "startHere": "Mulai di sini",
+    "setupRequirements": "Yang perlu disiapkan",
+    "recommendedSequence": "Urutan belajar yang disarankan",
+    "checkpoints": "Tujuh checkpoint",
+    "checkpointLabel": "Checkpoint {{order}}",
+    "openCheckpoint": "Buka checkpoint",
+    "completed": "Selesai",
+    "incomplete": "Belum selesai",
+    "progress": "{{completed}} dari {{total}} checkpoint selesai",
+    "capstone": "Capstone",
+    "capstoneDescription": "Gabungkan seluruh workflow menjadi satu praktik end-to-end dari requirement sampai keputusan kualitas.",
+    "capstoneRequirements": "Syarat capstone",
+    "duration": "{{minutes}} menit",
+    "unavailable": "Course ini belum tersedia untuk bahasa yang dipilih."
+  }
+}

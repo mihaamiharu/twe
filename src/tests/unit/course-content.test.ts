@@ -107,6 +107,12 @@ describe('AI-assisted QA course manifest', () => {
     expect(content.courseSlug).toBe(AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG);
     expect(content.locale).toBe('id');
     expect(content.templateVersion).toBe(1);
+    expect(content.overview.title).toBe('AI-Assisted QA Workflow');
+    expect(content.overview.targetAudience.length).toBeGreaterThan(0);
+    expect(content.overview.outcome.length).toBeGreaterThan(0);
+    expect(content.overview.prerequisites.length).toBeGreaterThan(0);
+    expect(content.overview.startHere.steps.length).toBeGreaterThan(0);
+    expect(content.overview.setupRequirements.length).toBeGreaterThan(0);
     expect(content.checkpoints).toHaveLength(7);
 
     for (const checkpoint of content.checkpoints) {

@@ -22,10 +22,13 @@ import aboutEn from './resources/en/about.json';
 import aboutId from './resources/id/about.json';
 import changelogEn from './resources/en/changelog.json';
 import changelogId from './resources/id/changelog.json';
+import coursesEn from './resources/en/courses.json';
+import coursesId from './resources/id/courses.json';
 
 const resources = {
   en: {
     common: commonEn,
+    courses: coursesEn,
     home: homeEn,
     challenges: challengesEn,
     tutorials: tutorialsEn,
@@ -39,6 +42,7 @@ const resources = {
   },
   id: {
     common: commonId,
+    courses: coursesId,
     home: homeId,
     challenges: challengesId,
     tutorials: tutorialsId,
@@ -61,6 +65,7 @@ void i18n.use(initReactI18next).init({
   },
   ns: [
     'common',
+    'courses',
     'home',
     'challenges',
     'tutorials',

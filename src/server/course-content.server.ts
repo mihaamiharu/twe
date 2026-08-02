@@ -9,14 +9,14 @@
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { z } from 'zod';
+import { AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG } from '@/lib/course-content.types';
 import type {
   CourseContentDocument,
   CourseManifest,
 } from '@/lib/course-content.types';
 import { isValidLocale } from '@/lib/i18n/settings';
 
-export const AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG =
-  'ai-assisted-qa-workflow' as const;
+export { AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG } from '@/lib/course-content.types';
 
 const COURSE_MANIFEST_FILES = new Map<string, string>([
   [
@@ -99,6 +99,20 @@ const courseContentSchema = z.object({
   courseSlug: z.string().min(1),
   locale: z.enum(['en', 'id']),
   templateVersion: z.literal(1),
+  overview: z.object({
+    title: z.string().min(1),
+    subtitle: z.string().min(1),
+    targetAudience: z.string().min(1),
+    outcome: z.string().min(1),
+    prerequisites: z.array(z.string().min(1)).min(1),
+    startHere: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      steps: z.array(z.string().min(1)).min(1),
+    }),
+    setupRequirements: z.array(z.string().min(1)).min(1),
+    recommendedSequence: z.string().min(1),
+  }),
   checkpoints: z.array(courseCheckpointContentSchema).min(1),
   capstone: courseContentUnitSchema.extend({
     id: z.string().min(1),

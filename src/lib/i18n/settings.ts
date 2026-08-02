@@ -6,6 +6,7 @@ export type Locale = (typeof supportedLngs)[number];
 export const defaultNS = 'common';
 export const namespaces = [
   'common',
+  'courses',
   'home',
   'challenges',
   'tutorials',

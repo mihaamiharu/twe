@@ -8,6 +8,7 @@ import {
   applyCourseUnitCompletion,
   courseCapstoneCompletionInputSchema,
   courseCheckpointCompletionInputSchema,
+  courseOverviewInputSchema,
   getCourseProgressTutorialSlug,
   isCourseCompletionEligible,
   type CourseProgressState,
@@ -21,7 +22,11 @@ import type {
   CourseCheckpointContent,
   CourseContentDocument,
 } from '@/lib/course-content.types';
-import { getCourseContent } from './course-content.server';
+import {
+  AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+  getCourseContent,
+  getCourseManifest,
+} from './course-content.server';
 import { authMiddleware } from './auth.mw';
 
 type CourseUnitDefinition = {
@@ -30,6 +35,67 @@ type CourseUnitDefinition = {
   content: CourseCheckpointContent | CourseCapstoneContent;
   order: number;
 };
+
+export const getCourseOverview = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .inputValidator((data: unknown) => courseOverviewInputSchema.parse(data))
+  .handler(async ({ data, context }) => {
+    if (
+      data.courseSlug !== AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG ||
+      data.locale !== 'id'
+    ) {
+      return {
+        success: false,
+        error: 'Course is only available in Indonesian',
+      };
+    }
+
+    const [manifest, content] = await Promise.all([
+      getCourseManifest(data.courseSlug, data.locale),
+      getCourseContent(data.courseSlug, data.locale),
+    ]);
+
+    if (!manifest || !content) {
+      return { success: false, error: 'Course overview not found' };
+    }
+
+    const unitSlugs = [
+      ...manifest.checkpoints.map((checkpoint) =>
+        getCourseProgressTutorialSlug(data.courseSlug, checkpoint.slug),
+      ),
+      getCourseProgressTutorialSlug(data.courseSlug, content.capstone.id),
+    ];
+    const completedRows = await db
+      .select({ slug: tutorials.slug })
+      .from(progress)
+      .innerJoin(tutorials, eq(progress.tutorialId, tutorials.id))
+      .where(
+        and(
+          eq(progress.userId, context.user.id),
+          eq(progress.isCompleted, true),
+          inArray(tutorials.slug, unitSlugs),
+        ),
+      );
+    const completedSlugs = new Set(completedRows.map((row) => row.slug));
+
+    return {
+      success: true,
+      data: {
+        manifest,
+        content,
+        completedCheckpointSlugs: manifest.checkpoints
+          .filter((checkpoint) =>
+            completedSlugs.has(
+              getCourseProgressTutorialSlug(data.courseSlug, checkpoint.slug),
+            ),
+          )
+          .map((checkpoint) => checkpoint.slug),
+        capstoneCompleted: completedSlugs.has(
+          getCourseProgressTutorialSlug(data.courseSlug, content.capstone.id),
+        ),
+      },
+    };
+  });
 
 function getUnitProgressSlug(courseSlug: string, unit: CourseUnitDefinition) {
   return getCourseProgressTutorialSlug(courseSlug, unit.id);

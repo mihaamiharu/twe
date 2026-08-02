@@ -1,0 +1,22 @@
+{
+  "overview": {
+    "language": "Indonesian course",
+    "targetAudience": "Target audience",
+    "outcome": "Learning outcome",
+    "prerequisites": "Advisory prerequisites",
+    "startHere": "Start Here",
+    "setupRequirements": "Setup requirements",
+    "recommendedSequence": "Recommended learning sequence",
+    "checkpoints": "Seven checkpoints",
+    "checkpointLabel": "Checkpoint {{order}}",
+    "openCheckpoint": "Open checkpoint",
+    "completed": "Completed",
+    "incomplete": "Not completed",
+    "progress": "{{completed}} of {{total}} checkpoints complete",
+    "capstone": "Capstone",
+    "capstoneDescription": "Combine the full workflow into one end-to-end practice from requirements to a quality decision.",
+    "capstoneRequirements": "Capstone requirements",
+    "duration": "{{minutes}} minutes",
+    "unavailable": "This course is not available in the selected language."
+  }
+}

@@ -1,5 +1,9 @@
 import type { Locale } from './i18n/settings';
 
+/** Stable slug for the first localized course pilot. */
+export const AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG =
+  'ai-assisted-qa-workflow' as const;
+
 /**
  * Route patterns declared by a course manifest.
  *
@@ -81,6 +85,22 @@ export interface CourseContentUnit {
   completionAction: CourseCompletionActionOutline;
 }
 
+/** Localized copy and setup guidance for the course overview page. */
+export interface CourseOverviewContent {
+  title: string;
+  subtitle: string;
+  targetAudience: string;
+  outcome: string;
+  prerequisites: readonly string[];
+  startHere: {
+    title: string;
+    description: string;
+    steps: readonly string[];
+  };
+  setupRequirements: readonly string[];
+  recommendedSequence: string;
+}
+
 /** Authored content outline for one course checkpoint. */
 export interface CourseCheckpointContent extends CourseContentUnit {
   slug: string;
@@ -102,6 +122,7 @@ export interface CourseContentDocument {
   courseSlug: string;
   locale: Locale;
   templateVersion: 1;
+  overview: CourseOverviewContent;
   checkpoints: readonly CourseCheckpointContent[];
   capstone: CourseCapstoneContent;
 }

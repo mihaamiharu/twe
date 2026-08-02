@@ -2,6 +2,35 @@
   "courseSlug": "ai-assisted-qa-workflow",
   "locale": "id",
   "templateVersion": 1,
+  "overview": {
+    "title": "AI-Assisted QA Workflow",
+    "subtitle": "Dari requirement ke keputusan kualitas dengan bantuan AI dan Playwright + TypeScript.",
+    "targetAudience": "Profesional manual QA dan QA yang sedang beralih ke otomasi. Course ini bukan jalur pemula total; kamu akan bekerja dengan requirement, risiko, dan keputusan pengujian.",
+    "outcome": "Kamu akan mampu membawa fitur penjadwalan dari requirement, desain skenario, dan test case sampai otomasi, eksekusi, triage failure, komunikasi defect, dan ringkasan kualitas berbasis risiko.",
+    "prerequisites": [
+      "Memahami dasar software testing dan cara membaca requirement.",
+      "Pernah bekerja dengan acceptance criteria atau skenario pengujian.",
+      "JavaScript/TypeScript dan Playwright adalah pengetahuan yang disarankan, bukan syarat wajib."
+    ],
+    "startHere": {
+      "title": "Mulai di sini",
+      "description": "Siapkan workspace lokal dan companion repository sebelum masuk ke checkpoint. Semua latihan memakai data sintetis dan berhenti sebelum booking nyata.",
+      "steps": [
+        "Gunakan Node.js LTS, npm, dan Playwright.",
+        "Buat repository pribadi dari template companion course.",
+        "Jalankan smoke test lokal dan pastikan TARGET_BASE_URL mengarah ke target yang disetujui.",
+        "Baca aturan keselamatan sebelum menjalankan browser automation."
+      ]
+    },
+    "setupRequirements": [
+      "Node.js LTS dan npm.",
+      "Editor kode dan terminal.",
+      "Playwright browsers terpasang di mesin lokal.",
+      "Companion repository dengan package-lock.json.",
+      "Target URL yang disetujui course dan hanya data sintetis."
+    ],
+    "recommendedSequence": "Ikuti checkpoint dari 1 sampai 7 untuk membangun satu workflow yang utuh. Kamu tetap bebas membuka checkpoint mana pun dari halaman ini."
+  },
   "checkpoints": [
     {
       "slug": "01-requirements",
