@@ -236,7 +236,7 @@
       "localExercise": {
         "repositoryPaths": ["01-requirements", "docs/requirements/"],
         "instructions": [
-          "Baca PRD dan acceptance criteria fiktif di companion repository.",
+          "Baca PRD dan acceptance criteria fiktif di companion repository, lalu periksa template requirements pada docs/requirements/.",
           "Tulis requirement notes dan kelompokkan ambiguitas, asumsi, serta risiko.",
           "Tandai batas praktik yang aman sebelum menyentuh target publik."
         ],

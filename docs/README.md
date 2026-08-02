@@ -17,6 +17,11 @@ Welcome to the **TestingWithEkki** project documentation.
 - [**app_flows.md**](./app_flows.md): Visual diagrams of user journeys and system flows.
 - [**API.md**](./API.md): API reference documentation.
 - [**github_issues.md**](./github_issues.md): Breakdown of tasks and issues.
+- [**AI-Assisted QA Workflow Course Brief**](./courses/ai-assisted-qa-workflow/COURSE-BRIEF.md): Agreed pilot course direction and learning flow.
+- [**Starter Repository Plan**](./courses/ai-assisted-qa-workflow/STARTER-REPOSITORY.md): Companion repository structure and learner execution boundary.
+- [**AI-Assisted QA Workflow Implementation Plan**](./courses/ai-assisted-qa-workflow/IMPLEMENTATION-PLAN.md): Locked pilot decisions, delivery phases, and definition of ready.
+- [**AI-Assisted QA Workflow Task Backlog**](./courses/ai-assisted-qa-workflow/TASKS.md): Small implementation tasks with acceptance criteria.
+- [**Implementation Chat Prompt**](./courses/ai-assisted-qa-workflow/IMPLEMENTATION-CHAT-PROMPT.md): Reusable prompt for starting focused implementation chats.
 - [**github_issues.md**](./github_issues.md): Breakdown of tasks and issues.
 
 ## Architecture Decisions
@@ -28,6 +33,8 @@ Welcome to the **TestingWithEkki** project documentation.
   - [ADR-004: Drizzle ORM](./adr/ADR-004-drizzle-orm.md)
   - [ADR-005: PostgreSQL Database](./adr/ADR-005-postgresql-database.md)
   - [ADR-006: Monaco Editor](./adr/ADR-006-monaco-editor.md)
+  - [ADR-007: Free-First Validation Phase](./adr/ADR-007-free-first-validation-phase.md)
+  - [ADR-008: Course Delivery and Execution Boundary](./adr/ADR-008-course-delivery-and-execution-boundary.md)
 
 ## Security
 

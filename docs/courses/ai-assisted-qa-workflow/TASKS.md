@@ -93,7 +93,7 @@ covers the local npm workflow, public-template ownership, OS notes,
 troubleshooting, expected smoke output, and public-target safety boundaries.
 The page does not execute Playwright, call GitHub, or upload artifacts.
 
-### [ ] QA-012 — Build checkpoint 1: requirements analysis
+### [x] QA-012 — Build checkpoint 1: requirements analysis
 
 **Outcome:** A learner can analyze the fictional scheduling PRD and record assumptions and risks.
 
@@ -104,16 +104,45 @@ The page does not execute Playwright, call GitHub, or upload artifacts.
 - The evidence checklist and reflection are clear.
 - Completion can be recorded without uploading artifacts.
 
-### [ ] QA-013 — Add checkpoint reflection and completion flow
+**Implementation decision:** The Indonesian checkpoint is served at
+`/$locale/courses/$courseSlug/checkpoints/$checkpointSlug` beneath the existing
+authenticated locale layout, with the stable `01-requirements` slug. It uses
+`getCourseOverview` (which loads the typed manifest/content and existing
+course-tagged progress), renders the lesson Markdown and planned video metadata,
+and shows the AI workflow, local repository paths, evidence, reflection, and
+self-attestation sections. Completion calls the QA-003
+`completeCourseCheckpoint` contract with both confirmations; it does not upload
+artifacts, embed video, or perform AI review. The next checkpoint is linked by
+its stable path, but checkpoints 2–7 remain unimplemented.
+
+### [x] QA-013 — Add checkpoint reflection and completion flow
 
 **Outcome:** A learner can confirm evidence, answer a reflection prompt, and complete checkpoint 1.
 
 **Acceptance criteria:**
 
 - Reflection prompts are visible before completion.
+- Completion is self-attested and requires both the exercise and reflection confirmations.
 - Completion is idempotent.
 - Existing progress and XP behavior is preserved.
 - The next recommended checkpoint is shown.
+
+**Verification:** QA-012 already delivered the complete checkpoint-1 reflection
+and completion UI, so QA-013 added no duplicate page work. The reflection card
+is rendered before the completion card; completion is gated until both
+self-attestation checkboxes are checked; the server schema requires both
+confirmation values to be literal `true`; and an already-completed checkpoint
+renders its recorded state without a second completion action. Existing course
+progress tests verify that the first checkpoint completion awards the existing
+25 XP and a duplicate completion awards 0 XP without changing state. The
+course progress loader preserves existing `progress` rows, and the page shows
+the stable link to checkpoint 2 (`02-test-design`) as the next recommendation.
+
+Focused verification passed:
+
+`./.runtime/bun/bin/bun test --preload ./src/tests/bun-preload.ts src/tests/unit/course-checkpoint.test.tsx src/tests/unit/course-content.test.ts`
+
+16 tests passed.
 
 ## Phase 2 — Full learner course
 

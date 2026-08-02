@@ -277,6 +277,12 @@ describe('AI-assisted QA course progress contract', () => {
         exerciseConfirmed: false,
       }),
     ).toThrow();
+    expect(() =>
+      courseCheckpointCompletionInputSchema.parse({
+        ...parsed,
+        reflectionConfirmed: false,
+      }),
+    ).toThrow();
   });
 
   it('uses a stable hidden tutorial key for existing progress storage', () => {
