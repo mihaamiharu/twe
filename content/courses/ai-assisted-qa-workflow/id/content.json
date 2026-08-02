@@ -1,0 +1,530 @@
+{
+  "courseSlug": "ai-assisted-qa-workflow",
+  "locale": "id",
+  "templateVersion": 1,
+  "checkpoints": [
+    {
+      "slug": "01-requirements",
+      "order": 1,
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.01-requirements.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.01-requirements.completion",
+      "title": "Menganalisis requirement fitur penjadwalan",
+      "objective": "Mampu memisahkan fakta, ambiguitas, asumsi, batasan, dan risiko dari PRD fiktif sebelum menentukan apa yang perlu diuji.",
+      "video": {
+        "status": "planned",
+        "title": "Dari requirement ke pertanyaan QA",
+        "durationMinutes": 8,
+        "focus": "Menunjukkan cara membaca requirement sebagai sumber pertanyaan dan keputusan risiko."
+      },
+      "writtenLesson": "## Fokus\n\nBaca PRD fiktif sebagai kontrak yang perlu diuji, bukan sebagai daftar langkah implementasi.\n\n## Konsep inti\n\nPisahkan fakta, ambiguitas, asumsi, batasan, dan risiko bisnis sebelum menyusun skenario.",
+      "aiActivity": {
+        "goal": "Memakai AI untuk menemukan pertanyaan dan risiko yang mungkin terlewat tanpa menyerahkan keputusan QA kepada AI.",
+        "prompt": "Baca PRD fitur penjadwalan ini. Buat daftar fakta, ambiguitas, asumsi, batasan, dan risiko. Tandai bagian yang memerlukan konfirmasi manusia dan jangan mengarang perilaku vendor.",
+        "learnerActions": [
+          "AI mengusulkan daftar pertanyaan dan risiko.",
+          "Learner memverifikasi setiap usulan terhadap PRD dan konteks produk.",
+          "Learner mengedit daftar agar hanya memuat risiko yang dapat dipertanggungjawabkan.",
+          "Learner menjelaskan alasan prioritas dan hal yang sengaja tidak dimasukkan."
+        ],
+        "expectedOutput": "Catatan requirement, daftar asumsi, dan risk list yang memiliki alasan prioritas."
+      },
+      "localExercise": {
+        "repositoryPaths": ["01-requirements", "docs/requirements/"],
+        "instructions": [
+          "Baca PRD dan acceptance criteria fiktif di companion repository.",
+          "Tulis requirement notes dan kelompokkan ambiguitas, asumsi, serta risiko.",
+          "Tandai batas praktik yang aman sebelum menyentuh target publik."
+        ],
+        "expectedArtifacts": ["requirements-notes.md", "risk-list.md"],
+        "safetyNotes": [
+          "Gunakan PRD fiktif sebagai spesifikasi latihan, bukan spesifikasi vendor.",
+          "Gunakan data sintetis dan jangan membuat booking nyata.",
+          "Jangan menguji target yang tidak diizinkan atau mengirim data pribadi."
+        ]
+      },
+      "evidenceChecklist": [
+        "Fakta dan acceptance criteria dirujuk dengan jelas.",
+        "Ambiguitas dan asumsi dipisahkan dari fakta.",
+        "Risiko memiliki alasan, dampak, dan prioritas.",
+        "Batasan keselamatan latihan dicatat."
+      ],
+      "reflectionPrompts": [
+        "Bagian requirement mana yang paling mengubah strategi pengujianmu?",
+        "Asumsi apa yang paling berbahaya jika tidak dikonfirmasi?",
+        "Apa yang kamu minta dari AI tetapi akhirnya kamu tolak, dan mengapa?"
+      ],
+      "completionAction": {
+        "id": "ai-assisted-qa-workflow.checkpoints.01-requirements.completion",
+        "label": "Konfirmasi analisis requirement selesai",
+        "requirements": [
+          "Requirement notes dan risk list sudah ditulis.",
+          "Evidence checklist sudah diperiksa.",
+          "Reflection sudah dijawab di repository pribadi."
+        ],
+        "selfAttested": true
+      }
+    },
+    {
+      "slug": "02-test-design",
+      "order": 2,
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.02-test-design.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.02-test-design.completion",
+      "title": "Mendesain skenario tes dengan bantuan AI",
+      "objective": "Mampu menghasilkan kandidat skenario, mengkritik cakupan, dan memprioritaskan pengujian berdasarkan risiko.",
+      "video": {
+        "status": "planned",
+        "title": "Dari risiko ke cakupan tes",
+        "durationMinutes": 9,
+        "focus": "Menjelaskan traceability, happy path, negative path, boundary, dan prioritas berbasis risiko."
+      },
+      "writtenLesson": "## Fokus\n\nAI boleh membantu memperluas ruang kemungkinan, tetapi QA tetap menentukan apakah skenario relevan dan cukup.\n\n## Konsep inti\n\nHubungkan risiko dengan skenario, cari celah cakupan, lalu pilih subset yang paling bernilai untuk latihan.",
+      "aiActivity": {
+        "goal": "Menggunakan AI sebagai generator kandidat skenario lalu menguji kualitas, duplikasi, dan celah dari hasilnya.",
+        "prompt": "Berdasarkan requirement notes dan risk list, usulkan skenario tes dalam format Given-When-Then. Kelompokkan berdasarkan risiko, tandai asumsi, dan jelaskan cakupan yang belum terjawab.",
+        "learnerActions": [
+          "AI mengusulkan kandidat skenario dan pengelompokan risiko.",
+          "Learner memverifikasi traceability setiap skenario ke requirement.",
+          "Learner mengedit, menggabungkan, atau membuang skenario yang lemah.",
+          "Learner menjelaskan prioritas dan coverage gap yang masih tersisa."
+        ],
+        "expectedOutput": "Test strategy singkat, matriks traceability, dan daftar skenario prioritas."
+      },
+      "localExercise": {
+        "repositoryPaths": ["02-test-design", "docs/test-cases/"],
+        "instructions": [
+          "Gunakan requirement notes dari checkpoint pertama.",
+          "Buat scenario inventory untuk happy path, negative path, dan boundary.",
+          "Prioritaskan skenario dengan alasan risiko dan catat coverage gap."
+        ],
+        "expectedArtifacts": [
+          "test-strategy.md",
+          "prioritized-scenarios.md",
+          "ai-critique.md"
+        ],
+        "safetyNotes": [
+          "Skenario state-changing harus berhenti sebelum booking nyata.",
+          "Jangan menambah scraping, load testing, atau security probing.",
+          "Catat perilaku eksternal yang belum dapat dipastikan sebagai asumsi."
+        ]
+      },
+      "evidenceChecklist": [
+        "Setiap skenario prioritas dapat ditelusuri ke requirement atau risiko.",
+        "Happy path, negative path, dan boundary dipertimbangkan.",
+        "Skenario hasil AI dikritik dan tidak diterima mentah-mentah.",
+        "Coverage gap dan asumsi dicatat."
+      ],
+      "reflectionPrompts": [
+        "Skenario apa yang disarankan AI tetapi tidak layak diprioritaskan?",
+        "Risiko penting mana yang masih belum punya skenario?",
+        "Apa trade-off cakupan dan waktu yang kamu buat?"
+      ],
+      "completionAction": {
+        "id": "ai-assisted-qa-workflow.checkpoints.02-test-design.completion",
+        "label": "Konfirmasi desain tes selesai",
+        "requirements": [
+          "Test strategy dan prioritized scenarios sudah ditulis.",
+          "AI critique dan coverage gap sudah dicatat.",
+          "Reflection sudah dijawab di repository pribadi."
+        ],
+        "selfAttested": true
+      }
+    },
+    {
+      "slug": "03-test-writing",
+      "order": 3,
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.03-test-writing.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.03-test-writing.completion",
+      "title": "Menulis test case yang dapat dieksekusi",
+      "objective": "Mampu mengubah skenario prioritas menjadi test case yang jelas, dapat diamati, dan memiliki kandidat otomasi.",
+      "video": {
+        "status": "planned",
+        "title": "Test case yang dapat dibaca dan dibuktikan",
+        "durationMinutes": 8,
+        "focus": "Menghubungkan precondition, langkah, expected result, data, dan automation candidate."
+      },
+      "writtenLesson": "## Fokus\n\nTest case yang baik menjelaskan apa yang dilakukan, apa yang diamati, dan mengapa hasilnya penting.\n\n## Konsep inti\n\nPisahkan langkah setup dari aksi yang diuji, gunakan expected result yang dapat diamati, dan tandai kandidat otomasi tanpa mengubah test case menjadi kode.",
+      "aiActivity": {
+        "goal": "Memakai AI untuk merapikan format test case dan menemukan langkah atau expected result yang ambigu.",
+        "prompt": "Ubah skenario prioritas berikut menjadi test case yang memiliki precondition, test data sintetis, langkah, expected result, risiko, dan automation candidate. Tandai bagian yang masih membutuhkan keputusan QA.",
+        "learnerActions": [
+          "AI mengusulkan test case terstruktur.",
+          "Learner memverifikasi apakah setiap expected result dapat diamati.",
+          "Learner mengedit bahasa, data, dan langkah yang terlalu umum.",
+          "Learner menjelaskan test case mana yang dipilih untuk otomasi dan alasannya."
+        ],
+        "expectedOutput": "Kumpulan test case prioritas dan automation map yang dapat ditelusuri ke skenario."
+      },
+      "localExercise": {
+        "repositoryPaths": ["03-test-writing", "docs/test-cases/"],
+        "instructions": [
+          "Pilih skenario prioritas yang paling bernilai untuk suite kecil.",
+          "Tulis test case manual lengkap dengan data sintetis dan expected result.",
+          "Tandai kandidat otomasi, observasi yang diperlukan, dan batasan target."
+        ],
+        "expectedArtifacts": ["test-cases.md", "automation-map.md"],
+        "safetyNotes": [
+          "Jangan memakai email, nama, atau kalender pribadi.",
+          "Expected result harus berasal dari PRD fiktif atau observasi yang diizinkan.",
+          "Jangan mengubah test case menjadi instruksi untuk booking nyata."
+        ]
+      },
+      "evidenceChecklist": [
+        "Test case memiliki precondition, data, langkah, dan expected result.",
+        "Expected result dapat diamati dan tidak ambigu.",
+        "Test case terhubung ke skenario dan risiko.",
+        "Automation candidate memiliki alasan."
+      ],
+      "reflectionPrompts": [
+        "Expected result mana yang paling sulit dibuat observable?",
+        "Apa yang berubah setelah kamu meninjau usulan AI?",
+        "Kapan test case sebaiknya tetap manual?"
+      ],
+      "completionAction": {
+        "id": "ai-assisted-qa-workflow.checkpoints.03-test-writing.completion",
+        "label": "Konfirmasi penulisan test case selesai",
+        "requirements": [
+          "Test cases dan automation map sudah ditulis.",
+          "Data sintetis dan batasan praktik sudah diperiksa.",
+          "Reflection sudah dijawab di repository pribadi."
+        ],
+        "selfAttested": true
+      }
+    },
+    {
+      "slug": "04-automation",
+      "order": 4,
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.04-automation.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.04-automation.completion",
+      "title": "Membuat otomasi Playwright dengan TypeScript",
+      "objective": "Mampu mengimplementasikan subset test case sebagai test Playwright yang terbaca, stabil, dan memiliki assertion bermakna.",
+      "video": {
+        "status": "planned",
+        "title": "Dari test case ke Playwright",
+        "durationMinutes": 10,
+        "focus": "Memilih locator, action, assertion, dan struktur test yang menjaga niat pengujian tetap terlihat."
+      },
+      "writtenLesson": "## Fokus\n\nOtomasi adalah cara menjalankan pemeriksaan yang sudah dirancang, bukan pengganti test design.\n\n## Konsep inti\n\nGunakan locator yang bermakna, action yang minimal, dan web-first assertion. Biarkan AI membantu syntax, tetapi QA memeriksa apakah kode benar-benar menguji risiko.",
+      "aiActivity": {
+        "goal": "Meminta AI mengubah test case menjadi starter test lalu memeriksa selector, assertion, dan asumsi yang dibuat.",
+        "prompt": "Buat starter test Playwright + TypeScript dari test case ini. Gunakan locator yang tahan perubahan, assertion web-first, dan jangan melakukan booking. Jelaskan asumsi setiap selector serta bagian yang perlu diverifikasi manual.",
+        "learnerActions": [
+          "AI mengusulkan kode Playwright dan alasan teknisnya.",
+          "Learner memverifikasi locator, action, assertion, dan batas target.",
+          "Learner mengedit kode agar sesuai dengan test case dan standar repository.",
+          "Learner menjelaskan mengapa suite kecil itu cukup untuk risiko yang dipilih."
+        ],
+        "expectedOutput": "Playwright starter tests, catatan verifikasi kode, dan automation decision log."
+      },
+      "localExercise": {
+        "repositoryPaths": ["04-automation", "tests/"],
+        "instructions": [
+          "Siapkan environment Node.js LTS, npm, Playwright, dan TypeScript.",
+          "Implementasikan subset test case dengan locator dan assertion yang dapat dipertanggungjawabkan.",
+          "Jalankan pemeriksaan lokal tanpa mengirim booking atau data pribadi."
+        ],
+        "expectedArtifacts": [
+          "tests/scheduling.spec.ts",
+          "automation-decision-log.md"
+        ],
+        "safetyNotes": [
+          "Gunakan TARGET_BASE_URL yang disetujui course author.",
+          "Stop sebelum submit booking pada target eksternal.",
+          "Jangan menyimpan credential, token, trace sensitif, atau data pribadi."
+        ]
+      },
+      "evidenceChecklist": [
+        "Kode test dapat ditelusuri ke test case.",
+        "Locator dan assertion memiliki alasan.",
+        "Suite tidak melakukan aksi di luar batas aman.",
+        "Test dapat dijalankan ulang secara lokal."
+      ],
+      "reflectionPrompts": [
+        "Bagian kode apa yang paling banyak kamu ubah dari hasil AI?",
+        "Mengapa assertion yang kamu pilih membuktikan risiko yang dituju?",
+        "Apa tanda bahwa test ini berpotensi flaky?"
+      ],
+      "completionAction": {
+        "id": "ai-assisted-qa-workflow.checkpoints.04-automation.completion",
+        "label": "Konfirmasi otomasi Playwright selesai",
+        "requirements": [
+          "Starter tests sudah diimplementasikan dan direview.",
+          "Automation decision log sudah ditulis.",
+          "Reflection sudah dijawab di repository pribadi."
+        ],
+        "selfAttested": true
+      }
+    },
+    {
+      "slug": "05-execution",
+      "order": 5,
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.05-execution.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.05-execution.completion",
+      "title": "Menjalankan tes dan mengumpulkan evidence",
+      "objective": "Mampu menjalankan suite secara lokal, membaca hasil, dan menyimpan evidence yang cukup untuk keputusan QA.",
+      "video": {
+        "status": "planned",
+        "title": "Evidence dari test run",
+        "durationMinutes": 8,
+        "focus": "Menjelaskan hasil pass/fail, screenshot, trace, log, dan perbedaan antara output tool dan bukti produk."
+      },
+      "writtenLesson": "## Fokus\n\nHasil test run adalah bukti yang perlu dibaca dalam konteks, bukan keputusan kualitas otomatis.\n\n## Konsep inti\n\nSimpan command, environment, timestamp, hasil, screenshot atau trace yang relevan, serta keterbatasan evidence.",
+      "aiActivity": {
+        "goal": "Memakai AI untuk membantu merangkum output run tanpa mengubah ringkasan menjadi klaim yang tidak didukung evidence.",
+        "prompt": "Tinjau hasil test run dan metadata environment ini. Buat ringkasan pass/fail, evidence yang tersedia, pertanyaan terbuka, dan klaim yang belum boleh dibuat. Jangan menyimpulkan kualitas produk hanya dari status pass.",
+        "learnerActions": [
+          "AI mengusulkan ringkasan dan daftar pertanyaan.",
+          "Learner memverifikasi setiap klaim terhadap log, screenshot, dan trace.",
+          "Learner mengedit ringkasan agar menyebut batas evidence.",
+          "Learner menjelaskan evidence tambahan yang paling bernilai."
+        ],
+        "expectedOutput": "Execution report dengan command, environment, hasil, evidence, dan limitation."
+      },
+      "localExercise": {
+        "repositoryPaths": ["05-execution", "evidence/", "docs/reports/"],
+        "instructions": [
+          "Jalankan smoke dan functional test sesuai README repository.",
+          "Simpan hasil yang aman untuk dibagikan dan catat environment.",
+          "Pisahkan observed result, test output, dan interpretasi QA."
+        ],
+        "expectedArtifacts": [
+          "execution-report.md",
+          "evidence/README.md",
+          "screenshots atau trace yang sudah disanitasi"
+        ],
+        "safetyNotes": [
+          "Periksa evidence sebelum commit agar tidak berisi data pribadi.",
+          "Batasi volume dan frekuensi request pada target publik.",
+          "External-site behavior yang berubah dicatat sebagai konteks, bukan dipaksa menjadi pass."
+        ]
+      },
+      "evidenceChecklist": [
+        "Command dan environment test run tercatat.",
+        "Pass/fail disertai output yang dapat ditinjau.",
+        "Screenshot atau trace dipilih secara relevan dan disanitasi.",
+        "Limitasi evidence dan pertanyaan terbuka dicatat."
+      ],
+      "reflectionPrompts": [
+        "Evidence mana yang paling membantu orang lain memahami hasil run?",
+        "Klaim apa yang hampir kamu buat tetapi tidak didukung evidence?",
+        "Apa perbedaan antara test passed dan feature terbukti berkualitas?"
+      ],
+      "completionAction": {
+        "id": "ai-assisted-qa-workflow.checkpoints.05-execution.completion",
+        "label": "Konfirmasi execution evidence selesai",
+        "requirements": [
+          "Execution report sudah dibuat.",
+          "Evidence sudah diperiksa untuk keamanan dan relevansi.",
+          "Reflection sudah dijawab di repository pribadi."
+        ],
+        "selfAttested": true
+      }
+    },
+    {
+      "slug": "06-triage",
+      "order": 6,
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.06-triage.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.06-triage.completion",
+      "title": "Melakukan failure triage",
+      "objective": "Mampu mengklasifikasikan failure sebagai masalah test, produk, environment, atau data dan menyusun hipotesis berdasarkan evidence.",
+      "video": {
+        "status": "planned",
+        "title": "Failure bukan otomatis product bug",
+        "durationMinutes": 10,
+        "focus": "Mengajarkan triage berbasis reproduksi, evidence, dan hipotesis yang dapat diuji."
+      },
+      "writtenLesson": "## Fokus\n\nFailure triage dimulai dari menjaga bukti dan mempersempit kemungkinan penyebab.\n\n## Konsep inti\n\nBedakan test defect, product defect, environment issue, dan test-data problem. Jangan mengubah test secara acak hanya agar statusnya hijau.",
+      "aiActivity": {
+        "goal": "Memakai AI untuk membuat daftar hipotesis triage lalu menguji apakah hipotesis itu didukung evidence.",
+        "prompt": "Analisis failure packet ini. Kelompokkan hipotesis sebagai test, product, environment, atau data problem. Untuk setiap hipotesis, sebutkan evidence yang mendukung, evidence yang kurang, dan langkah verifikasi berisiko rendah.",
+        "learnerActions": [
+          "AI mengusulkan klasifikasi dan hipotesis.",
+          "Learner memverifikasi hipotesis dengan output, reproduksi, dan perubahan environment.",
+          "Learner mengedit klasifikasi serta menambahkan bukti yang kurang.",
+          "Learner menjelaskan keputusan triage dan langkah berikutnya."
+        ],
+        "expectedOutput": "Failure analysis dengan klasifikasi, evidence, hipotesis, dan rencana verifikasi."
+      },
+      "localExercise": {
+        "repositoryPaths": ["06-triage", "docs/reports/"],
+        "instructions": [
+          "Gunakan seeded failure atau failure packet yang tersedia.",
+          "Reproduksi secara terbatas dan catat perubahan antara run.",
+          "Klasifikasikan penyebab tanpa menghapus evidence awal."
+        ],
+        "expectedArtifacts": ["failure-analysis.md", "triage-notes.md"],
+        "safetyNotes": [
+          "Gunakan seeded failure untuk latihan deterministik bila target publik tidak stabil.",
+          "Jangan mencoba memperluas failure menjadi probing keamanan.",
+          "Jangan menganggap setiap failure sebagai defect produk."
+        ]
+      },
+      "evidenceChecklist": [
+        "Failure packet, command, dan environment tercatat.",
+        "Hipotesis dipisahkan dari fakta observasi.",
+        "Klasifikasi test, product, environment, atau data memiliki alasan.",
+        "Langkah verifikasi berikutnya aman dan dapat dilakukan."
+      ],
+      "reflectionPrompts": [
+        "Evidence apa yang mengubah klasifikasi failure-mu?",
+        "Apa perbedaan antara memperbaiki test defect dan menyembunyikan product defect?",
+        "Kapan kamu akan berhenti mencoba reproduksi?"
+      ],
+      "completionAction": {
+        "id": "ai-assisted-qa-workflow.checkpoints.06-triage.completion",
+        "label": "Konfirmasi failure triage selesai",
+        "requirements": [
+          "Failure analysis dan triage notes sudah dibuat.",
+          "Klasifikasi didukung evidence dan hipotesis.",
+          "Reflection sudah dijawab di repository pribadi."
+        ],
+        "selfAttested": true
+      }
+    },
+    {
+      "slug": "07-quality-summary",
+      "order": 7,
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.07-quality-summary.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.07-quality-summary.completion",
+      "title": "Memperbaiki test dan membuat quality decision",
+      "objective": "Mampu memperbaiki test defect atau mendokumentasikan product defect, menjalankan verifikasi ulang, dan merangkum residual risk.",
+      "video": {
+        "status": "planned",
+        "title": "Dari failure ke keputusan kualitas",
+        "durationMinutes": 10,
+        "focus": "Menghubungkan triage, re-run, defect communication, coverage gap, dan rekomendasi release-quality."
+      },
+      "writtenLesson": "## Fokus\n\nKeputusan kualitas harus menjelaskan evidence, hal yang belum diuji, dan residual risk.\n\n## Konsep inti\n\nSetelah triage, perbaiki test jika memang test defect atau tulis defect report jika masalahnya ada di produk. Re-run lalu nyatakan batas keyakinanmu.",
+      "aiActivity": {
+        "goal": "Memakai AI untuk mengkritik quality summary dan defect communication tanpa membiarkan AI menentukan release decision.",
+        "prompt": "Tinjau failure analysis, hasil re-run, dan coverage gap. Buat draft quality summary yang memisahkan evidence, hal yang belum diuji, residual risk, dan rekomendasi. Tandai klaim yang memerlukan keputusan QA manusia.",
+        "learnerActions": [
+          "AI mengusulkan draft defect report atau quality summary.",
+          "Learner memverifikasi draft terhadap evidence awal dan hasil re-run.",
+          "Learner mengedit rekomendasi agar proporsional dengan risk dan coverage.",
+          "Learner menjelaskan keputusan kualitas serta residual risk yang diterima."
+        ],
+        "expectedOutput": "Updated test atau defect report dan quality summary dengan recommendation berbasis evidence."
+      },
+      "localExercise": {
+        "repositoryPaths": ["07-quality-summary", "docs/reports/"],
+        "instructions": [
+          "Terapkan hasil triage pada test atau dokumentasikan product defect.",
+          "Jalankan re-run yang relevan dan bandingkan dengan evidence awal.",
+          "Tulis quality summary yang menyebut coverage, gap, residual risk, dan rekomendasi."
+        ],
+        "expectedArtifacts": [
+          "updated test atau defect-report.md",
+          "quality-summary.md",
+          "re-run evidence"
+        ],
+        "safetyNotes": [
+          "Jangan menandai release aman hanya karena semua check yang dipilih pass.",
+          "Jaga data dan screenshot tetap sintetis serta tersanitasi.",
+          "Rujuk capstone tanpa mengunggah artifact ke TestingWithEkki."
+        ]
+      },
+      "evidenceChecklist": [
+        "Perbaikan test atau defect report dapat ditelusuri ke triage.",
+        "Re-run dan perubahan hasil tercatat.",
+        "Quality summary menyebut coverage gap dan residual risk.",
+        "Rekomendasi dibatasi oleh evidence dan keputusan QA."
+      ],
+      "reflectionPrompts": [
+        "Apa yang membuatmu yakin bahwa perubahan yang dilakukan memperbaiki masalah yang benar?",
+        "Risiko residual apa yang masih harus diketahui stakeholder?",
+        "Bagaimana AI membantu tanpa mengambil alih quality decision?"
+      ],
+      "capstoneReference": "ai-assisted-qa-workflow.capstone",
+      "completionAction": {
+        "id": "ai-assisted-qa-workflow.checkpoints.07-quality-summary.completion",
+        "label": "Konfirmasi quality summary selesai",
+        "requirements": [
+          "Updated test atau defect report dan quality summary sudah dibuat.",
+          "Re-run evidence sudah dicatat.",
+          "Reflection sudah dijawab dan capstone siap dikerjakan."
+        ],
+        "selfAttested": true
+      }
+    }
+  ],
+  "capstone": {
+    "id": "ai-assisted-qa-workflow.capstone",
+    "reflectionId": "ai-assisted-qa-workflow.capstone.reflection",
+    "title": "Capstone: end-to-end scheduling quality decision",
+    "objective": "Mendemonstrasikan seluruh AI-assisted QA workflow dari requirement sampai keputusan kualitas yang dapat dipertanggungjawabkan.",
+    "video": {
+      "status": "planned",
+      "title": "Menyatukan workflow dan residual risk",
+      "durationMinutes": 12,
+      "focus": "Menunjukkan cara menggabungkan artefak tujuh checkpoint menjadi evidence package dan quality decision."
+    },
+    "writtenLesson": "## Fokus\n\nSatukan artefak dari tujuh checkpoint menjadi satu cerita evidence yang dapat dibaca stakeholder.\n\n## Konsep inti\n\nCapstone selesai ketika kamu bisa menjelaskan apa yang diuji, apa yang tidak diuji, arti failure, dan residual risk. Semua tests passed bukan tujuan akhirnya.",
+    "aiActivity": {
+      "goal": "Memakai AI untuk meninjau konsistensi evidence package dan menemukan gap sebelum learner membuat keputusan akhir.",
+      "prompt": "Tinjau daftar artefak capstone dan rangkum traceability dari requirement ke quality decision. Tunjukkan contradiction, missing evidence, uncertainty, dan pertanyaan yang harus dijawab learner. Jangan memberi verdict otomatis.",
+      "learnerActions": [
+        "AI mengusulkan ringkasan traceability dan daftar gap.",
+        "Learner memverifikasi setiap temuan terhadap repository dan hasil run.",
+        "Learner mengedit evidence package serta menutup gap yang dapat ditangani.",
+        "Learner menjelaskan quality decision dan residual risk secara mandiri."
+      ],
+      "expectedOutput": "Evidence package lengkap, final quality summary, dan refleksi tentang keputusan kualitas."
+    },
+    "localExercise": {
+      "repositoryPaths": ["README.md", "tests/", "evidence/", "reflections/"],
+      "instructions": [
+        "Gabungkan output tujuh checkpoint dalam satu repository learner.",
+        "Jalankan suite kecil dan simpan evidence yang sudah disanitasi.",
+        "Triage minimal satu failure dan nyatakan apakah itu test, product, environment, atau data problem.",
+        "Tulis rekomendasi kualitas dengan coverage gap dan residual risk."
+      ],
+      "expectedArtifacts": [
+        "requirements notes dan risk list",
+        "test strategy, scenarios, dan test cases",
+        "Playwright suite yang dapat dijalankan",
+        "execution report dan evidence",
+        "failure analysis atau defect report",
+        "final quality-summary.md"
+      ],
+      "safetyNotes": [
+        "Gunakan companion repository milik learner sebagai tempat evidence.",
+        "Jalankan hanya pada target yang diizinkan dan dengan data sintetis.",
+        "Stop sebelum booking, cancellation, atau rescheduling nyata.",
+        "Jangan mengunggah raw artifact ke TestingWithEkki."
+      ]
+    },
+    "evidenceChecklist": [
+      "Semua tujuh checkpoint memiliki artifact dan reflection.",
+      "Requirement dapat ditelusuri ke skenario, test case, dan test code.",
+      "Minimal satu failure ditriage dengan klasifikasi yang jelas.",
+      "Hasil re-run dan keputusan fix atau defect tercatat.",
+      "Quality summary menyebut apa yang diuji, tidak diuji, dan residual risk.",
+      "Keputusan akhir dibuat learner dan tidak berasal dari verdict AI otomatis."
+    ],
+    "reflectionPrompts": [
+      "Apa bukti terkuat yang mendukung quality decision-mu?",
+      "Apa yang masih belum kamu ketahui tentang feature ini?",
+      "Bagaimana proses AI proposes, learner verifies, learner edits, learner justifies mengubah cara kerjamu?"
+    ],
+    "requirements": [
+      "Mengidentifikasi risiko dan ambiguitas dari requirement.",
+      "Menghasilkan skenario dan test case yang diprioritaskan.",
+      "Mengimplementasikan suite Playwright + TypeScript kecil.",
+      "Menjalankan suite secara lokal dan mengumpulkan evidence.",
+      "Melakukan triage minimal satu failure.",
+      "Membedakan test failure dari product defect.",
+      "Melaporkan evidence, coverage gap, dan residual risk."
+    ],
+    "completionAction": {
+      "id": "ai-assisted-qa-workflow.capstone.completion",
+      "label": "Konfirmasi capstone selesai",
+      "requirements": [
+        "Semua tujuh checkpoint telah diselesaikan.",
+        "Evidence package dan final quality summary sudah diperiksa.",
+        "Reflection capstone sudah dijawab.",
+        "Quality decision tetap merupakan keputusan learner."
+      ],
+      "selfAttested": true
+    }
+  }
+}

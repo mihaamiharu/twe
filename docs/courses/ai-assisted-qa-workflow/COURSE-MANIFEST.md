@@ -4,7 +4,7 @@
 
 **Status:** Stable pilot contract; lesson content is authored in QA-002.
 
-The machine-readable source of truth is [`manifest.json`](../../../content/courses/ai-assisted-qa-workflow/manifest.json). The manifest is intentionally separate from the tutorial registry because this course is a multi-checkpoint learning package, not an existing tutorial.
+The machine-readable source of truth is [`manifest.json`](../../../content/courses/ai-assisted-qa-workflow/manifest.json). The reusable checkpoint authoring structure and Indonesian outline are defined in [`COURSE-CONTENT-TEMPLATE.md`](./COURSE-CONTENT-TEMPLATE.md) and [`content.json`](../../../content/courses/ai-assisted-qa-workflow/id/content.json). The manifest is intentionally separate from the tutorial registry because this course is a multi-checkpoint learning package, not an existing tutorial.
 
 ## Course contract
 
