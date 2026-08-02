@@ -4,6 +4,8 @@
  * Achievement definitions, checking, and awarding logic.
  */
 
+import { COURSE_COMPLETION_ACHIEVEMENT_ID } from './course-progress';
+
 export type AchievementCategory =
   | 'CHALLENGES'
   | 'TUTORIALS'
@@ -259,6 +261,18 @@ export const ACHIEVEMENTS: Achievement[] = [
     category: 'SPECIAL',
     xpReward: 100,
     criteria: { type: 'count', target: 1 },
+  },
+  {
+    id: COURSE_COMPLETION_ACHIEVEMENT_ID,
+    key: COURSE_COMPLETION_ACHIEVEMENT_ID,
+    name: 'QA Workflow Complete',
+    description: 'Complete all seven QA checkpoints and the capstone',
+    icon: '🧭',
+    category: 'SPECIAL',
+    // Checkpoint XP remains the only course XP award; this achievement is a
+    // completion marker and does not introduce a second reward rule.
+    xpReward: 0,
+    criteria: { type: 'special', target: 1 },
   },
 ];
 

@@ -12,12 +12,14 @@ import {
   userAchievements,
   achievements,
   bugReports,
+  tutorials,
 } from '@/db/schema';
 import { eq, and, sql } from 'drizzle-orm';
 import type { UserStats } from './achievements';
 import { logger } from '@/lib/logger';
 import { getTierFromCategory } from '@/lib/constants';
 import { checkLevelUp } from '@/lib/gamification';
+import { COURSE_PROGRESS_TAG } from '@/lib/course-progress';
 
 /**
  * Get user stats for achievement checking
@@ -66,18 +68,22 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   const tutorialsResult = await db
     .select({ count: sql<number>`count(*)::int` })
     .from(progress)
+    .innerJoin(tutorials, eq(progress.tutorialId, tutorials.id))
     .where(
       and(
         eq(progress.userId, userId),
         eq(progress.isCompleted, true),
         sql`${progress.tutorialId} IS NOT NULL`,
+        sql`(${tutorials.tags} IS NULL OR NOT (${tutorials.tags} @> ARRAY[${COURSE_PROGRESS_TAG}]::text[]))`,
       ),
     );
 
   const tutorialsCompleted = tutorialsResult[0]?.count || 0;
 
   // Calculate streak and max daily challenges
-  const completionDates = completedChallenges.map((c) => c.completedAt).filter(Boolean) as Date[];
+  const completionDates = completedChallenges
+    .map((c) => c.completedAt)
+    .filter(Boolean) as Date[];
   const { currentStreak, longestStreak } = calculateStreak(completionDates);
   const maxDailyChallenges = calculateMaxDailyChallenges(completionDates);
 

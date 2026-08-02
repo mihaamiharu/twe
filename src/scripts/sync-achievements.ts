@@ -84,6 +84,10 @@ const ID_TRANSLATIONS: Record<string, { name: string; description: string }> = {
         name: 'Pembasmi Bug',
         description: 'Laporkan bug pertamamu yang valid',
     },
+    'ai-assisted-qa-workflow-complete': {
+        name: 'Alur QA Selesai',
+        description: 'Selesaikan tujuh checkpoint QA dan capstone',
+    },
 };
 
 async function syncAchievements() {
@@ -103,6 +107,7 @@ async function syncAchievements() {
             else if (achievement.criteria.type === 'level') requirementType = 'level_reached';
             else if (achievement.category === 'TUTORIALS') requirementType = 'tutorial_count';
             else if (achievement.id === 'bug-squasher') requirementType = 'bug_report_count';
+            else if (achievement.id === 'ai-assisted-qa-workflow-complete') requirementType = 'course_completion';
             else if (achievement.criteria.type === 'daily') requirementType = 'daily_count';
 
             const data = {

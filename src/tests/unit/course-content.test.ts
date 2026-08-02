@@ -4,6 +4,17 @@ import {
   getCourseContent,
   getCourseManifest,
 } from '@/server/course-content.server';
+import {
+  COURSE_CHECKPOINT_XP,
+  COURSE_COMPLETION_ACHIEVEMENT_ID,
+  applyCourseUnitCompletion,
+  courseCheckpointCompletionInputSchema,
+  getCourseProgressTutorialSlug,
+  isCourseComplete,
+  isCourseCompletionEligible,
+  type CourseProgressState,
+} from '@/lib/course-progress';
+import { getAchievementById } from '@/lib/achievements';
 
 const expectedCheckpointSlugs: string[] = [
   '01-requirements',
@@ -126,5 +137,138 @@ describe('AI-assisted QA course manifest', () => {
     );
 
     expect(englishContent).toBeNull();
+  });
+});
+
+describe('AI-assisted QA course progress contract', () => {
+  const checkpointSlugs = expectedCheckpointSlugs;
+  const initialState: CourseProgressState = {
+    completedCheckpointSlugs: [],
+    capstoneCompleted: false,
+  };
+
+  it('awards existing checkpoint XP once and makes duplicate completion idempotent', () => {
+    const first = applyCourseUnitCompletion(
+      initialState,
+      { kind: 'checkpoint', id: checkpointSlugs[0] },
+      checkpointSlugs,
+    );
+    const duplicate = applyCourseUnitCompletion(
+      first.state,
+      { kind: 'checkpoint', id: checkpointSlugs[0] },
+      checkpointSlugs,
+    );
+
+    expect(first.xpAwarded).toBe(COURSE_CHECKPOINT_XP);
+    expect(first.wasAlreadyCompleted).toBe(false);
+    expect(duplicate.xpAwarded).toBe(0);
+    expect(duplicate.wasAlreadyCompleted).toBe(true);
+    expect(duplicate.state).toEqual(first.state);
+  });
+
+  it('requires every checkpoint and the capstone before course completion', () => {
+    let state = initialState;
+    let checkpointXp = 0;
+
+    for (const checkpointSlug of checkpointSlugs) {
+      const outcome = applyCourseUnitCompletion(
+        state,
+        { kind: 'checkpoint', id: checkpointSlug },
+        checkpointSlugs,
+      );
+      checkpointXp += outcome.xpAwarded;
+      state = outcome.state;
+    }
+
+    expect(checkpointXp).toBe(7 * COURSE_CHECKPOINT_XP);
+    expect(isCourseComplete(state, checkpointSlugs)).toBe(false);
+
+    const capstone = applyCourseUnitCompletion(
+      state,
+      { kind: 'capstone', id: 'ai-assisted-qa-workflow.capstone' },
+      checkpointSlugs,
+    );
+
+    expect(capstone.xpAwarded).toBe(0);
+    expect(capstone.courseComplete).toBe(true);
+    expect(isCourseComplete(capstone.state, checkpointSlugs)).toBe(true);
+    expect(
+      isCourseCompletionEligible(capstone.state, checkpointSlugs, false),
+    ).toBe(true);
+    expect(
+      isCourseCompletionEligible(capstone.state, checkpointSlugs, true),
+    ).toBe(false);
+
+    const duplicateCapstone = applyCourseUnitCompletion(
+      capstone.state,
+      { kind: 'capstone', id: 'ai-assisted-qa-workflow.capstone' },
+      checkpointSlugs,
+    );
+    expect(duplicateCapstone.wasAlreadyCompleted).toBe(true);
+    expect(duplicateCapstone.xpAwarded).toBe(0);
+  });
+
+  it('does not make an incomplete course eligible for its achievement', () => {
+    const onlyFirstCheckpoint = applyCourseUnitCompletion(
+      initialState,
+      { kind: 'checkpoint', id: checkpointSlugs[0] },
+      checkpointSlugs,
+    ).state;
+
+    expect(
+      isCourseCompletionEligible(onlyFirstCheckpoint, checkpointSlugs, false),
+    ).toBe(false);
+    expect(
+      isCourseCompletionEligible(initialState, checkpointSlugs, true),
+    ).toBe(false);
+  });
+
+  it('defines one zero-XP course completion achievement', () => {
+    const achievement = getAchievementById(COURSE_COMPLETION_ACHIEVEMENT_ID);
+
+    expect(achievement).toMatchObject({
+      id: COURSE_COMPLETION_ACHIEVEMENT_ID,
+      category: 'SPECIAL',
+      xpReward: 0,
+    });
+  });
+
+  it('accepts only Indonesian self-attestation and ignores review metadata', () => {
+    const parsed = courseCheckpointCompletionInputSchema.parse({
+      courseSlug: AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      locale: 'id',
+      checkpointSlug: checkpointSlugs[0],
+      completionId: 'completion-id',
+      reflectionId: 'reflection-id',
+      exerciseConfirmed: true,
+      reflectionConfirmed: true,
+      aiReview: 'needs-revision',
+      humanReview: 'approved',
+    });
+
+    expect(parsed.locale).toBe('id');
+    expect(parsed).not.toHaveProperty('aiReview');
+    expect(parsed).not.toHaveProperty('humanReview');
+    expect(() =>
+      courseCheckpointCompletionInputSchema.parse({
+        ...parsed,
+        locale: 'en',
+      }),
+    ).toThrow();
+    expect(() =>
+      courseCheckpointCompletionInputSchema.parse({
+        ...parsed,
+        exerciseConfirmed: false,
+      }),
+    ).toThrow();
+  });
+
+  it('uses a stable hidden tutorial key for existing progress storage', () => {
+    expect(
+      getCourseProgressTutorialSlug(
+        AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+        checkpointSlugs[0],
+      ),
+    ).toBe('course:ai-assisted-qa-workflow:01-requirements');
   });
 });
