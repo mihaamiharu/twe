@@ -1,0 +1,65 @@
+{
+  "slug": "ai-assisted-qa-workflow",
+  "defaultLocale": "id",
+  "availableLocales": ["id"],
+  "requiresAuthentication": true,
+  "routes": {
+    "overview": "/$locale/courses/$courseSlug",
+    "checkpoint": "/$locale/courses/$courseSlug/checkpoints/$checkpointSlug"
+  },
+  "capstone": {
+    "id": "ai-assisted-qa-workflow.capstone",
+    "checkpointSlug": "07-quality-summary"
+  },
+  "checkpoints": [
+    {
+      "slug": "01-requirements",
+      "order": 1,
+      "repositoryPath": "01-requirements",
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.01-requirements.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.01-requirements.completion"
+    },
+    {
+      "slug": "02-test-design",
+      "order": 2,
+      "repositoryPath": "02-test-design",
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.02-test-design.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.02-test-design.completion"
+    },
+    {
+      "slug": "03-test-writing",
+      "order": 3,
+      "repositoryPath": "03-test-writing",
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.03-test-writing.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.03-test-writing.completion"
+    },
+    {
+      "slug": "04-automation",
+      "order": 4,
+      "repositoryPath": "04-automation",
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.04-automation.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.04-automation.completion"
+    },
+    {
+      "slug": "05-execution",
+      "order": 5,
+      "repositoryPath": "05-execution",
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.05-execution.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.05-execution.completion"
+    },
+    {
+      "slug": "06-triage",
+      "order": 6,
+      "repositoryPath": "06-triage",
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.06-triage.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.06-triage.completion"
+    },
+    {
+      "slug": "07-quality-summary",
+      "order": 7,
+      "repositoryPath": "07-quality-summary",
+      "reflectionId": "ai-assisted-qa-workflow.checkpoints.07-quality-summary.reflection",
+      "completionId": "ai-assisted-qa-workflow.checkpoints.07-quality-summary.completion"
+    }
+  ]
+}
