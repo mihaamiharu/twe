@@ -5,6 +5,7 @@
     "outcome": "Learning outcome",
     "prerequisites": "Advisory prerequisites",
     "startHere": "Start Here",
+    "openStartHere": "Open the full setup guide",
     "setupRequirements": "Setup requirements",
     "recommendedSequence": "Recommended learning sequence",
     "checkpoints": "Seven checkpoints",
@@ -18,5 +19,18 @@
     "capstoneRequirements": "Capstone requirements",
     "duration": "{{minutes}} minutes",
     "unavailable": "This course is not available in the selected language."
+  },
+  "startHere": {
+    "badge": "Local setup guide",
+    "backToCourse": "Back to course overview",
+    "workflow": "Setup sequence",
+    "instructions": "Steps",
+    "commands": "Commands",
+    "notes": "Notes",
+    "expectedOutput": "Smoke test output",
+    "platformNotes": "Operating-system notes",
+    "troubleshooting": "Common troubleshooting",
+    "safety": "Safety rules",
+    "safetyDescription": "These boundaries protect the public target, learner data, and portfolio repository."
   }
 }

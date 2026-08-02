@@ -5,6 +5,7 @@
     "outcome": "Hasil belajar",
     "prerequisites": "Prasyarat yang disarankan",
     "startHere": "Mulai di sini",
+    "openStartHere": "Buka panduan setup lengkap",
     "setupRequirements": "Yang perlu disiapkan",
     "recommendedSequence": "Urutan belajar yang disarankan",
     "checkpoints": "Tujuh checkpoint",
@@ -18,5 +19,18 @@
     "capstoneRequirements": "Syarat capstone",
     "duration": "{{minutes}} menit",
     "unavailable": "Course ini belum tersedia untuk bahasa yang dipilih."
+  },
+  "startHere": {
+    "badge": "Panduan setup lokal",
+    "backToCourse": "Kembali ke overview course",
+    "workflow": "Urutan setup",
+    "instructions": "Langkah",
+    "commands": "Perintah",
+    "notes": "Catatan",
+    "expectedOutput": "Output smoke test",
+    "platformNotes": "Catatan per sistem operasi",
+    "troubleshooting": "Troubleshooting umum",
+    "safety": "Aturan keselamatan",
+    "safetyDescription": "Batas ini melindungi target publik, data learner, dan repository portfolio."
   }
 }

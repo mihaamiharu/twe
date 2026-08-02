@@ -12,6 +12,7 @@ export const AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG =
 export interface CourseRouteContract {
   overview: string;
   checkpoint: string;
+  startHere: string;
 }
 
 /** Stable metadata for one learner-facing course checkpoint. */
@@ -101,6 +102,45 @@ export interface CourseOverviewContent {
   recommendedSequence: string;
 }
 
+/** One concrete step in the learner's local-first setup workflow. */
+export interface CourseStartHereStep {
+  id: string;
+  title: string;
+  purpose: string;
+  instructions: readonly string[];
+  commands: readonly string[];
+  notes: readonly string[];
+}
+
+/** Operating-system-specific guidance for a local learner environment. */
+export interface CourseStartHerePlatformNote {
+  id: string;
+  title: string;
+  notes: readonly string[];
+}
+
+/** One common setup problem and a low-risk way to investigate it. */
+export interface CourseStartHereTroubleshootingItem {
+  problem: string;
+  solution: string;
+}
+
+/** Detailed Indonesian orientation for preparing the companion repository. */
+export interface CourseStartHereContent {
+  title: string;
+  subtitle: string;
+  introduction: string;
+  steps: readonly CourseStartHereStep[];
+  expectedOutput: {
+    title: string;
+    description: string;
+    lines: readonly string[];
+  };
+  platformNotes: readonly CourseStartHerePlatformNote[];
+  troubleshooting: readonly CourseStartHereTroubleshootingItem[];
+  safetyRules: readonly string[];
+}
+
 /** Authored content outline for one course checkpoint. */
 export interface CourseCheckpointContent extends CourseContentUnit {
   slug: string;
@@ -123,6 +163,7 @@ export interface CourseContentDocument {
   locale: Locale;
   templateVersion: 1;
   overview: CourseOverviewContent;
+  startHere: CourseStartHereContent;
   checkpoints: readonly CourseCheckpointContent[];
   capstone: CourseCapstoneContent;
 }

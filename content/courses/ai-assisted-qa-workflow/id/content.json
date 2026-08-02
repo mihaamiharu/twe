@@ -31,6 +31,182 @@
     ],
     "recommendedSequence": "Ikuti checkpoint dari 1 sampai 7 untuk membangun satu workflow yang utuh. Kamu tetap bebas membuka checkpoint mana pun dari halaman ini."
   },
+  "startHere": {
+    "title": "Mulai di sini: siapkan workspace lokal",
+    "subtitle": "Ikuti panduan ini untuk menyiapkan Node.js, membuat repository pendamping, dan menjalankan smoke test pertama secara lokal.",
+    "introduction": "Semua perintah dijalankan di mesinmu sendiri. Halaman ini tidak menjalankan Playwright, mengakses GitHub atas namamu, atau mengunggah artifact ke TestingWithEkki. Gunakan hanya target publik yang disetujui course author dan data sintetis.",
+    "steps": [
+      {
+        "id": "node-and-npm",
+        "title": "Pasang Node.js LTS dan npm",
+        "purpose": "Node.js menjalankan test runner dan npm memasang dependency dengan lockfile yang konsisten.",
+        "instructions": [
+          "Instal rilis Node.js LTS terbaru dari situs resmi Node.js untuk sistem operasimu.",
+          "Tutup lalu buka kembali terminal agar PATH terbaru terbaca.",
+          "Pastikan versi yang terbaca adalah LTS dan npm ikut terpasang. Jangan memakai npm global untuk dependency course."
+        ],
+        "commands": ["node --version", "npm --version"],
+        "notes": [
+          "Jika command tidak ditemukan, periksa PATH atau buka terminal baru sebelum melanjutkan."
+        ]
+      },
+      {
+        "id": "create-template-repository",
+        "title": "Buat repository dari template GitHub publik",
+        "purpose": "Repository milikmu menjadi workspace dan bukti portfolio; template membuatnya independen dari repository template course.",
+        "instructions": [
+          "Buka link template repository publik resmi yang diberikan course author.",
+          "Klik tombol GitHub Use this template lalu pilih Create a new repository.",
+          "Pilih owner, nama repository, dan visibility. Public direkomendasikan untuk portfolio; private tetap boleh jika diperlukan.",
+          "Buat repository baru sebagai repository mandiri. Jangan menggunakan Fork dan jangan memasukkan repository solusi instructor."
+        ],
+        "commands": [],
+        "notes": [
+          "Jika template publik belum tersedia, jangan menebak URL atau menyalin repository solusi; tunggu link resmi course author."
+        ]
+      },
+      {
+        "id": "clone-repository",
+        "title": "Clone repository ke mesin lokal",
+        "purpose": "Test, catatan QA, dan evidence dikerjakan di salinan lokal yang kamu kendalikan.",
+        "instructions": [
+          "Dari halaman repository barumu, salin URL HTTPS melalui tombol Code.",
+          "Buka terminal di folder tempat kamu menyimpan project lalu clone repository.",
+          "Masuk ke folder repository dan pastikan remote menunjuk ke repository milikmu."
+        ],
+        "commands": [
+          "git clone https://github.com/<username>/<repository>.git",
+          "cd <repository>",
+          "git remote -v"
+        ],
+        "notes": [
+          "Ganti placeholder dengan username dan nama repository milikmu."
+        ]
+      },
+      {
+        "id": "install-dependencies",
+        "title": "Pasang dependency dengan npm",
+        "purpose": "npm install memasang dependency yang didefinisikan repository dan menghormati package-lock.json.",
+        "instructions": [
+          "Jalankan npm install dari root repository, yaitu folder yang berisi package.json.",
+          "Tunggu sampai proses selesai dan pastikan tidak ada error yang belum dipahami.",
+          "Jangan menghapus package-lock.json untuk mengatasi warning; catat warning dan telusuri penyebabnya."
+        ],
+        "commands": ["npm install"],
+        "notes": [
+          "Jangan menjalankan npm dengan sudo atau hak administrator hanya untuk mengatasi masalah dependency."
+        ]
+      },
+      {
+        "id": "install-playwright-browsers",
+        "title": "Instal browser Playwright",
+        "purpose": "Package Playwright dan browser binary adalah dua hal berbeda; smoke test membutuhkan keduanya.",
+        "instructions": [
+          "Dari root repository, instal browser yang dipakai course dengan npx.",
+          "Biarkan proses selesai sebelum menjalankan smoke test."
+        ],
+        "commands": ["npx playwright install"],
+        "notes": [
+          "Di Linux, jika dependency sistem browser belum ada, gunakan catatan Linux pada halaman ini dan jalankan --with-deps hanya setelah memahami perubahan paketnya."
+        ]
+      },
+      {
+        "id": "configure-target",
+        "title": "Konfigurasikan TARGET_BASE_URL",
+        "purpose": "Variable ini menentukan target observasi yang dipakai test; nilainya harus eksplisit dan disetujui sebelum browser dibuka.",
+        "instructions": [
+          "Buat file .env dari .env.example di root repository jika file itu tersedia.",
+          "Isi TARGET_BASE_URL dengan URL publik yang disetujui course author. Jangan memakai URL production, akun pribadi, atau target yang tidak kamu kuasai.",
+          "Simpan .env hanya di mesin lokal dan pastikan .env masuk .gitignore."
+        ],
+        "commands": ["TARGET_BASE_URL=https://<target-yang-disetujui>"],
+        "notes": [
+          "Contoh perintah menampilkan format nilai, bukan target yang boleh dipakai. Jangan mengubah URL menjadi target acak."
+        ]
+      },
+      {
+        "id": "run-smoke-test",
+        "title": "Jalankan smoke test lokal pertama",
+        "purpose": "Smoke test memeriksa bahwa setup, browser, konfigurasi target, dan satu alur observasi dasar bekerja bersama.",
+        "instructions": [
+          "Pastikan terminal berada di root repository dan TARGET_BASE_URL sudah dimuat.",
+          "Jalankan script smoke yang disediakan starter repository.",
+          "Jika hasilnya gagal, simpan output awal dan gunakan bagian troubleshooting sebelum mengubah test secara acak."
+        ],
+        "commands": ["npm run test:smoke"],
+        "notes": [
+          "Smoke test hanya melakukan observasi fungsional ber-volume rendah. Berhenti sebelum submit booking, cancellation, atau rescheduling."
+        ]
+      }
+    ],
+    "expectedOutput": {
+      "title": "Output berhasil yang diharapkan",
+      "description": "Nama project, waktu, dan detail output bisa berbeda. Yang penting smoke test selesai tanpa error dan melaporkan satu pemeriksaan lulus.",
+      "lines": [
+        "Running 1 test using 1 worker",
+        "✓ tests/smoke.spec.ts:...",
+        "1 passed"
+      ]
+    },
+    "platformNotes": [
+      {
+        "id": "windows",
+        "title": "Windows",
+        "notes": [
+          "Gunakan PowerShell, Windows Terminal, atau Git Bash dengan konsisten. Sintaks penyalinan file berbeda: PowerShell memakai Copy-Item .env.example .env.",
+          "Gunakan path folder tanpa karakter yang menyulitkan shell bila kamu menemukan error path. Jangan menjalankan npm atau Playwright sebagai Administrator kecuali dokumentasi sistem secara spesifik memintanya.",
+          "Jika npx diblokir oleh execution policy, cek kebijakan PowerShell atau gunakan npx.cmd; jangan menonaktifkan proteksi secara global."
+        ]
+      },
+      {
+        "id": "macos",
+        "title": "macOS",
+        "notes": [
+          "Terminal bawaan atau shell seperti zsh dapat dipakai. Setelah instal Node.js, buka terminal baru agar PATH diperbarui.",
+          "Jika git atau tool compiler belum tersedia, instal Xcode Command Line Tools dari sumber resmi Apple.",
+          "Pada Apple silicon, gunakan installer Node.js yang sesuai arsitektur dan hindari mencampur instalasi global dari beberapa pengelola versi tanpa alasan."
+        ]
+      },
+      {
+        "id": "linux",
+        "title": "Linux",
+        "notes": [
+          "Gunakan package manager atau pengelola versi Node.js yang sesuai distribusimu dan pastikan versi LTS terbaca oleh shell yang menjalankan test.",
+          "Jika browser gagal diluncurkan karena library sistem belum ada, jalankan npx playwright install --with-deps hanya setelah meninjau paket yang akan dipasang.",
+          "Jangan menjalankan npm install dengan sudo. Perbaiki owner atau PATH instalasi Node.js jika permission bermasalah."
+        ]
+      }
+    ],
+    "troubleshooting": [
+      {
+        "problem": "node atau npm tidak ditemukan.",
+        "solution": "Tutup terminal, buka kembali, lalu jalankan node --version dan npm --version. Jika tetap gagal, periksa PATH dan instalasi Node.js LTS; jangan lanjut dengan versi Node.js acak."
+      },
+      {
+        "problem": "npm install gagal atau package-lock.json berubah tanpa sengaja.",
+        "solution": "Baca error pertama, periksa versi Node.js, ruang disk, dan koneksi registry. Jangan menghapus lockfile atau menambahkan dependency baru sebelum penyebabnya jelas."
+      },
+      {
+        "problem": "Playwright melaporkan browser executable tidak ditemukan.",
+        "solution": "Pastikan npm install selesai, lalu jalankan npx playwright install dari root repository. Jika Linux melaporkan library sistem hilang, ikuti catatan Linux."
+      },
+      {
+        "problem": "Smoke test gagal karena TARGET_BASE_URL kosong atau salah.",
+        "solution": "Periksa nama variable, lokasi .env, format URL, dan apakah URL tersebut memang disetujui. Jangan mengganti target hanya agar test menjadi lulus."
+      },
+      {
+        "problem": "Smoke test timeout atau target publik berubah.",
+        "solution": "Simpan output dan waktu kejadian, coba ulang secara terbatas, lalu klasifikasikan sebagai kemungkinan masalah environment atau target. Jangan menaikkan timeout dan volume request tanpa alasan."
+      }
+    ],
+    "safetyRules": [
+      "Jalankan test hanya terhadap target publik yang secara eksplisit disetujui course author dan berada dalam batas latihan.",
+      "Gunakan nama, email, jawaban, dan test data sintetis. Jangan memasukkan credential, token, data invitee, atau informasi pribadi.",
+      "Jangan melakukan scraping, load testing, security probing, bypass, booking, cancellation, atau rescheduling nyata.",
+      "Periksa screenshot, trace, log, dan artifact sebelum commit ke repository publik; hapus data sensitif dan jangan commit file .env.",
+      "Jaga volume request tetap rendah. Jika perilaku target berubah atau muncul efek samping yang tidak dipahami, berhenti dan dokumentasikan konteksnya sebagai risiko triage."
+    ]
+  },
   "checkpoints": [
     {
       "slug": "01-requirements",

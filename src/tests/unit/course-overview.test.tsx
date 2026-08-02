@@ -72,6 +72,9 @@ describe('AI-assisted QA course overview', () => {
       screen.getByText(course.content.overview.startHere.title),
     ).toBeTruthy();
     expect(
+      screen.getByTestId('course-start-here-link').getAttribute('href'),
+    ).toBe(`/id/courses/${course.manifest.slug}/start-here`);
+    expect(
       screen.getByText(course.content.overview.setupRequirements[0]),
     ).toBeTruthy();
     expect(screen.getByTestId('course-capstone')).toBeTruthy();

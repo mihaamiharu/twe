@@ -74,7 +74,7 @@ layout. It loads Indonesian manifest/content and existing progress through
 checkpoint links only; detail pages remain deferred to QA-012 onward. English
 course content is not used as a fallback.
 
-### [ ] QA-011 — Build Start Here orientation
+### [x] QA-011 — Build Start Here orientation
 
 **Outcome:** A learner can prepare their machine and create the starter repository.
 
@@ -85,6 +85,13 @@ course content is not used as a fallback.
 - `TARGET_BASE_URL` configuration is explained.
 - The learner can run a small Playwright smoke test.
 - Setup failures have troubleshooting guidance.
+
+**Implementation decision:** Start Here is a dedicated Indonesian page at
+`/$locale/courses/$courseSlug/start-here` beneath the authenticated locale
+layout. Setup guidance is stored in the localized course content document and
+covers the local npm workflow, public-template ownership, OS notes,
+troubleshooting, expected smoke output, and public-target safety boundaries.
+The page does not execute Playwright, call GitHub, or upload artifacts.
 
 ### [ ] QA-012 — Build checkpoint 1: requirements analysis
 

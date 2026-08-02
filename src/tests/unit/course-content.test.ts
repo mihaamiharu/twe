@@ -78,6 +78,7 @@ describe('AI-assisted QA course manifest', () => {
     expect(manifest?.routes).toEqual({
       overview: '/$locale/courses/$courseSlug',
       checkpoint: '/$locale/courses/$courseSlug/checkpoints/$checkpointSlug',
+      startHere: '/$locale/courses/$courseSlug/start-here',
     });
   });
 
@@ -113,6 +114,15 @@ describe('AI-assisted QA course manifest', () => {
     expect(content.overview.prerequisites.length).toBeGreaterThan(0);
     expect(content.overview.startHere.steps.length).toBeGreaterThan(0);
     expect(content.overview.setupRequirements.length).toBeGreaterThan(0);
+    expect(content.startHere.steps).toHaveLength(7);
+    expect(content.startHere.expectedOutput.lines).toContain('1 passed');
+    expect(content.startHere.platformNotes.map((note) => note.id)).toEqual([
+      'windows',
+      'macos',
+      'linux',
+    ]);
+    expect(content.startHere.troubleshooting.length).toBeGreaterThan(0);
+    expect(content.startHere.safetyRules.length).toBeGreaterThan(0);
     expect(content.checkpoints).toHaveLength(7);
 
     for (const checkpoint of content.checkpoints) {

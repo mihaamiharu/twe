@@ -5,7 +5,8 @@
   "requiresAuthentication": true,
   "routes": {
     "overview": "/$locale/courses/$courseSlug",
-    "checkpoint": "/$locale/courses/$courseSlug/checkpoints/$checkpointSlug"
+    "checkpoint": "/$locale/courses/$courseSlug/checkpoints/$checkpointSlug",
+    "startHere": "/$locale/courses/$courseSlug/start-here"
   },
   "capstone": {
     "id": "ai-assisted-qa-workflow.capstone",

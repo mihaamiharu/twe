@@ -45,6 +45,7 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
     course;
   const completed = new Set(completedCheckpointSlugs);
   const courseSlug = manifest.slug;
+  const startHereHref = `/${locale}/courses/${courseSlug}/start-here`;
   const orderedCheckpoints = [...manifest.checkpoints].sort(
     (a, b) => a.order - b.order,
   );
@@ -74,7 +75,7 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
               </p>
             </div>
             <Button asChild size="lg">
-              <a href="#start-here">
+              <a href={startHereHref} data-testid="course-start-here-link">
                 {t('overview.startHere')}
                 <ArrowRight className="h-4 w-4" />
               </a>
@@ -105,6 +106,12 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
               <CardDescription className="max-w-3xl text-base leading-7">
                 {content.overview.startHere.description}
               </CardDescription>
+              <Button asChild variant="outline" className="w-fit">
+                <a href={startHereHref}>
+                  {t('overview.openStartHere')}
+                  <ExternalLink className="h-4 w-4" />
+                </a>
+              </Button>
             </CardHeader>
             <CardContent className="grid gap-8 md:grid-cols-2">
               <div>

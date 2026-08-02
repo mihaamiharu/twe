@@ -26,6 +26,7 @@ The route patterns use the existing TanStack Router `$param` convention:
 | Page       | Pattern                                                    | Indonesian example                                                |
 | ---------- | ---------------------------------------------------------- | ----------------------------------------------------------------- |
 | Overview   | `/$locale/courses/$courseSlug`                             | `/id/courses/ai-assisted-qa-workflow`                             |
+| Start Here | `/$locale/courses/$courseSlug/start-here`                  | `/id/courses/ai-assisted-qa-workflow/start-here`                  |
 | Checkpoint | `/$locale/courses/$courseSlug/checkpoints/$checkpointSlug` | `/id/courses/ai-assisted-qa-workflow/checkpoints/01-requirements` |
 
 The overview is the canonical course destination. All seven checkpoints are available from day one and may be opened freely; ordering is the recommended sequence.

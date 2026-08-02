@@ -113,6 +113,46 @@ const courseContentSchema = z.object({
     setupRequirements: z.array(z.string().min(1)).min(1),
     recommendedSequence: z.string().min(1),
   }),
+  startHere: z.object({
+    title: z.string().min(1),
+    subtitle: z.string().min(1),
+    introduction: z.string().min(1),
+    steps: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          title: z.string().min(1),
+          purpose: z.string().min(1),
+          instructions: z.array(z.string().min(1)).min(1),
+          commands: z.array(z.string()),
+          notes: z.array(z.string().min(1)),
+        }),
+      )
+      .min(1),
+    expectedOutput: z.object({
+      title: z.string().min(1),
+      description: z.string().min(1),
+      lines: z.array(z.string().min(1)).min(1),
+    }),
+    platformNotes: z
+      .array(
+        z.object({
+          id: z.string().min(1),
+          title: z.string().min(1),
+          notes: z.array(z.string().min(1)).min(1),
+        }),
+      )
+      .min(1),
+    troubleshooting: z
+      .array(
+        z.object({
+          problem: z.string().min(1),
+          solution: z.string().min(1),
+        }),
+      )
+      .min(1),
+    safetyRules: z.array(z.string().min(1)).min(1),
+  }),
   checkpoints: z.array(courseCheckpointContentSchema).min(1),
   capstone: courseContentUnitSchema.extend({
     id: z.string().min(1),
