@@ -1,136 +1,254 @@
 import OpenAI from 'openai';
+import {
+  buildCourseReviewSystemPrompt,
+  buildCourseReviewUserPrompt,
+  parseCourseReviewDraftOutput,
+  type CourseReviewFile,
+  type CourseReviewDraft,
+} from '@/lib/course-review';
 
 // Initialize OpenAI client for DeepSeek
 const getClient = () => {
-    const apiKey = process.env.DEEPSEEK_API_KEY;
-    if (!apiKey) return null;
-    return new OpenAI({
-        baseURL: 'https://api.deepseek.com',
-        apiKey,
-    });
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) return null;
+  return new OpenAI({
+    baseURL: 'https://api.deepseek.com',
+    apiKey,
+  });
 };
 
 export interface HintRequest {
-    challengeType: 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'PLAYWRIGHT' | 'JAVASCRIPT';
-    instructions: string;
-    htmlContent?: string;
-    starterCode?: string;
-    userAttempt?: string;
-    locale?: string;
-    staticHints?: string[];
+  challengeType:
+    | 'CSS_SELECTOR'
+    | 'XPATH_SELECTOR'
+    | 'PLAYWRIGHT'
+    | 'JAVASCRIPT';
+  instructions: string;
+  htmlContent?: string;
+  starterCode?: string;
+  userAttempt?: string;
+  locale?: string;
+  staticHints?: string[];
 }
 
 export interface HintResponse {
-    success: boolean;
-    hint?: string;
-    error?: string;
+  success: boolean;
+  hint?: string;
+  error?: string;
+}
+
+export interface CourseReviewDraftRequest {
+  checkpointSlug: string;
+  files: readonly CourseReviewFile[];
+  reviewerNotes?: string;
+  locale: 'id' | 'en';
+}
+
+export interface CourseReviewDraftResponse {
+  success: boolean;
+  draft?: CourseReviewDraft;
+  error?: string;
+}
+
+/**
+ * Generate a structured, reviewer-only course assessment draft.
+ * Raw learner files are passed to the provider for this request only and are
+ * never persisted by this function.
+ */
+export async function generateCourseReviewDraft(
+  request: CourseReviewDraftRequest,
+): Promise<CourseReviewDraftResponse> {
+  const client = getClient();
+  if (!client) {
+    return {
+      success: false,
+      error: 'AI review is not configured. Please contact support.',
+    };
+  }
+
+  try {
+    const completion = await client.chat.completions.create({
+      model: 'deepseek-chat',
+      messages: [
+        {
+          role: 'system',
+          content: buildCourseReviewSystemPrompt(request.locale),
+        },
+        {
+          role: 'user',
+          content: buildCourseReviewUserPrompt(request),
+        },
+      ],
+      temperature: 0.1,
+      max_tokens: 2_048,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content || typeof content !== 'string') {
+      return { success: false, error: 'AI returned an empty review draft.' };
+    }
+
+    return {
+      success: true,
+      draft: parseCourseReviewDraftOutput(content),
+    };
+  } catch (error: unknown) {
+    console.error('[AI Course Review] Failed to generate draft:', error);
+    const message = error instanceof Error ? error.message : String(error);
+    const status = (error as { status?: number })?.status;
+
+    if (status === 401) {
+      return {
+        success: false,
+        error: 'AI authentication failed. Please check configuration.',
+      };
+    }
+
+    if (status === 429 || message.includes('429')) {
+      return {
+        success: false,
+        error: 'AI service is busy. Please try again later.',
+      };
+    }
+
+    return {
+      success: false,
+      error:
+        'Unable to generate the review draft. Verify the files and try again.',
+    };
+  }
 }
 
 /**
  * Generate an AI hint for a challenge using DeepSeek Chat (V3).
  * The hint guides the user without revealing the exact solution.
  */
-export async function generateHint(request: HintRequest): Promise<HintResponse> {
-    const { challengeType, instructions, htmlContent, starterCode, userAttempt, locale = 'en', staticHints } = request;
+export async function generateHint(
+  request: HintRequest,
+): Promise<HintResponse> {
+  const {
+    challengeType,
+    instructions,
+    htmlContent,
+    starterCode,
+    userAttempt,
+    locale = 'en',
+    staticHints,
+  } = request;
 
-    const client = getClient();
-    if (!client) {
-        return {
-            success: false,
-            error: 'AI hints are not configured. Please contact support.',
-        };
+  const client = getClient();
+  if (!client) {
+    return {
+      success: false,
+      error: 'AI hints are not configured. Please contact support.',
+    };
+  }
+
+  // Optimization: Keep system prompt static for DeepSeek caching.
+  // Pass 'challengeType' to user prompt instead.
+  const systemPrompt = getSystemPrompt(locale);
+  const userPrompt = buildUserPrompt(
+    challengeType,
+    instructions,
+    htmlContent,
+    starterCode,
+    userAttempt,
+    locale,
+    staticHints,
+  );
+
+  console.log('[AI Debug] System Prompt:', systemPrompt);
+  console.log('[AI Debug] User Prompt:', userPrompt);
+
+  try {
+    const completion = await client.chat.completions.create({
+      model: 'deepseek-chat',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt },
+      ],
+      // DeepSeek specific parameters if any needed, usually standard OpenAI params work
+      temperature: 0.7,
+      max_tokens: 1024,
+    });
+
+    const hint = completion.choices[0].message.content?.trim();
+
+    if (!hint) {
+      return {
+        success: false,
+        error: 'Unable to generate hint. Please try again.',
+      };
     }
 
-    // Optimization: Keep system prompt static for DeepSeek caching. 
-    // Pass 'challengeType' to user prompt instead.
-    const systemPrompt = getSystemPrompt(locale);
-    const userPrompt = buildUserPrompt(challengeType, instructions, htmlContent, starterCode, userAttempt, locale, staticHints);
+    return {
+      success: true,
+      hint,
+    };
+  } catch (error: unknown) {
+    console.error('[AI Hint] Error generating hint:', error);
 
-    console.log('[AI Debug] System Prompt:', systemPrompt);
-    console.log('[AI Debug] User Prompt:', userPrompt);
+    // Specific DeepSeek/OpenAI error handling
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const status =
+      (error as { status?: number; response?: { status?: number } })?.status ||
+      (error as { status?: number; response?: { status?: number } })?.response
+        ?.status; // Check for HTTP status code if available
 
-    try {
-        const completion = await client.chat.completions.create({
-            model: 'deepseek-chat',
-            messages: [
-                { role: 'system', content: systemPrompt },
-                { role: 'user', content: userPrompt },
-            ],
-            // DeepSeek specific parameters if any needed, usually standard OpenAI params work
-            temperature: 0.7,
-            max_tokens: 1024,
-        });
-
-        const hint = completion.choices[0].message.content?.trim();
-
-        if (!hint) {
-            return {
-                success: false,
-                error: 'Unable to generate hint. Please try again.',
-            };
-        }
-
-        return {
-            success: true,
-            hint,
-        };
-    } catch (error: unknown) {
-        console.error('[AI Hint] Error generating hint:', error);
-
-        // Specific DeepSeek/OpenAI error handling
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const status = (error as { status?: number; response?: { status?: number } })?.status
-            || (error as { status?: number; response?: { status?: number } })?.response?.status; // Check for HTTP status code if available
-
-        if (status === 401) {
-            return {
-                success: false,
-                error: 'AI authentication failed. Please check configuration.',
-            };
-        }
-
-        if (status === 402) {
-            return {
-                success: false,
-                error: 'AI service PI balance is exhausted. Hints are temporarily unavailable.',
-            };
-        }
-
-        if (status === 429 || errorMessage.includes('429') || errorMessage.includes('Too Many Requests')) {
-            return {
-                success: false,
-                error: 'AI service is busy, please try again.',
-            };
-        }
-
-        if (errorMessage.includes('timed out')) {
-            return {
-                success: false,
-                error: 'Request timed out. Please try again.',
-            };
-        }
-
-        // Generic 5xx or other errors
-        if (status && status >= 500) {
-            return {
-                success: false,
-                error: 'AI service unavailable. Please try again later.',
-            };
-        }
-
-        return {
-            success: false,
-            error: 'Failed to generate hint. Please try again later.',
-        };
+    if (status === 401) {
+      return {
+        success: false,
+        error: 'AI authentication failed. Please check configuration.',
+      };
     }
+
+    if (status === 402) {
+      return {
+        success: false,
+        error:
+          'AI service PI balance is exhausted. Hints are temporarily unavailable.',
+      };
+    }
+
+    if (
+      status === 429 ||
+      errorMessage.includes('429') ||
+      errorMessage.includes('Too Many Requests')
+    ) {
+      return {
+        success: false,
+        error: 'AI service is busy, please try again.',
+      };
+    }
+
+    if (errorMessage.includes('timed out')) {
+      return {
+        success: false,
+        error: 'Request timed out. Please try again.',
+      };
+    }
+
+    // Generic 5xx or other errors
+    if (status && status >= 500) {
+      return {
+        success: false,
+        error: 'AI service unavailable. Please try again later.',
+      };
+    }
+
+    return {
+      success: false,
+      error: 'Failed to generate hint. Please try again later.',
+    };
+  }
 }
 
 function getSystemPrompt(locale: string): string {
-    const isIndonesian = locale === 'id';
+  const isIndonesian = locale === 'id';
 
-    // STATIC PROMPT - Do not include dynamic variables here to maximize DeepSeek caching
-    const basePrompt = isIndonesian
-        ? `Kamu adalah mentor QA teknis yang membantu siswa belajar web testing.
+  // STATIC PROMPT - Do not include dynamic variables here to maximize DeepSeek caching
+  const basePrompt = isIndonesian
+    ? `Kamu adalah mentor QA teknis yang membantu siswa belajar web testing.
 
 Aturan PENTING:
 1. JANGAN PERNAH memberikan solusi lengkap (copy-paste solution).
@@ -147,7 +265,7 @@ LINGKUNGAN TEKNIS (Browser Shim):
 - State sesi disimpan di 'window.__APP_STATE__', bukan localStorage
 - Statement import '@playwright/test' hanya dekoratif (dihapus saat eksekusi)
 - Gunakan sintaks Playwright standar; shim akan mengemulasikannya`
-        : `You are a technical QA mentor helping a student learn web testing.
+    : `You are a technical QA mentor helping a student learn web testing.
 
 IMPORTANT Rules:
 1. NEVER give the exact copy-paste solution.
@@ -165,64 +283,64 @@ TECHNICAL ENVIRONMENT (Browser Shim):
 - The 'import from @playwright/test' statement is decorative (stripped at runtime)
 - Use standard Playwright syntax; the shim intercepts and emulates it`;
 
-    return basePrompt;
+  return basePrompt;
 }
 
 function buildUserPrompt(
-    challengeType: string,
-    instructions: string,
-    htmlContent?: string,
-    starterCode?: string,
-    userAttempt?: string,
-    locale?: string,
-    staticHints?: string[]
+  challengeType: string,
+  instructions: string,
+  htmlContent?: string,
+  starterCode?: string,
+  userAttempt?: string,
+  locale?: string,
+  staticHints?: string[],
 ): string {
-    const isIndonesian = locale === 'id';
-    const readableType = challengeType.replace('_', ' ');
+  const isIndonesian = locale === 'id';
+  const readableType = challengeType.replace('_', ' ');
 
-    // Start with Context to establish what we are testing (formerly in system prompt)
-    let prompt = isIndonesian
-        ? `Konteks: Tantangan ${readableType}.\n\n`
-        : `Context: ${readableType} Challenge.\n\n`;
+  // Start with Context to establish what we are testing (formerly in system prompt)
+  let prompt = isIndonesian
+    ? `Konteks: Tantangan ${readableType}.\n\n`
+    : `Context: ${readableType} Challenge.\n\n`;
 
+  prompt += isIndonesian
+    ? `## Instruksi Tantangan\n${instructions}\n`
+    : `## Challenge Instructions\n${instructions}\n`;
+
+  // Add Technical Environment Section for PLAYWRIGHT challenges
+  if (challengeType === 'PLAYWRIGHT') {
     prompt += isIndonesian
-        ? `## Instruksi Tantangan\n${instructions}\n`
-        : `## Challenge Instructions\n${instructions}\n`;
+      ? `\n## Catatan Lingkungan\n- \`test()\` menyediakan fixture \`{ page }\` (expect tersedia global)\n- Class Page Object sudah preloaded sebagai global (tidak perlu import)\n- \`await expect(locator).toBeVisible()\` berfungsi seperti biasa\n- Navigasi: \`await page.goto('/path')\` menggunakan Virtual File System\n- State sesi: Gunakan \`window.__APP_STATE__\` jika diperlukan (bukan localStorage)\n`
+      : `\n## Environment Notes\n- \`test()\` provides \`{ page }\` fixture (expect is available globally)\n- Page Object classes are preloaded globals (no import needed)\n- \`await expect(locator).toBeVisible()\` works as expected\n- Navigation: \`await page.goto('/path')\` uses Virtual File System\n- Session state: Use \`window.__APP_STATE__\` if needed (not localStorage)\n`;
+  }
 
-    // Add Technical Environment Section for PLAYWRIGHT challenges
-    if (challengeType === 'PLAYWRIGHT') {
-        prompt += isIndonesian
-            ? `\n## Catatan Lingkungan\n- \`test()\` menyediakan fixture \`{ page }\` (expect tersedia global)\n- Class Page Object sudah preloaded sebagai global (tidak perlu import)\n- \`await expect(locator).toBeVisible()\` berfungsi seperti biasa\n- Navigasi: \`await page.goto('/path')\` menggunakan Virtual File System\n- State sesi: Gunakan \`window.__APP_STATE__\` jika diperlukan (bukan localStorage)\n`
-            : `\n## Environment Notes\n- \`test()\` provides \`{ page }\` fixture (expect is available globally)\n- Page Object classes are preloaded globals (no import needed)\n- \`await expect(locator).toBeVisible()\` works as expected\n- Navigation: \`await page.goto('/path')\` uses Virtual File System\n- Session state: Use \`window.__APP_STATE__\` if needed (not localStorage)\n`;
-    }
+  if (staticHints && staticHints.length > 0) {
+    prompt += isIndonesian
+      ? `\n## Petunjuk yang Sudah Diberikan\nSiswa sudah membaca petunjuk statis berikut:\n${staticHints.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nJANGAN mengulangi informasi dari petunjuk di atas. Berikan bantuan yang lebih mendalam atau spesifik berdasarkan kode mereka.`
+      : `\n## Already Provided Hints\nThe student has already read these static hints:\n${staticHints.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nDO NOT repeat information from the hints above. Provide more in-depth or specific assistance based on their code.`;
+  }
 
-    if (staticHints && staticHints.length > 0) {
-        prompt += isIndonesian
-            ? `\n## Petunjuk yang Sudah Diberikan\nSiswa sudah membaca petunjuk statis berikut:\n${staticHints.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nJANGAN mengulangi informasi dari petunjuk di atas. Berikan bantuan yang lebih mendalam atau spesifik berdasarkan kode mereka.`
-            : `\n## Already Provided Hints\nThe student has already read these static hints:\n${staticHints.map((h, i) => `${i + 1}. ${h}`).join('\n')}\n\nDO NOT repeat information from the hints above. Provide more in-depth or specific assistance based on their code.`;
-    }
+  if (htmlContent) {
+    prompt += isIndonesian
+      ? `\n## Konten HTML\n\`\`\`html\n${htmlContent.slice(0, 1500)}\n\`\`\`\n`
+      : `\n## HTML Content\n\`\`\`html\n${htmlContent.slice(0, 1500)}\n\`\`\`\n`;
+  }
 
-    if (htmlContent) {
-        prompt += isIndonesian
-            ? `\n## Konten HTML\n\`\`\`html\n${htmlContent.slice(0, 1500)}\n\`\`\`\n`
-            : `\n## HTML Content\n\`\`\`html\n${htmlContent.slice(0, 1500)}\n\`\`\`\n`;
-    }
+  // Optimization: Treat starter code as "no attempt" to get general guidance
+  // Normalize by stripping whitespace for loose comparison
+  const normalizedAttempt = userAttempt?.trim() || '';
+  const normalizedStarter = starterCode?.trim() || '';
+  const isStarterCode = normalizedAttempt === normalizedStarter;
 
-    // Optimization: Treat starter code as "no attempt" to get general guidance
-    // Normalize by stripping whitespace for loose comparison
-    const normalizedAttempt = userAttempt?.trim() || '';
-    const normalizedStarter = starterCode?.trim() || '';
-    const isStarterCode = normalizedAttempt === normalizedStarter;
+  if (normalizedAttempt && !isStarterCode) {
+    prompt += isIndonesian
+      ? `\n## Percobaan Siswa\n\`\`\`\n${userAttempt}\n\`\`\`\n\nSiswa sudah mencoba ini tapi belum berhasil. Bantu mereka pahami apa yang perlu diperbaiki tanpa memberikan jawabannya.`
+      : `\n## Student's Attempt\n\`\`\`\n${userAttempt}\n\`\`\`\n\nThe student tried this but it didn't work. Help them understand what to adjust without giving away the answer.`;
+  } else {
+    prompt += isIndonesian
+      ? `\nSiswa belum melakukan perubahan signifikan pada kode awal. Berikan petunjuk umum tentang teknik apa yang harus mereka eksplorasi.`
+      : `\nThe student hasn't made significant changes to the starter code yet. Give them a general hint about what technique they should explore.`;
+  }
 
-    if (normalizedAttempt && !isStarterCode) {
-        prompt += isIndonesian
-            ? `\n## Percobaan Siswa\n\`\`\`\n${userAttempt}\n\`\`\`\n\nSiswa sudah mencoba ini tapi belum berhasil. Bantu mereka pahami apa yang perlu diperbaiki tanpa memberikan jawabannya.`
-            : `\n## Student's Attempt\n\`\`\`\n${userAttempt}\n\`\`\`\n\nThe student tried this but it didn't work. Help them understand what to adjust without giving away the answer.`;
-    } else {
-        prompt += isIndonesian
-            ? `\nSiswa belum melakukan perubahan signifikan pada kode awal. Berikan petunjuk umum tentang teknik apa yang harus mereka eksplorasi.`
-            : `\nThe student hasn't made significant changes to the starter code yet. Give them a general hint about what technique they should explore.`;
-    }
-
-    return prompt;
+  return prompt;
 }
