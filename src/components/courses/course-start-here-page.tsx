@@ -21,6 +21,7 @@ import type {
   CourseContentDocument,
   CourseManifest,
 } from '@/lib/course-content.types';
+import { getCourseOverviewHref } from '@/lib/course-navigation';
 
 export interface CourseStartHereData {
   manifest: CourseManifest;
@@ -36,7 +37,7 @@ function CourseStartHerePage({ course, locale }: CourseStartHerePageProps) {
   const { t } = useTranslation('courses');
   const { content, manifest } = course;
   const startHere = content.startHere;
-  const overviewHref = `/${locale}/courses/${manifest.slug}`;
+  const overviewHref = getCourseOverviewHref(locale, manifest.slug);
 
   return (
     <main
@@ -265,7 +266,10 @@ function CourseStartHerePage({ course, locale }: CourseStartHerePageProps) {
 
         <div className="flex justify-start">
           <Button asChild variant="outline">
-            <a href={overviewHref}>
+            <a
+              href={overviewHref}
+              data-testid="course-start-here-overview-link"
+            >
               <ArrowLeft className="h-4 w-4" />
               {t('startHere.backToCourse')}
             </a>

@@ -12,6 +12,9 @@ export const REQUIREMENTS_CHECKPOINT_SLUG = '01-requirements' as const;
 export const TEST_DESIGN_CHECKPOINT_SLUG = '02-test-design' as const;
 export const TEST_WRITING_CHECKPOINT_SLUG = '03-test-writing' as const;
 export const AUTOMATION_CHECKPOINT_SLUG = '04-automation' as const;
+export const EXECUTION_CHECKPOINT_SLUG = '05-execution' as const;
+export const TRIAGE_CHECKPOINT_SLUG = '06-triage' as const;
+export const QUALITY_SUMMARY_CHECKPOINT_SLUG = '07-quality-summary' as const;
 
 export const COURSE_CHECKPOINT_ROUTE =
   '/$locale/_authenticated/courses/$courseSlug/checkpoints/$checkpointSlug' as const;
@@ -27,7 +30,10 @@ export function isSupportedCourseCheckpointParams(
     (checkpointSlug === REQUIREMENTS_CHECKPOINT_SLUG ||
       checkpointSlug === TEST_DESIGN_CHECKPOINT_SLUG ||
       checkpointSlug === TEST_WRITING_CHECKPOINT_SLUG ||
-      checkpointSlug === AUTOMATION_CHECKPOINT_SLUG)
+      checkpointSlug === AUTOMATION_CHECKPOINT_SLUG ||
+      checkpointSlug === EXECUTION_CHECKPOINT_SLUG ||
+      checkpointSlug === TRIAGE_CHECKPOINT_SLUG ||
+      checkpointSlug === QUALITY_SUMMARY_CHECKPOINT_SLUG)
   );
 }
 
@@ -56,6 +62,30 @@ export function getCourseCheckpointSeoMetadata(checkpointSlug: string): {
       title: 'Checkpoint 4: Playwright Automation | TestingWithEkki',
       description:
         'Implementasikan test case terpilih dengan Playwright dan TypeScript menggunakan locator, assertion, dan struktur test yang maintainable.',
+    };
+  }
+
+  if (checkpointSlug === EXECUTION_CHECKPOINT_SLUG) {
+    return {
+      title: 'Checkpoint 5: Test Execution and Evidence | TestingWithEkki',
+      description:
+        'Jalankan test Playwright secara lokal, baca hasilnya, dan kumpulkan evidence yang relevan untuk keputusan QA.',
+    };
+  }
+
+  if (checkpointSlug === TRIAGE_CHECKPOINT_SLUG) {
+    return {
+      title: 'Checkpoint 6: Failure Triage | TestingWithEkki',
+      description:
+        'Investigasi failure Playwright dengan evidence, uji hipotesis, dan klasifikasikan penyebab sebagai test, product, environment, atau data issue.',
+    };
+  }
+
+  if (checkpointSlug === QUALITY_SUMMARY_CHECKPOINT_SLUG) {
+    return {
+      title: 'Checkpoint 7: Quality Decision and Capstone | TestingWithEkki',
+      description:
+        'Rangkum area yang diuji dan belum diuji, dokumentasikan evidence, keterbatasan, serta residual risk untuk membuat rekomendasi kualitas berbasis risiko dan menyelesaikan capstone.',
     };
   }
 
@@ -140,6 +170,8 @@ function CourseCheckpointRoute() {
     content: data.data.content,
     checkpoint,
     completed: data.data.completedCheckpointSlugs.includes(checkpoint.slug),
+    completedCheckpointSlugs: data.data.completedCheckpointSlugs,
+    capstoneCompleted: data.data.capstoneCompleted,
   };
 
   return <CourseCheckpointPage course={course} locale="id" />;

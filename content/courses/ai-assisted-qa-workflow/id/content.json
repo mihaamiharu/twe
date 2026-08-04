@@ -465,17 +465,17 @@
       "reflectionId": "ai-assisted-qa-workflow.checkpoints.05-execution.reflection",
       "completionId": "ai-assisted-qa-workflow.checkpoints.05-execution.completion",
       "title": "Menjalankan tes dan mengumpulkan evidence",
-      "objective": "Mampu menjalankan suite secara lokal, membaca hasil, dan menyimpan evidence yang cukup untuk keputusan QA.",
+      "objective": "Mampu menjalankan suite Playwright secara lokal, membaca hasil test, dan menyimpan evidence yang cukup untuk keputusan QA.",
       "video": {
         "status": "planned",
         "title": "Evidence dari test run",
         "durationMinutes": 8,
         "focus": "Menjelaskan hasil pass/fail, screenshot, trace, log, dan perbedaan antara output tool dan bukti produk."
       },
-      "writtenLesson": "## Fokus\n\nHasil test run adalah bukti yang perlu dibaca dalam konteks, bukan keputusan kualitas otomatis.\n\n## Konsep inti\n\nSimpan command, environment, timestamp, hasil, screenshot atau trace yang relevan, serta keterbatasan evidence.",
+      "writtenLesson": "## Fokus\n\nJalankan test Playwright di companion repository milikmu. TestingWithEkki menyediakan materi dan menyimpan progress, tetapi tidak menjalankan browser secara live atau menerima artifact evidence.\n\n## Menjalankan dan membaca hasil test\n\nGunakan command pada README repository, misalnya `npx playwright test` untuk menjalankan smoke atau functional test. Baca output terminal dan buka report dengan `npx playwright show-report` bila tersedia. Untuk failure yang perlu ditelusuri, periksa screenshot dan buka trace dengan `npx playwright show-trace path/to/trace.zip`. Perhatikan jumlah passed, failed, skipped, durasi, error assertion atau locator, serta kondisi environment saat run.\n\n## Evidence, asumsi, dan interpretasi\n\nPisahkan fakta yang benar-benar terlihat di output, screenshot, trace, atau report dari asumsi dan hipotesis tentang penyebabnya. Simpan command, environment, timestamp, hasil, evidence yang relevan, serta keterbatasan evidence. Test passed membuktikan assertion pada kondisi run tersebut; itu bukan bukti bahwa seluruh feature atau kualitas produk sudah terbukti.",
       "aiActivity": {
         "goal": "Memakai AI untuk membantu merangkum output run tanpa mengubah ringkasan menjadi klaim yang tidak didukung evidence.",
-        "prompt": "Tinjau hasil test run dan metadata environment ini. Buat ringkasan pass/fail, evidence yang tersedia, pertanyaan terbuka, dan klaim yang belum boleh dibuat. Jangan menyimpulkan kualitas produk hanya dari status pass.",
+        "prompt": "Tinjau output test run, report, screenshot atau trace, dan metadata environment ini. Buat ringkasan pass/fail, fakta evidence, asumsi atau hipotesis, pertanyaan terbuka, dan klaim yang belum boleh dibuat. Jangan menyimpulkan kualitas produk hanya dari status pass.",
         "learnerActions": [
           "AI mengusulkan ringkasan dan daftar pertanyaan.",
           "Learner memverifikasi setiap klaim terhadap log, screenshot, dan trace.",
@@ -487,9 +487,9 @@
       "localExercise": {
         "repositoryPaths": ["05-execution", "evidence/", "docs/reports/"],
         "instructions": [
-          "Jalankan smoke dan functional test sesuai README repository.",
-          "Simpan hasil yang aman untuk dibagikan dan catat environment.",
-          "Pisahkan observed result, test output, dan interpretasi QA."
+          "Jalankan smoke dan functional test Playwright sesuai README repository, lalu catat command yang dipakai.",
+          "Baca output pass/fail dan report; periksa screenshot atau trace untuk run yang relevan.",
+          "Simpan hasil yang aman untuk dibagikan, catat environment dan timestamp, lalu pisahkan observed result, test output, asumsi, dan interpretasi QA."
         ],
         "expectedArtifacts": [
           "execution-report.md",
@@ -530,56 +530,71 @@
       "reflectionId": "ai-assisted-qa-workflow.checkpoints.06-triage.reflection",
       "completionId": "ai-assisted-qa-workflow.checkpoints.06-triage.completion",
       "title": "Melakukan failure triage",
-      "objective": "Mampu mengklasifikasikan failure sebagai masalah test, produk, environment, atau data dan menyusun hipotesis berdasarkan evidence.",
+      "objective": "Mampu menyelidiki failed Playwright test dengan evidence, menguji hipotesis, lalu mengklasifikasikan penyebab sebagai masalah test, produk, environment, atau data.",
       "video": {
         "status": "planned",
         "title": "Failure bukan otomatis product bug",
         "durationMinutes": 10,
-        "focus": "Mengajarkan triage berbasis reproduksi, evidence, dan hipotesis yang dapat diuji."
+        "focus": "Mengajarkan investigasi failed test berbasis evidence, reproduksi terbatas, dan hipotesis yang dapat diuji."
       },
-      "writtenLesson": "## Fokus\n\nFailure triage dimulai dari menjaga bukti dan mempersempit kemungkinan penyebab.\n\n## Konsep inti\n\nBedakan test defect, product defect, environment issue, dan test-data problem. Jangan mengubah test secara acak hanya agar statusnya hijau.",
+      "writtenLesson": "## Fokus\n\nFailure triage adalah investigasi terhadap failed Playwright test, bukan perlombaan membuat status kembali hijau. Mulai dengan menyimpan failure packet dan konteks run, lalu gunakan evidence untuk mempersempit penyebab.\n\n## Evidence sebelum perubahan kode\n\nSebelum mengubah test atau konfigurasi, catat command, commit atau versi code, browser dan OS, timestamp, environment variable yang aman untuk dibagikan, output terminal, stack trace, screenshot, trace, report, serta test data yang dipakai. Bandingkan expected result dengan observed result. Jangan menimpa evidence awal dengan hasil rerun dan jangan menyamarkan failure dengan menaikkan timeout atau melemahkan assertion tanpa alasan yang bisa dijelaskan.\n\n## Empat klasifikasi failure\n\n- **Test issue:** locator, assertion, fixture, setup, atau asumsi test salah; produk dapat berperilaku sesuai requirement ketika diperiksa dengan cara lain.\n- **Product issue:** failure dapat direproduksi pada produk dengan test atau observasi independen dan perilakunya bertentangan dengan expected result atau requirement.\n- **Environment issue:** browser, dependency, network, permission, service availability, atau konfigurasi mesin menghalangi test sebelum perilaku produk dapat dinilai.\n- **Test-data issue:** fixture, tanggal, locale, state akun, atau data sintetis tidak valid, sudah kedaluwarsa, atau tidak sesuai prasyarat test.\n\nSatu failure dapat memiliki lebih dari satu faktor. Pilih klasifikasi utama yang paling didukung evidence dan tulis ketidakpastian yang masih tersisa.\n\n## Bentuk dan uji hipotesis\n\nTulis hipotesis yang dapat dibantah, misalnya: `H1: locator gagal karena UI berubah`, `H2: browser tidak siap di environment ini`, atau `H3: seeded data sudah tidak memenuhi prasyarat`. Untuk setiap hipotesis, sebutkan evidence yang mendukung, evidence yang belum ada, dan satu pemeriksaan berisiko rendah yang membedakannya. Ulangi run secara terbatas dengan satu variabel berubah, lalu perbarui klasifikasi berdasarkan hasilnya. Evidence yang tidak cukup berarti statusnya masih belum pasti, bukan alasan untuk menebak.\n\n## AI sebagai partner analisis\n\nAI boleh mengusulkan ringkasan, klasifikasi, dan langkah verifikasi dari failure packet. AI tidak boleh dianggap sebagai sumber fakta atau pemberi verdict. Ikuti alur **AI proposes → learner verifies → learner edits → learner justifies**: cocokkan setiap klaim dengan packet, hapus saran yang tidak didukung, lalu tulis alasan keputusanmu sendiri.",
       "aiActivity": {
-        "goal": "Memakai AI untuk membuat daftar hipotesis triage lalu menguji apakah hipotesis itu didukung evidence.",
-        "prompt": "Analisis failure packet ini. Kelompokkan hipotesis sebagai test, product, environment, atau data problem. Untuk setiap hipotesis, sebutkan evidence yang mendukung, evidence yang kurang, dan langkah verifikasi berisiko rendah.",
+        "goal": "Memakai AI untuk membuat daftar hipotesis triage dari failure packet lalu menguji apakah hipotesis itu didukung evidence.",
+        "prompt": "Analisis failure packet dari companion repository ini tanpa mengarang fakta. Kelompokkan hipotesis sebagai test issue, product issue, environment issue, atau test-data issue. Untuk setiap hipotesis, sebutkan evidence yang mendukung, evidence yang kurang, confidence sementara, dan langkah verifikasi berisiko rendah. Pisahkan observed facts dari assumptions, lalu tandai keputusan yang tetap harus dibuat learner.",
         "learnerActions": [
-          "AI mengusulkan klasifikasi dan hipotesis.",
-          "Learner memverifikasi hipotesis dengan output, reproduksi, dan perubahan environment.",
-          "Learner mengedit klasifikasi serta menambahkan bukti yang kurang.",
-          "Learner menjelaskan keputusan triage dan langkah berikutnya."
+          "AI mengusulkan klasifikasi, hipotesis, dan pemeriksaan pembeda dari failure packet.",
+          "Learner memverifikasi setiap klaim dengan output, reproduksi terbatas, dan konteks environment.",
+          "Learner mengedit analisis, memisahkan fakta dari asumsi, serta menambahkan evidence yang kurang.",
+          "Learner menjelaskan klasifikasi, confidence, batas ketidakpastian, dan langkah berikutnya."
         ],
-        "expectedOutput": "Failure analysis dengan klasifikasi, evidence, hipotesis, dan rencana verifikasi."
+        "expectedOutput": "Failure analysis dengan klasifikasi utama, evidence yang dapat ditelusuri, hipotesis teruji atau terbantahkan, confidence, dan rencana verifikasi berikutnya."
       },
       "localExercise": {
-        "repositoryPaths": ["06-triage", "docs/reports/"],
-        "instructions": [
-          "Gunakan seeded failure atau failure packet yang tersedia.",
-          "Reproduksi secara terbatas dan catat perubahan antara run.",
-          "Klasifikasikan penyebab tanpa menghapus evidence awal."
+        "repositoryPaths": [
+          "06-triage",
+          "06-triage/failure-packet/",
+          "docs/reports/"
         ],
-        "expectedArtifacts": ["failure-analysis.md", "triage-notes.md"],
+        "instructions": [
+          "Buka seeded failure atau recorded failure packet dari companion repository pada path 06-triage/failure-packet/; jangan mengganti packet awal dengan hasil analisis.",
+          "Jalankan kembali test secara lokal dengan command dan batas aman yang dicatat repository. Simpan output awal, lalu ubah hanya satu variabel pada setiap pemeriksaan pembeda.",
+          "Buat daftar fakta observed result, expected result, dan konteks environment sebelum membentuk hipotesis.",
+          "Gunakan AI untuk mengusulkan klasifikasi dan hipotesis, lalu verifikasi dan edit hasilnya terhadap packet.",
+          "Tulis klasifikasi utama (test, product, environment, atau test-data), alasan evidence-backed, confidence, dan langkah verifikasi berikutnya."
+        ],
+        "expectedArtifacts": [
+          "failure-analysis.md",
+          "triage-notes.md",
+          "failure packet atau referensi packet yang digunakan"
+        ],
         "safetyNotes": [
-          "Gunakan seeded failure untuk latihan deterministik bila target publik tidak stabil.",
-          "Jangan mencoba memperluas failure menjadi probing keamanan.",
-          "Jangan menganggap setiap failure sebagai defect produk."
+          "Gunakan seeded atau recorded failure packet untuk latihan deterministik bila target publik tidak stabil.",
+          "Jalankan hanya di repository dan environment lokal milikmu; jangan menambahkan live browser execution ke TestingWithEkki.",
+          "Jangan mencoba memperluas failure menjadi probing keamanan, load test, atau aksi booking nyata.",
+          "Periksa screenshot, trace, log, dan data sebelum commit agar tidak berisi credential atau informasi pribadi.",
+          "Jangan menganggap setiap failure sebagai defect produk dan jangan menghapus evidence awal."
         ]
       },
       "evidenceChecklist": [
-        "Failure packet, command, dan environment tercatat.",
-        "Hipotesis dipisahkan dari fakta observasi.",
-        "Klasifikasi test, product, environment, atau data memiliki alasan.",
-        "Langkah verifikasi berikutnya aman dan dapat dilakukan."
+        "Seeded atau recorded failure packet, command, commit atau versi code, timestamp, dan environment tercatat.",
+        "Expected result, observed result, output, screenshot atau trace, serta test data dapat ditelusuri dan evidence awal tetap utuh.",
+        "Fakta observasi dipisahkan dari asumsi, hipotesis, dan confidence sementara.",
+        "Klasifikasi test issue, product issue, environment issue, atau test-data issue memiliki alasan evidence-backed.",
+        "Setiap hipotesis memiliki pemeriksaan pembeda dan hasil verifikasi yang dicatat.",
+        "Langkah berikutnya aman, lokal, terbatas, dan tidak bergantung pada AI verdict otomatis."
       ],
       "reflectionPrompts": [
-        "Evidence apa yang mengubah klasifikasi failure-mu?",
-        "Apa perbedaan antara memperbaiki test defect dan menyembunyikan product defect?",
-        "Kapan kamu akan berhenti mencoba reproduksi?"
+        "Evidence apa yang paling mengubah klasifikasi failure-mu, dan mengapa evidence itu lebih kuat daripada asumsi awal?",
+        "Bagaimana kamu membedakan memperbaiki test issue dari menyembunyikan product issue dengan melemahkan assertion?",
+        "Hipotesis apa yang belum terbukti, dan kapan kamu akan berhenti mencoba reproduksi?",
+        "Bagian mana dari analisis AI yang kamu edit atau tolak setelah memeriksa failure packet?"
       ],
       "completionAction": {
         "id": "ai-assisted-qa-workflow.checkpoints.06-triage.completion",
         "label": "Konfirmasi failure triage selesai",
         "requirements": [
-          "Failure analysis dan triage notes sudah dibuat.",
-          "Klasifikasi didukung evidence dan hipotesis.",
+          "Failure packet sudah diinvestigasi dan failure analysis serta triage notes sudah dibuat.",
+          "Klasifikasi dan hipotesis didukung evidence, dengan ketidakpastian yang masih terbuka dicatat.",
           "Reflection sudah dijawab di repository pribadi."
         ],
         "selfAttested": true
@@ -590,37 +605,40 @@
       "order": 7,
       "reflectionId": "ai-assisted-qa-workflow.checkpoints.07-quality-summary.reflection",
       "completionId": "ai-assisted-qa-workflow.checkpoints.07-quality-summary.completion",
-      "title": "Memperbaiki test dan membuat quality decision",
-      "objective": "Mampu memperbaiki test defect atau mendokumentasikan product defect, menjalankan verifikasi ulang, dan merangkum residual risk.",
+      "title": "Membuat quality summary dan menyelesaikan capstone",
+      "objective": "Mampu memperbaiki test defect atau mendokumentasikan product defect, merangkum area yang diuji dan belum diuji, melaporkan evidence serta keterbatasannya, mendokumentasikan residual risk, dan membuat rekomendasi kualitas atau release berbasis risiko.",
       "video": {
         "status": "planned",
         "title": "Dari failure ke keputusan kualitas",
         "durationMinutes": 10,
-        "focus": "Menghubungkan triage, re-run, defect communication, coverage gap, dan rekomendasi release-quality."
+        "focus": "Menghubungkan triage, re-run, defect communication, area tested dan untested, coverage gap, residual risk, serta rekomendasi release-quality."
       },
-      "writtenLesson": "## Fokus\n\nKeputusan kualitas harus menjelaskan evidence, hal yang belum diuji, dan residual risk.\n\n## Konsep inti\n\nSetelah triage, perbaiki test jika memang test defect atau tulis defect report jika masalahnya ada di produk. Re-run lalu nyatakan batas keyakinanmu.",
+      "writtenLesson": "## Fokus\n\nQuality summary bukan klaim bahwa semua hal sudah aman. Dokumen ini harus membantu stakeholder memahami apa yang benar-benar diuji, apa yang belum diuji, evidence yang tersedia, keterbatasan evidence, dan residual risk.\n\n## Dari triage ke evidence baru\n\nSetelah triage, perbaiki test jika memang test defect atau tulis defect report jika masalahnya ada di produk. Jangan mengubah assertion hanya untuk membuat status hijau. Jalankan re-run yang relevan, catat perubahan hasil, dan hubungkan perubahan itu ke evidence awal.\n\n## Tested, untested, dan limitations\n\nQuality summary harus memisahkan area yang diuji dari area yang belum diuji. Jelaskan scope, environment, browser, data, dan jalur yang diperiksa. Laporkan limitations seperti coverage yang sempit, satu environment, evidence yang tidak lengkap, flaky behavior, atau failure yang belum terverifikasi. Passed checks hanya mendukung klaim pada kondisi run tersebut.\n\n## Residual risk dan rekomendasi\n\nTuliskan residual risk yang masih diterima, dampak yang mungkin terjadi, confidence, dan langkah mitigasi atau follow-up. Buat rekomendasi risk-based seperti **release**, **release dengan catatan atau mitigasi**, atau **hold / needs revision**. Rekomendasi harus proporsional dengan severity, likelihood, coverage, evidence, dan ketidakpastian; bukan hanya jumlah test yang pass.\n\n## AI sebagai reviewer quality summary\n\nAI dapat mengkritik struktur summary, mencari gap, dan menandai klaim yang tidak memiliki evidence. AI tidak menentukan release decision. Ikuti alur **AI proposes → learner verifies → learner edits → learner justifies** dan tulis alasan keputusanmu sendiri.",
       "aiActivity": {
-        "goal": "Memakai AI untuk mengkritik quality summary dan defect communication tanpa membiarkan AI menentukan release decision.",
-        "prompt": "Tinjau failure analysis, hasil re-run, dan coverage gap. Buat draft quality summary yang memisahkan evidence, hal yang belum diuji, residual risk, dan rekomendasi. Tandai klaim yang memerlukan keputusan QA manusia.",
+        "goal": "Memakai AI untuk mengkritik quality summary dan defect communication tanpa membiarkan AI menentukan quality atau release decision.",
+        "prompt": "Tinjau failure analysis, defect report bila ada, hasil re-run, dan coverage gap. Kritik draft quality summary dengan memisahkan area yang diuji dan belum diuji, evidence, limitations, residual risk, serta rekomendasi release berbasis risiko. Tandai klaim yang tidak didukung evidence dan keputusan yang tetap harus dibuat QA manusia. Jangan memberi verdict otomatis.",
         "learnerActions": [
-          "AI mengusulkan draft defect report atau quality summary.",
-          "Learner memverifikasi draft terhadap evidence awal dan hasil re-run.",
-          "Learner mengedit rekomendasi agar proporsional dengan risk dan coverage.",
-          "Learner menjelaskan keputusan kualitas serta residual risk yang diterima."
+          "AI mengusulkan kritik dan draft defect report atau quality summary.",
+          "Learner memverifikasi setiap klaim terhadap evidence awal, hasil re-run, scope, dan limitation.",
+          "Learner mengedit coverage gap, residual risk, serta rekomendasi agar proporsional dengan risk dan evidence.",
+          "Learner menjelaskan quality atau release decision serta residual risk yang diterima."
         ],
-        "expectedOutput": "Updated test atau defect report dan quality summary dengan recommendation berbasis evidence."
+        "expectedOutput": "Updated test atau defect report dan quality summary yang membedakan tested, untested, evidence, limitations, residual risk, serta recommendation berbasis risk."
       },
       "localExercise": {
         "repositoryPaths": ["07-quality-summary", "docs/reports/"],
         "instructions": [
           "Terapkan hasil triage pada test atau dokumentasikan product defect.",
-          "Jalankan re-run yang relevan dan bandingkan dengan evidence awal.",
-          "Tulis quality summary yang menyebut coverage, gap, residual risk, dan rekomendasi."
+          "Jalankan re-run yang relevan dan bandingkan command, scope, hasil, serta evidence baru dengan evidence awal.",
+          "Tulis quality summary yang memisahkan area tested dan untested, evidence, limitations, coverage gap, residual risk, confidence, dan rekomendasi release berbasis risiko.",
+          "Gunakan AI untuk mengkritik summary, lalu verifikasi, edit, dan justifikasi keputusanmu di repository pribadi.",
+          "Gabungkan hasil tujuh checkpoint dan lanjutkan ke capstone end-to-end tanpa mengunggah artifact ke TestingWithEkki."
         ],
         "expectedArtifacts": [
           "updated test atau defect-report.md",
           "quality-summary.md",
-          "re-run evidence"
+          "re-run evidence",
+          "capstone evidence package"
         ],
         "safetyNotes": [
           "Jangan menandai release aman hanya karena semua check yang dipilih pass.",
@@ -630,13 +648,16 @@
       },
       "evidenceChecklist": [
         "Perbaikan test atau defect report dapat ditelusuri ke triage.",
-        "Re-run dan perubahan hasil tercatat.",
-        "Quality summary menyebut coverage gap dan residual risk.",
-        "Rekomendasi dibatasi oleh evidence dan keputusan QA."
+        "Re-run, scope, perubahan hasil, dan evidence baru dapat dibandingkan dengan evidence awal.",
+        "Quality summary memisahkan area tested dan untested serta menyebut coverage gap dan limitations.",
+        "Residual risk, dampak, confidence, dan follow-up atau mitigasi terdokumentasi.",
+        "Rekomendasi release atau quality dibatasi oleh evidence, severity, coverage, dan ketidakpastian.",
+        "Kritik AI telah diverifikasi dan diedit; keputusan akhir tetap merupakan keputusan learner."
       ],
       "reflectionPrompts": [
         "Apa yang membuatmu yakin bahwa perubahan yang dilakukan memperbaiki masalah yang benar?",
         "Risiko residual apa yang masih harus diketahui stakeholder?",
+        "Area apa yang belum diuji atau memiliki limitation paling penting, dan bagaimana dampaknya pada rekomendasi release?",
         "Bagaimana AI membantu tanpa mengambil alih quality decision?"
       ],
       "capstoneReference": "ai-assisted-qa-workflow.capstone",

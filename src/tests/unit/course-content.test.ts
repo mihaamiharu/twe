@@ -8,6 +8,7 @@ import {
   COURSE_CHECKPOINT_XP,
   COURSE_COMPLETION_ACHIEVEMENT_ID,
   applyCourseUnitCompletion,
+  courseCapstoneCompletionInputSchema,
   courseCheckpointCompletionInputSchema,
   getCourseProgressTutorialSlug,
   isCourseComplete,
@@ -146,6 +147,50 @@ describe('AI-assisted QA course manifest', () => {
     expect(content.capstone.completionAction.selfAttested).toBe(true);
   });
 
+  it('defines checkpoint 7 as the quality decision handoff into the capstone', async () => {
+    const content = await getCourseContent(
+      AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      'id',
+    );
+    const checkpoint = content?.checkpoints.find(
+      (candidate) => candidate.slug === '07-quality-summary',
+    );
+
+    expect(checkpoint).toBeTruthy();
+    expect(checkpoint?.order).toBe(7);
+    expect(checkpoint?.objective).toMatch(
+      /tested|belum diuji|evidence|residual risk|rekomendasi/i,
+    );
+    expect(checkpoint?.writtenLesson).toMatch(
+      /tested|untested|limitations|residual risk|release/i,
+    );
+    expect(checkpoint?.aiActivity.prompt).toMatch(
+      /quality summary|limitations|residual risk|release|verdict/i,
+    );
+    expect(checkpoint?.aiActivity.prompt).not.toMatch(
+      /ChatGPT|Claude|Copilot/i,
+    );
+    expect(checkpoint?.localExercise.repositoryPaths).toEqual([
+      '07-quality-summary',
+      'docs/reports/',
+    ]);
+    expect(checkpoint?.localExercise.expectedArtifacts).toContain(
+      'quality-summary.md',
+    );
+    expect(checkpoint?.localExercise.expectedArtifacts).toContain(
+      'capstone evidence package',
+    );
+    expect(checkpoint?.evidenceChecklist.join(' ')).toMatch(
+      /tested|untested|limitations|residual risk|rekomendasi/i,
+    );
+    expect(checkpoint?.reflectionPrompts.length).toBeGreaterThanOrEqual(3);
+    expect(checkpoint?.capstoneReference).toBe(content?.capstone.id);
+    expect(checkpoint?.completionAction).toMatchObject({
+      id: 'ai-assisted-qa-workflow.checkpoints.07-quality-summary.completion',
+      selfAttested: true,
+    });
+  });
+
   it('does not fall back to Indonesian course content for English', async () => {
     const englishContent = await getCourseContent(
       AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
@@ -237,6 +282,60 @@ describe('AI-assisted QA course progress contract', () => {
     expect(
       isCourseCompletionEligible(initialState, checkpointSlugs, true),
     ).toBe(false);
+  });
+
+  it('requires the capstone in addition to all seven completed checkpoints for the achievement', () => {
+    const allCheckpointsState: CourseProgressState = {
+      completedCheckpointSlugs: checkpointSlugs,
+      capstoneCompleted: false,
+    };
+    const completedState = {
+      ...allCheckpointsState,
+      capstoneCompleted: true,
+    };
+
+    expect(isCourseComplete(allCheckpointsState, checkpointSlugs)).toBe(false);
+    expect(
+      isCourseCompletionEligible(allCheckpointsState, checkpointSlugs, false),
+    ).toBe(false);
+    expect(isCourseComplete(completedState, checkpointSlugs)).toBe(true);
+    expect(
+      isCourseCompletionEligible(completedState, checkpointSlugs, false),
+    ).toBe(true);
+  });
+
+  it('uses the existing capstone completion contract without awarding XP', async () => {
+    const content = await getCourseContent(
+      AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      'id',
+    );
+    if (!content) throw new Error('Expected Indonesian course content');
+
+    const parsed = courseCapstoneCompletionInputSchema.parse({
+      courseSlug: AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      locale: 'id',
+      capstoneId: content.capstone.id,
+      completionId: content.capstone.completionAction.id,
+      reflectionId: content.capstone.reflectionId,
+      exerciseConfirmed: true,
+      reflectionConfirmed: true,
+    });
+
+    let state: CourseProgressState = {
+      completedCheckpointSlugs: checkpointSlugs,
+      capstoneCompleted: false,
+    };
+    const outcome = applyCourseUnitCompletion(
+      state,
+      { kind: 'capstone', id: parsed.capstoneId },
+      checkpointSlugs,
+    );
+    state = outcome.state;
+
+    expect(parsed.capstoneId).toBe('ai-assisted-qa-workflow.capstone');
+    expect(outcome.xpAwarded).toBe(0);
+    expect(outcome.courseComplete).toBe(true);
+    expect(state.capstoneCompleted).toBe(true);
   });
 
   it('defines one zero-XP course completion achievement', () => {
@@ -365,6 +464,82 @@ describe('AI-assisted QA course progress contract', () => {
     );
 
     expect(parsed.checkpointSlug).toBe('04-automation');
+    expect(first.xpAwarded).toBe(COURSE_CHECKPOINT_XP);
+    expect(duplicate.wasAlreadyCompleted).toBe(true);
+    expect(duplicate.xpAwarded).toBe(0);
+  });
+
+  it('records checkpoint 5 through the existing self-attested completion contract', async () => {
+    const content = await getCourseContent(
+      AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      'id',
+    );
+    const checkpoint = content?.checkpoints.find(
+      (candidate) => candidate.slug === '05-execution',
+    );
+
+    expect(checkpoint).toBeTruthy();
+    if (!checkpoint) throw new Error('Expected execution checkpoint');
+
+    const parsed = courseCheckpointCompletionInputSchema.parse({
+      courseSlug: AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      locale: 'id',
+      checkpointSlug: checkpoint.slug,
+      completionId: checkpoint.completionAction.id,
+      reflectionId: checkpoint.reflectionId,
+      exerciseConfirmed: true,
+      reflectionConfirmed: true,
+    });
+    const first = applyCourseUnitCompletion(
+      initialState,
+      { kind: 'checkpoint', id: parsed.checkpointSlug },
+      checkpointSlugs,
+    );
+    const duplicate = applyCourseUnitCompletion(
+      first.state,
+      { kind: 'checkpoint', id: parsed.checkpointSlug },
+      checkpointSlugs,
+    );
+
+    expect(parsed.checkpointSlug).toBe('05-execution');
+    expect(first.xpAwarded).toBe(COURSE_CHECKPOINT_XP);
+    expect(duplicate.wasAlreadyCompleted).toBe(true);
+    expect(duplicate.xpAwarded).toBe(0);
+  });
+
+  it('records checkpoint 6 through the existing self-attested completion contract', async () => {
+    const content = await getCourseContent(
+      AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      'id',
+    );
+    const checkpoint = content?.checkpoints.find(
+      (candidate) => candidate.slug === '06-triage',
+    );
+
+    expect(checkpoint).toBeTruthy();
+    if (!checkpoint) throw new Error('Expected failure triage checkpoint');
+
+    const parsed = courseCheckpointCompletionInputSchema.parse({
+      courseSlug: AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+      locale: 'id',
+      checkpointSlug: checkpoint.slug,
+      completionId: checkpoint.completionAction.id,
+      reflectionId: checkpoint.reflectionId,
+      exerciseConfirmed: true,
+      reflectionConfirmed: true,
+    });
+    const first = applyCourseUnitCompletion(
+      initialState,
+      { kind: 'checkpoint', id: parsed.checkpointSlug },
+      checkpointSlugs,
+    );
+    const duplicate = applyCourseUnitCompletion(
+      first.state,
+      { kind: 'checkpoint', id: parsed.checkpointSlug },
+      checkpointSlugs,
+    );
+
+    expect(parsed.checkpointSlug).toBe('06-triage');
     expect(first.xpAwarded).toBe(COURSE_CHECKPOINT_XP);
     expect(duplicate.wasAlreadyCompleted).toBe(true);
     expect(duplicate.xpAwarded).toBe(0);

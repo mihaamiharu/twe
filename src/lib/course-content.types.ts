@@ -47,6 +47,7 @@ export interface CourseVideoOutline {
   title: string;
   durationMinutes: number;
   focus: string;
+  embedUrl?: string;
 }
 
 /** Reusable shape for an AI-assisted learning activity. */

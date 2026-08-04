@@ -74,6 +74,23 @@ describe('AI-assisted QA course overview', () => {
     expect(
       screen.getByTestId('course-start-here-link').getAttribute('href'),
     ).toBe(`/id/courses/${course.manifest.slug}/start-here`);
+    expect(screen.getByTestId('course-progress-summary')).toBeTruthy();
+    expect(
+      screen.getByTestId('course-recommended-sequence').textContent,
+    ).toContain(course.content.overview.recommendedSequence);
+    expect(
+      screen
+        .getByTestId('course-progress-checkpoints')
+        .getAttribute('data-completed-checkpoints'),
+    ).toBe('1');
+    expect(
+      screen
+        .getByTestId('course-progress-checkpoints')
+        .getAttribute('data-total-checkpoints'),
+    ).toBe('7');
+    expect(screen.getByTestId('course-progress-percent').textContent).toBe(
+      '13%',
+    );
     expect(
       screen.getByText(course.content.overview.setupRequirements[0]),
     ).toBeTruthy();
@@ -103,5 +120,41 @@ describe('AI-assisted QA course overview', () => {
         .getByTestId('course-checkpoint-02-test-design')
         .getAttribute('data-completed'),
     ).toBe('false');
+    expect(
+      screen
+        .getByTestId('course-capstone-state')
+        .getAttribute('data-completed'),
+    ).toBe('false');
+    expect(
+      screen
+        .getByTestId('course-completion-state')
+        .getAttribute('data-completed'),
+    ).toBe('false');
+  });
+
+  it('shows course completion only when all checkpoints and the capstone are complete', () => {
+    const completedCourse: CourseOverviewData = {
+      ...course,
+      completedCheckpointSlugs: course.manifest.checkpoints.map(
+        (checkpoint) => checkpoint.slug,
+      ),
+      capstoneCompleted: true,
+    };
+
+    render(<CourseOverviewPage course={completedCourse} locale="id" />);
+
+    expect(
+      screen
+        .getByTestId('course-completion-state')
+        .getAttribute('data-completed'),
+    ).toBe('true');
+    expect(
+      screen
+        .getByTestId('course-capstone-state')
+        .getAttribute('data-completed'),
+    ).toBe('true');
+    expect(screen.getByTestId('course-progress-percent').textContent).toBe(
+      '100%',
+    );
   });
 });

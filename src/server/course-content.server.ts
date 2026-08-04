@@ -10,6 +10,7 @@ import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { z } from 'zod';
 import { AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG } from '@/lib/course-content.types';
+import { isAllowedCourseVideoEmbedUrl } from '@/lib/course-video';
 import type {
   CourseContentDocument,
   CourseManifest,
@@ -53,12 +54,31 @@ const COURSE_CONTENT_FILES = new Map<string, ReadonlyMap<string, string>>([
 const manifestCache = new Map<string, CourseManifest>();
 const contentCache = new Map<string, CourseContentDocument>();
 
-const courseVideoOutlineSchema = z.object({
-  status: z.enum(['planned', 'ready']),
-  title: z.string().min(1),
-  durationMinutes: z.number().int().positive(),
-  focus: z.string().min(1),
-});
+const courseVideoOutlineSchema = z
+  .object({
+    status: z.enum(['planned', 'ready']),
+    title: z.string().min(1),
+    durationMinutes: z.number().int().positive(),
+    focus: z.string().min(1),
+    embedUrl: z.string().url().optional(),
+  })
+  .superRefine((video, context) => {
+    if (video.status === 'ready' && !video.embedUrl) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['embedUrl'],
+        message: 'Ready course videos require an embedUrl',
+      });
+    }
+
+    if (video.embedUrl && !isAllowedCourseVideoEmbedUrl(video.embedUrl)) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['embedUrl'],
+        message: 'Course video embedUrl is not an allowed YouTube embed URL',
+      });
+    }
+  });
 
 const courseContentUnitSchema = z.object({
   title: z.string().min(1),

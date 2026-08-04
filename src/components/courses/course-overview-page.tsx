@@ -25,7 +25,13 @@ import type {
   CourseContentDocument,
   CourseManifest,
 } from '@/lib/course-content.types';
+import {
+  getCourseCheckpointHref,
+  getCourseStartHereHref,
+} from '@/lib/course-navigation';
+import { isCourseComplete } from '@/lib/course-progress';
 import { cn } from '@/lib/utils';
+import { Progress } from '@/components/ui/progress';
 
 export interface CourseOverviewData {
   manifest: CourseManifest;
@@ -45,12 +51,25 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
     course;
   const completed = new Set(completedCheckpointSlugs);
   const courseSlug = manifest.slug;
-  const startHereHref = `/${locale}/courses/${courseSlug}/start-here`;
+  const startHereHref = getCourseStartHereHref(locale, courseSlug);
   const orderedCheckpoints = [...manifest.checkpoints].sort(
     (a, b) => a.order - b.order,
   );
   const contentBySlug = new Map(
     content.checkpoints.map((checkpoint) => [checkpoint.slug, checkpoint]),
+  );
+  const courseComplete = isCourseComplete(
+    { completedCheckpointSlugs, capstoneCompleted },
+    orderedCheckpoints.map((checkpoint) => checkpoint.slug),
+  );
+  const completedCheckpointCount = orderedCheckpoints.filter((checkpoint) =>
+    completed.has(checkpoint.slug),
+  ).length;
+  const completedCourseUnits =
+    completedCheckpointCount + (capstoneCompleted ? 1 : 0);
+  const totalCourseUnits = orderedCheckpoints.length + 1;
+  const progressPercent = Math.round(
+    (completedCourseUnits / totalCourseUnits) * 100,
   );
 
   return (
@@ -95,6 +114,47 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
             description={content.overview.outcome}
           />
         </div>
+
+        <Card data-testid="course-progress-summary">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-2xl">
+              <ListChecks className="h-5 w-5 text-primary" />
+              {t('overview.progressSummary')}
+            </CardTitle>
+            <CardDescription
+              className="text-base leading-7"
+              data-testid="course-progress-checkpoints"
+              data-completed-checkpoints={completedCheckpointCount}
+              data-total-checkpoints={orderedCheckpoints.length}
+            >
+              {t('overview.progress', {
+                completed: completedCheckpointCount,
+                total: orderedCheckpoints.length,
+              })}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <Progress
+              value={progressPercent}
+              aria-label={t('overview.progressSummary')}
+              data-testid="course-progress-bar"
+            />
+            <div className="flex flex-wrap justify-between gap-2 text-sm text-muted-foreground">
+              <span data-testid="course-progress-percent">
+                {progressPercent}%
+              </span>
+              <span
+                data-testid="course-progress-capstone"
+                data-completed={capstoneCompleted}
+              >
+                {t('overview.capstone')}:{' '}
+                {capstoneCompleted
+                  ? t('overview.completed')
+                  : t('overview.incomplete')}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
 
         <section id="start-here" className="scroll-mt-6">
           <Card>
@@ -157,14 +217,17 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
               <h2 className="text-2xl font-bold md:text-3xl">
                 {t('overview.checkpoints')}
               </h2>
-              <p className="mt-2 max-w-3xl leading-7 text-muted-foreground">
+              <p
+                className="mt-2 max-w-3xl leading-7 text-muted-foreground"
+                data-testid="course-recommended-sequence"
+              >
                 {content.overview.recommendedSequence}
               </p>
             </div>
             <Badge variant="secondary" className="w-fit gap-1.5">
               <ListChecks className="h-3.5 w-3.5" />
               {t('overview.progress', {
-                completed: completedCheckpointSlugs.length,
+                completed: completedCheckpointCount,
                 total: orderedCheckpoints.length,
               })}
             </Badge>
@@ -176,7 +239,11 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
               if (!checkpointContent) return null;
 
               const isCompleted = completed.has(checkpoint.slug);
-              const checkpointHref = `/${locale}/courses/${courseSlug}/checkpoints/${checkpoint.slug}`;
+              const checkpointHref = getCourseCheckpointHref(
+                locale,
+                courseSlug,
+                checkpoint.slug,
+              );
 
               return (
                 <li key={checkpoint.slug}>
@@ -264,10 +331,23 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
                 <CardTitle className="text-2xl">
                   {t('overview.capstone')}
                 </CardTitle>
-                <Badge variant={capstoneCompleted ? 'default' : 'outline'}>
+                <Badge
+                  variant={capstoneCompleted ? 'default' : 'outline'}
+                  data-testid="course-capstone-state"
+                  data-completed={capstoneCompleted}
+                >
                   {capstoneCompleted
                     ? t('overview.completed')
                     : t('overview.incomplete')}
+                </Badge>
+                <Badge
+                  variant={courseComplete ? 'default' : 'secondary'}
+                  data-testid="course-completion-state"
+                  data-completed={courseComplete}
+                >
+                  {courseComplete
+                    ? t('overview.courseComplete')
+                    : t('overview.courseIncomplete')}
                 </Badge>
               </div>
               <CardDescription className="max-w-3xl text-base leading-7">

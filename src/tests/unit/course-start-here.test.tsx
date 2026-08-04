@@ -89,5 +89,10 @@ describe('AI-assisted QA Start Here orientation', () => {
     expect(screen.getByTestId('course-start-here-safety').textContent).toMatch(
       /jangan melakukan scraping/i,
     );
+    expect(
+      screen
+        .getByTestId('course-start-here-overview-link')
+        .getAttribute('href'),
+    ).toBe(`/id/courses/${course.manifest.slug}`);
   });
 });
