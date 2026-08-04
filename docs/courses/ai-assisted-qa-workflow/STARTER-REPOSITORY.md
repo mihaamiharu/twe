@@ -4,6 +4,15 @@
 
 The starter repository is a companion workspace, not a second course platform. Learners clone it, follow the course checkpoints, run Playwright locally, and keep their QA artifacts with their code.
 
+The local template prepared for this repository lives at
+`starter-repository/ai-assisted-qa-workflow-starter/`. It is a staging copy for
+the eventual public GitHub template; publishing it externally remains a
+separate release action.
+
+The local staging copy includes a generated `package-lock.json`. It was
+generated with Node.js LTS and npm so the template is ready for publication
+after the external repository is created.
+
 ## Learner-facing layout
 
 ```text
@@ -69,13 +78,13 @@ The setup guide must provide one universal workflow plus separate Windows, macOS
 
 ## Separation of ownership
 
-| Concern | Canonical location |
-| --- | --- |
-| Course narrative, videos, progress, XP | TestingWithEkki |
-| Requirements and QA artifact templates | Companion repository, linked from TestingWithEkki |
-| Executable tests and local evidence | Companion repository |
-| AI provider choice for learner activities | Learner |
-| Automation framework | Playwright + TypeScript |
-| External target behavior | Observed public target, within authorized limits |
-| Portfolio evidence | Learner-owned public repository created from the template |
-| Instructor review | Private TestingWithEkki reviewer workspace; raw artifacts deleted after processing |
+| Concern                                   | Canonical location                                                                 |
+| ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| Course narrative, videos, progress, XP    | TestingWithEkki                                                                    |
+| Requirements and QA artifact templates    | Companion repository, linked from TestingWithEkki                                  |
+| Executable tests and local evidence       | Companion repository                                                               |
+| AI provider choice for learner activities | Learner                                                                            |
+| Automation framework                      | Playwright + TypeScript                                                            |
+| External target behavior                  | Observed public target, within authorized limits                                   |
+| Portfolio evidence                        | Learner-owned public repository created from the template                          |
+| Instructor review                         | Private TestingWithEkki reviewer workspace; raw artifacts deleted after processing |

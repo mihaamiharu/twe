@@ -22,6 +22,9 @@ Welcome to the **TestingWithEkki** project documentation.
 - [**AI-Assisted QA Workflow Implementation Plan**](./courses/ai-assisted-qa-workflow/IMPLEMENTATION-PLAN.md): Locked pilot decisions, delivery phases, and definition of ready.
 - [**AI-Assisted QA Workflow Task Backlog**](./courses/ai-assisted-qa-workflow/TASKS.md): Small implementation tasks with acceptance criteria.
 - [**Implementation Chat Prompt**](./courses/ai-assisted-qa-workflow/IMPLEMENTATION-CHAT-PROMPT.md): Reusable prompt for starting focused implementation chats.
+- [**Private Pilot Plan**](./courses/ai-assisted-qa-workflow/PILOT-PLAN.md): Pilot boundary, success criteria, and review workflow.
+- [**Pilot Feedback Pack**](./courses/ai-assisted-qa-workflow/PILOT-FEEDBACK.md): Survey, interview prompts, and friction log.
+- [**Threads Campaign Draft**](./courses/ai-assisted-qa-workflow/THREADS-CAMPAIGN.md): Launch thread and weekly campaign copy.
 - [**github_issues.md**](./github_issues.md): Breakdown of tasks and issues.
 
 ## Architecture Decisions

@@ -146,7 +146,7 @@ Focused verification passed:
 
 ## Phase 2 — Full learner course
 
-### [ ] QA-020 — Add checkpoints 2–7 and capstone
+### [x] QA-020 — Add checkpoints 2–7 and capstone
 
 **Outcome:** All course exercises are available from day one.
 
@@ -215,19 +215,67 @@ the stable slug, automation-specific metadata and lesson, locator/assertion and
 maintainability guidance, local exercise and evidence contract, self-attestation
 gating, next-checkpoint navigation, and idempotent existing progress behavior.
 
-#### [ ] QA-020-05 — Test execution and evidence
+#### [x] QA-020-05 — Test execution and evidence
 
 **Outcome:** A learner can run the suite locally and capture sanitized execution evidence.
 
-#### [ ] QA-020-06 — Failure triage
+**Implementation decision:** The existing parameterized checkpoint route now
+allowlists `05-execution` and provides checkpoint-specific SEO metadata. The
+page reuses the typed Indonesian content loader, shared renderer, existing
+self-attested completion contract, and the stable link to `06-triage`.
+Playwright execution and evidence storage remain local to the learner's
+companion repository; TestingWithEkki does not run live Playwright or receive
+artifact uploads.
+
+**Verification:** Focused route, content, component, and completion tests cover
+the stable slug, execution-specific metadata and lesson, local test execution,
+result reading, sanitized screenshot/trace/report evidence, evidence-versus-
+assumption boundaries, AI-assisted result analysis, self-attestation gating,
+next-checkpoint navigation, and idempotent existing progress behavior.
+
+#### [x] QA-020-06 — Failure triage
 
 **Outcome:** A learner can classify a failed check and record evidence-backed hypotheses for test, product, environment, or data causes.
 
-#### [ ] QA-020-07 — Quality decision and capstone
+**Implementation decision:** The existing parameterized checkpoint route now
+allowlists `06-triage`, provides checkpoint-specific SEO metadata, and links
+the Indonesian learner to `07-quality-summary`. The typed content teaches
+evidence-first investigation of a failed Playwright test, four-way failure
+classification, hypothesis testing, and AI-assisted analysis. The local
+exercise uses a seeded or recorded failure packet from the companion
+repository; execution, evidence, and reflection remain in the learner-owned
+repository. The shared self-attested completion contract is reused without
+artifact uploads, live browser execution, AI review, CI, or new persistence.
+
+**Verification:** Focused route, content, component, and completion tests cover
+the stable slug, Indonesian-only route support, checkpoint-specific SEO,
+failure-packet guidance, evidence-before-code-change boundaries, test/product/
+environment/test-data classification, hypothesis verification, AI-assisted
+analysis, local exercise artifacts, self-attestation gating, next-checkpoint
+navigation, and idempotent existing progress behavior.
+
+#### [x] QA-020-07 — Quality decision and capstone
 
 **Outcome:** A learner can verify a fix or communicate a defect, then make a risk-based quality decision in the capstone.
 
-### [ ] QA-021 — Add course navigation and progress display
+**Implementation decision:** The existing parameterized authenticated checkpoint
+route now allowlists `07-quality-summary` and provides checkpoint-specific SEO
+metadata. The Indonesian content explicitly covers tested and untested areas,
+evidence and limitations, residual risk, risk-based quality or release
+recommendations, AI-assisted summary review, and the local end-to-end capstone.
+The shared checkpoint renderer displays the capstone on the final checkpoint
+and calls the existing QA-003 `completeCourseCapstone` contract with the same
+self-attested exercise and reflection confirmations. All code, evidence, and
+execution remain in the learner's companion repository; the pilot adds no
+uploads, live browser execution, AI review, CI, or new database tables.
+
+**Verification:** Focused route, content, component, overview, completion, and
+capstone tests cover the stable Indonesian slug, SEO metadata, quality-summary
+content, evidence and reflection sections, capstone confirmation gating,
+recorded course completion state, zero-XP capstone behavior, and achievement
+eligibility only after all seven checkpoints and the capstone are complete.
+
+### [x] QA-021 — Add course navigation and progress display
 
 **Outcome:** Learners can move through the course and understand their progress.
 
@@ -238,7 +286,25 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Recommended sequence is visible.
 - Completed checkpoints are visually distinct.
 
-### [ ] QA-022 — Add allowlisted video embeds
+**Implementation decision:** The parameterized authenticated Indonesian
+checkpoint route keeps every checkpoint freely reachable while the shared
+navigation helper derives adjacent links from manifest order. Checkpoint pages
+link back to the overview and Start Here, show explicit first/final boundary
+states, and retain the existing next-recommended presentation. The overview
+shows all seven checkpoint links, a recommended-sequence explanation, a
+checkpoint/capstone progress summary, distinct completed states, and the
+course-complete state only after all checkpoints and the capstone are complete.
+The existing authenticated progress loader and hidden tutorial progress rows
+remain the source of truth; no new tables or English fallback routes were
+added.
+
+**Verification:** Focused navigation, route-boundary, progress, and component
+tests cover Indonesian-only paths, Start Here and overview links, free access
+to all seven checkpoints, checkpoint 1 and checkpoint 7 boundaries,
+completed/incomplete states, progress counts, capstone state, and completion
+eligibility. The targeted course test suite passes with 53 tests.
+
+### [x] QA-022 — Add allowlisted video embeds
 
 **Outcome:** Unlisted course videos render safely inside checkpoint pages.
 
@@ -249,9 +315,20 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Missing videos have a useful fallback state.
 - Video metadata is localized.
 
+**Implementation decision:** Course video metadata now accepts an optional
+`embedUrl`, and a `ready` video must use an HTTPS `/embed/` URL hosted by
+YouTube or YouTube No Cookie. The dedicated `CourseVideoEmbed` component
+renders only validated URLs inside a sandboxed iframe; planned, missing, or
+invalid videos render a localized fallback. Markdown remains unable to emit
+arbitrary iframe HTML.
+
+**Verification:** Focused component and URL-policy tests cover approved hosts,
+HTTPS-only URLs, rejection of watch URLs and arbitrary hosts, safe iframe
+attributes, and planned/invalid fallback states.
+
 ## Phase 3 — Starter repository
 
-### [ ] QA-030 — Create the public GitHub template repository
+### [ ] QA-030 — Publish the public GitHub template repository
 
 **Outcome:** Learners can create an independent portfolio repository from the template.
 
@@ -263,7 +340,12 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - `package-lock.json` is committed.
 - No reference solution is included.
 
-### [ ] QA-031 — Add PRD, artifact templates, reflections, and evidence structure
+**Local preparation:** The publishable template is staged at
+`starter-repository/ai-assisted-qa-workflow-starter/`. This task remains open
+until the separate public GitHub repository is created and the template is
+verified there. The local staging copy now includes `package-lock.json`.
+
+### [x] QA-031 — Add PRD, artifact templates, reflections, and evidence structure
 
 **Outcome:** Learners have everything required to produce portfolio evidence.
 
@@ -274,7 +356,12 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Folder README files explain expected contents.
 - Public-repository safety guidance is included.
 
-### [ ] QA-032 — Add deterministic failure practice
+**Verification:** The local template contains the fictional PRD, acceptance
+criteria, requirements/test-case/report templates, seven checkpoint reflection
+files, capstone reflection, evidence rules, synthetic data, and portfolio
+checklist.
+
+### [x] QA-032 — Add deterministic failure practice
 
 **Outcome:** Learners can practice failure triage without depending entirely on external-site behavior.
 
@@ -284,6 +371,10 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Captured evidence or a triage packet is included.
 - The exercise distinguishes test, product, environment, and data failures.
 - The solution remains private.
+
+**Verification:** The local template contains a deliberately fixme-marked
+Playwright test and a synthetic failure packet with evidence-first triage
+instructions. No instructor solution is included.
 
 ### [ ] QA-033 — Validate setup on all supported operating systems
 
@@ -295,9 +386,13 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Commands do not depend on Bash-only behavior.
 - Troubleshooting notes cover common browser-install and environment failures.
 
+**Local preparation:** Universal and OS-specific instructions are present in
+the template README. Runtime validation remains open until the template can be
+run on Windows, macOS, and Linux.
+
 ## Phase 4 — Private AI review workspace
 
-### [ ] QA-040 — Add admin-only review access
+### [x] QA-040 — Add admin-only review access
 
 **Outcome:** Only the course owner/admin can access the review workspace.
 
@@ -307,7 +402,12 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Access is permission-based, not exposed through a public route.
 - Learners cannot see AI drafts or other learners’ reviews.
 
-### [ ] QA-041 — Add selected-file review input
+**Implementation decision:** The reviewer workspace is served at
+`/admin/course-reviews` beneath the existing admin route guard. Server
+functions use `adminMiddleware`, and the route is excluded from indexing.
+The sidebar exposes it only inside the admin portal.
+
+### [x] QA-041 — Add selected-file review input
 
 **Outcome:** The reviewer can select relevant files for one checkpoint at a time.
 
@@ -318,7 +418,13 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Whole-repository fetching and arbitrary URL fetching are not required.
 - Raw inputs are deleted after processing.
 
-### [ ] QA-042 — Add standardized structured AI review
+**Implementation decision:** The workspace accepts up to eight selected text
+files for one checkpoint at a time. The browser sends file contents only to
+the draft-generation request, clears its file state after success, and the
+server persists no raw artifact content. Arbitrary repository fetching is not
+implemented.
+
+### [x] QA-042 — Add standardized structured AI review
 
 **Outcome:** AI produces a consistent draft that the reviewer can verify.
 
@@ -329,7 +435,13 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Standard rubric prompt is versioned.
 - Reviewer notes can add private context.
 
-### [ ] QA-043 — Add reviewer editing and private feedback preparation
+**Implementation decision:** The existing AI provider abstraction generates a
+versioned `course-review-v1` JSON draft. The draft includes status, evidence,
+concerns, suggestions, confidence, uncertainty, and human-verification items.
+The server validates the response before storing it and never logs the raw
+learner files or prompt.
+
+### [x] QA-043 — Add reviewer editing and private feedback preparation
 
 **Outcome:** The reviewer can edit the draft and prepare a message for manual sending.
 
@@ -340,6 +452,12 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Draft and final feedback are stored without raw uploaded artifacts.
 - No automatic learner email is sent.
 - Review status does not affect course completion or XP.
+
+**Implementation decision:** The admin can edit each checkpoint status, write
+final feedback, and finalize the review. Finalized feedback is not sent by the
+platform; the owner sends it manually. Raw files are not stored, while the
+structured draft, final feedback, repository URL, review round, and prompt
+version are retained in the private review record.
 
 ## Phase 5 — Pilot and launch
 
@@ -356,7 +474,11 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Seeded failure classification is reviewed.
 - No critical safety or privacy issue is found.
 
-### [ ] QA-051 — Prepare Threads campaign
+**Local preparation:** The pilot workflow, success criteria, safety boundary,
+and optional private review process are documented in `PILOT-PLAN.md`. This
+task remains open until learners participate.
+
+### [x] QA-051 — Prepare Threads campaign
 
 **Outcome:** Threads drives learners to the course overview page.
 
@@ -366,6 +488,10 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - Weekly supporting posts are prepared.
 - Course overview is the canonical CTA.
 - No waitlist or email gate is promoted.
+
+**Verification:** Launch-thread and seven-week supporting-post drafts are in
+`THREADS-CAMPAIGN.md`. They are prepared for Threads but have not been posted
+externally.
 
 ### [ ] QA-052 — Capture pilot feedback and decide next scope
 
@@ -378,3 +504,6 @@ gating, next-checkpoint navigation, and idempotent existing progress behavior.
 - A few completers and abandoners are interviewed.
 - Friction points are recorded and prioritized.
 - Monetization, CI, and broader tracks remain deferred unless evidence supports revisiting them.
+
+**Local preparation:** Survey, interview, and friction-log templates are in
+`PILOT-FEEDBACK.md`. This task remains open until real pilot feedback exists.
