@@ -55,6 +55,7 @@ import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutori
 import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
 import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
 import { Route as LocaleAuthenticatedCoursesCourseSlugRouteImport } from './routes/$locale/_authenticated/courses/$courseSlug'
+import { Route as LocaleAuthenticatedCoursesCourseSlugIndexRouteImport } from './routes/$locale/_authenticated/courses/$courseSlug/index'
 import { Route as LocaleAuthenticatedCoursesCourseSlugStartHereRouteImport } from './routes/$locale/_authenticated/courses/$courseSlug/start-here'
 import { Route as LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRouteImport } from './routes/$locale/_authenticated/courses/$courseSlug/checkpoints/$checkpointSlug'
 
@@ -290,6 +291,12 @@ const LocaleAuthenticatedCoursesCourseSlugRoute =
     path: '/courses/$courseSlug',
     getParentRoute: () => LocaleAuthenticatedRoute,
   } as any)
+const LocaleAuthenticatedCoursesCourseSlugIndexRoute =
+  LocaleAuthenticatedCoursesCourseSlugIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => LocaleAuthenticatedCoursesCourseSlugRoute,
+  } as any)
 const LocaleAuthenticatedCoursesCourseSlugStartHereRoute =
   LocaleAuthenticatedCoursesCourseSlugStartHereRouteImport.update({
     id: '/start-here',
@@ -352,6 +359,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersIndexRoute
   '/$locale/courses/$courseSlug': typeof LocaleAuthenticatedCoursesCourseSlugRouteWithChildren
   '/$locale/courses/$courseSlug/start-here': typeof LocaleAuthenticatedCoursesCourseSlugStartHereRoute
+  '/$locale/courses/$courseSlug/': typeof LocaleAuthenticatedCoursesCourseSlugIndexRoute
   '/$locale/courses/$courseSlug/checkpoints/$checkpointSlug': typeof LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRoute
 }
 export interface FileRoutesByTo {
@@ -397,8 +405,8 @@ export interface FileRoutesByTo {
   '/$locale/challenges': typeof LocaleChallengesIndexRoute
   '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
-  '/$locale/courses/$courseSlug': typeof LocaleAuthenticatedCoursesCourseSlugRouteWithChildren
   '/$locale/courses/$courseSlug/start-here': typeof LocaleAuthenticatedCoursesCourseSlugStartHereRoute
+  '/$locale/courses/$courseSlug': typeof LocaleAuthenticatedCoursesCourseSlugIndexRoute
   '/$locale/courses/$courseSlug/checkpoints/$checkpointSlug': typeof LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRoute
 }
 export interface FileRoutesById {
@@ -450,6 +458,7 @@ export interface FileRoutesById {
   '/admin/users/': typeof AdminUsersIndexRoute
   '/$locale/_authenticated/courses/$courseSlug': typeof LocaleAuthenticatedCoursesCourseSlugRouteWithChildren
   '/$locale/_authenticated/courses/$courseSlug/start-here': typeof LocaleAuthenticatedCoursesCourseSlugStartHereRoute
+  '/$locale/_authenticated/courses/$courseSlug/': typeof LocaleAuthenticatedCoursesCourseSlugIndexRoute
   '/$locale/_authenticated/courses/$courseSlug/checkpoints/$checkpointSlug': typeof LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRoute
 }
 export interface FileRouteTypes {
@@ -501,6 +510,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/$locale/courses/$courseSlug'
     | '/$locale/courses/$courseSlug/start-here'
+    | '/$locale/courses/$courseSlug/'
     | '/$locale/courses/$courseSlug/checkpoints/$checkpointSlug'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -546,8 +556,8 @@ export interface FileRouteTypes {
     | '/$locale/challenges'
     | '/$locale/tutorials'
     | '/admin/users'
-    | '/$locale/courses/$courseSlug'
     | '/$locale/courses/$courseSlug/start-here'
+    | '/$locale/courses/$courseSlug'
     | '/$locale/courses/$courseSlug/checkpoints/$checkpointSlug'
   id:
     | '__root__'
@@ -598,6 +608,7 @@ export interface FileRouteTypes {
     | '/admin/users/'
     | '/$locale/_authenticated/courses/$courseSlug'
     | '/$locale/_authenticated/courses/$courseSlug/start-here'
+    | '/$locale/_authenticated/courses/$courseSlug/'
     | '/$locale/_authenticated/courses/$courseSlug/checkpoints/$checkpointSlug'
   fileRoutesById: FileRoutesById
 }
@@ -943,6 +954,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleAuthenticatedCoursesCourseSlugRouteImport
       parentRoute: typeof LocaleAuthenticatedRoute
     }
+    '/$locale/_authenticated/courses/$courseSlug/': {
+      id: '/$locale/_authenticated/courses/$courseSlug/'
+      path: '/'
+      fullPath: '/$locale/courses/$courseSlug/'
+      preLoaderRoute: typeof LocaleAuthenticatedCoursesCourseSlugIndexRouteImport
+      parentRoute: typeof LocaleAuthenticatedCoursesCourseSlugRoute
+    }
     '/$locale/_authenticated/courses/$courseSlug/start-here': {
       id: '/$locale/_authenticated/courses/$courseSlug/start-here'
       path: '/start-here'
@@ -962,6 +980,7 @@ declare module '@tanstack/react-router' {
 
 interface LocaleAuthenticatedCoursesCourseSlugRouteChildren {
   LocaleAuthenticatedCoursesCourseSlugStartHereRoute: typeof LocaleAuthenticatedCoursesCourseSlugStartHereRoute
+  LocaleAuthenticatedCoursesCourseSlugIndexRoute: typeof LocaleAuthenticatedCoursesCourseSlugIndexRoute
   LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRoute: typeof LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRoute
 }
 
@@ -969,6 +988,8 @@ const LocaleAuthenticatedCoursesCourseSlugRouteChildren: LocaleAuthenticatedCour
   {
     LocaleAuthenticatedCoursesCourseSlugStartHereRoute:
       LocaleAuthenticatedCoursesCourseSlugStartHereRoute,
+    LocaleAuthenticatedCoursesCourseSlugIndexRoute:
+      LocaleAuthenticatedCoursesCourseSlugIndexRoute,
     LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRoute:
       LocaleAuthenticatedCoursesCourseSlugCheckpointsCheckpointSlugRoute,
   }
