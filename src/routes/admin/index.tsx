@@ -1,4 +1,4 @@
-import { createFileRoute, redirect, Link } from '@tanstack/react-router';
+import { createFileRoute, Link } from '@tanstack/react-router';
 import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
 import { getAdminStats } from '@/server/admin/stats.fn';
@@ -39,37 +39,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-
-interface PopularChallenge {
-  id: string;
-  title: string | { en: string;[key: string]: string };
-  slug: string;
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  completionCount: number;
-}
-
-interface RecentSubmission {
-  id: string;
-  isPassed: boolean;
-  createdAt: Date;
-  userId: string;
-  challengeId: string;
-  code: string;
-  xpEarned: number;
-  executionTime: number | null;
-  testsPassed: number;
-  testsTotal: number;
-  errorMessage: string | null;
-  user: {
-    name: string | null;
-    image: string | null;
-    email: string;
-  };
-  challenge: {
-    title: string | { en: string;[key: string]: string };
-    slug: string;
-  };
-}
 
 export const Route = createFileRoute('/admin/')({
   component: AdminDashboard,
@@ -329,7 +298,7 @@ function AdminDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={stats.userGrowth}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.4} />
-                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v) => v.split('-').slice(1).join('/')} />
+                  <XAxis dataKey="date" stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(v: unknown) => String(v).split('-').slice(1).join('/')} />
                   <YAxis stroke="hsl(var(--muted-foreground))" fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                   <Tooltip
                     cursor={{ fill: 'transparent' }}
@@ -385,7 +354,7 @@ function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {stats.popularChallenges.map((challenge: PopularChallenge) => (
+              {stats.popularChallenges.map((challenge) => (
                 <div
                   key={challenge.id}
                   className="flex flex-col p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors"
@@ -432,7 +401,7 @@ function AdminDashboard() {
             </TableHeader>
             <TableBody>
               {stats.recentActivity.map(
-                (submission: RecentSubmission, i: number) => (
+                (submission, i: number) => (
                   <TableRow key={i}>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-2">
@@ -538,7 +507,7 @@ function AdminDashboard() {
         </Link>
 
         {/* System Debug */}
-        <Link to="/admin/debug" className="block group">
+        <Link to="/admin/settings" className="block group">
           <Card className="h-full transition-colors hover:bg-muted/50 hover:border-primary/50 cursor-pointer">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

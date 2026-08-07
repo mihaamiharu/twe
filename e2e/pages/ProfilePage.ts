@@ -35,6 +35,8 @@ export class ProfilePage extends BasePage {
 
   async switchTab(tabName: 'progress' | 'activity' | 'achievements') {
     await this.page
+      // tabName is a closed union of known tab labels.
+      // eslint-disable-next-line security/detect-non-literal-regexp
       .getByRole('tab', { name: new RegExp(tabName, 'i') })
       .click();
   }

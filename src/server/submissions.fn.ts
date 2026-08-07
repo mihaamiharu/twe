@@ -20,6 +20,7 @@ import {
 } from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { getRawChallengeContent } from './content.server';
+import type { TestCaseDefinition } from '@/lib/content.types';
 import { ensureEntityInDb } from './ensure-entity-in-db';
 
 // ----------------------------------------------------------------------------
@@ -102,12 +103,14 @@ export const challengeSubmissionHandler = async ({
     }
 
     // Get challenge by slug
-    let challenge = await db.query.challenges.findFirst({
+    const existingChallenge = await db.query.challenges.findFirst({
       where: eq(challenges.slug, challengeSlug),
     });
 
+    let challenge = existingChallenge;
+
     if (!challenge) {
-      challenge = await ensureEntityInDb({
+      const ensuredChallenge = await ensureEntityInDb({
         slug: challengeSlug,
         findExisting: (slug) =>
           db.query.challenges.findFirst({
@@ -119,7 +122,7 @@ export const challengeSubmissionHandler = async ({
             .insert(challenges)
             .values({
               slug: fsChallenge.slug,
-              title: fsChallenge.title as any,
+              title: fsChallenge.title,
               type: fsChallenge.type,
               difficulty: fsChallenge.difficulty,
               xpReward: fsChallenge.xpReward,
@@ -132,7 +135,7 @@ export const challengeSubmissionHandler = async ({
 
           if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
             await db.insert(testCases).values(
-              fsChallenge.testCases.map((tc: any, index: number) => ({
+              fsChallenge.testCases.map((tc: TestCaseDefinition, index: number) => ({
                 challengeId: newChallenge.id,
                 description: tc.description,
                 input: tc.input,
@@ -147,6 +150,8 @@ export const challengeSubmissionHandler = async ({
         },
         logger,
       });
+
+      challenge = ensuredChallenge ?? undefined;
 
       if (!challenge) {
         return {

@@ -91,7 +91,7 @@ function ContactPage() {
                                 </Button>
                             </div>
                         ) : (
-                            <form onSubmit={handleSubmit} className="space-y-4">
+                            <form onSubmit={(event) => { void handleSubmit(event); }} className="space-y-4">
                                 <div className="space-y-2">
                                     <Label htmlFor="name">{t('contact.form.name')}</Label>
                                     <Input id="name" name="name" required placeholder="John Doe" />

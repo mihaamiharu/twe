@@ -189,7 +189,6 @@ export async function executePlaywrightCode(
               if (iframe.contentWindow) {
                 iframe.contentWindow.localStorage?.clear();
                 iframe.contentWindow.sessionStorage?.clear();
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const win = iframe.contentWindow as any;
                 win.__MOCK_ROUTES__ = [];
                 // In-memory state that persists across VFS navigations within a single execution run
@@ -226,11 +225,9 @@ export async function executePlaywrightCode(
             scripts.forEach((script) => {
               if (script.textContent) {
                 try {
-                  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
                   const win = iframe.contentWindow as any;
                   const doc = iframe.contentDocument;
                   if (!win || !doc) return;
-                  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
                   const scriptCode = script.textContent;
 
@@ -256,7 +253,6 @@ export async function executePlaywrightCode(
 
                   // eslint-disable-next-line @typescript-eslint/no-implied-eval
                   const fn = new Function('window', 'document', code);
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                   fn(win, doc);
                 } catch (e) {
                   console.error('Failed to execute script shim:', e);
@@ -403,11 +399,9 @@ export async function executePlaywrightCode(
 
             let returnValue;
             if (typeof contentWindow.eval === 'function') {
-              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
               returnValue = await contentWindow.eval(
                 `(function() { ${wrappedCode} })()`,
               );
-              /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
             } else {
               // Fallback for environments without iframe eval (e.g. HappyDOM tests)
               // This runs in parent context, so 'Array' !== iframe.contentWindow.Array
@@ -516,8 +510,7 @@ export async function executePlaywrightCode(
       }
     });
   } finally {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    logger.setHandler(null as any);
+    logger.setHandler(null);
   }
 }
 
@@ -613,7 +606,6 @@ export async function executeWithTestCases(
       return (async () => { ${code} })();
     `,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     await userFunction(page, createExpect());
 
     // Run test cases

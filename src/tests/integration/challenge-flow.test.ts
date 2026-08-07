@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, beforeEach, mock } from 'bun:test';
-import { db, users, challenges, progress, submissions, testCases } from '../../db';
+import { db, users, challenges, progress, testCases } from '../../db';
 import { challengeSubmissionHandler } from '../../server/submissions.fn';
 import { setupTestDb, truncateTables } from './setup';
 import { eq } from 'drizzle-orm';
@@ -16,7 +16,7 @@ void mock.module(
 '../../server/auth.server', () => ({
     auth: {
         api: {
-            getSession: async () => ({
+            getSession: () => ({
                 user: { id: testUserId },
                 session: { id: 'test-session' }
             })
@@ -37,7 +37,7 @@ void mock.module(
 // Mock content server for lazy sync (optional)
 void mock.module(
 '../../server/content.server', () => ({
-    getRawChallengeContent: async (slug: string) => {
+    getRawChallengeContent: (slug: string) => {
         if (slug === 'test-challenge') {
             return {
                 slug: 'test-challenge',

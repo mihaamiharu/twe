@@ -106,13 +106,12 @@ export function createShimError(
     const template = ERROR_TEMPLATES[type];
     const message = template(options);
 
-    const error = new Error(message);
+    const error = Object.assign(new Error(message), {
+        type,
+        selector: options.selector,
+        action: options.action,
+    });
     error.name = `PlaywrightShimError`;
-
-    // Attach metadata for programmatic access
-    (error as any).type = type;
-    (error as any).selector = options.selector;
-    (error as any).action = options.action;
 
     return error;
 }

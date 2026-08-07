@@ -1,5 +1,7 @@
 import { TestResult } from '../test-results';
 import { LogEntry } from '../console-output';
+import type { TFunction } from 'i18next';
+import type { TypeDefinition } from '@/core/type-generator';
 
 export type ChallengeType =
     | 'JAVASCRIPT'
@@ -60,7 +62,7 @@ export interface Challenge {
 
 export interface ChallengePlaygroundProps {
     challenge: Challenge;
-    onSubmit: (data: {
+    onSubmit?: (data: {
         code: string;
         passed: boolean;
         testResults: TestResult[];
@@ -123,7 +125,7 @@ export interface PlaygroundState {
     // Derived
     isCodeChallenge: boolean;
     isSelectorChallenge: boolean;
-    extraLibs?: any; // Type from generateTypeDefinitions
+    extraLibs?: TypeDefinition[];
     locale: string;
-    t: any; // i18n t function
+    t: TFunction;
 }

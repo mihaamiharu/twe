@@ -41,11 +41,9 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear field error on change
-    // eslint-disable-next-line security/detect-object-injection
     if (errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
-        // eslint-disable-next-line security/detect-object-injection
         delete newErrors[name];
         return newErrors;
       });
@@ -63,9 +61,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
       const fieldErrors: Record<string, string> = {};
       for (const error of result.error.issues) {
         const path = error.path.join('.');
-        // eslint-disable-next-line security/detect-object-injection
         if (!fieldErrors[path]) {
-          // eslint-disable-next-line security/detect-object-injection
           fieldErrors[path] = error.message;
         }
       }

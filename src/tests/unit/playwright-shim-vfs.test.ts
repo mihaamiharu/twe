@@ -90,7 +90,7 @@ describe('Playwright Shim VFS (Multi-page Support)', () => {
     expect((iframe.contentWindow as any).clicked).toBe(true);
   });
 
-  test('should throw error if page missing in VFS', async () => {
+  test('should throw error if page missing in VFS', () => {
     page.setVFS(vfs);
     expect(page.goto('/missing.html')).rejects.toThrow('Page not found in VFS');
   });

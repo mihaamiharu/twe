@@ -102,7 +102,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         } else {
                             text = String(actual || '');
                         }
-                    } catch (e) {
+                    } catch {
                         // Element might be missing
                         text = '';
                     }
@@ -126,7 +126,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         } else {
                             text = String(actual || '');
                         }
-                    } catch (e) {
+                    } catch {
                         text = '';
                     }
 
@@ -308,7 +308,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             },
 
             async toHaveURL(expected: string | RegExp, options?: { timeout?: number }) {
-                await poll(async () => {
+                await poll(() => {
                     let url = '';
                     if (actual && typeof actual.url === 'function') {
                         url = actual.url();
@@ -473,10 +473,12 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 handleResult(pass, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be close to ${expected} with precision ${precision}`);
             },
 
-            async toContain(expected: any) {
+            async toContain(expected: unknown) {
                 await Promise.resolve();
                 let pass = false;
-                if (Array.isArray(actual) || typeof actual === 'string') {
+                if (typeof actual === 'string' && typeof expected === 'string') {
+                    pass = actual.includes(expected);
+                } else if (Array.isArray(actual)) {
                     pass = actual.includes(expected);
                 } else if (actual instanceof Set || actual instanceof Map) {
                     pass = actual.has(expected);

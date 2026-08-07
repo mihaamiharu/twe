@@ -166,14 +166,14 @@ export function createRouteFetchWrapper(
   originalFetch: typeof window.fetch | undefined,
   getWindow: () => (Window & Record<string, unknown>) | undefined,
 ): typeof window.fetch {
-  return (input: RequestInfo | URL, init?: RequestInit) => {
+  const wrappedFetch = (input: RequestInfo | URL, init?: RequestInit) => {
     let url: string;
     if (typeof input === 'string') {
       url = input.startsWith('/') ? 'http://localhost' + input : input;
     } else if (input instanceof Request) {
       url = input.url;
     } else if (input && typeof input === 'object' && 'toString' in input) {
-      url = (input as URL).toString();
+      url = input.toString();
     } else {
       url = String(input);
     }
@@ -205,31 +205,13 @@ export function createRouteFetchWrapper(
             })
             .then((r) => {
               if (r?.type === 'fulfill') {
-                return Promise.resolve({
-                  ok:
-                    (r.response?.status || 200) >= 200 &&
-                    (r.response?.status || 200) < 300,
-                  status: r.response?.status || 200,
-                  statusText: r.response?.statusText || 'OK',
-                  json: () =>
-                    Promise.resolve(
-                      r.response?.json ||
-                        (r.response?.body ? JSON.parse(r.response.body) : {}),
-                    ),
-                  text: () =>
-                    Promise.resolve(
-                      r.response?.body || JSON.stringify(r.response?.json || {}),
-                    ),
-                  arrayBuffer: () =>
-                    Promise.resolve(
-                      new TextEncoder().encode(
-                        r.response?.body || JSON.stringify(r.response?.json || {}),
-                      ).buffer,
-                    ),
-                  headers: new Headers(
-                    (r.response?.headers as HeadersInit) || {},
-                  ),
-                });
+              const body =
+                r.response?.body || JSON.stringify(r.response?.json || {});
+              return new Response(body, {
+                status: r.response?.status || 200,
+                statusText: r.response?.statusText || 'OK',
+                headers: (r.response?.headers as HeadersInit) || {},
+              });
               }
               return Promise.reject(new Error('Route not fulfilled'));
             });
@@ -241,4 +223,6 @@ export function createRouteFetchWrapper(
       ? originalFetch(input, init)
       : Promise.resolve(new Response(null, { status: 404 }));
   };
+
+  return wrappedFetch as unknown as typeof window.fetch;
 }

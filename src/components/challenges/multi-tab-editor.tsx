@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { X, Lock, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { CodeEditor } from './code-editor';
@@ -15,7 +15,6 @@ interface MultiTabEditorProps {
     onReady?: () => void;
     storageKeyPrefix?: string;
     className?: string;
-    height?: string | number;
     extraLibs?: { content: string; filePath?: string }[];
 }
 
@@ -31,7 +30,6 @@ export function MultiTabEditor({
     onReady,
     storageKeyPrefix,
     className,
-    height = '100%',
     extraLibs,
 }: MultiTabEditorProps) {
 

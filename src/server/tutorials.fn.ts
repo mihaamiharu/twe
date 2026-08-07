@@ -343,12 +343,11 @@ export const completeTutorial = createServerFn({ method: 'POST' })
       const { slug } = input;
 
       // Get tutorial from DB, or create it from filesystem content
-      let tutorial = await db.query.tutorials.findFirst({
+      const existingTutorial = await db.query.tutorials.findFirst({
         where: eq(tutorials.slug, slug),
       });
 
-      if (!tutorial) {
-        tutorial = await ensureEntityInDb({
+      const tutorial = existingTutorial ?? await ensureEntityInDb({
           slug,
           findExisting: (s) =>
             db.query.tutorials.findFirst({
@@ -378,7 +377,6 @@ export const completeTutorial = createServerFn({ method: 'POST' })
         if (!tutorial) {
           return { success: false, error: 'Tutorial not found' };
         }
-      }
 
       // Check existing progress
       const existingProgress = await db.query.progress.findFirst({

@@ -1,11 +1,47 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { loader, type OnMount, type Monaco } from '@monaco-editor/react';
-import type { editor, IDisposable } from 'monaco-editor';
+import { loader, type OnMount } from '@monaco-editor/react';
+import type { editor } from 'monaco-editor';
 import { storage } from '@/lib/storage-adapter';
 import { CUSTOM_DARK_THEME, CUSTOM_LIGHT_THEME } from './themes';
 import type { CodeEditorProps } from './types';
 
 let monacoConfigured = false;
+
+type Disposable = {
+    dispose: () => void;
+};
+
+type MonacoDefaults = {
+    setCompilerOptions: (options: {
+        target: unknown;
+        module: unknown;
+        allowNonTsExtensions: boolean;
+        moduleResolution: unknown;
+    }) => void;
+    setDiagnosticsOptions: (options: {
+        noSemanticValidation: boolean;
+        noSyntaxValidation: boolean;
+    }) => void;
+    addExtraLib: (content: string, filePath?: string) => Disposable;
+};
+
+type MonacoInstance = {
+    editor: {
+        setTheme: (theme: string) => void;
+        defineTheme: (name: string, theme: object) => void;
+    };
+    languages: {
+        typescript: {
+            typescriptDefaults: MonacoDefaults;
+            javascriptDefaults: MonacoDefaults;
+            ScriptTarget: { ESNext: unknown };
+            ModuleKind: { ESNext: unknown };
+            ModuleResolutionKind: { NodeJs: unknown };
+        };
+    };
+    KeyMod: { CtrlCmd: number };
+    KeyCode: { Enter: number; KeyS: number };
+};
 
 export function useMonacoSetup(
     props: CodeEditorProps,
@@ -13,7 +49,7 @@ export function useMonacoSetup(
 ) {
     const { onRun, storageKey, onReady, extraLibs } = props;
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
-    const monacoRef = useRef<Monaco | null>(null);
+    const monacoRef = useRef<MonacoInstance | null>(null);
     const [isMounted, setIsMounted] = useState(false);
 
     // Configure Monaco loader on client side
@@ -37,15 +73,16 @@ export function useMonacoSetup(
     // Handle editor mount and configuration
     const handleEditorMount: OnMount = useCallback(
         (editor, monaco) => {
+            const monacoApi = monaco as unknown as MonacoInstance;
             editorRef.current = editor;
-            monacoRef.current = monaco;
+            monacoRef.current = monacoApi;
 
             // Compiler Options
-            monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
-                target: monaco.languages.typescript.ScriptTarget.ESNext,
-                module: monaco.languages.typescript.ModuleKind.ESNext,
+            monacoApi.languages.typescript.typescriptDefaults.setCompilerOptions({
+                target: monacoApi.languages.typescript.ScriptTarget.ESNext,
+                module: monacoApi.languages.typescript.ModuleKind.ESNext,
                 allowNonTsExtensions: true,
-                moduleResolution: monaco.languages.typescript.ModuleResolutionKind.NodeJs,
+                moduleResolution: monacoApi.languages.typescript.ModuleResolutionKind.NodeJs,
             });
 
             // Diagnostics
@@ -53,19 +90,19 @@ export function useMonacoSetup(
                 noSemanticValidation: true,
                 noSyntaxValidation: false,
             };
-            monaco.languages.typescript.typescriptDefaults.setDiagnosticsOptions(diagOptions);
-            monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions(diagOptions);
+            monacoApi.languages.typescript.typescriptDefaults.setDiagnosticsOptions(diagOptions);
+            monacoApi.languages.typescript.javascriptDefaults.setDiagnosticsOptions(diagOptions);
 
             // Register Themes
-            monaco.editor.defineTheme('customDark', CUSTOM_DARK_THEME);
-            monaco.editor.defineTheme('customLight', CUSTOM_LIGHT_THEME);
-            monaco.editor.setTheme(monacoTheme);
+            monacoApi.editor.defineTheme('customDark', CUSTOM_DARK_THEME);
+            monacoApi.editor.defineTheme('customLight', CUSTOM_LIGHT_THEME);
+            monacoApi.editor.setTheme(monacoTheme);
 
             // Shortcuts: Run Code
             editor.addAction({
                 id: 'run-code',
                 label: 'Run Code',
-                keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter],
+                keybindings: [monacoApi.KeyMod.CtrlCmd | monacoApi.KeyCode.Enter],
                 run: () => onRun?.(editor.getValue()),
             });
 
@@ -73,7 +110,7 @@ export function useMonacoSetup(
             editor.addAction({
                 id: 'save-code',
                 label: 'Save Code',
-                keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+                keybindings: [monacoApi.KeyMod.CtrlCmd | monacoApi.KeyCode.KeyS],
                 run: () => {
                     if (storageKey) {
                         void storage.setItem(storageKey, editor.getValue());
@@ -105,7 +142,7 @@ export function useMonacoSetup(
         if (!isMounted || !monacoRef.current || !extraLibs) return;
 
         const monaco = monacoRef.current;
-        const disposables: IDisposable[] = [];
+        const disposables: Disposable[] = [];
 
         extraLibs.forEach((lib) => {
             disposables.push(monaco.languages.typescript.javascriptDefaults.addExtraLib(lib.content, lib.filePath));

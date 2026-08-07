@@ -6,6 +6,7 @@
 import { db } from './index';
 import { challenges } from './schema';
 import { inArray } from 'drizzle-orm';
+import { getLocalizedString } from '@/lib/localized';
 
 async function cleanupLegacyChallenges() {
   console.log('\n🧹 Cleaning up legacy dummy challenges...\n');
@@ -35,7 +36,7 @@ async function cleanupLegacyChallenges() {
 
     console.log('\n📋 Found legacy challenges to remove:');
     toDelete.forEach((c, i) => {
-      console.log(`   ${i + 1}. ${c.title} (${c.slug}) - ${c.type}`);
+      console.log(`   ${i + 1}. ${getLocalizedString(c.title)} (${c.slug}) - ${c.type}`);
     });
 
     // Delete them

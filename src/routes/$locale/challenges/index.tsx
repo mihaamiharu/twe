@@ -1,4 +1,4 @@
-import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
+import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { z } from 'zod';
@@ -13,16 +13,12 @@ import {
 } from '@/components/ui/table';
 import {
   Code,
-  Trophy,
-  Zap,
   CheckCircle2,
   Palette,
   Route as RouteIcon,
   LayoutGrid,
   List,
   Search,
-  Lock,
-  Swords,
   LayoutDashboard,
   Layers,
   Box,
@@ -191,7 +187,6 @@ export function ChallengesPage() {
     if (debouncedSearchQuery !== (q ?? '')) {
       updateSearch({ q: debouncedSearchQuery || undefined });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- updateSearch is stable, q is intentionally excluded to prevent loops
   }, [debouncedSearchQuery]);
 
 
@@ -495,7 +490,7 @@ export function ChallengesPage() {
                       className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"
                     >
                       <AnimatePresence mode="popLayout">
-                        {categoryChallenges.map((challenge, idx) => {
+                        {categoryChallenges.map((challenge) => {
                           const config = challengeTypeConfig[challenge.type] || challengeTypeConfig.JAVASCRIPT;
                           const isComingSoon = challenge.tags?.includes('coming-soon');
                           const isBoss = isBossChallenge(challenge);
@@ -504,7 +499,6 @@ export function ChallengesPage() {
                             <ChallengeListCard
                               key={challenge.slug}
                               challenge={challenge}
-                              index={idx}
                               config={config}
                               isComingSoon={!!isComingSoon}
                               isBoss={isBoss}

@@ -39,7 +39,7 @@ export const Route = createFileRoute('/$locale/leaderboard')({
     // Prefetch specific period first (priority)
     const activePromise = context.queryClient.ensureQueryData(
       leaderboardQueryOptions({
-        period,
+        period: period ?? 'all',
         locale: params.locale,
         page: 1,
         limit: 50,

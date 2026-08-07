@@ -38,17 +38,22 @@ async function ensureUserImage(userId: string): Promise<string | null> {
     if (account?.idToken) {
       // Decode ID Token to get picture
       try {
-        const payload = JSON.parse(
+        const payload: unknown = JSON.parse(
           Buffer.from(account.idToken.split('.')[1], 'base64').toString(),
         );
-        if (payload.picture) {
+        if (
+          typeof payload === 'object' &&
+          payload !== null &&
+          'picture' in payload &&
+          typeof payload.picture === 'string'
+        ) {
           await db
             .update(users)
             .set({ image: payload.picture })
             .where(eq(users.id, userId));
-          return payload.picture as string;
+          return payload.picture;
         }
-      } catch (e) {
+      } catch {
         // Ignore decoding errors
       }
     }

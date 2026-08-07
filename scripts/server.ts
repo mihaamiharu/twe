@@ -6,6 +6,8 @@ const PORT = process.env.PORT || 3000;
 import * as Sentry from "@sentry/bun";
 import { getSentryConfig } from "../src/lib/sentry.config";
 
+type StartServer = { fetch(request: Request): Promise<Response> };
+
 Sentry.init(getSentryConfig());
 
 const env = process.env.NODE_ENV || 'development';
@@ -46,8 +48,7 @@ Bun.serve({
 
         // SSR fallback to TanStack Start handler
         try {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-            const response = (await (server as any).fetch(req)) as Response;
+            const response = await (server as unknown as StartServer).fetch(req);
             const host = req.headers.get('host');
 
             if (host?.startsWith('qa.')) {

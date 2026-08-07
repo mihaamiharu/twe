@@ -79,7 +79,6 @@ export class MockedPlaywrightPage {
     const normalizedFiles: Record<string, string> = {};
     for (const [key, value] of Object.entries(files)) {
       const normalizedKey = key.startsWith('/') ? key : '/' + key;
-      // eslint-disable-next-line security/detect-object-injection
       normalizedFiles[normalizedKey] = value;
     }
     this.vfs = normalizedFiles;
@@ -376,8 +375,8 @@ export class MockedPlaywrightPage {
       iframeWindow.__MOCK_FETCH_PATCHED__ = true;
       const originalFetch = iframeWindow.fetch;
       iframeWindow.fetch = createRouteFetchWrapper(
-        originalFetch,
-        () => this.targetDocument.defaultView as (Window & Record<string, unknown>) | undefined,
+        originalFetch as unknown as typeof window.fetch | undefined,
+        () => this.targetDocument.defaultView as unknown as (Window & Record<string, unknown>) | undefined,
       );
     }
 
@@ -463,7 +462,6 @@ export class MockedPlaywrightPage {
 
     // VFS Mode: Replace iframe content with virtual file
     if (this.vfs) {
-      // eslint-disable-next-line security/detect-object-injection
       const content = this.vfs[path];
       if (!content) {
         throw new Error(`Page not found in VFS: ${path}. Available pages: ${Object.keys(this.vfs).join(', ')}`);
@@ -570,7 +568,7 @@ export class MockedPlaywrightPage {
 
     attachOnclickHandlers({
       document: this.targetDocument,
-      window: win as Window & Record<string, unknown>,
+      window: win as unknown as Window & Record<string, unknown>,
       excludeKeys: ['__MOCK_ROUTES__', '__VFS_NAVIGATE__', 'page'],
       errorPrefix: 'VFS',
     });
@@ -965,7 +963,6 @@ export class MockedPlaywrightPage {
         if (index < 0) {
           targetIndex = frames.length + index; // Handle -1 for last
         }
-        // eslint-disable-next-line security/detect-object-injection
         const frame = frames[targetIndex] as HTMLIFrameElement;
         if (!frame) return null;
         return frame.contentDocument || frame.contentWindow?.document || null;
@@ -977,7 +974,7 @@ export class MockedPlaywrightPage {
             const doc = getFrameDoc();
             if (!doc) return [];
             return Array.from(
-              doc.querySelectorAll(itemSelector),
+              doc.querySelectorAll<HTMLElement>(itemSelector),
             );
           });
         },
@@ -989,7 +986,7 @@ export class MockedPlaywrightPage {
             // Use page's internal getByRole logic indirectly via querying
             const roleSelector = `[role="${role}"]`;
             let elements = Array.from(
-              doc.querySelectorAll(roleSelector),
+              doc.querySelectorAll<HTMLElement>(roleSelector),
             );
             if (options?.name) {
               elements = elements.filter((el) => {
@@ -1058,7 +1055,7 @@ export class MockedPlaywrightPage {
             const doc = getFrameDoc();
             if (!doc) return [];
             const inputs = Array.from(
-              doc.querySelectorAll('[placeholder]'),
+              doc.querySelectorAll<HTMLElement>('[placeholder]'),
             );
             return inputs.filter((el) => {
               const placeholder = el.getAttribute('placeholder') || '';
@@ -1075,7 +1072,7 @@ export class MockedPlaywrightPage {
             const doc = getFrameDoc();
             if (!doc) return [];
             return Array.from(
-              doc.querySelectorAll(`[data-testid="${testId}"]`),
+              doc.querySelectorAll<HTMLElement>(`[data-testid="${testId}"]`),
             );
           });
         },
@@ -1520,7 +1517,7 @@ export class MockedPlaywrightPage {
     const matches: HTMLElement[] = [];
 
     for (const cont of containers) {
-      const inputs = Array.from(cont.querySelectorAll('[placeholder]'));
+      const inputs = Array.from(cont.querySelectorAll<HTMLElement>('[placeholder]'));
       const contMatches = inputs.filter((el) => {
         const ph = el.getAttribute('placeholder') || '';
         const normalizedPh = this._normalizeText(ph);
@@ -1554,7 +1551,7 @@ export class MockedPlaywrightPage {
     const matches: HTMLElement[] = [];
 
     for (const cont of containers) {
-      const elements = Array.from(cont.querySelectorAll('[alt]'));
+      const elements = Array.from(cont.querySelectorAll<HTMLElement>('[alt]'));
       const contMatches = elements.filter((el) => {
         const alt = el.getAttribute('alt') || '';
         const normalizedAlt = this._normalizeText(alt);
@@ -1586,7 +1583,7 @@ export class MockedPlaywrightPage {
     const matches: HTMLElement[] = [];
 
     for (const cont of containers) {
-      const elements = Array.from(cont.querySelectorAll('[title]'));
+      const elements = Array.from(cont.querySelectorAll<HTMLElement>('[title]'));
       const contMatches = elements.filter((el) => {
         const title = el.getAttribute('title') || '';
         const normalizedTitle = this._normalizeText(title);
@@ -1640,7 +1637,12 @@ export class MockedPlaywrightPage {
   }
 
   private _createAPIRequestContext(): APIRequestContext {
-    const fetchWithIframe = async (url: string, init?: any) => {
+    const toRequestInit = (options: unknown): RequestInit => {
+      if (typeof options !== 'object' || options === null) return {};
+      return options as RequestInit;
+    };
+
+    const fetchWithIframe = async (url: string, init?: RequestInit) => {
       const win = this.targetDocument.defaultView as any;
       if (win && win.fetch) {
         const resp = await win.fetch(url, init);
@@ -1670,11 +1672,11 @@ export class MockedPlaywrightPage {
     };
 
     return {
-      get: (url, options) => fetchWithIframe(url, { ...options, method: 'GET' }),
-      post: (url, options) => fetchWithIframe(url, { ...options, method: 'POST' }),
-      put: (url, options) => fetchWithIframe(url, { ...options, method: 'PUT' }),
-      delete: (url, options) => fetchWithIframe(url, { ...options, method: 'DELETE' }),
-      fetch: (url, options) => fetchWithIframe(url, options),
+      get: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'GET' }),
+      post: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'POST' }),
+      put: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'PUT' }),
+      delete: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'DELETE' }),
+      fetch: (url, options) => fetchWithIframe(url, toRequestInit(options)),
       storageState: () => Promise.resolve({ cookies: [], origins: [] }),
       newContext: () => Promise.resolve(this._createAPIRequestContext()),
     };
@@ -1726,7 +1728,6 @@ export class MockedPlaywrightPage {
       if (filterType === 'first') return [elements[0]];
       if (filterType === 'last') return [elements[elements.length - 1]];
       if (filterType === 'nth' && filterIndex !== null)
-        // eslint-disable-next-line security/detect-object-injection
         return elements[filterIndex] ? [elements[filterIndex]] : [];
 
       return elements;
@@ -1808,7 +1809,7 @@ export class MockedPlaywrightPage {
     const locator: Locator = {
       // Expose finder for internal cross-locator delegation
        
-      finder: getFilteredElements as any,
+      finder: getFilteredElements,
       
       click: async (options?: ClickOptions) => {
         await this.delay(50);

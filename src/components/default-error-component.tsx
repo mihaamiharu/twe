@@ -9,7 +9,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { AlertCircle, RefreshCcw, Home } from 'lucide-react';
+import { AlertCircle, RefreshCcw } from 'lucide-react';
 import { useEffect } from 'react';
 import * as Sentry from '@sentry/react';
 
@@ -52,7 +52,7 @@ export function DefaultErrorComponent({ error }: { error: Error }) {
                         onClick={() => {
                             // Invalidate all queries and reload the page
                             queryErrorResetBoundary.reset();
-                            router.invalidate();
+                            void router.invalidate();
                             window.location.reload();
                         }}
                     >

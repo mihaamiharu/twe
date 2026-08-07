@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { MockedPlaywrightPage } from '../../core/executor/playwright-shim';
 
 describe('Playwright Shim Coverage Expansion', () => {
@@ -31,9 +31,6 @@ describe('Playwright Shim Coverage Expansion', () => {
             div.style.width = '100px';
             div.style.height = '100px';
             document.body.appendChild(div);
-
-            let mouseOver = false;
-            div.onmouseover = () => { mouseOver = true; };
 
             await page.mouse.move(50, 50);
             await page.mouse.click(50, 50);
@@ -262,10 +259,8 @@ describe('Playwright Shim Coverage Expansion', () => {
 
     describe('Dialogs', () => {
         test('should handle alerts via dialog emitter', async () => {
-            let dialogMsg = '';
-            page.on('dialog', async (dialog) => {
-                dialogMsg = dialog.message();
-                await dialog.dismiss();
+            await page.on('dialog', (dialog) => {
+                void dialog.dismiss();
             });
 
             // Simulate alert trigger from window

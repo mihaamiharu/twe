@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
 import { LeaderboardPage } from '../pages/LeaderboardPage';
 
 test.describe('Leaderboard', () => {
@@ -9,7 +9,7 @@ test.describe('Leaderboard', () => {
     await leaderboardPage.goto();
   });
 
-  test('should display leaderboard', async ({ page }) => {
+  test('should display leaderboard', async () => {
     await leaderboardPage.verifyLeaderboardVisible();
   });
 });

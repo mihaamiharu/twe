@@ -11,7 +11,7 @@ test.describe('Tutorials', () => {
     await tutorialsPage.gotoList();
   });
 
-  test('should list tutorials', async ({ page }) => {
+  test('should list tutorials', async () => {
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
   });
 

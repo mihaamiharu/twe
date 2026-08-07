@@ -41,8 +41,6 @@ test.describe('Hide/Show Completed', () => {
         // The implementation adds CheckCircle2 which we can check, or class on the row/card
         // Let's check for the check circle icon inside a link pointing to this slug
         const challengeLink = page.locator(`a[href*="/challenges/${slug}"]`);
-        const checkIcon = challengeLink.locator('.lucide-check-circle-2');
-
         // It should be visible initially (show completed by default or just in list)
         // Wait for list to load
         await expect(challengeLink.first()).toBeVisible();

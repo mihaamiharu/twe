@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- paths are rooted in the repository's content directories. */
+
 /**
  * Content Server - Filesystem-Driven Content Loader
  *
@@ -10,7 +12,6 @@ import { join } from 'path';
 import type {
   Tutorial,
   TutorialRegistry,
-  TutorialRegistryEntry,
   Challenge,
   ChallengeDefinition,
   ChallengeTierFile,
@@ -129,14 +130,12 @@ export async function getTutorialContent(
 
     // Try requested locale first, then fallback to 'en'
     let content: string;
-    let usedLocale = locale;
 
     try {
       const filePath = join(TUTORIALS_DIR, locale, `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     } catch {
       // Fallback to English
-      usedLocale = 'en';
       const filePath = join(TUTORIALS_DIR, 'en', `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     }
@@ -167,7 +166,8 @@ export async function getTutorialList(
 ): Promise<Omit<Tutorial, 'content'>[]> {
   const registry = await loadRegistry();
 
-  const tutorialPromises = registry.tutorials.map(async (entry) => {
+  type TutorialSummary = Omit<Tutorial, 'content'>;
+  const tutorialPromises: Promise<TutorialSummary | null>[] = registry.tutorials.map(async (entry) => {
     // Skip non-published content (default to published if no status)
     if (entry.status && entry.status !== 'published') return null;
 
@@ -207,9 +207,7 @@ export async function getTutorialList(
 
   const results = await Promise.all(tutorialPromises);
 
-  const tutorials = results.filter(
-    (t): t is Omit<Tutorial, 'content'> => t !== null,
-  );
+  const tutorials = results.filter((t): t is TutorialSummary => t !== null);
 
   return tutorials.sort((a, b) => a.order - b.order);
 }
