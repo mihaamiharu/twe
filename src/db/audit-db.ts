@@ -4,6 +4,7 @@
 
 import { db } from './index';
 import { challenges, tutorials } from './schema';
+import { getLocalizedString } from '@/lib/localized';
 
 async function audit() {
   console.log('\n📊 DATABASE CONTENT AUDIT\n');
@@ -53,7 +54,7 @@ async function audit() {
     console.log(`\n${category.toUpperCase()}`);
     challs.forEach((c, i) => {
       console.log(
-        `  ${i + 1}. [${c.type.padEnd(15)}] ${c.title.padEnd(35)} (${c.xp} XP)`,
+        `  ${i + 1}. [${c.type.padEnd(15)}] ${getLocalizedString(c.title).padEnd(35)} (${c.xp} XP)`,
       );
     });
   }
@@ -80,7 +81,7 @@ async function audit() {
 
   allTutorials.forEach((t, i) => {
     const tags = t.tags?.join(', ') || 'no tags';
-    console.log(`  ${i + 1}. ${t.title} (${tags})`);
+    console.log(`  ${i + 1}. ${getLocalizedString(t.title)} (${tags})`);
   });
 
   console.log('\n' + '='.repeat(60));

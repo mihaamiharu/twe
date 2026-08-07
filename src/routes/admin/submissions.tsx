@@ -20,10 +20,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Button } from '@/components/ui/button';
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { DataTablePagination } from '@/components/admin/data-table-pagination';
+import { getLocalizedString } from '@/lib/localized';
 import {
     Select,
     SelectContent,
@@ -58,8 +58,7 @@ function SubmissionsManager() {
             const matchesSearch =
                 sub.user?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 sub.user?.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                (typeof sub.challenge?.title === 'string' && sub.challenge.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
-                (typeof sub.challenge?.title === 'object' && sub.challenge.title.en.toLowerCase().includes(searchQuery.toLowerCase()));
+                getLocalizedString(sub.challenge?.title).toLowerCase().includes(searchQuery.toLowerCase());
 
             const matchesStatus =
                 statusFilter === 'ALL' ||
@@ -105,7 +104,11 @@ function SubmissionsManager() {
                     <Filter className="h-4 w-4 text-muted-foreground" />
                     <Select
                         value={statusFilter}
-                        onValueChange={(v: any) => setStatusFilter(v)}
+                        onValueChange={(v) => {
+                            if (v === 'ALL' || v === 'PASSED' || v === 'FAILED') {
+                                setStatusFilter(v);
+                            }
+                        }}
                     >
                         <SelectTrigger className="w-[150px]">
                             <SelectValue placeholder="Status" />

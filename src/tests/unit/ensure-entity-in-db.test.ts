@@ -89,7 +89,7 @@ describe('ensureEntityInDb', () => {
     expect(findExisting).toHaveBeenCalledTimes(2);
   });
 
-  test('throws when insert fails and entity still not found on retry', async () => {
+  test('throws when insert fails and entity still not found on retry', () => {
     const findExisting = mock(() => Promise.resolve(undefined));
     const fetchContent = mock(() =>
       Promise.resolve({ slug: 'fail-slug', title: 'Fail' }),
@@ -98,7 +98,7 @@ describe('ensureEntityInDb', () => {
       Promise.reject(new Error('constraint violation')),
     );
 
-    await expect(
+    expect(
       ensureEntityInDb({
         slug: 'fail-slug',
         findExisting,

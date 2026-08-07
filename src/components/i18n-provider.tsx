@@ -25,12 +25,12 @@ export function I18nProvider({ children, locale }: I18nProviderProps) {
   // Synchronously set language if mismatch is detected during render
   // This ensures the I18nextProvider receives the correct state immediately during hydration
   if (i18n.language !== targetLocale) {
-    i18n.changeLanguage(targetLocale);
+    void i18n.changeLanguage(targetLocale);
   }
 
   useEffect(() => {
     if (i18n.language !== targetLocale) {
-      i18n.changeLanguage(targetLocale);
+      void i18n.changeLanguage(targetLocale);
     }
   }, [targetLocale]);
 

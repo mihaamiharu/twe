@@ -14,7 +14,6 @@ interface SelectorPanelProps {
 }
 
 export function SelectorPanel({
-    challenge,
     state,
     onSelectorChange,
     onValidate,

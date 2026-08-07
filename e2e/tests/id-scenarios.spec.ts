@@ -29,7 +29,7 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
     await expect(page).toHaveURL(/.*\/id\/.*/);
   });
 
-  test('ID Tutorials: should list tutorials in ID', async ({ page }) => {
+  test('ID Tutorials: should list tutorials in ID', async () => {
     await tutorialsPage.gotoList('id');
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
     // Check for "Mulai Belajar" or similar ID-specific text if applicable

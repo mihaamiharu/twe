@@ -38,9 +38,9 @@ export interface AuthContext {
  */
 export const authMiddleware = createMiddleware({ type: 'function' }).server(
     async ({ next }) => {
-        const headers = getRequestHeaders();
+        const headers = getRequestHeaders() as unknown as Headers;
 
-        const session = await auth.api.getSession({ headers });
+        const session = await auth.api.getSession({ headers }) as unknown as Parameters<typeof mapSessionToUser>[0] | null;
 
         if (!session?.user?.id) {
             throw new Error('Unauthorized');
@@ -64,9 +64,9 @@ export const authMiddleware = createMiddleware({ type: 'function' }).server(
 export const optionalAuthMiddleware = createMiddleware({
     type: 'function',
 }).server(async ({ next }) => {
-    const headers = getRequestHeaders();
+    const headers = getRequestHeaders() as unknown as Headers;
 
-    const session = await auth.api.getSession({ headers });
+    const session = await auth.api.getSession({ headers }) as unknown as Parameters<typeof mapSessionToUser>[0] | null;
 
     const user = mapSessionToUser(session);
 

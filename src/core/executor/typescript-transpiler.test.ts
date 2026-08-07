@@ -1,5 +1,5 @@
 import { expect, test, describe } from 'bun:test';
-import { transpileTypeScript, initEsbuild } from './typescript-transpiler';
+import { transpileTypeScript } from './typescript-transpiler';
 
 describe('TypeScript Transpiler', () => {
     test('should transpile basic TypeScript to JavaScript', async () => {

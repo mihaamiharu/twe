@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- paths are rooted in the repository's challenge directory. */
+
 import fs from 'node:fs';
 import path from 'node:path';
 

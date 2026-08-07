@@ -1,6 +1,6 @@
 import { test, expect, describe, beforeAll, afterAll, beforeEach } from 'bun:test';
 import { db } from '../../db';
-import { users, challenges, tutorials, progress, submissions } from '../../db/schema';
+import { users, challenges, tutorials } from '../../db/schema';
 import { truncateTables } from './setup';
 import { eq } from 'drizzle-orm';
 
@@ -25,7 +25,7 @@ describe('E2E Test Support APIs', () => {
     await truncateTables();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     process.env.NODE_ENV = originalEnv;
     if (originalSecret !== undefined) {
       process.env.E2E_SECRET = originalSecret;
@@ -38,7 +38,7 @@ describe('E2E Test Support APIs', () => {
     await truncateTables();
     
     // Seed some static data for tests
-    const [insertedUser] = await db.insert(users).values({
+    await db.insert(users).values({
       email: TEST_EMAIL,
       name: 'Test Tester',
     }).returning();
@@ -75,7 +75,6 @@ describe('E2E Test Support APIs', () => {
 
   describe('Security Gates', () => {
     test('rejects request without correct secret header', async () => {
-      // @ts-ignore - reaching into internal options
       const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL }, 'wrong-secret');
       
@@ -84,7 +83,6 @@ describe('E2E Test Support APIs', () => {
     });
 
     test('rejects request if NODE_ENV is not test', async () => {
-      // @ts-ignore 
       const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       
@@ -99,7 +97,6 @@ describe('E2E Test Support APIs', () => {
 
   describe('Teardown User API', () => {
     test('successfully deletes an existing user', async () => {
-      // @ts-ignore 
       const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       

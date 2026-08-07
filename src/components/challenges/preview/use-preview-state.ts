@@ -3,9 +3,37 @@ import { HIGHLIGHT_STYLES, INJECTED_SCRIPTS } from './constants';
 import type {
     WebComponentPreviewProps,
     ViewMode,
-    PreviewState,
-    SelectorType
 } from './types';
+
+type PreviewMessage =
+    | { type: 'elementClick'; path: string }
+    | { type: 'elementHover'; path: string }
+    | { type: 'validationResult'; isValid: boolean; matchCount: number }
+    | { type: 'vfsNavigate'; path: string };
+
+function isPreviewMessage(value: unknown): value is PreviewMessage {
+    if (typeof value !== 'object' || value === null || !('type' in value)) {
+        return false;
+    }
+
+    const type = value.type;
+    if (typeof type !== 'string') return false;
+
+    if (type === 'validationResult') {
+        return (
+            'isValid' in value &&
+            typeof value.isValid === 'boolean' &&
+            'matchCount' in value &&
+            typeof value.matchCount === 'number'
+        );
+    }
+
+    return (
+        (type === 'elementClick' || type === 'elementHover' || type === 'vfsNavigate') &&
+        'path' in value &&
+        typeof value.path === 'string'
+    );
+}
 
 export function usePreviewState(
     props: WebComponentPreviewProps,
@@ -91,8 +119,8 @@ export function usePreviewState(
     // Effect: Listen for messages from the iframe
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
+            if (!isPreviewMessage(event.data)) return;
             const data = event.data;
-            if (!data || typeof data !== 'object') return;
 
             switch (data.type) {
                 case 'elementClick':

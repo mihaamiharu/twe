@@ -1,6 +1,6 @@
 import { createMiddleware } from '@tanstack/react-start';
 import { getSentryConfig } from '../lib/sentry.config';
-import type * as Sentry from '@sentry/bun';
+import type * as SentryModule from '@sentry/bun';
 
 interface SentryContext {
     user?: {
@@ -17,7 +17,7 @@ interface SentryContext {
  */
 export function attachSentryUserContext(
     context: SentryContext,
-    Sentry: typeof Sentry,
+    Sentry: typeof SentryModule,
 ) {
     if (context.user) {
         Sentry.setUser({

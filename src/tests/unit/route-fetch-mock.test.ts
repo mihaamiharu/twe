@@ -91,7 +91,7 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: '/api/test',
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: { status: 200, json: { matched: true } },
           }),
@@ -117,9 +117,9 @@ describe('createRouteFetchWrapper', () => {
     } as unknown as Window & Record<string, unknown>;
 
     let originalCalled = false;
-    const originalFetch = async () => {
+    const originalFetch = () => {
       originalCalled = true;
-      return new Response(null, { status: 200 });
+      return Promise.resolve(new Response(null, { status: 200 }));
     };
 
     const wrapper = createRouteFetchWrapper(
@@ -136,7 +136,7 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: '/api/data',
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: {
               status: 200,
@@ -164,7 +164,7 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: /\/api\/.*/,
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: { status: 200, json: { matched: true } },
           }),
@@ -188,7 +188,7 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: (url: URL) => url.pathname === '/api/special',
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: { status: 200, json: { special: true } },
           }),

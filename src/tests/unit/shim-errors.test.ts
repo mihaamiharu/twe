@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { createShimError, isShimError, type ShimErrorType } from '@/core/executor/shim-errors';
+import { createShimError, isShimError } from '@/core/executor/shim-errors';
 
 describe('createShimError', () => {
     it('should create error with element_not_found type', () => {

@@ -1,7 +1,7 @@
 import { expect, test, describe, mock } from 'bun:test';
 
 // Mock esbuild-wasm BEFORE importing the transpiler
-mock.module('esbuild-wasm', () => ({
+void mock.module('esbuild-wasm', () => ({
     initialize: mock(() => Promise.resolve()),
     transform: mock((code: string) => Promise.resolve({ code: code.replace('const', 'var') })),
 }));

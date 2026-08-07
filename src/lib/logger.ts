@@ -59,7 +59,7 @@ class Logger {
 
   private handler: ((level: LogLevel, message: string, args: unknown[]) => void) | null = null;
 
-  setHandler(handler: (level: LogLevel, message: string, args: unknown[]) => void) {
+  setHandler(handler: ((level: LogLevel, message: string, args: unknown[]) => void) | null) {
     this.handler = handler;
   }
 

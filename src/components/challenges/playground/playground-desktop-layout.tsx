@@ -10,11 +10,12 @@ import { ResultsPanel } from './results-panel';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type { Challenge, PlaygroundState } from './types';
 import type { SelectorType } from '../selector-input';
+import type { ChallengeExecution } from './use-challenge-execution';
 
 interface PlaygroundDesktopLayoutProps {
     challenge: Challenge;
     state: PlaygroundState;
-    execution: any;
+    execution: ChallengeExecution;
     previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
     userId?: string;
 }
@@ -134,7 +135,7 @@ export function PlaygroundDesktopLayout({
                             state={state}
                             userId={userId}
                             isMobile={false}
-                            onRunCode={handleRunCode}
+                            onRunCode={() => { void handleRunCode(); }}
                             onReset={handleReset}
                             onFileChange={handleFileChange}
                             onSelectFile={handleSelectFile}
@@ -157,7 +158,7 @@ export function PlaygroundDesktopLayout({
                         <ResultsPanel
                             challenge={challenge}
                             state={state}
-                            onRunCode={handleRunCode}
+                            onRunCode={() => { void handleRunCode(); }}
                         />
                     </div>
                 )}

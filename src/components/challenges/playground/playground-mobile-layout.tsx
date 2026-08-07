@@ -3,7 +3,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { BookOpen, Play, Search, Code2, Info, CheckCircle2, Folder } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
@@ -13,14 +12,14 @@ import { FileExplorer } from '../file-explorer';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type { Challenge, PlaygroundState } from './types';
 import type { SelectorType } from '../selector-input';
-import { cn } from '@/lib/utils';
 import { useState, useEffect } from 'react';
+import type { ChallengeExecution } from './use-challenge-execution';
 
 interface PlaygroundMobileLayoutProps {
     challenge: Challenge;
     state: PlaygroundState;
-    execution: any; // Result from useChallengeExecution hook
-    previewIframeRef: React.RefObject<HTMLIFrameElement>;
+    execution: ChallengeExecution;
+    previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export function PlaygroundMobileLayout({
@@ -159,7 +158,7 @@ export function PlaygroundMobileLayout({
                                             <CheckCircle2 className="h-5 w-5 text-green-500" />
                                             {t('challenges:playground.results')}
                                         </h3>
-                                        <Button size="sm" onClick={() => { handleRunCode(); setIsResultsSheetOpen(false); }} className="gap-2 h-8 px-3">
+                                        <Button size="sm" onClick={() => { void handleRunCode(); setIsResultsSheetOpen(false); }} className="gap-2 h-8 px-3">
                                             <Play className="h-3.5 w-3.5" />
                                             Re-run
                                         </Button>
@@ -168,7 +167,7 @@ export function PlaygroundMobileLayout({
                                         <ResultsPanel
                                             challenge={challenge}
                                             state={state}
-                                            onRunCode={handleRunCode}
+                                            onRunCode={() => { void handleRunCode(); }}
                                         />
                                     </div>
                                 </SheetContent>
@@ -197,7 +196,7 @@ export function PlaygroundMobileLayout({
                                         challenge={challenge}
                                         state={state}
                                         isMobile={true}
-                                        onRunCode={handleRunCode}
+                                        onRunCode={() => { void handleRunCode(); }}
                                         onReset={handleReset}
                                         onFileChange={handleFileChange}
                                         onSelectFile={handleSelectFile}

@@ -78,11 +78,13 @@ export function createRateLimitMiddleware(options: {
     windowMinutes: number; // Time window in minutes
 }) {
     return createMiddleware().server(async ({ next, context }) => {
-        const headers = getRequestHeaders();
+        const headers = getRequestHeaders() as unknown as Headers;
 
         // We try to get userId from context (if authMiddleware ran before this)
-        // @ts-expect-error - context is unknown here, but we check safely
-        const userId = context?.user?.id as string | undefined;
+        const contextValue = context as unknown as {
+            user?: { id?: string };
+        } | undefined;
+        const userId = contextValue?.user?.id;
 
         const identifier = getClientIdentifier(headers, userId);
         const storeKey = `${options.key}:${identifier}`;

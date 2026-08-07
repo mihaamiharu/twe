@@ -2,8 +2,7 @@
 export interface FilePayload {
     name: string;
     mimeType: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    buffer: any;
+    buffer: Buffer;
 }
 
 /**
@@ -42,6 +41,15 @@ export interface FillOptions extends ActionOptions {
 }
 
 export interface Locator {
+    /** Internal synchronous finder used by the shim's locator composition. */
+    finder?: () => HTMLElement[];
+    allAttributes?(): Promise<Record<string, string>>;
+    boundingBox?(): Promise<{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }>;
     click(options?: ClickOptions): Promise<void>;
     dblclick(options?: ClickOptions): Promise<void>;
     fill(value: string, options?: FillOptions): Promise<void>;
@@ -82,6 +90,8 @@ export interface Locator {
     elementHandles(): Promise<HTMLElement[]>; // Internal helper exposed for filter({ has })
     getByRole(role: string, options?: LocatorOptions): Locator;
     getByText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+    getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+    getByTitle(text: string | RegExp, options?: { exact?: boolean }): Locator;
     getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator;
     getByPlaceholder(
         text: string | RegExp,
@@ -169,7 +179,7 @@ export interface BrowserContext {
     cookies(): Promise<unknown[]>;
     addCookies(cookies: unknown[]): Promise<void>;
     clearCookies(): Promise<void>;
-    newPage(): Promise<any>;
+    newPage(): Promise<unknown>;
     close(): Promise<void>;
     request: APIRequestContext;
 }

@@ -16,7 +16,7 @@ const solutions = JSON.parse(fs.readFileSync(solutionsPath, 'utf-8')) as Record<
 test.describe('Challenges', () => {
   let challengesPage: ChallengesPage;
 
-  test.beforeAll(async () => {
+  test.beforeAll(() => {
     // Ensure solutions exist
     expect(Object.keys(solutions).length).toBeGreaterThan(0);
   });

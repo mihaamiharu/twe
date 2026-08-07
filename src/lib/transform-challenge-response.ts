@@ -1,3 +1,5 @@
+import type { ChallengeType } from './content.types';
+
 interface TestCase {
   id: string;
   description: string;
@@ -12,7 +14,7 @@ interface ServerChallengeData {
   title: string;
   description: string;
   instructions: string;
-  type: string;
+  type: ChallengeType;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   category: string;
   xpReward: number;
@@ -52,7 +54,7 @@ interface TransformedChallenge {
   slug: string;
   title: string;
   description: string;
-  type: string;
+  type: ChallengeType;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   xp: number;
   instructions: string;
@@ -71,9 +73,9 @@ interface TransformedChallenge {
   hints?: string[];
   category: string;
   isCompleted: boolean;
-  tutorial?: { slug: string; title: string } | null;
-  nextChallenge?: { slug: string; title: string } | null;
-  prevChallenge?: { slug: string; title: string } | null;
+  tutorial?: { slug: string; title: string };
+  nextChallenge?: { slug: string; title: string };
+  prevChallenge?: { slug: string; title: string };
 }
 
 const difficultyMap: Record<string, 'Easy' | 'Medium' | 'Hard'> = {
@@ -122,8 +124,8 @@ export function transformChallengeResponse(
     hints: data.hints,
     category: data.category,
     isCompleted: data.userProgress?.isCompleted || false,
-    tutorial: data.tutorial,
-    nextChallenge: data.nextChallenge,
-    prevChallenge: data.prevChallenge,
+    tutorial: data.tutorial ?? undefined,
+    nextChallenge: data.nextChallenge ?? undefined,
+    prevChallenge: data.prevChallenge ?? undefined,
   };
 }

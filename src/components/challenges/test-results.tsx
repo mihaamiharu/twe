@@ -21,7 +21,7 @@ import {
   AlertTriangle,
   Loader2,
 } from 'lucide-react';
-import type { ChallengeType } from './challenge-playground';
+import type { ChallengeType } from './playground';
 
 export interface TestResult {
   id: string;
@@ -54,6 +54,11 @@ const COPY_CONFIG: Record<
     success: 'Tests Passed!',
     failure: 'Logic Error',
     testName: 'Logical Verification',
+  },
+  TYPESCRIPT: {
+    success: 'Tests Passed!',
+    failure: 'Type Error',
+    testName: 'Type-Safe Verification',
   },
   PLAYWRIGHT: {
     success: 'Scenario Passed!',

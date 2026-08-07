@@ -183,7 +183,9 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
         });
 
         // Check cleanup
-        expect((storage.storage.removeItem as any)).toHaveBeenCalled();
+        // The storage adapter method is intentionally inspected as a mock in this test.
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        expect(storage.storage.removeItem).toHaveBeenCalled();
         expect(mockState.setCode).toHaveBeenCalledWith(expect.any(String)); // starterCode
         expect(mockState.setHasPassed).toHaveBeenCalledWith(false);
         expect(mockState.setTestResults).toHaveBeenCalledWith([]);

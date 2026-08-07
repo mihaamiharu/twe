@@ -1,7 +1,6 @@
 import { describe, it, expect, mock, beforeEach, afterEach, spyOn } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { ChallengePlayground } from '@/components/challenges/challenge-playground';
-import * as executor from '@/core/executor';
 import { ThemeProvider } from '@/components/theme-provider';
 import * as stateHook from '@/components/challenges/playground/use-playground-state';
 import * as execHook from '@/components/challenges/playground/use-challenge-execution';
@@ -146,7 +145,7 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
     // Skip loading overlay test since the layout handles it differently
 
 
-    it('should run code on Cmd+Enter shortcut', async () => {
+    it('should run code on Cmd+Enter shortcut', () => {
         renderWithTheme(<ChallengePlayground challenge={mockChallenge as any} userId="user1" onSubmit={() => {}} />);
 
         fireEvent.keyDown(window, { key: 'Enter', metaKey: true });

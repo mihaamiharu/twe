@@ -1,5 +1,5 @@
-import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { describe, it, expect, mock, afterEach } from 'bun:test';
+import { render, screen, cleanup } from '@testing-library/react';
 import { EditorPanel } from '@/components/challenges/playground/editor-panel';
 import { SelectorPanel } from '@/components/challenges/playground/selector-panel';
 import { ResultsPanel } from '@/components/challenges/playground/results-panel';

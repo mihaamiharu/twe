@@ -26,7 +26,6 @@ import {
     History,
     User as UserIcon,
     CheckCircle2,
-    XCircle,
     Trash2,
     AlertTriangle
 } from 'lucide-react';
@@ -60,8 +59,8 @@ function UserDetailPage() {
         },
         onSuccess: () => {
             toast.success('User deleted successfully');
-            queryClient.invalidateQueries({ queryKey: ['admin-users'] });
-            navigate({ to: '/admin/users' });
+            void queryClient.invalidateQueries({ queryKey: ['admin-users'] });
+            void navigate({ to: '/admin/users' });
         },
         onError: (err) => {
             toast.error(err.message);

@@ -1,5 +1,6 @@
 import { Check, Copy } from 'lucide-react';
 import { useState } from 'react';
+import * as React from 'react';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -15,8 +16,8 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
   const getTextContent = (node: React.ReactNode): string => {
     if (typeof node === 'string') return node;
     if (Array.isArray(node)) return node.map(getTextContent).join('');
-    if (typeof node === 'object' && node !== null && 'props' in node) {
-      return getTextContent((node as any).props.children);
+    if (React.isValidElement<{ children?: React.ReactNode }>(node)) {
+      return getTextContent(node.props.children);
     }
     return '';
   };
@@ -30,7 +31,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
       setIsCopied(true);
       toast.success('Code copied to clipboard');
       setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast.error('Failed to copy code');
     }
   };
@@ -44,7 +45,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
           <div className="w-2.5 h-2.5 rounded-full bg-green-500/20 opacity-50"></div>
         </div>
         <button
-          onClick={copyToClipboard}
+          onClick={() => { void copyToClipboard(); }}
           className="p-1.5 rounded-md hover:bg-background/50 text-muted-foreground transition-colors"
           title="Copy code"
         >

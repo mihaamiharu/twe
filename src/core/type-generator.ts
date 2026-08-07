@@ -1,4 +1,9 @@
 
+export interface TypeDefinition {
+  content: string;
+  filePath: string;
+}
+
 /**
  * Generates TypeScript type definitions for the challenge environment.
  * This includes global variables like 'page' and 'expect', as well as
@@ -7,8 +12,8 @@
 export function generateTypeDefinitions(
   files: Record<string, string>,
   preloadModules?: Record<string, { source: string; exports: string[] }>
-): { content: string; filePath: string }[] {
-  const definitions: { content: string; filePath: string }[] = [];
+): TypeDefinition[] {
+  const definitions: TypeDefinition[] = [];
 
   // 1. Core Playwright & Test Runner Globals
   // We provide a simplified type definition for common Playwright objects
@@ -141,7 +146,10 @@ export function generateTypeDefinitions(
         // Extract class definition using simple regex
         // Matches: export class ClassName { ... }
         // We capture the body to extract methods
-        const classRegex = new RegExp(`export\\s+class\\s+${moduleName}\\s*{([\\s\\S]*?)}\\s*$`, 'gm');
+        const escapedModuleName = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // The module name is escaped above before being interpolated into this parser regex.
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        const classRegex = new RegExp(`export\\s+class\\s+${escapedModuleName}\\s*{([\\s\\S]*?)}\\s*$`, 'gm');
         const match = classRegex.exec(sourceContent);
 
         if (match) {

@@ -143,7 +143,7 @@ function ResetPasswordPage() {
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (!Object.is(password, confirmPassword)) {
       setError(t('auth:errors.passwordMismatch'));
       return;
     }

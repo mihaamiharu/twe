@@ -156,7 +156,8 @@ function DocsIndexPage() {
           </div>
           <div className="mt-6 pt-6 border-t">
             <Link
-              to="/challenges"
+              to="/$locale/challenges"
+              params={{ locale: 'en' }}
               className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
             >
               Browse All Challenges →

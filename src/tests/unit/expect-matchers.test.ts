@@ -63,7 +63,7 @@ describe('Expect Matchers (Final Push)', () => {
         const { expect } = createExpect({ deadline: Date.now() + 50 });
         try {
             // This should fail quickly due to deadline
-            await expect(async () => ({ pass: false, message: 'fail' })).toBeTruthy();
+            await expect(() => ({ pass: false, message: 'fail' })).toBeTruthy();
         } catch {
             // Logic
         }

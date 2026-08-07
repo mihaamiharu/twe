@@ -1,6 +1,5 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import * as router from '@tanstack/react-router';
 import * as query from '@tanstack/react-query';
 
 // Mutable mock state

@@ -12,7 +12,8 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { ChallengePlayground, type Challenge, ChallengeSkeleton } from '@/components/challenges';
+import type { ChallengeDetailResponse } from '@/lib/challenges.query';
+import { ChallengePlayground, ChallengeSkeleton } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -31,66 +32,16 @@ import { transformChallengeResponse } from '@/lib/transform-challenge-response';
 
 import i18n from '@/lib/i18n';
 
-interface ServerChallengeResponse {
-  success: boolean;
-  data?: {
-    id: string;
-    slug: string;
-    title: string;
-    description: string;
-    instructions: string;
-    type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';
-    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-    category: string;
-    xpReward: number;
-    order: number;
-    htmlContent?: string;
-    files?: Record<string, string>;
-    editableFiles?: string[];
-    preloadModules?: Record<string, { exports: string[]; source: string }>;
-    starterCode?: string;
-    tags?: string[];
-    hints?: string[];
-    completionCount: number;
-    tutorial?: { slug: string; title: string } | null;
-    testCases: {
-      id: string;
-      description: string;
-      input: unknown;
-      expectedOutput: unknown;
-      isHidden?: boolean;
-    }[];
-    hiddenTestCaseCount: number;
-    userProgress?: {
-      isCompleted: boolean;
-      attempts: number;
-      lastAccessedAt: Date;
-      usedHint: boolean;
-      hintContent?: string | null;
-    } | null;
-    bestSubmission?: {
-      code: string;
-      isPassed: boolean;
-      xpEarned: number;
-      testsPassed: number;
-      testsTotal: number;
-      executionTime: number;
-    } | null;
-    nextChallenge?: { slug: string; title: string } | null;
-    prevChallenge?: { slug: string; title: string } | null;
-  };
-  error?: string;
-}
-
 export const Route = createFileRoute('/$locale/challenges/$slug')({
   loader: ({ context, params }) => {
-    void context.queryClient.prefetchQuery(
+    return context.queryClient.ensureQueryData(
       challengeDetailQueryOptions(params.slug, params.locale),
-    );
+    ) as unknown as Promise<object>;
   },
   component: ChallengeDetailPage,
   head: ({ loaderData, params }) => {
-    const data = loaderData?.data;
+    // TanStack Router's generated route type currently widens this loader to `{}`.
+    const data = (loaderData as unknown as ChallengeDetailResponse | undefined)?.data;
     const locale = params.locale || 'en';
     const url = `https://testingwithekki.com/${locale}/challenges/${params.slug}`;
 
@@ -240,7 +191,7 @@ function ChallengeDetailPage() {
 
   // Rename for compatibility with existing code
   // Rename for compatibility with existing code
-  const data = challengeData as ServerChallengeResponse;
+  const data: ChallengeDetailResponse = challengeData;
 
 
 
@@ -486,7 +437,7 @@ function ChallengeDetailPage() {
                 setShowSuccessDialog(false);
                 void navigate({
                   to: '/$locale/challenges/$slug',
-                  params: { locale, slug: data.data.nextChallenge!.slug },
+                  params: { locale, slug: data.data?.nextChallenge?.slug ?? '' },
                 });
               }
               : undefined

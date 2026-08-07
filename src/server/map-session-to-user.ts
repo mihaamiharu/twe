@@ -5,6 +5,7 @@ interface SessionUser {
     email: string;
     name?: string | null;
     image?: string | null;
+    role?: string | null;
 }
 
 interface Session {
@@ -21,7 +22,6 @@ export function mapSessionToUser(session: Session | null): AuthUser | null {
         email: session.user.email,
         name: session.user.name || null,
         image: session.user.image || null,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        role: (session.user as any).role || 'USER',
+        role: session.user.role || 'USER',
     };
 }

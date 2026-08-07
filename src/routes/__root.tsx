@@ -38,7 +38,7 @@ export interface RootContext {
 import { DefaultErrorComponent } from "@/components/default-error-component";
 
 export const Route = createRootRouteWithContext<RootContext>()({
-  defaultErrorComponent: DefaultErrorComponent,
+  errorComponent: DefaultErrorComponent,
   beforeLoad: async ({ context, location }) => {
     // Optimization: Check cache first to avoid blocking every navigation
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);
@@ -62,17 +62,16 @@ export const Route = createRootRouteWithContext<RootContext>()({
 
     return { auth, consent, pathname: location.pathname };
   },
-  head: ({ context }: any) => {
+  head: () => {
     const isQa = typeof window !== 'undefined' 
       ? window.location.hostname.startsWith('qa.')
       : false; // Server-side detection handled by header injection in scripts/server.ts
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    const pathname = (context?.pathname as string) || '/';
+    const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
     const canonicalUrl = getCanonicalUrl(pathname);
     const alternateLinks = getAlternateLinks(pathname);
 
-    const meta: any[] = [
+    const meta = [
       {
         charSet: 'utf-8',
       },
