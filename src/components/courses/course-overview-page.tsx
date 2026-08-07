@@ -14,6 +14,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { CourseLearnerShell } from '@/components/courses/course-learner-shell';
 import {
   Card,
   CardContent,
@@ -73,11 +74,15 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
   );
 
   return (
-    <main
-      className="min-h-screen bg-background px-4 py-8 md:px-8 md:py-12"
-      data-testid="course-overview"
+    <CourseLearnerShell
+      manifest={manifest}
+      content={content}
+      locale={locale}
+      completedCheckpointSlugs={completedCheckpointSlugs}
+      capstoneCompleted={capstoneCompleted}
+      dataTestId="course-overview"
     >
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="space-y-8">
         <header className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 hard-shadow md:p-10">
           <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
           <div className="relative max-w-3xl space-y-5">
@@ -371,7 +376,7 @@ function CourseOverviewPage({ course, locale }: CourseOverviewPageProps) {
           </Card>
         </section>
       </div>
-    </main>
+    </CourseLearnerShell>
   );
 }
 

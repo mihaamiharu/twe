@@ -23,9 +23,23 @@
     "duration": "{{minutes}} menit",
     "unavailable": "Course ini belum tersedia untuk bahasa yang dipilih."
   },
+  "learnerShell": {
+    "contents": "Isi course",
+    "contentsDescription": "Pilih checkpoint atau capstone. Progress akan tetap terlihat saat kamu melanjutkan course.",
+    "openContents": "Buka isi course",
+    "progress": "{{completed}} dari {{total}} unit course selesai",
+    "completed": "Selesai",
+    "current": "Sedang dibuka",
+    "incomplete": "Belum mulai",
+    "capstone": "Capstone",
+    "resume": "Lanjutkan course",
+    "allComplete": "Semua unit course sudah selesai. Kamu tetap bisa membuka ulang checkpoint kapan saja."
+  },
   "startHere": {
     "badge": "Panduan setup lokal",
     "backToCourse": "Kembali ke overview course",
+    "nextStep": "Langkah berikutnya",
+    "openFirstCheckpoint": "Buka checkpoint pertama",
     "workflow": "Urutan setup",
     "instructions": "Langkah",
     "commands": "Perintah",
@@ -51,7 +65,7 @@
     "learnerActions": "Alur kerja learner",
     "expectedOutput": "Output yang diharapkan",
     "localExercise": "Latihan lokal",
-    "repositoryGuidance": "Buka starter repository milikmu dan inspeksi PRD fiktif serta template requirements pada path di bawah. Template repository publik belum memiliki URL resmi di halaman ini, jadi gunakan path repository sebagai rujukan.",
+    "repositoryGuidance": "Buka starter repository milikmu dan inspeksi PRD fiktif serta template requirements pada path di bawah. Klik nama file Markdown untuk membaca reference companion repository langsung di course. Template repository publik belum memiliki URL resmi di halaman ini.",
     "repositoryPaths": "Path repository yang perlu diperiksa",
     "instructions": "Instruksi latihan",
     "expectedArtifacts": "Artifact yang diharapkan",

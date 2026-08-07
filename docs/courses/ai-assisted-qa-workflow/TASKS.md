@@ -326,6 +326,104 @@ arbitrary iframe HTML.
 HTTPS-only URLs, rejection of watch URLs and arbitrary hosts, safe iframe
 attributes, and planned/invalid fallback states.
 
+## Phase 2.5 — Course learning experience upgrade
+
+This phase adapts the strongest AI Hero interaction patterns without changing
+the pilot's existing completion, XP, review, or content-authority contracts.
+The current checkpoint pages remain the compatibility baseline until the new
+experience is covered by tests.
+
+### [x] QA-023 — Add the reusable course learner shell
+
+**Outcome:** Overview and checkpoint pages share a consistent learner layout.
+
+**Acceptance criteria:**
+
+- The shell shows course context, current checkpoint, overall progress, and a resume/next action.
+- A course contents navigator works on desktop and mobile.
+- Every checkpoint and the capstone show incomplete, current, and completed states.
+- Existing overview and checkpoint URLs remain valid.
+- Navigation is derived from the manifest rather than duplicated in components.
+
+**Implementation boundary:** Start with the existing checkpoint model. Do not
+introduce a new course database table or delete the current page components.
+
+**Implementation decision:** The overview, Start Here, and checkpoint pages now
+share `CourseLearnerShell` and `CourseContents`. Desktop renders a sticky
+contents panel; mobile renders a labeled sheet navigator. The navigator derives
+checkpoint and capstone links from the existing manifest, shows current and
+completed states, and points the learner to the first incomplete unit.
+
+**Verification:** Overview and checkpoint tests cover current/completed states
+and the resume link. Focused course tests and ESLint pass.
+
+### [ ] QA-024 — Define and implement resume progress semantics
+
+**Outcome:** Learners can return to the last active checkpoint without changing completion semantics.
+
+**Acceptance criteria:**
+
+- The course overview identifies the next incomplete checkpoint.
+- The last accessed checkpoint is persisted for authenticated learners.
+- Reading progress can be tracked independently from completion.
+- Video position is optional and provider-agnostic.
+- Exercise and reflection self-attestation remain the only completion gates.
+
+**Dependency:** Resolve the broader progress decision in
+`docs/plans/learning-content-architecture/tickets/05-define-progress-completion-and-assessment-semantics.md`
+before adding irreversible schema changes.
+
+### [ ] QA-025 — Add transcript and lesson-support content
+
+**Outcome:** Learners can use written material and video together like a real lesson player.
+
+**Acceptance criteria:**
+
+- Course content can optionally include a transcript and timestamped segments.
+- Transcript segments are keyboard accessible and can seek the video when supported.
+- Planned or unavailable videos retain the current localized fallback.
+- Copyable prompts, commands, and resource links remain safe and localized.
+- Arbitrary HTML or untrusted iframe content is still rejected.
+
+### [ ] QA-026 — Recompose the checkpoint lesson page
+
+**Outcome:** The checkpoint page has a clear learning sequence and persistent navigation.
+
+**Acceptance criteria:**
+
+- Video and objective appear before the long-form activity content.
+- Written lesson, AI activity, local exercise, resources, evidence, reflection, and completion are easy to scan.
+- Previous/next actions are available near the lesson header and at the bottom.
+- Completion state remains idempotent and server-authoritative.
+- Existing content and course-resource routes continue to work.
+
+### [ ] QA-027 — Verify responsive and accessible course navigation
+
+**Outcome:** The course experience works at mobile and desktop widths and with keyboard navigation.
+
+**Acceptance criteria:**
+
+- The contents navigator is usable as a mobile drawer and desktop navigation region.
+- Current and completed states are conveyed without color alone.
+- Dialog/drawer controls have labels, focus behavior, and escape handling.
+- Video, transcript, completion, and next actions are keyboard accessible.
+- Unit and E2E coverage verifies the main learner journey.
+
+### [ ] QA-028 — Migrate toward sections and lessons incrementally
+
+**Outcome:** The pilot content can evolve toward the canonical lesson model without a rewrite.
+
+**Acceptance criteria:**
+
+- Existing checkpoint content can be projected into course sections.
+- New lesson types can be added without hard-coding them into route components.
+- Existing checkpoint progress remains readable during migration.
+- One pilot checkpoint is migrated and verified before broader content migration.
+
+**Dependency:** Use the settled decisions from the learning-architecture
+rendering, route, and migration tickets before introducing the generalized
+lesson model.
+
 ## Phase 3 — Starter repository
 
 ### [ ] QA-030 — Publish the public GitHub template repository

@@ -1,5 +1,6 @@
 import {
   ArrowLeft,
+  ArrowRight,
   CheckCircle2,
   CircleAlert,
   Laptop,
@@ -8,6 +9,7 @@ import {
   Terminal,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { CourseLearnerShell } from '@/components/courses/course-learner-shell';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,11 +23,16 @@ import type {
   CourseContentDocument,
   CourseManifest,
 } from '@/lib/course-content.types';
-import { getCourseOverviewHref } from '@/lib/course-navigation';
+import {
+  getCourseCheckpointHref,
+  getCourseOverviewHref,
+} from '@/lib/course-navigation';
 
 export interface CourseStartHereData {
   manifest: CourseManifest;
   content: CourseContentDocument;
+  completedCheckpointSlugs?: readonly string[];
+  capstoneCompleted?: boolean;
 }
 
 interface CourseStartHerePageProps {
@@ -38,13 +45,28 @@ function CourseStartHerePage({ course, locale }: CourseStartHerePageProps) {
   const { content, manifest } = course;
   const startHere = content.startHere;
   const overviewHref = getCourseOverviewHref(locale, manifest.slug);
+  const firstCheckpoint = [...manifest.checkpoints].sort(
+    (a, b) => a.order - b.order,
+  )[0];
+  const firstCheckpointContent = firstCheckpoint
+    ? content.checkpoints.find(
+        (checkpoint) => checkpoint.slug === firstCheckpoint.slug,
+      )
+    : undefined;
+  const firstCheckpointHref = firstCheckpoint
+    ? getCourseCheckpointHref(locale, manifest.slug, firstCheckpoint.slug)
+    : undefined;
 
   return (
-    <main
-      className="min-h-screen bg-background px-4 py-8 md:px-8 md:py-12"
-      data-testid="course-start-here"
+    <CourseLearnerShell
+      manifest={manifest}
+      content={content}
+      locale={locale}
+      completedCheckpointSlugs={course.completedCheckpointSlugs}
+      capstoneCompleted={course.capstoneCompleted}
+      dataTestId="course-start-here"
     >
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="space-y-8">
         <header className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 hard-shadow md:p-10">
           <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
           <div className="relative max-w-4xl space-y-5">
@@ -264,7 +286,37 @@ function CourseStartHerePage({ course, locale }: CourseStartHerePageProps) {
           </CardContent>
         </Card>
 
-        <div className="flex justify-start">
+        {firstCheckpoint && firstCheckpointContent && firstCheckpointHref && (
+          <Card
+            className="border-primary/30 bg-primary/[0.04]"
+            data-testid="course-start-here-next"
+          >
+            <CardContent className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between md:p-6">
+              <div className="space-y-1">
+                <p className="text-sm font-semibold uppercase tracking-wider text-primary">
+                  {t('startHere.nextStep')}
+                </p>
+                <h2 className="text-xl font-semibold">
+                  {firstCheckpointContent.title}
+                </h2>
+                <p className="text-sm leading-6 text-muted-foreground">
+                  {firstCheckpointContent.objective}
+                </p>
+              </div>
+              <Button asChild size="lg">
+                <a
+                  href={firstCheckpointHref}
+                  data-testid="course-start-here-next-link"
+                >
+                  {t('startHere.openFirstCheckpoint')}
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+
+        <div className="flex flex-wrap justify-between gap-3">
           <Button asChild variant="outline">
             <a
               href={overviewHref}
@@ -276,7 +328,7 @@ function CourseStartHerePage({ course, locale }: CourseStartHerePageProps) {
           </Button>
         </div>
       </div>
-    </main>
+    </CourseLearnerShell>
   );
 }
 

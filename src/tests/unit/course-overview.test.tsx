@@ -75,6 +75,15 @@ describe('AI-assisted QA course overview', () => {
       screen.getByTestId('course-start-here-link').getAttribute('href'),
     ).toBe(`/id/courses/${course.manifest.slug}/start-here`);
     expect(screen.getByTestId('course-progress-summary')).toBeTruthy();
+    expect(screen.getByTestId('course-contents-desktop')).toBeTruthy();
+    expect(
+      screen
+        .getByTestId('course-contents-item-01-requirements')
+        .getAttribute('data-completed'),
+    ).toBe('true');
+    expect(screen.getByTestId('course-resume-link').getAttribute('href')).toBe(
+      `/id/courses/${course.manifest.slug}/checkpoints/02-test-design`,
+    );
     expect(
       screen.getByTestId('course-recommended-sequence').textContent,
     ).toContain(course.content.overview.recommendedSequence);

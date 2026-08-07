@@ -129,7 +129,10 @@ describe('AI-assisted QA course manifest', () => {
     for (const checkpoint of content.checkpoints) {
       expect(checkpoint.title.length).toBeGreaterThan(0);
       expect(checkpoint.objective.length).toBeGreaterThan(0);
-      expect(checkpoint.video.status).toBe('planned');
+      expect(checkpoint.video.status).toBe('ready');
+      expect(checkpoint.video.embedUrl).toBe(
+        'https://www.youtube-nocookie.com/embed/M7lc1UVf-VE',
+      );
       expect(checkpoint.writtenLesson).toContain('##');
       expect(checkpoint.aiActivity.learnerActions).toHaveLength(4);
       expect(checkpoint.localExercise.instructions.length).toBeGreaterThan(0);

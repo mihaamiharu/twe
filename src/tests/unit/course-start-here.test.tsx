@@ -60,7 +60,7 @@ describe('AI-assisted QA Start Here orientation', () => {
     expect(
       screen.getByTestId('course-start-here-step-install-dependencies')
         .textContent,
-    ).toContain('npm install');
+    ).toContain('npm ci');
     expect(
       screen.getByTestId('course-start-here-step-install-playwright-browsers')
         .textContent,
@@ -94,5 +94,8 @@ describe('AI-assisted QA Start Here orientation', () => {
         .getByTestId('course-start-here-overview-link')
         .getAttribute('href'),
     ).toBe(`/id/courses/${course.manifest.slug}`);
+    expect(
+      screen.getByTestId('course-start-here-next-link').getAttribute('href'),
+    ).toBe(`/id/courses/${course.manifest.slug}/checkpoints/01-requirements`);
   });
 });

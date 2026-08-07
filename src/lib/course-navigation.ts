@@ -38,6 +38,15 @@ export function getCourseCheckpointHref(
   return `${getCourseOverviewHref(locale, courseSlug)}/checkpoints/${checkpointSlug}`;
 }
 
+export function getCourseResourceHref(
+  locale: 'id',
+  courseSlug: string,
+  resourcePath: string,
+): string {
+  const search = new URLSearchParams({ path: resourcePath });
+  return `${getCourseOverviewHref(locale, courseSlug)}/resources?${search.toString()}`;
+}
+
 /**
  * Resolve adjacent checkpoints from the manifest's recommended order.
  * Checkpoint pages stay freely accessible; this helper only describes links.

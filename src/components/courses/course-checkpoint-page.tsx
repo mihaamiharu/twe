@@ -12,10 +12,12 @@ import {
   Target,
 } from 'lucide-react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { CourseLearnerShell } from '@/components/courses/course-learner-shell';
 import { CourseVideoEmbed } from '@/components/courses/course-video-embed';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -30,8 +32,12 @@ import {
   completeCourseCapstone,
   completeCourseCheckpoint,
 } from '@/server/course-progress.fn';
-import { getCourseCheckpointNavigation } from '@/lib/course-navigation';
+import {
+  getCourseCheckpointNavigation,
+  getCourseResourceHref,
+} from '@/lib/course-navigation';
 import { isCourseComplete } from '@/lib/course-progress';
+import { resolveCourseStarterResourcePath } from '@/lib/course-resources';
 import type {
   CourseCapstoneContent,
   CourseCheckpointContent,
@@ -80,6 +86,11 @@ function CourseCheckpointPage({ course, locale }: CourseCheckpointPageProps) {
       checkpointSlug: checkpoint.slug,
       locale,
     });
+  const resourceContext = {
+    courseSlug: manifest.slug,
+    checkpointSlug: checkpoint.slug,
+    locale,
+  } as const;
 
   const completionMutation = useMutation({
     mutationFn: async () => {
@@ -131,11 +142,16 @@ function CourseCheckpointPage({ course, locale }: CourseCheckpointPageProps) {
   );
 
   return (
-    <main
-      className="min-h-screen bg-background px-4 py-8 md:px-8 md:py-12"
-      data-testid={`course-checkpoint-${checkpoint.slug}`}
+    <CourseLearnerShell
+      manifest={manifest}
+      content={content}
+      locale={locale}
+      completedCheckpointSlugs={completedCheckpointSlugs}
+      capstoneCompleted={isCapstoneCompleted}
+      currentCheckpointSlug={checkpoint.slug}
+      dataTestId={`course-checkpoint-${checkpoint.slug}`}
     >
-      <div className="mx-auto max-w-6xl space-y-8">
+      <div className="space-y-8">
         <header className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 hard-shadow md:p-10">
           <div className="absolute -right-24 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
           <div className="relative max-w-4xl space-y-5">
@@ -316,27 +332,57 @@ function CourseCheckpointPage({ course, locale }: CourseCheckpointPageProps) {
                 {t('checkpoint.repositoryPaths')}
               </h3>
               <div className="flex flex-wrap gap-2">
-                {checkpoint.localExercise.repositoryPaths.map((path) => (
-                  <code
-                    key={path}
-                    className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary"
-                  >
-                    {path}
-                  </code>
-                ))}
+                {checkpoint.localExercise.repositoryPaths.map((path) => {
+                  const resourcePath = resolveCourseStarterResourcePath(
+                    resourceContext.checkpointSlug,
+                    path,
+                  );
+
+                  return (
+                    <code
+                      key={path}
+                      className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary"
+                    >
+                      {resourcePath ? (
+                        <a
+                          href={getCourseResourceHref(
+                            resourceContext.locale,
+                            resourceContext.courseSlug,
+                            resourcePath,
+                          )}
+                          className="hover:underline"
+                        >
+                          {path}
+                        </a>
+                      ) : (
+                        path
+                      )}
+                    </code>
+                  );
+                })}
               </div>
             </div>
             <div>
               <h3 className="mb-3 font-semibold">
                 {t('checkpoint.instructions')}
               </h3>
-              <BulletList items={checkpoint.localExercise.instructions} />
+              <BulletList
+                items={checkpoint.localExercise.instructions}
+                renderItem={(item) =>
+                  renderCourseResourceReference(item, resourceContext)
+                }
+              />
             </div>
             <div>
               <h3 className="mb-3 font-semibold">
                 {t('checkpoint.expectedArtifacts')}
               </h3>
-              <BulletList items={checkpoint.localExercise.expectedArtifacts} />
+              <BulletList
+                items={checkpoint.localExercise.expectedArtifacts}
+                renderItem={(item) =>
+                  renderCourseResourceReference(item, resourceContext)
+                }
+              />
             </div>
             <div className="rounded-xl border border-destructive/30 bg-destructive/[0.04] p-5">
               <h3 className="mb-3 flex items-center gap-2 font-semibold">
@@ -541,7 +587,7 @@ function CourseCheckpointPage({ course, locale }: CourseCheckpointPageProps) {
           )}
         </nav>
       </div>
-    </main>
+    </CourseLearnerShell>
   );
 }
 
@@ -743,27 +789,65 @@ function CourseCapstoneSection({
               {t('checkpoint.repositoryPaths')}
             </h3>
             <div className="flex flex-wrap gap-2">
-              {capstone.localExercise.repositoryPaths.map((path) => (
-                <code
-                  key={path}
-                  className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary"
-                >
-                  {path}
-                </code>
-              ))}
+              {capstone.localExercise.repositoryPaths.map((path) => {
+                const resourcePath = resolveCourseStarterResourcePath(
+                  capstone.id,
+                  path,
+                );
+
+                return (
+                  <code
+                    key={path}
+                    className="rounded-lg border border-border bg-muted px-3 py-2 text-sm text-primary"
+                  >
+                    {resourcePath ? (
+                      <a
+                        href={getCourseResourceHref(
+                          'id',
+                          courseSlug,
+                          resourcePath,
+                        )}
+                        className="hover:underline"
+                      >
+                        {path}
+                      </a>
+                    ) : (
+                      path
+                    )}
+                  </code>
+                );
+              })}
             </div>
           </div>
           <div>
             <h3 className="mb-3 font-semibold">
               {t('checkpoint.instructions')}
             </h3>
-            <BulletList items={capstone.localExercise.instructions} />
+            <BulletList
+              items={capstone.localExercise.instructions}
+              renderItem={(item) =>
+                renderCourseResourceReference(item, {
+                  courseSlug,
+                  checkpointSlug: capstone.id,
+                  locale: 'id',
+                })
+              }
+            />
           </div>
           <div>
             <h3 className="mb-3 font-semibold">
               {t('checkpoint.expectedArtifacts')}
             </h3>
-            <BulletList items={capstone.localExercise.expectedArtifacts} />
+            <BulletList
+              items={capstone.localExercise.expectedArtifacts}
+              renderItem={(item) =>
+                renderCourseResourceReference(item, {
+                  courseSlug,
+                  checkpointSlug: capstone.id,
+                  locale: 'id',
+                })
+              }
+            />
           </div>
           <div className="rounded-xl border border-destructive/30 bg-destructive/[0.04] p-5">
             <h3 className="mb-3 flex items-center gap-2 font-semibold">
@@ -910,13 +994,58 @@ function CourseCapstoneSection({
   );
 }
 
-function BulletList({ items }: { items: readonly string[] }) {
+function renderCourseResourceReference(
+  reference: string,
+  context: {
+    courseSlug: string;
+    checkpointSlug: string;
+    locale: 'id';
+  },
+): ReactNode {
+  const resourcePath = resolveCourseStarterResourcePath(
+    context.checkpointSlug,
+    reference,
+  );
+  if (!resourcePath) return reference;
+
+  const href = getCourseResourceHref(
+    context.locale,
+    context.courseSlug,
+    resourcePath,
+  );
+  const match = reference.match(/[A-Za-z0-9][A-Za-z0-9_./-]*\.md\b/i);
+  const linkLabel = match?.[0] ?? resourcePath;
+  const linkStart = match?.index ?? -1;
+  const link = (
+    <a href={href} className="text-primary hover:underline">
+      {linkLabel}
+    </a>
+  );
+
+  if (linkStart < 0) return link;
+
+  return (
+    <>
+      {reference.slice(0, linkStart)}
+      {link}
+      {reference.slice(linkStart + linkLabel.length)}
+    </>
+  );
+}
+
+function BulletList({
+  items,
+  renderItem,
+}: {
+  items: readonly string[];
+  renderItem?: (item: string) => ReactNode;
+}) {
   return (
     <ul className="grid gap-3">
       {items.map((item) => (
         <li key={item} className="flex items-start gap-2 text-sm leading-6">
           <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-primary" />
-          <span>{item}</span>
+          <span>{renderItem ? renderItem(item) : item}</span>
         </li>
       ))}
     </ul>

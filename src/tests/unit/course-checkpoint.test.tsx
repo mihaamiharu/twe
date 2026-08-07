@@ -167,17 +167,22 @@ describe('AI-assisted QA requirements checkpoint', () => {
       screen.getByTestId('course-checkpoint-01-requirements'),
     ).toBeTruthy();
     expect(
+      screen
+        .getByTestId('course-contents-item-01-requirements')
+        .getAttribute('data-current'),
+    ).toBe('true');
+    expect(
       screen.getByTestId('course-checkpoint-objective').textContent,
     ).toContain(course.checkpoint.objective);
     expect(screen.getByTestId('course-checkpoint-video').textContent).toContain(
       course.checkpoint.video.title,
     );
     expect(screen.getByTestId('course-checkpoint-video').textContent).toContain(
-      'checkpoint.videoPlanned',
+      'checkpoint.videoReady',
     );
     expect(
       screen.getByTestId('course-checkpoint-video').querySelector('iframe'),
-    ).toBeNull();
+    ).toBeTruthy();
     expect(
       screen.getByTestId('course-checkpoint-written-lesson').textContent,
     ).toContain('Baca PRD fiktif');
@@ -187,6 +192,13 @@ describe('AI-assisted QA requirements checkpoint', () => {
     expect(
       screen.getByTestId('course-checkpoint-local-exercise').textContent,
     ).toContain('docs/requirements/');
+    expect(
+      screen
+        .getByRole('link', { name: 'requirements-notes.md' })
+        .getAttribute('href'),
+    ).toBe(
+      '/id/courses/ai-assisted-qa-workflow/resources?path=docs%2Frequirements%2Frequirements-notes.md',
+    );
     expect(
       screen.getByTestId('course-checkpoint-evidence').textContent,
     ).toContain(course.checkpoint.evidenceChecklist[0]);
@@ -333,7 +345,7 @@ describe('AI-assisted QA test-writing checkpoint', () => {
     ).toContain(course.checkpoint.completionAction.requirements[0]);
     expect(
       screen.getByTestId('course-checkpoint-video').querySelector('iframe'),
-    ).toBeNull();
+    ).toBeTruthy();
     expect(
       screen.getByTestId('course-checkpoint-next-link').getAttribute('href'),
     ).toBe(`/id/courses/${course.manifest.slug}/checkpoints/04-automation`);
@@ -413,7 +425,7 @@ describe('AI-assisted QA Playwright automation checkpoint', () => {
     ).toContain(course.checkpoint.completionAction.requirements[0]);
     expect(
       screen.getByTestId('course-checkpoint-video').querySelector('iframe'),
-    ).toBeNull();
+    ).toBeTruthy();
     expect(
       screen.getByTestId('course-checkpoint-next-link').getAttribute('href'),
     ).toBe(`/id/courses/${course.manifest.slug}/checkpoints/05-execution`);
@@ -462,6 +474,7 @@ describe('automation checkpoint content contract', () => {
     expect(checkpoint?.localExercise.repositoryPaths).toEqual([
       '04-automation',
       'tests/',
+      'docs/test-cases/',
     ]);
     expect(checkpoint?.localExercise.expectedArtifacts).toEqual([
       'tests/scheduling.spec.ts',
@@ -539,7 +552,7 @@ describe('AI-assisted QA test execution checkpoint', () => {
     ).toContain(course.checkpoint.completionAction.requirements[0]);
     expect(
       screen.getByTestId('course-checkpoint-video').querySelector('iframe'),
-    ).toBeNull();
+    ).toBeTruthy();
     expect(
       screen.getByTestId('course-checkpoint-next-link').getAttribute('href'),
     ).toBe(`/id/courses/${course.manifest.slug}/checkpoints/06-triage`);
@@ -671,7 +684,7 @@ describe('AI-assisted QA failure triage checkpoint', () => {
     ).toContain(course.checkpoint.completionAction.requirements[0]);
     expect(
       screen.getByTestId('course-checkpoint-video').querySelector('iframe'),
-    ).toBeNull();
+    ).toBeTruthy();
     expect(
       screen.getByTestId('course-checkpoint-next-link').getAttribute('href'),
     ).toBe(
@@ -724,7 +737,7 @@ describe('failure triage checkpoint content contract', () => {
     );
     expect(checkpoint?.localExercise.repositoryPaths).toEqual([
       '06-triage',
-      '06-triage/failure-packet/',
+      'docs/reports/failure-packet.md',
       'docs/reports/',
     ]);
     expect(checkpoint?.localExercise.expectedArtifacts).toEqual([
@@ -807,7 +820,10 @@ describe('requirements checkpoint content contract', () => {
     expect(checkpoint?.aiActivity.prompt).not.toMatch(
       /ChatGPT|Claude|Copilot/i,
     );
-    expect(checkpoint?.video.status).toBe('planned');
+    expect(checkpoint?.video.status).toBe('ready');
+    expect(checkpoint?.video.embedUrl).toBe(
+      'https://www.youtube-nocookie.com/embed/M7lc1UVf-VE',
+    );
     expect(checkpoint?.completionAction.selfAttested).toBe(true);
     expect(checkpoint?.completionAction.id).toBe(
       'ai-assisted-qa-workflow.checkpoints.01-requirements.completion',
@@ -873,14 +889,14 @@ describe('AI-assisted QA test-design checkpoint', () => {
     ).toContain(course.checkpoint.completionAction.requirements[0]);
     expect(
       screen.getByTestId('course-checkpoint-video').querySelector('iframe'),
-    ).toBeNull();
+    ).toBeTruthy();
     expect(
       screen.getByTestId('course-checkpoint-next-link').getAttribute('href'),
     ).toBe(`/id/courses/${course.manifest.slug}/checkpoints/03-test-writing`);
   });
 
   it('keeps test-design activity portable, evidence-based, and self-attested', () => {
-    expect(course.checkpoint.video.status).toBe('planned');
+    expect(course.checkpoint.video.status).toBe('ready');
     expect(course.checkpoint.aiActivity.learnerActions).toHaveLength(4);
     expect(course.checkpoint.aiActivity.prompt).not.toMatch(
       /ChatGPT|Claude|Copilot/i,
@@ -984,7 +1000,7 @@ describe('AI-assisted QA quality decision checkpoint and capstone', () => {
     ).toMatch(/traceability|gap|quality decision/i);
     expect(
       screen.getByTestId('course-capstone-local-exercise').textContent,
-    ).toMatch(/README\.md|evidence|final quality-summary\.md/i);
+    ).toMatch(/README\.md|evidence|quality-summary\.md/i);
     expect(
       screen.getByTestId('course-capstone-evidence').textContent,
     ).toContain(course.content.capstone.evidenceChecklist[0]);

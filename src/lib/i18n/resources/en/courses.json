@@ -23,9 +23,23 @@
     "duration": "{{minutes}} minutes",
     "unavailable": "This course is not available in the selected language."
   },
+  "learnerShell": {
+    "contents": "Course contents",
+    "contentsDescription": "Choose a checkpoint or the capstone. Your progress is kept visible as you move through the course.",
+    "openContents": "Open course contents",
+    "progress": "{{completed}} of {{total}} course units complete",
+    "completed": "Completed",
+    "current": "Current",
+    "incomplete": "Not started",
+    "capstone": "Capstone",
+    "resume": "Resume course",
+    "allComplete": "All course units are complete. Revisit any checkpoint whenever you want."
+  },
   "startHere": {
     "badge": "Local setup guide",
     "backToCourse": "Back to course overview",
+    "nextStep": "Next step",
+    "openFirstCheckpoint": "Open first checkpoint",
     "workflow": "Setup sequence",
     "instructions": "Steps",
     "commands": "Commands",
@@ -51,7 +65,7 @@
     "learnerActions": "Learner workflow",
     "expectedOutput": "Expected output",
     "localExercise": "Local exercise",
-    "repositoryGuidance": "Open your starter repository and inspect the fictional PRD and requirements templates at the paths below. The public template repository does not have an official URL on this page yet, so use repository paths as the reference.",
+    "repositoryGuidance": "Open your starter repository and inspect the fictional PRD and requirements templates at the paths below. Click a Markdown filename to read the companion repository reference directly in the course. The public template repository does not have an official URL on this page yet.",
     "repositoryPaths": "Repository paths to inspect",
     "instructions": "Exercise instructions",
     "expectedArtifacts": "Expected artifacts",

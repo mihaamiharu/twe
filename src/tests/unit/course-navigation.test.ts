@@ -8,6 +8,7 @@ import {
   getCourseCheckpointNavigation,
   getCourseCheckpointHref,
   getCourseOverviewHref,
+  getCourseResourceHref,
   getCourseStartHereHref,
 } from '@/lib/course-navigation';
 
@@ -36,6 +37,15 @@ describe('AI-assisted QA course navigation', () => {
         '01-requirements',
       ),
     ).toBe('/id/courses/ai-assisted-qa-workflow/checkpoints/01-requirements');
+    expect(
+      getCourseResourceHref(
+        'id',
+        AI_ASSISTED_QA_WORKFLOW_COURSE_SLUG,
+        'docs/requirements/requirements-notes.md',
+      ),
+    ).toBe(
+      '/id/courses/ai-assisted-qa-workflow/resources?path=docs%2Frequirements%2Frequirements-notes.md',
+    );
   });
 
   it('has no previous link on checkpoint 1 and recommends checkpoint 2 next', () => {

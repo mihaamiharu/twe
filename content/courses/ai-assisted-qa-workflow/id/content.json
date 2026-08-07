@@ -14,7 +14,7 @@
     ],
     "startHere": {
       "title": "Mulai di sini",
-      "description": "Siapkan workspace lokal dan companion repository sebelum masuk ke checkpoint. Semua latihan memakai data sintetis dan berhenti sebelum booking nyata.",
+      "description": "Siapkan workspace lokal dan companion repository sebelum masuk ke checkpoint. Semua latihan memakai data sintetis dan berhenti sebelum booking nyata. Pada staging ini, link template dan target resmi masih menunggu publikasi course author; jangan menggantinya dengan URL acak.",
       "steps": [
         "Gunakan Node.js LTS, npm, dan Playwright.",
         "Buat repository pribadi dari template companion course.",
@@ -34,7 +34,7 @@
   "startHere": {
     "title": "Mulai di sini: siapkan workspace lokal",
     "subtitle": "Ikuti panduan ini untuk menyiapkan Node.js, membuat repository pendamping, dan menjalankan smoke test pertama secara lokal.",
-    "introduction": "Semua perintah dijalankan di mesinmu sendiri. Halaman ini tidak menjalankan Playwright, mengakses GitHub atas namamu, atau mengunggah artifact ke TestingWithEkki. Gunakan hanya target publik yang disetujui course author dan data sintetis.",
+    "introduction": "Semua perintah dijalankan di mesinmu sendiri. Halaman ini tidak menjalankan Playwright, mengakses GitHub atas namamu, atau mengunggah artifact ke TestingWithEkki. Gunakan hanya target publik yang disetujui course author dan data sintetis. Jika link template atau target resmi belum diberikan, berhenti di tahap setup dan jangan memilih target pengganti.",
     "steps": [
       {
         "id": "node-and-npm",
@@ -86,13 +86,13 @@
       {
         "id": "install-dependencies",
         "title": "Pasang dependency dengan npm",
-        "purpose": "npm install memasang dependency yang didefinisikan repository dan menghormati package-lock.json.",
+        "purpose": "npm ci memasang dependency yang didefinisikan repository secara konsisten dari package-lock.json.",
         "instructions": [
-          "Jalankan npm install dari root repository, yaitu folder yang berisi package.json.",
+          "Jalankan npm ci dari root repository, yaitu folder yang berisi package.json dan package-lock.json.",
           "Tunggu sampai proses selesai dan pastikan tidak ada error yang belum dipahami.",
           "Jangan menghapus package-lock.json untuk mengatasi warning; catat warning dan telusuri penyebabnya."
         ],
-        "commands": ["npm install"],
+        "commands": ["npm ci"],
         "notes": [
           "Jangan menjalankan npm dengan sudo atau hak administrator hanya untuk mengatasi masalah dependency."
         ]
@@ -141,10 +141,10 @@
     ],
     "expectedOutput": {
       "title": "Output berhasil yang diharapkan",
-      "description": "Nama project, waktu, dan detail output bisa berbeda. Yang penting smoke test selesai tanpa error dan melaporkan satu pemeriksaan lulus.",
+      "description": "Setelah target resmi dikonfigurasi, nama project, waktu, dan detail output bisa berbeda; smoke test yang berhasil melaporkan satu pemeriksaan lulus. Jika TARGET_BASE_URL masih kosong, Playwright akan melaporkan satu test skipped dan setup belum selesai.",
       "lines": [
         "Running 1 test using 1 worker",
-        "✓ tests/smoke.spec.ts:...",
+        "✓ tests/smoke/scheduling-page.spec.ts:...",
         "1 passed"
       ]
     },
@@ -173,7 +173,7 @@
         "notes": [
           "Gunakan package manager atau pengelola versi Node.js yang sesuai distribusimu dan pastikan versi LTS terbaca oleh shell yang menjalankan test.",
           "Jika browser gagal diluncurkan karena library sistem belum ada, jalankan npx playwright install --with-deps hanya setelah meninjau paket yang akan dipasang.",
-          "Jangan menjalankan npm install dengan sudo. Perbaiki owner atau PATH instalasi Node.js jika permission bermasalah."
+          "Jangan menjalankan npm ci dengan sudo. Perbaiki owner atau PATH instalasi Node.js jika permission bermasalah."
         ]
       }
     ],
@@ -183,12 +183,12 @@
         "solution": "Tutup terminal, buka kembali, lalu jalankan node --version dan npm --version. Jika tetap gagal, periksa PATH dan instalasi Node.js LTS; jangan lanjut dengan versi Node.js acak."
       },
       {
-        "problem": "npm install gagal atau package-lock.json berubah tanpa sengaja.",
+        "problem": "npm ci gagal atau package-lock.json tidak cocok dengan package.json.",
         "solution": "Baca error pertama, periksa versi Node.js, ruang disk, dan koneksi registry. Jangan menghapus lockfile atau menambahkan dependency baru sebelum penyebabnya jelas."
       },
       {
         "problem": "Playwright melaporkan browser executable tidak ditemukan.",
-        "solution": "Pastikan npm install selesai, lalu jalankan npx playwright install dari root repository. Jika Linux melaporkan library sistem hilang, ikuti catatan Linux."
+        "solution": "Pastikan npm ci selesai, lalu jalankan npx playwright install dari root repository. Jika Linux melaporkan library sistem hilang, ikuti catatan Linux."
       },
       {
         "problem": "Smoke test gagal karena TARGET_BASE_URL kosong atau salah.",
@@ -216,7 +216,8 @@
       "title": "Menganalisis requirement fitur penjadwalan",
       "objective": "Mampu memisahkan fakta, ambiguitas, asumsi, batasan, dan risiko dari PRD fiktif sebelum menentukan apa yang perlu diuji.",
       "video": {
-        "status": "planned",
+        "status": "ready",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
         "title": "Dari requirement ke pertanyaan QA",
         "durationMinutes": 8,
         "focus": "Menunjukkan cara membaca requirement sebagai sumber pertanyaan dan keputusan risiko."
@@ -277,7 +278,8 @@
       "title": "Mendesain skenario tes dengan bantuan AI",
       "objective": "Mampu menghasilkan kandidat skenario, mengkritik cakupan, dan memprioritaskan pengujian berdasarkan risiko.",
       "video": {
-        "status": "planned",
+        "status": "ready",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
         "title": "Dari risiko ke cakupan tes",
         "durationMinutes": 9,
         "focus": "Menjelaskan traceability, happy path, negative path, boundary, dan prioritas berbasis risiko."
@@ -342,7 +344,8 @@
       "title": "Menulis test case yang dapat dieksekusi",
       "objective": "Mampu mengubah skenario prioritas menjadi test case yang jelas, dapat diamati, dan memiliki kandidat otomasi.",
       "video": {
-        "status": "planned",
+        "status": "ready",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
         "title": "Test case yang dapat dibaca dan dibuktikan",
         "durationMinutes": 8,
         "focus": "Menghubungkan precondition, langkah, expected result, data, dan automation candidate."
@@ -403,7 +406,8 @@
       "title": "Membuat otomasi Playwright dengan TypeScript",
       "objective": "Mampu mengimplementasikan subset test case sebagai test Playwright yang terbaca, stabil, dan memiliki assertion bermakna.",
       "video": {
-        "status": "planned",
+        "status": "ready",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
         "title": "Dari test case ke Playwright",
         "durationMinutes": 10,
         "focus": "Memilih locator, action, assertion, dan struktur test yang menjaga niat pengujian tetap terlihat."
@@ -421,7 +425,7 @@
         "expectedOutput": "Playwright starter tests, catatan verifikasi kode, dan automation decision log."
       },
       "localExercise": {
-        "repositoryPaths": ["04-automation", "tests/"],
+        "repositoryPaths": ["04-automation", "tests/", "docs/test-cases/"],
         "instructions": [
           "Siapkan environment Node.js LTS, npm, Playwright, dan TypeScript.",
           "Implementasikan subset test case dengan locator dan assertion yang dapat dipertanggungjawabkan.",
@@ -467,12 +471,13 @@
       "title": "Menjalankan tes dan mengumpulkan evidence",
       "objective": "Mampu menjalankan suite Playwright secara lokal, membaca hasil test, dan menyimpan evidence yang cukup untuk keputusan QA.",
       "video": {
-        "status": "planned",
+        "status": "ready",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
         "title": "Evidence dari test run",
         "durationMinutes": 8,
         "focus": "Menjelaskan hasil pass/fail, screenshot, trace, log, dan perbedaan antara output tool dan bukti produk."
       },
-      "writtenLesson": "## Fokus\n\nJalankan test Playwright di companion repository milikmu. TestingWithEkki menyediakan materi dan menyimpan progress, tetapi tidak menjalankan browser secara live atau menerima artifact evidence.\n\n## Menjalankan dan membaca hasil test\n\nGunakan command pada README repository, misalnya `npx playwright test` untuk menjalankan smoke atau functional test. Baca output terminal dan buka report dengan `npx playwright show-report` bila tersedia. Untuk failure yang perlu ditelusuri, periksa screenshot dan buka trace dengan `npx playwright show-trace path/to/trace.zip`. Perhatikan jumlah passed, failed, skipped, durasi, error assertion atau locator, serta kondisi environment saat run.\n\n## Evidence, asumsi, dan interpretasi\n\nPisahkan fakta yang benar-benar terlihat di output, screenshot, trace, atau report dari asumsi dan hipotesis tentang penyebabnya. Simpan command, environment, timestamp, hasil, evidence yang relevan, serta keterbatasan evidence. Test passed membuktikan assertion pada kondisi run tersebut; itu bukan bukti bahwa seluruh feature atau kualitas produk sudah terbukti.",
+      "writtenLesson": "## Fokus\n\nJalankan test Playwright di companion repository milikmu. TestingWithEkki menyediakan materi dan menyimpan progress, tetapi tidak menjalankan browser secara live atau menerima artifact evidence.\n\n## Menjalankan dan membaca hasil test\n\nGunakan command pada README repository, misalnya `npx playwright test` untuk menjalankan smoke atau functional test. Baca output terminal dan buka report dengan `npx playwright show-report reports/playwright` bila tersedia. Untuk failure yang perlu ditelusuri, periksa screenshot dan buka trace dengan `npx playwright show-trace path/to/trace.zip`. Perhatikan jumlah passed, failed, skipped, durasi, error assertion atau locator, serta kondisi environment saat run.\n\n## Evidence, asumsi, dan interpretasi\n\nPisahkan fakta yang benar-benar terlihat di output, screenshot, trace, atau report dari asumsi dan hipotesis tentang penyebabnya. Simpan command, environment, timestamp, hasil, evidence yang relevan, serta keterbatasan evidence. Test passed membuktikan assertion pada kondisi run tersebut; itu bukan bukti bahwa seluruh feature atau kualitas produk sudah terbukti.",
       "aiActivity": {
         "goal": "Memakai AI untuk membantu merangkum output run tanpa mengubah ringkasan menjadi klaim yang tidak didukung evidence.",
         "prompt": "Tinjau output test run, report, screenshot atau trace, dan metadata environment ini. Buat ringkasan pass/fail, fakta evidence, asumsi atau hipotesis, pertanyaan terbuka, dan klaim yang belum boleh dibuat. Jangan menyimpulkan kualitas produk hanya dari status pass.",
@@ -532,7 +537,8 @@
       "title": "Melakukan failure triage",
       "objective": "Mampu menyelidiki failed Playwright test dengan evidence, menguji hipotesis, lalu mengklasifikasikan penyebab sebagai masalah test, produk, environment, atau data.",
       "video": {
-        "status": "planned",
+        "status": "ready",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
         "title": "Failure bukan otomatis product bug",
         "durationMinutes": 10,
         "focus": "Mengajarkan investigasi failed test berbasis evidence, reproduksi terbatas, dan hipotesis yang dapat diuji."
@@ -552,11 +558,11 @@
       "localExercise": {
         "repositoryPaths": [
           "06-triage",
-          "06-triage/failure-packet/",
+          "docs/reports/failure-packet.md",
           "docs/reports/"
         ],
         "instructions": [
-          "Buka seeded failure atau recorded failure packet dari companion repository pada path 06-triage/failure-packet/; jangan mengganti packet awal dengan hasil analisis.",
+          "Buka seeded failure atau recorded failure packet dari companion repository pada path docs/reports/failure-packet.md; jangan mengganti packet awal dengan hasil analisis.",
           "Jalankan kembali test secara lokal dengan command dan batas aman yang dicatat repository. Simpan output awal, lalu ubah hanya satu variabel pada setiap pemeriksaan pembeda.",
           "Buat daftar fakta observed result, expected result, dan konteks environment sebelum membentuk hipotesis.",
           "Gunakan AI untuk mengusulkan klasifikasi dan hipotesis, lalu verifikasi dan edit hasilnya terhadap packet.",
@@ -608,7 +614,8 @@
       "title": "Membuat quality summary dan menyelesaikan capstone",
       "objective": "Mampu memperbaiki test defect atau mendokumentasikan product defect, merangkum area yang diuji dan belum diuji, melaporkan evidence serta keterbatasannya, mendokumentasikan residual risk, dan membuat rekomendasi kualitas atau release berbasis risiko.",
       "video": {
-        "status": "planned",
+        "status": "ready",
+        "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
         "title": "Dari failure ke keputusan kualitas",
         "durationMinutes": 10,
         "focus": "Menghubungkan triage, re-run, defect communication, area tested dan untested, coverage gap, residual risk, serta rekomendasi release-quality."
@@ -679,7 +686,8 @@
     "title": "Capstone: end-to-end scheduling quality decision",
     "objective": "Mendemonstrasikan seluruh AI-assisted QA workflow dari requirement sampai keputusan kualitas yang dapat dipertanggungjawabkan.",
     "video": {
-      "status": "planned",
+      "status": "ready",
+      "embedUrl": "https://www.youtube-nocookie.com/embed/M7lc1UVf-VE",
       "title": "Menyatukan workflow dan residual risk",
       "durationMinutes": 12,
       "focus": "Menunjukkan cara menggabungkan artefak tujuh checkpoint menjadi evidence package dan quality decision."
@@ -710,7 +718,7 @@
         "Playwright suite yang dapat dijalankan",
         "execution report dan evidence",
         "failure analysis atau defect report",
-        "final quality-summary.md"
+        "quality-summary.md"
       ],
       "safetyNotes": [
         "Gunakan companion repository milik learner sebagai tempat evidence.",
