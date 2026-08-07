@@ -177,7 +177,7 @@ async function recordCourseUnitCompletion({
         .insert(tutorials)
         .values({
           slug: unitSlug,
-          title: { id: definition.content.title },
+          title: { en: definition.content.title, id: definition.content.title },
           order: 10000 + definition.order,
           estimatedMinutes: definition.content.video.durationMinutes,
           tags: [COURSE_PROGRESS_TAG, courseSlug],
