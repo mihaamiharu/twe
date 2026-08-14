@@ -9,10 +9,11 @@ export const Route = createFileRoute('/$locale')({
 
     // Redirect invalid locales to fallback
     if (!isValidLocale(locale)) {
-      throw redirect({
+      redirect({
         to: '/$locale',
         params: { locale: fallbackLng },
         replace: true,
+        throw: true,
       });
     }
 

@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 import { authMiddleware } from './auth.mw';
 import { auth } from './auth.server';
 import { db } from '@/db';
@@ -110,9 +110,7 @@ export const getTutorials = createServerFn({ method: 'GET' })
         { isCompleted: boolean; readingProgress: number }
       > = {};
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbRecords.length > 0) {
@@ -266,9 +264,7 @@ export const getTutorial = createServerFn({ method: 'GET' })
       // User progress
       let userProgressData = null;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbTutorial) {

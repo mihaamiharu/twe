@@ -23,10 +23,24 @@ export interface RouteHandlerResult {
   response?: {
     status?: number;
     statusText?: string;
-    body?: string;
-    json?: Record<string, unknown>;
+    body?: string | ArrayBuffer;
+    json?: unknown;
     headers?: Record<string, string>;
   };
+  options?: {
+    method?: string;
+    headers?: Record<string, string>;
+    postData?: string | Buffer;
+  };
+}
+
+export type BrowserFetch = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>;
+
+export interface RouteWindow {
+  __MOCK_ROUTES__?: RouteMatcher[];
 }
 
 /**
@@ -163,10 +177,10 @@ export function generateFetchPolyfillCode(options: {
  * registered mock routes.
  */
 export function createRouteFetchWrapper(
-  originalFetch: typeof window.fetch | undefined,
-  getWindow: () => (Window & Record<string, unknown>) | undefined,
-): typeof window.fetch {
-  const wrappedFetch = (input: RequestInfo | URL, init?: RequestInit) => {
+  originalFetch: BrowserFetch | undefined,
+  getWindow: () => RouteWindow | undefined,
+): BrowserFetch {
+  const wrappedFetch: BrowserFetch = (input, init) => {
     let url: string;
     if (typeof input === 'string') {
       url = input.startsWith('/') ? 'http://localhost' + input : input;
@@ -180,7 +194,7 @@ export function createRouteFetchWrapper(
 
     const iframeWindow = getWindow();
     if (iframeWindow?.__MOCK_ROUTES__) {
-      const routes = iframeWindow.__MOCK_ROUTES__ as RouteMatcher[];
+      const routes = iframeWindow.__MOCK_ROUTES__;
       for (const route of routes) {
         let isMatch = false;
         if (typeof route.matcher === 'string') {
@@ -199,9 +213,11 @@ export function createRouteFetchWrapper(
           return route
             .handler({
               url,
-              method: (init as RequestInit)?.method || 'GET',
-              headers: (init as RequestInit)?.headers as Record<string, string> | undefined,
-              body: (init as RequestInit)?.body as string | undefined,
+              method: init?.method || 'GET',
+              headers: init?.headers
+                ? Object.fromEntries(new Headers(init.headers).entries())
+                : undefined,
+              body: typeof init?.body === 'string' ? init.body : undefined,
             })
             .then((r) => {
               if (r?.type === 'fulfill') {
@@ -210,7 +226,7 @@ export function createRouteFetchWrapper(
               return new Response(body, {
                 status: r.response?.status || 200,
                 statusText: r.response?.statusText || 'OK',
-                headers: (r.response?.headers as HeadersInit) || {},
+                headers: r.response?.headers || {},
               });
               }
               return Promise.reject(new Error('Route not fulfilled'));
@@ -224,5 +240,5 @@ export function createRouteFetchWrapper(
       : Promise.resolve(new Response(null, { status: 404 }));
   };
 
-  return wrappedFetch as unknown as typeof window.fetch;
+  return wrappedFetch;
 }

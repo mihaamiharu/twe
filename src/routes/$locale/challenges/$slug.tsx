@@ -12,7 +12,6 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import type { ChallengeDetailResponse } from '@/lib/challenges.query';
 import { ChallengePlayground, ChallengeSkeleton } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
@@ -33,15 +32,13 @@ import { transformChallengeResponse } from '@/lib/transform-challenge-response';
 import i18n from '@/lib/i18n';
 
 export const Route = createFileRoute('/$locale/challenges/$slug')({
-  loader: ({ context, params }) => {
-    return context.queryClient.ensureQueryData(
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(
       challengeDetailQueryOptions(params.slug, params.locale),
-    ) as unknown as Promise<object>;
-  },
+    ),
   component: ChallengeDetailPage,
   head: ({ loaderData, params }) => {
-    // TanStack Router's generated route type currently widens this loader to `{}`.
-    const data = (loaderData as unknown as ChallengeDetailResponse | undefined)?.data;
+    const data = loaderData?.data;
     const locale = params.locale || 'en';
     const url = `https://testingwithekki.com/${locale}/challenges/${params.slug}`;
 
@@ -191,7 +188,7 @@ function ChallengeDetailPage() {
 
   // Rename for compatibility with existing code
   // Rename for compatibility with existing code
-  const data: ChallengeDetailResponse = challengeData;
+  const data = challengeData;
 
 
 

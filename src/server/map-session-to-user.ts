@@ -12,8 +12,31 @@ interface Session {
     user: SessionUser;
 }
 
-export function mapSessionToUser(session: Session | null): AuthUser | null {
-    if (!session?.user) {
+function isOptionalString(value: unknown): value is string | null | undefined {
+    return value === undefined || value === null || typeof value === 'string';
+}
+
+function isSession(value: unknown): value is Session {
+    if (typeof value !== 'object' || value === null || !('user' in value)) {
+        return false;
+    }
+
+    const { user } = value;
+    return (
+        typeof user === 'object' &&
+        user !== null &&
+        'id' in user &&
+        typeof user.id === 'string' &&
+        'email' in user &&
+        typeof user.email === 'string' &&
+        (!('name' in user) || isOptionalString(user.name)) &&
+        (!('image' in user) || isOptionalString(user.image)) &&
+        (!('role' in user) || isOptionalString(user.role))
+    );
+}
+
+export function mapSessionToUser(session: unknown): AuthUser | null {
+    if (!isSession(session)) {
         return null;
     }
 

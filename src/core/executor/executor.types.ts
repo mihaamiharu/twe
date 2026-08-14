@@ -73,7 +73,7 @@ export interface ExpectMatchers {
         toHaveTitle: (title: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveURL: (url: string | RegExp, options?: { timeout?: number }) => Promise<void>;
 
-        not: ExpectMatchers;
+        not: Omit<ExpectMatchers, 'not'>;
 }
 
 export interface ExpectFunction {
@@ -85,4 +85,17 @@ export interface ExpectResult {
     expect: ExpectFunction;
     getAssertionCount: () => number;
     getTestResults: () => Array<{ message: string; passed: boolean }>;
+}
+
+export interface ExecutorTestFixtures {
+    page: MockedPlaywrightPage;
+    expect: ExpectFunction;
+}
+
+export interface ExecutorTestFunction {
+    (
+        name: string,
+        callback: (fixtures: ExecutorTestFixtures) => Promise<void>,
+    ): Promise<void>;
+    step: (name: string, callback: () => Promise<unknown>) => Promise<void>;
 }

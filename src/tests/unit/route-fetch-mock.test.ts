@@ -75,6 +75,9 @@ describe('generateFetchPolyfillCode', () => {
 
     // Wrap in function to test syntax
     expect(() => {
+      // The generated polyfill is dynamic code by design; this assertion only
+      // compiles it and never executes untrusted input.
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
       new Function(code);
     }).not.toThrow();
   });
@@ -97,7 +100,7 @@ describe('createRouteFetchWrapper', () => {
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -107,23 +110,20 @@ describe('createRouteFetchWrapper', () => {
     // Relative URL should be normalized and match the route
     const response = await wrapper('/api/test');
     expect(response.ok).toBe(true);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ matched: true });
   });
 
   test('should pass through to original fetch when no routes match', async () => {
     const mockWindow = {
       __MOCK_ROUTES__: [],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     let originalCalled = false;
-    const originalFetch: typeof fetch = Object.assign(
-      () => {
+    const originalFetch = () => {
         originalCalled = true;
         return Promise.resolve(new Response(null, { status: 200 }));
-      },
-      { preconnect: globalThis.fetch.preconnect },
-    );
+      };
 
     const wrapper = createRouteFetchWrapper(
       originalFetch,
@@ -148,7 +148,7 @@ describe('createRouteFetchWrapper', () => {
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -158,7 +158,7 @@ describe('createRouteFetchWrapper', () => {
     const response = await wrapper('http://localhost/api/data');
     expect(response.ok).toBe(true);
     expect(response.status).toBe(200);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ message: 'mocked' });
   });
 
@@ -173,7 +173,7 @@ describe('createRouteFetchWrapper', () => {
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -182,7 +182,7 @@ describe('createRouteFetchWrapper', () => {
 
     const response = await wrapper('http://localhost/api/users');
     expect(response.ok).toBe(true);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ matched: true });
   });
 
@@ -197,7 +197,7 @@ describe('createRouteFetchWrapper', () => {
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -206,14 +206,14 @@ describe('createRouteFetchWrapper', () => {
 
     const response = await wrapper('http://localhost/api/special');
     expect(response.ok).toBe(true);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ special: true });
   });
 
   test('should return 404 response when no original fetch and no routes match', async () => {
     const mockWindow = {
       __MOCK_ROUTES__: [],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,

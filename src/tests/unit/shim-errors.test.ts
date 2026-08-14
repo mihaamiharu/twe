@@ -95,9 +95,9 @@ describe('createShimError', () => {
             action: 'fill'
         });
 
-        expect((error as any).type).toBe('element_not_found');
-        expect((error as any).selector).toBe('#my-element');
-        expect((error as any).action).toBe('fill');
+        expect(error.type).toBe('element_not_found');
+        expect(error.selector).toBe('#my-element');
+        expect(error.action).toBe('fill');
     });
 
     it('should work without any options', () => {

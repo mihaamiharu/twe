@@ -2,6 +2,45 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { useTheme } from '@/components/theme-provider';
 
+declare global {
+  interface Window {
+    SwaggerUIBundle?: unknown;
+  }
+}
+
+interface SwaggerUIBundle {
+  (config: unknown): void;
+  presets: { apis: unknown };
+  plugins: { DownloadUrl: unknown };
+}
+
+function getSwaggerUIBundle(value: unknown): SwaggerUIBundle | undefined {
+  if (typeof value !== 'function') return undefined;
+
+  const presets: unknown = Reflect.get(value, 'presets');
+  const plugins: unknown = Reflect.get(value, 'plugins');
+  if (
+    typeof presets !== 'object' ||
+    presets === null ||
+    !('apis' in presets) ||
+    typeof plugins !== 'object' ||
+    plugins === null ||
+    !('DownloadUrl' in plugins)
+  ) {
+    return undefined;
+  }
+
+  return Object.assign(
+    (config: unknown) => {
+      Reflect.apply(value, undefined, [config]);
+    },
+    {
+      presets: { apis: presets.apis },
+      plugins: { DownloadUrl: plugins.DownloadUrl },
+    },
+  );
+}
+
 export const Route = createFileRoute('/docs/api')({
   component: ApiDocsPage,
 });
@@ -37,21 +76,14 @@ function ApiDocsPage() {
       script.onload = () => {
         // Wait a bit for standalone preset to be available
         setTimeout(() => {
-          // Define types for SwaggerUI on window
-          const win = window as unknown as {
-            SwaggerUIBundle: ((config: unknown) => void) & {
-              presets: { apis: unknown };
-              plugins: { DownloadUrl: unknown };
-            };
-          } & Window;
-
-          if (win.SwaggerUIBundle && containerRef.current) {
-            win.SwaggerUIBundle({
+          const swaggerUI = getSwaggerUIBundle(window.SwaggerUIBundle);
+          if (swaggerUI && containerRef.current) {
+            swaggerUI({
               url: '/openapi.json',
               dom_id: '#swagger-ui',
               deepLinking: true,
-              presets: [win.SwaggerUIBundle.presets.apis],
-              plugins: [win.SwaggerUIBundle.plugins.DownloadUrl],
+              presets: [swaggerUI.presets.apis],
+              plugins: [swaggerUI.plugins.DownloadUrl],
               defaultModelsExpandDepth: 1,
               defaultModelExpandDepth: 1,
               docExpansion: 'list',

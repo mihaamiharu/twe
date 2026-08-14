@@ -13,11 +13,28 @@ import type {
 import type { TestResult } from '../test-results';
 import type { SelectorType } from '../selector-input';
 
+export interface ChallengeExecution {
+    handleRunCode: () => Promise<void>;
+    handleValidateSelector: () => void;
+    handleReset: () => void;
+    confirmReset: () => Promise<void>;
+    handleSubmit: () => void;
+    handleSelectorChange: (value: string, type: SelectorType) => void;
+    handleFileChange: (path: string, newCode: string) => void;
+    handleSelectFile: (path: string) => void;
+    handleCloseFile: (path: string) => void;
+    handlePreviewValidation: (result: { isValid: boolean; matchCount: number }) => void;
+    hintMutation: {
+        isPending: boolean;
+        mutate: () => void;
+    };
+}
+
 export function useChallengeExecution(
     state: PlaygroundState,
     props: ChallengePlaygroundProps,
     previewIframeRef: React.RefObject<HTMLIFrameElement | null>
-) {
+): ChallengeExecution {
     const { challenge, onSubmit, userId } = props;
     const {
         code,
@@ -410,5 +427,3 @@ export function useChallengeExecution(
         hintMutation,
     };
 }
-
-export type ChallengeExecution = ReturnType<typeof useChallengeExecution>;

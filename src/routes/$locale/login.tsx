@@ -5,17 +5,17 @@ import {
   useParams,
 } from '@tanstack/react-router';
 import { LoginForm } from '@/components/auth';
-import type { RootContext } from '../__root';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/login')({
   beforeLoad: ({ context, params }) => {
-    const { auth } = context as RootContext;
+    const { auth } = context;
     if (auth?.isAuthenticated) {
-      throw redirect({
+      redirect({
         to: LocaleRoutes.home,
         params: localeParams(params.locale),
+        throw: true,
       });
     }
   },

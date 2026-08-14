@@ -16,13 +16,14 @@ export default tseslint.config(
       },
     },
     rules: {
-      '@typescript-eslint/only-throw-error': 'off',
       'security/detect-object-injection': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
   {
-    // Specific overrides for tests to allow looser typing for mocking
+    // Security's syntactic object-injection checks are not type-aware. Preserve
+    // the existing scope for test fixtures and typed map/DOM access; this PR
+    // removes TypeScript escape hatches without expanding security-lint scope.
     files: [
       'src/tests/**/*.ts',
       'src/tests/**/*.tsx',
@@ -31,30 +32,11 @@ export default tseslint.config(
       'e2e/**/*.ts',
     ],
     rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      '@typescript-eslint/no-unused-vars': 'warn',
-      '@typescript-eslint/require-await': 'warn',
-      '@typescript-eslint/no-floating-promises': 'warn',
-      '@typescript-eslint/no-misused-promises': 'warn',
       'security/detect-object-injection': 'off',
       'security/detect-non-literal-fs-filename': 'off',
-      '@typescript-eslint/no-require-imports': 'off',
-      '@typescript-eslint/no-implied-eval': 'off',
-      '@typescript-eslint/ban-ts-comment': 'warn',
-      '@typescript-eslint/await-thenable': 'warn',
-      '@typescript-eslint/unbound-method': 'warn',
-      'no-useless-catch': 'warn',
     },
   },
   {
-    // These surfaces intentionally use dynamic keys for typed UI maps, localized
-    // content, and DOM shims. The strict TypeScript checks provide the relevant
-    // safety here while the security rule otherwise reports every map lookup.
     files: [
       'src/components/**/*.tsx',
       'src/routes/**/*.tsx',
@@ -70,33 +52,6 @@ export default tseslint.config(
     ],
     rules: {
       'security/detect-object-injection': 'off',
-    },
-  },
-  {
-    // Admin routes often have boilerplate or incomplete features in development
-    files: ['src/routes/admin/**/*.tsx', 'src/routes/admin/**/*.ts'],
-    rules: {
-      '@typescript-eslint/no-unused-vars': 'warn',
-      '@typescript-eslint/no-misused-promises': 'warn',
-      '@typescript-eslint/no-unsafe-assignment': 'warn',
-      '@typescript-eslint/no-unsafe-member-access': 'warn',
-      '@typescript-eslint/no-unsafe-call': 'warn',
-      '@typescript-eslint/no-unsafe-argument': 'warn',
-      '@typescript-eslint/no-explicit-any': 'warn',
-    },
-  },
-  {
-    // Override for the core playwright shim as it handles untyped iframe interactions
-    files: [
-      'src/core/executor/playwright-shim.ts',
-      'src/core/executor/iframe-executor.ts',
-    ],
-    rules: {
-      '@typescript-eslint/no-explicit-any': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-return': 'off',
     },
   },
   {

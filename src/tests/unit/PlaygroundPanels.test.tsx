@@ -3,15 +3,32 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { EditorPanel } from '@/components/challenges/playground/editor-panel';
 import { SelectorPanel } from '@/components/challenges/playground/selector-panel';
 import { ResultsPanel } from '@/components/challenges/playground/results-panel';
+import type { TestResult } from '@/components/challenges/test-results';
+import {
+    createChallenge,
+    createPlaygroundState,
+} from '@/tests/fixtures/playground';
+
+interface CodeEditorMockProps {
+    initialCode: string;
+    onChange: (value: string) => void;
+}
+
+interface SelectorInputMockProps {
+    value: string;
+    onChange: (value: string, type: 'css' | 'xpath') => void;
+    onValidate: () => void;
+    defaultType: 'css' | 'xpath';
+}
 
 // Mock dependencies
 void mock.module(
 '@/components/challenges/code-editor', () => ({
-    CodeEditor: ({ initialCode, onChange }: any) => (
+    CodeEditor: ({ initialCode, onChange }: CodeEditorMockProps) => (
         <textarea
             data-testid="code-editor"
             defaultValue={initialCode}
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(event) => onChange(event.target.value)}
         />
     ),
 }));
@@ -28,12 +45,12 @@ void mock.module(
 
 void mock.module(
 '@/components/challenges/selector-input', () => ({
-    SelectorInput: ({ value, onChange, onValidate, defaultType }: any) => (
+    SelectorInput: ({ value, onChange, onValidate, defaultType }: SelectorInputMockProps) => (
         <div data-testid="selector-input">
             <input
                 data-testid="input-field"
                 value={value}
-                onChange={(e) => onChange(e.target.value, defaultType)}
+                onChange={(event) => onChange(event.target.value, defaultType)}
             />
             <button data-testid="validate-btn" onClick={onValidate}>Validate</button>
         </div>
@@ -42,9 +59,9 @@ void mock.module(
 
 void mock.module(
 '@/components/challenges/test-results', () => ({
-    TestResults: ({ results }: any) => (
+    TestResults: ({ results }: { results: TestResult[] }) => (
         <div data-testid="test-results">
-            {results.map((r: any) => (
+            {results.map((r) => (
                 <div key={r.id} data-testid={`result-${r.id}`}>{r.name}: {r.passed ? 'PASS' : 'FAIL'}</div>
             ))}
         </div>
@@ -61,17 +78,15 @@ void mock.module(
 describe('Playground Panels', () => {
     afterEach(cleanup);
 
-    const mockChallenge = {
-        id: '1',
+    const mockChallenge = createChallenge({
         slug: 'test',
         title: 'Test',
-        type: 'JAVASCRIPT',
         starterCode: 'console.log("hello")',
         files: { '/index.js': 'console.log("hello")' },
         editableFiles: ['/index.js'],
-    };
+    });
 
-    const mockState: any = {
+    const mockState = createPlaygroundState({
         code: 'console.log("hello")',
         setCode: mock(),
         selector: '',
@@ -88,7 +103,7 @@ describe('Playground Panels', () => {
         setConsoleLogs: mock(),
         isRunning: false,
         hasPassed: false,
-    };
+    });
 
     const mockHandlers = {
         onRunCode: mock(),
@@ -111,7 +126,7 @@ describe('Playground Panels', () => {
 
             render(
                 <EditorPanel
-                    challenge={singleFileChallenge as any}
+                    challenge={singleFileChallenge}
                     state={mockState}
                     isMobile={false}
                     {...mockHandlers}
@@ -129,7 +144,7 @@ describe('Playground Panels', () => {
 
             render(
                 <EditorPanel
-                    challenge={multiFileChallenge as any}
+                    challenge={multiFileChallenge}
                     state={mockState}
                     isMobile={false}
                     {...mockHandlers}
@@ -142,11 +157,11 @@ describe('Playground Panels', () => {
 
     describe('SelectorPanel', () => {
         it('should render selector input', () => {
-            const selectorState = { ...mockState, selector: '.test' };
+            const selectorState = createPlaygroundState({ ...mockState, selector: '.test' });
 
             render(
                 <SelectorPanel
-                    challenge={mockChallenge as any}
+                    challenge={mockChallenge}
                     state={selectorState}
                     onSelectorChange={mockHandlers.onSelectorChange}
                     onValidate={mockHandlers.onValidate}
@@ -158,11 +173,15 @@ describe('Playground Panels', () => {
         });
 
         it('should show success indication when passed', () => {
-            const passedState = { ...mockState, hasPassed: true, testResults: [{ passed: true }] };
+            const passedState = createPlaygroundState({
+                ...mockState,
+                hasPassed: true,
+                testResults: [{ id: 'selector', name: 'Selector', passed: true }],
+            });
 
             render(
                 <SelectorPanel
-                    challenge={mockChallenge as any}
+                    challenge={mockChallenge}
                     state={passedState}
                     onSelectorChange={mockHandlers.onSelectorChange}
                     onValidate={mockHandlers.onValidate}
@@ -175,14 +194,14 @@ describe('Playground Panels', () => {
 
     describe('ResultsPanel', () => {
         it('should show test results by default', () => {
-            const resultState = {
+            const resultState = createPlaygroundState({
                 ...mockState,
                 testResults: [{ id: '1', name: 'Test 1', passed: true }]
-            };
+            });
 
             render(
                 <ResultsPanel
-                    challenge={mockChallenge as any}
+                    challenge={mockChallenge}
                     state={resultState}
                     onRunCode={mockHandlers.onRunCode}
                 />
@@ -193,11 +212,11 @@ describe('Playground Panels', () => {
         });
 
         it('should show console output in console tab', () => {
-            const consoleState = { ...mockState, resultsTab: 'console' };
+            const consoleState = createPlaygroundState({ ...mockState, resultsTab: 'console' });
 
             render(
                 <ResultsPanel
-                    challenge={mockChallenge as any}
+                    challenge={mockChallenge}
                     state={consoleState}
                     onRunCode={mockHandlers.onRunCode}
                 />

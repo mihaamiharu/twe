@@ -8,11 +8,14 @@ if (typeof window === 'undefined') {
   };
 
   // Simple mock of window/iframe relationship
-  (global as any).window = parentWindow;
-  (global as any).document = {
+  Reflect.set(global, 'window', parentWindow);
+  Reflect.set(global, 'document', {
     createElement: (tag: string) => {
       if (tag === 'iframe') {
-        const iframe: any = {
+        const contentWindow = {
+          parent: parentWindow,
+        };
+        return {
           style: {},
           sandbox: { add: () => {} },
           contentDocument: {
@@ -21,26 +24,23 @@ if (typeof window === 'undefined') {
             close: () => {},
             querySelectorAll: () => [],
             // In same-origin, contentWindow has ref to parent
-            defaultView: {
-              parent: parentWindow,
-            },
+            defaultView: contentWindow,
           },
-          contentWindow: null, // set below
+          contentWindow,
           parentNode: null,
         };
-        iframe.contentWindow = iframe.contentDocument.defaultView;
-        // Mock eval-like behavior if needed, but our executor uses new Function() in parent
-        return iframe;
       }
       return {};
     },
     body: {
-      appendChild: (el: any) => {
-        el.parentNode = {};
+      appendChild: (element: unknown) => {
+        if (typeof element === 'object' && element !== null) {
+          Reflect.set(element, 'parentNode', {});
+        }
       },
       removeChild: () => {},
     },
-  };
+  });
 }
 
 async function checkSecurity() {

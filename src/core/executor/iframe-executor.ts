@@ -10,6 +10,7 @@ import { logger } from '@/lib/logger';
 import { transpileTypeScript } from './typescript-transpiler';
 import {
   type ExecutionResult,
+  type ExecutorTestFunction,
   type ExecuteOptions,
   type TestCase,
   type TestCaseResult
@@ -19,6 +20,7 @@ import { validateExpectedState } from './dom-validator';
 import { createInterceptedConsole } from './console-interceptor';
 import { attachOnclickHandlers } from './attach-onclick-handlers';
 import { generateIframeTemplate } from './iframe-template';
+import { invokeDynamicFunction } from './dynamic-code';
 
 /**
  * Executes Playwright-style code in a sandboxed iframe
@@ -189,7 +191,7 @@ export async function executePlaywrightCode(
               if (iframe.contentWindow) {
                 iframe.contentWindow.localStorage?.clear();
                 iframe.contentWindow.sessionStorage?.clear();
-                const win = iframe.contentWindow as any;
+                const win = iframe.contentWindow;
                 win.__MOCK_ROUTES__ = [];
                 // In-memory state that persists across VFS navigations within a single execution run
                 win.__APP_STATE__ = {};
@@ -225,7 +227,7 @@ export async function executePlaywrightCode(
             scripts.forEach((script) => {
               if (script.textContent) {
                 try {
-                  const win = iframe.contentWindow as any;
+                  const win = iframe.contentWindow;
                   const doc = iframe.contentDocument;
                   if (!win || !doc) return;
 
@@ -253,7 +255,7 @@ export async function executePlaywrightCode(
 
                   // eslint-disable-next-line @typescript-eslint/no-implied-eval
                   const fn = new Function('window', 'document', code);
-                  fn(win, doc);
+                  invokeDynamicFunction(fn, undefined, [win, doc]);
                 } catch (e) {
                   console.error('Failed to execute script shim:', e);
                 }
@@ -266,7 +268,7 @@ export async function executePlaywrightCode(
             if (iframeWindow) {
               attachOnclickHandlers({
                 document: iframeDoc,
-                window: iframeWindow as Window & Record<string, unknown>,
+                window: iframeWindow,
               });
             }
 
@@ -306,8 +308,10 @@ export async function executePlaywrightCode(
                       return elements;
                     };
                   }
-                  const value = (target as any)[prop];
-                  return typeof value === 'function' ? value.bind(target) : value;
+                  const value: unknown = Reflect.get(target, prop);
+                  if (typeof value !== 'function') return value;
+                  return (...args: unknown[]) =>
+                    invokeDynamicFunction(value, target, args);
                 },
               };
               return new Proxy(doc, handler);
@@ -316,13 +320,19 @@ export async function executePlaywrightCode(
             const enhancedDocument = createEnhancedDocument(iframeDoc);
 
             // Prepare the iframe execution environment
-            const contentWindow = iframe.contentWindow as any;
+            const contentWindow = iframe.contentWindow;
+            if (!contentWindow) {
+              throw new Error('Could not access iframe window');
+            }
 
             // Initialize promise tracker for async tests
             contentWindow.__testPromises = [];
 
             // Mock test runner object (Support both test.step and standard test('name', ...))
-            const testInstance = async (name: string, callback: (fixtures: any) => Promise<void>) => {
+            const testInstance = async (
+              name: string,
+              callback: Parameters<ExecutorTestFunction>[1],
+            ) => {
               // Create a tracking promise for this test
               const testPromise = (async () => {
                 interceptedConsole.log(`[Test] ${name}`);
@@ -341,16 +351,20 @@ export async function executePlaywrightCode(
 
               return testPromise;
             };
-            (testInstance as any).step = async (name: string, callback: () => Promise<unknown>) => {
-              interceptedConsole.log(`[Step] ${name}`);
-              try {
-                await callback();
-              } catch (error) {
-                interceptedConsole.error(`[Step] ${name} FAILED: ${String(error)}`);
-                throw error;
-              }
-            };
-            const test = testInstance;
+            const test: ExecutorTestFunction = Object.assign(testInstance, {
+              step: async (
+                name: string,
+                callback: () => Promise<unknown>,
+              ) => {
+                interceptedConsole.log(`[Step] ${name}`);
+                try {
+                  await callback();
+                } catch (error) {
+                  interceptedConsole.error(`[Step] ${name} FAILED: ${String(error)}`);
+                  throw error;
+                }
+              },
+            });
 
             // Inject tools into the iframe context
             contentWindow.page = page;
@@ -397,7 +411,7 @@ export async function executePlaywrightCode(
                     `;
 
 
-            let returnValue;
+            let returnValue: unknown;
             if (typeof contentWindow.eval === 'function') {
               returnValue = await contentWindow.eval(
                 `(function() { ${wrappedCode} })()`,
@@ -418,14 +432,18 @@ export async function executePlaywrightCode(
                 'console',
                 wrappedCode,
               );
-              await fallbackFn(
-                page,
-                expect,
-                test,
-                contentWindow,
-                enhancedDocument,
-                contentWindow.console,
-              );
+              await Promise.resolve(invokeDynamicFunction(
+                fallbackFn,
+                undefined,
+                [
+                  page,
+                  expect,
+                  test,
+                  contentWindow,
+                  enhancedDocument,
+                  contentWindow.console,
+                ],
+              ));
               returnValue = (contentWindow).__returnValue;
                
             }
@@ -606,7 +624,11 @@ export async function executeWithTestCases(
       return (async () => { ${code} })();
     `,
     );
-    await userFunction(page, createExpect());
+    await Promise.resolve(invokeDynamicFunction(
+      userFunction,
+      undefined,
+      [page, createExpect()],
+    ));
 
     // Run test cases
     for (const testCase of testCases) {

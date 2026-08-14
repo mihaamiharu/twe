@@ -1,22 +1,34 @@
 
 import { describe, it, expect as bunExpect } from 'bun:test';
 import { createExpect } from './expect-matchers';
+import type { ExpectFunction } from './executor.types';
+
+interface SimulatedFixtures {
+    page: Record<string, never>;
+    expect: ExpectFunction;
+}
+
+type SimulatedTest = (
+    name: string,
+    callback: (fixtures: SimulatedFixtures) => Promise<void>,
+) => Promise<void>;
 
 // Mock implementation of the IFrame Executor logic
 async function simulateExecutor(
-    userCodeFn: (test: any, expect: any) => void | Promise<void>,
+    userCodeFn: (
+        test: SimulatedTest,
+        expect: ExpectFunction,
+    ) => void | Promise<void>,
 ) {
     const { expect, getAssertionCount } = createExpect({ timeout: 100 });
-    const contentWindow: any = { __testPromises: [] };
+    const testPromises: Promise<void>[] = [];
 
-    const test = (name: string, callback: (args: any) => Promise<void>) => {
+    const test: SimulatedTest = (name, callback) => {
         void name;
         const testPromise = (async () => {
             await callback({ page: {}, expect });
         })();
-        if (Array.isArray(contentWindow.__testPromises)) {
-            contentWindow.__testPromises.push(testPromise);
-        }
+        testPromises.push(testPromise);
         return testPromise;
     };
 
@@ -26,9 +38,7 @@ async function simulateExecutor(
 
     // Executor wait loop (simulates wrappedCode)
     try {
-        if (contentWindow.__testPromises && Array.isArray(contentWindow.__testPromises)) {
-            await Promise.all(contentWindow.__testPromises);
-        }
+        await Promise.all(testPromises);
 
         return { status: 'PASSED', count: getAssertionCount() };
     } catch (e) {
@@ -40,7 +50,7 @@ async function simulateExecutor(
 describe('Executor Logic with Wrapper', () => {
     it('captures assertions inside test wrapper', async () => {
         const result = await simulateExecutor((test) => {
-            test('wrapped test', async ({ expect }: any) => {
+            void test('wrapped test', async ({ expect }) => {
                 await expect('actual').toHaveText('actual', { timeout: 50 });
             });
         });
@@ -52,7 +62,7 @@ describe('Executor Logic with Wrapper', () => {
 
     it('captures failure inside test wrapper', async () => {
         const result = await simulateExecutor((test) => {
-            test('wrapped failing test', async ({ expect }: any) => {
+            void test('wrapped failing test', async ({ expect }) => {
                 await expect('actual').toHaveText('mismatch', { timeout: 50 });
             });
         });

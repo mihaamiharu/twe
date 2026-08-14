@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 import { db } from '@/db';
 import { challenges, progress, submissions } from '@/db/schema';
 import { eq, and, asc, desc, sql, or } from 'drizzle-orm';
@@ -43,9 +43,7 @@ export const getChallenges = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeFiltersSchema.parse(data))
   .handler(async ({ data: filters }) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
       const userId = session?.user?.id;
       const locale = filters.locale;
@@ -194,7 +192,6 @@ const ChallengeDetailSchema = z.object({
 
 export const getChallenge = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
-  // @ts-expect-error TanStack Start type inference issue with complex handler return types
   .handler(async ({ data: { slug, locale } }) => {
     try {
       // Load challenge content from filesystem
@@ -276,9 +273,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
       let userProgressData = null;
       let bestSubmissionData = null;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbChallenge) {

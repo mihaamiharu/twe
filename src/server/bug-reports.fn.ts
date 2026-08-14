@@ -1,5 +1,5 @@
 import { createServerFn } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 import { z } from 'zod';
 import { db } from '@/db';
 import { bugReports } from '@/db/schema';
@@ -41,13 +41,11 @@ export const createBugReport = createServerFn({ method: 'POST' })
   .inputValidator((data: unknown) => BugReportSchema.parse(data))
   .handler(async ({ data: input }) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
+      const headers = getRequest().headers;
       let userId: string | null = null;
       let userEmail: string | null = null;
 
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const session = await auth.api.getSession({ headers });
         userId = session?.user?.id || null;
         userEmail = session?.user?.email || null;

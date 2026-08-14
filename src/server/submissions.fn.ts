@@ -57,7 +57,7 @@ const CreateSubmissionSchema = z.object({
     z.object({
       testCaseId: z.string().uuid().optional(),
       passed: z.boolean(),
-      output: z.any().optional(),
+      output: z.unknown().optional(),
       error: z.string().optional(),
     }),
   ),

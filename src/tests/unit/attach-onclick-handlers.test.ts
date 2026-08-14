@@ -6,7 +6,7 @@ const isCI = !!process.env.CI;
 
 describe.skipIf(isCI)('attachOnclickHandlers', () => {
   let container: HTMLElement;
-  let mockWindow: Window & Record<string, unknown>;
+  let mockWindow: object;
 
   beforeEach(() => {
     document.body.innerHTML = '';
@@ -21,7 +21,7 @@ describe.skipIf(isCI)('attachOnclickHandlers', () => {
       clearInterval: globalThis.clearInterval,
       myCustomFunc: () => 'custom',
       anotherFunc: () => 'another',
-    } as unknown as Window & Record<string, unknown>;
+    };
   });
 
   test('should attach click handlers to elements with onclick attribute', () => {

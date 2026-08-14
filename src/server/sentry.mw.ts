@@ -6,9 +6,6 @@ interface SentryContext {
     user?: {
         id: string;
         email: string;
-        name: string | null;
-        image: string | null;
-        role: string | null;
     } | null;
 }
 
@@ -16,15 +13,29 @@ interface SentryContext {
  * Attach user context to Sentry if available
  */
 export function attachSentryUserContext(
-    context: SentryContext,
-    Sentry: typeof SentryModule,
+    context: unknown,
+    Sentry: Pick<typeof SentryModule, 'setUser'>,
 ) {
-    if (context.user) {
+    if (isSentryContext(context) && context.user) {
         Sentry.setUser({
             id: context.user.id,
             email: context.user.email,
         });
     }
+}
+
+function isSentryContext(value: unknown): value is SentryContext {
+    if (typeof value !== 'object' || value === null || !('user' in value)) {
+        return false;
+    }
+    const { user } = value;
+    return user === undefined || user === null || (
+        typeof user === 'object' &&
+        'id' in user &&
+        typeof user.id === 'string' &&
+        'email' in user &&
+        typeof user.email === 'string'
+    );
 }
 
 /**
@@ -40,7 +51,7 @@ export const sentryMiddleware = createMiddleware().server(async ({ next, context
     }
 
     try {
-        attachSentryUserContext(context as unknown as SentryContext, Sentry);
+        attachSentryUserContext(context, Sentry);
 
         const result = await next();
         return result;

@@ -1,6 +1,10 @@
 import type { Mock } from 'bun:test';
 import type { TrackId } from '@/config/tracks';
 
+interface QueryMockOptions {
+  queryKey?: readonly unknown[];
+}
+
 declare global {
   var mockSearchParams: {
     track?: TrackId;
@@ -11,6 +15,7 @@ declare global {
   };
 
   var mockNavigate: Mock<() => Promise<void>>;
+  var mockUseQuery: Mock<(options: QueryMockOptions) => unknown>;
 }
 
 export {};

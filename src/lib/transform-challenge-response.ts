@@ -32,7 +32,7 @@ export interface ServerChallengeData {
   hiddenTestCaseCount: number;
   userProgress?: {
     isCompleted: boolean;
-    attempts: number;
+    attempts: number | null;
     lastAccessedAt: Date;
     usedHint: boolean;
     hintContent?: string | null;
@@ -43,7 +43,7 @@ export interface ServerChallengeData {
     xpEarned: number;
     testsPassed: number;
     testsTotal: number;
-    executionTime: number;
+    executionTime: number | null;
   } | null;
   nextChallenge?: { slug: string; title: string } | null;
   prevChallenge?: { slug: string; title: string } | null;

@@ -44,6 +44,28 @@ export function generateTypeDefinitions(
       focus?: boolean;
     }
 
+    declare interface LocatorFilterOptions {
+      has?: Locator;
+      hasNot?: Locator;
+      hasText?: string | RegExp;
+      hasNotText?: string | RegExp;
+    }
+
+    declare interface LocatorQueryOptions {
+      exact?: boolean;
+    }
+
+    declare interface RoleQueryOptions extends LocatorQueryOptions {
+      name?: string | RegExp;
+      checked?: boolean;
+      disabled?: boolean;
+      expanded?: boolean;
+      pressed?: boolean;
+      selected?: boolean;
+      level?: number;
+      includeHidden?: boolean;
+    }
+
     declare interface Locator {
       click(options?: ClickOptions): Promise<void>;
       dblclick(options?: ClickOptions): Promise<void>;
@@ -69,19 +91,19 @@ export function generateTypeDefinitions(
       clear(options?: ActionOptions): Promise<void>;
       press(key: string, options?: ActionOptions): Promise<void>;
       hover(options?: ActionOptions): Promise<void>;
-      filter(options: any): Locator;
+      filter(options: LocatorFilterOptions): Locator;
       waitFor(options?: { state?: 'attached' | 'detached' | 'visible' | 'hidden'; timeout?: number }): Promise<void>;
     }
 
     declare interface Page {
       goto(url: string): Promise<void>;
       locator(selector: string): Locator;
-      getByRole(role: string, options?: any): Locator;
-      getByText(text: string, options?: any): Locator;
-      getByLabel(text: string, options?: any): Locator;
-      getByPlaceholder(text: string, options?: any): Locator;
-      getByTitle(text: string, options?: any): Locator;
-      getByTestId(text: string, options?: any): Locator;
+      getByRole(role: string, options?: RoleQueryOptions): Locator;
+      getByText(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByLabel(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByPlaceholder(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByTitle(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByTestId(text: string | RegExp): Locator;
       click(selector: string, options?: ClickOptions): Promise<void>;
       fill(selector: string, value: string, options?: FillOptions): Promise<void>;
       check(selector: string, options?: ActionOptions): Promise<void>;
@@ -91,25 +113,28 @@ export function generateTypeDefinitions(
       waitForSelector(selector: string, options?: { state?: string; timeout?: number }): Promise<void>;
     }
 
-    declare interface Expect {
-      (actual: any): any;
-      not: Expect;
-      soft: Expect;
-      toBe(expected: any): void;
-      toEqual(expected: any): void;
-      toContain(expected: any): void;
+    declare interface ExpectMatchers {
+      readonly not: ExpectMatchers;
+      toBe(expected: unknown): Promise<void>;
+      toEqual(expected: unknown): Promise<void>;
+      toContain(expected: unknown): Promise<void>;
       toContainText(expected: string): Promise<void>;
       toHaveText(expected: string | RegExp): Promise<void>;
       toBeVisible(): Promise<void>;
       toBeHidden(): Promise<void>;
       toHaveCount(count: number): Promise<void>;
       toHaveAttribute(name: string, value: string | RegExp): Promise<void>;
-      toBeTruthy(): void;
-      toBeFalsy(): void;
+      toBeTruthy(): Promise<void>;
+      toBeFalsy(): Promise<void>;
+    }
+
+    declare interface Expect {
+      (actual: unknown): ExpectMatchers;
+      soft(actual: unknown): ExpectMatchers;
     }
 
     declare interface Test {
-      (name: string, callback: (fixtures: { page: Page, expect: Expect }) => Promise<void>): void;
+      (name: string, callback: (fixtures: { page: Page, expect: Expect }) => Promise<void>): Promise<void>;
       step(name: string, callback: () => Promise<void>): Promise<void>;
     }
 
@@ -149,20 +174,20 @@ export function generateTypeDefinitions(
         const escapedModuleName = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         // The module name is escaped above before being interpolated into this parser regex.
         // eslint-disable-next-line security/detect-non-literal-regexp
-        const classRegex = new RegExp(`export\\s+class\\s+${escapedModuleName}\\s*{([\\s\\S]*?)}\\s*$`, 'gm');
+        const classRegex = new RegExp(`export\\s+class\\s+${escapedModuleName}\\s*{([\\s\\S]*?)}\\s*$`, 'g');
         const match = classRegex.exec(sourceContent);
 
         if (match) {
           const body = match[1];
 
-          // Extract constructor
-          // constructor(page) -> constructor(page: any)
+          // Extract constructor parameters. Unknown accepts challenge inputs while
+          // preventing generated declarations from promising unsupported members.
           const ctorRegex = /constructor\s*\(([^)]*)\)/;
           const ctorMatch = ctorRegex.exec(body);
-          let ctorDef = 'constructor(page: any);'; // Default fallback
+          let ctorDef = 'constructor(page: unknown);';
           if (ctorMatch) {
             // Simple parameter handling
-            ctorDef = `constructor(${ctorMatch[1].split(',').map(p => p.trim() + ': any').join(', ')});`;
+            ctorDef = `constructor(${ctorMatch[1].split(',').map(p => p.trim() + ': unknown').join(', ')});`;
           }
 
           // Extract async methods
@@ -172,12 +197,9 @@ export function generateTypeDefinitions(
           let methodMatch;
           while ((methodMatch = methodRegex.exec(body)) !== null) {
             const methodName = methodMatch[1];
-            const args = methodMatch[2].split(',').filter(a => a.trim()).map(a => a.trim() + ': any').join(', ');
+            const args = methodMatch[2].split(',').filter(a => a.trim()).map(a => a.trim() + ': unknown').join(', ');
             methods += `  ${methodName}(${args}): Promise<void>;\n`; // Assume void return for actions usually
           }
-
-          // Also allow any other property lookup for now to be safe
-          // [key: string]: any; 
 
           moduleDefs += `
             declare class ${moduleName} {
@@ -186,8 +208,8 @@ export function generateTypeDefinitions(
             }
           `;
         } else {
-          // Fallback if regex fails - declare check as any
-          moduleDefs += `declare const ${moduleName}: any;\n`;
+          // A failed signature extraction must not invent callable members.
+          moduleDefs += `declare const ${moduleName}: unknown;\n`;
         }
       }
     });

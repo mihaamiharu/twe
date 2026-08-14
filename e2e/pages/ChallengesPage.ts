@@ -1,6 +1,16 @@
 import { Page, Locator, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 
+declare global {
+  interface Window {
+    monaco?: {
+      editor?: {
+        getModels(): Array<{ setValue(value: string): void }>;
+      };
+    };
+  }
+}
+
 export class ChallengesPage extends BasePage {
   readonly runButton: Locator;
   readonly submitButton: Locator;
@@ -105,7 +115,7 @@ export class ChallengesPage extends BasePage {
       // This is the most robust way to ensure a fresh editor state
       await this.page.evaluate(() => {
         try {
-          const editor = (window as any).monaco?.editor?.getModels()?.[0];
+          const editor = window.monaco?.editor?.getModels()[0];
           if (editor) {
             editor.setValue('');
           }

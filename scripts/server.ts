@@ -1,12 +1,30 @@
-// @ts-expect-error - dist import is untyped
-import server from '../dist/server/server.js';
-
 const PORT = process.env.PORT || 3000;
 
 import * as Sentry from "@sentry/bun";
 import { getSentryConfig } from "../src/lib/sentry.config";
 
 type StartServer = { fetch(request: Request): Promise<Response> };
+
+function isStartServer(value: unknown): value is StartServer {
+    return (
+        typeof value === 'object' &&
+        value !== null &&
+        'fetch' in value &&
+        typeof value.fetch === 'function'
+    );
+}
+
+const serverModulePath = '../dist/server/server.js';
+const serverModule: unknown = await import(serverModulePath);
+if (
+    typeof serverModule !== 'object' ||
+    serverModule === null ||
+    !('default' in serverModule) ||
+    !isStartServer(serverModule.default)
+) {
+    throw new TypeError('Built server module does not expose a compatible default handler');
+}
+const server = serverModule.default;
 
 Sentry.init(getSentryConfig());
 
@@ -48,7 +66,7 @@ Bun.serve({
 
         // SSR fallback to TanStack Start handler
         try {
-            const response = await (server as unknown as StartServer).fetch(req);
+            const response = await server.fetch(req);
             const host = req.headers.get('host');
 
             if (host?.startsWith('qa.')) {

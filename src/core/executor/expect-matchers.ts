@@ -1,9 +1,55 @@
-import type { ExpectResult } from './executor.types';
+import type {
+    ExpectFunction,
+    ExpectMatchers,
+    ExpectResult,
+} from './executor.types';
 
-/**
- * Create a simple expect function for assertions
- * Returns both the expect function and assert count getter
- */
+function getMethod(
+    value: unknown,
+    name: string,
+): ((...args: unknown[]) => unknown) | undefined {
+    if (
+        (typeof value !== 'object' && typeof value !== 'function') ||
+        value === null
+    ) {
+        return undefined;
+    }
+    const method: unknown = Reflect.get(value, name);
+    if (typeof method !== 'function') return undefined;
+    return (...args: unknown[]) => {
+        const result: unknown = Reflect.apply(method, value, args);
+        return result;
+    };
+}
+
+function getProperty(value: unknown, name: string): unknown {
+    if (
+        (typeof value !== 'object' && typeof value !== 'function') ||
+        value === null
+    ) {
+        return undefined;
+    }
+    return Reflect.get(value, name);
+}
+
+function stringifyText(value: unknown): string {
+    if (!value) return '';
+    if (
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        typeof value === 'bigint' ||
+        typeof value === 'boolean' ||
+        typeof value === 'symbol'
+    ) {
+        return String(value);
+    }
+
+    const toString = getMethod(value, 'toString');
+    if (!toString) return '';
+    const result = toString();
+    return typeof result === 'string' ? result : '';
+}
+
 /**
  * Create a simple expect function for assertions
  * Returns both the expect function and assert count getter
@@ -21,8 +67,11 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
     const getAssertionCount = () => assertionCount;
     const getTestResults = () => testResults;
 
-    /* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/restrict-template-expressions, @typescript-eslint/no-unsafe-return */
-    const createMatchers = (actual: any, isSoft = false, isNot = false) => {
+    const createMatchers = (
+        actual: unknown,
+        isSoft = false,
+        isNot = false,
+    ): Omit<ExpectMatchers, 'not'> => {
         const handleResult = (pass: boolean, message: string) => {
             incrementCount();
             // Invert if isNot is true
@@ -95,12 +144,14 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 await poll(async () => {
                     let text = '';
                     try {
-                        if (actual && typeof actual.textContent === 'function') {
-                            text = (await actual.textContent()) || '';
+                        const textContent = getMethod(actual, 'textContent');
+                        if (textContent) {
+                            const result = await textContent();
+                            text = typeof result === 'string' ? result : '';
                         } else if (actual instanceof HTMLElement) {
                             text = actual.textContent || '';
                         } else {
-                            text = String(actual || '');
+                            text = stringifyText(actual);
                         }
                     } catch {
                         // Element might be missing
@@ -119,12 +170,14 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 await poll(async () => {
                     let text = '';
                     try {
-                        if (actual && typeof actual.textContent === 'function') {
-                            text = (await actual.textContent()) || '';
+                        const textContent = getMethod(actual, 'textContent');
+                        if (textContent) {
+                            const result = await textContent();
+                            text = typeof result === 'string' ? result : '';
                         } else if (actual instanceof HTMLElement) {
                             text = actual.textContent || '';
                         } else {
-                            text = String(actual || '');
+                            text = stringifyText(actual);
                         }
                     } catch {
                         text = '';
@@ -149,15 +202,17 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 await poll(async () => {
                     let value = '';
                     try {
-                        if (actual && typeof actual.inputValue === 'function') {
-                            value = (await actual.inputValue()) || '';
+                        const inputValue = getMethod(actual, 'inputValue');
+                        if (inputValue) {
+                            const result = await inputValue();
+                            value = typeof result === 'string' ? result : '';
                         } else if (
                             actual instanceof HTMLInputElement ||
                             actual instanceof HTMLTextAreaElement ||
                             actual instanceof HTMLSelectElement ||
                             actual instanceof HTMLButtonElement
                         ) {
-                            value = (actual as any).value || '';
+                            value = actual.value || '';
                         }
                     } catch {
                         value = '';
@@ -175,8 +230,10 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 await poll(async () => {
                     let attrValue: string | null = null;
                     try {
-                        if (actual && typeof actual.getAttribute === 'function') {
-                            attrValue = await actual.getAttribute(name);
+                        const getAttribute = getMethod(actual, 'getAttribute');
+                        if (getAttribute) {
+                            const result = await getAttribute(name);
+                            attrValue = typeof result === 'string' ? result : null;
                         } else if (actual instanceof HTMLElement) {
                             attrValue = actual.getAttribute(name);
                         }
@@ -202,8 +259,10 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toHaveCount(expected: number, options?: { timeout?: number }) {
                 await poll(async () => {
                     let count = 0;
-                    if (actual && typeof actual.count === 'function') {
-                        count = await actual.count();
+                    const countMethod = getMethod(actual, 'count');
+                    if (countMethod) {
+                        const result = await countMethod();
+                        count = typeof result === 'number' ? result : 0;
                     } else if (Array.isArray(actual)) {
                         count = actual.length;
                     }
@@ -217,8 +276,9 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeVisible(options?: { timeout?: number }) {
                 await poll(async () => {
                     let visible = false;
-                    if (actual && typeof actual.isVisible === 'function') {
-                        visible = await actual.isVisible();
+                    const isVisible = getMethod(actual, 'isVisible');
+                    if (isVisible) {
+                        visible = Boolean(await isVisible());
                     } else if (actual instanceof HTMLElement) {
                         visible = actual.style.display !== 'none';
                     }
@@ -232,10 +292,11 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeChecked(options?: { timeout?: number }) {
                 await poll(async () => {
                     let checked = false;
-                    if (actual && typeof actual.isChecked === 'function') {
-                        checked = await actual.isChecked();
-                    } else if (actual instanceof HTMLInputElement || actual instanceof HTMLTextAreaElement) {
-                        checked = (actual as any).checked || false;
+                    const isChecked = getMethod(actual, 'isChecked');
+                    if (isChecked) {
+                        checked = Boolean(await isChecked());
+                    } else if (actual instanceof HTMLInputElement) {
+                        checked = actual.checked;
                     }
                     return {
                         pass: checked,
@@ -247,10 +308,16 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeEnabled(options?: { timeout?: number }) {
                 await poll(async () => {
                     let disabled = false;
-                    if (actual && typeof actual.isDisabled === 'function') {
-                        disabled = await actual.isDisabled();
-                    } else if (actual instanceof HTMLElement) {
-                        disabled = (actual as any).disabled || false;
+                    const isDisabled = getMethod(actual, 'isDisabled');
+                    if (isDisabled) {
+                        disabled = Boolean(await isDisabled());
+                    } else if (
+                        actual instanceof HTMLButtonElement ||
+                        actual instanceof HTMLInputElement ||
+                        actual instanceof HTMLSelectElement ||
+                        actual instanceof HTMLTextAreaElement
+                    ) {
+                        disabled = actual.disabled;
                     }
                     return {
                         pass: !disabled,
@@ -262,10 +329,16 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeDisabled(options?: { timeout?: number }) {
                 await poll(async () => {
                     let disabled = false;
-                    if (actual && typeof actual.isDisabled === 'function') {
-                        disabled = await actual.isDisabled();
-                    } else if (actual instanceof HTMLElement) {
-                        disabled = (actual as any).disabled || false;
+                    const isDisabled = getMethod(actual, 'isDisabled');
+                    if (isDisabled) {
+                        disabled = Boolean(await isDisabled());
+                    } else if (
+                        actual instanceof HTMLButtonElement ||
+                        actual instanceof HTMLInputElement ||
+                        actual instanceof HTMLSelectElement ||
+                        actual instanceof HTMLTextAreaElement
+                    ) {
+                        disabled = actual.disabled;
                     }
                     return {
                         pass: disabled,
@@ -277,10 +350,11 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeEditable(options?: { timeout?: number }) {
                 await poll(async () => {
                     let editable = false;
-                    if (actual && typeof actual.isEditable === 'function') {
-                        editable = await actual.isEditable();
+                    const isEditable = getMethod(actual, 'isEditable');
+                    if (isEditable) {
+                        editable = Boolean(await isEditable());
                     } else if (actual instanceof HTMLInputElement || actual instanceof HTMLTextAreaElement) {
-                        editable = !(actual as any).readOnly && !(actual as any).disabled;
+                        editable = !actual.readOnly && !actual.disabled;
                     }
                     return {
                         pass: editable,
@@ -292,12 +366,17 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toHaveTitle(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let title = '';
-                    if (actual && typeof actual.title === 'function') {
-                        title = await actual.title();
-                    } else if (actual && actual.targetDocument) {
-                        title = actual.targetDocument.title;
-                    } else if (typeof actual === 'string') {
-                        title = actual;
+                    const titleMethod = getMethod(actual, 'title');
+                    if (titleMethod) {
+                        const result = await titleMethod();
+                        title = typeof result === 'string' ? result : '';
+                    } else {
+                        const targetDocument = getProperty(actual, 'targetDocument');
+                        if (targetDocument instanceof Document) {
+                            title = targetDocument.title;
+                        } else if (typeof actual === 'string') {
+                            title = actual;
+                        }
                     }
                     const pass = expected instanceof RegExp ? expected.test(title) : title === expected;
                     return {
@@ -310,8 +389,10 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toHaveURL(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(() => {
                     let url = '';
-                    if (actual && typeof actual.url === 'function') {
-                        url = actual.url();
+                    const urlMethod = getMethod(actual, 'url');
+                    if (urlMethod) {
+                        const result = urlMethod();
+                        url = typeof result === 'string' ? result : '';
                     } else if (typeof actual === 'string') {
                         url = actual;
                     }
@@ -326,8 +407,10 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toHaveClass(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let className = '';
-                    if (actual && typeof actual.getAttribute === 'function') {
-                        className = (await actual.getAttribute('class')) || '';
+                    const getAttribute = getMethod(actual, 'getAttribute');
+                    if (getAttribute) {
+                        const result = await getAttribute('class');
+                        className = typeof result === 'string' ? result : '';
                     } else if (actual instanceof HTMLElement) {
                         className = actual.className;
                     }
@@ -342,10 +425,12 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toHaveCSS(name: string, value: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let cssValue = '';
-                    if (actual && typeof actual.evaluate === 'function') {
-                        cssValue = await actual.evaluate((el: HTMLElement, name: string) => {
+                    const evaluate = getMethod(actual, 'evaluate');
+                    if (evaluate) {
+                        const result = await evaluate((el: HTMLElement, name: string) => {
                             return window.getComputedStyle(el).getPropertyValue(name);
                         }, name);
+                        cssValue = typeof result === 'string' ? result : '';
                     } else if (actual instanceof HTMLElement) {
                         cssValue = window.getComputedStyle(actual).getPropertyValue(name);
                     }
@@ -357,13 +442,18 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 }, options);
             },
 
-            async toHaveJSProperty(name: string, value: any, options?: { timeout?: number }) {
+            async toHaveJSProperty(name: string, value: unknown, options?: { timeout?: number }) {
                 await poll(async () => {
-                    let propValue: any = undefined;
-                    if (actual && typeof actual.evaluate === 'function') {
-                        propValue = await actual.evaluate((el: any, name: string) => el[name], name);
+                    let propValue: unknown;
+                    const evaluate = getMethod(actual, 'evaluate');
+                    if (evaluate) {
+                        propValue = await evaluate(
+                            (element: unknown, propertyName: string) =>
+                                getProperty(element, propertyName),
+                            name,
+                        );
                     } else if (actual) {
-                        propValue = (actual)[name];
+                        propValue = getProperty(actual, name);
                     }
                     const pass = JSON.stringify(propValue) === JSON.stringify(value);
                     return {
@@ -376,8 +466,12 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeFocused(options?: { timeout?: number }) {
                 await poll(async () => {
                     let isFocused = false;
-                    if (actual && typeof actual.evaluate === 'function') {
-                        isFocused = await actual.evaluate((el: any) => el === el.ownerDocument.activeElement);
+                    const evaluate = getMethod(actual, 'evaluate');
+                    if (evaluate) {
+                        isFocused = Boolean(await evaluate(
+                            (element: HTMLElement) =>
+                                element === element.ownerDocument.activeElement,
+                        ));
                     } else if (actual instanceof HTMLElement) {
                         isFocused = actual === actual.ownerDocument.activeElement;
                     }
@@ -391,11 +485,12 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeEmpty(options?: { timeout?: number }) {
                 await poll(async () => {
                     let isEmpty = false;
-                    if (actual && typeof actual.evaluate === 'function') {
-                        isEmpty = await actual.evaluate((el: HTMLElement) => {
+                    const evaluate = getMethod(actual, 'evaluate');
+                    if (evaluate) {
+                        isEmpty = Boolean(await evaluate((el: HTMLElement) => {
                             if (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) return !(el as HTMLInputElement).value;
                             return !el.textContent;
-                        });
+                        }));
                     } else if (actual instanceof HTMLElement) {
                         if (['INPUT', 'TEXTAREA', 'SELECT'].includes(actual.tagName)) isEmpty = !(actual as HTMLInputElement).value;
                         else isEmpty = !actual.textContent;
@@ -410,8 +505,9 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             async toBeHidden(options?: { timeout?: number }) {
                 await poll(async () => {
                     let visible = false;
-                    if (actual && typeof actual.isVisible === 'function') {
-                        visible = await actual.isVisible();
+                    const isVisible = getMethod(actual, 'isVisible');
+                    if (isVisible) {
+                        visible = Boolean(await isVisible());
                     } else if (actual instanceof HTMLElement) {
                         visible = actual.style.display !== 'none';
                     }
@@ -424,22 +520,22 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
 
             async toBeTruthy() {
                 await Promise.resolve();
-                handleResult(!!actual, `Expected value ${isNot ? 'NOT ' : ''}to be truthy, got ${actual}`);
+                handleResult(!!actual, `Expected value ${isNot ? 'NOT ' : ''}to be truthy, got ${String(actual)}`);
             },
 
             async toBeFalsy() {
                 await Promise.resolve();
-                handleResult(!actual, `Expected value ${isNot ? 'NOT ' : ''}to be falsy, got ${actual}`);
+                handleResult(!actual, `Expected value ${isNot ? 'NOT ' : ''}to be falsy, got ${String(actual)}`);
             },
 
             async toBeNull() {
                 await Promise.resolve();
-                handleResult(actual === null, `Expected value ${isNot ? 'NOT ' : ''}to be null, got ${actual}`);
+                handleResult(actual === null, `Expected value ${isNot ? 'NOT ' : ''}to be null, got ${String(actual)}`);
             },
 
             async toBeUndefined() {
                 await Promise.resolve();
-                handleResult(actual === undefined, `Expected value ${isNot ? 'NOT ' : ''}to be undefined, got ${actual}`);
+                handleResult(actual === undefined, `Expected value ${isNot ? 'NOT ' : ''}to be undefined, got ${String(actual)}`);
             },
 
             async toBeDefined() {
@@ -449,28 +545,28 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
 
             async toBeGreaterThan(expected: number) {
                 await Promise.resolve();
-                handleResult(actual > expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be greater than ${expected}`);
+                handleResult(typeof actual === 'number' && actual > expected, `Expected ${String(actual)} ${isNot ? 'NOT ' : ''}to be greater than ${expected}`);
             },
 
             async toBeGreaterThanOrEqual(expected: number) {
                 await Promise.resolve();
-                handleResult(actual >= expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be greater than or equal to ${expected}`);
+                handleResult(typeof actual === 'number' && actual >= expected, `Expected ${String(actual)} ${isNot ? 'NOT ' : ''}to be greater than or equal to ${expected}`);
             },
 
             async toBeLessThan(expected: number) {
                 await Promise.resolve();
-                handleResult(actual < expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be less than ${expected}`);
+                handleResult(typeof actual === 'number' && actual < expected, `Expected ${String(actual)} ${isNot ? 'NOT ' : ''}to be less than ${expected}`);
             },
 
             async toBeLessThanOrEqual(expected: number) {
                 await Promise.resolve();
-                handleResult(actual <= expected, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be less than or equal to ${expected}`);
+                handleResult(typeof actual === 'number' && actual <= expected, `Expected ${String(actual)} ${isNot ? 'NOT ' : ''}to be less than or equal to ${expected}`);
             },
 
             async toBeCloseTo(expected: number, precision = 2) {
                 await Promise.resolve();
-                const pass = Math.abs(actual - expected) < Math.pow(10, -precision) / 2;
-                handleResult(pass, `Expected ${actual} ${isNot ? 'NOT ' : ''}to be close to ${expected} with precision ${precision}`);
+                const pass = typeof actual === 'number' && Math.abs(actual - expected) < Math.pow(10, -precision) / 2;
+                handleResult(pass, `Expected ${String(actual)} ${isNot ? 'NOT ' : ''}to be close to ${expected} with precision ${precision}`);
             },
 
             async toContain(expected: unknown) {
@@ -483,22 +579,35 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 } else if (actual instanceof Set || actual instanceof Map) {
                     pass = actual.has(expected);
                 }
-                handleResult(pass, `Expected ${actual} ${isNot ? 'NOT ' : ''}to contain ${expected}`);
+                handleResult(pass, `Expected ${String(actual)} ${isNot ? 'NOT ' : ''}to contain ${String(expected)}`);
             },
 
             async toHaveLength(expected: number) {
                 await Promise.resolve();
-                const length = actual?.length ?? (actual?.size ?? 0);
+                let length = 0;
+                if (typeof actual === 'string' || Array.isArray(actual)) {
+                    length = actual.length;
+                } else if (actual instanceof Set || actual instanceof Map) {
+                    length = actual.size;
+                } else {
+                    const lengthValue = getProperty(actual, 'length');
+                    const sizeValue = getProperty(actual, 'size');
+                    length = typeof lengthValue === 'number'
+                        ? lengthValue
+                        : typeof sizeValue === 'number'
+                            ? sizeValue
+                            : 0;
+                }
                 handleResult(length === expected, `Expected length ${expected}, got ${length}`);
             },
 
             async toMatch(expected: string | RegExp) {
                 await Promise.resolve();
                 const pass = expected instanceof RegExp ? expected.test(String(actual)) : String(actual).includes(expected);
-                handleResult(pass, `Expected "${actual}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
+                handleResult(pass, `Expected "${String(actual)}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
             },
 
-            async toHaveProperty(path: string, value?: any) {
+            async toHaveProperty(path: string, value?: unknown) {
                 await Promise.resolve();
                 // Simple dot-notation path resolver
                 const parts = path.split('.');
@@ -509,7 +618,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         found = false;
                         break;
                     }
-                    current = current[part];
+                    current = Reflect.get(current, part);
                 }
 
                 if (!found) {
@@ -527,7 +636,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
 
             async toBe(expected: unknown) {
                 await Promise.resolve();
-                handleResult(actual === expected, `Expected ${expected}, got ${actual}`);
+                handleResult(actual === expected, `Expected ${String(expected)}, got ${String(actual)}`);
             },
             async toEqual(expected: unknown) {
                 await Promise.resolve();
@@ -536,17 +645,18 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
         };
     };
 
-    const expectFunc = ((actual: any) => {
-        const matchers: any = createMatchers(actual, false, false);
-        matchers.not = createMatchers(actual, false, true);
-        return matchers;
-    }) as any;
+    const createExpectation = (
+        actual: unknown,
+        isSoft: boolean,
+    ): ExpectMatchers => ({
+        ...createMatchers(actual, isSoft, false),
+        not: createMatchers(actual, isSoft, true),
+    });
 
-    expectFunc.soft = (actual: any) => {
-        const matchers: any = createMatchers(actual, true, false);
-        matchers.not = createMatchers(actual, true, true);
-        return matchers;
-    };
+    const expectFunc: ExpectFunction = (actual) =>
+        createExpectation(actual, false);
+
+    expectFunc.soft = (actual) => createExpectation(actual, true);
 
     return { expect: expectFunc, getAssertionCount, getTestResults };
 }

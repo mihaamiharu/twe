@@ -1,8 +1,13 @@
-import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
+import { describe, it, expect, mock, beforeEach, afterEach, spyOn } from 'bun:test';
 import { renderHook, act } from '@testing-library/react';
 import { useChallengeExecution } from '@/components/challenges/playground/use-challenge-execution';
 import * as executor from '@/core/executor';
 import * as storage from '@/lib/storage-adapter';
+import {
+    createChallenge,
+    createPlaygroundProps,
+    createPlaygroundState,
+} from '@/tests/fixtures/playground';
 
 // These tests use mock.module() which pollutes Bun's module registry globally
 // and breaks iframe-executor.test.ts. Run with BUN_RUN_SKIPPED=1 to enable.
@@ -10,12 +15,6 @@ const isSkipped = !process.env.BUN_RUN_SKIPPED;
 
 describe.skipIf(isSkipped)('useChallengeExecution', () => {
     beforeEach(() => {
-        void mock.module(
-            '@/core/executor', () => ({
-                executePlaywrightCode: mock(),
-            })
-        );
-
         void mock.module(
             '@/core/executor/module-preloader', () => ({
                 generatePreloadCode: () => '',
@@ -42,7 +41,7 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
     afterEach(() => {
         mock.restore();
     });
-    const mockState = {
+    const mockState = createPlaygroundState({
         code: 'console.log("hello")',
         selector: '',
         selectorType: 'css',
@@ -64,26 +63,24 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
         setHintContent: mock(),
         setIsHintDialogOpen: mock(),
         setHintUsed: mock(),
-        t: (k: string) => k,
         locale: 'en',
         isRunning: false,
         hasPassed: false,
         isCodeChallenge: true,
         isSelectorChallenge: false,
-    };
+    });
 
-    const mockProps = {
-        challenge: {
+    const mockProps = createPlaygroundProps({
+        challenge: createChallenge({
             id: '1',
             slug: 'test',
-            type: 'JAVASCRIPT',
-            testCases: [{ expectedOutput: 'hello' }],
+            testCases: [{ id: 'case-1', name: 'returns greeting', expectedOutput: 'hello' }],
             category: 'basics',
             starterCode: 'console.log("start")'
-        },
+        }),
         onSubmit: mock(),
         userId: 'user1',
-    };
+    });
 
     const mockIframe = { current: null };
 
@@ -92,7 +89,7 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
     });
 
     it('should run code successfully', async () => {
-        (executor.executePlaywrightCode as any).mockResolvedValue({
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
             status: 'PASSED',
             output: 'Success',
             returnValue: 'hello',
@@ -100,7 +97,7 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
             logs: []
         });
 
-        const { result } = renderHook(() => useChallengeExecution(mockState as any, mockProps as any, mockIframe));
+        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
 
         await act(async () => {
             await result.current.handleRunCode();
@@ -114,13 +111,14 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
     });
 
     it('should handle execution failure', async () => {
-        (executor.executePlaywrightCode as any).mockResolvedValue({
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
             status: 'FAILED',
+            output: 'Syntax Error',
             error: 'Syntax Error',
             executionTime: 0,
         });
 
-        const { result } = renderHook(() => useChallengeExecution(mockState as any, mockProps as any, mockIframe));
+        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
 
         await act(async () => {
             await result.current.handleRunCode();
@@ -133,13 +131,14 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
     });
 
     it('should validate value mismatch for JS challenge', async () => {
-        (executor.executePlaywrightCode as any).mockResolvedValue({
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
             status: 'PASSED',
+            output: 'Success',
             returnValue: 'wrong',
             executionTime: 100,
         });
 
-        const { result } = renderHook(() => useChallengeExecution(mockState as any, mockProps as any, mockIframe));
+        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
 
         await act(async () => {
             await result.current.handleRunCode();
@@ -151,8 +150,8 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
 
     it('should submit results if passed', () => {
         const { result } = renderHook(() => useChallengeExecution(
-            { ...mockState, hasPassed: true } as any,
-            mockProps as any,
+            createPlaygroundState({ ...mockState, hasPassed: true }),
+            mockProps,
             mockIframe
         ));
 
@@ -164,10 +163,23 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
     });
 
     it('should validate selectors', () => {
-        const selectorChallenge = { ...mockProps.challenge, type: 'CSS_SELECTOR', targetSelector: '.target' };
-        const selectorState = { ...mockState, isCodeChallenge: false, isSelectorChallenge: true, selector: '.target' };
+        const selectorChallenge = createChallenge({
+            ...mockProps.challenge,
+            type: 'CSS_SELECTOR',
+            targetSelector: '.target',
+        });
+        const selectorState = createPlaygroundState({
+            ...mockState,
+            isCodeChallenge: false,
+            isSelectorChallenge: true,
+            selector: '.target',
+        });
 
-        const { result } = renderHook(() => useChallengeExecution(selectorState as any, { ...mockProps, challenge: selectorChallenge } as any, mockIframe));
+        const { result } = renderHook(() => useChallengeExecution(
+            selectorState,
+            createPlaygroundProps({ ...mockProps, challenge: selectorChallenge }),
+            mockIframe,
+        ));
 
         act(() => {
             result.current.handleValidateSelector();
@@ -176,7 +188,7 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
         expect(mockState.setHasPassed).toHaveBeenCalledWith(true);
     });
     it('should reset state on confirmReset', async () => {
-        const { result } = renderHook(() => useChallengeExecution(mockState as any, mockProps as any, mockIframe));
+        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
 
         await act(async () => {
             await result.current.confirmReset();
@@ -193,14 +205,20 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
     });
 
     it('should update file content on file change', () => {
-        const fileState = {
+        const fileState = createPlaygroundState({
             ...mockState,
             fileContents: { '/test.spec.ts': '' },
             setFileContents: mock(),
-            challenge: { ...mockProps.challenge, editableFiles: ['/test.spec.ts'] }
-        };
+        });
+        const fileProps = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                ...mockProps.challenge,
+                editableFiles: ['/test.spec.ts'],
+            }),
+        });
 
-        const { result } = renderHook(() => useChallengeExecution(fileState as any, mockProps as any, mockIframe));
+        const { result } = renderHook(() => useChallengeExecution(fileState, fileProps, mockIframe));
 
         act(() => {
             result.current.handleFileChange('/test.spec.ts', 'new content');

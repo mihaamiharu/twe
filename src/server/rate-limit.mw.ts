@@ -11,7 +11,7 @@
  */
 
 import { createMiddleware } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 
 
 interface RateLimitEntry {
@@ -78,13 +78,10 @@ export function createRateLimitMiddleware(options: {
     windowMinutes: number; // Time window in minutes
 }) {
     return createMiddleware().server(async ({ next, context }) => {
-        const headers = getRequestHeaders() as unknown as Headers;
+        const headers = getRequest().headers;
 
         // We try to get userId from context (if authMiddleware ran before this)
-        const contextValue = context as unknown as {
-            user?: { id?: string };
-        } | undefined;
-        const userId = contextValue?.user?.id;
+        const userId = getContextUserId(context);
 
         const identifier = getClientIdentifier(headers, userId);
         const storeKey = `${options.key}:${identifier}`;
@@ -116,4 +113,15 @@ export function createRateLimitMiddleware(options: {
         // Proceed
         return next();
     });
+}
+
+function getContextUserId(context: unknown): string | undefined {
+    if (typeof context !== 'object' || context === null || !('user' in context)) {
+        return undefined;
+    }
+    const { user } = context;
+    if (typeof user !== 'object' || user === null || !('id' in user)) {
+        return undefined;
+    }
+    return typeof user.id === 'string' ? user.id : undefined;
 }

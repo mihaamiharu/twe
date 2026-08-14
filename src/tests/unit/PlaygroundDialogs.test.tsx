@@ -71,8 +71,8 @@ describe('Playground Dialogs', () => {
         };
 
         beforeEach(() => {
-            (defaultProps.onOpenChange as any).mockClear?.();
-            (defaultProps.onConfirm as any).mockClear?.();
+            defaultProps.onOpenChange.mockClear();
+            defaultProps.onConfirm.mockClear();
         });
 
         it('should render when open', () => {
@@ -114,8 +114,8 @@ describe('Playground Dialogs', () => {
         };
 
         beforeEach(() => {
-            (defaultProps.onOpenChange as any).mockClear?.();
-            (defaultProps.onConfirm as any).mockClear?.();
+            defaultProps.onOpenChange.mockClear();
+            defaultProps.onConfirm.mockClear();
         });
 
         it('should render warning info', () => {

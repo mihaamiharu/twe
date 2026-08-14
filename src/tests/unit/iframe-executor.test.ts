@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { executePlaywrightCode, executeWithTestCases } from '../../core/executor/iframe-executor';
 import { type TestCase } from '../../core/executor/executor.types';
+import type { ExpectedStateRule } from '../../lib/content.types';
 
 // These tests require real iframe DOM behavior (script injection, fetch polyfills, onclick handlers)
 // that HappyDOM cannot replicate on GitHub Actions CI. They pass locally but are structurally
@@ -126,14 +127,14 @@ describe.skipIf(isCI)('Iframe Executor', () => {
   test('should fail on invalid DOM state', async () => {
     const code = 'document.body.innerHTML = "<div>Wrong</div>"';
     const html = '<div>Failure</div>';
-    const expectedState = [
+    const expectedState: ExpectedStateRule[] = [
       {
         selector: 'div',
         containsText: 'Success'
       }
     ];
 
-    const result = await executePlaywrightCode(code, html, { expectedState: expectedState as any });
+    const result = await executePlaywrightCode(code, html, { expectedState });
 
     expect(result.status).toBe('FAILED');
   });

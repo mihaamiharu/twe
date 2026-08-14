@@ -13,7 +13,9 @@ import { ROLE_TO_TAG } from './role-mappings';
 import { createShimError } from './shim-errors';
 import { attachOnclickHandlers } from './attach-onclick-handlers';
 import { createRouteFetchWrapper } from './route-fetch-mock';
+import type { RouteMatcher, RouteRequestInfo } from './route-fetch-mock';
 import { generateVfsNavigationTemplate } from './iframe-template';
+import { invokeDynamicFunction } from './dynamic-code';
 import type {
   FilePayload,
   Locator,
@@ -26,6 +28,7 @@ import type {
   Route,
   APIRequest,
   Dialog,
+  DialogType,
   BrowserContext,
   Keyboard,
   Mouse,
@@ -47,7 +50,7 @@ export class MockedPlaywrightPage {
   private currentUrl: string = 'about:blank';
   private _context: BrowserContext;
    
-  private routes: any[] = [];
+  private routes: RouteMatcher[] = [];
 
   // VFS (Virtual File System) for multi-page E2E support
   private vfs: Record<string, string> | null = null;
@@ -301,33 +304,33 @@ export class MockedPlaywrightPage {
   async on(event: string, handler: (dialog: Dialog) => void): Promise<void> {
     if (event === 'dialog') {
       // Register global handler that iframe logic can call
-      /* eslint-disable @typescript-eslint/require-await */
-      const iframeWindow = this.targetDocument.defaultView as any;
+      const iframeWindow = this.targetDocument.defaultView;
       if (!iframeWindow) return;
 
       if (!iframeWindow.__MOCK_DIALOG_HANDLER__) {
         iframeWindow.__MOCK_DIALOG_HANDLER__ = (
-          type: string,
+          type: DialogType,
           message: string,
           defaultValue?: string,
         ) => {
           return new Promise((resolve) => {
             const dialog: Dialog = {
-              type: () => type as any,
+              type: () => type,
               message: () => message,
               defaultValue: () => defaultValue || '',
-              accept: async (promptText) => {
+              accept: (promptText) => {
                 resolve({ action: 'accept', promptText });
+                return Promise.resolve();
               },
-              dismiss: async () => {
+              dismiss: () => {
                 resolve({ action: 'dismiss' });
+                return Promise.resolve();
               },
             };
             handler(dialog);
           });
         };
       }
-      /* eslint-enable @typescript-eslint/require-await */
     }
     await Promise.resolve();
   }
@@ -367,50 +370,61 @@ export class MockedPlaywrightPage {
   ): Promise<void> {
     // Register route in global registry on the iframe window
     // The iframe fetch polyfill will read from this
-    /* eslint-disable @typescript-eslint/require-await */
-    const iframeWindow = this.targetDocument.defaultView as any;
+    const iframeWindow = this.targetDocument.defaultView;
     if (!iframeWindow) return;
 
     if (!iframeWindow.__MOCK_FETCH_PATCHED__) {
       iframeWindow.__MOCK_FETCH_PATCHED__ = true;
-      const originalFetch = iframeWindow.fetch;
-      iframeWindow.fetch = createRouteFetchWrapper(
-        originalFetch as unknown as typeof window.fetch | undefined,
-        () => this.targetDocument.defaultView as unknown as (Window & Record<string, unknown>) | undefined,
+      const originalFetch = iframeWindow.fetch.bind(iframeWindow);
+      const wrappedFetch = createRouteFetchWrapper(
+        originalFetch,
+        () => this.targetDocument.defaultView ?? undefined,
       );
+      Reflect.set(iframeWindow, 'fetch', wrappedFetch);
     }
 
     const routeEntry = {
       matcher: urlOrPredicate,
-      handler: async (requestInfo: any) => {
+      handler: (requestInfo: RouteRequestInfo) => {
         const route: Route = {
-          fulfill: async (response) => {
-            return Promise.resolve(response) as any;
-          },
-          continue: async (options) => {
-            return Promise.resolve(options) as any;
-          },
+          fulfill: () => Promise.resolve(),
+          continue: () => Promise.resolve(),
           request: () => ({
             url: () => requestInfo.url,
             method: () => requestInfo.method,
-            headers: () => requestInfo.headers,
-            postData: () => requestInfo.body,
+            headers: () => requestInfo.headers instanceof Headers
+              ? Object.fromEntries(requestInfo.headers.entries())
+              : requestInfo.headers ?? {},
+            postData: () => requestInfo.body ?? null,
           }),
         };
 
         const request: APIRequest = route.request();
 
-        return new Promise<any>((resolve) => {
+        return new Promise<Awaited<ReturnType<RouteMatcher['handler']>>>((resolve, reject) => {
           // Override fulfill/continue to resolve our promise
-          route.fulfill = async (response) => {
-            resolve({ type: 'fulfill', response });
+          route.fulfill = (response) => {
+            resolve({
+              type: 'fulfill',
+              response: {
+                status: response.status,
+                body: typeof response.body === 'string'
+                  ? response.body
+                  : response.body === undefined
+                    ? undefined
+                    : Uint8Array.from(response.body).buffer,
+                json: response.json,
+                headers: response.headers,
+              },
+            });
+            return Promise.resolve();
           };
-          route.continue = async (options) => {
+          route.continue = (options) => {
             resolve({ type: 'continue', options });
+            return Promise.resolve();
           };
 
-          // eslint-disable-next-line @typescript-eslint/no-floating-promises
-          handler(route, request);
+          void Promise.resolve(handler(route, request)).catch(reject);
         });
       },
     };
@@ -421,24 +435,25 @@ export class MockedPlaywrightPage {
       iframeWindow.__MOCK_ROUTES__ = [];
     }
     iframeWindow.__MOCK_ROUTES__.push(routeEntry);
-    /* eslint-enable @typescript-eslint/require-await */
     await Promise.resolve();
   }
 
   async unroute(
     urlOrPredicate: string | RegExp | ((url: URL) => boolean),
+    handler?: (route: Route, request: APIRequest) => Promise<void> | void,
   ): Promise<void> {
+    void handler;
      
-    const iframeWindow = this.targetDocument.defaultView as any;
+    const iframeWindow = this.targetDocument.defaultView;
     if (!iframeWindow || !iframeWindow.__MOCK_ROUTES__) return;
 
     // Remove matching routes
     this.routes = this.routes.filter(
-      (r: any) => r.matcher.toString() !== urlOrPredicate.toString(),
+      (route) => route.matcher.toString() !== urlOrPredicate.toString(),
     );
 
     iframeWindow.__MOCK_ROUTES__ = iframeWindow.__MOCK_ROUTES__.filter(
-      (r: any) => r.matcher.toString() !== urlOrPredicate.toString(),
+      (route) => route.matcher.toString() !== urlOrPredicate.toString(),
     );
      
     await Promise.resolve();
@@ -469,7 +484,7 @@ export class MockedPlaywrightPage {
 
       // Save state that must persist across page navigations
        
-      const oldWin = this.targetDocument.defaultView as any;
+      const oldWin = this.targetDocument.defaultView;
       const preservedAppState = oldWin?.__APP_STATE__ || {};
 
       // Wrap content with necessary HTML structure including restored state
@@ -483,7 +498,7 @@ export class MockedPlaywrightPage {
       // Restore window references BEFORE executing scripts so app scripts can access state
       if (this.targetDocument.defaultView) {
          
-        const win = this.targetDocument.defaultView as any;
+        const win = this.targetDocument.defaultView;
         win.page = this;
         // Re-inject active routes
         win.__MOCK_ROUTES__ = this.routes;
@@ -512,7 +527,10 @@ export class MockedPlaywrightPage {
   /**
    * Wrap VFS content with full HTML structure including styles and polyfills
    */
-  private _wrapVfsContent(content: string, appState: any = {}): string {
+  private _wrapVfsContent(
+    content: string,
+    appState: Record<string, unknown> = {},
+  ): string {
     return generateVfsNavigationTemplate({
       bodyContent: content,
       cssContent: this.cssContent,
@@ -532,7 +550,7 @@ export class MockedPlaywrightPage {
       if (script.textContent) {
         try {
            
-          const win = this.targetDocument.defaultView as any;
+          const win = this.targetDocument.defaultView;
           if (!win) return;
 
           // eslint-disable-next-line @typescript-eslint/no-implied-eval
@@ -546,7 +564,7 @@ export class MockedPlaywrightPage {
             }).call(window, window, document);
           `);
            
-          fn(win, this.targetDocument);
+          invokeDynamicFunction(fn, undefined, [win, this.targetDocument]);
         } catch (e) {
           console.error('Failed to execute VFS script:', e);
         }
@@ -568,7 +586,7 @@ export class MockedPlaywrightPage {
 
     attachOnclickHandlers({
       document: this.targetDocument,
-      window: win as unknown as Window & Record<string, unknown>,
+      window: win,
       excludeKeys: ['__MOCK_ROUTES__', '__VFS_NAVIGATE__', 'page'],
       errorPrefix: 'VFS',
     });
@@ -596,24 +614,37 @@ export class MockedPlaywrightPage {
     await this.delay(100);
   }
 
-  async evaluate<R, Arg>(
-    pageFunction: ((arg: Arg) => R | Promise<R>) | string,
+  evaluate<R, Arg>(
+    pageFunction: (arg: Arg) => R | Promise<R>,
     arg?: Arg,
-  ): Promise<R> {
+  ): Promise<R>;
+  evaluate(pageFunction: string, arg?: unknown): Promise<unknown>;
+  async evaluate(
+    pageFunction: CallableFunction | string,
+    arg?: unknown,
+  ): Promise<unknown> {
      
-    const iframeWindow = this.targetDocument.defaultView as any;
+    const iframeWindow = this.targetDocument.defaultView;
     if (!iframeWindow) throw new Error('Iframe window not available');
 
     if (typeof pageFunction === 'function') {
       // Execute in the context of the iframe window
       // Note: Arrow functions will still capture parent context, but this is the best we can do without eval
-      return Promise.resolve(pageFunction.call(iframeWindow, arg as Arg));
+      return Promise.resolve(invokeDynamicFunction(
+        pageFunction,
+        iframeWindow,
+        [arg],
+      ));
     }
     if (typeof pageFunction === 'string') {
       // eslint-disable-next-line @typescript-eslint/no-implied-eval
       const fn = new Function('window', 'document', 'arg', `return (async () => { ${pageFunction} })(arg)`);
        
-      return fn(iframeWindow, this.targetDocument, arg);
+      return invokeDynamicFunction(
+        fn,
+        undefined,
+        [iframeWindow, this.targetDocument, arg],
+      );
     }
     throw new Error('evaluate only supports functions or strings');
   }
@@ -764,7 +795,6 @@ export class MockedPlaywrightPage {
     selector: string,
     files: string | FilePayload | string[] | FilePayload[],
   ): Promise<void> {
-    // @ts-expect-error Types in shim are simplified
     return this.locator(selector).setInputFiles(files);
   }
 
@@ -895,7 +925,13 @@ export class MockedPlaywrightPage {
 
   async waitForResponse(
     urlOrPredicate: string | RegExp | ((resp: unknown) => boolean),
-  ): Promise<unknown> {
+  ): Promise<{
+    ok: boolean;
+    status: () => number;
+    json: () => Promise<unknown>;
+    text: () => Promise<string>;
+    url: () => string;
+  }> {
     await this.delay(500);
     return {
       ok: true,
@@ -1316,8 +1352,11 @@ export class MockedPlaywrightPage {
         const name = this._getAccessibleName(el);
         const normalizedName = this._normalizeText(name);
 
-        const isRegex = (val: any): val is RegExp => {
-          return val && (val instanceof RegExp || Object.prototype.toString.call(val) === '[object RegExp]');
+        const isRegex = (val: unknown): val is RegExp => {
+          return Boolean(val) && (
+            val instanceof RegExp ||
+            Object.prototype.toString.call(val) === '[object RegExp]'
+          );
         };
 
         if (isRegex(options.name)) {
@@ -1623,7 +1662,7 @@ export class MockedPlaywrightPage {
     // In environments without a layout engine (like Happy DOM in unit tests), 
     // offsetParent and offsetWidth/Height are always null/0.
     // We detect this to avoid failing tests while keeping robustness for real browsers.
-    const isHappyDOM = typeof window !== 'undefined' && !!(window as any).happyDOM;
+    const isHappyDOM = typeof window !== 'undefined' && Boolean(window.happyDOM);
     if (isHappyDOM) return true;
 
     return (
@@ -1637,16 +1676,11 @@ export class MockedPlaywrightPage {
   }
 
   private _createAPIRequestContext(): APIRequestContext {
-    const toRequestInit = (options: unknown): RequestInit => {
-      if (typeof options !== 'object' || options === null) return {};
-      return options as RequestInit;
-    };
-
     const fetchWithIframe = async (url: string, init?: RequestInit) => {
-      const win = this.targetDocument.defaultView as any;
+      const win = this.targetDocument.defaultView;
       if (win && win.fetch) {
         const resp = await win.fetch(url, init);
-        return {
+        const apiResponse: APIResponse = {
           ok: () => resp.ok,
           status: () => resp.status,
           statusText: () => resp.statusText || 'OK',
@@ -1657,26 +1691,25 @@ export class MockedPlaywrightPage {
             }
             return h;
           },
-          json: () => typeof resp.json === 'function' ? resp.json() : Promise.resolve(resp.json || {}),
-          text: () => typeof resp.text === 'function' ? resp.text() : Promise.resolve(resp.text || ''),
-          body: () => {
-             if (typeof resp.arrayBuffer === 'function') {
-                return resp.arrayBuffer().then((ab: ArrayBuffer) => Buffer.from(ab));
-             }
-             return Promise.resolve(Buffer.from(resp.text || ''));
+          json: async () => {
+            const body: unknown = await resp.json();
+            return body;
           },
+          text: () => resp.text(),
+          body: () => resp.arrayBuffer().then((buffer) => Buffer.from(buffer)),
           url: () => url,
-        } as APIResponse;
+        };
+        return apiResponse;
       }
       return this._mockResponse();
     };
 
     return {
-      get: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'GET' }),
-      post: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'POST' }),
-      put: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'PUT' }),
-      delete: (url, options) => fetchWithIframe(url, { ...toRequestInit(options), method: 'DELETE' }),
-      fetch: (url, options) => fetchWithIframe(url, toRequestInit(options)),
+      get: (url, options) => fetchWithIframe(url, { ...options, method: 'GET' }),
+      post: (url, options) => fetchWithIframe(url, { ...options, method: 'POST' }),
+      put: (url, options) => fetchWithIframe(url, { ...options, method: 'PUT' }),
+      delete: (url, options) => fetchWithIframe(url, { ...options, method: 'DELETE' }),
+      fetch: (url, options) => fetchWithIframe(url, options),
       storageState: () => Promise.resolve({ cookies: [], origins: [] }),
       newContext: () => Promise.resolve(this._createAPIRequestContext()),
     };
@@ -1691,6 +1724,7 @@ export class MockedPlaywrightPage {
       json: () => Promise.resolve({ success: true, id: 1 }),
       text: () => Promise.resolve('{"success":true}'),
       body: () => Promise.resolve(Buffer.from('')),
+      url: () => '',
     };
   }
 
@@ -2179,16 +2213,10 @@ export class MockedPlaywrightPage {
 
             // To solve this properly in a sync finder:
             // We need access to the 'has' locator's finder.
-            // We cast to any to access the internal finder if possible.
-
-             
-            const hasLocatorAny = options.has as any;
             let hasElements: HTMLElement[] = [];
 
-             
-            if (typeof hasLocatorAny.finder === 'function') {
-               
-              hasElements = hasLocatorAny.finder();
+            if (typeof options.has.finder === 'function') {
+              hasElements = options.has.finder();
             } else {
               // Fallback: If passed a locator from outside the shim or different structure
               // We might just skip filtering or warn?

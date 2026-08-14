@@ -1,6 +1,8 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { PlaygroundHeader } from '@/components/challenges/playground/playground-header';
+import type { ReactNode } from 'react';
+import type { Challenge } from '@/components/challenges/playground/types';
 
 // Mock dependencies
 
@@ -19,10 +21,10 @@ void mock.module(
 
 void mock.module(
 '@/components/ui/tooltip', () => ({
-    Tooltip: ({ children }: any) => <>{children}</>,
-    TooltipTrigger: ({ children }: any) => <>{children}</>,
-    TooltipContent: ({ children }: any) => <div data-testid="tooltip-content">{children}</div>,
-    TooltipProvider: ({ children }: any) => <>{children}</>,
+    Tooltip: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    TooltipTrigger: ({ children }: { children?: ReactNode }) => <>{children}</>,
+    TooltipContent: ({ children }: { children?: ReactNode }) => <div data-testid="tooltip-content">{children}</div>,
+    TooltipProvider: ({ children }: { children?: ReactNode }) => <>{children}</>,
 }));
 
 describe('PlaygroundHeader', () => {
@@ -45,9 +47,12 @@ describe('PlaygroundHeader', () => {
             slug: 'test',
             description: 'desc',
             type: 'JAVASCRIPT',
-            difficulty: 'EASY',
+            difficulty: 'Easy',
+            xp: 10,
+            instructions: 'Do the thing',
+            starterCode: '',
             hints: ['Hint 1'],
-        } as any,
+        } satisfies Challenge,
         locale: 'en',
         userId: 'user1',
         isMobile: false,

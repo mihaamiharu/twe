@@ -6,7 +6,7 @@ describe('attachSentryUserContext', () => {
 
     const mockSentry = {
         setUser: mockSetUser,
-    } as any;
+    };
 
     beforeEach(() => {
         mockSetUser.mockReset();
@@ -46,7 +46,7 @@ describe('attachSentryUserContext', () => {
     it('should not set user context when user is undefined (no auth middleware)', () => {
         const context = {};
 
-        attachSentryUserContext(context as any, mockSentry);
+        attachSentryUserContext(context, mockSentry);
 
         expect(mockSetUser).not.toHaveBeenCalled();
     });

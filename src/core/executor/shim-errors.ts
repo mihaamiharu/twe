@@ -41,6 +41,12 @@ export interface ShimErrorOptions {
     hint?: string;
 }
 
+export interface ShimError extends Error {
+    type: ShimErrorType;
+    selector?: string;
+    action?: string;
+}
+
 /**
  * Error message templates for each error type
  */
@@ -102,7 +108,7 @@ const ERROR_TEMPLATES: Record<ShimErrorType, (opts: ShimErrorOptions) => string>
 export function createShimError(
     type: ShimErrorType,
     options: ShimErrorOptions = {}
-): Error {
+): ShimError {
     const template = ERROR_TEMPLATES[type];
     const message = template(options);
 

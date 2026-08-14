@@ -4,7 +4,7 @@
  */
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 import { auth } from './auth.server';
 import { db } from '@/db';
 import { users, accounts } from '@/db/schema';
@@ -66,10 +66,7 @@ async function ensureUserImage(userId: string): Promise<string | null> {
 export const getServerSession = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthSession> => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
 
       if (session?.user) {
@@ -86,8 +83,7 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             name: session.user.name || null,
             image: image || null,
             emailVerified: session.user.emailVerified || false,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-            role: (session.user as any).role || 'USER',
+            role: session.user.role || 'USER',
           },
           isAuthenticated: true,
           gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
