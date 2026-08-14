@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { z } from 'zod';
 
 interface CreateIssueParams {
     title: string;
@@ -6,12 +7,37 @@ interface CreateIssueParams {
     labels?: string[];
 }
 
-interface GitHubIssue {
+export interface GitHubIssue {
     id: number;
     number: number;
     html_url: string;
     title: string;
     state: string;
+}
+
+const GitHubIssueSchema = z.object({
+    id: z.number().int(),
+    number: z.number().int(),
+    html_url: z.string().url(),
+    title: z.string(),
+    state: z.enum(['open', 'closed']),
+}).passthrough();
+
+export function parseGitHubIssueResponse(
+    value: unknown,
+    repository: string,
+): GitHubIssue {
+    const result = GitHubIssueSchema.safeParse(value);
+    if (!result.success) {
+        const details = result.error.issues.map((issue) => {
+            const path = issue.path.length > 0 ? issue.path.join('.') : '<root>';
+            return `${path}: ${issue.message}`;
+        }).join('; ');
+        throw new Error(
+            `[GitHub] Invalid create-issue response for ${repository}: ${details}`,
+        );
+    }
+    return result.data;
 }
 
 /**
@@ -60,7 +86,16 @@ export async function createGitHubIssue(
             return null;
         }
 
-        const issue = (await response.json()) as GitHubIssue;
+        let responseBody: unknown;
+        try {
+            responseBody = await response.json();
+        } catch (error) {
+            throw new Error(
+                `[GitHub] Invalid JSON response while creating issue for ${owner}/${repo}`,
+                { cause: error },
+            );
+        }
+        const issue = parseGitHubIssueResponse(responseBody, `${owner}/${repo}`);
         logger.info(`[GitHub] Issue created successfully: ${issue.html_url}`);
         return issue;
     } catch (error) {

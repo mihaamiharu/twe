@@ -13,15 +13,9 @@ import { createMiddleware } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
 import { auth } from './auth.server';
 import { mapSessionToUser } from './map-session-to-user';
+import type { AuthUser } from './auth-user';
 
-// Type for authenticated user context
-export interface AuthUser {
-    id: string;
-    email: string;
-    name: string | null;
-    image: string | null;
-    role: string | null;
-}
+export type { AuthUser } from './auth-user';
 
 // Context provided by authMiddleware (user guaranteed to exist)
 export interface AuthContext {

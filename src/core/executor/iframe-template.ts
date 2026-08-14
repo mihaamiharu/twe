@@ -182,45 +182,13 @@ export function generateVfsNavigationTemplate(options: {
     `
     : '';
 
-  // Simplified fetch polyfill for VFS (no wildcard, no function matcher, no api/data fallback)
-  const vfsFetchPolyfill = `
-            window.fetch = function(input, init) {
-              let url = input;
-              if (typeof input === 'string') {
-                if (input.startsWith('/')) {
-                  url = 'http://localhost' + input;
-                }
-              } else if (input instanceof Request) {
-                url = input.url;
-              } else if (input && typeof input === 'object' && 'toString' in input) {
-                 url = input.toString();
-              }
-
-              if (window.__MOCK_ROUTES__) {
-                for (const route of window.__MOCK_ROUTES__) {
-                  let isMatch = false;
-                  if (typeof route.matcher === 'string') {
-                    isMatch = url.includes(route.matcher);
-                  } else if (route.matcher instanceof RegExp) {
-                    isMatch = route.matcher.test(url);
-                  }
-                  if (isMatch) {
-                    return route.handler({ url, method: init?.method || 'GET' }).then(r => {
-                      if (r?.type === 'fulfill') {
-                        return Promise.resolve({
-                          ok: (r.response.status || 200) >= 200 && (r.response.status || 200) < 300,
-                          status: r.response.status || 200,
-                          json: () => Promise.resolve(r.response.json || {}),
-                          text: () => Promise.resolve(r.response.body || '')
-                        });
-                      }
-                      return Promise.reject(new Error('Route not fulfilled'));
-                    });
-                  }
-                }
-              }
-              return Promise.resolve({ ok: true, status: 404, json: () => Promise.resolve({}) });
-            };`;
+  const vfsFetchPolyfill = generateFetchPolyfillCode({
+    includeApiDataFallback: false,
+    includeFunctionMatcher: false,
+    includeArrayBuffer: false,
+    includeStatusText: false,
+    fallbackToOriginal: false,
+  });
 
   return `
       <!DOCTYPE html>

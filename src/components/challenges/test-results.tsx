@@ -22,13 +22,14 @@ import {
   Loader2,
 } from 'lucide-react';
 import type { ChallengeType } from './playground';
+import type { JsonValue } from '@/lib/content.types';
 
 export interface TestResult {
   id: string;
   name: string;
   description?: string;
   passed: boolean;
-  output?: unknown;
+  output?: JsonValue;
   expected?: unknown;
   error?: string;
   executionTime?: number;

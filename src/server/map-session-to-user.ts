@@ -1,50 +1,29 @@
-import type { AuthUser } from './auth.mw';
-
-interface SessionUser {
-    id: string;
-    email: string;
-    name?: string | null;
-    image?: string | null;
-    role?: string | null;
-}
-
-interface Session {
-    user: SessionUser;
-}
+import { getContainedAuthUser, type AuthUser } from './auth-user';
 
 function isOptionalString(value: unknown): value is string | null | undefined {
     return value === undefined || value === null || typeof value === 'string';
 }
 
-function isSession(value: unknown): value is Session {
-    if (typeof value !== 'object' || value === null || !('user' in value)) {
-        return false;
-    }
-
-    const { user } = value;
-    return (
-        typeof user === 'object' &&
-        user !== null &&
-        'id' in user &&
-        typeof user.id === 'string' &&
-        'email' in user &&
-        typeof user.email === 'string' &&
-        (!('name' in user) || isOptionalString(user.name)) &&
-        (!('image' in user) || isOptionalString(user.image)) &&
-        (!('role' in user) || isOptionalString(user.role))
-    );
-}
-
 export function mapSessionToUser(session: unknown): AuthUser | null {
-    if (!isSession(session)) {
+    const user = getContainedAuthUser(session);
+    if (!user) {
         return null;
     }
 
+    const name: unknown = 'name' in user ? user.name : undefined;
+    const image: unknown = 'image' in user ? user.image : undefined;
+    const role: unknown = 'role' in user ? user.role : undefined;
+    if (
+        !isOptionalString(name) ||
+        !isOptionalString(image) ||
+        !isOptionalString(role)
+    ) return null;
+
     return {
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.name || null,
-        image: session.user.image || null,
-        role: session.user.role || 'USER',
+        id: user.id,
+        email: user.email,
+        name: name || null,
+        image: image || null,
+        role: role || 'USER',
     };
 }

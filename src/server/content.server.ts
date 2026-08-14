@@ -14,12 +14,15 @@ import type {
   TutorialRegistry,
   Challenge,
   ChallengeDefinition,
-  ChallengeTierFile,
   ChallengeFilters,
   ChallengeTier,
   LocalizedString,
   LocalizedArray,
 } from '@/lib/content.types';
+import {
+  parseChallengeTierJson,
+  parseTutorialRegistryJson,
+} from './content-validation';
 
 // =============================================================================
 // HELPERS
@@ -108,7 +111,7 @@ async function loadRegistry(): Promise<TutorialRegistry> {
 
   const registryPath = join(TUTORIALS_DIR, 'registry.json');
   const content = await readFile(registryPath, 'utf-8');
-  registryCache = JSON.parse(content) as TutorialRegistry;
+  registryCache = parseTutorialRegistryJson(content, registryPath);
   return registryCache;
 }
 
@@ -274,21 +277,31 @@ async function loadAllChallenges(): Promise<Map<string, ChallengeDefinition>> {
     try {
       const filePath = join(CHALLENGES_DIR, `${tier}.json`);
       const content = await readFile(filePath, 'utf-8');
-      const tierData = JSON.parse(content) as ChallengeTierFile;
+      const tierData = parseChallengeTierJson(content, filePath);
 
       for (const challenge of tierData.challenges) {
         challengeCache.set(challenge.slug, challenge);
       }
-    } catch {
-      // Tier file doesn't exist yet, skip
-      console.log(
-        `[ContentService] Tier file ${tier}.json not found, skipping`,
-      );
+    } catch (error) {
+      if (isFileNotFoundError(error)) {
+        console.log(
+          `[ContentService] Tier file ${tier}.json not found, skipping`,
+        );
+        continue;
+      }
+      throw error;
     }
   }
 
   challengeCacheLoaded = true;
   return challengeCache;
+}
+
+function isFileNotFoundError(error: unknown): boolean {
+  return typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'ENOENT';
 }
 
 /**

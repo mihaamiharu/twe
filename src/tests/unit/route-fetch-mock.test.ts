@@ -7,7 +7,7 @@ import {
 describe('generateFetchPolyfillCode', () => {
   test('should generate valid JavaScript code', () => {
     const code = generateFetchPolyfillCode();
-    expect(code).toContain('window.fetch = function');
+    expect(code).toContain('window.fetch = async function');
     expect(code).toContain('__MOCK_ROUTES__');
   });
 
@@ -160,6 +160,34 @@ describe('createRouteFetchWrapper', () => {
     expect(response.status).toBe(200);
     const json: unknown = await response.json();
     expect(json).toEqual({ message: 'mocked' });
+  });
+
+  test('preserves URLSearchParams request bodies for route handlers', async () => {
+    let capturedBody: string | undefined;
+    const wrapper = createRouteFetchWrapper(
+      undefined,
+      () => ({
+        __MOCK_ROUTES__: [
+          {
+            matcher: '/api/form',
+            handler: (request) => {
+              capturedBody = request.body;
+              return Promise.resolve({
+                type: 'fulfill' as const,
+                response: { status: 200 },
+              });
+            },
+          },
+        ],
+      }),
+    );
+
+    await wrapper('http://localhost/api/form', {
+      method: 'POST',
+      body: new URLSearchParams({ query: 'type safety', page: '2' }),
+    });
+
+    expect(capturedBody).toBe('query=type+safety&page=2');
   });
 
   test('should support RegExp matchers', async () => {

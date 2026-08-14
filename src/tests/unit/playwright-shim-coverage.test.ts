@@ -98,6 +98,39 @@ describe('Playwright Shim Coverage Expansion', () => {
             }
         });
 
+        test('unroute removes only the identical handler for a shared matcher', async () => {
+            const firstHandler = mock((route: Route) =>
+                route.fulfill({ status: 200, body: 'first' }),
+            );
+            const secondHandler = mock((route: Route) =>
+                route.fulfill({ status: 200, body: 'second' }),
+            );
+
+            await page.route('/api/shared', firstHandler);
+            await page.route('/api/shared', secondHandler);
+            await page.unroute('/api/shared', firstHandler);
+
+            const response = await page.request.get('http://localhost/api/shared');
+
+            expect(await response.text()).toBe('second');
+            expect(firstHandler).not.toHaveBeenCalled();
+            expect(secondHandler).toHaveBeenCalledTimes(1);
+        });
+
+        test('exposes URLSearchParams request bodies through postData()', async () => {
+            const captured: { postData?: string | null } = {};
+            await page.route('/api/form', (route, request) => {
+                captured.postData = request.postData();
+                return route.fulfill({ status: 200, body: '{}' });
+            });
+
+            await page.request.post('http://localhost/api/form', {
+                body: new URLSearchParams({ name: 'Ada Lovelace', role: 'admin' }),
+            });
+
+            expect(captured.postData).toBe('name=Ada+Lovelace&role=admin');
+        });
+
         test('should waitForResponse', async () => {
             const waitPromise = page.waitForResponse('/api/data');
             

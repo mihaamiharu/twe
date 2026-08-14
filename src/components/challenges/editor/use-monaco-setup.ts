@@ -48,6 +48,13 @@ function requireObject(value: unknown, name: string): object {
     return value;
 }
 
+function requirePropertyContainer(value: unknown, name: string): object {
+    if ((typeof value !== 'object' || value === null) && typeof value !== 'function') {
+        throw new TypeError(`Monaco ${name} API is unavailable`);
+    }
+    return value;
+}
+
 function requireNumber(value: unknown, name: string): number {
     if (typeof value !== 'number') {
         throw new TypeError(`Monaco ${name} value is unavailable`);
@@ -86,7 +93,7 @@ function createDefaultsAdapter(value: unknown, name: string): TypeScriptDefaults
     };
 }
 
-function createMonacoAdapter(monaco: unknown): MonacoInstance {
+export function createMonacoAdapter(monaco: unknown): MonacoInstance {
     // @monaco-editor/react types its callback against editor.api, while
     // loader.config receives the full Monaco module with language contributions.
     const root = requireObject(monaco, 'root');
@@ -95,7 +102,8 @@ function createMonacoAdapter(monaco: unknown): MonacoInstance {
         Reflect.get(root, 'typescript'),
         'TypeScript contribution',
     );
-    const keyMod = requireObject(Reflect.get(root, 'KeyMod'), 'KeyMod');
+    // Monaco exposes KeyMod as a class/function with static numeric modifiers.
+    const keyMod = requirePropertyContainer(Reflect.get(root, 'KeyMod'), 'KeyMod');
     const keyCode = requireObject(Reflect.get(root, 'KeyCode'), 'KeyCode');
     const scriptTarget = requireObject(
         Reflect.get(typescriptApi, 'ScriptTarget'),

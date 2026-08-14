@@ -50,4 +50,10 @@ describe('attachSentryUserContext', () => {
 
         expect(mockSetUser).not.toHaveBeenCalled();
     });
+
+    it('should not set user context when the contained user is malformed', () => {
+        attachSentryUserContext({ user: { id: 'user-123', email: null } }, mockSentry);
+
+        expect(mockSetUser).not.toHaveBeenCalled();
+    });
 });

@@ -1,13 +1,7 @@
 import { createMiddleware } from '@tanstack/react-start';
 import { getSentryConfig } from '../lib/sentry.config';
 import type * as SentryModule from '@sentry/bun';
-
-interface SentryContext {
-    user?: {
-        id: string;
-        email: string;
-    } | null;
-}
+import { getContainedAuthUser } from './auth-user';
 
 /**
  * Attach user context to Sentry if available
@@ -16,26 +10,13 @@ export function attachSentryUserContext(
     context: unknown,
     Sentry: Pick<typeof SentryModule, 'setUser'>,
 ) {
-    if (isSentryContext(context) && context.user) {
+    const user = getContainedAuthUser(context);
+    if (user) {
         Sentry.setUser({
-            id: context.user.id,
-            email: context.user.email,
+            id: user.id,
+            email: user.email,
         });
     }
-}
-
-function isSentryContext(value: unknown): value is SentryContext {
-    if (typeof value !== 'object' || value === null || !('user' in value)) {
-        return false;
-    }
-    const { user } = value;
-    return user === undefined || user === null || (
-        typeof user === 'object' &&
-        'id' in user &&
-        typeof user.id === 'string' &&
-        'email' in user &&
-        typeof user.email === 'string'
-    );
 }
 
 /**

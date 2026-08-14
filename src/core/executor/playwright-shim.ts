@@ -36,6 +36,25 @@ import type {
   WaitOptions,
 } from './shim.types';
 
+type PageRouteHandler = (
+  route: Route,
+  request: APIRequest,
+) => Promise<void> | void;
+
+interface RegisteredRoute extends RouteMatcher {
+  handlerIdentity: PageRouteHandler;
+}
+
+function routeMatchersEqual(
+  left: string | RegExp | ((url: URL) => boolean),
+  right: string | RegExp | ((url: URL) => boolean),
+): boolean {
+  if (left instanceof RegExp && right instanceof RegExp) {
+    return left.source === right.source && left.flags === right.flags;
+  }
+  return left === right;
+}
+
 /**
  * MockedPlaywrightPage - Implements a subset of Playwright's Page API
  * that works with DOM elements in an iframe.
@@ -50,7 +69,7 @@ export class MockedPlaywrightPage {
   private currentUrl: string = 'about:blank';
   private _context: BrowserContext;
    
-  private routes: RouteMatcher[] = [];
+  private routes: RegisteredRoute[] = [];
 
   // VFS (Virtual File System) for multi-page E2E support
   private vfs: Record<string, string> | null = null;
@@ -366,7 +385,7 @@ export class MockedPlaywrightPage {
 
   async route(
     urlOrPredicate: string | RegExp | ((url: URL) => boolean),
-    handler: (route: Route, request: APIRequest) => Promise<void> | void,
+    handler: PageRouteHandler,
   ): Promise<void> {
     // Register route in global registry on the iframe window
     // The iframe fetch polyfill will read from this
@@ -383,8 +402,9 @@ export class MockedPlaywrightPage {
       Reflect.set(iframeWindow, 'fetch', wrappedFetch);
     }
 
-    const routeEntry = {
+    const routeEntry: RegisteredRoute = {
       matcher: urlOrPredicate,
+      handlerIdentity: handler,
       handler: (requestInfo: RouteRequestInfo) => {
         const route: Route = {
           fulfill: () => Promise.resolve(),
@@ -431,31 +451,30 @@ export class MockedPlaywrightPage {
 
     this.routes.push(routeEntry);
 
-    if (!iframeWindow.__MOCK_ROUTES__) {
-      iframeWindow.__MOCK_ROUTES__ = [];
-    }
-    iframeWindow.__MOCK_ROUTES__.push(routeEntry);
+    iframeWindow.__MOCK_ROUTES__ = this.routes;
     await Promise.resolve();
   }
 
   async unroute(
     urlOrPredicate: string | RegExp | ((url: URL) => boolean),
-    handler?: (route: Route, request: APIRequest) => Promise<void> | void,
+    handler?: PageRouteHandler,
   ): Promise<void> {
-    void handler;
-     
     const iframeWindow = this.targetDocument.defaultView;
-    if (!iframeWindow || !iframeWindow.__MOCK_ROUTES__) return;
 
-    // Remove matching routes
+    const shouldRemove = (route: RegisteredRoute) => {
+      const matcherMatches = routeMatchersEqual(route.matcher, urlOrPredicate);
+      return (
+        matcherMatches &&
+        (handler === undefined || route.handlerIdentity === handler)
+      );
+    };
+
     this.routes = this.routes.filter(
-      (route) => route.matcher.toString() !== urlOrPredicate.toString(),
+      (route) => !shouldRemove(route),
     );
 
-    iframeWindow.__MOCK_ROUTES__ = iframeWindow.__MOCK_ROUTES__.filter(
-      (route) => route.matcher.toString() !== urlOrPredicate.toString(),
-    );
-     
+    if (iframeWindow) iframeWindow.__MOCK_ROUTES__ = this.routes;
+
     await Promise.resolve();
   }
 

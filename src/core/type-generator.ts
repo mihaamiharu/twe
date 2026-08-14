@@ -46,9 +46,7 @@ export function generateTypeDefinitions(
 
     declare interface LocatorFilterOptions {
       has?: Locator;
-      hasNot?: Locator;
       hasText?: string | RegExp;
-      hasNotText?: string | RegExp;
     }
 
     declare interface LocatorQueryOptions {
@@ -103,7 +101,7 @@ export function generateTypeDefinitions(
       getByLabel(text: string | RegExp, options?: LocatorQueryOptions): Locator;
       getByPlaceholder(text: string | RegExp, options?: LocatorQueryOptions): Locator;
       getByTitle(text: string | RegExp, options?: LocatorQueryOptions): Locator;
-      getByTestId(text: string | RegExp): Locator;
+      getByTestId(testId: string): Locator;
       click(selector: string, options?: ClickOptions): Promise<void>;
       fill(selector: string, value: string, options?: FillOptions): Promise<void>;
       check(selector: string, options?: ActionOptions): Promise<void>;
@@ -162,6 +160,12 @@ export function generateTypeDefinitions(
   // We need to parse the source files to extract class signatures
   if (preloadModules) {
     let moduleDefs = '';
+    const configuredClasses = new Set(
+      Object.entries(preloadModules).flatMap(([moduleName, config]) => [
+        moduleName,
+        ...config.exports,
+      ]),
+    );
 
     Object.entries(preloadModules).forEach(([moduleName, config]) => {
       const sourcePath = config.source;
@@ -194,12 +198,21 @@ export function generateTypeDefinitions(
           // async method(arg1, arg2) 
           const methodRegex = /async\s+(\w+)\s*\(([^)]*)\)/g;
           let methods = '';
-          let methodMatch;
-          while ((methodMatch = methodRegex.exec(body)) !== null) {
+          const methodMatches = Array.from(body.matchAll(methodRegex));
+          methodMatches.forEach((methodMatch, index) => {
             const methodName = methodMatch[1];
             const args = methodMatch[2].split(',').filter(a => a.trim()).map(a => a.trim() + ': unknown').join(', ');
-            methods += `  ${methodName}(${args}): Promise<void>;\n`; // Assume void return for actions usually
-          }
+            const methodBodyStart = (methodMatch.index ?? 0) + methodMatch[0].length;
+            const methodBodyEnd = methodMatches[index + 1]?.index ?? body.length;
+            const methodBody = body.slice(methodBodyStart, methodBodyEnd);
+            const constructedReturn = /\breturn\s+new\s+([A-Za-z_$][\w$]*)\s*\(/.exec(methodBody)?.[1];
+            const returnType = constructedReturn && configuredClasses.has(constructedReturn)
+              ? constructedReturn
+              : /\breturn\b/.test(methodBody)
+                ? 'unknown'
+                : 'void';
+            methods += `  ${methodName}(${args}): Promise<${returnType}>;\n`;
+          });
 
           moduleDefs += `
             declare class ${moduleName} {

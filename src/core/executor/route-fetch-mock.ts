@@ -43,6 +43,21 @@ export interface RouteWindow {
   __MOCK_ROUTES__?: RouteMatcher[];
 }
 
+export async function requestBodyToPostData(
+  body: BodyInit | null | undefined,
+): Promise<string | null> {
+  if (body === undefined || body === null) return null;
+
+  try {
+    return await new Response(body).text();
+  } catch (error) {
+    const detail = error instanceof Error ? `: ${error.message}` : '';
+    throw new TypeError(`Unsupported request body for page.route${detail}`, {
+      cause: error,
+    });
+  }
+}
+
 /**
  * Generate the fetch polyfill code as a string for inline script injection.
  *
@@ -112,7 +127,7 @@ export function generateFetchPolyfillCode(options: {
     : `return Promise.resolve({ ok: true, status: 404, json: () => Promise.resolve({}) });`;
 
   return `
-            window.fetch = function(input, init) {
+            window.fetch = async function(input, init) {
                 let url = input;
                 if (typeof input === 'string') {
                     if (input.startsWith('/')) {
@@ -120,11 +135,11 @@ export function generateFetchPolyfillCode(options: {
                     } else if (input.startsWith('http')) {
                         url = input;
                     }
-                }${includeArrayBuffer || includeStatusText ? ` else if (input instanceof Request) {
+                } else if (input instanceof Request) {
                     url = input.url;
                 } else if (input && typeof input === 'object' && 'toString' in input) {
                     url = input.toString();
-                }` : ''}
+                }
 
                 if (window.__MOCK_ROUTES__) {
                     for (const route of window.__MOCK_ROUTES__) {
@@ -142,11 +157,21 @@ export function generateFetchPolyfillCode(options: {
 
                         if (isMatch) {
                             console.log('Mocking fetch via page.route to ' + url);
+                            let body = null;
+                            if (init?.body !== undefined && init.body !== null) {
+                                try {
+                                    body = await new Response(init.body).text();
+                                } catch (error) {
+                                    throw new TypeError('Unsupported request body for page.route', { cause: error });
+                                }
+                            } else if (input instanceof Request && input.body !== null) {
+                                body = await input.clone().text();
+                            }
                             const requestInfo = {
                                 url,
-                                method: init?.method || 'GET',
-                                headers: init?.headers || {},
-                                body: init?.body
+                                method: init?.method || (input instanceof Request ? input.method : 'GET'),
+                                headers: init?.headers || (input instanceof Request ? input.headers : {}),
+                                body
                             };
 
                             return route.handler(requestInfo).then(result => {
@@ -180,7 +205,7 @@ export function createRouteFetchWrapper(
   originalFetch: BrowserFetch | undefined,
   getWindow: () => RouteWindow | undefined,
 ): BrowserFetch {
-  const wrappedFetch: BrowserFetch = (input, init) => {
+  const wrappedFetch: BrowserFetch = async (input, init) => {
     let url: string;
     if (typeof input === 'string') {
       url = input.startsWith('/') ? 'http://localhost' + input : input;
@@ -210,24 +235,36 @@ export function createRouteFetchWrapper(
         }
 
         if (isMatch) {
+          const headersInit = init?.headers ??
+            (input instanceof Request ? input.headers : undefined);
+          const headers = headersInit
+            ? Object.fromEntries(new Headers(headersInit).entries())
+            : undefined;
+          const requestBody = init?.body !== undefined
+            ? init.body
+            : input instanceof Request && input.body !== null
+              ? await input.clone().text()
+              : null;
+          const body = typeof requestBody === 'string'
+            ? requestBody
+            : await requestBodyToPostData(requestBody);
+
           return route
             .handler({
               url,
-              method: init?.method || 'GET',
-              headers: init?.headers
-                ? Object.fromEntries(new Headers(init.headers).entries())
-                : undefined,
-              body: typeof init?.body === 'string' ? init.body : undefined,
+              method: init?.method || (input instanceof Request ? input.method : 'GET'),
+              headers,
+              body: body ?? undefined,
             })
             .then((r) => {
               if (r?.type === 'fulfill') {
-              const body =
-                r.response?.body || JSON.stringify(r.response?.json || {});
-              return new Response(body, {
-                status: r.response?.status || 200,
-                statusText: r.response?.statusText || 'OK',
-                headers: r.response?.headers || {},
-              });
+                const body =
+                  r.response?.body || JSON.stringify(r.response?.json || {});
+                return new Response(body, {
+                  status: r.response?.status || 200,
+                  statusText: r.response?.statusText || 'OK',
+                  headers: r.response?.headers || {},
+                });
               }
               return Promise.reject(new Error('Route not fulfilled'));
             });

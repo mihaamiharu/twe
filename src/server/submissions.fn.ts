@@ -20,7 +20,7 @@ import {
 } from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { getRawChallengeContent } from './content.server';
-import type { TestCaseDefinition } from '@/lib/content.types';
+import type { JsonValue, TestCaseDefinition } from '@/lib/content.types';
 import { ensureEntityInDb } from './ensure-entity-in-db';
 
 // ----------------------------------------------------------------------------
@@ -49,7 +49,9 @@ const getErrorMessage = (key: string, locale: string) => {
 // CREATE SUBMISSION
 // ----------------------------------------------------------------------------
 
-const CreateSubmissionSchema = z.object({
+export const JsonValueSchema: z.ZodType<JsonValue> = z.json();
+
+export const CreateSubmissionSchema = z.object({
   challengeSlug: z.string().min(1, 'Challenge slug is required'),
   code: z.string().min(1, 'Code is required'),
   isPractice: z.boolean().optional().default(false),
@@ -57,7 +59,7 @@ const CreateSubmissionSchema = z.object({
     z.object({
       testCaseId: z.string().uuid().optional(),
       passed: z.boolean(),
-      output: z.unknown().optional(),
+      output: JsonValueSchema.optional(),
       error: z.string().optional(),
     }),
   ),

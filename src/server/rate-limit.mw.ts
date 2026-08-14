@@ -12,6 +12,7 @@
 
 import { createMiddleware } from '@tanstack/react-start';
 import { getRequest } from '@tanstack/react-start/server';
+import { getContainedAuthUser } from './auth-user';
 
 
 interface RateLimitEntry {
@@ -81,7 +82,7 @@ export function createRateLimitMiddleware(options: {
         const headers = getRequest().headers;
 
         // We try to get userId from context (if authMiddleware ran before this)
-        const userId = getContextUserId(context);
+        const userId = getContainedAuthUser(context)?.id;
 
         const identifier = getClientIdentifier(headers, userId);
         const storeKey = `${options.key}:${identifier}`;
@@ -113,15 +114,4 @@ export function createRateLimitMiddleware(options: {
         // Proceed
         return next();
     });
-}
-
-function getContextUserId(context: unknown): string | undefined {
-    if (typeof context !== 'object' || context === null || !('user' in context)) {
-        return undefined;
-    }
-    const { user } = context;
-    if (typeof user !== 'object' || user === null || !('id' in user)) {
-        return undefined;
-    }
-    return typeof user.id === 'string' ? user.id : undefined;
 }

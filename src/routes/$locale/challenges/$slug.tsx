@@ -28,6 +28,7 @@ import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 import { transformChallengeResponse } from '@/lib/transform-challenge-response';
+import type { JsonValue } from '@/lib/content.types';
 
 import i18n from '@/lib/i18n';
 
@@ -232,7 +233,7 @@ function ChallengeDetailPage() {
       testResults: {
         testCaseId?: string;
         passed: boolean;
-        output?: unknown;
+        output?: JsonValue;
         error?: string;
       }[];
       executionTime?: number;

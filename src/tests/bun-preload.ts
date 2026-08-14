@@ -37,61 +37,26 @@ interface MotionOnlyProps {
     variants?: unknown;
 }
 
-const MotionDiv = React.forwardRef<
-    HTMLDivElement,
-    React.ComponentPropsWithoutRef<'div'> & MotionOnlyProps
->(function MotionDiv({ layout, layoutId, initial, animate, exit, transition, variants, ...props }, ref) {
-    void layout;
-    void layoutId;
-    void initial;
-    void animate;
-    void exit;
-    void transition;
-    void variants;
-    return React.createElement('div', { ...props, ref });
-});
+function createMotionMock<Tag extends keyof React.JSX.IntrinsicElements>(tag: Tag) {
+    return React.forwardRef<
+        React.ComponentRef<Tag>,
+        React.ComponentPropsWithoutRef<Tag> & MotionOnlyProps
+    >(function MotionMock({ layout, layoutId, initial, animate, exit, transition, variants, ...props }, ref) {
+        void layout;
+        void layoutId;
+        void initial;
+        void animate;
+        void exit;
+        void transition;
+        void variants;
+        return React.createElement(tag, { ...props, ref });
+    });
+}
 
-const MotionTr = React.forwardRef<
-    HTMLTableRowElement,
-    React.ComponentPropsWithoutRef<'tr'> & MotionOnlyProps
->(function MotionTr({ layout, layoutId, initial, animate, exit, transition, variants, ...props }, ref) {
-    void layout;
-    void layoutId;
-    void initial;
-    void animate;
-    void exit;
-    void transition;
-    void variants;
-    return React.createElement('tr', { ...props, ref });
-});
-
-const MotionSpan = React.forwardRef<
-    HTMLSpanElement,
-    React.ComponentPropsWithoutRef<'span'> & MotionOnlyProps
->(function MotionSpan({ layout, layoutId, initial, animate, exit, transition, variants, ...props }, ref) {
-    void layout;
-    void layoutId;
-    void initial;
-    void animate;
-    void exit;
-    void transition;
-    void variants;
-    return React.createElement('span', { ...props, ref });
-});
-
-const MotionPath = React.forwardRef<
-    SVGPathElement,
-    React.ComponentPropsWithoutRef<'path'> & MotionOnlyProps
->(function MotionPath({ layout, layoutId, initial, animate, exit, transition, variants, ...props }, ref) {
-    void layout;
-    void layoutId;
-    void initial;
-    void animate;
-    void exit;
-    void transition;
-    void variants;
-    return React.createElement('path', { ...props, ref });
-});
+const MotionDiv = createMotionMock('div');
+const MotionTr = createMotionMock('tr');
+const MotionSpan = createMotionMock('span');
+const MotionPath = createMotionMock('path');
 
 void mock.module(
 'framer-motion', () => ({
