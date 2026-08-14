@@ -11,7 +11,7 @@ const isSkipped = !process.env.BUN_RUN_SKIPPED;
 
 const renderWithTheme = (ui: React.ReactElement) => {
     return render(
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <ThemeProvider>
             {ui}
         </ThemeProvider>
     );

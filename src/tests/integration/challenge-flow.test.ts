@@ -80,16 +80,12 @@ describe('Challenge Flow Integration', () => {
         // Seed Challenge
         await db.insert(challenges).values({
             id: '00000000-0000-0000-0000-000000000101',
-            title: 'Test Challenge',
+            title: { en: 'Test Challenge' },
             slug: 'test-challenge',
             type: 'JAVASCRIPT',
             xpReward: 100,
             difficulty: 'EASY',
             order: 1,
-            description: 'test description',
-            instructions: 'test instructions',
-            htmlContent: '<div></div>',
-            starterCode: '',
             isPublished: true,
             completionCount: 0
         });
@@ -116,12 +112,15 @@ describe('Challenge Flow Integration', () => {
             isPractice: false
         };
 
-        const result: any = await challengeSubmissionHandler({ 
+        const result = await challengeSubmissionHandler({
             data: input,
             context: { user: { id: testUserId } }
         });
 
         expect(result.success).toBe(true);
+        if (!result.success || !result.data) {
+            throw new Error(result.error ?? 'Submission returned no data');
+        }
         expect(result.data.isFirstCompletion).toBe(true);
         expect(result.data.submission.xpEarned).toBe(100);
 
@@ -147,12 +146,15 @@ describe('Challenge Flow Integration', () => {
             isPractice: false
         };
 
-        const result: any = await challengeSubmissionHandler({ 
+        const result = await challengeSubmissionHandler({
             data: input,
             context: { user: { id: testUserId } }
         });
 
         expect(result.success).toBe(true); // Request success, but submission failed
+        if (!result.success || !result.data) {
+            throw new Error(result.error ?? 'Submission returned no data');
+        }
         expect(result.data.submission.isPassed).toBe(false);
 
         // Verify DB

@@ -1,6 +1,5 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import * as React from 'react';
 
 // ============================================================
 // Inline stubs for the dialog components under test.

@@ -117,10 +117,13 @@ describe('createRouteFetchWrapper', () => {
     } as unknown as Window & Record<string, unknown>;
 
     let originalCalled = false;
-    const originalFetch = () => {
-      originalCalled = true;
-      return Promise.resolve(new Response(null, { status: 200 }));
-    };
+    const originalFetch: typeof fetch = Object.assign(
+      () => {
+        originalCalled = true;
+        return Promise.resolve(new Response(null, { status: 200 }));
+      },
+      { preconnect: globalThis.fetch.preconnect },
+    );
 
     const wrapper = createRouteFetchWrapper(
       originalFetch,

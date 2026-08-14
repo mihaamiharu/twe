@@ -8,7 +8,7 @@ interface TestCase {
   isHidden?: boolean;
 }
 
-interface ServerChallengeData {
+export interface ServerChallengeData {
   id: string;
   slug: string;
   title: string;

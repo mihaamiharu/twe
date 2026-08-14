@@ -6,7 +6,7 @@ describe('ensureEntityInDb', () => {
     const existing = { id: '1', slug: 'my-slug' };
     const findExisting = mock(() => Promise.resolve(existing));
     const fetchContent = mock(() => Promise.resolve(null));
-    const insert = mock(() => Promise.resolve(null as any));
+    const insert = mock(() => Promise.resolve(existing));
 
     const result = await ensureEntityInDb({
       slug: 'my-slug',
@@ -45,7 +45,9 @@ describe('ensureEntityInDb', () => {
   test('returns null when content not found on filesystem', async () => {
     const findExisting = mock(() => Promise.resolve(undefined));
     const fetchContent = mock(() => Promise.resolve(null));
-    const insert = mock(() => Promise.resolve(null as any));
+    const insert = mock(() =>
+      Promise.resolve({ id: 'unused', slug: 'unused' }),
+    );
 
     const result = await ensureEntityInDb({
       slug: 'missing-slug',
@@ -61,7 +63,9 @@ describe('ensureEntityInDb', () => {
   test('retries findExisting on insert failure (race condition)', async () => {
     const existing = { id: '3', slug: 'race-slug' };
 
-    const findExisting = mock(() => Promise.resolve(undefined));
+    const findExisting = mock(
+      (): Promise<typeof existing | undefined> => Promise.resolve(undefined),
+    );
     // On second call, return the entity (simulating another request inserted it)
     findExisting.mockImplementation(() => {
       if (findExisting.mock.calls.length > 1) {
@@ -137,7 +141,9 @@ describe('ensureEntityInDb', () => {
       Promise.resolve({ id: '5', slug: 'existing' }),
     );
     const fetchContent = mock(() => Promise.resolve(null));
-    const insert = mock(() => Promise.resolve(null as any));
+    const insert = mock(() =>
+      Promise.resolve({ id: 'unused', slug: 'unused' }),
+    );
 
     await ensureEntityInDb({
       slug: 'existing',

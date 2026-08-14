@@ -32,8 +32,11 @@ describe('TypeScript Transpiler', () => {
         
         try {
             await initEsbuild();
-        } catch (e) {
-            expect(e.message).toBe('init fail');
+        } catch (error) {
+            if (!(error instanceof Error)) {
+                throw error;
+            }
+            expect(error.message).toBe('init fail');
         }
         
         (globalThis as any).window = originalWindow;

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'bun:test';
 import { transformChallengeResponse } from '@/lib/transform-challenge-response';
+import type { ServerChallengeData } from '@/lib/transform-challenge-response';
 
 describe('transformChallengeResponse', () => {
     const mockServerData = {
@@ -28,7 +29,7 @@ describe('transformChallengeResponse', () => {
         userProgress: null,
         nextChallenge: null,
         prevChallenge: null,
-    };
+    } satisfies ServerChallengeData;
 
     it('should transform server response to challenge shape', () => {
         const result = transformChallengeResponse(mockServerData, mockServerData.testCases);

@@ -1,4 +1,4 @@
-import { executePlaywrightCode } from '../lib/iframe-executor';
+import { executePlaywrightCode } from '../core/executor/iframe-executor';
 
 // Mock browser APIs
 if (typeof window === 'undefined') {

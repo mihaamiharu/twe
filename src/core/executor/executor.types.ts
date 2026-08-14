@@ -34,8 +34,7 @@ export interface TestCaseResult {
     error?: string;
 }
 
-export interface ExpectResult {
-    expect: ((actual: unknown) => {
+export interface ExpectMatchers {
         // Generic Assertions
         toBe: (expected: unknown) => Promise<void>;
         toEqual: (expected: unknown) => Promise<void>;
@@ -74,10 +73,16 @@ export interface ExpectResult {
         toHaveTitle: (title: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveURL: (url: string | RegExp, options?: { timeout?: number }) => Promise<void>;
 
-        not: unknown; // Runtime matcher collection is built dynamically.
-    }) & {
-        soft: (actual: unknown) => unknown;
-    };
+        not: ExpectMatchers;
+}
+
+export interface ExpectFunction {
+    (actual: unknown): ExpectMatchers;
+    soft: (actual: unknown) => ExpectMatchers;
+}
+
+export interface ExpectResult {
+    expect: ExpectFunction;
     getAssertionCount: () => number;
     getTestResults: () => Array<{ message: string; passed: boolean }>;
 }

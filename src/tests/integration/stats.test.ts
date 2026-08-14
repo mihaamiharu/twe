@@ -27,47 +27,37 @@ describe('Stats Integration', () => {
       level: 1,
     });
 
-    await db.insert(challenges).values([
+    const challengeFixtures = [
       {
         id: '00000000-0000-0000-0000-000000000101',
-        title: 'CSS Help',
+        title: { en: 'CSS Help' },
         slug: 'css-help',
         type: 'CSS_SELECTOR',
         xpReward: 50,
         difficulty: 'EASY',
         order: 1,
-        description: 'test description',
-        instructions: 'test instructions',
-        htmlContent: '<div></div>',
-        starterCode: '',
       },
       {
         id: '00000000-0000-0000-0000-000000000102',
-        title: 'XPath Master',
+        title: { en: 'XPath Master' },
         slug: 'xpath-master',
         type: 'XPATH_SELECTOR',
         xpReward: 50,
         difficulty: 'EASY',
         order: 2,
-        description: 'test description',
-        instructions: 'test instructions',
-        htmlContent: '<div></div>',
-        starterCode: '',
       },
       {
         id: '00000000-0000-0000-0000-000000000103',
-        title: 'JS Intro',
+        title: { en: 'JS Intro' },
         slug: 'js-intro',
         type: 'JAVASCRIPT',
         xpReward: 50,
         difficulty: 'EASY',
         order: 3,
-        description: 'test description',
-        instructions: 'test instructions',
-        htmlContent: '<div></div>',
-        starterCode: '',
       },
-    ]);
+    ] satisfies (typeof challenges.$inferInsert)[];
+
+    await db.insert(challenges).values(challengeFixtures);
   });
 
   test('should calculate stats correctly for a user with completions', async () => {
@@ -127,8 +117,8 @@ describe('Stats Integration', () => {
     await db.insert(achievements).values({
       id: achievementId,
       slug: 'first-challenge',
-      name: 'First Challenge',
-      description: 'Completed your first challenge',
+      name: { en: 'First Challenge' },
+      description: { en: 'Completed your first challenge' },
       icon: '🏆',
       category: 'challenges',
       requirementType: 'challenge_count',

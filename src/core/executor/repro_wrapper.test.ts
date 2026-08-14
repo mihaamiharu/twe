@@ -62,7 +62,7 @@ describe('Executor Logic with Wrapper', () => {
     });
 
     it('captures assertions at top level (unwrapped)', async () => {
-        const result = await simulateExecutor(async (test, expect) => {
+        const result = await simulateExecutor(async (_test, expect) => {
              await expect('actual').toHaveText('actual', { timeout: 50 });
         });
 

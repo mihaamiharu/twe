@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { difficultyColors } from '@/lib/constants';
-import type { TFunction } from 'i18next';
 
 export interface ChallengeListCardProps {
   challenge: {
@@ -33,7 +32,7 @@ export interface ChallengeListCardProps {
   isComingSoon: boolean;
   isBoss: boolean;
   params: { locale: string; slug: string };
-  t: TFunction;
+  t: (key: string) => string;
 }
 
 export function ChallengeListCard({

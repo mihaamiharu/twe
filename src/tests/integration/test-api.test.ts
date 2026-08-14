@@ -4,9 +4,9 @@ import { users, challenges, tutorials } from '../../db/schema';
 import { truncateTables } from './setup';
 import { eq } from 'drizzle-orm';
 
-import { Route as teardownRoute } from '../../routes/api/test/teardown-user';
-import { Route as resetRoute } from '../../routes/api/test/reset-progress';
-import { Route as setProgressRoute } from '../../routes/api/test/set-progress';
+import { handleTeardownUserRequest } from '../../routes/api/test/teardown-user';
+import { handleResetProgressRequest } from '../../routes/api/test/reset-progress';
+import { handleSetProgressRequest } from '../../routes/api/test/set-progress';
 
 const TEST_SECRET = 'test-secret-123';
 const TEST_EMAIL = 'e2e-tester@example.com';
@@ -61,7 +61,7 @@ describe('E2E Test Support APIs', () => {
   });
 
   // Helper builder
-  function buildRequest(body: any, secret: string = TEST_SECRET) {
+  function buildRequest(body: unknown, secret: string = TEST_SECRET) {
     const req = new Request('http://localhost/api/test', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -75,20 +75,18 @@ describe('E2E Test Support APIs', () => {
 
   describe('Security Gates', () => {
     test('rejects request without correct secret header', async () => {
-      const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL }, 'wrong-secret');
       
-      const res = await handler({ request: req });
+      const res = await handleTeardownUserRequest(req);
       expect(res.status).toBe(403);
     });
 
     test('rejects request if NODE_ENV is not test', async () => {
-      const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       
       const origEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
-      const res = await handler({ request: req });
+      const res = await handleTeardownUserRequest(req);
       process.env.NODE_ENV = origEnv;
       
       expect(res.status).toBe(403);
@@ -97,10 +95,9 @@ describe('E2E Test Support APIs', () => {
 
   describe('Teardown User API', () => {
     test('successfully deletes an existing user', async () => {
-      const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       
-      const res = await handler({ request: req });
+      const res = await handleTeardownUserRequest(req);
       expect(res.status).toBe(200);
 
       const user = await db.query.users.findFirst({ where: eq(users.email, TEST_EMAIL) });
@@ -110,11 +107,9 @@ describe('E2E Test Support APIs', () => {
 
   describe('Set & Reset Progress APIs', () => {
     test('sets challenge progress correctly and grants XP', async () => {
-      // @ts-expect-error - reaching into internal handlers
-      const handler = setProgressRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 });
       
-      const res = await handler({ request: req });
+      const res = await handleSetProgressRequest(req);
       expect(res.status).toBe(200);
 
       // Verify db
@@ -133,15 +128,11 @@ describe('E2E Test Support APIs', () => {
 
     test('resets all challenge progress and resets user XP', async () => {
       // Setup: set progress first
-      // @ts-expect-error - reaching into internal handlers
-      const setHandler = setProgressRoute.options.server.handlers.POST;
-      await setHandler({ request: buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 }) });
+      await handleSetProgressRequest(buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 }));
       
       // Reset
-      // @ts-expect-error - reaching into internal handlers
-      const resetHandler = resetRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL, type: 'challenge' }); // null slug means all 
-      const res = await resetHandler({ request: req });
+      const res = await handleResetProgressRequest(req);
       expect(res.status).toBe(200);
 
       // Verify wiped
