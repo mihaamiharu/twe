@@ -110,9 +110,9 @@ export function transformChallengeResponse(
     xp: data.xpReward,
     instructions: data.instructions,
     htmlContent: data.htmlContent || '',
-    files: data.files,
-    editableFiles: data.editableFiles,
-    preloadModules: data.preloadModules,
+    ...(data.files === undefined ? {} : { files: data.files }),
+    ...(data.editableFiles === undefined ? {} : { editableFiles: data.editableFiles }),
+    ...(data.preloadModules === undefined ? {} : { preloadModules: data.preloadModules }),
     starterCode: data.starterCode || '',
     targetSelector: extractTargetSelector(testCases),
     testCases: testCases.map((tc) => ({
@@ -121,11 +121,17 @@ export function transformChallengeResponse(
       input: tc.input,
       expectedOutput: tc.expectedOutput,
     })),
-    hints: data.hints,
+    ...(data.hints === undefined ? {} : { hints: data.hints }),
     category: data.category,
     isCompleted: data.userProgress?.isCompleted || false,
-    tutorial: data.tutorial ?? undefined,
-    nextChallenge: data.nextChallenge ?? undefined,
-    prevChallenge: data.prevChallenge ?? undefined,
+    ...(data.tutorial === null || data.tutorial === undefined
+      ? {}
+      : { tutorial: data.tutorial }),
+    ...(data.nextChallenge === null || data.nextChallenge === undefined
+      ? {}
+      : { nextChallenge: data.nextChallenge }),
+    ...(data.prevChallenge === null || data.prevChallenge === undefined
+      ? {}
+      : { prevChallenge: data.prevChallenge }),
   };
 }

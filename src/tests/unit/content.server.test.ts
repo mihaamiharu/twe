@@ -68,4 +68,39 @@ describe('Content Server', () => {
       'content/challenges/broken.json',
     )).toThrow(/content\/challenges\/broken\.json.*challenges\.0\.solution/);
   });
+
+  it('preserves absent optional properties in validated JSON content', () => {
+    const registry = parseTutorialRegistryJson(JSON.stringify({
+      tutorials: [{
+        slug: 'intro',
+        order: 1,
+        estimatedMinutes: 5,
+        tags: [],
+      }],
+    }), 'tutorials/test-registry.json');
+    expect('relatedChallenges' in registry.tutorials[0]).toBe(false);
+    expect('nextTutorialSlug' in registry.tutorials[0]).toBe(false);
+    expect('status' in registry.tutorials[0]).toBe(false);
+
+    const tier = parseChallengeTierJson(JSON.stringify({
+      tier: 'basic',
+      challenges: [{
+        slug: 'minimal',
+        type: 'JAVASCRIPT',
+        difficulty: 'EASY',
+        category: 'javascript',
+        xpReward: 10,
+        order: 1,
+        title: { en: 'Minimal' },
+        description: { en: 'Minimal challenge' },
+        instructions: { en: 'Return true' },
+        testCases: [],
+        solution: 'return true;',
+      }],
+    }), 'content/challenges/test-tier.json');
+    const challenge = tier.challenges[0];
+    expect('tutorialSlug' in challenge).toBe(false);
+    expect('htmlContent' in challenge).toBe(false);
+    expect('id' in challenge.title).toBe(false);
+  });
 });

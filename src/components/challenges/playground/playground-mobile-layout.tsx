@@ -125,7 +125,9 @@ export function PlaygroundMobileLayout({
                                     <div className="flex-1 overflow-hidden p-2">
                                         <FileExplorer
                                             files={challenge.files}
-                                            editableFiles={challenge.editableFiles}
+                                            {...(challenge.editableFiles === undefined
+                                                ? {}
+                                                : { editableFiles: challenge.editableFiles })}
                                             selectedFile={currentVfsPath}
                                             onSelectFile={(path) => {
                                                 handleSelectFile(path);
@@ -224,7 +226,7 @@ export function PlaygroundMobileLayout({
                                                 ? e2eSelectorStyles
                                                 : defaultSelectorStyles
                                         }
-                                        userSelector={isSelectorChallenge ? selector : undefined}
+                                        {...(isSelectorChallenge ? { userSelector: selector } : {})}
                                         selectorType={selectorType as SelectorType}
                                         targetSelector={challenge.targetSelector as string}
                                         targetSelectorType={
@@ -235,7 +237,7 @@ export function PlaygroundMobileLayout({
                                         showControls={true}
                                         height="100%"
                                         iframeRef={previewIframeRef}
-                                        files={challenge.files}
+                                        {...(challenge.files === undefined ? {} : { files: challenge.files })}
                                         currentPath={currentVfsPath}
                                         onNavigate={(path) => setCurrentVfsPath(path)}
                                     />

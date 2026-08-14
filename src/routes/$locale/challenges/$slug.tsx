@@ -257,12 +257,14 @@ function ChallengeDetailPage() {
         setLastSubmissionResult({
           xpEarned: response.data.submission.xpEarned,
           achievements: response.data.newAchievements || [],
-          levelUp: response.data.levelUp
+          ...(response.data.levelUp
             ? {
-              newLevel: response.data.levelUp.newLevel,
-              title: getLevelTitle(response.data.levelUp.newLevel),
+              levelUp: {
+                newLevel: response.data.levelUp.newLevel,
+                title: getLevelTitle(response.data.levelUp.newLevel),
+              },
             }
-            : undefined,
+            : {}),
         });
         setShowSuccessDialog(true);
 
@@ -340,13 +342,12 @@ function ChallengeDetailPage() {
         code: data.code,
         isPractice: challenge.isCompleted, // Auto-detect practice mode
         testResults: data.testResults.map((tr) => ({
-          testCaseId:
-            tr.id !== 'main' && tr.id !== 'selector' ? tr.id : undefined,
+          ...(tr.id !== 'main' && tr.id !== 'selector' ? { testCaseId: tr.id } : {}),
           passed: tr.passed,
-          output: tr.output,
-          error: tr.error,
+          ...(tr.output === undefined ? {} : { output: tr.output }),
+          ...(tr.error === undefined ? {} : { error: tr.error }),
         })),
-        executionTime: data.executionTime,
+        ...(data.executionTime === undefined ? {} : { executionTime: data.executionTime }),
         locale,
       };
 
@@ -414,7 +415,7 @@ function ChallengeDetailPage() {
           key={challenge.id}
           challenge={challenge}
           onSubmit={handleSubmit}
-          userId={userId}
+          {...(userId === undefined ? {} : { userId })}
           hintUsed={data?.data?.userProgress?.usedHint || false}
           initialHintContent={data?.data?.userProgress?.hintContent || null}
         />
@@ -427,19 +428,21 @@ function ChallengeDetailPage() {
           onClose={() => setShowSuccessDialog(false)}
           xpEarned={lastSubmissionResult.xpEarned}
           achievements={lastSubmissionResult.achievements}
-          levelUp={lastSubmissionResult.levelUp}
+          {...(lastSubmissionResult.levelUp === undefined
+            ? {}
+            : { levelUp: lastSubmissionResult.levelUp })}
           onRetry={() => setShowSuccessDialog(false)}
-          onNextChallenge={
-            data?.data?.nextChallenge
-              ? () => {
+          {...(data?.data?.nextChallenge
+            ? {
+              onNextChallenge: () => {
                 setShowSuccessDialog(false);
                 void navigate({
                   to: '/$locale/challenges/$slug',
                   params: { locale, slug: data.data?.nextChallenge?.slug ?? '' },
                 });
-              }
-              : undefined
-          }
+              },
+            }
+            : {})}
         />
       )}
 

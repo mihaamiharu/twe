@@ -51,7 +51,7 @@ export const Route = createFileRoute('/$locale/tutorials/')({
     return context.queryClient.ensureQueryData(
       tutorialsListQueryOptions({
         locale: params.locale,
-        search: search.q,
+        ...(search.q === undefined ? {} : { search: search.q }),
         limit: 50,
       }),
     );
@@ -107,7 +107,7 @@ function TutorialsPage() {
   const { data: tutorialsResponse } = useSuspenseQuery(
     tutorialsListQueryOptions({
       locale,
-      search: q || undefined,
+      ...(q ? { search: q } : {}),
       limit: 50,
     }),
   );

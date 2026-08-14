@@ -181,7 +181,7 @@ export function usePlaygroundState({
         setRevealedHintsCount,
         isCodeChallenge,
         isSelectorChallenge,
-        extraLibs,
+        ...(extraLibs === undefined ? {} : { extraLibs }),
         locale,
         t,
     };

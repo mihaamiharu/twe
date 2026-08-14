@@ -1,8 +1,14 @@
 import { z } from 'zod';
 import { formatZodIssues } from '@/lib/zod-errors';
 import type {
+  ChallengeDefinition,
   ChallengeTierFile,
+  ExpectedStateRule,
+  LocalizedArray,
+  LocalizedString,
+  TestCaseDefinition,
   TutorialRegistry,
+  TutorialRegistryEntry,
 } from '@/lib/content.types';
 
 const ContentStatusSchema = z.enum(['published', 'draft', 'coming_soon']);
@@ -92,6 +98,105 @@ const ChallengeTierFileSchema = z.object({
   challenges: z.array(ChallengeDefinitionSchema),
 }).strict();
 
+function normalizeLocalizedString(
+  value: z.infer<typeof LocalizedStringSchema>,
+): LocalizedString {
+  return {
+    en: value.en,
+    ...(value.id === undefined ? {} : { id: value.id }),
+  };
+}
+
+function normalizeLocalizedArray(
+  value: z.infer<typeof LocalizedArraySchema>,
+): LocalizedArray {
+  return {
+    en: value.en,
+    ...(value.id === undefined ? {} : { id: value.id }),
+  };
+}
+
+function normalizeExpectedState(
+  value: z.infer<typeof ExpectedStateSchema>,
+): ExpectedStateRule {
+  return {
+    selector: value.selector,
+    ...(value.visible === undefined ? {} : { visible: value.visible }),
+    ...(value.hidden === undefined ? {} : { hidden: value.hidden }),
+    ...(value.containsText === undefined ? {} : { containsText: value.containsText }),
+    ...(value.hasAttribute === undefined
+      ? {}
+      : {
+          hasAttribute: {
+            name: value.hasAttribute.name,
+            ...(value.hasAttribute.value === undefined
+              ? {}
+              : { value: value.hasAttribute.value }),
+          },
+        }),
+    ...(value.count === undefined ? {} : { count: value.count }),
+  };
+}
+
+function normalizeTestCase(
+  value: z.infer<typeof ChallengeDefinitionSchema>['testCases'][number],
+): TestCaseDefinition {
+  return {
+    description: value.description,
+    ...(value.input === undefined ? {} : { input: value.input }),
+    expectedOutput: value.expectedOutput,
+    ...(value.isHidden === undefined ? {} : { isHidden: value.isHidden }),
+  };
+}
+
+function normalizeChallengeDefinition(
+  value: z.infer<typeof ChallengeDefinitionSchema>,
+): ChallengeDefinition {
+  return {
+    slug: value.slug,
+    type: value.type,
+    difficulty: value.difficulty,
+    category: value.category,
+    xpReward: value.xpReward,
+    order: value.order,
+    ...(value.tutorialSlug === undefined ? {} : { tutorialSlug: value.tutorialSlug }),
+    title: normalizeLocalizedString(value.title),
+    description: normalizeLocalizedString(value.description),
+    instructions: normalizeLocalizedString(value.instructions),
+    ...(value.hints === undefined ? {} : { hints: normalizeLocalizedArray(value.hints) }),
+    ...(value.htmlContent === undefined ? {} : { htmlContent: value.htmlContent }),
+    ...(value.files === undefined ? {} : { files: value.files }),
+    ...(value.editableFiles === undefined ? {} : { editableFiles: value.editableFiles }),
+    ...(value.preloadModules === undefined ? {} : { preloadModules: value.preloadModules }),
+    ...(value.starterCode === undefined ? {} : { starterCode: value.starterCode }),
+    testCases: value.testCases.map(normalizeTestCase),
+    solution: value.solution,
+    ...(value.tags === undefined ? {} : { tags: value.tags }),
+    ...(value.status === undefined ? {} : { status: value.status }),
+    ...(value.expectedState === undefined
+      ? {}
+      : { expectedState: value.expectedState.map(normalizeExpectedState) }),
+  };
+}
+
+function normalizeTutorialRegistryEntry(
+  value: z.infer<typeof TutorialRegistrySchema>['tutorials'][number],
+): TutorialRegistryEntry {
+  return {
+    slug: value.slug,
+    order: value.order,
+    estimatedMinutes: value.estimatedMinutes,
+    tags: value.tags,
+    ...(value.relatedChallenges === undefined
+      ? {}
+      : { relatedChallenges: value.relatedChallenges }),
+    ...(value.nextTutorialSlug === undefined
+      ? {}
+      : { nextTutorialSlug: value.nextTutorialSlug }),
+    ...(value.status === undefined ? {} : { status: value.status }),
+  };
+}
+
 function parseJson(content: string, sourcePath: string): unknown {
   try {
     const parsed: unknown = JSON.parse(content);
@@ -112,7 +217,9 @@ export function parseTutorialRegistryJson(
       `Invalid tutorial registry in ${sourcePath}: ${formatZodIssues(result.error)}`,
     );
   }
-  return result.data;
+  return {
+    tutorials: result.data.tutorials.map(normalizeTutorialRegistryEntry),
+  };
 }
 
 export function parseChallengeTierJson(
@@ -125,5 +232,8 @@ export function parseChallengeTierJson(
       `Invalid challenge tier in ${sourcePath}: ${formatZodIssues(result.error)}`,
     );
   }
-  return result.data;
+  return {
+    tier: result.data.tier,
+    challenges: result.data.challenges.map(normalizeChallengeDefinition),
+  };
 }

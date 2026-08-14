@@ -290,7 +290,13 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-      {consent === 'granted' && <GoogleAnalytics measurementId={auth?.gaMeasurementId} />}
+      {consent === 'granted' && (
+        <GoogleAnalytics
+          {...(auth?.gaMeasurementId === undefined
+            ? {}
+            : { measurementId: auth.gaMeasurementId })}
+        />
+      )}
       <CookieConsent onConsentChange={handleConsentChange} initialConsent={consent} />
       <div className="flex flex-col min-h-screen">
         <Header session={auth || null} />

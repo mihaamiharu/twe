@@ -208,7 +208,9 @@ export async function executePlaywrightCode(
 
             const htmlTemplate = generateIframeTemplate({
               bodyContent: finalHtml,
-              cssContent: options?.cssContent,
+              ...(options?.cssContent === undefined
+                ? {}
+                : { cssContent: options.cssContent }),
               filesEnabled: !!options?.files,
               includeAlertPolyfill: true,
               includeFunctionMatcher: true,
@@ -285,8 +287,12 @@ export async function executePlaywrightCode(
             // Set up VFS for multi-page E2E challenges
             if (options?.files) {
               page.setVFS(options.files, {
-                onNavigate: options.onNavigate,
-                cssContent: options.cssContent,
+                ...(options.onNavigate === undefined
+                  ? {}
+                  : { onNavigate: options.onNavigate }),
+                ...(options.cssContent === undefined
+                  ? {}
+                  : { cssContent: options.cssContent }),
               });
             }
 
@@ -473,7 +479,9 @@ export async function executePlaywrightCode(
                   status: 'FAILED',
                   output: `DOM State Validation Failed: ${stateValidation.error}`,
                   executionTime,
-                  error: stateValidation.error,
+                  ...(stateValidation.error === undefined
+                    ? {}
+                    : { error: stateValidation.error }),
                   logs,
                   assertionCount: getAssertionCount(),
                 });

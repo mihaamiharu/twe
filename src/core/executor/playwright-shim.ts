@@ -80,7 +80,9 @@ export class MockedPlaywrightPage {
   constructor(iframeDocument: Document, options?: { timeout?: number; deadline?: number }) {
     this.targetDocument = iframeDocument;
     this.defaultTimeout = options?.timeout || 5000;
-    this.globalDeadline = options?.deadline;
+    if (options?.deadline !== undefined) {
+      this.globalDeadline = options.deadline;
+    }
     this.request = this._createAPIRequestContext();
     this._context = this._createBrowserContext();
     this.keyboard = this._createKeyboard();
@@ -104,8 +106,16 @@ export class MockedPlaywrightPage {
       normalizedFiles[normalizedKey] = value;
     }
     this.vfs = normalizedFiles;
-    this.onNavigate = options?.onNavigate;
-    this.cssContent = options?.cssContent;
+    if (options?.onNavigate === undefined) {
+      delete this.onNavigate;
+    } else {
+      this.onNavigate = options.onNavigate;
+    }
+    if (options?.cssContent === undefined) {
+      delete this.cssContent;
+    } else {
+      this.cssContent = options.cssContent;
+    }
   }
 
   // ============================================
@@ -424,23 +434,27 @@ export class MockedPlaywrightPage {
         return new Promise<Awaited<ReturnType<RouteMatcher['handler']>>>((resolve, reject) => {
           // Override fulfill/continue to resolve our promise
           route.fulfill = (response) => {
+            const responseBody = typeof response.body === 'string'
+              ? response.body
+              : response.body === undefined
+                ? undefined
+                : Uint8Array.from(response.body).buffer;
             resolve({
               type: 'fulfill',
               response: {
-                status: response.status,
-                body: typeof response.body === 'string'
-                  ? response.body
-                  : response.body === undefined
-                    ? undefined
-                    : Uint8Array.from(response.body).buffer,
-                json: response.json,
-                headers: response.headers,
+                ...(response.status === undefined ? {} : { status: response.status }),
+                ...(responseBody === undefined ? {} : { body: responseBody }),
+                ...(response.json === undefined ? {} : { json: response.json }),
+                ...(response.headers === undefined ? {} : { headers: response.headers }),
               },
             });
             return Promise.resolve();
           };
           route.continue = (options) => {
-            resolve({ type: 'continue', options });
+            resolve({
+              type: 'continue',
+              ...(options === undefined ? {} : { options }),
+            });
             return Promise.resolve();
           };
 
@@ -552,7 +566,7 @@ export class MockedPlaywrightPage {
   ): string {
     return generateVfsNavigationTemplate({
       bodyContent: content,
-      cssContent: this.cssContent,
+      ...(this.cssContent === undefined ? {} : { cssContent: this.cssContent }),
       appState: appState || {},
     });
   }

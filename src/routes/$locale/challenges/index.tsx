@@ -68,7 +68,7 @@ export const Route = createFileRoute('/$locale/challenges/')({
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
-        search: q,
+        ...(q === undefined ? {} : { search: q }),
         limit: 1000,
       }),
     );
@@ -196,7 +196,7 @@ export function ChallengesPage() {
   const { data: challengesResponse } = useQuery({
     ...challengeListQueryOptions({
       locale,
-      search: debouncedSearchQuery || undefined,
+      ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {}),
       limit: 1000,
     }),
     placeholderData: keepPreviousData,

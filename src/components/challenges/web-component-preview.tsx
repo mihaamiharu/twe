@@ -51,9 +51,9 @@ export function WebComponentPreview(props: WebComponentPreviewProps) {
     >
       {/* Browser Window Frame with Toolbar */}
       <PreviewHeader
-        currentPath={currentPath}
-        files={files}
-        targetElementId={targetElementId}
+        {...(currentPath === undefined ? {} : { currentPath })}
+        {...(files === undefined ? {} : { files })}
+        {...(targetElementId === undefined ? {} : { targetElementId })}
         viewMode={viewMode}
         setViewMode={setViewMode}
         zoom={zoom}

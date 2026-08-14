@@ -111,12 +111,16 @@ export function useChallengeExecution(
                 initialHtml,
                 {
                     timeout: 10000,
-                    existingIframe: previewIframeRef.current || undefined,
+                    ...(previewIframeRef.current === null
+                        ? {}
+                        : { existingIframe: previewIframeRef.current }),
                     strictMode: challenge.type === 'PLAYWRIGHT',
                     cssContent: (challenge.category?.startsWith('e2e')) ? e2eSelectorStyles : defaultSelectorStyles,
-                    files: challenge.files,
+                    ...(challenge.files === undefined ? {} : { files: challenge.files }),
                     onNavigate: (path) => setCurrentVfsPath(path),
-                    expectedState: challenge.expectedState,
+                    ...(challenge.expectedState === undefined
+                        ? {}
+                        : { expectedState: challenge.expectedState }),
                     isTypeScript: challenge.type === 'TYPESCRIPT' || challenge.type === 'PLAYWRIGHT',
                 },
             );
@@ -178,7 +182,7 @@ export function useChallengeExecution(
                 id: 'main',
                 name: t('challenges:playground.results'),
                 passed: validationPassed,
-                error: !validationPassed ? result.error || outputMessage : undefined,
+                ...(!validationPassed ? { error: result.error || outputMessage } : {}),
                 executionTime: result.executionTime,
             };
 

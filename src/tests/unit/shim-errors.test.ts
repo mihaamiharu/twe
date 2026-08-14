@@ -105,6 +105,8 @@ describe('createShimError', () => {
 
         expect(error).toBeInstanceOf(Error);
         expect(error.message).toContain('Element not found');
+        expect('selector' in error).toBe(false);
+        expect('action' in error).toBe(false);
     });
 });
 

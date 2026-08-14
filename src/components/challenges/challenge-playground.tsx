@@ -95,7 +95,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       <PlaygroundHeader
         challenge={challenge}
         locale={state.locale}
-        userId={props.userId}
+        {...(props.userId === undefined ? {} : { userId: props.userId })}
         isMobile={state.isMobile}
         isCodeChallenge={state.isCodeChallenge}
         isRunning={state.isRunning}
@@ -139,7 +139,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
               state={state}
               execution={execution}
               previewIframeRef={previewIframeRef}
-              userId={props.userId}
+              {...(props.userId === undefined ? {} : { userId: props.userId })}
             />
           )}
         </div>

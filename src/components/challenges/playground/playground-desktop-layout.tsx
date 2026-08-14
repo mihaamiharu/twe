@@ -99,7 +99,7 @@ export function PlaygroundDesktopLayout({
                                         ? e2eSelectorStyles
                                         : defaultSelectorStyles
                                 }
-                                userSelector={isSelectorChallenge ? selector : undefined}
+                                {...(isSelectorChallenge ? { userSelector: selector } : {})}
                                 selectorType={selectorType as SelectorType}
                                 targetSelector={challenge.targetSelector as string}
                                 targetSelectorType={
@@ -110,7 +110,7 @@ export function PlaygroundDesktopLayout({
                                 showControls={true}
                                 height="100%"
                                 iframeRef={previewIframeRef}
-                                files={challenge.files}
+                                {...(challenge.files === undefined ? {} : { files: challenge.files })}
                                 currentPath={currentVfsPath}
                                 onNavigate={(path) => setCurrentVfsPath(path)}
                             />
@@ -133,7 +133,7 @@ export function PlaygroundDesktopLayout({
                         <EditorPanel
                             challenge={challenge}
                             state={state}
-                            userId={userId}
+                            {...(userId === undefined ? {} : { userId })}
                             isMobile={false}
                             onRunCode={() => { void handleRunCode(); }}
                             onReset={handleReset}

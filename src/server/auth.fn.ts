@@ -86,7 +86,9 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             role: session.user.role || 'USER',
           },
           isAuthenticated: true,
-          gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
+          ...(process.env.VITE_GA_MEASUREMENT_ID === undefined
+            ? {}
+            : { gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID }),
         };
       }
     } catch (error) {
@@ -96,7 +98,9 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
     return {
       user: null,
       isAuthenticated: false,
-      gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
+      ...(process.env.VITE_GA_MEASUREMENT_ID === undefined
+        ? {}
+        : { gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID }),
     };
   },
 );

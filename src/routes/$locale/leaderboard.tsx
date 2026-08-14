@@ -94,6 +94,10 @@ function LeaderboardPage() {
 
   // Animation delay utility
   const getDelay = (index: number) => ({ animationDelay: `${index * 50}ms` });
+  const getDisplayXpProps = (user: LeaderboardEntry) => {
+    const displayXp = period === 'monthly' ? user.monthlyXp : user.xp;
+    return displayXp === undefined ? {} : { displayXp };
+  };
 
   return (
     <div className="min-h-screen p-4 md:p-8 relative overflow-hidden bg-background">
@@ -178,7 +182,7 @@ function LeaderboardPage() {
                             rank={1}
                             isCenter
                             isAuthenticated={isAuthenticated}
-                            displayXp={period === 'monthly' ? TopThree[0].monthlyXp : TopThree[0].xp}
+                            {...getDisplayXpProps(TopThree[0])}
                           />
                         </div>
                       ) : (
@@ -190,7 +194,7 @@ function LeaderboardPage() {
                                 user={TopThree[1]}
                                 rank={2}
                                 isAuthenticated={isAuthenticated}
-                                displayXp={period === 'monthly' ? TopThree[1].monthlyXp : TopThree[1].xp}
+                                {...getDisplayXpProps(TopThree[1])}
                               />
                             ) : (
                               <div className="w-[200px]" />
@@ -204,7 +208,7 @@ function LeaderboardPage() {
                               rank={1}
                               isCenter
                               isAuthenticated={isAuthenticated}
-                              displayXp={period === 'monthly' ? TopThree[0].monthlyXp : TopThree[0].xp}
+                              {...getDisplayXpProps(TopThree[0])}
                             />
                           </div>
 
@@ -215,7 +219,7 @@ function LeaderboardPage() {
                                 user={TopThree[2]}
                                 rank={3}
                                 isAuthenticated={isAuthenticated}
-                                displayXp={period === 'monthly' ? TopThree[2].monthlyXp : TopThree[2].xp}
+                                {...getDisplayXpProps(TopThree[2])}
                               />
                             ) : (
                               <div className="hidden md:block w-[200px]" />

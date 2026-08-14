@@ -322,8 +322,8 @@ export function createRouteFetchWrapper(
             .handler({
               url,
               method: init?.method || requestInput?.method || 'GET',
-              headers,
-              body: body ?? undefined,
+              ...(headers === undefined ? {} : { headers }),
+              ...(body === null ? {} : { body }),
             })
             .then((r) => {
               if (r?.type === 'fulfill') {

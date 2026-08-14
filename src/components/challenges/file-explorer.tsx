@@ -58,7 +58,7 @@ export function FileExplorer({
                         name: part,
                         path: currentPath,
                         type: isLast ? 'file' : 'folder',
-                        children: isLast ? undefined : {},
+                        ...(isLast ? {} : { children: {} }),
                     };
                 }
                 current = current.children[part];

@@ -114,8 +114,8 @@ export function createShimError(
 
     const error = Object.assign(new Error(message), {
         type,
-        selector: options.selector,
-        action: options.action,
+        ...(options.selector === undefined ? {} : { selector: options.selector }),
+        ...(options.action === undefined ? {} : { action: options.action }),
     });
     error.name = `PlaywrightShimError`;
 

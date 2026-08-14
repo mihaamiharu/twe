@@ -197,6 +197,34 @@ describe('createRouteFetchWrapper', () => {
     expect(json).toEqual({ message: 'mocked' });
   });
 
+  test('omits absent request headers and body from route handlers', async () => {
+    let capturedRequest: Parameters<RouteMatcher['handler']>[0] | undefined;
+    const wrapper = createRouteFetchWrapper(
+      undefined,
+      () => ({
+        __MOCK_ROUTES__: [
+          {
+            matcher: '/api/no-options',
+            handler: (request) => {
+              capturedRequest = request;
+              return Promise.resolve({
+                type: 'fulfill' as const,
+                response: { status: 204 },
+              });
+            },
+          },
+        ],
+      }),
+    );
+
+    await wrapper('http://localhost/api/no-options');
+
+    expect(capturedRequest).toBeDefined();
+    if (!capturedRequest) throw new Error('Expected the route handler to run');
+    expect('headers' in capturedRequest).toBe(false);
+    expect('body' in capturedRequest).toBe(false);
+  });
+
   test('preserves URLSearchParams request bodies for route handlers', async () => {
     let capturedBody: string | undefined;
     const wrapper = createRouteFetchWrapper(

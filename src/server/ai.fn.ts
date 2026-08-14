@@ -85,11 +85,15 @@ export const getAIHint = createServerFn({ method: 'POST' })
                     | 'PLAYWRIGHT'
                     | 'JAVASCRIPT',
                 instructions: challengeContent.instructions,
-                htmlContent: challengeContent.htmlContent,
-                starterCode: challengeContent.starterCode,
-                userAttempt,
+                ...(challengeContent.htmlContent === undefined
+                    ? {}
+                    : { htmlContent: challengeContent.htmlContent }),
+                ...(challengeContent.starterCode === undefined
+                    ? {}
+                    : { starterCode: challengeContent.starterCode }),
+                ...(userAttempt === undefined ? {} : { userAttempt }),
                 locale,
-                staticHints: data.staticHints,
+                ...(data.staticHints === undefined ? {} : { staticHints: data.staticHints }),
             });
 
             if (!hintResult.success) {

@@ -136,4 +136,18 @@ describe('transformChallengeResponse', () => {
         expect(result!.nextChallenge).toEqual({ slug: 'next', title: 'Next' });
         expect(result!.prevChallenge).toEqual({ slug: 'prev', title: 'Prev' });
     });
+
+    it('omits optional fields when the server response does not provide them', () => {
+        const result = transformChallengeResponse(mockServerData, mockServerData.testCases);
+
+        expect(result).not.toBeNull();
+        if (!result) throw new Error('Expected a transformed challenge');
+
+        expect('files' in result).toBe(false);
+        expect('editableFiles' in result).toBe(false);
+        expect('preloadModules' in result).toBe(false);
+        expect('tutorial' in result).toBe(false);
+        expect('nextChallenge' in result).toBe(false);
+        expect('prevChallenge' in result).toBe(false);
+    });
 });

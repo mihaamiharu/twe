@@ -2,7 +2,7 @@ import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 
 // Mutable mock state
-globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false };
 globalThis.mockNavigate = mock(() => Promise.resolve());
 
 describe('ChallengesPage', () => {
@@ -54,7 +54,7 @@ describe('ChallengesPage', () => {
 
     beforeEach(() => {
 
-        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false };
 
         // Setup query mock with SEARCH filtering simulation
         globalThis.mockUseQuery.mockImplementation((options) => {

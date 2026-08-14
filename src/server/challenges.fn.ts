@@ -224,7 +224,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
           input: tc.expectedOutput, // For display purposes
           expectedOutput: tc.expectedOutput,
           order: index,
-          isHidden: tc.isHidden,
+          ...(tc.isHidden === undefined ? {} : { isHidden: tc.isHidden }),
         }),
       );
 
@@ -357,13 +357,21 @@ export const getChallenge = createServerFn({ method: 'GET' })
           category: challengeContent.category,
           xpReward: challengeContent.xpReward,
           order: challengeContent.order,
-          hints: challengeContent.hints,
-          htmlContent: challengeContent.htmlContent,
-          files: challengeContent.files,
-          editableFiles: challengeContent.editableFiles,
-          preloadModules: challengeContent.preloadModules,
-          starterCode: challengeContent.starterCode,
-          tags: challengeContent.tags,
+          ...(challengeContent.hints === undefined ? {} : { hints: challengeContent.hints }),
+          ...(challengeContent.htmlContent === undefined
+            ? {}
+            : { htmlContent: challengeContent.htmlContent }),
+          ...(challengeContent.files === undefined ? {} : { files: challengeContent.files }),
+          ...(challengeContent.editableFiles === undefined
+            ? {}
+            : { editableFiles: challengeContent.editableFiles }),
+          ...(challengeContent.preloadModules === undefined
+            ? {}
+            : { preloadModules: challengeContent.preloadModules }),
+          ...(challengeContent.starterCode === undefined
+            ? {}
+            : { starterCode: challengeContent.starterCode }),
+          ...(challengeContent.tags === undefined ? {} : { tags: challengeContent.tags }),
           completionCount: dbChallenge?.completionCount || 0,
           tutorial: tutorialData,
           testCases: visibleTestCases,

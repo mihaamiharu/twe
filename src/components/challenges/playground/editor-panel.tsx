@@ -80,7 +80,9 @@ export function EditorPanel({
                         {!isMobile && (
                             <FileExplorer
                                 files={challenge.files!}
-                                editableFiles={challenge.editableFiles}
+                                {...(challenge.editableFiles === undefined
+                                    ? {}
+                                    : { editableFiles: challenge.editableFiles })}
                                 selectedFile={selectedFile}
                                 onSelectFile={onSelectFile}
                                 className="w-60 shrink-0 border-r border-border"
@@ -88,7 +90,9 @@ export function EditorPanel({
                         )}
                         <MultiTabEditor
                             files={fileContents}
-                            editableFiles={challenge.editableFiles}
+                            {...(challenge.editableFiles === undefined
+                                ? {}
+                                : { editableFiles: challenge.editableFiles })}
                             selectedFile={selectedFile}
                             openFiles={openFiles}
                             onSelectFile={onSelectFile}
@@ -98,7 +102,7 @@ export function EditorPanel({
                             onReady={onReady}
                             storageKeyPrefix={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                             className="flex-1"
-                            extraLibs={extraLibs}
+                            {...(extraLibs === undefined ? {} : { extraLibs })}
                         />
                     </div>
                 ) : (
@@ -116,7 +120,7 @@ export function EditorPanel({
                         height="100%"
                         className="h-full"
                         key={`${challenge.id}-${resetCount}`}
-                        extraLibs={extraLibs}
+                        {...(extraLibs === undefined ? {} : { extraLibs })}
                     />
                 )}
             </div>

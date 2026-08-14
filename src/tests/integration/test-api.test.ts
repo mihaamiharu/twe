@@ -87,7 +87,11 @@ describe('E2E Test Support APIs', () => {
       const origEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
       const res = await handleTeardownUserRequest(req);
-      process.env.NODE_ENV = origEnv;
+      if (origEnv === undefined) {
+        delete process.env.NODE_ENV;
+      } else {
+        process.env.NODE_ENV = origEnv;
+      }
       
       expect(res.status).toBe(403);
     });

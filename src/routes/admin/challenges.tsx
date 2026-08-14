@@ -235,7 +235,7 @@ function ChallengeManager() {
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-2">
                             <Switch
-                              checked={isComingSoon}
+                              checked={isComingSoon ?? false}
                               onCheckedChange={(checked) =>
                                 updateMutation.mutate({
                                   id: challenge.id,

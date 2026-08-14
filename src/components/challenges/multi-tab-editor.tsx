@@ -119,18 +119,16 @@ export function MultiTabEditor({
                     initialCode={files[selectedFile] || ''}
                     language={getLanguage(selectedFile)}
                     onChange={(code) => isEditable && onCodeChange(selectedFile, code)}
-                    onRun={onRun}
-                    onReady={onReady}
+                    {...(onRun === undefined ? {} : { onRun })}
+                    {...(onReady === undefined ? {} : { onReady })}
                     readOnly={!isEditable}
-                    storageKey={
-                        isEditable && storageKeyPrefix
-                            ? `${storageKeyPrefix}-${selectedFile}`
-                            : undefined
-                    }
+                    {...(isEditable && storageKeyPrefix
+                        ? { storageKey: `${storageKeyPrefix}-${selectedFile}` }
+                        : {})}
                     height="100%"
                     showMinimap={true}
                     className="h-full"
-                    extraLibs={extraLibs}
+                    {...(extraLibs === undefined ? {} : { extraLibs })}
                 />
             </div>
         </div>
