@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { formatZodIssues } from '@/lib/zod-errors';
 import type {
   ChallengeTierFile,
   TutorialRegistry,
@@ -101,13 +102,6 @@ function parseJson(content: string, sourcePath: string): unknown {
   }
 }
 
-function formatIssues(error: z.ZodError): string {
-  return error.issues.map((issue) => {
-    const path = issue.path.length > 0 ? issue.path.join('.') : '<root>';
-    return `${path}: ${issue.message}`;
-  }).join('; ');
-}
-
 export function parseTutorialRegistryJson(
   content: string,
   sourcePath: string,
@@ -115,7 +109,7 @@ export function parseTutorialRegistryJson(
   const result = TutorialRegistrySchema.safeParse(parseJson(content, sourcePath));
   if (!result.success) {
     throw new Error(
-      `Invalid tutorial registry in ${sourcePath}: ${formatIssues(result.error)}`,
+      `Invalid tutorial registry in ${sourcePath}: ${formatZodIssues(result.error)}`,
     );
   }
   return result.data;
@@ -128,7 +122,7 @@ export function parseChallengeTierJson(
   const result = ChallengeTierFileSchema.safeParse(parseJson(content, sourcePath));
   if (!result.success) {
     throw new Error(
-      `Invalid challenge tier in ${sourcePath}: ${formatIssues(result.error)}`,
+      `Invalid challenge tier in ${sourcePath}: ${formatZodIssues(result.error)}`,
     );
   }
   return result.data;

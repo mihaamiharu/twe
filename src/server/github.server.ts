@@ -1,4 +1,5 @@
 import { logger } from '@/lib/logger';
+import { formatZodIssues } from '@/lib/zod-errors';
 import { z } from 'zod';
 
 interface CreateIssueParams {
@@ -29,12 +30,8 @@ export function parseGitHubIssueResponse(
 ): GitHubIssue {
     const result = GitHubIssueSchema.safeParse(value);
     if (!result.success) {
-        const details = result.error.issues.map((issue) => {
-            const path = issue.path.length > 0 ? issue.path.join('.') : '<root>';
-            return `${path}: ${issue.message}`;
-        }).join('; ');
         throw new Error(
-            `[GitHub] Invalid create-issue response for ${repository}: ${details}`,
+            `[GitHub] Invalid create-issue response for ${repository}: ${formatZodIssues(result.error)}`,
         );
     }
     return result.data;

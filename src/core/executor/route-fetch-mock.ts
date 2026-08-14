@@ -43,16 +43,67 @@ export interface RouteWindow {
   __MOCK_ROUTES__?: RouteMatcher[];
 }
 
+const supportedRequestBodyTags = [
+  '[object ArrayBuffer]',
+  '[object Blob]',
+  '[object File]',
+  '[object FormData]',
+  '[object ReadableStream]',
+  '[object URLSearchParams]',
+] as const;
+const unsupportedRequestBodyMessage =
+  'Unsupported request body for page.route';
+
+function isSupportedRequestBody(body: unknown): body is BodyInit {
+  if (typeof body === 'string' || ArrayBuffer.isView(body)) return true;
+  const bodyTag = Object.prototype.toString.call(body);
+  return supportedRequestBodyTags.some((supportedTag) => supportedTag === bodyTag);
+}
+
+function isRequestInput(input: unknown): input is Request {
+  if (typeof input !== 'object' || input === null) return false;
+  return Object.prototype.toString.call(input) === '[object Request]' &&
+    typeof Reflect.get(input, 'url') === 'string' &&
+    typeof Reflect.get(input, 'method') === 'string' &&
+    typeof Reflect.get(input, 'clone') === 'function';
+}
+
+type FetchInputStringifier = (this: object) => unknown;
+
+function isFetchInputStringifier(
+  value: unknown,
+): value is FetchInputStringifier {
+  return typeof value === 'function';
+}
+
+function stringifyFetchInput(input: object): string {
+  const toString: unknown = Reflect.get(input, 'toString');
+  if (!isFetchInputStringifier(toString)) {
+    throw new TypeError('Fetch input does not provide a toString method');
+  }
+  const result: unknown = Reflect.apply(toString, input, []);
+  if (typeof result !== 'string') {
+    throw new TypeError('Fetch input toString method did not return a string');
+  }
+  return result;
+}
+
 export async function requestBodyToPostData(
-  body: BodyInit | null | undefined,
+  body: unknown,
 ): Promise<string | null> {
   if (body === undefined || body === null) return null;
+
+  if (!isSupportedRequestBody(body)) {
+    throw new TypeError(
+      `${unsupportedRequestBodyMessage}: ${Object.prototype.toString.call(body)}`,
+    );
+  }
 
   try {
     return await new Response(body).text();
   } catch (error) {
     const detail = error instanceof Error ? `: ${error.message}` : '';
-    throw new TypeError(`Unsupported request body for page.route${detail}`, {
+    throw new TypeError(`${unsupportedRequestBodyMessage}${detail}`, {
       cause: error,
     });
   }
@@ -125,6 +176,10 @@ export function generateFetchPolyfillCode(options: {
   const fallbackCode = fallbackToOriginal
     ? `return originalFetch ? originalFetch(input, init) : Promise.resolve({ ok: false, status: 404 });`
     : `return Promise.resolve({ ok: true, status: 404, json: () => Promise.resolve({}) });`;
+  const supportedRequestBodyTagsCode = JSON.stringify(supportedRequestBodyTags);
+  const unsupportedRequestBodyMessageCode = JSON.stringify(
+    unsupportedRequestBodyMessage,
+  );
 
   return `
             window.fetch = async function(input, init) {
@@ -157,13 +212,26 @@ export function generateFetchPolyfillCode(options: {
 
                         if (isMatch) {
                             console.log('Mocking fetch via page.route to ' + url);
+                            const serializeRequestBody = async function(requestBody) {
+                                if (requestBody === undefined || requestBody === null) return null;
+                                const tag = Object.prototype.toString.call(requestBody);
+                                const isSupported =
+                                    typeof requestBody === 'string' ||
+                                    ArrayBuffer.isView(requestBody) ||
+                                    ${supportedRequestBodyTagsCode}.includes(tag);
+                                if (!isSupported) {
+                                    throw new TypeError(${unsupportedRequestBodyMessageCode} + ': ' + tag);
+                                }
+                                try {
+                                    return await new Response(requestBody).text();
+                                } catch (error) {
+                                    const detail = error instanceof Error ? ': ' + error.message : '';
+                                    throw new TypeError(${unsupportedRequestBodyMessageCode} + detail, { cause: error });
+                                }
+                            };
                             let body = null;
                             if (init?.body !== undefined && init.body !== null) {
-                                try {
-                                    body = await new Response(init.body).text();
-                                } catch (error) {
-                                    throw new TypeError('Unsupported request body for page.route', { cause: error });
-                                }
+                                body = await serializeRequestBody(init.body);
                             } else if (input instanceof Request && input.body !== null) {
                                 body = await input.clone().text();
                             }
@@ -206,13 +274,14 @@ export function createRouteFetchWrapper(
   getWindow: () => RouteWindow | undefined,
 ): BrowserFetch {
   const wrappedFetch: BrowserFetch = async (input, init) => {
+    const requestInput = isRequestInput(input) ? input : undefined;
     let url: string;
     if (typeof input === 'string') {
       url = input.startsWith('/') ? 'http://localhost' + input : input;
-    } else if (input instanceof Request) {
-      url = input.url;
+    } else if (requestInput) {
+      url = requestInput.url;
     } else if (input && typeof input === 'object' && 'toString' in input) {
-      url = input.toString();
+      url = stringifyFetchInput(input);
     } else {
       url = String(input);
     }
@@ -236,14 +305,14 @@ export function createRouteFetchWrapper(
 
         if (isMatch) {
           const headersInit = init?.headers ??
-            (input instanceof Request ? input.headers : undefined);
+            requestInput?.headers;
           const headers = headersInit
             ? Object.fromEntries(new Headers(headersInit).entries())
             : undefined;
           const requestBody = init?.body !== undefined
             ? init.body
-            : input instanceof Request && input.body !== null
-              ? await input.clone().text()
+            : requestInput && requestInput.body !== null
+              ? await requestInput.clone().text()
               : null;
           const body = typeof requestBody === 'string'
             ? requestBody
@@ -252,7 +321,7 @@ export function createRouteFetchWrapper(
           return route
             .handler({
               url,
-              method: init?.method || (input instanceof Request ? input.method : 'GET'),
+              method: init?.method || requestInput?.method || 'GET',
               headers,
               body: body ?? undefined,
             })
