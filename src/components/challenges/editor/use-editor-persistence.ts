@@ -67,6 +67,7 @@ export function useEditorPersistence(
             }, 500);
             return () => clearTimeout(debounceTimer);
         }
+        return undefined;
     }, [code, storageKey, isStorageLoaded]);
 
     return {

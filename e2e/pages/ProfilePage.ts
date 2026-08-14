@@ -1,4 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class ProfilePage extends BasePage {
@@ -23,7 +24,7 @@ export class ProfilePage extends BasePage {
     this.tabsList = page.getByRole('tablist');
   }
 
-  async goto(locale: string = 'en') {
+  override async goto(locale: string = 'en') {
     await this.page.goto(`/${locale}/profile`);
   }
 

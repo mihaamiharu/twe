@@ -1,4 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class AdminPage extends BasePage {
@@ -25,7 +26,7 @@ export class AdminPage extends BasePage {
     });
   }
 
-  async goto() {
+  override async goto() {
     await this.page.goto('/admin');
   }
 

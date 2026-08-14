@@ -1,5 +1,5 @@
-import { TestResult } from '../test-results';
-import { LogEntry } from '../console-output';
+import type { TestResult } from '../test-results';
+import type { LogEntry } from '../console-output';
 import type { TFunction } from 'i18next';
 import type { TypeDefinition } from '@/core/type-generator';
 

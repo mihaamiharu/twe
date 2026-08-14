@@ -1,4 +1,4 @@
-import { APIRequestContext, BrowserContext, Page } from '@playwright/test';
+import type { APIRequestContext, BrowserContext, Page } from '@playwright/test';
 
 const baseURL = process.env.BASE_URL || 'http://localhost:3000';
 

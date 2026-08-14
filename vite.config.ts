@@ -35,6 +35,7 @@ const config = defineConfig({
           if (id.includes('node_modules/@radix-ui/') || id.includes('node_modules/lucide-react/')) {
             return 'ui-vendor';
           }
+          return undefined;
         },
       },
     },

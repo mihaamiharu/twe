@@ -1,7 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import {
-  ChallengePlaygroundProps,
   usePlaygroundState,
   useChallengeExecution,
   PlaygroundHeader,
@@ -14,6 +13,7 @@ import {
   LoadingOverlay,
   PracticeModeBanner
 } from './playground';
+import type { ChallengePlaygroundProps } from './playground';
 
 /**
  * ChallengePlayground - Main challenge solving interface
@@ -48,6 +48,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       }, 5000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [state.isLayoutReady, state.isCodeChallenge]);
 
   // Keyboard Shortcuts (Cmd/Ctrl + Enter to run, + Shift + Enter to submit)

@@ -1,4 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class DashboardPage extends BasePage {
@@ -35,7 +36,7 @@ export class DashboardPage extends BasePage {
     this.learningTiers = page.locator('.glass-card');
   }
 
-  async goto(locale: string = 'en') {
+  override async goto(locale: string = 'en') {
     await this.page.goto(`/${locale}/`);
   }
 
