@@ -33,7 +33,9 @@ export function NotFound() {
     let logIndex = 0;
     const interval = setInterval(() => {
       setVisibleLogs((prev) => {
-        const newLogs = [...prev, terminalLogs[logIndex % terminalLogs.length]];
+        const nextLog = terminalLogs[logIndex % terminalLogs.length];
+        if (nextLog === undefined) return prev;
+        const newLogs = [...prev, nextLog];
         // Keep only last 8 logs for scrolling effect
         if (newLogs.length > 8) {
           return newLogs.slice(-8);

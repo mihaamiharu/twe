@@ -4,6 +4,7 @@ import { generateTypeDefinitions } from '@/core/type-generator';
 describe('generateTypeDefinitions', () => {
   test('emits typed challenge globals without explicit any', () => {
     const [globals] = generateTypeDefinitions({});
+    if (!globals) throw new Error('Expected global type definitions');
 
     expect(globals.content).not.toMatch(/\bany\b/);
     expect(globals.content).toContain(

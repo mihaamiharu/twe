@@ -193,6 +193,16 @@ export function testSelectorAgainstTarget(
     ? expectedSelector
     : [expectedSelector];
 
+  const firstExpectedSelector = expectedSelectors[0];
+  if (firstExpectedSelector === undefined) {
+    return {
+      isCorrect: false,
+      userMatchCount: 0,
+      expectedMatchCount: 0,
+      feedback: 'No expected selector was provided.',
+    };
+  }
+
   // Get user's matched elements
   let userMatches: Element[] | Node[] = [];
   let userCount = 0;
@@ -295,12 +305,12 @@ export function testSelectorAgainstTarget(
   // Get expected count for feedback
   let expectedCount = 0;
   if (selectorType === 'css') {
-    expectedCount = testCSSSelector(expectedSelectors[0], container).count;
+    expectedCount = testCSSSelector(firstExpectedSelector, container).count;
   } else {
     const doc =
       container instanceof Document ? container : container.ownerDocument;
     if (doc) {
-      expectedCount = testXPath(expectedSelectors[0], container).count;
+      expectedCount = testXPath(firstExpectedSelector, container).count;
     }
   }
 

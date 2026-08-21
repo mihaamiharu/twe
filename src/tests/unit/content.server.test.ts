@@ -27,7 +27,10 @@ describe('Content Server', () => {
 
       // Verify sorting
       for (let i = 0; i < tutorials.length - 1; i++) {
-        expect(tutorials[i].order).toBeLessThanOrEqual(tutorials[i + 1].order);
+        const current = tutorials[i];
+        const next = tutorials[i + 1];
+        if (!current || !next) throw new Error('Expected adjacent tutorials');
+        expect(current.order).toBeLessThanOrEqual(next.order);
       }
     });
   });
@@ -93,9 +96,11 @@ describe('Content Server', () => {
         tags: [],
       }],
     }), 'tutorials/test-registry.json');
-    expect('relatedChallenges' in registry.tutorials[0]).toBe(false);
-    expect('nextTutorialSlug' in registry.tutorials[0]).toBe(false);
-    expect('status' in registry.tutorials[0]).toBe(false);
+    const tutorial = registry.tutorials[0];
+    if (!tutorial) throw new Error('Expected validated tutorial');
+    expect('relatedChallenges' in tutorial).toBe(false);
+    expect('nextTutorialSlug' in tutorial).toBe(false);
+    expect('status' in tutorial).toBe(false);
 
     const tier = parseChallengeTierJson(JSON.stringify({
       tier: 'basic',
@@ -114,6 +119,7 @@ describe('Content Server', () => {
       }],
     }), 'content/challenges/test-tier.json');
     const challenge = tier.challenges[0];
+    if (!challenge) throw new Error('Expected validated challenge');
     expect('tutorialSlug' in challenge).toBe(false);
     expect('htmlContent' in challenge).toBe(false);
     expect('id' in challenge.title).toBe(false);

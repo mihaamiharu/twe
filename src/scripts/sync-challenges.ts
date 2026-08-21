@@ -66,6 +66,9 @@ export async function syncChallenges() {
                 const [newChallenge] = await db.insert(challenges)
                     .values(challengeData)
                     .returning();
+                if (!newChallenge) {
+                    throw new Error(`Failed to create challenge ${rawContent.slug}`);
+                }
 
                 // Insert test cases for new challenge
                 if (rawContent.testCases && rawContent.testCases.length > 0) {

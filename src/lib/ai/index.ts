@@ -61,7 +61,8 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
             max_tokens: 1024,
         });
 
-        const hint = completion.choices[0].message.content?.trim();
+        const firstChoice = completion.choices[0];
+        const hint = firstChoice?.message.content?.trim();
 
         if (!hint) {
             return {

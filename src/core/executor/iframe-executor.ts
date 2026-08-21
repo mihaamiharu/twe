@@ -240,7 +240,10 @@ export async function executePlaywrightCode(
                   );
                   const funcNames: string[] = [];
                   for (const match of funcMatches) {
-                    funcNames.push(match[1]);
+                    const functionName = match[1];
+                    if (functionName !== undefined) {
+                      funcNames.push(functionName);
+                    }
                   }
 
                   const code = `
@@ -456,12 +459,13 @@ export async function executePlaywrightCode(
 
             // Check for soft failures
             const softFailures = getTestResults().filter((r) => !r.passed);
-            if (softFailures.length > 0) {
+            const firstSoftFailure = softFailures[0];
+            if (firstSoftFailure) {
               resolve({
                 status: 'FAILED',
                 output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map((f) => `- ${f.message}`).join('\n')}`,
                 executionTime,
-                error: softFailures[0].message, // Return first error
+                error: firstSoftFailure.message, // Return first error
                 logs,
                 assertionCount: getAssertionCount(),
               });

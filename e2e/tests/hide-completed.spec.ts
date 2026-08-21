@@ -30,6 +30,9 @@ test.describe('Hide/Show Completed', () => {
     // We pick one that is quick and stable
     const slug = 'css-selector-101-id-class';
     const solution = solutions[slug];
+    if (solution === undefined) {
+      throw new Error(`Missing E2E solution for ${slug}`);
+    }
 
     await challengesPage.gotoChallenge(slug);
     await challengesPage.solveChallenge(solution, slug);

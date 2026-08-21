@@ -103,6 +103,9 @@ describe('Challenge Integrity & Solutions', () => {
 
                             // Get expectation (either a selector or an ID)
                             const testCase = challenge.testCases[0];
+                            if (!testCase) {
+                                throw new Error(`${challenge.slug} has no test case`);
+                            }
                             const expectedOutput = testCase.expectedOutput;
 
                             let expectedSelector = '';

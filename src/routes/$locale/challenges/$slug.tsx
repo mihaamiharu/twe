@@ -264,7 +264,7 @@ function ChallengeDetailPage() {
         toast.success(t('common:messages.challengeCompleted'), {
           description: response.data.newAchievements?.length
             ? t('common:messages.achievementUnlocked', {
-              name: response.data.newAchievements[0].name,
+              name: response.data.newAchievements[0]?.name,
             })
             : undefined,
         });

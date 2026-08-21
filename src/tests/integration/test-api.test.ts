@@ -122,12 +122,16 @@ describe('E2E Test Support APIs', () => {
 
       const prog = await db.query.progress.findMany();
       expect(prog.length).toBe(1);
-      expect(prog[0].isCompleted).toBe(true);
+      const firstProgress = prog[0];
+      if (!firstProgress) throw new Error('Expected seeded progress');
+      expect(firstProgress.isCompleted).toBe(true);
       
       const subs = await db.query.submissions.findMany();
       expect(subs.length).toBe(1);
-      expect(subs[0].isPassed).toBe(true);
-      expect(subs[0].xpEarned).toBe(50);
+      const firstSubmission = subs[0];
+      if (!firstSubmission) throw new Error('Expected seeded submission');
+      expect(firstSubmission.isPassed).toBe(true);
+      expect(firstSubmission.xpEarned).toBe(50);
     });
 
     test('resets all challenge progress and resets user XP', async () => {

@@ -88,7 +88,10 @@ const difficultyMap: Record<string, 'Easy' | 'Medium' | 'Hard'> = {
 function extractTargetSelector(testCases: TestCase[]): string {
   if (!testCases.length) return '';
 
-  const firstTestInput = testCases[0].input as {
+  const firstTestCase = testCases[0];
+  if (!firstTestCase) return '';
+
+  const firstTestInput = firstTestCase.input as {
     selector?: string;
     xpath?: string;
   };

@@ -288,6 +288,9 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
             profileVisibility: users.profileVisibility,
             showOnLeaderboard: users.showOnLeaderboard,
           });
+        if (!updatedUser) {
+          throw new Error('User not found');
+        }
 
         return {
           success: true,

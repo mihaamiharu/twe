@@ -60,7 +60,7 @@ function getClientIdentifier(
     const forwardedFor = headers.get('x-forwarded-for');
     if (forwardedFor) {
         // Get the first IP in the list (client IP)
-        return forwardedFor.split(',')[0].trim();
+        return forwardedFor.split(',')[0]?.trim() ?? 'unknown-ip';
     }
 
     const realIp = headers.get('x-real-ip');

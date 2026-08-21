@@ -82,6 +82,9 @@ export const createBugReport = createServerFn({ method: 'POST' })
           browserInfo: browserInfo || null,
         })
         .returning();
+      if (!report) {
+        throw new Error('Failed to create bug report');
+      }
 
       logger.info(
         `[BugReport] New bug report created: ${report.id} - "${title}" (${severity})`,

@@ -48,7 +48,8 @@ export function validateExpectedState(
         // Check hasAttribute
         if (rule.hasAttribute && elements.length > 0) {
             const el = elements[0];
-            const attrValue = el?.getAttribute(rule.hasAttribute.name);
+            if (!el) continue;
+            const attrValue = el.getAttribute(rule.hasAttribute.name);
             if (attrValue === null) {
                 return {
                     passed: false,

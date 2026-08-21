@@ -172,7 +172,9 @@ describe('Playwright Shim Coverage Expansion', () => {
 
             const locators = await page.locator('button').all();
             expect(locators.length).toBe(3);
-            expect(await locators[1].textContent()).toBe('Btn 1');
+            const secondLocator = locators[1];
+            if (!secondLocator) throw new Error('Expected second button locator');
+            expect(await secondLocator.textContent()).toBe('Btn 1');
         });
 
         test('should cover all getBy methods', async () => {
@@ -256,7 +258,9 @@ describe('Playwright Shim Coverage Expansion', () => {
                  mimeType: 'text/plain',
                  buffer: Buffer.from('hello')
              });
-             expect(input.files?.[0].name).toBe('test.txt');
+             const uploadedFile = input.files?.[0];
+             if (!uploadedFile) throw new Error('Expected uploaded file');
+             expect(uploadedFile.name).toBe('test.txt');
         });
 
         test('should filter by pressed state in getByRole', async () => {

@@ -183,13 +183,14 @@ export function generateTypeDefinitions(
 
         if (match) {
           const body = match[1];
+          if (body === undefined) return;
 
           // Extract constructor parameters. Unknown accepts challenge inputs while
           // preventing generated declarations from promising unsupported members.
           const ctorRegex = /constructor\s*\(([^)]*)\)/;
           const ctorMatch = ctorRegex.exec(body);
           let ctorDef = 'constructor(page: unknown);';
-          if (ctorMatch) {
+          if (ctorMatch?.[1] !== undefined) {
             // Simple parameter handling
             ctorDef = `constructor(${ctorMatch[1].split(',').map(p => p.trim() + ': unknown').join(', ')});`;
           }
@@ -201,7 +202,9 @@ export function generateTypeDefinitions(
           const methodMatches = Array.from(body.matchAll(methodRegex));
           methodMatches.forEach((methodMatch, index) => {
             const methodName = methodMatch[1];
-            const args = methodMatch[2].split(',').filter(a => a.trim()).map(a => a.trim() + ': unknown').join(', ');
+            const parameterList = methodMatch[2];
+            if (methodName === undefined || parameterList === undefined) return;
+            const args = parameterList.split(',').filter(a => a.trim()).map(a => a.trim() + ': unknown').join(', ');
             const methodBodyStart = (methodMatch.index ?? 0) + methodMatch[0].length;
             const methodBodyEnd = methodMatches[index + 1]?.index ?? body.length;
             const methodBody = body.slice(methodBodyStart, methodBodyEnd);

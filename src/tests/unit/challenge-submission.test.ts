@@ -19,10 +19,13 @@ describe('buildChallengeSubmissionPayload', () => {
     });
 
     expect('executionTime' in payload).toBe(false);
-    expect('testCaseId' in payload.testResults[0]).toBe(false);
-    expect('output' in payload.testResults[0]).toBe(false);
-    expect('error' in payload.testResults[0]).toBe(false);
-    expect(payload.testResults[1]).toEqual({
+    const firstResult = payload.testResults[0];
+    const secondResult = payload.testResults[1];
+    if (!firstResult || !secondResult) throw new Error('Expected two test results');
+    expect('testCaseId' in firstResult).toBe(false);
+    expect('output' in firstResult).toBe(false);
+    expect('error' in firstResult).toBe(false);
+    expect(secondResult).toEqual({
       passed: true,
       testCaseId: '123e4567-e89b-12d3-a456-426614174000',
       output: null,
@@ -42,7 +45,9 @@ describe('buildChallengeSubmissionPayload', () => {
     });
 
     expect(payload.executionTime).toBe(0);
-    expect(payload.testResults[0]).toEqual({
+    const result = payload.testResults[0];
+    if (!result) throw new Error('Expected one test result');
+    expect(result).toEqual({
       passed: false,
       output: false,
       error: '',

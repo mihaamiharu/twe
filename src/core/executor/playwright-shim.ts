@@ -1443,7 +1443,7 @@ export class MockedPlaywrightPage {
     if (options?.level !== undefined) {
       filteredMatches = filteredMatches.filter((el) => {
         const tagMatch = el.tagName.match(/^H(\d)$/);
-        if (tagMatch) return parseInt(tagMatch[1]) === options.level;
+        if (tagMatch?.[1] !== undefined) return parseInt(tagMatch[1]) === options.level;
         return el.getAttribute('aria-level') === String(options.level);
       });
     }
@@ -1793,10 +1793,18 @@ export class MockedPlaywrightPage {
       const elements = finder();
       if (elements.length === 0) return [];
 
-      if (filterType === 'first') return [elements[0]];
-      if (filterType === 'last') return [elements[elements.length - 1]];
-      if (filterType === 'nth' && filterIndex !== null)
-        return elements[filterIndex] ? [elements[filterIndex]] : [];
+      if (filterType === 'first') {
+        const first = elements[0];
+        return first ? [first] : [];
+      }
+      if (filterType === 'last') {
+        const last = elements.at(-1);
+        return last ? [last] : [];
+      }
+      if (filterType === 'nth' && filterIndex !== null) {
+        const nth = elements[filterIndex];
+        return nth ? [nth] : [];
+      }
 
       return elements;
     };
@@ -1805,7 +1813,7 @@ export class MockedPlaywrightPage {
     const getElement = (): HTMLElement | null => {
       const elements = getFilteredElements();
       if (elements.length === 0) return null;
-      return elements[0];
+      return elements[0] ?? null;
     };
 
     /**
@@ -1928,7 +1936,7 @@ export class MockedPlaywrightPage {
         const attrs: Record<string, string> = {};
         for (let i = 0; i < el.attributes.length; i++) {
           const attr = el.attributes[i];
-          attrs[attr.name] = attr.value;
+          if (attr) attrs[attr.name] = attr.value;
         }
         return attrs;
       },

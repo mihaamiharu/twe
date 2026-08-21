@@ -339,9 +339,9 @@ function TutorialDetailPage() {
       const h2Match = line.match(/^##\s+(.+)$/);
       const h3Match = line.match(/^###\s+(.+)$/);
 
-      if (h2Match) {
+      if (h2Match?.[1]) {
         items.push({ id: slugify(h2Match[1]), text: h2Match[1], level: 2 });
-      } else if (h3Match) {
+      } else if (h3Match?.[1]) {
         items.push({ id: slugify(h3Match[1]), text: h3Match[1], level: 3 });
       }
     });

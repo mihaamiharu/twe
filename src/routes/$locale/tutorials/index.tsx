@@ -126,6 +126,8 @@ function TutorialsPage() {
       advanced: [],
       other: [],
     };
+    const otherGroup = groups['other'];
+    if (!otherGroup) return groups;
 
     tutorials.forEach((t) => {
       if (hideCompleted && t.isCompleted) return;
@@ -135,10 +137,11 @@ function TutorialsPage() {
       if (tag) {
         // Explicitly cast tag to string to avoid typescript error since we just checked it
         const key = (tag).toLowerCase();
-        if (groups[key]) groups[key].push(t);
-        else groups['other'].push(t);
+        const group = groups[key];
+        if (group) group.push(t);
+        else otherGroup.push(t);
       } else {
-        groups['other'].push(t);
+        otherGroup.push(t);
       }
     });
 

@@ -63,8 +63,7 @@ async function audit() {
   console.log('\n\nBY TYPE:');
   const byType = allChallenges.reduce(
     (acc, c) => {
-      if (!acc[c.type]) acc[c.type] = 0;
-      acc[c.type]++;
+      acc[c.type] = (acc[c.type] ?? 0) + 1;
       return acc;
     },
     {} as Record<string, number>,

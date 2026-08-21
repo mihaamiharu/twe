@@ -109,7 +109,9 @@ describe.skipIf(isCI)('Iframe Executor', () => {
     const result = await executeWithTestCases(code, html, testCases);
 
     expect(result.overall.status).toBe('PASSED');
-    expect(result.results[0].passed).toBe(true);
+    const firstResult = result.results[0];
+    if (!firstResult) throw new Error('Expected a test-case result');
+    expect(firstResult.passed).toBe(true);
   });
 
   test('should handle soft failures', async () => {

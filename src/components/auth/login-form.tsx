@@ -3,7 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { Link, useParams } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { signIn } from '@/lib/auth.client';
-import { signInSchema, type SignInInput } from '@/lib/validations';
+import {
+  formatValidationErrors,
+  signInSchema,
+  type SignInInput,
+} from '@/lib/validations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,6 +28,10 @@ interface LoginFormProps {
   onRegisterClick?: () => void;
 }
 
+function isSignInField(name: string): name is keyof SignInInput {
+  return name === 'email' || name === 'password';
+}
+
 export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
   const { t } = useTranslation(['auth', 'common']);
   const { locale } = useParams({ strict: false });
@@ -32,7 +40,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
     email: '',
     password: '',
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<SignInInput>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState('');
 
@@ -41,7 +49,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear field error on change
-    if (errors[name]) {
+    if (isSignInField(name) && errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[name];
@@ -58,14 +66,7 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
     // Validate with Zod
     const result = signInSchema.safeParse(formData);
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const error of result.error.issues) {
-        const path = error.path.join('.');
-        if (!fieldErrors[path]) {
-          fieldErrors[path] = error.message;
-        }
-      }
-      setErrors(fieldErrors);
+      setErrors(formatValidationErrors(result.error));
       return;
     }
 

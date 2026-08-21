@@ -155,7 +155,7 @@ export const getChallenges = createServerFn({ method: 'GET' })
         .from(challenges)
         .where(and(...conditions));
 
-      const total = Number(countQuery[0].count);
+      const total = Number(countQuery[0]?.count ?? 0);
 
       return {
         success: true,

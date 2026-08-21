@@ -26,8 +26,10 @@ async function ensureUserImage(userId: string): Promise<string | null> {
     if (account?.idToken) {
       // Decode ID Token to get picture
       try {
+        const encodedPayload = account.idToken.split('.')[1];
+        if (!encodedPayload) return null;
         const payload: unknown = JSON.parse(
-          Buffer.from(account.idToken.split('.')[1], 'base64').toString(),
+          Buffer.from(encodedPayload, 'base64').toString(),
         );
         if (
           typeof payload === 'object' &&

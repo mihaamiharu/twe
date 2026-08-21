@@ -35,6 +35,9 @@ export const submitContactMessage = createServerFn({ method: 'POST' })
                     status: 'NEW',
                 })
                 .returning();
+            if (!newMessage) {
+                throw new Error('Failed to create contact message');
+            }
 
             logger.info(`[Contact] New message from ${email} (ID: ${newMessage.id})`);
 

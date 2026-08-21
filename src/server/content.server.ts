@@ -74,7 +74,11 @@ function parseFrontmatter(content: string): {
     };
   }
 
-  const [, frontmatter, body] = frontmatterMatch;
+  const frontmatter = frontmatterMatch[1];
+  const body = frontmatterMatch[2];
+  if (frontmatter === undefined || body === undefined) {
+    return { meta: {}, content };
+  }
   const meta: { title?: string; description?: string } = {};
 
   for (const line of frontmatter.split('\n')) {

@@ -92,6 +92,7 @@ function LeaderboardPage() {
 
   const TopThree = users.slice(0, 3);
   const RestUsers = users.slice(3);
+  const firstUser = TopThree[0];
 
   // Animation delay utility
   const getDelay = (index: number) => ({ animationDelay: `${index * 50}ms` });
@@ -165,7 +166,7 @@ function LeaderboardPage() {
             ) : (
               <>
                 {/* Top 3 Podium - Compact & Floating */}
-                {TopThree.length > 0 && (
+                {TopThree.length > 0 && firstUser && (
                   <div className="relative pt-10 pb-4">
                     {/* Glow effect for rank 1 */}
                     <div className="absolute left-1/2 top-4 -translate-x-1/2 w-64 h-64 bg-accent/20 blur-[80px] rounded-full -z-10" />
@@ -179,11 +180,11 @@ function LeaderboardPage() {
                       {TopThree.length === 1 ? (
                         <div className="animate-in fade-in zoom-in-75 duration-500 delay-300">
                           <PodiumCard
-                            user={TopThree[0]}
+                            user={firstUser}
                             rank={1}
                             isCenter
                             isAuthenticated={isAuthenticated}
-                            {...getDisplayXpProps(TopThree[0])}
+                            {...getDisplayXpProps(firstUser)}
                           />
                         </div>
                       ) : (
@@ -205,11 +206,11 @@ function LeaderboardPage() {
                           {/* Rank 1 (Center) */}
                           <div className="order-1 md:order-2 w-full md:w-auto flex justify-center -mt-8 mb-4 md:mb-8 z-10 animate-in fade-in zoom-in-75 duration-500 delay-300">
                             <PodiumCard
-                              user={TopThree[0]}
+                              user={firstUser}
                               rank={1}
                               isCenter
                               isAuthenticated={isAuthenticated}
-                              {...getDisplayXpProps(TopThree[0])}
+                              {...getDisplayXpProps(firstUser)}
                             />
                           </div>
 
@@ -266,7 +267,7 @@ function LeaderboardPage() {
                               />
                             ) : (
                               <div className="h-full w-full flex items-center justify-center bg-primary/5 text-primary font-bold">
-                                {(user.name || 'A')[0].toUpperCase()}
+                                (user.name || 'A').charAt(0).toUpperCase()
                               </div>
                             )
                           ) : (

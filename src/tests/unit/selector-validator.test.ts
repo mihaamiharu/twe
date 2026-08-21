@@ -75,7 +75,9 @@ describe('selector-validator', () => {
     it('should find elements correctly', () => {
       const result = testCSSSelector('.child', container);
       expect(result.count).toBe(2);
-      expect(result.matches[0].textContent).toBe('Item 1');
+      const firstMatch = result.matches[0];
+      if (!firstMatch) throw new Error('Expected first selector match');
+      expect(firstMatch.textContent).toBe('Item 1');
     });
 
     it('should return zero matches for non-existent selector', () => {
@@ -139,6 +141,18 @@ describe('selector-validator', () => {
       );
       expect(result.isCorrect).toBe(false);
       expect(result.feedback).toContain('did not match any elements');
+    });
+
+    it('handles an empty expected selector list without indexing undefined', () => {
+      const result = testSelectorAgainstTarget(
+        '.action',
+        'css',
+        container,
+        [],
+      );
+
+      expect(result.isCorrect).toBe(false);
+      expect(result.expectedMatchCount).toBe(0);
     });
   });
 

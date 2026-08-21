@@ -195,6 +195,11 @@ export function ChallengesPage() {
   // Derive active track
   const activeTrack =
     ALL_TRACKS.find((t) => t.id === activeTrackId) || ALL_TRACKS[0];
+  if (!activeTrack) {
+    throw new Error(
+      'Challenge track configuration must define at least one track',
+    );
+  }
   const activeGroup = SIDEBAR_GROUPS.find((group) =>
     group.tracks.includes(activeTrackId),
   );
@@ -242,7 +247,10 @@ export function ChallengesPage() {
 
     // Sort challenges within groups by order
     for (const category in groups) {
-      groups[category].sort((a, b) => a.order - b.order);
+      const categoryChallenges = groups[category];
+      if (categoryChallenges) {
+        categoryChallenges.sort((a, b) => a.order - b.order);
+      }
     }
 
     // Sort Categories themselves
@@ -527,8 +535,9 @@ export function ChallengesPage() {
                       <AnimatePresence mode="popLayout">
                         {categoryChallenges.map((challenge) => {
                           const config =
-                            challengeTypeConfig[challenge.type] ||
-                            challengeTypeConfig.JAVASCRIPT;
+                            challengeTypeConfig[challenge.type] ??
+                            challengeTypeConfig['JAVASCRIPT'];
+                          if (!config) return null;
                           const isComingSoon =
                             challenge.tags?.includes('coming-soon');
                           const isBoss = isBossChallenge(challenge);
@@ -572,8 +581,9 @@ export function ChallengesPage() {
                           <AnimatePresence mode="popLayout">
                             {categoryChallenges.map((challenge, idx) => {
                               const config =
-                                challengeTypeConfig[challenge.type] ||
-                                challengeTypeConfig.JAVASCRIPT;
+                                challengeTypeConfig[challenge.type] ??
+                                challengeTypeConfig['JAVASCRIPT'];
+                              if (!config) return null;
                               const isComingSoon =
                                 challenge.tags?.includes('coming-soon');
                               const isBoss = isBossChallenge(challenge);

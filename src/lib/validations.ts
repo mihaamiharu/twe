@@ -29,6 +29,19 @@ export const signInSchema = z.object({
 export type SignUpInput = z.infer<typeof signUpSchema>;
 export type SignInInput = z.infer<typeof signInSchema>;
 
+export function formatValidationErrors(
+  error: z.ZodError,
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+  for (const issue of error.issues) {
+    const path = issue.path.join('.');
+    if (!errors[path]) {
+      errors[path] = issue.message;
+    }
+  }
+  return errors;
+}
+
 // Validation helper
 export function validateInput<T>(
   schema: z.ZodSchema<T>,
@@ -42,13 +55,5 @@ export function validateInput<T>(
     return { success: true, data: result.data };
   }
 
-  const errors: Record<string, string> = {};
-  for (const error of result.error.issues) {
-    const path = error.path.join('.');
-    if (!errors[path]) {
-      errors[path] = error.message;
-    }
-  }
-
-  return { success: false, errors };
+  return { success: false, errors: formatValidationErrors(result.error) };
 }

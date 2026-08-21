@@ -69,6 +69,9 @@ export async function handleSetProgressRequest(
           testsTotal: 1,
         })
         .returning();
+      if (!newSubmission) {
+        throw new Error('Failed to create progress submission');
+      }
 
       const existingProgress = await db.query.progress.findFirst({
         where: and(

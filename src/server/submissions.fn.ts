@@ -134,6 +134,9 @@ export const challengeSubmissionHandler = async ({
               isPublished: true,
             })
             .returning();
+          if (!newChallenge) {
+            throw new Error(`Failed to create challenge ${fsChallenge.slug}`);
+          }
 
           if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
             await db.insert(testCases).values(
@@ -256,6 +259,9 @@ export const challengeSubmissionHandler = async ({
         errorMessage: testResults.find((r) => r.error)?.error,
       })
       .returning();
+    if (!submission) {
+      throw new Error('Failed to create submission');
+    }
 
     // Update or create progress record
     if (existingProgress) {

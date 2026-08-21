@@ -151,7 +151,7 @@ export function useChallengeExecution(
             else if (
                 isCodeChallenge &&
                 !isAssertionChallenge &&
-                challenge.testCases?.length &&
+                challenge.testCases?.[0] &&
                 result.status === 'PASSED'
             ) {
                 const expected = challenge.testCases[0].expectedOutput;
@@ -414,8 +414,9 @@ export function useChallengeExecution(
         const newOpenFiles = state.openFiles.filter(p => p !== path);
         state.setOpenFiles(newOpenFiles);
         if (state.selectedFile === path) {
-            if (newOpenFiles.length > 0) {
-                state.setSelectedFile(newOpenFiles[newOpenFiles.length - 1]);
+            const nextFile = newOpenFiles.at(-1);
+            if (nextFile !== undefined) {
+                state.setSelectedFile(nextFile);
             }
         }
     }, [state.openFiles, state.setOpenFiles, state.selectedFile, state.setSelectedFile]);

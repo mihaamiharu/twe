@@ -1,7 +1,23 @@
 import { db } from './index';
 import { sql } from 'drizzle-orm';
 
-type ParityRow = Record<string, unknown>;
+interface ParityRow extends Record<string, unknown> {
+  slug: unknown;
+}
+
+interface TutorialParityRow extends ParityRow {
+  title: unknown;
+}
+
+interface ChallengeParityRow extends ParityRow {
+  title: unknown;
+  instructions: unknown;
+}
+
+interface AchievementParityRow extends ParityRow {
+  name: unknown;
+  description: unknown;
+}
 
 function hasEnglishString(value: unknown): boolean {
   if (typeof value !== 'object' || value === null || !('en' in value)) {
@@ -23,7 +39,7 @@ async function verifyParity() {
   try {
     // 1. Verify Tutorials
     console.log('--- Tutorials ---');
-    const dbTutorials = await db.execute(
+    const dbTutorials = await db.execute<TutorialParityRow>(
       sql`SELECT slug, title FROM tutorials`,
     );
     // Note: For tutorials, content matches the markdown file content
@@ -39,7 +55,7 @@ async function verifyParity() {
 
     // 2. Verify Challenges
     console.log('\n--- Challenges ---');
-    const dbChallenges = await db.execute(
+    const dbChallenges = await db.execute<ChallengeParityRow>(
       sql`SELECT slug, title, instructions FROM challenges`,
     );
     for (const row of dbChallenges) {
@@ -60,7 +76,7 @@ async function verifyParity() {
 
     // 3. Verify Achievements
     console.log('\n--- Achievements ---');
-    const dbAchievements = await db.execute(
+    const dbAchievements = await db.execute<AchievementParityRow>(
       sql`SELECT slug, name, description FROM achievements`,
     );
     for (const row of dbAchievements) {

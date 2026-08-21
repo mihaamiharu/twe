@@ -82,10 +82,13 @@ export async function loginViaApi(
       (h) => h.name.toLowerCase() === 'set-cookie',
     );
     const cookiesToAdd = setCookieHeaders.flatMap((header) => {
-      const parts = header.value.split(';')[0].split('=');
-      if (parts.length < 2) return [];
+      const cookiePair = header.value.split(';')[0];
+      if (cookiePair === undefined) return [];
+      const parts = cookiePair.split('=');
+      const name = parts[0];
+      if (parts.length < 2 || name === undefined) return [];
       return {
-        name: parts[0].trim(),
+        name: name.trim(),
         value: parts.slice(1).join('=').trim(),
         url: baseURL,
         httpOnly: true,

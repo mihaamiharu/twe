@@ -22,7 +22,7 @@ export function AnimatedCounter({
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting && !isVisible) {
+        if (entry?.isIntersecting && !isVisible) {
           setIsVisible(true);
         }
       },
