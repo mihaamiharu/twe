@@ -1,9 +1,7 @@
 name: Deploy to Production
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
   workflow_dispatch:
 
 concurrency:
@@ -81,8 +79,8 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT }}
-          source: "docker-compose.prod.yml"
-          target: "~/apps/twe"
+          source: 'docker-compose.prod.yml'
+          target: '~/apps/twe'
 
       - name: Create .env.production from secrets
         uses: appleboy/ssh-action@v1.2.2
@@ -94,7 +92,7 @@ jobs:
           script: |
             mkdir -p ~/apps/twe
             cd ~/apps/twe
-            
+
             # Overwrite .env.production with values from GitHub Secrets
             cat <<EOF > .env.production
             DATABASE_URL="${{ secrets.DATABASE_URL }}"
@@ -133,26 +131,26 @@ jobs:
           port: ${{ secrets.VPS_PORT }}
           script: |
             cd ~/apps/twe
-            
+
             echo "🔐 Logging into GHCR..."
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo "📥 Pulling latest image..."
             docker pull ghcr.io/mihaamiharu/twe:latest
-            
+
             echo "🔄 Restarting containers..."
             docker compose -f docker-compose.prod.yml up -d
-            
+
             # Run migrations and sync
             echo "🗄️ Running DB migrations..."
-            docker exec twe-app bun run db:migrate || true
-            
+            docker exec twe-app bun run db:migrate
+
             echo "📚 Syncing content..."
             docker exec twe-app bun run db:sync
-            
+
             echo "🧹 Cleaning up old images..."
             docker image prune -af
-            
+
             echo "✅ Deployment complete!"
 
       - name: Notify on failure

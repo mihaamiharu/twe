@@ -8,7 +8,7 @@
 
 export interface AttachOnclickHandlersOptions {
   document: Document;
-  window: Window & Record<string, unknown>;
+  window: object;
   /** Additional keys to exclude from the window function destructure */
   excludeKeys?: string[];
   /** Custom error message prefix for console.error */
@@ -46,7 +46,7 @@ export function attachOnclickHandlers(options: AttachOnclickHandlersOptions): vo
     try {
       const windowFuncs = Object.keys(win).filter(
         (key) =>
-          typeof win[key] === 'function' &&
+          typeof Reflect.get(win, key) === 'function' &&
           !allExcludeKeys.includes(key),
       );
 

@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface OgImageTemplateProps {
     title: string;
     type: string;

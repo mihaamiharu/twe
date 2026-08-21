@@ -25,6 +25,14 @@ export interface LocalizedArray {
   id?: string[];
 }
 
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
 // =============================================================================
 // TUTORIAL TYPES
 // =============================================================================
@@ -89,8 +97,8 @@ export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e' | 'pom
  */
 export interface TestCaseDefinition {
   description: string;
-  input?: unknown;
-  expectedOutput: unknown;
+  input?: JsonValue;
+  expectedOutput: JsonValue;
   isHidden?: boolean;
 }
 

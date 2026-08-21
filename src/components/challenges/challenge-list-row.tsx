@@ -5,7 +5,6 @@ import { Badge } from '@/components/ui/badge';
 import { TableCell } from '@/components/ui/table';
 import { cn } from '@/lib/utils';
 import { difficultyColors } from '@/lib/constants';
-import type { TFunction } from 'i18next';
 
 export interface ChallengeListRowProps {
   challenge: {
@@ -26,7 +25,7 @@ export interface ChallengeListRowProps {
   isComingSoon: boolean;
   isBoss: boolean;
   params: { locale: string; slug: string };
-  t: TFunction;
+  t: (key: string) => string;
 }
 
 export function ChallengeListRow({

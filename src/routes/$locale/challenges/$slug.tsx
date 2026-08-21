@@ -12,7 +12,7 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { ChallengePlayground, type Challenge, ChallengeSkeleton } from '@/components/challenges';
+import { ChallengePlayground, ChallengeSkeleton } from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -28,66 +28,19 @@ import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 import { transformChallengeResponse } from '@/lib/transform-challenge-response';
+import {
+  buildChallengeSubmissionPayload,
+  type ChallengeSubmissionPayload,
+} from '@/lib/challenge-submission';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 import i18n from '@/lib/i18n';
 
-interface ServerChallengeResponse {
-  success: boolean;
-  data?: {
-    id: string;
-    slug: string;
-    title: string;
-    description: string;
-    instructions: string;
-    type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';
-    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-    category: string;
-    xpReward: number;
-    order: number;
-    htmlContent?: string;
-    files?: Record<string, string>;
-    editableFiles?: string[];
-    preloadModules?: Record<string, { exports: string[]; source: string }>;
-    starterCode?: string;
-    tags?: string[];
-    hints?: string[];
-    completionCount: number;
-    tutorial?: { slug: string; title: string } | null;
-    testCases: {
-      id: string;
-      description: string;
-      input: unknown;
-      expectedOutput: unknown;
-      isHidden?: boolean;
-    }[];
-    hiddenTestCaseCount: number;
-    userProgress?: {
-      isCompleted: boolean;
-      attempts: number;
-      lastAccessedAt: Date;
-      usedHint: boolean;
-      hintContent?: string | null;
-    } | null;
-    bestSubmission?: {
-      code: string;
-      isPassed: boolean;
-      xpEarned: number;
-      testsPassed: number;
-      testsTotal: number;
-      executionTime: number;
-    } | null;
-    nextChallenge?: { slug: string; title: string } | null;
-    prevChallenge?: { slug: string; title: string } | null;
-  };
-  error?: string;
-}
-
 export const Route = createFileRoute('/$locale/challenges/$slug')({
-  loader: ({ context, params }) => {
-    void context.queryClient.prefetchQuery(
+  loader: ({ context, params }) =>
+    context.queryClient.ensureQueryData(
       challengeDetailQueryOptions(params.slug, params.locale),
-    );
-  },
+    ),
   component: ChallengeDetailPage,
   head: ({ loaderData, params }) => {
     const data = loaderData?.data;
@@ -240,7 +193,7 @@ function ChallengeDetailPage() {
 
   // Rename for compatibility with existing code
   // Rename for compatibility with existing code
-  const data = challengeData as ServerChallengeResponse;
+  const data = challengeData;
 
 
 
@@ -277,18 +230,7 @@ function ChallengeDetailPage() {
   );
 
   const submitMutation = useMutation({
-    mutationFn: async (submissionData: {
-      challengeSlug: string;
-      code: string;
-      isPractice?: boolean;
-      testResults: {
-        testCaseId?: string;
-        passed: boolean;
-        output?: unknown;
-        error?: string;
-      }[];
-      executionTime?: number;
-    }) => {
+    mutationFn: async (submissionData: ChallengeSubmissionPayload) => {
       const response = await createSubmission({ data: submissionData });
 
       if (!response.success) {
@@ -308,19 +250,21 @@ function ChallengeDetailPage() {
         setLastSubmissionResult({
           xpEarned: response.data.submission.xpEarned,
           achievements: response.data.newAchievements || [],
-          levelUp: response.data.levelUp
-            ? {
-              newLevel: response.data.levelUp.newLevel,
-              title: getLevelTitle(response.data.levelUp.newLevel),
-            }
-            : undefined,
+          ...omitUndefined({
+            levelUp: response.data.levelUp
+              ? {
+                newLevel: response.data.levelUp.newLevel,
+                title: getLevelTitle(response.data.levelUp.newLevel),
+              }
+              : undefined,
+          }),
         });
         setShowSuccessDialog(true);
 
         toast.success(t('common:messages.challengeCompleted'), {
           description: response.data.newAchievements?.length
             ? t('common:messages.achievementUnlocked', {
-              name: response.data.newAchievements[0].name,
+              name: response.data.newAchievements[0]?.name,
             })
             : undefined,
         });
@@ -386,20 +330,14 @@ function ChallengeDetailPage() {
         return;
       }
 
-      const submissionData = {
+      const submissionData = buildChallengeSubmissionPayload({
         challengeSlug: challenge.slug,
         code: data.code,
         isPractice: challenge.isCompleted, // Auto-detect practice mode
-        testResults: data.testResults.map((tr) => ({
-          testCaseId:
-            tr.id !== 'main' && tr.id !== 'selector' ? tr.id : undefined,
-          passed: tr.passed,
-          output: tr.output,
-          error: tr.error,
-        })),
-        executionTime: data.executionTime,
+        testResults: data.testResults,
+        ...omitUndefined({ executionTime: data.executionTime }),
         locale,
-      };
+      });
 
       toast.promise(submitMutation.mutateAsync(submissionData), {
         loading: t('common:messages.submitting'),
@@ -465,7 +403,7 @@ function ChallengeDetailPage() {
           key={challenge.id}
           challenge={challenge}
           onSubmit={handleSubmit}
-          userId={userId}
+          {...omitUndefined({ userId })}
           hintUsed={data?.data?.userProgress?.usedHint || false}
           initialHintContent={data?.data?.userProgress?.hintContent || null}
         />
@@ -478,19 +416,19 @@ function ChallengeDetailPage() {
           onClose={() => setShowSuccessDialog(false)}
           xpEarned={lastSubmissionResult.xpEarned}
           achievements={lastSubmissionResult.achievements}
-          levelUp={lastSubmissionResult.levelUp}
+          {...omitUndefined({ levelUp: lastSubmissionResult.levelUp })}
           onRetry={() => setShowSuccessDialog(false)}
-          onNextChallenge={
-            data?.data?.nextChallenge
+          {...omitUndefined({
+            onNextChallenge: data?.data?.nextChallenge
               ? () => {
                 setShowSuccessDialog(false);
                 void navigate({
                   to: '/$locale/challenges/$slug',
-                  params: { locale, slug: data.data.nextChallenge!.slug },
+                  params: { locale, slug: data.data?.nextChallenge?.slug ?? '' },
                 });
               }
-              : undefined
-          }
+              : undefined,
+          })}
         />
       )}
 

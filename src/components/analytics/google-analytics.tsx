@@ -3,10 +3,8 @@ import { useLocation } from '@tanstack/react-router';
 
 declare global {
   interface Window {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    dataLayer: any[];
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    gtag: (...args: any[]) => void;
+    dataLayer: IArguments[];
+    gtag: (...args: unknown[]) => void;
   }
 }
 
@@ -22,7 +20,8 @@ export function GoogleAnalytics({ measurementId }: { measurementId?: string }) {
 
     // Define gtag if it doesn't exist
     if (!window.gtag) {
-       
+      // Google's bootstrap contract intentionally stores the function's
+      // IArguments object in dataLayer rather than a rest-parameter array.
       window.gtag = function () {
         // eslint-disable-next-line prefer-rest-params
         window.dataLayer.push(arguments);

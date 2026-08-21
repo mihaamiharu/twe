@@ -1,4 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class DashboardPage extends BasePage {
@@ -14,28 +15,35 @@ export class DashboardPage extends BasePage {
     this.heroTitle = page.getByRole('heading', { level: 1 }).first();
     this.startLearningButton = page
       .getByRole('main')
-      .getByRole('link', { name: /start learning/i })
+      .getByRole('link', {
+        name: /Solve Your First Challenge|Selesaikan Tantangan Pertamamu/i,
+      })
       .first();
-    // Targeted stats based on the structure in index.tsx
-    this.statsChallenges = page
-      .locator('div.text-center')
-      .filter({ hasText: /Challenges/i })
-      .locator('.text-3xl, .text-4xl')
+    // The label is the stable contract; its grandparent is the stat card and
+    // its first child is the animated value.
+    const stats = page.locator('main section').first();
+    this.statsChallenges = stats
+      .getByText('Real Scenarios', { exact: true })
+      .locator('..')
+      .locator('..')
+      .locator('div')
       .first();
-    this.statsTutorials = page
-      .locator('div.text-center')
-      .filter({ hasText: /Tutorials/i })
-      .locator('.text-3xl, .text-4xl')
+    this.statsTutorials = stats
+      .getByText('Curated Lessons', { exact: true })
+      .locator('..')
+      .locator('..')
+      .locator('div')
       .first();
-    this.statsAchievements = page
-      .locator('div.text-center')
-      .filter({ hasText: /Achievements/i })
-      .locator('.text-3xl, .text-4xl')
+    this.statsAchievements = stats
+      .getByText('Achievements', { exact: true })
+      .locator('..')
+      .locator('..')
+      .locator('div')
       .first();
     this.learningTiers = page.locator('.glass-card');
   }
 
-  async goto(locale: string = 'en') {
+  override async goto(locale: string = 'en') {
     await this.page.goto(`/${locale}/`);
   }
 

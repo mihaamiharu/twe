@@ -6,6 +6,8 @@
  * (runtime TypeScript and VFS navigation).
  */
 
+import { omitUndefined } from '@/lib/omit-undefined';
+
 export interface RouteMatcher {
   matcher: string | RegExp | ((url: URL) => boolean);
   handler: (requestInfo: RouteRequestInfo) => Promise<RouteHandlerResult>;
@@ -23,10 +25,90 @@ export interface RouteHandlerResult {
   response?: {
     status?: number;
     statusText?: string;
-    body?: string;
-    json?: Record<string, unknown>;
+    body?: string | ArrayBuffer;
+    json?: unknown;
     headers?: Record<string, string>;
   };
+  options?: {
+    method?: string;
+    headers?: Record<string, string>;
+    postData?: string | Buffer;
+  };
+}
+
+export type BrowserFetch = (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+) => Promise<Response>;
+
+export interface RouteWindow {
+  __MOCK_ROUTES__?: RouteMatcher[];
+}
+
+const supportedRequestBodyTags = [
+  '[object ArrayBuffer]',
+  '[object Blob]',
+  '[object File]',
+  '[object FormData]',
+  '[object ReadableStream]',
+  '[object URLSearchParams]',
+] as const;
+const unsupportedRequestBodyMessage =
+  'Unsupported request body for page.route';
+
+function isSupportedRequestBody(body: unknown): body is BodyInit {
+  if (typeof body === 'string' || ArrayBuffer.isView(body)) return true;
+  const bodyTag = Object.prototype.toString.call(body);
+  return supportedRequestBodyTags.some((supportedTag) => supportedTag === bodyTag);
+}
+
+function isRequestInput(input: unknown): input is Request {
+  if (typeof input !== 'object' || input === null) return false;
+  return Object.prototype.toString.call(input) === '[object Request]' &&
+    typeof Reflect.get(input, 'url') === 'string' &&
+    typeof Reflect.get(input, 'method') === 'string' &&
+    typeof Reflect.get(input, 'clone') === 'function';
+}
+
+type FetchInputStringifier = (this: object) => unknown;
+
+function isFetchInputStringifier(
+  value: unknown,
+): value is FetchInputStringifier {
+  return typeof value === 'function';
+}
+
+function stringifyFetchInput(input: object): string {
+  const toString: unknown = Reflect.get(input, 'toString');
+  if (!isFetchInputStringifier(toString)) {
+    throw new TypeError('Fetch input does not provide a toString method');
+  }
+  const result: unknown = Reflect.apply(toString, input, []);
+  if (typeof result !== 'string') {
+    throw new TypeError('Fetch input toString method did not return a string');
+  }
+  return result;
+}
+
+export async function requestBodyToPostData(
+  body: unknown,
+): Promise<string | null> {
+  if (body === undefined || body === null) return null;
+
+  if (!isSupportedRequestBody(body)) {
+    throw new TypeError(
+      `${unsupportedRequestBodyMessage}: ${Object.prototype.toString.call(body)}`,
+    );
+  }
+
+  try {
+    return await new Response(body).text();
+  } catch (error) {
+    const detail = error instanceof Error ? `: ${error.message}` : '';
+    throw new TypeError(`${unsupportedRequestBodyMessage}${detail}`, {
+      cause: error,
+    });
+  }
 }
 
 /**
@@ -96,9 +178,13 @@ export function generateFetchPolyfillCode(options: {
   const fallbackCode = fallbackToOriginal
     ? `return originalFetch ? originalFetch(input, init) : Promise.resolve({ ok: false, status: 404 });`
     : `return Promise.resolve({ ok: true, status: 404, json: () => Promise.resolve({}) });`;
+  const supportedRequestBodyTagsCode = JSON.stringify(supportedRequestBodyTags);
+  const unsupportedRequestBodyMessageCode = JSON.stringify(
+    unsupportedRequestBodyMessage,
+  );
 
   return `
-            window.fetch = function(input, init) {
+            window.fetch = async function(input, init) {
                 let url = input;
                 if (typeof input === 'string') {
                     if (input.startsWith('/')) {
@@ -106,11 +192,11 @@ export function generateFetchPolyfillCode(options: {
                     } else if (input.startsWith('http')) {
                         url = input;
                     }
-                }${includeArrayBuffer || includeStatusText ? ` else if (input instanceof Request) {
+                } else if (input instanceof Request) {
                     url = input.url;
                 } else if (input && typeof input === 'object' && 'toString' in input) {
                     url = input.toString();
-                }` : ''}
+                }
 
                 if (window.__MOCK_ROUTES__) {
                     for (const route of window.__MOCK_ROUTES__) {
@@ -128,11 +214,34 @@ export function generateFetchPolyfillCode(options: {
 
                         if (isMatch) {
                             console.log('Mocking fetch via page.route to ' + url);
+                            const serializeRequestBody = async function(requestBody) {
+                                if (requestBody === undefined || requestBody === null) return null;
+                                const tag = Object.prototype.toString.call(requestBody);
+                                const isSupported =
+                                    typeof requestBody === 'string' ||
+                                    ArrayBuffer.isView(requestBody) ||
+                                    ${supportedRequestBodyTagsCode}.includes(tag);
+                                if (!isSupported) {
+                                    throw new TypeError(${unsupportedRequestBodyMessageCode} + ': ' + tag);
+                                }
+                                try {
+                                    return await new Response(requestBody).text();
+                                } catch (error) {
+                                    const detail = error instanceof Error ? ': ' + error.message : '';
+                                    throw new TypeError(${unsupportedRequestBodyMessageCode} + detail, { cause: error });
+                                }
+                            };
+                            let body = null;
+                            if (init?.body !== undefined && init.body !== null) {
+                                body = await serializeRequestBody(init.body);
+                            } else if (input instanceof Request && input.body !== null) {
+                                body = await input.clone().text();
+                            }
                             const requestInfo = {
                                 url,
-                                method: init?.method || 'GET',
-                                headers: init?.headers || {},
-                                body: init?.body
+                                method: init?.method || (input instanceof Request ? input.method : 'GET'),
+                                headers: init?.headers || (input instanceof Request ? input.headers : {}),
+                                body
                             };
 
                             return route.handler(requestInfo).then(result => {
@@ -163,24 +272,25 @@ export function generateFetchPolyfillCode(options: {
  * registered mock routes.
  */
 export function createRouteFetchWrapper(
-  originalFetch: typeof window.fetch | undefined,
-  getWindow: () => (Window & Record<string, unknown>) | undefined,
-): typeof window.fetch {
-  return (input: RequestInfo | URL, init?: RequestInit) => {
+  originalFetch: BrowserFetch | undefined,
+  getWindow: () => RouteWindow | undefined,
+): BrowserFetch {
+  const wrappedFetch: BrowserFetch = async (input, init) => {
+    const requestInput = isRequestInput(input) ? input : undefined;
     let url: string;
     if (typeof input === 'string') {
       url = input.startsWith('/') ? 'http://localhost' + input : input;
-    } else if (input instanceof Request) {
-      url = input.url;
+    } else if (requestInput) {
+      url = requestInput.url;
     } else if (input && typeof input === 'object' && 'toString' in input) {
-      url = (input as URL).toString();
+      url = stringifyFetchInput(input);
     } else {
       url = String(input);
     }
 
     const iframeWindow = getWindow();
     if (iframeWindow?.__MOCK_ROUTES__) {
-      const routes = iframeWindow.__MOCK_ROUTES__ as RouteMatcher[];
+      const routes = iframeWindow.__MOCK_ROUTES__;
       for (const route of routes) {
         let isMatch = false;
         if (typeof route.matcher === 'string') {
@@ -196,39 +306,34 @@ export function createRouteFetchWrapper(
         }
 
         if (isMatch) {
+          const headersInit = init?.headers ??
+            requestInput?.headers;
+          const headers = headersInit
+            ? Object.fromEntries(new Headers(headersInit).entries())
+            : undefined;
+          const requestBody = init?.body !== undefined
+            ? init.body
+            : requestInput && requestInput.body !== null
+              ? await requestInput.clone().text()
+              : null;
+          const body = typeof requestBody === 'string'
+            ? requestBody
+            : await requestBodyToPostData(requestBody);
+
           return route
             .handler({
               url,
-              method: (init as RequestInit)?.method || 'GET',
-              headers: (init as RequestInit)?.headers as Record<string, string> | undefined,
-              body: (init as RequestInit)?.body as string | undefined,
+              method: init?.method || requestInput?.method || 'GET',
+              ...omitUndefined({ headers, body: body ?? undefined }),
             })
             .then((r) => {
               if (r?.type === 'fulfill') {
-                return Promise.resolve({
-                  ok:
-                    (r.response?.status || 200) >= 200 &&
-                    (r.response?.status || 200) < 300,
+                const body =
+                  r.response?.body || JSON.stringify(r.response?.json || {});
+                return new Response(body, {
                   status: r.response?.status || 200,
                   statusText: r.response?.statusText || 'OK',
-                  json: () =>
-                    Promise.resolve(
-                      r.response?.json ||
-                        (r.response?.body ? JSON.parse(r.response.body) : {}),
-                    ),
-                  text: () =>
-                    Promise.resolve(
-                      r.response?.body || JSON.stringify(r.response?.json || {}),
-                    ),
-                  arrayBuffer: () =>
-                    Promise.resolve(
-                      new TextEncoder().encode(
-                        r.response?.body || JSON.stringify(r.response?.json || {}),
-                      ).buffer,
-                    ),
-                  headers: new Headers(
-                    (r.response?.headers as HeadersInit) || {},
-                  ),
+                  headers: r.response?.headers || {},
                 });
               }
               return Promise.reject(new Error('Route not fulfilled'));
@@ -241,4 +346,6 @@ export function createRouteFetchWrapper(
       ? originalFetch(input, init)
       : Promise.resolve(new Response(null, { status: 404 }));
   };
+
+  return wrappedFetch;
 }

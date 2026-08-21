@@ -1,3 +1,5 @@
+/* eslint-disable security/detect-non-literal-fs-filename -- paths are rooted in the repository's content directories. */
+
 /**
  * Content Server - Filesystem-Driven Content Loader
  *
@@ -10,15 +12,18 @@ import { join } from 'path';
 import type {
   Tutorial,
   TutorialRegistry,
-  TutorialRegistryEntry,
   Challenge,
   ChallengeDefinition,
-  ChallengeTierFile,
   ChallengeFilters,
   ChallengeTier,
   LocalizedString,
   LocalizedArray,
 } from '@/lib/content.types';
+import {
+  parseChallengeTierJson,
+  parseTutorialRegistryJson,
+} from './content-validation';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 // =============================================================================
 // HELPERS
@@ -61,15 +66,19 @@ function parseFrontmatter(content: string): {
     const titleMatch = content.match(/^#\s+(.+)$/m);
     const descMatch = content.match(/^#[^\n]+\n+([^\n#]+)/);
     return {
-      meta: {
+      meta: omitUndefined({
         title: titleMatch?.[1]?.trim(),
         description: descMatch?.[1]?.trim(),
-      },
+      }),
       content,
     };
   }
 
-  const [, frontmatter, body] = frontmatterMatch;
+  const frontmatter = frontmatterMatch[1];
+  const body = frontmatterMatch[2];
+  if (frontmatter === undefined || body === undefined) {
+    return { meta: {}, content };
+  }
   const meta: { title?: string; description?: string } = {};
 
   for (const line of frontmatter.split('\n')) {
@@ -107,7 +116,7 @@ async function loadRegistry(): Promise<TutorialRegistry> {
 
   const registryPath = join(TUTORIALS_DIR, 'registry.json');
   const content = await readFile(registryPath, 'utf-8');
-  registryCache = JSON.parse(content) as TutorialRegistry;
+  registryCache = parseTutorialRegistryJson(content, registryPath);
   return registryCache;
 }
 
@@ -129,14 +138,12 @@ export async function getTutorialContent(
 
     // Try requested locale first, then fallback to 'en'
     let content: string;
-    let usedLocale = locale;
 
     try {
       const filePath = join(TUTORIALS_DIR, locale, `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     } catch {
       // Fallback to English
-      usedLocale = 'en';
       const filePath = join(TUTORIALS_DIR, 'en', `${slug}.md`);
       content = await readFile(filePath, 'utf-8');
     }
@@ -151,7 +158,7 @@ export async function getTutorialContent(
       order: entry.order,
       estimatedMinutes: entry.estimatedMinutes,
       tags: entry.tags,
-      relatedChallenges: entry.relatedChallenges,
+      ...omitUndefined({ relatedChallenges: entry.relatedChallenges }),
     };
   } catch (error) {
     console.error(`[ContentService] Failed to load tutorial: ${slug}`, error);
@@ -167,7 +174,8 @@ export async function getTutorialList(
 ): Promise<Omit<Tutorial, 'content'>[]> {
   const registry = await loadRegistry();
 
-  const tutorialPromises = registry.tutorials.map(async (entry) => {
+  type TutorialSummary = Omit<Tutorial, 'content'>;
+  const tutorialPromises: Promise<TutorialSummary | null>[] = registry.tutorials.map(async (entry) => {
     // Skip non-published content (default to published if no status)
     if (entry.status && entry.status !== 'published') return null;
 
@@ -201,15 +209,13 @@ export async function getTutorialList(
       order: entry.order,
       estimatedMinutes: entry.estimatedMinutes,
       tags: entry.tags,
-      relatedChallenges: entry.relatedChallenges,
+      ...omitUndefined({ relatedChallenges: entry.relatedChallenges }),
     };
   });
 
   const results = await Promise.all(tutorialPromises);
 
-  const tutorials = results.filter(
-    (t): t is Omit<Tutorial, 'content'> => t !== null,
-  );
+  const tutorials = results.filter((t): t is TutorialSummary => t !== null);
 
   return tutorials.sort((a, b) => a.order - b.order);
 }
@@ -276,21 +282,54 @@ async function loadAllChallenges(): Promise<Map<string, ChallengeDefinition>> {
     try {
       const filePath = join(CHALLENGES_DIR, `${tier}.json`);
       const content = await readFile(filePath, 'utf-8');
-      const tierData = JSON.parse(content) as ChallengeTierFile;
+      const tierData = parseChallengeTierJson(content, filePath);
 
       for (const challenge of tierData.challenges) {
         challengeCache.set(challenge.slug, challenge);
       }
-    } catch {
-      // Tier file doesn't exist yet, skip
-      console.log(
-        `[ContentService] Tier file ${tier}.json not found, skipping`,
-      );
+    } catch (error) {
+      if (isFileNotFoundError(error)) {
+        console.log(
+          `[ContentService] Tier file ${tier}.json not found, skipping`,
+        );
+        continue;
+      }
+      throw error;
     }
   }
 
   challengeCacheLoaded = true;
   return challengeCache;
+}
+
+function isFileNotFoundError(error: unknown): boolean {
+  return typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    error.code === 'ENOENT';
+}
+
+function resolveChallengeSummary(def: ChallengeDefinition, locale: string) {
+  return {
+    slug: def.slug,
+    type: def.type,
+    difficulty: def.difficulty,
+    category: def.category,
+    xpReward: def.xpReward,
+    order: def.order,
+    title: resolveLocale(def.title, locale),
+    description: resolveLocale(def.description, locale),
+    instructions: resolveLocale(def.instructions, locale),
+    ...omitUndefined({
+      tutorialSlug: def.tutorialSlug,
+      htmlContent: def.htmlContent,
+      files: def.files,
+      editableFiles: def.editableFiles,
+      preloadModules: def.preloadModules,
+      starterCode: def.starterCode,
+      tags: def.tags,
+    }),
+  };
 }
 
 /**
@@ -309,25 +348,10 @@ export async function getChallengeContent(
   if (def.status && def.status !== 'published') return null;
 
   return {
-    slug: def.slug,
-    type: def.type,
-    difficulty: def.difficulty,
-    category: def.category,
-    xpReward: def.xpReward,
-    order: def.order,
-    tutorialSlug: def.tutorialSlug,
-    title: resolveLocale(def.title, locale),
-    description: resolveLocale(def.description, locale),
-    instructions: resolveLocale(def.instructions, locale),
+    ...resolveChallengeSummary(def, locale),
     hints: resolveLocaleArray(def.hints, locale),
-    htmlContent: def.htmlContent,
-    files: def.files,
-    editableFiles: def.editableFiles,
-    preloadModules: def.preloadModules,
-    starterCode: def.starterCode,
     testCases: def.testCases,
     solution: def.solution,
-    tags: def.tags,
   };
 }
 
@@ -377,24 +401,7 @@ export async function getChallengeList(
       if (!titleMatch && !descMatch) continue;
     }
 
-    results.push({
-      slug: def.slug,
-      type: def.type,
-      difficulty: def.difficulty,
-      category: def.category,
-      xpReward: def.xpReward,
-      order: def.order,
-      tutorialSlug: def.tutorialSlug,
-      title: resolveLocale(def.title, locale),
-      description: resolveLocale(def.description, locale),
-      instructions: resolveLocale(def.instructions, locale),
-      htmlContent: def.htmlContent,
-      files: def.files,
-      editableFiles: def.editableFiles,
-      preloadModules: def.preloadModules,
-      starterCode: def.starterCode,
-      tags: def.tags,
-    });
+    results.push(resolveChallengeSummary(def, locale));
   }
 
   return results.sort((a, b) => a.order - b.order);

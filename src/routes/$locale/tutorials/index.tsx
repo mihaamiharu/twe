@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { z } from 'zod';
 import {
   Card,
@@ -51,7 +52,7 @@ export const Route = createFileRoute('/$locale/tutorials/')({
     return context.queryClient.ensureQueryData(
       tutorialsListQueryOptions({
         locale: params.locale,
-        search: search.q,
+        ...omitUndefined({ search: search.q }),
         limit: 50,
       }),
     );
@@ -107,7 +108,7 @@ function TutorialsPage() {
   const { data: tutorialsResponse } = useSuspenseQuery(
     tutorialsListQueryOptions({
       locale,
-      search: q || undefined,
+      ...omitUndefined({ search: q || undefined }),
       limit: 50,
     }),
   );
@@ -125,6 +126,8 @@ function TutorialsPage() {
       advanced: [],
       other: [],
     };
+    const otherGroup = groups['other'];
+    if (!otherGroup) return groups;
 
     tutorials.forEach((t) => {
       if (hideCompleted && t.isCompleted) return;
@@ -134,10 +137,11 @@ function TutorialsPage() {
       if (tag) {
         // Explicitly cast tag to string to avoid typescript error since we just checked it
         const key = (tag).toLowerCase();
-        if (groups[key]) groups[key].push(t);
-        else groups['other'].push(t);
+        const group = groups[key];
+        if (group) group.push(t);
+        else otherGroup.push(t);
       } else {
-        groups['other'].push(t);
+        otherGroup.push(t);
       }
     });
 

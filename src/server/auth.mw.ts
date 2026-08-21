@@ -10,18 +10,12 @@
  *   });
  */
 import { createMiddleware } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 import { auth } from './auth.server';
 import { mapSessionToUser } from './map-session-to-user';
+import type { AuthUser } from './auth-user';
 
-// Type for authenticated user context
-export interface AuthUser {
-    id: string;
-    email: string;
-    name: string | null;
-    image: string | null;
-    role: string | null;
-}
+export type { AuthUser } from './auth-user';
 
 // Context provided by authMiddleware (user guaranteed to exist)
 export interface AuthContext {
@@ -38,19 +32,22 @@ export interface AuthContext {
  */
 export const authMiddleware = createMiddleware({ type: 'function' }).server(
     async ({ next }) => {
-        const headers = getRequestHeaders();
-
-        const session = await auth.api.getSession({ headers });
+        const session = await auth.api.getSession({
+            headers: getRequest().headers,
+        });
 
         if (!session?.user?.id) {
             throw new Error('Unauthorized');
         }
 
         const user = mapSessionToUser(session);
+        if (!user) {
+            throw new Error('Unauthorized');
+        }
 
         return next({
             context: {
-                user: user!,
+                user,
                 userId: session.user.id,
             },
         });
@@ -64,9 +61,9 @@ export const authMiddleware = createMiddleware({ type: 'function' }).server(
 export const optionalAuthMiddleware = createMiddleware({
     type: 'function',
 }).server(async ({ next }) => {
-    const headers = getRequestHeaders();
-
-    const session = await auth.api.getSession({ headers });
+    const session = await auth.api.getSession({
+        headers: getRequest().headers,
+    });
 
     const user = mapSessionToUser(session);
 

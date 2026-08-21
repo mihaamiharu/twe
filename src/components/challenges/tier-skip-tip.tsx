@@ -22,6 +22,7 @@ export function TierSkipTip({
   if (!isVisible || missingPrerequisites.length === 0) return null;
 
   const mainMissing = missingPrerequisites[0];
+  if (!mainMissing) return null;
 
   return (
     <div className="group relative flex items-center justify-between gap-3 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2 text-amber-700 dark:text-amber-300">

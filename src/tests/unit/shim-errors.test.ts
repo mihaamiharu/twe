@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'bun:test';
-import { createShimError, isShimError, type ShimErrorType } from '@/core/executor/shim-errors';
+import { createShimError, isShimError } from '@/core/executor/shim-errors';
 
 describe('createShimError', () => {
     it('should create error with element_not_found type', () => {
@@ -95,9 +95,9 @@ describe('createShimError', () => {
             action: 'fill'
         });
 
-        expect((error as any).type).toBe('element_not_found');
-        expect((error as any).selector).toBe('#my-element');
-        expect((error as any).action).toBe('fill');
+        expect(error.type).toBe('element_not_found');
+        expect(error.selector).toBe('#my-element');
+        expect(error.action).toBe('fill');
     });
 
     it('should work without any options', () => {
@@ -105,6 +105,8 @@ describe('createShimError', () => {
 
         expect(error).toBeInstanceOf(Error);
         expect(error.message).toContain('Element not found');
+        expect('selector' in error).toBe(false);
+        expect('action' in error).toBe(false);
     });
 });
 

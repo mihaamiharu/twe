@@ -10,6 +10,8 @@ async function runManualMigration() {
     process.cwd(),
     'drizzle/migrations/0004_broken_wong.sql',
   );
+  // The path is anchored to the repository's migrations directory.
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   const sqlContent = await readFile(migrationPath, 'utf-8');
 
   // Split statements by breakpoint
@@ -32,4 +34,4 @@ async function runManualMigration() {
   }
 }
 
-runManualMigration();
+void runManualMigration();

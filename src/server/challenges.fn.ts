@@ -1,11 +1,12 @@
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 import { db } from '@/db';
 import { challenges, progress, submissions } from '@/db/schema';
 import { eq, and, asc, desc, sql, or } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { obfuscate } from '@/lib/obfuscator';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { auth } from './auth.server';
 import {
   getChallengeContent,
@@ -43,9 +44,7 @@ export const getChallenges = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeFiltersSchema.parse(data))
   .handler(async ({ data: filters }) => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
       const userId = session?.user?.id;
       const locale = filters.locale;
@@ -156,7 +155,7 @@ export const getChallenges = createServerFn({ method: 'GET' })
         .from(challenges)
         .where(and(...conditions));
 
-      const total = Number(countQuery[0].count);
+      const total = Number(countQuery[0]?.count ?? 0);
 
       return {
         success: true,
@@ -194,7 +193,6 @@ const ChallengeDetailSchema = z.object({
 
 export const getChallenge = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
-  // @ts-expect-error TanStack Start type inference issue with complex handler return types
   .handler(async ({ data: { slug, locale } }) => {
     try {
       // Load challenge content from filesystem
@@ -227,7 +225,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
           input: tc.expectedOutput, // For display purposes
           expectedOutput: tc.expectedOutput,
           order: index,
-          isHidden: tc.isHidden,
+          ...omitUndefined({ isHidden: tc.isHidden }),
         }),
       );
 
@@ -276,9 +274,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
       let userProgressData = null;
       let bestSubmissionData = null;
 
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbChallenge) {
@@ -362,13 +358,15 @@ export const getChallenge = createServerFn({ method: 'GET' })
           category: challengeContent.category,
           xpReward: challengeContent.xpReward,
           order: challengeContent.order,
-          hints: challengeContent.hints,
-          htmlContent: challengeContent.htmlContent,
-          files: challengeContent.files,
-          editableFiles: challengeContent.editableFiles,
-          preloadModules: challengeContent.preloadModules,
-          starterCode: challengeContent.starterCode,
-          tags: challengeContent.tags,
+          ...omitUndefined({
+            hints: challengeContent.hints,
+            htmlContent: challengeContent.htmlContent,
+            files: challengeContent.files,
+            editableFiles: challengeContent.editableFiles,
+            preloadModules: challengeContent.preloadModules,
+            starterCode: challengeContent.starterCode,
+            tags: challengeContent.tags,
+          }),
           completionCount: dbChallenge?.completionCount || 0,
           tutorial: tutorialData,
           testCases: visibleTestCases,

@@ -7,7 +7,11 @@ describe('mapSessionToUser', () => {
     });
 
     it('returns null when session.user is missing', () => {
-        expect(mapSessionToUser({} as any)).toBeNull();
+        expect(mapSessionToUser({})).toBeNull();
+    });
+
+    it('returns null when required user fields have invalid types', () => {
+        expect(mapSessionToUser({ user: { id: 42, email: null } })).toBeNull();
     });
 
     it('maps valid session to AuthUser with default USER role', () => {

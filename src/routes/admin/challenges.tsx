@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { useSuspenseQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminChallengesQueryOptions } from '@/lib/admin.query';
 import { updateChallengeStatus } from '@/server/admin/challenges.fn';
@@ -21,18 +21,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DataTablePagination } from '@/components/admin/data-table-pagination';
-
-interface AdminChallenge {
-  id: string;
-  title: string | { en: string;[key: string]: string }; // Updated to support localized title
-  slug: string;
-  type: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR';
-  difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-  xpReward: number;
-  order: number;
-  isPublished: boolean;
-  tags: string[] | null;
-}
+import { omitUndefined } from '@/lib/omit-undefined';
 
 export const Route = createFileRoute('/admin/challenges')({
   loader: async ({ context }) => {
@@ -54,7 +43,7 @@ function ChallengeManager() {
     const query = searchQuery.toLowerCase().trim();
     const result = query
       ? challenges.filter(
-        (c: AdminChallenge) => {
+        (c) => {
           const title = typeof c.title === 'object' ? c.title?.en || '' : c.title;
           return title.toLowerCase().includes(query) ||
             c.slug?.toLowerCase().includes(query)
@@ -161,7 +150,7 @@ function ChallengeManager() {
                     </TableCell>
                   </TableRow>
                 ) : (
-                  paginatedChallenges.map((challenge: AdminChallenge) => {
+                  paginatedChallenges.map((challenge) => {
                     const isComingSoon =
                       challenge.tags?.includes('coming-soon');
 
@@ -175,6 +164,8 @@ function ChallengeManager() {
                         'bg-blue-500/10 text-blue-600 border-blue-500/20 dark:text-blue-400',
                       XPATH_SELECTOR:
                         'bg-purple-500/10 text-purple-600 border-purple-500/20 dark:text-purple-400',
+                      TYPESCRIPT:
+                        'bg-cyan-500/10 text-cyan-600 border-cyan-500/20 dark:text-cyan-400',
                     };
 
                     const difficultyColors = {
@@ -194,7 +185,7 @@ function ChallengeManager() {
                         transition={{ duration: 0.2 }}
                         className="group border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                       >
-                        <TableCell component="th">
+                        <TableCell>
                           {' '}
                           {/* Workaround for motion.tr typings if needed, but usually motion.tr works fine as child of tbody if TableBody accepts valid nodes? Actually radix/shadcn TableBody is basically a tbody. Framer motion needs direct direct parent context sometimes or replace TableRow with motion copy of it. */}
                           {/* Ideally I should use a custom component for motion row or just motion.tr inside standard tbody. 
@@ -245,7 +236,7 @@ function ChallengeManager() {
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-2">
                             <Switch
-                              checked={isComingSoon}
+                              {...omitUndefined({ checked: isComingSoon })}
                               onCheckedChange={(checked) =>
                                 updateMutation.mutate({
                                   id: challenge.id,

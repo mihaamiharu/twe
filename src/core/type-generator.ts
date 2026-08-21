@@ -1,4 +1,9 @@
 
+export interface TypeDefinition {
+  content: string;
+  filePath: string;
+}
+
 /**
  * Generates TypeScript type definitions for the challenge environment.
  * This includes global variables like 'page' and 'expect', as well as
@@ -7,8 +12,8 @@
 export function generateTypeDefinitions(
   files: Record<string, string>,
   preloadModules?: Record<string, { source: string; exports: string[] }>
-): { content: string; filePath: string }[] {
-  const definitions: { content: string; filePath: string }[] = [];
+): TypeDefinition[] {
+  const definitions: TypeDefinition[] = [];
 
   // 1. Core Playwright & Test Runner Globals
   // We provide a simplified type definition for common Playwright objects
@@ -39,6 +44,26 @@ export function generateTypeDefinitions(
       focus?: boolean;
     }
 
+    declare interface LocatorFilterOptions {
+      has?: Locator;
+      hasText?: string | RegExp;
+    }
+
+    declare interface LocatorQueryOptions {
+      exact?: boolean;
+    }
+
+    declare interface RoleQueryOptions extends LocatorQueryOptions {
+      name?: string | RegExp;
+      checked?: boolean;
+      disabled?: boolean;
+      expanded?: boolean;
+      pressed?: boolean;
+      selected?: boolean;
+      level?: number;
+      includeHidden?: boolean;
+    }
+
     declare interface Locator {
       click(options?: ClickOptions): Promise<void>;
       dblclick(options?: ClickOptions): Promise<void>;
@@ -64,19 +89,19 @@ export function generateTypeDefinitions(
       clear(options?: ActionOptions): Promise<void>;
       press(key: string, options?: ActionOptions): Promise<void>;
       hover(options?: ActionOptions): Promise<void>;
-      filter(options: any): Locator;
+      filter(options: LocatorFilterOptions): Locator;
       waitFor(options?: { state?: 'attached' | 'detached' | 'visible' | 'hidden'; timeout?: number }): Promise<void>;
     }
 
     declare interface Page {
       goto(url: string): Promise<void>;
       locator(selector: string): Locator;
-      getByRole(role: string, options?: any): Locator;
-      getByText(text: string, options?: any): Locator;
-      getByLabel(text: string, options?: any): Locator;
-      getByPlaceholder(text: string, options?: any): Locator;
-      getByTitle(text: string, options?: any): Locator;
-      getByTestId(text: string, options?: any): Locator;
+      getByRole(role: string, options?: RoleQueryOptions): Locator;
+      getByText(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByLabel(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByPlaceholder(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByTitle(text: string | RegExp, options?: LocatorQueryOptions): Locator;
+      getByTestId(testId: string): Locator;
       click(selector: string, options?: ClickOptions): Promise<void>;
       fill(selector: string, value: string, options?: FillOptions): Promise<void>;
       check(selector: string, options?: ActionOptions): Promise<void>;
@@ -86,25 +111,28 @@ export function generateTypeDefinitions(
       waitForSelector(selector: string, options?: { state?: string; timeout?: number }): Promise<void>;
     }
 
-    declare interface Expect {
-      (actual: any): any;
-      not: Expect;
-      soft: Expect;
-      toBe(expected: any): void;
-      toEqual(expected: any): void;
-      toContain(expected: any): void;
+    declare interface ExpectMatchers {
+      readonly not: ExpectMatchers;
+      toBe(expected: unknown): Promise<void>;
+      toEqual(expected: unknown): Promise<void>;
+      toContain(expected: unknown): Promise<void>;
       toContainText(expected: string): Promise<void>;
       toHaveText(expected: string | RegExp): Promise<void>;
       toBeVisible(): Promise<void>;
       toBeHidden(): Promise<void>;
       toHaveCount(count: number): Promise<void>;
       toHaveAttribute(name: string, value: string | RegExp): Promise<void>;
-      toBeTruthy(): void;
-      toBeFalsy(): void;
+      toBeTruthy(): Promise<void>;
+      toBeFalsy(): Promise<void>;
+    }
+
+    declare interface Expect {
+      (actual: unknown): ExpectMatchers;
+      soft(actual: unknown): ExpectMatchers;
     }
 
     declare interface Test {
-      (name: string, callback: (fixtures: { page: Page, expect: Expect }) => Promise<void>): void;
+      (name: string, callback: (fixtures: { page: Page, expect: Expect }) => Promise<void>): Promise<void>;
       step(name: string, callback: () => Promise<void>): Promise<void>;
     }
 
@@ -132,6 +160,12 @@ export function generateTypeDefinitions(
   // We need to parse the source files to extract class signatures
   if (preloadModules) {
     let moduleDefs = '';
+    const configuredClasses = new Set(
+      Object.entries(preloadModules).flatMap(([moduleName, config]) => [
+        moduleName,
+        ...config.exports,
+      ]),
+    );
 
     Object.entries(preloadModules).forEach(([moduleName, config]) => {
       const sourcePath = config.source;
@@ -141,35 +175,47 @@ export function generateTypeDefinitions(
         // Extract class definition using simple regex
         // Matches: export class ClassName { ... }
         // We capture the body to extract methods
-        const classRegex = new RegExp(`export\\s+class\\s+${moduleName}\\s*{([\\s\\S]*?)}\\s*$`, 'gm');
+        const escapedModuleName = moduleName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        // The module name is escaped above before being interpolated into this parser regex.
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        const classRegex = new RegExp(`export\\s+class\\s+${escapedModuleName}\\s*{([\\s\\S]*?)}\\s*$`, 'g');
         const match = classRegex.exec(sourceContent);
 
         if (match) {
           const body = match[1];
+          if (body === undefined) return;
 
-          // Extract constructor
-          // constructor(page) -> constructor(page: any)
+          // Extract constructor parameters. Unknown accepts challenge inputs while
+          // preventing generated declarations from promising unsupported members.
           const ctorRegex = /constructor\s*\(([^)]*)\)/;
           const ctorMatch = ctorRegex.exec(body);
-          let ctorDef = 'constructor(page: any);'; // Default fallback
-          if (ctorMatch) {
+          let ctorDef = 'constructor(page: unknown);';
+          if (ctorMatch?.[1] !== undefined) {
             // Simple parameter handling
-            ctorDef = `constructor(${ctorMatch[1].split(',').map(p => p.trim() + ': any').join(', ')});`;
+            ctorDef = `constructor(${ctorMatch[1].split(',').map(p => p.trim() + ': unknown').join(', ')});`;
           }
 
           // Extract async methods
           // async method(arg1, arg2) 
           const methodRegex = /async\s+(\w+)\s*\(([^)]*)\)/g;
           let methods = '';
-          let methodMatch;
-          while ((methodMatch = methodRegex.exec(body)) !== null) {
+          const methodMatches = Array.from(body.matchAll(methodRegex));
+          methodMatches.forEach((methodMatch, index) => {
             const methodName = methodMatch[1];
-            const args = methodMatch[2].split(',').filter(a => a.trim()).map(a => a.trim() + ': any').join(', ');
-            methods += `  ${methodName}(${args}): Promise<void>;\n`; // Assume void return for actions usually
-          }
-
-          // Also allow any other property lookup for now to be safe
-          // [key: string]: any; 
+            const parameterList = methodMatch[2];
+            if (methodName === undefined || parameterList === undefined) return;
+            const args = parameterList.split(',').filter(a => a.trim()).map(a => a.trim() + ': unknown').join(', ');
+            const methodBodyStart = (methodMatch.index ?? 0) + methodMatch[0].length;
+            const methodBodyEnd = methodMatches[index + 1]?.index ?? body.length;
+            const methodBody = body.slice(methodBodyStart, methodBodyEnd);
+            const constructedReturn = /\breturn\s+new\s+([A-Za-z_$][\w$]*)\s*\(/.exec(methodBody)?.[1];
+            const returnType = constructedReturn && configuredClasses.has(constructedReturn)
+              ? constructedReturn
+              : /\breturn\b/.test(methodBody)
+                ? 'unknown'
+                : 'void';
+            methods += `  ${methodName}(${args}): Promise<${returnType}>;\n`;
+          });
 
           moduleDefs += `
             declare class ${moduleName} {
@@ -178,8 +224,8 @@ export function generateTypeDefinitions(
             }
           `;
         } else {
-          // Fallback if regex fails - declare check as any
-          moduleDefs += `declare const ${moduleName}: any;\n`;
+          // A failed signature extraction must not invent callable members.
+          moduleDefs += `declare const ${moduleName}: unknown;\n`;
         }
       }
     });

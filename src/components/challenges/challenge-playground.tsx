@@ -1,7 +1,7 @@
 import { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { omitUndefined } from '@/lib/omit-undefined';
 import {
-  ChallengePlaygroundProps,
   usePlaygroundState,
   useChallengeExecution,
   PlaygroundHeader,
@@ -14,6 +14,7 @@ import {
   LoadingOverlay,
   PracticeModeBanner
 } from './playground';
+import type { ChallengePlaygroundProps } from './playground';
 
 /**
  * ChallengePlayground - Main challenge solving interface
@@ -48,6 +49,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       }, 5000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [state.isLayoutReady, state.isCodeChallenge]);
 
   // Keyboard Shortcuts (Cmd/Ctrl + Enter to run, + Shift + Enter to submit)
@@ -94,7 +96,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       <PlaygroundHeader
         challenge={challenge}
         locale={state.locale}
-        userId={props.userId}
+        {...omitUndefined({ userId: props.userId })}
         isMobile={state.isMobile}
         isCodeChallenge={state.isCodeChallenge}
         isRunning={state.isRunning}
@@ -138,7 +140,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
               state={state}
               execution={execution}
               previewIframeRef={previewIframeRef}
-              userId={props.userId}
+              {...omitUndefined({ userId: props.userId })}
             />
           )}
         </div>

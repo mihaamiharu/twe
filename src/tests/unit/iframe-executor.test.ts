@@ -1,6 +1,7 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { executePlaywrightCode, executeWithTestCases } from '../../core/executor/iframe-executor';
 import { type TestCase } from '../../core/executor/executor.types';
+import type { ExpectedStateRule } from '../../lib/content.types';
 
 // These tests require real iframe DOM behavior (script injection, fetch polyfills, onclick handlers)
 // that HappyDOM cannot replicate on GitHub Actions CI. They pass locally but are structurally
@@ -27,6 +28,7 @@ describe.skipIf(isCI)('Iframe Executor', () => {
 
     expect(result.status).toBe('PASSED');
     expect(result.returnValue).toBe('Clicked');
+    expect('error' in result).toBe(false);
   });
 
   test('should handle TypeScript transpilation (mocked)', async () => {
@@ -62,6 +64,7 @@ describe.skipIf(isCI)('Iframe Executor', () => {
 
     expect(result.status).toBe('FAILED');
     expect(result.output).toContain('Strict Mode Error');
+    expect(result.error).toContain('Strict Mode Error');
   });
 
   test('should allow bypassing strict mode', async () => {
@@ -106,7 +109,9 @@ describe.skipIf(isCI)('Iframe Executor', () => {
     const result = await executeWithTestCases(code, html, testCases);
 
     expect(result.overall.status).toBe('PASSED');
-    expect(result.results[0].passed).toBe(true);
+    const firstResult = result.results[0];
+    if (!firstResult) throw new Error('Expected a test-case result');
+    expect(firstResult.passed).toBe(true);
   });
 
   test('should handle soft failures', async () => {
@@ -126,14 +131,14 @@ describe.skipIf(isCI)('Iframe Executor', () => {
   test('should fail on invalid DOM state', async () => {
     const code = 'document.body.innerHTML = "<div>Wrong</div>"';
     const html = '<div>Failure</div>';
-    const expectedState = [
+    const expectedState: ExpectedStateRule[] = [
       {
         selector: 'div',
         containsText: 'Success'
       }
     ];
 
-    const result = await executePlaywrightCode(code, html, { expectedState: expectedState as any });
+    const result = await executePlaywrightCode(code, html, { expectedState });
 
     expect(result.status).toBe('FAILED');
   });

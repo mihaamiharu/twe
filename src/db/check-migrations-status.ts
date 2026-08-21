@@ -20,4 +20,4 @@ async function checkMigrationStatus() {
   }
 }
 
-checkMigrationStatus();
+void checkMigrationStatus();

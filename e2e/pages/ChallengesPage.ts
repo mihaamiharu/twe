@@ -1,5 +1,30 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
+
+type MonacoEditor = {
+  getDomNode(): HTMLElement | null;
+  getValue(): string;
+  setValue(nextValue: string): void;
+};
+
+type MonacoApi = {
+  editor: { getEditors(): MonacoEditor[] };
+};
+
+type LoadedMonaco = MonacoApi | { m: MonacoApi };
+
+type AMDRequire = (
+  modules: string[],
+  onLoad: (module: LoadedMonaco) => void,
+  onError: (error: unknown) => void,
+) => void;
+
+declare global {
+  interface Window {
+    require?: AMDRequire;
+  }
+}
 
 export class ChallengesPage extends BasePage {
   readonly runButton: Locator;
@@ -18,7 +43,9 @@ export class ChallengesPage extends BasePage {
     this.testSelectorButton = page.getByRole('button', {
       name: 'Test Selector',
     });
-    this.hideCompletedToggle = page.getByRole('button', { name: /Hide Completed|hm/i }); // Regex for flexibility & locale
+    this.hideCompletedToggle = page.getByRole('button', {
+      name: /Hide (Completed|Done)|Show Completed|Tampilkan Selesai|Sembunyikan Selesai/i,
+    });
 
     // Debug console logs from the page (including iframes)
     page.on('console', (msg) => {
@@ -30,11 +57,11 @@ export class ChallengesPage extends BasePage {
 
   async gotoList(locale: string = 'en') {
     await this.goto(`/${locale}/challenges`);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async gotoChallenge(slug: string, locale: string = 'en') {
     await this.goto(`/${locale}/challenges/${slug}`);
-    await this.page.waitForLoadState('networkidle');
   }
 
   async solveChallenge(codeOrSelector: string, slug?: string) {
@@ -64,29 +91,37 @@ export class ChallengesPage extends BasePage {
     }
 
     if (isSelectorChallenge) {
-      await this.selectorInput.waitFor({ state: 'visible', timeout: 10000 });
-      await this.selectorInput.fill(codeOrSelector);
+      await this.page.waitForLoadState('networkidle');
+      const isXPath =
+        codeOrSelector.startsWith('//') || Boolean(slug?.includes('xpath'));
+      const selectorInput = this.page.getByPlaceholder(
+        isXPath ? /Enter XPath/i : /Enter CSS selector/i,
+      );
+      await this.selectorInput.first().waitFor({
+        state: 'visible',
+        timeout: 10000,
+      });
 
-      // Check based on content or slug
-      if (codeOrSelector.startsWith('//') || (slug && slug.includes('xpath'))) {
-        // Try to find the XPath toggle button.
-        // In SelectorInput, it's a button with text "XPath".
-        const xpathBtn = this.page
-          .locator('button')
-          .filter({ hasText: 'XPath' })
-          .last();
-        if (await xpathBtn.isVisible()) {
-          await xpathBtn.click();
-        }
-      } else {
-        const cssBtn = this.page
-          .locator('button')
-          .filter({ hasText: 'CSS' })
-          .last();
-        if (await cssBtn.isVisible()) {
-          await cssBtn.click();
-        }
+      // Changing selector type preserves the value but changes the input's
+      // placeholder, so select the desired type before filling it.
+      if (!(await selectorInput.isVisible())) {
+        await this.page
+          .getByRole('button', { name: isXPath ? 'XPath' : 'CSS', exact: true })
+          .click();
       }
+      await selectorInput.waitFor({ state: 'visible', timeout: 10000 });
+      // The challenge state resets once after hydration. Keep the input and
+      // React state aligned before relying on the product's disabled state.
+      await expect
+        .poll(async () => {
+          if ((await selectorInput.inputValue()) !== codeOrSelector) {
+            await selectorInput.fill('');
+            await selectorInput.pressSequentially(codeOrSelector);
+          }
+          return selectorInput.inputValue();
+        })
+        .toBe(codeOrSelector);
+      await expect(this.testSelectorButton).toBeEnabled();
 
       await this.testSelectorButton.click();
     } else {
@@ -97,39 +132,65 @@ export class ChallengesPage extends BasePage {
       // Monaco's visible area
       const viewLines = this.editor.locator('.view-lines');
       await viewLines.waitFor();
-      // Focus and clear more aggressively
+      const solution = codeOrSelector.trim();
+
+      // Resolve the same AMD Monaco instance that owns the rendered editor.
+      // This updates the editor through its public API and avoids
+      // OS-specific modifier or clipboard shortcuts entirely.
       await viewLines.click();
-      await this.page.waitForTimeout(200);
+      await this.page.evaluate((value) => {
+        const amdRequire = window.require;
+        if (!amdRequire) throw new Error('Monaco AMD loader is not available.');
 
-      // Attempt to clear using Monaco API if available in window
-      // This is the most robust way to ensure a fresh editor state
-      await this.page.evaluate(() => {
-        try {
-          const editor = (window as any).monaco?.editor?.getModels()?.[0];
-          if (editor) {
-            editor.setValue('');
-          }
-        } catch {
-          // Silent fail
-        }
-      });
-
-      // Try both modifiers to be safe in different environments
-      await this.page.keyboard.press('Control+A');
-      await this.page.keyboard.press('Meta+A');
-      await this.page.waitForTimeout(100);
-      await this.page.keyboard.press('Delete');
-      await this.page.waitForTimeout(100);
-
-      // Double check clear
-      await this.page.keyboard.press('Control+A');
-      await this.page.keyboard.press('Meta+A');
-      await this.page.keyboard.press('Backspace');
-      await this.page.waitForTimeout(200);
-
-      // Paste solution (trimmed)
-      await this.page.keyboard.insertText(codeOrSelector.trim());
-      await this.page.waitForTimeout(200); // Wait for change to register
+        return new Promise<void>((resolve, reject) => {
+          amdRequire(
+            ['vs/editor/editor.main'],
+            (loaded) => {
+              const monaco = 'm' in loaded ? loaded.m : loaded;
+              const editorElement = document.querySelector('.monaco-editor');
+              const editor = monaco.editor
+                .getEditors()
+                .find((candidate) => candidate.getDomNode() === editorElement);
+              if (!editor) {
+                reject(
+                  new Error(
+                    'Rendered Monaco editor instance is not available.',
+                  ),
+                );
+                return;
+              }
+              editor.setValue(value);
+              resolve();
+            },
+            reject,
+          );
+        });
+      }, solution);
+      await expect
+        .poll(() =>
+          this.page.evaluate(() => {
+            const amdRequire = window.require;
+            if (!amdRequire) return '';
+            return new Promise<string>((resolve, reject) => {
+              amdRequire(
+                ['vs/editor/editor.main'],
+                (loaded) => {
+                  const monaco = 'm' in loaded ? loaded.m : loaded;
+                  const editorElement =
+                    document.querySelector('.monaco-editor');
+                  const editor = monaco.editor
+                    .getEditors()
+                    .find(
+                      (candidate) => candidate.getDomNode() === editorElement,
+                    );
+                  resolve(editor?.getValue() ?? '');
+                },
+                reject,
+              );
+            });
+          }),
+        )
+        .toBe(solution);
 
       // Run
       await this.runButton.click();
@@ -140,16 +201,15 @@ export class ChallengesPage extends BasePage {
     // We verify Submit button first.
     await expect(this.submitButton).toBeEnabled({ timeout: 20000 });
 
-    // Optional: assert Correct text if visible, but don't fail hard if it's transient
-    // await expect(this.page.getByText('Correct', { exact: false }).first()).toBeVisible({ timeout: 1000 }).catch(() => {});
-
     // Submit
     await expect(this.submitButton).toBeEnabled({ timeout: 5000 });
     await this.submitButton.click();
 
-    // Verify success dialog
-    // Note: Even with auth cookies, dialog might not appear if already completed or state is complex.
-    // Relaxing to just ensure we clicked submit.
-    // await expect(this.page.getByText('Challenge Completed')).toBeVisible();
+    await expect(this.page.getByRole('dialog')).toContainText(
+      /Challenge Complete!/i,
+      {
+        timeout: 20000,
+      },
+    );
   }
 }

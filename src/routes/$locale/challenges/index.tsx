@@ -1,6 +1,7 @@
-import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
+import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,16 +14,12 @@ import {
 } from '@/components/ui/table';
 import {
   Code,
-  Trophy,
-  Zap,
   CheckCircle2,
   Palette,
   Route as RouteIcon,
   LayoutGrid,
   List,
   Search,
-  Lock,
-  Swords,
   LayoutDashboard,
   Layers,
   Box,
@@ -35,9 +32,7 @@ import {
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  useDebounce,
-} from '@/lib/useDebounce';
+import { useDebounce } from '@/lib/useDebounce';
 import {
   getTierFromCategory,
   TIER_ORDER,
@@ -72,7 +67,7 @@ export const Route = createFileRoute('/$locale/challenges/')({
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
-        search: q,
+        ...omitUndefined({ search: q }),
         limit: 1000,
       }),
     );
@@ -155,6 +150,8 @@ const ALL_TRACKS = TRACK_IDS.map((id) => ({
   ...TRACK_CONFIG[id],
   id,
   icon: TRACK_ICONS[id],
+  labelKey: `tracks.${id}.label`,
+  descriptionKey: `tracks.${id}.description`,
 }));
 
 const routeApi = getRouteApi('/$locale/challenges/');
@@ -178,7 +175,9 @@ export function ChallengesPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Helper to update URL search params
-  const updateSearch = (updates: Partial<z.infer<typeof ChallengesSearchSchema>>) => {
+  const updateSearch = (
+    updates: Partial<z.infer<typeof ChallengesSearchSchema>>,
+  ) => {
     void navigate({
       to: '.',
       search: (prev) => ({ ...prev, ...updates }),
@@ -191,17 +190,24 @@ export function ChallengesPage() {
     if (debouncedSearchQuery !== (q ?? '')) {
       updateSearch({ q: debouncedSearchQuery || undefined });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- updateSearch is stable, q is intentionally excluded to prevent loops
   }, [debouncedSearchQuery]);
 
-
   // Derive active track
-  const activeTrack = ALL_TRACKS.find(t => t.id === activeTrackId) || ALL_TRACKS[0];
+  const activeTrack =
+    ALL_TRACKS.find((t) => t.id === activeTrackId) || ALL_TRACKS[0];
+  if (!activeTrack) {
+    throw new Error(
+      'Challenge track configuration must define at least one track',
+    );
+  }
+  const activeGroup = SIDEBAR_GROUPS.find((group) =>
+    group.tracks.includes(activeTrackId),
+  );
 
   const { data: challengesResponse } = useQuery({
     ...challengeListQueryOptions({
       locale,
-      search: debouncedSearchQuery || undefined,
+      ...omitUndefined({ search: debouncedSearchQuery || undefined }),
       limit: 1000,
     }),
     placeholderData: keepPreviousData,
@@ -241,7 +247,10 @@ export function ChallengesPage() {
 
     // Sort challenges within groups by order
     for (const category in groups) {
-      groups[category].sort((a, b) => a.order - b.order);
+      const categoryChallenges = groups[category];
+      if (categoryChallenges) {
+        categoryChallenges.sort((a, b) => a.order - b.order);
+      }
     }
 
     // Sort Categories themselves
@@ -268,8 +277,8 @@ export function ChallengesPage() {
   // Calculate counts for Sidebar Badges
   const trackCounts = useMemo(() => {
     const counts: Record<string, number> = {};
-    challenges.forEach(c => {
-      ALL_TRACKS.forEach(track => {
+    challenges.forEach((c) => {
+      ALL_TRACKS.forEach((track) => {
         if (track.match(c)) {
           counts[track.id] = (counts[track.id] || 0) + 1;
         }
@@ -278,30 +287,31 @@ export function ChallengesPage() {
     return counts;
   }, [challenges]);
 
-
   // Helper component for Sidebar Item
-  const SidebarItem = ({ track }: { track: typeof ALL_TRACKS[number] }) => (
+  const SidebarItem = ({ track }: { track: (typeof ALL_TRACKS)[number] }) => (
     <button
       onClick={() => {
         updateSearch({ track: track.id });
         setIsMobileMenuOpen(false);
       }}
       className={cn(
-        "w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium",
+        'w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium',
         activeTrackId === track.id
-          ? "bg-primary/10 text-primary shadow-sm"
-          : "text-muted-foreground/80 hover:bg-muted/50 hover:text-foreground"
+          ? 'bg-primary/10 text-primary shadow-sm'
+          : 'text-muted-foreground/80 hover:bg-muted/50 hover:text-foreground',
       )}
     >
       <div className="flex items-start gap-3 text-left">
         {track.icon}
-        <span className="leading-tight">{track.label}</span>
+        <span className="leading-tight">{t(track.labelKey)}</span>
       </div>
       <Badge
         variant="secondary"
         className={cn(
-          "ml-auto text-[10px] h-5 px-1.5 min-w-[24px] justify-center shadow-none",
-          activeTrackId === track.id ? "bg-background text-primary" : "bg-muted text-muted-foreground"
+          'ml-auto text-[10px] h-5 px-1.5 min-w-[24px] justify-center shadow-none',
+          activeTrackId === track.id
+            ? 'bg-background text-primary'
+            : 'bg-muted text-muted-foreground',
         )}
       >
         {trackCounts[track.id] || 0}
@@ -310,21 +320,23 @@ export function ChallengesPage() {
   );
 
   const SidebarContent = () => (
-    <div className='flex flex-col h-full'>
+    <div className="flex flex-col h-full">
       <div className="mb-6 lg:mb-8 lg:px-2">
         <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
           <Box className="h-6 w-6 fill-primary/20 text-primary" />
-          Challenges
+          {t('page.title')}
         </h2>
-        <p className="text-xs text-muted-foreground mt-1">Level up your automation skills</p>
+        <p className="text-xs text-muted-foreground mt-1">
+          {t('page.sidebarSubtitle')}
+        </p>
       </div>
 
       <nav className="flex-1 space-y-6 overflow-y-auto">
         {SIDEBAR_GROUPS.map((group) => (
-          <div key={group.title}>
-            {group.title !== 'Overview' && (
+          <div key={group.id}>
+            {group.id !== 'overview' && (
               <h3 className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2 px-3">
-                {group.title}
+                {t(`trackGroups.${group.id}`)}
               </h3>
             )}
 
@@ -342,24 +354,34 @@ export function ChallengesPage() {
       <div className="mt-auto pt-6 border-t border-border/50 bg-background/95 backdrop-blur-sm sticky bottom-0 pb-2">
         <div className="px-2">
           <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-            <span>Overall Progress</span>
-            <span>{challenges.length > 0 ? Math.round((challenges.filter(c => c.isCompleted).length / challenges.length) * 100) : 0}%</span>
+            <span>{t('page.overallProgress')}</span>
+            <span>
+              {challenges.length > 0
+                ? Math.round(
+                    (challenges.filter((c) => c.isCompleted).length /
+                      challenges.length) *
+                      100,
+                  )
+                : 0}
+              %
+            </span>
           </div>
           <div className="h-1.5 bg-muted rounded-full overflow-hidden">
             <div
               className="h-full bg-primary transition-all duration-500"
-              style={{ width: `${challenges.length > 0 ? (challenges.filter(c => c.isCompleted).length / challenges.length) * 100 : 0}%` }}
+              style={{
+                width: `${challenges.length > 0 ? (challenges.filter((c) => c.isCompleted).length / challenges.length) * 100 : 0}%`,
+              }}
             />
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
-
         {/* --- Desktop Sidebar --- */}
         <aside className="hidden lg:flex flex-col w-[260px] h-[calc(100vh-64px)] shrink-0 border-r border-border/50 sticky top-[64px] bg-card/10 backdrop-blur-xl p-4 overflow-hidden">
           <SidebarContent />
@@ -367,7 +389,6 @@ export function ChallengesPage() {
 
         {/* --- Main Content Area --- */}
         <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto w-full min-h-[calc(100vh-64px)]">
-
           {/* Mobile Header / Controls */}
           <div className="lg:hidden flex items-center justify-between mb-6 gap-4">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
@@ -381,31 +402,32 @@ export function ChallengesPage() {
               </SheetContent>
             </Sheet>
             <div className="flex-1">
-              <h1 className="text-lg font-bold truncate">{activeTrack.label}</h1>
+              <h1 className="text-lg font-bold truncate">
+                {t(activeTrack.labelKey)}
+              </h1>
             </div>
           </div>
-
 
           {/* Toolbar */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="hidden lg:block">
               <div className="flex items-center gap-2 mb-1">
                 {/* Breadcrumb-ish */}
-                {SIDEBAR_GROUPS.find(g => g.tracks.includes(activeTrackId))?.title !== 'Overview' && (
+                {activeGroup && activeGroup.id !== 'overview' && (
                   <>
                     <span className="text-sm font-medium text-muted-foreground">
-                      {SIDEBAR_GROUPS.find(g => g.tracks.includes(activeTrackId))?.title}
+                      {t(`trackGroups.${activeGroup.id}`)}
                     </span>
                     <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
                   </>
                 )}
                 <h1 className="text-2xl font-bold tracking-tight">
-                  {activeTrack.label}
+                  {t(activeTrack.labelKey)}
                 </h1>
               </div>
 
               <p className="text-muted-foreground text-sm">
-                {activeTrack.description}
+                {t(activeTrack.descriptionKey)}
               </p>
             </div>
 
@@ -413,7 +435,7 @@ export function ChallengesPage() {
               <div className="relative flex-1 sm:min-w-[240px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search challenges..."
+                  placeholder={t('filters.searchPlaceholder')}
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
                   className="pl-9 bg-card/50"
@@ -422,14 +444,25 @@ export function ChallengesPage() {
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
-                  onClick={() => updateSearch({ hideCompleted: !hideCompleted })}
+                  onClick={() =>
+                    updateSearch({ hideCompleted: !hideCompleted })
+                  }
                   className={cn(
-                    "flex-1 sm:flex-none",
-                    hideCompleted && "bg-primary/5 border-primary/30 text-primary"
+                    'flex-1 sm:flex-none',
+                    hideCompleted &&
+                      'bg-primary/5 border-primary/30 text-primary',
                   )}
                 >
-                  {hideCompleted ? <CheckCircle2 className="h-4 w-4 mr-2" /> : <CheckCircle2 className="h-4 w-4 mr-2 opacity-30" />}
-                  <span className="sr-only sm:not-sr-only sm:inline">Hide Done</span>
+                  {hideCompleted ? (
+                    <CheckCircle2 className="h-4 w-4 mr-2" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 mr-2 opacity-30" />
+                  )}
+                  <span className="sr-only sm:not-sr-only sm:inline">
+                    {hideCompleted
+                      ? t('filters.showCompleted')
+                      : t('filters.hideCompleted')}
+                  </span>
                 </Button>
 
                 <div className="flex p-1 bg-muted/50 rounded-lg border border-border/50">
@@ -461,7 +494,9 @@ export function ChallengesPage() {
                 <Search className="h-10 w-10 text-muted-foreground/50" />
               </div>
               <h3 className="text-lg font-semibold">No challenges found</h3>
-              <p className="text-muted-foreground mt-1">Try adjusting your filters or search query.</p>
+              <p className="text-muted-foreground mt-1">
+                Try adjusting your filters or search query.
+              </p>
               {(searchInput || hideCompleted) && (
                 <Button
                   variant="link"
@@ -484,7 +519,10 @@ export function ChallengesPage() {
                     <h2 className="text-xl font-semibold tracking-tight">
                       {t(`categories.${category}`) || category}
                     </h2>
-                    <Badge variant="outline" className="ml-auto text-xs font-normal text-muted-foreground">
+                    <Badge
+                      variant="outline"
+                      className="ml-auto text-xs font-normal text-muted-foreground"
+                    >
                       {categoryChallenges.length} items
                     </Badge>
                   </div>
@@ -495,23 +533,26 @@ export function ChallengesPage() {
                       className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"
                     >
                       <AnimatePresence mode="popLayout">
-                        {categoryChallenges.map((challenge, idx) => {
-                          const config = challengeTypeConfig[challenge.type] || challengeTypeConfig.JAVASCRIPT;
-                          const isComingSoon = challenge.tags?.includes('coming-soon');
+                        {categoryChallenges.map((challenge) => {
+                          const config =
+                            challengeTypeConfig[challenge.type] ??
+                            challengeTypeConfig['JAVASCRIPT'];
+                          if (!config) return null;
+                          const isComingSoon =
+                            challenge.tags?.includes('coming-soon');
                           const isBoss = isBossChallenge(challenge);
 
                           return (
                             <ChallengeListCard
                               key={challenge.slug}
                               challenge={challenge}
-                              index={idx}
                               config={config}
                               isComingSoon={!!isComingSoon}
                               isBoss={isBoss}
                               params={{ locale, slug: challenge.slug }}
                               t={t}
                             />
-                          )
+                          );
                         })}
                       </AnimatePresence>
                     </motion.div>
@@ -521,11 +562,17 @@ export function ChallengesPage() {
                         <TableHeader>
                           <TableRow className="hover:bg-transparent">
                             <TableHead className="w-[60px] pl-4">#</TableHead>
-                            <TableHead className="w-full min-w-[300px]">Challenge</TableHead>
+                            <TableHead className="w-full min-w-[300px]">
+                              Challenge
+                            </TableHead>
                             {/* Type Column Restored */}
                             <TableHead className="w-[120px]">Type</TableHead>
-                            <TableHead className="w-[80px]">Difficulty</TableHead>
-                            <TableHead className="w-[80px] text-right">XP</TableHead>
+                            <TableHead className="w-[80px]">
+                              Difficulty
+                            </TableHead>
+                            <TableHead className="w-[80px] text-right">
+                              XP
+                            </TableHead>
                             {/* Spacer Column REMOVED */}
                             <TableHead className="w-[40px] px-2"></TableHead>
                           </TableRow>
@@ -533,8 +580,12 @@ export function ChallengesPage() {
                         <TableBody>
                           <AnimatePresence mode="popLayout">
                             {categoryChallenges.map((challenge, idx) => {
-                              const config = challengeTypeConfig[challenge.type] || challengeTypeConfig.JAVASCRIPT;
-                              const isComingSoon = challenge.tags?.includes('coming-soon');
+                              const config =
+                                challengeTypeConfig[challenge.type] ??
+                                challengeTypeConfig['JAVASCRIPT'];
+                              if (!config) return null;
+                              const isComingSoon =
+                                challenge.tags?.includes('coming-soon');
                               const isBoss = isBossChallenge(challenge);
 
                               return (
@@ -548,7 +599,7 @@ export function ChallengesPage() {
                                   params={{ locale, slug: challenge.slug }}
                                   t={t}
                                 />
-                              )
+                              );
                             })}
                           </AnimatePresence>
                         </TableBody>

@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import * as React from 'react';
 import { Lightbulb } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
@@ -43,7 +44,13 @@ export function HintDisplayPanel({
                                     components={{
                                         code: ({ className, children, ...props }) => {
                                             const match = /language-(\w+)/.exec(className || '');
-                                            const codeContent = String(children).replace(/\n$/, '');
+                                            const codeContent = React.Children.toArray(children)
+                                                .reduce<string>(
+                                                    (result, child) =>
+                                                        result + (typeof child === 'string' ? child : ''),
+                                                    '',
+                                                )
+                                                .replace(/\n$/, '');
                                             const isInline = !match && !codeContent.includes('\n');
                                             return (
                                                 <code

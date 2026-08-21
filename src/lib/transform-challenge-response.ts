@@ -1,3 +1,6 @@
+import type { ChallengeType } from './content.types';
+import { omitUndefined } from './omit-undefined';
+
 interface TestCase {
   id: string;
   description: string;
@@ -6,13 +9,13 @@ interface TestCase {
   isHidden?: boolean;
 }
 
-interface ServerChallengeData {
+export interface ServerChallengeData {
   id: string;
   slug: string;
   title: string;
   description: string;
   instructions: string;
-  type: string;
+  type: ChallengeType;
   difficulty: 'EASY' | 'MEDIUM' | 'HARD';
   category: string;
   xpReward: number;
@@ -30,7 +33,7 @@ interface ServerChallengeData {
   hiddenTestCaseCount: number;
   userProgress?: {
     isCompleted: boolean;
-    attempts: number;
+    attempts: number | null;
     lastAccessedAt: Date;
     usedHint: boolean;
     hintContent?: string | null;
@@ -41,7 +44,7 @@ interface ServerChallengeData {
     xpEarned: number;
     testsPassed: number;
     testsTotal: number;
-    executionTime: number;
+    executionTime: number | null;
   } | null;
   nextChallenge?: { slug: string; title: string } | null;
   prevChallenge?: { slug: string; title: string } | null;
@@ -52,7 +55,7 @@ interface TransformedChallenge {
   slug: string;
   title: string;
   description: string;
-  type: string;
+  type: ChallengeType;
   difficulty: 'Easy' | 'Medium' | 'Hard';
   xp: number;
   instructions: string;
@@ -71,9 +74,9 @@ interface TransformedChallenge {
   hints?: string[];
   category: string;
   isCompleted: boolean;
-  tutorial?: { slug: string; title: string } | null;
-  nextChallenge?: { slug: string; title: string } | null;
-  prevChallenge?: { slug: string; title: string } | null;
+  tutorial?: { slug: string; title: string };
+  nextChallenge?: { slug: string; title: string };
+  prevChallenge?: { slug: string; title: string };
 }
 
 const difficultyMap: Record<string, 'Easy' | 'Medium' | 'Hard'> = {
@@ -85,7 +88,10 @@ const difficultyMap: Record<string, 'Easy' | 'Medium' | 'Hard'> = {
 function extractTargetSelector(testCases: TestCase[]): string {
   if (!testCases.length) return '';
 
-  const firstTestInput = testCases[0].input as {
+  const firstTestCase = testCases[0];
+  if (!firstTestCase) return '';
+
+  const firstTestInput = firstTestCase.input as {
     selector?: string;
     xpath?: string;
   };
@@ -108,9 +114,15 @@ export function transformChallengeResponse(
     xp: data.xpReward,
     instructions: data.instructions,
     htmlContent: data.htmlContent || '',
-    files: data.files,
-    editableFiles: data.editableFiles,
-    preloadModules: data.preloadModules,
+    ...omitUndefined({
+      files: data.files,
+      editableFiles: data.editableFiles,
+      preloadModules: data.preloadModules,
+      hints: data.hints,
+      tutorial: data.tutorial ?? undefined,
+      nextChallenge: data.nextChallenge ?? undefined,
+      prevChallenge: data.prevChallenge ?? undefined,
+    }),
     starterCode: data.starterCode || '',
     targetSelector: extractTargetSelector(testCases),
     testCases: testCases.map((tc) => ({
@@ -119,11 +131,7 @@ export function transformChallengeResponse(
       input: tc.input,
       expectedOutput: tc.expectedOutput,
     })),
-    hints: data.hints,
     category: data.category,
     isCompleted: data.userProgress?.isCompleted || false,
-    tutorial: data.tutorial,
-    nextChallenge: data.nextChallenge,
-    prevChallenge: data.prevChallenge,
   };
 }

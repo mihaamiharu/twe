@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { executePlaywrightCode } from '@/core/executor';
 import { generatePreloadCode } from '@/core/executor/module-preloader';
 import { storage } from '@/lib/storage-adapter';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import { INJECTED_SCRIPTS, HIGHLIGHT_STYLES } from '../preview/constants';
 import type {
@@ -13,11 +14,28 @@ import type {
 import type { TestResult } from '../test-results';
 import type { SelectorType } from '../selector-input';
 
+export interface ChallengeExecution {
+    handleRunCode: () => Promise<void>;
+    handleValidateSelector: () => void;
+    handleReset: () => void;
+    confirmReset: () => Promise<void>;
+    handleSubmit: () => void;
+    handleSelectorChange: (value: string, type: SelectorType) => void;
+    handleFileChange: (path: string, newCode: string) => void;
+    handleSelectFile: (path: string) => void;
+    handleCloseFile: (path: string) => void;
+    handlePreviewValidation: (result: { isValid: boolean; matchCount: number }) => void;
+    hintMutation: {
+        isPending: boolean;
+        mutate: () => void;
+    };
+}
+
 export function useChallengeExecution(
     state: PlaygroundState,
     props: ChallengePlaygroundProps,
     previewIframeRef: React.RefObject<HTMLIFrameElement | null>
-) {
+): ChallengeExecution {
     const { challenge, onSubmit, userId } = props;
     const {
         code,
@@ -94,12 +112,14 @@ export function useChallengeExecution(
                 initialHtml,
                 {
                     timeout: 10000,
-                    existingIframe: previewIframeRef.current || undefined,
+                    ...omitUndefined({
+                        existingIframe: previewIframeRef.current ?? undefined,
+                        files: challenge.files,
+                        expectedState: challenge.expectedState,
+                    }),
                     strictMode: challenge.type === 'PLAYWRIGHT',
                     cssContent: (challenge.category?.startsWith('e2e')) ? e2eSelectorStyles : defaultSelectorStyles,
-                    files: challenge.files,
                     onNavigate: (path) => setCurrentVfsPath(path),
-                    expectedState: challenge.expectedState,
                     isTypeScript: challenge.type === 'TYPESCRIPT' || challenge.type === 'PLAYWRIGHT',
                 },
             );
@@ -125,14 +145,13 @@ export function useChallengeExecution(
                         "No assertions were called. Write assertions like: await expect(locator).toHaveText('...');";
                     result.status = 'FAILED';
                 } else {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     outputMessage = t('challenges:playground.correct');
                 }
             }
             else if (
                 isCodeChallenge &&
                 !isAssertionChallenge &&
-                challenge.testCases?.length &&
+                challenge.testCases?.[0] &&
                 result.status === 'PASSED'
             ) {
                 const expected = challenge.testCases[0].expectedOutput;
@@ -148,24 +167,25 @@ export function useChallengeExecution(
                     String(actual) !== String(expectedValue)
                 ) {
                     validationPassed = false;
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     outputMessage =
                         actual === undefined
                             ? `${t('challenges:playground.jsUndefined')} (Did you forget to assign your answer to 'result'?)`
                             : t('challenges:playground.jsMismatch');
                     result.status = 'FAILED';
                 } else {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                     outputMessage = `${t('challenges:playground.correct')} Result is ${String(actual)}`;
                 }
             }
 
             const testResult: TestResult = {
                 id: 'main',
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                 name: t('challenges:playground.results'),
                 passed: validationPassed,
-                error: !validationPassed ? result.error || outputMessage : undefined,
+                ...omitUndefined({
+                    error: validationPassed
+                        ? undefined
+                        : result.error || outputMessage,
+                }),
                 executionTime: result.executionTime,
             };
 
@@ -184,7 +204,6 @@ export function useChallengeExecution(
             setTestResults([
                 {
                     id: 'error',
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     name: t('challenges:playground.executionError'),
                     passed: false,
                     error:
@@ -263,7 +282,6 @@ export function useChallengeExecution(
                 state.setStoredHint(result.hint);
                 setHintUsed(true);
             } else if (!result.success && result.error) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-call
                 toast.error(t('challenges:hints.errorTitle', 'Hint Generation Failed'), {
                     description: result.error,
                 });
@@ -272,9 +290,7 @@ export function useChallengeExecution(
         onError: (error) => {
             console.error('[AI Hint] Error:', error);
             setIsHintDialogOpen(false);
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
             toast.error(t('challenges:hints.errorTitle', 'Error'), {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                 description: t('challenges:hints.errorGeneric', 'Something went wrong. Please try again.'),
             });
         },
@@ -316,7 +332,6 @@ export function useChallengeExecution(
                     id: 'selector',
                     name: 'Selector Validation',
                     passed: false,
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
                     error: t('challenges:playground.selectorMismatch'),
                 },
             ]);
@@ -360,7 +375,7 @@ export function useChallengeExecution(
             0,
         );
 
-        onSubmit({
+        onSubmit?.({
             code: submissionCode,
             passed: hasPassed,
             testResults,
@@ -399,8 +414,9 @@ export function useChallengeExecution(
         const newOpenFiles = state.openFiles.filter(p => p !== path);
         state.setOpenFiles(newOpenFiles);
         if (state.selectedFile === path) {
-            if (newOpenFiles.length > 0) {
-                state.setSelectedFile(newOpenFiles[newOpenFiles.length - 1]);
+            const nextFile = newOpenFiles.at(-1);
+            if (nextFile !== undefined) {
+                state.setSelectedFile(nextFile);
             }
         }
     }, [state.openFiles, state.setOpenFiles, state.selectedFile, state.setSelectedFile]);

@@ -1,10 +1,15 @@
 import { describe, it, expect, mock, beforeEach, afterEach, spyOn } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { ChallengePlayground } from '@/components/challenges/challenge-playground';
-import * as executor from '@/core/executor';
 import { ThemeProvider } from '@/components/theme-provider';
 import * as stateHook from '@/components/challenges/playground/use-playground-state';
 import * as execHook from '@/components/challenges/playground/use-challenge-execution';
+import type { ChallengeExecution } from '@/components/challenges/playground/use-challenge-execution';
+import type { Challenge } from '@/components/challenges/playground/types';
+import {
+    createChallenge,
+    createPlaygroundState,
+} from '@/tests/fixtures/playground';
 
 // These tests use mock.module('@/core/executor') which pollutes Bun's module registry globally
 // and breaks iframe-executor.test.ts. Run with BUN_RUN_SKIPPED=1 to enable.
@@ -12,26 +17,20 @@ const isSkipped = !process.env.BUN_RUN_SKIPPED;
 
 const renderWithTheme = (ui: React.ReactElement) => {
     return render(
-        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+        <ThemeProvider>
             {ui}
         </ThemeProvider>
     );
 };
 
 describe.skipIf(isSkipped)('ChallengePlayground', () => {
-    const mockChallenge = {
-        id: '1',
-        slug: 'test-challenge',
-        title: 'Test Challenge',
-        description: 'Solve this',
-        type: 'JAVASCRIPT',
-        difficulty: 'EASY',
+    const mockChallenge = createChallenge({
         starterCode: 'console.log("hello");',
         files: { '/index.js': 'console.log("hello");' },
         isCompleted: false,
-    };
+    });
 
-    const mockState = {
+    const mockState = createPlaygroundState({
         isLayoutReady: true,
         isMobile: false,
         isCodeChallenge: true,
@@ -43,27 +42,32 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
         consoleLogs: [],
         testResults: [],
         locale: 'en',
-        t: (k: string) => k,
         setIsLayoutReady: mock(),
         setIsHintDialogOpen: mock(),
         setHintContent: mock(),
-    };
+    });
 
-    const mockExecution = {
+    const mockExecution: ChallengeExecution = {
         handleRunCode: mock(() => Promise.resolve()),
         handleValidateSelector: mock(),
+        handleReset: mock(),
         handleSubmit: mock(),
-        confirmReset: mock(),
+        confirmReset: mock(() => Promise.resolve()),
+        handleSelectorChange: mock(),
+        handleFileChange: mock(),
+        handleSelectFile: mock(),
+        handleCloseFile: mock(),
+        handlePreviewValidation: mock(),
         hintMutation: { isPending: false, mutate: mock() },
     };
 
     beforeEach(() => {
-        spyOn(stateHook, 'usePlaygroundState').mockReturnValue(mockState as any);
-        spyOn(execHook, 'useChallengeExecution').mockReturnValue(mockExecution as any);
+        spyOn(stateHook, 'usePlaygroundState').mockReturnValue(mockState);
+        spyOn(execHook, 'useChallengeExecution').mockReturnValue(mockExecution);
 
         void mock.module(
 '@/components/challenges/playground/Header/PlaygroundHeader', () => ({
-            PlaygroundHeader: ({ challenge, onRunCode }: any) => (
+            PlaygroundHeader: ({ challenge, onRunCode }: { challenge: Challenge; onRunCode: () => void }) => (
                 <div data-testid="header">
                     {challenge.title}
                     <button onClick={onRunCode} data-testid="run-btn">Run</button>
@@ -88,7 +92,7 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
 
         void mock.module(
 '@/components/challenges/playground/playground-goal-bar', () => ({
-            PlaygroundGoalBar: ({ description }: any) => <div data-testid="goal-bar">{description}</div>
+            PlaygroundGoalBar: ({ description }: { description: string }) => <div data-testid="goal-bar">{description}</div>
         }));
 
         void mock.module(
@@ -103,7 +107,7 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
 
         void mock.module(
 '@/components/challenges/playground/reset-confirm-dialog', () => ({
-            ResetConfirmDialog: ({ open }: any) => open ? <div data-testid="reset-dialog">Reset Dialog</div> : null
+            ResetConfirmDialog: ({ open }: { open: boolean }) => open ? <div data-testid="reset-dialog">Reset Dialog</div> : null
         }));
 
         void mock.module(
@@ -119,8 +123,6 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
 
     afterEach(() => {
         cleanup();
-        (stateHook.usePlaygroundState as any).mockRestore?.();
-        (execHook.useChallengeExecution as any).mockRestore?.();
         mock.restore();
     });
 
@@ -128,7 +130,7 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
         Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1200 });
         fireEvent(window, new Event('resize'));
 
-        renderWithTheme(<ChallengePlayground challenge={mockChallenge as any} userId="user1" />);
+        renderWithTheme(<ChallengePlayground challenge={mockChallenge} userId="user1" />);
 
         expect(screen.getByText('Test Challenge')).toBeTruthy();
     });
@@ -137,7 +139,7 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
         Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 500 });
         fireEvent(window, new Event('resize'));
 
-        renderWithTheme(<ChallengePlayground challenge={mockChallenge as any} userId="user1" />);
+        renderWithTheme(<ChallengePlayground challenge={mockChallenge} userId="user1" />);
 
         // In real component, mobile lays out differently
         expect(screen.getByRole('tablist')).toBeTruthy();
@@ -146,20 +148,20 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
     // Skip loading overlay test since the layout handles it differently
 
 
-    it('should run code on Cmd+Enter shortcut', async () => {
-        renderWithTheme(<ChallengePlayground challenge={mockChallenge as any} userId="user1" onSubmit={() => {}} />);
+    it('should run code on Cmd+Enter shortcut', () => {
+        renderWithTheme(<ChallengePlayground challenge={mockChallenge} userId="user1" onSubmit={() => {}} />);
 
         fireEvent.keyDown(window, { key: 'Enter', metaKey: true });
     });
 
     it('should submit on Cmd+Shift+Enter shortcut if passed', () => {
-        renderWithTheme(<ChallengePlayground challenge={{...mockChallenge, isCompleted: true} as any} userId="user1" onSubmit={() => {}} />);
+        renderWithTheme(<ChallengePlayground challenge={{...mockChallenge, isCompleted: true}} userId="user1" onSubmit={() => {}} />);
 
         fireEvent.keyDown(window, { key: 'Enter', metaKey: true, shiftKey: true });
     });
 
     it('should show practice banner if completed', () => {
-        renderWithTheme(<ChallengePlayground challenge={{ ...mockChallenge, isCompleted: true } as any} userId="user1" onSubmit={() => {}} />);
+        renderWithTheme(<ChallengePlayground challenge={{ ...mockChallenge, isCompleted: true }} userId="user1" onSubmit={() => {}} />);
         expect(screen.getByTestId('practice-banner')).toBeTruthy();
     });
 });

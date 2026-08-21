@@ -39,8 +39,10 @@ function ChangelogPage() {
         if (entries.length > 0) {
             // Sort entries to find the latest date
             const sortedEntries = [...entries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-            const latestDate = sortedEntries[0].date;
-            localStorage.setItem('latestSeenChangelogDate', latestDate);
+            const latestEntry = sortedEntries[0];
+            if (latestEntry) {
+                localStorage.setItem('latestSeenChangelogDate', latestEntry.date);
+            }
         }
     }, [entries]);
 

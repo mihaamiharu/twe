@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generateTypeDefinitions } from '@/core/type-generator';
+import { omitUndefined } from '@/lib/omit-undefined';
 import type {
     ChallengePlaygroundProps,
     PlaygroundState
@@ -90,9 +91,10 @@ export function usePlaygroundState({
 
         if (challenge.files) {
             setFileContents({ ...challenge.files });
-            const editable = challenge.editableFiles || [Object.keys(challenge.files)[0]];
+            const firstFile = Object.keys(challenge.files)[0];
+            const editable = challenge.editableFiles ?? (firstFile ? [firstFile] : []);
             setOpenFiles([...editable]);
-            setSelectedFile(editable[0]);
+            setSelectedFile(editable[0] ?? '');
         } else {
             setFileContents({});
             setOpenFiles([]);
@@ -126,7 +128,12 @@ export function usePlaygroundState({
                 setCurrentVfsPath('/index.html');
             } else if (paths.length > 0) {
                 const htmlFile = paths.find(p => p.endsWith('.html'));
-                setCurrentVfsPath(htmlFile || paths[0]);
+                const firstPath = paths[0];
+                if (htmlFile) {
+                    setCurrentVfsPath(htmlFile);
+                } else if (firstPath) {
+                    setCurrentVfsPath(firstPath);
+                }
             }
         } else {
             setCurrentVfsPath('/index.html');
@@ -181,7 +188,7 @@ export function usePlaygroundState({
         setRevealedHintsCount,
         isCodeChallenge,
         isSelectorChallenge,
-        extraLibs,
+        ...omitUndefined({ extraLibs }),
         locale,
         t,
     };

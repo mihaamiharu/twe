@@ -1,11 +1,10 @@
 import { createServerFn } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequestHeader } from '@tanstack/react-start/server';
 
 export const getConsent = createServerFn({ method: 'GET' }).handler(
-  async (): Promise<'granted' | 'denied' | null> => {
+  (): 'granted' | 'denied' | null => {
     try {
-      const headers = getRequestHeaders();
-      const cookieHeader = headers.get('cookie');
+      const cookieHeader = getRequestHeader('cookie');
       if (!cookieHeader) return null;
 
       const cookieValue = cookieHeader
@@ -14,7 +13,7 @@ export const getConsent = createServerFn({ method: 'GET' }).handler(
         ?.split('=')[1];
 
       if (cookieValue === 'granted' || cookieValue === 'denied') {
-        return cookieValue as 'granted' | 'denied';
+        return cookieValue;
       }
     } catch (error) {
       console.error('[Consent] Failed to get consent from cookie:', error);

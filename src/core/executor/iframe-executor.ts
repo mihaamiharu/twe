@@ -7,9 +7,11 @@
 
 import { MockedPlaywrightPage } from './playwright-shim';
 import { logger } from '@/lib/logger';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { transpileTypeScript } from './typescript-transpiler';
 import {
   type ExecutionResult,
+  type ExecutorTestFunction,
   type ExecuteOptions,
   type TestCase,
   type TestCaseResult
@@ -19,6 +21,7 @@ import { validateExpectedState } from './dom-validator';
 import { createInterceptedConsole } from './console-interceptor';
 import { attachOnclickHandlers } from './attach-onclick-handlers';
 import { generateIframeTemplate } from './iframe-template';
+import { invokeDynamicFunction } from './dynamic-code';
 
 /**
  * Executes Playwright-style code in a sandboxed iframe
@@ -189,8 +192,7 @@ export async function executePlaywrightCode(
               if (iframe.contentWindow) {
                 iframe.contentWindow.localStorage?.clear();
                 iframe.contentWindow.sessionStorage?.clear();
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                const win = iframe.contentWindow as any;
+                const win = iframe.contentWindow;
                 win.__MOCK_ROUTES__ = [];
                 // In-memory state that persists across VFS navigations within a single execution run
                 win.__APP_STATE__ = {};
@@ -207,7 +209,7 @@ export async function executePlaywrightCode(
 
             const htmlTemplate = generateIframeTemplate({
               bodyContent: finalHtml,
-              cssContent: options?.cssContent,
+              ...omitUndefined({ cssContent: options?.cssContent }),
               filesEnabled: !!options?.files,
               includeAlertPolyfill: true,
               includeFunctionMatcher: true,
@@ -226,11 +228,9 @@ export async function executePlaywrightCode(
             scripts.forEach((script) => {
               if (script.textContent) {
                 try {
-                  /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
-                  const win = iframe.contentWindow as any;
+                  const win = iframe.contentWindow;
                   const doc = iframe.contentDocument;
                   if (!win || !doc) return;
-                  /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any */
 
                   const scriptCode = script.textContent;
 
@@ -240,7 +240,10 @@ export async function executePlaywrightCode(
                   );
                   const funcNames: string[] = [];
                   for (const match of funcMatches) {
-                    funcNames.push(match[1]);
+                    const functionName = match[1];
+                    if (functionName !== undefined) {
+                      funcNames.push(functionName);
+                    }
                   }
 
                   const code = `
@@ -256,8 +259,7 @@ export async function executePlaywrightCode(
 
                   // eslint-disable-next-line @typescript-eslint/no-implied-eval
                   const fn = new Function('window', 'document', code);
-                  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-                  fn(win, doc);
+                  invokeDynamicFunction(fn, undefined, [win, doc]);
                 } catch (e) {
                   console.error('Failed to execute script shim:', e);
                 }
@@ -270,7 +272,7 @@ export async function executePlaywrightCode(
             if (iframeWindow) {
               attachOnclickHandlers({
                 document: iframeDoc,
-                window: iframeWindow as Window & Record<string, unknown>,
+                window: iframeWindow,
               });
             }
 
@@ -287,8 +289,10 @@ export async function executePlaywrightCode(
             // Set up VFS for multi-page E2E challenges
             if (options?.files) {
               page.setVFS(options.files, {
-                onNavigate: options.onNavigate,
-                cssContent: options.cssContent,
+                ...omitUndefined({
+                  onNavigate: options.onNavigate,
+                  cssContent: options.cssContent,
+                }),
               });
             }
 
@@ -310,8 +314,10 @@ export async function executePlaywrightCode(
                       return elements;
                     };
                   }
-                  const value = (target as any)[prop];
-                  return typeof value === 'function' ? value.bind(target) : value;
+                  const value: unknown = Reflect.get(target, prop);
+                  if (typeof value !== 'function') return value;
+                  return (...args: unknown[]) =>
+                    invokeDynamicFunction(value, target, args);
                 },
               };
               return new Proxy(doc, handler);
@@ -320,13 +326,19 @@ export async function executePlaywrightCode(
             const enhancedDocument = createEnhancedDocument(iframeDoc);
 
             // Prepare the iframe execution environment
-            const contentWindow = iframe.contentWindow as any;
+            const contentWindow = iframe.contentWindow;
+            if (!contentWindow) {
+              throw new Error('Could not access iframe window');
+            }
 
             // Initialize promise tracker for async tests
             contentWindow.__testPromises = [];
 
             // Mock test runner object (Support both test.step and standard test('name', ...))
-            const testInstance = async (name: string, callback: (fixtures: any) => Promise<void>) => {
+            const testInstance = async (
+              name: string,
+              callback: Parameters<ExecutorTestFunction>[1],
+            ) => {
               // Create a tracking promise for this test
               const testPromise = (async () => {
                 interceptedConsole.log(`[Test] ${name}`);
@@ -345,16 +357,20 @@ export async function executePlaywrightCode(
 
               return testPromise;
             };
-            (testInstance as any).step = async (name: string, callback: () => Promise<unknown>) => {
-              interceptedConsole.log(`[Step] ${name}`);
-              try {
-                await callback();
-              } catch (error) {
-                interceptedConsole.error(`[Step] ${name} FAILED: ${String(error)}`);
-                throw error;
-              }
-            };
-            const test = testInstance;
+            const test: ExecutorTestFunction = Object.assign(testInstance, {
+              step: async (
+                name: string,
+                callback: () => Promise<unknown>,
+              ) => {
+                interceptedConsole.log(`[Step] ${name}`);
+                try {
+                  await callback();
+                } catch (error) {
+                  interceptedConsole.error(`[Step] ${name} FAILED: ${String(error)}`);
+                  throw error;
+                }
+              },
+            });
 
             // Inject tools into the iframe context
             contentWindow.page = page;
@@ -401,13 +417,11 @@ export async function executePlaywrightCode(
                     `;
 
 
-            let returnValue;
+            let returnValue: unknown;
             if (typeof contentWindow.eval === 'function') {
-              /* eslint-disable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
               returnValue = await contentWindow.eval(
                 `(function() { ${wrappedCode} })()`,
               );
-              /* eslint-enable @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access */
             } else {
               // Fallback for environments without iframe eval (e.g. HappyDOM tests)
               // This runs in parent context, so 'Array' !== iframe.contentWindow.Array
@@ -424,14 +438,18 @@ export async function executePlaywrightCode(
                 'console',
                 wrappedCode,
               );
-              await fallbackFn(
-                page,
-                expect,
-                test,
-                contentWindow,
-                enhancedDocument,
-                contentWindow.console,
-              );
+              await Promise.resolve(invokeDynamicFunction(
+                fallbackFn,
+                undefined,
+                [
+                  page,
+                  expect,
+                  test,
+                  contentWindow,
+                  enhancedDocument,
+                  contentWindow.console,
+                ],
+              ));
               returnValue = (contentWindow).__returnValue;
                
             }
@@ -441,12 +459,13 @@ export async function executePlaywrightCode(
 
             // Check for soft failures
             const softFailures = getTestResults().filter((r) => !r.passed);
-            if (softFailures.length > 0) {
+            const firstSoftFailure = softFailures[0];
+            if (firstSoftFailure) {
               resolve({
                 status: 'FAILED',
                 output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map((f) => `- ${f.message}`).join('\n')}`,
                 executionTime,
-                error: softFailures[0].message, // Return first error
+                error: firstSoftFailure.message, // Return first error
                 logs,
                 assertionCount: getAssertionCount(),
               });
@@ -461,7 +480,7 @@ export async function executePlaywrightCode(
                   status: 'FAILED',
                   output: `DOM State Validation Failed: ${stateValidation.error}`,
                   executionTime,
-                  error: stateValidation.error,
+                  ...omitUndefined({ error: stateValidation.error }),
                   logs,
                   assertionCount: getAssertionCount(),
                 });
@@ -516,8 +535,7 @@ export async function executePlaywrightCode(
       }
     });
   } finally {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    logger.setHandler(null as any);
+    logger.setHandler(null);
   }
 }
 
@@ -613,8 +631,11 @@ export async function executeWithTestCases(
       return (async () => { ${code} })();
     `,
     );
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    await userFunction(page, createExpect());
+    await Promise.resolve(invokeDynamicFunction(
+      userFunction,
+      undefined,
+      [page, createExpect()],
+    ));
 
     // Run test cases
     for (const testCase of testCases) {

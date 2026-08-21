@@ -1,6 +1,21 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { MockedPlaywrightPage } from '../../core/executor/playwright-shim';
 
+function getBooleanWindowProperty(
+  iframeWindow: Window | null,
+  property: string,
+): boolean | undefined {
+  if (!iframeWindow) {
+    throw new Error('Iframe window not found');
+  }
+
+  const value: unknown = Object.getOwnPropertyDescriptor(
+    iframeWindow,
+    property,
+  )?.value;
+  return typeof value === 'boolean' ? value : undefined;
+}
+
 describe('Playwright Shim VFS (Multi-page Support)', () => {
   let page: MockedPlaywrightPage;
   const vfs = {
@@ -71,8 +86,7 @@ describe('Playwright Shim VFS (Multi-page Support)', () => {
     await page.goto('/about.html');
     
     const iframe = document.querySelector('iframe')!;
-    // @ts-expect-error - reaching into iframe window
-    expect((iframe.contentWindow as any).aboutLoaded).toBe(true);
+    expect(getBooleanWindowProperty(iframe.contentWindow, 'aboutLoaded')).toBe(true);
   });
 
   test('should restore onclick handlers on VFS navigation', async () => {
@@ -86,11 +100,10 @@ describe('Playwright Shim VFS (Multi-page Support)', () => {
     const btn = iframe.contentDocument?.getElementById('btn');
     btn?.click();
     
-    // @ts-expect-error - reaching into iframe window
-    expect((iframe.contentWindow as any).clicked).toBe(true);
+    expect(getBooleanWindowProperty(iframe.contentWindow, 'clicked')).toBe(true);
   });
 
-  test('should throw error if page missing in VFS', async () => {
+  test('should throw error if page missing in VFS', () => {
     page.setVFS(vfs);
     expect(page.goto('/missing.html')).rejects.toThrow('Page not found in VFS');
   });

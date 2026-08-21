@@ -1,27 +1,29 @@
-import type { AuthUser } from './auth.mw';
+import { getContainedAuthUser, type AuthUser } from './auth-user';
 
-interface SessionUser {
-    id: string;
-    email: string;
-    name?: string | null;
-    image?: string | null;
+function isOptionalString(value: unknown): value is string | null | undefined {
+    return value === undefined || value === null || typeof value === 'string';
 }
 
-interface Session {
-    user: SessionUser;
-}
-
-export function mapSessionToUser(session: Session | null): AuthUser | null {
-    if (!session?.user) {
+export function mapSessionToUser(session: unknown): AuthUser | null {
+    const user = getContainedAuthUser(session);
+    if (!user) {
         return null;
     }
 
+    const name: unknown = 'name' in user ? user.name : undefined;
+    const image: unknown = 'image' in user ? user.image : undefined;
+    const role: unknown = 'role' in user ? user.role : undefined;
+    if (
+        !isOptionalString(name) ||
+        !isOptionalString(image) ||
+        !isOptionalString(role)
+    ) return null;
+
     return {
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.name || null,
-        image: session.user.image || null,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        role: (session.user as any).role || 'USER',
+        id: user.id,
+        email: user.email,
+        name: name || null,
+        image: image || null,
+        role: role || 'USER',
     };
 }

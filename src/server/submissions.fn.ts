@@ -20,6 +20,7 @@ import {
 } from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { getRawChallengeContent } from './content.server';
+import type { JsonValue, TestCaseDefinition } from '@/lib/content.types';
 import { ensureEntityInDb } from './ensure-entity-in-db';
 
 // ----------------------------------------------------------------------------
@@ -48,7 +49,9 @@ const getErrorMessage = (key: string, locale: string) => {
 // CREATE SUBMISSION
 // ----------------------------------------------------------------------------
 
-const CreateSubmissionSchema = z.object({
+export const JsonValueSchema: z.ZodType<JsonValue> = z.json();
+
+export const CreateSubmissionSchema = z.object({
   challengeSlug: z.string().min(1, 'Challenge slug is required'),
   code: z.string().min(1, 'Code is required'),
   isPractice: z.boolean().optional().default(false),
@@ -56,7 +59,7 @@ const CreateSubmissionSchema = z.object({
     z.object({
       testCaseId: z.string().uuid().optional(),
       passed: z.boolean(),
-      output: z.any().optional(),
+      output: JsonValueSchema.optional(),
       error: z.string().optional(),
     }),
   ),
@@ -102,12 +105,14 @@ export const challengeSubmissionHandler = async ({
     }
 
     // Get challenge by slug
-    let challenge = await db.query.challenges.findFirst({
+    const existingChallenge = await db.query.challenges.findFirst({
       where: eq(challenges.slug, challengeSlug),
     });
 
+    let challenge = existingChallenge;
+
     if (!challenge) {
-      challenge = await ensureEntityInDb({
+      const ensuredChallenge = await ensureEntityInDb({
         slug: challengeSlug,
         findExisting: (slug) =>
           db.query.challenges.findFirst({
@@ -119,7 +124,7 @@ export const challengeSubmissionHandler = async ({
             .insert(challenges)
             .values({
               slug: fsChallenge.slug,
-              title: fsChallenge.title as any,
+              title: fsChallenge.title,
               type: fsChallenge.type,
               difficulty: fsChallenge.difficulty,
               xpReward: fsChallenge.xpReward,
@@ -129,10 +134,13 @@ export const challengeSubmissionHandler = async ({
               isPublished: true,
             })
             .returning();
+          if (!newChallenge) {
+            throw new Error(`Failed to create challenge ${fsChallenge.slug}`);
+          }
 
           if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
             await db.insert(testCases).values(
-              fsChallenge.testCases.map((tc: any, index: number) => ({
+              fsChallenge.testCases.map((tc: TestCaseDefinition, index: number) => ({
                 challengeId: newChallenge.id,
                 description: tc.description,
                 input: tc.input,
@@ -147,6 +155,8 @@ export const challengeSubmissionHandler = async ({
         },
         logger,
       });
+
+      challenge = ensuredChallenge ?? undefined;
 
       if (!challenge) {
         return {
@@ -249,6 +259,9 @@ export const challengeSubmissionHandler = async ({
         errorMessage: testResults.find((r) => r.error)?.error,
       })
       .returning();
+    if (!submission) {
+      throw new Error('Failed to create submission');
+    }
 
     // Update or create progress record
     if (existingProgress) {

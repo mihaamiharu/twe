@@ -1,4 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class LeaderboardPage extends BasePage {
@@ -9,7 +10,7 @@ export class LeaderboardPage extends BasePage {
     this.leaderboardTable = page.getByTestId('leaderboard-list');
   }
 
-  async goto() {
+  override async goto() {
     await this.page.goto('/en/leaderboard');
   }
 

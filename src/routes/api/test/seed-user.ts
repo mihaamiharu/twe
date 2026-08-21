@@ -10,14 +10,14 @@ const seedSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
   name: z.string().min(1),
+  role: z.enum(['USER', 'ADMIN']).default('USER'),
 });
 
 export async function fetchWithHeaders(url: string, init?: RequestInit) {
   return fetch(url, init);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const Route = createFileRoute('/api/test/seed-user' as any)({
+export const Route = createFileRoute('/api/test/seed-user')({
   server: {
     handlers: {
       POST: async ({ request }) => {
@@ -28,11 +28,14 @@ export const Route = createFileRoute('/api/test/seed-user' as any)({
           const parsed = seedSchema.safeParse(await request.json());
           if (!parsed.success) {
             return new Response(
-              JSON.stringify({ error: 'Email, password, and name are required', details: parsed.error }),
-              { status: 400, headers: { 'Content-Type': 'application/json' } }
+              JSON.stringify({
+                error: 'Email, password, and name are required',
+                details: parsed.error,
+              }),
+              { status: 400, headers: { 'Content-Type': 'application/json' } },
             );
           }
-          const { email, password, name } = parsed.data;
+          const { email, password, name, role } = parsed.data;
 
           // 1. Wipe if exists
           await db.delete(users).where(eq(users.email, email));
@@ -44,9 +47,9 @@ export const Route = createFileRoute('/api/test/seed-user' as any)({
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              email, 
-              password, 
-              name
+              email,
+              password,
+              name,
             }),
           });
 
@@ -55,14 +58,33 @@ export const Route = createFileRoute('/api/test/seed-user' as any)({
             throw new Error(`Better Auth sign-up failed: ${errBody}`);
           }
 
+          if (role === 'ADMIN') {
+            const [updatedUser] = await db
+              .update(users)
+              .set({ role })
+              .where(eq(users.email, email))
+              .returning({ id: users.id });
+            if (!updatedUser) {
+              throw new Error(
+                `Could not promote seeded user ${email} to ADMIN`,
+              );
+            }
+          }
+
           return new Response(
-            JSON.stringify({ success: true, message: 'Test user seeded successfully via Better Auth' }),
-            { status: 200, headers: { 'Content-Type': 'application/json' } }
+            JSON.stringify({
+              success: true,
+              message: 'Test user seeded successfully via Better Auth',
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } },
           );
         } catch (e) {
           return new Response(
-            JSON.stringify({ error: 'Internal Server Error', details: String(e) }),
-            { status: 500, headers: { 'Content-Type': 'application/json' } }
+            JSON.stringify({
+              error: 'Internal Server Error',
+              details: String(e),
+            }),
+            { status: 500, headers: { 'Content-Type': 'application/json' } },
           );
         }
       },

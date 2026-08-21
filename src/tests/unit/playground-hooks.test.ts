@@ -1,37 +1,24 @@
-import { describe, it, expect, mock, beforeEach } from 'bun:test';
+import { describe, it, expect } from 'bun:test';
 import { renderHook, act } from '@testing-library/react';
 import { usePlaygroundState } from '@/components/challenges/playground/use-playground-state';
+import { createChallenge } from '@/tests/fixtures/playground';
 // import { useChallengeExecution } from '@/components/challenges/playground/use-challenge-execution'; // Will test later if time permits
 
-// Mock i18n
-
-// Mock type-generator
-void mock.module(
-'@/core/type-generator', () => ({
-    generateTypeDefinitions: () => '',
-}));
-
 describe('usePlaygroundState', () => {
-    const mockChallenge = {
-        id: '1',
-        slug: 'test-challenge',
+    const mockChallenge = createChallenge({
         title: 'Test',
         description: 'Desc',
-        type: 'JAVASCRIPT',
-        difficulty: 'EASY',
         category: 'basics',
-        xp: 10,
-        instructions: 'Instructions',
         htmlContent: '<div></div>',
         starterCode: 'console.log("start");',
         files: { '/index.html': '<div></div>' },
         testCases: [],
         isCompleted: false,
-    };
+    });
 
     it('should initialize with starter code', () => {
         const { result } = renderHook(() => usePlaygroundState({
-            challenge: mockChallenge as any,
+            challenge: mockChallenge,
             userId: 'user1',
         }));
 
@@ -42,7 +29,7 @@ describe('usePlaygroundState', () => {
 
     it('should handle code updates', () => {
         const { result } = renderHook(() => usePlaygroundState({
-            challenge: mockChallenge as any,
+            challenge: mockChallenge,
             userId: 'user1',
         }));
 
@@ -56,7 +43,7 @@ describe('usePlaygroundState', () => {
     it('should reset state when confirmReset is called (indirectly via hook logic)', () => {
         // usePlaygroundState exposes setIsResetConfirmOpen
         const { result } = renderHook(() => usePlaygroundState({
-            challenge: mockChallenge as any,
+            challenge: mockChallenge,
             userId: 'user1',
         }));
 
@@ -68,9 +55,13 @@ describe('usePlaygroundState', () => {
     });
 
     it('should initialize selector code for CSS challenges', () => {
-        const cssChallenge = { ...mockChallenge, type: 'CSS_SELECTOR', starterCode: '' };
+        const cssChallenge = createChallenge({
+            ...mockChallenge,
+            type: 'CSS_SELECTOR',
+            starterCode: '',
+        });
         const { result } = renderHook(() => usePlaygroundState({
-            challenge: cssChallenge as any,
+            challenge: cssChallenge,
             userId: 'user1',
         }));
 

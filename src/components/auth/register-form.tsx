@@ -2,7 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { signUp } from '@/lib/auth.client';
 import { resendVerification } from '@/server/auth.fn';
-import { signUpSchema, type SignUpInput } from '@/lib/validations';
+import {
+  formatValidationErrors,
+  signUpSchema,
+  type SignUpInput,
+} from '@/lib/validations';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,6 +26,10 @@ interface RegisterFormProps {
   onLoginClick?: () => void;
 }
 
+function isSignUpField(name: string): name is keyof SignUpInput {
+  return name === 'email' || name === 'password' || name === 'name';
+}
+
 export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
   const { t } = useTranslation(['auth', 'common']);
   const [formData, setFormData] = useState<SignUpInput>({
@@ -29,7 +37,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
     password: '',
     name: '',
   });
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<SignUpInput>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [formError, setFormError] = useState('');
   const [registrationComplete, setRegistrationComplete] = useState(false);
@@ -91,11 +99,9 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
 
     // Clear field error on change
-    // eslint-disable-next-line security/detect-object-injection
-    if (errors[name]) {
+    if (isSignUpField(name) && errors[name]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
-        // eslint-disable-next-line security/detect-object-injection
         delete newErrors[name];
         return newErrors;
       });
@@ -110,16 +116,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
     // Validate with Zod
     const result = signUpSchema.safeParse(formData);
     if (!result.success) {
-      const fieldErrors: Record<string, string> = {};
-      for (const error of result.error.issues) {
-        const path = error.path.join('.');
-        // eslint-disable-next-line security/detect-object-injection
-        if (!fieldErrors[path]) {
-          // eslint-disable-next-line security/detect-object-injection
-          fieldErrors[path] = error.message;
-        }
-      }
-      setErrors(fieldErrors);
+      setErrors(formatValidationErrors(result.error));
       return;
     }
 

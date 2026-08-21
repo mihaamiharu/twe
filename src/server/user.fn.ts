@@ -11,6 +11,7 @@ import {
 import { eq, desc, sql } from 'drizzle-orm';
 import { getUserStats } from '@/lib/stats';
 import { logger } from '@/lib/logger';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { authMiddleware } from './auth.mw';
 import { getCachedTierTotals } from './content.server';
 
@@ -193,7 +194,7 @@ export const getUserSettings = createServerFn({ method: 'GET' })
             id: user.id,
             email: user.email,
             name: user.name,
-            image: user.image || undefined,
+            ...omitUndefined({ image: user.image || undefined }),
             createdAt: user.createdAt,
 
             // Gamification
@@ -256,7 +257,15 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
     }: {
       data: z.infer<typeof updateUserSchema>;
       context: { user: { id: string } };
-    }): Promise<{ success: boolean; data?: any; error?: string }> => {
+    }): Promise<{
+      success: boolean;
+      data?: {
+        name: string | null;
+        profileVisibility: 'PUBLIC' | 'PRIVATE' | null;
+        showOnLeaderboard: boolean;
+      };
+      error?: string;
+    }> => {
       try {
         const updates = data;
 
@@ -279,6 +288,9 @@ export const updateUserProfile = createServerFn({ method: 'POST' })
             profileVisibility: users.profileVisibility,
             showOnLeaderboard: users.showOnLeaderboard,
           });
+        if (!updatedUser) {
+          throw new Error('User not found');
+        }
 
         return {
           success: true,

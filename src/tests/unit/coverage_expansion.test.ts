@@ -64,7 +64,7 @@ describe('Final Coverage & Stability Pass', () => {
             // 5. Hard failure catch
             try {
                 await expect(btnEl).toBeDisabled({ timeout: 10 });
-            } catch (e) {
+            } catch {
                 // Expected throw
             }
         });

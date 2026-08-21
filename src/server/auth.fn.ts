@@ -4,28 +4,16 @@
  */
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
 import { auth } from './auth.server';
 import { db } from '@/db';
 import { users, accounts } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { sendVerificationEmail } from '@/server/email.server';
 import { logger } from '@/lib/logger';
+import { buildAuthSession, type AuthSession } from './auth-session';
 
-export type SessionUser = {
-  id: string;
-  email: string;
-  name: string | null;
-  image: string | null;
-  emailVerified: boolean;
-  role: string | null;
-};
-
-export type AuthSession = {
-  user: SessionUser | null;
-  isAuthenticated: boolean;
-  gaMeasurementId?: string;
-};
+export type { AuthSession, SessionUser } from './auth-session';
 
 // Helper to update user image from Google if missing (Lazy Migration)
 async function ensureUserImage(userId: string): Promise<string | null> {
@@ -38,17 +26,24 @@ async function ensureUserImage(userId: string): Promise<string | null> {
     if (account?.idToken) {
       // Decode ID Token to get picture
       try {
-        const payload = JSON.parse(
-          Buffer.from(account.idToken.split('.')[1], 'base64').toString(),
+        const encodedPayload = account.idToken.split('.')[1];
+        if (!encodedPayload) return null;
+        const payload: unknown = JSON.parse(
+          Buffer.from(encodedPayload, 'base64').toString(),
         );
-        if (payload.picture) {
+        if (
+          typeof payload === 'object' &&
+          payload !== null &&
+          'picture' in payload &&
+          typeof payload.picture === 'string'
+        ) {
           await db
             .update(users)
             .set({ image: payload.picture })
             .where(eq(users.id, userId));
-          return payload.picture as string;
+          return payload.picture;
         }
-      } catch (e) {
+      } catch {
         // Ignore decoding errors
       }
     }
@@ -61,10 +56,7 @@ async function ensureUserImage(userId: string): Promise<string | null> {
 export const getServerSession = createServerFn({ method: 'GET' }).handler(
   async (): Promise<AuthSession> => {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      const headers = getRequestHeaders();
-
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
 
       if (session?.user) {
@@ -74,29 +66,23 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
           if (newImage) image = newImage;
         }
 
-        return {
-          user: {
+        return buildAuthSession(
+          {
             id: session.user.id,
             email: session.user.email,
             name: session.user.name || null,
             image: image || null,
             emailVerified: session.user.emailVerified || false,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-            role: (session.user as any).role || 'USER',
+            role: session.user.role || 'USER',
           },
-          isAuthenticated: true,
-          gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
-        };
+          process.env.VITE_GA_MEASUREMENT_ID,
+        );
       }
     } catch (error) {
       console.error('[Auth] Failed to get session:', error);
     }
 
-    return {
-      user: null,
-      isAuthenticated: false,
-      gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID,
-    };
+    return buildAuthSession(null, process.env.VITE_GA_MEASUREMENT_ID);
   },
 );
 

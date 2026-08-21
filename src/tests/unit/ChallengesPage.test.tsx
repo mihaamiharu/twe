@@ -1,10 +1,8 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import * as router from '@tanstack/react-router';
-import * as query from '@tanstack/react-query';
 
 // Mutable mock state
-globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false };
 globalThis.mockNavigate = mock(() => Promise.resolve());
 
 describe('ChallengesPage', () => {
@@ -56,12 +54,15 @@ describe('ChallengesPage', () => {
 
     beforeEach(() => {
 
-        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false, tier: undefined };
+        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false };
 
         // Setup query mock with SEARCH filtering simulation
-        (query.useQuery as any).mockImplementation((options: any) => {
+        globalThis.mockUseQuery.mockImplementation((options) => {
             const filters = options.queryKey?.[1];
-            const searchQuery = filters?.search?.toLowerCase();
+            const searchQuery = typeof filters === 'object' && filters !== null &&
+                'search' in filters && typeof filters.search === 'string'
+                ? filters.search.toLowerCase()
+                : undefined;
 
             let filtered = mockChallenges;
             if (searchQuery) {
@@ -138,7 +139,7 @@ describe('ChallengesPage', () => {
     it('should update search params when typing in search box', async () => {
         await renderPage();
 
-        const searchInput = screen.getByPlaceholderText('Search challenges...');
+        const searchInput = screen.getByRole('textbox');
         fireEvent.change(searchInput, { target: { value: 'New Search' } });
 
         expect((searchInput as HTMLInputElement).value).toBe('New Search');

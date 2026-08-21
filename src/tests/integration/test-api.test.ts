@@ -1,12 +1,12 @@
 import { test, expect, describe, beforeAll, afterAll, beforeEach } from 'bun:test';
 import { db } from '../../db';
-import { users, challenges, tutorials, progress, submissions } from '../../db/schema';
+import { users, challenges, tutorials } from '../../db/schema';
 import { truncateTables } from './setup';
 import { eq } from 'drizzle-orm';
 
-import { Route as teardownRoute } from '../../routes/api/test/teardown-user';
-import { Route as resetRoute } from '../../routes/api/test/reset-progress';
-import { Route as setProgressRoute } from '../../routes/api/test/set-progress';
+import { handleTeardownUserRequest } from '../../routes/api/test/teardown-user';
+import { handleResetProgressRequest } from '../../routes/api/test/reset-progress';
+import { handleSetProgressRequest } from '../../routes/api/test/set-progress';
 
 const TEST_SECRET = 'test-secret-123';
 const TEST_EMAIL = 'e2e-tester@example.com';
@@ -25,7 +25,7 @@ describe('E2E Test Support APIs', () => {
     await truncateTables();
   });
 
-  afterAll(async () => {
+  afterAll(() => {
     process.env.NODE_ENV = originalEnv;
     if (originalSecret !== undefined) {
       process.env.E2E_SECRET = originalSecret;
@@ -38,7 +38,7 @@ describe('E2E Test Support APIs', () => {
     await truncateTables();
     
     // Seed some static data for tests
-    const [insertedUser] = await db.insert(users).values({
+    await db.insert(users).values({
       email: TEST_EMAIL,
       name: 'Test Tester',
     }).returning();
@@ -61,7 +61,7 @@ describe('E2E Test Support APIs', () => {
   });
 
   // Helper builder
-  function buildRequest(body: any, secret: string = TEST_SECRET) {
+  function buildRequest(body: unknown, secret: string = TEST_SECRET) {
     const req = new Request('http://localhost/api/test', {
       method: 'POST',
       body: JSON.stringify(body),
@@ -75,23 +75,23 @@ describe('E2E Test Support APIs', () => {
 
   describe('Security Gates', () => {
     test('rejects request without correct secret header', async () => {
-      // @ts-ignore - reaching into internal options
-      const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL }, 'wrong-secret');
       
-      const res = await handler({ request: req });
+      const res = await handleTeardownUserRequest(req);
       expect(res.status).toBe(403);
     });
 
     test('rejects request if NODE_ENV is not test', async () => {
-      // @ts-ignore 
-      const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       
       const origEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = 'development';
-      const res = await handler({ request: req });
-      process.env.NODE_ENV = origEnv;
+      const res = await handleTeardownUserRequest(req);
+      if (origEnv === undefined) {
+        delete process.env.NODE_ENV;
+      } else {
+        process.env.NODE_ENV = origEnv;
+      }
       
       expect(res.status).toBe(403);
     });
@@ -99,11 +99,9 @@ describe('E2E Test Support APIs', () => {
 
   describe('Teardown User API', () => {
     test('successfully deletes an existing user', async () => {
-      // @ts-ignore 
-      const handler = teardownRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL });
       
-      const res = await handler({ request: req });
+      const res = await handleTeardownUserRequest(req);
       expect(res.status).toBe(200);
 
       const user = await db.query.users.findFirst({ where: eq(users.email, TEST_EMAIL) });
@@ -113,11 +111,9 @@ describe('E2E Test Support APIs', () => {
 
   describe('Set & Reset Progress APIs', () => {
     test('sets challenge progress correctly and grants XP', async () => {
-      // @ts-expect-error - reaching into internal handlers
-      const handler = setProgressRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 });
       
-      const res = await handler({ request: req });
+      const res = await handleSetProgressRequest(req);
       expect(res.status).toBe(200);
 
       // Verify db
@@ -126,25 +122,25 @@ describe('E2E Test Support APIs', () => {
 
       const prog = await db.query.progress.findMany();
       expect(prog.length).toBe(1);
-      expect(prog[0].isCompleted).toBe(true);
+      const firstProgress = prog[0];
+      if (!firstProgress) throw new Error('Expected seeded progress');
+      expect(firstProgress.isCompleted).toBe(true);
       
       const subs = await db.query.submissions.findMany();
       expect(subs.length).toBe(1);
-      expect(subs[0].isPassed).toBe(true);
-      expect(subs[0].xpEarned).toBe(50);
+      const firstSubmission = subs[0];
+      if (!firstSubmission) throw new Error('Expected seeded submission');
+      expect(firstSubmission.isPassed).toBe(true);
+      expect(firstSubmission.xpEarned).toBe(50);
     });
 
     test('resets all challenge progress and resets user XP', async () => {
       // Setup: set progress first
-      // @ts-expect-error - reaching into internal handlers
-      const setHandler = setProgressRoute.options.server.handlers.POST;
-      await setHandler({ request: buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 }) });
+      await handleSetProgressRequest(buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 }));
       
       // Reset
-      // @ts-expect-error - reaching into internal handlers
-      const resetHandler = resetRoute.options.server.handlers.POST;
       const req = buildRequest({ email: TEST_EMAIL, type: 'challenge' }); // null slug means all 
-      const res = await resetHandler({ request: req });
+      const res = await handleResetProgressRequest(req);
       expect(res.status).toBe(200);
 
       // Verify wiped

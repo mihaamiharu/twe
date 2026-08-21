@@ -202,7 +202,7 @@ export function MarkdownRenderer({
               /^\s*\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]/i,
             );
 
-            if (alertMatch) {
+            if (alertMatch?.[1]) {
               const alertType = alertMatch[1].toLowerCase() as
                 | 'note'
                 | 'tip'
@@ -219,6 +219,7 @@ export function MarkdownRenderer({
 
                 const nodeArray = React.Children.toArray(nodes);
                 const index = path[0];
+                if (index === undefined) return nodes;
                 const node = nodeArray[index];
 
                 if (path.length === 1) {

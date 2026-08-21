@@ -112,7 +112,12 @@ bun test
 
 ### End-to-End (E2E) Tests
 
-We use Playwright for E2E testing. This requires the Docker container to be running.
+We use Playwright for E2E testing. The command below creates an isolated,
+disposable PostgreSQL 15 container with Podman, applies the schema and content,
+starts the app in test mode, provisions test users, and cleans up its resources
+when the run finishes. Ensure your intended Podman machine or service is running
+before starting the suite. Podman is the local default; use
+`E2E_CONTAINER_RUNTIME=docker` to run the same orchestration with Docker.
 
 ```bash
 bun run test:e2e

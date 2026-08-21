@@ -55,7 +55,7 @@ describe('generateIframeTemplate', () => {
       bodyContent: '<h1>Test</h1>',
     });
 
-    expect(html).toContain('window.fetch = function');
+    expect(html).toContain('window.fetch = async function');
     expect(html).toContain('__MOCK_ROUTES__');
   });
 
@@ -159,7 +159,7 @@ describe('generateVfsNavigationTemplate', () => {
       bodyContent: '<h1>Test</h1>',
     });
 
-    expect(html).toContain('window.fetch = function');
+    expect(html).toContain('window.fetch = async function');
     expect(html).toContain('__MOCK_ROUTES__');
   });
 

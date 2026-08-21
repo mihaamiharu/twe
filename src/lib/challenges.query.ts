@@ -1,6 +1,8 @@
 import { queryOptions } from '@tanstack/react-query';
 import { getChallenges, getChallenge } from '@/server/challenges.fn';
 
+export type ChallengeDetailResponse = Awaited<ReturnType<typeof getChallenge>>;
+
 export const challengeListQueryOptions = (filters: {
     locale: string;
     type?: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';

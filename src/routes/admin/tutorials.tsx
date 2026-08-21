@@ -2,8 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getAdminTutorials, updateTutorialStatus } from '@/server/admin/tutorials.fn';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { BookOpen, Search, Eye, Clock } from 'lucide-react';
+import { Search, Eye, Clock } from 'lucide-react';
 import {
     Table,
     TableBody,
@@ -60,7 +59,7 @@ function TutorialsManager() {
             return res;
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['admin-tutorials'] });
+            void queryClient.invalidateQueries({ queryKey: ['admin-tutorials'] });
             toast.success('Tutorial visibility updated');
         },
         onError: () => {

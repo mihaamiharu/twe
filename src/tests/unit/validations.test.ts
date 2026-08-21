@@ -1,9 +1,11 @@
 import { describe, it, expect } from 'bun:test';
 import {
+  formatValidationErrors,
   signUpSchema,
   signInSchema,
   validateInput,
 } from '../../lib/validations';
+import { z } from 'zod';
 
 describe('Validations', () => {
   describe('signUpSchema', () => {
@@ -24,7 +26,9 @@ describe('Validations', () => {
       });
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
+        const firstIssue = result.error.issues[0];
+        if (!firstIssue) throw new Error('Expected validation issue');
+        expect(firstIssue.message).toBe(
           'Please enter a valid email',
         );
       }
@@ -38,7 +42,9 @@ describe('Validations', () => {
       });
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
+        const firstIssue = result.error.issues[0];
+        if (!firstIssue) throw new Error('Expected validation issue');
+        expect(firstIssue.message).toBe(
           'Password must be at least 8 characters',
         );
       }
@@ -52,7 +58,9 @@ describe('Validations', () => {
       });
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues[0].message).toBe(
+        const firstIssue = result.error.issues[0];
+        if (!firstIssue) throw new Error('Expected validation issue');
+        expect(firstIssue.message).toBe(
           'Name must be at least 2 characters',
         );
       }
@@ -103,6 +111,27 @@ describe('Validations', () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toEqual(data);
+      }
+    });
+  });
+
+  describe('formatValidationErrors helper', () => {
+    it('preserves nested paths and the first issue for each path', () => {
+      const schema = z.object({
+        profile: z.object({
+          email: z
+            .string()
+            .min(1, 'Email is required')
+            .email('Email is invalid'),
+        }),
+      });
+      const result = schema.safeParse({ profile: { email: '' } });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(formatValidationErrors(result.error)).toEqual({
+          'profile.email': 'Email is required',
+        });
       }
     });
   });

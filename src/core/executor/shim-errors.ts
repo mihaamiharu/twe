@@ -5,6 +5,8 @@
  * Modeled after real Playwright error patterns.
  */
 
+import { omitUndefined } from '@/lib/omit-undefined';
+
 /**
  * All possible error types thrown by the shim
  */
@@ -39,6 +41,12 @@ export interface ShimErrorOptions {
     matchCount?: number;
     /** Additional context or hints */
     hint?: string;
+}
+
+export interface ShimError extends Error {
+    type: ShimErrorType;
+    selector?: string;
+    action?: string;
 }
 
 /**
@@ -102,17 +110,18 @@ const ERROR_TEMPLATES: Record<ShimErrorType, (opts: ShimErrorOptions) => string>
 export function createShimError(
     type: ShimErrorType,
     options: ShimErrorOptions = {}
-): Error {
+): ShimError {
     const template = ERROR_TEMPLATES[type];
     const message = template(options);
 
-    const error = new Error(message);
+    const error = Object.assign(new Error(message), {
+        type,
+        ...omitUndefined({
+            selector: options.selector,
+            action: options.action,
+        }),
+    });
     error.name = `PlaywrightShimError`;
-
-    // Attach metadata for programmatic access
-    (error as any).type = type;
-    (error as any).selector = options.selector;
-    (error as any).action = options.action;
 
     return error;
 }

@@ -23,10 +23,10 @@ export function PlaywrightDemo() {
             setStep(0);
 
             // Schedule steps
-            steps.forEach((_, index) => {
+            steps.forEach((step, index) => {
                 setTimeout(() => {
                     setStep(index + 1);
-                }, steps[index].delay);
+                }, step.delay);
             });
 
             // Reset loop

@@ -1,5 +1,6 @@
-import { describe, test, expect, beforeEach, mock, spyOn } from 'bun:test';
+import { describe, test, expect, beforeEach, mock } from 'bun:test';
 import { MockedPlaywrightPage } from '../../core/executor/playwright-shim';
+import type { Route } from '../../core/executor/shim.types';
 
 describe('Playwright Shim Coverage Expansion', () => {
     let page: MockedPlaywrightPage;
@@ -32,9 +33,6 @@ describe('Playwright Shim Coverage Expansion', () => {
             div.style.height = '100px';
             document.body.appendChild(div);
 
-            let mouseOver = false;
-            div.onmouseover = () => { mouseOver = true; };
-
             await page.mouse.move(50, 50);
             await page.mouse.click(50, 50);
             // Mouse move should trigger mouseover on element at point
@@ -45,7 +43,7 @@ describe('Playwright Shim Coverage Expansion', () => {
     describe('Networking (Routing)', () => {
         test('should intercept fetch via route()', async () => {
             let intercepted = false;
-            await (page as any).route('/api/test', async (route: any) => {
+            await page.route('/api/test', async (route) => {
                 intercepted = true;
                 await route.fulfill({
                     status: 200,
@@ -59,31 +57,82 @@ describe('Playwright Shim Coverage Expansion', () => {
             console.log('[Test] GET finished, status:', response.status());
             expect(intercepted).toBe(true);
             expect(response.status()).toBe(200);
+            expect(response.url()).toBe('http://localhost/api/test');
             expect(await response.json()).toEqual({ success: true });
         });
 
+        test('should preserve binary route response bodies', async () => {
+            await page.route('/api/binary', (route) =>
+                route.fulfill({
+                    status: 200,
+                    body: Buffer.from([0, 255, 1]),
+                }),
+            );
+
+            const response = await page.request.get('http://localhost/api/binary');
+            expect(Array.from(await response.body())).toEqual([0, 255, 1]);
+        });
+
         test('should handle unroute()', async () => {
-            const handler = mock(async (route: any) => {
+            const handler = mock(async (route: Route) => {
                 await route.fulfill({ status: 200, body: '{}' });
             });
 
-            const win = document.defaultView as any;
+            const win = document.defaultView;
+            if (!win) throw new Error('Test window is unavailable');
             const originalFetch = win.fetch;
-            win.fetch = mock(() => Promise.resolve({ ok: true, status: 200, json: () => Promise.resolve({}) }));
+            Reflect.set(
+                win,
+                'fetch',
+                mock(() => Promise.resolve(new Response('{}', { status: 200 }))),
+            );
 
             try {
-                await (page as any).route('/api/test', handler);
-                await (page as any).unroute('/api/test', handler);
+                await page.route('/api/test', handler);
+                await page.unroute('/api/test', handler);
 
                 await page.request.get('http://localhost/api/test');
                 expect(handler).not.toHaveBeenCalled();
             } finally {
-                win.fetch = originalFetch;
+                Reflect.set(win, 'fetch', originalFetch);
             }
         });
 
+        test('unroute removes only the identical handler for a shared matcher', async () => {
+            const firstHandler = mock((route: Route) =>
+                route.fulfill({ status: 200, body: 'first' }),
+            );
+            const secondHandler = mock((route: Route) =>
+                route.fulfill({ status: 200, body: 'second' }),
+            );
+
+            await page.route('/api/shared', firstHandler);
+            await page.route('/api/shared', secondHandler);
+            await page.unroute('/api/shared', firstHandler);
+
+            const response = await page.request.get('http://localhost/api/shared');
+
+            expect(await response.text()).toBe('second');
+            expect(firstHandler).not.toHaveBeenCalled();
+            expect(secondHandler).toHaveBeenCalledTimes(1);
+        });
+
+        test('exposes URLSearchParams request bodies through postData()', async () => {
+            const captured: { postData?: string | null } = {};
+            await page.route('/api/form', (route, request) => {
+                captured.postData = request.postData();
+                return route.fulfill({ status: 200, body: '{}' });
+            });
+
+            await page.request.post('http://localhost/api/form', {
+                body: new URLSearchParams({ name: 'Ada Lovelace', role: 'admin' }),
+            });
+
+            expect(captured.postData).toBe('name=Ada+Lovelace&role=admin');
+        });
+
         test('should waitForResponse', async () => {
-            const waitPromise = (page as any).waitForResponse('/api/data');
+            const waitPromise = page.waitForResponse('/api/data');
             
             // Trigger request
             void page.request.get('http://localhost/api/data');
@@ -106,8 +155,8 @@ describe('Playwright Shim Coverage Expansion', () => {
             document.body.appendChild(container1);
             document.body.appendChild(container2);
 
-            const locator = (page as any).locator('.container').filter({
-                has: (page as any).locator('.target')
+            const locator = page.locator('.container').filter({
+                has: page.locator('.target')
             });
 
             expect(await locator.count()).toBe(1);
@@ -121,9 +170,11 @@ describe('Playwright Shim Coverage Expansion', () => {
                 document.body.appendChild(btn);
             }
 
-            const locators = await (page as any).locator('button').all();
+            const locators = await page.locator('button').all();
             expect(locators.length).toBe(3);
-            expect(await locators[1].textContent()).toBe('Btn 1');
+            const secondLocator = locators[1];
+            if (!secondLocator) throw new Error('Expected second button locator');
+            expect(await secondLocator.textContent()).toBe('Btn 1');
         });
 
         test('should cover all getBy methods', async () => {
@@ -137,30 +188,30 @@ describe('Playwright Shim Coverage Expansion', () => {
                 <input type="checkbox" id="check">
             `;
 
-            expect(await (page as any).getByRole('button', { name: 'Submit' }).count()).toBe(1);
-            expect(await (page as any).getByPlaceholder('Enter name').count()).toBe(1);
-            expect(await (page as any).getByAltText('Logo').count()).toBe(1);
-            expect(await (page as any).getByLabel('Email').count()).toBe(1);
-            expect(await (page as any).getByTitle('Tooltip').count()).toBe(1);
-            expect(await (page as any).getByTestId('test-div').count()).toBe(1);
-            expect(await (page as any).getByText('Test').count()).toBe(1);
+            expect(await page.getByRole('button', { name: 'Submit' }).count()).toBe(1);
+            expect(await page.getByPlaceholder('Enter name').count()).toBe(1);
+            expect(await page.getByAltText('Logo').count()).toBe(1);
+            expect(await page.getByLabel('Email').count()).toBe(1);
+            expect(await page.getByTitle('Tooltip').count()).toBe(1);
+            expect(await page.getByTestId('test-div').count()).toBe(1);
+            expect(await page.getByText('Test').count()).toBe(1);
 
             // Locator actions
-            const locator = (page as any).locator('#check');
+            const locator = page.locator('#check');
             await locator.check();
             expect((document.getElementById('check') as HTMLInputElement).checked).toBe(true);
             await locator.uncheck();
             expect((document.getElementById('check') as HTMLInputElement).checked).toBe(false);
 
-            await (page as any).locator('#name').fill('Alice');
+            await page.locator('#name').fill('Alice');
             expect((document.getElementById('name') as HTMLInputElement).value).toBe('Alice');
 
-            await (page as any).locator('#name').focus();
-            await (page as any).locator('#name').press('Enter');
+            await page.locator('#name').focus();
+            await page.locator('#name').press('Enter');
             
-            expect(await (page as any).locator('img').getAttribute('src')).toBe('logo.png');
-            expect(await (page as any).locator('img').allAttributes()).toBeDefined();
-            expect(await (page as any).locator('img').boundingBox()).toBeDefined();
+            expect(await page.locator('img').getAttribute('src')).toBe('logo.png');
+            expect(await page.locator('img').allAttributes()).toBeDefined();
+            expect(await page.locator('img').boundingBox()).toBeDefined();
         });
 
         test('should handle visibility variants', async () => {
@@ -168,11 +219,11 @@ describe('Playwright Shim Coverage Expansion', () => {
              document.body.appendChild(div);
              
              div.style.visibility = 'hidden';
-             expect(await (page as any).locator('div').isVisible()).toBe(false);
+             expect(await page.locator('div').isVisible()).toBe(false);
              
              div.style.visibility = 'visible';
              div.style.opacity = '0';
-             expect(await (page as any).locator('div').isVisible()).toBe(false);
+             expect(await page.locator('div').isVisible()).toBe(false);
         });
 
         test('should waitForSelector hidden', async () => {
@@ -183,8 +234,8 @@ describe('Playwright Shim Coverage Expansion', () => {
                  div.style.display = 'none';
              }, 100);
              
-             await (page as any).waitForSelector('div', { state: 'hidden', timeout: 500 });
-             expect(await (page as any).locator('div').isVisible()).toBe(false);
+             await page.waitForSelector('div', { state: 'hidden', timeout: 500 });
+             expect(await page.locator('div').isVisible()).toBe(false);
         });
 
         test('should handle selectOption with array', async () => {
@@ -193,7 +244,7 @@ describe('Playwright Shim Coverage Expansion', () => {
              select.innerHTML = '<option value="a">A</option><option value="b">B</option>';
              document.body.appendChild(select);
              
-             await (page as any).locator('select').selectOption(['a', 'b']);
+             await page.locator('select').selectOption(['a', 'b']);
              expect(Array.from(select.selectedOptions).map(o => o.value)).toEqual(['a', 'b']);
         });
 
@@ -202,12 +253,14 @@ describe('Playwright Shim Coverage Expansion', () => {
              input.type = 'file';
              document.body.appendChild(input);
              
-             await (page as any).locator('input').setInputFiles({
+             await page.locator('input').setInputFiles({
                  name: 'test.txt',
                  mimeType: 'text/plain',
                  buffer: Buffer.from('hello')
              });
-             expect(input.files?.[0].name).toBe('test.txt');
+             const uploadedFile = input.files?.[0];
+             if (!uploadedFile) throw new Error('Expected uploaded file');
+             expect(uploadedFile.name).toBe('test.txt');
         });
 
         test('should filter by pressed state in getByRole', async () => {
@@ -215,7 +268,7 @@ describe('Playwright Shim Coverage Expansion', () => {
                 <button type="button" aria-pressed="true">Pressed</button>
                 <button type="button" aria-pressed="false">Not Pressed</button>
              `;
-             expect(await (page as any).getByRole('button', { pressed: true }).count()).toBe(1);
+             expect(await page.getByRole('button', { pressed: true }).count()).toBe(1);
         });
 
         test('should hit all methods on frameLocator', async () => {
@@ -232,7 +285,7 @@ describe('Playwright Shim Coverage Expansion', () => {
             `);
             iframeDoc.close();
 
-            const fl = (page as any).frameLocator('iframe');
+            const fl = page.frameLocator('iframe');
             expect(await fl.getByRole('button').count()).toBe(1);
             expect(await fl.getByPlaceholder('Enter name').count()).toBe(1);
             expect(await fl.getByLabel('Label').count()).toBe(1);
@@ -243,9 +296,9 @@ describe('Playwright Shim Coverage Expansion', () => {
 
         test('should handle text= selector and deep match', async () => {
             document.body.innerHTML = '<div><span>Deep Text</span></div>';
-            expect(await (page as any).locator('text="Deep Text"').count()).toBe(1);
+            expect(await page.locator('text="Deep Text"').count()).toBe(1);
             // Should pick the span, not the div (deepest match principle)
-            expect(await (page as any).locator('text="Deep Text"').evaluate((el: any) => el.tagName)).toBe('SPAN');
+            expect(await page.locator('text="Deep Text"').evaluate((el: HTMLElement) => el.tagName)).toBe('SPAN');
         });
 
         test('should handle various event dispatching', async () => {
@@ -255,25 +308,23 @@ describe('Playwright Shim Coverage Expansion', () => {
             let customTriggered = false;
             div.addEventListener('my-event', () => { customTriggered = true; });
 
-            await (page as any).locator('div').dispatchEvent('my-event');
+            await page.locator('div').dispatchEvent('my-event');
             expect(customTriggered).toBe(true);
         });
     });
 
     describe('Dialogs', () => {
         test('should handle alerts via dialog emitter', async () => {
-            let dialogMsg = '';
-            page.on('dialog', async (dialog) => {
-                dialogMsg = dialog.message();
-                await dialog.dismiss();
+            await page.on('dialog', (dialog) => {
+                void dialog.dismiss();
             });
 
             // Simulate alert trigger from window
             // In shim.ts, alert is usually shimmed by iframe-executor
             // But we can manually trigger the callback if we access internal __MOCK_DIALOG_HANDLER__
-            const win = document.defaultView as any;
+            const win = document.defaultView;
             if (win && win.__MOCK_DIALOG_HANDLER__) {
-                win.__MOCK_DIALOG_HANDLER__('alert', 'Hello World');
+                await win.__MOCK_DIALOG_HANDLER__('alert', 'Hello World');
             }
             // Wait a tick for async emitter
             await new Promise(r => setTimeout(r, 10));
@@ -283,7 +334,7 @@ describe('Playwright Shim Coverage Expansion', () => {
 
     describe('Evaluation', () => {
         test('should evaluate code in context', async () => {
-            const result = await (page as any).evaluate((arg: number) => {
+            const result = await page.evaluate((arg: number) => {
                 return arg + 1;
             }, 41);
             expect(result).toBe(42);
@@ -295,7 +346,7 @@ describe('Playwright Shim Coverage Expansion', () => {
             div.textContent = 'Original';
             document.body.appendChild(div);
 
-            await (page as any).locator('#eval-target').evaluate((el: HTMLElement) => {
+            await page.locator('#eval-target').evaluate((el: HTMLElement) => {
                 el.textContent = 'Updated';
             });
             expect(div.textContent).toBe('Updated');

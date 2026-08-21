@@ -1,4 +1,5 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { expect } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class ProfilePage extends BasePage {
@@ -23,7 +24,7 @@ export class ProfilePage extends BasePage {
     this.tabsList = page.getByRole('tablist');
   }
 
-  async goto(locale: string = 'en') {
+  override async goto(locale: string = 'en') {
     await this.page.goto(`/${locale}/profile`);
   }
 
@@ -35,6 +36,8 @@ export class ProfilePage extends BasePage {
 
   async switchTab(tabName: 'progress' | 'activity' | 'achievements') {
     await this.page
+      // tabName is a closed union of known tab labels.
+      // eslint-disable-next-line security/detect-non-literal-regexp
       .getByRole('tab', { name: new RegExp(tabName, 'i') })
       .click();
   }

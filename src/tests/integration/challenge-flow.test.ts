@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, beforeEach, mock } from 'bun:test';
-import { db, users, challenges, progress, submissions, testCases } from '../../db';
+import { db, users, challenges, progress, testCases } from '../../db';
 import { challengeSubmissionHandler } from '../../server/submissions.fn';
 import { setupTestDb, truncateTables } from './setup';
 import { eq } from 'drizzle-orm';
@@ -16,7 +16,7 @@ void mock.module(
 '../../server/auth.server', () => ({
     auth: {
         api: {
-            getSession: async () => ({
+            getSession: () => ({
                 user: { id: testUserId },
                 session: { id: 'test-session' }
             })
@@ -37,7 +37,7 @@ void mock.module(
 // Mock content server for lazy sync (optional)
 void mock.module(
 '../../server/content.server', () => ({
-    getRawChallengeContent: async (slug: string) => {
+    getRawChallengeContent: (slug: string) => {
         if (slug === 'test-challenge') {
             return {
                 slug: 'test-challenge',
@@ -80,16 +80,12 @@ describe('Challenge Flow Integration', () => {
         // Seed Challenge
         await db.insert(challenges).values({
             id: '00000000-0000-0000-0000-000000000101',
-            title: 'Test Challenge',
+            title: { en: 'Test Challenge' },
             slug: 'test-challenge',
             type: 'JAVASCRIPT',
             xpReward: 100,
             difficulty: 'EASY',
             order: 1,
-            description: 'test description',
-            instructions: 'test instructions',
-            htmlContent: '<div></div>',
-            starterCode: '',
             isPublished: true,
             completionCount: 0
         });
@@ -116,12 +112,15 @@ describe('Challenge Flow Integration', () => {
             isPractice: false
         };
 
-        const result: any = await challengeSubmissionHandler({ 
+        const result = await challengeSubmissionHandler({
             data: input,
             context: { user: { id: testUserId } }
         });
 
         expect(result.success).toBe(true);
+        if (!result.success || !result.data) {
+            throw new Error(result.error ?? 'Submission returned no data');
+        }
         expect(result.data.isFirstCompletion).toBe(true);
         expect(result.data.submission.xpEarned).toBe(100);
 
@@ -147,12 +146,15 @@ describe('Challenge Flow Integration', () => {
             isPractice: false
         };
 
-        const result: any = await challengeSubmissionHandler({ 
+        const result = await challengeSubmissionHandler({
             data: input,
             context: { user: { id: testUserId } }
         });
 
         expect(result.success).toBe(true); // Request success, but submission failed
+        if (!result.success || !result.data) {
+            throw new Error(result.error ?? 'Submission returned no data');
+        }
         expect(result.data.submission.isPassed).toBe(false);
 
         // Verify DB

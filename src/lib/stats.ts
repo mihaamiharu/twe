@@ -140,7 +140,7 @@ export function calculateStreak(completionDates: Date[]): {
   const dayDates: Date[] = [];
 
   for (const date of sortedDates) {
-    const dayKey = date.toISOString().split('T')[0];
+    const dayKey = date.toISOString().slice(0, 10);
     if (!uniqueDays.has(dayKey)) {
       uniqueDays.add(dayKey);
       dayDates.push(date);
@@ -158,7 +158,11 @@ export function calculateStreak(completionDates: Date[]): {
   let longestStreak = 1;
   let tempStreak = 1;
 
-  const firstDay = new Date(dayDates[0]);
+  const firstDayValue = dayDates[0];
+  if (!firstDayValue) {
+    return { currentStreak: 0, longestStreak: 0 };
+  }
+  const firstDay = new Date(firstDayValue);
   firstDay.setHours(0, 0, 0, 0);
 
   // Check if the most recent activity is today or yesterday
@@ -172,8 +176,11 @@ export function calculateStreak(completionDates: Date[]): {
 
   // Calculate streaks
   for (let i = 1; i < dayDates.length; i++) {
-    const prevDay = new Date(dayDates[i - 1]);
-    const currDay = new Date(dayDates[i]);
+    const previousDate = dayDates[i - 1];
+    const currentDate = dayDates[i];
+    if (!previousDate || !currentDate) continue;
+    const prevDay = new Date(previousDate);
+    const currDay = new Date(currentDate);
     prevDay.setHours(0, 0, 0, 0);
     currDay.setHours(0, 0, 0, 0);
 
@@ -207,8 +214,8 @@ function calculateMaxDailyChallenges(completionDates: Date[]): number {
 
   const countByDay = new Map<string, number>();
   for (const date of completionDates) {
-    const dayKey = date.toISOString().split('T')[0]; // "2026-01-16"
-    countByDay.set(dayKey, (countByDay.get(dayKey) || 0) + 1);
+    const dayKey = date.toISOString().slice(0, 10); // "2026-01-16"
+    countByDay.set(dayKey, (countByDay.get(dayKey) ?? 0) + 1);
   }
 
   return Math.max(0, ...countByDay.values());

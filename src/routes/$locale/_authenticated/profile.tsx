@@ -29,7 +29,7 @@ import { getXPForLevel } from '@/lib/gamification';
 import { getUserSettings } from '@/server/user.fn';
 
 import { AchievementBadge } from '@/components/gamification/achievement-badge';
-import { Achievement } from '@/lib/achievements';
+import type { Achievement } from '@/lib/achievements';
 
 export const Route = createFileRoute('/$locale/_authenticated/profile')({
   component: ProfilePage,

@@ -1,13 +1,48 @@
 import { describe, test, expect } from 'bun:test';
+import { Window } from 'happy-dom';
 import {
   generateFetchPolyfillCode,
   createRouteFetchWrapper,
 } from '../../core/executor/route-fetch-mock';
+import type {
+  BrowserFetch,
+  RouteMatcher,
+  RouteWindow,
+} from '../../core/executor/route-fetch-mock';
+import { invokeDynamicFunction } from '../../core/executor/dynamic-code';
+
+interface GeneratedFetchWindow extends RouteWindow {
+  fetch?: BrowserFetch;
+}
+
+function installGeneratedFetch(routes: RouteMatcher[]): BrowserFetch {
+  const generatedWindow: GeneratedFetchWindow = { __MOCK_ROUTES__: routes };
+  const code = generateFetchPolyfillCode();
+  // The generated polyfill is trusted application code under test.
+  // eslint-disable-next-line @typescript-eslint/no-implied-eval
+  const install = new Function('window', code);
+  invokeDynamicFunction(install, undefined, [generatedWindow]);
+
+  if (!generatedWindow.fetch) {
+    throw new Error('Generated fetch polyfill did not install');
+  }
+  return generatedWindow.fetch;
+}
+
+async function captureRejectedError(value: unknown): Promise<Error> {
+  try {
+    await Promise.resolve(value);
+  } catch (error) {
+    if (error instanceof Error) return error;
+    throw new Error('Expected rejection to contain an Error', { cause: error });
+  }
+  throw new Error('Expected promise to reject');
+}
 
 describe('generateFetchPolyfillCode', () => {
   test('should generate valid JavaScript code', () => {
     const code = generateFetchPolyfillCode();
-    expect(code).toContain('window.fetch = function');
+    expect(code).toContain('window.fetch = async function');
     expect(code).toContain('__MOCK_ROUTES__');
   });
 
@@ -75,6 +110,9 @@ describe('generateFetchPolyfillCode', () => {
 
     // Wrap in function to test syntax
     expect(() => {
+      // The generated polyfill is dynamic code by design; this assertion only
+      // compiles it and never executes untrusted input.
+      // eslint-disable-next-line @typescript-eslint/no-implied-eval
       new Function(code);
     }).not.toThrow();
   });
@@ -91,13 +129,13 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: '/api/test',
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: { status: 200, json: { matched: true } },
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -107,20 +145,20 @@ describe('createRouteFetchWrapper', () => {
     // Relative URL should be normalized and match the route
     const response = await wrapper('/api/test');
     expect(response.ok).toBe(true);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ matched: true });
   });
 
   test('should pass through to original fetch when no routes match', async () => {
     const mockWindow = {
       __MOCK_ROUTES__: [],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     let originalCalled = false;
-    const originalFetch = async () => {
-      originalCalled = true;
-      return new Response(null, { status: 200 });
-    };
+    const originalFetch = () => {
+        originalCalled = true;
+        return Promise.resolve(new Response(null, { status: 200 }));
+      };
 
     const wrapper = createRouteFetchWrapper(
       originalFetch,
@@ -136,7 +174,7 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: '/api/data',
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: {
               status: 200,
@@ -145,7 +183,7 @@ describe('createRouteFetchWrapper', () => {
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -155,8 +193,237 @@ describe('createRouteFetchWrapper', () => {
     const response = await wrapper('http://localhost/api/data');
     expect(response.ok).toBe(true);
     expect(response.status).toBe(200);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ message: 'mocked' });
+  });
+
+  test('omits absent request headers and body from route handlers', async () => {
+    let capturedRequest: Parameters<RouteMatcher['handler']>[0] | undefined;
+    const wrapper = createRouteFetchWrapper(
+      undefined,
+      () => ({
+        __MOCK_ROUTES__: [
+          {
+            matcher: '/api/no-options',
+            handler: (request) => {
+              capturedRequest = request;
+              return Promise.resolve({
+                type: 'fulfill' as const,
+                response: { status: 204 },
+              });
+            },
+          },
+        ],
+      }),
+    );
+
+    await wrapper('http://localhost/api/no-options');
+
+    expect(capturedRequest).toBeDefined();
+    if (!capturedRequest) throw new Error('Expected the route handler to run');
+    expect('headers' in capturedRequest).toBe(false);
+    expect('body' in capturedRequest).toBe(false);
+  });
+
+  test('preserves URLSearchParams request bodies for route handlers', async () => {
+    let capturedBody: string | undefined;
+    const wrapper = createRouteFetchWrapper(
+      undefined,
+      () => ({
+        __MOCK_ROUTES__: [
+          {
+            matcher: '/api/form',
+            handler: (request) => {
+              capturedBody = request.body;
+              return Promise.resolve({
+                type: 'fulfill' as const,
+                response: { status: 200 },
+              });
+            },
+          },
+        ],
+      }),
+    );
+
+    await wrapper('http://localhost/api/form', {
+      method: 'POST',
+      body: new URLSearchParams({ query: 'type safety', page: '2' }),
+    });
+
+    expect(capturedBody).toBe('query=type+safety&page=2');
+  });
+
+  test('preserves bodies from Request inputs for route handlers', async () => {
+    let capturedBody: string | undefined;
+    const wrapper = createRouteFetchWrapper(
+      undefined,
+      () => ({
+        __MOCK_ROUTES__: [
+          {
+            matcher: '/api/request',
+            handler: (request) => {
+              capturedBody = request.body;
+              return Promise.resolve({
+                type: 'fulfill' as const,
+                response: { status: 200 },
+              });
+            },
+          },
+        ],
+      }),
+    );
+    const request = new Request('http://localhost/api/request', {
+      method: 'POST',
+      body: new URLSearchParams({ source: 'request', valid: 'true' }),
+    });
+
+    await wrapper(request);
+
+    expect(capturedBody).toBe('source=request&valid=true');
+  });
+
+  test('preserves bodies from iframe-realm Request inputs', async () => {
+    const iframeWindow = new Window();
+
+    try {
+      let capturedBody: string | undefined;
+      const wrapper = createRouteFetchWrapper(
+        undefined,
+        () => ({
+          __MOCK_ROUTES__: [
+            {
+              matcher: '/api/cross-realm-request',
+              handler: (request) => {
+                capturedBody = request.body;
+                return Promise.resolve({
+                  type: 'fulfill' as const,
+                  response: { status: 200 },
+                });
+              },
+            },
+          ],
+        }),
+      );
+      const request = new iframeWindow.Request(
+        'http://localhost/api/cross-realm-request',
+        {
+          method: 'POST',
+          body: 'created-inside-iframe',
+        },
+      );
+
+      expect(request instanceof Request).toBe(false);
+      await Promise.resolve(
+        invokeDynamicFunction(wrapper, undefined, [request]),
+      );
+
+      expect(capturedBody).toBe('created-inside-iframe');
+    } finally {
+      iframeWindow.close();
+    }
+  });
+
+  test('continues to route URL-like inputs with custom stringification', async () => {
+    let matched = false;
+    const wrapper = createRouteFetchWrapper(
+      undefined,
+      () => ({
+        __MOCK_ROUTES__: [
+          {
+            matcher: '/api/url-like',
+            handler: () => {
+              matched = true;
+              return Promise.resolve({
+                type: 'fulfill' as const,
+                response: { status: 200 },
+              });
+            },
+          },
+        ],
+      }),
+    );
+    const result = invokeDynamicFunction(wrapper, undefined, [
+      { toString: () => 'http://localhost/api/url-like' },
+    ]);
+
+    await Promise.resolve(result);
+
+    expect(matched).toBe(true);
+  });
+
+  test('rejects unsupported request bodies instead of coercing them', async () => {
+    const wrapper = createRouteFetchWrapper(
+      undefined,
+      () => ({
+        __MOCK_ROUTES__: [
+          {
+            matcher: '/api/invalid',
+            handler: () => Promise.resolve({
+              type: 'fulfill' as const,
+              response: { status: 200 },
+            }),
+          },
+        ],
+      }),
+    );
+    const result = invokeDynamicFunction(wrapper, undefined, [
+      'http://localhost/api/invalid',
+      { method: 'POST', body: { unsupported: true } },
+    ]);
+
+    const error = await captureRejectedError(result);
+
+    expect(error).toBeInstanceOf(TypeError);
+    expect(error.message).toBe(
+      'Unsupported request body for page.route: [object Object]',
+    );
+  });
+
+  test('generated polyfill preserves bodies from Request inputs', async () => {
+    let capturedBody: string | undefined;
+    const generatedFetch = installGeneratedFetch([
+      {
+        matcher: '/api/request',
+        handler: (request) => {
+          capturedBody = request.body;
+          return Promise.resolve({
+            type: 'fulfill' as const,
+            response: { status: 200 },
+          });
+        },
+      },
+    ]);
+    const request = new Request('http://localhost/api/request', {
+      method: 'POST',
+      body: new URLSearchParams({ generated: 'true', source: 'request' }),
+    });
+
+    await generatedFetch(request);
+
+    expect(capturedBody).toBe('generated=true&source=request');
+  });
+
+  test('generated polyfill rejects unsupported request bodies', async () => {
+    const generatedFetch = installGeneratedFetch([
+      {
+        matcher: '/api/invalid',
+        handler: () => Promise.resolve({
+          type: 'fulfill' as const,
+          response: { status: 200 },
+        }),
+      },
+    ]);
+    const result = invokeDynamicFunction(generatedFetch, undefined, [
+      'http://localhost/api/invalid',
+      { method: 'POST', body: { unsupported: true } },
+    ]);
+
+    const error = await captureRejectedError(result);
+
+    expect(error).toBeInstanceOf(TypeError);
+    expect(error.message).toBe(
+      'Unsupported request body for page.route: [object Object]',
+    );
   });
 
   test('should support RegExp matchers', async () => {
@@ -164,13 +431,13 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: /\/api\/.*/,
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: { status: 200, json: { matched: true } },
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -179,7 +446,7 @@ describe('createRouteFetchWrapper', () => {
 
     const response = await wrapper('http://localhost/api/users');
     expect(response.ok).toBe(true);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ matched: true });
   });
 
@@ -188,13 +455,13 @@ describe('createRouteFetchWrapper', () => {
       __MOCK_ROUTES__: [
         {
           matcher: (url: URL) => url.pathname === '/api/special',
-          handler: async () => ({
+          handler: () => Promise.resolve({
             type: 'fulfill' as const,
             response: { status: 200, json: { special: true } },
           }),
         },
       ],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,
@@ -203,14 +470,14 @@ describe('createRouteFetchWrapper', () => {
 
     const response = await wrapper('http://localhost/api/special');
     expect(response.ok).toBe(true);
-    const json = await response.json();
+    const json: unknown = await response.json();
     expect(json).toEqual({ special: true });
   });
 
   test('should return 404 response when no original fetch and no routes match', async () => {
     const mockWindow = {
       __MOCK_ROUTES__: [],
-    } as unknown as Window & Record<string, unknown>;
+    };
 
     const wrapper = createRouteFetchWrapper(
       undefined,

@@ -131,29 +131,29 @@ export const getAdminStats = createServerFn({ method: 'GET' })
           .groupBy(bugReports.status),
       ]);
 
-      const totalUsers = userCountResult[0].value;
-      const totalSubmissions = submissionCountResult[0].value;
+      const totalUsers = userCountResult[0]?.value ?? 0;
+      const totalSubmissions = submissionCountResult[0]?.value ?? 0;
 
       const userGrowthPercent =
-        previousMonthUsers[0].value > 0
-          ? ((currentMonthUsers[0].value - previousMonthUsers[0].value) /
-            previousMonthUsers[0].value) *
+        (previousMonthUsers[0]?.value ?? 0) > 0
+          ? (((currentMonthUsers[0]?.value ?? 0) - (previousMonthUsers[0]?.value ?? 0)) /
+            (previousMonthUsers[0]?.value ?? 0)) *
           100
-          : currentMonthUsers[0].value > 0
+          : (currentMonthUsers[0]?.value ?? 0) > 0
             ? 100
             : 0;
 
       const submissionGrowthPercent =
-        previousMonthSubmissions[0].value > 0
-          ? ((currentMonthSubmissions[0].value -
-            previousMonthSubmissions[0].value) /
-            previousMonthSubmissions[0].value) *
+        (previousMonthSubmissions[0]?.value ?? 0) > 0
+          ? (((currentMonthSubmissions[0]?.value ?? 0) -
+            (previousMonthSubmissions[0]?.value ?? 0)) /
+            (previousMonthSubmissions[0]?.value ?? 0)) *
           100
-          : currentMonthSubmissions[0].value > 0
+          : (currentMonthSubmissions[0]?.value ?? 0) > 0
             ? 100
             : 0;
 
-      const activeUsers = activeUsersResult[0].value;
+      const activeUsers = activeUsersResult[0]?.value ?? 0;
 
       const bugStats = {
         OPEN: 0,
@@ -166,7 +166,6 @@ export const getAdminStats = createServerFn({ method: 'GET' })
 
       bugStatsResults.forEach((stat) => {
         if (stat.status) {
-          // @ts-expect-error - dynamic assignment
           bugStats[stat.status] = stat.count;
         }
       });

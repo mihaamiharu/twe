@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import { X, Lock, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { CodeEditor } from './code-editor';
 
 interface MultiTabEditorProps {
@@ -15,7 +16,6 @@ interface MultiTabEditorProps {
     onReady?: () => void;
     storageKeyPrefix?: string;
     className?: string;
-    height?: string | number;
     extraLibs?: { content: string; filePath?: string }[];
 }
 
@@ -31,7 +31,6 @@ export function MultiTabEditor({
     onReady,
     storageKeyPrefix,
     className,
-    height = '100%',
     extraLibs,
 }: MultiTabEditorProps) {
 
@@ -121,18 +120,18 @@ export function MultiTabEditor({
                     initialCode={files[selectedFile] || ''}
                     language={getLanguage(selectedFile)}
                     onChange={(code) => isEditable && onCodeChange(selectedFile, code)}
-                    onRun={onRun}
-                    onReady={onReady}
+                    {...omitUndefined({ onRun, onReady })}
                     readOnly={!isEditable}
-                    storageKey={
-                        isEditable && storageKeyPrefix
-                            ? `${storageKeyPrefix}-${selectedFile}`
-                            : undefined
-                    }
+                    {...omitUndefined({
+                        storageKey:
+                            isEditable && storageKeyPrefix
+                                ? `${storageKeyPrefix}-${selectedFile}`
+                                : undefined,
+                    })}
                     height="100%"
                     showMinimap={true}
                     className="h-full"
-                    extraLibs={extraLibs}
+                    {...omitUndefined({ extraLibs })}
                 />
             </div>
         </div>

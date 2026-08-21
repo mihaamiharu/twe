@@ -1,17 +1,15 @@
 import { test, expect } from '@playwright/test';
 import { DashboardPage } from '../pages/DashboardPage';
 import { ProfilePage } from '../pages/ProfilePage';
-import { SettingsPage } from '../pages/SettingsPage';
 import { loginViaApi } from '../utils/auth';
 
 /**
  * Basic Application Scenarios
- * Covers core visibility and navigation checks across Dashboard, Profile, and Settings
+ * Covers core visibility and profile checks across the authenticated experience
  */
 test.describe('Expanded Application Scenarios', () => {
   let dashboardPage: DashboardPage;
   let profilePage: ProfilePage;
-  let settingsPage: SettingsPage;
 
   test.beforeEach(async ({ page, context, request }) => {
     // Log in before each test to ensure access to authenticated routes
@@ -20,7 +18,6 @@ test.describe('Expanded Application Scenarios', () => {
 
     dashboardPage = new DashboardPage(page);
     profilePage = new ProfilePage(page);
-    settingsPage = new SettingsPage(page);
   });
 
   test('Dashboard: should display core components and stats', async ({
@@ -32,14 +29,12 @@ test.describe('Expanded Application Scenarios', () => {
     await dashboardPage.verifyStats();
 
     // Check if featured challenges are present
-    const section = dashboardPage.page
-      .locator('section')
-      .filter({
-        has: dashboardPage.page.getByRole('heading', {
-          name: /Featured Challenges/i,
-        }),
-      });
-    const challenges = section.locator('a.glass-card');
+    const section = dashboardPage.page.locator('section').filter({
+      has: dashboardPage.page.getByRole('heading', {
+        name: /Real Problem/i,
+      }),
+    });
+    const challenges = section.locator('a[href*="/challenges/"]');
     await expect(challenges).toHaveCount(3);
   });
 
@@ -57,21 +52,18 @@ test.describe('Expanded Application Scenarios', () => {
     await expect(profilePage.userName).toContainText(/kikkawa23/i);
   });
 
-  test('Settings: should allow navigating back to profile', async ({
-    page,
-  }) => {
-    await settingsPage.goto();
-    console.log('Settings URL:', page.url());
+  test('Profile: should expose all progress tabs', async () => {
+    await profilePage.goto();
 
-    // Verify we are on settings page
+    await expect(profilePage.tabsList).toBeVisible();
     await expect(
-      settingsPage.page
-        .getByRole('heading', { level: 1, name: /Settings/i })
-        .first(),
+      profilePage.page.getByRole('tab', { name: /Progress/i }),
     ).toBeVisible();
-
-    // Test back to profile link
-    await settingsPage.backToProfile();
-    await expect(page).toHaveURL(/.*profile$/);
+    await expect(
+      profilePage.page.getByRole('tab', { name: /Activity/i }),
+    ).toBeVisible();
+    await expect(
+      profilePage.page.getByRole('tab', { name: /Achievements/i }),
+    ).toBeVisible();
   });
 });

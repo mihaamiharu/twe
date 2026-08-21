@@ -3,6 +3,7 @@ import { GripVertical } from 'lucide-react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
 import { SelectorPanel } from './selector-panel';
@@ -10,11 +11,12 @@ import { ResultsPanel } from './results-panel';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type { Challenge, PlaygroundState } from './types';
 import type { SelectorType } from '../selector-input';
+import type { ChallengeExecution } from './use-challenge-execution';
 
 interface PlaygroundDesktopLayoutProps {
     challenge: Challenge;
     state: PlaygroundState;
-    execution: any;
+    execution: ChallengeExecution;
     previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
     userId?: string;
 }
@@ -98,7 +100,11 @@ export function PlaygroundDesktopLayout({
                                         ? e2eSelectorStyles
                                         : defaultSelectorStyles
                                 }
-                                userSelector={isSelectorChallenge ? selector : undefined}
+                                {...omitUndefined({
+                                    userSelector: isSelectorChallenge
+                                        ? selector
+                                        : undefined,
+                                })}
                                 selectorType={selectorType as SelectorType}
                                 targetSelector={challenge.targetSelector as string}
                                 targetSelectorType={
@@ -109,7 +115,7 @@ export function PlaygroundDesktopLayout({
                                 showControls={true}
                                 height="100%"
                                 iframeRef={previewIframeRef}
-                                files={challenge.files}
+                                {...omitUndefined({ files: challenge.files })}
                                 currentPath={currentVfsPath}
                                 onNavigate={(path) => setCurrentVfsPath(path)}
                             />
@@ -132,9 +138,9 @@ export function PlaygroundDesktopLayout({
                         <EditorPanel
                             challenge={challenge}
                             state={state}
-                            userId={userId}
+                            {...omitUndefined({ userId })}
                             isMobile={false}
-                            onRunCode={handleRunCode}
+                            onRunCode={() => { void handleRunCode(); }}
                             onReset={handleReset}
                             onFileChange={handleFileChange}
                             onSelectFile={handleSelectFile}
@@ -157,7 +163,7 @@ export function PlaygroundDesktopLayout({
                         <ResultsPanel
                             challenge={challenge}
                             state={state}
-                            onRunCode={handleRunCode}
+                            onRunCode={() => { void handleRunCode(); }}
                         />
                     </div>
                 )}

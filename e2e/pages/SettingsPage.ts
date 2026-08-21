@@ -1,4 +1,4 @@
-import { Page, Locator } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { BasePage } from './BasePage';
 
 export class SettingsPage extends BasePage {
@@ -17,7 +17,7 @@ export class SettingsPage extends BasePage {
     });
   }
 
-  async goto(locale: string = 'en') {
+  override async goto(locale: string = 'en') {
     await this.page.goto(`/${locale}/settings`);
   }
 

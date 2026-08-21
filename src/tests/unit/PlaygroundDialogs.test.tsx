@@ -1,6 +1,5 @@
 import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import * as React from 'react';
 
 // ============================================================
 // Inline stubs for the dialog components under test.
@@ -72,8 +71,8 @@ describe('Playground Dialogs', () => {
         };
 
         beforeEach(() => {
-            (defaultProps.onOpenChange as any).mockClear?.();
-            (defaultProps.onConfirm as any).mockClear?.();
+            defaultProps.onOpenChange.mockClear();
+            defaultProps.onConfirm.mockClear();
         });
 
         it('should render when open', () => {
@@ -115,8 +114,8 @@ describe('Playground Dialogs', () => {
         };
 
         beforeEach(() => {
-            (defaultProps.onOpenChange as any).mockClear?.();
-            (defaultProps.onConfirm as any).mockClear?.();
+            defaultProps.onOpenChange.mockClear();
+            defaultProps.onConfirm.mockClear();
         });
 
         it('should render warning info', () => {

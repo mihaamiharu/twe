@@ -33,8 +33,8 @@ export const forgetPassword = async ({
   }
 
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  return response.json();
+  const body: unknown = JSON.parse(await response.text());
+  return body;
 };
 
 // resetPassword is available on the client

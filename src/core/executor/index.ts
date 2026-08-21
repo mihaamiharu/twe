@@ -5,7 +5,7 @@
  */
 
 export { MockedPlaywrightPage } from './playwright-shim';
-export type { Locator, LocatorOptions, WaitOptions } from './playwright-shim';
+export type { Locator, LocatorOptions, WaitOptions } from './shim.types';
 
 export {
   executePlaywrightCode,
@@ -17,4 +17,4 @@ export type {
   ExecuteOptions,
   TestCase,
   TestCaseResult,
-} from './iframe-executor';
+} from './executor.types';

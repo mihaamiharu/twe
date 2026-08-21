@@ -2,8 +2,7 @@
 export interface FilePayload {
     name: string;
     mimeType: string;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    buffer: any;
+    buffer: Buffer;
 }
 
 /**
@@ -42,6 +41,15 @@ export interface FillOptions extends ActionOptions {
 }
 
 export interface Locator {
+    /** Internal synchronous finder used by the shim's locator composition. */
+    finder?: () => HTMLElement[];
+    allAttributes(): Promise<Record<string, string>>;
+    boundingBox(): Promise<{
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    }>;
     click(options?: ClickOptions): Promise<void>;
     dblclick(options?: ClickOptions): Promise<void>;
     fill(value: string, options?: FillOptions): Promise<void>;
@@ -64,7 +72,10 @@ export interface Locator {
     blur(options?: ActionOptions): Promise<void>;
     clear(options?: ActionOptions): Promise<void>;
     dispatchEvent(type: string, eventInit?: CustomEventInit): Promise<void>;
-    setInputFiles(files: FilePayload | FilePayload[], options?: ActionOptions): Promise<void>;
+    setInputFiles(
+        files: string | FilePayload | string[] | FilePayload[],
+        options?: ActionOptions,
+    ): Promise<void>;
     dragTo(target: Locator, options?: ActionOptions): Promise<void>;
     dragAndDrop(target: Locator, options?: ActionOptions): Promise<void>;
     press(key: string, options?: ActionOptions): Promise<void>;
@@ -82,6 +93,8 @@ export interface Locator {
     elementHandles(): Promise<HTMLElement[]>; // Internal helper exposed for filter({ has })
     getByRole(role: string, options?: LocatorOptions): Locator;
     getByText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+    getByAltText(text: string | RegExp, options?: { exact?: boolean }): Locator;
+    getByTitle(text: string | RegExp, options?: { exact?: boolean }): Locator;
     getByLabel(text: string | RegExp, options?: { exact?: boolean }): Locator;
     getByPlaceholder(
         text: string | RegExp,
@@ -108,11 +121,11 @@ export interface LocatorOptions {
 }
 
 export interface APIRequestContext {
-    get(url: string, options?: unknown): Promise<APIResponse>;
-    post(url: string, options?: unknown): Promise<APIResponse>;
-    put(url: string, options?: unknown): Promise<APIResponse>;
-    delete(url: string, options?: unknown): Promise<APIResponse>;
-    fetch(url: string, options?: unknown): Promise<APIResponse>;
+    get(url: string, options?: RequestInit): Promise<APIResponse>;
+    post(url: string, options?: RequestInit): Promise<APIResponse>;
+    put(url: string, options?: RequestInit): Promise<APIResponse>;
+    delete(url: string, options?: RequestInit): Promise<APIResponse>;
+    fetch(url: string, options?: RequestInit): Promise<APIResponse>;
     storageState(
         options?: unknown,
     ): Promise<{ cookies: unknown[]; origins: unknown[] }>;
@@ -127,6 +140,7 @@ export interface APIResponse {
     json(): Promise<unknown>;
     text(): Promise<string>;
     body(): Promise<Buffer>;
+    url(): string;
 }
 
 export interface Route {
@@ -153,9 +167,11 @@ export interface APIRequest {
     postData(): string | null;
 }
 
+export type DialogType = 'alert' | 'confirm' | 'prompt' | 'beforeunload';
+
 export interface Dialog {
     message(): string;
-    type(): 'alert' | 'confirm' | 'prompt' | 'beforeunload';
+    type(): DialogType;
     accept(promptText?: string): Promise<void>;
     dismiss(): Promise<void>;
     defaultValue(): string;
@@ -169,7 +185,7 @@ export interface BrowserContext {
     cookies(): Promise<unknown[]>;
     addCookies(cookies: unknown[]): Promise<void>;
     clearCookies(): Promise<void>;
-    newPage(): Promise<any>;
+    newPage(): Promise<unknown>;
     close(): Promise<void>;
     request: APIRequestContext;
 }

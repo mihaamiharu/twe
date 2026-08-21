@@ -34,8 +34,7 @@ export interface TestCaseResult {
     error?: string;
 }
 
-export interface ExpectResult {
-    expect: ((actual: unknown) => {
+export interface ExpectMatchers {
         // Generic Assertions
         toBe: (expected: unknown) => Promise<void>;
         toEqual: (expected: unknown) => Promise<void>;
@@ -49,10 +48,10 @@ export interface ExpectResult {
         toBeLessThan: (expected: number) => Promise<void>;
         toBeLessThanOrEqual: (expected: number) => Promise<void>;
         toBeCloseTo: (expected: number, precision?: number) => Promise<void>;
-        toContain: (expected: any) => Promise<void>;
+        toContain: (expected: unknown) => Promise<void>;
         toHaveLength: (expected: number) => Promise<void>;
         toMatch: (expected: string | RegExp) => Promise<void>;
-        toHaveProperty: (path: string, value?: any) => Promise<void>;
+        toHaveProperty: (path: string, value?: unknown) => Promise<void>;
 
         // Locator Assertions
         toBeVisible: (options?: { timeout?: number }) => Promise<void>;
@@ -63,7 +62,7 @@ export interface ExpectResult {
         toHaveAttribute: (name: string, value?: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveClass: (className: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveCSS: (name: string, value: string | RegExp, options?: { timeout?: number }) => Promise<void>;
-        toHaveJSProperty: (name: string, value: any, options?: { timeout?: number }) => Promise<void>;
+        toHaveJSProperty: (name: string, value: unknown, options?: { timeout?: number }) => Promise<void>;
         toHaveCount: (count: number, options?: { timeout?: number }) => Promise<void>;
         toBeChecked: (options?: { timeout?: number }) => Promise<void>;
         toBeEnabled: (options?: { timeout?: number }) => Promise<void>;
@@ -74,10 +73,29 @@ export interface ExpectResult {
         toHaveTitle: (title: string | RegExp, options?: { timeout?: number }) => Promise<void>;
         toHaveURL: (url: string | RegExp, options?: { timeout?: number }) => Promise<void>;
 
-        not: any; // Simplified for brevity in type definition, implementation handles it
-    }) & {
-        soft: (actual: unknown) => any;
-    };
+        not: Omit<ExpectMatchers, 'not'>;
+}
+
+export interface ExpectFunction {
+    (actual: unknown): ExpectMatchers;
+    soft: (actual: unknown) => ExpectMatchers;
+}
+
+export interface ExpectResult {
+    expect: ExpectFunction;
     getAssertionCount: () => number;
     getTestResults: () => Array<{ message: string; passed: boolean }>;
+}
+
+export interface ExecutorTestFixtures {
+    page: MockedPlaywrightPage;
+    expect: ExpectFunction;
+}
+
+export interface ExecutorTestFunction {
+    (
+        name: string,
+        callback: (fixtures: ExecutorTestFixtures) => Promise<void>,
+    ): Promise<void>;
+    step: (name: string, callback: () => Promise<unknown>) => Promise<void>;
 }

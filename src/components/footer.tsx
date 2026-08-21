@@ -54,7 +54,7 @@ export function Footer() {
       const lastSeenDate = localStorage.getItem('latestSeenChangelogDate');
 
       // Compare dates as strings (YYYY-MM-DD) to avoid timezone issues
-      if (!lastSeenDate || latestEntry.date > lastSeenDate) {
+      if (latestEntry && (!lastSeenDate || latestEntry.date > lastSeenDate)) {
         setHasNewChangelog(true);
       }
     }

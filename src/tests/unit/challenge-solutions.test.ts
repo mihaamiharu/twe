@@ -1,33 +1,42 @@
 import { describe, it, expect } from 'bun:test';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { z } from 'zod';
 import {
     testSelectorAgainstTarget,
     validateSelector,
 } from '../../core/executor/selector-validator';
 
-// Define types matching the JSON structure
-interface Challenge {
-    slug: string;
-    type: string;
-    difficulty: string;
-    title: { en: string; id: string };
-    description: { en: string; id: string };
-    instructions: { en: string; id: string };
-    htmlContent: string;
-    starterCode: string;
-    solution: string;
-    testCases: Array<{
-        description: string;
-        expectedOutput: string | { selector?: string; matchCount?: number; targetElementId?: string };
-        isHidden: boolean;
-    }>;
-}
-
-interface TierData {
-    tier: string;
-    challenges: Challenge[];
-}
+const localizedTextSchema = z.object({
+    en: z.string(),
+    id: z.string().optional(),
+});
+const tierDataSchema = z.object({
+    tier: z.string(),
+    challenges: z.array(z.object({
+        slug: z.string(),
+        type: z.string(),
+        difficulty: z.string(),
+        title: localizedTextSchema,
+        description: localizedTextSchema,
+        instructions: localizedTextSchema,
+        htmlContent: z.string().optional(),
+        starterCode: z.string(),
+        solution: z.string(),
+        testCases: z.array(z.object({
+            description: z.string(),
+            expectedOutput: z.union([
+                z.string(),
+                z.object({
+                    selector: z.string().optional(),
+                    matchCount: z.number().optional(),
+                    targetElementId: z.string().optional(),
+                }),
+            ]),
+            isHidden: z.boolean(),
+        })),
+    })),
+});
 
 const CHALLENGE_FILES = [
     'beginner.json',
@@ -42,7 +51,8 @@ describe('Challenge Integrity & Solutions', () => {
     CHALLENGE_FILES.forEach((file) => {
         const filePath = join(CONTENT_DIR, file);
         const content = readFileSync(filePath, 'utf-8');
-        const data: TierData = JSON.parse(content);
+        const parsed: unknown = JSON.parse(content);
+        const data = tierDataSchema.parse(parsed);
 
         describe(`${data.tier} tier (${file})`, () => {
             data.challenges.forEach((challenge) => {
@@ -72,13 +82,17 @@ describe('Challenge Integrity & Solutions', () => {
                         it('should give correct feedback for the solution', () => {
                             const selectorType =
                                 challenge.type === 'CSS_SELECTOR' ? 'css' : 'xpath';
+                            if (challenge.htmlContent === undefined) {
+                                throw new Error(`${challenge.slug} is missing selector HTML content`);
+                            }
+                            const { htmlContent } = challenge;
 
                             if (selectorType === 'xpath' && typeof document.evaluate === 'undefined') {
                                 return;
                             }
 
                             const container = document.createElement('div');
-                            container.innerHTML = challenge.htmlContent;
+                            container.innerHTML = htmlContent;
 
                             // Ensure container is attached to document for some selectors to work (like :root, etc, though usually not needed for simple ones)
                             document.body.appendChild(container);
@@ -89,6 +103,9 @@ describe('Challenge Integrity & Solutions', () => {
 
                             // Get expectation (either a selector or an ID)
                             const testCase = challenge.testCases[0];
+                            if (!testCase) {
+                                throw new Error(`${challenge.slug} has no test case`);
+                            }
                             const expectedOutput = testCase.expectedOutput;
 
                             let expectedSelector = '';
@@ -118,7 +135,7 @@ describe('Challenge Integrity & Solutions', () => {
                                 console.error(`\nFAILED: ${challenge.slug}`);
                                 console.error(`Solution: "${challenge.solution}"`);
                                 console.error(`Expected: "${expectedSelector}"`);
-                                console.error(`HTML: ${challenge.htmlContent.substring(0, 100)}...`);
+                                console.error(`HTML: ${htmlContent.substring(0, 100)}...`);
                                 console.error(`User Matches: ${result.userMatchCount}`);
                                 console.error(`Expected Matches: ${result.expectedMatchCount}`);
                                 console.error(`Feedback: ${result.feedback}`);

@@ -11,7 +11,8 @@
  */
 
 import { createMiddleware } from '@tanstack/react-start';
-import { getRequestHeaders } from '@tanstack/react-start/server';
+import { getRequest } from '@tanstack/react-start/server';
+import { getContainedAuthUser } from './auth-user';
 
 
 interface RateLimitEntry {
@@ -59,7 +60,7 @@ function getClientIdentifier(
     const forwardedFor = headers.get('x-forwarded-for');
     if (forwardedFor) {
         // Get the first IP in the list (client IP)
-        return forwardedFor.split(',')[0].trim();
+        return forwardedFor.split(',')[0]?.trim() ?? 'unknown-ip';
     }
 
     const realIp = headers.get('x-real-ip');
@@ -78,11 +79,10 @@ export function createRateLimitMiddleware(options: {
     windowMinutes: number; // Time window in minutes
 }) {
     return createMiddleware().server(async ({ next, context }) => {
-        const headers = getRequestHeaders();
+        const headers = getRequest().headers;
 
         // We try to get userId from context (if authMiddleware ran before this)
-        // @ts-expect-error - context is unknown here, but we check safely
-        const userId = context?.user?.id as string | undefined;
+        const userId = getContainedAuthUser(context)?.id;
 
         const identifier = getClientIdentifier(headers, userId);
         const storeKey = `${options.key}:${identifier}`;

@@ -6,12 +6,17 @@ GlobalRegistrator.register();
 // Prevent real HTTP calls from HappyDOM's fetch polyfill (e.g. from <script>fetch('/api/data')</script> in iframe HTML)
 // Without this, HappyDOM throws `NetworkError: ECONNREFUSED` which causes bun to exit with code 1
 // even when the test that caused the fetch is skipped or already completed.
-(globalThis as any).fetch = async (url: string) => {
-    return new Response(JSON.stringify({ mocked: true, url }), {
+globalThis.fetch = Object.assign((input: RequestInfo | URL) => {
+    const url = typeof input === 'string'
+        ? input
+        : input instanceof URL
+            ? input.href
+            : input.url;
+    return Promise.resolve(new Response(JSON.stringify({ mocked: true, url }), {
         status: 200,
         headers: { 'Content-Type': 'application/json' }
-    });
-};
+    }));
+}, { preconnect: globalThis.fetch.preconnect });
 
 process.env.DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
 process.env.TEST_DATABASE_URL = "postgres://dummy:dummy@localhost:5432/dummy";
@@ -22,31 +27,46 @@ process.env.GOOGLE_CLIENT_SECRET = "dummy_google_secret";
 
 import * as React from 'react';
 
+interface MotionOnlyProps {
+    layout?: unknown;
+    layoutId?: unknown;
+    initial?: unknown;
+    animate?: unknown;
+    exit?: unknown;
+    transition?: unknown;
+    variants?: unknown;
+}
+
+function createMotionMock<Tag extends keyof React.JSX.IntrinsicElements>(tag: Tag) {
+    return React.forwardRef<
+        React.ComponentRef<Tag>,
+        React.ComponentPropsWithoutRef<Tag> & MotionOnlyProps
+    >(function MotionMock({ layout, layoutId, initial, animate, exit, transition, variants, ...props }, ref) {
+        void layout;
+        void layoutId;
+        void initial;
+        void animate;
+        void exit;
+        void transition;
+        void variants;
+        return React.createElement(tag, { ...props, ref });
+    });
+}
+
+const MotionDiv = createMotionMock('div');
+const MotionTr = createMotionMock('tr');
+const MotionSpan = createMotionMock('span');
+const MotionPath = createMotionMock('path');
+
 void mock.module(
 'framer-motion', () => ({
     motion: {
-        div: React.forwardRef(({ children, className, ...props }: any, ref) => {
-            const domProps = { ...props, ref };
-            ['layout', 'layoutId', 'initial', 'animate', 'exit', 'transition', 'variants'].forEach(k => delete domProps[k]);
-            return React.createElement('div', { className, ...domProps }, children);
-        }),
-        tr: React.forwardRef(({ children, className, ...props }: any, ref) => {
-            const domProps = { ...props, ref };
-            ['layout', 'layoutId', 'initial', 'animate', 'exit', 'transition', 'variants'].forEach(k => delete domProps[k]);
-            return React.createElement('tr', { className, ...domProps }, children);
-        }),
-        span: React.forwardRef(({ children, className, ...props }: any, ref) => {
-            const domProps = { ...props, ref };
-            ['layout', 'layoutId', 'initial', 'animate', 'exit', 'transition', 'variants'].forEach(k => delete domProps[k]);
-            return React.createElement('span', { className, ...domProps }, children);
-        }),
-        path: React.forwardRef(({ children, className, ...props }: any, ref) => {
-            const domProps = { ...props, ref };
-            ['layout', 'layoutId', 'initial', 'animate', 'exit', 'transition', 'variants'].forEach(k => delete domProps[k]);
-            return React.createElement('path', { className, ...domProps }, children);
-        }),
+        div: MotionDiv,
+        tr: MotionTr,
+        span: MotionSpan,
+        path: MotionPath,
     },
-    AnimatePresence: ({ children }: any) => React.createElement(React.Fragment, null, children),
+    AnimatePresence: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
 }));
 
 globalThis.mockSearchParams = {};
@@ -54,7 +74,13 @@ globalThis.mockNavigate = mock(() => Promise.resolve());
 
 void mock.module(
 '@tanstack/react-router', () => ({
-    Link: ({ children, params, search, to, activeProps, partiallyActive, className, ...props }: any) => {
+    Link: ({
+        children,
+        params,
+        to,
+        className,
+        ...props
+    }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { params?: unknown; to?: string }) => {
         return React.createElement('a', { href: to || 'mock-link', className, 'data-params': JSON.stringify(params), ...props }, children);
     },
     useRouter: () => ({}),
@@ -78,15 +104,15 @@ void mock.module(
 
 void mock.module(
 '@tanstack/react-query', () => {
-    const { mock } = require('bun:test');
+    globalThis.mockUseQuery = mock(() => undefined);
     return {
-        useQuery: mock(),
+        useQuery: globalThis.mockUseQuery,
         useMutation: () => ({
             mutate: mock(),
             isPending: false,
         }),
         keepPreviousData: mock(),
-        queryOptions: (opts: any) => opts,
+        queryOptions: <T,>(options: T): T => options,
         useQueryClient: () => ({
             setQueryData: mock(),
             invalidateQueries: mock()
@@ -109,7 +135,7 @@ void mock.module(
 void mock.module(
 'next-themes', () => ({
     useTheme: () => ({ theme: 'dark', setTheme: () => {} }),
-    ThemeProvider: ({ children }: any) => React.createElement(React.Fragment, null, children),
+    ThemeProvider: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
 }));
 
 void mock.module(
@@ -124,39 +150,44 @@ void mock.module(
 
 void mock.module(
 '@/components/ui/dialog', () => {
-    const React = require('react');
     return {
-        Dialog: ({ open, children }: any) => open ? React.createElement('div', { 'data-testid': 'dialog-root' }, children) : null,
-        DialogContent: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-content' }, children),
-        DialogHeader: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-header' }, children),
-        DialogFooter: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-footer' }, children),
-        DialogTitle: ({ children }: any) => React.createElement('h2', { 'data-testid': 'dialog-title' }, children),
-        DialogDescription: ({ children }: any) => React.createElement('div', { 'data-testid': 'dialog-description' }, children),
+        Dialog: ({ open, children }: React.PropsWithChildren<{ open?: boolean }>) => open ? React.createElement('div', { 'data-testid': 'dialog-root' }, children) : null,
+        DialogContent: ({ children }: React.PropsWithChildren) => React.createElement('div', { 'data-testid': 'dialog-content' }, children),
+        DialogHeader: ({ children }: React.PropsWithChildren) => React.createElement('div', { 'data-testid': 'dialog-header' }, children),
+        DialogFooter: ({ children }: React.PropsWithChildren) => React.createElement('div', { 'data-testid': 'dialog-footer' }, children),
+        DialogTitle: ({ children }: React.PropsWithChildren) => React.createElement('h2', { 'data-testid': 'dialog-title' }, children),
+        DialogDescription: ({ children }: React.PropsWithChildren) => React.createElement('div', { 'data-testid': 'dialog-description' }, children),
     };
 });
 
 void mock.module(
 "@/components/ui/dropdown-menu", () => {
-    const React = require('react');
     return {
-        DropdownMenu: ({ children }: any) => React.createElement(React.Fragment, null, children),
-        DropdownMenuTrigger: ({ children }: any) => React.createElement(React.Fragment, null, children),
-        DropdownMenuContent: ({ children }: any) => React.createElement('div', { 'data-testid': 'dropdown-content' }, children),
-        DropdownMenuItem: ({ children, onClick, className }: any) => React.createElement('div', { onClick, className, 'data-testid': 'dropdown-item' }, children),
-        DropdownMenuLabel: ({ children }: any) => React.createElement('div', null, children),
+        DropdownMenu: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
+        DropdownMenuTrigger: ({ children }: React.PropsWithChildren) => React.createElement(React.Fragment, null, children),
+        DropdownMenuContent: ({ children }: React.PropsWithChildren) => React.createElement('div', { 'data-testid': 'dropdown-content' }, children),
+        DropdownMenuItem: ({ children, onClick, className }: React.PropsWithChildren<React.HTMLAttributes<HTMLDivElement>>) => React.createElement('div', { onClick, className, 'data-testid': 'dropdown-item' }, children),
+        DropdownMenuLabel: ({ children }: React.PropsWithChildren) => React.createElement('div', null, children),
         DropdownMenuSeparator: () => React.createElement('hr'),
     };
 });
 
 void mock.module(
 '@monaco-editor/react', () => {
-    const React = require('react');
     return {
-        default: ({ defaultValue, value, onChange }: any) => {
+        default: ({
+            defaultValue,
+            value,
+            onChange,
+        }: {
+            defaultValue?: string;
+            value?: string;
+            onChange?: (value: string) => void;
+        }) => {
             return React.createElement('textarea', {
                 'data-testid': 'monaco-editor',
                 defaultValue: value || defaultValue,
-                onChange: (e: any) => onChange?.(e.target.value)
+                onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => onChange?.(event.target.value)
             });
         },
         loader: { 
@@ -165,4 +196,3 @@ void mock.module(
         }
     };
 });
-
