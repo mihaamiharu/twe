@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 import { executePlaywrightCode } from '@/core/executor';
 import { generatePreloadCode } from '@/core/executor/module-preloader';
 import { storage } from '@/lib/storage-adapter';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import { INJECTED_SCRIPTS, HIGHLIGHT_STYLES } from '../preview/constants';
 import type {
@@ -111,16 +112,14 @@ export function useChallengeExecution(
                 initialHtml,
                 {
                     timeout: 10000,
-                    ...(previewIframeRef.current === null
-                        ? {}
-                        : { existingIframe: previewIframeRef.current }),
+                    ...omitUndefined({
+                        existingIframe: previewIframeRef.current ?? undefined,
+                        files: challenge.files,
+                        expectedState: challenge.expectedState,
+                    }),
                     strictMode: challenge.type === 'PLAYWRIGHT',
                     cssContent: (challenge.category?.startsWith('e2e')) ? e2eSelectorStyles : defaultSelectorStyles,
-                    ...(challenge.files === undefined ? {} : { files: challenge.files }),
                     onNavigate: (path) => setCurrentVfsPath(path),
-                    ...(challenge.expectedState === undefined
-                        ? {}
-                        : { expectedState: challenge.expectedState }),
                     isTypeScript: challenge.type === 'TYPESCRIPT' || challenge.type === 'PLAYWRIGHT',
                 },
             );
@@ -182,7 +181,11 @@ export function useChallengeExecution(
                 id: 'main',
                 name: t('challenges:playground.results'),
                 passed: validationPassed,
-                ...(!validationPassed ? { error: result.error || outputMessage } : {}),
+                ...omitUndefined({
+                    error: validationPassed
+                        ? undefined
+                        : result.error || outputMessage,
+                }),
                 executionTime: result.executionTime,
             };
 

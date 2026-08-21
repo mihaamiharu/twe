@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { X, Lock, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { CodeEditor } from './code-editor';
 
 interface MultiTabEditorProps {
@@ -119,16 +120,18 @@ export function MultiTabEditor({
                     initialCode={files[selectedFile] || ''}
                     language={getLanguage(selectedFile)}
                     onChange={(code) => isEditable && onCodeChange(selectedFile, code)}
-                    {...(onRun === undefined ? {} : { onRun })}
-                    {...(onReady === undefined ? {} : { onReady })}
+                    {...omitUndefined({ onRun, onReady })}
                     readOnly={!isEditable}
-                    {...(isEditable && storageKeyPrefix
-                        ? { storageKey: `${storageKeyPrefix}-${selectedFile}` }
-                        : {})}
+                    {...omitUndefined({
+                        storageKey:
+                            isEditable && storageKeyPrefix
+                                ? `${storageKeyPrefix}-${selectedFile}`
+                                : undefined,
+                    })}
                     height="100%"
                     showMinimap={true}
                     className="h-full"
-                    {...(extraLibs === undefined ? {} : { extraLibs })}
+                    {...omitUndefined({ extraLibs })}
                 />
             </div>
         </div>

@@ -7,6 +7,7 @@
 
 import { MockedPlaywrightPage } from './playwright-shim';
 import { logger } from '@/lib/logger';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { transpileTypeScript } from './typescript-transpiler';
 import {
   type ExecutionResult,
@@ -208,9 +209,7 @@ export async function executePlaywrightCode(
 
             const htmlTemplate = generateIframeTemplate({
               bodyContent: finalHtml,
-              ...(options?.cssContent === undefined
-                ? {}
-                : { cssContent: options.cssContent }),
+              ...omitUndefined({ cssContent: options?.cssContent }),
               filesEnabled: !!options?.files,
               includeAlertPolyfill: true,
               includeFunctionMatcher: true,
@@ -287,12 +286,10 @@ export async function executePlaywrightCode(
             // Set up VFS for multi-page E2E challenges
             if (options?.files) {
               page.setVFS(options.files, {
-                ...(options.onNavigate === undefined
-                  ? {}
-                  : { onNavigate: options.onNavigate }),
-                ...(options.cssContent === undefined
-                  ? {}
-                  : { cssContent: options.cssContent }),
+                ...omitUndefined({
+                  onNavigate: options.onNavigate,
+                  cssContent: options.cssContent,
+                }),
               });
             }
 
@@ -479,9 +476,7 @@ export async function executePlaywrightCode(
                   status: 'FAILED',
                   output: `DOM State Validation Failed: ${stateValidation.error}`,
                   executionTime,
-                  ...(stateValidation.error === undefined
-                    ? {}
-                    : { error: stateValidation.error }),
+                  ...omitUndefined({ error: stateValidation.error }),
                   logs,
                   assertionCount: getAssertionCount(),
                 });

@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { RotateCcw, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { CodeEditor } from '../code-editor';
 import { FileExplorer } from '../file-explorer';
 import { MultiTabEditor } from '../multi-tab-editor';
@@ -80,9 +81,9 @@ export function EditorPanel({
                         {!isMobile && (
                             <FileExplorer
                                 files={challenge.files!}
-                                {...(challenge.editableFiles === undefined
-                                    ? {}
-                                    : { editableFiles: challenge.editableFiles })}
+                                {...omitUndefined({
+                                    editableFiles: challenge.editableFiles,
+                                })}
                                 selectedFile={selectedFile}
                                 onSelectFile={onSelectFile}
                                 className="w-60 shrink-0 border-r border-border"
@@ -90,9 +91,9 @@ export function EditorPanel({
                         )}
                         <MultiTabEditor
                             files={fileContents}
-                            {...(challenge.editableFiles === undefined
-                                ? {}
-                                : { editableFiles: challenge.editableFiles })}
+                            {...omitUndefined({
+                                editableFiles: challenge.editableFiles,
+                            })}
                             selectedFile={selectedFile}
                             openFiles={openFiles}
                             onSelectFile={onSelectFile}
@@ -102,7 +103,7 @@ export function EditorPanel({
                             onReady={onReady}
                             storageKeyPrefix={userId ? `challenge-${challenge.id}-${userId}` : `challenge-${challenge.id}`}
                             className="flex-1"
-                            {...(extraLibs === undefined ? {} : { extraLibs })}
+                            {...omitUndefined({ extraLibs })}
                         />
                     </div>
                 ) : (
@@ -120,7 +121,7 @@ export function EditorPanel({
                         height="100%"
                         className="h-full"
                         key={`${challenge.id}-${resetCount}`}
-                        {...(extraLibs === undefined ? {} : { extraLibs })}
+                        {...omitUndefined({ extraLibs })}
                     />
                 )}
             </div>

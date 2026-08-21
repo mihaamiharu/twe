@@ -6,6 +6,7 @@ import { progress, challenges } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { generateHint } from '@/lib/ai';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { getChallengeContent } from './content.server';
 
 // ----------------------------------------------------------------------------
@@ -85,15 +86,13 @@ export const getAIHint = createServerFn({ method: 'POST' })
                     | 'PLAYWRIGHT'
                     | 'JAVASCRIPT',
                 instructions: challengeContent.instructions,
-                ...(challengeContent.htmlContent === undefined
-                    ? {}
-                    : { htmlContent: challengeContent.htmlContent }),
-                ...(challengeContent.starterCode === undefined
-                    ? {}
-                    : { starterCode: challengeContent.starterCode }),
-                ...(userAttempt === undefined ? {} : { userAttempt }),
+                ...omitUndefined({
+                    htmlContent: challengeContent.htmlContent,
+                    starterCode: challengeContent.starterCode,
+                    userAttempt,
+                    staticHints: data.staticHints,
+                }),
                 locale,
-                ...(data.staticHints === undefined ? {} : { staticHints: data.staticHints }),
             });
 
             if (!hintResult.success) {

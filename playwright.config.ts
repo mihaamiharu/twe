@@ -8,6 +8,9 @@ import path from 'path';
  */
 dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
+const baseURL = process.env.BASE_URL || 'http://localhost:3000';
+const baseURLHostname = new URL(baseURL).hostname;
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
@@ -25,7 +28,24 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.BASE_URL || 'http://localhost:3000',
+    baseURL,
+
+    // Keep the consent banner from intercepting interactions in fresh test contexts.
+    storageState: {
+      cookies: [
+        {
+          name: 'twe-consent',
+          value: 'denied',
+          domain: baseURLHostname,
+          path: '/',
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: 'Lax',
+        },
+      ],
+      origins: [],
+    },
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',

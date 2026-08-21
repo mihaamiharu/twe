@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import { BookOpen, Play, Search, Code2, Info, CheckCircle2, Folder } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
 import { SelectorPanel } from './selector-panel';
@@ -125,9 +126,9 @@ export function PlaygroundMobileLayout({
                                     <div className="flex-1 overflow-hidden p-2">
                                         <FileExplorer
                                             files={challenge.files}
-                                            {...(challenge.editableFiles === undefined
-                                                ? {}
-                                                : { editableFiles: challenge.editableFiles })}
+                                            {...omitUndefined({
+                                                editableFiles: challenge.editableFiles,
+                                            })}
                                             selectedFile={currentVfsPath}
                                             onSelectFile={(path) => {
                                                 handleSelectFile(path);
@@ -226,7 +227,11 @@ export function PlaygroundMobileLayout({
                                                 ? e2eSelectorStyles
                                                 : defaultSelectorStyles
                                         }
-                                        {...(isSelectorChallenge ? { userSelector: selector } : {})}
+                                        {...omitUndefined({
+                                            userSelector: isSelectorChallenge
+                                                ? selector
+                                                : undefined,
+                                        })}
                                         selectorType={selectorType as SelectorType}
                                         targetSelector={challenge.targetSelector as string}
                                         targetSelectorType={
@@ -237,7 +242,7 @@ export function PlaygroundMobileLayout({
                                         showControls={true}
                                         height="100%"
                                         iframeRef={previewIframeRef}
-                                        {...(challenge.files === undefined ? {} : { files: challenge.files })}
+                                        {...omitUndefined({ files: challenge.files })}
                                         currentPath={currentVfsPath}
                                         onNavigate={(path) => setCurrentVfsPath(path)}
                                     />

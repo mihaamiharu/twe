@@ -23,6 +23,7 @@ import {
   parseChallengeTierJson,
   parseTutorialRegistryJson,
 } from './content-validation';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 // =============================================================================
 // HELPERS
@@ -65,12 +66,10 @@ function parseFrontmatter(content: string): {
     const titleMatch = content.match(/^#\s+(.+)$/m);
     const descMatch = content.match(/^#[^\n]+\n+([^\n#]+)/);
     return {
-      meta: {
-        ...(titleMatch?.[1] === undefined ? {} : { title: titleMatch[1].trim() }),
-        ...(descMatch?.[1] === undefined
-          ? {}
-          : { description: descMatch[1].trim() }),
-      },
+      meta: omitUndefined({
+        title: titleMatch?.[1]?.trim(),
+        description: descMatch?.[1]?.trim(),
+      }),
       content,
     };
   }
@@ -155,9 +154,7 @@ export async function getTutorialContent(
       order: entry.order,
       estimatedMinutes: entry.estimatedMinutes,
       tags: entry.tags,
-      ...(entry.relatedChallenges === undefined
-        ? {}
-        : { relatedChallenges: entry.relatedChallenges }),
+      ...omitUndefined({ relatedChallenges: entry.relatedChallenges }),
     };
   } catch (error) {
     console.error(`[ContentService] Failed to load tutorial: ${slug}`, error);
@@ -208,9 +205,7 @@ export async function getTutorialList(
       order: entry.order,
       estimatedMinutes: entry.estimatedMinutes,
       tags: entry.tags,
-      ...(entry.relatedChallenges === undefined
-        ? {}
-        : { relatedChallenges: entry.relatedChallenges }),
+      ...omitUndefined({ relatedChallenges: entry.relatedChallenges }),
     };
   });
 
@@ -310,6 +305,29 @@ function isFileNotFoundError(error: unknown): boolean {
     error.code === 'ENOENT';
 }
 
+function resolveChallengeSummary(def: ChallengeDefinition, locale: string) {
+  return {
+    slug: def.slug,
+    type: def.type,
+    difficulty: def.difficulty,
+    category: def.category,
+    xpReward: def.xpReward,
+    order: def.order,
+    title: resolveLocale(def.title, locale),
+    description: resolveLocale(def.description, locale),
+    instructions: resolveLocale(def.instructions, locale),
+    ...omitUndefined({
+      tutorialSlug: def.tutorialSlug,
+      htmlContent: def.htmlContent,
+      files: def.files,
+      editableFiles: def.editableFiles,
+      preloadModules: def.preloadModules,
+      starterCode: def.starterCode,
+      tags: def.tags,
+    }),
+  };
+}
+
 /**
  * Get a single challenge by slug
  */
@@ -326,25 +344,10 @@ export async function getChallengeContent(
   if (def.status && def.status !== 'published') return null;
 
   return {
-    slug: def.slug,
-    type: def.type,
-    difficulty: def.difficulty,
-    category: def.category,
-    xpReward: def.xpReward,
-    order: def.order,
-    ...(def.tutorialSlug === undefined ? {} : { tutorialSlug: def.tutorialSlug }),
-    title: resolveLocale(def.title, locale),
-    description: resolveLocale(def.description, locale),
-    instructions: resolveLocale(def.instructions, locale),
+    ...resolveChallengeSummary(def, locale),
     hints: resolveLocaleArray(def.hints, locale),
-    ...(def.htmlContent === undefined ? {} : { htmlContent: def.htmlContent }),
-    ...(def.files === undefined ? {} : { files: def.files }),
-    ...(def.editableFiles === undefined ? {} : { editableFiles: def.editableFiles }),
-    ...(def.preloadModules === undefined ? {} : { preloadModules: def.preloadModules }),
-    ...(def.starterCode === undefined ? {} : { starterCode: def.starterCode }),
     testCases: def.testCases,
     solution: def.solution,
-    ...(def.tags === undefined ? {} : { tags: def.tags }),
   };
 }
 
@@ -394,24 +397,7 @@ export async function getChallengeList(
       if (!titleMatch && !descMatch) continue;
     }
 
-    results.push({
-      slug: def.slug,
-      type: def.type,
-      difficulty: def.difficulty,
-      category: def.category,
-      xpReward: def.xpReward,
-      order: def.order,
-      ...(def.tutorialSlug === undefined ? {} : { tutorialSlug: def.tutorialSlug }),
-      title: resolveLocale(def.title, locale),
-      description: resolveLocale(def.description, locale),
-      instructions: resolveLocale(def.instructions, locale),
-      ...(def.htmlContent === undefined ? {} : { htmlContent: def.htmlContent }),
-      ...(def.files === undefined ? {} : { files: def.files }),
-      ...(def.editableFiles === undefined ? {} : { editableFiles: def.editableFiles }),
-      ...(def.preloadModules === undefined ? {} : { preloadModules: def.preloadModules }),
-      ...(def.starterCode === undefined ? {} : { starterCode: def.starterCode }),
-      ...(def.tags === undefined ? {} : { tags: def.tags }),
-    });
+    results.push(resolveChallengeSummary(def, locale));
   }
 
   return results.sort((a, b) => a.order - b.order);

@@ -15,9 +15,14 @@ export class AdminPage extends BasePage {
     this.dashboardTitle = page
       .locator('h1')
       .filter({ hasText: /admin dashboard|dashboard admin/i });
-    this.statsCards = page.locator('.grid.gap-4 .border');
+    this.statsCards = page.locator(
+      'div.grid.gap-4.md\\:grid-cols-2.lg\\:grid-cols-4 > [data-slot="card"]',
+    );
     this.submissionsTable = page.locator('table');
-    this.bugReportsLink = page.getByRole('link', { name: /bug reports/i });
+    this.bugReportsLink = page.getByRole('link', {
+      name: 'Bug Reports',
+      exact: true,
+    });
     this.userModerationLink = page.getByRole('link', {
       name: /user moderation/i,
     });

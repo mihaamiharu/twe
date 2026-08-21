@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { z } from 'zod';
 import {
   Card,
@@ -51,7 +52,7 @@ export const Route = createFileRoute('/$locale/tutorials/')({
     return context.queryClient.ensureQueryData(
       tutorialsListQueryOptions({
         locale: params.locale,
-        ...(search.q === undefined ? {} : { search: search.q }),
+        ...omitUndefined({ search: search.q }),
         limit: 50,
       }),
     );
@@ -107,7 +108,7 @@ function TutorialsPage() {
   const { data: tutorialsResponse } = useSuspenseQuery(
     tutorialsListQueryOptions({
       locale,
-      ...(q ? { search: q } : {}),
+      ...omitUndefined({ search: q || undefined }),
       limit: 50,
     }),
   );

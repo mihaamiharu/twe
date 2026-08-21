@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { omitUndefined } from '@/lib/omit-undefined';
 import {
   type WebComponentPreviewProps,
   usePreviewState,
@@ -51,9 +52,7 @@ export function WebComponentPreview(props: WebComponentPreviewProps) {
     >
       {/* Browser Window Frame with Toolbar */}
       <PreviewHeader
-        {...(currentPath === undefined ? {} : { currentPath })}
-        {...(files === undefined ? {} : { files })}
-        {...(targetElementId === undefined ? {} : { targetElementId })}
+        {...omitUndefined({ currentPath, files, targetElementId })}
         viewMode={viewMode}
         setViewMode={setViewMode}
         zoom={zoom}

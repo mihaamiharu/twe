@@ -21,6 +21,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DataTablePagination } from '@/components/admin/data-table-pagination';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 export const Route = createFileRoute('/admin/challenges')({
   loader: async ({ context }) => {
@@ -235,7 +236,7 @@ function ChallengeManager() {
                         <TableCell className="text-center">
                           <div className="flex items-center justify-center gap-2">
                             <Switch
-                              checked={isComingSoon ?? false}
+                              {...omitUndefined({ checked: isComingSoon })}
                               onCheckedChange={(checked) =>
                                 updateMutation.mutate({
                                   id: challenge.id,

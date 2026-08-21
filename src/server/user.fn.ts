@@ -11,6 +11,7 @@ import {
 import { eq, desc, sql } from 'drizzle-orm';
 import { getUserStats } from '@/lib/stats';
 import { logger } from '@/lib/logger';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { authMiddleware } from './auth.mw';
 import { getCachedTierTotals } from './content.server';
 
@@ -193,7 +194,7 @@ export const getUserSettings = createServerFn({ method: 'GET' })
             id: user.id,
             email: user.email,
             name: user.name,
-            ...(user.image ? { image: user.image } : {}),
+            ...omitUndefined({ image: user.image || undefined }),
             createdAt: user.createdAt,
 
             // Gamification

@@ -1,4 +1,5 @@
 import type { ChallengeType } from './content.types';
+import { omitUndefined } from './omit-undefined';
 
 interface TestCase {
   id: string;
@@ -110,9 +111,15 @@ export function transformChallengeResponse(
     xp: data.xpReward,
     instructions: data.instructions,
     htmlContent: data.htmlContent || '',
-    ...(data.files === undefined ? {} : { files: data.files }),
-    ...(data.editableFiles === undefined ? {} : { editableFiles: data.editableFiles }),
-    ...(data.preloadModules === undefined ? {} : { preloadModules: data.preloadModules }),
+    ...omitUndefined({
+      files: data.files,
+      editableFiles: data.editableFiles,
+      preloadModules: data.preloadModules,
+      hints: data.hints,
+      tutorial: data.tutorial ?? undefined,
+      nextChallenge: data.nextChallenge ?? undefined,
+      prevChallenge: data.prevChallenge ?? undefined,
+    }),
     starterCode: data.starterCode || '',
     targetSelector: extractTargetSelector(testCases),
     testCases: testCases.map((tc) => ({
@@ -121,17 +128,7 @@ export function transformChallengeResponse(
       input: tc.input,
       expectedOutput: tc.expectedOutput,
     })),
-    ...(data.hints === undefined ? {} : { hints: data.hints }),
     category: data.category,
     isCompleted: data.userProgress?.isCompleted || false,
-    ...(data.tutorial === null || data.tutorial === undefined
-      ? {}
-      : { tutorial: data.tutorial }),
-    ...(data.nextChallenge === null || data.nextChallenge === undefined
-      ? {}
-      : { nextChallenge: data.nextChallenge }),
-    ...(data.prevChallenge === null || data.prevChallenge === undefined
-      ? {}
-      : { prevChallenge: data.prevChallenge }),
   };
 }

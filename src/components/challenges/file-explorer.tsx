@@ -11,6 +11,7 @@ import {
     Globe
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 interface FileExplorerProps {
     files: Record<string, string>;
@@ -58,7 +59,7 @@ export function FileExplorer({
                         name: part,
                         path: currentPath,
                         type: isLast ? 'file' : 'folder',
-                        ...(isLast ? {} : { children: {} }),
+                        ...omitUndefined({ children: isLast ? undefined : {} }),
                     };
                 }
                 current = current.children[part];

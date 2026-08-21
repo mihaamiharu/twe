@@ -28,7 +28,11 @@ import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import { showAchievementToasts } from '@/components/achievement-toast';
 import { getLevelTitle } from '@/lib/gamification';
 import { transformChallengeResponse } from '@/lib/transform-challenge-response';
-import type { JsonValue } from '@/lib/content.types';
+import {
+  buildChallengeSubmissionPayload,
+  type ChallengeSubmissionPayload,
+} from '@/lib/challenge-submission';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 import i18n from '@/lib/i18n';
 
@@ -226,18 +230,7 @@ function ChallengeDetailPage() {
   );
 
   const submitMutation = useMutation({
-    mutationFn: async (submissionData: {
-      challengeSlug: string;
-      code: string;
-      isPractice?: boolean;
-      testResults: {
-        testCaseId?: string;
-        passed: boolean;
-        output?: JsonValue;
-        error?: string;
-      }[];
-      executionTime?: number;
-    }) => {
+    mutationFn: async (submissionData: ChallengeSubmissionPayload) => {
       const response = await createSubmission({ data: submissionData });
 
       if (!response.success) {
@@ -257,14 +250,14 @@ function ChallengeDetailPage() {
         setLastSubmissionResult({
           xpEarned: response.data.submission.xpEarned,
           achievements: response.data.newAchievements || [],
-          ...(response.data.levelUp
-            ? {
-              levelUp: {
+          ...omitUndefined({
+            levelUp: response.data.levelUp
+              ? {
                 newLevel: response.data.levelUp.newLevel,
                 title: getLevelTitle(response.data.levelUp.newLevel),
-              },
-            }
-            : {}),
+              }
+              : undefined,
+          }),
         });
         setShowSuccessDialog(true);
 
@@ -337,19 +330,14 @@ function ChallengeDetailPage() {
         return;
       }
 
-      const submissionData = {
+      const submissionData = buildChallengeSubmissionPayload({
         challengeSlug: challenge.slug,
         code: data.code,
         isPractice: challenge.isCompleted, // Auto-detect practice mode
-        testResults: data.testResults.map((tr) => ({
-          ...(tr.id !== 'main' && tr.id !== 'selector' ? { testCaseId: tr.id } : {}),
-          passed: tr.passed,
-          ...(tr.output === undefined ? {} : { output: tr.output }),
-          ...(tr.error === undefined ? {} : { error: tr.error }),
-        })),
-        ...(data.executionTime === undefined ? {} : { executionTime: data.executionTime }),
+        testResults: data.testResults,
+        ...omitUndefined({ executionTime: data.executionTime }),
         locale,
-      };
+      });
 
       toast.promise(submitMutation.mutateAsync(submissionData), {
         loading: t('common:messages.submitting'),
@@ -415,7 +403,7 @@ function ChallengeDetailPage() {
           key={challenge.id}
           challenge={challenge}
           onSubmit={handleSubmit}
-          {...(userId === undefined ? {} : { userId })}
+          {...omitUndefined({ userId })}
           hintUsed={data?.data?.userProgress?.usedHint || false}
           initialHintContent={data?.data?.userProgress?.hintContent || null}
         />
@@ -428,21 +416,19 @@ function ChallengeDetailPage() {
           onClose={() => setShowSuccessDialog(false)}
           xpEarned={lastSubmissionResult.xpEarned}
           achievements={lastSubmissionResult.achievements}
-          {...(lastSubmissionResult.levelUp === undefined
-            ? {}
-            : { levelUp: lastSubmissionResult.levelUp })}
+          {...omitUndefined({ levelUp: lastSubmissionResult.levelUp })}
           onRetry={() => setShowSuccessDialog(false)}
-          {...(data?.data?.nextChallenge
-            ? {
-              onNextChallenge: () => {
+          {...omitUndefined({
+            onNextChallenge: data?.data?.nextChallenge
+              ? () => {
                 setShowSuccessDialog(false);
                 void navigate({
                   to: '/$locale/challenges/$slug',
                   params: { locale, slug: data.data?.nextChallenge?.slug ?? '' },
                 });
-              },
-            }
-            : {})}
+              }
+              : undefined,
+          })}
         />
       )}
 

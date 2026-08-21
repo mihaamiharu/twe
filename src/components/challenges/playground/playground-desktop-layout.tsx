@@ -3,6 +3,7 @@ import { GripVertical } from 'lucide-react';
 import { Panel, PanelGroup, PanelResizeHandle } from 'react-resizable-panels';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
 import { SelectorPanel } from './selector-panel';
@@ -99,7 +100,11 @@ export function PlaygroundDesktopLayout({
                                         ? e2eSelectorStyles
                                         : defaultSelectorStyles
                                 }
-                                {...(isSelectorChallenge ? { userSelector: selector } : {})}
+                                {...omitUndefined({
+                                    userSelector: isSelectorChallenge
+                                        ? selector
+                                        : undefined,
+                                })}
                                 selectorType={selectorType as SelectorType}
                                 targetSelector={challenge.targetSelector as string}
                                 targetSelectorType={
@@ -110,7 +115,7 @@ export function PlaygroundDesktopLayout({
                                 showControls={true}
                                 height="100%"
                                 iframeRef={previewIframeRef}
-                                {...(challenge.files === undefined ? {} : { files: challenge.files })}
+                                {...omitUndefined({ files: challenge.files })}
                                 currentPath={currentVfsPath}
                                 onNavigate={(path) => setCurrentVfsPath(path)}
                             />
@@ -133,7 +138,7 @@ export function PlaygroundDesktopLayout({
                         <EditorPanel
                             challenge={challenge}
                             state={state}
-                            {...(userId === undefined ? {} : { userId })}
+                            {...omitUndefined({ userId })}
                             isMobile={false}
                             onRunCode={() => { void handleRunCode(); }}
                             onReset={handleReset}

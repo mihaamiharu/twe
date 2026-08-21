@@ -11,21 +11,9 @@ import { users, accounts } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { sendVerificationEmail } from '@/server/email.server';
 import { logger } from '@/lib/logger';
+import { buildAuthSession, type AuthSession } from './auth-session';
 
-export type SessionUser = {
-  id: string;
-  email: string;
-  name: string | null;
-  image: string | null;
-  emailVerified: boolean;
-  role: string | null;
-};
-
-export type AuthSession = {
-  user: SessionUser | null;
-  isAuthenticated: boolean;
-  gaMeasurementId?: string;
-};
+export type { AuthSession, SessionUser } from './auth-session';
 
 // Helper to update user image from Google if missing (Lazy Migration)
 async function ensureUserImage(userId: string): Promise<string | null> {
@@ -76,8 +64,8 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
           if (newImage) image = newImage;
         }
 
-        return {
-          user: {
+        return buildAuthSession(
+          {
             id: session.user.id,
             email: session.user.email,
             name: session.user.name || null,
@@ -85,23 +73,14 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             emailVerified: session.user.emailVerified || false,
             role: session.user.role || 'USER',
           },
-          isAuthenticated: true,
-          ...(process.env.VITE_GA_MEASUREMENT_ID === undefined
-            ? {}
-            : { gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID }),
-        };
+          process.env.VITE_GA_MEASUREMENT_ID,
+        );
       }
     } catch (error) {
       console.error('[Auth] Failed to get session:', error);
     }
 
-    return {
-      user: null,
-      isAuthenticated: false,
-      ...(process.env.VITE_GA_MEASUREMENT_ID === undefined
-        ? {}
-        : { gaMeasurementId: process.env.VITE_GA_MEASUREMENT_ID }),
-    };
+    return buildAuthSession(null, process.env.VITE_GA_MEASUREMENT_ID);
   },
 );
 

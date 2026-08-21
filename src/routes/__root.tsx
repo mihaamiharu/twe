@@ -25,6 +25,7 @@ import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
 import { organizationSchema, getCanonicalUrl, getAlternateLinks } from '@/lib/seo';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
 
 // Export context type for child routes
@@ -292,9 +293,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
     <>
       {consent === 'granted' && (
         <GoogleAnalytics
-          {...(auth?.gaMeasurementId === undefined
-            ? {}
-            : { measurementId: auth.gaMeasurementId })}
+          {...omitUndefined({ measurementId: auth?.gaMeasurementId })}
         />
       )}
       <CookieConsent onConsentChange={handleConsentChange} initialConsent={consent} />

@@ -1,6 +1,7 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { z } from 'zod';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -68,7 +69,7 @@ export const Route = createFileRoute('/$locale/challenges/')({
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
-        ...(q === undefined ? {} : { search: q }),
+        ...omitUndefined({ search: q }),
         limit: 1000,
       }),
     );
@@ -196,7 +197,7 @@ export function ChallengesPage() {
   const { data: challengesResponse } = useQuery({
     ...challengeListQueryOptions({
       locale,
-      ...(debouncedSearchQuery ? { search: debouncedSearchQuery } : {}),
+      ...omitUndefined({ search: debouncedSearchQuery || undefined }),
       limit: 1000,
     }),
     placeholderData: keepPreviousData,

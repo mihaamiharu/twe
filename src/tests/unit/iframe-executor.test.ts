@@ -28,6 +28,7 @@ describe.skipIf(isCI)('Iframe Executor', () => {
 
     expect(result.status).toBe('PASSED');
     expect(result.returnValue).toBe('Clicked');
+    expect('error' in result).toBe(false);
   });
 
   test('should handle TypeScript transpilation (mocked)', async () => {
@@ -63,6 +64,7 @@ describe.skipIf(isCI)('Iframe Executor', () => {
 
     expect(result.status).toBe('FAILED');
     expect(result.output).toContain('Strict Mode Error');
+    expect(result.error).toContain('Strict Mode Error');
   });
 
   test('should allow bypassing strict mode', async () => {

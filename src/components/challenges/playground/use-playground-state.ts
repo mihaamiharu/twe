@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generateTypeDefinitions } from '@/core/type-generator';
+import { omitUndefined } from '@/lib/omit-undefined';
 import type {
     ChallengePlaygroundProps,
     PlaygroundState
@@ -181,7 +182,7 @@ export function usePlaygroundState({
         setRevealedHintsCount,
         isCodeChallenge,
         isSelectorChallenge,
-        ...(extraLibs === undefined ? {} : { extraLibs }),
+        ...omitUndefined({ extraLibs }),
         locale,
         t,
     };

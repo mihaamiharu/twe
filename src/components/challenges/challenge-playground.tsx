@@ -1,5 +1,6 @@
 import { useRef, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { omitUndefined } from '@/lib/omit-undefined';
 import {
   usePlaygroundState,
   useChallengeExecution,
@@ -95,7 +96,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       <PlaygroundHeader
         challenge={challenge}
         locale={state.locale}
-        {...(props.userId === undefined ? {} : { userId: props.userId })}
+        {...omitUndefined({ userId: props.userId })}
         isMobile={state.isMobile}
         isCodeChallenge={state.isCodeChallenge}
         isRunning={state.isRunning}
@@ -139,7 +140,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
               state={state}
               execution={execution}
               previewIframeRef={previewIframeRef}
-              {...(props.userId === undefined ? {} : { userId: props.userId })}
+              {...omitUndefined({ userId: props.userId })}
             />
           )}
         </div>

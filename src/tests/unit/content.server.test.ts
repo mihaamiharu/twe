@@ -1,7 +1,11 @@
 import { describe, it, expect } from 'bun:test';
 import { readFile } from 'fs/promises';
 import { join } from 'path';
-import { getTutorialList } from '@/server/content.server';
+import {
+  getChallengeContent,
+  getChallengeList,
+  getTutorialList,
+} from '@/server/content.server';
 import {
   parseChallengeTierJson,
   parseTutorialRegistryJson,
@@ -26,6 +30,17 @@ describe('Content Server', () => {
         expect(tutorials[i].order).toBeLessThanOrEqual(tutorials[i + 1].order);
       }
     });
+  });
+
+  it('uses the same localized projection for challenge lists and details', async () => {
+    const challenges = await getChallengeList('en');
+    const summary = challenges[0];
+    expect(summary).toBeDefined();
+    if (!summary) throw new Error('Expected at least one challenge');
+
+    const detail = await getChallengeContent(summary.slug, 'en');
+    expect(detail).not.toBeNull();
+    expect(detail).toMatchObject(summary);
   });
 
   it('validates the real tutorial registry and active challenge tiers', async () => {

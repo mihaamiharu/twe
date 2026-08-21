@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { formatZodIssues } from '@/lib/zod-errors';
 import type {
   ChallengeDefinition,
@@ -103,7 +104,7 @@ function normalizeLocalizedString(
 ): LocalizedString {
   return {
     en: value.en,
-    ...(value.id === undefined ? {} : { id: value.id }),
+    ...omitUndefined({ id: value.id }),
   };
 }
 
@@ -112,7 +113,7 @@ function normalizeLocalizedArray(
 ): LocalizedArray {
   return {
     en: value.en,
-    ...(value.id === undefined ? {} : { id: value.id }),
+    ...omitUndefined({ id: value.id }),
   };
 }
 
@@ -121,20 +122,19 @@ function normalizeExpectedState(
 ): ExpectedStateRule {
   return {
     selector: value.selector,
-    ...(value.visible === undefined ? {} : { visible: value.visible }),
-    ...(value.hidden === undefined ? {} : { hidden: value.hidden }),
-    ...(value.containsText === undefined ? {} : { containsText: value.containsText }),
-    ...(value.hasAttribute === undefined
-      ? {}
-      : {
-          hasAttribute: {
-            name: value.hasAttribute.name,
-            ...(value.hasAttribute.value === undefined
-              ? {}
-              : { value: value.hasAttribute.value }),
-          },
-        }),
-    ...(value.count === undefined ? {} : { count: value.count }),
+    ...omitUndefined({
+      visible: value.visible,
+      hidden: value.hidden,
+      containsText: value.containsText,
+      count: value.count,
+      hasAttribute:
+        value.hasAttribute === undefined
+          ? undefined
+          : {
+              name: value.hasAttribute.name,
+              ...omitUndefined({ value: value.hasAttribute.value }),
+            },
+    }),
   };
 }
 
@@ -143,9 +143,9 @@ function normalizeTestCase(
 ): TestCaseDefinition {
   return {
     description: value.description,
-    ...(value.input === undefined ? {} : { input: value.input }),
+    ...omitUndefined({ input: value.input }),
     expectedOutput: value.expectedOutput,
-    ...(value.isHidden === undefined ? {} : { isHidden: value.isHidden }),
+    ...omitUndefined({ isHidden: value.isHidden }),
   };
 }
 
@@ -159,23 +159,29 @@ function normalizeChallengeDefinition(
     category: value.category,
     xpReward: value.xpReward,
     order: value.order,
-    ...(value.tutorialSlug === undefined ? {} : { tutorialSlug: value.tutorialSlug }),
     title: normalizeLocalizedString(value.title),
     description: normalizeLocalizedString(value.description),
     instructions: normalizeLocalizedString(value.instructions),
-    ...(value.hints === undefined ? {} : { hints: normalizeLocalizedArray(value.hints) }),
-    ...(value.htmlContent === undefined ? {} : { htmlContent: value.htmlContent }),
-    ...(value.files === undefined ? {} : { files: value.files }),
-    ...(value.editableFiles === undefined ? {} : { editableFiles: value.editableFiles }),
-    ...(value.preloadModules === undefined ? {} : { preloadModules: value.preloadModules }),
-    ...(value.starterCode === undefined ? {} : { starterCode: value.starterCode }),
+    ...omitUndefined({
+      tutorialSlug: value.tutorialSlug,
+      hints:
+        value.hints === undefined
+          ? undefined
+          : normalizeLocalizedArray(value.hints),
+      htmlContent: value.htmlContent,
+      files: value.files,
+      editableFiles: value.editableFiles,
+      preloadModules: value.preloadModules,
+      starterCode: value.starterCode,
+      tags: value.tags,
+      status: value.status,
+      expectedState:
+        value.expectedState === undefined
+          ? undefined
+          : value.expectedState.map(normalizeExpectedState),
+    }),
     testCases: value.testCases.map(normalizeTestCase),
     solution: value.solution,
-    ...(value.tags === undefined ? {} : { tags: value.tags }),
-    ...(value.status === undefined ? {} : { status: value.status }),
-    ...(value.expectedState === undefined
-      ? {}
-      : { expectedState: value.expectedState.map(normalizeExpectedState) }),
   };
 }
 
@@ -187,13 +193,11 @@ function normalizeTutorialRegistryEntry(
     order: value.order,
     estimatedMinutes: value.estimatedMinutes,
     tags: value.tags,
-    ...(value.relatedChallenges === undefined
-      ? {}
-      : { relatedChallenges: value.relatedChallenges }),
-    ...(value.nextTutorialSlug === undefined
-      ? {}
-      : { nextTutorialSlug: value.nextTutorialSlug }),
-    ...(value.status === undefined ? {} : { status: value.status }),
+    ...omitUndefined({
+      relatedChallenges: value.relatedChallenges,
+      nextTutorialSlug: value.nextTutorialSlug,
+      status: value.status,
+    }),
   };
 }
 

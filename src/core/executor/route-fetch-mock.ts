@@ -6,6 +6,8 @@
  * (runtime TypeScript and VFS navigation).
  */
 
+import { omitUndefined } from '@/lib/omit-undefined';
+
 export interface RouteMatcher {
   matcher: string | RegExp | ((url: URL) => boolean);
   handler: (requestInfo: RouteRequestInfo) => Promise<RouteHandlerResult>;
@@ -322,8 +324,7 @@ export function createRouteFetchWrapper(
             .handler({
               url,
               method: init?.method || requestInput?.method || 'GET',
-              ...(headers === undefined ? {} : { headers }),
-              ...(body === null ? {} : { body }),
+              ...omitUndefined({ headers, body: body ?? undefined }),
             })
             .then((r) => {
               if (r?.type === 'fulfill') {

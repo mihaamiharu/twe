@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { leaderboardQueryOptions } from '@/lib/leaderboard.query';
 import { createSeoHead } from '@/lib/seo';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 interface LeaderboardEntry {
   id: string;
@@ -96,7 +97,7 @@ function LeaderboardPage() {
   const getDelay = (index: number) => ({ animationDelay: `${index * 50}ms` });
   const getDisplayXpProps = (user: LeaderboardEntry) => {
     const displayXp = period === 'monthly' ? user.monthlyXp : user.xp;
-    return displayXp === undefined ? {} : { displayXp };
+    return omitUndefined({ displayXp });
   };
 
   return (

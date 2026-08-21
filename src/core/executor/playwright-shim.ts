@@ -8,6 +8,7 @@
  */
 
 import { logger } from '@/lib/logger';
+import { omitUndefined } from '@/lib/omit-undefined';
 
 import { ROLE_TO_TAG } from './role-mappings';
 import { createShimError } from './shim-errors';
@@ -441,19 +442,19 @@ export class MockedPlaywrightPage {
                 : Uint8Array.from(response.body).buffer;
             resolve({
               type: 'fulfill',
-              response: {
-                ...(response.status === undefined ? {} : { status: response.status }),
-                ...(responseBody === undefined ? {} : { body: responseBody }),
-                ...(response.json === undefined ? {} : { json: response.json }),
-                ...(response.headers === undefined ? {} : { headers: response.headers }),
-              },
+              response: omitUndefined({
+                status: response.status,
+                body: responseBody,
+                json: response.json,
+                headers: response.headers,
+              }),
             });
             return Promise.resolve();
           };
           route.continue = (options) => {
             resolve({
               type: 'continue',
-              ...(options === undefined ? {} : { options }),
+              ...omitUndefined({ options }),
             });
             return Promise.resolve();
           };
@@ -566,7 +567,7 @@ export class MockedPlaywrightPage {
   ): string {
     return generateVfsNavigationTemplate({
       bodyContent: content,
-      ...(this.cssContent === undefined ? {} : { cssContent: this.cssContent }),
+      ...omitUndefined({ cssContent: this.cssContent }),
       appState: appState || {},
     });
   }
