@@ -1,18 +1,13 @@
 import { test, expect } from '@playwright/test';
 import { AdminPage } from '../pages/AdminPage';
-import { loginViaApi } from '../utils/auth';
+import { getE2EAdminCredentials, loginViaApi } from '../utils/auth';
 
 test.describe('Admin Panel', () => {
   let adminPage: AdminPage;
 
   test.beforeEach(async ({ page, context, request }) => {
-    await loginViaApi(
-      context,
-      request,
-      page,
-      'ekkithedestroyer@gmail.com',
-      'ekkithedestroyer@gmail.com',
-    );
+    const { email, password } = getE2EAdminCredentials();
+    await loginViaApi(context, request, page, email, password);
     adminPage = new AdminPage(page);
   });
 

@@ -13,7 +13,7 @@ This file contains guidelines for agentic coding assistants working in this repo
 ### Testing
 
 * `bun test` - Run unit/logic tests
-* `bun run test:e2e` - Run Playwright tests (Playwright now handles orchestration)
+* `bun run test:e2e` - Run the isolated, disposable Playwright E2E suite
 
 ### Database (Drizzle ORM v1.0+)
 

@@ -90,6 +90,22 @@ bun run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
+### Run the end-to-end suite
+
+```bash
+bun run test:e2e
+```
+
+This command creates a disposable PostgreSQL 15 container, applies migrations
+and synced content, starts the app in `NODE_ENV=test`, provisions isolated
+regular and admin accounts, runs the full Playwright suite, and removes its
+container and app process even when a test fails. It selects verified free
+local ports automatically. Set `E2E_DB_PORT` or `E2E_APP_PORT` to a specific
+free port when needed, or set either to `0` to request automatic selection.
+
+The command only removes the uniquely named container it created; it does not
+stop or remove the development databases from `podman compose`.
+
 ## 📦 Tech Stack
 
 | Category        | Technology                                                  |

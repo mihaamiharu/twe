@@ -11,17 +11,21 @@ export class TutorialsPage extends BasePage {
     super(page);
     this.tutorialCards = page.locator('a[href*="/tutorials/"][class*="group"]');
     this.completeButton = page.getByRole('button', {
-      name: /Complete|Selesai/i,
+      name: /Read to Complete|Complete & Continue|Baca untuk Menyelesaikan|Selesai & Lanjutkan/i,
     });
-    this.hideCompletedToggle = page.getByRole('button', { name: /Hide Completed|hm/i });
+    this.hideCompletedToggle = page.getByRole('button', {
+      name: /Hide Completed|Sembunyikan Selesai/i,
+    });
   }
 
   async gotoList(locale: string = 'en') {
     await this.goto(`/${locale}/tutorials`);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async gotoTutorial(slug: string, locale: string = 'en') {
     await this.goto(`/${locale}/tutorials/${slug}`);
+    await this.page.waitForLoadState('networkidle');
   }
 
   async verifyTutorialContent() {
@@ -32,7 +36,7 @@ export class TutorialsPage extends BasePage {
   async completeTutorial() {
     await this.completeButton.click();
     await expect(
-      this.page.getByText('Completed', { exact: false }),
+      this.page.getByText('Completed! 🎉', { exact: true }),
     ).toBeVisible();
   }
 }

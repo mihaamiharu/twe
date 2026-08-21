@@ -139,7 +139,7 @@ describe('ChallengesPage', () => {
     it('should update search params when typing in search box', async () => {
         await renderPage();
 
-        const searchInput = screen.getByPlaceholderText('Search challenges...');
+        const searchInput = screen.getByRole('textbox');
         fireEvent.change(searchInput, { target: { value: 'New Search' } });
 
         expect((searchInput as HTMLInputElement).value).toBe('New Search');

@@ -32,18 +32,21 @@ test.describe('Tutorials', () => {
       document.body.style.minHeight = '10000px';
     });
 
-    // 2. Perform multiple scrolls to ensure progress hits 100%
-    // We use a loop for robustness in headless mode
-    for (let i = 0; i < 10; i++) {
-      await page.mouse.wheel(0, 2000);
-      await page.waitForTimeout(200);
-    }
+    // 2. Scroll to the bottom where the button usually lives. The assertion
+    // below waits for the app's scroll-driven progress update.
+    await expect
+      .poll(
+        async () => {
+          await page.evaluate(() =>
+            window.scrollTo(0, document.body.scrollHeight),
+          );
+          return tutorialsPage.completeButton.isEnabled();
+        },
+        { timeout: 10000 },
+      )
+      .toBe(true);
 
-    // 3. Scroll to the bottom where the button usually lives
-    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-    await page.waitForTimeout(1000);
-
-    // 4. Verify and Click Complete
+    // 3. Verify and Click Complete
     await expect(tutorialsPage.completeButton).toBeVisible({ timeout: 10000 });
     await tutorialsPage.completeTutorial();
   });

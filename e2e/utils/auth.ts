@@ -2,26 +2,73 @@ import type { APIRequestContext, BrowserContext, Page } from '@playwright/test';
 
 const baseURL = process.env.BASE_URL || 'http://localhost:3000';
 
+export function getE2EAdminCredentials(): {
+  email: string;
+  password: string;
+} {
+  const email = process.env.E2E_ADMIN_EMAIL;
+  const password = process.env.E2E_ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    throw new Error(
+      'E2E_ADMIN_EMAIL and E2E_ADMIN_PASSWORD must be set by the disposable E2E runner before an admin test runs.',
+    );
+  }
+
+  return { email, password };
+}
+
 export async function loginViaApi(
   context: BrowserContext,
   request: APIRequestContext,
   page?: Page,
-  email: string = 'kikkawa23@gmail.com',
-  password: string = 'kikkawa23@gmail.com',
+  email?: string,
+  password?: string,
 ) {
+  const usesDisposableUser = email === undefined && password === undefined;
+  const userSuffix = crypto.randomUUID();
+  const resolvedEmail = usesDisposableUser
+    ? `kikkawa23+${userSuffix}@example.com`
+    : email || 'kikkawa23@gmail.com';
+  const resolvedPassword = usesDisposableUser
+    ? `e2e-password-${userSuffix}`
+    : password || 'kikkawa23@gmail.com';
+
+  const requester = page ? page.request : request;
+
+  // Default authenticated tests mutate progress. Give each test its own
+  // disposable account so parallel tests cannot change each other's state.
+  if (usesDisposableUser && process.env.E2E_SECRET) {
+    const seedResponse = await requester.post(`${baseURL}/api/test/seed-user`, {
+      headers: {
+        'content-type': 'application/json',
+        'x-e2e-secret': process.env.E2E_SECRET,
+      },
+      data: {
+        email: resolvedEmail,
+        password: resolvedPassword,
+        name: 'kikkawa23',
+      },
+    });
+
+    if (!seedResponse.ok()) {
+      const text = await seedResponse.text();
+      throw new Error(`E2E user seed failed: ${seedResponse.status()} ${text}`);
+    }
+  }
+
   if (page) {
     await page.goto(`${baseURL}/en/login`);
     await page.waitForLoadState('networkidle');
   }
 
-  const requester = page ? page.request : request;
   const response = await requester.post(`${baseURL}/api/auth/sign-in/email`, {
     headers: {
       'content-type': 'application/json',
       origin: baseURL,
       referer: `${baseURL}/en/login`,
     },
-    data: { email, password },
+    data: { email: resolvedEmail, password: resolvedPassword },
   });
 
   if (!response.ok()) {
@@ -49,8 +96,6 @@ export async function loginViaApi(
     if (cookiesToAdd.length > 0) {
       await context.addCookies(cookiesToAdd);
     }
-  } else {
-    await page.waitForTimeout(500);
   }
 
   return response;

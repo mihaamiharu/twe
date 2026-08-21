@@ -10,6 +10,14 @@ dotenv.config({ path: path.resolve(process.cwd(), '.env') });
 
 const baseURL = process.env.BASE_URL || 'http://localhost:3000';
 const baseURLHostname = new URL(baseURL).hostname;
+const webServer = process.env.E2E_EXTERNAL_SERVER
+  ? undefined
+  : {
+      command: 'bun run dev',
+      url: baseURL,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120 * 1000,
+    };
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -20,8 +28,8 @@ export default defineConfig({
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
+  /* Keep failures visible instead of allowing flaky tests to pass on retry. */
+  retries: 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 2,
   reporter: [['html'], ['allure-playwright']],
@@ -61,10 +69,5 @@ export default defineConfig({
     },
   ],
 
-  webServer: {
-    command: 'bun run dev',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-    timeout: 120 * 1000,
-  },
+  ...(webServer ? { webServer } : {}),
 });

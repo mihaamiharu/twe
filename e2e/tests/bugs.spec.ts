@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { DashboardPage } from '../pages/DashboardPage';
 import { AdminPage } from '../pages/AdminPage';
-import { loginViaApi } from '../utils/auth';
+import { getE2EAdminCredentials, loginViaApi } from '../utils/auth';
 
 test.describe('Bug Reporting Flow', () => {
   let dashboardPage: DashboardPage;
@@ -15,32 +15,18 @@ test.describe('Bug Reporting Flow', () => {
   });
 
   test('should submit a bug report successfully', async ({ page }) => {
-    test.skip(); // Skipped for manual verification later
     await dashboardPage.goto();
+    await page.waitForLoadState('networkidle');
 
     // Open the bug report dialog
     // Try footer first
     const footerBugButton = page
       .locator('footer')
-      .getByRole('button', { name: /Report a Bug|Laporkan Bug/i });
+      .getByRole('button', { name: /Report Bug|Report a Bug|Laporkan Bug/i });
     await footerBugButton.scrollIntoViewIfNeeded();
     await footerBugButton.click();
 
-    // Check if dialog appeared, if not, try the user menu (header)
-    try {
-      await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
-    } catch {
-      // Click avatar to open menu
-      await page
-        .locator('header')
-        .getByRole('button', { name: /avatar|user menu/i })
-        .first()
-        .click();
-      await page
-        .getByRole('menuitem', { name: /Report Bug|Laporkan Bug/i })
-        .click();
-      await expect(page.getByRole('dialog')).toBeVisible({ timeout: 5000 });
-    }
+    await expect(page.getByRole('dialog')).toBeVisible();
 
     // Fill the form
     await page.getByLabel(/Bug Title|Judul Bug/i).fill('E2E Test Bug Report');
@@ -52,7 +38,7 @@ test.describe('Bug Reporting Flow', () => {
       .fill('It should work');
     await page
       .getByLabel(/Actual Behavior|Perilaku sebenarnya/i)
-      .fill('It failed');
+      .fill('The issue still occurs');
 
     // Submit
     await page
@@ -61,27 +47,58 @@ test.describe('Bug Reporting Flow', () => {
 
     // Verify success toast/message
     await expect(
-      page.getByText(/submitted successfully|berhasil dikirim/i),
+      page.getByText('Bug report submitted!', { exact: true }),
     ).toBeVisible();
   });
 
-  test('admin should be able to see the bug report', async ({ page }) => {
-    // Skipping as the test user relies on seed data and may not have admin privileges in all environments
-    test.skip();
+  test('admin should be able to see a submitted bug report', async ({
+    page,
+    context,
+    request,
+  }) => {
+    const { email, password } = getE2EAdminCredentials();
+    await loginViaApi(context, request, page, email, password);
 
-    // We assume we are logged in as admin from beforeEach
+    await dashboardPage.goto();
+    await page.waitForLoadState('networkidle');
+
+    const footerBugButton = page
+      .locator('footer')
+      .getByRole('button', { name: /Report Bug|Report a Bug|Laporkan Bug/i });
+    await footerBugButton.scrollIntoViewIfNeeded();
+    await footerBugButton.click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+
+    await page.getByLabel(/Bug Title|Judul Bug/i).fill('Admin E2E Bug Report');
+    await page
+      .getByLabel(/Steps to Reproduce|Langkah/i)
+      .fill('1. Open the app\n2. Submit a report\n3. Review the admin table');
+    await page
+      .getByLabel(/Expected Behavior|Perilaku yang diharapkan/i)
+      .fill('The admin should see the submitted report');
+    await page
+      .getByLabel(/Actual Behavior|Perilaku sebenarnya/i)
+      .fill('The report is available in the admin table');
+    await page
+      .getByRole('button', { name: /Submit Bug Report|Kirim Laporan Bug/i })
+      .click();
+    await expect(
+      page.getByText('Bug report submitted!', { exact: true }),
+    ).toBeVisible();
+
     await adminPage.goto();
     await adminPage.verifyAdminVisible();
 
     // Navigate to bug reports
     await adminPage.bugReportsLink.click();
 
-    // Verify the bug report we just submitted (or at least the table exists)
-    await expect(page.locator('h1')).toContainText(/bug reports|laporan bug/i);
-
-    // Check if the report is in the table (Wait a bit for DB sync)
-    await expect(page.getByText('E2E Test Bug Report')).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Bug Reports' }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole('cell', { name: 'Admin E2E Bug Report', exact: true })
+        .first(),
+    ).toBeVisible();
   });
 });

@@ -5,7 +5,35 @@
     "overallProgress": "Progres Keseluruhan",
     "notFound": "Tantangan Tidak Ditemukan",
     "notFoundDescription": "Tantangan yang kamu cari tidak dapat ditemukan.",
-    "reviewTutorial": "Tinjau Tutorial: {{title}}"
+    "reviewTutorial": "Tinjau Tutorial: {{title}}",
+    "sidebarSubtitle": "Tingkatkan kemampuan otomasi pengujianmu"
+  },
+  "tracks": {
+    "all": {
+      "label": "Semua Tantangan",
+      "description": "Ringkasan semua tantangan yang tersedia"
+    },
+    "selectors": {
+      "label": "Selektor",
+      "description": "Kuasai Selektor CSS dan XPath"
+    },
+    "scripting": {
+      "label": "JavaScript & TypeScript",
+      "description": "Dasar Pemrograman untuk Otomasi Pengujian"
+    },
+    "core": {
+      "label": "Inti",
+      "description": "Navigasi, Locator, Aksi, dan Assertion"
+    },
+    "e2e": {
+      "label": "Pengujian Aplikasi",
+      "description": "Alur E2E Lengkap, POM, dan Skenario Nyata"
+    }
+  },
+  "trackGroups": {
+    "overview": "Ringkasan",
+    "coreSkills": "Keahlian Inti",
+    "playwright": "Playwright"
   },
   "filters": {
     "allDifficulties": "Semua Kesulitan",

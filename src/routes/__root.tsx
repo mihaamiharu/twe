@@ -24,7 +24,7 @@ import { CookieConsent } from '@/components/cookie-consent';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
 import i18n from '@/lib/i18n';
-import { organizationSchema, getCanonicalUrl, getAlternateLinks } from '@/lib/seo';
+import { organizationSchema } from '@/lib/seo';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
 
@@ -67,10 +67,6 @@ export const Route = createRootRouteWithContext<RootContext>()({
     const isQa = typeof window !== 'undefined' 
       ? window.location.hostname.startsWith('qa.')
       : false; // Server-side detection handled by header injection in scripts/server.ts
-
-    const pathname = typeof window !== 'undefined' ? window.location.pathname : '/';
-    const canonicalUrl = getCanonicalUrl(pathname);
-    const alternateLinks = getAlternateLinks(pathname);
 
     const meta = [
       {
@@ -149,35 +145,33 @@ export const Route = createRootRouteWithContext<RootContext>()({
     return {
       meta,
       links: [
-      { rel: 'canonical', href: canonicalUrl },
-      ...alternateLinks.map(link => ({
-        rel: link.rel,
-        hrefLang: link.hrefLang,
-        href: link.href,
-      })),
-      // Preload critical fonts removed to avoid warnings (loaded via CSS)
-      // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-      // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-      // Deferred loading for Lora (reading font - not critical for LCP)
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossOrigin: 'anonymous' },
-      {
-        rel: 'icon',
-        href: '/logo-icon.svg',
-        type: 'image/svg+xml',
-      },
-      {
-        rel: 'apple-touch-icon',
-        href: '/logo-icon.svg',
-      },
-      {
-        rel: 'manifest',
-        href: '/manifest.json',
-      },
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
+        // Preload critical fonts removed to avoid warnings (loaded via CSS)
+        // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+        // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
+        // Deferred loading for Lora (reading font - not critical for LCP)
+        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        {
+          rel: 'preconnect',
+          href: 'https://fonts.gstatic.com',
+          crossOrigin: 'anonymous',
+        },
+        {
+          rel: 'icon',
+          href: '/logo-icon.svg',
+          type: 'image/svg+xml',
+        },
+        {
+          rel: 'apple-touch-icon',
+          href: '/logo-icon.svg',
+        },
+        {
+          rel: 'manifest',
+          href: '/manifest.json',
+        },
+        {
+          rel: 'stylesheet',
+          href: appCss,
+        },
     ],
     scripts: [
       {

@@ -21,12 +21,14 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
 
   test('ID Dashboard: should display Indonesian content', async ({ page }) => {
     await dashboardPage.goto('id');
-    // Hero title in ID: "Kuasai Pengujian Perangkat Lunak"
-    await expect(dashboardPage.heroTitle).toContainText(/Kuasai Pengujian/i);
+    // The current Indonesian homepage copy starts with "Bangun Test Automation Modern".
+    await expect(dashboardPage.heroTitle).toContainText(
+      /Bangun Test Automation Modern/i,
+    );
 
     // Stats in ID usually remain 'Challenges' etc if not localized in stats section yet,
     // but we verify the page loaded.
-    await expect(page).toHaveURL(/.*\/id\/.*/);
+    await expect(page).toHaveURL(/\/id\/?$/);
   });
 
   test('ID Tutorials: should list tutorials in ID', async () => {
@@ -37,7 +39,21 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
 
   test('ID Challenges: should list challenges in ID', async ({ page }) => {
     await challengesPage.gotoList('id');
-    await expect(page.locator('h1')).toContainText(/Tantangan/i);
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Semua Tantangan' }),
+    ).toBeVisible();
+    await expect(
+      page.locator('a[href*="/id/challenges/"]').first(),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: /Selektor/ }).click();
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Selektor' }),
+    ).toBeVisible();
+    await expect(page.getByText('Kuasai Selektor CSS dan XPath')).toBeVisible();
+    await expect(
+      page.getByRole('heading', { level: 3, name: 'Keahlian Inti' }),
+    ).toBeVisible();
   });
 
   test('ID Profile: should display profile in ID context', async ({ page }) => {

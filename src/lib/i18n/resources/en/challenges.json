@@ -9,7 +9,35 @@
     "overallProgress": "Overall Progress",
     "notFound": "Challenge Not Found",
     "notFoundDescription": "The requested challenge could not be found.",
-    "reviewTutorial": "Review Tutorial: {{title}}"
+    "reviewTutorial": "Review Tutorial: {{title}}",
+    "sidebarSubtitle": "Level up your automation skills"
+  },
+  "tracks": {
+    "all": {
+      "label": "All Challenges",
+      "description": "Overview of all available challenges"
+    },
+    "selectors": {
+      "label": "Selectors",
+      "description": "Master CSS Selectors and XPath"
+    },
+    "scripting": {
+      "label": "JavaScript & TypeScript",
+      "description": "Programming Fundamentals for Test Automation"
+    },
+    "core": {
+      "label": "Core",
+      "description": "Navigation, Locators, Actions & Assertions"
+    },
+    "e2e": {
+      "label": "App Testing",
+      "description": "Full E2E Flows, POM & Real Scenarios"
+    }
+  },
+  "trackGroups": {
+    "overview": "Overview",
+    "coreSkills": "Core Skills",
+    "playwright": "Playwright"
   },
   "filters": {
     "allDifficulties": "All Difficulties",
