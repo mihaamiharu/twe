@@ -21,6 +21,7 @@ const adminUser: SeedUser = {
 };
 
 type Environment = Record<string, string>;
+type ContainerRuntime = 'docker' | 'podman';
 type Subprocess = ReturnType<typeof Bun.spawn>;
 type CommandResult = {
   exitCode: number;
@@ -31,6 +32,7 @@ type CommandResult = {
 let appProcess: Subprocess | undefined;
 let activeProcess: Subprocess | undefined;
 let containerCreated = false;
+let containerRuntime: ContainerRuntime = 'podman';
 
 function buildEnvironment(overrides: Environment = {}): Environment {
   const inheritedEnvironment = Object.fromEntries(
@@ -183,26 +185,47 @@ async function resolvePort(
   return port;
 }
 
-async function ensurePodman(): Promise<void> {
+function resolveContainerRuntime(): ContainerRuntime {
+  const configuredRuntime = process.env.E2E_CONTAINER_RUNTIME;
+  if (configuredRuntime === undefined || configuredRuntime === '') {
+    return 'podman';
+  }
+  if (configuredRuntime === 'docker' || configuredRuntime === 'podman') {
+    return configuredRuntime;
+  }
+
+  throw new Error(
+    `E2E_CONTAINER_RUNTIME must be "podman" or "docker". Received: ${configuredRuntime}`,
+  );
+}
+
+async function ensureContainerRuntime(
+  runtime: ContainerRuntime,
+): Promise<void> {
+  const displayName = runtime === 'docker' ? 'Docker' : 'Podman';
   let version: CommandResult;
   try {
-    version = await captureCommand('podman', ['--version']);
+    version = await captureCommand(runtime, ['--version']);
   } catch {
     throw new Error(
-      'Podman is required for E2E tests but was not found on PATH. Install Podman Desktop (or Podman) and retry.',
+      `${displayName} is required for E2E tests but was not found on PATH. Install ${displayName} and retry.`,
     );
   }
   if (version.exitCode !== 0) {
     throw new Error(
-      'Podman is required for E2E tests. Install Podman and ensure the podman command is on PATH.',
+      `${displayName} is required for E2E tests. Install ${displayName} and ensure the ${runtime} command is on PATH.`,
     );
   }
 
-  const info = await captureCommand('podman', ['info']);
+  const info = await captureCommand(runtime, ['info']);
   if (info.exitCode === 0) return;
 
+  const serviceHint =
+    runtime === 'podman'
+      ? 'Start your intended Podman machine or service. The E2E runner will not start a machine automatically because that could activate unrelated workloads.'
+      : 'Start the Docker daemon or Docker Desktop.';
   throw new Error(
-    `Podman is installed but its service is unavailable. Start your intended Podman machine or service, then retry. The E2E runner will not start a machine automatically because that could activate unrelated workloads.\n${info.stderr}`,
+    `${displayName} is installed but its service is unavailable. ${serviceHint}\n${info.stderr}`,
   );
 }
 
@@ -293,10 +316,14 @@ async function cleanup(): Promise<boolean> {
   }
 
   if (containerCreated) {
-    const result = await captureCommand('podman', ['rm', '-f', containerName]);
+    const result = await captureCommand(containerRuntime, [
+      'rm',
+      '-f',
+      containerName,
+    ]);
     if (result.exitCode !== 0) {
       console.error(
-        `Could not remove disposable E2E container ${containerName}. Remove only that container manually with: podman rm -f ${containerName}\n${result.stderr}`,
+        `Could not remove disposable E2E container ${containerName}. Remove only that container manually with: ${containerRuntime} rm -f ${containerName}\n${result.stderr}`,
       );
       succeeded = false;
     }
@@ -306,7 +333,8 @@ async function cleanup(): Promise<boolean> {
 }
 
 async function main(): Promise<void> {
-  await ensurePodman();
+  containerRuntime = resolveContainerRuntime();
+  await ensureContainerRuntime(containerRuntime);
 
   const databasePort = await resolvePort('E2E_DB_PORT');
   const appPort = await resolvePort('E2E_APP_PORT');
@@ -336,9 +364,9 @@ async function main(): Promise<void> {
   };
 
   console.log(
-    `Starting disposable PostgreSQL 15 container on ${host}:${databasePort}...`,
+    `Starting disposable PostgreSQL 15 container with ${containerRuntime} on ${host}:${databasePort}...`,
   );
-  await runCommand('podman', [
+  await runCommand(containerRuntime, [
     'run',
     '--detach',
     '--name',
@@ -358,7 +386,7 @@ async function main(): Promise<void> {
   containerCreated = true;
 
   await waitFor('PostgreSQL readiness', async () => {
-    const result = await captureCommand('podman', [
+    const result = await captureCommand(containerRuntime, [
       'exec',
       containerName,
       'pg_isready',

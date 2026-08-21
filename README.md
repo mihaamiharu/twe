@@ -102,6 +102,9 @@ regular and admin accounts, runs the full Playwright suite, and removes its
 container and app process even when a test fails. It selects verified free
 local ports automatically. Set `E2E_DB_PORT` or `E2E_APP_PORT` to a specific
 free port when needed, or set either to `0` to request automatic selection.
+Podman is the default local container runtime. Set
+`E2E_CONTAINER_RUNTIME=docker` to run the same orchestration with Docker, as
+GitHub Actions does.
 
 The command only removes the uniquely named container it created; it does not
 stop or remove the development databases from `podman compose`.
@@ -158,7 +161,13 @@ bun run db:studio  # Open Drizzle Studio
 
 ## 🧪 Testing & CI/CD
 
-The project includes unit and integration tests. Integration tests run against a dedicated PostgreSQL container.
+Pull requests to `main` run quality/build, unit, integration, and E2E jobs in
+parallel. Integration and E2E each own an isolated PostgreSQL database; the E2E
+runner also starts the app and provisions its test users. An aggregate
+`Required CI` job fails unless every job succeeds. Production deployment runs
+only after the same gate passes on `main`.
+
+Local integration tests run against a dedicated PostgreSQL container.
 
 ### Running Subsets
 
