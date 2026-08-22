@@ -11,7 +11,6 @@ import {
   Terminal,
 } from 'lucide-react';
 import {
-  QaAnnotation,
   QaDoodle,
   QaEngineerIllustration,
 } from '@/components/qa-illustrations';
@@ -39,9 +38,11 @@ function BrowserChrome({ title }: { title: string }) {
 export function PracticePreview({
   className,
   compact = false,
+  showWorkflowStep = false,
 }: {
   className?: string;
   compact?: boolean;
+  showWorkflowStep?: boolean;
 }) {
   return (
     <div
@@ -52,12 +53,33 @@ export function PracticePreview({
       aria-label="Practice workspace preview"
       data-practice-preview={compact ? 'compact' : 'full'}
     >
-      <div className="flex items-center justify-between border-b border-[#393c38] px-4 py-3">
-        <div className="flex items-center gap-2 font-mono text-[11px] text-[#a5a69f]">
+      <div
+        className={cn(
+          'flex items-center justify-between border-b border-[#393c38] px-4 py-3',
+          compact && 'px-3 py-2.5',
+        )}
+      >
+        <div
+          className={cn(
+            'flex items-center gap-2 whitespace-nowrap font-mono text-[11px] text-[#a5a69f]',
+            compact && 'gap-1.5 text-[9px]',
+          )}
+        >
           <Terminal className="h-3.5 w-3.5" aria-hidden="true" />
           TWE PRACTICE
         </div>
-        <div className="flex items-center gap-2">
+        <div
+          className={cn('flex items-center gap-2', compact && 'gap-1.5')}
+          data-run-control={showWorkflowStep ? '02' : undefined}
+        >
+          {showWorkflowStep && (
+            <span
+              className="whitespace-nowrap font-mono text-[9px] text-[var(--brand-orange)]"
+              data-workflow-label="run"
+            >
+              02 /
+            </span>
+          )}
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-orange)] text-[#f2f1ec]">
             <Play className="h-3 w-3 fill-current" aria-hidden="true" />
           </span>
@@ -81,8 +103,17 @@ export function PracticePreview({
               in&apos; &#125;).click()
             </div>
             <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#393c38] pt-2 font-mono text-[9px]">
-              <span className="text-[var(--brand-orange)]">03 / VERIFY</span>
-              <span className="flex items-center gap-1 text-[var(--brand-success)]">
+              <span
+                className="text-[var(--brand-orange)]"
+                data-hero-step="verify"
+                data-workflow-label="verify"
+              >
+                03 / VERIFY
+              </span>
+              <span
+                className="flex items-center gap-1 text-[var(--brand-success)]"
+                data-result-state="passed"
+              >
                 <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
                 Dashboard · passed
               </span>
@@ -166,8 +197,8 @@ function InspectTargetBrowser({ className }: { className?: string }) {
       data-hero-step="inspect"
     >
       <BrowserChrome title="example.test / sign-in" />
-      <div className="grid grid-cols-[0.75fr_1.25fr] items-center gap-4 p-4 sm:p-5">
-        <div>
+      <div className="grid grid-cols-[1.1fr_0.9fr] items-center gap-4 p-4 sm:grid-cols-[1.25fr_0.75fr] sm:p-5">
+        <div className="sm:order-2">
           <div className="h-2 w-14 rounded-full bg-[var(--soft-border)]" />
           <div className="mt-3 font-mono text-[10px] font-medium text-[var(--graphite)]">
             Welcome back
@@ -176,7 +207,15 @@ function InspectTargetBrowser({ className }: { className?: string }) {
             Continue to your workspace
           </div>
         </div>
-        <div className="space-y-2">
+        <div className="space-y-2 sm:order-1">
+          <div className="flex justify-end font-mono text-[8px] uppercase tracking-[0.08em] sm:text-[9px]">
+            <span
+              className="text-[var(--brand-orange)]"
+              data-workflow-label="inspect"
+            >
+              01 / Inspect
+            </span>
+          </div>
           <div className="h-7 rounded-md border border-[var(--soft-border)] bg-white" />
           <div className="h-7 rounded-md border border-[var(--soft-border)] bg-white" />
           <div
@@ -198,15 +237,22 @@ function InspectTargetBrowser({ className }: { className?: string }) {
 
 function HomeInspectorCharacter({ className }: { className?: string }) {
   return (
-    <div className={cn('mix-blend-multiply', className)} data-hero-character>
+    <div
+      className={cn(
+        'pointer-events-none aspect-[0.62] overflow-hidden select-none',
+        className,
+      )}
+      data-hero-character
+    >
       <img
         src="/illustrations/twe-inspector-male-hero.png"
         alt="TWE Inspector pointing toward the highlighted Sign in button"
-        className="h-auto w-full"
+        className="absolute left-1/2 top-1/2 h-[115%] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
         width={1122}
         height={1402}
         loading="eager"
         fetchPriority="high"
+        draggable={false}
       />
     </div>
   );
@@ -216,19 +262,22 @@ function VerificationResult({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 shadow-[0_12px_30px_rgba(29,29,27,0.09)]',
+        'rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-3 shadow-[0_12px_30px_rgba(29,29,27,0.09)]',
         className,
       )}
       data-hero-step="verify"
     >
-      <div className="mb-3 flex items-center justify-between font-mono text-[9px] text-[var(--muted-graphite)]">
-        <span>EXPECTED → ACTUAL</span>
-        <Check
-          className="h-4 w-4 text-[var(--brand-success)]"
-          aria-hidden="true"
-        />
+      <div
+        className="mb-2 font-mono text-[9px] text-[var(--brand-orange)]"
+        data-workflow-label="verify"
+      >
+        03 / VERIFY
       </div>
-      <div className="space-y-1.5 font-mono text-[10px]">
+      <div className="mb-2 flex items-center justify-between border-t border-[var(--soft-border)] pt-2 font-mono text-[8px] text-[var(--muted-graphite)]">
+        <span>EXPECTED → ACTUAL</span>
+        <Check className="h-3.5 w-3.5" aria-hidden="true" />
+      </div>
+      <div className="space-y-1 font-mono text-[9px]">
         <div className="flex justify-between gap-3">
           <span className="text-[var(--muted-graphite)]">Expected</span>
           <span>Dashboard</span>
@@ -238,7 +287,10 @@ function VerificationResult({ className }: { className?: string }) {
           <span>Dashboard</span>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2.5 font-mono text-[10px] text-[var(--brand-success)]">
+      <div
+        className="mt-2 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2 font-mono text-[9px] text-[var(--brand-success)]"
+        data-result-state="passed"
+      >
         <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
         PASSED
       </div>
@@ -249,39 +301,19 @@ function VerificationResult({ className }: { className?: string }) {
 function HeroWorkflowTrace() {
   return (
     <svg
-      viewBox="0 0 680 540"
-      className="pointer-events-none absolute inset-0 hidden h-full w-full sm:block"
+      viewBox="0 0 680 590"
+      className="pointer-events-none absolute inset-0 z-30 hidden h-full w-full sm:block"
       fill="none"
       aria-hidden="true"
       data-workflow-connectors
     >
       <path
-        d="M290 176c34 2 57 9 78 28 12 11 23 17 39 19"
+        d="M380 188c36 5 56 19 78 44"
         stroke="var(--brand-orange)"
         strokeDasharray="3 6"
         strokeLinecap="round"
-        strokeWidth="1.35"
-      />
-      <path
-        d="m399 216 10 7-11 3"
-        stroke="var(--brand-orange)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.35"
-      />
-      <path
-        d="M560 397c13 15 17 29 14 44"
-        stroke="var(--brand-orange)"
-        strokeDasharray="3 6"
-        strokeLinecap="round"
-        strokeWidth="1.35"
-      />
-      <path
-        d="m569 434 5 8 6-8"
-        stroke="var(--brand-orange)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth="1.35"
+        strokeOpacity="0.68"
+        strokeWidth="1.2"
       />
     </svg>
   );
@@ -290,60 +322,52 @@ function HeroWorkflowTrace() {
 export function HomeHeroVisual() {
   return (
     <div
-      className="relative isolate mx-auto h-[510px] w-full max-w-[680px] overflow-hidden sm:h-[560px] sm:overflow-visible lg:h-[540px]"
+      className="relative isolate mx-auto h-[500px] w-full max-w-[680px] overflow-hidden sm:h-[610px] sm:overflow-visible lg:h-[590px]"
       role="group"
       aria-label="Inspect, run, and verify testing workflow"
       data-home-hero-visual
     >
       <div className="sm:hidden">
-        <InspectTargetBrowser className="absolute left-[2%] top-8 z-10 w-[92%]" />
-        <div className="absolute left-[5%] top-1 z-30">
-          <QaAnnotation step="inspect" arrow="after" />
-        </div>
+        <div className="absolute bottom-[1%] left-[14%] z-0 h-20 w-[76%] rounded-[48%] bg-[var(--orange-tint)]/45" />
+        <div className="absolute -left-[4%] top-[18%] z-[5] h-[76%] w-[74%] rounded-[38%] bg-[var(--paper-surface)]" />
 
-        <HomeInspectorCharacter className="absolute -left-[5%] top-[17%] z-20 w-[78%]" />
+        <InspectTargetBrowser className="absolute left-[2%] top-5 z-10 w-[96%]" />
+
+        <HomeInspectorCharacter className="absolute -left-[2%] top-[20%] z-20 w-[66%]" />
 
         <div
-          className="absolute bottom-7 right-[2%] z-30 w-[61%]"
+          className="absolute bottom-4 right-[1%] z-40 w-[57%]"
           data-hero-step="run"
         >
-          <div className="mb-2 flex justify-end">
-            <QaAnnotation step="execute" />
-          </div>
-          <PracticePreview compact />
+          <PracticePreview compact showWorkflowStep />
         </div>
       </div>
 
       <div className="hidden sm:block">
-        <HeroWorkflowTrace />
+        <div className="absolute bottom-[1%] left-[16%] z-0 h-24 w-[78%] rounded-[48%] bg-[var(--orange-tint)]/45" />
+        <div className="absolute -left-[2%] top-[16%] z-[5] h-[72%] w-[44%] rounded-[42%] bg-[var(--paper-surface)]/80" />
 
-        <div className="absolute left-[1%] top-[6%] z-10 w-[56%]">
-          <div className="mb-2 ml-3">
-            <QaAnnotation step="inspect" arrow="after" />
-          </div>
+        <div className="absolute left-[35%] top-[4%] z-10 w-[62%]">
           <InspectTargetBrowser />
         </div>
 
-        <HomeInspectorCharacter className="absolute -left-[1%] top-[13%] z-[15] w-[57%]" />
+        <HomeInspectorCharacter className="absolute left-0 top-[14%] z-20 w-[46%]" />
+
+        <HeroWorkflowTrace />
 
         <div
-          className="absolute right-0 top-[29%] z-20 w-[54%]"
+          className="absolute right-0 top-[39%] z-40 w-[52%]"
           data-hero-step="run"
         >
-          <div className="absolute -left-9 -top-7">
-            <QaAnnotation step="execute" />
-          </div>
-          <PracticePreview />
+          <PracticePreview
+            className="origin-top-right scale-[0.87]"
+            showWorkflowStep
+          />
         </div>
 
-        <div className="absolute bottom-[1%] right-[3%] z-30 w-[37%]">
-          <div className="absolute -left-28 top-1/2 -translate-y-1/2">
-            <QaAnnotation step="verify" arrow="after" />
-          </div>
+        <div className="absolute bottom-[1%] right-[2%] z-50 w-[28%]">
           <VerificationResult />
         </div>
-
-        <div className="absolute bottom-[2%] left-[20%] -z-10 h-28 w-[68%] rounded-[48%] bg-[var(--orange-tint)]/45" />
       </div>
     </div>
   );
