@@ -13,10 +13,7 @@ import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NotFound } from '@/components/not-found';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -30,10 +27,6 @@ import { organizationSchema } from '@/lib/seo';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
 
-function isChallengeWorkspacePath(pathname: string) {
-  return /^\/(en|id)\/challenges\/[^/]+$/.test(pathname);
-}
-
 function isLocaleProductPath(pathname: string) {
   return /^\/(en|id)(?:\/|$)/.test(pathname);
 }
@@ -46,7 +39,7 @@ export interface RootContext {
   pathname?: string;
 }
 
-import { DefaultErrorComponent } from "@/components/default-error-component";
+import { DefaultErrorComponent } from '@/components/default-error-component';
 
 export const Route = createRootRouteWithContext<RootContext>()({
   errorComponent: DefaultErrorComponent,
@@ -74,9 +67,10 @@ export const Route = createRootRouteWithContext<RootContext>()({
     return { auth, consent, pathname: location.pathname };
   },
   head: () => {
-    const isQa = typeof window !== 'undefined' 
-      ? window.location.hostname.startsWith('qa.')
-      : false; // Server-side detection handled by header injection in scripts/server.ts
+    const isQa =
+      typeof window !== 'undefined'
+        ? window.location.hostname.startsWith('qa.')
+        : false; // Server-side detection handled by header injection in scripts/server.ts
 
     const meta = [
       {
@@ -144,7 +138,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
       },
       {
         name: 'theme-color',
-        content: '#09090b', // Zinc-950 (background color)
+        content: '#F4F0E8', // Warm Canvas
       },
     ];
 
@@ -182,14 +176,14 @@ export const Route = createRootRouteWithContext<RootContext>()({
           rel: 'stylesheet',
           href: appCss,
         },
-    ],
-    scripts: [
-      {
-        type: 'application/ld+json',
-        children: JSON.stringify(organizationSchema),
-      },
-    ]
-    }
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(organizationSchema),
+        },
+      ],
+    };
   },
 
   component: RootComponent,
@@ -214,11 +208,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
   const pathname = context?.pathname || '';
-  const forcedTheme = isChallengeWorkspacePath(pathname)
-    ? 'dark'
-    : isLocaleProductPath(pathname)
-      ? 'light'
-      : undefined;
+  const forcedTheme = isLocaleProductPath(pathname) ? 'light' : undefined;
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -237,11 +227,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             __html: `
               (function() {
                 const pathname = window.location.pathname;
-                const isChallengeWorkspace = ${isChallengeWorkspacePath.toString()}(pathname);
                 const isLocaleProduct = ${isLocaleProductPath.toString()}(pathname);
-                const theme = isChallengeWorkspace
-                  ? 'dark'
-                  : isLocaleProduct
+                const theme = isLocaleProduct
                     ? 'light'
                     : (localStorage.getItem('twe-theme') || 'system');
                 let resolved = theme;
@@ -285,7 +272,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const auth = context?.auth;
   const location = useLocation();
   const preloadedImageRef = useRef<string | null>(null);
-  const [consent, setConsent] = useState<'granted' | 'denied' | null>(context?.consent || null);
+  const [consent, setConsent] = useState<'granted' | 'denied' | null>(
+    context?.consent || null,
+  );
 
   // Sync consent state if it changes via CookieConsent component
   const handleConsentChange = (newConsent: 'granted' | 'denied' | null) => {
@@ -316,7 +305,10 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           {...omitUndefined({ measurementId: auth?.gaMeasurementId })}
         />
       )}
-      <CookieConsent onConsentChange={handleConsentChange} initialConsent={consent} />
+      <CookieConsent
+        onConsentChange={handleConsentChange}
+        initialConsent={consent}
+      />
       <div className="flex flex-col min-h-screen">
         <Header session={auth || null} />
         <main className="flex-1">

@@ -47,7 +47,9 @@
   --radius-xl: calc(var(--radius) + 4px);
 
   /* Typography */
-  --font-sans: 'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans:
+    'Instrument Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
   --font-reading: 'Instrument Sans', system-ui, sans-serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace;
 
@@ -138,7 +140,7 @@
   --brand-error: #c74b42;
   --brand-warning: #b78327;
 
-  /* Locked dark workspace colors */
+  /* Locked neutral palette defaults for technical surfaces */
   --workspace-background: #171918;
   --workspace-panel: #202321;
   --workspace-elevated: #292c29;
@@ -172,7 +174,7 @@
   --shadow-strength: 0px;
 }
 
-/* Dark mode remains useful internally and matches the workspace palette. */
+/* Dark mode remains useful internally and matches the technical palette. */
 .dark {
   --background: var(--workspace-background);
   --foreground: var(--workspace-text);
@@ -195,8 +197,62 @@
   --ring: var(--brand-orange);
 }
 
-/* A challenge workspace is dark even when the public theme infrastructure is light. */
+/*
+ * Challenge pages stay inside the warm TWE product shell. The workspace
+ * aliases are warm here by default and are overridden by .technical-surface
+ * only for code, editor, and raw console surfaces.
+ */
 .workspace-shell {
+  --workspace-background: var(--warm-canvas);
+  --workspace-panel: var(--paper-surface);
+  --workspace-elevated: var(--paper-surface);
+  --workspace-border: var(--soft-border);
+  --workspace-text: var(--graphite);
+  --workspace-muted: var(--muted-graphite);
+
+  --background: var(--warm-canvas);
+  --foreground: var(--graphite);
+  --card: var(--paper-surface);
+  --card-foreground: var(--graphite);
+  --popover: var(--paper-surface);
+  --popover-foreground: var(--graphite);
+  --primary: var(--brand-orange);
+  --primary-foreground: var(--paper-surface);
+  --secondary: var(--paper-surface);
+  --secondary-foreground: var(--graphite);
+  --muted: var(--warm-canvas);
+  --muted-foreground: var(--muted-graphite);
+  --accent: var(--orange-tint);
+  --accent-foreground: var(--graphite);
+  --destructive: var(--brand-error);
+  --destructive-foreground: var(--paper-surface);
+  --border: var(--soft-border);
+  --input: var(--soft-border);
+  --ring: var(--brand-orange);
+  background: var(--warm-canvas);
+  color: var(--graphite);
+  isolation: isolate;
+}
+
+.workspace-panel {
+  background: var(--workspace-panel);
+  border-color: var(--workspace-border);
+}
+
+.workspace-elevated {
+  background: var(--workspace-elevated);
+  border-color: var(--workspace-border);
+}
+
+/* Focused technical surfaces intentionally retain the neutral dark palette. */
+.technical-surface {
+  --workspace-background: #171918;
+  --workspace-panel: #202321;
+  --workspace-elevated: #292c29;
+  --workspace-border: #393c38;
+  --workspace-text: #f2f1ec;
+  --workspace-muted: #a5a69f;
+
   --background: var(--workspace-background);
   --foreground: var(--workspace-text);
   --card: var(--workspace-panel);
@@ -218,17 +274,66 @@
   --ring: var(--brand-orange);
   background: var(--workspace-background);
   color: var(--workspace-text);
-  isolation: isolate;
 }
 
-.workspace-panel {
-  background: var(--workspace-panel);
-  border-color: var(--workspace-border);
+/* Results remain human-readable and warm, even when adjacent to an editor. */
+.human-results-surface {
+  --workspace-background: var(--warm-canvas);
+  --workspace-panel: var(--paper-surface);
+  --workspace-elevated: var(--paper-surface);
+  --workspace-border: var(--soft-border);
+  --workspace-text: var(--graphite);
+  --workspace-muted: var(--muted-graphite);
+
+  --background: var(--warm-canvas);
+  --foreground: var(--graphite);
+  --card: var(--paper-surface);
+  --card-foreground: var(--graphite);
+  --popover: var(--paper-surface);
+  --popover-foreground: var(--graphite);
+  --primary-foreground: var(--paper-surface);
+  --secondary: var(--paper-surface);
+  --secondary-foreground: var(--graphite);
+  --muted: var(--warm-canvas);
+  --muted-foreground: var(--muted-graphite);
+  --accent: var(--orange-tint);
+  --accent-foreground: var(--graphite);
+  --destructive-foreground: var(--paper-surface);
+  --border: var(--soft-border);
+  --input: var(--soft-border);
+  background: var(--warm-canvas);
+  color: var(--graphite);
 }
 
-.workspace-elevated {
-  background: var(--workspace-elevated);
-  border-color: var(--workspace-border);
+/* Tailwind's generated color aliases resolve at the active surface boundary. */
+.workspace-shell,
+.technical-surface,
+.human-results-surface {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-workspace-background: var(--workspace-background);
+  --color-workspace-panel: var(--workspace-panel);
+  --color-workspace-elevated: var(--workspace-elevated);
+  --color-workspace-border: var(--workspace-border);
+  --color-workspace-text: var(--workspace-text);
+  --color-workspace-muted: var(--workspace-muted);
 }
 
 /* Base Styles */
@@ -269,6 +374,11 @@ body {
 }
 
 .workspace-shell .glass-card {
+  background: var(--paper-surface);
+  border-color: var(--soft-border);
+}
+
+.technical-surface .glass-card {
   background: var(--workspace-panel);
   border-color: var(--workspace-border);
 }

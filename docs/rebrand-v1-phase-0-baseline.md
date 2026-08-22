@@ -52,7 +52,8 @@ Rebrand UI must read these existing data boundaries rather than introducing disp
 ## Approved rebrand constraints
 
 - Warm editorial surfaces are for reading, discovery, learning, Practice browsing, Labs, About, Contact, and Profile.
-- The actual challenge workspace remains explicitly dark and technical.
+- Challenge pages use the warm TWE product shell, with dark technical surfaces
+  for code editing and console/debug output where appropriate.
 - Instrument Sans is the primary family; IBM Plex Mono is the technical family.
 - The palette, geometry, spacing, motion, and reduced-motion requirements come from `twe-rebrand-spec-v1.md`.
 - Curriculum labels, lesson counts, durations, locks, path progress, and future products must come from approved real data or remain unspecified.

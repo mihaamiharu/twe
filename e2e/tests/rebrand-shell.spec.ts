@@ -12,17 +12,25 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(primary).toContainText('Labs');
     await expect(primary).toContainText('Soon');
     await expect(primary).toContainText('About');
-    await expect(primary.getByRole('link', { name: 'Leaderboard' })).toHaveCount(0);
+    await expect(
+      primary.getByRole('link', { name: 'Leaderboard' }),
+    ).toHaveCount(0);
 
-    await expect(page.getByRole('button', { name: /Switch language/ })).toContainText('EN');
+    await expect(
+      page.getByRole('button', { name: /Switch language/ }),
+    ).toContainText('EN');
     await expect(page.getByRole('link', { name: 'Sign In' })).toBeVisible();
     await expect(
-      page.locator('header').getByRole('link', { name: /Start Web Automation/ }),
+      page
+        .locator('header')
+        .getByRole('link', { name: /Start Web Automation/ }),
     ).toBeVisible();
     await expect(page.locator('[aria-label*="theme" i]')).toHaveCount(0);
 
     const footer = page.locator('footer');
-    await expect(footer).toContainText('Practical software testing education for QA engineers who want to grow technically.');
+    await expect(footer).toContainText(
+      'Practical software testing education for QA engineers who want to grow technically.',
+    );
     await expect(footer).toContainText('Explore');
     await expect(footer).toContainText('Connect');
     await expect(footer).toContainText('Legal');
@@ -30,7 +38,9 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(footer).not.toContainText('Leaderboard');
     await expect(footer).not.toContainText('Subscribe');
     await expect(footer).not.toContainText('Changelog');
-    await expect(footer.getByRole('button', { name: /Report a Bug/i })).toBeVisible();
+    await expect(
+      footer.getByRole('button', { name: /Report a Bug/i }),
+    ).toBeVisible();
   });
 
   test('renders the signed-in desktop shell with account access', async ({
@@ -42,8 +52,12 @@ test.describe('Rebrand V1 global shell', () => {
     await page.setViewportSize({ width: 1280, height: 720 });
     await page.goto('/en');
 
-    await expect(page.getByRole('navigation', { name: 'Primary' })).toContainText('Practice');
-    await expect(page.getByRole('button', { name: 'Open account menu' })).toBeVisible();
+    await expect(
+      page.getByRole('navigation', { name: 'Primary' }),
+    ).toContainText('Practice');
+    await expect(
+      page.getByRole('button', { name: 'Open account menu' }),
+    ).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sign In' })).toHaveCount(0);
     await expect(page.locator('header')).not.toContainText('XP');
     await expect(page.locator('[aria-label*="theme" i]')).toHaveCount(0);
@@ -66,13 +80,17 @@ test.describe('Rebrand V1 global shell', () => {
       { timeout: 20_000 },
     );
 
-    const menuButton = page.locator('button[aria-controls="mobile-navigation"]');
+    const menuButton = page.locator(
+      'button[aria-controls="mobile-navigation"]',
+    );
     await expect(menuButton).toBeVisible();
     await expect(menuButton).toHaveAttribute('aria-expanded', 'false');
     await menuButton.click();
     await expect(menuButton).toHaveAttribute('aria-expanded', 'true');
 
-    const mobileNavigation = page.getByRole('navigation', { name: 'Mobile navigation' });
+    const mobileNavigation = page.getByRole('navigation', {
+      name: 'Mobile navigation',
+    });
     await expect(mobileNavigation).toContainText('Learn');
     await expect(mobileNavigation).toContainText('Practice');
     await expect(mobileNavigation).toContainText('Labs');
@@ -82,11 +100,15 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(mobileNavigation).toContainText('Sign In');
 
     await page.keyboard.press('Escape');
-    await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toHaveCount(0);
+    await expect(
+      page.getByRole('navigation', { name: 'Mobile navigation' }),
+    ).toHaveCount(0);
     await expect(menuButton).toBeFocused();
 
     await menuButton.click();
-    await mobileNavigation.getByRole('button', { name: /Switch language/ }).click();
+    await mobileNavigation
+      .getByRole('button', { name: /Switch language/ })
+      .click();
     await page.getByRole('menuitem', { name: 'Bahasa Indonesia' }).click();
     await expect(page).toHaveURL(/\/id\/?$/);
     await page.waitForFunction(
@@ -100,18 +122,26 @@ test.describe('Rebrand V1 global shell', () => {
       undefined,
       { timeout: 20_000 },
     );
-    const localizedMenuButton = page.locator('button[aria-controls="mobile-navigation"]');
+    const localizedMenuButton = page.locator(
+      'button[aria-controls="mobile-navigation"]',
+    );
     await localizedMenuButton.click();
-    await expect(page.getByRole('navigation', { name: 'Mobile navigation' })).toContainText('Belajar');
+    await expect(
+      page.getByRole('navigation', { name: 'Mobile navigation' }),
+    ).toContainText('Belajar');
   });
 
-  test('keeps the challenge workspace dark', async ({ page }) => {
+  test('keeps the challenge page warm around dark technical surfaces', async ({
+    page,
+  }) => {
     await page.goto('/en/challenges/css-selector-101-id-class');
 
     await expect(page.locator('.workspace-shell')).toBeVisible();
     await expect(page.locator('footer')).toHaveCount(0);
     await expect
-      .poll(() => page.evaluate(() => getComputedStyle(document.body).backgroundColor))
-      .toBe('rgb(23, 25, 24)');
+      .poll(() =>
+        page.evaluate(() => getComputedStyle(document.body).backgroundColor),
+      )
+      .toBe('rgb(244, 240, 232)');
   });
 });
