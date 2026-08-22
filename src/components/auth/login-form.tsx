@@ -98,9 +98,9 @@ export function LoginForm({ onSuccess, onRegisterClick }: LoginFormProps) {
   };
 
   return (
-    <Card className="w-full max-w-md glass-card">
+    <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold gradient-text">
+        <CardTitle className="text-2xl font-semibold tracking-tight text-foreground">
           {t('auth:login.title')}
         </CardTitle>
         <CardDescription>{t('auth:login.description')}</CardDescription>

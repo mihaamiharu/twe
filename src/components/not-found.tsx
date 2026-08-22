@@ -27,7 +27,6 @@ export function NotFound() {
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
   const [visibleLogs, setVisibleLogs] = useState<string[]>([]);
-  const [isToggled, setIsToggled] = useState(false);
 
   useEffect(() => {
     let logIndex = 0;
@@ -49,9 +48,9 @@ export function NotFound() {
   }, []);
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+    <div className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center overflow-hidden bg-[var(--warm-canvas)] p-4 text-[var(--graphite)]">
       {/* Circuit pattern background */}
-      <div className="absolute inset-0 opacity-10">
+      <div className="pointer-events-none absolute inset-0 text-[var(--soft-border)] opacity-40">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern
@@ -91,52 +90,48 @@ export function NotFound() {
         </svg>
       </div>
 
-      {/* Glowing orb effect */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-green-500/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-
       {/* Content */}
-      <div className="relative z-10 text-center max-w-2xl mx-auto">
+      <div className="relative z-10 mx-auto max-w-2xl text-center">
         {/* Status code badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-mono bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
-          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+        <div className="mb-6 inline-flex items-center gap-2 border border-[var(--brand-error)]/30 bg-[var(--brand-error)]/10 px-3 py-1 font-mono text-xs text-[var(--brand-error)]">
+          <span className="h-2 w-2 rounded-full bg-[var(--brand-error)]" />
           ERROR 404
         </div>
 
         {/* Headline */}
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+        <h1 className="mb-4 text-4xl font-semibold tracking-tight text-[var(--graphite)] md:text-5xl">
           {t('notFound.title')}
         </h1>
 
         {/* Sub-headline */}
-        <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
+        <p className="mx-auto mb-8 max-w-xl text-lg leading-8 text-[var(--muted-graphite)]">
           {t('notFound.description').split('headless: true')[0]}
-          <code className="px-2 py-0.5 bg-gray-800 rounded text-green-400 font-mono text-sm">
+          <code className="border border-[var(--workspace-border)] bg-[var(--workspace-panel)] px-2 py-0.5 font-mono text-sm text-[var(--workspace-text)]">
             headless: true
           </code>
           {t('notFound.description').split('headless: true')[1]}
         </p>
 
         {/* Terminal window */}
-        <div className="relative mx-auto max-w-lg mb-8">
+        <div className="mx-auto mb-8 max-w-lg text-left">
           {/* Terminal header */}
-          <div className="flex items-center gap-2 px-4 py-3 bg-gray-800 rounded-t-lg border border-gray-700 border-b-0">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="ml-2 text-xs text-gray-500 font-mono">
+          <div className="technical-surface flex items-center gap-2 rounded-t-md border border-[var(--workspace-border)] border-b-0 px-4 py-3">
+            <div className="h-2.5 w-2.5 rounded-full bg-[var(--brand-error)]" />
+            <div className="h-2.5 w-2.5 rounded-full bg-[var(--brand-warning)]" />
+            <div className="h-2.5 w-2.5 rounded-full bg-[var(--brand-success)]" />
+            <span className="ml-2 font-mono text-xs text-[var(--workspace-muted)]">
               playwright-test
             </span>
           </div>
 
           {/* Terminal body */}
-          <div className="relative bg-gray-950 rounded-b-lg border border-gray-700 border-t-0 p-4 h-48 overflow-hidden font-mono text-sm text-left">
+          <div className="technical-surface relative h-48 overflow-hidden rounded-b-md border border-[var(--workspace-border)] border-t-0 p-4 font-mono text-sm">
             {/* Scrolling logs */}
             <div className="space-y-1">
               {visibleLogs.map((log, index) => (
                 <div
                   key={`${log}-${index}`}
-                  className={`text-green-400 transition-opacity duration-300 ${
+                  className={`text-[var(--workspace-text)] transition-opacity duration-300 ${
                     index === visibleLogs.length - 1
                       ? 'opacity-100'
                       : 'opacity-70'
@@ -144,55 +139,37 @@ export function NotFound() {
                 >
                   {log}
                   {index === visibleLogs.length - 1 && (
-                    <span className="inline-block w-2 h-4 ml-1 bg-green-400 animate-pulse" />
+                    <span className="ml-1 inline-block h-4 w-2 animate-pulse bg-[var(--brand-orange)]" />
                   )}
                 </div>
               ))}
             </div>
-
-            {/* Scanline effect */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-green-500/5 to-transparent animate-scan" />
           </div>
-
-          {/* Glow effect around terminal */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-green-500/20 via-transparent to-green-500/20 rounded-xl blur-sm -z-10" />
         </div>
 
-        {/* Toggle switch CTA */}
+        {/* Return CTA */}
         <Link
           to={LocaleRoutes.home}
           params={localeParams(locale)}
-          className="group inline-flex items-center gap-3"
+          className="inline-flex min-h-11 items-center gap-3 rounded-md bg-[var(--brand-orange)] px-5 py-3 font-medium text-[var(--paper-surface)] transition-colors hover:bg-[var(--brand-orange)]/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
         >
-          <button
-            onMouseEnter={() => setIsToggled(true)}
-            onMouseLeave={() => setIsToggled(false)}
-            className="relative inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-medium rounded-full transition-all duration-300 shadow-lg shadow-green-500/25 hover:shadow-green-500/40"
-          >
-            {/* Toggle switch visual */}
-            <div
-              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${isToggled ? 'bg-green-300' : 'bg-gray-600'}`}
-            >
-              <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300 ${
-                  isToggled ? 'left-7' : 'left-1'
-                }`}
-              />
-            </div>
-            <span>{t('notFound.backHome')}</span>
-          </button>
+          <span
+            aria-hidden="true"
+            className="h-2 w-2 rounded-full bg-[var(--paper-surface)]"
+          />
+          <span>{t('notFound.backHome')}</span>
         </Link>
 
         {/* Fun footer note */}
-        <p className="mt-8 text-xs text-gray-600 font-mono">
+        <p className="mt-8 font-mono text-xs text-[var(--muted-graphite)]">
           {t('notFound.tip').split('--headed')[0]}
-          <code className="text-gray-500">--headed</code>
+          <code className="text-[var(--graphite)]">--headed</code>
           {t('notFound.tip').split('--headed')[1]}
         </p>
       </div>
 
       {/* Decorative star/cursor in corner */}
-      <div className="absolute bottom-8 right-8 text-yellow-500/50">
+      <div className="absolute bottom-8 right-8 text-[var(--brand-orange)]/40">
         <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7-6.3-4.6L5.7 21l2.3-7-6-4.6h7.6z" />
         </svg>

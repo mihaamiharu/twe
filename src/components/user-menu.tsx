@@ -82,7 +82,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
               <div className="flex items-center gap-1 mt-1.5">
                 <Badge
                   variant="outline"
-                  className="w-fit bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-500/10 dark:text-purple-400 dark:border-purple-500/20 text-[10px] h-5 px-1.5 uppercase tracking-wider"
+                  className="h-5 w-fit border-brand-orange/25 bg-brand-orange-tint px-1.5 text-[10px] uppercase tracking-wider text-brand-orange"
                 >
                   Admin
                 </Badge>
@@ -115,7 +115,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
           <DropdownMenuItem asChild>
             <Link
               to="/admin"
-              className="cursor-pointer font-medium text-purple-600 focus:text-purple-600 focus:bg-purple-50 dark:focus:bg-purple-500/10"
+              className="cursor-pointer font-medium text-brand-orange focus:bg-brand-orange-tint focus:text-brand-orange"
             >
               <LayoutDashboard className="mr-2 h-4 w-4" />
               {t('common:navigation.admin')}

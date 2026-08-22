@@ -54,7 +54,7 @@ export function Footer() {
             <p className="mt-5 max-w-[19rem] text-[1rem] leading-7 text-[var(--muted-graphite)]">
               {t('common:footer.tagline')}
             </p>
-            <QaDoodle kind="trace" className="mt-7 h-11 w-11" />
+            <QaDoodle kind="check" className="mt-7 h-11 w-11" />
           </div>
 
           <nav aria-label={t('common:footer.explore')}>

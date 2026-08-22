@@ -147,7 +147,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
               <nav
                 aria-label="Primary"
-                className="hidden items-center gap-7 md:flex"
+                className="hidden items-center gap-7 lg:flex"
               >
                 {navLinks.map((link) => (
                   <Link
@@ -196,7 +196,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
-                  <div className="hidden items-center gap-4 md:flex">
+                  <div className="hidden items-center gap-4 lg:flex">
                     <Link
                       to={LocaleRoutes.login}
                       params={localeParams(locale)}
@@ -225,7 +225,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="lg:hidden"
                 type="button"
                 onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
                 aria-expanded={isMobileMenuOpen}
@@ -249,7 +249,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           <div
             className="fixed inset-0 bg-[var(--graphite)]/15"
             onClick={() => setIsMobileMenuOpen(false)}

@@ -80,7 +80,10 @@ export function PracticePreview({
               02 /
             </span>
           )}
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-orange)] text-[#f2f1ec]">
+          <span
+            className="practice-run-indicator inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-orange)] text-[#f2f1ec]"
+            data-practice-motion="run"
+          >
             <Play className="h-3 w-3 fill-current" aria-hidden="true" />
           </span>
           <span
@@ -138,7 +141,7 @@ export function PracticePreview({
               <div className="space-y-2">
                 <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
                 <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
-                <div className="flex h-7 items-center justify-center rounded bg-[var(--brand-orange)] font-mono text-[10px] text-white">
+                <div className="practice-target-button flex h-7 items-center justify-center rounded bg-[var(--brand-orange)] font-mono text-[10px] text-white">
                   Sign in
                 </div>
               </div>
@@ -180,7 +183,10 @@ export function PracticePreview({
             </pre>
             <div className="mt-3 border-t border-[#393c38] pt-3">
               <div className="flex items-center justify-between font-mono text-[10px]">
-                <span className="flex items-center gap-1.5 text-[var(--brand-success)]">
+                <span
+                  className="practice-result-indicator flex items-center gap-1.5 text-[var(--brand-success)]"
+                  data-practice-motion="verify"
+                >
                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
                   test passed
                 </span>

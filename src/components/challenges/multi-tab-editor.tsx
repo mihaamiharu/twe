@@ -67,7 +67,7 @@ export function MultiTabEditor({
             >
               <div className="mr-2 opacity-50">
                 {isFileEditable ? (
-                  <Edit3 className="h-3 w-3 text-brand-teal" />
+                  <Edit3 className="h-3 w-3 text-brand-success" />
                 ) : (
                   <Lock className="h-3 w-3" />
                 )}

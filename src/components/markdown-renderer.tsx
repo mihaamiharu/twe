@@ -36,10 +36,7 @@ export function MarkdownRenderer({
 }: MarkdownRendererProps) {
   return (
     <div
-      className={cn(
-        'prose prose-lg max-w-none dark:prose-invert',
-        className,
-      )}
+      className={cn('prose prose-lg max-w-none dark:prose-invert', className)}
     >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
@@ -267,14 +264,14 @@ export function MarkdownRenderer({
               }
 
               const styles = {
-                note: 'bg-blue-500/10 border-blue-500 text-blue-700 dark:text-blue-300',
-                tip: 'bg-green-500/10 border-green-500 text-green-700 dark:text-green-300',
+                note: 'bg-brand-orange-tint/60 border-brand-orange text-foreground',
+                tip: 'bg-brand-orange-tint/60 border-brand-orange text-foreground',
                 important:
-                  'bg-purple-500/10 border-purple-500 text-purple-700 dark:text-purple-300',
+                  'bg-brand-orange-tint/60 border-brand-orange text-foreground',
                 warning:
-                  'bg-yellow-500/10 border-yellow-500 text-yellow-700 dark:text-yellow-300',
+                  'bg-brand-warning/10 border-brand-warning text-brand-warning',
                 caution:
-                  'bg-red-500/10 border-red-500 text-red-700 dark:text-red-300',
+                  'bg-brand-error/10 border-brand-error text-brand-error',
               };
 
               const titles = {

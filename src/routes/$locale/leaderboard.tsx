@@ -65,7 +65,8 @@ export const Route = createFileRoute('/$locale/leaderboard')({
     const locale = params.locale || 'en';
     return createSeoHead({
       title: 'Leaderboard | TestingWithEkki',
-      description: 'See who tops the charts! View the all-time and monthly leaderboard for TestingWithEkki challenges.',
+      description:
+        'See who tops the charts! View the all-time and monthly leaderboard for TestingWithEkki challenges.',
       path: '/leaderboard',
       locale,
     });
@@ -102,11 +103,8 @@ function LeaderboardPage() {
   };
 
   return (
-    <div className="min-h-screen p-4 md:p-8 relative overflow-hidden bg-background">
-      {/* Background decoration - softer gradient */}
-      <div className="absolute top-0 left-0 w-full h-[400px] bg-gradient-to-b from-primary/5 to-transparent -z-10" />
-
-      <div className="max-w-4xl mx-auto space-y-8">
+    <div className="relative min-h-screen overflow-hidden bg-background p-4 md:p-8">
+      <div className="mx-auto max-w-4xl space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-black tracking-tight flex items-center justify-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
             <span className="text-primary">~</span>
@@ -129,16 +127,16 @@ function LeaderboardPage() {
           }}
         >
           <div className="flex justify-center">
-            <TabsList className="bg-muted/30 p-1 h-12 rounded-2xl animate-in fade-in zoom-in-50 duration-500 delay-200">
+            <TabsList className="h-12 rounded-md border border-border bg-muted/30 p-1 animate-in fade-in zoom-in-50 duration-500 delay-200">
               <TabsTrigger
                 value="all-time"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                className="h-10 rounded-sm px-6 font-semibold data-[state=active]:bg-background data-[state=active]:shadow-none transition-colors"
               >
                 {t('leaderboard:tabs.allTime')}
               </TabsTrigger>
               <TabsTrigger
                 value="monthly"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                className="h-10 rounded-sm px-6 font-semibold data-[state=active]:bg-background data-[state=active]:shadow-none transition-colors"
               >
                 {t('leaderboard:tabs.thisMonth')}
               </TabsTrigger>
@@ -151,7 +149,7 @@ function LeaderboardPage() {
           >
             {users.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500">
-                <div className="h-20 w-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-4">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-md bg-muted/50">
                   <Trophy className="h-10 w-10 text-muted-foreground/30" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">
@@ -159,7 +157,8 @@ function LeaderboardPage() {
                 </h3>
                 <p className="text-muted-foreground max-w-xs">
                   {t('leaderboard:table.emptyDescription', {
-                    defaultValue: 'No one has climbed the leaderboard yet. Be the first!',
+                    defaultValue:
+                      'No one has climbed the leaderboard yet. Be the first!',
                   })}
                 </p>
               </div>
@@ -168,13 +167,10 @@ function LeaderboardPage() {
                 {/* Top 3 Podium - Compact & Floating */}
                 {TopThree.length > 0 && firstUser && (
                   <div className="relative pt-10 pb-4">
-                    {/* Glow effect for rank 1 */}
-                    <div className="absolute left-1/2 top-4 -translate-x-1/2 w-64 h-64 bg-accent/20 blur-[80px] rounded-full -z-10" />
-
                     <div
                       className={cn(
                         'flex flex-col md:flex-row gap-4 items-end justify-center',
-                        TopThree.length === 1 ? 'max-w-xs mx-auto' : ''
+                        TopThree.length === 1 ? 'max-w-xs mx-auto' : '',
                       )}
                     >
                       {TopThree.length === 1 ? (
@@ -235,7 +231,7 @@ function LeaderboardPage() {
 
                 {/* Rest of Leaderboard - List View */}
                 <div
-                  className="bg-muted/10 rounded-3xl p-2 md:p-6 space-y-2"
+                  className="space-y-2 rounded-md border border-border/60 bg-muted/10 p-2 md:p-6"
                   data-testid="leaderboard-list"
                 >
                   {RestUsers.map((user, index) => (
@@ -244,8 +240,8 @@ function LeaderboardPage() {
                       data-testid="leaderboard-item"
                       style={getDelay(index)}
                       className={cn(
-                        'group flex items-center gap-4 p-3 md:p-4 rounded-2xl bg-card border border-border/40 hover:border-border transition-all hover:translate-x-1 hover:shadow-md animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards',
-                        !isAuthenticated && 'opacity-60 blur-[1px]'
+                        'group flex items-center gap-4 rounded-md border border-border/40 bg-card p-3 transition-colors hover:border-border md:p-4 animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards',
+                        !isAuthenticated && 'opacity-60 blur-[1px]',
                       )}
                     >
                       {/* Rank */}
@@ -271,7 +267,9 @@ function LeaderboardPage() {
                               </div>
                             )
                           ) : (
-                            <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">?</div>
+                            <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">
+                              ?
+                            </div>
                           )}
                         </div>
                       </div>
@@ -280,28 +278,45 @@ function LeaderboardPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-bold truncate">
-                            {isAuthenticated ? user.name || t('leaderboard:table.anonymous') : t('leaderboard:table.hiddenUser')}
+                            {isAuthenticated
+                              ? user.name || t('leaderboard:table.anonymous')
+                              : t('leaderboard:table.hiddenUser')}
                           </span>
                           {/* Badges inline on mobile, hidden on very small screens */}
                           <div className="flex -space-x-1">
                             {user.badges.slice(0, 3).map((badge, i) => (
-                              <div key={i} className="h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center text-[10px]" title={badge.name}>
+                              <div
+                                key={i}
+                                className="h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center text-[10px]"
+                                title={badge.name}
+                              >
                                 {badge.icon}
                               </div>
                             ))}
                           </div>
                         </div>
                         <div className="text-xs text-muted-foreground font-medium flex items-center gap-2">
-                          <span>{t('common:labels.level')} {user.level}</span>
+                          <span>
+                            {t('common:labels.level')} {user.level}
+                          </span>
                           <span className="w-1 h-1 rounded-full bg-border" />
-                          <span>{user.challengesCompleted} {t('leaderboard:table.challenges')}</span>
+                          <span>
+                            {user.challengesCompleted}{' '}
+                            {t('leaderboard:table.challenges')}
+                          </span>
                         </div>
                       </div>
 
                       {/* XP */}
                       <div className="flex-none text-right">
                         <div className="font-black text-primary">
-                          {((period === 'monthly' ? user.monthlyXp : user.xp) || 0).toLocaleString()} <span className="text-xs text-muted-foreground font-medium">XP</span>
+                          {(
+                            (period === 'monthly' ? user.monthlyXp : user.xp) ||
+                            0
+                          ).toLocaleString()}{' '}
+                          <span className="text-xs text-muted-foreground font-medium">
+                            XP
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -314,13 +329,24 @@ function LeaderboardPage() {
                   )}
 
                   {!isAuthenticated && (
-                    <div className="mt-8 text-center p-8 bg-card/50 backdrop-blur-sm rounded-3xl border border-dashed border-border relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+                    <div className="relative mt-8 overflow-hidden rounded-md border border-dashed border-border bg-card/50 p-8 text-center animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
                       <div className="relative z-10 max-w-md mx-auto space-y-4">
                         <Shield className="h-12 w-12 text-primary mx-auto opacity-50" />
-                        <h3 className="text-xl font-bold">{t('leaderboard:gating.title')}</h3>
-                        <p className="text-muted-foreground">{t('leaderboard:gating.description')}</p>
-                        <Link to="/$locale/login" params={{ locale }} search={{ redirect: '/leaderboard' }}>
-                          <Button size="lg" className="rounded-xl px-8 font-bold hover:scale-105 transition-transform">
+                        <h3 className="text-xl font-bold">
+                          {t('leaderboard:gating.title')}
+                        </h3>
+                        <p className="text-muted-foreground">
+                          {t('leaderboard:gating.description')}
+                        </p>
+                        <Link
+                          to="/$locale/login"
+                          params={{ locale }}
+                          search={{ redirect: '/leaderboard' }}
+                        >
+                          <Button
+                            size="lg"
+                            className="rounded-md px-8 font-semibold"
+                          >
                             {t('leaderboard:gating.button')}
                           </Button>
                         </Link>
@@ -352,9 +378,9 @@ function PodiumCard({
 }) {
   const { t } = useTranslation(['leaderboard', 'common']);
 
-  // Compact styling
-  // Rank 1 gets special teal accent, others are more muted
-  const accentColor = rank === 1 ? 'text-teal-400' : rank === 2 ? 'text-slate-400' : 'text-amber-700';
+  // Keep rank one distinct while the rest stay quiet in the editorial palette.
+  const accentColor =
+    rank === 1 ? 'text-brand-orange' : 'text-muted-foreground';
 
   const displayName = isAuthenticated
     ? user.name || t('leaderboard:table.anonymous')
@@ -366,50 +392,73 @@ function PodiumCard({
     <div
       data-testid="leaderboard-podium-item"
       className={cn(
-        'relative bg-card rounded-3xl p-4 flex flex-row items-center gap-4 transition-all hover:-translate-y-1',
-        isCenter ? 'ring-2 ring-teal-500/20 shadow-lg shadow-teal-500/10 min-w-[280px]' : 'border border-border/50 min-w-[240px] opacity-90',
+        'relative flex min-w-[240px] flex-row items-center gap-4 rounded-md bg-card p-4 transition-colors hover:border-border',
+        isCenter
+          ? 'min-w-[280px] border border-brand-orange/40'
+          : 'border border-border/50 opacity-90',
       )}
     >
       {/* Rank Badge */}
-      <div className={cn(
-        "absolute -top-3 -left-3 h-8 w-8 rounded-full flex items-center justify-center font-black text-sm shadow-sm z-10",
-        rank === 1 ? "bg-teal-500 text-black" : "bg-card border border-border text-muted-foreground"
-      )}>
+      <div
+        className={cn(
+          'absolute -left-3 -top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold',
+          rank === 1
+            ? 'bg-brand-orange text-[var(--paper-surface)]'
+            : 'border border-border bg-card text-muted-foreground',
+        )}
+      >
         {rank}
       </div>
 
       {isCenter && (
         <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce">
-          <Crown className="h-8 w-8 text-teal-400 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
+          <Crown className="h-8 w-8 text-brand-orange" />
         </div>
       )}
 
       {/* Avatar - Compact */}
-      <div className={cn(
-        "h-16 w-16 rounded-2xl overflow-hidden flex-none",
-        rank === 1 ? "ring-2 ring-offset-2 ring-offset-card ring-teal-500" : ""
-      )}>
+      <div
+        className={cn(
+          'h-16 w-16 flex-none overflow-hidden rounded-md',
+          rank === 1 ? 'border-2 border-brand-orange' : 'border border-border',
+        )}
+      >
         {displayAvatar ? (
-          <img src={displayAvatar} alt={displayName} className="h-full w-full object-cover" />
+          <img
+            src={displayAvatar}
+            alt={displayName}
+            className="h-full w-full object-cover"
+          />
         ) : (
           <div className="h-full w-full bg-muted flex items-center justify-center text-xl font-bold">
-            {isAuthenticated ? (user.name?.[0] || '?') : '?'}
+            {isAuthenticated ? user.name?.[0] || '?' : '?'}
           </div>
         )}
       </div>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
-        <div className={cn("font-bold text-lg truncate", !isAuthenticated && "blur-[2px]")}>
+        <div
+          className={cn(
+            'font-bold text-lg truncate',
+            !isAuthenticated && 'blur-[2px]',
+          )}
+        >
           {displayName}
         </div>
         <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-          <span className={cn("font-bold", accentColor)}>{xpToShow.toLocaleString()}</span> XP
+          <span className={cn('font-bold', accentColor)}>
+            {xpToShow.toLocaleString()}
+          </span>{' '}
+          XP
         </div>
         {/* Badges */}
         <div className="flex -space-x-1 mt-1">
           {user.badges.slice(0, 2).map((b, i) => (
-            <div key={i} className="h-4 w-4 bg-background rounded-full border border-border flex items-center justify-center text-[8px]">
+            <div
+              key={i}
+              className="h-4 w-4 bg-background rounded-full border border-border flex items-center justify-center text-[8px]"
+            >
               {b.icon}
             </div>
           ))}

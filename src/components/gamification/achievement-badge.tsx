@@ -48,9 +48,9 @@ export function AchievementBadge({
   return (
     <Card
       className={cn(
-        'glass-card relative overflow-hidden transition-all',
+        'relative overflow-hidden transition-all',
         earned
-          ? 'border-yellow-500/30 bg-yellow-500/5'
+          ? 'border-brand-orange/30 bg-brand-orange/5'
           : 'opacity-70 grayscale',
         className,
       )}
@@ -62,7 +62,7 @@ export function AchievementBadge({
           <div
             className={cn(
               'flex-shrink-0 flex items-center justify-center rounded-lg bg-muted/50 p-2',
-              earned ? 'bg-yellow-500/20' : '',
+              earned ? 'bg-brand-orange/10' : '',
             )}
           >
             <span className={iconSizes[size]}>{achievement.icon}</span>
@@ -80,7 +80,7 @@ export function AchievementBadge({
                 {achievement.name}
               </h3>
               {earned ? (
-                <Check className="h-4 w-4 text-green-400 flex-shrink-0" />
+                <Check className="h-4 w-4 shrink-0 text-brand-success" />
               ) : (
                 <Lock className="h-3 w-3 text-muted-foreground flex-shrink-0" />
               )}
@@ -128,7 +128,7 @@ export function AchievementBadge({
           className={cn(
             'absolute top-2 right-2',
             earned
-              ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+              ? 'border-brand-orange/30 bg-brand-orange/10 text-brand-orange'
               : 'bg-muted',
           )}
         >

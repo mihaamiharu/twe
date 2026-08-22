@@ -359,7 +359,7 @@ function ChallengeDetailPage() {
     return (
       <div className="min-h-screen p-6 md:p-10">
         <div className="max-w-4xl mx-auto">
-          <Card className="glass-card">
+          <Card>
             <CardContent className="py-12 text-center">
               <h1 className="text-2xl font-bold mb-4">
                 {t('challenges:page.notFound')}

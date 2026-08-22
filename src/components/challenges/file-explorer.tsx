@@ -81,9 +81,9 @@ export function FileExplorer({
 
   const getFileIcon = (fileName: string) => {
     if (fileName.endsWith('.html'))
-      return <Globe className="h-4 w-4 text-blue-400" />;
+      return <Globe className="h-4 w-4 text-brand-orange" />;
     if (fileName.endsWith('.ts') || fileName.endsWith('.js'))
-      return <FileCode className="h-4 w-4 text-brand-teal-dark" />;
+      return <FileCode className="h-4 w-4 text-brand-success" />;
     return <File className="h-4 w-4 text-slate-400" />;
   };
 
@@ -160,7 +160,7 @@ export function FileExplorer({
           {node.type === 'file' && (
             <div className="ml-auto pl-2 flex items-center gap-1 opacity-60 group-hover:opacity-100">
               {isEditable ? (
-                <Edit3 className="h-3 w-3 text-brand-teal" />
+                <Edit3 className="h-3 w-3 text-brand-success" />
               ) : (
                 <Lock className="h-3 w-3 text-slate-400" />
               )}

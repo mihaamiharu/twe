@@ -42,60 +42,62 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
     const baseUrl = 'https://testingwithekki.com';
     const url = `${baseUrl}/${locale}/tutorials/${slug}`;
 
-    const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))}&type=Tutorial`;
-    const title = slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()))}&type=Tutorial`;
+    const title = slug
+      .replace(/-/g, ' ')
+      .replace(/\b\w/g, (l) => l.toUpperCase());
     const description = i18n.t('tutorials:page.seo.description');
 
     // Structured Data
     const jsonLd = [
       {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
           {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": `${baseUrl}/${locale}`
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `${baseUrl}/${locale}`,
           },
           {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Tutorials",
-            "item": `${baseUrl}/${locale}/tutorials`
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Tutorials',
+            item: `${baseUrl}/${locale}/tutorials`,
           },
           {
-            "@type": "ListItem",
-            "position": 3,
-            "name": title,
-            "item": url
-          }
-        ]
+            '@type': 'ListItem',
+            position: 3,
+            name: title,
+            item: url,
+          },
+        ],
       },
       {
-        "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": title,
-        "description": description,
-        "image": ogImageUrl,
-        "author": {
-          "@type": "Organization",
-          "name": "TestingWithEkki",
-          "url": baseUrl
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: title,
+        description: description,
+        image: ogImageUrl,
+        author: {
+          '@type': 'Organization',
+          name: 'TestingWithEkki',
+          url: baseUrl,
         },
-        "publisher": {
-          "@type": "Organization",
-          "name": "TestingWithEkki",
-          "logo": {
-            "@type": "ImageObject",
-            "url": `${baseUrl}/logo-icon.png`
-          }
+        publisher: {
+          '@type': 'Organization',
+          name: 'TestingWithEkki',
+          logo: {
+            '@type': 'ImageObject',
+            url: `${baseUrl}/logo-icon.png`,
+          },
         },
-        "mainEntityOfPage": {
-          "@type": "WebPage",
-          "@id": url
-        }
-      }
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': url,
+        },
+      },
     ];
 
     return {
@@ -111,14 +113,26 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
       ],
       links: [
         { rel: 'canonical', href: url },
-        { rel: 'alternate', hrefLang: 'en', href: `${baseUrl}/en/tutorials/${slug}` },
-        { rel: 'alternate', hrefLang: 'id', href: `${baseUrl}/id/tutorials/${slug}` },
-        { rel: 'alternate', hrefLang: 'x-default', href: `${baseUrl}/en/tutorials/${slug}` },
+        {
+          rel: 'alternate',
+          hrefLang: 'en',
+          href: `${baseUrl}/en/tutorials/${slug}`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'id',
+          href: `${baseUrl}/id/tutorials/${slug}`,
+        },
+        {
+          rel: 'alternate',
+          hrefLang: 'x-default',
+          href: `${baseUrl}/en/tutorials/${slug}`,
+        },
       ],
-      scripts: jsonLd.map(data => ({
+      scripts: jsonLd.map((data) => ({
         type: 'application/ld+json',
-        children: JSON.stringify(data)
-      }))
+        children: JSON.stringify(data),
+      })),
     };
   },
 });
@@ -200,8 +214,10 @@ function TutorialDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
 
-
-      if (result.data?.newAchievements && result.data.newAchievements.length > 0) {
+      if (
+        result.data?.newAchievements &&
+        result.data.newAchievements.length > 0
+      ) {
         showAchievementToasts(result.data.newAchievements);
       }
     },
@@ -268,7 +284,10 @@ function TutorialDetailPage() {
 
     // Delay attaching the scroll listener to let the page settle after SPA navigation
     // This prevents the listener from firing with stale scrollY from the previous page
-    const timeouts: { main?: ReturnType<typeof setTimeout>; retry?: ReturnType<typeof setTimeout> } = {};
+    const timeouts: {
+      main?: ReturnType<typeof setTimeout>;
+      retry?: ReturnType<typeof setTimeout>;
+    } = {};
 
     timeouts.main = setTimeout(() => {
       // Only attach if we're at the top of the page (scroll reset completed)
@@ -437,7 +456,7 @@ function TutorialDetailPage() {
               {/* Tags & Meta */}
               <div className="flex items-center gap-3">
                 {tutorial.tags?.[0] && (
-                  <div className="px-3 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-bold tracking-wider uppercase">
+                  <div className="border border-[var(--soft-border)] bg-[var(--orange-tint)] px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-[var(--brand-orange)]">
                     {tutorial.tags[0]}
                   </div>
                 )}
@@ -451,9 +470,7 @@ function TutorialDetailPage() {
               </div>
 
               {/* Title */}
-              <h1
-                className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight max-w-4xl"
-              >
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight max-w-4xl">
                 {tutorial.title}
               </h1>
 
@@ -485,7 +502,7 @@ function TutorialDetailPage() {
             )}
 
             {/* Progress Card */}
-            <Card className="glass-card shadow-lg">
+            <Card>
               <CardHeader>
                 <CardTitle className="text-base flex items-center gap-2">
                   <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
@@ -509,7 +526,7 @@ function TutorialDetailPage() {
                 {/* Mark as Complete Button */}
                 {!isCompleted ? (
                   <Button
-                    className="w-full shadow-md hover:shadow-lg transition-shadow"
+                    className="w-full shadow-none"
                     onClick={() => {
                       if (!sessionData?.user) {
                         setShowAuthGuard(true);
@@ -536,9 +553,9 @@ function TutorialDetailPage() {
                   </Button>
                 ) : (
                   <div className="space-y-4">
-                    <div className="flex items-center gap-2 p-4 rounded-lg bg-green-500/10 border-2 border-green-500/30 shadow-sm">
-                      <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      <span className="text-sm font-semibold text-green-500">
+                    <div className="flex items-center gap-2 rounded-md border border-brand-success/30 bg-brand-success/10 p-4 text-brand-success">
+                      <CheckCircle2 className="h-5 w-5" />
+                      <span className="text-sm font-semibold">
                         {t('tutorials:sidebar.completedTitle')}
                       </span>
                     </div>
@@ -580,7 +597,7 @@ function TutorialDetailPage() {
                     </span>
                   </div>
                   {isCompleted && (
-                    <div className="flex items-center gap-2 text-sm text-green-600 dark:text-green-400">
+                    <div className="flex items-center gap-2 text-sm text-brand-success">
                       <CheckCircle2 className="h-4 w-4" />
                       <span className="font-medium">
                         {t('tutorials:sidebar.statusCompleted')}
@@ -593,7 +610,7 @@ function TutorialDetailPage() {
 
             {/* Linked Challenges List */}
             {tutorial.challenges && tutorial.challenges.length > 0 && (
-              <Card className="glass-card shadow-lg border-primary/20">
+              <Card className="border-primary/20">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
@@ -639,7 +656,7 @@ function TutorialDetailPage() {
                         </div>
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                            <span className="h-1.5 w-1.5 rounded-full bg-brand-orange" />
                             {t(
                               `challenges:types.${challenge.type.toLowerCase()}`,
                             )}

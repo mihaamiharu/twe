@@ -26,9 +26,21 @@ import {
 } from 'lucide-react';
 import { getUserSettings } from '@/server/user.fn';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
+import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/_authenticated/profile')({
   component: ProfilePage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Profile | TestingWithEkki',
+      description:
+        'Manage your TestingWithEkki profile, progress, and achievements.',
+      path: '/profile',
+      locale,
+      noIndex: true,
+    });
+  },
 });
 
 interface UserProfile {
@@ -99,7 +111,7 @@ function ProfilePage() {
     return (
       <div className="min-h-screen bg-background p-6 md:p-10">
         <div className="mx-auto max-w-5xl">
-          <Card className="glass-card mb-8">
+          <Card className="mb-8">
             <CardContent className="p-8">
               <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
                 <Skeleton className="h-24 w-24 rounded-full" />
@@ -113,7 +125,7 @@ function ProfilePage() {
           </Card>
           <div className="grid gap-4 sm:grid-cols-3">
             {[1, 2, 3].map((item) => (
-              <Card key={item} className="glass-card">
+              <Card key={item}>
                 <CardContent className="p-6">
                   <Skeleton className="mb-2 h-8 w-8" />
                   <Skeleton className="mb-1 h-6 w-12" />
@@ -161,7 +173,7 @@ function ProfilePage() {
   return (
     <div className="min-h-screen bg-background p-4 page-transition sm:p-6 md:p-10">
       <div className="mx-auto max-w-5xl">
-        <Card className="glass-card mb-8">
+        <Card className="mb-8">
           <CardContent className="p-6 sm:p-8">
             <div className="flex flex-col items-start gap-6 md:flex-row md:items-center">
               <Avatar className="h-24 w-24 shrink-0">
@@ -282,7 +294,7 @@ function ProfilePage() {
           </TabsList>
 
           <TabsContent value="progress" className="mt-6">
-            <Card className="glass-card">
+            <Card>
               <CardHeader>
                 <CardTitle>{t('profile:tierProgress.title')}</CardTitle>
                 <CardDescription>
@@ -306,7 +318,7 @@ function ProfilePage() {
           </TabsContent>
 
           <TabsContent value="activity" className="mt-6">
-            <Card className="glass-card">
+            <Card>
               <CardHeader>
                 <CardTitle>{t('profile:activity.title')}</CardTitle>
                 <CardDescription>
@@ -358,7 +370,7 @@ function ProfilePage() {
           <TabsContent value="achievements" className="mt-6">
             {!user.earnedAchievements ||
             user.earnedAchievements.length === 0 ? (
-              <Card className="glass-card">
+              <Card>
                 <CardContent className="p-8 text-center text-muted-foreground">
                   <Award className="mx-auto mb-2 h-8 w-8 opacity-50" />
                   <p>{t('profile:achievements.empty')}</p>
@@ -367,7 +379,7 @@ function ProfilePage() {
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
                 {user.earnedAchievements.map((achievement) => (
-                  <Card key={achievement.id} className="glass-card">
+                  <Card key={achievement.id}>
                     <CardContent className="flex gap-3 p-5">
                       <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-accent text-xl">
                         {achievement.icon}
