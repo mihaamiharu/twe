@@ -10,7 +10,7 @@ const annotationCopy: Record<
   { number: string; label: string }
 > = {
   inspect: { number: '01', label: 'INSPECT' },
-  execute: { number: '02', label: 'EXECUTE' },
+  execute: { number: '02', label: 'RUN' },
   verify: { number: '03', label: 'VERIFY' },
 };
 

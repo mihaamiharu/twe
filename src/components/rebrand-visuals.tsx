@@ -36,7 +36,13 @@ function BrowserChrome({ title }: { title: string }) {
   );
 }
 
-export function PracticePreview({ className }: { className?: string }) {
+export function PracticePreview({
+  className,
+  compact = false,
+}: {
+  className?: string;
+  compact?: boolean;
+}) {
   return (
     <div
       className={cn(
@@ -44,6 +50,7 @@ export function PracticePreview({ className }: { className?: string }) {
         className,
       )}
       aria-label="Practice workspace preview"
+      data-practice-preview={compact ? 'compact' : 'full'}
     >
       <div className="flex items-center justify-between border-b border-[#393c38] px-4 py-3">
         <div className="flex items-center gap-2 font-mono text-[11px] text-[#a5a69f]">
@@ -51,134 +58,293 @@ export function PracticePreview({ className }: { className?: string }) {
           TWE PRACTICE
         </div>
         <div className="flex items-center gap-2">
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[#23856d] text-[#f2f1ec]">
+          <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-orange)] text-[#f2f1ec]">
             <Play className="h-3 w-3 fill-current" aria-hidden="true" />
           </span>
           <span className="font-mono text-[10px] text-[#a5a69f]">RUN</span>
         </div>
       </div>
 
-      <div className="grid gap-2 p-3 sm:grid-cols-[0.8fr_1.2fr]">
-        <div className="rounded-md border border-[#393c38] bg-[#202321] p-3">
-          <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.1em] text-[#a5a69f]">
-            Target / Browser
+      {compact ? (
+        <div className="p-3">
+          <div className="rounded-md border border-[#393c38] bg-[#202321] p-3">
+            <div className="mb-2 flex items-center gap-2 font-mono text-[9px] text-[#a5a69f]">
+              <Code2
+                className="h-3 w-3 text-[var(--brand-orange)]"
+                aria-hidden="true"
+              />
+              tests/login.spec.ts
+            </div>
+            <div className="overflow-hidden whitespace-nowrap font-mono text-[9px] leading-4 text-[#f2f1ec]">
+              <span className="text-[var(--brand-orange)]">await</span>{' '}
+              page.getByRole(&apos;button&apos;, &#123; name: &apos;Sign
+              in&apos; &#125;).click()
+            </div>
+            <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#393c38] pt-2 font-mono text-[9px]">
+              <span className="text-[var(--brand-orange)]">03 / VERIFY</span>
+              <span className="flex items-center gap-1 text-[var(--brand-success)]">
+                <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+                Dashboard · passed
+              </span>
+            </div>
           </div>
-          <div className="rounded-md bg-[#f2f1ec] p-3 text-[#1d1d1b]">
-            <div className="mb-3 h-2 w-16 rounded bg-[#d9d3c8]" />
-            <div className="space-y-2">
-              <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
-              <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
-              <div className="flex h-7 items-center justify-center rounded bg-[#23856d] font-mono text-[10px] text-white">
-                Sign in
+        </div>
+      ) : (
+        <div className="grid gap-2 p-3 sm:grid-cols-[0.8fr_1.2fr]">
+          <div className="rounded-md border border-[#393c38] bg-[#202321] p-3">
+            <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.1em] text-[#a5a69f]">
+              Target / Browser
+            </div>
+            <div className="rounded-md bg-[#f2f1ec] p-3 text-[#1d1d1b]">
+              <div className="mb-3 h-2 w-16 rounded bg-[#d9d3c8]" />
+              <div className="space-y-2">
+                <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
+                <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
+                <div className="flex h-7 items-center justify-center rounded bg-[var(--brand-orange)] font-mono text-[10px] text-white">
+                  Sign in
+                </div>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center gap-2 font-mono text-[10px] text-[#a5a69f]">
+              <Eye
+                className="h-3 w-3 text-[var(--brand-orange)]"
+                aria-hidden="true"
+              />
+              inspected
+            </div>
+          </div>
+
+          <div className="rounded-md border border-[#393c38] bg-[#202321] p-3">
+            <div className="mb-3 flex items-center justify-between font-mono text-[10px] text-[#a5a69f]">
+              <span>tests/login.spec.ts</span>
+              <span>01 / 03</span>
+            </div>
+            <pre className="overflow-hidden font-mono text-[10px] leading-5 text-[#f2f1ec]">
+              <code>
+                <span className="text-[#a5a69f]">1 </span>
+                <span className="text-[var(--brand-orange)]">await</span>{' '}
+                page.getByRole(
+                {'\n'}
+                <span className="text-[#a5a69f]">2 </span>
+                {'  '}&#123; name:{' '}
+                <span className="text-[#b78327]">'Sign in'</span> &#125;
+                ).click()
+                {'\n'}
+                <span className="text-[#a5a69f]">3 </span>
+                <span className="text-[var(--brand-orange)]">await</span>{' '}
+                expect(page.getByText(
+                {'\n'}
+                <span className="text-[#a5a69f]">4 </span>
+                {'  '}
+                <span className="text-[#b78327]">'Dashboard'</span>
+                )).toBeVisible()
+              </code>
+            </pre>
+            <div className="mt-3 border-t border-[#393c38] pt-3">
+              <div className="flex items-center justify-between font-mono text-[10px]">
+                <span className="flex items-center gap-1.5 text-[var(--brand-success)]">
+                  <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+                  test passed
+                </span>
+                <span className="text-[#a5a69f]">12.4s</span>
               </div>
             </div>
           </div>
-          <div className="mt-3 flex items-center gap-2 font-mono text-[10px] text-[#a5a69f]">
-            <Eye className="h-3 w-3 text-[#e65f3a]" aria-hidden="true" />
-            inspected
-          </div>
         </div>
+      )}
+    </div>
+  );
+}
 
-        <div className="rounded-md border border-[#393c38] bg-[#202321] p-3">
-          <div className="mb-3 flex items-center justify-between font-mono text-[10px] text-[#a5a69f]">
-            <span>tests/login.spec.ts</span>
-            <span>01 / 03</span>
+function InspectTargetBrowser({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        'relative rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] shadow-[0_14px_38px_rgba(29,29,27,0.09)]',
+        className,
+      )}
+      data-hero-step="inspect"
+    >
+      <BrowserChrome title="example.test / sign-in" />
+      <div className="grid grid-cols-[0.75fr_1.25fr] items-center gap-4 p-4 sm:p-5">
+        <div>
+          <div className="h-2 w-14 rounded-full bg-[var(--soft-border)]" />
+          <div className="mt-3 font-mono text-[10px] font-medium text-[var(--graphite)]">
+            Welcome back
           </div>
-          <pre className="overflow-hidden font-mono text-[10px] leading-5 text-[#f2f1ec]">
-            <code>
-              <span className="text-[#a5a69f]">1 </span>
-              <span className="text-[#e65f3a]">await</span> page.getByRole(
-              {'\n'}
-              <span className="text-[#a5a69f]">2 </span>
-              {'  '}&#123; name:{' '}
-              <span className="text-[#b78327]">'Sign in'</span> &#125; ).click()
-              {'\n'}
-              <span className="text-[#a5a69f]">3 </span>
-              <span className="text-[#e65f3a]">await</span>{' '}
-              expect(page.getByText(
-              {'\n'}
-              <span className="text-[#a5a69f]">4 </span>
-              {'  '}
-              <span className="text-[#b78327]">'Dashboard'</span>
-              )).toBeVisible()
-            </code>
-          </pre>
-          <div className="mt-3 border-t border-[#393c38] pt-3">
-            <div className="flex items-center justify-between font-mono text-[10px]">
-              <span className="flex items-center gap-1.5 text-[#23856d]">
-                <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
-                test passed
-              </span>
-              <span className="text-[#a5a69f]">12.4s</span>
-            </div>
+          <div className="mt-1 max-w-24 font-mono text-[8px] leading-3 text-[var(--muted-graphite)]">
+            Continue to your workspace
           </div>
         </div>
+        <div className="space-y-2">
+          <div className="h-7 rounded-md border border-[var(--soft-border)] bg-white" />
+          <div className="h-7 rounded-md border border-[var(--soft-border)] bg-white" />
+          <div
+            className="relative flex h-8 items-center justify-center rounded-md bg-[var(--brand-orange)] font-mono text-[10px] font-medium text-white"
+            data-inspector-target="sign-in"
+          >
+            <span className="absolute -inset-1.5 rounded-[8px] border border-[var(--brand-orange)]" />
+            <span className="absolute -left-2 -top-2 h-2.5 w-2.5 border-l border-t border-[var(--brand-orange)]" />
+            Sign in
+          </div>
+        </div>
+      </div>
+      <span className="absolute -bottom-3 right-4 rounded-sm border border-[var(--brand-orange)]/35 bg-[var(--paper-surface)] px-2 py-1 font-mono text-[8px] text-[var(--brand-orange)] sm:text-[9px]">
+        button[type=&quot;submit&quot;]
+      </span>
+    </div>
+  );
+}
+
+function HomeInspectorCharacter({ className }: { className?: string }) {
+  return (
+    <div className={cn('mix-blend-multiply', className)} data-hero-character>
+      <img
+        src="/illustrations/twe-inspector-male-hero.png"
+        alt="TWE Inspector pointing toward the highlighted Sign in button"
+        className="h-auto w-full"
+        width={1122}
+        height={1402}
+        loading="eager"
+        fetchPriority="high"
+      />
+    </div>
+  );
+}
+
+function VerificationResult({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        'rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 shadow-[0_12px_30px_rgba(29,29,27,0.09)]',
+        className,
+      )}
+      data-hero-step="verify"
+    >
+      <div className="mb-3 flex items-center justify-between font-mono text-[9px] text-[var(--muted-graphite)]">
+        <span>EXPECTED → ACTUAL</span>
+        <Check
+          className="h-4 w-4 text-[var(--brand-success)]"
+          aria-hidden="true"
+        />
+      </div>
+      <div className="space-y-1.5 font-mono text-[10px]">
+        <div className="flex justify-between gap-3">
+          <span className="text-[var(--muted-graphite)]">Expected</span>
+          <span>Dashboard</span>
+        </div>
+        <div className="flex justify-between gap-3">
+          <span className="text-[var(--muted-graphite)]">Actual</span>
+          <span>Dashboard</span>
+        </div>
+      </div>
+      <div className="mt-3 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2.5 font-mono text-[10px] text-[var(--brand-success)]">
+        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+        PASSED
       </div>
     </div>
   );
 }
 
+function HeroWorkflowTrace() {
+  return (
+    <svg
+      viewBox="0 0 680 540"
+      className="pointer-events-none absolute inset-0 hidden h-full w-full sm:block"
+      fill="none"
+      aria-hidden="true"
+      data-workflow-connectors
+    >
+      <path
+        d="M290 176c34 2 57 9 78 28 12 11 23 17 39 19"
+        stroke="var(--brand-orange)"
+        strokeDasharray="3 6"
+        strokeLinecap="round"
+        strokeWidth="1.35"
+      />
+      <path
+        d="m399 216 10 7-11 3"
+        stroke="var(--brand-orange)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.35"
+      />
+      <path
+        d="M560 397c13 15 17 29 14 44"
+        stroke="var(--brand-orange)"
+        strokeDasharray="3 6"
+        strokeLinecap="round"
+        strokeWidth="1.35"
+      />
+      <path
+        d="m569 434 5 8 6-8"
+        stroke="var(--brand-orange)"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="1.35"
+      />
+    </svg>
+  );
+}
+
 export function HomeHeroVisual() {
   return (
-    <div className="relative mx-auto min-h-[700px] w-full max-w-[590px] sm:min-h-[430px] lg:min-h-[520px]">
-      <div className="absolute left-[4%] top-[9%] hidden w-[48%] rotate-[-3deg] rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-3 shadow-[0_12px_35px_rgba(29,29,27,0.08)] sm:block">
-        <BrowserChrome title="example.test / sign-in" />
-        <div className="space-y-3 p-4">
-          <div className="h-3 w-20 rounded bg-[var(--soft-border)]" />
-          <div className="h-8 rounded border border-[var(--soft-border)] bg-white" />
-          <div className="h-8 rounded border border-[var(--soft-border)] bg-white" />
-          <div className="flex h-8 items-center justify-center rounded-md bg-[var(--brand-orange)] font-mono text-[10px] text-white">
-            Sign in
+    <div
+      className="relative isolate mx-auto h-[510px] w-full max-w-[680px] overflow-hidden sm:h-[560px] sm:overflow-visible lg:h-[540px]"
+      role="group"
+      aria-label="Inspect, run, and verify testing workflow"
+      data-home-hero-visual
+    >
+      <div className="sm:hidden">
+        <InspectTargetBrowser className="absolute left-[2%] top-8 z-10 w-[92%]" />
+        <div className="absolute left-[5%] top-1 z-30">
+          <QaAnnotation step="inspect" arrow="after" />
+        </div>
+
+        <HomeInspectorCharacter className="absolute -left-[5%] top-[17%] z-20 w-[78%]" />
+
+        <div
+          className="absolute bottom-7 right-[2%] z-30 w-[61%]"
+          data-hero-step="run"
+        >
+          <div className="mb-2 flex justify-end">
+            <QaAnnotation step="execute" />
           </div>
-        </div>
-        <div className="absolute -bottom-8 -right-5">
-          <QaAnnotation step="inspect" />
+          <PracticePreview compact />
         </div>
       </div>
 
-      <div className="absolute right-0 top-[2%] z-10 w-[94%] sm:top-[20%] sm:w-[60%]">
-        <PracticePreview />
-        <div className="absolute -left-7 top-12 hidden sm:flex">
-          <QaAnnotation step="execute" />
-        </div>
-      </div>
+      <div className="hidden sm:block">
+        <HeroWorkflowTrace />
 
-      <div className="absolute bottom-0 -left-[18%] z-[12] w-[125%] sm:bottom-[2%] sm:-left-[22%] sm:z-[4] sm:w-[88%] sm:min-w-[330px]">
-        <QaEngineerIllustration />
-      </div>
-
-      <div className="absolute bottom-[2%] left-[10%] hidden w-[55%] rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 shadow-[0_12px_35px_rgba(29,29,27,0.08)] sm:block">
-        <div className="mb-3 flex items-center justify-between font-mono text-[10px] text-[var(--muted-graphite)]">
-          <span>EXPECTED → ACTUAL</span>
-          <Check
-            className="h-4 w-4 text-[var(--brand-success)]"
-            aria-hidden="true"
-          />
-        </div>
-        <div className="space-y-2 font-mono text-[11px]">
-          <div className="flex justify-between gap-3">
-            <span className="text-[var(--muted-graphite)]">Expected</span>
-            <span className="text-[var(--brand-success)]">Dashboard</span>
+        <div className="absolute left-[1%] top-[6%] z-10 w-[56%]">
+          <div className="mb-2 ml-3">
+            <QaAnnotation step="inspect" arrow="after" />
           </div>
-          <div className="flex justify-between gap-3">
-            <span className="text-[var(--muted-graphite)]">Actual</span>
-            <span className="text-[var(--brand-success)]">Dashboard</span>
+          <InspectTargetBrowser />
+        </div>
+
+        <HomeInspectorCharacter className="absolute -left-[1%] top-[13%] z-[15] w-[57%]" />
+
+        <div
+          className="absolute right-0 top-[29%] z-20 w-[54%]"
+          data-hero-step="run"
+        >
+          <div className="absolute -left-9 -top-7">
+            <QaAnnotation step="execute" />
           </div>
+          <PracticePreview />
         </div>
-        <div className="mt-4 flex items-center gap-2 border-t border-[var(--soft-border)] pt-3 font-mono text-[11px] text-[var(--brand-success)]">
-          <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-          PASSED
-        </div>
-        <div className="absolute -bottom-8 -right-8 hidden sm:flex">
-          <QaAnnotation step="verify" arrow="after" direction="down" />
-        </div>
-      </div>
 
-      <div className="absolute right-[3%] top-[4%] hidden opacity-75 sm:block">
-        <QaDoodle kind="trace" className="h-12 w-12" />
-      </div>
+        <div className="absolute bottom-[1%] right-[3%] z-30 w-[37%]">
+          <div className="absolute -left-28 top-1/2 -translate-y-1/2">
+            <QaAnnotation step="verify" arrow="after" />
+          </div>
+          <VerificationResult />
+        </div>
 
-      <div className="absolute bottom-0 left-0 right-0 -z-10 h-36 rounded-[45%] bg-[var(--orange-tint)]/60 blur-2xl" />
+        <div className="absolute bottom-[2%] left-[20%] -z-10 h-28 w-[68%] rounded-[48%] bg-[var(--orange-tint)]/45" />
+      </div>
     </div>
   );
 }
