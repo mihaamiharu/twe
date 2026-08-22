@@ -1,109 +1,99 @@
-import { useState, useMemo, useEffect } from 'react';
-import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
+import { useEffect, useMemo, useState } from 'react';
+import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
-import { omitUndefined } from '@/lib/omit-undefined';
 import { z } from 'zod';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
+  ArrowRight,
   BookOpen,
+  CheckCircle2,
+  Circle,
   Clock,
   Search,
-  CheckCircle2,
-  LayoutGrid,
-  List,
-  Layers,
-  Circle,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { LearnHeroVisual } from '@/components/rebrand-visuals';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { useDebounce } from '@/lib/useDebounce';
-import i18n from '@/lib/i18n';
+import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
+import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
-// --- Search Params Schema ---
-const TutorialsSearchSchema = z.object({
+const LearnSearchSchema = z.object({
   q: z.string().optional(),
-  difficulty: z.enum(['all', 'foundations', 'beginner', 'intermediate', 'advanced']).optional(),
+  difficulty: z
+    .enum(['all', 'foundations', 'beginner', 'intermediate', 'advanced'])
+    .optional(),
   view: z.enum(['grid', 'list']).optional(),
   hideCompleted: z.coerce.boolean().optional(),
 });
 
 export const Route = createFileRoute('/$locale/tutorials/')({
-  validateSearch: TutorialsSearchSchema,
+  validateSearch: LearnSearchSchema,
   loaderDeps: ({ search }) => search,
-  loader: ({ context, params, deps: search }) => {
-    return context.queryClient.ensureQueryData(
+  loader: ({ context, params, deps: search }) =>
+    context.queryClient.ensureQueryData(
       tutorialsListQueryOptions({
         locale: params.locale,
         ...omitUndefined({ search: search.q }),
         limit: 50,
       }),
-    );
-  },
-  component: TutorialsPage,
+    ),
+  component: LearnPage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
+
     return createSeoHead({
-      title: i18n.t('tutorials:page.seo.title'),
-      description: i18n.t('tutorials:page.seo.description'),
+      title: i18n.t('tutorials:learn.seo.title'),
+      description: i18n.t('tutorials:learn.seo.description'),
       path: '/tutorials',
       locale,
     });
   },
 });
 
-const difficulties = ['all', 'foundations', 'beginner', 'intermediate', 'advanced'] as const;
-
 const routeApi = getRouteApi('/$locale/tutorials/');
 
-function TutorialsPage() {
+interface LessonListItem {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  estimatedMinutes: number;
+  tags: string[];
+  isCompleted: boolean;
+  readingProgress: number;
+}
+
+function LearnPage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('tutorials');
   const navigate = routeApi.useNavigate();
-
-  // URL-based State
   const searchParams = routeApi.useSearch();
   const q = searchParams.q;
   const selectedDifficulty = searchParams.difficulty || 'all';
-  const viewMode = searchParams.view || 'grid';
   const hideCompleted = searchParams.hideCompleted ?? false;
-
-  // Local state for search input (debounced to URL)
   const [searchInput, setSearchInput] = useState(q ?? '');
   const debouncedSearchQuery = useDebounce(searchInput, 300);
 
-  // Helper to update URL search params
-  const updateSearch = (updates: Partial<z.infer<typeof TutorialsSearchSchema>>) => {
+  const updateSearch = (
+    updates: Partial<z.infer<typeof LearnSearchSchema>>,
+  ) => {
     void navigate({
       to: '.',
-      search: (prev) => ({ ...prev, ...updates }),
+      search: (previous) => ({ ...previous, ...updates }),
       replace: true,
     });
   };
 
-  // Sync debounced search to URL
   useEffect(() => {
     if (debouncedSearchQuery !== (q ?? '')) {
       updateSearch({ q: debouncedSearchQuery || undefined });
     }
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, q]);
 
   const { data: tutorialsResponse } = useSuspenseQuery(
     tutorialsListQueryOptions({
@@ -113,379 +103,300 @@ function TutorialsPage() {
     }),
   );
 
-  const tutorials = tutorialsResponse?.data ?? [];
+  const tutorials = (
+    tutorialsResponse.success ? tutorialsResponse.data : []
+  ) as LessonListItem[];
 
-  // Group tutorials for the "All" view (Track view)
-  const groupedTutorials = useMemo(() => {
-    if (selectedDifficulty !== 'all') return null;
+  const filteredLessons = useMemo(
+    () =>
+      tutorials.filter((lesson) => {
+        if (hideCompleted && lesson.isCompleted) return false;
+        if (selectedDifficulty === 'all') return true;
+        return lesson.tags.some(
+          (tag) => tag.toLowerCase() === selectedDifficulty.toLowerCase(),
+        );
+      }),
+    [tutorials, selectedDifficulty, hideCompleted],
+  );
 
-    const groups: Record<string, typeof tutorials> = {
-      foundations: [],
-      beginner: [],
-      intermediate: [],
-      advanced: [],
-      other: [],
-    };
-    const otherGroup = groups['other'];
-    if (!otherGroup) return groups;
-
-    tutorials.forEach((t) => {
-      if (hideCompleted && t.isCompleted) return;
-      const tag = t.tags?.find((tag: string) =>
-        ['foundations', 'beginner', 'intermediate', 'advanced'].includes(tag.toLowerCase()),
-      );
-      if (tag) {
-        // Explicitly cast tag to string to avoid typescript error since we just checked it
-        const key = (tag).toLowerCase();
-        const group = groups[key];
-        if (group) group.push(t);
-        else otherGroup.push(t);
-      } else {
-        otherGroup.push(t);
-      }
-    });
-
-    return groups;
-  }, [tutorials, selectedDifficulty, hideCompleted]);
-
-  const filteredTutorials = useMemo(() => {
-    return tutorials.filter((t) => {
-      if (hideCompleted && t.isCompleted) return false;
-      if (selectedDifficulty === 'all') return true;
-      return t.tags?.some(
-        (tag: string) => tag.toLowerCase() === selectedDifficulty.toLowerCase(),
-      );
-    });
-  }, [tutorials, selectedDifficulty, hideCompleted]);
+  const heroLabels = {
+    inspect: t('learn.visual.inspect'),
+    execute: t('learn.visual.execute'),
+    verify: t('learn.visual.verify'),
+    target: t('learn.visual.target'),
+    artifact: t('learn.visual.artifact'),
+    result: t('learn.visual.result'),
+  };
 
   return (
-    <div className="min-h-screen p-6 md:p-10">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold gradient-text mb-3">
-            {t('page.title')}
-          </h1>
-          <p className="text-muted-foreground text-lg">{t('page.subtitle')}</p>
-        </div>
-
-        {/* Search, Filters, and View Toggle */}
-        <div className="flex flex-col gap-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder={t('page.searchPlaceholder')}
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                className="pl-10 h-11 bg-card border-border rounded-xl shadow-sm focus-visible:ring-primary/20"
-              />
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={() => updateSearch({ hideCompleted: !hideCompleted })}
-              className={`h-11 px-4 rounded-lg shadow-sm whitespace-nowrap border-border bg-card hover:bg-accent hover:text-accent-foreground self-end md:self-auto ${hideCompleted ? 'ring-2 ring-primary/20 border-primary/50 text-foreground' : 'text-muted-foreground'
-                }`}
-            >
-              {hideCompleted ? (
-                <CheckCircle2 className="mr-2 h-5 w-5 text-primary fill-primary/10" />
-              ) : (
-                <Circle className="mr-2 h-5 w-5 text-muted-foreground/50" />
-              )}
-              <span className={hideCompleted ? 'font-medium' : 'font-normal'}>
-                {t('filters.hideCompleted', { defaultValue: 'Hide Completed' })}
+    <main className="min-h-screen bg-background">
+      <div className="mx-auto max-w-7xl px-5 pb-20 pt-10 md:px-10 md:pt-16">
+        <section
+          aria-labelledby="learn-title"
+          className="grid items-center gap-8 border-b border-border pb-12 md:grid-cols-[minmax(0,0.9fr)_minmax(420px,1.1fr)] md:gap-8 md:pb-20"
+        >
+          <div className="max-w-2xl">
+            <div className="mb-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+              <span>{t('learn.eyebrow')}</span>
+              <span className="h-px w-10 bg-border" aria-hidden="true" />
+              <span className="text-muted-foreground">
+                {t('learn.eyebrowNote')}
               </span>
-            </Button>
-            <div className="flex items-center gap-2 self-end md:self-auto bg-muted/50 h-11 px-1.5 rounded-xl border border-border shadow-sm shrink-0">
-              <Button
-                variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => updateSearch({ view: 'grid' })}
-                className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'grid' ? 'bg-background shadow-sm' : ''}`}
-                title={t('view.grid')}
+            </div>
+
+            <h1
+              id="learn-title"
+              className="max-w-xl text-4xl font-semibold tracking-[-0.045em] text-foreground sm:text-5xl md:text-6xl md:leading-[1.02]"
+            >
+              {t('learn.title')}
+            </h1>
+            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+              {t('learn.description')}
+            </p>
+
+            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+              {(
+                ['webFundamentals', 'handsOnPractice', 'builtForQa'] as const
+              ).map((item) => (
+                <span key={item} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  {t(`learn.metadata.${item}`)}
+                </span>
+              ))}
+            </div>
+
+            <a
+              href="#web-automation"
+              className="mt-9 inline-flex min-h-11 items-center gap-3 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              {t('learn.primaryCta')}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </div>
+
+          <LearnHeroVisual
+            labels={heroLabels}
+            className="md:justify-self-end"
+          />
+        </section>
+
+        <section
+          id="web-automation"
+          aria-labelledby="web-automation-title"
+          className="scroll-mt-24 pt-14 md:pt-20"
+        >
+          <div className="grid gap-8 border-b border-border pb-12 md:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] md:gap-16 md:pb-16">
+            <div>
+              <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em]">
+                <span className="text-primary">{t('learn.path.eyebrow')}</span>
+                <span className="border border-brand-success/35 bg-brand-success/10 px-2 py-1 text-brand-success">
+                  {t('learn.path.status')}
+                </span>
+              </div>
+              <h2
+                id="web-automation-title"
+                className="mt-4 text-3xl font-semibold tracking-[-0.035em] text-foreground sm:text-4xl"
               >
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                size="sm"
-                onClick={() => updateSearch({ view: 'list' })}
-                className={`h-8 w-8 p-0 rounded-lg ${viewMode === 'list' ? 'bg-background shadow-sm' : ''}`}
-                title={t('view.list')}
+                {t('learn.path.title')}
+              </h2>
+            </div>
+
+            <div className="max-w-2xl">
+              <p className="text-lg leading-8 text-foreground">
+                {t('learn.path.description')}
+              </p>
+              <a
+                href="#web-automation-lessons"
+                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
               >
-                <List className="h-4 w-4" />
-              </Button>
+                {t('learn.path.cta')}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </a>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
-            {difficulties.map((difficulty) => (
-              <Badge
-                key={difficulty}
-                variant={
-                  selectedDifficulty === difficulty ? 'default' : 'outline'
-                }
-                className="cursor-pointer px-3 py-1 text-sm"
-                onClick={() =>
-                  updateSearch({
-                    difficulty: selectedDifficulty === difficulty ? 'all' : difficulty,
-                  })
-                }
-              >
-                {t(`filters.${difficulty}`)}
-              </Badge>
-            ))}
+          <div id="web-automation-lessons" className="scroll-mt-24 pt-10">
+            <div className="flex flex-col gap-5 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-primary">
+                  {t('learn.lessons.eyebrow')}
+                </p>
+                <h3 className="mt-2 text-2xl font-semibold tracking-[-0.025em] text-foreground">
+                  {t('learn.lessons.title')}
+                </h3>
+                <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
+                  {t('learn.lessons.description')}
+                </p>
+                <Link
+                  to={LocaleRoutes.challenges}
+                  params={localeParams(locale)}
+                  className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                >
+                  {t('learn.lessons.practiceLink')}
+                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                </Link>
+              </div>
+
+              <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+                <label className="relative min-w-0 flex-1 lg:w-64">
+                  <span className="sr-only">
+                    {t('learn.lessons.searchLabel')}
+                  </span>
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    placeholder={t('learn.lessons.searchPlaceholder')}
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    className="h-10 rounded-md border-border bg-card pl-9 shadow-none"
+                  />
+                </label>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    updateSearch({ hideCompleted: !hideCompleted })
+                  }
+                  className="h-10 justify-start rounded-md border-border bg-card px-3 shadow-none hover:bg-accent hover:text-accent-foreground sm:justify-center"
+                >
+                  {hideCompleted ? (
+                    <CheckCircle2 className="mr-2 h-4 w-4 text-primary" />
+                  ) : (
+                    <Circle className="mr-2 h-4 w-4 text-muted-foreground" />
+                  )}
+                  {t('filters.hideCompleted')}
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-2 py-5">
+              {(
+                [
+                  'all',
+                  'foundations',
+                  'beginner',
+                  'intermediate',
+                  'advanced',
+                ] as const
+              ).map((difficulty) => (
+                <Badge
+                  key={difficulty}
+                  variant={
+                    selectedDifficulty === difficulty ? 'default' : 'outline'
+                  }
+                  className="cursor-pointer rounded-md px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em]"
+                  onClick={() =>
+                    updateSearch({
+                      difficulty:
+                        selectedDifficulty === difficulty ? 'all' : difficulty,
+                    })
+                  }
+                >
+                  {t(`filters.${difficulty}`)}
+                </Badge>
+              ))}
+            </div>
+
+            {filteredLessons.length === 0 ? (
+              <div className="border-y border-dashed border-border py-14 text-center">
+                <BookOpen className="mx-auto mb-4 h-8 w-8 text-muted-foreground" />
+                <h4 className="text-lg font-semibold text-foreground">
+                  {t('learn.lessons.noResults')}
+                </h4>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {q
+                    ? t('learn.lessons.tryDifferentSearch')
+                    : t('learn.lessons.checkBackSoon')}
+                </p>
+              </div>
+            ) : (
+              <div className="border-t border-border">
+                {filteredLessons.map((lesson, index) => (
+                  <LessonRow
+                    key={lesson.slug}
+                    lesson={lesson}
+                    index={index}
+                    locale={locale}
+                    completedLabel={t('card.completed')}
+                    minutesLabel={t('card.estimatedTimeShort', {
+                      minutes: lesson.estimatedMinutes,
+                    })}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        </div>
+        </section>
 
-
-
-
-
-        {/* Empty State */}
-        {filteredTutorials.length === 0 && (
-          <div className="text-center py-12">
-            <BookOpen className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {t('page.noResults')}
-            </h3>
-            <p className="text-muted-foreground">
-              {q ? t('page.tryDifferentSearch') : t('page.checkBackSoon')}
+        <aside className="mt-14 border-y border-border py-7 md:mt-20 md:flex md:items-center md:justify-between md:gap-10">
+          <div>
+            <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-primary">
+              {t('learn.future.eyebrow')}
+            </p>
+            <p className="mt-2 text-lg font-medium text-foreground">
+              {t('learn.future.title')}
             </p>
           </div>
-        )}
-
-        {/* Tutorials Content */}
-        {filteredTutorials.length > 0 && (
-          <>
-            {/* Track View (Grouped) - Only in Grid Mode and when 'All' is selected */}
-            {viewMode === 'grid' && groupedTutorials ? (
-              <div className="space-y-12">
-                {(
-                  ['foundations', 'beginner', 'intermediate', 'advanced', 'other'] as const
-                ).map((level) => {
-                  const items = groupedTutorials[level];
-                  if (!items || items.length === 0) return null;
-
-                  return (
-                    <div key={level} className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-brand-teal/20 flex items-center justify-center border border-brand-teal/30">
-                          <Layers className="h-4 w-4 text-brand-teal-dark" />
-                        </div>
-                        <h2 className="text-2xl font-bold tracking-tight">
-                          {t(`tracks.${level}`)}
-                        </h2>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pl-4 border-l-2 border-border/50 ml-4">
-                        {items.map((tutorial) => (
-                          <TutorialCard
-                            key={tutorial.slug}
-                            tutorial={tutorial}
-                            locale={locale}
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : /* Filtered Grid or List View */
-              viewMode === 'grid' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {filteredTutorials.map((tutorial) => (
-                    <TutorialCard
-                      key={tutorial.slug}
-                      tutorial={tutorial}
-                      locale={locale}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="rounded-md border bg-card">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-[50px]"></TableHead>
-                        <TableHead className="w-[300px]">
-                          {t('table.title')}
-                        </TableHead>
-                        <TableHead className="hidden md:table-cell">
-                          {t('table.description')}
-                        </TableHead>
-                        <TableHead>{t('table.tags')}</TableHead>
-                        <TableHead className="text-right">
-                          {t('table.time')}
-                        </TableHead>
-                        <TableHead className="w-[100px] text-right">
-                          {t('table.status')}
-                        </TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredTutorials.map((tutorial) => (
-                        <TableRow
-                          key={tutorial.slug}
-                          className="group cursor-pointer"
-                        >
-                          <TableCell>
-                            <Link
-                              to="/$locale/tutorials/$slug"
-                              params={{ locale, slug: tutorial.slug }}
-                              className="block h-full w-full flex items-center justify-center text-muted-foreground group-hover:text-primary"
-                            >
-                              <BookOpen className="h-4 w-4" />
-                            </Link>
-                          </TableCell>
-                          <TableCell className="font-medium group-hover:text-primary transition-colors">
-                            <Link
-                              to="/$locale/tutorials/$slug"
-                              params={{ locale, slug: tutorial.slug }}
-                              className="block"
-                            >
-                              {tutorial.title}
-                            </Link>
-                          </TableCell>
-                          <TableCell className="hidden md:table-cell text-muted-foreground max-w-[300px] truncate">
-                            {tutorial.description}
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex flex-wrap gap-1">
-                              {tutorial.tags?.slice(0, 2).map((tag) => (
-                                <Badge
-                                  key={tag}
-                                  variant="secondary"
-                                  className="text-xs px-1.5 py-0 border-border/50"
-                                >
-                                  {tag}
-                                </Badge>
-                              ))}
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1 text-muted-foreground">
-                              <Clock className="h-3 w-3" />
-                              {tutorial.estimatedMinutes}m
-                            </div>
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex justify-end">
-                              {tutorial.isCompleted && (
-                                <Badge
-                                  variant="outline"
-                                  className="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400 gap-1 pr-2"
-                                >
-                                  <CheckCircle2 className="h-3 w-3" />
-                                  {t('card.completed')}
-                                </Badge>
-                              )}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              )}
-          </>
-        )}
+          <p className="mt-3 max-w-xl text-sm leading-6 text-muted-foreground md:mt-0">
+            {t('learn.future.description')}
+          </p>
+        </aside>
       </div>
-    </div>
+    </main>
   );
 }
 
-interface TutorialListItem {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  estimatedMinutes: number;
-  tags: string[];
-  order: number;
-  viewCount: number;
-  isCompleted: boolean;
-  readingProgress: number;
-  difficulty?: 'FOUNDATIONS' | 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-}
-
-function TutorialCard({
-  tutorial,
+function LessonRow({
+  lesson,
+  index,
   locale,
+  completedLabel,
+  minutesLabel,
 }: {
-  tutorial: TutorialListItem;
+  lesson: LessonListItem;
+  index: number;
   locale: string;
+  completedLabel: string;
+  minutesLabel: string;
 }) {
-  const { t } = useTranslation('tutorials');
   return (
     <Link
       to="/$locale/tutorials/$slug"
-      params={{ locale, slug: tutorial.slug }}
-      className="group"
+      params={{ locale, slug: lesson.slug }}
+      className="group grid gap-4 border-b border-border py-5 transition-colors hover:bg-accent/40 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
     >
-      <Card className="h-full glass-card hover:border-brand-teal/50 hover:scale-[1.02] transition-all duration-300 hover:shadow-xl hover:shadow-brand-teal/10 relative overflow-hidden border border-border flex flex-col mx-auto w-full">
-        {/* Completed Badge */}
-        {tutorial.isCompleted && (
-          <div className="absolute top-0 right-0 p-2 bg-green-500/10 rounded-bl-lg border-l border-b border-green-500/20 z-10">
-            <div className="flex items-center gap-1 text-xs font-semibold text-green-600 dark:text-green-400">
-              <CheckCircle2 className="h-3.5 w-3.5" />
-              {t('card.completed')}
-            </div>
-          </div>
-        )}
-        <CardHeader>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-2 rounded-lg bg-brand-teal/10 text-brand-teal">
-              <BookOpen className="h-5 w-5" />
-            </div>
-            {tutorial.tags && tutorial.tags.length > 0 && (
-              <Badge
-                variant="secondary"
-                className="border-transparent bg-secondary/50 text-secondary-foreground"
-              >
-                {tutorial.tags[0]}
-              </Badge>
-            )}
-          </div>
-          <CardTitle className="group-hover:text-brand-teal transition-colors text-xl leading-tight">
-            {tutorial.title}
-          </CardTitle>
-          <CardDescription className="line-clamp-3 mt-2 text-base">
-            {tutorial.description}
-          </CardDescription>
-        </CardHeader>
-        {/* Spacer to push content to bottom if needed */}
-        <div className="flex-grow" />
-        <CardContent className="mt-auto pt-0">
-          <div className="flex items-center gap-4 text-sm text-muted-foreground border-t border-border/50 pt-4">
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">
-                {tutorial.estimatedMinutes} min
-              </span>
-            </div>
-            {tutorial.difficulty && (
-              <div className="flex items-center gap-1.5 capitalize ml-auto">
-                <span
-                  className={
-                    tutorial.difficulty === 'FOUNDATIONS'
-                      ? 'text-purple-500'
-                      : tutorial.difficulty === 'BEGINNER'
-                        ? 'text-green-500'
-                        : tutorial.difficulty === 'INTERMEDIATE'
-                          ? 'text-yellow-500'
-                          : 'text-red-500'
-                  }
-                >
-                  ●
-                </span>
-                {tutorial.difficulty.toLowerCase()}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <span className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground">
+        {String(index + 1).padStart(2, '0')}
+      </span>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-3">
+          <h4 className="text-lg font-semibold tracking-[-0.015em] text-foreground transition-colors group-hover:text-primary">
+            {lesson.title}
+          </h4>
+          {lesson.isCompleted && (
+            <Badge className="gap-1 rounded-md border-brand-success/25 bg-brand-success/10 px-2 py-0.5 text-[10px] text-brand-success hover:bg-brand-success/10">
+              <CheckCircle2 className="h-3 w-3" />
+              {completedLabel}
+            </Badge>
+          )}
+        </div>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+          {lesson.description}
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+          {lesson.tags.slice(0, 2).map((tag) => (
+            <span key={tag}>{tag}</span>
+          ))}
+          <span className="flex items-center gap-1">
+            <Clock className="h-3 w-3" />
+            {minutesLabel}
+          </span>
+        </div>
+      </div>
+      <ArrowRight
+        className="hidden h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary sm:mt-1 sm:block"
+        aria-hidden="true"
+      />
     </Link>
   );
 }
 
-export default TutorialsPage;
+export default LearnPage;

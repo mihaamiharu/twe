@@ -183,6 +183,78 @@ export function HomeHeroVisual() {
   );
 }
 
+export function LearnHeroVisual({
+  className,
+  labels = {
+    inspect: 'INSPECT',
+    execute: 'EXECUTE',
+    verify: 'VERIFY',
+    target: 'DOM target',
+    artifact: 'Playwright artifact',
+    result: 'Assertion passed',
+  },
+}: {
+  className?: string;
+  labels?: {
+    inspect: string;
+    execute: string;
+    verify: string;
+    target: string;
+    artifact: string;
+    result: string;
+  };
+}) {
+  return (
+    <div
+      className={cn(
+        'relative mx-auto min-h-[230px] w-full max-w-[560px] sm:min-h-[390px]',
+        className,
+      )}
+    >
+      <div className="absolute left-0 top-3 z-20 rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] sm:left-[2%] sm:top-[5%] sm:px-4 sm:py-3 sm:text-[11px]">
+        <span className="block text-[9px] text-[var(--muted-graphite)] sm:text-[10px]">
+          01 /
+        </span>
+        {labels.inspect}
+        <div className="mt-2 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2 text-[var(--graphite)]">
+          <QaDoodle kind="magnifier" className="h-5 w-5" />
+          <span>{labels.target}</span>
+        </div>
+      </div>
+
+      <div className="absolute right-0 top-[21%] z-20 rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] sm:right-[1%] sm:top-[24%] sm:px-4 sm:py-3 sm:text-[11px]">
+        <span className="block text-[9px] text-[var(--muted-graphite)] sm:text-[10px]">
+          02 /
+        </span>
+        {labels.execute}
+        <div className="mt-2 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2 text-[var(--graphite)]">
+          <Code2
+            className="h-4 w-4 text-[var(--brand-orange)]"
+            aria-hidden="true"
+          />
+          <span>{labels.artifact}</span>
+        </div>
+      </div>
+
+      <div className="absolute bottom-[2%] left-[5%] z-20 rounded-md border border-[var(--brand-success)]/35 bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-success)] sm:left-[9%] sm:px-4 sm:py-3 sm:text-[11px]">
+        <span className="block text-[9px] text-[var(--muted-graphite)] sm:text-[10px]">
+          03 /
+        </span>
+        {labels.verify}
+        <div className="mt-2 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2">
+          <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
+          <span>{labels.result}</span>
+        </div>
+      </div>
+
+      <div className="absolute inset-x-[10%] bottom-0 h-[38%] rounded-[45%] bg-[var(--orange-tint)]/60" />
+      <div className="absolute bottom-0 left-[16%] z-10 w-[74%] sm:left-[18%] sm:w-[68%]">
+        <QaEngineerIllustration />
+      </div>
+    </div>
+  );
+}
+
 export function AboutHeroVisual() {
   return (
     <div className="relative mx-auto w-full max-w-[560px] pb-6">
