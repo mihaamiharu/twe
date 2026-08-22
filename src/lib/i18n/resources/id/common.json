@@ -109,10 +109,21 @@
     }
   },
   "notFound": {
-    "title": "Kamu berada dalam Mode Headless",
-    "description": "Konten ada di sini, tetapi kamu tidak dapat melihatnya karena viewport kamu disetel ke headless: true. Percayalah, pengujian berjalan di latar belakang.",
-    "backHome": "Beralih ke Mode Headed (Kembali ke Beranda)",
-    "tip": "Tip: Coba jalankan dengan flag --headed lain kali"
+    "eyebrow": "404 / TIDAK DITEMUKAN",
+    "label": "PEMERIKSAAN QA",
+    "headline": "Halaman ini tidak lolos pengujian.",
+    "description": "Halaman yang kamu cari mungkin sudah dipindahkan, diubah, atau tidak pernah ada.",
+    "backHome": "Kembali ke Beranda",
+    "exploreLearning": "Jelajahi Learning",
+    "browserLabel": "INSPEKTOR HALAMAN",
+    "browserTitle": "Halaman tidak ditemukan",
+    "browserCode": "404 · rute hilang",
+    "assertionLabel": "HASIL ASSERTION",
+    "expected": "Ekspektasi:",
+    "actual": "Aktual:",
+    "failed": "GAGAL",
+    "characterAlt": "TWE Inspector sedang memeriksa halaman yang hilang",
+    "inspectorNote": "Inspector masih mencari."
   },
   "auth": {
     "signInToSubmit": "Masuk untuk Mengirim",
