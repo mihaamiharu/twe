@@ -5,10 +5,12 @@ import { type AuthSession } from '@/server/auth.fn';
 import { useTranslation } from 'react-i18next';
 import { useState, useEffect, useRef, memo } from 'react';
 import {
+  ArrowRight,
   Bug,
   LogOut,
   Menu,
   User,
+  Trophy,
   X,
   LayoutDashboard,
 } from 'lucide-react';
@@ -19,7 +21,6 @@ import { BugReportDialog } from '@/components/bug-report-dialog';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
-
 
 export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const user = session?.user;
@@ -88,6 +89,16 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     label: t('common:navigation.about'),
   };
 
+  const primaryCta = isAuthenticated
+    ? {
+        to: LocaleRoutes.tutorials,
+        params: localeParams(locale),
+      }
+    : {
+        to: LocaleRoutes.register,
+        params: localeParams(locale),
+      };
+  const showPrimaryCta = isAuthenticated || !isAuthPage;
 
   const handleSignOut = async () => {
     try {
@@ -106,58 +117,68 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   return (
     <>
       <header
+        data-shell="header"
         className={cn(
-          'sticky top-0 z-40 w-full transition-all duration-200 border-b',
+          'sticky top-0 z-40 w-full border-b bg-[var(--paper-surface)] transition-colors duration-200',
           scrolled
-            ? 'bg-background border-border'
-            : 'bg-background border-transparent',
+            ? 'border-[var(--soft-border)]'
+            : 'border-[var(--soft-border)]/70',
         )}
         style={{
           paddingRight: 'var(--removed-body-scroll-bar-size, 0px)',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-[4.5rem] items-center justify-between">
             {/* Logo */}
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-9">
               <Link
                 to={LocaleRoutes.home}
                 params={localeParams(locale)}
-                className="flex items-center gap-2 group"
+                className="group inline-flex min-h-11 items-center"
               >
-                <span className="text-xl font-bold font-sans tracking-tight text-foreground transition-colors group-hover:text-foreground">
-                  TestingWith<span className="text-primary">Ekki</span>
+                <span className="text-[1.2rem] font-semibold tracking-[-0.04em] text-[var(--graphite)] group-hover:text-[var(--brand-orange)]">
+                  TestingWith
+                  <span className="twe-wordmark-ekki text-[var(--brand-orange)]">
+                    Ekki
+                  </span>
                 </span>
               </Link>
 
-              <nav aria-label="Primary" className="hidden md:flex items-center gap-5">
+              <nav
+                aria-label="Primary"
+                className="hidden items-center gap-7 md:flex"
+              >
                 {navLinks.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="relative flex min-h-11 items-center text-sm font-medium text-muted-foreground transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-transparent hover:text-foreground focus-visible:text-foreground"
+                    className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)]"
                     activeProps={{
                       className:
-                        'relative flex min-h-11 items-center text-sm font-semibold text-primary transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-primary',
+                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)]',
                     }}
                   >
                     {link.label}
                   </Link>
                 ))}
-                <span className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground/70" aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}>
+                <span
+                  className="inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-medium text-[var(--muted-graphite)]"
+                  aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                >
                   {t('common:navigation.labs')}
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary/80">
+                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
                     {t('common:navigation.labsSoon')}
                   </span>
                 </span>
                 <Link
                   to={aboutLink.to}
                   params={aboutLink.params}
-                  className="relative flex min-h-11 items-center text-sm font-medium text-muted-foreground transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-transparent hover:text-foreground focus-visible:text-foreground"
+                  className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)]"
                   activeProps={{
                     className:
-                      'relative flex min-h-11 items-center text-sm font-semibold text-primary transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-primary',
+                      'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)]',
                   }}
                 >
                   {aboutLink.label}
@@ -166,8 +187,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
             </div>
 
             {/* Right side */}
-            <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-3">
+            <div className="flex items-center gap-3">
+              <div className="hidden sm:flex items-center">
                 <LanguageSwitcher />
               </div>
 
@@ -175,22 +196,25 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
-                  <div className="hidden md:flex items-center gap-2">
-                  <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
-                      <Link
-                        to={LocaleRoutes.login}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:actions.signIn')}
-                      </Link>
-                    </Button>
-                    <Button size="sm" asChild>
+                  <div className="hidden items-center gap-4 md:flex">
+                    <Link
+                      to={LocaleRoutes.login}
+                      params={localeParams(locale)}
+                      className="inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
+                    >
+                      {t('common:actions.signIn')}
+                    </Link>
+                    <Button
+                      size="sm"
+                      asChild
+                      className="rounded-md bg-[var(--brand-orange)] px-4 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+                    >
                       <Link
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
                         {t('common:actions.startWebAutomation')}
-                        <span aria-hidden="true">→</span>
+                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>
                   </div>
@@ -206,7 +230,11 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-navigation"
-                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+                aria-label={
+                  isMobileMenuOpen
+                    ? t('common:actions.closeMenu')
+                    : t('common:actions.openMenu')
+                }
               >
                 {isMobileMenuOpen ? (
                   <X className="h-5 w-5" />
@@ -219,160 +247,190 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         </div>
       </header>
 
-      {/* Scroll Listener Space for Fixed/Sticky Header if needed in future */}
-
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex flex-col">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-50 md:hidden">
           <div
-            className="fixed inset-0 bg-foreground/20"
+            className="fixed inset-0 bg-[var(--graphite)]/15"
             onClick={() => setIsMobileMenuOpen(false)}
             aria-hidden="true"
           />
 
-          {/* Menu panel */}
-          <nav id="mobile-navigation" aria-label="Mobile navigation" className="relative flex-1 bg-background border-r border-border max-w-[86vw] w-full p-4 animate-slide-in-left flex flex-col h-full">
-
-            <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2">
-                <span className="font-bold text-lg">TestingWith<span className="text-primary">Ekki</span></span>
-              </div>
-              <Button ref={closeButtonRef} variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu">
+          <nav
+            id="mobile-navigation"
+            aria-label="Mobile navigation"
+            className="relative flex h-full w-full max-w-[22rem] flex-col border-r border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 py-5 animate-slide-in-left"
+          >
+            <div className="mb-7 flex items-center justify-between">
+              <Link
+                to={LocaleRoutes.home}
+                params={localeParams(locale)}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="group inline-flex min-h-11 items-center"
+              >
+                <span className="text-[1.15rem] font-semibold tracking-[-0.04em] text-[var(--graphite)] group-hover:text-[var(--brand-orange)]">
+                  TestingWith
+                  <span className="twe-wordmark-ekki text-[var(--brand-orange)]">
+                    Ekki
+                  </span>
+                </span>
+              </Link>
+              <Button
+                ref={closeButtonRef}
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label={t('common:actions.closeMenu')}
+                className="rounded-md text-[var(--graphite)] hover:bg-[var(--orange-tint)]"
+              >
                 <X className="h-5 w-5" />
               </Button>
             </div>
 
-            <div className="space-y-1 flex-1">
-              {navLinks.map((link) => (
+            <div className="flex-1 overflow-y-auto">
+              <div className="space-y-0.5">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    params={link.params}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex min-h-12 items-center border-b border-transparent px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
+                    activeProps={{
+                      className:
+                        'flex min-h-12 items-center border-b-2 border-[var(--brand-orange)] px-1 text-[1rem] font-semibold text-[var(--graphite)]',
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
+                <span
+                  className="flex min-h-12 items-center gap-2 px-1 text-[1rem] font-medium text-[var(--muted-graphite)]"
+                  aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                >
+                  {t('common:navigation.labs')}
+                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
+                    {t('common:navigation.labsSoon')}
+                  </span>
+                </span>
+
                 <Link
-                  key={link.to}
-                  to={link.to}
-                  params={link.params}
+                  to={aboutLink.to}
+                  params={aboutLink.params}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex min-h-11 items-center gap-3 border-b border-transparent px-2 text-muted-foreground hover:text-foreground transition-colors focus-visible:text-foreground"
+                  className="flex min-h-12 items-center border-b border-transparent px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
                   activeProps={{
                     className:
-                      'flex min-h-11 items-center gap-3 border-b border-primary px-2 font-medium text-primary',
+                      'flex min-h-12 items-center border-b-2 border-[var(--brand-orange)] px-1 text-[1rem] font-semibold text-[var(--graphite)]',
                   }}
                 >
-                  {link.label}
+                  {aboutLink.label}
                 </Link>
-              ))}
+              </div>
 
-              <span className="flex min-h-11 items-center gap-2 px-2 text-muted-foreground/70" aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}>
-                {t('common:navigation.labs')}
-                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary/80">
-                  {t('common:navigation.labsSoon')}
-                </span>
-              </span>
-
-              <Link
-                to={aboutLink.to}
-                params={aboutLink.params}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex min-h-11 items-center border-b border-transparent px-2 text-muted-foreground hover:text-foreground transition-colors focus-visible:text-foreground"
-                activeProps={{
-                  className:
-                    'flex min-h-11 items-center border-b border-primary px-2 font-medium text-primary',
-                }}
-              >
-                {aboutLink.label}
-              </Link>
+              <div className="my-5 border-t border-[var(--soft-border)]" />
 
               <Link
                 to={LocaleRoutes.contact}
                 params={localeParams(locale)}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex min-h-11 items-center border-b border-transparent px-2 text-muted-foreground hover:text-foreground transition-colors focus-visible:text-foreground"
+                className="flex min-h-12 items-center px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
               >
                 {t('legal:contact.title')}
               </Link>
 
-              <div className="my-6 border-t border-border/50" />
+              <div className="my-5 border-t border-[var(--soft-border)]" />
 
-              {isAuthenticated && user ? (
-                <>
-                  <Link
-                    to={LocaleRoutes.profile}
-                    params={localeParams(locale)}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                  >
-                    <User className="h-5 w-5" />
-                    {t('common:navigation.profile')}
-                  </Link>
-                  {isAdmin && (
+              <div className="space-y-0.5">
+                <div className="flex min-h-12 items-center px-1">
+                  <LanguageSwitcher />
+                </div>
+
+                {isAuthenticated && user ? (
+                  <>
                     <Link
-                      to="/admin"
+                      to={LocaleRoutes.profile}
+                      params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
+                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
                     >
-                      <LayoutDashboard className="h-5 w-5" />
-                      Admin Dashboard
+                      <User className="h-4 w-4" aria-hidden="true" />
+                      {t('common:navigation.profile')}
                     </Link>
-                  )}
-                  <div className="px-3 py-2">
-                    <BugReportDialog
-                      trigger={
-                        <button className="flex items-center gap-3 w-full py-1 text-muted-foreground hover:text-foreground transition-colors">
-                          <Bug className="h-5 w-5" />
-                          {t('bugs:dialog.trigger')}
-                        </button>
-                      }
-                    />
-                  </div>
-
-                  <div className="mt-auto pt-4">
+                    <Link
+                      to={LocaleRoutes.leaderboard}
+                      params={localeParams(locale)}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
+                    >
+                      <Trophy className="h-4 w-4" aria-hidden="true" />
+                      {t('common:navigation.leaderboard')}
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
+                      >
+                        <LayoutDashboard
+                          className="h-4 w-4"
+                          aria-hidden="true"
+                        />
+                        {t('common:navigation.admin')}
+                      </Link>
+                    )}
+                    <div className="flex min-h-12 items-center px-1">
+                      <BugReportDialog
+                        trigger={
+                          <button className="inline-flex items-center gap-3 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]">
+                            <Bug className="h-4 w-4" aria-hidden="true" />
+                            {t('bugs:dialog.trigger')}
+                          </button>
+                        }
+                      />
+                    </div>
                     <button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
                         void handleSignOut();
                       }}
-                      className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
+                      className="flex min-h-12 w-full items-center gap-3 px-1 text-left text-[var(--brand-error)] transition-colors hover:text-[var(--brand-error)]/80"
                     >
-                      <LogOut className="h-5 w-5" />
+                      <LogOut className="h-4 w-4" aria-hidden="true" />
                       {t('common:navigation.logout')}
                     </button>
-                  </div>
-                </>
-              ) : (
-                !isAuthPage && (
-                  <div className="space-y-3 mt-4">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      asChild
+                  </>
+                ) : (
+                  !isAuthPage && (
+                    <Link
+                      to={LocaleRoutes.login}
+                      params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex min-h-12 items-center gap-3 px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
                     >
-                      <Link
-                        to={LocaleRoutes.login}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:actions.signIn')}
-                      </Link>
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      asChild
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Link
-                        to={LocaleRoutes.register}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:actions.startWebAutomation')}
-                        <span aria-hidden="true">→</span>
-                      </Link>
-                    </Button>
-                  </div>
-                )
-              )}
+                      <User className="h-4 w-4" aria-hidden="true" />
+                      {t('common:actions.signIn')}
+                    </Link>
+                  )
+                )}
+              </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-border/50 flex gap-4">
-              <LanguageSwitcher />
-            </div>
+            {showPrimaryCta && (
+              <div className="mt-5 border-t border-[var(--soft-border)] pt-5">
+                <Button
+                  asChild
+                  className="h-12 w-full rounded-md bg-[var(--brand-orange)] text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Link to={primaryCta.to} params={primaryCta.params}>
+                    {t('common:actions.startWebAutomation')}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              </div>
+            )}
           </nav>
         </div>
       )}

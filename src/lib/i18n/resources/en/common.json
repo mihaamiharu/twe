@@ -1,7 +1,7 @@
 {
   "appName": "TestingWithEkki",
   "seo": {
-    "title": "TestingWithEkki - Practical Software Testing Education",
+    "title": "TestingWithEkki — Practical Software Testing",
     "description": "Grow beyond test execution with practical lessons and hands-on challenges for QA engineers.",
     "ogTitle": "Grow beyond test execution. | TestingWithEkki",
     "ogDescription": "Build technical testing skills through Web Automation lessons and Practice challenges.",
@@ -46,6 +46,8 @@
     "dismiss": "Dismiss",
     "refresh": "Refresh Page",
     "signIn": "Sign In",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "signUp": "Sign Up",
     "backToSignIn": "Back to Sign In",
     "signInNow": "Sign In Now",

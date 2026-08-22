@@ -1,20 +1,15 @@
 {
   "short_name": "TestingWithEkki",
-  "name": "TestingWithEkki - Learn Testing Skills",
+  "name": "TestingWithEkki — Practical Software Testing",
   "icons": [
     {
-      "src": "/logo-icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any"
-    },
-    {
-      "src": "/logo-dark-new.png",
+      "src": "/logo-icon.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "1254x1254"
     }
   ],
   "start_url": ".",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "theme_color": "#f4f0e8",
+  "background_color": "#f4f0e8"
 }

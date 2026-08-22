@@ -1,4 +1,51 @@
 {
+  "learn": {
+    "eyebrow": "BELAJAR",
+    "eyebrowNote": "JALUR PEMBELAJARAN TERARAH",
+    "title": "Bangun keterampilan di balik otomasi web.",
+    "description": "Mulai dari cara kerja web, bangun pengetahuan pemrograman yang kamu butuhkan, lalu berlatih otomasi Playwright melalui pelajaran dan latihan langsung.",
+    "primaryCta": "Mulai Otomasi Web",
+    "metadata": {
+      "webFundamentals": "Dasar web",
+      "handsOnPractice": "Latihan langsung",
+      "builtForQa": "Dibuat untuk QA"
+    },
+    "visual": {
+      "inspect": "INSPEKSI",
+      "execute": "EKSEKUSI",
+      "verify": "VERIFIKASI",
+      "target": "Target DOM",
+      "artifact": "Artefak Playwright",
+      "result": "Assertion berhasil"
+    },
+    "path": {
+      "eyebrow": "JALUR PEMBELAJARAN",
+      "status": "TERSEDIA",
+      "title": "Otomasi Web",
+      "description": "Pelajari cara kerja web, bangun dasar pemrograman yang dibutuhkan untuk otomasi, dan berlatih menulis test Playwright yang andal.",
+      "cta": "Lihat Jalur Pembelajaran"
+    },
+    "lessons": {
+      "eyebrow": "OTOMASI WEB / PELAJARAN",
+      "title": "Pelajaran",
+      "description": "Ikuti materi secara berurutan, lalu gunakan tantangan Practice terkait untuk menerapkan apa yang sudah kamu pelajari.",
+      "practiceLink": "Lihat tantangan Practice",
+      "searchLabel": "Cari pelajaran",
+      "searchPlaceholder": "Cari pelajaran...",
+      "noResults": "Pelajaran tidak ditemukan",
+      "tryDifferentSearch": "Coba kata kunci pencarian lain",
+      "checkBackSoon": "Pelajaran baru akan muncul di sini saat sudah siap."
+    },
+    "future": {
+      "eyebrow": "BERIKUTNYA",
+      "title": "Jalur pembelajaran lainnya akan hadir nanti.",
+      "description": "Otomasi Web adalah yang pertama. Area baru akan ditambahkan saat materinya sudah siap."
+    },
+    "seo": {
+      "title": "Belajar Otomasi Web — TestingWithEkki",
+      "description": "Bangun dasar otomasi web melalui pelajaran terarah, latihan langsung, dan pengujian Playwright."
+    }
+  },
   "page": {
     "title": "Tutorial",
     "subtitle": "Pelajari konsep inti bersama saya, langkah demi langkah.",

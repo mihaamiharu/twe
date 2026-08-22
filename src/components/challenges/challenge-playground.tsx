@@ -12,13 +12,13 @@ import {
   HintConfirmDialog,
   HintDisplayPanel,
   LoadingOverlay,
-  PracticeModeBanner
+  PracticeModeBanner,
 } from './playground';
 import type { ChallengePlaygroundProps } from './playground';
 
 /**
  * ChallengePlayground - Main challenge solving interface
- * 
+ *
  * Refactored in 2026 for improved maintainability.
  * This component acts as an orchestrator that composes smaller components
  * and delegates logic to custom hooks.
@@ -44,7 +44,9 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
   useEffect(() => {
     if (!state.isLayoutReady && state.isCodeChallenge) {
       const timer = setTimeout(() => {
-        console.warn('[ChallengePlayground] Layout load timeout - forcing ready state');
+        console.warn(
+          '[ChallengePlayground] Layout load timeout - forcing ready state',
+        );
         state.setIsLayoutReady(true);
       }, 5000);
       return () => clearTimeout(timer);
@@ -88,7 +90,12 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
   ]);
 
   return (
-    <div className={cn('relative flex flex-col h-full bg-background', className)}>
+    <div
+      className={cn(
+        'workspace-shell relative flex h-full min-w-0 flex-col overflow-hidden bg-workspace-background',
+        className,
+      )}
+    >
       {/* Practice Mode Banner */}
       {challenge.isCompleted && <PracticeModeBanner />}
 
@@ -123,8 +130,8 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       <div className="flex-1 overflow-hidden relative flex flex-col">
         <div
           className={cn(
-            "flex-1 flex flex-col min-h-0 transition-opacity duration-300",
-            state.isLayoutReady ? "opacity-100" : "opacity-0 invisible"
+            'flex-1 flex flex-col min-h-0 transition-opacity duration-300',
+            state.isLayoutReady ? 'opacity-100' : 'opacity-0 invisible',
           )}
         >
           {state.isMobile ? (

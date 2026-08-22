@@ -5,12 +5,12 @@ import { Loader2 } from 'lucide-react';
 import {
   type CodeEditorProps,
   useEditorPersistence,
-  useMonacoSetup
+  useMonacoSetup,
 } from './editor';
 
 /**
  * CodeEditor - Monaco Editor wrapper for challenge code input
- * 
+ *
  * Refactored in 2026 for improved maintainability.
  * This component orchestrates the Monaco lifecycle, theme management,
  * and asynchronous persistence to IndexedDB.
@@ -27,16 +27,16 @@ export function CodeEditor(props: CodeEditorProps) {
     className,
   } = props;
 
-  // The challenge workspace is intentionally dark even while public surfaces
-  // use the warm editorial theme.
+  // Monaco remains a focused dark technical surface inside the warm challenge
+  // page shell.
   const monacoTheme = useMemo(() => 'customDark', []);
 
   // Hook: Handle storage loading and debounced persistence
-  const {
-    code,
-    setCode,
-    isStorageLoaded,
-  } = useEditorPersistence(storageKey, initialCode, onChange);
+  const { code, setCode, isStorageLoaded } = useEditorPersistence(
+    storageKey,
+    initialCode,
+    onChange,
+  );
 
   // Hook: Handle Monaco lifecycle, themes, shortcuts, and typings
   const { handleEditorMount } = useMonacoSetup(props, monacoTheme);
@@ -75,7 +75,8 @@ export function CodeEditor(props: CodeEditorProps) {
         options={{
           readOnly,
           fontSize: 14,
-          fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace",
+          fontFamily:
+            "'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace",
           minimap: { enabled: showMinimap },
           lineNumbers: 'on',
           scrollBeyondLastLine: false,

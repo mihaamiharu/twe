@@ -76,7 +76,7 @@ nav a:hover { color: #E65F3A; }
 `;
 
 export const e2eSelectorStyles = `
-/* E2E Challenges Tailwind Subset - Neutral dark workspace */
+/* E2E challenge target environment - intentionally dark technical UI */
 :root {
   --background: #171918;
   --foreground: #F2F1EC;

@@ -70,8 +70,8 @@ export const Route = createFileRoute('/$locale/challenges/')({
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: i18n.t('challenges:page.seo.title'),
-      description: i18n.t('challenges:page.seo.description'),
+      title: i18n.t('challenges:page.seo.title', { lng: locale }),
+      description: i18n.t('challenges:page.seo.description', { lng: locale }),
       path: '/challenges',
       locale,
     });

@@ -48,12 +48,28 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="default"
-          className="min-w-[5rem] gap-1 px-2 font-mono text-xs tracking-wide"
+          className="min-w-[5rem] gap-1 rounded-md px-2 font-mono text-xs tracking-wide text-[var(--graphite)] shadow-none hover:bg-[var(--orange-tint)] hover:text-[var(--graphite)]"
           aria-label={`Switch language, currently ${languageNames[currentLocale]}`}
         >
-          <span className={currentLocale === 'en' ? 'text-foreground' : 'text-muted-foreground'}>EN</span>
+          <span
+            className={
+              currentLocale === 'en'
+                ? 'text-foreground'
+                : 'text-muted-foreground'
+            }
+          >
+            EN
+          </span>
           <span className="text-muted-foreground">/</span>
-          <span className={currentLocale === 'id' ? 'text-foreground' : 'text-muted-foreground'}>ID</span>
+          <span
+            className={
+              currentLocale === 'id'
+                ? 'text-foreground'
+                : 'text-muted-foreground'
+            }
+          >
+            ID
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

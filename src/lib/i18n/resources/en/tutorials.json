@@ -1,4 +1,51 @@
 {
+  "learn": {
+    "eyebrow": "LEARN",
+    "eyebrowNote": "GUIDED LEARNING PATHS",
+    "title": "Build the skills behind web automation.",
+    "description": "Start with how the web works, build the programming knowledge you need, and move into practical Playwright automation through lessons and hands-on practice.",
+    "primaryCta": "Start Web Automation",
+    "metadata": {
+      "webFundamentals": "Web fundamentals",
+      "handsOnPractice": "Hands-on practice",
+      "builtForQa": "Built for QA"
+    },
+    "visual": {
+      "inspect": "INSPECT",
+      "execute": "EXECUTE",
+      "verify": "VERIFY",
+      "target": "DOM target",
+      "artifact": "Playwright artifact",
+      "result": "Assertion passed"
+    },
+    "path": {
+      "eyebrow": "LEARNING PATH",
+      "status": "AVAILABLE",
+      "title": "Web Automation",
+      "description": "Learn how the web works, build the programming foundations needed for automation, and practice writing reliable Playwright tests.",
+      "cta": "View Learning Path"
+    },
+    "lessons": {
+      "eyebrow": "WEB AUTOMATION / LESSONS",
+      "title": "Lessons",
+      "description": "Move through the material in order, then use linked Practice challenges to apply what you have learned.",
+      "practiceLink": "Explore Practice challenges",
+      "searchLabel": "Search lessons",
+      "searchPlaceholder": "Search lessons...",
+      "noResults": "No lessons found",
+      "tryDifferentSearch": "Try a different search term",
+      "checkBackSoon": "New lessons will appear here when they are ready."
+    },
+    "future": {
+      "eyebrow": "NEXT",
+      "title": "More learning paths will come later.",
+      "description": "Web Automation is the first. New areas will be added when the material is ready."
+    },
+    "seo": {
+      "title": "Learn Web Automation — TestingWithEkki",
+      "description": "Build the foundations behind web automation through guided lessons, hands-on practice, and Playwright testing."
+    }
+  },
   "page": {
     "title": "Tutorials",
     "subtitle": "Walk through core concepts with me, step-by-step.",

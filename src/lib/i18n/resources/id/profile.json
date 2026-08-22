@@ -3,6 +3,7 @@
     "title": "Profil Kamu",
     "level": "Level {{level}}",
     "progressTo": "Kemajuan ke Level {{level}}",
+    "xpEarned": "{{xp}} XP diperoleh",
     "settings": "Pengaturan"
   },
   "stats": {
@@ -35,6 +36,11 @@
   },
   "achievements": {
     "empty": "Belum ada pencapaian. Selesaikan tantangan untuk mendapatkan lencana!",
-    "available": "{{count}} lencana tersedia untuk dibuka"
+    "earned": "Diperoleh {{date}} · +{{xp}} XP"
+  },
+  "danger": {
+    "title": "Zona Berbahaya",
+    "description": "Setelah akun dihapus, akun tidak dapat dipulihkan. Pastikan keputusanmu.",
+    "requestDeletion": "Minta Penghapusan Akun"
   }
 }

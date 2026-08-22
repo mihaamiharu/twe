@@ -3,6 +3,7 @@
     "title": "Your Profile",
     "level": "Level {{level}}",
     "progressTo": "Progress to Level {{level}}",
+    "xpEarned": "{{xp}} XP earned",
     "settings": "Settings"
   },
   "stats": {
@@ -35,6 +36,11 @@
   },
   "achievements": {
     "empty": "No achievements yet. Complete challenges to earn badges!",
-    "available": "{{count}} badges available to unlock"
+    "earned": "Earned {{date}} · +{{xp}} XP"
+  },
+  "danger": {
+    "title": "Danger Zone",
+    "description": "Once you delete your account, there is no going back. Please be certain.",
+    "requestDeletion": "Request Account Deletion"
   }
 }
