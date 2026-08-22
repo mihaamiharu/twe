@@ -54,7 +54,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className="relative h-11 w-11 rounded-full ring-1 ring-transparent hover:ring-border transition-colors p-0 overflow-hidden"
+          className="relative h-11 w-11 rounded-full border border-[var(--brand-orange)]/70 bg-[var(--paper-surface)] p-0 shadow-none transition-colors hover:border-[var(--brand-orange)] hover:bg-[var(--orange-tint)]/45"
           aria-label="Open account menu"
         >
           <Avatar className="h-9 w-9">
@@ -63,7 +63,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
               alt={user.name || 'User'}
               className="object-cover"
             />
-            <AvatarFallback className="bg-primary/10 text-primary font-medium">
+            <AvatarFallback className="bg-[var(--orange-tint)] text-[var(--brand-orange)] font-medium">
               {(user.name || user.email || 'U').charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>

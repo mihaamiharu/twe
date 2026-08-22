@@ -46,6 +46,8 @@
     "dismiss": "Dismiss",
     "refresh": "Refresh Page",
     "signIn": "Sign In",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
     "signUp": "Sign Up",
     "backToSignIn": "Back to Sign In",
     "signInNow": "Sign In Now",
