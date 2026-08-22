@@ -21,13 +21,10 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
 
   test('ID Dashboard: should display Indonesian content', async ({ page }) => {
     await dashboardPage.goto('id');
-    // The current Indonesian homepage copy starts with "Bangun Test Automation Modern".
+    // The rebranded Indonesian homepage starts with the Phase 3 source-of-truth copy.
     await expect(dashboardPage.heroTitle).toContainText(
-      /Bangun Test Automation Modern/i,
+      /Melampaui sekadar menjalankan test/i,
     );
-
-    // Stats in ID usually remain 'Challenges' etc if not localized in stats section yet,
-    // but we verify the page loaded.
     await expect(page).toHaveURL(/\/id\/?$/);
   });
 

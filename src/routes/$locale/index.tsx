@@ -1,24 +1,18 @@
-import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
-import { Button } from '@/components/ui/button';
-import { WaveSeparator } from '@/components/ui/wave-separator';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
 import {
-  Zap,
-  BookOpen,
-  Code2,
-  Trophy,
-  Target,
-  Sparkles,
   ArrowRight,
-  CheckCircle,
+  BookOpen,
+  Check,
+  Code2,
+  Lightbulb,
+  Play,
+  Wrench,
 } from 'lucide-react';
-import { SelectorDemo } from '@/components/selector-demo';
-import { PlaywrightDemo } from '@/components/playwright-demo';
 import { useTranslation } from 'react-i18next';
-
-import i18n from '@/lib/i18n';
+import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
 import { createSeoHead, websiteSchema } from '@/lib/seo';
+import i18n from '@/lib/i18n';
+import { LocaleRoutes, localeParams } from '@/lib/navigation';
 
 export const Route = createFileRoute('/$locale/')({
   component: HomePage,
@@ -39,337 +33,188 @@ const routeApi = getRouteApi('/$locale/');
 function HomePage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('home');
+  const params = localeParams(locale);
 
-  const features = [
-    {
-      icon: <BookOpen className="w-10 h-10 text-primary" />,
-      title: t('features.interactiveTutorials.title'),
-      description: t('features.interactiveTutorials.description'),
-    },
-    {
-      icon: <Code2 className="w-10 h-10 text-primary" />,
-      title: t('features.playwrightChallenges.title'),
-      description: t('features.playwrightChallenges.description'),
-      demo: <PlaywrightDemo />,
-    },
-    {
-      icon: <Target className="w-10 h-10 text-primary" />,
-      title: t('features.selectorChallenges.title'),
-      description: t('features.selectorChallenges.description'),
-      demo: <SelectorDemo />,
-    },
-    {
-      icon: <Trophy className="w-10 h-10 text-primary" />,
-      title: t('features.gamification.title'),
-      description: t('features.gamification.description'),
-    },
-    {
-      icon: <Zap className="w-10 h-10 text-primary" />,
-      title: t('features.instantFeedback.title'),
-      description: t('features.instantFeedback.description'),
-    },
-    {
-      icon: <Sparkles className="w-10 h-10 text-primary" />,
-      title: t('features.trackProgress.title'),
-      description: t('features.trackProgress.description'),
-    },
+  const learningSteps = [
+    { number: '01', title: t('learningPath.steps.foundations.title'), description: t('learningPath.steps.foundations.description') },
+    { number: '02', title: t('learningPath.steps.programming.title'), description: t('learningPath.steps.programming.description') },
+    { number: '03', title: t('learningPath.steps.playwright.title'), description: t('learningPath.steps.playwright.description') },
+    { number: '04', title: t('learningPath.steps.design.title'), description: t('learningPath.steps.design.description') },
+    { number: '05', title: t('learningPath.steps.e2e.title'), description: t('learningPath.steps.e2e.description') },
   ];
 
-  const featuredChallenges = [
-    {
-      title: 'CSS Selector 101',
-      difficulty: 'EASY',
-      type: 'CSS Selector',
-      xp: 15,
-      slug: 'css-selector-101-id-class',
-    },
-    {
-      title: 'Variables & Types',
-      difficulty: 'EASY',
-      type: 'JavaScript',
-      xp: 15,
-      slug: 'js-variables-types',
-    },
-    {
-      title: 'Click Actions',
-      difficulty: 'MEDIUM',
-      type: 'Playwright',
-      xp: 45,
-      slug: 'pw-click-actions',
-    },
+  const methodSteps = [
+    { number: '01', label: t('learnPractice.steps.learn.label'), title: t('learnPractice.steps.learn.title'), description: t('learnPractice.steps.learn.description'), icon: BookOpen },
+    { number: '02', label: t('learnPractice.steps.practice.label'), title: t('learnPractice.steps.practice.title'), description: t('learnPractice.steps.practice.description'), icon: Code2 },
+    { number: '03', label: t('learnPractice.steps.review.label'), title: t('learnPractice.steps.review.title'), description: t('learnPractice.steps.review.description'), icon: Check },
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section with Technical Grid */}
-      <section className="relative py-24 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-grid-small [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background"></div>
-
-        <div className="relative max-w-5xl mx-auto">
-          {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="gradient-text">{t('hero.title')}</span>
-            <br />
-            {t('hero.titleSuffix')}
+    <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
+      <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-4 lg:px-12 lg:pb-28 lg:pt-20">
+        <div className="relative z-10 max-w-2xl">
+          <p className="mb-6 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+            {t('hero.eyebrow')}
+          </p>
+          <h1 className="max-w-[680px] text-[clamp(3rem,6vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
+            {t('hero.title')}
+            <span className="text-[var(--brand-orange)]">.</span>
           </h1>
-
-          {/* Tagline */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-2 max-w-3xl mx-auto">
-            {t('hero.tagline')}
+          <p className="mt-7 max-w-xl text-lg leading-8 text-[var(--muted-graphite)] sm:text-[1.125rem]">
+            {t('hero.description')}
           </p>
-
-          {/* Authority Statement */}
-          <p className="text-base md:text-lg text-primary/80 font-medium mb-4 max-w-2xl mx-auto">
-            {t('hero.authorityStatement')}
-          </p>
-
-          <p
-            className="text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-6"
-            dangerouslySetInnerHTML={{ __html: t('hero.description') }}
-          />
-
-          {/* Trust Bar - Skills/Tools */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🎭 Playwright
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              ⚡ JavaScript
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🎯 CSS Selectors
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🔍 XPath
-            </Badge>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link to="/$locale/challenges" params={{ locale }}>
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 rounded-xl border-2 border-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
-              >
-                {t('hero.startLearning')}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+          <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
+            <Link
+              to={LocaleRoutes.tutorials}
+              params={params}
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white transition-transform hover:-translate-y-px hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+            >
+              {t('hero.startWebAutomation')}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link to="/$locale/tutorials" params={{ locale }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-muted"
-              >
-                {t('hero.browseTutorials')}
-              </Button>
+            <Link
+              to={LocaleRoutes.challenges}
+              params={params}
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+            >
+              {t('hero.explorePractice')}
             </Link>
           </div>
-
+          <div className="mt-9 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
+            <span className="flex -space-x-2" aria-hidden="true">
+              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#d8b5a7]" />
+              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#b9c4c8]" />
+              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#d4c8a7]" />
+            </span>
+            <span>{t('hero.creatorNote')}</span>
+          </div>
         </div>
-
-
-
-        {/* Animated Wave Separator */}
-        <WaveSeparator />
+        <HomeHeroVisual />
       </section>
 
-      {/* Featured Challenges */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('featuredChallenges.title')}{' '}
-              <span className="gradient-text">
-                {t('featuredChallenges.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              {t('featuredChallenges.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredChallenges.map((challenge) => (
-              <Link
-                key={challenge.slug}
-                to="/$locale/challenges/$slug"
-                params={{ locale, slug: challenge.slug }}
-              >
-                <Card className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge
-                        className="font-bold border-2"
-                        variant={
-                          challenge.difficulty === 'EASY'
-                            ? 'secondary'
-                            : challenge.difficulty === 'MEDIUM'
-                              ? 'default'
-                              : 'destructive'
-                        }
-                      >
-                        {challenge.difficulty}
-                      </Badge>
-                      <span className="text-sm text-primary font-bold">
-                        +{challenge.xp} XP
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">
-                      {challenge.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground font-medium">
-                      {challenge.type}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <Link to="/$locale/challenges" params={{ locale }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="rounded-xl border-2"
-              >
-                {t('featuredChallenges.viewAll')}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="grid gap-10 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:p-9 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:p-12">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('learningPath.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learningPath.title')}</h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learningPath.description')}</p>
+            <Link
+              to={LocaleRoutes.tutorials}
+              params={params}
+              className="mt-7 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
+            >
+              {t('learningPath.cta')}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('features.title')}{' '}
-              <span className="gradient-text">
-                {t('features.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('features.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <Card
-                key={index}
-                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10"
-              >
-                <CardContent className="p-6">
-                  <div className="mb-4 p-3 bg-primary/10 rounded-xl w-fit border-2 border-primary/20">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: feature.description }} />
-                  {feature.demo && feature.demo}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* How It Works Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('howItWorks.title')}{' '}
-              <span className="gradient-text">
-                {t('howItWorks.titleHighlight')}
-              </span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                step: '1',
-                title: t('howItWorks.step1.title'),
-                description: t('howItWorks.step1.description'),
-              },
-              {
-                step: '2',
-                title: t('howItWorks.step2.title'),
-                description: t('howItWorks.step2.description'),
-              },
-              {
-                step: '3',
-                title: t('howItWorks.step3.title'),
-                description: t('howItWorks.step3.description'),
-              },
-            ].map((item) => (
-              <div key={item.step} className="text-center group">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl font-bold text-primary">
-                    {item.step}
-                  </span>
+          <ol className="relative grid gap-0 sm:grid-cols-5 sm:gap-3">
+            {learningSteps.map((step, index) => (
+              <li key={step.number} className="relative flex gap-4 border-l border-[var(--soft-border)] pb-6 pl-5 last:pb-0 sm:border-l-0 sm:pb-0 sm:pl-0">
+                {index < learningSteps.length - 1 && <span className="absolute left-[-1px] top-3 hidden h-px w-[calc(100%+0.75rem)] bg-[var(--soft-border)] sm:block" />}
+                <div className="relative z-10 flex min-w-7 items-center justify-center sm:block">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--brand-orange)] bg-[var(--paper-surface)] font-mono text-[10px] text-[var(--brand-orange)]">{step.number}</span>
                 </div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
-              </div>
+                <div className="relative z-10 sm:pt-11">
+                  <h3 className="font-semibold">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">{step.description}</p>
+                </div>
+              </li>
             ))}
+          </ol>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="grid items-start gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('learnPractice.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learnPractice.title')}</h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learnPractice.description')}</p>
+          </div>
+          <div className="grid gap-7 lg:grid-cols-[0.85fr_1.15fr]">
+            <ol className="space-y-5">
+              {methodSteps.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <li key={step.number} className="flex gap-4 border-b border-[var(--soft-border)] pb-5 last:border-b-0">
+                    <span className="font-mono text-xs text-[var(--brand-orange)]">{step.number}</span>
+                    <div>
+                      <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
+                        <Icon className="h-3.5 w-3.5 text-[var(--brand-orange)]" aria-hidden="true" />
+                        {step.label}
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">{step.description}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+            <div className="lg:pt-4">
+              <PracticePreview />
+              <Link to={LocaleRoutes.challenges} params={params} className="mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+                {t('learnPractice.cta')}
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-
-
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="glass-card p-12 rounded-3xl border-2 border-primary/20">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('cta.title')}
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              {t('cta.subtitle')}
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/$locale/challenges" params={{ locale }}>
-                <Button
-                  size="lg"
-                  className="text-lg px-8 rounded-xl border-2 border-primary shadow-lg shadow-primary/20"
-                >
-                  {t('cta.getStarted')}
-                </Button>
-              </Link>
-              <Link to="/$locale/leaderboard" params={{ locale }}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-lg px-8 rounded-xl border-2"
-                >
-                  {t('cta.viewLeaderboard')}
-                </Button>
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14">
+          <div className="relative mx-auto w-full max-w-[300px]">
+            <div className="absolute inset-4 rounded-[42%] border border-[var(--brand-orange)]/35" />
+            <img src="/me.small.jpg" alt="Ekki" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-top" width={400} height={400} loading="lazy" />
+            <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] shadow-sm">WHY / HOW / TOOLS</div>
+          </div>
+          <div>
+            <h2 className="max-w-2xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t('philosophy.title')}</h2>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">{t('philosophy.description')}</p>
+            <div className="mt-8 grid gap-5 sm:grid-cols-3">
+              <div><Lightbulb className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" /><p className="mt-2 font-semibold">{t('philosophy.why')}</p></div>
+              <div><Wrench className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" /><p className="mt-2 font-semibold">{t('philosophy.how')}</p></div>
+              <div><Code2 className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" /><p className="mt-2 font-semibold">{t('philosophy.tools')}</p></div>
+            </div>
+            <div className="mt-8 border-t border-[var(--brand-orange)]/25 pt-6">
+              <p className="font-mono text-xs uppercase tracking-[0.15em] text-[var(--brand-orange)]">{t('creator.eyebrow')}</p>
+              <h3 className="mt-2 text-2xl font-semibold">{t('creator.title')}</h3>
+              <p className="mt-3 max-w-xl text-base leading-7 text-[var(--muted-graphite)]">{t('creator.description')}</p>
+              <Link to={LocaleRoutes.about} params={params} className="mt-5 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+                {t('creator.cta')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground font-medium">
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.freeToUse')}
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.noCreditCard')}
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.learnAtOwnPace')}
-              </span>
-            </div>
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="flex flex-col gap-8 border-y border-[var(--soft-border)] py-10 sm:flex-row sm:items-center sm:justify-between sm:py-12">
+          <div className="max-w-2xl">
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('labs.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('labs.title')}</h2>
+            <p className="mt-4 text-base leading-7 text-[var(--muted-graphite)]">{t('labs.description')}</p>
+          </div>
+          <Link to={LocaleRoutes.challenges} params={params} className="inline-flex shrink-0 items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+            {t('labs.cta')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-24 sm:px-8 lg:px-12 lg:pb-32">
+        <div className="rounded-xl bg-[var(--graphite)] px-7 py-12 text-[var(--paper-surface)] sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--orange-tint)]">{t('cta.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('cta.title')}</h2>
+            <p className="mt-4 max-w-xl text-base leading-7 text-[#d2d0c9]">{t('cta.description')}</p>
+          </div>
+          <div className="mt-8 flex shrink-0 flex-col items-start gap-4 sm:flex-row lg:mt-0 lg:flex-col lg:items-start">
+            <Link to={LocaleRoutes.tutorials} params={params} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
+              {t('cta.primary')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link to={LocaleRoutes.challenges} params={params} className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
+              {t('cta.secondary')} <Play className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

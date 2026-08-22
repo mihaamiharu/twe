@@ -125,21 +125,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 params={localeParams(locale)}
                 className="flex items-center gap-2 group"
               >
-                {/* Dark Mode Logo */}
-                <img
-                  src="/logo-dark.svg"
-                  alt="Logo"
-                  className="h-8 w-8 hidden dark:block group-hover:scale-105 transition-all"
-                />
-                {/* Light Mode Logo */}
-                <img
-                  src="/logo-light.svg"
-                  alt="Logo"
-                  className="h-8 w-8 block dark:hidden group-hover:scale-105 transition-all"
-                />
-                <span className="text-xl font-bold font-sans tracking-tight text-foreground group-hover:text-primary transition-colors">
-                  TestingWithEkki
-                  <span className="text-primary animate-pulse">.</span>
+                <span className="text-xl font-bold font-sans tracking-tight text-foreground transition-colors group-hover:text-foreground">
+                  TestingWith<span className="text-primary">Ekki</span>
                 </span>
               </Link>
 
@@ -248,9 +235,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
           <nav id="mobile-navigation" aria-label="Mobile navigation" className="relative flex-1 bg-background border-r border-border max-w-[86vw] w-full p-4 animate-slide-in-left flex flex-col h-full">
 
             <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2">
-                {/* Mobile Logo Rep */}
-                <span className="font-bold text-lg">TestingWithEkki</span>
+            <div className="flex items-center gap-2">
+                <span className="font-bold text-lg">TestingWith<span className="text-primary">Ekki</span></span>
               </div>
               <Button ref={closeButtonRef} variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu">
                 <X className="h-5 w-5" />

@@ -1,158 +1,60 @@
 {
   "hero": {
-    "title": "Bangun Test Automation Modern",
-    "titleSuffix": "Tanpa Basa-basi",
-    "tagline": "Kurikulum praktis yang menjembatani teori dan praktik.",
-    "authorityStatement": "Karir saya dibangun atas dukungan mentor hebat. Platform ini cara saya membalas budi.",
-    "description": "Saya memberikan <strong>lingkungan suportif dan hands-on</strong> yang kamu butuhkan untuk membangun framework testing scalable, fokus pada pola yang digunakan tim engineering top.",
-    "startLearning": "Selesaikan Tantangan Pertamamu",
-    "browseTutorials": "Lihat Tutorial"
+    "eyebrow": "PENDIDIKAN SOFTWARE TESTING PRAKTIS",
+    "title": "Melampaui sekadar menjalankan test",
+    "description": "Bangun kemampuan teknis testing melalui pelajaran praktis dan tantangan hands-on. Mulai dari Web Automation, dari dasar web sampai Playwright.",
+    "startWebAutomation": "Mulai Web Automation",
+    "explorePractice": "Jelajahi Practice",
+    "creatorNote": "Dibuat oleh Ekki · Belajar dengan ritmemu"
   },
-  "stats": {
-    "challenges": "Skenario Nyata",
-    "tutorials": "Materi Terkurasi",
-    "achievements": "Pencapaian",
-    "learning": "Pembelajaran"
-  },
-  "careerPath": {
-    "title": "Kurikulum",
-    "titleHighlight": "Kamu",
-    "subtitle": "Jalur terstruktur dari dasar selektor hingga arsitektur otomasi tingkat lanjut.",
-    "tier": "Fase",
-    "challenges": "skenario"
-  },
-  "tiers": {
-    "basic": {
-      "title": "Locator Tangguh",
-      "description": "Kuasai selektor CSS dan XPath - fondasi tes yang stabil dan mudah dipelihara",
-      "skills": [
-        "Selektor CSS",
-        "Query XPath",
-        "Penargetan Elemen"
-      ]
-    },
-    "beginner": {
-      "title": "JavaScript & TypeScript",
-      "description": "Pelajari dasar-dasar JS/TS untuk otomasi pengujian",
-      "skills": [
-        "Variabel & Tipe",
-        "Manipulasi DOM",
-        "Async/Await"
-      ]
-    },
-    "intermediate": {
-      "title": "Playwright",
-      "description": "Buat tes otomatis nyata dengan Playwright",
-      "skills": [
-        "Navigasi",
-        "Locator",
-        "Assertion",
-        "Wait"
-      ]
-    },
-    "e2e": {
-      "title": "E2E Testing",
-      "description": "Bangun suite pengujian otomatis lengkap dengan pola profesional",
-      "skills": [
-        "Page Objects",
-        "Data-Driven",
-        "Test Suites"
-      ]
+  "learningPath": {
+    "eyebrow": "LEARNING PATH",
+    "title": "Web Automation Learning Path",
+    "description": "Pelajari cara kerja web, bangun fondasi pemrograman yang dibutuhkan, lalu terapkan dengan Playwright.",
+    "cta": "Lihat Learning Path",
+    "steps": {
+      "foundations": { "title": "Dasar Web", "description": "Pahami browser dan web." },
+      "programming": { "title": "Pemrograman", "description": "Bangun fondasi kode untuk otomasi." },
+      "playwright": { "title": "Playwright", "description": "Tulis browser test yang praktis." },
+      "design": { "title": "Desain Otomasi", "description": "Buat test yang jelas dan mudah dirawat." },
+      "e2e": { "title": "End-to-End Testing", "description": "Satukan semuanya dalam alur nyata." }
     }
   },
-  "featuredChallenges": {
-    "title": "Selesaikan",
-    "titleHighlight": "Masalah Nyata",
-    "subtitle": "Mulai coding langsung. Tanpa setup.",
-    "viewAll": "Lihat Semua Tantangan",
-    "challenge1": {
-      "badge": "MUDAH",
-      "xp": "+10 XP",
-      "title": "CSS Selector 101",
-      "description": "Kuasai dasar-dasar mutlak",
-      "slug": "css-selector-101-id-class"
-    },
-    "challenge2": {
-      "badge": "SEDANG",
-      "xp": "+50 XP",
-      "title": "Testing Aplikasi Legacy",
-      "description": "Temukan elemen di kode berantakan",
-      "slug": "css-foundations-boss"
-    },
-    "challenge3": {
-      "badge": "SULIT",
-      "xp": "+60 XP",
-      "title": "Formulir Dinamis",
-      "description": "Tangani status validasi kompleks",
-      "slug": "css-forms-boss"
+  "learnPractice": {
+    "eyebrow": "BELAJAR + PRACTICE",
+    "title": "Pelajari konsepnya. Praktikkan sendiri.",
+    "description": "Pelajaran menjelaskan idenya. Practice memberimu tempat untuk menggunakannya.",
+    "cta": "Jelajahi Practice",
+    "steps": {
+      "learn": { "label": "BELAJAR", "title": "Pahami konsepnya", "description": "Mulai dari alasan di balik pekerjaan ini." },
+      "practice": { "label": "PRACTICE", "title": "Coba sendiri", "description": "Gunakan tantangan interaktif tanpa setup." },
+      "review": { "label": "REVIEW", "title": "Lihat apa dan mengapa berhasil", "description": "Jalankan test dan periksa hasilnya." }
     }
   },
-  "features": {
-    "title": "Semua yang Kamu Butuhkan untuk",
-    "titleHighlight": "Naik Level",
-    "subtitle": "Kurikulum personal yang dirancang untuk membawamu dari pemula ke pro",
-    "interactiveTutorials": {
-      "title": "Tutorial Interaktif",
-      "description": "Pelajari konsep testing langkah demi langkah. Saya sudah memecah bagian-bagian sulit agar kamu tidak perlu berjuang."
-    },
-    "playwrightChallenges": {
-      "title": "Lingkungan Sandbox Terpadu",
-      "description": "Latihan dengan <strong>skenario sandbox</strong>. Kode kamu berjalan <strong>sepenuhnya di browser</strong> - cepat, aman, dan tanpa instalasi."
-    },
-    "selectorChallenges": {
-      "title": "Tantangan Selektor",
-      "description": "Kuasai selektor CSS dan XPath dengan feedback visual. Lihat elemen menyala saat kamu mengetik."
-    },
-    "gamification": {
-      "title": "Gamifikasi",
-      "description": "Dapatkan XP, naik level, unlock achievement, dan bersaing di leaderboard. Belajar jadi menyenangkan!"
-    },
-    "instantFeedback": {
-      "title": "Tanpa Hambatan",
-      "description": "Mulai coding segera. <strong>Tanpa perlu akun</strong>. Cukup verifikasi skill kamu dan lanjut."
-    },
-    "trackProgress": {
-      "title": "Lacak Progres",
-      "description": "Lihat progres kamu di tutorial dan tantangan. Jangan pernah kehilangan jejak di mana kamu terakhir berhenti."
-    }
+  "philosophy": {
+    "title": "Pahami alasannya. Praktikkan caranya. Gunakan tool yang tepat.",
+    "description": "Testing bukan hanya tentang mengetahui tool yang digunakan. TWE berfokus pada pemahaman sistem yang diuji, menerapkan konsepnya sendiri, dan menggunakan tool saat benar-benar membantu.",
+    "why": "Pahami alasannya.",
+    "how": "Praktikkan caranya.",
+    "tools": "Gunakan tool yang tepat."
   },
-  "howItWorks": {
-    "title": "Cara",
-    "titleHighlight": "Kerjanya",
-    "step1": {
-      "title": "Pilih Tantangan",
-      "description": "Pilih dari tantangan Playwright, selektor CSS, atau JavaScript."
-    },
-    "step2": {
-      "title": "Tulis Kode Kamu",
-      "description": "Gunakan editor kode kami. <strong>Semuanya berjalan lokal</strong> di browser kamu untuk feedback instan."
-    },
-    "step3": {
-      "title": "Dapatkan Feedback Instan",
-      "description": "Jalankan kode kamu dan lihat hasil langsung. Dapatkan XP saat kamu lulus!"
-    }
+  "creator": {
+    "eyebrow": "CREATOR",
+    "title": "Belajar testing bersama Ekki.",
+    "description": "Saya adalah QA/SDET yang bekerja dengan otomasi, sistem yang banyak integrasi, dan infrastruktur testing. Saya membangun TWE untuk berbagi pembelajaran praktis dan mentorship yang membantu membentuk karier saya.",
+    "cta": "Tentang Ekki"
   },
-  "mission": {
-    "title": "Kenapa Saya",
-    "titleHighlight": "Membangun Ini",
-    "story1": "Saya memulai karier di dunia QA dengan nol pengalaman. Saya bisa bertahan di masa-masa awal berkat bimbingan para senior yang sangat sabar membantu saya melewati tantangan tersulit.",
-    "story2": "TestingWithEkki adalah cara saya untuk pay it forward.",
-    "story3": "Sadar kalo gak semua orang punya mentor, saya membangun resource yang dulu saya dambakan: materi praktis dan hands-on yang beneran masuk akal.",
-    "author": "Ekki",
-    "authorRole": "Creator of TestingWithEkki"
+  "labs": {
+    "eyebrow": "LABS · SEGERA HADIR",
+    "title": "Praktik QA di environment nyata.",
+    "description": "Beberapa skill testing lebih baik dipelajari di luar sandbox browser. Labs akan menghadirkan latihan terpandu dengan repository, API, framework test, pipeline CI, dan environment development lainnya.",
+    "cta": "Jelajahi Practice sementara ini"
   },
   "cta": {
-    "title": "Siap mengotomasi skenario nyata pertamamu?",
-    "subtitle": "Mulai selesaikan tantangan praktis yang mencerminkan aplikasi dunia nyata. Gratis selamanya untuk individu.",
-    "getStarted": "Mulai Gratis",
-    "viewLeaderboard": "Lihat Leaderboard",
-    "freeToUse": "Gratis digunakan",
-    "noCreditCard": "Tanpa kartu kredit",
-    "learnAtOwnPace": "Belajar dengan kecepatan sendiri"
-  },
-  "hallOfFame": {
-    "title": "Daftar",
-    "titleHighlight": "Kehormatan",
-    "subtitle": "Lihat pencapaian terbaru yang dibuka oleh komunitas."
+    "eyebrow": "MULAI DI SINI",
+    "title": "Mulai dengan Web Automation.",
+    "description": "Bangun fondasinya, pelajari Playwright, dan praktikkan sambil berjalan.",
+    "primary": "Mulai Belajar",
+    "secondary": "Jelajahi Practice"
   }
 }

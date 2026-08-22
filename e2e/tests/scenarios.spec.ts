@@ -20,22 +20,13 @@ test.describe('Expanded Application Scenarios', () => {
     profilePage = new ProfilePage(page);
   });
 
-  test('Dashboard: should display core components and stats', async ({
+  test('Dashboard: should display core learning surfaces', async ({
     page,
   }) => {
     await dashboardPage.goto();
     console.log('Dashboard URL:', page.url());
     await dashboardPage.verifyDashboardVisible();
-    await dashboardPage.verifyStats();
-
-    // Check if featured challenges are present
-    const section = dashboardPage.page.locator('section').filter({
-      has: dashboardPage.page.getByRole('heading', {
-        name: /Real Problem/i,
-      }),
-    });
-    const challenges = section.locator('a[href*="/challenges/"]');
-    await expect(challenges).toHaveCount(3);
+    await dashboardPage.verifyLearningSurface();
   });
 
   test('Profile: should display user information and tabs', async ({

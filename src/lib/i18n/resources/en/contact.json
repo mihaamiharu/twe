@@ -1,0 +1,42 @@
+{
+  "hero": {
+    "eyebrow": "CONTACT",
+    "title": "Let’s talk",
+    "description": "Looking for QA mentoring, interested in working together, or have something else in mind? Choose what you’d like to discuss."
+  },
+  "mentoring": {
+    "title": "1:1 QA Mentoring",
+    "description": "For QA engineers who want help with automation, technical growth, test design, CI/CD, or a specific testing problem.",
+    "cta": "Book a 1:1 session"
+  },
+  "partnerships": {
+    "title": "Partnerships & Sponsorships",
+    "description": "For testing and developer tools, communities, events, educational collaborations, or relevant sponsorships.",
+    "cta": "Talk about a partnership"
+  },
+  "form": {
+    "eyebrow": "GENERAL MESSAGE",
+    "title": "Send a message",
+    "description": "For general questions or anything else.",
+    "name": "Name",
+    "namePlaceholder": "Your name",
+    "email": "Email",
+    "emailPlaceholder": "you@example.com",
+    "topic": "Topic",
+    "topicPlaceholder": "Choose a topic",
+    "topics": {
+      "general": "General question",
+      "mentoring": "Mentoring",
+      "partnership": "Partnership / sponsorship",
+      "other": "Other"
+    },
+    "message": "Message",
+    "messagePlaceholder": "How can I help?",
+    "submit": "Send message",
+    "sending": "Sending...",
+    "successTitle": "Message sent.",
+    "successMessage": "Thanks for reaching out. I’ll get back to you soon.",
+    "sendAnother": "Send another message",
+    "errorMessage": "Something went wrong. Please try again later."
+  }
+}

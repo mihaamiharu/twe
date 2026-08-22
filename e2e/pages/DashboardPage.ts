@@ -5,42 +5,19 @@ import { BasePage } from './BasePage';
 export class DashboardPage extends BasePage {
   readonly heroTitle: Locator;
   readonly startLearningButton: Locator;
-  readonly statsChallenges: Locator;
-  readonly statsTutorials: Locator;
-  readonly statsAchievements: Locator;
-  readonly learningTiers: Locator;
+  readonly learningPathHeading: Locator;
 
   constructor(page: Page) {
     super(page);
     this.heroTitle = page.getByRole('heading', { level: 1 }).first();
     this.startLearningButton = page
       .getByRole('main')
-      .getByRole('link', {
-        name: /Solve Your First Challenge|Selesaikan Tantangan Pertamamu/i,
-      })
+      .getByRole('link', { name: 'Start Web Automation', exact: true })
       .first();
-    // The label is the stable contract; its grandparent is the stat card and
-    // its first child is the animated value.
-    const stats = page.locator('main section').first();
-    this.statsChallenges = stats
-      .getByText('Real Scenarios', { exact: true })
-      .locator('..')
-      .locator('..')
-      .locator('div')
-      .first();
-    this.statsTutorials = stats
-      .getByText('Curated Lessons', { exact: true })
-      .locator('..')
-      .locator('..')
-      .locator('div')
-      .first();
-    this.statsAchievements = stats
-      .getByText('Achievements', { exact: true })
-      .locator('..')
-      .locator('..')
-      .locator('div')
-      .first();
-    this.learningTiers = page.locator('.glass-card');
+    this.learningPathHeading = page.getByRole('heading', {
+      name: 'The Web Automation Learning Path',
+      exact: true,
+    });
   }
 
   override async goto(locale: string = 'en') {
@@ -52,10 +29,10 @@ export class DashboardPage extends BasePage {
     await expect(this.startLearningButton).toBeVisible();
   }
 
-  async verifyStats() {
-    // Just verify they are visible and have some content
-    await expect(this.statsChallenges).toBeVisible();
-    await expect(this.statsTutorials).toBeVisible();
-    await expect(this.statsAchievements).toBeVisible();
+  async verifyLearningSurface() {
+    await expect(this.learningPathHeading).toBeVisible();
+    await expect(
+      this.page.getByRole('link', { name: 'Explore Practice', exact: true }).first(),
+    ).toBeVisible();
   }
 }

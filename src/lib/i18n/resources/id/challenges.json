@@ -8,9 +8,20 @@
     "reviewTutorial": "Tinjau Tutorial: {{title}}",
     "sidebarSubtitle": "Tingkatkan kemampuan otomasi pengujianmu"
   },
+  "library": {
+    "eyebrow": "LATIHAN",
+    "headline": "Praktikkan yang kamu tahu.",
+    "description": "Kerjakan tantangan mandiri berdasarkan topik, atau gunakan Practice bersama Learning Path.",
+    "discoveryLabel": "Temukan tantangan",
+    "showingCount": "{{count}} tantangan",
+    "challengeCount_one": "{{count}} tantangan",
+    "challengeCount_other": "{{count}} tantangan",
+    "emptyTitle": "Tantangan tidak ditemukan",
+    "emptyDescription": "Coba ubah pencarian atau filter untuk menemukan tantangan yang ingin kamu kerjakan."
+  },
   "tracks": {
     "all": {
-      "label": "Semua Tantangan",
+      "label": "Semua",
       "description": "Ringkasan semua tantangan yang tersedia"
     },
     "selectors": {
@@ -22,7 +33,7 @@
       "description": "Dasar Pemrograman untuk Otomasi Pengujian"
     },
     "core": {
-      "label": "Inti",
+      "label": "Playwright Core",
       "description": "Navigasi, Locator, Aksi, dan Assertion"
     },
     "e2e": {
@@ -36,11 +47,16 @@
     "playwright": "Playwright"
   },
   "filters": {
+    "search": "Cari tantangan",
+    "track": "Track tantangan",
+    "difficulty": "Kesulitan",
     "allDifficulties": "Semua Kesulitan",
     "clear": "Bersihkan",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai",
-    "searchPlaceholder": "Cari tantangan..."
+    "searchPlaceholder": "Cari tantangan...",
+    "listView": "Tampilan daftar",
+    "gridView": "Tampilan grid"
   },
   "difficulty": {
     "EASY": "Mudah",
@@ -156,10 +172,35 @@
     "allTypes": "Semua Tipe",
     "comingSoon": "Segera Hadir",
     "completed": "selesai",
+    "completedState": "Selesai",
+    "start": "Mulai",
+    "review": "Tinjau",
     "rank": "Peringkat",
     "challenge": "Tantangan",
     "stats": "Statistik",
     "creatingNew": "Membuat tantangan baru...",
     "craftingScenarios": "Saya sedang menyusun skenario baru berdasarkan bug nyata yang saya temukan. Cek kembali segera!"
+  },
+  "howPractice": {
+    "title": "Cara kerja Practice",
+    "description": "Practice berdiri sendiri. Ikuti tantangan dari Learning Path atau langsung pilih topik apa pun.",
+    "steps": {
+      "choose": {
+        "title": "Pilih",
+        "description": "Pilih sebuah tantangan"
+      },
+      "solve": {
+        "title": "Pecahkan",
+        "description": "Tulis dan jalankan kode tesmu"
+      },
+      "run": {
+        "title": "Jalankan",
+        "description": "Eksekusi dan verifikasi"
+      },
+      "review": {
+        "title": "Tinjau",
+        "description": "Periksa hasil dan perbaiki"
+      }
+    }
   }
 }

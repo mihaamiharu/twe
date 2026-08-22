@@ -16,7 +16,9 @@ test.describe('Rebrand V1 global shell', () => {
 
     await expect(page.getByRole('button', { name: /Switch language/ })).toContainText('EN');
     await expect(page.getByRole('link', { name: 'Sign In' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Start Web Automation/ })).toBeVisible();
+    await expect(
+      page.locator('header').getByRole('link', { name: /Start Web Automation/ }),
+    ).toBeVisible();
     await expect(page.locator('[aria-label*="theme" i]')).toHaveCount(0);
 
     const footer = page.locator('footer');

@@ -210,6 +210,13 @@ function MessagesManager() {
                                     </div>
                                 </div>
 
+                                <div className="space-y-1">
+                                    <Label className="text-xs text-muted-foreground">Topic</Label>
+                                    <div className="text-sm font-medium capitalize">
+                                        {(selectedMessage.topic || 'general').replace('-', ' ')}
+                                    </div>
+                                </div>
+
                                 <div className="space-y-2">
                                     <Label className="font-semibold">Message</Label>
                                     <div className="border p-4 rounded-md bg-muted/30 text-sm whitespace-pre-wrap max-h-[300px] overflow-y-auto">

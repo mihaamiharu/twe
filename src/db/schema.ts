@@ -338,6 +338,7 @@ export const contactMessages = pgTable('contact_messages', {
   id: uuid('id').defaultRandom().primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull(),
+  topic: text('topic'),
   message: text('message').notNull(),
   status: contactMessageStatusEnum('status').notNull().default('NEW'),
   adminNotes: text('admin_notes'),
