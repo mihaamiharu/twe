@@ -12,9 +12,20 @@
     "reviewTutorial": "Review Tutorial: {{title}}",
     "sidebarSubtitle": "Level up your automation skills"
   },
+  "library": {
+    "eyebrow": "PRACTICE",
+    "headline": "Practice what you know.",
+    "description": "Work through standalone challenges by topic, or use Practice alongside a Learning Path.",
+    "discoveryLabel": "Challenge discovery",
+    "showingCount": "{{count}} challenges",
+    "challengeCount_one": "{{count}} challenge",
+    "challengeCount_other": "{{count}} challenges",
+    "emptyTitle": "No challenges found",
+    "emptyDescription": "Try adjusting your search or filters to find a challenge to work on."
+  },
   "tracks": {
     "all": {
-      "label": "All Challenges",
+      "label": "All",
       "description": "Overview of all available challenges"
     },
     "selectors": {
@@ -26,7 +37,7 @@
       "description": "Programming Fundamentals for Test Automation"
     },
     "core": {
-      "label": "Core",
+      "label": "Playwright Core",
       "description": "Navigation, Locators, Actions & Assertions"
     },
     "e2e": {
@@ -40,11 +51,16 @@
     "playwright": "Playwright"
   },
   "filters": {
+    "search": "Search challenges",
+    "track": "Challenge tracks",
+    "difficulty": "Difficulty",
     "allDifficulties": "All Difficulties",
     "clear": "Clear",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed",
-    "searchPlaceholder": "Search challenges..."
+    "searchPlaceholder": "Search challenges...",
+    "listView": "List view",
+    "gridView": "Grid view"
   },
   "difficulty": {
     "EASY": "Easy",
@@ -160,10 +176,35 @@
     "allTypes": "All Types",
     "comingSoon": "Coming Soon",
     "completed": "completed",
+    "completedState": "Completed",
+    "start": "Start",
+    "review": "Review",
     "rank": "Rank",
     "challenge": "Challenge",
     "stats": "Stats",
     "creatingNew": "Creating new challenges...",
     "craftingScenarios": "I'm crafting new scenarios based on real bugs I've found. Check back soon!"
+  },
+  "howPractice": {
+    "title": "How Practice works",
+    "description": "Practice is independent. Follow challenges from a Learning Path or jump directly into any topic.",
+    "steps": {
+      "choose": {
+        "title": "Choose",
+        "description": "Pick a challenge"
+      },
+      "solve": {
+        "title": "Solve",
+        "description": "Write and run your test code"
+      },
+      "run": {
+        "title": "Run",
+        "description": "Execute and verify"
+      },
+      "review": {
+        "title": "Review",
+        "description": "Check the result and improve"
+      }
+    }
   }
 }

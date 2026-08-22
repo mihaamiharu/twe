@@ -1,73 +1,67 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router';
-import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { challengeListQueryOptions } from '@/lib/challenges.query';
-import { omitUndefined } from '@/lib/omit-undefined';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Code,
-  CheckCircle2,
-  Palette,
-  Route as RouteIcon,
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Code2,
   LayoutGrid,
   List,
+  ListChecks,
+  Play,
   Search,
-  LayoutDashboard,
-  Layers,
-  Box,
-  Compass,
-  Menu,
-  ChevronRight,
-  MousePointer2,
-  FileCode2,
+  SlidersHorizontal,
 } from 'lucide-react';
-import { useState, useMemo, useEffect } from 'react';
-import { Input } from '@/components/ui/input';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useDebounce } from '@/lib/useDebounce';
+import { useTranslation } from 'react-i18next';
+
 import {
+  PracticeChallengeGridCard,
+  PracticeChallengeRow,
+} from '@/components/challenges/practice-challenge-item';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import {
+  CATEGORY_ORDER,
   getTierFromCategory,
   TIER_ORDER,
-  CATEGORY_ORDER,
 } from '@/lib/constants';
-import { useTranslation } from 'react-i18next';
+import { challengeListQueryOptions } from '@/lib/challenges.query';
+import { omitUndefined } from '@/lib/omit-undefined';
+import { useDebounce } from '@/lib/useDebounce';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import {
-  TRACK_CONFIG,
-  SIDEBAR_GROUPS,
-  TRACK_IDS,
-  type TrackId,
-} from '@/config/tracks';
+import { TRACK_CONFIG, TRACK_IDS, type TrackId } from '@/config/tracks';
 import i18n from '@/lib/i18n';
 import { createSeoHead } from '@/lib/seo';
-import { ChallengeListCard, ChallengeListRow } from '@/components/challenges';
 
-// --- Search Params Schema ---
+const DifficultySchema = z.enum(['EASY', 'MEDIUM', 'HARD']);
+
 const ChallengesSearchSchema = z.object({
   track: z.enum(TRACK_IDS).optional(),
   q: z.string().optional(),
   hideCompleted: z.coerce.boolean().optional(),
   view: z.enum(['grid', 'list']).optional(),
   tier: z.string().optional(),
+  difficulty: DifficultySchema.optional(),
 });
 
 export const Route = createFileRoute('/$locale/challenges/')({
   validateSearch: ChallengesSearchSchema,
-  loaderDeps: ({ search: { q } }) => ({ q }),
-  loader: ({ context, params, deps: { q } }) => {
+  loaderDeps: ({ search: { q, difficulty } }) => ({ q, difficulty }),
+  loader: ({ context, params, deps: { q, difficulty } }) => {
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
-        ...omitUndefined({ search: q }),
+        ...omitUndefined({ search: q, difficulty }),
         limit: 1000,
       }),
     );
@@ -84,39 +78,6 @@ export const Route = createFileRoute('/$locale/challenges/')({
   },
 });
 
-// --- Configuration ---
-
-// Detailed badge config for challenge cards (kept for cards/table)
-const challengeTypeConfig: Record<
-  string,
-  { color: string; icon: React.ReactNode; label: string }
-> = {
-  JAVASCRIPT: {
-    color: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-    icon: <Code className="h-4 w-4" />,
-    label: 'JavaScript',
-  },
-  PLAYWRIGHT: {
-    color: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    icon: <Code className="h-4 w-4" />,
-    label: 'Playwright',
-  },
-  CSS_SELECTOR: {
-    color: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-    icon: <Palette className="h-4 w-4" />,
-    label: 'CSS Selector',
-  },
-  XPATH_SELECTOR: {
-    color: 'bg-green-500/20 text-green-400 border-green-500/30',
-    icon: <RouteIcon className="h-4 w-4" />,
-    label: 'XPath',
-  },
-};
-
-const isBossChallenge = (challenge: Challenge) => {
-  return challenge.slug.includes('boss');
-};
-
 export interface Challenge {
   id: string;
   slug: string;
@@ -132,27 +93,33 @@ export interface Challenge {
   tags: string[] | null;
 }
 
-// --- Sidebar / Tracks Configuration ---
-
-// --- Configuration ---
-
-// Map icons purely for UI (keeps config serializable/clean)
-const TRACK_ICONS: Record<TrackId, React.ReactNode> = {
-  all: <LayoutDashboard className="h-4 w-4" />,
-  selectors: <MousePointer2 className="h-4 w-4" />,
-  scripting: <FileCode2 className="h-4 w-4" />,
-  core: <Compass className="h-4 w-4" />,
-  e2e: <Layers className="h-4 w-4" />,
+const TRACK_LABEL_KEYS: Record<TrackId, string> = {
+  all: 'tracks.all.label',
+  selectors: 'tracks.selectors.label',
+  scripting: 'tracks.scripting.label',
+  core: 'tracks.core.label',
+  e2e: 'tracks.e2e.label',
 };
 
-// Reconstruct full track objects with icons for the UI
+const TRACK_DESCRIPTION_KEYS: Record<TrackId, string> = {
+  all: 'tracks.all.description',
+  selectors: 'tracks.selectors.description',
+  scripting: 'tracks.scripting.description',
+  core: 'tracks.core.description',
+  e2e: 'tracks.e2e.description',
+};
+
 const ALL_TRACKS = TRACK_IDS.map((id) => ({
   ...TRACK_CONFIG[id],
   id,
-  icon: TRACK_ICONS[id],
-  labelKey: `tracks.${id}.label`,
-  descriptionKey: `tracks.${id}.description`,
 }));
+
+const PRACTICE_STEPS = [
+  { key: 'choose', icon: ListChecks },
+  { key: 'solve', icon: Code2 },
+  { key: 'run', icon: Play },
+  { key: 'review', icon: Check },
+] as const;
 
 const routeApi = getRouteApi('/$locale/challenges/');
 
@@ -160,458 +127,470 @@ export function ChallengesPage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('challenges');
   const navigate = routeApi.useNavigate();
-
-  // URL-based State
   const searchParams = routeApi.useSearch();
+  const loaderData = routeApi.useLoaderData?.();
+
   const q = searchParams.q;
-  const hideCompleted = searchParams.hideCompleted ?? false;
   const tier = searchParams.tier;
+  const difficulty = searchParams.difficulty;
+  const hideCompleted = searchParams.hideCompleted ?? false;
   const activeTrackId = (searchParams.track || 'all') as TrackId;
-  const viewMode = searchParams.view || 'grid';
+  const viewMode = searchParams.view || 'list';
 
-  // Local state for search input (debounced to URL)
   const [searchInput, setSearchInput] = useState(q ?? '');
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [isMobileLayout, setIsMobileLayout] = useState(false);
   const debouncedSearchQuery = useDebounce(searchInput, 300);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  // Helper to update URL search params
+  useEffect(() => {
+    const updateLayout = () => {
+      setIsMobileLayout(window.innerWidth < 1024);
+    };
+
+    updateLayout();
+    window.addEventListener('resize', updateLayout);
+    return () => window.removeEventListener('resize', updateLayout);
+  }, []);
+
   const updateSearch = (
     updates: Partial<z.infer<typeof ChallengesSearchSchema>>,
   ) => {
     void navigate({
       to: '.',
-      search: (prev) => ({ ...prev, ...updates }),
+      search: (previous) => ({ ...previous, ...updates }),
       replace: true,
     });
   };
 
-  // Sync debounced search to URL
   useEffect(() => {
     if (debouncedSearchQuery !== (q ?? '')) {
       updateSearch({ q: debouncedSearchQuery || undefined });
     }
-  }, [debouncedSearchQuery]);
+  }, [debouncedSearchQuery, q]);
 
-  // Derive active track
   const activeTrack =
-    ALL_TRACKS.find((t) => t.id === activeTrackId) || ALL_TRACKS[0];
+    ALL_TRACKS.find((track) => track.id === activeTrackId) ?? ALL_TRACKS[0];
+
   if (!activeTrack) {
     throw new Error(
       'Challenge track configuration must define at least one track',
     );
   }
-  const activeGroup = SIDEBAR_GROUPS.find((group) =>
-    group.tracks.includes(activeTrackId),
-  );
 
   const { data: challengesResponse } = useQuery({
     ...challengeListQueryOptions({
       locale,
-      ...omitUndefined({ search: debouncedSearchQuery || undefined }),
+      ...omitUndefined({
+        search: debouncedSearchQuery || undefined,
+        difficulty,
+      }),
       limit: 1000,
     }),
+    initialData: loaderData,
     placeholderData: keepPreviousData,
   });
 
-  const challenges = challengesResponse?.data ?? [];
+  const challenges = (challengesResponse?.data ?? []) as Challenge[];
 
-  // Filter challenges based on Active Track & Search & Completed status
   const filteredChallenges = useMemo(() => {
-    if (!challenges) return [];
-
-    return challenges.filter((c: Challenge) => {
-      // Track Filter
-      if (!activeTrack.match(c)) return false;
-
-      // Hide Completed Filter
-      if (hideCompleted && c.isCompleted) return false;
-
-      // Tier Filter
-      if (tier && getTierFromCategory(c.category || '') !== tier) return false;
-
+    return challenges.filter((challenge) => {
+      if (!activeTrack.match(challenge)) return false;
+      if (hideCompleted && challenge.isCompleted) return false;
+      if (difficulty && challenge.difficulty !== difficulty) return false;
+      if (tier && getTierFromCategory(challenge.category || '') !== tier) {
+        return false;
+      }
       return true;
     });
-  }, [challenges, activeTrack, hideCompleted, tier]);
+  }, [activeTrack, challenges, difficulty, hideCompleted, tier]);
 
-  // Group challenges by category (for display)
   const groupedChallenges = useMemo(() => {
-    const groups: Record<string, Challenge[]> = {};
+    const groups = new Map<string, Challenge[]>();
 
     for (const challenge of filteredChallenges) {
       const category = challenge.category || 'uncategorized';
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      groups[category].push(challenge);
+      const group = groups.get(category) ?? [];
+      group.push(challenge);
+      groups.set(category, group);
     }
 
-    // Sort challenges within groups by order
-    for (const category in groups) {
-      const categoryChallenges = groups[category];
-      if (categoryChallenges) {
-        categoryChallenges.sort((a, b) => a.order - b.order);
-      }
+    for (const group of groups.values()) {
+      group.sort((a, b) => a.order - b.order);
     }
 
-    // Sort Categories themselves
-    return Object.entries(groups).sort(([catA], [catB]) => {
-      // Special case: uncategorized last
-      if (catA === 'uncategorized') return 1;
-      if (catB === 'uncategorized') return -1;
+    return [...groups.entries()].sort(([categoryA], [categoryB]) => {
+      if (categoryA === 'uncategorized') return 1;
+      if (categoryB === 'uncategorized') return -1;
 
-      const tierA = getTierFromCategory(catA);
-      const tierB = getTierFromCategory(catB);
-      const tierOrderA = TIER_ORDER.indexOf(tierA);
-      const tierOrderB = TIER_ORDER.indexOf(tierB);
+      const tierOrderA = TIER_ORDER.indexOf(getTierFromCategory(categoryA));
+      const tierOrderB = TIER_ORDER.indexOf(getTierFromCategory(categoryB));
+      if (tierOrderA !== tierOrderB) return tierOrderA - tierOrderB;
 
-      if (tierOrderA !== tierOrderB) {
-        return tierOrderA - tierOrderB;
-      }
-      // Within same tier, use CATEGORY_ORDER
-      const catOrderA = CATEGORY_ORDER[catA] ?? 999;
-      const catOrderB = CATEGORY_ORDER[catB] ?? 999;
-      return catOrderA - catOrderB;
+      return (
+        (CATEGORY_ORDER[categoryA] ?? 999) - (CATEGORY_ORDER[categoryB] ?? 999)
+      );
     });
   }, [filteredChallenges]);
 
-  // Calculate counts for Sidebar Badges
-  const trackCounts = useMemo(() => {
-    const counts: Record<string, number> = {};
-    challenges.forEach((c) => {
-      ALL_TRACKS.forEach((track) => {
-        if (track.match(c)) {
-          counts[track.id] = (counts[track.id] || 0) + 1;
-        }
-      });
+  const clearFilters = () => {
+    setSearchInput('');
+    updateSearch({
+      q: undefined,
+      track: undefined,
+      difficulty: undefined,
+      hideCompleted: undefined,
+      tier: undefined,
     });
-    return counts;
-  }, [challenges]);
+  };
 
-  // Helper component for Sidebar Item
-  const SidebarItem = ({ track }: { track: (typeof ALL_TRACKS)[number] }) => (
-    <button
-      onClick={() => {
-        updateSearch({ track: track.id });
-        setIsMobileMenuOpen(false);
-      }}
-      className={cn(
-        'w-full flex items-center justify-between px-3 py-2 rounded-lg transition-all duration-200 text-sm font-medium',
-        activeTrackId === track.id
-          ? 'bg-primary/10 text-primary shadow-sm'
-          : 'text-muted-foreground/80 hover:bg-muted/50 hover:text-foreground',
-      )}
-    >
-      <div className="flex items-start gap-3 text-left">
-        {track.icon}
-        <span className="leading-tight">{t(track.labelKey)}</span>
-      </div>
-      <Badge
-        variant="secondary"
-        className={cn(
-          'ml-auto text-[10px] h-5 px-1.5 min-w-[24px] justify-center shadow-none',
-          activeTrackId === track.id
-            ? 'bg-background text-primary'
-            : 'bg-muted text-muted-foreground',
-        )}
-      >
-        {trackCounts[track.id] || 0}
-      </Badge>
-    </button>
+  const hasActiveFilters = Boolean(
+    searchInput ||
+    q ||
+    difficulty ||
+    hideCompleted ||
+    tier ||
+    activeTrackId !== 'all',
   );
 
-  const SidebarContent = () => (
-    <div className="flex flex-col h-full">
-      <div className="mb-6 lg:mb-8 lg:px-2">
-        <h2 className="text-xl font-bold tracking-tight flex items-center gap-2">
-          <Box className="h-6 w-6 fill-primary/20 text-primary" />
-          {t('page.title')}
-        </h2>
-        <p className="text-xs text-muted-foreground mt-1">
-          {t('page.sidebarSubtitle')}
-        </p>
-      </div>
+  const renderChallengeProps = (challenge: Challenge) => ({
+    challenge,
+    locale,
+    typeLabel: t(`types.${challenge.type.toLowerCase()}`, {
+      defaultValue: challenge.type,
+    }).toUpperCase(),
+    difficultyLabel: t(`difficulty.${challenge.difficulty}`, {
+      defaultValue: challenge.difficulty,
+    }),
+    completedLabel: t('labels.completedState'),
+    comingSoonLabel: t('labels.comingSoon'),
+    startLabel: t('labels.start'),
+    reviewLabel: t('labels.review'),
+  });
 
-      <nav className="flex-1 space-y-6 overflow-y-auto">
-        {SIDEBAR_GROUPS.map((group) => (
-          <div key={group.id}>
-            {group.id !== 'overview' && (
-              <h3 className="text-xs font-semibold text-muted-foreground/50 uppercase tracking-wider mb-2 px-3">
-                {t(`trackGroups.${group.id}`)}
-              </h3>
-            )}
+  const showListView = viewMode === 'list' || isMobileLayout;
+  const showGridView = viewMode === 'grid' && !isMobileLayout;
+  const emptyStateTitle = t('library.emptyTitle', {
+    defaultValue: 'No challenges found',
+  });
 
-            <div className="space-y-1">
-              {group.tracks.map((trackId) => {
-                const track = ALL_TRACKS.find((t) => t.id === trackId);
-                if (!track) return null;
-                return <SidebarItem key={track.id} track={track} />;
-              })}
-            </div>
-          </div>
-        ))}
-      </nav>
-
-      <div className="mt-auto pt-6 border-t border-border/50 bg-background/95 backdrop-blur-sm sticky bottom-0 pb-2">
-        <div className="px-2">
-          <div className="flex items-center justify-between text-xs text-muted-foreground mb-2">
-            <span>{t('page.overallProgress')}</span>
-            <span>
-              {challenges.length > 0
-                ? Math.round(
-                    (challenges.filter((c) => c.isCompleted).length /
-                      challenges.length) *
-                      100,
-                  )
-                : 0}
-              %
-            </span>
-          </div>
-          <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-            <div
-              className="h-full bg-primary transition-all duration-500"
-              style={{
-                width: `${challenges.length > 0 ? (challenges.filter((c) => c.isCompleted).length / challenges.length) * 100 : 0}%`,
-              }}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  const toggleGroup = (category: string) => {
+    setCollapsedGroups((previous) => {
+      const next = new Set(previous);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="flex">
-        {/* --- Desktop Sidebar --- */}
-        <aside className="hidden lg:flex flex-col w-[260px] h-[calc(100vh-64px)] shrink-0 border-r border-border/50 sticky top-[64px] bg-card/10 backdrop-blur-xl p-4 overflow-hidden">
-          <SidebarContent />
-        </aside>
+    <div className="min-h-screen bg-background" data-testid="practice-library">
+      <main className="mx-auto w-full max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8 lg:pt-12">
+        <section
+          className="max-w-3xl pb-8 lg:pb-10"
+          aria-labelledby="practice-title"
+        >
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            {t('library.eyebrow')}
+          </p>
+          <h1
+            id="practice-title"
+            className="mt-3 text-4xl font-semibold tracking-[-0.045em] text-foreground sm:text-5xl"
+          >
+            {t('library.headline')}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+            {t('library.description')}
+          </p>
+        </section>
 
-        {/* --- Main Content Area --- */}
-        <main className="flex-1 p-4 md:p-8 lg:p-10 max-w-[1600px] mx-auto w-full min-h-[calc(100vh-64px)]">
-          {/* Mobile Header / Controls */}
-          <div className="lg:hidden flex items-center justify-between mb-6 gap-4">
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="shrink-0">
-                  <Menu className="h-5 w-5" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] p-4 pt-10">
-                <SidebarContent />
-              </SheetContent>
-            </Sheet>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold truncate">
-                {t(activeTrack.labelKey)}
-              </h1>
-            </div>
-          </div>
-
-          {/* Toolbar */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-            <div className="hidden lg:block">
-              <div className="flex items-center gap-2 mb-1">
-                {/* Breadcrumb-ish */}
-                {activeGroup && activeGroup.id !== 'overview' && (
-                  <>
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {t(`trackGroups.${activeGroup.id}`)}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-muted-foreground/50" />
-                  </>
-                )}
-                <h1 className="text-2xl font-bold tracking-tight">
-                  {t(activeTrack.labelKey)}
-                </h1>
-              </div>
-
-              <p className="text-muted-foreground text-sm">
-                {t(activeTrack.descriptionKey)}
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-              <div className="relative flex-1 sm:min-w-[240px]">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder={t('filters.searchPlaceholder')}
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  className="pl-9 bg-card/50"
-                />
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
+        <section
+          aria-label={t('library.discoveryLabel')}
+          className="relative flex flex-col md:sticky md:top-16 md:z-30 md:-mx-6 md:bg-background/95 md:px-6 md:backdrop-blur-sm lg:-mx-8 lg:px-8"
+        >
+          <nav
+            aria-label={t('filters.track')}
+            role="tablist"
+            className="order-2 -mx-4 flex snap-x overflow-x-auto border-b border-border px-4 md:mx-0 md:px-0 lg:order-1"
+          >
+            {ALL_TRACKS.map((track) => {
+              const isActive = activeTrack.id === track.id;
+              return (
+                <button
+                  key={track.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls="challenge-results"
                   onClick={() =>
-                    updateSearch({ hideCompleted: !hideCompleted })
+                    updateSearch({
+                      track: track.id === 'all' ? undefined : track.id,
+                    })
                   }
                   className={cn(
-                    'flex-1 sm:flex-none',
-                    hideCompleted &&
-                      'bg-primary/5 border-primary/30 text-primary',
+                    'min-h-11 shrink-0 snap-start border-b-2 px-4 text-sm font-medium transition-colors first:pl-0 last:pr-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
+                    isActive
+                      ? 'border-primary text-primary'
+                      : 'border-transparent text-muted-foreground hover:text-foreground',
                   )}
                 >
-                  {hideCompleted ? (
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                  ) : (
-                    <CheckCircle2 className="h-4 w-4 mr-2 opacity-30" />
-                  )}
-                  <span className="sr-only sm:not-sr-only sm:inline">
-                    {hideCompleted
-                      ? t('filters.showCompleted')
-                      : t('filters.hideCompleted')}
-                  </span>
-                </Button>
+                  {t(TRACK_LABEL_KEYS[track.id])}
+                </button>
+              );
+            })}
+          </nav>
 
-                <div className="flex p-1 bg-muted/50 rounded-lg border border-border/50">
-                  <Button
-                    variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => updateSearch({ view: 'grid' })}
-                  >
-                    <LayoutGrid className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'secondary' : 'ghost'}
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => updateSearch({ view: 'list' })}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
+          <div className="order-1 flex flex-col gap-3 border-b border-border bg-background/95 py-3 md:bg-transparent lg:order-2 lg:flex-row lg:items-center">
+            <div className="relative min-w-0 flex-1">
+              <Search
+                className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <Input
+                aria-label={t('filters.search')}
+                placeholder={t('filters.searchPlaceholder')}
+                value={searchInput}
+                onChange={(event) => setSearchInput(event.target.value)}
+                className="h-11 bg-card pl-10 md:border-foreground/25"
+              />
+            </div>
+
+            <div className="grid gap-2 sm:flex sm:items-center lg:shrink-0">
+              <Select
+                value={difficulty ?? 'all'}
+                onValueChange={(value) =>
+                  updateSearch({
+                    difficulty:
+                      value === 'all'
+                        ? undefined
+                        : DifficultySchema.parse(value),
+                  })
+                }
+              >
+                <SelectTrigger
+                  aria-label={t('filters.difficulty')}
+                  className="h-11 w-full bg-card sm:w-[170px]"
+                >
+                  <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+                  <SelectValue placeholder={t('filters.allDifficulties')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t('filters.allDifficulties')}
+                  </SelectItem>
+                  <SelectItem value="EASY">{t('difficulty.EASY')}</SelectItem>
+                  <SelectItem value="MEDIUM">
+                    {t('difficulty.MEDIUM')}
+                  </SelectItem>
+                  <SelectItem value="HARD">{t('difficulty.HARD')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <label
+                htmlFor="hide-completed"
+                className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground sm:min-w-[170px]"
+              >
+                <span>{t('filters.hideCompleted')}</span>
+                <Switch
+                  id="hide-completed"
+                  checked={hideCompleted}
+                  onCheckedChange={(checked) =>
+                    updateSearch({ hideCompleted: checked ? true : undefined })
+                  }
+                  aria-label={t('filters.hideCompleted')}
+                />
+              </label>
+
+              <div className="hidden items-center rounded-lg border border-border bg-card p-1 lg:flex">
+                <Button
+                  type="button"
+                  variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                  size="icon-sm"
+                  aria-label={t('filters.listView')}
+                  aria-pressed={viewMode === 'list'}
+                  onClick={() => updateSearch({ view: 'list' })}
+                >
+                  <List className="h-4 w-4" aria-hidden="true" />
+                </Button>
+                <Button
+                  type="button"
+                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                  size="icon-sm"
+                  aria-label={t('filters.gridView')}
+                  aria-pressed={viewMode === 'grid'}
+                  onClick={() => updateSearch({ view: 'grid' })}
+                >
+                  <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                </Button>
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Content */}
+        <div className="mt-7 flex items-center justify-between gap-4 md:mt-8">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+              {t(TRACK_DESCRIPTION_KEYS[activeTrack.id])}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t('library.showingCount', { count: filteredChallenges.length })}
+            </p>
+          </div>
+          {hasActiveFilters && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="shrink-0 text-muted-foreground"
+              onClick={clearFilters}
+            >
+              {t('filters.clear')}
+            </Button>
+          )}
+        </div>
+
+        <div id="challenge-results" className="mt-5" aria-live="polite">
           {groupedChallenges.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="bg-muted/30 h-20 w-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="h-10 w-10 text-muted-foreground/50" />
-              </div>
-              <h3 className="text-lg font-semibold">No challenges found</h3>
-              <p className="text-muted-foreground mt-1">
-                Try adjusting your filters or search query.
+            <div className="border border-dashed border-border px-6 py-16 text-center">
+              <Search
+                className="mx-auto h-8 w-8 text-muted-foreground/60"
+                aria-hidden="true"
+              />
+              <h2 className="mt-4 text-lg font-semibold text-foreground">
+                {emptyStateTitle === 'library.emptyTitle'
+                  ? 'No challenges found'
+                  : emptyStateTitle}
+              </h2>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                {t('library.emptyDescription')}
               </p>
-              {(searchInput || hideCompleted) && (
-                <Button
-                  variant="link"
-                  className="mt-4"
-                  onClick={() => {
-                    setSearchInput('');
-                    updateSearch({ q: undefined, hideCompleted: false });
-                  }}
-                >
-                  Clear filters
-                </Button>
-              )}
             </div>
           ) : (
-            <div className="space-y-12">
+            <div className="space-y-6">
               {groupedChallenges.map(([category, categoryChallenges]) => (
-                <div key={category} className="space-y-4">
-                  <div className="flex items-center gap-3 pb-2 border-b border-border/30">
-                    <div className="h-8 w-1 rounded-full bg-gradient-to-b from-primary to-transparent" />
-                    <h2 className="text-xl font-semibold tracking-tight">
-                      {t(`categories.${category}`) || category}
-                    </h2>
-                    <Badge
-                      variant="outline"
-                      className="ml-auto text-xs font-normal text-muted-foreground"
+                <section
+                  key={category}
+                  aria-labelledby={`category-${category}`}
+                  className="overflow-hidden rounded-xl border border-border bg-card"
+                >
+                  <div className="border-b border-border">
+                    <button
+                      type="button"
+                      aria-expanded={!collapsedGroups.has(category)}
+                      aria-controls={`category-content-${category}`}
+                      onClick={() => toggleGroup(category)}
+                      className="group flex min-h-14 w-full items-center justify-between gap-4 px-4 text-left outline-none transition-colors hover:bg-foreground/[0.025] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-5"
                     >
-                      {categoryChallenges.length} items
-                    </Badge>
+                      <span className="flex min-w-0 items-baseline gap-3">
+                        <span
+                          id={`category-${category}`}
+                          className="truncate font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-foreground"
+                        >
+                          {t(`categories.${category}`, {
+                            defaultValue: category,
+                          })}
+                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">
+                          {t('library.challengeCount', {
+                            count: categoryChallenges.length,
+                          })}
+                        </span>
+                      </span>
+                      <ChevronDown
+                        className={cn(
+                          'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+                          !collapsedGroups.has(category) && 'rotate-180',
+                        )}
+                        aria-hidden="true"
+                      />
+                    </button>
                   </div>
 
-                  {viewMode === 'grid' ? (
-                    <motion.div
-                      layout
-                      className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4"
-                    >
-                      <AnimatePresence mode="popLayout">
-                        {categoryChallenges.map((challenge) => {
-                          const config =
-                            challengeTypeConfig[challenge.type] ??
-                            challengeTypeConfig['JAVASCRIPT'];
-                          if (!config) return null;
-                          const isComingSoon =
-                            challenge.tags?.includes('coming-soon');
-                          const isBoss = isBossChallenge(challenge);
+                  <div
+                    id={`category-content-${category}`}
+                    hidden={collapsedGroups.has(category)}
+                  >
+                    {showListView && (
+                      <div
+                        data-testid="challenge-library-list"
+                        className="block"
+                      >
+                        {categoryChallenges.map((challenge) => (
+                          <PracticeChallengeRow
+                            key={challenge.slug}
+                            {...renderChallengeProps(challenge)}
+                          />
+                        ))}
+                      </div>
+                    )}
 
-                          return (
-                            <ChallengeListCard
-                              key={challenge.slug}
-                              challenge={challenge}
-                              config={config}
-                              isComingSoon={!!isComingSoon}
-                              isBoss={isBoss}
-                              params={{ locale, slug: challenge.slug }}
-                              t={t}
-                            />
-                          );
-                        })}
-                      </AnimatePresence>
-                    </motion.div>
-                  ) : (
-                    <div className="rounded-xl border bg-card/50 overflow-hidden w-full">
-                      <Table>
-                        <TableHeader>
-                          <TableRow className="hover:bg-transparent">
-                            <TableHead className="w-[60px] pl-4">#</TableHead>
-                            <TableHead className="w-full min-w-[300px]">
-                              Challenge
-                            </TableHead>
-                            {/* Type Column Restored */}
-                            <TableHead className="w-[120px]">Type</TableHead>
-                            <TableHead className="w-[80px]">
-                              Difficulty
-                            </TableHead>
-                            <TableHead className="w-[80px] text-right">
-                              XP
-                            </TableHead>
-                            {/* Spacer Column REMOVED */}
-                            <TableHead className="w-[40px] px-2"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <AnimatePresence mode="popLayout">
-                            {categoryChallenges.map((challenge, idx) => {
-                              const config =
-                                challengeTypeConfig[challenge.type] ??
-                                challengeTypeConfig['JAVASCRIPT'];
-                              if (!config) return null;
-                              const isComingSoon =
-                                challenge.tags?.includes('coming-soon');
-                              const isBoss = isBossChallenge(challenge);
-
-                              return (
-                                <ChallengeListRow
-                                  key={challenge.slug}
-                                  challenge={challenge}
-                                  index={idx}
-                                  config={config}
-                                  isComingSoon={!!isComingSoon}
-                                  isBoss={isBoss}
-                                  params={{ locale, slug: challenge.slug }}
-                                  t={t}
-                                />
-                              );
-                            })}
-                          </AnimatePresence>
-                        </TableBody>
-                      </Table>
-                    </div>
-                  )}
-                </div>
+                    {showGridView && (
+                      <div
+                        data-testid="challenge-library-grid"
+                        className="hidden gap-px bg-border lg:grid lg:grid-cols-2 xl:grid-cols-3"
+                      >
+                        {categoryChallenges.map((challenge) => (
+                          <PracticeChallengeGridCard
+                            key={challenge.slug}
+                            {...renderChallengeProps(challenge)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </section>
               ))}
             </div>
           )}
-        </main>
-      </div>
+        </div>
+
+        <section
+          aria-labelledby="how-practice-works"
+          className="mt-10 border border-brand-orange/20 bg-brand-orange/8 px-5 py-6 sm:px-7"
+        >
+          <div className="grid gap-7 lg:grid-cols-[minmax(220px,0.9fr)_minmax(0,2fr)] lg:items-center lg:gap-10">
+            <div>
+              <h2
+                id="how-practice-works"
+                className="text-xl font-semibold tracking-[-0.025em]"
+              >
+                {t('howPractice.title')}
+              </h2>
+              <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
+                {t('howPractice.description')}
+              </p>
+            </div>
+            <ol className="grid grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-4">
+              {PRACTICE_STEPS.map(({ key, icon: Icon }, index) => (
+                <li key={key} className="relative">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-brand-orange/25 bg-background text-brand-orange">
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </div>
+                  <p className="mt-3 text-sm font-semibold text-foreground">
+                    <span className="mr-1 font-mono text-[10px] text-brand-orange">
+                      0{index + 1}
+                    </span>
+                    {t(`howPractice.steps.${key}.title`)}
+                  </p>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {t(`howPractice.steps.${key}.description`)}
+                  </p>
+                  {index < PRACTICE_STEPS.length - 1 && (
+                    <ArrowRight
+                      className="absolute -right-3 top-4 hidden h-4 w-4 text-muted-foreground/60 sm:block"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      </main>
     </div>
   );
 }

@@ -116,7 +116,10 @@ export const getChallenges = createServerFn({ method: 'GET' })
       if (userId) {
         query.leftJoin(
           progress,
-          and(eq(progress.challengeId, challenges.id), eq(progress.userId, userId)),
+          and(
+            eq(progress.challengeId, challenges.id),
+            eq(progress.userId, userId),
+          ),
         );
       }
 
@@ -156,16 +159,29 @@ export const getChallenges = createServerFn({ method: 'GET' })
         .where(and(...conditions));
 
       const total = Number(countQuery[0]?.count ?? 0);
+      const contentBySlug = new Map(
+        (await getChallengeList(locale)).map((challenge) => [
+          challenge.slug,
+          challenge,
+        ]),
+      );
 
       return {
         success: true,
-        data: data.map((c) => ({
-          ...c,
-          // Ensure tags is array
-          tags: c.tags || [],
-          // UI expects explicit boolean
-          isCompleted: Boolean(c.isCompleted),
-        })),
+        data: data.map((c) => {
+          const content = contentBySlug.get(c.slug);
+          return {
+            ...c,
+            // Challenge copy is authored in content/challenges and localized
+            // consistently with the challenge detail workspace.
+            title: content?.title ?? c.title,
+            description: content?.description ?? c.description,
+            category: content?.category ?? c.category,
+            tags: c.tags?.length ? c.tags : (content?.tags ?? []),
+            // UI expects explicit boolean
+            isCompleted: Boolean(c.isCompleted),
+          };
+        }),
         pagination: {
           page: filters.page,
           limit: filters.limit,
@@ -375,15 +391,15 @@ export const getChallenge = createServerFn({ method: 'GET' })
           bestSubmission: bestSubmissionData,
           nextChallenge: nextChallenge
             ? {
-              slug: nextChallenge.slug,
-              title: nextChallenge.title,
-            }
+                slug: nextChallenge.slug,
+                title: nextChallenge.title,
+              }
             : null,
           prevChallenge: prevChallenge
             ? {
-              slug: prevChallenge.slug,
-              title: prevChallenge.title,
-            }
+                slug: prevChallenge.slug,
+                title: prevChallenge.title,
+              }
             : null,
         },
       };
