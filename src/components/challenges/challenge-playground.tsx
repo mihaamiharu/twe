@@ -88,7 +88,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
   ]);
 
   return (
-    <div className={cn('relative flex flex-col h-full bg-background animate-fade-in', className)}>
+    <div className={cn('relative flex flex-col h-full bg-background', className)}>
       {/* Practice Mode Banner */}
       {challenge.isCompleted && <PracticeModeBanner />}
 

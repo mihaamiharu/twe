@@ -1,20 +1,17 @@
+'use client';
+
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { type AuthSession } from '@/server/auth.fn';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import {
-  BookOpen,
   Bug,
-  Code,
   LogOut,
   Menu,
-  Trophy,
   User,
   X,
   LayoutDashboard,
-  Info,
 } from 'lucide-react';
-import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/user-menu';
 import { signOut } from '@/lib/auth.client';
@@ -29,9 +26,10 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const isAuthenticated = !!user;
   const isAdmin = (user as { role?: string })?.role === 'ADMIN';
 
-  const { t } = useTranslation(['common', 'bugs']);
+  const { t } = useTranslation(['common', 'bugs', 'legal']);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
@@ -48,35 +46,47 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
 
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
-  // Dynamic nav links based on locale
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus();
+    };
+  }, [isMobileMenuOpen]);
+
+  // Public labels intentionally map to the existing route names for now.
   const navLinks = [
     {
       to: LocaleRoutes.tutorials,
       params: localeParams(locale),
-      label: t('common:navigation.tutorials'),
-      icon: BookOpen,
+      label: t('common:navigation.learn'),
     },
     {
       to: LocaleRoutes.challenges,
       params: localeParams(locale),
-      label: t('common:navigation.challenges'),
-      icon: Code,
-    },
-    {
-      to: LocaleRoutes.leaderboard,
-      params: localeParams(locale),
-      label: t('common:navigation.leaderboard'),
-      icon: Trophy,
-    },
-    {
-      to: LocaleRoutes.about,
-      params: localeParams(locale),
-      label: t('common:navigation.about'),
-      icon: Info,
+      label: t('common:navigation.practice'),
     },
   ];
+
+  const aboutLink = {
+    to: LocaleRoutes.about,
+    params: localeParams(locale),
+    label: t('common:navigation.about'),
+  };
 
 
   const handleSignOut = async () => {
@@ -99,8 +109,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         className={cn(
           'sticky top-0 z-40 w-full transition-all duration-200 border-b',
           scrolled
-            ? 'bg-background/80 backdrop-blur-md border-border/40 shadow-sm'
-            : 'bg-background/0 border-transparent',
+            ? 'bg-background border-border'
+            : 'bg-background border-transparent',
         )}
         style={{
           paddingRight: 'var(--removed-body-scroll-bar-size, 0px)',
@@ -133,30 +143,45 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 </span>
               </Link>
 
-              <nav className="hidden md:flex items-center gap-1">
+              <nav aria-label="Primary" className="hidden md:flex items-center gap-5">
                 {navLinks.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground"
+                    className="relative flex min-h-11 items-center text-sm font-medium text-muted-foreground transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-transparent hover:text-foreground focus-visible:text-foreground"
                     activeProps={{
                       className:
-                        'text-primary bg-primary/5 hover:bg-primary/10 font-semibold shadow-sm ring-1 ring-border/20',
+                        'relative flex min-h-11 items-center text-sm font-semibold text-primary transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-primary',
                     }}
                   >
-                    <link.icon className="h-4 w-4" />
                     {link.label}
                   </Link>
                 ))}
+                <span className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground/70" aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}>
+                  {t('common:navigation.labs')}
+                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary/80">
+                    {t('common:navigation.labsSoon')}
+                  </span>
+                </span>
+                <Link
+                  to={aboutLink.to}
+                  params={aboutLink.params}
+                  className="relative flex min-h-11 items-center text-sm font-medium text-muted-foreground transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-transparent hover:text-foreground focus-visible:text-foreground"
+                  activeProps={{
+                    className:
+                      'relative flex min-h-11 items-center text-sm font-semibold text-primary transition-colors after:absolute after:inset-x-0 after:bottom-0 after:h-px after:bg-primary',
+                  }}
+                >
+                  {aboutLink.label}
+                </Link>
               </nav>
             </div>
 
             {/* Right side */}
             <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-1 mr-2">
+              <div className="hidden sm:flex items-center gap-3">
                 <LanguageSwitcher />
-                <ThemeToggle />
               </div>
 
               {isAuthenticated && user ? (
@@ -164,20 +189,21 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               ) : (
                 !isAuthPage && (
                   <div className="hidden md:flex items-center gap-2">
-                    <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+                  <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
                       <Link
                         to={LocaleRoutes.login}
                         params={localeParams(locale)}
                       >
-                        {t('common:navigation.login')}
+                        {t('common:actions.signIn')}
                       </Link>
                     </Button>
-                    <Button size="sm" asChild className="shadow-sm">
+                    <Button size="sm" asChild>
                       <Link
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
-                        {t('common:actions.startLearning')}
+                        {t('common:actions.startWebAutomation')}
+                        <span aria-hidden="true">→</span>
                       </Link>
                     </Button>
                   </div>
@@ -189,8 +215,11 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 variant="ghost"
                 size="icon"
                 className="md:hidden"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label="Toggle menu"
+                type="button"
+                onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-navigation"
+                aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
               >
                 {isMobileMenuOpen ? (
                   <X className="h-5 w-5" />
@@ -210,19 +239,20 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         <div className="fixed inset-0 z-50 md:hidden flex flex-col">
           {/* Backdrop */}
           <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-foreground/20"
             onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
           />
 
           {/* Menu panel */}
-          <nav className="relative flex-1 bg-background border-r border-border/50 max-w-[80vw] w-full p-4 animate-slide-in-left shadow-2xl flex flex-col h-full">
+          <nav id="mobile-navigation" aria-label="Mobile navigation" className="relative flex-1 bg-background border-r border-border max-w-[86vw] w-full p-4 animate-slide-in-left flex flex-col h-full">
 
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-2">
                 {/* Mobile Logo Rep */}
                 <span className="font-bold text-lg">TestingWithEkki</span>
               </div>
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+              <Button ref={closeButtonRef} variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu">
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -234,16 +264,44 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                   to={link.to}
                   params={link.params}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+                  className="flex min-h-11 items-center gap-3 border-b border-transparent px-2 text-muted-foreground hover:text-foreground transition-colors focus-visible:text-foreground"
                   activeProps={{
                     className:
-                      'text-primary bg-primary/5 font-medium border-l-2 border-primary rounded-l-none pl-3',
+                      'flex min-h-11 items-center gap-3 border-b border-primary px-2 font-medium text-primary',
                   }}
                 >
-                  <link.icon className="h-5 w-5" />
                   {link.label}
                 </Link>
               ))}
+
+              <span className="flex min-h-11 items-center gap-2 px-2 text-muted-foreground/70" aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}>
+                {t('common:navigation.labs')}
+                <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary/80">
+                  {t('common:navigation.labsSoon')}
+                </span>
+              </span>
+
+              <Link
+                to={aboutLink.to}
+                params={aboutLink.params}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex min-h-11 items-center border-b border-transparent px-2 text-muted-foreground hover:text-foreground transition-colors focus-visible:text-foreground"
+                activeProps={{
+                  className:
+                    'flex min-h-11 items-center border-b border-primary px-2 font-medium text-primary',
+                }}
+              >
+                {aboutLink.label}
+              </Link>
+
+              <Link
+                to={LocaleRoutes.contact}
+                params={localeParams(locale)}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex min-h-11 items-center border-b border-transparent px-2 text-muted-foreground hover:text-foreground transition-colors focus-visible:text-foreground"
+              >
+                {t('legal:contact.title')}
+              </Link>
 
               <div className="my-6 border-t border-border/50" />
 
@@ -305,7 +363,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                         to={LocaleRoutes.login}
                         params={localeParams(locale)}
                       >
-                        {t('common:navigation.login')}
+                        {t('common:actions.signIn')}
                       </Link>
                     </Button>
                     <Button
@@ -317,7 +375,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
-                        {t('common:actions.startLearning')}
+                        {t('common:actions.startWebAutomation')}
+                        <span aria-hidden="true">→</span>
                       </Link>
                     </Button>
                   </div>
@@ -327,7 +386,6 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
             <div className="mt-4 pt-4 border-t border-border/50 flex gap-4">
               <LanguageSwitcher />
-              <ThemeToggle />
             </div>
           </nav>
         </div>

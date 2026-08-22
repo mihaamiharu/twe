@@ -70,7 +70,7 @@ export function usePreviewState(
           body {
             margin: 0;
             padding: 16px;
-            font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+            font-family: 'Instrument Sans', system-ui, sans-serif;
             background: #ffffff;
             color: #1f2937;
             min-height: 100vh;

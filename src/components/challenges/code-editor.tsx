@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import Editor from '@monaco-editor/react';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
-import { useTheme } from '@/components/theme-provider';
 import {
   type CodeEditorProps,
   useEditorPersistence,
@@ -28,13 +27,9 @@ export function CodeEditor(props: CodeEditorProps) {
     className,
   } = props;
 
-  const { resolvedTheme } = useTheme();
-
-  // Determine Monaco theme based on app theme
-  const monacoTheme = useMemo(
-    () => (resolvedTheme === 'dark' ? 'customDark' : 'customLight'),
-    [resolvedTheme],
-  );
+  // The challenge workspace is intentionally dark even while public surfaces
+  // use the warm editorial theme.
+  const monacoTheme = useMemo(() => 'customDark', []);
 
   // Hook: Handle storage loading and debounced persistence
   const {
@@ -51,7 +46,7 @@ export function CodeEditor(props: CodeEditorProps) {
     return (
       <div
         className={cn(
-          'rounded-lg border border-border bg-slate-900 flex items-center justify-center text-muted-foreground',
+          'rounded-lg border border-workspace-border bg-workspace-background flex items-center justify-center text-workspace-muted',
           className,
         )}
         style={{ height }}
@@ -80,7 +75,7 @@ export function CodeEditor(props: CodeEditorProps) {
         options={{
           readOnly,
           fontSize: 14,
-          fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+          fontFamily: "'IBM Plex Mono', ui-monospace, SFMono-Regular, monospace",
           minimap: { enabled: showMinimap },
           lineNumbers: 'on',
           scrollBeyondLastLine: false,
@@ -108,7 +103,7 @@ export function CodeEditor(props: CodeEditorProps) {
           contextmenu: true,
         }}
         loading={
-          <div className="flex items-center justify-center h-full bg-slate-900 text-muted-foreground">
+          <div className="flex items-center justify-center h-full bg-workspace-background text-workspace-muted">
             <Loader2 className="h-5 w-5 animate-spin mr-2" />
             Loading editor...
           </div>

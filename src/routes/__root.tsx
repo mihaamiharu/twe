@@ -1,3 +1,5 @@
+'use client';
+
 import {
   HeadContent,
   Outlet,
@@ -27,6 +29,14 @@ import i18n from '@/lib/i18n';
 import { organizationSchema } from '@/lib/seo';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
+
+function isChallengeWorkspacePath(pathname: string) {
+  return /^\/(en|id)\/challenges\/[^/]+$/.test(pathname);
+}
+
+function isLocaleProductPath(pathname: string) {
+  return /^\/(en|id)(?:\/|$)/.test(pathname);
+}
 
 // Export context type for child routes
 export interface RootContext {
@@ -187,19 +197,28 @@ export const Route = createRootRouteWithContext<RootContext>()({
   notFoundComponent: NotFound,
 });
 
-// RootComponent now just renders the Outlet
-// The layout (Header, Footer) is in RootDocument which is stable
+// RootComponent owns the interactive app shell so Header/Footer event handlers
+// hydrate with the route tree while the document/providers remain stable.
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
+  );
 }
 
-// RootDocument is the "shell" that persists during SPA navigation
-// Header, Footer, and layout go here to prevent flicker
+// RootDocument is the document/provider shell that persists during navigation.
 function RootDocument({ children }: { children: React.ReactNode }) {
   const context = Route.useRouteContext();
   const queryClient = context?.queryClient;
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+  const pathname = context?.pathname || '';
+  const forcedTheme = isChallengeWorkspacePath(pathname)
+    ? 'dark'
+    : isLocaleProductPath(pathname)
+      ? 'light'
+      : undefined;
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -217,7 +236,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const theme = localStorage.getItem('twe-theme') || 'system';
+                const pathname = window.location.pathname;
+                const isChallengeWorkspace = ${isChallengeWorkspacePath.toString()}(pathname);
+                const isLocaleProduct = ${isLocaleProductPath.toString()}(pathname);
+                const theme = isChallengeWorkspace
+                  ? 'dark'
+                  : isLocaleProduct
+                    ? 'light'
+                    : (localStorage.getItem('twe-theme') || 'system');
                 let resolved = theme;
                 if (theme === 'system') {
                   resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -231,8 +257,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="scrollbar-thin" suppressHydrationWarning>
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <AppLayout>{children}</AppLayout>
+          <ThemeProvider {...(forcedTheme ? { forcedTheme } : {})}>
+            {children}
           </ThemeProvider>
           <TanStackDevtools
             config={{
