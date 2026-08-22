@@ -243,7 +243,7 @@ function HomeInspectorCharacter({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'pointer-events-none aspect-[0.62] overflow-hidden select-none',
+        'pointer-events-none aspect-[0.62] overflow-hidden select-none sm:overflow-visible',
         className,
       )}
       data-hero-character
@@ -251,9 +251,9 @@ function HomeInspectorCharacter({ className }: { className?: string }) {
       <img
         src="/illustrations/twe-inspector-male-hero.png"
         alt="TWE Inspector pointing toward the highlighted Sign in button"
-        className="absolute left-1/2 top-1/2 h-[115%] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
-        width={1122}
-        height={1402}
+        className="absolute left-1/2 top-1/2 h-full w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
+        width={1145}
+        height={1374}
         loading="eager"
         fetchPriority="high"
         draggable={false}
