@@ -74,7 +74,7 @@ export function PracticePreview({
         >
           {showWorkflowStep && (
             <span
-              className="whitespace-nowrap font-mono text-[9px] text-[var(--brand-orange)]"
+              className="whitespace-nowrap font-mono text-[9px] tracking-[0.08em] text-[var(--brand-orange)]"
               data-workflow-label="run"
             >
               02 /
@@ -83,7 +83,14 @@ export function PracticePreview({
           <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-orange)] text-[#f2f1ec]">
             <Play className="h-3 w-3 fill-current" aria-hidden="true" />
           </span>
-          <span className="font-mono text-[10px] text-[#a5a69f]">RUN</span>
+          <span
+            className={cn(
+              'font-mono text-[10px] text-[#a5a69f]',
+              showWorkflowStep && 'text-[var(--brand-orange)]',
+            )}
+          >
+            RUN
+          </span>
         </div>
       </div>
 
@@ -208,12 +215,12 @@ function InspectTargetBrowser({ className }: { className?: string }) {
           </div>
         </div>
         <div className="space-y-2 sm:order-1">
-          <div className="flex justify-end font-mono text-[8px] uppercase tracking-[0.08em] sm:text-[9px]">
+          <div className="flex justify-end font-mono text-[9px] uppercase tracking-[0.08em]">
             <span
               className="text-[var(--brand-orange)]"
               data-workflow-label="inspect"
             >
-              01 / Inspect
+              01 / INSPECT
             </span>
           </div>
           <div className="h-7 rounded-md border border-[var(--soft-border)] bg-white" />
@@ -228,9 +235,6 @@ function InspectTargetBrowser({ className }: { className?: string }) {
           </div>
         </div>
       </div>
-      <span className="absolute -bottom-3 right-4 rounded-sm border border-[var(--brand-orange)]/35 bg-[var(--paper-surface)] px-2 py-1 font-mono text-[8px] text-[var(--brand-orange)] sm:text-[9px]">
-        button[type=&quot;submit&quot;]
-      </span>
     </div>
   );
 }
@@ -268,7 +272,7 @@ function VerificationResult({ className }: { className?: string }) {
       data-hero-step="verify"
     >
       <div
-        className="mb-2 font-mono text-[9px] text-[var(--brand-orange)]"
+        className="mb-2 font-mono text-[9px] tracking-[0.08em] text-[var(--brand-orange)]"
         data-workflow-label="verify"
       >
         03 / VERIFY
@@ -329,7 +333,7 @@ export function HomeHeroVisual() {
     >
       <div className="sm:hidden">
         <div className="absolute bottom-[1%] left-[14%] z-0 h-20 w-[76%] rounded-[48%] bg-[var(--orange-tint)]/45" />
-        <div className="absolute -left-[4%] top-[18%] z-[5] h-[76%] w-[74%] rounded-[38%] bg-[var(--paper-surface)]" />
+        <div className="absolute -left-[4%] top-[18%] z-[5] h-[76%] w-[74%] rounded-[38%] bg-[var(--paper-surface)]/65" />
 
         <InspectTargetBrowser className="absolute left-[2%] top-5 z-10 w-[96%]" />
 
@@ -345,13 +349,13 @@ export function HomeHeroVisual() {
 
       <div className="hidden sm:block">
         <div className="absolute bottom-[1%] left-[16%] z-0 h-24 w-[78%] rounded-[48%] bg-[var(--orange-tint)]/45" />
-        <div className="absolute -left-[2%] top-[16%] z-[5] h-[72%] w-[44%] rounded-[42%] bg-[var(--paper-surface)]/80" />
+        <div className="absolute -left-[2%] top-[16%] z-[5] h-[72%] w-[44%] rounded-[42%] bg-[var(--paper-surface)]/55" />
 
         <div className="absolute left-[35%] top-[4%] z-10 w-[62%]">
           <InspectTargetBrowser />
         </div>
 
-        <HomeInspectorCharacter className="absolute left-0 top-[14%] z-20 w-[46%]" />
+        <HomeInspectorCharacter className="absolute left-0 top-[16.5%] z-20 w-[50%]" />
 
         <HeroWorkflowTrace />
 
@@ -360,12 +364,12 @@ export function HomeHeroVisual() {
           data-hero-step="run"
         >
           <PracticePreview
-            className="origin-top-right scale-[0.87]"
+            className="origin-top-right scale-[0.83]"
             showWorkflowStep
           />
         </div>
 
-        <div className="absolute bottom-[1%] right-[2%] z-50 w-[28%]">
+        <div className="absolute bottom-0 right-0 z-50 w-[25%]">
           <VerificationResult />
         </div>
       </div>
