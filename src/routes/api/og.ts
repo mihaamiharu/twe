@@ -40,8 +40,8 @@ export const Route = createFileRoute('/api/og')({
                     console.log(`[OG] Fetching fonts for "${title}"`);
 
                     const [fontData, fontRegularData] = await Promise.all([
-                        loadGoogleFont('Outfit', 700),
-                        loadGoogleFont('Outfit', 400)
+                        loadGoogleFont('Instrument Sans', 700),
+                        loadGoogleFont('Instrument Sans', 400)
                     ]);
 
                     console.log(`[OG] Fonts loaded, generating SVG`);
@@ -53,13 +53,13 @@ export const Route = createFileRoute('/api/og')({
                             height: 630,
                             fonts: [
                                 {
-                                    name: 'Outfit',
+                                    name: 'Instrument Sans',
                                     data: fontData,
                                     weight: 700,
                                     style: 'normal',
                                 },
                                 {
-                                    name: 'Outfit',
+                                    name: 'Instrument Sans',
                                     data: fontRegularData,
                                     weight: 400,
                                     style: 'normal',

@@ -57,6 +57,7 @@ export const LocaleRoutes = {
 
   privacy: '/$locale/privacy',
   terms: '/$locale/terms',
+  contact: '/$locale/contact',
   about: '/$locale/about',
 } as const;
 

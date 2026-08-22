@@ -25,17 +25,23 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const THEME_KEY = 'twe-theme';
 
 function getSystemTheme(): 'light' | 'dark' {
-  if (typeof window === 'undefined') return 'dark';
+  if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches
     ? 'dark'
     : 'light';
 }
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
+export function ThemeProvider({
+  children,
+  forcedTheme,
+}: {
+  children: ReactNode;
+  forcedTheme?: 'light' | 'dark';
+}) {
   // Use consistent default values for SSR to prevent hydration mismatch
   // The actual localStorage value will be synced in useEffect
   const [theme, setThemeState] = useState<Theme>('system');
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('dark');
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>('light');
 
   // Sync with localStorage after mount to prevent hydration mismatch
   useEffect(() => {
@@ -53,7 +59,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
     // Determine actual theme
     let actualTheme: 'light' | 'dark';
-    if (theme === 'system') {
+    if (forcedTheme) {
+      actualTheme = forcedTheme;
+    } else if (theme === 'system') {
       actualTheme = getSystemTheme();
     } else {
       actualTheme = theme;
@@ -62,7 +70,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     // Apply theme
     root.classList.add(actualTheme);
     setResolvedTheme(actualTheme);
-  }, [theme]);
+  }, [theme, forcedTheme]);
 
   // Listen for system theme changes
   useEffect(() => {

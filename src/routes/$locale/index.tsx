@@ -1,10 +1,8 @@
 import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { WaveSeparator } from '@/components/ui/wave-separator';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import {
   Zap,
   BookOpen,
@@ -15,32 +13,14 @@ import {
   ArrowRight,
   CheckCircle,
 } from 'lucide-react';
-import { AnimatedCounter } from '@/components/animated-counter';
 import { SelectorDemo } from '@/components/selector-demo';
 import { PlaywrightDemo } from '@/components/playwright-demo';
-import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
 
 import i18n from '@/lib/i18n';
 import { createSeoHead, websiteSchema } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/')({
-  loader: async ({ context }) => {
-    // Prefetch stats for SSR
-    if (context?.queryClient) {
-      await context.queryClient.ensureQueryData({
-        queryKey: ['homepage-stats'],
-        queryFn: async () => {
-          const result = await getDashboardStats();
-          if (!result.success || !result.data) {
-            throw new Error(result.error || 'Failed to fetch stats');
-          }
-          return result.data;
-        },
-        staleTime: 1000 * 60 * 5,
-      });
-    }
-  },
   component: HomePage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
@@ -59,20 +39,6 @@ const routeApi = getRouteApi('/$locale/');
 function HomePage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('home');
-  // Fetch real stats from Server Function
-  const { data: statsData, isLoading: statsLoading } = useQuery({
-    queryKey: ['homepage-stats'],
-    queryFn: async () => {
-      const result = await getDashboardStats();
-      if (!result.success || !result.data) {
-        throw new Error(result.error || 'Failed to fetch stats');
-      }
-      return result.data;
-    },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
-
-  const stats = statsData;
 
   const features = [
     {
@@ -106,43 +72,6 @@ function HomePage() {
       icon: <Sparkles className="w-10 h-10 text-primary" />,
       title: t('features.trackProgress.title'),
       description: t('features.trackProgress.description'),
-    },
-  ];
-
-  const learningPath = [
-    {
-      tier: 'basic',
-      emoji: '🟢',
-      title: t('tiers.basic.title'),
-      description: t('tiers.basic.description'),
-      skills: t('tiers.basic.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.basic || 0,
-    },
-    {
-      tier: 'beginner',
-      emoji: '🟡',
-      title: t('tiers.beginner.title'),
-      description: t('tiers.beginner.description'),
-      skills: t('tiers.beginner.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.beginner || 0,
-    },
-    {
-      tier: 'intermediate',
-      emoji: '🟠',
-      title: t('tiers.intermediate.title'),
-      description: t('tiers.intermediate.description'),
-      skills: t('tiers.intermediate.skills', {
-        returnObjects: true,
-      }) as string[],
-      count: stats?.tiers.intermediate || 0,
-    },
-    {
-      tier: 'e2e',
-      emoji: '🟣',
-      title: t('tiers.e2e.title'),
-      description: t('tiers.e2e.description'),
-      skills: t('tiers.e2e.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.e2e || 0,
     },
   ];
 
@@ -238,121 +167,12 @@ function HomePage() {
             </Link>
           </div>
 
-          {/* Dynamic Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-16 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.challenges || 0} suffix="+" />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.challenges')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-12 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.tutorials || 0} />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.tutorials')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-12 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.achievements || 0} />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.achievements')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                ∞
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.learning')}
-              </div>
-            </div>
-          </div>
         </div>
 
 
 
         {/* Animated Wave Separator */}
         <WaveSeparator />
-      </section>
-
-      {/* Learning Path Section */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('careerPath.title')}{' '}
-              <span className="gradient-text">
-                {t('careerPath.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('careerPath.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {learningPath.map((tier, index) => (
-              <Card
-                key={tier.tier}
-                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 relative overflow-hidden group"
-              >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-3xl grayscale-[0.5]">{tier.emoji}</span>
-                    <div>
-                      <div className="text-sm text-muted-foreground font-bold">
-                        Phase {index + 1}
-                      </div>
-                      <h3 className="text-xl font-bold">{tier.title}</h3>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {tier.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {tier.skills.map((skill) => (
-                      <Badge
-                        key={skill}
-                        variant="secondary"
-                        className="text-xs font-medium border border-border"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="text-sm font-bold text-primary">
-                    {tier.count > 0 ? (
-                      `${tier.count} ${t('careerPath.challenges')}`
-                    ) : (
-                      <Badge variant="outline" className="text-xs border-dashed border-muted-foreground text-muted-foreground">
-                        Coming Soon
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* Featured Challenges */}

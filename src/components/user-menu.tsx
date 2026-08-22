@@ -1,3 +1,5 @@
+'use client';
+
 import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { memo } from 'react';
@@ -52,7 +54,8 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
             <DropdownMenuTrigger asChild>
                 <Button
                     variant="ghost"
-                    className="relative h-9 w-9 rounded-full ring-2 ring-transparent hover:ring-border/50 transition-all p-0 overflow-hidden"
+                    className="relative h-11 w-11 rounded-full ring-1 ring-transparent hover:ring-border transition-colors p-0 overflow-hidden"
+                    aria-label="Open account menu"
                 >
                     <Avatar className="h-9 w-9">
                         <AvatarImage
@@ -60,7 +63,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
                             alt={user.name || 'User'}
                             className="object-cover"
                         />
-                        <AvatarFallback className="bg-gradient-to-br from-primary/10 to-primary/5 text-primary font-medium">
+                        <AvatarFallback className="bg-primary/10 text-primary font-medium">
                             {(user.name || user.email || 'U')
                                 .charAt(0)
                                 .toUpperCase()}
