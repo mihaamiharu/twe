@@ -88,7 +88,7 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
           "name": "TestingWithEkki",
           "logo": {
             "@type": "ImageObject",
-            "url": `${baseUrl}/logo-dark-new.png`
+            "url": `${baseUrl}/logo-icon.png`
           }
         },
         "mainEntityOfPage": {

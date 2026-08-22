@@ -137,6 +137,15 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 params={localeParams(locale)}
                 className="group inline-flex min-h-11 items-center"
               >
+                <img
+                  src="/logo-icon.png"
+                  alt=""
+                  aria-hidden="true"
+                  width={36}
+                  height={36}
+                  draggable={false}
+                  className="mr-2.5 h-9 w-9 shrink-0 rounded-md object-cover"
+                />
                 <span className="relative text-[1.2rem] font-semibold tracking-[-0.04em] text-[var(--graphite)] after:absolute after:-bottom-1 after:left-[57%] after:h-[2px] after:w-10 after:-rotate-6 after:bg-[var(--brand-orange)] after:content-[''] group-hover:text-[var(--brand-orange)]">
                   TestingWith
                   <span className="text-[var(--brand-orange)]">Ekki</span>
