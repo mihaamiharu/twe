@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   User,
+  Trophy,
   X,
   LayoutDashboard,
 } from 'lucide-react';
@@ -19,7 +20,6 @@ import { BugReportDialog } from '@/components/bug-report-dialog';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
-
 
 export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const user = session?.user;
@@ -88,7 +88,6 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     label: t('common:navigation.about'),
   };
 
-
   const handleSignOut = async () => {
     try {
       await signOut({
@@ -130,7 +129,10 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 </span>
               </Link>
 
-              <nav aria-label="Primary" className="hidden md:flex items-center gap-5">
+              <nav
+                aria-label="Primary"
+                className="hidden md:flex items-center gap-5"
+              >
                 {navLinks.map((link) => (
                   <Link
                     key={link.to}
@@ -145,7 +147,10 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                     {link.label}
                   </Link>
                 ))}
-                <span className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground/70" aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}>
+                <span
+                  className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted-foreground/70"
+                  aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                >
                   {t('common:navigation.labs')}
                   <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary/80">
                     {t('common:navigation.labsSoon')}
@@ -176,7 +181,12 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               ) : (
                 !isAuthPage && (
                   <div className="hidden md:flex items-center gap-2">
-                  <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      asChild
+                      className="text-muted-foreground hover:text-foreground"
+                    >
                       <Link
                         to={LocaleRoutes.login}
                         params={localeParams(locale)}
@@ -232,13 +242,24 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
           />
 
           {/* Menu panel */}
-          <nav id="mobile-navigation" aria-label="Mobile navigation" className="relative flex-1 bg-background border-r border-border max-w-[86vw] w-full p-4 animate-slide-in-left flex flex-col h-full">
-
+          <nav
+            id="mobile-navigation"
+            aria-label="Mobile navigation"
+            className="relative flex-1 bg-background border-r border-border max-w-[86vw] w-full p-4 animate-slide-in-left flex flex-col h-full"
+          >
             <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-2">
-                <span className="font-bold text-lg">TestingWith<span className="text-primary">Ekki</span></span>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-lg">
+                  TestingWith<span className="text-primary">Ekki</span>
+                </span>
               </div>
-              <Button ref={closeButtonRef} variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} aria-label="Close menu">
+              <Button
+                ref={closeButtonRef}
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label="Close menu"
+              >
                 <X className="h-5 w-5" />
               </Button>
             </div>
@@ -260,7 +281,10 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 </Link>
               ))}
 
-              <span className="flex min-h-11 items-center gap-2 px-2 text-muted-foreground/70" aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}>
+              <span
+                className="flex min-h-11 items-center gap-2 px-2 text-muted-foreground/70"
+                aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+              >
                 {t('common:navigation.labs')}
                 <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-primary/80">
                   {t('common:navigation.labsSoon')}
@@ -301,6 +325,15 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                   >
                     <User className="h-5 w-5" />
                     {t('common:navigation.profile')}
+                  </Link>
+                  <Link
+                    to={LocaleRoutes.leaderboard}
+                    params={localeParams(locale)}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                  >
+                    <Trophy className="h-5 w-5" />
+                    {t('common:navigation.leaderboard')}
                   </Link>
                   {isAdmin && (
                     <Link

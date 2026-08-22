@@ -12,7 +12,10 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import { ChallengePlayground, ChallengeSkeleton } from '@/components/challenges';
+import {
+  ChallengePlayground,
+  ChallengeSkeleton,
+} from '@/components/challenges';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -51,9 +54,15 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
       return {
         meta: [
           { title: i18n.t('challenges:page.seo.title') },
-          { name: 'description', content: i18n.t('challenges:page.seo.description') },
+          {
+            name: 'description',
+            content: i18n.t('challenges:page.seo.description'),
+          },
           { property: 'og:url', content: url },
-          { property: 'og:image', content: 'https://testingwithekki.com/twe-banner.png' },
+          {
+            property: 'og:image',
+            content: 'https://testingwithekki.com/twe-banner.png',
+          },
         ],
         links: [
           {
@@ -86,45 +95,50 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
     // Structured Data
     const jsonLd = [
       {
-        "@context": "https://schema.org",
-        "@type": "BreadcrumbList",
-        "itemListElement": [
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
           {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Home",
-            "item": `https://testingwithekki.com/${locale}`
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `https://testingwithekki.com/${locale}`,
           },
           {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Challenges",
-            "item": `https://testingwithekki.com/${locale}/challenges`
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Challenges',
+            item: `https://testingwithekki.com/${locale}/challenges`,
           },
           {
-            "@type": "ListItem",
-            "position": 3,
-            "name": data.title,
-            "item": url
-          }
-        ]
+            '@type': 'ListItem',
+            position: 3,
+            name: data.title,
+            item: url,
+          },
+        ],
       },
       {
-        "@context": "https://schema.org",
-        "@type": "LearningResource",
-        "name": data.title,
-        "description": data.description,
-        "learningResourceType": "Practice Problem",
-        "educationalLevel": data.difficulty === 'EASY' ? 'Beginner' : data.difficulty === 'MEDIUM' ? 'Intermediate' : 'Advanced',
-        "teaches": data.category || "Playwright Automation",
-        "url": url,
-        "image": ogImageUrl,
-        "author": {
-          "@type": "Organization",
-          "name": "TestingWithEkki",
-          "url": "https://testingwithekki.com"
-        }
-      }
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        name: data.title,
+        description: data.description,
+        learningResourceType: 'Practice Problem',
+        educationalLevel:
+          data.difficulty === 'EASY'
+            ? 'Beginner'
+            : data.difficulty === 'MEDIUM'
+              ? 'Intermediate'
+              : 'Advanced',
+        teaches: data.category || 'Playwright Automation',
+        url: url,
+        image: ogImageUrl,
+        author: {
+          '@type': 'Organization',
+          name: 'TestingWithEkki',
+          url: 'https://testingwithekki.com',
+        },
+      },
     ];
 
     return {
@@ -161,18 +175,14 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
           href: `https://testingwithekki.com/en/challenges/${data.slug}`,
         },
       ],
-      scripts: jsonLd.map(data => ({
+      scripts: jsonLd.map((data) => ({
         type: 'application/ld+json',
-        children: JSON.stringify(data)
-      }))
+        children: JSON.stringify(data),
+      })),
     };
   },
   pendingComponent: ChallengeSkeleton,
 });
-
-
-
-
 
 function ChallengeDetailPage() {
   const { locale, slug } = useParams({ from: '/$locale/challenges/$slug' });
@@ -187,16 +197,13 @@ function ChallengeDetailPage() {
     levelUp?: { newLevel: number; title: string };
   } | null>(null);
 
-  const {
-    data: challengeData,
-  } = useSuspenseQuery(challengeDetailQueryOptions(slug, locale));
+  const { data: challengeData } = useSuspenseQuery(
+    challengeDetailQueryOptions(slug, locale),
+  );
 
   // Rename for compatibility with existing code
   // Rename for compatibility with existing code
   const data = challengeData;
-
-
-
 
   const { data: auth } = useSuspenseQuery(authQueryOptions);
   const sessionData = auth; // Alias for compatibility
@@ -253,9 +260,9 @@ function ChallengeDetailPage() {
           ...omitUndefined({
             levelUp: response.data.levelUp
               ? {
-                newLevel: response.data.levelUp.newLevel,
-                title: getLevelTitle(response.data.levelUp.newLevel),
-              }
+                  newLevel: response.data.levelUp.newLevel,
+                  title: getLevelTitle(response.data.levelUp.newLevel),
+                }
               : undefined,
           }),
         });
@@ -264,8 +271,8 @@ function ChallengeDetailPage() {
         toast.success(t('common:messages.challengeCompleted'), {
           description: response.data.newAchievements?.length
             ? t('common:messages.achievementUnlocked', {
-              name: response.data.newAchievements[0]?.name,
-            })
+                name: response.data.newAchievements[0]?.name,
+              })
             : undefined,
         });
 
@@ -348,7 +355,6 @@ function ChallengeDetailPage() {
     [challenge, submitMutation, sessionData, locale, t],
   );
 
-
   if (!challenge) {
     return (
       <div className="min-h-screen p-6 md:p-10">
@@ -397,8 +403,8 @@ function ChallengeDetailPage() {
   }
 
   return (
-    <div className="workspace-shell h-[calc(100vh-4rem)] flex flex-col">
-      <div className="flex-1 min-h-0">
+    <div className="h-[calc(100vh-4rem)] min-w-0 overflow-hidden flex flex-col">
+      <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
         <ChallengePlayground
           key={challenge.id}
           challenge={challenge}
@@ -421,12 +427,15 @@ function ChallengeDetailPage() {
           {...omitUndefined({
             onNextChallenge: data?.data?.nextChallenge
               ? () => {
-                setShowSuccessDialog(false);
-                void navigate({
-                  to: '/$locale/challenges/$slug',
-                  params: { locale, slug: data.data?.nextChallenge?.slug ?? '' },
-                });
-              }
+                  setShowSuccessDialog(false);
+                  void navigate({
+                    to: '/$locale/challenges/$slug',
+                    params: {
+                      locale,
+                      slug: data.data?.nextChallenge?.slug ?? '',
+                    },
+                  });
+                }
               : undefined,
           })}
         />
