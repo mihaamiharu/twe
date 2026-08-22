@@ -47,8 +47,8 @@ export const Route = createFileRoute('/$locale/tutorials/')({
     const locale = params.locale || 'en';
 
     return createSeoHead({
-      title: i18n.t('tutorials:learn.seo.title'),
-      description: i18n.t('tutorials:learn.seo.description'),
+      title: i18n.t('tutorials:learn.seo.title', { lng: locale }),
+      description: i18n.t('tutorials:learn.seo.description', { lng: locale }),
       path: '/tutorials',
       locale,
     });

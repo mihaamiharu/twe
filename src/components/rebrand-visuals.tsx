@@ -337,7 +337,7 @@ export function HomeHeroVisual() {
 
         <InspectTargetBrowser className="absolute left-[2%] top-5 z-10 w-[96%]" />
 
-        <HomeInspectorCharacter className="absolute -left-[2%] top-[20%] z-20 w-[66%]" />
+        <HomeInspectorCharacter className="absolute -left-[2%] top-[23%] z-20 w-[66%]" />
 
         <div
           className="absolute bottom-4 right-[1%] z-40 w-[57%]"

@@ -44,9 +44,11 @@ export function Footer() {
               params={localizedParams}
               className="group inline-flex min-h-11 items-center"
             >
-              <span className="relative text-[1.7rem] font-semibold tracking-[-0.05em] text-[var(--graphite)] after:absolute after:-bottom-1 after:left-[57%] after:h-[2px] after:w-14 after:-rotate-6 after:bg-[var(--brand-orange)] after:content-[''] group-hover:text-[var(--brand-orange)]">
+              <span className="text-[1.7rem] font-semibold tracking-[-0.05em] text-[var(--graphite)] group-hover:text-[var(--brand-orange)]">
                 TestingWith
-                <span className="text-[var(--brand-orange)]">Ekki</span>
+                <span className="twe-wordmark-ekki text-[var(--brand-orange)]">
+                  Ekki
+                </span>
               </span>
             </Link>
             <p className="mt-5 max-w-[19rem] text-[1rem] leading-7 text-[var(--muted-graphite)]">

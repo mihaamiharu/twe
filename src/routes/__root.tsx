@@ -27,6 +27,8 @@ import { organizationSchema } from '@/lib/seo';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
 
+const HOME_OG_IMAGE = 'https://testingwithekki.com/api/og?type=Home';
+
 function isLocaleProductPath(pathname: string) {
   return /^\/(en|id)(?:\/|$)/.test(pathname);
 }
@@ -102,7 +104,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
       },
       {
         property: 'og:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
+        content: HOME_OG_IMAGE,
       },
       {
         property: 'og:image:width',
@@ -134,7 +136,7 @@ export const Route = createRootRouteWithContext<RootContext>()({
       },
       {
         name: 'twitter:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
+        content: HOME_OG_IMAGE,
       },
       {
         name: 'theme-color',

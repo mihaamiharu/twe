@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
-import { createSeoHead, websiteSchema } from '@/lib/seo';
+import { BASE_URL, createSeoHead, websiteSchema } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { LocaleRoutes, localeParams } from '@/lib/navigation';
 
@@ -19,10 +19,11 @@ export const Route = createFileRoute('/$locale/')({
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: i18n.t('common:seo.title'),
-      description: i18n.t('common:seo.description'),
+      title: i18n.t('common:seo.title', { lng: locale }),
+      description: i18n.t('common:seo.description', { lng: locale }),
       path: '/',
       locale,
+      ogImage: `${BASE_URL}/api/og?type=Home`,
       jsonLd: [websiteSchema],
     });
   },

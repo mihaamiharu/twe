@@ -2,6 +2,9 @@
   "page": {
     "title": "Tantangan",
     "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
+    "seo": {
+      "title": "Praktik Software Testing — TestingWithEkki"
+    },
     "overallProgress": "Progres Keseluruhan",
     "notFound": "Tantangan Tidak Ditemukan",
     "notFoundDescription": "Tantangan yang kamu cari tidak dapat ditemukan.",
