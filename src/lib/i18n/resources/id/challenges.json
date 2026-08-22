@@ -19,6 +19,7 @@
     "showingCount": "{{count}} tantangan",
     "challengeCount_one": "{{count}} tantangan",
     "challengeCount_other": "{{count}} tantangan",
+    "emptyEyebrow": "TIDAK ADA HASIL",
     "emptyTitle": "Tantangan tidak ditemukan",
     "emptyDescription": "Coba ubah pencarian atau filter untuk menemukan tantangan yang ingin kamu kerjakan."
   },

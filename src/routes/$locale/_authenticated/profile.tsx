@@ -24,6 +24,7 @@ import {
   Trophy,
   Zap,
 } from 'lucide-react';
+import { EmptyState } from '@/components/empty-state';
 import { getUserSettings } from '@/server/user.fn';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { createSeoHead } from '@/lib/seo';
@@ -327,10 +328,12 @@ function ProfilePage() {
               </CardHeader>
               <CardContent>
                 {!user.recentActivity || user.recentActivity.length === 0 ? (
-                  <div className="py-12 text-center text-muted-foreground">
-                    <Code className="mx-auto mb-3 h-10 w-10 opacity-30" />
-                    <p>{t('profile:activity.empty')}</p>
-                  </div>
+                  <EmptyState
+                    size="compact"
+                    eyebrow={t('profile:activity.emptyEyebrow')}
+                    title={t('profile:activity.title')}
+                    description={t('profile:activity.empty')}
+                  />
                 ) : (
                   <div className="divide-y divide-border">
                     {user.recentActivity.map((activity, index) => (
@@ -371,9 +374,13 @@ function ProfilePage() {
             {!user.earnedAchievements ||
             user.earnedAchievements.length === 0 ? (
               <Card>
-                <CardContent className="p-8 text-center text-muted-foreground">
-                  <Award className="mx-auto mb-2 h-8 w-8 opacity-50" />
-                  <p>{t('profile:achievements.empty')}</p>
+                <CardContent className="p-0">
+                  <EmptyState
+                    size="compact"
+                    eyebrow={t('profile:achievements.emptyEyebrow')}
+                    title={t('profile:tabs.achievements')}
+                    description={t('profile:achievements.empty')}
+                  />
                 </CardContent>
               </Card>
             ) : (

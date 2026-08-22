@@ -4,13 +4,13 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
 import {
   ArrowRight,
-  BookOpen,
   CheckCircle2,
   Circle,
   Clock,
   Search,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { EmptyState } from '@/components/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -296,17 +296,17 @@ function LearnPage() {
             </div>
 
             {filteredLessons.length === 0 ? (
-              <div className="border-y border-dashed border-border py-14 text-center">
-                <BookOpen className="mx-auto mb-4 h-8 w-8 text-muted-foreground" />
-                <h4 className="text-lg font-semibold text-foreground">
-                  {t('learn.lessons.noResults')}
-                </h4>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {q
+              <EmptyState
+                size="compact"
+                className="border-y border-dashed border-border"
+                eyebrow={t('learn.lessons.emptyEyebrow')}
+                title={t('learn.lessons.noResults')}
+                description={
+                  q
                     ? t('learn.lessons.tryDifferentSearch')
-                    : t('learn.lessons.checkBackSoon')}
-                </p>
-              </div>
+                    : t('learn.lessons.checkBackSoon')
+                }
+              />
             ) : (
               <div className="border-t border-border">
                 {filteredLessons.map((lesson, index) => (

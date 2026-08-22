@@ -20,6 +20,7 @@
     "showingCount": "{{count}} challenges",
     "challengeCount_one": "{{count}} challenge",
     "challengeCount_other": "{{count}} challenges",
+    "emptyEyebrow": "NO MATCHES",
     "emptyTitle": "No challenges found",
     "emptyDescription": "Try adjusting your search or filters to find a challenge to work on."
   },

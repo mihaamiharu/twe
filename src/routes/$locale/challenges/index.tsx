@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { EmptyState } from '@/components/empty-state';
 import {
   PracticeChallengeGridCard,
   PracticeChallengeRow,
@@ -271,9 +272,7 @@ export function ChallengesPage() {
 
   const showListView = viewMode === 'list' || isMobileLayout;
   const showGridView = viewMode === 'grid' && !isMobileLayout;
-  const emptyStateTitle = t('library.emptyTitle', {
-    defaultValue: 'No challenges found',
-  });
+  const emptyStateTitle = t('library.emptyTitle');
 
   const toggleGroup = (category: string) => {
     setCollapsedGroups((previous) => {
@@ -455,20 +454,13 @@ export function ChallengesPage() {
 
         <div id="challenge-results" className="mt-5" aria-live="polite">
           {groupedChallenges.length === 0 ? (
-            <div className="border border-dashed border-border px-6 py-16 text-center">
-              <Search
-                className="mx-auto h-8 w-8 text-muted-foreground/60"
-                aria-hidden="true"
-              />
-              <h2 className="mt-4 text-lg font-semibold text-foreground">
-                {emptyStateTitle === 'library.emptyTitle'
-                  ? 'No challenges found'
-                  : emptyStateTitle}
-              </h2>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                {t('library.emptyDescription')}
-              </p>
-            </div>
+            <EmptyState
+              size="compact"
+              className="rounded-xl border border-dashed border-border px-6"
+              eyebrow={t('library.emptyEyebrow')}
+              title={emptyStateTitle}
+              description={t('library.emptyDescription')}
+            />
           ) : (
             <div className="space-y-6">
               {groupedChallenges.map(([category, categoryChallenges]) => (
