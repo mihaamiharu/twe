@@ -130,7 +130,7 @@ export const organizationSchema = {
     "@type": "Organization",
     "name": "TestingWithEkki",
     "url": "https://testingwithekki.com",
-    "logo": "https://testingwithekki.com/logo-dark-new.png",
+    "logo": "https://testingwithekki.com/logo-icon.png",
     "sameAs": [
         "https://x.com/ekkisyam2310",
         "https://www.linkedin.com/in/ekkisyamsugiardi"
