@@ -406,6 +406,7 @@ export async function sendContactNotificationEmail(message: {
   id: string;
   name: string;
   email: string;
+  topic?: string | null;
   message: string;
   createdAt: Date;
 }): Promise<void> {
@@ -418,7 +419,7 @@ export async function sendContactNotificationEmail(message: {
     return;
   }
 
-  const subject = `📩 [Contact] New Message from ${message.name}`;
+  const subject = `📩 [Contact] ${message.topic || 'general'} message from ${message.name}`;
 
   // Use environment variable for base URL if available
   const baseUrl = process.env.BETTER_AUTH_URL || 'https://testingwithekki.com';
@@ -448,6 +449,7 @@ export async function sendContactNotificationEmail(message: {
             
             <div class="section">
                 <p><strong>From:</strong> ${message.name} (<a href="mailto:${message.email}">${message.email}</a>)</p>
+                <p><strong>Topic:</strong> ${message.topic || 'general'}</p>
                 <p><strong>Date:</strong> ${message.createdAt.toLocaleString()}</p>
                 <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
                 <p style="white-space: pre-wrap;">${message.message}</p>

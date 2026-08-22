@@ -1,205 +1,191 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { createFileRoute } from '@tanstack/react-router';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Handshake,
+  Loader2,
+  MessageCircle,
+  Send,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Send, Loader2, CheckCircle, Calendar, ArrowRight, Briefcase } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { ContactHeroVisual } from '@/components/rebrand-visuals';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { toast } from 'sonner';
 import { submitContactMessage } from '@/server/contact.fn';
 import { createSeoHead } from '@/lib/seo';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/$locale/contact')({
-    component: ContactPage,
-    head: ({ params }) => {
-        const locale = params.locale || 'en';
-        return createSeoHead({
-            title: 'Contact | TestingWithEkki',
-            description: 'Get in touch with Ekki Syam Sugiardi. Send a message, book a 1-on-1 session, or explore hiring opportunities.',
-            path: '/contact',
-            locale,
-        });
-    },
+  component: ContactPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: 'Contact | TestingWithEkki',
+      description: 'Contact Ekki about QA mentoring, partnerships, sponsorships, or questions about TestingWithEkki.',
+      path: '/contact',
+      locale,
+    });
+  },
 });
 
+const topicOptions = ['general', 'mentoring', 'partnership', 'other'] as const;
+
 function ContactPage() {
-    const { t } = useTranslation('legal');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [isSuccess, setIsSuccess] = useState(false);
+  const { t } = useTranslation('contact');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-    // ... (in component)
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setIsSubmitting(true);
 
-    async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
-        setIsSubmitting(true);
+    const formData = new FormData(event.currentTarget);
+    const name = formData.get('name');
+    const email = formData.get('email');
+    const topic = formData.get('topic');
+    const message = formData.get('message');
 
-        const formData = new FormData(event.currentTarget);
-        const name = formData.get('name') as string;
-        const email = formData.get('email') as string;
-        const message = formData.get('message') as string;
-
-        try {
-            const response = await submitContactMessage({
-                data: { name, email, message },
-            });
-
-            if (response.success) {
-                setIsSuccess(true);
-                toast.success(response.message);
-            } else {
-                toast.error(response.error || t('contact.form.errorMessage'));
-            }
-        } catch {
-            toast.error(t('contact.form.errorMessage'));
-        } finally {
-            setIsSubmitting(false);
-        }
+    if (
+      typeof name !== 'string' ||
+      typeof email !== 'string' ||
+      typeof topic !== 'string' ||
+      typeof message !== 'string'
+    ) {
+      toast.error(t('form.errorMessage'));
+      setIsSubmitting(false);
+      return;
     }
 
-    return (
-        <div className="min-h-[80vh] flex flex-col justify-center max-w-5xl mx-auto px-6 py-12 lg:px-8">
-            <div className="text-center mb-12">
-                <h1 className="text-4xl font-bold tracking-tight mb-4">
-                    {t('contact.title')}
-                </h1>
-                <p className="text-lg text-muted-foreground">
-                    {t('contact.description')}
-                </p>
-            </div>
+    try {
+      const response = await submitContactMessage({
+        data: {
+          name,
+          email,
+          topic: topic as (typeof topicOptions)[number],
+          message,
+        },
+      });
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
-                {/* Left Column: Contact Form */}
-                <Card className="shadow-lg border-primary/10 h-full">
-                    <CardHeader>
-                        <CardTitle>{t('contact.form.submit')}</CardTitle>
-                        <CardDescription>
-                            {t('contact.description')}
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        {isSuccess ? (
-                            <div className="flex flex-col items-center justify-center py-12 text-center space-y-4">
-                                <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
-                                    <CheckCircle className="w-8 h-8" />
-                                </div>
-                                <h3 className="text-xl font-bold">{t('contact.form.successTitle')}</h3>
-                                <p className="text-muted-foreground max-w-xs">{t('contact.form.successMessage')}</p>
-                                <Button onClick={() => setIsSuccess(false)} variant="outline" className="mt-4">
-                                    Send Another Message
-                                </Button>
-                            </div>
-                        ) : (
-                            <form onSubmit={(event) => { void handleSubmit(event); }} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">{t('contact.form.name')}</Label>
-                                    <Input id="name" name="name" required placeholder="John Doe" />
-                                </div>
+      if (response.success) {
+        setIsSuccess(true);
+        toast.success(response.message);
+      } else {
+        toast.error(response.error || t('form.errorMessage'));
+      }
+    } catch {
+      toast.error(t('form.errorMessage'));
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
 
-                                <div className="space-y-2">
-                                    <Label htmlFor="email">{t('contact.form.email')}</Label>
-                                    <Input id="email" name="email" type="email" required placeholder="john@example.com" />
-                                </div>
-
-                                <div className="space-y-2">
-                                    <Label htmlFor="message">{t('contact.form.message')}</Label>
-                                    <Textarea
-                                        id="message"
-                                        name="message"
-                                        required
-                                        placeholder="Tell me about what's your inquiry..."
-                                        className="min-h-[150px]"
-                                    />
-                                </div>
-
-                                {/* Honeypot field to fool bots (Formspree checks this) */}
-                                <input type="text" name="_gotcha" style={{ display: 'none' }} tabIndex={-1} autoComplete="off" />
-
-                                <Button type="submit" className="w-full" disabled={isSubmitting}>
-                                    {isSubmitting ? (
-                                        <>
-                                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                            {t('contact.form.sending')}
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Send className="mr-2 h-4 w-4" />
-                                            {t('contact.form.submit')}
-                                        </>
-                                    )}
-                                </Button>
-                            </form>
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* Right Column: 1-1 Booking & Hire Me */}
-                <div className="flex flex-col gap-6 h-full">
-                    {/* Booking Card */}
-                    <Card className="shadow-lg border-primary/10 flex-1 flex flex-col relative overflow-hidden group hover:border-primary/30 transition-all">
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
-                        <CardHeader>
-                            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-4">
-                                <Calendar className="w-6 h-6" />
-                            </div>
-                            <CardTitle className="text-2xl">{t('contact.booking.title')}</CardTitle>
-                            <CardDescription className="text-base pt-2">
-                                {t('contact.booking.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardContent className="flex-1">
-                            <ul className="space-y-3 text-sm text-muted-foreground">
-                                {(t('contact.booking.items', { returnObjects: true }) as string[]).map((item, i) => (
-                                    <li key={i} className="flex items-center gap-2">
-                                        <CheckCircle className="w-4 h-4 text-primary" />
-                                        {item}
-                                    </li>
-                                ))}
-                            </ul>
-                        </CardContent>
-                        <CardFooter>
-                            <Button className="w-full" size="lg" asChild>
-                                <a
-                                    href="https://calendar.app.google/CKy4ozvuwXQouzkJ6"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="gap-2"
-                                >
-                                    {t('contact.booking.cta')}
-                                    <ArrowRight className="w-4 h-4" />
-                                </a>
-                            </Button>
-                        </CardFooter>
-                    </Card>
-
-                    {/* Hire Me Card */}
-                    <Card className="shadow-lg border-emerald-500/20 bg-emerald-50/50 dark:bg-emerald-950/10 flex flex-col relative overflow-hidden group hover:border-emerald-500/40 transition-all">
-                        <CardHeader>
-                            <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-4">
-                                <Briefcase className="w-6 h-6" />
-                            </div>
-                            <CardTitle className="text-2xl">{t('contact.hire.title')}</CardTitle>
-                            <CardDescription className="text-base pt-2">
-                                {t('contact.hire.description')}
-                            </CardDescription>
-                        </CardHeader>
-                        <CardFooter>
-                            <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white" size="lg" asChild>
-                                <a
-                                    href="https://drive.google.com/file/d/1EYmOmsqR6ZrNKG7hWP672I1CMvcPBSAi/view?usp=sharing"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="gap-2"
-                                >
-                                    {t('contact.hire.cta')}
-                                    <ArrowRight className="w-4 h-4" />
-                                </a>
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                </div>
-            </div>
+  return (
+    <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
+      <section className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-16 pt-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 lg:px-12 lg:pb-20 lg:pt-20">
+        <div className="max-w-xl">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('hero.eyebrow')}</p>
+          <h1 className="mt-5 text-[clamp(3rem,6vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
+            {t('hero.title')}<span className="text-[var(--brand-orange)]">.</span>
+          </h1>
+          <p className="mt-7 max-w-lg text-lg leading-8 text-[var(--muted-graphite)]">{t('hero.description')}</p>
         </div>
-    );
+        <ContactHeroVisual />
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="space-y-4">
+          <ContactOption
+            number="01"
+            icon={<MessageCircle className="h-7 w-7" aria-hidden="true" />}
+            title={t('mentoring.title')}
+            description={t('mentoring.description')}
+            cta={t('mentoring.cta')}
+            href="https://calendar.app.google/CKy4ozvuwXQouzkJ6"
+          />
+          <ContactOption
+            number="02"
+            icon={<Handshake className="h-7 w-7" aria-hidden="true" />}
+            title={t('partnerships.title')}
+            description={t('partnerships.description')}
+            cta={t('partnerships.cta')}
+            href="mailto:ekki@testingwithekki.com?subject=Partnership%20with%20TestingWithEkki"
+          />
+        </div>
+
+        <div id="message-form" className="mt-4 grid gap-8 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:p-9 lg:grid-cols-[0.68fr_1.32fr] lg:gap-12 lg:p-10">
+          <div className="border-b border-[var(--soft-border)] pb-7 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-10">
+            <div className="flex items-center gap-3">
+              <span className="font-mono text-xs text-[var(--brand-orange)]">03</span>
+              <Send className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+            </div>
+            <p className="mt-7 font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange)]">{t('form.eyebrow')}</p>
+            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">{t('form.title')}</h2>
+            <p className="mt-3 max-w-sm text-base leading-7 text-[var(--muted-graphite)]">{t('form.description')}</p>
+          </div>
+
+          {isSuccess ? (
+            <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
+              <CheckCircle2 className="h-12 w-12 text-[var(--brand-success)]" strokeWidth={1.5} aria-hidden="true" />
+              <h2 className="mt-5 text-2xl font-semibold">{t('form.successTitle')}</h2>
+              <p className="mt-3 max-w-sm text-base leading-7 text-[var(--muted-graphite)]">{t('form.successMessage')}</p>
+              <Button type="button" variant="outline" className="mt-6" onClick={() => setIsSuccess(false)}>{t('form.sendAnother')}</Button>
+            </div>
+          ) : (
+            <form onSubmit={(event) => { void handleSubmit(event); }} className="grid gap-5 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="contact-name">{t('form.name')}</Label>
+                <Input id="contact-name" name="name" placeholder={t('form.namePlaceholder')} required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="contact-email">{t('form.email')}</Label>
+                <Input id="contact-email" name="email" type="email" placeholder={t('form.emailPlaceholder')} required />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="contact-topic">{t('form.topic')}</Label>
+                <select id="contact-topic" name="topic" defaultValue="" required className="flex h-11 w-full rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 text-[15px] text-[var(--graphite)] outline-none transition-colors focus:border-[var(--brand-orange)] focus:ring-2 focus:ring-[var(--brand-orange)]/20">
+                  <option value="" disabled>{t('form.topicPlaceholder')}</option>
+                  {topicOptions.map((topic) => <option key={topic} value={topic}>{t(`form.topics.${topic}`)}</option>)}
+                </select>
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="contact-message">{t('form.message')}</Label>
+                <Textarea id="contact-message" name="message" placeholder={t('form.messagePlaceholder')} required minLength={10} className="min-h-36 resize-y" />
+              </div>
+              <div className="sm:col-span-2 sm:flex sm:justify-end">
+                <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
+                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Send className="h-4 w-4" aria-hidden="true" />}
+                  {isSubmitting ? t('form.sending') : t('form.submit')}
+                  {!isSubmitting && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
+                </Button>
+              </div>
+              <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
+            </form>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ContactOption({ number, icon, title, description, cta, href }: { number: string; icon: React.ReactNode; title: string; description: string; cta: string; href: string }) {
+  return (
+    <div className="grid gap-5 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-7 sm:p-7">
+      <div className="flex items-center gap-4 sm:block">
+        <span className="font-mono text-xs text-[var(--brand-orange)]">{number}</span>
+        <div className="mt-0 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange)] sm:mt-4">{icon}</div>
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold">{title}</h2>
+        <p className="mt-2 max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">{description}</p>
+      </div>
+      <Button asChild className="w-full sm:w-auto">
+        <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+          {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+        </a>
+      </Button>
+    </div>
+  );
 }

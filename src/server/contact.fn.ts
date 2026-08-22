@@ -9,6 +9,7 @@ import { logger } from '@/lib/logger';
 const ContactSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Please enter a valid email address'),
+    topic: z.enum(['general', 'mentoring', 'partnership', 'other']).default('general'),
     message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
@@ -23,7 +24,7 @@ export const submitContactMessage = createServerFn({ method: 'POST' })
     .inputValidator((data: unknown) => ContactSchema.parse(data))
     .handler(async ({ data: input }) => {
         try {
-            const { name, email, message } = input;
+            const { name, email, topic, message } = input;
 
             // 1. Store in DB
             const [newMessage] = await db
@@ -31,6 +32,7 @@ export const submitContactMessage = createServerFn({ method: 'POST' })
                 .values({
                     name,
                     email,
+                    topic,
                     message,
                     status: 'NEW',
                 })
@@ -47,6 +49,7 @@ export const submitContactMessage = createServerFn({ method: 'POST' })
                 id: newMessage.id,
                 name,
                 email,
+                topic,
                 message,
                 createdAt: newMessage.createdAt,
             }).catch((err) => {

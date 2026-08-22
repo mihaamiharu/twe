@@ -1,10 +1,10 @@
 {
   "appName": "TestingWithEkki",
   "seo": {
-    "title": "TestingWithEkki - Learn Testing Skills",
-    "description": "Learn testing skills through interactive tutorials and coding challenges",
-    "ogTitle": "TestingWithEkki - Master the Art of Automation",
-    "ogDescription": "Interactive tutorials and coding challenges to level up your software testing skills.",
+    "title": "TestingWithEkki - Practical Software Testing Education",
+    "description": "Grow beyond test execution with practical lessons and hands-on challenges for QA engineers.",
+    "ogTitle": "Grow beyond test execution. | TestingWithEkki",
+    "ogDescription": "Build technical testing skills through Web Automation lessons and Practice challenges.",
     "keywords": "playwright, automation testing, qa, software testing, learn qa automation, learn web automation, learn playwright, end-to-end testing, javascript testing"
   },
   "navigation": {

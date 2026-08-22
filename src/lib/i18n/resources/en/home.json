@@ -1,85 +1,60 @@
 {
   "hero": {
-    "title": "Build Modern Test Automation",
-    "titleSuffix": "without the Fluff",
-    "tagline": "The practical curriculum that bridges the gap between theory and practice.",
-    "authorityStatement": "My career was built on the support of great mentors. This platform is my way of paying it forward.",
-    "description": "I'm giving you the <strong>hands-on, supportive environment</strong> you need to build scalable test frameworks, focusing on the patterns used by top engineering teams.",
-    "startLearning": "Solve Your First Challenge",
-    "browseTutorials": "Browse Tutorials"
+    "eyebrow": "PRACTICAL SOFTWARE TESTING EDUCATION",
+    "title": "Grow beyond test execution",
+    "description": "Build stronger technical testing skills through practical lessons and hands-on challenges. Start with Web Automation, from web fundamentals to Playwright.",
+    "startWebAutomation": "Start Web Automation",
+    "explorePractice": "Explore Practice",
+    "creatorNote": "Creator-led by Ekki · Learn at your own pace"
   },
-  "featuredChallenges": {
-    "title": "Solve a",
-    "titleHighlight": "Real Problem",
-    "subtitle": "Start coding immediately. No setup required.",
-    "viewAll": "View All Challenges"
-  },
-  "features": {
-    "title": "Everything You Need to",
-    "titleHighlight": "Level Up",
-    "subtitle": "A personal curriculum designed to take you from beginner to mastery",
-    "interactiveTutorials": {
-      "title": "Interactive Tutorials",
-      "description": "Learn testing concepts step-by-step. I've broken down the tricky parts so you don't have to struggle."
-    },
-    "playwrightChallenges": {
-      "title": "Embedded Sandbox Environment",
-      "description": "Practice with <strong>sandboxed scenarios</strong>. Your code runs <strong>entirely in your browser</strong> - fast, secure, and no installation."
-    },
-    "selectorChallenges": {
-      "title": "Selector Challenges",
-      "description": "Master CSS and XPath selectors with visual feedback. See elements highlight as you type."
-    },
-    "gamification": {
-      "title": "Gamification",
-      "description": "Earn XP, level up, unlock achievements, and compete on the leaderboard. Learning made fun!"
-    },
-    "instantFeedback": {
-      "title": "Zero Friction",
-      "description": "Start coding immediately. <strong>No account required</strong>. Just verify your skills and go."
-    },
-    "trackProgress": {
-      "title": "Track Progress",
-      "description": "See your progress across tutorials and challenges. Never lose track of where you left off."
+  "learningPath": {
+    "eyebrow": "LEARNING PATH",
+    "title": "The Web Automation Learning Path",
+    "description": "Learn how the web works, build the programming foundations you need, and apply them with Playwright.",
+    "cta": "View Learning Path",
+    "steps": {
+      "foundations": { "title": "Web Foundations", "description": "Understand the browser and the web." },
+      "programming": { "title": "Programming", "description": "Build the code foundations for automation." },
+      "playwright": { "title": "Playwright", "description": "Write practical browser tests." },
+      "design": { "title": "Automation Design", "description": "Make tests clear and maintainable." },
+      "e2e": { "title": "End-to-End Testing", "description": "Connect the pieces in real flows." }
     }
   },
-  "howItWorks": {
-    "title": "How It",
-    "titleHighlight": "Works",
-    "step1": {
-      "title": "Choose a Challenge",
-      "description": "Pick from Playwright, CSS selectors, or JavaScript challenges."
-    },
-    "step2": {
-      "title": "Write Your Code",
-      "description": "Use our embedded code editor. <strong>Everything runs locally</strong> in your browser for instant feedback."
-    },
-    "step3": {
-      "title": "Get Instant Feedback",
-      "description": "Run your code and see results immediately. Earn XP when you pass!"
+  "learnPractice": {
+    "eyebrow": "LEARN + PRACTICE",
+    "title": "Learn the concept. Practice it yourself.",
+    "description": "Lessons explain the idea. Practice gives you a place to use it.",
+    "cta": "Explore Practice",
+    "steps": {
+      "learn": { "label": "LEARN", "title": "Understand the concept", "description": "Start with the reasoning behind the work." },
+      "practice": { "label": "PRACTICE", "title": "Try it yourself", "description": "Use a real interactive challenge without setup." },
+      "review": { "label": "REVIEW", "title": "See what worked and why", "description": "Run the test and inspect the result." }
     }
   },
-  "mission": {
-    "title": "Built by",
-    "titleHighlight": "Ekki",
-    "story1": "I am a QA Engineer who loves building tools. I started my career with zero QA experience and survived thanks to patient mentors.",
-    "story2": "TestingWithEkki is my way of passing that forward.",
-    "story3": "Not everyone has a mentor to guide them, so I'm building the resource I wish I had: practical, hands-on lessons that actually make sense.",
-    "author": "Ekki",
-    "authorRole": "Creator of TestingWithEkki"
+  "philosophy": {
+    "title": "Understand the why. Practice the how. Use the right tools.",
+    "description": "Testing is more than knowing which tool to use. TWE focuses on understanding the systems you test, applying the concepts yourself, and using tools where they actually help.",
+    "why": "Understand the why.",
+    "how": "Practice the how.",
+    "tools": "Use the right tools."
+  },
+  "creator": {
+    "eyebrow": "CREATOR",
+    "title": "Learn testing with Ekki.",
+    "description": "I’m a QA/SDET working across automation, integration-heavy systems, and test infrastructure. I built TWE to share the kind of practical learning and mentorship that helped shape my own career.",
+    "cta": "About Ekki"
+  },
+  "labs": {
+    "eyebrow": "LABS · COMING SOON",
+    "title": "Practice QA in real environments.",
+    "description": "Some testing skills are better learned outside a browser sandbox. Labs will introduce guided work with repositories, APIs, test frameworks, CI pipelines, and other real development environments.",
+    "cta": "Explore Practice in the meantime"
   },
   "cta": {
-    "title": "Ready to automate your first real scenario?",
-    "subtitle": "Start solving practical challenges that mirror real-world applications. Free forever for individuals.",
-    "getStarted": "Start Your Journey",
-    "viewLeaderboard": "See Who's Best",
-    "freeToUse": "Open Source heart",
-    "noCreditCard": "No strings attached",
-    "learnAtOwnPace": "Self-paced mastery"
-  },
-  "hallOfFame": {
-    "title": "Hall of",
-    "titleHighlight": "Fame",
-    "subtitle": "See the latest achievements unlocked by the community."
+    "eyebrow": "START HERE",
+    "title": "Start with Web Automation.",
+    "description": "Build the foundations, learn Playwright, and practice as you go.",
+    "primary": "Start Learning",
+    "secondary": "Browse Practice"
   }
 }

@@ -25,9 +25,7 @@ export function Footer() {
               params={localizedParams}
               className="inline-flex min-h-11 items-center gap-2 text-lg font-semibold tracking-tight text-foreground transition-colors hover:text-primary focus-visible:text-primary"
             >
-              <img src="/logo-light.svg" alt="" className="h-7 w-7 dark:hidden" />
-              <img src="/logo-dark.svg" alt="" className="hidden h-7 w-7 dark:block" />
-              <span>TestingWithEkki</span>
+              <span>TestingWith<span className="text-primary">Ekki</span></span>
             </Link>
             <p className="mt-4 text-sm leading-6 text-muted-foreground">
               {t('common:footer.tagline')}
