@@ -108,17 +108,22 @@ export function usePreviewState(
         const iframe = iframeRef.current;
         if (!iframe || viewMode !== 'preview') return;
 
-        const doc = iframe.contentDocument || iframe.contentWindow?.document;
-        if (doc) {
-            doc.open();
-            doc.write(getFullIframeDocument());
-            doc.close();
-        }
+        // Use srcdoc so the preview keeps an opaque sandbox origin. This lets
+        // the inspector communicate through postMessage without granting the
+        // preview access to the parent origin.
+        iframe.srcdoc = getFullIframeDocument();
     }, [getFullIframeDocument, viewMode, iframeRef]);
 
     // Effect: Listen for messages from the iframe
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
+            if (
+                iframeRef.current?.contentWindow &&
+                event.source !== iframeRef.current.contentWindow
+            ) {
+                return;
+            }
+
             if (!isPreviewMessage(event.data)) return;
             const data = event.data;
 

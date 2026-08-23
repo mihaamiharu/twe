@@ -31,7 +31,7 @@ export function IframeContainer({
                     ref={iframeRef}
                     className="w-full h-full border-none bg-white"
                     title="Challenge Preview"
-                    sandbox="allow-same-origin allow-scripts allow-forms"
+                    sandbox="allow-scripts allow-forms"
                 />
             </div>
 

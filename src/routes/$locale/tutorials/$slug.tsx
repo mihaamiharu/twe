@@ -1,7 +1,6 @@
 import {
   createFileRoute,
   useParams,
-  useNavigate,
   Link,
 } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
@@ -173,7 +172,6 @@ interface Tutorial {
 function TutorialDetailPage() {
   const { locale, slug } = useParams({ from: '/$locale/tutorials/$slug' });
   const { t } = useTranslation(['tutorials', 'common']);
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [readingProgress, setReadingProgress] = useState(0);
   const [localSubmitting, setLocalSubmitting] = useState(false);
@@ -561,23 +559,27 @@ function TutorialDetailPage() {
                     </div>
                     {tutorial.nextTutorial && (
                       <Button
+                        asChild
                         className="w-full h-auto py-3 whitespace-normal"
-                        onClick={() => {
-                          void navigate({
-                            to: '/$locale/tutorials/$slug',
-                            params: {
-                              locale,
-                              slug: tutorial.nextTutorial!.slug,
-                            },
-                          });
-                        }}
                       >
-                        <span className="flex-1 px-1">
-                          {t('tutorials:sidebar.nextLabel', {
+                        <Link
+                          to="/$locale/tutorials/$slug"
+                          params={{
+                            locale,
+                            slug: tutorial.nextTutorial.slug,
+                          }}
+                          aria-label={t('tutorials:sidebar.nextLabel', {
                             title: tutorial.nextTutorial.title,
                           })}
-                        </span>
-                        <ArrowRight className="h-4 w-4 ml-2 shrink-0" />
+                          data-testid="next-tutorial"
+                        >
+                          <span className="flex-1 px-1">
+                            {t('tutorials:sidebar.nextLabel', {
+                              title: tutorial.nextTutorial.title,
+                            })}
+                          </span>
+                          <ArrowRight className="h-4 w-4 ml-2 shrink-0" />
+                        </Link>
                       </Button>
                     )}
                   </div>

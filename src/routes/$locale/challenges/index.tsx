@@ -194,9 +194,22 @@ export function ChallengesPage() {
   });
 
   const challenges = (challengesResponse?.data ?? []) as Challenge[];
+  const normalizedSearchQuery = searchInput.trim().toLocaleLowerCase();
 
   const filteredChallenges = useMemo(() => {
     return challenges.filter((challenge) => {
+      // Keep the UI deterministic while a filtered query is using previous
+      // query data. The server remains the source of truth, but applying the
+      // same search predicate here prevents stale placeholder data from
+      // making a no-match search look like it returned every challenge.
+      if (
+        normalizedSearchQuery &&
+        ![challenge.title, challenge.description].some((value) =>
+          value.toLocaleLowerCase().includes(normalizedSearchQuery),
+        )
+      ) {
+        return false;
+      }
       if (!activeTrack.match(challenge)) return false;
       if (hideCompleted && challenge.isCompleted) return false;
       if (difficulty && challenge.difficulty !== difficulty) return false;
@@ -205,7 +218,14 @@ export function ChallengesPage() {
       }
       return true;
     });
-  }, [activeTrack, challenges, difficulty, hideCompleted, tier]);
+  }, [
+    activeTrack,
+    challenges,
+    difficulty,
+    hideCompleted,
+    normalizedSearchQuery,
+    tier,
+  ]);
 
   const groupedChallenges = useMemo(() => {
     const groups = new Map<string, Challenge[]>();

@@ -113,7 +113,6 @@ export function useChallengeExecution(
                 {
                     timeout: 10000,
                     ...omitUndefined({
-                        existingIframe: previewIframeRef.current ?? undefined,
                         files: challenge.files,
                         expectedState: challenge.expectedState,
                     }),

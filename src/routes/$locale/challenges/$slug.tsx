@@ -5,17 +5,14 @@ import {
   Link,
 } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
-import { useCallback, useMemo } from 'react';
+import { lazy, Suspense, useCallback, useMemo } from 'react';
 import {
   useMutation,
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
 import { challengeDetailQueryOptions } from '@/lib/challenges.query';
-import {
-  ChallengePlayground,
-  ChallengeSkeleton,
-} from '@/components/challenges';
+import { ChallengeSkeleton } from '@/components/challenges/challenge-skeleton';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft, BookOpen } from 'lucide-react';
@@ -38,6 +35,11 @@ import {
 import { omitUndefined } from '@/lib/omit-undefined';
 
 import i18n from '@/lib/i18n';
+
+const ChallengePlayground = lazy(async () => {
+  const module = await import('@/components/challenges/challenge-playground');
+  return { default: module.ChallengePlayground };
+});
 
 export const Route = createFileRoute('/$locale/challenges/$slug')({
   loader: ({ context, params }) =>
@@ -405,14 +407,16 @@ function ChallengeDetailPage() {
   return (
     <div className="h-[calc(100vh-4rem)] min-w-0 overflow-hidden flex flex-col">
       <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
-        <ChallengePlayground
-          key={challenge.id}
-          challenge={challenge}
-          onSubmit={handleSubmit}
-          {...omitUndefined({ userId })}
-          hintUsed={data?.data?.userProgress?.usedHint || false}
-          initialHintContent={data?.data?.userProgress?.hintContent || null}
-        />
+        <Suspense fallback={<ChallengeSkeleton />}>
+          <ChallengePlayground
+            key={challenge.id}
+            challenge={challenge}
+            onSubmit={handleSubmit}
+            {...omitUndefined({ userId })}
+            hintUsed={data?.data?.userProgress?.usedHint || false}
+            initialHintContent={data?.data?.userProgress?.hintContent || null}
+          />
+        </Suspense>
       </div>
 
       {lastSubmissionResult && (

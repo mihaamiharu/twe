@@ -331,6 +331,19 @@ export async function executePlaywrightCode(
               throw new Error('Could not access iframe window');
             }
 
+            // User-authored E2E pages can submit forms or click links before
+            // the VFS page shim has had a chance to handle the event. Install
+            // the bridge after the mock page exists as well as in the HTML
+            // template so navigation is always callable at execution time.
+            if (options?.files) {
+              contentWindow.__VFS_NAVIGATE__ = (path: string) => {
+                logger.debug(`[VFS] Navigating to ${path}`);
+                void page.goto(path).catch((error) => {
+                  logger.error(`VFS navigation failed: ${String(error)}`);
+                });
+              };
+            }
+
             // Initialize promise tracker for async tests
             contentWindow.__testPromises = [];
 

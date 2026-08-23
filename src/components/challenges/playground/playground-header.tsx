@@ -208,7 +208,7 @@ export function PlaygroundHeader({
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto"
+              className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto bg-[var(--paper-surface)] text-[var(--graphite)] border-[var(--soft-border)]"
             >
               <DropdownMenuLabel className="flex items-center justify-between">
                 <span>
@@ -235,7 +235,7 @@ export function PlaygroundHeader({
                         {i === 0 ? 'Concept' : i === 1 ? 'Syntax' : 'Code'}
                       </span>
                     </div>
-                    <span className="flex-1 leading-relaxed text-workspace-text">
+                    <span className="flex-1 leading-relaxed text-[var(--graphite)]">
                       {hint}
                     </span>
                   </div>

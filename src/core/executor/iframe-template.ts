@@ -72,10 +72,10 @@ export function generateIframeTemplate(options: IframeTemplateOptions): string {
     ? `
                                 window.__VFS_NAVIGATE__ = function(path) {
                                     console.log('[VFS] Navigating to ' + path);
-                                    if (window.page) {
+                                    if (window.page && typeof window.page.goto === 'function') {
                                         window.page.goto(path).catch(e => console.error('Navigation failed:', e));
                                     } else {
-                                        console.error('window.page not found for VFS navigation');
+                                        console.error('VFS navigation is not ready for ' + path);
                                     }
                                 };
 
@@ -85,7 +85,9 @@ export function generateIframeTemplate(options: IframeTemplateOptions): string {
                                         const href = link.getAttribute('href');
                                         if (href && (href.startsWith('/') || href.endsWith('.html'))) {
                                             e.preventDefault();
-                                            window.__VFS_NAVIGATE__(href);
+                                            if (typeof window.__VFS_NAVIGATE__ === 'function') {
+                                                window.__VFS_NAVIGATE__(href);
+                                            }
                                         }
                                     }
                                 }, true);
@@ -95,7 +97,9 @@ export function generateIframeTemplate(options: IframeTemplateOptions): string {
                                     const action = form.getAttribute('action');
                                     if (action && (action.startsWith('/') || action.endsWith('.html'))) {
                                         e.preventDefault();
-                                        window.__VFS_NAVIGATE__(action);
+                                        if (typeof window.__VFS_NAVIGATE__ === 'function') {
+                                            window.__VFS_NAVIGATE__(action);
+                                        }
                                     }
                                 }, true);`
     : `
@@ -208,20 +212,23 @@ export function generateVfsNavigationTemplate(options: {
         </style>
         <script data-internal="true">
           (function() {
+            // Define VFS Navigation Helper before the one-time polyfill guard.
+            // Document navigation can preserve the Window object while
+            // replacing its document, so this bridge must be refreshed on
+            // every generated VFS document.
+            window.__VFS_NAVIGATE__ = function(path) {
+              if (window.page && typeof window.page.goto === 'function') {
+                window.page.goto(path).catch(e => console.error('Navigation failed:', e));
+              } else {
+                console.error('VFS navigation is not ready for ' + path);
+              }
+            };
+
             if (window['__tweVfsPolyfillInstalled']) return;
             window['__tweVfsPolyfillInstalled'] = true;
 
             // Polyfill fetch to handle mock routes
             ${vfsFetchPolyfill}
-
-            // Define VFS Navigation Helper
-            window.__VFS_NAVIGATE__ = function(path) {
-              if (window.page) {
-                  window.page.goto(path).catch(e => console.error('Navigation failed:', e));
-              } else {
-                  console.error('window.page not found for VFS navigation');
-              }
-            };
 
             // Handle navigation for VFS
             window.addEventListener('click', function(e) {
@@ -230,7 +237,9 @@ export function generateVfsNavigationTemplate(options: {
                 const href = link.getAttribute('href');
                 if (href && (href.startsWith('/') || href.endsWith('.html'))) {
                   e.preventDefault();
-                  window.__VFS_NAVIGATE__ && window.__VFS_NAVIGATE__(href);
+                  if (typeof window.__VFS_NAVIGATE__ === 'function') {
+                    window.__VFS_NAVIGATE__(href);
+                  }
                 }
               }
             }, true);
@@ -241,7 +250,9 @@ export function generateVfsNavigationTemplate(options: {
               const action = form.getAttribute('action');
               if (action && (action.startsWith('/') || action.endsWith('.html'))) {
                 e.preventDefault();
-                window.__VFS_NAVIGATE__ && window.__VFS_NAVIGATE__(action);
+                if (typeof window.__VFS_NAVIGATE__ === 'function') {
+                  window.__VFS_NAVIGATE__(action);
+                }
               }
             }, true);
           })();

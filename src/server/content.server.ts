@@ -230,11 +230,11 @@ export async function getNextTutorial(
   const registry = await loadRegistry();
   const current = registry.tutorials.find((t) => t.slug === currentSlug);
 
-  if (!current?.nextTutorialSlug) return null;
-
-  const nextEntry = registry.tutorials.find(
-    (t) => t.slug === current.nextTutorialSlug,
-  );
+  const nextEntry = current?.nextTutorialSlug
+    ? registry.tutorials.find((t) => t.slug === current.nextTutorialSlug)
+    : registry.tutorials
+        .filter((t) => current && t.order > current.order)
+        .sort((a, b) => a.order - b.order)[0];
   if (!nextEntry) return null;
 
   // Load just the title from frontmatter
