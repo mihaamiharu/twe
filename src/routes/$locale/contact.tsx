@@ -115,6 +115,7 @@ function ContactPage() {
             icon={<Handshake className="h-7 w-7" aria-hidden="true" />}
             title={t('partnerships.title')}
             description={t('partnerships.description')}
+            note={t('partnerships.opportunityNote')}
             cta={t('partnerships.cta')}
             href="mailto:ekki@testingwithekki.com?subject=Partnership%20with%20TestingWithEkki"
             secondaryCta={t('partnerships.cvCta')}
@@ -188,7 +189,7 @@ function ContactPage() {
   );
 }
 
-function ContactOption({ number, icon, title, description, cta, href, secondaryCta, secondaryHref }: { number: string; icon: React.ReactNode; title: string; description: string; cta: string; href: string; secondaryCta?: string; secondaryHref?: string }) {
+function ContactOption({ number, icon, title, description, note, cta, href, ctaVariant = 'default', secondaryCta, secondaryHref }: { number: string; icon: React.ReactNode; title: string; description: string; note?: string; cta: string; href: string; ctaVariant?: 'default' | 'link'; secondaryCta?: string; secondaryHref?: string }) {
   return (
     <div className="relative lg:pl-16">
       <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 items-center gap-2 lg:flex">
@@ -204,10 +205,17 @@ function ContactOption({ number, icon, title, description, cta, href, secondaryC
         <div>
           <h2 className="text-xl font-semibold tracking-[-0.025em]">{title}</h2>
           <p className="mt-1.5 max-w-[34rem] text-sm leading-6 text-[var(--muted-graphite)]">{description}</p>
+          {note && <p className="mt-1.5 text-sm font-medium text-[var(--brand-orange)]">{note}</p>}
         </div>
         <div className="hidden h-16 w-px bg-[var(--soft-border)] sm:block" />
         <div className="flex flex-col items-stretch gap-2 sm:items-end">
-          <Button asChild className="w-full sm:w-auto">
+          <Button
+            asChild
+            variant={ctaVariant}
+            className={ctaVariant === 'link'
+              ? 'h-auto w-full justify-start px-0 py-1 text-left text-[var(--brand-orange)] hover:bg-transparent hover:text-[var(--brand-orange)] hover:no-underline sm:w-auto sm:justify-end'
+              : 'w-full sm:w-auto'}
+          >
             <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
               {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>

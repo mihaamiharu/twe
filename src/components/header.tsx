@@ -19,7 +19,6 @@ import { UserMenu } from '@/components/user-menu';
 import { signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/bug-report-dialog';
 import { LanguageSwitcher } from '@/components/language-switcher';
-import { ThemeToggle } from '@/components/theme-toggle';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 
@@ -190,9 +189,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
             {/* Right side */}
             <div className="flex items-center gap-3">
-              {isContactPage && <ThemeToggle />}
-
-              <div className={cn('hidden items-center sm:flex', isContactPage && 'lg:hidden')}>
+              <div className="hidden items-center sm:flex">
                 <LanguageSwitcher />
               </div>
 

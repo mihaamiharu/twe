@@ -11,14 +11,15 @@
   },
   "partnerships": {
     "title": "Partnerships, Sponsorships & Opportunities",
-    "description": "For testing and developer tools, communities, events, educational collaborations, sponsorships, or QA engineering opportunities.",
+    "description": "For testing and developer tools, communities, events, educational collaborations, and relevant sponsorships.",
+    "opportunityNote": "Also open to QA engineering and test automation opportunities.",
     "cta": "Talk about working together",
     "cvCta": "View my CV"
   },
   "form": {
     "eyebrow": "GENERAL MESSAGE",
     "title": "Send a message",
-    "description": "For general questions or anything else.",
+    "description": "For general questions or anything that doesn’t fit above.",
     "name": "Name",
     "namePlaceholder": "Your name",
     "email": "Email",
