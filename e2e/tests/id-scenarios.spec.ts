@@ -31,7 +31,8 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
   test('ID Tutorials: should list tutorials in ID', async () => {
     await tutorialsPage.gotoList('id');
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
-    // Check for "Mulai Belajar" or similar ID-specific text if applicable
+    await expect(tutorialsPage.learningPath).toContainText('Web & DOM');
+    await expect(tutorialsPage.learningPath).toContainText('Dasar JavaScript');
   });
 
   test('ID Challenges: should list challenges in ID', async ({ page }) => {

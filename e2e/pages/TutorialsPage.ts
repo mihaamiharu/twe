@@ -6,6 +6,7 @@ export class TutorialsPage extends BasePage {
   readonly tutorialCards: Locator;
   readonly completeButton: Locator;
   readonly hideCompletedToggle: Locator;
+  readonly learningPath: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -14,8 +15,9 @@ export class TutorialsPage extends BasePage {
       name: /Read to Complete|Complete & Continue|Baca untuk Menyelesaikan|Selesai & Lanjutkan/i,
     });
     this.hideCompletedToggle = page.getByRole('button', {
-      name: /Hide Completed|Sembunyikan Selesai/i,
+      name: /Hide Completed|Show Completed|Sembunyikan Selesai|Tampilkan Selesai/i,
     });
+    this.learningPath = page.getByTestId('learning-path');
   }
 
   async gotoList(locale: string = 'en') {
