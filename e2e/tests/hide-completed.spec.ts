@@ -47,12 +47,22 @@ test.describe('Hide/Show Completed', () => {
     // It should be visible initially (show completed by default or just in list)
     // Wait for list to load
     await expect(challengeLink.first()).toBeVisible();
+    await expect(challengesPage.hideCompletedToggle).toHaveAttribute(
+      'aria-checked',
+      'false',
+    );
+    await expect(page.getByText('Hide Completed', { exact: true })).toBeVisible();
 
     // 4. Toggle Hide Completed
     await challengesPage.hideCompletedToggle.click();
     await expect(page).toHaveURL(
       /\/en\/challenges(?:\/)?\?hideCompleted=true$/,
     );
+    await expect(challengesPage.hideCompletedToggle).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
+    await expect(page.getByText('Show Completed', { exact: true })).toBeVisible();
 
     // 5. Verify it is hidden
     await expect(challengeLink.first()).toBeHidden();

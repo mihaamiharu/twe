@@ -65,13 +65,14 @@ function ChallengeItemContent({
   return (
     <div
       className={cn(
-        'grid gap-x-5 gap-y-2 px-4 py-3.5 transition-colors sm:px-5 lg:grid-cols-[minmax(0,1fr)_auto_auto_minmax(6rem,auto)_auto] lg:py-3.5',
+        'grid gap-x-5 gap-y-2 px-4 py-3.5 transition-colors sm:px-5 lg:grid-cols-[minmax(0,1fr)_minmax(26.5rem,auto)] lg:items-center lg:py-3.5',
         isComingSoon
           ? 'opacity-55'
           : 'group-hover:bg-foreground/[0.025] group-focus-visible:bg-foreground/[0.025]',
       )}
+      data-testid="challenge-list-row"
     >
-      <div className="min-w-0">
+      <div className="min-w-0 lg:self-center">
         <div className="mb-0.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
           <span>{typeLabel}</span>
           {isComingSoon && (
@@ -89,8 +90,11 @@ function ChallengeItemContent({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-x-5 lg:contents">
-        <div className="lg:justify-self-start">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-x-5 lg:grid lg:grid-cols-[5.5rem_7.5rem_5.5rem_minmax(5.5rem,auto)] lg:items-center lg:gap-x-4">
+        <div
+          className="lg:justify-self-start"
+          data-testid="challenge-row-difficulty"
+        >
           <DifficultyPill
             difficulty={challenge.difficulty}
             label={difficultyLabel}
@@ -98,7 +102,10 @@ function ChallengeItemContent({
         </div>
 
         {challenge.isCompleted && !isComingSoon ? (
-          <span className="order-3 inline-flex min-h-7 items-center gap-1 whitespace-nowrap text-xs font-medium text-brand-success lg:order-none">
+          <span
+            className="order-3 inline-flex min-h-7 items-center gap-1 whitespace-nowrap text-xs font-medium text-brand-success lg:order-none lg:justify-self-start"
+            data-testid="challenge-row-completion"
+          >
             <Check className="h-3.5 w-3.5" aria-hidden="true" />
             {completedLabel}
           </span>
@@ -106,18 +113,25 @@ function ChallengeItemContent({
           <span
             className="order-3 hidden min-h-7 items-center lg:inline-flex lg:order-none"
             aria-hidden="true"
+            data-testid="challenge-row-completion"
           />
         )}
 
         {!isComingSoon && (
-          <span className="order-2 inline-flex items-center gap-1 whitespace-nowrap text-xs font-medium tabular-nums text-muted-foreground lg:order-none lg:justify-self-end">
+          <span
+            className="order-2 inline-flex items-center gap-1 whitespace-nowrap text-xs font-medium tabular-nums text-muted-foreground lg:order-none lg:justify-self-end"
+            data-testid="challenge-row-xp"
+          >
             <Zap className="h-3.5 w-3.5 text-brand-orange" aria-hidden="true" />
             {challenge.xpReward} XP
           </span>
         )}
 
         {!isComingSoon && (
-          <span className="order-4 ml-auto inline-flex min-h-7 items-center gap-1 whitespace-nowrap text-xs font-medium text-muted-foreground transition-colors group-hover:text-brand-orange lg:order-none lg:ml-0 lg:justify-self-end">
+          <span
+            className="order-4 ml-auto inline-flex min-h-7 items-center gap-1 whitespace-nowrap text-xs font-medium text-muted-foreground transition-colors group-hover:text-brand-orange lg:order-none lg:ml-0 lg:justify-self-end"
+            data-testid="challenge-row-action"
+          >
             {actionLabel}
             <ArrowRight
               className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"

@@ -137,6 +137,9 @@ export function ChallengesPage() {
   const hideCompleted = searchParams.hideCompleted ?? false;
   const activeTrackId = (searchParams.track || 'all') as TrackId;
   const viewMode = searchParams.view || 'list';
+  const completionToggleLabel = hideCompleted
+    ? t('filters.showCompleted')
+    : t('filters.hideCompleted');
 
   const [searchInput, setSearchInput] = useState(q ?? '');
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
@@ -413,14 +416,14 @@ export function ChallengesPage() {
                 htmlFor="hide-completed"
                 className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground sm:min-w-[170px]"
               >
-                <span>{t('filters.hideCompleted')}</span>
+                <span>{completionToggleLabel}</span>
                 <Switch
                   id="hide-completed"
                   checked={hideCompleted}
                   onCheckedChange={(checked) =>
                     updateSearch({ hideCompleted: checked ? true : undefined })
                   }
-                  aria-label={t('filters.hideCompleted')}
+                  aria-label={completionToggleLabel}
                 />
               </label>
 
