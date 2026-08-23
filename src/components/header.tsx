@@ -19,6 +19,7 @@ import { UserMenu } from '@/components/user-menu';
 import { signOut } from '@/lib/auth.client';
 import { BugReportDialog } from '@/components/bug-report-dialog';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 
@@ -34,6 +35,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+  const isContactPage = location.pathname.endsWith('/contact');
   const isAuthPage =
     location.pathname.includes('/login') ||
     location.pathname.includes('/register');
@@ -129,7 +131,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-[4.5rem] items-center justify-between">
+          <div className={cn('flex items-center justify-between', isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]')}>
             {/* Logo */}
             <div className="flex items-center gap-9">
               <Link
@@ -188,7 +190,9 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
             {/* Right side */}
             <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center">
+              {isContactPage && <ThemeToggle />}
+
+              <div className={cn('hidden items-center sm:flex', isContactPage && 'lg:hidden')}>
                 <LanguageSwitcher />
               </div>
 
@@ -196,24 +200,27 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
-                  <div className="hidden items-center gap-4 lg:flex">
+                  <div className="hidden items-center gap-3 lg:flex">
                     <Link
                       to={LocaleRoutes.login}
                       params={localeParams(locale)}
-                      className="inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
+                      className={cn(
+                        'inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]',
+                        isContactPage && 'rounded-md border border-[var(--graphite)] px-5',
+                      )}
                     >
                       {t('common:actions.signIn')}
                     </Link>
                     <Button
                       size="sm"
                       asChild
-                      className="rounded-md bg-[var(--brand-orange)] px-4 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+                      className="rounded-md bg-[var(--brand-orange)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
                     >
                       <Link
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
-                        {t('common:actions.startWebAutomation')}
+                        {t(isContactPage ? 'common:actions.startLearning' : 'common:actions.startWebAutomation')}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>

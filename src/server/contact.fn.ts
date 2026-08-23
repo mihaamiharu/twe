@@ -9,7 +9,7 @@ import { logger } from '@/lib/logger';
 const ContactSchema = z.object({
     name: z.string().min(1, 'Name is required'),
     email: z.string().email('Please enter a valid email address'),
-    topic: z.enum(['general', 'mentoring', 'partnership', 'other']).default('general'),
+    topic: z.enum(['general', 'mentoring', 'partnership', 'opportunity', 'other']).default('general'),
     message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 

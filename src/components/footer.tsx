@@ -16,7 +16,7 @@ import {
 import { BugReportDialog } from '@/components/bug-report-dialog';
 import { QaDoodle } from '@/components/qa-illustrations';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from '@tanstack/react-router';
+import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 const externalLinkClass =
@@ -27,10 +27,54 @@ const iconClass =
 
 export function Footer() {
   const { t } = useTranslation(['common', 'legal']);
+  const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
   const localizedParams = localeParams(locale);
   const copyrightYear = new Date().getFullYear();
+
+  if (location.pathname.endsWith('/contact')) {
+    return (
+      <footer
+        data-shell="footer"
+        className="border-t border-[var(--soft-border)] bg-[var(--paper-surface)]"
+      >
+        <div className="mx-auto max-w-[1348px] px-6 py-6 sm:px-8 lg:px-10">
+          <div className="flex flex-col gap-5 text-sm sm:flex-row sm:items-center sm:justify-between sm:gap-6">
+            <p className="shrink-0 text-[var(--muted-graphite)]">
+              © {copyrightYear} TestingWithEkki
+            </p>
+
+            <nav aria-label="Footer navigation" className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[var(--graphite)]">
+              <Link to={LocaleRoutes.tutorials} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.learn')}</Link>
+              <Link to={LocaleRoutes.challenges} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.practice')}</Link>
+              <span className="inline-flex items-center gap-2">
+                {t('common:navigation.labs')}
+                <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
+                  {t('common:navigation.labsSoon')}
+                </span>
+              </span>
+              <Link to={LocaleRoutes.about} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.about')}</Link>
+              <Link to={LocaleRoutes.contact} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('legal:contact.title')}</Link>
+            </nav>
+
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[var(--muted-graphite)]">
+              <a href="https://www.linkedin.com/in/ekkisyamsugiardi/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange)]">
+                <Linkedin className="h-4 w-4" aria-hidden="true" />
+                LinkedIn
+              </a>
+              <a href="https://github.com/mihaamiharu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange)]">
+                <Github className="h-4 w-4" aria-hidden="true" />
+                GitHub
+              </a>
+              <Link to={LocaleRoutes.privacy} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('legal:privacy.title')}</Link>
+              <Link to={LocaleRoutes.terms} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('legal:terms.title')}</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <footer

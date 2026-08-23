@@ -5,8 +5,7 @@ import {
   CheckCircle2,
   Handshake,
   Loader2,
-  MessageCircle,
-  Send,
+  Mail,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ContactHeroVisual } from '@/components/rebrand-visuals';
@@ -24,14 +23,14 @@ export const Route = createFileRoute('/$locale/contact')({
     const locale = params.locale || 'en';
     return createSeoHead({
       title: 'Contact | TestingWithEkki',
-      description: 'Contact Ekki about QA mentoring, partnerships, sponsorships, or questions about TestingWithEkki.',
+      description: 'Contact Ekki about QA mentoring, partnerships, sponsorships, career opportunities, or questions about TestingWithEkki.',
       path: '/contact',
       locale,
     });
   },
 });
 
-const topicOptions = ['general', 'mentoring', 'partnership', 'other'] as const;
+const topicOptions = ['general', 'mentoring', 'partnership', 'opportunity', 'other'] as const;
 
 function ContactPage() {
   const { t } = useTranslation('contact');
@@ -84,22 +83,28 @@ function ContactPage() {
 
   return (
     <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
-      <section className="mx-auto grid max-w-7xl items-center gap-10 px-6 pb-16 pt-16 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:gap-12 lg:px-12 lg:pb-20 lg:pt-20">
+      <section className="mx-auto grid max-w-[1348px] items-center gap-6 px-6 pb-5 pt-8 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-8 lg:px-10 lg:pb-6 lg:pt-10">
         <div className="max-w-xl">
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('hero.eyebrow')}</p>
-          <h1 className="mt-5 text-[clamp(3rem,6vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
+          <h1 className="mt-4 text-[clamp(3.5rem,6.5vw,5.25rem)] font-semibold leading-[0.94] tracking-[-0.06em]">
             {t('hero.title')}<span className="text-[var(--brand-orange)]">.</span>
           </h1>
-          <p className="mt-7 max-w-lg text-lg leading-8 text-[var(--muted-graphite)]">{t('hero.description')}</p>
+          <p className="mt-5 max-w-[31rem] text-[1.08rem] leading-8 text-[var(--muted-graphite)]">{t('hero.description')}</p>
         </div>
         <ContactHeroVisual />
       </section>
 
-      <section className="mx-auto max-w-6xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="space-y-4">
+      <section className="mx-auto max-w-[1180px] px-6 pb-8 sm:px-8 lg:px-0 lg:pb-3">
+        <div className="space-y-3">
           <ContactOption
             number="01"
-            icon={<MessageCircle className="h-7 w-7" aria-hidden="true" />}
+            icon={
+              <img
+                src="/illustrations/twe-inspector-male-hero.png"
+                alt=""
+                className="absolute left-1/2 top-0 h-[230%] w-auto max-w-none -translate-x-1/2 object-contain object-top"
+              />
+            }
             title={t('mentoring.title')}
             description={t('mentoring.description')}
             cta={t('mentoring.cta')}
@@ -112,18 +117,30 @@ function ContactPage() {
             description={t('partnerships.description')}
             cta={t('partnerships.cta')}
             href="mailto:ekki@testingwithekki.com?subject=Partnership%20with%20TestingWithEkki"
+            secondaryCta={t('partnerships.cvCta')}
+            secondaryHref="/cv.pdf"
           />
         </div>
 
-        <div id="message-form" className="mt-4 grid gap-8 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:p-9 lg:grid-cols-[0.68fr_1.32fr] lg:gap-12 lg:p-10">
-          <div className="border-b border-[var(--soft-border)] pb-7 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-10">
-            <div className="flex items-center gap-3">
-              <span className="font-mono text-xs text-[var(--brand-orange)]">03</span>
-              <Send className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+        <div className="relative mt-3 lg:pl-16">
+          <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 items-center gap-2 lg:flex">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--brand-orange)] font-mono text-xs font-medium text-[var(--brand-orange)]">03</span>
+            <ArrowRight className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+          </div>
+
+          <div id="message-form" className="grid gap-6 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 sm:p-5 lg:grid-cols-[0.68fr_1.32fr] lg:gap-8 lg:p-5">
+          <div className="flex items-center gap-5 border-b border-[var(--soft-border)] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange)]">
+              <Mail className="h-9 w-9" strokeWidth={1.4} aria-hidden="true" />
             </div>
-            <p className="mt-7 font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange)]">{t('form.eyebrow')}</p>
-            <h2 className="mt-3 text-2xl font-semibold tracking-[-0.03em]">{t('form.title')}</h2>
-            <p className="mt-3 max-w-sm text-base leading-7 text-[var(--muted-graphite)]">{t('form.description')}</p>
+            <div>
+              <div className="mb-2 flex items-center gap-3 sm:hidden">
+                <span className="font-mono text-xs text-[var(--brand-orange)]">03</span>
+                <span className="h-px w-8 bg-[var(--brand-orange)]/40" />
+              </div>
+              <h2 className="text-2xl font-semibold tracking-[-0.03em]">{t('form.title')}</h2>
+              <p className="mt-2 max-w-sm text-sm leading-6 text-[var(--muted-graphite)]">{t('form.description')}</p>
+            </div>
           </div>
 
           {isSuccess ? (
@@ -134,29 +151,29 @@ function ContactPage() {
               <Button type="button" variant="outline" className="mt-6" onClick={() => setIsSuccess(false)}>{t('form.sendAnother')}</Button>
             </div>
           ) : (
-            <form onSubmit={(event) => { void handleSubmit(event); }} className="grid gap-5 sm:grid-cols-2">
-              <div className="space-y-2">
+            <form onSubmit={(event) => { void handleSubmit(event); }} className="grid gap-x-4 gap-y-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="contact-name">{t('form.name')}</Label>
                 <Input id="contact-name" name="name" placeholder={t('form.namePlaceholder')} required />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="contact-email">{t('form.email')}</Label>
                 <Input id="contact-email" name="email" type="email" placeholder={t('form.emailPlaceholder')} required />
               </div>
-              <div className="space-y-2 sm:col-span-2">
+              <div className="space-y-1.5">
                 <Label htmlFor="contact-topic">{t('form.topic')}</Label>
-                <select id="contact-topic" name="topic" defaultValue="" required className="flex h-11 w-full rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 text-[15px] text-[var(--graphite)] outline-none transition-colors focus:border-[var(--brand-orange)] focus:ring-2 focus:ring-[var(--brand-orange)]/20">
+                <select id="contact-topic" name="topic" defaultValue="" required className="flex h-10 w-full rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 text-sm text-[var(--graphite)] outline-none transition-colors focus:border-[var(--brand-orange)] focus:ring-2 focus:ring-[var(--brand-orange)]/20">
                   <option value="" disabled>{t('form.topicPlaceholder')}</option>
                   {topicOptions.map((topic) => <option key={topic} value={topic}>{t(`form.topics.${topic}`)}</option>)}
                 </select>
               </div>
-              <div className="space-y-2 sm:col-span-2">
+              <div className="space-y-1.5 sm:col-start-2 sm:row-start-2">
                 <Label htmlFor="contact-message">{t('form.message')}</Label>
-                <Textarea id="contact-message" name="message" placeholder={t('form.messagePlaceholder')} required minLength={10} className="min-h-36 resize-y" />
+                <Textarea id="contact-message" name="message" placeholder={t('form.messagePlaceholder')} required minLength={10} className="min-h-[4.5rem] resize-y" />
               </div>
-              <div className="sm:col-span-2 sm:flex sm:justify-end">
-                <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
-                  {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Send className="h-4 w-4" aria-hidden="true" />}
+              <div className="sm:col-start-2 sm:row-start-3 sm:flex sm:justify-end">
+                <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto sm:min-w-[9.5rem]">
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
                   {isSubmitting ? t('form.sending') : t('form.submit')}
                   {!isSubmitting && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
                 </Button>
@@ -164,28 +181,49 @@ function ContactPage() {
               <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
             </form>
           )}
+          </div>
         </div>
       </section>
     </div>
   );
 }
 
-function ContactOption({ number, icon, title, description, cta, href }: { number: string; icon: React.ReactNode; title: string; description: string; cta: string; href: string }) {
+function ContactOption({ number, icon, title, description, cta, href, secondaryCta, secondaryHref }: { number: string; icon: React.ReactNode; title: string; description: string; cta: string; href: string; secondaryCta?: string; secondaryHref?: string }) {
   return (
-    <div className="grid gap-5 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:gap-7 sm:p-7">
-      <div className="flex items-center gap-4 sm:block">
-        <span className="font-mono text-xs text-[var(--brand-orange)]">{number}</span>
-        <div className="mt-0 flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange)] sm:mt-4">{icon}</div>
+    <div className="relative lg:pl-16">
+      <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 items-center gap-2 lg:flex">
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--brand-orange)] font-mono text-xs font-medium text-[var(--brand-orange)]">{number}</span>
+        <ArrowRight className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
       </div>
-      <div>
-        <h2 className="text-xl font-semibold">{title}</h2>
-        <p className="mt-2 max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">{description}</p>
+
+      <div className="grid gap-5 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:grid-cols-[96px_minmax(0,1fr)_1px_auto] sm:items-center sm:gap-6 sm:p-6">
+        <div className="flex items-center gap-3 sm:justify-center">
+          <span className="font-mono text-xs text-[var(--brand-orange)] sm:hidden">{number}</span>
+          <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange)]">{icon}</div>
+        </div>
+        <div>
+          <h2 className="text-xl font-semibold tracking-[-0.025em]">{title}</h2>
+          <p className="mt-1.5 max-w-[34rem] text-sm leading-6 text-[var(--muted-graphite)]">{description}</p>
+        </div>
+        <div className="hidden h-16 w-px bg-[var(--soft-border)] sm:block" />
+        <div className="flex flex-col items-stretch gap-2 sm:items-end">
+          <Button asChild className="w-full sm:w-auto">
+            <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
+              {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </a>
+          </Button>
+          {secondaryCta && secondaryHref && (
+            <a
+              href={secondaryHref}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-1 text-sm font-medium text-[var(--brand-orange)] underline-offset-4 transition-colors hover:underline sm:justify-end"
+            >
+              {secondaryCta} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+            </a>
+          )}
+        </div>
       </div>
-      <Button asChild className="w-full sm:w-auto">
-        <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
-          {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-        </a>
-      </Button>
     </div>
   );
 }

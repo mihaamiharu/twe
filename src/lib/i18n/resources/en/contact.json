@@ -10,9 +10,10 @@
     "cta": "Book a 1:1 session"
   },
   "partnerships": {
-    "title": "Partnerships & Sponsorships",
-    "description": "For testing and developer tools, communities, events, educational collaborations, or relevant sponsorships.",
-    "cta": "Talk about a partnership"
+    "title": "Partnerships, Sponsorships & Opportunities",
+    "description": "For testing and developer tools, communities, events, educational collaborations, sponsorships, or QA engineering opportunities.",
+    "cta": "Talk about working together",
+    "cvCta": "View my CV"
   },
   "form": {
     "eyebrow": "GENERAL MESSAGE",
@@ -28,6 +29,7 @@
       "general": "General question",
       "mentoring": "Mentoring",
       "partnership": "Partnership / sponsorship",
+      "opportunity": "Job opportunity",
       "other": "Other"
     },
     "message": "Message",
