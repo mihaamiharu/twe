@@ -96,7 +96,7 @@
     "explore": "Explore",
     "connect": "Connect",
     "legal": "Legal",
-    "copyright": "© TestingWithEkki",
+    "copyright": "© TestingWithEkki {{year}}",
     "builtBy": "Built by Ekki",
     "reportBug": "Report a Bug",
     "newsletter": {

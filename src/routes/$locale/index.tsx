@@ -109,14 +109,22 @@ function HomePage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <ol className="relative grid gap-0 sm:grid-cols-5 sm:gap-3">
+          <ol
+            data-testid="learning-path-progress"
+            className="relative grid gap-0 sm:grid-cols-5 sm:gap-3"
+          >
             {learningSteps.map((step, index) => (
-              <li key={step.number} className="relative flex gap-4 border-l border-[var(--soft-border)] pb-6 pl-5 last:pb-0 sm:border-l-0 sm:pb-0 sm:pl-0">
-                {index < learningSteps.length - 1 && <span className="absolute left-[-1px] top-3 hidden h-px w-[calc(100%+0.75rem)] bg-[var(--soft-border)] sm:block" />}
-                <div className="relative z-10 flex min-w-7 items-center justify-center sm:block">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--brand-orange)] bg-[var(--paper-surface)] font-mono text-[10px] text-[var(--brand-orange)]">{step.number}</span>
+              <li key={step.number} className="relative flex gap-4 border-l border-[var(--soft-border)] pb-6 pl-5 last:pb-0 sm:block sm:border-l-0 sm:pb-0 sm:pl-0">
+                {index < learningSteps.length - 1 && <span className="absolute left-1/2 top-3.5 hidden h-px w-[calc(100%+0.75rem)] bg-[var(--soft-border)] sm:block" />}
+                <div className="relative z-10 flex min-w-7 items-center justify-center">
+                  <span
+                    data-testid={`learning-path-progress-marker-${step.number}`}
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--brand-orange)] bg-[var(--paper-surface)] font-mono text-[10px] text-[var(--brand-orange)]"
+                  >
+                    {step.number}
+                  </span>
                 </div>
-                <div className="relative z-10 sm:pt-11">
+                <div className="relative z-10 sm:mt-4">
                   <h3 className="font-semibold">{step.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">{step.description}</p>
                 </div>
@@ -194,6 +202,7 @@ function HomePage() {
         <div className="border-y border-[var(--soft-border)]">
           <EmptyState
             size="default"
+            showIllustration={false}
             className="py-8 sm:py-10"
             eyebrow={t('labs.eyebrow')}
             title={t('labs.title')}

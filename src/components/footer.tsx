@@ -30,6 +30,7 @@ export function Footer() {
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
   const localizedParams = localeParams(locale);
+  const copyrightYear = new Date().getFullYear();
 
   return (
     <footer
@@ -189,7 +190,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col gap-4 border-t border-[var(--soft-border)] pt-6 text-sm text-[var(--muted-graphite)] sm:flex-row sm:items-center sm:justify-between">
           <p>
-            {t('common:footer.copyright')}
+            {t('common:footer.copyright', { year: copyrightYear })}
             <span aria-hidden="true"> · </span>
             {t('common:footer.builtBy')}
           </p>

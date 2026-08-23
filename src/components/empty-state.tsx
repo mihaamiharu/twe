@@ -37,6 +37,7 @@ export interface EmptyStateProps {
   secondaryAction?: ReactNode;
   illustration?: keyof typeof illustrationSources;
   illustrationAlt?: string;
+  showIllustration?: boolean;
   size?: keyof typeof sizeStyles;
   className?: string;
 }
@@ -49,17 +50,21 @@ export function EmptyState({
   secondaryAction,
   illustration = 'thinking',
   illustrationAlt = '',
+  showIllustration = true,
   size = 'default',
   className,
 }: EmptyStateProps) {
   const styles = sizeStyles[size];
   const hasActions = Boolean(action || secondaryAction);
   const isDecorative = illustrationAlt.length === 0;
+  const layoutClassName = showIllustration
+    ? 'flex flex-col items-center justify-center text-center sm:flex-row sm:text-left'
+    : 'block text-left';
 
   return (
     <div
       className={cn(
-        'flex flex-col items-center justify-center text-center sm:flex-row sm:text-left',
+        layoutClassName,
         styles.layout,
         className,
       )}
@@ -96,20 +101,22 @@ export function EmptyState({
         )}
       </div>
 
-      <div
-        className={cn('flex shrink-0 items-end justify-center', styles.image)}
-        aria-hidden={isDecorative ? true : undefined}
-      >
-        <img
-          src={illustrationSources[illustration]}
-          alt={illustrationAlt}
-          className="h-full w-full object-contain"
-          width={1148}
-          height={1370}
-          loading="lazy"
-          draggable={false}
-        />
-      </div>
+      {showIllustration && (
+        <div
+          className={cn('flex shrink-0 items-end justify-center', styles.image)}
+          aria-hidden={isDecorative ? true : undefined}
+        >
+          <img
+            src={illustrationSources[illustration]}
+            alt={illustrationAlt}
+            className="h-full w-full object-contain"
+            width={1148}
+            height={1370}
+            loading="lazy"
+            draggable={false}
+          />
+        </div>
+      )}
     </div>
   );
 }

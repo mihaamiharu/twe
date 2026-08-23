@@ -95,7 +95,7 @@
     "explore": "Jelajahi",
     "connect": "Terhubung",
     "legal": "Legal",
-    "copyright": "© TestingWithEkki",
+    "copyright": "© TestingWithEkki {{year}}",
     "builtBy": "Dibuat oleh Ekki",
     "reportBug": "Laporkan Bug",
     "newsletter": {

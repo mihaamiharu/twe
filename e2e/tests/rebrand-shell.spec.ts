@@ -20,6 +20,28 @@ test.describe('Rebrand V1 global shell', () => {
       page.getByRole('button', { name: /Switch language/ }),
     ).toContainText('EN');
     await expect(page.getByRole('link', { name: 'Sign In' })).toBeVisible();
+    const learningPathMarkers = page.locator(
+      '[data-testid^="learning-path-progress-marker-"]',
+    );
+    const learningPathColumns = page.getByTestId('learning-path-progress').locator('li');
+    await expect(learningPathMarkers).toHaveCount(5);
+    await expect(learningPathColumns).toHaveCount(5);
+    const markerRects = await learningPathMarkers.evaluateAll((elements) =>
+      elements.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { centerX: rect.left + rect.width / 2, centerY: rect.top + rect.height / 2 };
+      }),
+    );
+    const columnRects = await learningPathColumns.evaluateAll((elements) =>
+      elements.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { centerX: rect.left + rect.width / 2 };
+      }),
+    );
+    expect(new Set(markerRects.map((rect) => Math.round(rect.centerY))).size).toBe(1);
+    expect(markerRects.map((rect) => Math.round(rect.centerX))).toEqual(
+      columnRects.map((rect) => Math.round(rect.centerX)),
+    );
     await expect(
       page
         .locator('header')
@@ -34,7 +56,9 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(footer).toContainText('Explore');
     await expect(footer).toContainText('Connect');
     await expect(footer).toContainText('Legal');
-    await expect(footer).toContainText('© TestingWithEkki · Built by Ekki');
+    await expect(footer).toContainText(
+      `© TestingWithEkki ${new Date().getFullYear()} · Built by Ekki`,
+    );
     await expect(footer).not.toContainText('Leaderboard');
     await expect(footer).not.toContainText('Subscribe');
     await expect(footer).not.toContainText('Changelog');
@@ -235,6 +259,7 @@ test.describe('Rebrand V1 global shell', () => {
     );
     await expect(labsEmptyState).toHaveCount(1);
     await expect(labsEmptyState).toContainText('LABS · COMING SOON');
+    await expect(labsEmptyState.locator('img')).toHaveCount(0);
   });
 
   test('uses the Thinking Inspector for empty profile tabs', async ({
