@@ -86,7 +86,7 @@ test.describe('Rebrand V1 global shell', () => {
       page.getByRole('link', { name: 'Explore Practice' }).first(),
     ).toHaveAttribute('href', '/en/practice');
     await expect(
-      page.getByRole('link', { name: 'Browse Learn' }),
+      page.getByRole('link', { name: 'Explore Learn' }),
     ).toHaveAttribute('href', '/en/learn');
     await expect(page.getByText('LABS', { exact: true })).toBeVisible();
     await expect(
@@ -97,11 +97,6 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(
       page.getByText('Good things need room to take shape.', { exact: true }),
     ).toHaveCount(0);
-    await expect(
-      page.getByText('For now, practice individual concepts in Practice.', {
-        exact: true,
-      }),
-    ).toBeVisible();
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.reload();

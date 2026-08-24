@@ -23,11 +23,8 @@
       "testDebug": "Test & debug"
     }
   },
-  "footer": {
-    "description": "For now, practice individual concepts in Practice."
-  },
   "actions": {
-    "learn": "Browse Learn",
+    "learn": "Explore Learn",
     "practice": "Explore Practice"
   }
 }

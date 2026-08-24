@@ -23,11 +23,8 @@
       "testDebug": "Test & debug"
     }
   },
-  "footer": {
-    "description": "Untuk sekarang, latih konsep individual di Practice."
-  },
   "actions": {
-    "learn": "Buka Learn",
+    "learn": "Jelajahi Learn",
     "practice": "Jelajahi Practice"
   }
 }

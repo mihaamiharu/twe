@@ -1,7 +1,6 @@
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
 import {
   ArrowDown,
-  ArrowRight,
   BookOpen,
   Code2,
   FlaskConical,
@@ -126,21 +125,6 @@ function LabsPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-24 sm:px-8 sm:pb-32 lg:px-12">
-        <div className="flex flex-col gap-4 border-t border-[var(--soft-border)] pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="font-mono text-xs uppercase tracking-[0.14em] text-[var(--muted-graphite)]">
-            {t('footer.description')}
-          </p>
-          <Link
-            to={LocaleRoutes.practice}
-            params={params}
-            className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
-          >
-            {t('actions.practice')}
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }
