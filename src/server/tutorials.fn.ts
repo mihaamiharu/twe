@@ -9,6 +9,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import {
   getChallengeCatalogList,
   getNextTutorialCatalogItem,
+  getPreviousTutorialCatalogItem,
   getTutorialCatalogList,
   getTutorialCatalogDetail,
 } from './content-catalog.server';
@@ -206,7 +207,10 @@ export const getTutorial = createServerFn({ method: 'GET' })
         }
       }
 
-      const nextTutorial = await getNextTutorialCatalogItem(slug, locale);
+      const [nextTutorial, previousTutorial] = await Promise.all([
+        getNextTutorialCatalogItem(slug, locale),
+        getPreviousTutorialCatalogItem(slug, locale),
+      ]);
 
       return {
         success: true,
@@ -223,10 +227,14 @@ export const getTutorial = createServerFn({ method: 'GET' })
           viewCount: dbTutorial?.viewCount || 0,
           challenges: relatedChallenges,
           userProgress: userProgressData,
+          previousTutorial,
           nextTutorial,
         },
       };
     } catch (error) {
+      if (error instanceof Error && error.message === 'Tutorial not found') {
+        return { success: false, error: 'Tutorial not found' };
+      }
       console.error('Error fetching tutorial detail:', error);
       return {
         success: false,

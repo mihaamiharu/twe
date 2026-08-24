@@ -402,6 +402,31 @@ export async function getNextTutorialCatalogItem(
   return { slug: next.slug, title: next.title };
 }
 
+/** Return the previous published Learn item in deterministic catalog order. */
+export async function getPreviousTutorialCatalogItem(
+  currentSlug: string,
+  locale: string,
+): Promise<{ slug: string; title: string } | null> {
+  const { registry } = await loadCatalogSources();
+  const current = registry.tutorials.find(
+    (tutorial) => tutorial.slug === currentSlug,
+  );
+  if (!current || !isPublished(current.status)) return null;
+
+  const orderedEntries = sortByOrder(
+    registry.tutorials.filter((tutorial) => isPublished(tutorial.status)),
+  );
+  const currentIndex = orderedEntries.findIndex(
+    (tutorial) => tutorial.slug === currentSlug,
+  );
+  const previousEntry =
+    currentIndex > 0 ? orderedEntries[currentIndex - 1] : undefined;
+
+  if (!previousEntry) return null;
+  const previous = await projectTutorialSummary(previousEntry, locale);
+  return { slug: previous.slug, title: previous.title };
+}
+
 /** Validate all declared Learn↔Practice relationships against filesystem IDs. */
 export async function validateCatalogRelationships(): Promise<void> {
   await loadCatalogSources();

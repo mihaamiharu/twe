@@ -1,30 +1,39 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
-import { ArrowRight, CheckCircle2, Circle, Clock, Search } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  Circle,
+  Clock,
+  LayoutGrid,
+  List,
+  Search,
+  SlidersHorizontal,
+  X,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Progress } from '@/components/ui/progress';
 import {
   LearningPathPreview,
   type LearningPathPreviewKind,
 } from '@/components/learning-path-preview';
-import { useDebounce } from '@/lib/useDebounce';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { createSeoHead } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
+import { filterLearnCatalog, LEARN_DIFFICULTIES } from '@/lib/learn-catalog';
+import type { TutorialCatalogListItemWithOverlay } from '@/lib/catalog-overlays';
 import { cn } from '@/lib/utils';
 
-const LearnSearchSchema = z.object({
+export const LearnSearchSchema = z.object({
   q: z.string().optional(),
-  difficulty: z
-    .enum(['all', 'foundations', 'beginner', 'intermediate', 'advanced'])
-    .optional(),
+  difficulty: z.enum(['all', ...LEARN_DIFFICULTIES]).optional(),
   view: z.enum(['grid', 'list']).optional(),
   hideCompleted: z.coerce.boolean().optional(),
 });
@@ -33,6 +42,7 @@ export const Route = createFileRoute('/$locale/learn/')({
   validateSearch: LearnSearchSchema,
   loader: async ({ context, params }) => {
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+
     return context.queryClient.ensureQueryData(
       tutorialsListQueryOptions({
         locale: params.locale,
@@ -41,6 +51,7 @@ export const Route = createFileRoute('/$locale/learn/')({
     );
   },
   component: LearnPage,
+  pendingComponent: LearnCatalogSkeleton,
   head: ({ params }) => {
     const locale = params.locale || 'en';
 
@@ -55,16 +66,7 @@ export const Route = createFileRoute('/$locale/learn/')({
 
 const routeApi = getRouteApi('/$locale/learn/');
 
-interface LessonListItem {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  estimatedMinutes: number;
-  tags: string[];
-  isCompleted: boolean;
-  readingProgress: number;
-}
+type LearnSearch = z.infer<typeof LearnSearchSchema>;
 
 interface LearningPathStep {
   number: string;
@@ -75,62 +77,76 @@ interface LearningPathStep {
   slug?: string;
 }
 
+function LearnCatalogSkeleton() {
+  return (
+    <main
+      className="min-h-screen bg-background"
+      aria-busy="true"
+      data-testid="learn-loading"
+    >
+      <div className="mx-auto max-w-7xl space-y-8 px-5 pb-20 pt-10 md:px-10 md:pt-16">
+        <div className="space-y-4 border-b border-border pb-12">
+          <div className="h-3 w-28 animate-pulse rounded bg-muted" />
+          <div className="h-14 max-w-2xl animate-pulse rounded bg-muted" />
+          <div className="h-5 max-w-xl animate-pulse rounded bg-muted" />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }, (_, index) => (
+            <div
+              key={index}
+              className="h-56 animate-pulse rounded-xl border border-border bg-card"
+            />
+          ))}
+        </div>
+      </div>
+    </main>
+  );
+}
+
 function LearnPage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('tutorials');
-  const { data: auth } = useSuspenseQuery(authQueryOptions);
   const navigate = routeApi.useNavigate();
   const searchParams = routeApi.useSearch();
-  const q = searchParams.q;
-  const selectedDifficulty = searchParams.difficulty || 'all';
+  const tutorialsResponse = routeApi.useLoaderData();
+  const query = searchParams.q ?? '';
+  const selectedDifficulty = searchParams.difficulty ?? 'all';
   const hideCompleted = searchParams.hideCompleted ?? false;
-  const [searchInput, setSearchInput] = useState(q ?? '');
-  const debouncedSearchQuery = useDebounce(searchInput, 300);
+  const viewMode = searchParams.view ?? 'grid';
 
-  const updateSearch = (
-    updates: Partial<z.infer<typeof LearnSearchSchema>>,
-  ) => {
+  const updateSearch = (updates: LearnSearch) => {
     void navigate({
       to: '.',
-      search: (previous) => ({ ...previous, ...updates }),
+      search: (previous) => {
+        const next = { ...previous, ...updates };
+        for (const key of Object.keys(next) as Array<keyof LearnSearch>) {
+          if (next[key] === undefined) delete next[key];
+        }
+        return next;
+      },
       replace: true,
     });
   };
 
-  useEffect(() => {
-    if (debouncedSearchQuery !== (q ?? '')) {
-      updateSearch({ q: debouncedSearchQuery || undefined });
-    }
-  }, [debouncedSearchQuery, q]);
+  const clearFilters = () => {
+    void navigate({ to: '.', search: {}, replace: true });
+  };
 
-  const { data: tutorialsResponse } = useSuspenseQuery(
-    tutorialsListQueryOptions({
-      locale,
-      viewerId: auth.user?.id,
-    }),
-  );
+  const filteredLessons = useMemo(() => {
+    if (!tutorialsResponse.success) return [];
 
-  const tutorials = tutorialsResponse.success ? tutorialsResponse.data : [];
-  const normalizedSearchQuery = searchInput.trim().toLocaleLowerCase();
+    return filterLearnCatalog(tutorialsResponse.data, {
+      query,
+      difficulty: selectedDifficulty,
+      hideCompleted,
+    });
+  }, [hideCompleted, query, selectedDifficulty, tutorialsResponse]);
 
-  const filteredLessons = useMemo(
-    () =>
-      tutorials.filter((lesson) => {
-        if (
-          normalizedSearchQuery &&
-          ![lesson.title, lesson.description].some((value) =>
-            value.toLocaleLowerCase().includes(normalizedSearchQuery),
-          )
-        ) {
-          return false;
-        }
-        if (hideCompleted && lesson.isCompleted) return false;
-        if (selectedDifficulty === 'all') return true;
-        return lesson.tags.some(
-          (tag) => tag.toLowerCase() === selectedDifficulty.toLowerCase(),
-        );
-      }),
-    [tutorials, selectedDifficulty, hideCompleted, normalizedSearchQuery],
+  const hasActiveFilters = Boolean(
+    query.trim() ||
+    selectedDifficulty !== 'all' ||
+    hideCompleted ||
+    viewMode !== 'grid',
   );
 
   const learningPathSteps: LearningPathStep[] = [
@@ -207,7 +223,7 @@ function LearnPage() {
 
             <a
               href="#web-automation-lessons"
-              className="mt-9 inline-flex min-h-11 items-center gap-3 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              className="mt-9 inline-flex min-h-11 items-center gap-3 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {t('learn.primaryCta')}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -248,119 +264,227 @@ function LearnPage() {
         <section
           id="web-automation-lessons"
           className="scroll-mt-24 pt-14 md:pt-20"
+          aria-labelledby="lesson-catalog-title"
         >
-          <div className="flex flex-col gap-5 border-b border-border pb-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-6 border-b border-border pb-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="font-mono text-[11px] uppercase tracking-[0.16em] text-primary">
                 {t('learn.lessons.eyebrow')}
               </p>
-              <h3 className="mt-2 text-2xl font-semibold tracking-[-0.025em] text-foreground">
+              <h2
+                id="lesson-catalog-title"
+                className="mt-2 text-2xl font-semibold tracking-[-0.025em] text-foreground sm:text-3xl"
+              >
                 {t('learn.lessons.title')}
-              </h3>
+              </h2>
               <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
                 {t('learn.lessons.description')}
               </p>
               <Link
                 to={LocaleRoutes.practice}
                 params={localeParams(locale)}
-                className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
+                className="mt-3 inline-flex min-h-10 items-center gap-2 text-sm font-semibold text-primary hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {t('learn.lessons.practiceLink')}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
 
-            <div className="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
-              <label className="relative min-w-0 flex-1 lg:w-64">
-                <span className="sr-only">
-                  {t('learn.lessons.searchLabel')}
-                </span>
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder={t('learn.lessons.searchPlaceholder')}
-                  value={searchInput}
-                  onChange={(event) => setSearchInput(event.target.value)}
-                  className="h-10 rounded-md border-border bg-card pl-9 shadow-none"
-                />
-              </label>
-              <Button
-                variant="outline"
-                aria-pressed={hideCompleted}
-                onClick={() => updateSearch({ hideCompleted: !hideCompleted })}
-                className="h-10 justify-start rounded-md border-border bg-card px-3 shadow-none hover:bg-accent hover:text-accent-foreground sm:justify-center"
-              >
-                {hideCompleted ? (
-                  <CheckCircle2 className="mr-2 h-4 w-4 text-primary" />
-                ) : (
-                  <Circle className="mr-2 h-4 w-4 text-muted-foreground" />
-                )}
-                {t(
-                  hideCompleted
-                    ? 'filters.showCompleted'
-                    : 'filters.hideCompleted',
-                )}
-              </Button>
+            <div className="flex w-full flex-col gap-3 lg:w-auto lg:min-w-[34rem]">
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <label className="relative min-w-0 flex-1">
+                  <span className="sr-only">
+                    {t('learn.lessons.searchLabel')}
+                  </span>
+                  <Search
+                    className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <Input
+                    placeholder={t('learn.lessons.searchPlaceholder')}
+                    value={query}
+                    onChange={(event) =>
+                      updateSearch({ q: event.target.value || undefined })
+                    }
+                    className="h-11 rounded-md border-border bg-card pl-9 pr-9 shadow-none"
+                    data-testid="learn-search"
+                  />
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => updateSearch({ q: undefined })}
+                      className="absolute right-2 top-1/2 inline-flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      aria-label={t('learn.lessons.clearSearch')}
+                    >
+                      <X className="h-4 w-4" aria-hidden="true" />
+                    </button>
+                  )}
+                </label>
+                <Button
+                  variant="outline"
+                  aria-pressed={hideCompleted}
+                  onClick={() =>
+                    updateSearch({
+                      hideCompleted: hideCompleted ? undefined : true,
+                    })
+                  }
+                  className="h-11 justify-start rounded-md border-border bg-card px-3 shadow-none hover:bg-accent hover:text-accent-foreground sm:justify-center"
+                  data-testid="learn-completion-filter"
+                >
+                  {hideCompleted ? (
+                    <CheckCircle2 className="mr-2 h-4 w-4 text-primary" />
+                  ) : (
+                    <Circle className="mr-2 h-4 w-4 text-muted-foreground" />
+                  )}
+                  {t(
+                    hideCompleted
+                      ? 'filters.showCompleted'
+                      : 'filters.hideCompleted',
+                  )}
+                </Button>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div
+                  className="flex flex-wrap gap-2"
+                  role="group"
+                  aria-label={t('filters.difficultyLabel')}
+                >
+                  {(['all', ...LEARN_DIFFICULTIES] as const).map(
+                    (difficulty) => (
+                      <button
+                        key={difficulty}
+                        type="button"
+                        aria-pressed={selectedDifficulty === difficulty}
+                        className={cn(
+                          'inline-flex min-h-9 items-center rounded-md border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                          selectedDifficulty === difficulty
+                            ? 'border-primary bg-primary text-primary-foreground'
+                            : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                        )}
+                        onClick={() =>
+                          updateSearch({
+                            difficulty:
+                              selectedDifficulty === difficulty ||
+                              difficulty === 'all'
+                                ? undefined
+                                : difficulty,
+                          })
+                        }
+                      >
+                        {t(`filters.${difficulty}`)}
+                      </button>
+                    ),
+                  )}
+                </div>
+
+                <div
+                  className="flex items-center gap-2"
+                  role="group"
+                  aria-label={t('view.label')}
+                >
+                  <SlidersHorizontal
+                    className="mr-1 h-4 w-4 text-muted-foreground"
+                    aria-hidden="true"
+                  />
+                  <Button
+                    type="button"
+                    variant={viewMode === 'grid' ? 'secondary' : 'outline'}
+                    size="sm"
+                    aria-pressed={viewMode === 'grid'}
+                    aria-label={t('view.grid')}
+                    onClick={() => updateSearch({ view: undefined })}
+                  >
+                    <LayoutGrid aria-hidden="true" />
+                    <span className="sr-only sm:not-sr-only">
+                      {t('view.grid')}
+                    </span>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant={viewMode === 'list' ? 'secondary' : 'outline'}
+                    size="sm"
+                    aria-pressed={viewMode === 'list'}
+                    aria-label={t('view.list')}
+                    onClick={() => updateSearch({ view: 'list' })}
+                  >
+                    <List aria-hidden="true" />
+                    <span className="sr-only sm:not-sr-only">
+                      {t('view.list')}
+                    </span>
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2 py-5">
-            {(
-              [
-                'all',
-                'foundations',
-                'beginner',
-                'intermediate',
-                'advanced',
-              ] as const
-            ).map((difficulty) => (
-              <button
-                key={difficulty}
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border py-4">
+            <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-muted-foreground">
+              {t('learn.lessons.results', { count: filteredLessons.length })}
+            </p>
+            {hasActiveFilters && (
+              <Button
                 type="button"
-                aria-pressed={selectedDifficulty === difficulty}
-                className={cn(
-                  'inline-flex min-h-9 items-center rounded-md border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                  selectedDifficulty === difficulty
-                    ? 'border-primary bg-primary text-primary-foreground'
-                    : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                )}
-                onClick={() =>
-                  updateSearch({
-                    difficulty:
-                      selectedDifficulty === difficulty ? 'all' : difficulty,
-                  })
-                }
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="h-9 px-2 text-muted-foreground"
+                data-testid="learn-clear-filters"
               >
-                {t(`filters.${difficulty}`)}
-              </button>
-            ))}
+                <X aria-hidden="true" />
+                {t('filters.clear')}
+              </Button>
+            )}
           </div>
 
-          {filteredLessons.length === 0 ? (
+          {!tutorialsResponse.success ? (
+            <LearnCatalogError message={tutorialsResponse.error} />
+          ) : filteredLessons.length === 0 ? (
             <EmptyState
               size="compact"
-              className="border-y border-dashed border-border"
+              className="border-b border-dashed border-border"
               eyebrow={t('learn.lessons.emptyEyebrow')}
               title={t('learn.lessons.noResults')}
               description={
-                searchInput
+                hasActiveFilters
                   ? t('learn.lessons.tryDifferentSearch')
                   : t('learn.lessons.checkBackSoon')
               }
+              action={
+                hasActiveFilters ? (
+                  <Button type="button" onClick={clearFilters}>
+                    {t('filters.clear')}
+                  </Button>
+                ) : undefined
+              }
             />
           ) : (
-            <div className="border-t border-border">
-              {filteredLessons.map((lesson, index) => (
-                <LessonRow
-                  key={lesson.slug}
-                  lesson={lesson}
-                  index={index}
-                  locale={locale}
-                  completedLabel={t('card.completed')}
-                  minutesLabel={t('card.estimatedTimeShort', {
-                    minutes: lesson.estimatedMinutes,
-                  })}
-                />
-              ))}
+            <div
+              id="lesson-results"
+              data-testid="learn-results"
+              data-view-mode={viewMode}
+              className={cn(
+                'pt-5',
+                viewMode === 'grid'
+                  ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'
+                  : 'divide-y divide-border border-t border-border',
+              )}
+            >
+              {filteredLessons.map((lesson) =>
+                viewMode === 'grid' ? (
+                  <LessonCard
+                    key={lesson.slug}
+                    lesson={lesson}
+                    locale={locale}
+                  />
+                ) : (
+                  <LessonRow
+                    key={lesson.slug}
+                    lesson={lesson}
+                    locale={locale}
+                  />
+                ),
+              )}
             </div>
           )}
         </section>
@@ -380,6 +504,28 @@ function LearnPage() {
         </aside>
       </div>
     </main>
+  );
+}
+
+function LearnCatalogError({ message }: { message: string }) {
+  const { t } = useTranslation('tutorials');
+
+  return (
+    <div
+      className="border-b border-dashed border-border py-12 text-center"
+      role="alert"
+      data-testid="learn-error"
+    >
+      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-destructive">
+        {t('learn.lessons.errorEyebrow')}
+      </p>
+      <h3 className="mt-2 text-xl font-semibold text-foreground">
+        {t('learn.lessons.errorTitle')}
+      </h3>
+      <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
+        {message || t('learn.lessons.errorDescription')}
+      </p>
+    </div>
   );
 }
 
@@ -433,7 +579,7 @@ function LearningPathCard({
       <Link
         to="/$locale/learn/$slug"
         params={{ locale, slug: step.slug }}
-        className="block"
+        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {cardContent}
       </Link>
@@ -444,59 +590,148 @@ function LearningPathCard({
     <Link
       to={LocaleRoutes.practice}
       params={localeParams(locale)}
-      className="block"
+      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {cardContent}
     </Link>
   );
 }
 
+function LessonMeta({
+  lesson,
+}: {
+  lesson: TutorialCatalogListItemWithOverlay;
+}) {
+  const { t } = useTranslation('tutorials');
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-2 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+      <span className="flex items-center gap-1.5">
+        <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+        {t('card.estimatedTimeShort', { minutes: lesson.estimatedMinutes })}
+      </span>
+      {lesson.tags.map((tag) => (
+        <span key={tag} className="rounded bg-muted px-1.5 py-1">
+          {tag}
+        </span>
+      ))}
+      {lesson.readingProgress > 0 && !lesson.isCompleted && (
+        <span className="text-primary">
+          {t('card.progress', { progress: lesson.readingProgress })}
+        </span>
+      )}
+    </div>
+  );
+}
+
+function LessonStatus({
+  lesson,
+}: {
+  lesson: TutorialCatalogListItemWithOverlay;
+}) {
+  const { t } = useTranslation('tutorials');
+
+  if (!lesson.isCompleted) return null;
+
+  return (
+    <Badge className="gap-1 rounded-md border-brand-success/25 bg-brand-success/10 px-2 py-0.5 text-[10px] text-brand-success hover:bg-brand-success/10">
+      <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
+      {t('card.completed')}
+    </Badge>
+  );
+}
+
+function LessonCard({
+  lesson,
+  locale,
+}: {
+  lesson: TutorialCatalogListItemWithOverlay;
+  locale: string;
+}) {
+  const { t } = useTranslation('tutorials');
+  const progress = lesson.isCompleted ? 100 : lesson.readingProgress;
+
+  return (
+    <Link
+      to="/$locale/learn/$slug"
+      params={{ locale, slug: lesson.slug }}
+      className="group flex min-h-64 flex-col rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/45 hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      data-testid="lesson-card"
+      data-completed={lesson.isCompleted}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-primary">
+          {t('learn.lessons.lessonNumber', {
+            number: String(lesson.order).padStart(2, '0'),
+          })}
+        </span>
+        <LessonStatus lesson={lesson} />
+      </div>
+      <h3 className="mt-5 text-xl font-semibold tracking-[-0.02em] text-foreground transition-colors group-hover:text-primary">
+        {lesson.title}
+      </h3>
+      <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
+        {lesson.description}
+      </p>
+      <div className="mt-auto">
+        <LessonMeta lesson={lesson} />
+        {progress > 0 && (
+          <div className="mt-4 flex items-center gap-3">
+            <Progress
+              value={progress}
+              className="h-1.5"
+              aria-label={t('card.progressLabel', { progress })}
+            />
+            <span className="font-mono text-[10px] text-muted-foreground">
+              {progress}%
+            </span>
+          </div>
+        )}
+        <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
+          {lesson.isCompleted
+            ? t('card.reviewLesson')
+            : lesson.readingProgress > 0
+              ? t('card.continueLesson')
+              : t('card.startLesson')}
+          <ArrowRight
+            className="h-4 w-4 transition-transform group-hover:translate-x-1"
+            aria-hidden="true"
+          />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 function LessonRow({
   lesson,
-  index,
   locale,
-  completedLabel,
-  minutesLabel,
 }: {
-  lesson: LessonListItem;
-  index: number;
+  lesson: TutorialCatalogListItemWithOverlay;
   locale: string;
-  completedLabel: string;
-  minutesLabel: string;
 }) {
   return (
     <Link
       to="/$locale/learn/$slug"
       params={{ locale, slug: lesson.slug }}
-      className="group grid gap-4 border-b border-border py-5 transition-colors hover:bg-accent/40 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
+      className="group grid gap-4 border-b border-border py-5 transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
+      data-testid="lesson-row"
+      data-completed={lesson.isCompleted}
     >
       <span className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground">
-        {String(index + 1).padStart(2, '0')}
+        {String(lesson.order).padStart(2, '0')}
       </span>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3">
-          <h4 className="text-lg font-semibold tracking-[-0.015em] text-foreground transition-colors group-hover:text-primary">
+          <h3 className="text-lg font-semibold tracking-[-0.015em] text-foreground transition-colors group-hover:text-primary">
             {lesson.title}
-          </h4>
-          {lesson.isCompleted && (
-            <Badge className="gap-1 rounded-md border-brand-success/25 bg-brand-success/10 px-2 py-0.5 text-[10px] text-brand-success hover:bg-brand-success/10">
-              <CheckCircle2 className="h-3 w-3" />
-              {completedLabel}
-            </Badge>
-          )}
+          </h3>
+          <LessonStatus lesson={lesson} />
         </div>
         <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
           {lesson.description}
         </p>
-        <div className="mt-3 flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
-          {lesson.tags.slice(0, 2).map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-          <span className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            {minutesLabel}
-          </span>
-        </div>
+        <LessonMeta lesson={lesson} />
       </div>
       <ArrowRight
         className="hidden h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary sm:mt-1 sm:block"

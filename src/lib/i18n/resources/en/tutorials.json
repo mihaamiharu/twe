@@ -64,10 +64,20 @@
       "practiceLink": "Explore Practice challenges",
       "searchLabel": "Search lessons",
       "searchPlaceholder": "Search lessons...",
+      "clearSearch": "Clear lesson search",
+      "results": "{{count}} lessons",
+      "lessonNumber": "Lesson {{number}}",
       "emptyEyebrow": "NO MATCHES",
       "noResults": "No lessons found",
       "tryDifferentSearch": "Try a different search term",
-      "checkBackSoon": "New lessons will appear here when they are ready."
+      "checkBackSoon": "New lessons will appear here when they are ready.",
+      "errorEyebrow": "LOAD ERROR",
+      "errorTitle": "Lessons are unavailable",
+      "errorDescription": "We couldn't load the lesson catalog. Please try again later."
+    },
+    "detailError": {
+      "title": "This lesson is unavailable",
+      "description": "We couldn't load this lesson. Please return to Learn and try again."
     },
     "future": {
       "eyebrow": "NEXT",
@@ -96,11 +106,13 @@
     "notFoundDescription": "The tutorial you are looking for does not exist"
   },
   "filters": {
+    "difficultyLabel": "Filter lessons by difficulty",
     "all": "All",
     "foundations": "Foundations",
     "beginner": "Beginner",
     "intermediate": "Intermediate",
     "advanced": "E2E Testing",
+    "clear": "Clear filters",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed"
   },
@@ -121,17 +133,22 @@
   "card": {
     "estimatedTime": "{{minutes}} min read",
     "estimatedTimeShort": "{{minutes}} min",
-    "startTutorial": "Start Tutorial",
-    "continueTutorial": "Continue",
-    "completed": "Done"
+    "startLesson": "Start lesson",
+    "continueLesson": "Continue lesson",
+    "completed": "Done",
+    "reviewLesson": "Review lesson",
+    "progress": "{{progress}}% read",
+    "progressLabel": "Reading progress: {{progress}}%"
   },
   "view": {
+    "label": "Lesson presentation",
     "grid": "Grid View",
     "list": "List View"
   },
   "sidebar": {
     "progress": "Your Progress",
     "reading": "Reading",
+    "readingProgress": "Reading progress: {{progress}}%",
     "readToComplete": "Read to Complete",
     "completeAndContinue": "Complete & Continue",
     "completedTitle": "Completed! 🎉",
@@ -141,8 +158,15 @@
     "challengesTitle": "Practice Challenges",
     "challengesDescription": "Reinforce what you've learned with these related challenges."
   },
+  "detail": {
+    "breadcrumbLabel": "Lesson breadcrumbs",
+    "contentLabel": "Lesson content",
+    "tagsLabel": "Lesson topics",
+    "tocTitle": "On this page",
+    "lessonNavigationLabel": "Lesson navigation"
+  },
   "toasts": {
-    "completed": "Tutorial completed! 🎉",
-    "failed": "Failed to mark as complete"
+    "completed": "Lesson completed! 🎉",
+    "failed": "Failed to mark the lesson as complete"
   }
 }
