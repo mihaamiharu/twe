@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generateTypeDefinitions } from '@/core/type-generator';
 import { omitUndefined } from '@/lib/omit-undefined';
+import { useMediaQuery } from '@/lib/use-media-query';
 import type {
     ChallengePlaygroundProps,
     PlaygroundState
@@ -40,16 +41,8 @@ export function usePlaygroundState({
 
     const [revealedHintsCount, setRevealedHintsCount] = useState(0);
 
-    // Layout state
-    const [isMobile, setIsMobile] = useState(false);
-
-    // Check for mobile on mount and resize
-    useEffect(() => {
-        const checkMobile = () => setIsMobile(window.innerWidth < 1024);
-        checkMobile();
-        window.addEventListener('resize', checkMobile);
-        return () => window.removeEventListener('resize', checkMobile);
-    }, []);
+    // Keep this in sync with the playground's responsive CSS without a resize listener.
+    const isMobile = useMediaQuery('(max-width: 1023px)');
 
     // Layout readiness state
     const isCodeChallenge =

@@ -1,6 +1,6 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { z } from 'zod';
 import {
   ArrowRight,
@@ -31,20 +31,21 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import {
-  CATEGORY_ORDER,
-  getTierFromCategory,
-  TIER_ORDER,
-} from '@/lib/constants';
+import { getTierFromCategory, TIER_ORDER } from '@/lib/constants';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { authQueryOptions } from '@/lib/auth.query';
-import { useDebounce } from '@/lib/useDebounce';
 import { cn } from '@/lib/utils';
 import { TRACK_CONFIG, TRACK_IDS, type TrackId } from '@/config/tracks';
 import i18n from '@/lib/i18n';
 import { createSeoHead } from '@/lib/seo';
+import {
+  filterPracticeChallenges,
+  groupPracticeChallenges,
+  type PracticeChallenge,
+} from '@/lib/practice-catalog';
 
 const DifficultySchema = z.enum(['EASY', 'MEDIUM', 'HARD']);
+const TierSchema = z.enum(['basic', 'beginner', 'intermediate', 'e2e']);
 
 const ChallengesSearchSchema = z.object({
   track: z.enum(TRACK_IDS).optional(),
@@ -77,21 +78,6 @@ export const Route = createFileRoute('/$locale/practice/')({
     });
   },
 });
-
-export interface Challenge {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  type: string;
-  difficulty: string;
-  category: string;
-  xpReward: number;
-  order: number;
-  completionCount: number;
-  isCompleted: boolean;
-  tags: string[];
-}
 
 const TRACK_LABEL_KEYS: Record<TrackId, string> = {
   all: 'tracks.all.label',
@@ -132,7 +118,7 @@ export function ChallengesPage() {
   const loaderData = routeApi.useLoaderData?.();
 
   const q = searchParams.q;
-  const tier = searchParams.tier;
+  const tier = TierSchema.safeParse(searchParams.tier).data;
   const difficulty = searchParams.difficulty;
   const hideCompleted = searchParams.hideCompleted ?? false;
   const activeTrackId: TrackId = searchParams.track || 'all';
@@ -145,18 +131,10 @@ export function ChallengesPage() {
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
     () => new Set(),
   );
-  const [isMobileLayout, setIsMobileLayout] = useState(false);
-  const debouncedSearchQuery = useDebounce(searchInput, 300);
 
   useEffect(() => {
-    const updateLayout = () => {
-      setIsMobileLayout(window.innerWidth < 1024);
-    };
-
-    updateLayout();
-    window.addEventListener('resize', updateLayout);
-    return () => window.removeEventListener('resize', updateLayout);
-  }, []);
+    setSearchInput(q ?? '');
+  }, [q]);
 
   const updateSearch = (
     updates: Partial<z.infer<typeof ChallengesSearchSchema>>,
@@ -168,12 +146,6 @@ export function ChallengesPage() {
     });
   };
 
-  useEffect(() => {
-    if (debouncedSearchQuery !== (q ?? '')) {
-      updateSearch({ q: debouncedSearchQuery || undefined });
-    }
-  }, [debouncedSearchQuery, q]);
-
   const activeTrack =
     ALL_TRACKS.find((track) => track.id === activeTrackId) ?? ALL_TRACKS[0];
 
@@ -183,79 +155,37 @@ export function ChallengesPage() {
     );
   }
 
-  const { data: challengesResponse } = useQuery({
+  const {
+    data: challengesResponse,
+    isError: isCatalogError,
+    isPending: isCatalogPending,
+    refetch: refetchCatalog,
+  } = useQuery({
     ...challengeListQueryOptions({
       locale,
       viewerId: auth?.user?.id,
     }),
     initialData: loaderData,
     placeholderData: keepPreviousData,
+    staleTime: Infinity,
   });
 
   const challenges = challengesResponse?.success ? challengesResponse.data : [];
-  const normalizedSearchQuery = searchInput.trim().toLocaleLowerCase();
-
-  const filteredChallenges = useMemo(() => {
-    return challenges.filter((challenge) => {
-      // Keep the UI deterministic while a filtered query is using previous
-      // query data. The server remains the source of truth, but applying the
-      // same search predicate here prevents stale placeholder data from
-      // making a no-match search look like it returned every challenge.
-      if (
-        normalizedSearchQuery &&
-        ![challenge.title, challenge.description].some((value) =>
-          value.toLocaleLowerCase().includes(normalizedSearchQuery),
-        )
-      ) {
-        return false;
-      }
-      if (!activeTrack.match(challenge)) return false;
-      if (hideCompleted && challenge.isCompleted) return false;
-      if (difficulty && challenge.difficulty !== difficulty) return false;
-      if (tier && getTierFromCategory(challenge.category || '') !== tier) {
-        return false;
-      }
-      return true;
-    });
-  }, [
-    activeTrack,
-    challenges,
+  const hasCatalogResponseError = Boolean(
+    challengesResponse && !challengesResponse.success,
+  );
+  const filteredChallenges = filterPracticeChallenges(challenges, {
+    query: searchInput,
+    track: activeTrackId,
+    tier,
     difficulty,
     hideCompleted,
-    normalizedSearchQuery,
-    tier,
-  ]);
-
-  const groupedChallenges = useMemo(() => {
-    const groups = new Map<string, Challenge[]>();
-
-    for (const challenge of filteredChallenges) {
-      const category = challenge.category || 'uncategorized';
-      const group = groups.get(category) ?? [];
-      group.push(challenge);
-      groups.set(category, group);
-    }
-
-    for (const group of groups.values()) {
-      group.sort((a, b) => a.order - b.order);
-    }
-
-    return [...groups.entries()].sort(([categoryA], [categoryB]) => {
-      if (categoryA === 'uncategorized') return 1;
-      if (categoryB === 'uncategorized') return -1;
-
-      const tierOrderA = TIER_ORDER.indexOf(getTierFromCategory(categoryA));
-      const tierOrderB = TIER_ORDER.indexOf(getTierFromCategory(categoryB));
-      if (tierOrderA !== tierOrderB) return tierOrderA - tierOrderB;
-
-      return (
-        (CATEGORY_ORDER[categoryA] ?? 999) - (CATEGORY_ORDER[categoryB] ?? 999)
-      );
-    });
-  }, [filteredChallenges]);
+  });
+  const groupedChallenges = groupPracticeChallenges(filteredChallenges);
 
   const clearFilters = () => {
     setSearchInput('');
+    setCollapsedGroups(new Set());
     updateSearch({
       q: undefined,
       track: undefined,
@@ -267,14 +197,18 @@ export function ChallengesPage() {
 
   const hasActiveFilters = Boolean(
     searchInput ||
-    q ||
     difficulty ||
     hideCompleted ||
     tier ||
     activeTrackId !== 'all',
   );
 
-  const renderChallengeProps = (challenge: Challenge) => ({
+  const handleSearchChange = (value: string) => {
+    setSearchInput(value);
+    updateSearch({ q: value || undefined });
+  };
+
+  const renderChallengeProps = (challenge: PracticeChallenge) => ({
     challenge,
     locale,
     typeLabel: t(`types.${challenge.type.toLowerCase()}`, {
@@ -283,15 +217,22 @@ export function ChallengesPage() {
     difficultyLabel: t(`difficulty.${challenge.difficulty}`, {
       defaultValue: challenge.difficulty,
     }),
+    categoryLabel: t(`categories.${challenge.category}`, {
+      defaultValue: challenge.category,
+    }),
+    tierLabel: t(`tiers.${getTierFromCategory(challenge.category)}`),
+    completionCountLabel: t('library.completedByCount', {
+      count: challenge.completionCount,
+    }),
     completedLabel: t('labels.completedState'),
     comingSoonLabel: t('labels.comingSoon'),
     startLabel: t('labels.start'),
     reviewLabel: t('labels.review'),
   });
 
-  const showListView = viewMode === 'list' || isMobileLayout;
-  const showGridView = viewMode === 'grid' && !isMobileLayout;
   const emptyStateTitle = t('library.emptyTitle');
+  const showListView = viewMode === 'list';
+  const showGridView = viewMode === 'grid';
 
   const toggleGroup = (category: string) => {
     setCollapsedGroups((previous) => {
@@ -372,7 +313,7 @@ export function ChallengesPage() {
                 aria-label={t('filters.search')}
                 placeholder={t('filters.searchPlaceholder')}
                 value={searchInput}
-                onChange={(event) => setSearchInput(event.target.value)}
+                onChange={(event) => handleSearchChange(event.target.value)}
                 className="h-11 bg-card pl-10 md:border-foreground/25"
               />
             </div>
@@ -405,6 +346,30 @@ export function ChallengesPage() {
                     {t('difficulty.MEDIUM')}
                   </SelectItem>
                   <SelectItem value="HARD">{t('difficulty.HARD')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={tier ?? 'all'}
+                onValueChange={(value) =>
+                  updateSearch({
+                    tier: value === 'all' ? undefined : TierSchema.parse(value),
+                  })
+                }
+              >
+                <SelectTrigger
+                  aria-label={t('filters.tier')}
+                  className="h-11 w-full bg-card sm:w-[170px]"
+                >
+                  <SelectValue placeholder={t('filters.allTiers')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('filters.allTiers')}</SelectItem>
+                  {TIER_ORDER.map((tierId) => (
+                    <SelectItem key={tierId} value={tierId}>
+                      {t(`tiers.${tierId}`)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 
@@ -472,7 +437,38 @@ export function ChallengesPage() {
         </div>
 
         <div id="challenge-results" className="mt-5" aria-live="polite">
-          {groupedChallenges.length === 0 ? (
+          {isCatalogPending && !challengesResponse ? (
+            <div
+              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+              aria-label={t('library.loading')}
+              aria-busy="true"
+            >
+              {[1, 2, 3, 4, 5, 6].map((item) => (
+                <div
+                  key={item}
+                  className="h-40 animate-pulse rounded-xl border border-border bg-card/70"
+                />
+              ))}
+            </div>
+          ) : isCatalogError || hasCatalogResponseError ? (
+            <EmptyState
+              size="compact"
+              className="rounded-xl border border-dashed border-border px-6"
+              eyebrow={t('library.errorEyebrow')}
+              title={t('library.errorTitle')}
+              description={t('library.errorDescription')}
+              action={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void refetchCatalog()}
+                >
+                  {t('library.retry')}
+                </Button>
+              }
+            />
+          ) : groupedChallenges.length === 0 ? (
             <EmptyState
               size="compact"
               className="rounded-xl border border-dashed border-border px-6"
@@ -482,79 +478,88 @@ export function ChallengesPage() {
             />
           ) : (
             <div className="space-y-6">
-              {groupedChallenges.map(([category, categoryChallenges]) => (
-                <section
-                  key={category}
-                  aria-labelledby={`category-${category}`}
-                  className="overflow-hidden rounded-xl border border-border bg-card"
-                >
-                  <div className="border-b border-border">
-                    <button
-                      type="button"
-                      aria-expanded={!collapsedGroups.has(category)}
-                      aria-controls={`category-content-${category}`}
-                      onClick={() => toggleGroup(category)}
-                      className="group flex min-h-14 w-full items-center justify-between gap-4 px-4 text-left outline-none transition-colors hover:bg-foreground/[0.025] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-5"
-                    >
-                      <span className="flex min-w-0 items-baseline gap-3">
-                        <span
-                          id={`category-${category}`}
-                          className="truncate font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-foreground"
-                        >
-                          {t(`categories.${category}`, {
-                            defaultValue: category,
-                          })}
-                        </span>
-                        <span className="shrink-0 text-xs text-muted-foreground">
-                          {t('library.challengeCount', {
-                            count: categoryChallenges.length,
-                          })}
-                        </span>
-                      </span>
-                      <ChevronDown
-                        className={cn(
-                          'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
-                          !collapsedGroups.has(category) && 'rotate-180',
-                        )}
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </div>
-
-                  <div
-                    id={`category-content-${category}`}
-                    hidden={collapsedGroups.has(category)}
+              {groupedChallenges.map(
+                ({
+                  category,
+                  tier: categoryTier,
+                  challenges: categoryChallenges,
+                }) => (
+                  <section
+                    key={category}
+                    aria-labelledby={`category-${category}`}
+                    className="overflow-hidden rounded-xl border border-border bg-card"
                   >
-                    {showListView && (
-                      <div
-                        data-testid="challenge-library-list"
-                        className="block"
+                    <div className="border-b border-border">
+                      <button
+                        type="button"
+                        aria-expanded={!collapsedGroups.has(category)}
+                        aria-controls={`category-content-${category}`}
+                        onClick={() => toggleGroup(category)}
+                        className="group flex min-h-14 w-full items-center justify-between gap-4 px-4 text-left outline-none transition-colors hover:bg-foreground/[0.025] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-5"
                       >
-                        {categoryChallenges.map((challenge) => (
-                          <PracticeChallengeRow
-                            key={challenge.slug}
-                            {...renderChallengeProps(challenge)}
-                          />
-                        ))}
-                      </div>
-                    )}
+                        <span className="flex min-w-0 items-baseline gap-3">
+                          <span
+                            id={`category-${category}`}
+                            className="truncate font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-foreground"
+                          >
+                            {t(`categories.${category}`, {
+                              defaultValue: category,
+                            })}
+                          </span>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {t('library.challengeCount', {
+                              count: categoryChallenges.length,
+                            })}
+                          </span>
+                          <span className="hidden shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground sm:inline-flex">
+                            {t(`tiers.${categoryTier}`)}
+                          </span>
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+                            !collapsedGroups.has(category) && 'rotate-180',
+                          )}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </div>
 
-                    {showGridView && (
-                      <div
-                        data-testid="challenge-library-grid"
-                        className="hidden gap-px bg-border lg:grid lg:grid-cols-2 xl:grid-cols-3"
-                      >
-                        {categoryChallenges.map((challenge) => (
-                          <PracticeChallengeGridCard
-                            key={challenge.slug}
-                            {...renderChallengeProps(challenge)}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </section>
-              ))}
+                    <div
+                      id={`category-content-${category}`}
+                      hidden={collapsedGroups.has(category)}
+                    >
+                      {showListView && (
+                        <div
+                          data-testid="challenge-library-list"
+                          className="block"
+                        >
+                          {categoryChallenges.map((challenge) => (
+                            <PracticeChallengeRow
+                              key={challenge.slug}
+                              {...renderChallengeProps(challenge)}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {showGridView && (
+                        <div
+                          data-testid="challenge-library-grid"
+                          className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                        >
+                          {categoryChallenges.map((challenge) => (
+                            <PracticeChallengeGridCard
+                              key={challenge.slug}
+                              {...renderChallengeProps(challenge)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                ),
+              )}
             </div>
           )}
         </div>

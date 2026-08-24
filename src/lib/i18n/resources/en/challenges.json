@@ -6,6 +6,7 @@
       "title": "Practice Software Testing — TestingWithEkki",
       "description": "Practice your Playwright, Selenium, and Cypress skills with real-world coding scenarios. Master selectors, automation authentication, and more."
     },
+    "practiceResourceType": "Practice challenge",
     "overallProgress": "Overall Progress",
     "notFound": "Challenge Not Found",
     "notFoundDescription": "The requested challenge could not be found.",
@@ -18,11 +19,17 @@
     "description": "Work through standalone challenges by topic, or use Practice alongside a Learning Path.",
     "discoveryLabel": "Challenge discovery",
     "showingCount": "{{count}} challenges",
+    "completedByCount": "{{count}} solved",
     "challengeCount_one": "{{count}} challenge",
     "challengeCount_other": "{{count}} challenges",
     "emptyEyebrow": "NO MATCHES",
     "emptyTitle": "No challenges found",
-    "emptyDescription": "Try adjusting your search or filters to find a challenge to work on."
+    "emptyDescription": "Try adjusting your search or filters to find a challenge to work on.",
+    "loading": "Loading challenges",
+    "errorEyebrow": "CATALOG UNAVAILABLE",
+    "errorTitle": "Practice is taking a moment",
+    "errorDescription": "We couldn't load the challenge library. Try again in a moment.",
+    "retry": "Try again"
   },
   "tracks": {
     "all": {
@@ -54,8 +61,10 @@
   "filters": {
     "search": "Search challenges",
     "track": "Challenge tracks",
+    "tier": "Tier",
     "difficulty": "Difficulty",
     "allDifficulties": "All Difficulties",
+    "allTiers": "All Tiers",
     "clear": "Clear",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed",

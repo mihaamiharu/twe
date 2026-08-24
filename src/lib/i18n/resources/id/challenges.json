@@ -3,8 +3,10 @@
     "title": "Tantangan",
     "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
     "seo": {
-      "title": "Praktik Software Testing — TestingWithEkki"
+      "title": "Praktik Software Testing — TestingWithEkki",
+      "description": "Latih kemampuan Playwright, Selenium, dan Cypress melalui skenario coding dunia nyata. Kuasai selektor, autentikasi otomasi, dan lainnya."
     },
+    "practiceResourceType": "Tantangan praktik",
     "overallProgress": "Progres Keseluruhan",
     "notFound": "Tantangan Tidak Ditemukan",
     "notFoundDescription": "Tantangan yang kamu cari tidak dapat ditemukan.",
@@ -17,11 +19,17 @@
     "description": "Kerjakan tantangan mandiri berdasarkan topik, atau gunakan Practice bersama Learning Path.",
     "discoveryLabel": "Temukan tantangan",
     "showingCount": "{{count}} tantangan",
+    "completedByCount": "{{count}} selesai",
     "challengeCount_one": "{{count}} tantangan",
     "challengeCount_other": "{{count}} tantangan",
     "emptyEyebrow": "TIDAK ADA HASIL",
     "emptyTitle": "Tantangan tidak ditemukan",
-    "emptyDescription": "Coba ubah pencarian atau filter untuk menemukan tantangan yang ingin kamu kerjakan."
+    "emptyDescription": "Coba ubah pencarian atau filter untuk menemukan tantangan yang ingin kamu kerjakan.",
+    "loading": "Memuat tantangan",
+    "errorEyebrow": "KATALOG TIDAK TERSEDIA",
+    "errorTitle": "Practice sedang memuat",
+    "errorDescription": "Perpustakaan tantangan belum dapat dimuat. Coba lagi sebentar.",
+    "retry": "Coba lagi"
   },
   "tracks": {
     "all": {
@@ -53,8 +61,10 @@
   "filters": {
     "search": "Cari tantangan",
     "track": "Track tantangan",
+    "tier": "Tingkat",
     "difficulty": "Kesulitan",
     "allDifficulties": "Semua Kesulitan",
+    "allTiers": "Semua Tingkat",
     "clear": "Bersihkan",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai",

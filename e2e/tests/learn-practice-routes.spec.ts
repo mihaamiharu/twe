@@ -35,6 +35,14 @@ test.describe('Learn and Practice public routes', () => {
   }
 
   for (const locale of ['en', 'id'] as const) {
+    test(`${locale} unknown practice challenge uses the app not-found state`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}/practice/does-not-exist`);
+      await expect(page.locator('[data-not-found-page]')).toBeVisible();
+      await expect(page).toHaveURL(`/${locale}/practice/does-not-exist`);
+    });
+
     for (const legacyPath of [
       '/tutorials',
       '/tutorials/dom-tree-hierarchy',

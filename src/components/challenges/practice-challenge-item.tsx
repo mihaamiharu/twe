@@ -9,6 +9,7 @@ export interface PracticeChallengeItemData {
   type: string;
   difficulty: string;
   xpReward: number;
+  completionCount?: number;
   isCompleted: boolean;
   tags?: string[] | null;
 }
@@ -18,6 +19,9 @@ interface PracticeChallengeItemProps {
   locale: string;
   typeLabel: string;
   difficultyLabel: string;
+  categoryLabel: string;
+  tierLabel: string;
+  completionCountLabel: string;
   completedLabel: string;
   comingSoonLabel: string;
   startLabel: string;
@@ -54,6 +58,9 @@ function ChallengeItemContent({
   challenge,
   typeLabel,
   difficultyLabel,
+  categoryLabel,
+  tierLabel,
+  completionCountLabel,
   completedLabel,
   comingSoonLabel,
   startLabel,
@@ -73,8 +80,15 @@ function ChallengeItemContent({
       data-testid="challenge-list-row"
     >
       <div className="min-w-0 lg:self-center">
-        <div className="mb-0.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+        <div className="mb-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
           <span>{typeLabel}</span>
+          <span aria-hidden="true">·</span>
+          <span className="truncate normal-case tracking-normal">
+            {categoryLabel}
+          </span>
+          <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] tracking-[0.08em]">
+            {tierLabel}
+          </span>
           {isComingSoon && (
             <span className="inline-flex items-center gap-1 tracking-[0.08em]">
               <Lock className="h-3 w-3" aria-hidden="true" />
@@ -90,7 +104,7 @@ function ChallengeItemContent({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-x-5 lg:grid lg:grid-cols-[5.5rem_7.5rem_5.5rem_minmax(5.5rem,auto)] lg:items-center lg:gap-x-4">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-x-5 lg:grid lg:grid-cols-[5rem_6.5rem_5rem_5rem_minmax(4.5rem,auto)] lg:items-center lg:gap-x-3">
         <div
           className="lg:justify-self-start"
           data-testid="challenge-row-difficulty"
@@ -115,6 +129,15 @@ function ChallengeItemContent({
             aria-hidden="true"
             data-testid="challenge-row-completion"
           />
+        )}
+
+        {!isComingSoon && challenge.completionCount !== undefined && (
+          <span
+            className="order-5 inline-flex items-center whitespace-nowrap text-xs tabular-nums text-muted-foreground lg:order-none lg:justify-self-start"
+            aria-label={completionCountLabel}
+          >
+            {completionCountLabel}
+          </span>
         )}
 
         {!isComingSoon && (
@@ -182,8 +205,17 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
       )}
     >
       <div>
-        <div className="mb-2 flex items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-          <span>{props.typeLabel}</span>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          <span className="flex min-w-0 items-center gap-2">
+            <span>{props.typeLabel}</span>
+            <span aria-hidden="true">·</span>
+            <span className="truncate normal-case tracking-normal">
+              {props.categoryLabel}
+            </span>
+          </span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] tracking-[0.08em]">
+            {props.tierLabel}
+          </span>
           {props.challenge.isCompleted && !isComingSoon && (
             <Check
               className="h-3.5 w-3.5 text-brand-success"
@@ -204,6 +236,11 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
             difficulty={props.challenge.difficulty}
             label={props.difficultyLabel}
           />
+          {props.challenge.completionCount !== undefined && (
+            <span className="text-xs tabular-nums text-muted-foreground">
+              {props.completionCountLabel}
+            </span>
+          )}
           {!isComingSoon && (
             <span className="inline-flex items-center gap-1 text-xs font-medium tabular-nums text-muted-foreground">
               <Zap
