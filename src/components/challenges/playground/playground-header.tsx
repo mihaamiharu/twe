@@ -113,12 +113,16 @@ export function PlaygroundHeader({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1 mt-0.5 cursor-help opacity-80 hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    aria-label={t('challenges:playground.shimNote')}
+                    className="flex items-center gap-1 mt-0.5 cursor-help opacity-80 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                  >
                     <Info className="h-3 w-3 text-brand-warning" />
                     <span className="text-[11px] text-workspace-muted border-b border-dotted border-workspace-muted/50">
                       {t('challenges:playground.shimNote')}
                     </span>
-                  </div>
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent
                   side="bottom"
@@ -201,6 +205,7 @@ export function PlaygroundHeader({
             variant="outline"
             onClick={onRunCode}
             disabled={isRunning}
+            aria-label={t('common:actions.runCode')}
             className="font-bold border-brand-orange text-brand-orange hover:bg-brand-orange/10"
           >
             {isRunning ? (
@@ -235,6 +240,7 @@ export function PlaygroundHeader({
               <Button
                 variant="outline"
                 size="sm"
+                aria-label={t('challenges:hints.title', 'Hints')}
                 className="font-bold border border-workspace-border text-workspace-muted hover:text-workspace-text h-8 md:h-9 px-2 md:px-3"
               >
                 <Lightbulb className="h-4 w-4 md:mr-2 text-yellow-500" />
@@ -396,6 +402,7 @@ export function PlaygroundHeader({
                 size="sm"
                 onClick={onSubmit}
                 disabled={!hasPassed}
+                aria-label={t('common:actions.submit')}
                 className={cn(
                   'font-bold border border-workspace-border transition-all h-8 md:h-9 px-2 md:px-3',
                   hasPassed

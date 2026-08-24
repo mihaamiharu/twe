@@ -20,28 +20,10 @@ test.describe('Rebrand V1 global shell', () => {
       page.getByRole('button', { name: /Switch language/ }),
     ).toContainText('EN');
     await expect(page.getByRole('link', { name: 'Sign In' })).toBeVisible();
-    const learningPathMarkers = page.locator(
-      '[data-testid^="learning-path-progress-marker-"]',
-    );
-    const learningPathColumns = page.getByTestId('learning-path-progress').locator('li');
-    await expect(learningPathMarkers).toHaveCount(5);
-    await expect(learningPathColumns).toHaveCount(5);
-    const markerRects = await learningPathMarkers.evaluateAll((elements) =>
-      elements.map((element) => {
-        const rect = element.getBoundingClientRect();
-        return { centerX: rect.left + rect.width / 2, centerY: rect.top + rect.height / 2 };
-      }),
-    );
-    const columnRects = await learningPathColumns.evaluateAll((elements) =>
-      elements.map((element) => {
-        const rect = element.getBoundingClientRect();
-        return { centerX: rect.left + rect.width / 2 };
-      }),
-    );
-    expect(new Set(markerRects.map((rect) => Math.round(rect.centerY))).size).toBe(1);
-    expect(markerRects.map((rect) => Math.round(rect.centerX))).toEqual(
-      columnRects.map((rect) => Math.round(rect.centerX)),
-    );
+    await expect(page.getByTestId('current-lessons')).toBeVisible();
+    await expect(
+      page.getByTestId('current-lessons').getByRole('link'),
+    ).toHaveCount(3);
     await expect(
       page
         .locator('header')
@@ -85,6 +67,56 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(page.getByRole('link', { name: 'Sign In' })).toHaveCount(0);
     await expect(page.locator('header')).not.toContainText('XP');
     await expect(page.locator('[aria-label*="theme" i]')).toHaveCount(0);
+  });
+
+  test('routes the Labs placeholder without implying a live lab', async ({
+    page,
+  }) => {
+    await page.goto('/en/labs');
+
+    await expect(
+      page.getByRole('heading', {
+        name: 'Practice QA in real environments.',
+      }),
+    ).toBeVisible();
+    await expect(
+      page.locator('header').getByRole('link', { name: 'Labs, Soon' }),
+    ).toHaveAttribute('href', '/en/labs');
+    await expect(
+      page.getByRole('link', { name: 'Explore Practice' }).first(),
+    ).toHaveAttribute('href', '/en/practice');
+    await expect(
+      page.getByRole('link', { name: 'Browse Learn' }),
+    ).toHaveAttribute('href', '/en/learn');
+    await expect(page.getByText('LABS', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('REAL ENVIRONMENTS', { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText('Repository', { exact: true })).toBeVisible();
+    await expect(page.getByText('CI pipeline', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Good things need room to take shape.', { exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText('For now, practice individual concepts in Practice.', {
+        exact: true,
+      }),
+    ).toBeVisible();
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    await expect(
+      page.getByRole('heading', {
+        name: 'Practice QA in real environments.',
+      }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      )
+      .toBe(true);
   });
 
   test('renders the branded not-found state and routes its CTAs', async ({
@@ -138,13 +170,16 @@ test.describe('Rebrand V1 global shell', () => {
   }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/en');
+    await page.waitForLoadState('load');
     await page.waitForFunction(
       () => {
         const appWindow = window as Window & {
           __TSS_START_OPTIONS__?: unknown;
           $_TSR?: unknown;
         };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) && !appWindow.$_TSR;
+        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
+          (appWindow.$_TSR?.initialized === true ||
+            appWindow.$_TSR === undefined);
       },
       undefined,
       { timeout: 20_000 },
@@ -181,13 +216,16 @@ test.describe('Rebrand V1 global shell', () => {
       .click();
     await page.getByRole('menuitem', { name: 'Bahasa Indonesia' }).click();
     await expect(page).toHaveURL(/\/id\/?$/);
+    await page.waitForLoadState('load');
     await page.waitForFunction(
       () => {
         const appWindow = window as Window & {
           __TSS_START_OPTIONS__?: unknown;
           $_TSR?: unknown;
         };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) && !appWindow.$_TSR;
+        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
+          (appWindow.$_TSR?.initialized === true ||
+            appWindow.$_TSR === undefined);
       },
       undefined,
       { timeout: 20_000 },
@@ -195,6 +233,8 @@ test.describe('Rebrand V1 global shell', () => {
     const localizedMenuButton = page.locator(
       'button[aria-controls="mobile-navigation"]',
     );
+    await expect(localizedMenuButton).toBeVisible();
+    await expect(localizedMenuButton).toHaveAttribute('aria-expanded', 'false');
     await localizedMenuButton.click();
     await expect(
       page.getByRole('navigation', { name: 'Mobile navigation' }),

@@ -11,6 +11,7 @@ const STATIC_PAGES = [
   { path: '/about', changefreq: 'monthly', priority: '0.6' },
   { path: '/practice', changefreq: 'weekly', priority: '0.9' },
   { path: '/learn', changefreq: 'weekly', priority: '0.9' },
+  { path: '/labs', changefreq: 'monthly', priority: '0.5' },
   { path: '/leaderboard', changefreq: 'daily', priority: '0.7' },
   { path: '/contact', changefreq: 'monthly', priority: '0.5' },
   { path: '/changelog', changefreq: 'weekly', priority: '0.5' },

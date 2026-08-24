@@ -1,6 +1,6 @@
 {
   "page": {
-    "title": "Tantangan",
+    "title": "Practice",
     "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
     "seo": {
       "title": "Praktik Software Testing — TestingWithEkki",
@@ -16,8 +16,8 @@
   "library": {
     "eyebrow": "LATIHAN",
     "headline": "Praktikkan yang kamu tahu.",
-    "description": "Kerjakan tantangan mandiri berdasarkan topik, atau gunakan Practice bersama Learning Path.",
-    "discoveryLabel": "Temukan tantangan",
+    "description": "Kerjakan tantangan Practice berdasarkan topik, atau gunakan bersama pelajaran Learn saat membutuhkan konteks.",
+    "discoveryLabel": "Temukan Practice",
     "showingCount": "{{count}} tantangan",
     "completedByCount": "{{count}} selesai",
     "challengeCount_one": "{{count}} tantangan",
@@ -60,9 +60,11 @@
   },
   "filters": {
     "search": "Cari tantangan praktik",
-    "track": "Track tantangan",
+    "track": "Track Practice",
     "difficulty": "Kesulitan",
     "allDifficulties": "Semua Kesulitan",
+    "tier": "Tingkat",
+    "allTiers": "Semua Tingkat",
     "clear": "Bersihkan",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai",
@@ -195,7 +197,7 @@
   },
   "howPractice": {
     "title": "Cara kerja Practice",
-    "description": "Practice berdiri sendiri. Ikuti tantangan dari Learning Path atau langsung pilih topik apa pun.",
+    "description": "Practice berdiri sendiri. Gunakan pelajaran Learn saat membutuhkan konteks, atau langsung pilih topik apa pun.",
     "steps": {
       "choose": {
         "title": "Pilih",

@@ -95,7 +95,7 @@ test.describe('Practice list state', () => {
       await expect(page.locator('#challenge-results')).toBeVisible();
     });
 
-    test(`${locale} ignores the removed tier URL parameter`, async ({
+    test(`${locale} preserves the tier URL parameter`, async ({
       page,
     }) => {
       await page.goto(
@@ -106,7 +106,10 @@ test.describe('Practice list state', () => {
       await expect(page.locator('[data-not-found-page]')).toHaveCount(0);
       await expect(
         page.getByRole('combobox', { name: /Tier|Tingkat/i }),
-      ).toHaveCount(0);
+      ).toHaveCount(1);
+      await expect
+        .poll(() => new URL(page.url()).searchParams.get('tier'))
+        .toBe('intermediate');
       await expect(page.locator('#challenge-results')).toBeVisible();
     });
   }

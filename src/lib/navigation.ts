@@ -52,6 +52,7 @@ export const LocaleRoutes = {
   learnDetail: '/$locale/learn/$slug',
   practice: '/$locale/practice',
   practiceDetail: '/$locale/practice/$slug',
+  labs: '/$locale/labs',
   leaderboard: '/$locale/leaderboard',
   profile: '/$locale/profile',
 

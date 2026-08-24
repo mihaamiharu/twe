@@ -48,12 +48,12 @@ export function Footer() {
             <nav aria-label="Footer navigation" className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[var(--graphite)]">
               <Link to={LocaleRoutes.learn} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.learn')}</Link>
               <Link to={LocaleRoutes.practice} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.practice')}</Link>
-              <span className="inline-flex items-center gap-2">
+              <Link to={LocaleRoutes.labs} params={localizedParams} className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]">
                 {t('common:navigation.labs')}
                 <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
                   {t('common:navigation.labsSoon')}
                 </span>
-              </span>
+              </Link>
               <Link to={LocaleRoutes.about} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.about')}</Link>
               <Link to={LocaleRoutes.contact} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('legal:contact.title')}</Link>
             </nav>
@@ -129,13 +129,17 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <span className="inline-flex min-h-11 items-center gap-3 text-[0.95rem] font-medium text-[var(--muted-graphite)]">
+                <Link
+                  to={LocaleRoutes.labs}
+                  params={localizedParams}
+                  className={externalLinkClass}
+                >
                   <FlaskConical className={iconClass} aria-hidden="true" />
                   {t('common:navigation.labs')}
                   <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
                     {t('common:navigation.labsSoon')}
                   </span>
-                </span>
+                </Link>
               </li>
               <li>
                 <Link

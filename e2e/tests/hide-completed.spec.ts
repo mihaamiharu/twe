@@ -108,7 +108,9 @@ test.describe('Hide/Show Completed', () => {
     await tutorialsPage.gotoList();
 
     // 3. Verify it is visible
-    const tutorialLink = page.locator(`a[href*="/learn/${slug}"]`);
+    const tutorialLink = page
+      .locator('section[aria-labelledby="lesson-catalog-title"]')
+      .locator(`a[href*="/learn/${slug}"]`);
     await expect(tutorialLink.first()).toBeVisible();
 
     // 4. Toggle Hide Completed

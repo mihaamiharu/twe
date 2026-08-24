@@ -8,17 +8,12 @@
     "creatorNote": "Creator-led by Ekki · Learn at your own pace"
   },
   "learningPath": {
-    "eyebrow": "LEARNING PATH",
-    "title": "The Web Automation Learning Path",
-    "description": "Learn how the web works, build the programming foundations you need, and apply them with Playwright.",
-    "cta": "View Learning Path",
-    "steps": {
-      "foundations": { "title": "Web Foundations", "description": "Understand the browser and the web." },
-      "programming": { "title": "Programming", "description": "Build the code foundations for automation." },
-      "playwright": { "title": "Playwright", "description": "Write practical browser tests." },
-      "design": { "title": "Automation Design", "description": "Make tests clear and maintainable." },
-      "e2e": { "title": "End-to-End Testing", "description": "Connect the pieces in real flows." }
-    }
+    "eyebrow": "WEB AUTOMATION / CURRENT LESSONS",
+    "title": "Start with the lessons that are ready.",
+    "description": "Browse the current Web Automation lessons, then use Practice to apply what you learn.",
+    "cta": "Browse all lessons",
+    "lessonNumber": "Lesson {{number}}",
+    "noLessons": "The current lesson catalog is unavailable right now."
   },
   "learnPractice": {
     "eyebrow": "LEARN + PRACTICE",
@@ -46,9 +41,9 @@
   },
   "labs": {
     "eyebrow": "LABS · COMING SOON",
-    "title": "Practice QA in real environments.",
-    "description": "Some testing skills are better learned outside a browser sandbox. Labs will introduce guided work with repositories, APIs, test frameworks, CI pipelines, and other real development environments.",
-    "cta": "Explore Practice in the meantime"
+    "title": "A new space for practicing the craft.",
+    "description": "Labs is taking shape as a slower, more hands-on way to explore software testing. The first experiments are still being shaped, and I’ll share them when they’re ready.",
+    "cta": "Visit Labs"
   },
   "cta": {
     "eyebrow": "START HERE",

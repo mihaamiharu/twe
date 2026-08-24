@@ -205,11 +205,10 @@ export class ChallengesPage extends BasePage {
     await expect(this.submitButton).toBeEnabled({ timeout: 5000 });
     await this.submitButton.click();
 
-    await expect(this.page.getByRole('dialog')).toContainText(
-      /Challenge Complete!/i,
-      {
-        timeout: 20000,
-      },
-    );
+    // A previously completed challenge is intentionally submitted in Practice
+    // mode and returns a toast instead of the reward dialog.
+    await expect(
+      this.page.getByText(/Challenge Complete!|Practice complete!/i).first(),
+    ).toBeVisible({ timeout: 20000 });
   }
 }

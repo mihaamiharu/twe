@@ -90,7 +90,36 @@ describe('LearnPage', () => {
     expect(screen.getByTestId('lesson-row').textContent).toContain(
       'First lesson',
     );
-    expect(screen.queryByText('Completed lesson')).toBeNull();
+    expect(screen.getAllByTestId('lesson-row')).toHaveLength(1);
     expect(screen.getByTestId('learn-clear-filters')).toBeTruthy();
+  });
+
+  it('renders the viewer-scoped query result over the SSR loader snapshot', async () => {
+    const reactiveLessons: TutorialListResponse = {
+      ...lessons,
+      data: [
+        {
+          ...lessons.data[0]!,
+          slug: 'updated-lesson',
+          title: 'Updated lesson state',
+        },
+      ],
+      pagination: { page: 1, limit: 1, total: 1, totalPages: 1 },
+    };
+    globalThis.mockUseQuery.mockImplementation((options) => {
+      if (options.queryKey?.[0] === 'auth') {
+        return { data: { user: { id: 'user-1' } } };
+      }
+      return { data: reactiveLessons };
+    });
+
+    await renderPage();
+
+    expect(screen.getByTestId('lesson-row').textContent).toContain(
+      'Updated lesson state',
+    );
+    expect(screen.getByTestId('lesson-row').textContent).not.toContain(
+      'First lesson',
+    );
   });
 });

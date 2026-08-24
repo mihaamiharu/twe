@@ -145,7 +145,7 @@ function ContactPage() {
           </div>
 
           {isSuccess ? (
-            <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
+            <div className="flex min-h-[300px] flex-col items-center justify-center text-center" role="status" aria-live="polite">
               <CheckCircle2 className="h-12 w-12 text-[var(--brand-success)]" strokeWidth={1.5} aria-hidden="true" />
               <h2 className="mt-5 text-2xl font-semibold">{t('form.successTitle')}</h2>
               <p className="mt-3 max-w-sm text-base leading-7 text-[var(--muted-graphite)]">{t('form.successMessage')}</p>
@@ -213,7 +213,7 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
             asChild
             variant={ctaVariant}
             className={ctaVariant === 'link'
-              ? 'h-auto w-full justify-start px-0 py-1 text-left text-[var(--brand-orange)] hover:bg-transparent hover:text-[var(--brand-orange)] hover:no-underline sm:w-auto sm:justify-end'
+              ? 'h-auto w-full justify-start px-0 py-1 text-left text-[var(--brand-orange)] hover:bg-transparent hover:text-[var(--brand-orange)] hover:no-underline focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] sm:w-auto sm:justify-end'
               : 'w-full sm:w-auto'}
           >
             <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
@@ -225,7 +225,7 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
               href={secondaryHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1 text-sm font-medium text-[var(--brand-orange)] underline-offset-4 transition-colors hover:underline sm:justify-end"
+              className="inline-flex items-center justify-center gap-1 text-sm font-medium text-[var(--brand-orange)] underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] sm:justify-end"
             >
               {secondaryCta} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </a>

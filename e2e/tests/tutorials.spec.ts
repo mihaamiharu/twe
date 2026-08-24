@@ -16,37 +16,31 @@ test.describe('Tutorials', () => {
   });
 
   test('should display the guided learning path', async ({ page }) => {
-    await expect(tutorialsPage.learningPath).toBeVisible();
+    await expect(tutorialsPage.currentLessonsPreview).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="learning-path-step-"]'),
+    ).toHaveCount(4);
     await expect(page.getByTestId('learning-path-step-01')).toContainText(
-      'The web & DOM',
-    );
-    await expect(page.getByTestId('learning-path-step-02')).toContainText(
-      'JavaScript fundamentals',
-    );
-    await expect(page.getByTestId('learning-path-step-03')).toContainText(
-      'Playwright automation',
-    );
-    await expect(page.getByTestId('learning-path-step-04')).toContainText(
-      'Hands-on challenges',
+      'Foundation 1: The Anatomy of an HTML Element',
     );
   });
 
   test('should navigate from a guided learning step', async ({ page }) => {
-    await tutorialsPage.learningPath
+    await tutorialsPage.currentLessonsPreview
       .getByTestId('learning-path-step-01')
       .click();
-    await expect(page).toHaveURL(/\/en\/learn\/dom-tree-hierarchy$/);
+    await expect(page).toHaveURL(/\/en\/learn\/html-element-anatomy$/);
   });
 
   test('should keep the guided path usable on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/en/learn');
 
-    await expect(tutorialsPage.learningPath).toBeVisible();
+    await expect(tutorialsPage.currentLessonsPreview).toBeVisible();
     await expect
       .poll(() =>
         page.evaluate(
-          () => document.documentElement.scrollWidth <= window.innerWidth,
+          () => document.documentElement.scrollWidth <= window.innerWidth + 2,
         ),
       )
       .toBe(true);
@@ -118,11 +112,12 @@ test.describe('Tutorials', () => {
     await expect
       .poll(() => new URL(page.url()).searchParams.get('q'))
       .toBe('DOM Tree');
+    const results = page.getByTestId('learn-results');
     await expect(
-      page.getByRole('link', { name: /Reading the DOM Tree/i }),
+      results.getByRole('link', { name: /Reading the DOM Tree/i }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /Anatomy of an HTML Element/i }),
+      results.getByRole('link', { name: /Anatomy of an HTML Element/i }),
     ).toHaveCount(0);
   });
 

@@ -35,6 +35,7 @@ import { Route as LocaleRegisterRouteImport } from './routes/$locale/register'
 import { Route as LocalePrivacyRouteImport } from './routes/$locale/privacy'
 import { Route as LocaleLoginRouteImport } from './routes/$locale/login'
 import { Route as LocaleLeaderboardRouteImport } from './routes/$locale/leaderboard'
+import { Route as LocaleLabsRouteImport } from './routes/$locale/labs'
 import { Route as LocaleForgotPasswordRouteImport } from './routes/$locale/forgot-password'
 import { Route as LocaleContactRouteImport } from './routes/$locale/contact'
 import { Route as LocaleConfirmSubscriptionRouteImport } from './routes/$locale/confirm-subscription'
@@ -184,6 +185,11 @@ const LocaleLeaderboardRoute = LocaleLeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => LocaleRoute,
 } as any)
+const LocaleLabsRoute = LocaleLabsRouteImport.update({
+  id: '/labs',
+  path: '/labs',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleForgotPasswordRoute = LocaleForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/labs': typeof LocaleLabsRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/privacy': typeof LocalePrivacyRoute
@@ -333,6 +340,7 @@ export interface FileRoutesByTo {
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/labs': typeof LocaleLabsRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/privacy': typeof LocalePrivacyRoute
@@ -379,6 +387,7 @@ export interface FileRoutesById {
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/labs': typeof LocaleLabsRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/privacy': typeof LocalePrivacyRoute
@@ -426,6 +435,7 @@ export interface FileRouteTypes {
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
+    | '/$locale/labs'
     | '/$locale/leaderboard'
     | '/$locale/login'
     | '/$locale/privacy'
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
+    | '/$locale/labs'
     | '/$locale/leaderboard'
     | '/$locale/login'
     | '/$locale/privacy'
@@ -515,6 +526,7 @@ export interface FileRouteTypes {
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
+    | '/$locale/labs'
     | '/$locale/leaderboard'
     | '/$locale/login'
     | '/$locale/privacy'
@@ -750,6 +762,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleLeaderboardRouteImport
       parentRoute: typeof LocaleRoute
     }
+    '/$locale/labs': {
+      id: '/$locale/labs'
+      path: '/labs'
+      fullPath: '/$locale/labs'
+      preLoaderRoute: typeof LocaleLabsRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/forgot-password': {
       id: '/$locale/forgot-password'
       path: '/forgot-password'
@@ -897,6 +916,7 @@ interface LocaleRouteChildren {
   LocaleConfirmSubscriptionRoute: typeof LocaleConfirmSubscriptionRoute
   LocaleContactRoute: typeof LocaleContactRoute
   LocaleForgotPasswordRoute: typeof LocaleForgotPasswordRoute
+  LocaleLabsRoute: typeof LocaleLabsRoute
   LocaleLeaderboardRoute: typeof LocaleLeaderboardRoute
   LocaleLoginRoute: typeof LocaleLoginRoute
   LocalePrivacyRoute: typeof LocalePrivacyRoute
@@ -917,6 +937,7 @@ const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleConfirmSubscriptionRoute: LocaleConfirmSubscriptionRoute,
   LocaleContactRoute: LocaleContactRoute,
   LocaleForgotPasswordRoute: LocaleForgotPasswordRoute,
+  LocaleLabsRoute: LocaleLabsRoute,
   LocaleLeaderboardRoute: LocaleLeaderboardRoute,
   LocaleLoginRoute: LocaleLoginRoute,
   LocalePrivacyRoute: LocalePrivacyRoute,

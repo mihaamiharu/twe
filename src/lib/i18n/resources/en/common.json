@@ -9,8 +9,6 @@
   },
   "navigation": {
     "home": "Home",
-    "challenges": "Challenges",
-    "tutorials": "Tutorials",
     "learn": "Learn",
     "practice": "Practice",
     "labs": "Labs",
@@ -88,7 +86,7 @@
     "loadingChallenge": "Loading challenge...",
     "unavailable": "Unavailable",
     "challengeCompleted": "Challenge completed!",
-    "tutorialCompleted": "Tutorial completed!",
+    "tutorialCompleted": "Lesson completed!",
     "achievementUnlocked": "Unlocked: {{name}}"
   },
   "footer": {
@@ -98,16 +96,7 @@
     "legal": "Legal",
     "copyright": "© TestingWithEkki {{year}}",
     "builtBy": "Built by Ekki",
-    "reportBug": "Report a Bug",
-    "newsletter": {
-      "title": "Stay Updated",
-      "description": "Get the latest tutorials, challenges, and testing tips delivered to your inbox.",
-      "placeholder": "your@email.com",
-      "submit": "Subscribe",
-      "submitting": "Subscribing...",
-      "success": "Thanks for subscribing!",
-      "error": "Something went wrong."
-    }
+    "reportBug": "Report a Bug"
   },
   "notFound": {
     "eyebrow": "404 / NOT FOUND",

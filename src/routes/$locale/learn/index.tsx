@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import {
   ArrowRight,
   CheckCircle2,
@@ -63,8 +63,15 @@ interface LearningPathStep {
   label: string;
   title: string;
   description: string;
-  slug?: string;
+  slug: string;
 }
+
+const LEARNING_PATH_PREVIEW_KINDS: LearningPathPreviewKind[] = [
+  'understand',
+  'build',
+  'automate',
+  'practice',
+];
 
 function LearnCatalogSkeleton() {
   return (
@@ -98,23 +105,27 @@ function LearnPage() {
   const { data: auth } = useQuery(authQueryOptions);
   const navigate = routeApi.useNavigate();
   const searchParams = routeApi.useSearch();
-  const tutorialsResponse = routeApi.useLoaderData();
+  const loaderData = routeApi.useLoaderData();
   const query = searchParams.q ?? '';
   const canFilterCompleted = Boolean(auth?.user);
   const hideCompleted = canFilterCompleted
     ? (searchParams.hideCompleted ?? false)
     : false;
 
-  const updateSearch = (updates: LearnSearch) => {
+  const { data: tutorialsQueryData } = useQuery({
+    ...tutorialsListQueryOptions({
+      locale,
+      viewerId: auth?.user?.id,
+    }),
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
+  });
+  const tutorialsResponse = tutorialsQueryData ?? loaderData;
+
+  const updateSearch = (updates: Partial<LearnSearch>) => {
     void navigate({
       to: '.',
-      search: (previous) => {
-        const next = { ...previous, ...updates };
-        for (const key of Object.keys(next) as Array<keyof LearnSearch>) {
-          if (next[key] === undefined) delete next[key];
-        }
-        return next;
-      },
+      search: { ...searchParams, ...updates },
       replace: true,
     });
   };
@@ -134,39 +145,16 @@ function LearnPage() {
 
   const hasActiveFilters = Boolean(query.trim() || hideCompleted);
 
-  const learningPathSteps: LearningPathStep[] = [
-    {
-      number: '01',
-      kind: 'understand',
-      label: t('learn.stack.steps.understand.label'),
-      title: t('learn.stack.steps.understand.title'),
-      description: t('learn.stack.steps.understand.description'),
-      slug: 'dom-tree-hierarchy',
-    },
-    {
-      number: '02',
-      kind: 'build',
-      label: t('learn.stack.steps.build.label'),
-      title: t('learn.stack.steps.build.title'),
-      description: t('learn.stack.steps.build.description'),
-      slug: 'javascript-fundamentals-for-qa',
-    },
-    {
-      number: '03',
-      kind: 'automate',
-      label: t('learn.stack.steps.automate.label'),
-      title: t('learn.stack.steps.automate.title'),
-      description: t('learn.stack.steps.automate.description'),
-      slug: 'playwright-interaction-fundamentals',
-    },
-    {
-      number: '04',
-      kind: 'practice',
-      label: t('learn.stack.steps.practice.label'),
-      title: t('learn.stack.steps.practice.title'),
-      description: t('learn.stack.steps.practice.description'),
-    },
-  ];
+  const learningPathSteps: LearningPathStep[] = tutorialsResponse.success
+    ? tutorialsResponse.data.slice(0, 4).map((lesson, index) => ({
+        number: String(index + 1).padStart(2, '0'),
+        kind: LEARNING_PATH_PREVIEW_KINDS[index] ?? 'practice',
+        label: t('learn.stack.lessonLabel', { number: index + 1 }),
+        title: lesson.title,
+        description: lesson.description,
+        slug: lesson.slug,
+      }))
+    : [];
 
   return (
     <main className="min-h-screen bg-background">
@@ -226,22 +214,25 @@ function LearnPage() {
             </div>
 
             <div
-              data-testid="learning-path"
+              data-testid="current-lessons-preview"
               className="relative mt-8 space-y-3 md:pl-10"
             >
               <div
                 className="absolute bottom-8 left-3 top-8 hidden border-l border-dashed border-[var(--brand-orange)]/45 md:block"
                 aria-hidden="true"
               />
-              {learningPathSteps.map((step, index) => (
+              {learningPathSteps.map((step) => (
                 <LearningPathCard
                   key={step.number}
                   step={step}
-                  index={index}
                   locale={locale}
-                  totalSteps={learningPathSteps.length}
                 />
               ))}
+              {learningPathSteps.length === 0 && (
+                <p className="rounded-xl border border-dashed border-border p-5 text-sm leading-6 text-muted-foreground">
+                  {t('learn.stack.noLessons')}
+                </p>
+              )}
             </div>
           </div>
         </section>
@@ -429,14 +420,10 @@ function LearnCatalogError() {
 
 function LearningPathCard({
   step,
-  index,
   locale,
-  totalSteps,
 }: {
   step: LearningPathStep;
-  index: number;
   locale: string;
-  totalSteps: number;
 }) {
   const { t } = useTranslation('tutorials');
   const cardContent = (
@@ -460,9 +447,7 @@ function LearningPathCard({
           {step.description}
         </p>
         <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
-          {index === totalSteps - 1
-            ? t('learn.stack.cardPractice')
-            : t('learn.stack.cardLesson')}
+          {t('learn.stack.cardLesson')}
           <ArrowRight
             className="h-4 w-4 transition-transform group-hover:translate-x-1"
             aria-hidden="true"
@@ -472,22 +457,10 @@ function LearningPathCard({
     </div>
   );
 
-  if (step.slug) {
-    return (
-      <Link
-        to="/$locale/learn/$slug"
-        params={{ locale, slug: step.slug }}
-        className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        {cardContent}
-      </Link>
-    );
-  }
-
   return (
     <Link
-      to={LocaleRoutes.practice}
-      params={localeParams(locale)}
+      to="/$locale/learn/$slug"
+      params={{ locale, slug: step.slug }}
       className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {cardContent}

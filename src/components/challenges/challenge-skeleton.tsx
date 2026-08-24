@@ -1,6 +1,6 @@
 export function ChallengeSkeleton() {
     return (
-        <div className="h-[calc(100vh-4rem)] flex flex-col overflow-hidden animate-pulse bg-background">
+        <div className="workspace-shell h-[calc(100dvh-4.5625rem)] flex flex-col overflow-hidden animate-pulse bg-background">
             {/* Skeleton for Panel Group layout - mimic 40/60 split */}
             <div className="flex-1 flex w-full">
                 {/* Left Panel: Instructions (approx 40%) */}

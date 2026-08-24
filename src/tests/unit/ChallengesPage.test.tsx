@@ -48,7 +48,7 @@ describe('ChallengesPage', () => {
       description: 'E2E testing',
       type: 'PLAYWRIGHT',
       difficulty: 'HARD',
-      category: 'playwright-basics', // defaults to intermediate or matches core logic
+      category: 'playwright-navigation',
       xpReward: 50,
       order: 3,
       completionCount: 10,
@@ -122,6 +122,19 @@ describe('ChallengesPage', () => {
     expect(screen.queryByText('JS Basic Challenge')).toBeNull();
     expect(screen.queryByText('CSS Selector Master')).toBeNull();
     expect(screen.getByText('Playwright E2E')).toBeTruthy();
+  });
+
+  it('should filter by the URL-backed tier', async () => {
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      tier: 'basic',
+    };
+
+    await renderPage();
+
+    expect(screen.queryByText('JS Basic Challenge')).toBeNull();
+    expect(screen.getByText('CSS Selector Master')).toBeTruthy();
+    expect(screen.queryByText('Playwright E2E')).toBeNull();
   });
 
   it('should not show or apply completion filtering to guests', async () => {

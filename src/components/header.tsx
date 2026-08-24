@@ -159,31 +159,37 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)]"
+                    className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                     activeProps={{
                       className:
-                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)]',
+                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
                     }}
                   >
                     {link.label}
                   </Link>
                 ))}
-                <span
-                  className="inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-medium text-[var(--muted-graphite)]"
+                <Link
+                  to={LocaleRoutes.labs}
+                  params={localeParams(locale)}
+                  className="inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                   aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                  activeProps={{
+                    className:
+                      'inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
+                  }}
                 >
                   {t('common:navigation.labs')}
                   <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
                     {t('common:navigation.labsSoon')}
                   </span>
-                </span>
+                </Link>
                 <Link
                   to={aboutLink.to}
                   params={aboutLink.params}
-                  className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)]"
+                  className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                   activeProps={{
                     className:
-                      'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)]',
+                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
                   }}
                 >
                   {aboutLink.label}
@@ -318,15 +324,22 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                   </Link>
                 ))}
 
-                <span
-                  className="flex min-h-12 items-center gap-2 px-1 text-[1rem] font-medium text-[var(--muted-graphite)]"
+                <Link
+                  to={LocaleRoutes.labs}
+                  params={localeParams(locale)}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex min-h-12 items-center gap-2 px-1 text-[1rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                   aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                  activeProps={{
+                    className:
+                      'flex min-h-12 items-center gap-2 px-1 text-[1rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
+                  }}
                 >
                   {t('common:navigation.labs')}
                   <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
                     {t('common:navigation.labsSoon')}
                   </span>
-                </span>
+                </Link>
 
                 <Link
                   to={aboutLink.to}
@@ -438,7 +451,11 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Link to={primaryCta.to} params={primaryCta.params}>
-                    {t('common:actions.startWebAutomation')}
+                    {t(
+                      isContactPage || isAuthenticated
+                        ? 'common:actions.startLearning'
+                        : 'common:actions.startWebAutomation',
+                    )}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </Button>

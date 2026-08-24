@@ -10,6 +10,7 @@ declare global {
   var mockSearchParams: {
     track?: TrackId;
     q?: string;
+    tier?: 'basic' | 'beginner' | 'intermediate' | 'e2e';
     hideCompleted?: boolean;
     view?: 'grid' | 'list';
   };

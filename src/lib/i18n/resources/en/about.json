@@ -19,13 +19,14 @@
     "paragraph2": "I want TWE to provide more of that kind of learning environment."
   },
   "background": {
+    "eyebrow": "BACKGROUND",
     "title": "A bit about my background",
     "paragraph1": "I started as a developer and moved deeper into QA engineering and SDET work. My experience spans web and API automation, integration-heavy systems, microservices, event-driven testing, CI/CD, and test infrastructure.",
     "paragraph2": "Over time, I also found myself spending more time building frameworks, helping other testers automate, and mentoring people who wanted to become more technical."
   },
   "find": {
     "title": "What you’ll find on TWE",
-    "learn": { "title": "Learn", "description": "Guided Learning Paths." },
+    "learn": { "title": "Learn", "description": "Current Web Automation lessons." },
     "practice": { "title": "Practice", "description": "Standalone hands-on challenges." },
     "labs": { "title": "Labs", "description": "Real-environment exercises, coming later." }
   },

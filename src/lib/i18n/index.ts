@@ -4,6 +4,8 @@ import commonEn from './resources/en/common.json';
 import commonId from './resources/id/common.json';
 import homeEn from './resources/en/home.json';
 import homeId from './resources/id/home.json';
+import labsEn from './resources/en/labs.json';
+import labsId from './resources/id/labs.json';
 import challengesEn from './resources/en/challenges.json';
 import challengesId from './resources/id/challenges.json';
 import tutorialsEn from './resources/en/tutorials.json';
@@ -29,6 +31,7 @@ const resources = {
   en: {
     common: commonEn,
     home: homeEn,
+    labs: labsEn,
     challenges: challengesEn,
     tutorials: tutorialsEn,
     leaderboard: leaderboardEn,
@@ -43,6 +46,7 @@ const resources = {
   id: {
     common: commonId,
     home: homeId,
+    labs: labsId,
     challenges: challengesId,
     tutorials: tutorialsId,
     leaderboard: leaderboardId,
@@ -66,6 +70,7 @@ void i18n.use(initReactI18next).init({
   ns: [
     'common',
     'home',
+    'labs',
     'challenges',
     'tutorials',
     'leaderboard',

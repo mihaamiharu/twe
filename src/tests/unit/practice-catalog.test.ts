@@ -56,14 +56,18 @@ describe('Practice catalog projection', () => {
     }),
   ];
 
-  test('ignores removed tier URL parameters', () => {
+  test('keeps tier as a typed URL filter', () => {
     expect(
       PracticeSearchSchema.parse({
         track: 'selectors',
-        tier: 'basic',
+        tier: 'intermediate',
         difficulty: 'EASY',
       }),
-    ).toEqual({ track: 'selectors', difficulty: 'EASY' });
+    ).toEqual({
+      track: 'selectors',
+      tier: 'intermediate',
+      difficulty: 'EASY',
+    });
   });
 
   test('applies search, track, difficulty, and completion locally', () => {
@@ -71,6 +75,7 @@ describe('Practice catalog projection', () => {
       filterPracticeChallenges(catalog, {
         query: 'KARTU',
         track: 'selectors',
+        tier: 'basic',
         difficulty: 'EASY',
         hideCompleted: false,
       }).map((item) => item.slug),
@@ -80,6 +85,7 @@ describe('Practice catalog projection', () => {
       filterPracticeChallenges(catalog, {
         query: 'locator',
         track: 'core',
+        tier: 'intermediate',
         difficulty: 'MEDIUM',
         hideCompleted: true,
       }),
@@ -88,6 +94,7 @@ describe('Practice catalog projection', () => {
     expect(
       filterPracticeChallenges(catalog, {
         track: 'core',
+        tier: 'intermediate',
         difficulty: 'MEDIUM',
         hideCompleted: false,
       }).map((item) => item.slug),

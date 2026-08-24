@@ -30,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { getTierFromCategory } from '@/lib/constants';
+import { getTierFromCategory, TIER_ORDER } from '@/lib/constants';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { cn } from '@/lib/utils';
@@ -46,6 +46,7 @@ import {
 import {
   PracticeDifficultySchema,
   PracticeSearchSchema,
+  PracticeTierSchema,
   type PracticeSearch,
 } from '@/lib/practice-search';
 
@@ -113,6 +114,7 @@ export function ChallengesPage() {
   const loaderData = routeApi.useLoaderData?.();
 
   const q = searchParams.q;
+  const tier = searchParams.tier;
   const difficulty = searchParams.difficulty;
   const canFilterCompleted = Boolean(auth?.user);
   const hideCompleted = canFilterCompleted
@@ -153,7 +155,7 @@ export function ChallengesPage() {
   }
 
   const {
-    data: challengesResponse,
+    data: challengesQueryData,
     isError: isCatalogError,
     isPending: isCatalogPending,
     refetch: refetchCatalog,
@@ -162,10 +164,10 @@ export function ChallengesPage() {
       locale,
       viewerId: auth?.user?.id,
     }),
-    initialData: loaderData,
     placeholderData: keepPreviousData,
     staleTime: Infinity,
   });
+  const challengesResponse = challengesQueryData ?? loaderData;
 
   const challenges = challengesResponse?.success ? challengesResponse.data : [];
   const hasCatalogResponseError = Boolean(
@@ -174,6 +176,7 @@ export function ChallengesPage() {
   const filteredChallenges = filterPracticeChallenges(challenges, {
     query: q,
     track: activeTrackId,
+    tier,
     difficulty,
     hideCompleted,
   });
@@ -184,13 +187,14 @@ export function ChallengesPage() {
     updateSearch({
       q: undefined,
       track: undefined,
+      tier: undefined,
       difficulty: undefined,
       hideCompleted: undefined,
     });
   };
 
   const hasActiveFilters = Boolean(
-    q || difficulty || hideCompleted || activeTrackId !== 'all',
+    q || tier || difficulty || hideCompleted || activeTrackId !== 'all',
   );
 
   const handleSearchChange = (value: string) => {
@@ -381,6 +385,33 @@ export function ChallengesPage() {
                     {t('difficulty.MEDIUM')}
                   </SelectItem>
                   <SelectItem value="HARD">{t('difficulty.HARD')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={tier ?? 'all'}
+                onValueChange={(value) =>
+                  updateSearch({
+                    tier:
+                      value === 'all'
+                        ? undefined
+                        : PracticeTierSchema.parse(value),
+                  })
+                }
+              >
+                <SelectTrigger
+                  aria-label={t('filters.tier')}
+                  className="h-11 w-full bg-card sm:w-[170px]"
+                >
+                  <SelectValue placeholder={t('filters.allTiers')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('filters.allTiers')}</SelectItem>
+                  {TIER_ORDER.map((tierId) => (
+                    <SelectItem key={tierId} value={tierId}>
+                      {t(`tiers.${tierId}`)}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
 

@@ -1,7 +1,7 @@
 {
   "learn": {
     "eyebrow": "LEARN",
-    "eyebrowNote": "GUIDED LEARNING PATHS",
+    "eyebrowNote": "CURRENT LESSONS",
     "title": "Build the skills behind web automation.",
     "description": "Start with how the web works, build the programming knowledge you need, and move into practical Playwright automation through lessons and hands-on practice.",
     "primaryCta": "Start Learning",
@@ -19,43 +19,10 @@
       "result": "Assertion passed"
     },
     "stack": {
-      "eyebrow": "Guided learning path",
-      "note": "Build the stack",
-      "title": "Build the stack behind automation.",
-      "description": "Move from understanding the web to writing reliable tests, one focused step at a time.",
-      "supportingDescription": "Start with the browser, add the programming foundations, then turn that knowledge into reliable Playwright practice.",
-      "cta": "Browse all lessons",
+      "note": "Current lessons",
+      "lessonLabel": "Lesson {{number}}",
       "cardLesson": "Open lesson",
-      "cardPractice": "Explore Practice",
-      "steps": {
-        "understand": {
-          "label": "01 / Understand",
-          "title": "The web & DOM",
-          "description": "Learn how browsers render pages and how the DOM works."
-        },
-        "build": {
-          "label": "02 / Build",
-          "title": "JavaScript fundamentals",
-          "description": "Build the programming foundation that powers automation."
-        },
-        "automate": {
-          "label": "03 / Automate",
-          "title": "Playwright automation",
-          "description": "Write reliable end-to-end tests with Playwright."
-        },
-        "practice": {
-          "label": "04 / Practice",
-          "title": "Hands-on challenges",
-          "description": "Apply what you have learned with real-world practice and feedback."
-        }
-      }
-    },
-    "path": {
-      "eyebrow": "LEARNING PATH",
-      "status": "AVAILABLE",
-      "title": "Web Automation",
-      "description": "Learn how the web works, build the programming foundations needed for automation, and practice writing reliable Playwright tests.",
-      "cta": "View Learning Path"
+      "noLessons": "The current lesson catalog is unavailable right now."
     },
     "lessons": {
       "eyebrow": "WEB AUTOMATION / LESSONS",
@@ -81,29 +48,13 @@
     },
     "future": {
       "eyebrow": "NEXT",
-      "title": "More learning paths will come later.",
+      "title": "More lesson areas will come later.",
       "description": "Web Automation is the first. New areas will be added when the material is ready."
     },
     "seo": {
       "title": "Learn Web Automation — TestingWithEkki",
       "description": "Build the foundations behind web automation through guided lessons, hands-on practice, and Playwright testing."
     }
-  },
-  "page": {
-    "title": "Tutorials",
-    "subtitle": "Walk through core concepts with me, step-by-step.",
-    "seo": {
-      "title": "Interactive Playwright Tutorials | TestingWithEkki",
-      "description": "Step-by-step guides for mastering software testing. Learn Playwright, end-to-end testing strategies, and best practices."
-    },
-    "searchPlaceholder": "Search tutorials...",
-    "noResults": "No tutorials found",
-    "tryDifferentSearch": "Try a different search term",
-    "checkBackSoon": "Check back soon for new tutorials!",
-    "failedToLoad": "Failed to load tutorials",
-    "pleaseTryAgain": "Please try again later",
-    "notFound": "Tutorial not found",
-    "notFoundDescription": "The tutorial you are looking for does not exist"
   },
   "filters": {
     "clear": "Clear filters",

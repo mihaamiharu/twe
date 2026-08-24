@@ -1,7 +1,7 @@
 {
   "learn": {
     "eyebrow": "BELAJAR",
-    "eyebrowNote": "JALUR PEMBELAJARAN TERARAH",
+    "eyebrowNote": "PELAJARAN SAAT INI",
     "title": "Bangun keterampilan di balik otomasi web.",
     "description": "Mulai dari cara kerja web, bangun pengetahuan pemrograman yang kamu butuhkan, lalu berlatih otomasi Playwright melalui pelajaran dan latihan langsung.",
     "primaryCta": "Mulai Belajar",
@@ -19,43 +19,10 @@
       "result": "Assertion berhasil"
     },
     "stack": {
-      "eyebrow": "Jalur pembelajaran terarah",
-      "note": "Bangun stack",
-      "title": "Bangun fondasi di balik otomasi.",
-      "description": "Mulai dari memahami web hingga menulis tes yang andal, satu langkah fokus setiap kali.",
-      "supportingDescription": "Mulai dari browser, tambahkan dasar pemrograman, lalu ubah pengetahuan itu menjadi latihan Playwright yang andal.",
-      "cta": "Lihat semua pelajaran",
+      "note": "Pelajaran saat ini",
+      "lessonLabel": "Pelajaran {{number}}",
       "cardLesson": "Buka pelajaran",
-      "cardPractice": "Jelajahi Practice",
-      "steps": {
-        "understand": {
-          "label": "01 / Pahami",
-          "title": "Web & DOM",
-          "description": "Pelajari bagaimana browser merender halaman dan bagaimana DOM bekerja."
-        },
-        "build": {
-          "label": "02 / Bangun",
-          "title": "Dasar JavaScript",
-          "description": "Bangun fondasi pemrograman yang mendukung otomasi."
-        },
-        "automate": {
-          "label": "03 / Otomatiskan",
-          "title": "Otomasi Playwright",
-          "description": "Tulis tes end-to-end yang andal dengan Playwright."
-        },
-        "practice": {
-          "label": "04 / Latihan",
-          "title": "Tantangan langsung",
-          "description": "Terapkan yang sudah kamu pelajari melalui latihan dan umpan balik nyata."
-        }
-      }
-    },
-    "path": {
-      "eyebrow": "JALUR PEMBELAJARAN",
-      "status": "TERSEDIA",
-      "title": "Otomasi Web",
-      "description": "Pelajari cara kerja web, bangun dasar pemrograman yang dibutuhkan untuk otomasi, dan berlatih menulis test Playwright yang andal.",
-      "cta": "Lihat Jalur Pembelajaran"
+      "noLessons": "Katalog pelajaran saat ini tidak tersedia."
     },
     "lessons": {
       "eyebrow": "OTOMASI WEB / PELAJARAN",
@@ -81,25 +48,13 @@
     },
     "future": {
       "eyebrow": "BERIKUTNYA",
-      "title": "Jalur pembelajaran lainnya akan hadir nanti.",
+      "title": "Area pelajaran lainnya akan hadir nanti.",
       "description": "Otomasi Web adalah yang pertama. Area baru akan ditambahkan saat materinya sudah siap."
     },
     "seo": {
       "title": "Belajar Otomasi Web — TestingWithEkki",
       "description": "Bangun dasar otomasi web melalui pelajaran terarah, latihan langsung, dan pengujian Playwright."
     }
-  },
-  "page": {
-    "title": "Tutorial",
-    "subtitle": "Pelajari konsep inti bersama saya, langkah demi langkah.",
-    "searchPlaceholder": "Cari tutorial...",
-    "noResults": "Tutorial tidak ditemukan",
-    "tryDifferentSearch": "Coba kata kunci pencarian lain",
-    "checkBackSoon": "Cek lagi nanti untuk tutorial baru!",
-    "failedToLoad": "Gagal memuat tutorial",
-    "pleaseTryAgain": "Silakan coba lagi nanti",
-    "notFound": "Tutorial tidak ditemukan",
-    "notFoundDescription": "Tutorial yang kamu cari tidak ada"
   },
   "filters": {
     "clear": "Hapus filter",

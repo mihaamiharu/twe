@@ -283,7 +283,7 @@ function ChallengeDetailPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] min-w-0 overflow-hidden flex flex-col">
+    <div className="h-[calc(100dvh-4.5625rem)] min-w-0 overflow-hidden flex flex-col">
       <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
         <Suspense fallback={<ChallengeSkeleton />}>
           <ChallengePlayground

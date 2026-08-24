@@ -1,6 +1,6 @@
 {
   "page": {
-    "title": "Challenges",
+    "title": "Practice",
     "subtitle": "Practice your CSS and XPath selectors with real-world scenarios.",
     "seo": {
       "title": "Practice Software Testing — TestingWithEkki",
@@ -13,11 +13,11 @@
     "reviewTutorial": "Review Tutorial: {{title}}",
     "sidebarSubtitle": "Level up your automation skills"
   },
-  "library": {
+    "library": {
     "eyebrow": "PRACTICE",
     "headline": "Practice what you know.",
-    "description": "Work through standalone challenges by topic, or use Practice alongside a Learning Path.",
-    "discoveryLabel": "Challenge discovery",
+    "description": "Work through standalone practice challenges by topic, or use them alongside current Learn lessons.",
+    "discoveryLabel": "Practice discovery",
     "showingCount": "{{count}} challenges",
     "completedByCount": "{{count}} solved",
     "challengeCount_one": "{{count}} challenge",
@@ -60,9 +60,11 @@
   },
   "filters": {
     "search": "Search practice challenges",
-    "track": "Challenge tracks",
+    "track": "Practice tracks",
     "difficulty": "Difficulty",
     "allDifficulties": "All Difficulties",
+    "tier": "Tier",
+    "allTiers": "All Tiers",
     "clear": "Clear",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed",
@@ -195,7 +197,7 @@
   },
   "howPractice": {
     "title": "How Practice works",
-    "description": "Practice is independent. Follow challenges from a Learning Path or jump directly into any topic.",
+    "description": "Practice is independent. Use Learn lessons when you want context, or jump directly into any topic.",
     "steps": {
       "choose": {
         "title": "Choose",

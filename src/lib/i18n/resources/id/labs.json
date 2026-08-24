@@ -1,0 +1,33 @@
+{
+  "seo": {
+    "title": "Labs — Segera Hadir | TestingWithEkki",
+    "description": "Berlatih QA di lingkungan nyata dengan repository, framework test, API, dan pipeline CI. Labs TestingWithEkki segera hadir."
+  },
+  "hero": {
+    "eyebrow": "LABS · SEGERA HADIR",
+    "title": "Berlatih QA di lingkungan nyata",
+    "description": "Sebagian keterampilan testing lebih tepat dipelajari di luar sandbox browser. Labs akan menghadirkan proyek terpandu dengan repository nyata, framework test, API, pipeline CI, dan tools lain yang akan kamu temui dalam pekerjaan QA.",
+    "badge": "SEGERA HADIR",
+    "visualLabel": "LABS",
+    "status": "STATUS"
+  },
+  "note": {
+    "eyebrow": "LINGKUNGAN NYATA",
+    "title": "Berlatih melampaui sandbox.",
+    "description": "Labs akan menghubungkan keterampilan testing individual dengan tools dan alur kerja yang membentuk pekerjaan QA sehari-hari.",
+    "steps": {
+      "repository": "Repository",
+      "testFramework": "Framework test",
+      "apiServices": "API / layanan",
+      "ciPipeline": "Pipeline CI",
+      "testDebug": "Test & debug"
+    }
+  },
+  "footer": {
+    "description": "Untuk sekarang, latih konsep individual di Practice."
+  },
+  "actions": {
+    "learn": "Buka Learn",
+    "practice": "Jelajahi Practice"
+  }
+}
