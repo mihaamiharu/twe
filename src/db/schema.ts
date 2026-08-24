@@ -4,6 +4,7 @@ import {
   timestamp,
   integer,
   boolean,
+  check,
   uuid,
   pgEnum,
   jsonb,
@@ -262,6 +263,10 @@ export const progress = pgTable(
   },
   (table) => ({
     userIdIdx: index('idx_progress_user_id').on(table.userId),
+    progressEntityCheck: check(
+      'progress_exactly_one_entity',
+      sql`(${table.tutorialId} IS NOT NULL) <> (${table.challengeId} IS NOT NULL)`,
+    ),
     userTutorialUnique: uniqueIndex('progress_user_tutorial_unique')
       .on(table.userId, table.tutorialId)
       .where(sql`${table.tutorialId} IS NOT NULL`),

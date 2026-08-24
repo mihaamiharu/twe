@@ -6,22 +6,15 @@ import {
   submissions,
   challenges,
   progress,
-  users,
   testCases,
   achievements,
 } from '@/db/schema';
 import { eq, and, sql, inArray, desc } from 'drizzle-orm';
-import { checkLevelUp } from '@/lib/gamification';
-import { checkAchievements } from '@/lib/achievements';
-import {
-  getUserStats,
-  getEarnedAchievementIds,
-  awardAchievements,
-} from '@/lib/stats';
 import { logger } from '@/lib/logger';
 import { getRawChallengeContent } from './content.server';
 import type { JsonValue, TestCaseDefinition } from '@/lib/content.types';
 import { ensureEntityInDb } from './ensure-entity-in-db';
+import { runProgressRewardTransaction } from './progress-rewards';
 
 // ----------------------------------------------------------------------------
 // HELPERS
@@ -220,129 +213,65 @@ export const challengeSubmissionHandler = async ({
     const testsPassed = testResults.filter((r) => r.passed).length;
     const isPassed = testsPassed === testsTotal && testsTotal > 0;
 
-    const completion = await db.transaction(async (transaction) => {
-      // Unique progress identity plus the row lock makes the incomplete ->
-      // complete transition a single-winner operation under concurrency.
-      await transaction
-        .insert(progress)
-        .values({
-          userId,
-          challengeId: challenge.id,
-          isCompleted: false,
-          attempts: 0,
-        })
-        .onConflictDoNothing();
+    const completion = await runProgressRewardTransaction({
+      userId,
+      target: {
+        kind: 'challenge',
+        challengeId: challenge.id,
+        xpReward: challenge.xpReward,
+      },
+      shouldComplete: isPassed,
+      onPersist: async (transaction, reward) => {
+        if (reward.isFirstCompletion) {
+          await transaction
+            .update(challenges)
+            .set({
+              completionCount: sql`${challenges.completionCount} + 1`,
+            })
+            .where(eq(challenges.id, challenge.id));
 
-      const [existingProgress] = await transaction
-        .select()
-        .from(progress)
-        .where(
-          and(
-            eq(progress.userId, userId),
-            eq(progress.challengeId, challenge.id),
-          ),
-        )
-        .for('update');
-      if (!existingProgress)
-        throw new Error('Failed to initialize challenge progress');
+          logger.info(
+            `[Submission] First completion for user ${userId}. Awarding ${reward.xpAwarded} XP${reward.usedHint ? ' (50% penalty for hint usage)' : ''}.`,
+          );
+        } else if (isPassed) {
+          logger.info(
+            `[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`,
+          );
+        }
 
-      const isFirstCompletion = isPassed && !existingProgress.isCompleted;
-      const hintUsed = existingProgress.usedHint;
-      const xpEarned = isFirstCompletion
-        ? Math.floor(challenge.xpReward * (hintUsed ? 0.5 : 1))
-        : 0;
-      const now = new Date();
-      let initialXp: number | null = null;
-
-      if (isFirstCompletion) {
-        const [user] = await transaction
-          .select({ xp: users.xp, level: users.level })
-          .from(users)
-          .where(eq(users.id, userId))
-          .for('update');
-        if (!user) throw new Error('User not found');
-
-        initialXp = user.xp;
-        const levelUpInfo = checkLevelUp(user.xp, xpEarned);
-        await transaction
-          .update(users)
-          .set({
-            xp: user.xp + xpEarned,
-            level: levelUpInfo.newLevel,
-            updatedAt: now,
+        const [submission] = await transaction
+          .insert(submissions)
+          .values({
+            userId,
+            challengeId: challenge.id,
+            code,
+            isPassed,
+            xpEarned: reward.xpAwarded,
+            executionTime,
+            testsPassed,
+            testsTotal,
+            errorMessage: testResults.find((r) => r.error)?.error,
           })
-          .where(eq(users.id, userId));
-        await transaction
-          .update(challenges)
-          .set({ completionCount: sql`${challenges.completionCount} + 1` })
-          .where(eq(challenges.id, challenge.id));
+          .returning();
+        if (!submission) throw new Error('Failed to create submission');
 
-        logger.info(
-          `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP${hintUsed ? ' (50% penalty for hint usage)' : ''}.`,
-        );
-      } else if (isPassed) {
-        logger.info(
-          `[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`,
-        );
-      }
+        if (isPassed) {
+          await transaction
+            .update(progress)
+            .set({ bestSubmissionId: submission.id })
+            .where(eq(progress.id, reward.progressId));
+        }
 
-      const [submission] = await transaction
-        .insert(submissions)
-        .values({
-          userId,
-          challengeId: challenge.id,
-          code,
-          isPassed,
-          xpEarned,
-          executionTime,
-          testsPassed,
-          testsTotal,
-          errorMessage: testResults.find((r) => r.error)?.error,
-        })
-        .returning();
-      if (!submission) throw new Error('Failed to create submission');
-
-      await transaction
-        .update(progress)
-        .set({
-          isCompleted: existingProgress.isCompleted || isPassed,
-          completedAt:
-            isPassed && !existingProgress.isCompleted
-              ? now
-              : existingProgress.completedAt,
-          attempts: (existingProgress.attempts ?? 0) + 1,
-          bestSubmissionId: isPassed
-            ? submission.id
-            : existingProgress.bestSubmissionId,
-          lastAccessedAt: now,
-          updatedAt: now,
-        })
-        .where(eq(progress.id, existingProgress.id));
-
-      let newAchievements: { id: string; name: string; icon: string }[] = [];
-      if (isPassed) {
-        const userStats = await getUserStats(userId, transaction);
-        const alreadyEarned = await getEarnedAchievementIds(
-          userId,
-          transaction,
-        );
-        const earnedAchievements = checkAchievements(userStats, alreadyEarned);
-        const awardedSlugs = await awardAchievements(
-          userId,
-          earnedAchievements.map((achievement) => achievement.id),
-          transaction,
-        );
-
-        if (awardedSlugs.length > 0) {
+        let newAchievements: { id: string; name: string; icon: string }[] = [];
+        if (reward.awardedAchievementSlugs.length > 0) {
           const dbAwarded = await transaction
             .select({
               id: achievements.id,
               name: sql<string>`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
               icon: achievements.icon,
-              slug: achievements.slug,
             })
             .from(achievements)
-            .where(inArray(achievements.slug, awardedSlugs));
+            .where(inArray(achievements.slug, reward.awardedAchievementSlugs));
 
           newAchievements = dbAwarded.map((achievement) => ({
             id: achievement.id,
@@ -354,50 +283,31 @@ export const challengeSubmissionHandler = async ({
             `[Achievements] User ${userId} earned: ${newAchievements.map((achievement) => achievement.name).join(', ')}`,
           );
         }
-      }
 
-      let levelUp: {
-        oldLevel: number;
-        newLevel: number;
-        levelsGained: number;
-      } | null = null;
-      if (initialXp !== null) {
-        const [updatedUser] = await transaction
-          .select({ xp: users.xp })
-          .from(users)
-          .where(eq(users.id, userId));
-        if (updatedUser) {
-          const levelUpInfo = checkLevelUp(
-            initialXp,
-            updatedUser.xp - initialXp,
-          );
-          if (levelUpInfo.leveledUp) {
-            levelUp = {
-              oldLevel: levelUpInfo.oldLevel,
-              newLevel: levelUpInfo.newLevel,
-              levelsGained: levelUpInfo.levelsGained,
-            };
-          }
-        }
-      }
-
-      return {
-        submission: {
-          id: submission.id,
-          isPassed,
-          testsPassed,
-          testsTotal,
-          xpEarned,
-          executionTime,
-        },
-        isFirstCompletion,
-        isPracticeMode: false,
-        levelUp,
-        newAchievements,
-      };
+        return {
+          submission: {
+            id: submission.id,
+            isPassed,
+            testsPassed,
+            testsTotal,
+            xpEarned: reward.xpAwarded,
+            executionTime,
+          },
+          newAchievements,
+        };
+      },
     });
 
-    return { success: true, data: completion };
+    return {
+      success: true,
+      data: {
+        submission: completion.persisted.submission,
+        isFirstCompletion: completion.isFirstCompletion,
+        isPracticeMode: false,
+        levelUp: completion.levelUp,
+        newAchievements: completion.persisted.newAchievements,
+      },
+    };
   } catch (error) {
     console.error('Error submitting solution:', error);
     return {

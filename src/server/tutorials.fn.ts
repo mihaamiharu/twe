@@ -4,7 +4,7 @@ import { getRequest } from '@tanstack/react-start/server';
 import { authMiddleware } from './auth.mw';
 import { auth } from './auth.server';
 import { db } from '@/db';
-import { tutorials, progress, users } from '@/db/schema';
+import { tutorials, progress } from '@/db/schema';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import {
   getChallengeCatalogList,
@@ -17,15 +17,10 @@ import type {
   ChallengeCatalogListItem,
   TutorialListResponse,
 } from '@/lib/catalog.types';
-import { checkAchievements } from '@/lib/achievements';
-import {
-  getUserStats,
-  getEarnedAchievementIds,
-  awardAchievements,
-} from '@/lib/stats';
-import { checkLevelUp } from '@/lib/gamification';
+import { TUTORIAL_COMPLETION_XP } from '@/lib/gamification';
 import { logger } from '@/lib/logger';
 import { ensureEntityInDb } from './ensure-entity-in-db';
+import { runProgressRewardTransaction } from './progress-rewards';
 
 // ----------------------------------------------------------------------------
 // GET TUTORIALS (LIST) - FILESYSTEM CATALOG + EXPLICIT DB OVERLAY
@@ -303,81 +298,25 @@ export const completeTutorialHandler = async ({
 
     if (!tutorial) return { success: false, error: 'Tutorial not found' };
 
-    const completion = await db.transaction(async (transaction) => {
-      // The partial unique index plus this insert prevents concurrent
-      // requests from creating two progress rows. The row lock serializes
-      // the transition from incomplete to complete and its rewards.
-      await transaction
-        .insert(progress)
-        .values({
-          userId,
-          tutorialId: tutorial.id,
-          isCompleted: false,
-          readingProgress: 0,
-        })
-        .onConflictDoNothing();
+    const completion = await runProgressRewardTransaction({
+      userId,
+      target: {
+        kind: 'tutorial',
+        tutorialId: tutorial.id,
+        xpReward: TUTORIAL_COMPLETION_XP,
+      },
+      shouldComplete: true,
+      onPersist: async (transaction, reward) => {
+        if (reward.isFirstCompletion) {
+          await transaction
+            .update(tutorials)
+            .set({ viewCount: sql`${tutorials.viewCount} + 1` })
+            .where(eq(tutorials.id, tutorial.id));
+        }
 
-      const [progressRecord] = await transaction
-        .select()
-        .from(progress)
-        .where(
-          and(
-            eq(progress.userId, userId),
-            eq(progress.tutorialId, tutorial.id),
-          ),
-        )
-        .for('update');
-
-      if (!progressRecord)
-        throw new Error('Failed to initialize tutorial progress');
-
-      const wasAlreadyCompleted = progressRecord.isCompleted;
-      let newAchievements: { id: string; name: string; icon: string }[] = [];
-
-      if (!wasAlreadyCompleted) {
-        const now = new Date();
-        await transaction
-          .update(progress)
-          .set({
-            isCompleted: true,
-            readingProgress: 100,
-            completedAt: now,
-            lastAccessedAt: now,
-            updatedAt: now,
-          })
-          .where(eq(progress.id, progressRecord.id));
-
-        const [user] = await transaction
-          .select({ xp: users.xp, level: users.level })
-          .from(users)
-          .where(eq(users.id, userId))
-          .for('update');
-        if (!user) throw new Error('User not found');
-
-        const levelUpInfo = checkLevelUp(user.xp, 25);
-        await transaction
-          .update(users)
-          .set({
-            xp: user.xp + 25,
-            level: levelUpInfo.newLevel,
-            updatedAt: now,
-          })
-          .where(eq(users.id, userId));
-
-        const userStats = await getUserStats(userId, transaction);
-        const alreadyEarned = await getEarnedAchievementIds(
-          userId,
-          transaction,
-        );
-        const earnedAchievements = checkAchievements(userStats, alreadyEarned);
-        const awardedSlugs = await awardAchievements(
-          userId,
-          earnedAchievements.map((achievement) => achievement.id),
-          transaction,
-        );
-        const awarded = new Set(awardedSlugs);
-        newAchievements = earnedAchievements
-          .filter((achievement) => awarded.has(achievement.id))
+        const awardedAchievements = new Set(reward.awardedAchievementSlugs);
+        const newAchievements = reward.earnedAchievements
+          .filter((achievement) => awardedAchievements.has(achievement.id))
           .map((achievement) => ({
             id: achievement.id,
             name: achievement.name,
@@ -389,23 +328,19 @@ export const completeTutorialHandler = async ({
             `[Achievements] Tutorial completion triggered: ${newAchievements.map((achievement) => achievement.name).join(', ')}`,
           );
         }
-      }
 
-      // Preserve the existing view-count behavior, but keep it in the same
-      // transaction so a failed completion cannot leave a partial write.
-      await transaction
-        .update(tutorials)
-        .set({ viewCount: sql`${tutorials.viewCount} + 1` })
-        .where(eq(tutorials.id, tutorial.id));
-
-      return {
-        isCompleted: true,
-        xpAwarded: wasAlreadyCompleted ? 0 : 25,
-        newAchievements,
-      };
+        return { newAchievements };
+      },
     });
 
-    return { success: true, data: completion };
+    return {
+      success: true,
+      data: {
+        isCompleted: true,
+        xpAwarded: completion.isFirstCompletion ? TUTORIAL_COMPLETION_XP : 0,
+        newAchievements: completion.persisted.newAchievements,
+      },
+    };
   } catch (error) {
     console.error('Error marking tutorial complete:', error);
     return {

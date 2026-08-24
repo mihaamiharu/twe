@@ -16,6 +16,7 @@ import {
   CreateSubmissionSchema,
 } from '../../server/submissions.fn';
 import { completeTutorialHandler } from '../../server/tutorials.fn';
+import { getEarnedAchievementIds, getUserStats } from '../../lib/stats';
 import { setupTestDb, truncateTables } from './setup';
 import type { z } from 'zod';
 
@@ -350,10 +351,12 @@ describe('Learn and Practice progress/reward invariants', () => {
     ).toBe(0);
   });
 
-  test('transaction rollback leaves no reward or completion writes when the authenticated identity is invalid', async () => {
+  test('transaction rollback removes every write after a deterministic submission failure', async () => {
+    await seedAchievement('first-challenge');
+
     const result = await challengeSubmissionHandler({
-      data: passingSubmission(),
-      context: { user: { id: '00000000-0000-0000-0000-000000000099' } },
+      data: passingSubmission({ executionTime: 2147483648 }),
+      context: { user: { id: testUserId } },
     });
 
     expect(result.success).toBe(false);
@@ -369,9 +372,20 @@ describe('Learn and Practice progress/reward invariants', () => {
     expect(
       (await db.query.users.findFirst({ where: eq(users.id, testUserId) }))?.xp,
     ).toBe(0);
+    expect(
+      await db.query.userAchievements.findMany({
+        where: eq(userAchievements.userId, testUserId),
+      }),
+    ).toHaveLength(0);
+
+    const stats = await getUserStats(testUserId);
+    expect(stats.totalChallengesCompleted).toBe(0);
+    expect(stats.tutorialsCompleted).toBe(0);
+    expect(stats.totalXP).toBe(0);
+    expect((await getEarnedAchievementIds(testUserId)).size).toBe(0);
   });
 
-  test('tutorial completion and its achievement reward are idempotent', async () => {
+  test('tutorial completion and retries are fully idempotent, including view statistics', async () => {
     await db.insert(tutorials).values({
       id: tutorialId,
       slug: 'dom-tree-hierarchy',
@@ -382,7 +396,7 @@ describe('Learn and Practice progress/reward invariants', () => {
     });
     await seedAchievement('first-tutorial');
 
-    const [first, retry] = await Promise.all([
+    const [first, concurrentRetry] = await Promise.all([
       completeTutorialHandler({
         data: { slug: 'dom-tree-hierarchy', locale: 'en' },
         context: { user: { id: testUserId } },
@@ -394,28 +408,86 @@ describe('Learn and Practice progress/reward invariants', () => {
     ]);
 
     expect(first.success).toBe(true);
-    expect(retry.success).toBe(true);
+    expect(concurrentRetry.success).toBe(true);
     const firstData = requireData(first);
-    const retryData = requireData(retry);
-    expect([firstData.xpAwarded, retryData.xpAwarded].sort()).toEqual([0, 25]);
+    const concurrentRetryData = requireData(concurrentRetry);
+    expect([firstData.xpAwarded, concurrentRetryData.xpAwarded].sort()).toEqual(
+      [0, 25],
+    );
     expect(
       [
         firstData.newAchievements.length,
-        retryData.newAchievements.length,
+        concurrentRetryData.newAchievements.length,
       ].sort(),
     ).toEqual([0, 1]);
 
-    const userProgress = await db.query.progress.findMany({
+    const initialProgress = await db.query.progress.findFirst({
       where: and(
         eq(progress.userId, testUserId),
         eq(progress.tutorialId, tutorialId),
       ),
     });
-    const user = await db.query.users.findFirst({
+    const initialTutorial = await db.query.tutorials.findFirst({
+      where: eq(tutorials.id, tutorialId),
+    });
+    const initialUser = await db.query.users.findFirst({
       where: eq(users.id, testUserId),
     });
-    expect(userProgress).toHaveLength(1);
-    expect(userProgress[0]?.isCompleted).toBe(true);
-    expect(user?.xp).toBe(75);
+    expect(initialProgress?.isCompleted).toBe(true);
+    expect(initialTutorial?.viewCount).toBe(1);
+    expect(initialUser?.xp).toBe(75);
+
+    const sequentialRetry = await completeTutorialHandler({
+      data: { slug: 'dom-tree-hierarchy', locale: 'en' },
+      context: { user: { id: testUserId } },
+    });
+    expect(sequentialRetry.success).toBe(true);
+    const sequentialRetryData = requireData(sequentialRetry);
+    expect(sequentialRetryData.xpAwarded).toBe(0);
+    expect(sequentialRetryData.newAchievements).toHaveLength(0);
+
+    const [retryA, retryB] = await Promise.all([
+      completeTutorialHandler({
+        data: { slug: 'dom-tree-hierarchy', locale: 'en' },
+        context: { user: { id: testUserId } },
+      }),
+      completeTutorialHandler({
+        data: { slug: 'dom-tree-hierarchy', locale: 'id' },
+        context: { user: { id: testUserId } },
+      }),
+    ]);
+    expect(retryA.success).toBe(true);
+    expect(retryB.success).toBe(true);
+    expect(requireData(retryA).xpAwarded).toBe(0);
+    expect(requireData(retryB).xpAwarded).toBe(0);
+    expect(requireData(retryA).newAchievements).toHaveLength(0);
+    expect(requireData(retryB).newAchievements).toHaveLength(0);
+
+    const finalProgress = await db.query.progress.findMany({
+      where: and(
+        eq(progress.userId, testUserId),
+        eq(progress.tutorialId, tutorialId),
+      ),
+    });
+    const finalTutorial = await db.query.tutorials.findFirst({
+      where: eq(tutorials.id, tutorialId),
+    });
+    const finalUser = await db.query.users.findFirst({
+      where: eq(users.id, testUserId),
+    });
+    const unlocked = await db.query.userAchievements.findMany({
+      where: and(
+        eq(userAchievements.userId, testUserId),
+        eq(userAchievements.achievementId, achievementId),
+      ),
+    });
+    expect(finalProgress).toHaveLength(1);
+    expect(finalProgress[0]?.isCompleted).toBe(true);
+    expect(finalProgress[0]?.completedAt).toEqual(initialProgress?.completedAt);
+    expect(finalProgress[0]?.updatedAt).toEqual(initialProgress?.updatedAt);
+    expect(finalProgress[0]?.attempts).toBe(initialProgress?.attempts);
+    expect(finalTutorial?.viewCount).toBe(1);
+    expect(finalUser?.xp).toBe(75);
+    expect(unlocked).toHaveLength(1);
   });
 });

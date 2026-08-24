@@ -1,6 +1,10 @@
--- Progress rows must identify exactly one catalog entity. Reject orphan rows
--- because there is no safe way to infer which tutorial or challenge they
--- represent. Mixed rows are split before the exact-key dedupe below.
+-- Compatibility repair for databases that already applied the original
+-- 0003 before its mixed-row cleanup was corrected. Fresh databases also run
+-- this idempotent repair immediately after the hardened 0003.
+DROP INDEX IF EXISTS "progress_user_tutorial_unique";
+DROP INDEX IF EXISTS "progress_user_challenge_unique";
+--> statement-breakpoint
+
 DO $$
 BEGIN
 	IF EXISTS (
@@ -9,14 +13,11 @@ BEGIN
 		WHERE "tutorial_id" IS NULL AND "challenge_id" IS NULL
 	) THEN
 		RAISE EXCEPTION 'progress contains rows without a tutorial_id or challenge_id'
-			USING HINT = 'Repair orphan progress rows before applying migration 0003';
+			USING HINT = 'Repair orphan progress rows before applying migration 0004';
 	END IF;
 END $$;
 --> statement-breakpoint
 
--- Preserve both sides of a legacy mixed row. The original row becomes the
--- tutorial record; the new row carries challenge attempts, submission, and
--- hint fields. The exact-key merge below resolves any resulting duplicates.
 INSERT INTO "progress" (
 	"user_id",
 	"tutorial_id",
@@ -61,10 +62,7 @@ SET
 WHERE "tutorial_id" IS NOT NULL AND "challenge_id" IS NOT NULL;
 --> statement-breakpoint
 
--- Map every row to a deterministic survivor using the same keys enforced by
--- the two unique indexes. Completed progress wins, then the newest activity,
--- then created time and id provide stable tie-breakers.
-CREATE TEMP TABLE "progress_dedupe_map_0003" ON COMMIT DROP AS
+CREATE TEMP TABLE "progress_dedupe_map_0004" ON COMMIT DROP AS
 WITH ranked AS (
 	SELECT
 		p."id",
@@ -92,7 +90,7 @@ SELECT "id", survivor_id
 FROM ranked;
 --> statement-breakpoint
 
-CREATE TEMP TABLE "progress_dedupe_merged_0003" ON COMMIT DROP AS
+CREATE TEMP TABLE "progress_dedupe_merged_0004" ON COMMIT DROP AS
 SELECT
 	m.survivor_id,
 	bool_or(p."is_completed") AS is_completed,
@@ -117,7 +115,7 @@ SELECT
 		FILTER (WHERE p."hint_content" IS NOT NULL)
 	)[1] AS hint_content,
 	max(p."updated_at") AS updated_at
-FROM "progress_dedupe_map_0003" m
+FROM "progress_dedupe_map_0004" m
 INNER JOIN "progress" p ON p."id" = m."id"
 GROUP BY m.survivor_id;
 --> statement-breakpoint
@@ -133,20 +131,35 @@ SET
 	"used_hint" = m.used_hint,
 	"hint_content" = m.hint_content,
 	"updated_at" = m.updated_at
-FROM "progress_dedupe_merged_0003" m
+FROM "progress_dedupe_merged_0004" m
 WHERE p."id" = m.survivor_id;
 --> statement-breakpoint
 
 DELETE FROM "progress" p
-USING "progress_dedupe_map_0003" m
+USING "progress_dedupe_map_0004" m
 WHERE p."id" = m."id" AND m."id" <> m.survivor_id;
 --> statement-breakpoint
 
-CREATE UNIQUE INDEX "progress_user_tutorial_unique"
+DO $$
+BEGIN
+	IF NOT EXISTS (
+		SELECT 1
+		FROM pg_constraint
+		WHERE conname = 'progress_exactly_one_entity'
+			AND conrelid = 'progress'::regclass
+	) THEN
+		ALTER TABLE "progress"
+			ADD CONSTRAINT "progress_exactly_one_entity"
+			CHECK (("tutorial_id" IS NOT NULL) <> ("challenge_id" IS NOT NULL));
+	END IF;
+END $$;
+--> statement-breakpoint
+
+CREATE UNIQUE INDEX IF NOT EXISTS "progress_user_tutorial_unique"
 	ON "progress" USING btree ("user_id", "tutorial_id")
 	WHERE "progress"."tutorial_id" IS NOT NULL;
 --> statement-breakpoint
 
-CREATE UNIQUE INDEX "progress_user_challenge_unique"
+CREATE UNIQUE INDEX IF NOT EXISTS "progress_user_challenge_unique"
 	ON "progress" USING btree ("user_id", "challenge_id")
 	WHERE "progress"."challenge_id" IS NOT NULL;
