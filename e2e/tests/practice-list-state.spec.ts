@@ -31,6 +31,39 @@ test.describe('Practice list state', () => {
       .poll(() => new URL(page.url()).searchParams.get('hideCompleted'))
       .toBe('true');
     await expect(completionToggle).toHaveAttribute('aria-checked', 'true');
+
+    await completionToggle.click();
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('hideCompleted'))
+      .toBe('false');
+    await expect(completionToggle).toHaveAttribute('aria-checked', 'false');
+
+    await page.goBack();
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('hideCompleted'))
+      .toBe('true');
+    await expect(completionToggle).toHaveAttribute('aria-checked', 'true');
+
+    await page.goForward();
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('hideCompleted'))
+      .toBe('false');
+    await expect(completionToggle).toHaveAttribute('aria-checked', 'false');
+  });
+
+  test('round-trips an explicit false completion filter from the URL', async ({
+    page,
+  }) => {
+    await page.goto('/en/practice?hideCompleted=false');
+    await page.waitForLoadState('networkidle');
+
+    const completionToggle = page.getByRole('switch', {
+      name: /Hide Completed|Show Completed/i,
+    });
+    await expect(completionToggle).toHaveAttribute('aria-checked', 'false');
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('hideCompleted'))
+      .toBe('false');
   });
 
   test('navigates from the practice list to a challenge detail workspace', async ({

@@ -9,19 +9,27 @@ export interface PracticeChallengeItemData {
   type: string;
   difficulty: string;
   xpReward: number;
+  completionCount?: number;
   isCompleted: boolean;
   tags?: string[] | null;
+}
+
+export interface PracticeChallengeLabels {
+  type: string;
+  difficulty: string;
+  category: string;
+  tier: string;
+  completionCount: string;
+  completed: string;
+  comingSoon: string;
+  start: string;
+  review: string;
 }
 
 interface PracticeChallengeItemProps {
   challenge: PracticeChallengeItemData;
   locale: string;
-  typeLabel: string;
-  difficultyLabel: string;
-  completedLabel: string;
-  comingSoonLabel: string;
-  startLabel: string;
-  reviewLabel: string;
+  labels: PracticeChallengeLabels;
 }
 
 const difficultyStyles: Record<string, string> = {
@@ -52,15 +60,10 @@ function DifficultyPill({
 
 function ChallengeItemContent({
   challenge,
-  typeLabel,
-  difficultyLabel,
-  completedLabel,
-  comingSoonLabel,
-  startLabel,
-  reviewLabel,
+  labels,
 }: Omit<PracticeChallengeItemProps, 'locale'>) {
   const isComingSoon = challenge.tags?.includes('coming-soon') ?? false;
-  const actionLabel = challenge.isCompleted ? reviewLabel : startLabel;
+  const actionLabel = challenge.isCompleted ? labels.review : labels.start;
 
   return (
     <div
@@ -73,12 +76,19 @@ function ChallengeItemContent({
       data-testid="challenge-list-row"
     >
       <div className="min-w-0 lg:self-center">
-        <div className="mb-0.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-          <span>{typeLabel}</span>
+        <div className="mb-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          <span>{labels.type}</span>
+          <span aria-hidden="true">·</span>
+          <span className="truncate normal-case tracking-normal">
+            {labels.category}
+          </span>
+          <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] tracking-[0.08em]">
+            {labels.tier}
+          </span>
           {isComingSoon && (
             <span className="inline-flex items-center gap-1 tracking-[0.08em]">
               <Lock className="h-3 w-3" aria-hidden="true" />
-              {comingSoonLabel}
+              {labels.comingSoon}
             </span>
           )}
         </div>
@@ -90,14 +100,14 @@ function ChallengeItemContent({
         </p>
       </div>
 
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-x-5 lg:grid lg:grid-cols-[5.5rem_7.5rem_5.5rem_minmax(5.5rem,auto)] lg:items-center lg:gap-x-4">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:gap-x-5 lg:grid lg:grid-cols-[5rem_6.5rem_5rem_5rem_minmax(4.5rem,auto)] lg:items-center lg:gap-x-3">
         <div
           className="lg:justify-self-start"
           data-testid="challenge-row-difficulty"
         >
           <DifficultyPill
             difficulty={challenge.difficulty}
-            label={difficultyLabel}
+            label={labels.difficulty}
           />
         </div>
 
@@ -107,7 +117,7 @@ function ChallengeItemContent({
             data-testid="challenge-row-completion"
           >
             <Check className="h-3.5 w-3.5" aria-hidden="true" />
-            {completedLabel}
+            {labels.completed}
           </span>
         ) : (
           <span
@@ -115,6 +125,15 @@ function ChallengeItemContent({
             aria-hidden="true"
             data-testid="challenge-row-completion"
           />
+        )}
+
+        {!isComingSoon && challenge.completionCount !== undefined && (
+          <span
+            className="order-5 inline-flex items-center whitespace-nowrap text-xs tabular-nums text-muted-foreground lg:order-none lg:justify-self-start"
+            aria-label={labels.completionCount}
+          >
+            {labels.completionCount}
+          </span>
         )}
 
         {!isComingSoon && (
@@ -152,7 +171,7 @@ export function PracticeChallengeRow(props: PracticeChallengeItemProps) {
     return (
       <div
         className="relative border-b border-border last:border-b-0"
-        aria-label={props.comingSoonLabel}
+        aria-label={props.labels.comingSoon}
       >
         {content}
       </div>
@@ -182,12 +201,21 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
       )}
     >
       <div>
-        <div className="mb-2 flex items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-          <span>{props.typeLabel}</span>
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
+          <span className="flex min-w-0 items-center gap-2">
+            <span>{props.labels.type}</span>
+            <span aria-hidden="true">·</span>
+            <span className="truncate normal-case tracking-normal">
+              {props.labels.category}
+            </span>
+          </span>
+          <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] tracking-[0.08em]">
+            {props.labels.tier}
+          </span>
           {props.challenge.isCompleted && !isComingSoon && (
             <Check
               className="h-3.5 w-3.5 text-brand-success"
-              aria-label={props.completedLabel}
+              aria-label={props.labels.completed}
             />
           )}
         </div>
@@ -202,8 +230,13 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
         <div className="flex items-center gap-3">
           <DifficultyPill
             difficulty={props.challenge.difficulty}
-            label={props.difficultyLabel}
+            label={props.labels.difficulty}
           />
+          {props.challenge.completionCount !== undefined && (
+            <span className="text-xs tabular-nums text-muted-foreground">
+              {props.labels.completionCount}
+            </span>
+          )}
           {!isComingSoon && (
             <span className="inline-flex items-center gap-1 text-xs font-medium tabular-nums text-muted-foreground">
               <Zap
@@ -216,7 +249,9 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
         </div>
         {!isComingSoon && (
           <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover:text-brand-orange">
-            {props.challenge.isCompleted ? props.reviewLabel : props.startLabel}
+            {props.challenge.isCompleted
+              ? props.labels.review
+              : props.labels.start}
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
         )}
@@ -225,7 +260,7 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
   );
 
   if (isComingSoon) {
-    return <div aria-label={props.comingSoonLabel}>{content}</div>;
+    return <div aria-label={props.labels.comingSoon}>{content}</div>;
   }
 
   return (

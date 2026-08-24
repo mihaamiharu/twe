@@ -15,6 +15,10 @@ import {
 } from './content-catalog.server';
 import { mergeChallengeCatalogOverlay } from '@/lib/catalog-overlays';
 import type { ChallengeListResponse } from '@/lib/catalog.types';
+import {
+  practiceDetailNotFoundFailure,
+  practiceDetailOperationalFailure,
+} from '@/lib/practice-detail-errors';
 
 // ----------------------------------------------------------------------------
 // GET CHALLENGES (LIST) - FILESYSTEM CATALOG + EXPLICIT DB OVERLAY
@@ -139,10 +143,12 @@ export const getChallenge = createServerFn({ method: 'GET' })
   .handler(async ({ data: { slug, locale } }) => {
     try {
       const challengeContent = await getChallengeCatalogDetail(slug, locale);
-      if (!challengeContent) throw new Error('Challenge not found');
+      if (!challengeContent) return practiceDetailNotFoundFailure();
 
       if (challengeContent.tags.includes('coming-soon')) {
-        throw new Error('This challenge is coming soon!');
+        return practiceDetailOperationalFailure(
+          'This challenge is coming soon!',
+        );
       }
 
       const dbChallenge = await db.query.challenges.findFirst({
@@ -154,7 +160,7 @@ export const getChallenge = createServerFn({ method: 'GET' })
         },
       });
       if (dbChallenge && !dbChallenge.isPublished) {
-        throw new Error('Challenge not found');
+        return practiceDetailNotFoundFailure();
       }
 
       const processedTestCases = challengeContent.testCases.map(
@@ -323,9 +329,6 @@ export const getChallenge = createServerFn({ method: 'GET' })
       };
     } catch (error) {
       logger.error('Error fetching challenge detail:', error);
-      return {
-        success: false,
-        error: 'An error occurred while processing your request.',
-      };
+      return practiceDetailOperationalFailure();
     }
   });

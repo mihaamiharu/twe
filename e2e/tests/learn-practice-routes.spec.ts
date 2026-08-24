@@ -45,6 +45,18 @@ test.describe('Learn and Practice public routes', () => {
       await expect(page.locator('[data-not-found-page]')).toBeVisible();
     });
 
+    test(`${locale} unknown practice challenge uses the app not-found state`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}/practice/does-not-exist`);
+      await expect(page.locator('[data-not-found-page]')).toBeVisible();
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+        'content',
+        'noindex, nofollow',
+      );
+      await expect(page).toHaveURL(`/${locale}/practice/does-not-exist`);
+    });
+
     for (const legacyPath of [
       '/tutorials',
       '/tutorials/dom-tree-hierarchy',
