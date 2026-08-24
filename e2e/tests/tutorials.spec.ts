@@ -64,6 +64,30 @@ test.describe('Tutorials', () => {
     await expect(beginner).toHaveAttribute('aria-pressed', 'true');
   });
 
+  test('should preserve explicit completion visibility booleans in the URL', async ({
+    page,
+  }) => {
+    await page.goto('/en/learn?hideCompleted=false');
+    await expect(page).toHaveURL(/hideCompleted=false/);
+    await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    await page.reload();
+    await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    await page.goto('/en/learn?hideCompleted=true');
+    await expect(page).toHaveURL(/hideCompleted=true/);
+    await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
   test('should keep grid and list presentation in URL state', async ({
     page,
   }) => {

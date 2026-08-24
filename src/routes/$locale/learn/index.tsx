@@ -1,6 +1,5 @@
 import { useMemo } from 'react';
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
-import { z } from 'zod';
 import {
   ArrowRight,
   CheckCircle2,
@@ -28,15 +27,11 @@ import { createSeoHead } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { filterLearnCatalog, LEARN_DIFFICULTIES } from '@/lib/learn-catalog';
+import { LearnSearchSchema, type LearnSearch } from '@/lib/learn-search';
 import type { TutorialCatalogListItemWithOverlay } from '@/lib/catalog-overlays';
 import { cn } from '@/lib/utils';
 
-export const LearnSearchSchema = z.object({
-  q: z.string().optional(),
-  difficulty: z.enum(['all', ...LEARN_DIFFICULTIES]).optional(),
-  view: z.enum(['grid', 'list']).optional(),
-  hideCompleted: z.coerce.boolean().optional(),
-});
+export { LearnSearchSchema } from '@/lib/learn-search';
 
 export const Route = createFileRoute('/$locale/learn/')({
   validateSearch: LearnSearchSchema,
@@ -65,8 +60,6 @@ export const Route = createFileRoute('/$locale/learn/')({
 });
 
 const routeApi = getRouteApi('/$locale/learn/');
-
-type LearnSearch = z.infer<typeof LearnSearchSchema>;
 
 interface LearningPathStep {
   number: string;
@@ -438,7 +431,7 @@ function LearnPage() {
           </div>
 
           {!tutorialsResponse.success ? (
-            <LearnCatalogError message={tutorialsResponse.error} />
+            <LearnCatalogError />
           ) : filteredLessons.length === 0 ? (
             <EmptyState
               size="compact"
@@ -507,7 +500,7 @@ function LearnPage() {
   );
 }
 
-function LearnCatalogError({ message }: { message: string }) {
+function LearnCatalogError() {
   const { t } = useTranslation('tutorials');
 
   return (
@@ -523,7 +516,7 @@ function LearnCatalogError({ message }: { message: string }) {
         {t('learn.lessons.errorTitle')}
       </h3>
       <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-        {message || t('learn.lessons.errorDescription')}
+        {t('learn.lessons.errorDescription')}
       </p>
     </div>
   );

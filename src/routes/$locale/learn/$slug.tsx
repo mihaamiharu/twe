@@ -34,9 +34,11 @@ import { showAchievementToasts } from '@/components/achievement-toast';
 import { authQueryOptions } from '@/lib/auth.query';
 import {
   tutorialCatalogQueryKeys,
+  type TutorialListResponse,
   type TutorialDetailResponse,
   tutorialDetailQueryOptions,
 } from '@/lib/tutorials.query';
+import { optimisticallyCompleteLearnCaches } from '@/lib/learn-completion';
 import {
   createLearnDetailSeoHead,
   createLearnFallbackSeoHead,
@@ -105,13 +107,13 @@ function TutorialDetailPage() {
 
   if (!response.success) {
     if (response.error === 'Tutorial not found') return <NotFound />;
-    return <TutorialDetailError message={response.error} />;
+    return <TutorialDetailError />;
   }
 
   return <TutorialDetailContent tutorial={response.data} />;
 }
 
-function TutorialDetailError({ message }: { message: string }) {
+function TutorialDetailError() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation(['tutorials', 'common']);
 
@@ -138,7 +140,7 @@ function TutorialDetailError({ message }: { message: string }) {
             {t('learn.detailError.title')}
           </h1>
           <p className="mx-auto mt-2 max-w-lg text-sm leading-6 text-muted-foreground">
-            {message || t('learn.detailError.description')}
+            {t('learn.detailError.description')}
           </p>
           <Button asChild className="mt-6">
             <Link to="/$locale/learn" params={{ locale }}>
@@ -175,28 +177,81 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
       if (!result.success) throw new Error(result.error);
       return result;
     },
-    onSuccess: async (result) => {
+    onMutate: async () => {
+      const detailQueryKey = tutorialCatalogQueryKeys.detail(
+        slug,
+        locale,
+        userId,
+      );
+      const listQueryKey = tutorialCatalogQueryKeys.list(locale, userId);
+
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: detailQueryKey }),
+        queryClient.cancelQueries({ queryKey: listQueryKey }),
+      ]);
+
+      const previousCaches = {
+        detail:
+          queryClient.getQueryData<TutorialDetailResponse>(detailQueryKey),
+        list: queryClient.getQueryData<TutorialListResponse>(listQueryKey),
+      };
+      const previousLocalState = {
+        isCompleted,
+        readingProgress,
+        progressRef: progressRef.current,
+      };
+      const optimisticCaches = optimisticallyCompleteLearnCaches(
+        previousCaches,
+        slug,
+      );
+
+      queryClient.setQueryData(detailQueryKey, optimisticCaches.detail);
+      queryClient.setQueryData(listQueryKey, optimisticCaches.list);
+      setIsCompleted(true);
+      setReadingProgress(100);
+      progressRef.current = 100;
+
+      return { previousCaches, previousLocalState };
+    },
+    onSuccess: (result) => {
       setIsCompleted(true);
       setReadingProgress(100);
       progressRef.current = 100;
       toast.success(t('toasts.completed'));
 
-      await queryClient.invalidateQueries({
-        queryKey: tutorialCatalogQueryKeys.detail(slug, locale, userId),
-      });
-      await queryClient.invalidateQueries({
-        queryKey: tutorialCatalogQueryKeys.list(locale, userId),
-      });
-      await queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
-      await queryClient.invalidateQueries({ queryKey: ['profile'] });
-      await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
-
       if (result.data?.newAchievements?.length) {
         showAchievementToasts(result.data.newAchievements);
       }
     },
-    onError: () => {
+    onError: (_error, _variables, context) => {
+      if (context) {
+        const detailQueryKey = tutorialCatalogQueryKeys.detail(
+          slug,
+          locale,
+          userId,
+        );
+        const listQueryKey = tutorialCatalogQueryKeys.list(locale, userId);
+
+        queryClient.setQueryData(detailQueryKey, context.previousCaches.detail);
+        queryClient.setQueryData(listQueryKey, context.previousCaches.list);
+        setIsCompleted(context.previousLocalState.isCompleted);
+        setReadingProgress(context.previousLocalState.readingProgress);
+        progressRef.current = context.previousLocalState.progressRef;
+      }
       toast.error(t('toasts.failed'));
+    },
+    onSettled: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: tutorialCatalogQueryKeys.detail(slug, locale, userId),
+        }),
+        queryClient.invalidateQueries({
+          queryKey: tutorialCatalogQueryKeys.list(locale, userId),
+        }),
+        queryClient.invalidateQueries({ queryKey: ['user', 'me'] }),
+        queryClient.invalidateQueries({ queryKey: ['profile'] }),
+        queryClient.invalidateQueries({ queryKey: ['leaderboard'] }),
+      ]);
     },
   });
 

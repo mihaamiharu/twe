@@ -376,36 +376,13 @@ export async function getRawChallengeCatalogContent(
   return definition;
 }
 
-export async function getNextTutorialCatalogItem(
+type TutorialDirection = 'next' | 'previous';
+
+/** Return an adjacent published Learn item using catalog order. */
+async function getAdjacentTutorialCatalogItem(
   currentSlug: string,
   locale: string,
-): Promise<{ slug: string; title: string } | null> {
-  const { registry } = await loadCatalogSources();
-  const current = registry.tutorials.find(
-    (tutorial) => tutorial.slug === currentSlug,
-  );
-  if (!current || !isPublished(current.status)) return null;
-
-  const nextEntry = current.nextTutorialSlug
-    ? registry.tutorials.find(
-        (tutorial) => tutorial.slug === current.nextTutorialSlug,
-      )
-    : sortByOrder(
-        registry.tutorials.filter(
-          (tutorial) =>
-            isPublished(tutorial.status) && tutorial.order > current.order,
-        ),
-      )[0];
-
-  if (!nextEntry || !isPublished(nextEntry.status)) return null;
-  const next = await projectTutorialSummary(nextEntry, locale);
-  return { slug: next.slug, title: next.title };
-}
-
-/** Return the previous published Learn item in deterministic catalog order. */
-export async function getPreviousTutorialCatalogItem(
-  currentSlug: string,
-  locale: string,
+  direction: TutorialDirection,
 ): Promise<{ slug: string; title: string } | null> {
   const { registry } = await loadCatalogSources();
   const current = registry.tutorials.find(
@@ -419,12 +396,31 @@ export async function getPreviousTutorialCatalogItem(
   const currentIndex = orderedEntries.findIndex(
     (tutorial) => tutorial.slug === currentSlug,
   );
-  const previousEntry =
-    currentIndex > 0 ? orderedEntries[currentIndex - 1] : undefined;
+  const adjacentEntry =
+    direction === 'next' && current.nextTutorialSlug
+      ? registry.tutorials.find(
+          (tutorial) => tutorial.slug === current.nextTutorialSlug,
+        )
+      : orderedEntries[currentIndex + (direction === 'next' ? 1 : -1)];
 
-  if (!previousEntry) return null;
-  const previous = await projectTutorialSummary(previousEntry, locale);
-  return { slug: previous.slug, title: previous.title };
+  if (!adjacentEntry || !isPublished(adjacentEntry.status)) return null;
+  const adjacent = await projectTutorialSummary(adjacentEntry, locale);
+  return { slug: adjacent.slug, title: adjacent.title };
+}
+
+export async function getNextTutorialCatalogItem(
+  currentSlug: string,
+  locale: string,
+): Promise<{ slug: string; title: string } | null> {
+  return getAdjacentTutorialCatalogItem(currentSlug, locale, 'next');
+}
+
+/** Return the previous published Learn item in deterministic catalog order. */
+export async function getPreviousTutorialCatalogItem(
+  currentSlug: string,
+  locale: string,
+): Promise<{ slug: string; title: string } | null> {
+  return getAdjacentTutorialCatalogItem(currentSlug, locale, 'previous');
 }
 
 /** Validate all declared Learn↔Practice relationships against filesystem IDs. */

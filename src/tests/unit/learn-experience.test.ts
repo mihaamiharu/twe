@@ -1,12 +1,24 @@
 import { describe, expect, test } from 'bun:test';
 import type { TutorialCatalogListItemWithOverlay } from '@/lib/catalog-overlays';
 import { filterLearnCatalog, LEARN_DIFFICULTIES } from '@/lib/learn-catalog';
+import { LearnSearchSchema } from '@/lib/learn-search';
+import {
+  optimisticallyCompleteLearnCaches,
+  type LearnCompletionCacheValues,
+} from '@/lib/learn-completion';
+import i18n from '@/lib/i18n';
+import type {
+  TutorialDetailResponse,
+  TutorialListResponse,
+} from '@/lib/tutorials.query';
 import {
   createLearnDetailSeoHead,
   createLearnFallbackSeoHead,
 } from '@/lib/learn-seo';
 import {
+  getNextTutorialCatalogItem,
   getPreviousTutorialCatalogItem,
+  getTutorialCatalogList,
   getTutorialCatalogDetail,
 } from '@/server/content-catalog.server';
 
@@ -28,7 +40,130 @@ const makeLesson = (
   ...overrides,
 });
 
+const makeDetailResponse = (): TutorialDetailResponse => ({
+  success: true,
+  data: {
+    id: 'lesson-id',
+    slug: 'dom-tree-hierarchy',
+    title: 'Reading the DOM Tree',
+    description: 'Understand browser hierarchy before writing selectors.',
+    content: '## Read the DOM',
+    estimatedMinutes: 8,
+    tags: ['foundations', 'dom'],
+    relatedChallenges: [],
+    order: 2,
+    viewCount: 0,
+    challenges: [],
+    userProgress: {
+      isCompleted: false,
+      readingProgress: 40,
+      lastAccessedAt: null,
+    },
+    previousTutorial: null,
+    nextTutorial: { slug: 'next-lesson', title: 'Next lesson' },
+  },
+});
+
+const makeListResponse = (): TutorialListResponse => ({
+  success: true,
+  data: [makeLesson({ readingProgress: 40 })],
+  meta: { availableTags: ['dom', 'foundations'] },
+  pagination: {
+    page: 1,
+    limit: 1,
+    total: 1,
+    totalPages: 1,
+  },
+});
+
 describe('Learn experience contracts', () => {
+  test('parses URL completion visibility as a typed boolean', () => {
+    expect(LearnSearchSchema.parse({}).hideCompleted).toBeUndefined();
+    expect(
+      LearnSearchSchema.parse({ hideCompleted: 'false' }).hideCompleted,
+    ).toBe(false);
+    expect(
+      LearnSearchSchema.parse({ hideCompleted: 'true' }).hideCompleted,
+    ).toBe(true);
+    expect(
+      LearnSearchSchema.parse({ hideCompleted: false }).hideCompleted,
+    ).toBe(false);
+  });
+
+  test('keeps catalog and detail error copy localized and safe', () => {
+    const englishCatalogError = i18n.t(
+      'tutorials:learn.lessons.errorDescription',
+      { lng: 'en' },
+    );
+    const indonesianCatalogError = i18n.t(
+      'tutorials:learn.lessons.errorDescription',
+      { lng: 'id' },
+    );
+    const englishDetailError = i18n.t(
+      'tutorials:learn.detailError.description',
+      {
+        lng: 'en',
+      },
+    );
+    const indonesianDetailError = i18n.t(
+      'tutorials:learn.detailError.description',
+      { lng: 'id' },
+    );
+
+    expect(englishCatalogError).toBe(
+      "We couldn't load the lesson catalog. Please try again later.",
+    );
+    expect(indonesianCatalogError).toBe(
+      'Katalog pelajaran tidak dapat dimuat. Silakan coba lagi nanti.',
+    );
+    expect(englishDetailError).toBe(
+      "We couldn't load this lesson. Please return to Learn and try again.",
+    );
+    expect(indonesianDetailError).toBe(
+      'Pelajaran ini tidak dapat dimuat. Kembali ke Belajar dan coba lagi.',
+    );
+    expect(englishCatalogError).not.toContain('An error occurred');
+    expect(englishDetailError).not.toContain('Error fetching');
+  });
+
+  test('optimistically completes viewer-scoped detail and list caches', () => {
+    const caches: LearnCompletionCacheValues = {
+      detail: makeDetailResponse(),
+      list: makeListResponse(),
+    };
+
+    const optimistic = optimisticallyCompleteLearnCaches(
+      caches,
+      'dom-tree-hierarchy',
+    );
+
+    expect(optimistic.detail?.success).toBe(true);
+    if (!optimistic.detail?.success) throw new Error('Expected detail cache');
+    expect(optimistic.detail.data.userProgress?.isCompleted).toBe(true);
+    expect(optimistic.detail.data.userProgress?.readingProgress).toBe(100);
+    expect(optimistic.list?.success).toBe(true);
+    if (!optimistic.list?.success) throw new Error('Expected list cache');
+    expect(optimistic.list.data[0]?.isCompleted).toBe(true);
+    expect(optimistic.list.data[0]?.readingProgress).toBe(100);
+  });
+
+  test('preserves the cache snapshot for completion rollback', () => {
+    const caches: LearnCompletionCacheValues = {
+      detail: makeDetailResponse(),
+      list: makeListResponse(),
+    };
+    const snapshot = { ...caches };
+
+    void optimisticallyCompleteLearnCaches(caches, 'dom-tree-hierarchy');
+
+    expect(snapshot.detail).toEqual(caches.detail);
+    expect(snapshot.list).toEqual(caches.list);
+    expect(snapshot.detail?.success).toBe(true);
+    if (!snapshot.detail?.success) throw new Error('Expected detail snapshot');
+    expect(snapshot.detail.data.userProgress?.isCompleted).toBe(false);
+    expect(snapshot.detail.data.userProgress?.readingProgress).toBe(40);
+  });
+
   test('filters the loaded localized catalog by displayed title and description', () => {
     const lessons = [
       makeLesson(),
@@ -158,5 +293,21 @@ describe('Learn experience contracts', () => {
       slug: 'html-element-anatomy',
       title: 'Foundation 1: The Anatomy of an HTML Element',
     });
+  });
+
+  test('catalog navigation handles first, last, and missing items', async () => {
+    const catalog = await getTutorialCatalogList('en');
+    const first = catalog[0];
+    const last = catalog.at(-1);
+    if (!first || !last) throw new Error('Expected catalog boundaries');
+
+    expect(await getPreviousTutorialCatalogItem(first.slug, 'en')).toBeNull();
+    expect(await getNextTutorialCatalogItem(last.slug, 'en')).toBeNull();
+    expect(
+      await getPreviousTutorialCatalogItem('not-a-real-lesson', 'en'),
+    ).toBeNull();
+    expect(
+      await getNextTutorialCatalogItem('not-a-real-lesson', 'en'),
+    ).toBeNull();
   });
 });
