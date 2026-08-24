@@ -50,7 +50,7 @@ export function ChallengeListRow({
       <TableCell className="w-full min-w-[300px]">
         <div className="flex flex-col">
           <Link
-            to="/$locale/challenges/$slug"
+            to="/$locale/practice/$slug"
             params={params}
             className={cn(
               'font-medium text-sm flex items-center gap-2 w-fit hover:underline decoration-primary/50 underline-offset-4',
@@ -102,7 +102,7 @@ export function ChallengeListRow({
 
       <TableCell className="w-[40px] px-2">
         <Link
-          to="/$locale/challenges/$slug"
+          to="/$locale/practice/$slug"
           params={params}
           className="flex items-center justify-center h-8 w-8 rounded-full hover:bg-muted transition-colors"
         >

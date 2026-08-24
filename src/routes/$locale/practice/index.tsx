@@ -55,7 +55,7 @@ const ChallengesSearchSchema = z.object({
   difficulty: DifficultySchema.optional(),
 });
 
-export const Route = createFileRoute('/$locale/challenges/')({
+export const Route = createFileRoute('/$locale/practice/')({
   validateSearch: ChallengesSearchSchema,
   loaderDeps: ({ search: { q, difficulty } }) => ({ q, difficulty }),
   loader: ({ context, params, deps: { q, difficulty } }) => {
@@ -73,7 +73,7 @@ export const Route = createFileRoute('/$locale/challenges/')({
     return createSeoHead({
       title: i18n.t('challenges:page.seo.title', { lng: locale }),
       description: i18n.t('challenges:page.seo.description', { lng: locale }),
-      path: '/challenges',
+      path: '/practice',
       locale,
     });
   },
@@ -122,7 +122,7 @@ const PRACTICE_STEPS = [
   { key: 'review', icon: Check },
 ] as const;
 
-const routeApi = getRouteApi('/$locale/challenges/');
+const routeApi = getRouteApi('/$locale/practice/');
 
 export function ChallengesPage() {
   const { locale } = routeApi.useParams();

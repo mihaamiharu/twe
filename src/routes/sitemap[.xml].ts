@@ -9,8 +9,8 @@ const BASE_URL = 'https://testingwithekki.com';
 const STATIC_PAGES = [
   { path: '', changefreq: 'daily', priority: '1.0' },
   { path: '/about', changefreq: 'monthly', priority: '0.6' },
-  { path: '/challenges', changefreq: 'weekly', priority: '0.9' },
-  { path: '/tutorials', changefreq: 'weekly', priority: '0.9' },
+  { path: '/practice', changefreq: 'weekly', priority: '0.9' },
+  { path: '/learn', changefreq: 'weekly', priority: '0.9' },
   { path: '/leaderboard', changefreq: 'daily', priority: '0.7' },
   { path: '/contact', changefreq: 'monthly', priority: '0.5' },
   { path: '/changelog', changefreq: 'weekly', priority: '0.5' },
@@ -100,17 +100,17 @@ export const Route = createFileRoute('/sitemap.xml')({
           // Challenge detail pages
           for (const challenge of publishedChallenges) {
             for (const locale of LOCALES) {
-              const loc = `${BASE_URL}/${locale}/challenges/${challenge.slug}`;
+              const loc = `${BASE_URL}/${locale}/practice/${challenge.slug}`;
               const lastmod = challenge.updatedAt
                 ? new Date(challenge.updatedAt).toISOString().split('T')[0]
                 : undefined;
               const alternates = LOCALES.map((l) => ({
                 locale: l,
-                href: `${BASE_URL}/${l}/challenges/${challenge.slug}`,
+                href: `${BASE_URL}/${l}/practice/${challenge.slug}`,
               }));
               alternates.push({
                 locale: 'x-default',
-                href: `${BASE_URL}/en/challenges/${challenge.slug}`,
+                href: `${BASE_URL}/en/practice/${challenge.slug}`,
               });
 
               urlEntries.push(
@@ -122,17 +122,17 @@ export const Route = createFileRoute('/sitemap.xml')({
           // Tutorial detail pages
           for (const tutorial of publishedTutorials) {
             for (const locale of LOCALES) {
-              const loc = `${BASE_URL}/${locale}/tutorials/${tutorial.slug}`;
+              const loc = `${BASE_URL}/${locale}/learn/${tutorial.slug}`;
               const lastmod = tutorial.updatedAt
                 ? new Date(tutorial.updatedAt).toISOString().split('T')[0]
                 : undefined;
               const alternates = LOCALES.map((l) => ({
                 locale: l,
-                href: `${BASE_URL}/${l}/tutorials/${tutorial.slug}`,
+                href: `${BASE_URL}/${l}/learn/${tutorial.slug}`,
               }));
               alternates.push({
                 locale: 'x-default',
-                href: `${BASE_URL}/en/tutorials/${tutorial.slug}`,
+                href: `${BASE_URL}/en/learn/${tutorial.slug}`,
               });
 
               urlEntries.push(

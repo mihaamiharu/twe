@@ -131,7 +131,7 @@ export function PlaygroundHeader({
             disabled={!challenge.prevChallenge}
             onClick={() => {
               if (challenge.prevChallenge) {
-                window.location.href = `/${locale}/challenges/${challenge.prevChallenge.slug}`;
+                window.location.href = `/${locale}/practice/${challenge.prevChallenge.slug}`;
               }
             }}
             className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
@@ -148,7 +148,7 @@ export function PlaygroundHeader({
             disabled={!challenge.nextChallenge}
             onClick={() => {
               if (challenge.nextChallenge) {
-                window.location.href = `/${locale}/challenges/${challenge.nextChallenge.slug}`;
+                window.location.href = `/${locale}/practice/${challenge.nextChallenge.slug}`;
               }
             }}
             className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
@@ -178,7 +178,7 @@ export function PlaygroundHeader({
 
         {challenge.tutorial && (
           <Link
-            to={LocaleRoutes.tutorialDetail}
+            to={LocaleRoutes.learnDetail}
             params={localeSlugParams(locale, challenge.tutorial.slug)}
           >
             <Button
@@ -187,7 +187,7 @@ export function PlaygroundHeader({
               className="hidden md:flex font-bold text-workspace-muted hover:text-workspace-text"
             >
               <BookOpen className="h-4 w-4 mr-2" />
-              {t('common:navigation.tutorials')}
+              {t('common:navigation.learn')}
             </Button>
           </Link>
         )}

@@ -44,7 +44,7 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
       }),
     ).toBeVisible();
     await expect(
-      page.locator('a[href*="/id/challenges/"]').first(),
+      page.locator('a[href*="/id/practice/"]').first(),
     ).toBeVisible();
 
     await page.getByRole('tab', { name: /Selektor/ }).click();

@@ -73,12 +73,12 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   // Public labels intentionally map to the existing route names for now.
   const navLinks = [
     {
-      to: LocaleRoutes.tutorials,
+      to: LocaleRoutes.learn,
       params: localeParams(locale),
       label: t('common:navigation.learn'),
     },
     {
-      to: LocaleRoutes.challenges,
+      to: LocaleRoutes.practice,
       params: localeParams(locale),
       label: t('common:navigation.practice'),
     },
@@ -92,7 +92,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
   const primaryCta = isAuthenticated
     ? {
-        to: LocaleRoutes.tutorials,
+        to: LocaleRoutes.learn,
         params: localeParams(locale),
       }
     : {

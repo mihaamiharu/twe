@@ -151,7 +151,7 @@ export function ChallengeListCard({
       className="h-full"
     >
       <Link
-        to="/$locale/challenges/$slug"
+        to="/$locale/practice/$slug"
         params={params}
         className="block h-full group outline-none"
       >

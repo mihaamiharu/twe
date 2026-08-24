@@ -56,12 +56,12 @@ export class ChallengesPage extends BasePage {
   }
 
   async gotoList(locale: string = 'en') {
-    await this.goto(`/${locale}/challenges`);
+    await this.goto(`/${locale}/practice`);
     await this.page.waitForLoadState('networkidle');
   }
 
   async gotoChallenge(slug: string, locale: string = 'en') {
-    await this.goto(`/${locale}/challenges/${slug}`);
+    await this.goto(`/${locale}/practice/${slug}`);
   }
 
   async solveChallenge(codeOrSelector: string, slug?: string) {

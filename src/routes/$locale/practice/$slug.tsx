@@ -41,7 +41,7 @@ const ChallengePlayground = lazy(async () => {
   return { default: module.ChallengePlayground };
 });
 
-export const Route = createFileRoute('/$locale/challenges/$slug')({
+export const Route = createFileRoute('/$locale/practice/$slug')({
   loader: ({ context, params }) =>
     context.queryClient.ensureQueryData(
       challengeDetailQueryOptions(params.slug, params.locale),
@@ -50,7 +50,7 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
   head: ({ loaderData, params }) => {
     const data = loaderData?.data;
     const locale = params.locale || 'en';
-    const url = `https://testingwithekki.com/${locale}/challenges/${params.slug}`;
+    const url = `https://testingwithekki.com/${locale}/practice/${params.slug}`;
 
     if (!data) {
       return {
@@ -74,17 +74,17 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
           {
             rel: 'alternate',
             hrefLang: 'en',
-            href: `https://testingwithekki.com/en/challenges/${params.slug}`,
+          href: `https://testingwithekki.com/en/practice/${params.slug}`,
           },
           {
             rel: 'alternate',
             hrefLang: 'id',
-            href: `https://testingwithekki.com/id/challenges/${params.slug}`,
+          href: `https://testingwithekki.com/id/practice/${params.slug}`,
           },
           {
             rel: 'alternate',
             hrefLang: 'x-default',
-            href: `https://testingwithekki.com/en/challenges/${params.slug}`,
+          href: `https://testingwithekki.com/en/practice/${params.slug}`,
           },
         ],
       };
@@ -109,8 +109,8 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
           {
             '@type': 'ListItem',
             position: 2,
-            name: 'Challenges',
-            item: `https://testingwithekki.com/${locale}/challenges`,
+            name: 'Practice',
+            item: `https://testingwithekki.com/${locale}/practice`,
           },
           {
             '@type': 'ListItem',
@@ -164,17 +164,17 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
         {
           rel: 'alternate',
           hrefLang: 'en',
-          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
+          href: `https://testingwithekki.com/en/practice/${data.slug}`,
         },
         {
           rel: 'alternate',
           hrefLang: 'id',
-          href: `https://testingwithekki.com/id/challenges/${data.slug}`,
+          href: `https://testingwithekki.com/id/practice/${data.slug}`,
         },
         {
           rel: 'alternate',
           hrefLang: 'x-default',
-          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
+          href: `https://testingwithekki.com/en/practice/${data.slug}`,
         },
       ],
       scripts: jsonLd.map((data) => ({
@@ -187,7 +187,7 @@ export const Route = createFileRoute('/$locale/challenges/$slug')({
 });
 
 function ChallengeDetailPage() {
-  const { locale, slug } = useParams({ from: '/$locale/challenges/$slug' });
+  const { locale, slug } = useParams({ from: '/$locale/practice/$slug' });
   const { t } = useTranslation(['challenges', 'common']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -370,7 +370,7 @@ function ChallengeDetailPage() {
                 {t('challenges:page.notFoundDescription')}
               </p>
               <div className="flex items-center gap-4 mb-6 justify-center">
-                <Link to="/$locale/challenges" params={{ locale }}>
+                <Link to="/$locale/practice" params={{ locale }}>
                   <Button variant="ghost" size="sm">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     {t('common:actions.backToChallenges')}
@@ -380,7 +380,7 @@ function ChallengeDetailPage() {
                   <>
                     <div className="h-4 w-px bg-border" />
                     <Link
-                      to="/$locale/tutorials/$slug"
+                      to="/$locale/learn/$slug"
                       params={{ locale, slug: data.data.tutorial.slug }}
                     >
                       <Button
@@ -433,7 +433,7 @@ function ChallengeDetailPage() {
               ? () => {
                   setShowSuccessDialog(false);
                   void navigate({
-                    to: '/$locale/challenges/$slug',
+                    to: '/$locale/practice/$slug',
                     params: {
                       locale,
                       slug: data.data?.nextChallenge?.slug ?? '',

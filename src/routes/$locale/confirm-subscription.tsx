@@ -113,7 +113,7 @@ function ConfirmSubscriptionPage() {
 
                 <CardFooter className="justify-center">
                     <Button asChild className="gap-2">
-                        <Link to="/$locale/tutorials" params={{ locale }}>
+                        <Link to="/$locale/learn" params={{ locale }}>
                             Explore Tutorials <ArrowRight className="w-4 h-4" />
                         </Link>
                     </Button>

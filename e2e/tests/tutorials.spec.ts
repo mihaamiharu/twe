@@ -35,12 +35,12 @@ test.describe('Tutorials', () => {
     await tutorialsPage.learningPath
       .getByTestId('learning-path-step-01')
       .click();
-    await expect(page).toHaveURL(/\/en\/tutorials\/dom-tree-hierarchy$/);
+    await expect(page).toHaveURL(/\/en\/learn\/dom-tree-hierarchy$/);
   });
 
   test('should keep the guided path usable on mobile', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/en/tutorials');
+    await page.goto('/en/learn');
 
     await expect(tutorialsPage.learningPath).toBeVisible();
     await expect
@@ -60,7 +60,7 @@ test.describe('Tutorials', () => {
 
     await beginner.click();
 
-    await expect(page).toHaveURL(/\/en\/tutorials\?difficulty=beginner$/);
+    await expect(page).toHaveURL(/\/en\/learn\?difficulty=beginner$/);
     await expect(beginner).toHaveAttribute('aria-pressed', 'true');
   });
 

@@ -82,7 +82,7 @@ describe('ChallengesPage', () => {
 
     const renderPage = async () => {
         // Dynamic import to ensure mocks apply
-        const { ChallengesPage } = await import('@/routes/$locale/challenges/index');
+        const { ChallengesPage } = await import('@/routes/$locale/practice/index');
         return render(<ChallengesPage />);
     };
 

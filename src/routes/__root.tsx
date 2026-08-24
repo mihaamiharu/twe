@@ -297,7 +297,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Check if current route is a challenge detail page
   const isChallengeDetail =
-    /\/challenges\/[^/]+$/.test(location.pathname) &&
+    /\/practice\/[^/]+$/.test(location.pathname) &&
     !location.pathname.includes('/admin/');
 
   return (

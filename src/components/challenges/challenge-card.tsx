@@ -106,7 +106,7 @@ export function ChallengeCard({
 
   return (
     <Link
-      to={LocaleRoutes.challengeDetail}
+      to={LocaleRoutes.practiceDetail}
       params={localeSlugParams(locale, slug)}
     >
       <Card

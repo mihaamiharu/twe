@@ -61,7 +61,7 @@ function tutorialFlow() {
         sleep(1);
 
         // Step 2: Tutorial List
-        let tutorialListRes = http.get(`${BASE_URL}/en/tutorials`);
+        let tutorialListRes = http.get(`${BASE_URL}/en/learn`);
         check(tutorialListRes, {
             'tutorial list status 200': (r) => r.status === 200,
         });
@@ -71,7 +71,7 @@ function tutorialFlow() {
 
         // Step 3: View a random tutorial
         const randomSlug = TUTORIAL_SLUGS[Math.floor(Math.random() * TUTORIAL_SLUGS.length)];
-        let tutorialRes = http.get(`${BASE_URL}/en/tutorials/${randomSlug}`);
+        let tutorialRes = http.get(`${BASE_URL}/en/learn/${randomSlug}`);
         check(tutorialRes, {
             'tutorial page loads': (r) => r.status === 200 || r.status === 404,
         });
@@ -117,7 +117,7 @@ function challengeFlow() {
         sleep(1);
 
         // Step 3: Challenge List
-        let challengeListRes = http.get(`${BASE_URL}/en/challenges`);
+        let challengeListRes = http.get(`${BASE_URL}/en/practice`);
         check(challengeListRes, {
             'challenge list status 200': (r) => r.status === 200,
         });
@@ -126,7 +126,7 @@ function challengeFlow() {
 
         // Step 4: View a random challenge
         const randomSlug = CHALLENGE_SLUGS[Math.floor(Math.random() * CHALLENGE_SLUGS.length)];
-        let challengeRes = http.get(`${BASE_URL}/en/challenges/${randomSlug}`);
+        let challengeRes = http.get(`${BASE_URL}/en/practice/${randomSlug}`);
         check(challengeRes, {
             'challenge page loads': (r) => r.status === 200 || r.status === 404,
         });

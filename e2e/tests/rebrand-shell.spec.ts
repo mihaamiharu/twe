@@ -110,7 +110,7 @@ test.describe('Rebrand V1 global shell', () => {
     ).toBeVisible();
     await expect(
       page.getByRole('link', { name: 'Explore Learning' }),
-    ).toHaveAttribute('href', '/en/tutorials');
+    ).toHaveAttribute('href', '/en/learn');
 
     await page.getByRole('link', { name: 'Back to Home' }).click();
     await expect(page).toHaveURL(/\/en\/?$/);
@@ -204,7 +204,7 @@ test.describe('Rebrand V1 global shell', () => {
   test('keeps the challenge page warm around dark technical surfaces', async ({
     page,
   }) => {
-    await page.goto('/en/challenges/css-selector-101-id-class');
+    await page.goto('/en/practice/css-selector-101-id-class');
 
     await expect(page.locator('.workspace-shell')).toBeVisible();
     await expect(page.locator('footer')).toHaveCount(0);
@@ -220,7 +220,7 @@ test.describe('Rebrand V1 global shell', () => {
   }) => {
     await page.setViewportSize({ width: 1280, height: 720 });
 
-    await page.goto('/en/tutorials?q=empty-state-no-match');
+    await page.goto('/en/learn?q=empty-state-no-match');
     const learnEmptyState = page.locator(
       '[data-empty-state][data-empty-state-illustration="thinking"]',
     );
@@ -232,21 +232,21 @@ test.describe('Rebrand V1 global shell', () => {
     ).toBeVisible();
     await expect(learnEmptyState).toContainText('NO MATCHES');
 
-    await page.goto('/en/challenges?q=empty-state-no-match');
+    await page.goto('/en/practice?q=empty-state-no-match');
     const practiceEmptyState = page.locator(
       '[data-empty-state][data-empty-state-illustration="thinking"]',
     );
     await expect(practiceEmptyState).toBeVisible();
     await expect(practiceEmptyState).toContainText('NO MATCHES');
 
-    await page.goto('/id/tutorials?q=empty-state-no-match');
+    await page.goto('/id/learn?q=empty-state-no-match');
     await expect(
       page.locator(
         '[data-empty-state][data-empty-state-illustration="thinking"]',
       ),
     ).toContainText('TIDAK ADA HASIL');
 
-    await page.goto('/id/challenges?q=empty-state-no-match');
+    await page.goto('/id/practice?q=empty-state-no-match');
     await expect(
       page.locator(
         '[data-empty-state][data-empty-state-illustration="thinking"]',

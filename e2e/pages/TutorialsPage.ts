@@ -10,7 +10,7 @@ export class TutorialsPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.tutorialCards = page.locator('a[href*="/tutorials/"][class*="group"]');
+    this.tutorialCards = page.locator('a[href*="/learn/"][class*="group"]');
     this.completeButton = page.getByRole('button', {
       name: /Read to Complete|Complete & Continue|Baca untuk Menyelesaikan|Selesai & Lanjutkan/i,
     });
@@ -21,12 +21,12 @@ export class TutorialsPage extends BasePage {
   }
 
   async gotoList(locale: string = 'en') {
-    await this.goto(`/${locale}/tutorials`);
+    await this.goto(`/${locale}/learn`);
     await this.page.waitForLoadState('networkidle');
   }
 
   async gotoTutorial(slug: string, locale: string = 'en') {
-    await this.goto(`/${locale}/tutorials/${slug}`);
+    await this.goto(`/${locale}/learn/${slug}`);
     await this.page.waitForLoadState('networkidle');
   }
 

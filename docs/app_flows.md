@@ -53,7 +53,7 @@ sequenceDiagram
     participant GamificationEngine
 
     User->>Frontend: Select Challenge
-    Frontend->>API: GET /challenges/:slug
+    Frontend->>API: GET /practice/:slug
     API->>Database: Fetch Challenge & Test Cases
     Database-->>API: Challenge Data
     API-->>Frontend: Challenge + Starter Code

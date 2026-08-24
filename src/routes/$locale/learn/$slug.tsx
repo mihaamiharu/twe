@@ -31,7 +31,7 @@ import {
 import i18n from '@/lib/i18n';
 import { showAchievementToasts } from '@/components/achievement-toast';
 
-export const Route = createFileRoute('/$locale/tutorials/$slug')({
+export const Route = createFileRoute('/$locale/learn/$slug')({
   component: TutorialDetailPage,
   head: ({ params }) => {
     // Dynamic meta based on slug - the component will fetch full data
@@ -39,13 +39,13 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
     const slug = params.slug;
     const locale = params.locale || 'en';
     const baseUrl = 'https://testingwithekki.com';
-    const url = `${baseUrl}/${locale}/tutorials/${slug}`;
+    const url = `${baseUrl}/${locale}/learn/${slug}`;
 
     const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(slug.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase()))}&type=Tutorial`;
     const title = slug
       .replace(/-/g, ' ')
       .replace(/\b\w/g, (l) => l.toUpperCase());
-    const description = i18n.t('tutorials:page.seo.description');
+    const description = i18n.t('tutorials:learn.seo.description');
 
     // Structured Data
     const jsonLd = [
@@ -62,8 +62,8 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
           {
             '@type': 'ListItem',
             position: 2,
-            name: 'Tutorials',
-            item: `${baseUrl}/${locale}/tutorials`,
+            name: 'Learn',
+            item: `${baseUrl}/${locale}/learn`,
           },
           {
             '@type': 'ListItem',
@@ -115,17 +115,17 @@ export const Route = createFileRoute('/$locale/tutorials/$slug')({
         {
           rel: 'alternate',
           hrefLang: 'en',
-          href: `${baseUrl}/en/tutorials/${slug}`,
+          href: `${baseUrl}/en/learn/${slug}`,
         },
         {
           rel: 'alternate',
           hrefLang: 'id',
-          href: `${baseUrl}/id/tutorials/${slug}`,
+          href: `${baseUrl}/id/learn/${slug}`,
         },
         {
           rel: 'alternate',
           hrefLang: 'x-default',
-          href: `${baseUrl}/en/tutorials/${slug}`,
+          href: `${baseUrl}/en/learn/${slug}`,
         },
       ],
       scripts: jsonLd.map((data) => ({
@@ -170,7 +170,7 @@ interface Tutorial {
 }
 
 function TutorialDetailPage() {
-  const { locale, slug } = useParams({ from: '/$locale/tutorials/$slug' });
+  const { locale, slug } = useParams({ from: '/$locale/learn/$slug' });
   const { t } = useTranslation(['tutorials', 'common']);
   const queryClient = useQueryClient();
   const [readingProgress, setReadingProgress] = useState(0);
@@ -410,7 +410,7 @@ function TutorialDetailPage() {
     return (
       <div className="min-h-screen p-6 md:p-10">
         <div className="max-w-4xl mx-auto">
-          <Link to="/$locale/tutorials" params={{ locale }}>
+          <Link to="/$locale/learn" params={{ locale }}>
             <Button variant="ghost" className="mb-8">
               <ArrowLeft className="h-4 w-4 mr-2" />
               {t('common:actions.backToTutorials')}
@@ -424,7 +424,7 @@ function TutorialDetailPage() {
             <p className="text-muted-foreground mb-6">
               {error?.message || t('tutorials:page.notFoundDescription')}
             </p>
-            <Link to="/$locale/tutorials" params={{ locale }}>
+            <Link to="/$locale/learn" params={{ locale }}>
               <Button>{t('common:actions.browseTutorials')}</Button>
             </Link>
           </div>
@@ -439,7 +439,7 @@ function TutorialDetailPage() {
     <div className="min-h-screen p-6 md:p-10">
       <div className="max-w-6xl mx-auto">
         {/* Back button - larger icon */}
-        <Link to="/$locale/tutorials" params={{ locale }}>
+        <Link to="/$locale/learn" params={{ locale }}>
           <Button variant="ghost" className="mb-8">
             <ArrowLeft className="h-5 w-5 mr-2" />
             {t('common:actions.backToTutorials')}
@@ -563,7 +563,7 @@ function TutorialDetailPage() {
                         className="w-full h-auto py-3 whitespace-normal"
                       >
                         <Link
-                          to="/$locale/tutorials/$slug"
+                          to="/$locale/learn/$slug"
                           params={{
                             locale,
                             slug: tutorial.nextTutorial.slug,
@@ -635,7 +635,7 @@ function TutorialDetailPage() {
                     {tutorial.challenges.map((challenge) => (
                       <Link
                         key={challenge.slug}
-                        to="/$locale/challenges/$slug"
+                        to="/$locale/practice/$slug"
                         params={{ locale, slug: challenge.slug }}
                         className="block p-3 rounded-lg border border-border hover:border-primary/50 hover:bg-primary/5 transition-all group"
                       >

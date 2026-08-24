@@ -161,7 +161,7 @@ export function PracticeChallengeRow(props: PracticeChallengeItemProps) {
 
   return (
     <Link
-      to="/$locale/challenges/$slug"
+      to="/$locale/practice/$slug"
       params={{ locale: props.locale, slug: props.challenge.slug }}
       className="group relative block border-b border-border outline-none last:border-b-0 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-orange"
     >
@@ -230,7 +230,7 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
 
   return (
     <Link
-      to="/$locale/challenges/$slug"
+      to="/$locale/practice/$slug"
       params={{ locale: props.locale, slug: props.challenge.slug }}
       className="group block outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
     >

@@ -37,7 +37,7 @@ export function TierSkipTip({
             missingName: mainMissing.name,
           })}
           <Link
-            to="/$locale/challenges"
+            to="/$locale/practice"
             params={{ locale: window.location.pathname.split('/')[1] || 'en' }}
             search={{ tier: mainMissing.tier }}
             className="ml-2 inline-flex items-center gap-0.5 font-semibold underline decoration-amber-500/30 underline-offset-2 hover:text-amber-500 hover:decoration-amber-500"

@@ -4,7 +4,7 @@ test.describe('Practice list state', () => {
   test('preserves search, track, view, and completion filters in the URL', async ({
     page,
   }) => {
-    await page.goto('/en/challenges');
+    await page.goto('/en/practice');
     await page.waitForLoadState('networkidle');
 
     const search = page.getByRole('textbox', { name: /Search challenges/i });
@@ -36,13 +36,13 @@ test.describe('Practice list state', () => {
   test('navigates from the practice list to a challenge detail workspace', async ({
     page,
   }) => {
-    await page.goto('/en/challenges');
+    await page.goto('/en/practice');
     await page.waitForLoadState('networkidle');
-    const firstChallenge = page.locator('a[href*="/en/challenges/"]').first();
+    const firstChallenge = page.locator('a[href*="/en/practice/"]').first();
     await expect(firstChallenge).toBeVisible();
     await firstChallenge.click();
 
-    await expect(page).toHaveURL(/\/en\/challenges\/[^/?]+$/);
+    await expect(page).toHaveURL(/\/en\/practice\/[^/?]+$/);
     await expect(page.locator('.workspace-shell')).toBeVisible();
   });
 });

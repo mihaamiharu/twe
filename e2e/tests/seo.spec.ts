@@ -63,12 +63,12 @@ test.describe('SEO Checks', () => {
     });
 
     test('Challenges page should have correct metadata', async ({ page }) => {
-        await page.goto('/en/challenges');
+        await page.goto('/en/practice');
         await expect(page).toHaveTitle(
             'Practice Software Testing — TestingWithEkki',
         );
 
         const canonical = page.locator('link[rel="canonical"]');
-        await expect(canonical).toHaveAttribute('href', /https:\/\/testingwithekki\.com\/en\/challenges/);
+        await expect(canonical).toHaveAttribute('href', /https:\/\/testingwithekki\.com\/en\/practice/);
     });
 });

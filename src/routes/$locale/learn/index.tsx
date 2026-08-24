@@ -35,7 +35,7 @@ const LearnSearchSchema = z.object({
   hideCompleted: z.coerce.boolean().optional(),
 });
 
-export const Route = createFileRoute('/$locale/tutorials/')({
+export const Route = createFileRoute('/$locale/learn/')({
   validateSearch: LearnSearchSchema,
   loaderDeps: ({ search }) => search,
   loader: ({ context, params, deps: search }) =>
@@ -53,13 +53,13 @@ export const Route = createFileRoute('/$locale/tutorials/')({
     return createSeoHead({
       title: i18n.t('tutorials:learn.seo.title', { lng: locale }),
       description: i18n.t('tutorials:learn.seo.description', { lng: locale }),
-      path: '/tutorials',
+      path: '/learn',
       locale,
     });
   },
 });
 
-const routeApi = getRouteApi('/$locale/tutorials/');
+const routeApi = getRouteApi('/$locale/learn/');
 
 interface LessonListItem {
   id: string;
@@ -257,7 +257,7 @@ function LearnPage() {
                 {t('learn.lessons.description')}
               </p>
               <Link
-                to={LocaleRoutes.challenges}
+                to={LocaleRoutes.practice}
                 params={localeParams(locale)}
                 className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:underline"
               >
@@ -427,7 +427,7 @@ function LearningPathCard({
   if (step.slug) {
     return (
       <Link
-        to="/$locale/tutorials/$slug"
+        to="/$locale/learn/$slug"
         params={{ locale, slug: step.slug }}
         className="block"
       >
@@ -438,7 +438,7 @@ function LearningPathCard({
 
   return (
     <Link
-      to={LocaleRoutes.challenges}
+      to={LocaleRoutes.practice}
       params={localeParams(locale)}
       className="block"
     >
@@ -462,7 +462,7 @@ function LessonRow({
 }) {
   return (
     <Link
-      to="/$locale/tutorials/$slug"
+      to="/$locale/learn/$slug"
       params={{ locale, slug: lesson.slug }}
       className="group grid gap-4 border-b border-border py-5 transition-colors hover:bg-accent/40 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
     >

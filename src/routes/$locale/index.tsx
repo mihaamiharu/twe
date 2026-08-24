@@ -67,7 +67,7 @@ function HomePage() {
           </p>
           <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
             <Link
-              to={LocaleRoutes.tutorials}
+              to={LocaleRoutes.learn}
               params={params}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white transition-transform hover:-translate-y-px hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
@@ -75,7 +75,7 @@ function HomePage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link
-              to={LocaleRoutes.challenges}
+              to={LocaleRoutes.practice}
               params={params}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
@@ -101,7 +101,7 @@ function HomePage() {
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learningPath.title')}</h2>
             <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learningPath.description')}</p>
             <Link
-              to={LocaleRoutes.tutorials}
+              to={LocaleRoutes.learn}
               params={params}
               className="mt-7 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
             >
@@ -162,7 +162,7 @@ function HomePage() {
             </ol>
             <div className="lg:pt-4">
               <PracticePreview />
-              <Link to={LocaleRoutes.challenges} params={params} className="mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+              <Link to={LocaleRoutes.practice} params={params} className="mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange)] hover:text-[var(--graphite)]">
                 {t('learnPractice.cta')}
                 <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
               </Link>
@@ -209,7 +209,7 @@ function HomePage() {
             description={t('labs.description')}
             action={
               <Link
-                to={LocaleRoutes.challenges}
+                to={LocaleRoutes.practice}
                 params={params}
                 className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)]"
               >
@@ -229,10 +229,10 @@ function HomePage() {
             <p className="mt-4 max-w-xl text-base leading-7 text-[#d2d0c9]">{t('cta.description')}</p>
           </div>
           <div className="mt-8 flex shrink-0 flex-col items-start gap-4 sm:flex-row lg:mt-0 lg:flex-col lg:items-start">
-            <Link to={LocaleRoutes.tutorials} params={params} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
+            <Link to={LocaleRoutes.learn} params={params} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
               {t('cta.primary')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link to={LocaleRoutes.challenges} params={params} className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
+            <Link to={LocaleRoutes.practice} params={params} className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
               {t('cta.secondary')} <Play className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>

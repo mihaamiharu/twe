@@ -46,8 +46,8 @@ export function Footer() {
             </p>
 
             <nav aria-label="Footer navigation" className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[var(--graphite)]">
-              <Link to={LocaleRoutes.tutorials} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.learn')}</Link>
-              <Link to={LocaleRoutes.challenges} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.practice')}</Link>
+              <Link to={LocaleRoutes.learn} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.learn')}</Link>
+              <Link to={LocaleRoutes.practice} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.practice')}</Link>
               <span className="inline-flex items-center gap-2">
                 {t('common:navigation.labs')}
                 <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
@@ -110,7 +110,7 @@ export function Footer() {
             <ul className="mt-3 space-y-0.5">
               <li>
                 <Link
-                  to={LocaleRoutes.tutorials}
+                  to={LocaleRoutes.learn}
                   params={localizedParams}
                   className={externalLinkClass}
                 >
@@ -120,7 +120,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  to={LocaleRoutes.challenges}
+                  to={LocaleRoutes.practice}
                   params={localizedParams}
                   className={externalLinkClass}
                 >

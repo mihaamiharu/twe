@@ -141,7 +141,7 @@ export function NotFound() {
               className="rounded-md border-[var(--soft-border)] bg-transparent px-5 text-[var(--graphite)] shadow-none hover:bg-[var(--paper-surface)]"
             >
               <Link
-                to={LocaleRoutes.tutorials}
+                to={LocaleRoutes.learn}
                 params={localeParams(locale)}
                 data-not-found-learning
               >
