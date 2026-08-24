@@ -12,7 +12,6 @@ export type PracticeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e';
 export interface PracticeCatalogFilters {
   query?: string | undefined;
   track: TrackId;
-  tier?: PracticeTier | undefined;
   difficulty?: PracticeChallenge['difficulty'] | undefined;
   hideCompleted: boolean;
 }
@@ -56,12 +55,6 @@ export function filterPracticeChallenges(
       if (!track.match(challenge)) return false;
       if (filters.hideCompleted && challenge.isCompleted) return false;
       if (filters.difficulty && challenge.difficulty !== filters.difficulty) {
-        return false;
-      }
-      if (
-        filters.tier &&
-        getTierFromCategory(challenge.category) !== filters.tier
-      ) {
         return false;
       }
 

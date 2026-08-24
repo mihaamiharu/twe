@@ -12,7 +12,6 @@ declare global {
     q?: string;
     hideCompleted?: boolean;
     view?: 'grid' | 'list';
-    tier?: string;
   };
   var mockLoaderData: TutorialListResponse;
 

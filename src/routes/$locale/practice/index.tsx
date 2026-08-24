@@ -1,7 +1,6 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { type KeyboardEvent, useRef, useState } from 'react';
-import { z } from 'zod';
 import {
   ArrowRight,
   Check,
@@ -31,7 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { getTierFromCategory, TIER_ORDER } from '@/lib/constants';
+import { getTierFromCategory } from '@/lib/constants';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
 import { authQueryOptions } from '@/lib/auth.query';
 import { cn } from '@/lib/utils';
@@ -44,25 +43,16 @@ import {
   groupPracticeChallenges,
   type PracticeChallenge,
 } from '@/lib/practice-catalog';
+import {
+  PracticeDifficultySchema,
+  PracticeSearchSchema,
+  type PracticeSearch,
+} from '@/lib/practice-search';
 
-const DifficultySchema = z.enum(['EASY', 'MEDIUM', 'HARD']);
-const TierSchema = z.enum(['basic', 'beginner', 'intermediate', 'e2e']);
-const BooleanSearchParam = z
-  .union([z.boolean(), z.enum(['true', 'false'])])
-  .transform((value) => (typeof value === 'boolean' ? value : value === 'true'))
-  .optional();
-
-const ChallengesSearchSchema = z.object({
-  track: z.enum(TRACK_IDS).optional(),
-  q: z.string().optional(),
-  hideCompleted: BooleanSearchParam,
-  view: z.enum(['grid', 'list']).optional(),
-  tier: TierSchema.optional(),
-  difficulty: DifficultySchema.optional(),
-});
+export { PracticeSearchSchema as ChallengesSearchSchema } from '@/lib/practice-search';
 
 export const Route = createFileRoute('/$locale/practice/')({
-  validateSearch: ChallengesSearchSchema,
+  validateSearch: PracticeSearchSchema,
   loader: async ({ context, params }) => {
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);
     return context.queryClient.ensureQueryData(
@@ -123,9 +113,11 @@ export function ChallengesPage() {
   const loaderData = routeApi.useLoaderData?.();
 
   const q = searchParams.q;
-  const tier = searchParams.tier;
   const difficulty = searchParams.difficulty;
-  const hideCompleted = searchParams.hideCompleted ?? false;
+  const canFilterCompleted = Boolean(auth?.user);
+  const hideCompleted = canFilterCompleted
+    ? (searchParams.hideCompleted ?? false)
+    : false;
   const activeTrackId: TrackId = searchParams.track || 'all';
   const viewMode = searchParams.view || 'list';
   const completionToggleLabel = hideCompleted
@@ -141,7 +133,7 @@ export function ChallengesPage() {
   >({});
 
   const updateSearch = (
-    updates: Partial<z.infer<typeof ChallengesSearchSchema>>,
+    updates: Partial<PracticeSearch>,
     { replace = false }: { replace?: boolean } = {},
   ) => {
     void navigate({
@@ -182,7 +174,6 @@ export function ChallengesPage() {
   const filteredChallenges = filterPracticeChallenges(challenges, {
     query: q,
     track: activeTrackId,
-    tier,
     difficulty,
     hideCompleted,
   });
@@ -195,12 +186,11 @@ export function ChallengesPage() {
       track: undefined,
       difficulty: undefined,
       hideCompleted: undefined,
-      tier: undefined,
     });
   };
 
   const hasActiveFilters = Boolean(
-    q || difficulty || hideCompleted || tier || activeTrackId !== 'all',
+    q || difficulty || hideCompleted || activeTrackId !== 'all',
   );
 
   const handleSearchChange = (value: string) => {
@@ -371,7 +361,7 @@ export function ChallengesPage() {
                     difficulty:
                       value === 'all'
                         ? undefined
-                        : DifficultySchema.parse(value),
+                        : PracticeDifficultySchema.parse(value),
                   })
                 }
               >
@@ -394,44 +384,22 @@ export function ChallengesPage() {
                 </SelectContent>
               </Select>
 
-              <Select
-                value={tier ?? 'all'}
-                onValueChange={(value) =>
-                  updateSearch({
-                    tier: value === 'all' ? undefined : TierSchema.parse(value),
-                  })
-                }
-              >
-                <SelectTrigger
-                  aria-label={t('filters.tier')}
-                  className="h-11 w-full bg-card sm:w-[170px]"
+              {canFilterCompleted && (
+                <label
+                  htmlFor="hide-completed"
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground sm:min-w-[170px]"
                 >
-                  <SelectValue placeholder={t('filters.allTiers')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{t('filters.allTiers')}</SelectItem>
-                  {TIER_ORDER.map((tierId) => (
-                    <SelectItem key={tierId} value={tierId}>
-                      {t(`tiers.${tierId}`)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              <label
-                htmlFor="hide-completed"
-                className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground sm:min-w-[170px]"
-              >
-                <span>{completionToggleLabel}</span>
-                <Switch
-                  id="hide-completed"
-                  checked={hideCompleted}
-                  onCheckedChange={(checked) =>
-                    updateSearch({ hideCompleted: checked })
-                  }
-                  aria-label={completionToggleLabel}
-                />
-              </label>
+                  <span>{completionToggleLabel}</span>
+                  <Switch
+                    id="hide-completed"
+                    checked={hideCompleted}
+                    onCheckedChange={(checked) =>
+                      updateSearch({ hideCompleted: checked })
+                    }
+                    aria-label={completionToggleLabel}
+                  />
+                </label>
+              )}
 
               <div className="hidden items-center rounded-lg border border-border bg-card p-1 lg:flex">
                 <Button

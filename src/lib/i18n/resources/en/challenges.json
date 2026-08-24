@@ -59,16 +59,14 @@
     "playwright": "Playwright"
   },
   "filters": {
-    "search": "Search challenges",
+    "search": "Search practice challenges",
     "track": "Challenge tracks",
-    "tier": "Tier",
     "difficulty": "Difficulty",
     "allDifficulties": "All Difficulties",
-    "allTiers": "All Tiers",
     "clear": "Clear",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed",
-    "searchPlaceholder": "Search challenges...",
+    "searchPlaceholder": "Search practice challenges...",
     "listView": "List view",
     "gridView": "Grid view"
   },
