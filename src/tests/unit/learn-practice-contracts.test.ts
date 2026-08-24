@@ -1,16 +1,31 @@
 import { describe, expect, test } from 'bun:test';
 import {
+  getChallengeCatalogDetail,
+  getChallengeCatalogList,
   getChallengeContent,
   getChallengeList,
   getRawChallengeContent,
+  getTutorialCatalogDetail,
+  getTutorialCatalogList,
   getTutorialContent,
   getTutorialList,
   getNextTutorial,
+  validateCatalogRelationships,
 } from '@/server/content.server';
 import {
+  challengeCatalogQueryKeys,
   challengeDetailQueryOptions,
   challengeListQueryOptions,
 } from '@/lib/challenges.query';
+import {
+  tutorialCatalogQueryKeys,
+  tutorialDetailQueryOptions,
+  tutorialsListQueryOptions,
+} from '@/lib/tutorials.query';
+import {
+  mergeChallengeCatalogOverlay,
+  mergeTutorialCatalogOverlay,
+} from '@/lib/catalog-overlays';
 import { challengeSubmissionHandler } from '@/server/submissions.fn';
 
 const REQUIRED_TUTORIAL_SUMMARY_FIELDS = [
@@ -177,10 +192,7 @@ describe('Learn and Practice catalog contracts', () => {
   test('challenge query keys isolate locale and list/detail dimensions', () => {
     const englishList = challengeListQueryOptions({ locale: 'en' });
     const indonesianList = challengeListQueryOptions({ locale: 'id' });
-    const filteredList = challengeListQueryOptions({
-      locale: 'en',
-      search: 'locator',
-    });
+    const clientFilteredList = challengeListQueryOptions({ locale: 'en' });
     const englishDetail = challengeDetailQueryOptions('pw-locator-intro', 'en');
     const indonesianDetail = challengeDetailQueryOptions(
       'pw-locator-intro',
@@ -188,10 +200,119 @@ describe('Learn and Practice catalog contracts', () => {
     );
 
     expect(englishList.queryKey).not.toEqual(indonesianList.queryKey);
-    expect(englishList.queryKey).not.toEqual(filteredList.queryKey);
+    expect(englishList.queryKey).toEqual(clientFilteredList.queryKey);
     expect(englishDetail.queryKey).not.toEqual(indonesianDetail.queryKey);
-    expect(englishList.queryKey[0]).toBe('challenges');
-    expect(englishDetail.queryKey[0]).toBe('challenge');
+    expect([...englishList.queryKey]).toEqual([
+      ...challengeCatalogQueryKeys.list('en'),
+    ]);
+    expect([...englishDetail.queryKey]).toEqual([
+      ...challengeCatalogQueryKeys.detail('pw-locator-intro', 'en'),
+    ]);
+  });
+
+  test('catalog query keys include viewer scope for dynamic overlays', () => {
+    const anonymous = tutorialsListQueryOptions({ locale: 'en' });
+    const authenticated = tutorialsListQueryOptions({
+      locale: 'en',
+      viewerId: 'user-1',
+    });
+
+    expect(anonymous.queryKey).not.toEqual(authenticated.queryKey);
+    expect([...anonymous.queryKey]).toEqual([
+      ...tutorialCatalogQueryKeys.list('en'),
+    ]);
+    expect([...authenticated.queryKey]).toEqual([
+      ...tutorialCatalogQueryKeys.list('en', 'user-1'),
+    ]);
+    expect([
+      ...tutorialDetailQueryOptions('dom-tree-hierarchy', 'id').queryKey,
+    ]).toEqual([
+      ...tutorialCatalogQueryKeys.detail('dom-tree-hierarchy', 'id'),
+    ]);
+  });
+
+  test('pure catalog contracts stay free of database and user overlays', async () => {
+    const [tutorialList, tutorialDetail, challengeList, challengeDetail] =
+      await Promise.all([
+        getTutorialCatalogList('en'),
+        getTutorialCatalogDetail('dom-tree-hierarchy', 'en'),
+        getChallengeCatalogList('en'),
+        getChallengeCatalogDetail('pw-locator-intro', 'en'),
+      ]);
+
+    expect(tutorialList[0]).not.toHaveProperty('id');
+    expect(tutorialDetail).not.toBeNull();
+    expect(tutorialDetail).not.toHaveProperty('viewCount');
+    expect(challengeList[0]).not.toHaveProperty('completionCount');
+    expect(challengeDetail).not.toBeNull();
+    expect(challengeDetail).not.toHaveProperty('isCompleted');
+  });
+
+  test('catalog overlays merge by slug without changing editorial fields', () => {
+    const tutorial = {
+      slug: 'lesson',
+      title: 'Localized lesson',
+      description: 'Description',
+      order: 1,
+      estimatedMinutes: 5,
+      tags: ['beginner'],
+      relatedChallenges: [],
+    };
+    const challenge = {
+      slug: 'challenge',
+      type: 'JAVASCRIPT' as const,
+      difficulty: 'EASY' as const,
+      category: 'js-fundamentals',
+      xpReward: 10,
+      order: 1,
+      title: 'Localized challenge',
+      description: 'Description',
+      tags: ['javascript'],
+    };
+
+    expect(mergeTutorialCatalogOverlay(tutorial)).toMatchObject({
+      slug: 'lesson',
+      id: 'lesson',
+      isCompleted: false,
+      readingProgress: 0,
+    });
+    expect(
+      mergeChallengeCatalogOverlay(challenge, {
+        slug: 'challenge',
+        id: 'db-id',
+        completionCount: 4,
+        isCompleted: true,
+      }),
+    ).toMatchObject({
+      slug: 'challenge',
+      id: 'db-id',
+      title: 'Localized challenge',
+      completionCount: 4,
+      isCompleted: true,
+    });
+  });
+
+  test('all declared Learn and Practice relationships resolve', async () => {
+    await validateCatalogRelationships();
+    const [tutorials, challenges] = await Promise.all([
+      getTutorialCatalogList('en'),
+      getChallengeCatalogList('en'),
+    ]);
+    const tutorialSlugs = new Set(tutorials.map((tutorial) => tutorial.slug));
+    const challengeSlugs = new Set(
+      challenges.map((challenge) => challenge.slug),
+    );
+
+    for (const tutorial of tutorials) {
+      for (const challengeSlug of tutorial.relatedChallenges) {
+        expect(challengeSlugs.has(challengeSlug)).toBe(true);
+      }
+    }
+    for (const challenge of challenges) {
+      if (challenge.tutorialSlug) {
+        expect(tutorialSlugs.has(challenge.tutorialSlug)).toBe(true);
+      }
+    }
   });
 
   test('practice submissions skip persistence and XP awards', async () => {

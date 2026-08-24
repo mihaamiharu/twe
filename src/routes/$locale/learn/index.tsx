@@ -2,13 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
-import {
-  ArrowRight,
-  CheckCircle2,
-  Circle,
-  Clock,
-  Search,
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2, Circle, Clock, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/empty-state';
 import { Badge } from '@/components/ui/badge';
@@ -18,9 +12,9 @@ import {
   LearningPathPreview,
   type LearningPathPreviewKind,
 } from '@/components/learning-path-preview';
-import { omitUndefined } from '@/lib/omit-undefined';
 import { useDebounce } from '@/lib/useDebounce';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
+import { authQueryOptions } from '@/lib/auth.query';
 import { createSeoHead } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
@@ -37,15 +31,15 @@ const LearnSearchSchema = z.object({
 
 export const Route = createFileRoute('/$locale/learn/')({
   validateSearch: LearnSearchSchema,
-  loaderDeps: ({ search }) => search,
-  loader: ({ context, params, deps: search }) =>
-    context.queryClient.ensureQueryData(
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+    return context.queryClient.ensureQueryData(
       tutorialsListQueryOptions({
         locale: params.locale,
-        ...omitUndefined({ search: search.q }),
-        limit: 50,
+        viewerId: auth.user?.id,
       }),
-    ),
+    );
+  },
   component: LearnPage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
@@ -84,6 +78,7 @@ interface LearningPathStep {
 function LearnPage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('tutorials');
+  const { data: auth } = useSuspenseQuery(authQueryOptions);
   const navigate = routeApi.useNavigate();
   const searchParams = routeApi.useSearch();
   const q = searchParams.q;
@@ -111,25 +106,31 @@ function LearnPage() {
   const { data: tutorialsResponse } = useSuspenseQuery(
     tutorialsListQueryOptions({
       locale,
-      ...omitUndefined({ search: q || undefined }),
-      limit: 50,
+      viewerId: auth.user?.id,
     }),
   );
 
-  const tutorials = (
-    tutorialsResponse.success ? tutorialsResponse.data : []
-  ) as LessonListItem[];
+  const tutorials = tutorialsResponse.success ? tutorialsResponse.data : [];
+  const normalizedSearchQuery = searchInput.trim().toLocaleLowerCase();
 
   const filteredLessons = useMemo(
     () =>
       tutorials.filter((lesson) => {
+        if (
+          normalizedSearchQuery &&
+          ![lesson.title, lesson.description].some((value) =>
+            value.toLocaleLowerCase().includes(normalizedSearchQuery),
+          )
+        ) {
+          return false;
+        }
         if (hideCompleted && lesson.isCompleted) return false;
         if (selectedDifficulty === 'all') return true;
         return lesson.tags.some(
           (tag) => tag.toLowerCase() === selectedDifficulty.toLowerCase(),
         );
       }),
-    [tutorials, selectedDifficulty, hideCompleted],
+    [tutorials, selectedDifficulty, hideCompleted, normalizedSearchQuery],
   );
 
   const learningPathSteps: LearningPathStep[] = [
@@ -217,7 +218,10 @@ function LearnPage() {
             <div className="flex items-center gap-4 font-mono text-[11px] uppercase tracking-[0.16em] text-primary">
               <span>{t('learn.stack.note')}</span>
               <span className="h-px flex-1 bg-border" aria-hidden="true" />
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-hidden="true" />
+              <span
+                className="h-1.5 w-1.5 rounded-full bg-primary"
+                aria-hidden="true"
+              />
             </div>
 
             <div
@@ -338,7 +342,7 @@ function LearnPage() {
               eyebrow={t('learn.lessons.emptyEyebrow')}
               title={t('learn.lessons.noResults')}
               description={
-                q
+                searchInput
                   ? t('learn.lessons.tryDifferentSearch')
                   : t('learn.lessons.checkBackSoon')
               }

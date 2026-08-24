@@ -2,154 +2,168 @@ import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 
 // Mutable mock state
-globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false };
+globalThis.mockSearchParams = {
+  track: 'all',
+  q: '',
+  view: 'grid',
+  hideCompleted: false,
+};
 globalThis.mockNavigate = mock(() => Promise.resolve());
 
 describe('ChallengesPage', () => {
-    // Mock Data
-    const mockChallenges = [
-        {
-            id: '1',
-            slug: 'js-basic',
-            title: 'JS Basic Challenge',
-            description: 'Learn JS variables',
-            type: 'JAVASCRIPT',
-            difficulty: 'EASY',
-            category: 'js-basics', // CHANGED to match 'js-' prefix for beginner tier
-            xpReward: 10,
-            order: 1,
-            completionCount: 100,
-            isCompleted: true,
-            tags: [],
-        },
-        {
-            id: '2',
-            slug: 'css-selector',
-            title: 'CSS Selector Master',
-            description: 'Master CSS selectors',
-            type: 'CSS_SELECTOR',
-            difficulty: 'MEDIUM',
-            category: 'css-basics',
-            xpReward: 20,
-            order: 2,
-            completionCount: 50,
-            isCompleted: false,
-            tags: [],
-        },
-        {
-            id: '3',
-            slug: 'pw-test',
-            title: 'Playwright E2E',
-            description: 'E2E testing',
-            type: 'PLAYWRIGHT',
-            difficulty: 'HARD',
-            category: 'playwright-basics', // defaults to intermediate or matches core logic
-            xpReward: 50,
-            order: 3,
-            completionCount: 10,
-            isCompleted: false,
-            tags: [],
-        },
-    ];
+  // Mock Data
+  const mockChallenges = [
+    {
+      id: '1',
+      slug: 'js-basic',
+      title: 'JS Basic Challenge',
+      description: 'Learn JS variables',
+      type: 'JAVASCRIPT',
+      difficulty: 'EASY',
+      category: 'js-basics', // CHANGED to match 'js-' prefix for beginner tier
+      xpReward: 10,
+      order: 1,
+      completionCount: 100,
+      isCompleted: true,
+      tags: [],
+    },
+    {
+      id: '2',
+      slug: 'css-selector',
+      title: 'CSS Selector Master',
+      description: 'Master CSS selectors',
+      type: 'CSS_SELECTOR',
+      difficulty: 'MEDIUM',
+      category: 'css-basics',
+      xpReward: 20,
+      order: 2,
+      completionCount: 50,
+      isCompleted: false,
+      tags: [],
+    },
+    {
+      id: '3',
+      slug: 'pw-test',
+      title: 'Playwright E2E',
+      description: 'E2E testing',
+      type: 'PLAYWRIGHT',
+      difficulty: 'HARD',
+      category: 'playwright-basics', // defaults to intermediate or matches core logic
+      xpReward: 50,
+      order: 3,
+      completionCount: 10,
+      isCompleted: false,
+      tags: [],
+    },
+  ];
 
-    beforeEach(() => {
-
-        globalThis.mockSearchParams = { track: 'all', q: '', view: 'grid', hideCompleted: false };
-
-        // Setup query mock with SEARCH filtering simulation
-        globalThis.mockUseQuery.mockImplementation((options) => {
-            const filters = options.queryKey?.[1];
-            const searchQuery = typeof filters === 'object' && filters !== null &&
-                'search' in filters && typeof filters.search === 'string'
-                ? filters.search.toLowerCase()
-                : undefined;
-
-            let filtered = mockChallenges;
-            if (searchQuery) {
-                filtered = mockChallenges.filter(c =>
-                    c.title.toLowerCase().includes(searchQuery) ||
-                    c.description.toLowerCase().includes(searchQuery)
-                );
-            }
-
-            return { data: { data: filtered } };
-        });
-    });
-
-    afterEach(() => {
-        cleanup();
-    });
-
-    const renderPage = async () => {
-        // Dynamic import to ensure mocks apply
-        const { ChallengesPage } = await import('@/routes/$locale/practice/index');
-        return render(<ChallengesPage />);
+  beforeEach(() => {
+    globalThis.mockSearchParams = {
+      track: 'all',
+      q: '',
+      view: 'grid',
+      hideCompleted: false,
     };
 
-    it('should render all challenges by default', async () => {
-        await renderPage();
-
-        expect(screen.getByText('JS Basic Challenge')).toBeTruthy();
-        expect(screen.getByText('CSS Selector Master')).toBeTruthy();
-        expect(screen.getByText('Playwright E2E')).toBeTruthy();
+    // Catalog reads return the complete authoritative list. Search is a
+    // client-side projection over the displayed title/description.
+    globalThis.mockUseQuery.mockImplementation((options) => {
+      if (options.queryKey?.[0] === 'auth') {
+        return { data: { user: null } };
+      }
+      return { data: { success: true, data: mockChallenges } };
     });
+  });
 
-    it('should filter by track (selectors)', async () => {
-        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, track: 'selectors' };
+  afterEach(() => {
+    cleanup();
+  });
 
-        await renderPage();
+  const renderPage = async () => {
+    // Dynamic import to ensure mocks apply
+    const { ChallengesPage } = await import('@/routes/$locale/practice/index');
+    return render(<ChallengesPage />);
+  };
 
-        // JS Basic (tier beginner) should be excluded
-        expect(screen.queryByText('JS Basic Challenge')).toBeNull();
-        // CSS Selector (type CSS_SELECTOR) should be included
-        expect(screen.getByText('CSS Selector Master')).toBeTruthy();
-    });
+  it('should render all challenges by default', async () => {
+    await renderPage();
 
-    it('should filter by search query', async () => {
-        // Set query in params. Component syncs this to useDebounce state, passing it to query options.
-        // Our smart mock catches the query option updates.
-        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, q: 'Playwright' };
+    expect(screen.getByText('JS Basic Challenge')).toBeTruthy();
+    expect(screen.getByText('CSS Selector Master')).toBeTruthy();
+    expect(screen.getByText('Playwright E2E')).toBeTruthy();
+  });
 
-        await renderPage();
+  it('should filter by track (selectors)', async () => {
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      track: 'selectors',
+    };
 
-        expect(screen.queryByText('JS Basic Challenge')).toBeNull();
-        expect(screen.queryByText('CSS Selector Master')).toBeNull();
-        expect(screen.getByText('Playwright E2E')).toBeTruthy();
-    });
+    await renderPage();
 
-    it('should hide completed challenges', async () => {
-        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, hideCompleted: true };
+    // JS Basic (tier beginner) should be excluded
+    expect(screen.queryByText('JS Basic Challenge')).toBeNull();
+    // CSS Selector (type CSS_SELECTOR) should be included
+    expect(screen.getByText('CSS Selector Master')).toBeTruthy();
+  });
 
-        await renderPage();
+  it('should filter by search query', async () => {
+    // Set query in params. Component syncs this to useDebounce state, passing it to query options.
+    // Our smart mock catches the query option updates.
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      q: 'Playwright',
+    };
 
-        // JS Basic is completed, should be hidden
-        expect(screen.queryByText('JS Basic Challenge')).toBeNull();
-        expect(screen.getByText('CSS Selector Master')).toBeTruthy();
-    });
+    await renderPage();
 
-    it('should switch to list view', async () => {
-        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, view: 'list' };
+    expect(screen.queryByText('JS Basic Challenge')).toBeNull();
+    expect(screen.queryByText('CSS Selector Master')).toBeNull();
+    expect(screen.getByText('Playwright E2E')).toBeTruthy();
+  });
 
-        await renderPage();
+  it('should hide completed challenges', async () => {
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      hideCompleted: true,
+    };
 
-        // List view still renders content
-        expect(screen.getByText('JS Basic Challenge')).toBeTruthy();
-    });
+    await renderPage();
 
-    it('should update search params when typing in search box', async () => {
-        await renderPage();
+    // JS Basic is completed, should be hidden
+    expect(screen.queryByText('JS Basic Challenge')).toBeNull();
+    expect(screen.getByText('CSS Selector Master')).toBeTruthy();
+  });
 
-        const searchInput = screen.getByRole('textbox');
-        fireEvent.change(searchInput, { target: { value: 'New Search' } });
+  it('should switch to list view', async () => {
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      view: 'list',
+    };
 
-        expect((searchInput as HTMLInputElement).value).toBe('New Search');
-    });
-    it('should show empty state when no matches found', async () => {
-        globalThis.mockSearchParams = { ...globalThis.mockSearchParams, q: 'NonExistent' };
-        await renderPage();
+    await renderPage();
 
-        expect(screen.getByText('library.emptyTitle')).toBeTruthy();
-        // Should show clear filter button or link
-        expect(screen.getByRole('button', { name: /clear/i })).toBeTruthy();
-    });
+    // List view still renders content
+    expect(screen.getByText('JS Basic Challenge')).toBeTruthy();
+  });
+
+  it('should update search params when typing in search box', async () => {
+    await renderPage();
+
+    const searchInput = screen.getByRole('textbox');
+    fireEvent.change(searchInput, { target: { value: 'New Search' } });
+
+    expect((searchInput as HTMLInputElement).value).toBe('New Search');
+  });
+  it('should show empty state when no matches found', async () => {
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      q: 'NonExistent',
+    };
+    await renderPage();
+
+    expect(screen.getByText('library.emptyTitle')).toBeTruthy();
+    // Should show clear filter button or link
+    expect(screen.getByRole('button', { name: /clear/i })).toBeTruthy();
+  });
 });

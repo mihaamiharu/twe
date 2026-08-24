@@ -1,22 +1,46 @@
 import { queryOptions } from '@tanstack/react-query';
-import { getChallenges, getChallenge } from '@/server/challenges.fn';
+import { getChallenge, getChallenges } from '@/server/challenges.fn';
 
+export type ChallengeListResponse = Awaited<ReturnType<typeof getChallenges>>;
 export type ChallengeDetailResponse = Awaited<ReturnType<typeof getChallenge>>;
 
-export const challengeListQueryOptions = (filters: {
-    locale: string;
-    type?: 'JAVASCRIPT' | 'PLAYWRIGHT' | 'CSS_SELECTOR' | 'XPATH_SELECTOR' | 'SELECTOR';
-    difficulty?: 'EASY' | 'MEDIUM' | 'HARD';
-    search?: string;
-    limit?: number;
-}) =>
-    queryOptions({
-        queryKey: ['challenges', filters],
-        queryFn: () => getChallenges({ data: filters }),
-    });
+export interface CatalogViewerScope {
+  /** Cache-only identity for the user-specific overlay returned by the server. */
+  viewerId?: string | null | undefined;
+}
 
-export const challengeDetailQueryOptions = (slug: string, locale: string) =>
-    queryOptions({
-        queryKey: ['challenge', slug, locale],
-        queryFn: () => getChallenge({ data: { slug, locale } }),
-    });
+const viewerKey = (viewerId: string | null | undefined): string =>
+  viewerId ?? 'anonymous';
+
+export const challengeCatalogQueryKeys = {
+  list: (locale: string, viewerId?: string | null) =>
+    ['catalog', 'practice', 'list', locale, viewerKey(viewerId)] as const,
+  detail: (slug: string, locale: string, viewerId?: string | null) =>
+    [
+      'catalog',
+      'practice',
+      'detail',
+      slug,
+      locale,
+      viewerKey(viewerId),
+    ] as const,
+};
+
+export const challengeListQueryOptions = ({
+  locale,
+  viewerId,
+}: { locale: string } & CatalogViewerScope) =>
+  queryOptions({
+    queryKey: challengeCatalogQueryKeys.list(locale, viewerId),
+    queryFn: () => getChallenges({ data: { locale } }),
+  });
+
+export const challengeDetailQueryOptions = (
+  slug: string,
+  locale: string,
+  viewerId?: string | null,
+) =>
+  queryOptions({
+    queryKey: challengeCatalogQueryKeys.detail(slug, locale, viewerId),
+    queryFn: () => getChallenge({ data: { slug, locale } }),
+  });

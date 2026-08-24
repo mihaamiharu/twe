@@ -1,11 +1,7 @@
-import {
-  createFileRoute,
-  useParams,
-  Link,
-} from '@tanstack/react-router';
+import { createFileRoute, useParams, Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTutorial, completeTutorial } from '@/server/tutorials.fn';
+import { completeTutorial } from '@/server/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,6 +19,10 @@ import { toast } from 'sonner';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { authQueryOptions } from '@/lib/auth.query';
+import {
+  tutorialDetailQueryOptions,
+  tutorialCatalogQueryKeys,
+} from '@/lib/tutorials.query';
 import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import {
   TableOfContents,
@@ -32,6 +32,12 @@ import i18n from '@/lib/i18n';
 import { showAchievementToasts } from '@/components/achievement-toast';
 
 export const Route = createFileRoute('/$locale/learn/$slug')({
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+    return context.queryClient.ensureQueryData(
+      tutorialDetailQueryOptions(params.slug, params.locale, auth.user?.id),
+    );
+  },
   component: TutorialDetailPage,
   head: ({ params }) => {
     // Dynamic meta based on slug - the component will fetch full data
@@ -136,39 +142,6 @@ export const Route = createFileRoute('/$locale/learn/$slug')({
   },
 });
 
-interface Tutorial {
-  id: string;
-  slug: string;
-  title: string;
-  description: string;
-  content: string;
-  estimatedMinutes: number;
-  tags: string[] | null;
-  viewCount: number;
-  createdAt: Date;
-  updatedAt: Date;
-  isPublished: boolean;
-  order: number;
-  difficulty: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  userProgress: {
-    isCompleted: boolean;
-    readingProgress: number | null;
-    lastAccessedAt: Date;
-  } | null;
-  nextTutorial: {
-    slug: string;
-    title: string;
-  } | null;
-  challenges: Array<{
-    slug: string;
-    title: string;
-    difficulty: 'EASY' | 'MEDIUM' | 'HARD';
-    type: string;
-    xpReward: number;
-    category: string | null;
-  }>;
-}
-
 function TutorialDetailPage() {
   const { locale, slug } = useParams({ from: '/$locale/learn/$slug' });
   const { t } = useTranslation(['tutorials', 'common']);
@@ -181,21 +154,14 @@ function TutorialDetailPage() {
   const sessionData = auth; // Alias for compatibility
 
   const {
-    data: tutorialData,
+    data: tutorialResponse,
     isLoading,
     error,
-  } = useQuery({
-    queryKey: ['tutorial', slug],
-    queryFn: async () => {
-      if (!slug) throw new Error('Tutorial slug is required');
-      const result = await getTutorial({ data: { slug, locale } });
-      if (!result.success) throw new Error(result.error);
-      return result.data as Tutorial;
-    },
-  });
+  } = useQuery(tutorialDetailQueryOptions(slug, locale, sessionData.user?.id));
 
-  // Rename for compatibility
-  const tutorial = tutorialData;
+  const tutorial = tutorialResponse?.success
+    ? tutorialResponse.data
+    : undefined;
 
   // Mark as complete mutation
   const markCompleteMutation = useMutation({
@@ -206,8 +172,16 @@ function TutorialDetailPage() {
     },
     onSuccess: async (result) => {
       toast.success(t('tutorials:toasts.completed'));
-      await queryClient.invalidateQueries({ queryKey: ['tutorial', slug] });
-      await queryClient.invalidateQueries({ queryKey: ['tutorials'] });
+      await queryClient.invalidateQueries({
+        queryKey: tutorialCatalogQueryKeys.detail(
+          slug,
+          locale,
+          sessionData.user?.id,
+        ),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: tutorialCatalogQueryKeys.list(locale, sessionData.user?.id),
+      });
       await queryClient.invalidateQueries({ queryKey: ['user', 'me'] });
       await queryClient.invalidateQueries({ queryKey: ['profile'] });
       await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });

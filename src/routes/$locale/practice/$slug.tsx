@@ -11,7 +11,10 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
-import { challengeDetailQueryOptions } from '@/lib/challenges.query';
+import {
+  challengeCatalogQueryKeys,
+  challengeDetailQueryOptions,
+} from '@/lib/challenges.query';
 import { ChallengeSkeleton } from '@/components/challenges/challenge-skeleton';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
@@ -42,10 +45,12 @@ const ChallengePlayground = lazy(async () => {
 });
 
 export const Route = createFileRoute('/$locale/practice/$slug')({
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(
-      challengeDetailQueryOptions(params.slug, params.locale),
-    ),
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+    return context.queryClient.ensureQueryData(
+      challengeDetailQueryOptions(params.slug, params.locale, auth.user?.id),
+    );
+  },
   component: ChallengeDetailPage,
   head: ({ loaderData, params }) => {
     const data = loaderData?.data;
@@ -199,17 +204,16 @@ function ChallengeDetailPage() {
     levelUp?: { newLevel: number; title: string };
   } | null>(null);
 
-  const { data: challengeData } = useSuspenseQuery(
-    challengeDetailQueryOptions(slug, locale),
-  );
-
-  // Rename for compatibility with existing code
-  // Rename for compatibility with existing code
-  const data = challengeData;
-
   const { data: auth } = useSuspenseQuery(authQueryOptions);
   const sessionData = auth; // Alias for compatibility
   const userId = sessionData?.user?.id;
+
+  const { data: challengeData } = useSuspenseQuery(
+    challengeDetailQueryOptions(slug, locale, sessionData.user?.id),
+  );
+
+  // Rename for compatibility with existing code
+  const data = challengeData;
 
   // Deobfuscate inputs if needed (for selector challenges)
   const testCases = useMemo(() => {
@@ -308,8 +312,19 @@ function ChallengeDetailPage() {
         }
 
         // Invalidate queries to refresh progress
-        await queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
-        await queryClient.invalidateQueries({ queryKey: ['challenges'] }); // Refresh challenges list
+        await queryClient.invalidateQueries({
+          queryKey: challengeCatalogQueryKeys.detail(
+            slug,
+            locale,
+            sessionData.user?.id,
+          ),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: challengeCatalogQueryKeys.list(
+            locale,
+            sessionData.user?.id,
+          ),
+        });
         await queryClient.invalidateQueries({ queryKey: ['profile'] });
         await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       }

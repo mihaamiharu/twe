@@ -37,7 +37,7 @@ import {
   TIER_ORDER,
 } from '@/lib/constants';
 import { challengeListQueryOptions } from '@/lib/challenges.query';
-import { omitUndefined } from '@/lib/omit-undefined';
+import { authQueryOptions } from '@/lib/auth.query';
 import { useDebounce } from '@/lib/useDebounce';
 import { cn } from '@/lib/utils';
 import { TRACK_CONFIG, TRACK_IDS, type TrackId } from '@/config/tracks';
@@ -57,13 +57,12 @@ const ChallengesSearchSchema = z.object({
 
 export const Route = createFileRoute('/$locale/practice/')({
   validateSearch: ChallengesSearchSchema,
-  loaderDeps: ({ search: { q, difficulty } }) => ({ q, difficulty }),
-  loader: ({ context, params, deps: { q, difficulty } }) => {
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
     return context.queryClient.ensureQueryData(
       challengeListQueryOptions({
         locale: params.locale,
-        ...omitUndefined({ search: q, difficulty }),
-        limit: 1000,
+        viewerId: auth.user?.id,
       }),
     );
   },
@@ -86,12 +85,12 @@ export interface Challenge {
   description: string;
   type: string;
   difficulty: string;
-  category: string | null;
+  category: string;
   xpReward: number;
   order: number;
   completionCount: number;
   isCompleted: boolean;
-  tags: string[] | null;
+  tags: string[];
 }
 
 const TRACK_LABEL_KEYS: Record<TrackId, string> = {
@@ -127,6 +126,7 @@ const routeApi = getRouteApi('/$locale/practice/');
 export function ChallengesPage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('challenges');
+  const { data: auth } = useQuery(authQueryOptions);
   const navigate = routeApi.useNavigate();
   const searchParams = routeApi.useSearch();
   const loaderData = routeApi.useLoaderData?.();
@@ -135,7 +135,7 @@ export function ChallengesPage() {
   const tier = searchParams.tier;
   const difficulty = searchParams.difficulty;
   const hideCompleted = searchParams.hideCompleted ?? false;
-  const activeTrackId = (searchParams.track || 'all') as TrackId;
+  const activeTrackId: TrackId = searchParams.track || 'all';
   const viewMode = searchParams.view || 'list';
   const completionToggleLabel = hideCompleted
     ? t('filters.showCompleted')
@@ -186,17 +186,13 @@ export function ChallengesPage() {
   const { data: challengesResponse } = useQuery({
     ...challengeListQueryOptions({
       locale,
-      ...omitUndefined({
-        search: debouncedSearchQuery || undefined,
-        difficulty,
-      }),
-      limit: 1000,
+      viewerId: auth?.user?.id,
     }),
     initialData: loaderData,
     placeholderData: keepPreviousData,
   });
 
-  const challenges = (challengesResponse?.data ?? []) as Challenge[];
+  const challenges = challengesResponse?.success ? challengesResponse.data : [];
   const normalizedSearchQuery = searchInput.trim().toLocaleLowerCase();
 
   const filteredChallenges = useMemo(() => {
