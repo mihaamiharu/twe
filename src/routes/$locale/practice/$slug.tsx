@@ -1,5 +1,6 @@
 import {
   createFileRoute,
+  type ErrorComponentProps,
   useParams,
   useNavigate,
   Link,
@@ -18,6 +19,7 @@ import {
   challengeDetailQueryOptions,
 } from '@/lib/challenges.query';
 import { ChallengeSkeleton } from '@/components/challenges/challenge-skeleton';
+import { EmptyState } from '@/components/empty-state';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
 import { ArrowLeft } from 'lucide-react';
@@ -51,22 +53,20 @@ export const Route = createFileRoute('/$locale/practice/$slug')({
     const response = await context.queryClient.ensureQueryData(
       challengeDetailQueryOptions(params.slug, params.locale, auth.user?.id),
     );
-
-    if (!response.success) {
-      // TanStack Router's notFound sentinel is the established route-level
-      // fallback, even though it is not typed as a native Error instance.
-      // eslint-disable-next-line @typescript-eslint/only-throw-error
-      throw notFound({ routeId: rootRouteId });
-    }
     return response;
   },
   component: ChallengeDetailPage,
+  errorComponent: PracticeDetailError,
   head: ({ loaderData, params }) => {
     const locale = params.locale || 'en';
     return createPracticeDetailSeoHead({
       locale,
       slug: params.slug,
       challenge: loaderData?.success ? loaderData.data : null,
+      noIndex:
+        loaderData?.success === false
+          ? loaderData.errorCode === 'not-found'
+          : undefined,
     });
   },
   pendingComponent: ChallengeSkeleton,
@@ -91,9 +91,18 @@ function ChallengeDetailPage() {
   const { data: challengeResponse } = useSuspenseQuery(
     challengeDetailQueryOptions(slug, locale, auth.user?.id),
   );
-  const challengeData = challengeResponse?.success
-    ? challengeResponse.data
-    : null;
+
+  if (!challengeResponse.success) {
+    if (challengeResponse.errorCode === 'not-found') {
+      // TanStack Router's notFound sentinel is the established route-level
+      // fallback, even though it is not typed as a native Error instance.
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw notFound({ routeId: rootRouteId });
+    }
+    throw new Error(challengeResponse.error);
+  }
+
+  const challengeData = challengeResponse.data;
 
   // Deobfuscate inputs if needed (for selector challenges)
   const testCases = useMemo(() => {
@@ -323,5 +332,36 @@ function ChallengeDetailPage() {
         description={t('auth:guard.description')}
       />
     </div>
+  );
+}
+
+function PracticeDetailError({ reset }: ErrorComponentProps) {
+  const { t } = useTranslation(['challenges', 'common']);
+  const { locale = 'en' } = useParams({ strict: false });
+
+  return (
+    <main className="min-h-[calc(100vh-4rem)] bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl rounded-xl border border-border bg-card px-6">
+        <EmptyState
+          showIllustration={false}
+          size="compact"
+          eyebrow={t('challenges:library.errorEyebrow')}
+          title={t('challenges:library.errorTitle')}
+          description={t('challenges:library.errorDescription')}
+          action={
+            <Button type="button" onClick={reset}>
+              {t('challenges:library.retry')}
+            </Button>
+          }
+          secondaryAction={
+            <Button asChild type="button" variant="ghost">
+              <Link to="/$locale/practice" params={{ locale }}>
+                {t('common:actions.backToChallenges')}
+              </Link>
+            </Button>
+          }
+        />
+      </div>
+    </main>
   );
 }

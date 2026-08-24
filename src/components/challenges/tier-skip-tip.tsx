@@ -4,10 +4,12 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 
+type PracticeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e';
+
 interface TierSkipTipProps {
   currentTier: string;
   missingPrerequisites: {
-    tier: string;
+    tier: PracticeTier;
     name: string;
   }[];
 }

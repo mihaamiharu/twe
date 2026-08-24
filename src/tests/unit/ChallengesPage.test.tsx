@@ -108,8 +108,7 @@ describe('ChallengesPage', () => {
   });
 
   it('should filter by search query', async () => {
-    // Set query in params. Component syncs this to useDebounce state, passing it to query options.
-    // Our smart mock catches the query option updates.
+    // Search is a URL-backed client-side projection.
     globalThis.mockSearchParams = {
       ...globalThis.mockSearchParams,
       q: 'Playwright',
@@ -117,6 +116,9 @@ describe('ChallengesPage', () => {
 
     await renderPage();
 
+    expect(Reflect.get(screen.getByRole('textbox'), 'value')).toBe(
+      'Playwright',
+    );
     expect(screen.queryByText('JS Basic Challenge')).toBeNull();
     expect(screen.queryByText('CSS Selector Master')).toBeNull();
     expect(screen.getByText('Playwright E2E')).toBeTruthy();
@@ -148,12 +150,33 @@ describe('ChallengesPage', () => {
   });
 
   it('should update search params when typing in search box', async () => {
+    globalThis.mockNavigate.mockClear();
     await renderPage();
 
     const searchInput = screen.getByRole('textbox');
     fireEvent.change(searchInput, { target: { value: 'New Search' } });
 
-    expect((searchInput as HTMLInputElement).value).toBe('New Search');
+    expect(globalThis.mockNavigate).toHaveBeenCalled();
+  });
+
+  it('should support roving keyboard focus and selection for track tabs', async () => {
+    globalThis.mockNavigate.mockClear();
+    await renderPage();
+
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs).toHaveLength(5);
+    expect(tabs[0]?.getAttribute('tabindex')).toBe('0');
+    expect(tabs[1]?.getAttribute('tabindex')).toBe('-1');
+
+    fireEvent.keyDown(tabs[0]!, { key: 'ArrowRight' });
+    expect(document.activeElement).toBe(tabs[1]!);
+    expect(globalThis.mockNavigate).toHaveBeenCalled();
+
+    fireEvent.keyDown(tabs[1]!, { key: 'End' });
+    expect(document.activeElement).toBe(tabs[4]!);
+
+    fireEvent.keyDown(tabs[4]!, { key: 'Home' });
+    expect(document.activeElement).toBe(tabs[0]!);
   });
   it('should show empty state when no matches found', async () => {
     globalThis.mockSearchParams = {

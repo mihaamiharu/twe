@@ -1,6 +1,6 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { type KeyboardEvent, useRef, useState } from 'react';
 import { z } from 'zod';
 import {
   ArrowRight,
@@ -38,6 +38,7 @@ import { cn } from '@/lib/utils';
 import { TRACK_CONFIG, TRACK_IDS, type TrackId } from '@/config/tracks';
 import i18n from '@/lib/i18n';
 import { createSeoHead } from '@/lib/seo';
+import { type PracticeChallengeLabels } from '@/components/challenges/practice-challenge-item';
 import {
   filterPracticeChallenges,
   groupPracticeChallenges,
@@ -46,13 +47,17 @@ import {
 
 const DifficultySchema = z.enum(['EASY', 'MEDIUM', 'HARD']);
 const TierSchema = z.enum(['basic', 'beginner', 'intermediate', 'e2e']);
+const BooleanSearchParam = z
+  .union([z.boolean(), z.enum(['true', 'false'])])
+  .transform((value) => (typeof value === 'boolean' ? value : value === 'true'))
+  .optional();
 
 const ChallengesSearchSchema = z.object({
   track: z.enum(TRACK_IDS).optional(),
   q: z.string().optional(),
-  hideCompleted: z.coerce.boolean().optional(),
+  hideCompleted: BooleanSearchParam,
   view: z.enum(['grid', 'list']).optional(),
-  tier: z.string().optional(),
+  tier: TierSchema.optional(),
   difficulty: DifficultySchema.optional(),
 });
 
@@ -118,7 +123,7 @@ export function ChallengesPage() {
   const loaderData = routeApi.useLoaderData?.();
 
   const q = searchParams.q;
-  const tier = TierSchema.safeParse(searchParams.tier).data;
+  const tier = searchParams.tier;
   const difficulty = searchParams.difficulty;
   const hideCompleted = searchParams.hideCompleted ?? false;
   const activeTrackId: TrackId = searchParams.track || 'all';
@@ -127,22 +132,22 @@ export function ChallengesPage() {
     ? t('filters.showCompleted')
     : t('filters.hideCompleted');
 
-  const [searchInput, setSearchInput] = useState(q ?? '');
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
     () => new Set(),
   );
 
-  useEffect(() => {
-    setSearchInput(q ?? '');
-  }, [q]);
+  const trackTabRefs = useRef<
+    Partial<Record<TrackId, HTMLButtonElement | null>>
+  >({});
 
   const updateSearch = (
     updates: Partial<z.infer<typeof ChallengesSearchSchema>>,
+    { replace = false }: { replace?: boolean } = {},
   ) => {
     void navigate({
       to: '.',
       search: (previous) => ({ ...previous, ...updates }),
-      replace: true,
+      ...(replace ? { replace: true } : {}),
     });
   };
 
@@ -175,7 +180,7 @@ export function ChallengesPage() {
     challengesResponse && !challengesResponse.success,
   );
   const filteredChallenges = filterPracticeChallenges(challenges, {
-    query: searchInput,
+    query: q,
     track: activeTrackId,
     tier,
     difficulty,
@@ -184,7 +189,6 @@ export function ChallengesPage() {
   const groupedChallenges = groupPracticeChallenges(filteredChallenges);
 
   const clearFilters = () => {
-    setSearchInput('');
     setCollapsedGroups(new Set());
     updateSearch({
       q: undefined,
@@ -196,38 +200,39 @@ export function ChallengesPage() {
   };
 
   const hasActiveFilters = Boolean(
-    searchInput ||
-    difficulty ||
-    hideCompleted ||
-    tier ||
-    activeTrackId !== 'all',
+    q || difficulty || hideCompleted || tier || activeTrackId !== 'all',
   );
 
   const handleSearchChange = (value: string) => {
-    setSearchInput(value);
-    updateSearch({ q: value || undefined });
+    updateSearch({ q: value || undefined }, { replace: true });
   };
+
+  const renderChallengeLabels = (
+    challenge: PracticeChallenge,
+  ): PracticeChallengeLabels => ({
+    type: t(`types.${challenge.type.toLowerCase()}`, {
+      defaultValue: challenge.type,
+    }).toUpperCase(),
+    difficulty: t(`difficulty.${challenge.difficulty}`, {
+      defaultValue: challenge.difficulty,
+    }),
+    category: t(`categories.${challenge.category}`, {
+      defaultValue: challenge.category,
+    }),
+    tier: t(`tiers.${getTierFromCategory(challenge.category)}`),
+    completionCount: t('library.completedByCount', {
+      count: challenge.completionCount,
+    }),
+    completed: t('labels.completedState'),
+    comingSoon: t('labels.comingSoon'),
+    start: t('labels.start'),
+    review: t('labels.review'),
+  });
 
   const renderChallengeProps = (challenge: PracticeChallenge) => ({
     challenge,
     locale,
-    typeLabel: t(`types.${challenge.type.toLowerCase()}`, {
-      defaultValue: challenge.type,
-    }).toUpperCase(),
-    difficultyLabel: t(`difficulty.${challenge.difficulty}`, {
-      defaultValue: challenge.difficulty,
-    }),
-    categoryLabel: t(`categories.${challenge.category}`, {
-      defaultValue: challenge.category,
-    }),
-    tierLabel: t(`tiers.${getTierFromCategory(challenge.category)}`),
-    completionCountLabel: t('library.completedByCount', {
-      count: challenge.completionCount,
-    }),
-    completedLabel: t('labels.completedState'),
-    comingSoonLabel: t('labels.comingSoon'),
-    startLabel: t('labels.start'),
-    reviewLabel: t('labels.review'),
+    labels: renderChallengeLabels(challenge),
   });
 
   const emptyStateTitle = t('library.emptyTitle');
@@ -244,6 +249,43 @@ export function ChallengesPage() {
       }
       return next;
     });
+  };
+
+  const selectTrack = (trackId: TrackId) => {
+    updateSearch({ track: trackId === 'all' ? undefined : trackId });
+  };
+
+  const handleTrackKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    let nextIndex: number | undefined;
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (index + 1) % ALL_TRACKS.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (index - 1 + ALL_TRACKS.length) % ALL_TRACKS.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = ALL_TRACKS.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    const nextTrack = ALL_TRACKS[nextIndex];
+    if (!nextTrack) return;
+
+    selectTrack(nextTrack.id);
+    trackTabRefs.current[nextTrack.id]?.focus();
   };
 
   return (
@@ -274,22 +316,25 @@ export function ChallengesPage() {
           <nav
             aria-label={t('filters.track')}
             role="tablist"
+            aria-orientation="horizontal"
             className="order-2 -mx-4 flex snap-x overflow-x-auto border-b border-border px-4 md:mx-0 md:px-0 lg:order-1"
           >
-            {ALL_TRACKS.map((track) => {
+            {ALL_TRACKS.map((track, index) => {
               const isActive = activeTrack.id === track.id;
               return (
                 <button
                   key={track.id}
                   type="button"
                   role="tab"
+                  id={`track-tab-${track.id}`}
+                  ref={(element) => {
+                    trackTabRefs.current[track.id] = element;
+                  }}
+                  tabIndex={isActive ? 0 : -1}
                   aria-selected={isActive}
                   aria-controls="challenge-results"
-                  onClick={() =>
-                    updateSearch({
-                      track: track.id === 'all' ? undefined : track.id,
-                    })
-                  }
+                  onClick={() => selectTrack(track.id)}
+                  onKeyDown={(event) => handleTrackKeyDown(event, index)}
                   className={cn(
                     'min-h-11 shrink-0 snap-start border-b-2 px-4 text-sm font-medium transition-colors first:pl-0 last:pr-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
                     isActive
@@ -312,7 +357,7 @@ export function ChallengesPage() {
               <Input
                 aria-label={t('filters.search')}
                 placeholder={t('filters.searchPlaceholder')}
-                value={searchInput}
+                value={q ?? ''}
                 onChange={(event) => handleSearchChange(event.target.value)}
                 className="h-11 bg-card pl-10 md:border-foreground/25"
               />
@@ -382,7 +427,7 @@ export function ChallengesPage() {
                   id="hide-completed"
                   checked={hideCompleted}
                   onCheckedChange={(checked) =>
-                    updateSearch({ hideCompleted: checked ? true : undefined })
+                    updateSearch({ hideCompleted: checked })
                   }
                   aria-label={completionToggleLabel}
                 />
@@ -436,7 +481,13 @@ export function ChallengesPage() {
           )}
         </div>
 
-        <div id="challenge-results" className="mt-5" aria-live="polite">
+        <div
+          id="challenge-results"
+          role="tabpanel"
+          aria-labelledby={`track-tab-${activeTrack.id}`}
+          className="mt-5"
+          aria-live="polite"
+        >
           {isCatalogPending && !challengesResponse ? (
             <div
               className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"

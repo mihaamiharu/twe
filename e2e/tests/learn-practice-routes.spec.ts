@@ -40,6 +40,10 @@ test.describe('Learn and Practice public routes', () => {
     }) => {
       await page.goto(`/${locale}/practice/does-not-exist`);
       await expect(page.locator('[data-not-found-page]')).toBeVisible();
+      await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+        'content',
+        'noindex, nofollow',
+      );
       await expect(page).toHaveURL(`/${locale}/practice/does-not-exist`);
     });
 

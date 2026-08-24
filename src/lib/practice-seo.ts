@@ -11,6 +11,7 @@ interface PracticeDetailSeoParams {
   locale: string;
   slug: string;
   challenge?: PracticeSeoChallenge | null;
+  noIndex?: boolean | undefined;
 }
 
 function translate(key: string, locale: string, fallback: string): string {
@@ -21,6 +22,7 @@ export function createPracticeDetailSeoHead({
   locale,
   slug,
   challenge,
+  noIndex,
 }: PracticeDetailSeoParams) {
   const path = `/practice/${slug}`;
   const fallbackTitle = translate(
@@ -40,7 +42,7 @@ export function createPracticeDetailSeoHead({
       description: fallbackDescription,
       path,
       locale,
-      noIndex: true,
+      noIndex: noIndex ?? true,
     });
   }
 

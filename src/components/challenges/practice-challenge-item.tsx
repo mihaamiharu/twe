@@ -14,18 +14,22 @@ export interface PracticeChallengeItemData {
   tags?: string[] | null;
 }
 
+export interface PracticeChallengeLabels {
+  type: string;
+  difficulty: string;
+  category: string;
+  tier: string;
+  completionCount: string;
+  completed: string;
+  comingSoon: string;
+  start: string;
+  review: string;
+}
+
 interface PracticeChallengeItemProps {
   challenge: PracticeChallengeItemData;
   locale: string;
-  typeLabel: string;
-  difficultyLabel: string;
-  categoryLabel: string;
-  tierLabel: string;
-  completionCountLabel: string;
-  completedLabel: string;
-  comingSoonLabel: string;
-  startLabel: string;
-  reviewLabel: string;
+  labels: PracticeChallengeLabels;
 }
 
 const difficultyStyles: Record<string, string> = {
@@ -56,18 +60,10 @@ function DifficultyPill({
 
 function ChallengeItemContent({
   challenge,
-  typeLabel,
-  difficultyLabel,
-  categoryLabel,
-  tierLabel,
-  completionCountLabel,
-  completedLabel,
-  comingSoonLabel,
-  startLabel,
-  reviewLabel,
+  labels,
 }: Omit<PracticeChallengeItemProps, 'locale'>) {
   const isComingSoon = challenge.tags?.includes('coming-soon') ?? false;
-  const actionLabel = challenge.isCompleted ? reviewLabel : startLabel;
+  const actionLabel = challenge.isCompleted ? labels.review : labels.start;
 
   return (
     <div
@@ -81,18 +77,18 @@ function ChallengeItemContent({
     >
       <div className="min-w-0 lg:self-center">
         <div className="mb-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
-          <span>{typeLabel}</span>
+          <span>{labels.type}</span>
           <span aria-hidden="true">·</span>
           <span className="truncate normal-case tracking-normal">
-            {categoryLabel}
+            {labels.category}
           </span>
           <span className="rounded-full bg-muted px-1.5 py-0.5 text-[9px] tracking-[0.08em]">
-            {tierLabel}
+            {labels.tier}
           </span>
           {isComingSoon && (
             <span className="inline-flex items-center gap-1 tracking-[0.08em]">
               <Lock className="h-3 w-3" aria-hidden="true" />
-              {comingSoonLabel}
+              {labels.comingSoon}
             </span>
           )}
         </div>
@@ -111,7 +107,7 @@ function ChallengeItemContent({
         >
           <DifficultyPill
             difficulty={challenge.difficulty}
-            label={difficultyLabel}
+            label={labels.difficulty}
           />
         </div>
 
@@ -121,7 +117,7 @@ function ChallengeItemContent({
             data-testid="challenge-row-completion"
           >
             <Check className="h-3.5 w-3.5" aria-hidden="true" />
-            {completedLabel}
+            {labels.completed}
           </span>
         ) : (
           <span
@@ -134,9 +130,9 @@ function ChallengeItemContent({
         {!isComingSoon && challenge.completionCount !== undefined && (
           <span
             className="order-5 inline-flex items-center whitespace-nowrap text-xs tabular-nums text-muted-foreground lg:order-none lg:justify-self-start"
-            aria-label={completionCountLabel}
+            aria-label={labels.completionCount}
           >
-            {completionCountLabel}
+            {labels.completionCount}
           </span>
         )}
 
@@ -175,7 +171,7 @@ export function PracticeChallengeRow(props: PracticeChallengeItemProps) {
     return (
       <div
         className="relative border-b border-border last:border-b-0"
-        aria-label={props.comingSoonLabel}
+        aria-label={props.labels.comingSoon}
       >
         {content}
       </div>
@@ -207,19 +203,19 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
       <div>
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-muted-foreground">
           <span className="flex min-w-0 items-center gap-2">
-            <span>{props.typeLabel}</span>
+            <span>{props.labels.type}</span>
             <span aria-hidden="true">·</span>
             <span className="truncate normal-case tracking-normal">
-              {props.categoryLabel}
+              {props.labels.category}
             </span>
           </span>
           <span className="rounded-full bg-muted px-2 py-0.5 text-[9px] tracking-[0.08em]">
-            {props.tierLabel}
+            {props.labels.tier}
           </span>
           {props.challenge.isCompleted && !isComingSoon && (
             <Check
               className="h-3.5 w-3.5 text-brand-success"
-              aria-label={props.completedLabel}
+              aria-label={props.labels.completed}
             />
           )}
         </div>
@@ -234,11 +230,11 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
         <div className="flex items-center gap-3">
           <DifficultyPill
             difficulty={props.challenge.difficulty}
-            label={props.difficultyLabel}
+            label={props.labels.difficulty}
           />
           {props.challenge.completionCount !== undefined && (
             <span className="text-xs tabular-nums text-muted-foreground">
-              {props.completionCountLabel}
+              {props.labels.completionCount}
             </span>
           )}
           {!isComingSoon && (
@@ -253,7 +249,9 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
         </div>
         {!isComingSoon && (
           <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover:text-brand-orange">
-            {props.challenge.isCompleted ? props.reviewLabel : props.startLabel}
+            {props.challenge.isCompleted
+              ? props.labels.review
+              : props.labels.start}
             <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
           </span>
         )}
@@ -262,7 +260,7 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
   );
 
   if (isComingSoon) {
-    return <div aria-label={props.comingSoonLabel}>{content}</div>;
+    return <div aria-label={props.labels.comingSoon}>{content}</div>;
   }
 
   return (

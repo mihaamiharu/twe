@@ -98,4 +98,17 @@ describe('Practice detail SEO', () => {
     });
     expect(head.scripts).toEqual([]);
   });
+
+  test('does not mark an operational detail failure as a 404', () => {
+    const head = createPracticeDetailSeoHead({
+      locale: 'en',
+      slug: 'temporarily-unavailable',
+      noIndex: false,
+    });
+
+    expect(head.meta).not.toContainEqual({
+      name: 'robots',
+      content: 'noindex, nofollow',
+    });
+  });
 });
