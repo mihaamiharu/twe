@@ -70,6 +70,10 @@ void mock.module(
 }));
 
 globalThis.mockSearchParams = {};
+globalThis.mockLoaderData = {
+    success: false,
+    error: 'No mock loader data configured',
+};
 globalThis.mockNavigate = mock(() => Promise.resolve());
 
 void mock.module(
@@ -94,11 +98,13 @@ void mock.module(
         useParams: () => ({ locale: 'en' }),
         useSearch: () => globalThis.mockSearchParams,
         useNavigate: () => globalThis.mockNavigate,
+        useLoaderData: () => globalThis.mockLoaderData,
     }),
     getRouteApi: () => ({
         useParams: () => ({ locale: 'en' }),
         useSearch: () => globalThis.mockSearchParams,
         useNavigate: () => globalThis.mockNavigate,
+        useLoaderData: () => globalThis.mockLoaderData,
     }),
 }));
 

@@ -52,18 +52,6 @@ test.describe('Tutorials', () => {
       .toBe(true);
   });
 
-  test('should expose difficulty filters as pressed buttons', async ({
-    page,
-  }) => {
-    const beginner = page.getByRole('button', { name: 'Beginner' });
-    await expect(beginner).toHaveAttribute('aria-pressed', 'false');
-
-    await beginner.click();
-
-    await expect(page).toHaveURL(/\/en\/learn\?difficulty=beginner$/);
-    await expect(beginner).toHaveAttribute('aria-pressed', 'true');
-  });
-
   test('should preserve explicit completion visibility booleans in the URL', async ({
     page,
   }) => {
@@ -73,6 +61,7 @@ test.describe('Tutorials', () => {
       'aria-pressed',
       'false',
     );
+    await expect(page.getByText('Show remaining only', { exact: true })).toBeVisible();
 
     await page.reload();
     await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
@@ -86,26 +75,31 @@ test.describe('Tutorials', () => {
       'aria-pressed',
       'true',
     );
+    await expect(page.getByText('Show all lessons', { exact: true })).toBeVisible();
   });
 
-  test('should keep grid and list presentation in URL state', async ({
+  test('should ignore removed difficulty and view parameters', async ({
     page,
   }) => {
-    await page.goto('/en/learn?view=list');
+    await page.goto('/en/learn?difficulty=beginner&view=grid');
     await expect(page.getByTestId('learn-results')).toHaveAttribute(
       'data-view-mode',
       'list',
     );
-    await expect(
-      page.getByRole('button', { name: 'List View' }),
-    ).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: 'Beginner' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Grid View' })).toHaveCount(0);
+  });
 
-    await page.getByRole('button', { name: 'Grid View' }).click();
-    await expect(page).toHaveURL(/\/en\/learn\/?$/);
-    await expect(page.getByTestId('learn-results')).toHaveAttribute(
-      'data-view-mode',
-      'grid',
-    );
+  test('should hide completion controls for guests', async ({
+    page,
+    context,
+  }) => {
+    await context.clearCookies();
+    await page.goto('/en/learn?hideCompleted=true');
+
+    await expect(page.getByTestId('learn-completion-filter')).toHaveCount(0);
+    await expect(page.getByTestId('learn-results')).toBeVisible();
+    await expect(page.getByText('Reading the DOM Tree', { exact: true })).toBeVisible();
   });
 
   test('should preserve lesson search in URL state and filter the list', async ({

@@ -1,0 +1,96 @@
+import { afterEach, beforeEach, describe, expect, it } from 'bun:test';
+import { cleanup, render, screen } from '@testing-library/react';
+import '@tanstack/react-query';
+import type { TutorialListResponse } from '@/lib/tutorials.query';
+
+const lessons: TutorialListResponse = {
+  success: true,
+  data: [
+    {
+      id: 'first-id',
+      slug: 'first-lesson',
+      title: 'First lesson',
+      description: 'Start here.',
+      order: 1,
+      estimatedMinutes: 5,
+      tags: ['foundations'],
+      relatedChallenges: [],
+      isPublished: true,
+      viewCount: 0,
+      isCompleted: false,
+      readingProgress: 0,
+    },
+    {
+      id: 'completed-id',
+      slug: 'completed-lesson',
+      title: 'Completed lesson',
+      description: 'Already covered.',
+      order: 2,
+      estimatedMinutes: 5,
+      tags: ['beginner'],
+      relatedChallenges: [],
+      isPublished: true,
+      viewCount: 0,
+      isCompleted: true,
+      readingProgress: 100,
+    },
+  ],
+  meta: { availableTags: ['beginner', 'foundations'] },
+  pagination: { page: 1, limit: 2, total: 2, totalPages: 1 },
+};
+
+describe('LearnPage', () => {
+  beforeEach(() => {
+    globalThis.mockLoaderData = lessons;
+    globalThis.mockSearchParams = {};
+    globalThis.mockUseQuery.mockImplementation((options) => {
+      if (options.queryKey?.[0] === 'auth') {
+        return { data: { user: null } };
+      }
+      return { data: lessons };
+    });
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
+  const renderPage = async () => {
+    const { default: LearnPage } = await import('@/routes/$locale/learn');
+    return render(<LearnPage />);
+  };
+
+  it('keeps the ordered list and ignores guest completion URL state', async () => {
+    globalThis.mockSearchParams = { hideCompleted: true };
+
+    await renderPage();
+
+    expect(screen.queryByTestId('learn-completion-filter')).toBeNull();
+    const rows = screen.getAllByTestId('lesson-row');
+    expect(rows).toHaveLength(2);
+    expect(rows[0]?.textContent ?? '').toContain('First lesson');
+    expect(rows[1]?.textContent ?? '').toContain('Completed lesson');
+  });
+
+  it('shows authenticated remaining-only filtering and its clear action', async () => {
+    globalThis.mockSearchParams = { hideCompleted: true, q: 'First' };
+    globalThis.mockUseQuery.mockImplementation((options) => {
+      if (options.queryKey?.[0] === 'auth') {
+        return { data: { user: { id: 'user-1' } } };
+      }
+      return { data: lessons };
+    });
+
+    await renderPage();
+
+    expect(screen.getByTestId('learn-completion-filter')).toBeTruthy();
+    expect(screen.getByTestId('learn-completion-filter').textContent).toContain(
+      'filters.showAll',
+    );
+    expect(screen.getByTestId('lesson-row').textContent).toContain(
+      'First lesson',
+    );
+    expect(screen.queryByText('Completed lesson')).toBeNull();
+    expect(screen.getByTestId('learn-clear-filters')).toBeTruthy();
+  });
+});

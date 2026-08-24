@@ -106,22 +106,9 @@
     "notFoundDescription": "The tutorial you are looking for does not exist"
   },
   "filters": {
-    "difficultyLabel": "Filter lessons by difficulty",
-    "all": "All",
-    "foundations": "Foundations",
-    "beginner": "Beginner",
-    "intermediate": "Intermediate",
-    "advanced": "E2E Testing",
     "clear": "Clear filters",
-    "hideCompleted": "Hide Completed",
-    "showCompleted": "Show Completed"
-  },
-  "tracks": {
-    "foundations": "Foundations Track",
-    "beginner": "Beginner Track",
-    "intermediate": "Intermediate Track",
-    "advanced": "E2E Track",
-    "other": "Additional Tutorials"
+    "showRemaining": "Show remaining only",
+    "showAll": "Show all lessons"
   },
   "table": {
     "title": "Title",
@@ -139,11 +126,6 @@
     "reviewLesson": "Review lesson",
     "progress": "{{progress}}% read",
     "progressLabel": "Reading progress: {{progress}}%"
-  },
-  "view": {
-    "label": "Lesson presentation",
-    "grid": "Grid View",
-    "list": "List View"
   },
   "sidebar": {
     "progress": "Your Progress",

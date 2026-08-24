@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import type { TutorialCatalogListItemWithOverlay } from '@/lib/catalog-overlays';
-import { filterLearnCatalog, LEARN_DIFFICULTIES } from '@/lib/learn-catalog';
+import { filterLearnCatalog } from '@/lib/learn-catalog';
 import { LearnSearchSchema } from '@/lib/learn-search';
 import {
   optimisticallyCompleteLearnCaches,
@@ -88,6 +88,16 @@ describe('Learn experience contracts', () => {
     expect(
       LearnSearchSchema.parse({ hideCompleted: false }).hideCompleted,
     ).toBe(false);
+  });
+
+  test('ignores removed Learn difficulty and view URL parameters', () => {
+    expect(
+      LearnSearchSchema.parse({
+        q: 'DOM',
+        difficulty: 'beginner',
+        view: 'grid',
+      }),
+    ).toEqual({ q: 'DOM' });
   });
 
   test('keeps catalog and detail error copy localized and safe', () => {
@@ -192,9 +202,8 @@ describe('Learn experience contracts', () => {
     );
   });
 
-  test('combines difficulty and completion visibility client-side', () => {
+  test('preserves registry order while applying authenticated completion filtering', () => {
     const lessons = [
-      makeLesson(),
       makeLesson({
         id: 'beginner-id',
         slug: 'javascript-fundamentals-for-qa',
@@ -203,20 +212,32 @@ describe('Learn experience contracts', () => {
         isCompleted: true,
         readingProgress: 100,
       }),
+      makeLesson({
+        order: 1,
+        slug: 'html-element-anatomy',
+        title: 'HTML Element Anatomy',
+        tags: ['foundations', 'html'],
+      }),
+      makeLesson({ order: 3, slug: 'playwright-basics' }),
     ];
 
-    expect(LEARN_DIFFICULTIES).toContain('beginner');
+    expect(filterLearnCatalog(lessons, {}).map((lesson) => lesson.slug)).toEqual(
+      [
+        'javascript-fundamentals-for-qa',
+        'html-element-anatomy',
+        'playwright-basics',
+      ],
+    );
     expect(
       filterLearnCatalog(lessons, {
-        difficulty: 'beginner',
         hideCompleted: true,
       }),
-    ).toEqual([]);
+    ).toEqual(lessons.slice(1));
     expect(
-      filterLearnCatalog(lessons, { difficulty: 'foundations' }).map(
+      filterLearnCatalog(lessons, { hideCompleted: false }).map(
         (lesson) => lesson.slug,
       ),
-    ).toEqual(['dom-tree-hierarchy']);
+    ).toEqual(lessons.map((lesson) => lesson.slug));
   });
 
   test('detail SEO uses localized catalog data and includes both learning schemas', async () => {
