@@ -20,6 +20,28 @@ test.describe('Rebrand V1 global shell', () => {
       page.getByRole('button', { name: /Switch language/ }),
     ).toContainText('EN');
     await expect(page.getByRole('link', { name: 'Sign In' })).toBeVisible();
+    const learningPathMarkers = page.locator(
+      '[data-testid^="learning-path-progress-marker-"]',
+    );
+    const learningPathColumns = page.getByTestId('learning-path-progress').locator('li');
+    await expect(learningPathMarkers).toHaveCount(5);
+    await expect(learningPathColumns).toHaveCount(5);
+    const markerRects = await learningPathMarkers.evaluateAll((elements) =>
+      elements.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { centerX: rect.left + rect.width / 2, centerY: rect.top + rect.height / 2 };
+      }),
+    );
+    const columnRects = await learningPathColumns.evaluateAll((elements) =>
+      elements.map((element) => {
+        const rect = element.getBoundingClientRect();
+        return { centerX: rect.left + rect.width / 2 };
+      }),
+    );
+    expect(new Set(markerRects.map((rect) => Math.round(rect.centerY))).size).toBe(1);
+    expect(markerRects.map((rect) => Math.round(rect.centerX))).toEqual(
+      columnRects.map((rect) => Math.round(rect.centerX)),
+    );
     await expect(
       page
         .locator('header')
@@ -34,7 +56,9 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(footer).toContainText('Explore');
     await expect(footer).toContainText('Connect');
     await expect(footer).toContainText('Legal');
-    await expect(footer).toContainText('© TestingWithEkki · Built by Ekki');
+    await expect(footer).toContainText(
+      `© TestingWithEkki ${new Date().getFullYear()} · Built by Ekki`,
+    );
     await expect(footer).not.toContainText('Leaderboard');
     await expect(footer).not.toContainText('Subscribe');
     await expect(footer).not.toContainText('Changelog');
@@ -61,6 +85,52 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(page.getByRole('link', { name: 'Sign In' })).toHaveCount(0);
     await expect(page.locator('header')).not.toContainText('XP');
     await expect(page.locator('[aria-label*="theme" i]')).toHaveCount(0);
+  });
+
+  test('renders the branded not-found state and routes its CTAs', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/en/not-a-real-page');
+
+    await expect(page.locator('[data-not-found-page]')).toBeVisible();
+    await expect(
+      page.getByRole('heading', {
+        name: 'This page didn’t pass the test.',
+      }),
+    ).toBeVisible();
+    await expect(
+      page.locator('[data-not-found-card="missing-page"]'),
+    ).toContainText('Page not found');
+    await expect(
+      page.locator('[data-not-found-card="assertion-result"]'),
+    ).toContainText('ASSERTION RESULT');
+    await expect(
+      page.locator('img[src="/illustrations/twe-inspector-female-404.png"]'),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Explore Learning' }),
+    ).toHaveAttribute('href', '/en/tutorials');
+
+    await page.getByRole('link', { name: 'Back to Home' }).click();
+    await expect(page).toHaveURL(/\/en\/?$/);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/en/not-a-real-page');
+    await expect(page.locator('[data-not-found-page]')).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Back to Home' }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: 'Explore Learning' }),
+    ).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      )
+      .toBe(true);
   });
 
   test('supports the mobile menu, contact access, locale switching, and focus return', async ({
@@ -143,5 +213,75 @@ test.describe('Rebrand V1 global shell', () => {
         page.evaluate(() => getComputedStyle(document.body).backgroundColor),
       )
       .toBe('rgb(244, 240, 232)');
+  });
+
+  test('uses the Thinking Inspector for reachable empty states', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+
+    await page.goto('/en/tutorials?q=empty-state-no-match');
+    const learnEmptyState = page.locator(
+      '[data-empty-state][data-empty-state-illustration="thinking"]',
+    );
+    await expect(learnEmptyState).toBeVisible();
+    await expect(
+      learnEmptyState.locator(
+        'img[src="/illustrations/twe-inspector-male-thinking.png"]',
+      ),
+    ).toBeVisible();
+    await expect(learnEmptyState).toContainText('NO MATCHES');
+
+    await page.goto('/en/challenges?q=empty-state-no-match');
+    const practiceEmptyState = page.locator(
+      '[data-empty-state][data-empty-state-illustration="thinking"]',
+    );
+    await expect(practiceEmptyState).toBeVisible();
+    await expect(practiceEmptyState).toContainText('NO MATCHES');
+
+    await page.goto('/id/tutorials?q=empty-state-no-match');
+    await expect(
+      page.locator(
+        '[data-empty-state][data-empty-state-illustration="thinking"]',
+      ),
+    ).toContainText('TIDAK ADA HASIL');
+
+    await page.goto('/id/challenges?q=empty-state-no-match');
+    await expect(
+      page.locator(
+        '[data-empty-state][data-empty-state-illustration="thinking"]',
+      ),
+    ).toContainText('TIDAK ADA HASIL');
+
+    await page.goto('/en');
+    const labsEmptyState = page.locator(
+      '[data-empty-state][data-empty-state-illustration="thinking"]',
+    );
+    await expect(labsEmptyState).toHaveCount(1);
+    await expect(labsEmptyState).toContainText('LABS · COMING SOON');
+    await expect(labsEmptyState.locator('img')).toHaveCount(0);
+  });
+
+  test('uses the Thinking Inspector for empty profile tabs', async ({
+    page,
+    context,
+    request,
+  }) => {
+    await loginViaApi(context, request);
+    await page.goto('/en/profile');
+
+    await page.getByRole('tab', { name: 'Recent Activity' }).click();
+    await expect(
+      page.locator(
+        '[data-empty-state][data-empty-state-illustration="thinking"]',
+      ),
+    ).toBeVisible();
+
+    await page.getByRole('tab', { name: 'Achievements' }).click();
+    await expect(
+      page.locator(
+        '[data-empty-state][data-empty-state-illustration="thinking"]',
+      ),
+    ).toBeVisible();
   });
 });

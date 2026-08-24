@@ -28,8 +28,8 @@ export interface ConsoleOutputProps {
 
 const LOG_STYLES: Record<LogEntry['type'], string> = {
   log: 'text-foreground',
-  warn: 'text-yellow-500',
-  error: 'text-red-500',
+  warn: 'text-brand-warning',
+  error: 'text-brand-error',
 };
 
 const LOG_PREFIXES: Record<LogEntry['type'], string> = {

@@ -2,24 +2,25 @@ export const tierLabels: Record<
   string,
   { name: string; color: string; tier: string }
 > = {
-  basic: { name: '🟢 Basic', color: 'text-emerald-400', tier: 'basic' },
+  basic: { name: '🟢 Basic', color: 'text-brand-success', tier: 'basic' },
   beginner: {
     name: '🟡 Beginner',
-    color: 'text-yellow-400/90',
+    color: 'text-brand-warning',
     tier: 'beginner',
   },
   intermediate: {
     name: '🟠 Intermediate',
-    color: 'text-orange-400/90',
+    color: 'text-brand-orange',
     tier: 'intermediate',
   },
-  e2e: { name: '🟣 E2E Testing', color: 'text-purple-400/90', tier: 'e2e' },
+  e2e: { name: '🟣 E2E Testing', color: 'text-brand-orange', tier: 'e2e' },
 };
 
 export const difficultyColors: Record<string, string> = {
-  EASY: 'bg-green-500/10 text-green-300 border border-green-500/20',
-  MEDIUM: 'bg-yellow-500/10 text-yellow-300 border border-yellow-500/20',
-  HARD: 'bg-red-500/10 text-red-300 border border-red-500/20',
+  EASY: 'bg-brand-success/10 text-brand-success border border-brand-success/20',
+  MEDIUM:
+    'bg-brand-warning/10 text-brand-warning border border-brand-warning/20',
+  HARD: 'bg-brand-error/10 text-brand-error border border-brand-error/20',
 };
 
 export const categoryLabels: Record<string, string> = {
@@ -53,7 +54,8 @@ export function getTierFromCategory(category?: string): string {
     category.startsWith('selector')
   )
     return 'basic';
-  if (category.startsWith('js-') || category.startsWith('ts-')) return 'beginner';
+  if (category.startsWith('js-') || category.startsWith('ts-'))
+    return 'beginner';
   if (
     category.startsWith('playwright-navigation') ||
     category.startsWith('playwright-locators') ||

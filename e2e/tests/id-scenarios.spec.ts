@@ -31,26 +31,25 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
   test('ID Tutorials: should list tutorials in ID', async () => {
     await tutorialsPage.gotoList('id');
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
-    // Check for "Mulai Belajar" or similar ID-specific text if applicable
+    await expect(tutorialsPage.learningPath).toContainText('Web & DOM');
+    await expect(tutorialsPage.learningPath).toContainText('Dasar JavaScript');
   });
 
   test('ID Challenges: should list challenges in ID', async ({ page }) => {
     await challengesPage.gotoList('id');
     await expect(
-      page.getByRole('heading', { level: 1, name: 'Semua Tantangan' }),
+      page.getByRole('heading', {
+        level: 1,
+        name: 'Praktikkan yang kamu tahu.',
+      }),
     ).toBeVisible();
     await expect(
       page.locator('a[href*="/id/challenges/"]').first(),
     ).toBeVisible();
 
-    await page.getByRole('button', { name: /Selektor/ }).click();
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Selektor' }),
-    ).toBeVisible();
+    await page.getByRole('tab', { name: /Selektor/ }).click();
+    await expect(page.getByRole('tab', { name: /Selektor/ })).toBeVisible();
     await expect(page.getByText('Kuasai Selektor CSS dan XPath')).toBeVisible();
-    await expect(
-      page.getByRole('heading', { level: 3, name: 'Keahlian Inti' }),
-    ).toBeVisible();
   });
 
   test('ID Profile: should display profile in ID context', async ({ page }) => {

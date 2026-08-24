@@ -9,6 +9,7 @@ import {
   Wrench,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { EmptyState } from '@/components/empty-state';
 import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
 import { BASE_URL, createSeoHead, websiteSchema } from '@/lib/seo';
 import i18n from '@/lib/i18n';
@@ -108,14 +109,22 @@ function HomePage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <ol className="relative grid gap-0 sm:grid-cols-5 sm:gap-3">
+          <ol
+            data-testid="learning-path-progress"
+            className="relative grid gap-0 sm:grid-cols-5 sm:gap-3"
+          >
             {learningSteps.map((step, index) => (
-              <li key={step.number} className="relative flex gap-4 border-l border-[var(--soft-border)] pb-6 pl-5 last:pb-0 sm:border-l-0 sm:pb-0 sm:pl-0">
-                {index < learningSteps.length - 1 && <span className="absolute left-[-1px] top-3 hidden h-px w-[calc(100%+0.75rem)] bg-[var(--soft-border)] sm:block" />}
-                <div className="relative z-10 flex min-w-7 items-center justify-center sm:block">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--brand-orange)] bg-[var(--paper-surface)] font-mono text-[10px] text-[var(--brand-orange)]">{step.number}</span>
+              <li key={step.number} className="relative flex gap-4 border-l border-[var(--soft-border)] pb-6 pl-5 last:pb-0 sm:block sm:border-l-0 sm:pb-0 sm:pl-0">
+                {index < learningSteps.length - 1 && <span className="absolute left-1/2 top-3.5 hidden h-px w-[calc(100%+0.75rem)] bg-[var(--soft-border)] sm:block" />}
+                <div className="relative z-10 flex min-w-7 items-center justify-center">
+                  <span
+                    data-testid={`learning-path-progress-marker-${step.number}`}
+                    className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--brand-orange)] bg-[var(--paper-surface)] font-mono text-[10px] text-[var(--brand-orange)]"
+                  >
+                    {step.number}
+                  </span>
                 </div>
-                <div className="relative z-10 sm:pt-11">
+                <div className="relative z-10 sm:mt-4">
                   <h3 className="font-semibold">{step.title}</h3>
                   <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">{step.description}</p>
                 </div>
@@ -190,15 +199,25 @@ function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="flex flex-col gap-8 border-y border-[var(--soft-border)] py-10 sm:flex-row sm:items-center sm:justify-between sm:py-12">
-          <div className="max-w-2xl">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('labs.eyebrow')}</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('labs.title')}</h2>
-            <p className="mt-4 text-base leading-7 text-[var(--muted-graphite)]">{t('labs.description')}</p>
-          </div>
-          <Link to={LocaleRoutes.challenges} params={params} className="inline-flex shrink-0 items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] hover:text-[var(--graphite)]">
-            {t('labs.cta')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </Link>
+        <div className="border-y border-[var(--soft-border)]">
+          <EmptyState
+            size="default"
+            showIllustration={false}
+            className="py-8 sm:py-10"
+            eyebrow={t('labs.eyebrow')}
+            title={t('labs.title')}
+            description={t('labs.description')}
+            action={
+              <Link
+                to={LocaleRoutes.challenges}
+                params={params}
+                className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)]"
+              >
+                {t('labs.cta')}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            }
+          />
         </div>
       </section>
 

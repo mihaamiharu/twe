@@ -46,10 +46,16 @@ export function ChallengeListCard({
   const CardContentWrapper = (
     <Card
       className={cn(
-        "h-full transition-all duration-200 overflow-hidden border-border/50",
-        isComingSoon ? "opacity-60 bg-muted/20" : "hover:shadow-lg hover:shadow-primary/5 hover:border-primary/20 bg-card/50 hover:bg-card",
-        isBoss && !isComingSoon && "border-red-500/20 bg-red-500/5 hover:border-red-500/40 hover:shadow-red-500/10",
-        challenge.isCompleted && !isComingSoon && "bg-green-500/5 border-green-500/20"
+        'h-full transition-all duration-200 overflow-hidden border-border/50',
+        isComingSoon
+          ? 'opacity-60 bg-muted/20'
+          : 'hover:border-primary/20 bg-card/50 hover:bg-card',
+        isBoss &&
+          !isComingSoon &&
+          'border-brand-error/20 bg-brand-error/5 hover:border-brand-error/40',
+        challenge.isCompleted &&
+          !isComingSoon &&
+          'bg-brand-success/5 border-brand-success/20',
       )}
     >
       <CardHeader className="p-5 pb-3 space-y-3">
@@ -57,26 +63,32 @@ export function ChallengeListCard({
           <Badge
             variant="outline"
             className={cn(
-              "rounded-md px-2 py-0.5 text-[10px] font-medium border-transparent",
-              isComingSoon ? "bg-muted text-muted-foreground" : config.color
+              'rounded-md px-2 py-0.5 text-[10px] font-medium border-transparent',
+              isComingSoon ? 'bg-muted text-muted-foreground' : config.color,
             )}
           >
             {config.icon}
-            <span className="ml-1.5">{t(`types.${challenge.type.toLowerCase()}`)}</span>
+            <span className="ml-1.5">
+              {t(`types.${challenge.type.toLowerCase()}`)}
+            </span>
           </Badge>
           {challenge.isCompleted && !isComingSoon && (
-            <div className="h-6 w-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-600 shrink-0">
+            <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-success/10 text-brand-success">
               <CheckCircle2 className="h-3.5 w-3.5" />
             </div>
           )}
         </div>
 
         <div className="space-y-1.5">
-          <CardTitle className={cn(
-            "text-base font-bold leading-tight line-clamp-1",
-            isBoss ? "text-red-600 dark:text-red-400" : ""
-          )}>
-            {isBoss && <Swords className="inline-block h-4 w-4 mr-1.5 -mt-0.5" />}
+          <CardTitle
+            className={cn(
+              'text-base font-bold leading-tight line-clamp-1',
+              isBoss ? 'text-brand-error' : '',
+            )}
+          >
+            {isBoss && (
+              <Swords className="inline-block h-4 w-4 mr-1.5 -mt-0.5" />
+            )}
             {challenge.title}
           </CardTitle>
           <CardDescription className="text-xs line-clamp-2 min-h-[2.5em]">
@@ -87,7 +99,13 @@ export function ChallengeListCard({
 
       <CardContent className="p-5 pt-0">
         <div className="flex items-center justify-between mt-4">
-          <Badge variant="secondary" className={cn("text-[10px] h-5 font-medium", difficultyColors[challenge.difficulty])}>
+          <Badge
+            variant="secondary"
+            className={cn(
+              'text-[10px] h-5 font-medium',
+              difficultyColors[challenge.difficulty],
+            )}
+          >
             {t(`difficulty.${challenge.difficulty}`)}
           </Badge>
 
@@ -132,7 +150,11 @@ export function ChallengeListCard({
       transition={{ duration: 0.2 }}
       className="h-full"
     >
-      <Link to="/$locale/challenges/$slug" params={params} className="block h-full group outline-none">
+      <Link
+        to="/$locale/challenges/$slug"
+        params={params}
+        className="block h-full group outline-none"
+      >
         {CardContentWrapper}
       </Link>
     </motion.div>

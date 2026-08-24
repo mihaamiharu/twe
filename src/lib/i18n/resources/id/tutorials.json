@@ -4,7 +4,7 @@
     "eyebrowNote": "JALUR PEMBELAJARAN TERARAH",
     "title": "Bangun keterampilan di balik otomasi web.",
     "description": "Mulai dari cara kerja web, bangun pengetahuan pemrograman yang kamu butuhkan, lalu berlatih otomasi Playwright melalui pelajaran dan latihan langsung.",
-    "primaryCta": "Mulai Otomasi Web",
+    "primaryCta": "Mulai Belajar",
     "metadata": {
       "webFundamentals": "Dasar web",
       "handsOnPractice": "Latihan langsung",
@@ -17,6 +17,38 @@
       "target": "Target DOM",
       "artifact": "Artefak Playwright",
       "result": "Assertion berhasil"
+    },
+    "stack": {
+      "eyebrow": "Jalur pembelajaran terarah",
+      "note": "Bangun stack",
+      "title": "Bangun fondasi di balik otomasi.",
+      "description": "Mulai dari memahami web hingga menulis tes yang andal, satu langkah fokus setiap kali.",
+      "supportingDescription": "Mulai dari browser, tambahkan dasar pemrograman, lalu ubah pengetahuan itu menjadi latihan Playwright yang andal.",
+      "cta": "Lihat semua pelajaran",
+      "cardLesson": "Buka pelajaran",
+      "cardPractice": "Jelajahi Practice",
+      "steps": {
+        "understand": {
+          "label": "01 / Pahami",
+          "title": "Web & DOM",
+          "description": "Pelajari bagaimana browser merender halaman dan bagaimana DOM bekerja."
+        },
+        "build": {
+          "label": "02 / Bangun",
+          "title": "Dasar JavaScript",
+          "description": "Bangun fondasi pemrograman yang mendukung otomasi."
+        },
+        "automate": {
+          "label": "03 / Otomatiskan",
+          "title": "Otomasi Playwright",
+          "description": "Tulis tes end-to-end yang andal dengan Playwright."
+        },
+        "practice": {
+          "label": "04 / Latihan",
+          "title": "Tantangan langsung",
+          "description": "Terapkan yang sudah kamu pelajari melalui latihan dan umpan balik nyata."
+        }
+      }
     },
     "path": {
       "eyebrow": "JALUR PEMBELAJARAN",
@@ -32,6 +64,7 @@
       "practiceLink": "Lihat tantangan Practice",
       "searchLabel": "Cari pelajaran",
       "searchPlaceholder": "Cari pelajaran...",
+      "emptyEyebrow": "TIDAK ADA HASIL",
       "noResults": "Pelajaran tidak ditemukan",
       "tryDifferentSearch": "Coba kata kunci pencarian lain",
       "checkBackSoon": "Pelajaran baru akan muncul di sini saat sudah siap."

@@ -8,7 +8,6 @@ import {
   Github,
   Lightbulb,
   Linkedin,
-  Youtube,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AboutHeroVisual } from '@/components/rebrand-visuals';
@@ -55,7 +54,6 @@ function AboutPage() {
           <div className="mt-7 flex flex-wrap gap-2">
             <SocialLink href="https://www.linkedin.com/in/ekkisyamsugiardi/" label={t('hero.linkedin')} icon={<Linkedin className="h-4 w-4" aria-hidden="true" />} />
             <SocialLink href="https://github.com/mihaamiharu" label={t('hero.github')} icon={<Github className="h-4 w-4" aria-hidden="true" />} />
-            <SocialLink href="https://www.youtube.com/@TestingWithEkki" label={t('hero.youtube')} icon={<Youtube className="h-4 w-4" aria-hidden="true" />} />
           </div>
         </div>
         <AboutHeroVisual />

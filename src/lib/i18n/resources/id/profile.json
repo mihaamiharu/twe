@@ -32,9 +32,11 @@
   "activity": {
     "title": "Aktivitas Terbaru",
     "description": "Kemajuan pembelajaran terbaru kamu",
+    "emptyEyebrow": "BELUM ADA AKTIVITAS",
     "empty": "Belum ada aktivitas terbaru. Mulai belajar!"
   },
   "achievements": {
+    "emptyEyebrow": "BELUM DIMULAI",
     "empty": "Belum ada pencapaian. Selesaikan tantangan untuk mendapatkan lencana!",
     "earned": "Diperoleh {{date}} · +{{xp}} XP"
   },

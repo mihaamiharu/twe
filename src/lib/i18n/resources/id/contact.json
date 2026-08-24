@@ -10,14 +10,16 @@
     "cta": "Pesan sesi 1:1"
   },
   "partnerships": {
-    "title": "Partnership & Sponsorship",
-    "description": "Untuk tool testing dan developer, komunitas, event, kolaborasi edukasi, atau sponsorship yang relevan.",
-    "cta": "Bicarakan partnership"
+    "title": "Partnership, Sponsorship & Peluang",
+    "description": "Untuk tool testing dan developer, komunitas, event, kolaborasi edukasi, dan sponsorship yang relevan.",
+    "opportunityNote": "Juga terbuka untuk peluang QA engineering dan test automation.",
+    "cta": "Bicarakan kerja sama",
+    "cvCta": "Lihat CV saya"
   },
   "form": {
     "eyebrow": "PESAN UMUM",
     "title": "Kirim pesan",
-    "description": "Untuk pertanyaan umum atau hal lainnya.",
+    "description": "Untuk pertanyaan umum atau hal yang tidak sesuai dengan pilihan di atas.",
     "name": "Nama",
     "namePlaceholder": "Nama kamu",
     "email": "Email",
@@ -28,6 +30,7 @@
       "general": "Pertanyaan umum",
       "mentoring": "Mentoring",
       "partnership": "Partnership / sponsorship",
+      "opportunity": "Peluang kerja",
       "other": "Lainnya"
     },
     "message": "Pesan",

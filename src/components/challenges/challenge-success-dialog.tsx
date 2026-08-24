@@ -60,7 +60,7 @@ export function ChallengeSuccessDialog({
             )}
           </div>
           <DialogTitle className="text-center text-xl font-semibold">
-            ✓ {t('common:messages.challengeCompleted')}
+            ✓ {t('challenges:success.title')}
           </DialogTitle>
         </DialogHeader>
         <DialogDescription className="text-center text-muted-foreground">

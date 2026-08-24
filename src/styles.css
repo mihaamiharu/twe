@@ -78,6 +78,9 @@
   --animate-accordion-up: accordion-up 0.2s ease-out;
   --animate-slide-up: slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   --animate-scale-in: scale-in 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-practice-run: practice-run 4.8s ease-in-out infinite;
+  --animate-practice-target: practice-target 4.8s ease-in-out infinite;
+  --animate-practice-verify: practice-verify 4.8s ease-in-out infinite;
 
   @keyframes accordion-down {
     from {
@@ -122,6 +125,72 @@
       transform: scale(1);
     }
   }
+
+  @keyframes practice-run {
+    0%,
+    16%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(230 95 58 / 0%);
+      transform: scale(1);
+    }
+
+    7% {
+      box-shadow: 0 0 0 5px rgb(230 95 58 / 18%);
+      transform: scale(1.06);
+    }
+  }
+
+  @keyframes practice-target {
+    0%,
+    24%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(230 95 58 / 0%);
+      transform: translateY(0);
+    }
+
+    17% {
+      box-shadow: 0 0 0 4px rgb(230 95 58 / 16%);
+      transform: translateY(-1px);
+    }
+
+    21% {
+      box-shadow: 0 0 0 0 rgb(230 95 58 / 0%);
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes practice-verify {
+    0%,
+    43%,
+    100% {
+      opacity: 0.72;
+      transform: translateX(0);
+    }
+
+    34% {
+      opacity: 1;
+      transform: translateX(2px);
+    }
+
+    39% {
+      opacity: 0.72;
+      transform: translateX(0);
+    }
+  }
+}
+
+.practice-run-indicator {
+  animation: var(--animate-practice-run);
+  transform-origin: center;
+}
+
+.practice-target-button {
+  animation: var(--animate-practice-target);
+  transform-origin: center;
+}
+
+.practice-result-indicator {
+  animation: var(--animate-practice-verify);
 }
 
 /* Base Variables - Warm editorial surfaces */

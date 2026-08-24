@@ -1,6 +1,6 @@
 ---
 title: 'Foundation 3: Mastering the Browser DevTools'
-description: 'The Inspect tool is a QA Engineer''s most powerful weapon. Learn to use it to "see" into the code of any website.'
+description: The Inspect tool is a QA Engineer's most powerful weapon. Learn to use it to "see" into the code of any website.
 ---
 
 > The Inspect tool is a QA Engineer's most powerful weapon. Learn to use it to "see" into the code of any website.

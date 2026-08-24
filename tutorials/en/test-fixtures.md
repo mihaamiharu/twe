@@ -17,7 +17,7 @@ That repetitive `new LoginPage(page)` line? We can delete it. **Playwright Fixtu
 
 ---
 
-## 1. The Problem: Boilerbrane
+## 1. The Problem: Boilerplate
 
 In traditional Selenium or early automation frameworks, you had to manually instantiate classes in every test (or in a `beforeEach` hook). This leads to **tight coupling** and boilerplate code.
 

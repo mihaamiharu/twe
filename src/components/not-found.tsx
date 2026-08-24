@@ -1,202 +1,192 @@
 import { Link, useParams } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import {
+  ArrowRight,
+  BookOpen,
+  FileQuestion,
+  Search,
+  XCircle,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '@/components/ui/button';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
-const terminalLogs = [
-  '> GET /page-content ... 200 OK',
-  '> Render ... Done',
-  '> Visibility ... Hidden',
-  '> Assertion passed: element is present',
-  '> Moving to next step...',
-  '> waitForSelector(".content") ... timeout',
-  '> Retrying with { visible: true } ...',
-  '> ERROR: Element not visible in headless mode',
-  '> Checking viewport: { width: 0, height: 0 }',
-  '> Screenshot saved: blank.png',
-  '> Test passed (ironically)',
-  '> GET /definitely-real-page ... 404',
-  '> But trust us, it exists',
-  '> Playwright.headless = true',
-  '> User.confusion = true',
-  '> Solution: Switch to headed mode',
-];
+function MissingPageCard() {
+  const { t } = useTranslation('common');
+
+  return (
+    <div
+      className="w-full rounded-[18px] border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 text-left shadow-[0_18px_45px_rgba(29,29,27,0.08)] sm:p-5"
+      data-not-found-card="missing-page"
+    >
+      <div className="flex items-center gap-2 border-b border-[var(--soft-border)] pb-3 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
+        <span className="h-2 w-2 rounded-full bg-[var(--brand-orange)]" />
+        {t('notFound.browserLabel')}
+      </div>
+
+      <div className="flex items-center gap-3 py-6 sm:py-7">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--orange-tint)] text-[var(--brand-orange)]">
+          <FileQuestion className="h-6 w-6" aria-hidden="true" />
+        </div>
+        <div>
+          <p className="font-semibold text-[var(--graphite)]">
+            {t('notFound.browserTitle')}
+          </p>
+          <p className="mt-1 font-mono text-[10px] text-[var(--muted-graphite)]">
+            {t('notFound.browserCode')}
+          </p>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-[var(--soft-border)] pt-3 font-mono text-[10px] text-[var(--muted-graphite)]">
+        <span>GET /page</span>
+        <span className="text-[var(--brand-error)]">404</span>
+      </div>
+    </div>
+  );
+}
+
+function AssertionResultCard() {
+  const { t } = useTranslation('common');
+
+  return (
+    <div
+      className="w-full rounded-[18px] border border-[#393c38] bg-[#202321] p-4 text-left text-[#f2f1ec] shadow-[0_18px_45px_rgba(29,29,27,0.14)] sm:p-5"
+      data-not-found-card="assertion-result"
+    >
+      <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#393c38] pb-3 font-mono text-[10px] uppercase tracking-[0.12em]">
+        <span className="text-[var(--brand-orange)]">
+          {t('notFound.assertionLabel')}
+        </span>
+        <Search className="h-3.5 w-3.5 text-[#a5a69f]" aria-hidden="true" />
+      </div>
+
+      <div className="space-y-2 font-mono text-[11px]">
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[#a5a69f]">{t('notFound.expected')}</span>
+          <span className="text-right text-[#f2f1ec]">page</span>
+        </div>
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-[#a5a69f]">{t('notFound.actual')}</span>
+          <span className="text-right text-[#f2f1ec]">not found</span>
+        </div>
+      </div>
+
+      <div className="mt-4 flex items-center gap-2 border-t border-[#393c38] pt-3 font-mono text-[10px] font-medium tracking-[0.08em] text-[var(--brand-error)]">
+        <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
+        {t('notFound.failed')}
+      </div>
+    </div>
+  );
+}
 
 export function NotFound() {
   const { t } = useTranslation('common');
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
-  const [visibleLogs, setVisibleLogs] = useState<string[]>([]);
-  const [isToggled, setIsToggled] = useState(false);
-
-  useEffect(() => {
-    let logIndex = 0;
-    const interval = setInterval(() => {
-      setVisibleLogs((prev) => {
-        const nextLog = terminalLogs[logIndex % terminalLogs.length];
-        if (nextLog === undefined) return prev;
-        const newLogs = [...prev, nextLog];
-        // Keep only last 8 logs for scrolling effect
-        if (newLogs.length > 8) {
-          return newLogs.slice(-8);
-        }
-        return newLogs;
-      });
-      logIndex++;
-    }, 800);
-
-    return () => clearInterval(interval);
-  }, []);
 
   return (
-    <div className="relative min-h-[calc(100vh-4rem)] flex flex-col items-center justify-center p-4 overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      {/* Circuit pattern background */}
-      <div className="absolute inset-0 opacity-10">
-        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern
-              id="circuit"
-              x="0"
-              y="0"
-              width="100"
-              height="100"
-              patternUnits="userSpaceOnUse"
-            >
-              <path
-                d="M10 10h80v80h-80z"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.5"
-              />
-              <circle cx="10" cy="10" r="3" fill="currentColor" />
-              <circle cx="90" cy="10" r="3" fill="currentColor" />
-              <circle cx="10" cy="90" r="3" fill="currentColor" />
-              <circle cx="90" cy="90" r="3" fill="currentColor" />
-              <path
-                d="M10 50h30M60 50h30M50 10v30M50 60v30"
-                stroke="currentColor"
-                strokeWidth="0.5"
-              />
-              <circle
-                cx="50"
-                cy="50"
-                r="5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="0.5"
-              />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#circuit)" />
-        </svg>
-      </div>
+    <section
+      className="relative isolate overflow-hidden bg-[var(--warm-canvas)] px-4 pb-20 pt-12 text-[var(--graphite)] sm:px-6 sm:pt-16 lg:min-h-[calc(100svh-4.5rem)] lg:px-8 lg:pb-24 lg:pt-20"
+      data-not-found-page
+    >
+      <div
+        className="pointer-events-none absolute -right-20 top-20 h-48 w-48 rounded-full border border-[var(--brand-orange)]/20 sm:-right-12 sm:h-64 sm:w-64"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute left-[8%] top-[44%] hidden h-px w-24 bg-[var(--brand-orange)]/45 sm:block"
+        aria-hidden="true"
+      />
 
-      {/* Glowing orb effect */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-96 h-96 bg-green-500/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl" />
-
-      {/* Content */}
-      <div className="relative z-10 text-center max-w-2xl mx-auto">
-        {/* Status code badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1 mb-6 text-xs font-mono bg-red-500/20 text-red-400 rounded-full border border-red-500/30">
-          <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-          ERROR 404
-        </div>
-
-        {/* Headline */}
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-          {t('notFound.title')}
-        </h1>
-
-        {/* Sub-headline */}
-        <p className="text-lg text-gray-400 mb-8 max-w-xl mx-auto">
-          {t('notFound.description').split('headless: true')[0]}
-          <code className="px-2 py-0.5 bg-gray-800 rounded text-green-400 font-mono text-sm">
-            headless: true
-          </code>
-          {t('notFound.description').split('headless: true')[1]}
-        </p>
-
-        {/* Terminal window */}
-        <div className="relative mx-auto max-w-lg mb-8">
-          {/* Terminal header */}
-          <div className="flex items-center gap-2 px-4 py-3 bg-gray-800 rounded-t-lg border border-gray-700 border-b-0">
-            <div className="w-3 h-3 rounded-full bg-red-500" />
-            <div className="w-3 h-3 rounded-full bg-yellow-500" />
-            <div className="w-3 h-3 rounded-full bg-green-500" />
-            <span className="ml-2 text-xs text-gray-500 font-mono">
-              playwright-test
+      <div className="relative z-10 mx-auto max-w-7xl">
+        <div className="mx-auto max-w-3xl text-center">
+          <div className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+            <span>{t('notFound.eyebrow')}</span>
+            <span className="h-px w-8 bg-[var(--brand-orange)]" />
+            <span className="text-[var(--muted-graphite)]">
+              {t('notFound.label')}
             </span>
           </div>
 
-          {/* Terminal body */}
-          <div className="relative bg-gray-950 rounded-b-lg border border-gray-700 border-t-0 p-4 h-48 overflow-hidden font-mono text-sm text-left">
-            {/* Scrolling logs */}
-            <div className="space-y-1">
-              {visibleLogs.map((log, index) => (
-                <div
-                  key={`${log}-${index}`}
-                  className={`text-green-400 transition-opacity duration-300 ${
-                    index === visibleLogs.length - 1
-                      ? 'opacity-100'
-                      : 'opacity-70'
-                  }`}
-                >
-                  {log}
-                  {index === visibleLogs.length - 1 && (
-                    <span className="inline-block w-2 h-4 ml-1 bg-green-400 animate-pulse" />
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {/* Scanline effect */}
-            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent via-green-500/5 to-transparent animate-scan" />
+          <div className="mt-5 text-[clamp(5.5rem,18vw,10rem)] font-semibold leading-[0.78] tracking-[-0.1em] text-[var(--brand-orange)]">
+            404
           </div>
 
-          {/* Glow effect around terminal */}
-          <div className="absolute -inset-1 bg-gradient-to-r from-green-500/20 via-transparent to-green-500/20 rounded-xl blur-sm -z-10" />
+          <h1 className="mx-auto mt-7 max-w-2xl text-4xl font-semibold tracking-[-0.055em] text-[var(--graphite)] sm:text-5xl lg:text-6xl">
+            {t('notFound.headline')}
+          </h1>
+          <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-[var(--muted-graphite)] sm:text-lg sm:leading-8">
+            {t('notFound.description')}
+          </p>
+
+          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-md bg-[var(--brand-orange)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+            >
+              <Link
+                to={LocaleRoutes.home}
+                params={localeParams(locale)}
+                data-not-found-home
+              >
+                {t('notFound.backHome')}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-md border-[var(--soft-border)] bg-transparent px-5 text-[var(--graphite)] shadow-none hover:bg-[var(--paper-surface)]"
+            >
+              <Link
+                to={LocaleRoutes.tutorials}
+                params={localeParams(locale)}
+                data-not-found-learning
+              >
+                <BookOpen className="h-4 w-4" aria-hidden="true" />
+                {t('notFound.exploreLearning')}
+              </Link>
+            </Button>
+          </div>
         </div>
 
-        {/* Toggle switch CTA */}
-        <Link
-          to={LocaleRoutes.home}
-          params={localeParams(locale)}
-          className="group inline-flex items-center gap-3"
+        <div
+          className="mx-auto mt-14 grid max-w-6xl items-end gap-6 md:grid-cols-[minmax(0,1fr)_minmax(18rem,24rem)_minmax(0,1fr)] lg:mt-16 lg:gap-8"
+          data-not-found-visual
         >
-          <button
-            onMouseEnter={() => setIsToggled(true)}
-            onMouseLeave={() => setIsToggled(false)}
-            className="relative inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-green-600 to-green-500 hover:from-green-500 hover:to-green-400 text-white font-medium rounded-full transition-all duration-300 shadow-lg shadow-green-500/25 hover:shadow-green-500/40"
-          >
-            {/* Toggle switch visual */}
-            <div
-              className={`relative w-12 h-6 rounded-full transition-colors duration-300 ${isToggled ? 'bg-green-300' : 'bg-gray-600'}`}
-            >
+          <MissingPageCard />
+
+          <div className="order-first flex justify-center md:order-none">
+            <div className="relative h-[22rem] w-full max-w-[18rem] sm:h-[30rem] sm:max-w-[23rem] lg:h-[35rem] lg:max-w-[24rem]">
               <div
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow-md transition-all duration-300 ${
-                  isToggled ? 'left-7' : 'left-1'
-                }`}
+                className="absolute bottom-3 left-1/2 h-8 w-[72%] -translate-x-1/2 rounded-[50%] bg-[var(--orange-tint)]/70 blur-[1px]"
+                aria-hidden="true"
+              />
+              <img
+                src="/illustrations/twe-inspector-female-404.png"
+                alt={t('notFound.characterAlt')}
+                className="relative z-10 h-full w-full object-contain object-bottom"
+                width={1122}
+                height={1402}
+                loading="eager"
+                draggable={false}
               />
             </div>
-            <span>{t('notFound.backHome')}</span>
-          </button>
-        </Link>
+          </div>
 
-        {/* Fun footer note */}
-        <p className="mt-8 text-xs text-gray-600 font-mono">
-          {t('notFound.tip').split('--headed')[0]}
-          <code className="text-gray-500">--headed</code>
-          {t('notFound.tip').split('--headed')[1]}
+          <AssertionResultCard />
+        </div>
+
+        <p className="mt-8 flex items-center justify-center gap-2 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted-graphite)] sm:mt-10">
+          <Search
+            className="h-3.5 w-3.5 text-[var(--brand-orange)]"
+            aria-hidden="true"
+          />
+          {t('notFound.inspectorNote')}
         </p>
       </div>
-
-      {/* Decorative star/cursor in corner */}
-      <div className="absolute bottom-8 right-8 text-yellow-500/50">
-        <svg className="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2l2.4 7.4H22l-6 4.6 2.3 7-6.3-4.6L5.7 21l2.3-7-6-4.6h7.6z" />
-        </svg>
-      </div>
-    </div>
+    </section>
   );
 }

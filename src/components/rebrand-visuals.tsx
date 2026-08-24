@@ -1,13 +1,13 @@
 import {
   ArrowRight,
+  Bug,
+  CalendarDays,
   Check,
   CheckCircle2,
   Code2,
   Eye,
-  Mail,
   MessageCircle,
   Play,
-  Send,
   Terminal,
 } from 'lucide-react';
 import {
@@ -80,7 +80,10 @@ export function PracticePreview({
               02 /
             </span>
           )}
-          <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-orange)] text-[#f2f1ec]">
+          <span
+            className="practice-run-indicator inline-flex h-6 w-6 items-center justify-center rounded-md bg-[var(--brand-orange)] text-[#f2f1ec]"
+            data-practice-motion="run"
+          >
             <Play className="h-3 w-3 fill-current" aria-hidden="true" />
           </span>
           <span
@@ -138,7 +141,7 @@ export function PracticePreview({
               <div className="space-y-2">
                 <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
                 <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
-                <div className="flex h-7 items-center justify-center rounded bg-[var(--brand-orange)] font-mono text-[10px] text-white">
+                <div className="practice-target-button flex h-7 items-center justify-center rounded bg-[var(--brand-orange)] font-mono text-[10px] text-white">
                   Sign in
                 </div>
               </div>
@@ -180,7 +183,10 @@ export function PracticePreview({
             </pre>
             <div className="mt-3 border-t border-[#393c38] pt-3">
               <div className="flex items-center justify-between font-mono text-[10px]">
-                <span className="flex items-center gap-1.5 text-[var(--brand-success)]">
+                <span
+                  className="practice-result-indicator flex items-center gap-1.5 text-[var(--brand-success)]"
+                  data-practice-motion="verify"
+                >
                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
                   test passed
                 </span>
@@ -484,61 +490,68 @@ export function AboutHeroVisual() {
 
 export function ContactHeroVisual() {
   return (
-    <div className="relative mx-auto min-h-[340px] w-full max-w-[560px]">
-      <div className="absolute left-[8%] top-[12%] h-28 w-28 rounded-full border border-[var(--soft-border)] bg-[var(--paper-surface)] p-7 shadow-sm">
-        <MessageCircle
-          className="h-full w-full text-[var(--graphite)]"
-          strokeWidth={1.4}
-          aria-hidden="true"
-        />
-      </div>
-      <div className="absolute right-[4%] top-[4%] w-[58%] rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 shadow-[0_12px_35px_rgba(29,29,27,0.08)]">
-        <div className="mb-4 flex items-center justify-between border-b border-[var(--soft-border)] pb-3 font-mono text-[10px] text-[var(--muted-graphite)]">
-          <span>CONTACT / TWE</span>
-          <Mail
-            className="h-4 w-4 text-[var(--brand-orange)]"
-            aria-hidden="true"
-          />
+    <div className="relative mx-auto min-h-[280px] w-full max-w-[680px] sm:min-h-[295px]">
+      <div className="absolute left-[8%] top-[10%] z-20 h-20 w-20 -rotate-6 rounded-md border border-[var(--graphite)] bg-[var(--paper-surface)] p-2 shadow-[0_8px_22px_rgba(29,29,27,0.08)]">
+        <div className="flex items-center justify-between border-b border-[var(--soft-border)] pb-1">
+          <CalendarDays className="h-4 w-4 text-[var(--brand-orange)]" aria-hidden="true" />
+          <span className="font-mono text-[8px] text-[var(--muted-graphite)]">JUN</span>
         </div>
-        <div className="space-y-3">
-          {['Mentoring', 'Partnerships', 'General message'].map(
-            (item, index) => (
-              <div
-                key={item}
-                className="flex items-center gap-3 font-mono text-[11px]"
-              >
-                <span className="text-[var(--brand-orange)]">0{index + 1}</span>
-                <span className="h-px flex-1 bg-[var(--soft-border)]" />
-                <span className="text-[var(--graphite)]">{item}</span>
-              </div>
-            ),
-          )}
+        <div className="mt-2 grid grid-cols-4 gap-1">
+          {Array.from({ length: 12 }, (_, index) => (
+            <span key={index} className="h-2.5 border border-[var(--soft-border)]" />
+          ))}
         </div>
       </div>
-      <div className="absolute bottom-[7%] left-[18%] w-[58%] rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 shadow-[0_12px_35px_rgba(29,29,27,0.08)]">
-        <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--brand-orange)]/40 bg-[var(--orange-tint)] text-[var(--brand-orange)]">
-            <Send className="h-4 w-4" aria-hidden="true" />
+
+      <div className="absolute right-[2%] top-[1%] z-20 w-[43%] rounded-lg border border-[var(--graphite)] bg-[var(--paper-surface)] shadow-[0_10px_28px_rgba(29,29,27,0.08)]">
+        <div className="flex items-center gap-1.5 border-b border-[var(--soft-border)] px-3 py-2">
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-orange)]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[#b78327]" />
+          <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-success)]" />
+        </div>
+        <div className="space-y-2 p-3">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-4 w-4 text-[var(--brand-success)]" aria-hidden="true" />
+            <span className="h-px flex-1 bg-[var(--soft-border)]" />
           </div>
-          <div>
-            <div className="font-semibold text-[var(--graphite)]">
-              Choose a topic
-            </div>
-            <div className="font-mono text-[10px] text-[var(--muted-graphite)]">
-              MESSAGE → RESPONSE
-            </div>
+          <div className="flex items-center gap-2">
+            <Bug className="h-4 w-4 text-[var(--brand-orange)]" aria-hidden="true" />
+            <span className="h-px flex-1 bg-[var(--soft-border)]" />
+          </div>
+          <div className="flex items-center gap-2">
+            <Code2 className="h-4 w-4 text-[var(--graphite)]" aria-hidden="true" />
+            <span className="h-px flex-1 bg-[var(--soft-border)]" />
           </div>
         </div>
       </div>
-      <div className="absolute bottom-[4%] right-[5%] hidden rounded-md border border-[var(--brand-orange)]/40 bg-[var(--paper-surface)] px-3 py-2 font-mono text-[11px] text-[var(--brand-orange)] sm:block">
-        LET&apos;S TALK{' '}
-        <ArrowRight className="ml-1 inline h-3.5 w-3.5" aria-hidden="true" />
+
+      <div className="absolute left-[4%] top-[38%] z-30 flex h-12 w-12 items-center justify-center rounded-xl border border-[var(--graphite)] bg-[var(--paper-surface)] shadow-sm">
+        <MessageCircle className="h-7 w-7 text-[var(--graphite)]" strokeWidth={1.5} aria-hidden="true" />
       </div>
-      <div className="absolute bottom-[11%] left-[2%] hidden items-center gap-2 sm:flex">
-        <QaDoodle kind="trace" className="h-10 w-10 opacity-75" />
-        <span className="font-mono text-[10px] text-[var(--brand-orange)]">
-          REVIEW / RESPONSE
-        </span>
+
+      <img
+        src="/illustrations/twe-inspector-male-contact-hero.png"
+        alt="QA engineer working at a laptop"
+        className="absolute bottom-0 left-[15%] z-10 w-[70%] max-w-none object-contain"
+        width={1536}
+        height={1024}
+        loading="eager"
+        fetchPriority="high"
+      />
+
+      <div className="absolute bottom-[4%] right-[1%] z-30 hidden w-[34%] rounded-md border border-[var(--graphite)] bg-[var(--paper-surface)] p-3 shadow-sm sm:block">
+        <div className="mb-2 flex items-center gap-2 font-mono text-[9px] text-[var(--brand-orange)]">
+          <Code2 className="h-3.5 w-3.5" aria-hidden="true" />
+          TEST / CONTACT
+        </div>
+        <div className="space-y-1 font-mono text-[8px] leading-4 text-[var(--graphite)]">
+          <p><span className="text-[var(--brand-orange)]">await</span> page.getByRole(<span className="text-[var(--brand-success)]">&apos;button&apos;</span>)</p>
+          <p><span className="text-[var(--brand-orange)]">await</span> expect(page).toBeVisible()</p>
+        </div>
+      </div>
+
+      <div className="absolute bottom-[1%] left-[46%] z-30 hidden -translate-x-1/2 rounded-md border border-[var(--brand-orange)]/40 bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] sm:block">
+        LET&apos;S TALK <ArrowRight className="ml-1 inline h-3.5 w-3.5" aria-hidden="true" />
       </div>
     </div>
   );

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+import { EmptyState } from '@/components/empty-state';
 import {
   PracticeChallengeGridCard,
   PracticeChallengeRow,
@@ -136,6 +137,9 @@ export function ChallengesPage() {
   const hideCompleted = searchParams.hideCompleted ?? false;
   const activeTrackId = (searchParams.track || 'all') as TrackId;
   const viewMode = searchParams.view || 'list';
+  const completionToggleLabel = hideCompleted
+    ? t('filters.showCompleted')
+    : t('filters.hideCompleted');
 
   const [searchInput, setSearchInput] = useState(q ?? '');
   const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
@@ -193,9 +197,22 @@ export function ChallengesPage() {
   });
 
   const challenges = (challengesResponse?.data ?? []) as Challenge[];
+  const normalizedSearchQuery = searchInput.trim().toLocaleLowerCase();
 
   const filteredChallenges = useMemo(() => {
     return challenges.filter((challenge) => {
+      // Keep the UI deterministic while a filtered query is using previous
+      // query data. The server remains the source of truth, but applying the
+      // same search predicate here prevents stale placeholder data from
+      // making a no-match search look like it returned every challenge.
+      if (
+        normalizedSearchQuery &&
+        ![challenge.title, challenge.description].some((value) =>
+          value.toLocaleLowerCase().includes(normalizedSearchQuery),
+        )
+      ) {
+        return false;
+      }
       if (!activeTrack.match(challenge)) return false;
       if (hideCompleted && challenge.isCompleted) return false;
       if (difficulty && challenge.difficulty !== difficulty) return false;
@@ -204,7 +221,14 @@ export function ChallengesPage() {
       }
       return true;
     });
-  }, [activeTrack, challenges, difficulty, hideCompleted, tier]);
+  }, [
+    activeTrack,
+    challenges,
+    difficulty,
+    hideCompleted,
+    normalizedSearchQuery,
+    tier,
+  ]);
 
   const groupedChallenges = useMemo(() => {
     const groups = new Map<string, Challenge[]>();
@@ -271,9 +295,7 @@ export function ChallengesPage() {
 
   const showListView = viewMode === 'list' || isMobileLayout;
   const showGridView = viewMode === 'grid' && !isMobileLayout;
-  const emptyStateTitle = t('library.emptyTitle', {
-    defaultValue: 'No challenges found',
-  });
+  const emptyStateTitle = t('library.emptyTitle');
 
   const toggleGroup = (category: string) => {
     setCollapsedGroups((previous) => {
@@ -394,14 +416,14 @@ export function ChallengesPage() {
                 htmlFor="hide-completed"
                 className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground sm:min-w-[170px]"
               >
-                <span>{t('filters.hideCompleted')}</span>
+                <span>{completionToggleLabel}</span>
                 <Switch
                   id="hide-completed"
                   checked={hideCompleted}
                   onCheckedChange={(checked) =>
                     updateSearch({ hideCompleted: checked ? true : undefined })
                   }
-                  aria-label={t('filters.hideCompleted')}
+                  aria-label={completionToggleLabel}
                 />
               </label>
 
@@ -455,20 +477,13 @@ export function ChallengesPage() {
 
         <div id="challenge-results" className="mt-5" aria-live="polite">
           {groupedChallenges.length === 0 ? (
-            <div className="border border-dashed border-border px-6 py-16 text-center">
-              <Search
-                className="mx-auto h-8 w-8 text-muted-foreground/60"
-                aria-hidden="true"
-              />
-              <h2 className="mt-4 text-lg font-semibold text-foreground">
-                {emptyStateTitle === 'library.emptyTitle'
-                  ? 'No challenges found'
-                  : emptyStateTitle}
-              </h2>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-                {t('library.emptyDescription')}
-              </p>
-            </div>
+            <EmptyState
+              size="compact"
+              className="rounded-xl border border-dashed border-border px-6"
+              eyebrow={t('library.emptyEyebrow')}
+              title={emptyStateTitle}
+              description={t('library.emptyDescription')}
+            />
           ) : (
             <div className="space-y-6">
               {groupedChallenges.map(([category, categoryChallenges]) => (

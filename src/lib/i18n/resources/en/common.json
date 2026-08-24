@@ -96,7 +96,7 @@
     "explore": "Explore",
     "connect": "Connect",
     "legal": "Legal",
-    "copyright": "© TestingWithEkki",
+    "copyright": "© TestingWithEkki {{year}}",
     "builtBy": "Built by Ekki",
     "reportBug": "Report a Bug",
     "newsletter": {
@@ -110,10 +110,21 @@
     }
   },
   "notFound": {
-    "title": "You are in Headless Mode",
-    "description": "The content is here, but you can't see it because your viewport is set to headless: true. Trust us, the tests are passing in the background.",
-    "backHome": "Switch to Headed Mode (Go Home)",
-    "tip": "Tip: Try running with --headed flag next time"
+    "eyebrow": "404 / NOT FOUND",
+    "label": "QA CHECK",
+    "headline": "This page didn’t pass the test.",
+    "description": "The page you’re looking for may have moved, changed, or never existed.",
+    "backHome": "Back to Home",
+    "exploreLearning": "Explore Learning",
+    "browserLabel": "PAGE INSPECTOR",
+    "browserTitle": "Page not found",
+    "browserCode": "404 · route missing",
+    "assertionLabel": "ASSERTION RESULT",
+    "expected": "Expected:",
+    "actual": "Actual:",
+    "failed": "FAILED",
+    "characterAlt": "TWE Inspector investigating a missing page",
+    "inspectorNote": "The Inspector is still looking."
   },
   "auth": {
     "signInToSubmit": "Sign in to Submit",

@@ -43,7 +43,7 @@ export class ChallengesPage extends BasePage {
     this.testSelectorButton = page.getByRole('button', {
       name: 'Test Selector',
     });
-    this.hideCompletedToggle = page.getByRole('button', {
+    this.hideCompletedToggle = page.getByRole('switch', {
       name: /Hide (Completed|Done)|Show Completed|Tampilkan Selesai|Sembunyikan Selesai/i,
     });
 

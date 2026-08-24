@@ -31,6 +31,24 @@ describe.skipIf(isCI)('Iframe Executor', () => {
     expect('error' in result).toBe(false);
   });
 
+  test('should keep VFS navigation available to authored page interactions', async () => {
+    const files = {
+      '/index.html': '<a href="/profile.html">Profile</a>',
+      '/profile.html': '<h1>Profile</h1>',
+    };
+    const code = `
+      await page.getByRole('link', { name: 'Profile' }).click();
+      await page.waitForTimeout(100);
+      await expect(page.getByRole('heading')).toHaveText('Profile');
+    `;
+
+    const result = await executePlaywrightCode(code, files['/index.html'], {
+      files,
+    });
+
+    expect(result.status).toBe('PASSED');
+  });
+
   test('should handle TypeScript transpilation (mocked)', async () => {
     // We skip actual transpilation test as esbuild-wasm is tricky in Bun/HappyDOM unit tests
     // But we test the wrapper logic by ensuring it runs when isTypeScript is false

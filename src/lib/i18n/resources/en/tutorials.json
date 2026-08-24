@@ -4,7 +4,7 @@
     "eyebrowNote": "GUIDED LEARNING PATHS",
     "title": "Build the skills behind web automation.",
     "description": "Start with how the web works, build the programming knowledge you need, and move into practical Playwright automation through lessons and hands-on practice.",
-    "primaryCta": "Start Web Automation",
+    "primaryCta": "Start Learning",
     "metadata": {
       "webFundamentals": "Web fundamentals",
       "handsOnPractice": "Hands-on practice",
@@ -17,6 +17,38 @@
       "target": "DOM target",
       "artifact": "Playwright artifact",
       "result": "Assertion passed"
+    },
+    "stack": {
+      "eyebrow": "Guided learning path",
+      "note": "Build the stack",
+      "title": "Build the stack behind automation.",
+      "description": "Move from understanding the web to writing reliable tests, one focused step at a time.",
+      "supportingDescription": "Start with the browser, add the programming foundations, then turn that knowledge into reliable Playwright practice.",
+      "cta": "Browse all lessons",
+      "cardLesson": "Open lesson",
+      "cardPractice": "Explore Practice",
+      "steps": {
+        "understand": {
+          "label": "01 / Understand",
+          "title": "The web & DOM",
+          "description": "Learn how browsers render pages and how the DOM works."
+        },
+        "build": {
+          "label": "02 / Build",
+          "title": "JavaScript fundamentals",
+          "description": "Build the programming foundation that powers automation."
+        },
+        "automate": {
+          "label": "03 / Automate",
+          "title": "Playwright automation",
+          "description": "Write reliable end-to-end tests with Playwright."
+        },
+        "practice": {
+          "label": "04 / Practice",
+          "title": "Hands-on challenges",
+          "description": "Apply what you have learned with real-world practice and feedback."
+        }
+      }
     },
     "path": {
       "eyebrow": "LEARNING PATH",
@@ -32,6 +64,7 @@
       "practiceLink": "Explore Practice challenges",
       "searchLabel": "Search lessons",
       "searchPlaceholder": "Search lessons...",
+      "emptyEyebrow": "NO MATCHES",
       "noResults": "No lessons found",
       "tryDifferentSearch": "Try a different search term",
       "checkBackSoon": "New lessons will appear here when they are ready."

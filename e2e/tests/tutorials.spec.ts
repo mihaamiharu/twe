@@ -15,6 +15,55 @@ test.describe('Tutorials', () => {
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
   });
 
+  test('should display the guided learning path', async ({ page }) => {
+    await expect(tutorialsPage.learningPath).toBeVisible();
+    await expect(page.getByTestId('learning-path-step-01')).toContainText(
+      'The web & DOM',
+    );
+    await expect(page.getByTestId('learning-path-step-02')).toContainText(
+      'JavaScript fundamentals',
+    );
+    await expect(page.getByTestId('learning-path-step-03')).toContainText(
+      'Playwright automation',
+    );
+    await expect(page.getByTestId('learning-path-step-04')).toContainText(
+      'Hands-on challenges',
+    );
+  });
+
+  test('should navigate from a guided learning step', async ({ page }) => {
+    await tutorialsPage.learningPath
+      .getByTestId('learning-path-step-01')
+      .click();
+    await expect(page).toHaveURL(/\/en\/tutorials\/dom-tree-hierarchy$/);
+  });
+
+  test('should keep the guided path usable on mobile', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto('/en/tutorials');
+
+    await expect(tutorialsPage.learningPath).toBeVisible();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => document.documentElement.scrollWidth <= window.innerWidth,
+        ),
+      )
+      .toBe(true);
+  });
+
+  test('should expose difficulty filters as pressed buttons', async ({
+    page,
+  }) => {
+    const beginner = page.getByRole('button', { name: 'Beginner' });
+    await expect(beginner).toHaveAttribute('aria-pressed', 'false');
+
+    await beginner.click();
+
+    await expect(page).toHaveURL(/\/en\/tutorials\?difficulty=beginner$/);
+    await expect(beginner).toHaveAttribute('aria-pressed', 'true');
+  });
+
   test('should navigate to tutorial detail', async ({ page }) => {
     const firstTutorial = tutorialsPage.tutorialCards.first();
     await firstTutorial.click();

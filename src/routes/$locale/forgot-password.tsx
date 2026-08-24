@@ -66,10 +66,10 @@ function ForgotPasswordPage() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+        <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 p-3 rounded-full bg-green-500/10 w-fit">
-              <CheckCircle2 className="h-8 w-8 text-green-500" />
+            <div className="mx-auto mb-4 w-fit rounded-md bg-brand-success/10 p-3">
+              <CheckCircle2 className="h-8 w-8 text-brand-success" />
             </div>
             <CardTitle className="text-2xl font-bold">
               {t('auth:verification.title')}
@@ -106,12 +106,12 @@ function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
-      <Card className="w-full max-w-md glass-card">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 p-3 rounded-full bg-primary/10 w-fit">
             <Mail className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="text-2xl font-semibold tracking-tight text-foreground">
             {t('auth:forgotPassword.title')}
           </CardTitle>
           <CardDescription>

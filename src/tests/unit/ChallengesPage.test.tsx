@@ -148,7 +148,7 @@ describe('ChallengesPage', () => {
         globalThis.mockSearchParams = { ...globalThis.mockSearchParams, q: 'NonExistent' };
         await renderPage();
 
-        expect(screen.getByText(/no challenges found/i)).toBeTruthy();
+        expect(screen.getByText('library.emptyTitle')).toBeTruthy();
         // Should show clear filter button or link
         expect(screen.getByRole('button', { name: /clear/i })).toBeTruthy();
     });

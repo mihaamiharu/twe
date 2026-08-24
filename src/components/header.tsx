@@ -34,6 +34,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+  const isContactPage = location.pathname.endsWith('/contact');
   const isAuthPage =
     location.pathname.includes('/login') ||
     location.pathname.includes('/register');
@@ -129,7 +130,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-[4.5rem] items-center justify-between">
+          <div className={cn('flex items-center justify-between', isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]')}>
             {/* Logo */}
             <div className="flex items-center gap-9">
               <Link
@@ -147,7 +148,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
               <nav
                 aria-label="Primary"
-                className="hidden items-center gap-7 md:flex"
+                className="hidden items-center gap-7 lg:flex"
               >
                 {navLinks.map((link) => (
                   <Link
@@ -188,7 +189,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
             {/* Right side */}
             <div className="flex items-center gap-3">
-              <div className="hidden sm:flex items-center">
+              <div className="hidden items-center sm:flex">
                 <LanguageSwitcher />
               </div>
 
@@ -196,24 +197,27 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
-                  <div className="hidden items-center gap-4 md:flex">
+                  <div className="hidden items-center gap-3 lg:flex">
                     <Link
                       to={LocaleRoutes.login}
                       params={localeParams(locale)}
-                      className="inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
+                      className={cn(
+                        'inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]',
+                        isContactPage && 'rounded-md border border-[var(--graphite)] px-5',
+                      )}
                     >
                       {t('common:actions.signIn')}
                     </Link>
                     <Button
                       size="sm"
                       asChild
-                      className="rounded-md bg-[var(--brand-orange)] px-4 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+                      className="rounded-md bg-[var(--brand-orange)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
                     >
                       <Link
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
-                        {t('common:actions.startWebAutomation')}
+                        {t(isContactPage ? 'common:actions.startLearning' : 'common:actions.startWebAutomation')}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>
@@ -225,7 +229,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className="lg:hidden"
                 type="button"
                 onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
                 aria-expanded={isMobileMenuOpen}
@@ -249,7 +253,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 lg:hidden">
           <div
             className="fixed inset-0 bg-[var(--graphite)]/15"
             onClick={() => setIsMobileMenuOpen(false)}
