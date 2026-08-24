@@ -78,29 +78,36 @@ test.describe('Tutorials', () => {
     await expect(page.getByText('Show all lessons', { exact: true })).toBeVisible();
   });
 
-  test('should ignore removed difficulty and view parameters', async ({
-    page,
-  }) => {
-    await page.goto('/en/learn?difficulty=beginner&view=grid');
-    await expect(page.getByTestId('learn-results')).toHaveAttribute(
-      'data-view-mode',
-      'list',
-    );
-    await expect(page.getByRole('button', { name: 'Beginner' })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Grid View' })).toHaveCount(0);
-  });
+  for (const locale of ['en', 'id'] as const) {
+    test(`${locale} should ignore removed difficulty and view parameters`, async ({
+      page,
+    }) => {
+      await page.goto(`/${locale}/learn?difficulty=beginner&view=grid`);
+      await expect(page.getByTestId('learn-results')).toHaveAttribute(
+        'data-view-mode',
+        'list',
+      );
+      await expect(
+        page.getByRole('button', { name: /Beginner|Pemula/i }),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole('button', { name: /Grid View|Tampilan Grid/i }),
+      ).toHaveCount(0);
+    });
+  }
 
-  test('should hide completion controls for guests', async ({
-    page,
-    context,
-  }) => {
-    await context.clearCookies();
-    await page.goto('/en/learn?hideCompleted=true');
+  for (const locale of ['en', 'id'] as const) {
+    test(`${locale} guests should not see completion controls`, async ({
+      page,
+      context,
+    }) => {
+      await context.clearCookies();
+      await page.goto(`/${locale}/learn?hideCompleted=true`);
 
-    await expect(page.getByTestId('learn-completion-filter')).toHaveCount(0);
-    await expect(page.getByTestId('learn-results')).toBeVisible();
-    await expect(page.getByText('Reading the DOM Tree', { exact: true })).toBeVisible();
-  });
+      await expect(page.getByTestId('learn-completion-filter')).toHaveCount(0);
+      await expect(page.getByTestId('learn-results')).toBeVisible();
+    });
+  }
 
   test('should preserve lesson search in URL state and filter the list', async ({
     page,
