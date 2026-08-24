@@ -72,12 +72,19 @@ export const challengeSubmissionHandler = async ({
   context,
 }: {
   data: z.infer<typeof CreateSubmissionSchema>;
-  context: { user: { id: string } };
+  context?: { user?: { id?: string } } | undefined;
 }) => {
   const { locale = 'en' } = input;
   try {
-    const userId = context.user.id;
-    const { challengeSlug, code, testResults, executionTime, isPractice } = input;
+    const userId = context?.user?.id;
+    if (!userId) {
+      return {
+        success: false,
+        error: getErrorMessage('unauthorized', locale),
+      };
+    }
+    const { challengeSlug, code, testResults, executionTime, isPractice } =
+      input;
 
     // Practice mode: skip all DB writes and return lightweight response
     if (isPractice) {
@@ -104,10 +111,28 @@ export const challengeSubmissionHandler = async ({
       };
     }
 
+    // A rewardable challenge must resolve through the server catalog. The
+    // request supplies only the stable slug; XP and test-case facts come from
+    // the server/database records below.
+    const challengeContent = await getRawChallengeContent(challengeSlug);
+    if (!challengeContent) {
+      return {
+        success: false,
+        error: getErrorMessage('challengeNotFound', locale),
+      };
+    }
+
     // Get challenge by slug
     const existingChallenge = await db.query.challenges.findFirst({
       where: eq(challenges.slug, challengeSlug),
     });
+
+    if (existingChallenge && !existingChallenge.isPublished) {
+      return {
+        success: false,
+        error: getErrorMessage('challengeNotFound', locale),
+      };
+    }
 
     let challenge = existingChallenge;
 
@@ -140,14 +165,16 @@ export const challengeSubmissionHandler = async ({
 
           if (fsChallenge.testCases && fsChallenge.testCases.length > 0) {
             await db.insert(testCases).values(
-              fsChallenge.testCases.map((tc: TestCaseDefinition, index: number) => ({
-                challengeId: newChallenge.id,
-                description: tc.description,
-                input: tc.input,
-                expectedOutput: tc.expectedOutput,
-                isHidden: tc.isHidden || false,
-                order: index,
-              })),
+              fsChallenge.testCases.map(
+                (tc: TestCaseDefinition, index: number) => ({
+                  challengeId: newChallenge.id,
+                  description: tc.description,
+                  input: tc.input,
+                  expectedOutput: tc.expectedOutput,
+                  isHidden: tc.isHidden || false,
+                  order: index,
+                }),
+              ),
             );
           }
 
@@ -164,6 +191,13 @@ export const challengeSubmissionHandler = async ({
           error: getErrorMessage('challengeNotFound', locale),
         };
       }
+    }
+
+    if (!challenge) {
+      return {
+        success: false,
+        error: getErrorMessage('challengeNotFound', locale),
+      };
     }
 
     // Get total test cases
@@ -186,163 +220,168 @@ export const challengeSubmissionHandler = async ({
     const testsPassed = testResults.filter((r) => r.passed).length;
     const isPassed = testsPassed === testsTotal && testsTotal > 0;
 
-    // Check if this is the first successful completion
-    const existingProgress = await db.query.progress.findFirst({
-      where: and(
-        eq(progress.userId, userId),
-        eq(progress.challengeId, challenge.id),
-      ),
-    });
+    const completion = await db.transaction(async (transaction) => {
+      // Unique progress identity plus the row lock makes the incomplete ->
+      // complete transition a single-winner operation under concurrency.
+      await transaction
+        .insert(progress)
+        .values({
+          userId,
+          challengeId: challenge.id,
+          isCompleted: false,
+          attempts: 0,
+        })
+        .onConflictDoNothing();
 
-    const isFirstCompletion =
-      isPassed && (!existingProgress || !existingProgress.isCompleted);
+      const [existingProgress] = await transaction
+        .select()
+        .from(progress)
+        .where(
+          and(
+            eq(progress.userId, userId),
+            eq(progress.challengeId, challenge.id),
+          ),
+        )
+        .for('update');
+      if (!existingProgress)
+        throw new Error('Failed to initialize challenge progress');
 
-    // Calculate XP earned (only on first completion)
-    let xpEarned = 0;
-    let levelUpInfo = null;
+      const isFirstCompletion = isPassed && !existingProgress.isCompleted;
+      const hintUsed = existingProgress.usedHint;
+      const xpEarned = isFirstCompletion
+        ? Math.floor(challenge.xpReward * (hintUsed ? 0.5 : 1))
+        : 0;
+      const now = new Date();
+      let initialXp: number | null = null;
 
-    if (isFirstCompletion) {
-      // Check if hint was used for this challenge - apply 50% XP penalty
-      const hintUsed = existingProgress?.usedHint || false;
-      const xpMultiplier = hintUsed ? 0.5 : 1;
-      xpEarned = Math.floor(challenge.xpReward * xpMultiplier);
+      if (isFirstCompletion) {
+        const [user] = await transaction
+          .select({ xp: users.xp, level: users.level })
+          .from(users)
+          .where(eq(users.id, userId))
+          .for('update');
+        if (!user) throw new Error('User not found');
 
-      // Get current user XP
-      const user = await db.query.users.findFirst({
-        where: eq(users.id, userId),
-      });
-
-      if (user) {
-        // Check for level up
-        levelUpInfo = checkLevelUp(user.xp, xpEarned);
-
-        // Update user XP and level
-        await db
+        initialXp = user.xp;
+        const levelUpInfo = checkLevelUp(user.xp, xpEarned);
+        await transaction
           .update(users)
           .set({
             xp: user.xp + xpEarned,
             level: levelUpInfo.newLevel,
-            updatedAt: new Date(),
+            updatedAt: now,
           })
           .where(eq(users.id, userId));
+        await transaction
+          .update(challenges)
+          .set({ completionCount: sql`${challenges.completionCount} + 1` })
+          .where(eq(challenges.id, challenge.id));
 
         logger.info(
           `[Submission] First completion for user ${userId}. Awarding ${xpEarned} XP${hintUsed ? ' (50% penalty for hint usage)' : ''}.`,
         );
-
-        // Increment challenge completion count
-        await db
-          .update(challenges)
-          .set({
-            completionCount: challenge.completionCount + 1,
-          })
-          .where(eq(challenges.id, challenge.id));
+      } else if (isPassed) {
+        logger.info(
+          `[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`,
+        );
       }
-    } else if (isPassed) {
-      logger.info(
-        `[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`,
-      );
-    }
 
-    // Create submission record
-    const [submission] = await db
-      .insert(submissions)
-      .values({
-        userId,
-        challengeId: challenge.id,
-        code,
-        isPassed,
-        xpEarned,
-        executionTime,
-        testsPassed,
-        testsTotal,
-        errorMessage: testResults.find((r) => r.error)?.error,
-      })
-      .returning();
-    if (!submission) {
-      throw new Error('Failed to create submission');
-    }
+      const [submission] = await transaction
+        .insert(submissions)
+        .values({
+          userId,
+          challengeId: challenge.id,
+          code,
+          isPassed,
+          xpEarned,
+          executionTime,
+          testsPassed,
+          testsTotal,
+          errorMessage: testResults.find((r) => r.error)?.error,
+        })
+        .returning();
+      if (!submission) throw new Error('Failed to create submission');
 
-    // Update or create progress record
-    if (existingProgress) {
-      await db
+      await transaction
         .update(progress)
         .set({
           isCompleted: existingProgress.isCompleted || isPassed,
           completedAt:
             isPassed && !existingProgress.isCompleted
-              ? new Date()
+              ? now
               : existingProgress.completedAt,
-          attempts: (existingProgress.attempts || 0) + 1,
+          attempts: (existingProgress.attempts ?? 0) + 1,
           bestSubmissionId: isPassed
             ? submission.id
             : existingProgress.bestSubmissionId,
-          lastAccessedAt: new Date(),
-          updatedAt: new Date(),
+          lastAccessedAt: now,
+          updatedAt: now,
         })
         .where(eq(progress.id, existingProgress.id));
-    } else {
-      await db.insert(progress).values({
-        userId,
-        challengeId: challenge.id,
-        isCompleted: isPassed,
-        completedAt: isPassed ? new Date() : null,
-        attempts: 1,
-        bestSubmissionId: isPassed ? submission.id : null,
-        lastAccessedAt: new Date(),
-      });
-    }
 
-    // Check and award achievements if passed
-    let newAchievements: { id: string; name: string; icon: string }[] = [];
-    if (isPassed) {
-      try {
-        // Get real user stats from DB
-        const userStats = await getUserStats(userId);
-        const alreadyEarned = await getEarnedAchievementIds(userId);
-
+      let newAchievements: { id: string; name: string; icon: string }[] = [];
+      if (isPassed) {
+        const userStats = await getUserStats(userId, transaction);
+        const alreadyEarned = await getEarnedAchievementIds(
+          userId,
+          transaction,
+        );
         const earnedAchievements = checkAchievements(userStats, alreadyEarned);
+        const awardedSlugs = await awardAchievements(
+          userId,
+          earnedAchievements.map((achievement) => achievement.id),
+          transaction,
+        );
 
-        if (earnedAchievements.length > 0) {
-          // Award the achievements
-          await awardAchievements(
-            userId,
-            earnedAchievements.map((a) => a.id),
-          );
-
-          // Get localized names from DB
-          const dbAwarded = await db
+        if (awardedSlugs.length > 0) {
+          const dbAwarded = await transaction
             .select({
               id: achievements.id,
-              name: sql`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
+              name: sql<string>`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
               icon: achievements.icon,
+              slug: achievements.slug,
             })
             .from(achievements)
-            .where(
-              inArray(
-                achievements.slug,
-                earnedAchievements.map((a) => a.id),
-              ),
-            );
+            .where(inArray(achievements.slug, awardedSlugs));
 
-          newAchievements = dbAwarded.map((a) => ({
-            id: a.id,
-            name: a.name as string,
-            icon: a.icon || '',
+          newAchievements = dbAwarded.map((achievement) => ({
+            id: achievement.id,
+            name: achievement.name,
+            icon: achievement.icon,
           }));
 
           logger.info(
-            `[Achievements] User ${userId} earned: ${newAchievements.map((a) => a.name).join(', ')}`,
+            `[Achievements] User ${userId} earned: ${newAchievements.map((achievement) => achievement.name).join(', ')}`,
           );
         }
-      } catch (error) {
-        logger.error('Error checking achievements:', error);
       }
-    }
 
-    return {
-      success: true,
-      data: {
+      let levelUp: {
+        oldLevel: number;
+        newLevel: number;
+        levelsGained: number;
+      } | null = null;
+      if (initialXp !== null) {
+        const [updatedUser] = await transaction
+          .select({ xp: users.xp })
+          .from(users)
+          .where(eq(users.id, userId));
+        if (updatedUser) {
+          const levelUpInfo = checkLevelUp(
+            initialXp,
+            updatedUser.xp - initialXp,
+          );
+          if (levelUpInfo.leveledUp) {
+            levelUp = {
+              oldLevel: levelUpInfo.oldLevel,
+              newLevel: levelUpInfo.newLevel,
+              levelsGained: levelUpInfo.levelsGained,
+            };
+          }
+        }
+      }
+
+      return {
         submission: {
           id: submission.id,
           isPassed,
@@ -352,16 +391,13 @@ export const challengeSubmissionHandler = async ({
           executionTime,
         },
         isFirstCompletion,
-        levelUp: levelUpInfo?.leveledUp
-          ? {
-            oldLevel: levelUpInfo.oldLevel,
-            newLevel: levelUpInfo.newLevel,
-            levelsGained: levelUpInfo.levelsGained,
-          }
-          : null,
+        isPracticeMode: false,
+        levelUp,
         newAchievements,
-      },
-    };
+      };
+    });
+
+    return { success: true, data: completion };
   } catch (error) {
     console.error('Error submitting solution:', error);
     return {

@@ -21,7 +21,9 @@ import {
   tutorialCatalogQueryKeys,
   tutorialDetailQueryOptions,
   tutorialsListQueryOptions,
+  tutorialProgressInvalidationKeys,
 } from '@/lib/tutorials.query';
+import { challengeProgressInvalidationKeys } from '@/lib/challenges.query';
 import {
   mergeChallengeCatalogOverlay,
   mergeTutorialCatalogOverlay,
@@ -228,6 +230,17 @@ describe('Learn and Practice catalog contracts', () => {
       ...tutorialDetailQueryOptions('dom-tree-hierarchy', 'id').queryKey,
     ]).toEqual([
       ...tutorialCatalogQueryKeys.detail('dom-tree-hierarchy', 'id'),
+    ]);
+
+    expect(tutorialProgressInvalidationKeys('lesson', 'en', 'user-1')).toEqual([
+      tutorialCatalogQueryKeys.detail('lesson', 'en', 'user-1'),
+      tutorialCatalogQueryKeys.list('en', 'user-1'),
+    ]);
+    expect(
+      challengeProgressInvalidationKeys('challenge', 'id', 'user-1'),
+    ).toEqual([
+      ['catalog', 'practice', 'detail', 'challenge', 'id', 'user-1'],
+      ['catalog', 'practice', 'list', 'id', 'user-1'],
     ]);
   });
 

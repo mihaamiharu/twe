@@ -13,27 +13,39 @@ import {
   achievements,
   bugReports,
 } from '@/db/schema';
-import { eq, and, sql } from 'drizzle-orm';
+import { eq, and, inArray, sql } from 'drizzle-orm';
 import type { UserStats } from './achievements';
 import { logger } from '@/lib/logger';
 import { getTierFromCategory } from '@/lib/constants';
 import { checkLevelUp } from '@/lib/gamification';
 
 /**
+ * The read/write surface shared by the root database and a Drizzle
+ * transaction. Keeping this narrow lets reward evaluation run against the
+ * same transaction as the progress mutation.
+ */
+type StatsDatabase = Pick<typeof db, 'select'>;
+type AchievementDatabase = Pick<typeof db, 'select' | 'insert' | 'update'>;
+
+/**
  * Get user stats for achievement checking
  */
-export async function getUserStats(userId: string): Promise<UserStats> {
+export async function getUserStats(
+  userId: string,
+  database: StatsDatabase = db,
+): Promise<UserStats> {
   // Get user
-  const user = await db.query.users.findFirst({
-    where: eq(users.id, userId),
-  });
+  const [user] = await database
+    .select({ xp: users.xp, level: users.level })
+    .from(users)
+    .where(eq(users.id, userId));
 
   if (!user) {
     throw new Error('User not found');
   }
 
   // Get completed challenges with their types
-  const completedChallenges = await db
+  const completedChallenges = await database
     .select({
       challengeId: progress.challengeId,
       type: challenges.type,
@@ -63,7 +75,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   }
 
   // Get completed tutorials count
-  const tutorialsResult = await db
+  const tutorialsResult = await database
     .select({ count: sql<number>`count(*)::int` })
     .from(progress)
     .where(
@@ -77,12 +89,14 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   const tutorialsCompleted = tutorialsResult[0]?.count || 0;
 
   // Calculate streak and max daily challenges
-  const completionDates = completedChallenges.map((c) => c.completedAt).filter(Boolean) as Date[];
+  const completionDates = completedChallenges
+    .map((c) => c.completedAt)
+    .filter(Boolean) as Date[];
   const { currentStreak, longestStreak } = calculateStreak(completionDates);
   const maxDailyChallenges = calculateMaxDailyChallenges(completionDates);
 
   // Count perfect scores (all tests passed on first try - we approximate by checking if attempts = 1)
-  const perfectScoresResult = await db
+  const perfectScoresResult = await database
     .select({ count: sql<number>`count(*)::int` })
     .from(progress)
     .where(
@@ -97,7 +111,7 @@ export async function getUserStats(userId: string): Promise<UserStats> {
   const perfectScores = perfectScoresResult[0]?.count || 0;
 
   // Count bug reports
-  const bugReportsResult = await db
+  const bugReportsResult = await database
     .select({ count: sql<number>`count(*)::int` })
     .from(bugReports)
     .where(eq(bugReports.userId, userId));
@@ -227,8 +241,9 @@ function calculateMaxDailyChallenges(completionDates: Date[]): number {
  */
 export async function getEarnedAchievementIds(
   userId: string,
+  database: StatsDatabase = db,
 ): Promise<Set<string>> {
-  const earned = await db
+  const earned = await database
     .select({ slug: achievements.slug })
     .from(userAchievements)
     .innerJoin(
@@ -249,15 +264,37 @@ export async function getEarnedAchievementIds(
 export async function awardAchievements(
   userId: string,
   achievementSlugs: string[],
-): Promise<void> {
-  if (achievementSlugs.length === 0) return;
+  database: AchievementDatabase = db,
+): Promise<string[]> {
+  if (achievementSlugs.length === 0) return [];
 
-  // 1. Get DB records for these slugs to get UUIDs and XP rewards
-  const dbAchievements = await db.query.achievements.findMany({
-    where: sql`${achievements.slug} IN ${achievementSlugs}`,
-  });
+  if (database === db) {
+    return db.transaction((transaction) =>
+      awardAchievementsInTransaction(userId, achievementSlugs, transaction),
+    );
+  }
 
-  if (dbAchievements.length === 0) return;
+  return awardAchievementsInTransaction(userId, achievementSlugs, database);
+}
+
+async function awardAchievementsInTransaction(
+  userId: string,
+  achievementSlugs: string[],
+  database: AchievementDatabase,
+): Promise<string[]> {
+  if (achievementSlugs.length === 0) return [];
+
+  // Resolve reward values from the database rather than from request data.
+  const dbAchievements = await database
+    .select({
+      id: achievements.id,
+      slug: achievements.slug,
+      xpReward: achievements.xpReward,
+    })
+    .from(achievements)
+    .where(inArray(achievements.slug, achievementSlugs));
+
+  if (dbAchievements.length === 0) return [];
 
   // 2. Insert into user_achievements
   const values = dbAchievements.map((a) => ({
@@ -267,40 +304,43 @@ export async function awardAchievements(
     progress: 100,
   }));
 
-  await db
+  const insertedAchievements = await database
     .insert(userAchievements)
     .values(values)
     .onConflictDoNothing({
       target: [userAchievements.userId, userAchievements.achievementId],
-    });
+    })
+    .returning({ achievementId: userAchievements.achievementId });
 
-  // 3. Calculate total XP reward and update user
-  const totalXpReward = dbAchievements.reduce(
-    (sum, a) => sum + (a.xpReward || 0),
+  if (insertedAchievements.length === 0) return [];
+
+  // Only rows inserted by this request may produce XP. A concurrent retry
+  // can therefore never re-award an already unlocked achievement.
+  const insertedIds = new Set(
+    insertedAchievements.map((achievement) => achievement.achievementId),
+  );
+  const awardedAchievements = dbAchievements.filter((achievement) =>
+    insertedIds.has(achievement.id),
+  );
+  const totalXpReward = awardedAchievements.reduce(
+    (sum, achievement) => sum + achievement.xpReward,
     0,
   );
 
   if (totalXpReward > 0) {
-    // We need to fetch current user to check for level up (or just increment)
-    // For simplicity and race-condition safety, we can use sql increment if supported,
-    // but we likely want to check "level up" logic too.
-    // For now, let's simple increment. The "Level Up mechanism" might be skipped here
-    // if we don't duplicate the checkLevelUp logic.
-    // Ideally, we should unify XP awarding.
-
-    const user = await db.query.users.findFirst({
-      where: eq(users.id, userId),
-      columns: {
-        xp: true,
-        level: true,
-      },
-    });
+    // Serialize all XP writes for one user so both the total and derived
+    // level are computed from the same authoritative value.
+    const [user] = await database
+      .select({ xp: users.xp, level: users.level })
+      .from(users)
+      .where(eq(users.id, userId))
+      .for('update');
 
     if (user) {
       // Calculate new level using the gamification helper
       const levelUpInfo = checkLevelUp(user.xp, totalXpReward);
 
-      await db
+      await database
         .update(users)
         .set({
           xp: user.xp + totalXpReward,
@@ -320,4 +360,12 @@ export async function awardAchievements(
       );
     }
   }
+
+  const slugById = new Map(
+    dbAchievements.map((achievement) => [achievement.id, achievement.slug]),
+  );
+  return insertedAchievements.flatMap((achievement) => {
+    const slug = slugById.get(achievement.achievementId);
+    return slug ? [slug] : [];
+  });
 }

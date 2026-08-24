@@ -23,6 +23,7 @@ import {
   getEarnedAchievementIds,
   awardAchievements,
 } from '@/lib/stats';
+import { checkLevelUp } from '@/lib/gamification';
 import { logger } from '@/lib/logger';
 import { ensureEntityInDb } from './ensure-entity-in-db';
 
@@ -247,133 +248,177 @@ const MarkTutorialCompleteSchema = z.object({
   locale: z.string().optional(),
 });
 
-export const completeTutorial = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
-  .inputValidator((data: unknown) => MarkTutorialCompleteSchema.parse(data))
-  .handler(async ({ data: input, context }) => {
-    try {
-      const userId = context.user.id;
-      const { slug } = input;
+export const completeTutorialHandler = async ({
+  data: input,
+  context,
+}: {
+  data: z.infer<typeof MarkTutorialCompleteSchema>;
+  context?: { user?: { id?: string } } | undefined;
+}) => {
+  try {
+    const userId = context?.user?.id;
+    if (!userId) return { success: false, error: 'Unauthorized' };
+    const { slug } = input;
+    const tutorialContent = await getTutorialCatalogDetail(slug, 'en');
 
-      const existingTutorial = await db.query.tutorials.findFirst({
-        where: eq(tutorials.slug, slug),
-      });
+    if (!tutorialContent)
+      return { success: false, error: 'Tutorial not found' };
 
-      const tutorial =
-        existingTutorial ??
-        (await ensureEntityInDb({
-          slug,
-          findExisting: (value) =>
-            db.query.tutorials.findFirst({
-              where: eq(tutorials.slug, value),
-            }),
-          fetchContent: (value) => getTutorialCatalogDetail(value, 'en'),
-          insert: async (tutorialContent) =>
-            (
-              await db
-                .insert(tutorials)
-                .values({
-                  slug: tutorialContent.slug,
-                  title: {
-                    en: tutorialContent.title,
-                    id: tutorialContent.title,
-                  },
-                  order: tutorialContent.order,
-                  estimatedMinutes: tutorialContent.estimatedMinutes,
-                  tags: tutorialContent.tags,
-                  isPublished: true,
-                })
-                .returning()
-            )[0],
-          logger,
-        }));
+    const existingTutorial = await db.query.tutorials.findFirst({
+      where: eq(tutorials.slug, slug),
+    });
 
-      if (!tutorial) return { success: false, error: 'Tutorial not found' };
+    if (existingTutorial && !existingTutorial.isPublished) {
+      return { success: false, error: 'Tutorial not found' };
+    }
 
-      const existingProgress = await db.query.progress.findFirst({
-        where: and(
-          eq(progress.userId, userId),
-          eq(progress.tutorialId, tutorial.id),
-        ),
-      });
+    const tutorial =
+      existingTutorial ??
+      (await ensureEntityInDb({
+        slug,
+        findExisting: (value) =>
+          db.query.tutorials.findFirst({
+            where: eq(tutorials.slug, value),
+          }),
+        fetchContent: () => Promise.resolve(tutorialContent),
+        insert: async (tutorialContent) =>
+          (
+            await db
+              .insert(tutorials)
+              .values({
+                slug: tutorialContent.slug,
+                title: {
+                  en: tutorialContent.title,
+                  id: tutorialContent.title,
+                },
+                order: tutorialContent.order,
+                estimatedMinutes: tutorialContent.estimatedMinutes,
+                tags: tutorialContent.tags,
+                isPublished: true,
+              })
+              .returning()
+          )[0],
+        logger,
+      }));
 
-      let wasAlreadyCompleted = false;
-      if (existingProgress) {
-        wasAlreadyCompleted = existingProgress.isCompleted;
-        if (!wasAlreadyCompleted) {
-          await db
-            .update(progress)
-            .set({
-              isCompleted: true,
-              readingProgress: 100,
-              completedAt: new Date(),
-              lastAccessedAt: new Date(),
-            })
-            .where(eq(progress.id, existingProgress.id));
-        }
-      } else {
-        await db.insert(progress).values({
+    if (!tutorial) return { success: false, error: 'Tutorial not found' };
+
+    const completion = await db.transaction(async (transaction) => {
+      // The partial unique index plus this insert prevents concurrent
+      // requests from creating two progress rows. The row lock serializes
+      // the transition from incomplete to complete and its rewards.
+      await transaction
+        .insert(progress)
+        .values({
           userId,
           tutorialId: tutorial.id,
-          isCompleted: true,
-          readingProgress: 100,
-          completedAt: new Date(),
-          lastAccessedAt: new Date(),
-        });
-      }
+          isCompleted: false,
+          readingProgress: 0,
+        })
+        .onConflictDoNothing();
+
+      const [progressRecord] = await transaction
+        .select()
+        .from(progress)
+        .where(
+          and(
+            eq(progress.userId, userId),
+            eq(progress.tutorialId, tutorial.id),
+          ),
+        )
+        .for('update');
+
+      if (!progressRecord)
+        throw new Error('Failed to initialize tutorial progress');
+
+      const wasAlreadyCompleted = progressRecord.isCompleted;
+      let newAchievements: { id: string; name: string; icon: string }[] = [];
 
       if (!wasAlreadyCompleted) {
-        await db
+        const now = new Date();
+        await transaction
+          .update(progress)
+          .set({
+            isCompleted: true,
+            readingProgress: 100,
+            completedAt: now,
+            lastAccessedAt: now,
+            updatedAt: now,
+          })
+          .where(eq(progress.id, progressRecord.id));
+
+        const [user] = await transaction
+          .select({ xp: users.xp, level: users.level })
+          .from(users)
+          .where(eq(users.id, userId))
+          .for('update');
+        if (!user) throw new Error('User not found');
+
+        const levelUpInfo = checkLevelUp(user.xp, 25);
+        await transaction
           .update(users)
-          .set({ xp: sql`${users.xp} + 25` })
+          .set({
+            xp: user.xp + 25,
+            level: levelUpInfo.newLevel,
+            updatedAt: now,
+          })
           .where(eq(users.id, userId));
-      }
 
-      let newAchievements: { id: string; name: string; icon: string }[] = [];
-      try {
-        const userStats = await getUserStats(userId);
-        const alreadyEarned = await getEarnedAchievementIds(userId);
+        const userStats = await getUserStats(userId, transaction);
+        const alreadyEarned = await getEarnedAchievementIds(
+          userId,
+          transaction,
+        );
         const earnedAchievements = checkAchievements(userStats, alreadyEarned);
-
-        if (earnedAchievements.length > 0) {
-          await awardAchievements(
-            userId,
-            earnedAchievements.map((achievement) => achievement.id),
-          );
-          newAchievements = earnedAchievements.map((achievement) => ({
+        const awardedSlugs = await awardAchievements(
+          userId,
+          earnedAchievements.map((achievement) => achievement.id),
+          transaction,
+        );
+        const awarded = new Set(awardedSlugs);
+        newAchievements = earnedAchievements
+          .filter((achievement) => awarded.has(achievement.id))
+          .map((achievement) => ({
             id: achievement.id,
             name: achievement.name,
             icon: achievement.icon,
           }));
+
+        if (newAchievements.length > 0) {
           logger.info(
-            `[Achievements] Tutorial completion triggered: ${earnedAchievements.map((achievement) => achievement.name).join(', ')}`,
+            `[Achievements] Tutorial completion triggered: ${newAchievements.map((achievement) => achievement.name).join(', ')}`,
           );
         }
-      } catch (error) {
-        logger.error('Error checking achievements after tutorial:', error);
       }
 
-      await db
+      // Preserve the existing view-count behavior, but keep it in the same
+      // transaction so a failed completion cannot leave a partial write.
+      await transaction
         .update(tutorials)
         .set({ viewCount: sql`${tutorials.viewCount} + 1` })
         .where(eq(tutorials.id, tutorial.id));
 
       return {
-        success: true,
-        data: {
-          isCompleted: true,
-          xpAwarded: wasAlreadyCompleted ? 0 : 25,
-          newAchievements,
-        },
+        isCompleted: true,
+        xpAwarded: wasAlreadyCompleted ? 0 : 25,
+        newAchievements,
       };
-    } catch (error) {
-      console.error('Error marking tutorial complete:', error);
-      return {
-        success: false,
-        error: 'An error occurred while processing your request.',
-      };
-    }
-  });
+    });
+
+    return { success: true, data: completion };
+  } catch (error) {
+    console.error('Error marking tutorial complete:', error);
+    return {
+      success: false,
+      error: 'An error occurred while processing your request.',
+    };
+  }
+};
+
+export const completeTutorial = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .inputValidator((data: unknown) => MarkTutorialCompleteSchema.parse(data))
+  .handler(completeTutorialHandler);
 
 // ----------------------------------------------------------------------------
 // INCREMENT VIEW COUNT

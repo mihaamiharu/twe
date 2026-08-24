@@ -26,6 +26,21 @@ export const challengeCatalogQueryKeys = {
     ] as const,
 };
 
+/**
+ * Keys to invalidate after a successful challenge submission. This keeps
+ * cache invalidation aligned with the server's viewer-scoped progress overlay.
+ */
+export function challengeProgressInvalidationKeys(
+  slug: string,
+  locale: string,
+  viewerId?: string | null,
+) {
+  return [
+    challengeCatalogQueryKeys.detail(slug, locale, viewerId),
+    challengeCatalogQueryKeys.list(locale, viewerId),
+  ] as const;
+}
+
 export const challengeListQueryOptions = ({
   locale,
   viewerId,
