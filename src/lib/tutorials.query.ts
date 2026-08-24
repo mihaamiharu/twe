@@ -19,6 +19,22 @@ export const tutorialCatalogQueryKeys = {
     ['catalog', 'learn', 'detail', slug, locale, viewerKey(viewerId)] as const,
 };
 
+/**
+ * Keys to invalidate after a successful tutorial completion. Kept in the
+ * client query contract so mutation consumers do not duplicate the
+ * viewer-scoped list/detail key shapes.
+ */
+export function tutorialProgressInvalidationKeys(
+  slug: string,
+  locale: string,
+  viewerId?: string | null,
+) {
+  return [
+    tutorialCatalogQueryKeys.detail(slug, locale, viewerId),
+    tutorialCatalogQueryKeys.list(locale, viewerId),
+  ] as const;
+}
+
 export const tutorialsListQueryOptions = ({
   locale,
   viewerId,

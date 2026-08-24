@@ -7,6 +7,9 @@
 
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
 
+/** XP awarded for the first authenticated completion of a tutorial. */
+export const TUTORIAL_COMPLETION_XP = 25;
+
 // XP reward ranges by difficulty
 const XP_REWARDS: Record<Difficulty, { min: number; max: number }> = {
   EASY: { min: 10, max: 30 },

@@ -4,7 +4,7 @@ import { getRequest } from '@tanstack/react-start/server';
 import { authMiddleware } from './auth.mw';
 import { auth } from './auth.server';
 import { db } from '@/db';
-import { tutorials, progress, users } from '@/db/schema';
+import { tutorials, progress } from '@/db/schema';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import {
   getChallengeCatalogList,
@@ -17,14 +17,10 @@ import type {
   ChallengeCatalogListItem,
   TutorialListResponse,
 } from '@/lib/catalog.types';
-import { checkAchievements } from '@/lib/achievements';
-import {
-  getUserStats,
-  getEarnedAchievementIds,
-  awardAchievements,
-} from '@/lib/stats';
+import { TUTORIAL_COMPLETION_XP } from '@/lib/gamification';
 import { logger } from '@/lib/logger';
 import { ensureEntityInDb } from './ensure-entity-in-db';
+import { runProgressRewardTransaction } from './progress-rewards';
 
 // ----------------------------------------------------------------------------
 // GET TUTORIALS (LIST) - FILESYSTEM CATALOG + EXPLICIT DB OVERLAY
@@ -247,133 +243,117 @@ const MarkTutorialCompleteSchema = z.object({
   locale: z.string().optional(),
 });
 
-export const completeTutorial = createServerFn({ method: 'POST' })
-  .middleware([authMiddleware])
-  .inputValidator((data: unknown) => MarkTutorialCompleteSchema.parse(data))
-  .handler(async ({ data: input, context }) => {
-    try {
-      const userId = context.user.id;
-      const { slug } = input;
+export const completeTutorialHandler = async ({
+  data: input,
+  context,
+}: {
+  data: z.infer<typeof MarkTutorialCompleteSchema>;
+  context?: { user?: { id?: string } } | undefined;
+}) => {
+  try {
+    const userId = context?.user?.id;
+    if (!userId) return { success: false, error: 'Unauthorized' };
+    const { slug } = input;
+    const tutorialContent = await getTutorialCatalogDetail(slug, 'en');
 
-      const existingTutorial = await db.query.tutorials.findFirst({
-        where: eq(tutorials.slug, slug),
-      });
+    if (!tutorialContent)
+      return { success: false, error: 'Tutorial not found' };
 
-      const tutorial =
-        existingTutorial ??
-        (await ensureEntityInDb({
-          slug,
-          findExisting: (value) =>
-            db.query.tutorials.findFirst({
-              where: eq(tutorials.slug, value),
-            }),
-          fetchContent: (value) => getTutorialCatalogDetail(value, 'en'),
-          insert: async (tutorialContent) =>
-            (
-              await db
-                .insert(tutorials)
-                .values({
-                  slug: tutorialContent.slug,
-                  title: {
-                    en: tutorialContent.title,
-                    id: tutorialContent.title,
-                  },
-                  order: tutorialContent.order,
-                  estimatedMinutes: tutorialContent.estimatedMinutes,
-                  tags: tutorialContent.tags,
-                  isPublished: true,
-                })
-                .returning()
-            )[0],
-          logger,
-        }));
+    const existingTutorial = await db.query.tutorials.findFirst({
+      where: eq(tutorials.slug, slug),
+    });
 
-      if (!tutorial) return { success: false, error: 'Tutorial not found' };
+    if (existingTutorial && !existingTutorial.isPublished) {
+      return { success: false, error: 'Tutorial not found' };
+    }
 
-      const existingProgress = await db.query.progress.findFirst({
-        where: and(
-          eq(progress.userId, userId),
-          eq(progress.tutorialId, tutorial.id),
-        ),
-      });
+    const tutorial =
+      existingTutorial ??
+      (await ensureEntityInDb({
+        slug,
+        findExisting: (value) =>
+          db.query.tutorials.findFirst({
+            where: eq(tutorials.slug, value),
+          }),
+        fetchContent: () => Promise.resolve(tutorialContent),
+        insert: async (tutorialContent) =>
+          (
+            await db
+              .insert(tutorials)
+              .values({
+                slug: tutorialContent.slug,
+                title: {
+                  en: tutorialContent.title,
+                  id: tutorialContent.title,
+                },
+                order: tutorialContent.order,
+                estimatedMinutes: tutorialContent.estimatedMinutes,
+                tags: tutorialContent.tags,
+                isPublished: true,
+              })
+              .returning()
+          )[0],
+        logger,
+      }));
 
-      let wasAlreadyCompleted = false;
-      if (existingProgress) {
-        wasAlreadyCompleted = existingProgress.isCompleted;
-        if (!wasAlreadyCompleted) {
-          await db
-            .update(progress)
-            .set({
-              isCompleted: true,
-              readingProgress: 100,
-              completedAt: new Date(),
-              lastAccessedAt: new Date(),
-            })
-            .where(eq(progress.id, existingProgress.id));
+    if (!tutorial) return { success: false, error: 'Tutorial not found' };
+
+    const completion = await runProgressRewardTransaction({
+      userId,
+      target: {
+        kind: 'tutorial',
+        tutorialId: tutorial.id,
+        xpReward: TUTORIAL_COMPLETION_XP,
+      },
+      shouldComplete: true,
+      onPersist: async (transaction, reward) => {
+        if (reward.isFirstCompletion) {
+          await transaction
+            .update(tutorials)
+            .set({ viewCount: sql`${tutorials.viewCount} + 1` })
+            .where(eq(tutorials.id, tutorial.id));
         }
-      } else {
-        await db.insert(progress).values({
-          userId,
-          tutorialId: tutorial.id,
-          isCompleted: true,
-          readingProgress: 100,
-          completedAt: new Date(),
-          lastAccessedAt: new Date(),
-        });
-      }
 
-      if (!wasAlreadyCompleted) {
-        await db
-          .update(users)
-          .set({ xp: sql`${users.xp} + 25` })
-          .where(eq(users.id, userId));
-      }
-
-      let newAchievements: { id: string; name: string; icon: string }[] = [];
-      try {
-        const userStats = await getUserStats(userId);
-        const alreadyEarned = await getEarnedAchievementIds(userId);
-        const earnedAchievements = checkAchievements(userStats, alreadyEarned);
-
-        if (earnedAchievements.length > 0) {
-          await awardAchievements(
-            userId,
-            earnedAchievements.map((achievement) => achievement.id),
-          );
-          newAchievements = earnedAchievements.map((achievement) => ({
+        const awardedAchievements = new Set(reward.awardedAchievementSlugs);
+        const newAchievements = reward.earnedAchievements
+          .filter((achievement) => awardedAchievements.has(achievement.id))
+          .map((achievement) => ({
             id: achievement.id,
             name: achievement.name,
             icon: achievement.icon,
           }));
+
+        if (newAchievements.length > 0) {
           logger.info(
-            `[Achievements] Tutorial completion triggered: ${earnedAchievements.map((achievement) => achievement.name).join(', ')}`,
+            `[Achievements] Tutorial completion triggered: ${newAchievements.map((achievement) => achievement.name).join(', ')}`,
           );
         }
-      } catch (error) {
-        logger.error('Error checking achievements after tutorial:', error);
-      }
 
-      await db
-        .update(tutorials)
-        .set({ viewCount: sql`${tutorials.viewCount} + 1` })
-        .where(eq(tutorials.id, tutorial.id));
+        return { newAchievements };
+      },
+    });
 
-      return {
-        success: true,
-        data: {
-          isCompleted: true,
-          xpAwarded: wasAlreadyCompleted ? 0 : 25,
-          newAchievements,
-        },
-      };
-    } catch (error) {
-      console.error('Error marking tutorial complete:', error);
-      return {
-        success: false,
-        error: 'An error occurred while processing your request.',
-      };
-    }
-  });
+    return {
+      success: true,
+      data: {
+        isCompleted: true,
+        xpAwarded: completion.isFirstCompletion ? TUTORIAL_COMPLETION_XP : 0,
+        newAchievements: completion.persisted.newAchievements,
+      },
+    };
+  } catch (error) {
+    console.error('Error marking tutorial complete:', error);
+    return {
+      success: false,
+      error: 'An error occurred while processing your request.',
+    };
+  }
+};
+
+export const completeTutorial = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .inputValidator((data: unknown) => MarkTutorialCompleteSchema.parse(data))
+  .handler(completeTutorialHandler);
 
 // ----------------------------------------------------------------------------
 // INCREMENT VIEW COUNT

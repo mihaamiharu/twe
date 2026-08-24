@@ -4,13 +4,15 @@ import {
   timestamp,
   integer,
   boolean,
+  check,
   uuid,
   pgEnum,
   jsonb,
   index,
   unique,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import type { LocalizedString, LocalizedArray } from '@/lib/content.types';
 
 // ============================================================================
@@ -147,36 +149,40 @@ export const tutorials = pgTable('tutorials', {
   updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });
 
-export const challenges = pgTable('challenges', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  slug: text('slug').notNull().unique(),
-  title: jsonb('title').$type<LocalizedString>().notNull(),
-  type: challengeTypeEnum('type').notNull(),
-  difficulty: difficultyEnum('difficulty').notNull(),
-  xpReward: integer('xp_reward').notNull(),
-  order: integer('order').notNull(), // Display order
+export const challenges = pgTable(
+  'challenges',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    slug: text('slug').notNull().unique(),
+    title: jsonb('title').$type<LocalizedString>().notNull(),
+    type: challengeTypeEnum('type').notNull(),
+    difficulty: difficultyEnum('difficulty').notNull(),
+    xpReward: integer('xp_reward').notNull(),
+    order: integer('order').notNull(), // Display order
 
-  // Relations
-  tutorialId: uuid('tutorial_id').references(() => tutorials.id, {
-    onDelete: 'set null',
+    // Relations
+    tutorialId: uuid('tutorial_id').references(() => tutorials.id, {
+      onDelete: 'set null',
+    }),
+
+    // Metadata
+    category: text('category'), // e.g., 'css-basics', 'xpath-basics', 'css-advanced'
+    tags: text('tags').array(),
+    hints: jsonb('hints').$type<LocalizedArray>(), // Progressive hints for the challenge (Localized)
+    isPublished: boolean('is_published').notNull().default(false),
+    completionCount: integer('completion_count').notNull().default(0),
+
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    publishedIdx: index('idx_challenges_published').on(table.isPublished),
+    categoryIdx: index('idx_challenges_category').on(table.category),
+    difficultyIdx: index('idx_challenges_difficulty').on(table.difficulty),
+    typeIdx: index('idx_challenges_type').on(table.type),
+    orderIdx: index('idx_challenges_order').on(table.order),
   }),
-
-  // Metadata
-  category: text('category'), // e.g., 'css-basics', 'xpath-basics', 'css-advanced'
-  tags: text('tags').array(),
-  hints: jsonb('hints').$type<LocalizedArray>(), // Progressive hints for the challenge (Localized)
-  isPublished: boolean('is_published').notNull().default(false),
-  completionCount: integer('completion_count').notNull().default(0),
-
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-}, (table) => ({
-  publishedIdx: index('idx_challenges_published').on(table.isPublished),
-  categoryIdx: index('idx_challenges_category').on(table.category),
-  difficultyIdx: index('idx_challenges_difficulty').on(table.difficulty),
-  typeIdx: index('idx_challenges_type').on(table.type),
-  orderIdx: index('idx_challenges_order').on(table.order),
-}));
+);
 
 export const testCases = pgTable('test_cases', {
   id: uuid('id').defaultRandom().primaryKey(),
@@ -195,60 +201,80 @@ export const testCases = pgTable('test_cases', {
 // USER PROGRESS TABLES
 // ============================================================================
 
-export const submissions = pgTable('submissions', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  challengeId: uuid('challenge_id')
-    .notNull()
-    .references(() => challenges.id, { onDelete: 'cascade' }),
+export const submissions = pgTable(
+  'submissions',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    challengeId: uuid('challenge_id')
+      .notNull()
+      .references(() => challenges.id, { onDelete: 'cascade' }),
 
-  code: text('code').notNull(), // User's submitted code
-  isPassed: boolean('is_passed').notNull(),
-  xpEarned: integer('xp_earned').notNull().default(0),
+    code: text('code').notNull(), // User's submitted code
+    isPassed: boolean('is_passed').notNull(),
+    xpEarned: integer('xp_earned').notNull().default(0),
 
-  // Execution details
-  executionTime: integer('execution_time'), // milliseconds
-  testsPassed: integer('tests_passed').notNull(),
-  testsTotal: integer('tests_total').notNull(),
-  errorMessage: text('error_message'),
+    // Execution details
+    executionTime: integer('execution_time'), // milliseconds
+    testsPassed: integer('tests_passed').notNull(),
+    testsTotal: integer('tests_total').notNull(),
+    errorMessage: text('error_message'),
 
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-}, (table) => ({
-  userIdIdx: index('idx_submissions_user_id').on(table.userId),
-}));
-
-export const progress = pgTable('progress', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  tutorialId: uuid('tutorial_id').references(() => tutorials.id, {
-    onDelete: 'cascade',
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    userIdIdx: index('idx_submissions_user_id').on(table.userId),
   }),
-  challengeId: uuid('challenge_id').references(() => challenges.id, {
-    onDelete: 'cascade',
+);
+
+export const progress = pgTable(
+  'progress',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    tutorialId: uuid('tutorial_id').references(() => tutorials.id, {
+      onDelete: 'cascade',
+    }),
+    challengeId: uuid('challenge_id').references(() => challenges.id, {
+      onDelete: 'cascade',
+    }),
+
+    isCompleted: boolean('is_completed').notNull().default(false),
+    completedAt: timestamp('completed_at'),
+    lastAccessedAt: timestamp('last_accessed_at').notNull().defaultNow(),
+
+    // For tutorials
+    readingProgress: integer('reading_progress').default(0), // Percentage
+
+    // For challenges
+    attempts: integer('attempts').default(0),
+    bestSubmissionId: uuid('best_submission_id').references(
+      () => submissions.id,
+    ),
+    usedHint: boolean('used_hint').notNull().default(false), // Track AI hint usage for XP penalty
+    hintContent: text('hint_content'), // Store the generated hint
+
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+  },
+  (table) => ({
+    userIdIdx: index('idx_progress_user_id').on(table.userId),
+    progressEntityCheck: check(
+      'progress_exactly_one_entity',
+      sql`(${table.tutorialId} IS NOT NULL) <> (${table.challengeId} IS NOT NULL)`,
+    ),
+    userTutorialUnique: uniqueIndex('progress_user_tutorial_unique')
+      .on(table.userId, table.tutorialId)
+      .where(sql`${table.tutorialId} IS NOT NULL`),
+    userChallengeUnique: uniqueIndex('progress_user_challenge_unique')
+      .on(table.userId, table.challengeId)
+      .where(sql`${table.challengeId} IS NOT NULL`),
   }),
-
-  isCompleted: boolean('is_completed').notNull().default(false),
-  completedAt: timestamp('completed_at'),
-  lastAccessedAt: timestamp('last_accessed_at').notNull().defaultNow(),
-
-  // For tutorials
-  readingProgress: integer('reading_progress').default(0), // Percentage
-
-  // For challenges
-  attempts: integer('attempts').default(0),
-  bestSubmissionId: uuid('best_submission_id').references(() => submissions.id),
-  usedHint: boolean('used_hint').notNull().default(false), // Track AI hint usage for XP penalty
-  hintContent: text('hint_content'), // Store the generated hint
-
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at').notNull().defaultNow(),
-}, (table) => ({
-  userIdIdx: index('idx_progress_user_id').on(table.userId),
-}));
+);
 
 // ============================================================================
 // GAMIFICATION TABLES
@@ -273,21 +299,27 @@ export const achievements = pgTable('achievements', {
   createdAt: timestamp('created_at').notNull().defaultNow(),
 });
 
-export const userAchievements = pgTable('user_achievements', {
-  id: uuid('id').defaultRandom().primaryKey(),
-  userId: uuid('user_id')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-  achievementId: uuid('achievement_id')
-    .notNull()
-    .references(() => achievements.id, { onDelete: 'cascade' }),
+export const userAchievements = pgTable(
+  'user_achievements',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    achievementId: uuid('achievement_id')
+      .notNull()
+      .references(() => achievements.id, { onDelete: 'cascade' }),
 
-  unlockedAt: timestamp('unlocked_at').notNull().defaultNow(),
-  progress: integer('progress').default(0), // For progressive achievements
-}, (table) => ({
-  // Prevent duplicate user-achievement pairs
-  userAchievementUnique: unique('user_achievements_user_achievement_unique').on(table.userId, table.achievementId),
-}));
+    unlockedAt: timestamp('unlocked_at').notNull().defaultNow(),
+    progress: integer('progress').default(0), // For progressive achievements
+  },
+  (table) => ({
+    // Prevent duplicate user-achievement pairs
+    userAchievementUnique: unique(
+      'user_achievements_user_achievement_unique',
+    ).on(table.userId, table.achievementId),
+  }),
+);
 
 // ============================================================================
 // BUG REPORTING
