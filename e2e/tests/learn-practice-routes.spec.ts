@@ -35,6 +35,16 @@ test.describe('Learn and Practice public routes', () => {
   }
 
   for (const locale of ['en', 'id'] as const) {
+    test(`${locale} unknown Learn lesson uses the branded not-found state`, async ({
+      page,
+    }) => {
+      const requestedUrl = `/${locale}/learn/not-a-real-lesson`;
+      await page.goto(requestedUrl);
+
+      await expect.poll(() => new URL(page.url()).pathname).toBe(requestedUrl);
+      await expect(page.locator('[data-not-found-page]')).toBeVisible();
+    });
+
     for (const legacyPath of [
       '/tutorials',
       '/tutorials/dom-tree-hierarchy',

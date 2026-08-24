@@ -64,6 +64,50 @@ test.describe('Tutorials', () => {
     await expect(beginner).toHaveAttribute('aria-pressed', 'true');
   });
 
+  test('should preserve explicit completion visibility booleans in the URL', async ({
+    page,
+  }) => {
+    await page.goto('/en/learn?hideCompleted=false');
+    await expect(page).toHaveURL(/hideCompleted=false/);
+    await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    await page.reload();
+    await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    await page.goto('/en/learn?hideCompleted=true');
+    await expect(page).toHaveURL(/hideCompleted=true/);
+    await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+  });
+
+  test('should keep grid and list presentation in URL state', async ({
+    page,
+  }) => {
+    await page.goto('/en/learn?view=list');
+    await expect(page.getByTestId('learn-results')).toHaveAttribute(
+      'data-view-mode',
+      'list',
+    );
+    await expect(
+      page.getByRole('button', { name: 'List View' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    await page.getByRole('button', { name: 'Grid View' }).click();
+    await expect(page).toHaveURL(/\/en\/learn\/?$/);
+    await expect(page.getByTestId('learn-results')).toHaveAttribute(
+      'data-view-mode',
+      'grid',
+    );
+  });
+
   test('should preserve lesson search in URL state and filter the list', async ({
     page,
   }) => {
@@ -86,6 +130,48 @@ test.describe('Tutorials', () => {
     await firstTutorial.click();
     await page.waitForLoadState('domcontentloaded');
     await tutorialsPage.verifyTutorialContent();
+  });
+
+  test('should render localized detail metadata and declared Practice links', async ({
+    page,
+  }) => {
+    await page.goto('/id/learn/javascript-fundamentals-for-qa');
+    await expect(page.locator('h1')).toContainText(
+      'Fundamental Modern JavaScript',
+    );
+    await expect(
+      page.locator('meta[name="description"]').last(),
+    ).toHaveAttribute('content', /Pahami dasar-dasar ES6/);
+    await expect(page.getByTestId('related-practice-links')).toContainText(
+      'Latihan',
+    );
+    await expect(
+      page.locator('a[href*="/id/practice/js-variables-types"]'),
+    ).toBeVisible();
+    await expect(page.getByTestId('reading-progress')).toBeVisible();
+  });
+
+  test('should guard completion for signed-out readers', async ({
+    page,
+    context,
+  }) => {
+    const consentCookies = (await context.cookies()).filter(
+      (cookie) => cookie.name === 'twe-consent',
+    );
+    await context.clearCookies();
+    await context.addCookies(consentCookies);
+    await page.goto('about:blank');
+    await page.goto('/en/learn/dom-tree-hierarchy');
+    await page.waitForLoadState('networkidle');
+
+    const completeButton = page.getByRole('button', {
+      name: 'Sign in to Save Progress',
+    });
+    await expect(completeButton).toBeVisible();
+    await completeButton.click();
+    await expect(page.getByRole('dialog')).toContainText(
+      'Sign in to Save Progress',
+    );
   });
 
   test('should mark tutorial as complete', async ({ page }) => {

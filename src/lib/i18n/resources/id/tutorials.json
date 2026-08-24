@@ -64,10 +64,20 @@
       "practiceLink": "Lihat tantangan Practice",
       "searchLabel": "Cari pelajaran",
       "searchPlaceholder": "Cari pelajaran...",
+      "clearSearch": "Hapus pencarian pelajaran",
+      "results": "{{count}} pelajaran",
+      "lessonNumber": "Pelajaran {{number}}",
       "emptyEyebrow": "TIDAK ADA HASIL",
       "noResults": "Pelajaran tidak ditemukan",
       "tryDifferentSearch": "Coba kata kunci pencarian lain",
-      "checkBackSoon": "Pelajaran baru akan muncul di sini saat sudah siap."
+      "checkBackSoon": "Pelajaran baru akan muncul di sini saat sudah siap.",
+      "errorEyebrow": "GAGAL MEMUAT",
+      "errorTitle": "Pelajaran tidak tersedia",
+      "errorDescription": "Katalog pelajaran tidak dapat dimuat. Silakan coba lagi nanti."
+    },
+    "detailError": {
+      "title": "Pelajaran ini tidak tersedia",
+      "description": "Pelajaran ini tidak dapat dimuat. Kembali ke Belajar dan coba lagi."
     },
     "future": {
       "eyebrow": "BERIKUTNYA",
@@ -92,11 +102,13 @@
     "notFoundDescription": "Tutorial yang kamu cari tidak ada"
   },
   "filters": {
+    "difficultyLabel": "Filter pelajaran berdasarkan tingkat kesulitan",
     "all": "Semua",
     "foundations": "Pondasi",
     "beginner": "Pemula",
     "intermediate": "Menengah",
     "advanced": "E2E Testing",
+    "clear": "Hapus filter",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai"
   },
@@ -117,17 +129,22 @@
   "card": {
     "estimatedTime": "{{minutes}} menit baca",
     "estimatedTimeShort": "{{minutes}} mnt",
-    "startTutorial": "Mulai Tutorial",
-    "continueTutorial": "Lanjutkan",
-    "completed": "Selesai"
+    "startLesson": "Mulai pelajaran",
+    "continueLesson": "Lanjutkan pelajaran",
+    "completed": "Selesai",
+    "reviewLesson": "Tinjau pelajaran",
+    "progress": "{{progress}}% dibaca",
+    "progressLabel": "Progres membaca: {{progress}}%"
   },
   "view": {
+    "label": "Tampilan pelajaran",
     "grid": "Tampilan Grid",
     "list": "Tampilan Daftar"
   },
   "sidebar": {
     "progress": "Progres Kamu",
     "reading": "Membaca",
+    "readingProgress": "Progres membaca: {{progress}}%",
     "readToComplete": "Baca untuk Menyelesaikan",
     "completeAndContinue": "Selesai & Lanjutkan",
     "completedTitle": "Selesai! 🎉",
@@ -137,8 +154,15 @@
     "challengesTitle": "Tantangan Latihan",
     "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini."
   },
+  "detail": {
+    "breadcrumbLabel": "Breadcrumb pelajaran",
+    "contentLabel": "Konten pelajaran",
+    "tagsLabel": "Topik pelajaran",
+    "tocTitle": "Di halaman ini",
+    "lessonNavigationLabel": "Navigasi pelajaran"
+  },
   "toasts": {
-    "completed": "Tutorial selesai! 🎉",
-    "failed": "Gagal menandai sebagai selesai"
+    "completed": "Pelajaran selesai! 🎉",
+    "failed": "Gagal menandai pelajaran sebagai selesai"
   }
 }
