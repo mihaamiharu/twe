@@ -70,7 +70,6 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     };
   }, [isMobileMenuOpen]);
 
-  // Public labels intentionally map to the existing route names for now.
   const navLinks = [
     {
       to: LocaleRoutes.learn,
@@ -130,7 +129,12 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={cn('flex items-center justify-between', isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]')}>
+          <div
+            className={cn(
+              'flex items-center justify-between',
+              isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]',
+            )}
+          >
             {/* Logo */}
             <div className="flex items-center gap-9">
               <Link
@@ -203,7 +207,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                       params={localeParams(locale)}
                       className={cn(
                         'inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]',
-                        isContactPage && 'rounded-md border border-[var(--graphite)] px-5',
+                        isContactPage &&
+                          'rounded-md border border-[var(--graphite)] px-5',
                       )}
                     >
                       {t('common:actions.signIn')}
@@ -217,7 +222,11 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
-                        {t(isContactPage ? 'common:actions.startLearning' : 'common:actions.startWebAutomation')}
+                        {t(
+                          isContactPage
+                            ? 'common:actions.startLearning'
+                            : 'common:actions.startWebAutomation',
+                        )}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>

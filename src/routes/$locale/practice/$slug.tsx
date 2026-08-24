@@ -74,17 +74,17 @@ export const Route = createFileRoute('/$locale/practice/$slug')({
           {
             rel: 'alternate',
             hrefLang: 'en',
-          href: `https://testingwithekki.com/en/practice/${params.slug}`,
+            href: `https://testingwithekki.com/en/practice/${params.slug}`,
           },
           {
             rel: 'alternate',
             hrefLang: 'id',
-          href: `https://testingwithekki.com/id/practice/${params.slug}`,
+            href: `https://testingwithekki.com/id/practice/${params.slug}`,
           },
           {
             rel: 'alternate',
             hrefLang: 'x-default',
-          href: `https://testingwithekki.com/en/practice/${params.slug}`,
+            href: `https://testingwithekki.com/en/practice/${params.slug}`,
           },
         ],
       };
