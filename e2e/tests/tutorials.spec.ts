@@ -64,6 +64,23 @@ test.describe('Tutorials', () => {
     await expect(beginner).toHaveAttribute('aria-pressed', 'true');
   });
 
+  test('should preserve lesson search in URL state and filter the list', async ({
+    page,
+  }) => {
+    const search = page.getByRole('textbox');
+    await search.fill('DOM Tree');
+
+    await expect
+      .poll(() => new URL(page.url()).searchParams.get('q'))
+      .toBe('DOM Tree');
+    await expect(
+      page.getByRole('link', { name: /Reading the DOM Tree/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /Anatomy of an HTML Element/i }),
+    ).toHaveCount(0);
+  });
+
   test('should navigate to tutorial detail', async ({ page }) => {
     const firstTutorial = tutorialsPage.tutorialCards.first();
     await firstTutorial.click();
