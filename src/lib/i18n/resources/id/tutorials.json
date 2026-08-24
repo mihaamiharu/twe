@@ -102,22 +102,9 @@
     "notFoundDescription": "Tutorial yang kamu cari tidak ada"
   },
   "filters": {
-    "difficultyLabel": "Filter pelajaran berdasarkan tingkat kesulitan",
-    "all": "Semua",
-    "foundations": "Pondasi",
-    "beginner": "Pemula",
-    "intermediate": "Menengah",
-    "advanced": "E2E Testing",
     "clear": "Hapus filter",
-    "hideCompleted": "Sembunyikan Selesai",
-    "showCompleted": "Tampilkan Selesai"
-  },
-  "tracks": {
-    "foundations": "Jalur Pondasi",
-    "beginner": "Jalur Pemula",
-    "intermediate": "Jalur Menengah",
-    "advanced": "Jalur E2E",
-    "other": "Tutorial Tambahan"
+    "showRemaining": "Tampilkan yang belum selesai saja",
+    "showAll": "Tampilkan semua pelajaran"
   },
   "table": {
     "title": "Judul",
@@ -135,11 +122,6 @@
     "reviewLesson": "Tinjau pelajaran",
     "progress": "{{progress}}% dibaca",
     "progressLabel": "Progres membaca: {{progress}}%"
-  },
-  "view": {
-    "label": "Tampilan pelajaran",
-    "grid": "Tampilan Grid",
-    "list": "Tampilan Daftar"
   },
   "sidebar": {
     "progress": "Progres Kamu",

@@ -124,7 +124,7 @@ describe('ChallengesPage', () => {
     expect(screen.getByText('Playwright E2E')).toBeTruthy();
   });
 
-  it('should hide completed challenges', async () => {
+  it('should not show or apply completion filtering to guests', async () => {
     globalThis.mockSearchParams = {
       ...globalThis.mockSearchParams,
       hideCompleted: true,
@@ -132,9 +132,28 @@ describe('ChallengesPage', () => {
 
     await renderPage();
 
-    // JS Basic is completed, should be hidden
+    expect(screen.getByText('JS Basic Challenge')).toBeTruthy();
+    expect(screen.getByText('CSS Selector Master')).toBeTruthy();
+    expect(screen.queryByRole('switch')).toBeNull();
+  });
+
+  it('should hide completed challenges for authenticated users', async () => {
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      hideCompleted: true,
+    };
+    globalThis.mockUseQuery.mockImplementation((options) => {
+      if (options.queryKey?.[0] === 'auth') {
+        return { data: { user: { id: 'user-1' } } };
+      }
+      return { data: { success: true, data: mockChallenges } };
+    });
+
+    await renderPage();
+
     expect(screen.queryByText('JS Basic Challenge')).toBeNull();
     expect(screen.getByText('CSS Selector Master')).toBeTruthy();
+    expect(screen.getByRole('switch')).toBeTruthy();
   });
 
   it('should switch to list view', async () => {

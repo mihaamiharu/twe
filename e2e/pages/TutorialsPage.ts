@@ -15,7 +15,7 @@ export class TutorialsPage extends BasePage {
       name: /Read to Complete|Complete & Continue|Baca untuk Menyelesaikan|Selesai & Lanjutkan/i,
     });
     this.hideCompletedToggle = page.getByRole('button', {
-      name: /Hide Completed|Show Completed|Sembunyikan Selesai|Tampilkan Selesai/i,
+      name: /Show remaining only|Show all lessons|Tampilkan yang belum selesai saja|Tampilkan semua pelajaran|Hide Completed|Show Completed|Sembunyikan Selesai|Tampilkan Selesai/i,
     });
     this.learningPath = page.getByTestId('learning-path');
   }

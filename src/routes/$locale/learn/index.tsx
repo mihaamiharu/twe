@@ -1,14 +1,12 @@
 import { useMemo } from 'react';
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
 import {
   ArrowRight,
   CheckCircle2,
   Circle,
   Clock,
-  LayoutGrid,
-  List,
   Search,
-  SlidersHorizontal,
   X,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +14,6 @@ import { EmptyState } from '@/components/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Progress } from '@/components/ui/progress';
 import {
   LearningPathPreview,
   type LearningPathPreviewKind,
@@ -26,10 +23,9 @@ import { authQueryOptions } from '@/lib/auth.query';
 import { createSeoHead } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
-import { filterLearnCatalog, LEARN_DIFFICULTIES } from '@/lib/learn-catalog';
+import { filterLearnCatalog } from '@/lib/learn-catalog';
 import { LearnSearchSchema, type LearnSearch } from '@/lib/learn-search';
 import type { TutorialCatalogListItemWithOverlay } from '@/lib/catalog-overlays';
-import { cn } from '@/lib/utils';
 
 export { LearnSearchSchema } from '@/lib/learn-search';
 
@@ -99,13 +95,15 @@ function LearnCatalogSkeleton() {
 function LearnPage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('tutorials');
+  const { data: auth } = useQuery(authQueryOptions);
   const navigate = routeApi.useNavigate();
   const searchParams = routeApi.useSearch();
   const tutorialsResponse = routeApi.useLoaderData();
   const query = searchParams.q ?? '';
-  const selectedDifficulty = searchParams.difficulty ?? 'all';
-  const hideCompleted = searchParams.hideCompleted ?? false;
-  const viewMode = searchParams.view ?? 'grid';
+  const canFilterCompleted = Boolean(auth?.user);
+  const hideCompleted = canFilterCompleted
+    ? (searchParams.hideCompleted ?? false)
+    : false;
 
   const updateSearch = (updates: LearnSearch) => {
     void navigate({
@@ -130,17 +128,11 @@ function LearnPage() {
 
     return filterLearnCatalog(tutorialsResponse.data, {
       query,
-      difficulty: selectedDifficulty,
       hideCompleted,
     });
-  }, [hideCompleted, query, selectedDifficulty, tutorialsResponse]);
+  }, [hideCompleted, query, tutorialsResponse]);
 
-  const hasActiveFilters = Boolean(
-    query.trim() ||
-    selectedDifficulty !== 'all' ||
-    hideCompleted ||
-    viewMode !== 'grid',
-  );
+  const hasActiveFilters = Boolean(query.trim() || hideCompleted);
 
   const learningPathSteps: LearningPathStep[] = [
     {
@@ -313,100 +305,30 @@ function LearnPage() {
                     </button>
                   )}
                 </label>
-                <Button
-                  variant="outline"
-                  aria-pressed={hideCompleted}
-                  onClick={() =>
-                    updateSearch({
-                      hideCompleted: hideCompleted ? undefined : true,
-                    })
-                  }
-                  className="h-11 justify-start rounded-md border-border bg-card px-3 shadow-none hover:bg-accent hover:text-accent-foreground sm:justify-center"
-                  data-testid="learn-completion-filter"
-                >
-                  {hideCompleted ? (
-                    <CheckCircle2 className="mr-2 h-4 w-4 text-primary" />
-                  ) : (
-                    <Circle className="mr-2 h-4 w-4 text-muted-foreground" />
-                  )}
-                  {t(
-                    hideCompleted
-                      ? 'filters.showCompleted'
-                      : 'filters.hideCompleted',
-                  )}
-                </Button>
-              </div>
-
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div
-                  className="flex flex-wrap gap-2"
-                  role="group"
-                  aria-label={t('filters.difficultyLabel')}
-                >
-                  {(['all', ...LEARN_DIFFICULTIES] as const).map(
-                    (difficulty) => (
-                      <button
-                        key={difficulty}
-                        type="button"
-                        aria-pressed={selectedDifficulty === difficulty}
-                        className={cn(
-                          'inline-flex min-h-9 items-center rounded-md border px-3 py-1 font-mono text-[10px] uppercase tracking-[0.08em] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                          selectedDifficulty === difficulty
-                            ? 'border-primary bg-primary text-primary-foreground'
-                            : 'border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                        )}
-                        onClick={() =>
-                          updateSearch({
-                            difficulty:
-                              selectedDifficulty === difficulty ||
-                              difficulty === 'all'
-                                ? undefined
-                                : difficulty,
-                          })
-                        }
-                      >
-                        {t(`filters.${difficulty}`)}
-                      </button>
-                    ),
-                  )}
-                </div>
-
-                <div
-                  className="flex items-center gap-2"
-                  role="group"
-                  aria-label={t('view.label')}
-                >
-                  <SlidersHorizontal
-                    className="mr-1 h-4 w-4 text-muted-foreground"
-                    aria-hidden="true"
-                  />
+                {canFilterCompleted && (
                   <Button
-                    type="button"
-                    variant={viewMode === 'grid' ? 'secondary' : 'outline'}
-                    size="sm"
-                    aria-pressed={viewMode === 'grid'}
-                    aria-label={t('view.grid')}
-                    onClick={() => updateSearch({ view: undefined })}
+                    variant="outline"
+                    aria-pressed={hideCompleted}
+                    onClick={() =>
+                      updateSearch({
+                        hideCompleted: hideCompleted ? undefined : true,
+                      })
+                    }
+                    className="h-11 justify-start rounded-md border-border bg-card px-3 shadow-none hover:bg-accent hover:text-accent-foreground sm:justify-center"
+                    data-testid="learn-completion-filter"
                   >
-                    <LayoutGrid aria-hidden="true" />
-                    <span className="sr-only sm:not-sr-only">
-                      {t('view.grid')}
-                    </span>
+                    {hideCompleted ? (
+                      <CheckCircle2 className="mr-2 h-4 w-4 text-primary" />
+                    ) : (
+                      <Circle className="mr-2 h-4 w-4 text-muted-foreground" />
+                    )}
+                    {t(
+                      hideCompleted
+                        ? 'filters.showAll'
+                        : 'filters.showRemaining',
+                    )}
                   </Button>
-                  <Button
-                    type="button"
-                    variant={viewMode === 'list' ? 'secondary' : 'outline'}
-                    size="sm"
-                    aria-pressed={viewMode === 'list'}
-                    aria-label={t('view.list')}
-                    onClick={() => updateSearch({ view: 'list' })}
-                  >
-                    <List aria-hidden="true" />
-                    <span className="sr-only sm:not-sr-only">
-                      {t('view.list')}
-                    </span>
-                  </Button>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -455,29 +377,12 @@ function LearnPage() {
             <div
               id="lesson-results"
               data-testid="learn-results"
-              data-view-mode={viewMode}
-              className={cn(
-                'pt-5',
-                viewMode === 'grid'
-                  ? 'grid gap-4 sm:grid-cols-2 lg:grid-cols-3'
-                  : 'divide-y divide-border border-t border-border',
-              )}
+              data-view-mode="list"
+              className="divide-y divide-border border-t border-border pt-5"
             >
-              {filteredLessons.map((lesson) =>
-                viewMode === 'grid' ? (
-                  <LessonCard
-                    key={lesson.slug}
-                    lesson={lesson}
-                    locale={locale}
-                  />
-                ) : (
-                  <LessonRow
-                    key={lesson.slug}
-                    lesson={lesson}
-                    locale={locale}
-                  />
-                ),
-              )}
+              {filteredLessons.map((lesson) => (
+                <LessonRow key={lesson.slug} lesson={lesson} locale={locale} />
+              ))}
             </div>
           )}
         </section>
@@ -631,68 +536,6 @@ function LessonStatus({
       <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
       {t('card.completed')}
     </Badge>
-  );
-}
-
-function LessonCard({
-  lesson,
-  locale,
-}: {
-  lesson: TutorialCatalogListItemWithOverlay;
-  locale: string;
-}) {
-  const { t } = useTranslation('tutorials');
-  const progress = lesson.isCompleted ? 100 : lesson.readingProgress;
-
-  return (
-    <Link
-      to="/$locale/learn/$slug"
-      params={{ locale, slug: lesson.slug }}
-      className="group flex min-h-64 flex-col rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/45 hover:bg-accent/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      data-testid="lesson-card"
-      data-completed={lesson.isCompleted}
-    >
-      <div className="flex items-start justify-between gap-3">
-        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-primary">
-          {t('learn.lessons.lessonNumber', {
-            number: String(lesson.order).padStart(2, '0'),
-          })}
-        </span>
-        <LessonStatus lesson={lesson} />
-      </div>
-      <h3 className="mt-5 text-xl font-semibold tracking-[-0.02em] text-foreground transition-colors group-hover:text-primary">
-        {lesson.title}
-      </h3>
-      <p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">
-        {lesson.description}
-      </p>
-      <div className="mt-auto">
-        <LessonMeta lesson={lesson} />
-        {progress > 0 && (
-          <div className="mt-4 flex items-center gap-3">
-            <Progress
-              value={progress}
-              className="h-1.5"
-              aria-label={t('card.progressLabel', { progress })}
-            />
-            <span className="font-mono text-[10px] text-muted-foreground">
-              {progress}%
-            </span>
-          </div>
-        )}
-        <span className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary">
-          {lesson.isCompleted
-            ? t('card.reviewLesson')
-            : lesson.readingProgress > 0
-              ? t('card.continueLesson')
-              : t('card.startLesson')}
-          <ArrowRight
-            className="h-4 w-4 transition-transform group-hover:translate-x-1"
-            aria-hidden="true"
-          />
-        </span>
-      </div>
-    </Link>
   );
 }
 

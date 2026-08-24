@@ -4,6 +4,7 @@ import {
   groupPracticeChallenges,
   type PracticeChallenge,
 } from '@/lib/practice-catalog';
+import { PracticeSearchSchema } from '@/lib/practice-search';
 
 function challenge(
   overrides: Partial<PracticeChallenge> = {},
@@ -55,12 +56,21 @@ describe('Practice catalog projection', () => {
     }),
   ];
 
-  test('applies search, track, tier, difficulty, and completion locally', () => {
+  test('ignores removed tier URL parameters', () => {
+    expect(
+      PracticeSearchSchema.parse({
+        track: 'selectors',
+        tier: 'basic',
+        difficulty: 'EASY',
+      }),
+    ).toEqual({ track: 'selectors', difficulty: 'EASY' });
+  });
+
+  test('applies search, track, difficulty, and completion locally', () => {
     expect(
       filterPracticeChallenges(catalog, {
         query: 'KARTU',
         track: 'selectors',
-        tier: 'basic',
         difficulty: 'EASY',
         hideCompleted: false,
       }).map((item) => item.slug),
@@ -70,11 +80,18 @@ describe('Practice catalog projection', () => {
       filterPracticeChallenges(catalog, {
         query: 'locator',
         track: 'core',
-        tier: 'intermediate',
         difficulty: 'MEDIUM',
         hideCompleted: true,
       }),
     ).toEqual([]);
+
+    expect(
+      filterPracticeChallenges(catalog, {
+        track: 'core',
+        difficulty: 'MEDIUM',
+        hideCompleted: false,
+      }).map((item) => item.slug),
+    ).toEqual(['pw-locator']);
   });
 
   test('groups deterministically by tier, category, order, and slug', () => {

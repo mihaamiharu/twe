@@ -114,6 +114,7 @@ test.describe('Hide/Show Completed', () => {
     // 4. Toggle Hide Completed
     await tutorialsPage.hideCompletedToggle.click();
     await expect(page).toHaveURL(/\/en\/learn(?:\/)?\?hideCompleted=true$/);
+    await expect(page.getByText('Show all lessons', { exact: true })).toBeVisible();
 
     // 5. Verify it is hidden
     await expect(tutorialLink.first()).toBeHidden();
@@ -123,6 +124,7 @@ test.describe('Hide/Show Completed', () => {
     await expect(page).toHaveURL(
       /\/en\/learn(?:\/)?(?:\?hideCompleted=false)?$/,
     );
+    await expect(page.getByText('Show remaining only', { exact: true })).toBeVisible();
     await expect(tutorialLink.first()).toBeVisible();
   });
 });

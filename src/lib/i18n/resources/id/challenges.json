@@ -59,16 +59,14 @@
     "playwright": "Playwright"
   },
   "filters": {
-    "search": "Cari tantangan",
+    "search": "Cari tantangan praktik",
     "track": "Track tantangan",
-    "tier": "Tingkat",
     "difficulty": "Kesulitan",
     "allDifficulties": "Semua Kesulitan",
-    "allTiers": "Semua Tingkat",
     "clear": "Bersihkan",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai",
-    "searchPlaceholder": "Cari tantangan...",
+    "searchPlaceholder": "Cari tantangan praktik...",
     "listView": "Tampilan daftar",
     "gridView": "Tampilan grid"
   },
