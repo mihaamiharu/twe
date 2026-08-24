@@ -304,6 +304,54 @@ export function ChallengesPage() {
         </section>
 
         <section
+          aria-labelledby="how-practice-works"
+          className="mb-8 border border-brand-orange/20 bg-brand-orange/8 px-4 py-4 sm:px-5 lg:mb-10 lg:py-3.5"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
+            <div className="shrink-0 lg:w-44">
+              <h2
+                id="how-practice-works"
+                className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-brand-orange"
+              >
+                {t('howPractice.title')}
+              </h2>
+              <p className="sr-only">{t('howPractice.description')}</p>
+            </div>
+            <ol className="grid min-w-0 grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4 sm:gap-4 lg:flex lg:flex-1 lg:items-center lg:gap-0">
+              {PRACTICE_STEPS.map(({ key, icon: Icon }, index) => (
+                <li
+                  key={key}
+                  className="relative min-w-0 lg:flex lg:flex-1 lg:items-center lg:pr-7"
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-orange/25 bg-background text-brand-orange">
+                      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">
+                        <span className="mr-1 font-mono text-[10px] text-brand-orange">
+                          0{index + 1}
+                        </span>
+                        {t(`howPractice.steps.${key}.title`)}
+                      </p>
+                      <p className="mt-0.5 hidden text-xs leading-4 text-muted-foreground sm:block">
+                        {t(`howPractice.steps.${key}.description`)}
+                      </p>
+                    </div>
+                  </div>
+                  {index < PRACTICE_STEPS.length - 1 && (
+                    <ArrowRight
+                      className="absolute -right-1 top-1/2 hidden h-3.5 w-3.5 -translate-y-1/2 text-brand-orange/50 lg:block"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section
           aria-label={t('library.discoveryLabel')}
           className="relative flex flex-col md:sticky md:top-16 md:z-30 md:-mx-6 md:bg-background/95 md:px-6 md:backdrop-blur-sm lg:-mx-8 lg:px-8"
         >
@@ -311,7 +359,7 @@ export function ChallengesPage() {
             aria-label={t('filters.track')}
             role="tablist"
             aria-orientation="horizontal"
-            className="order-2 -mx-4 flex snap-x overflow-x-auto border-b border-border px-4 md:mx-0 md:px-0 lg:order-1"
+            className="order-1 -mx-4 flex snap-x overflow-x-auto border-b border-border px-4 md:mx-0 md:px-0"
           >
             {ALL_TRACKS.map((track, index) => {
               const isActive = activeTrack.id === track.id;
@@ -342,7 +390,7 @@ export function ChallengesPage() {
             })}
           </nav>
 
-          <div className="order-1 flex flex-col gap-3 border-b border-border bg-background/95 py-3 md:bg-transparent lg:order-2 lg:flex-row lg:items-center">
+          <div className="order-2 flex flex-col gap-3 border-b border-border bg-background/95 py-3 md:bg-transparent lg:flex-row lg:items-center">
             <div className="relative min-w-0 flex-1">
               <Search
                 className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
@@ -613,49 +661,6 @@ export function ChallengesPage() {
             </div>
           )}
         </div>
-
-        <section
-          aria-labelledby="how-practice-works"
-          className="mt-10 border border-brand-orange/20 bg-brand-orange/8 px-5 py-6 sm:px-7"
-        >
-          <div className="grid gap-7 lg:grid-cols-[minmax(220px,0.9fr)_minmax(0,2fr)] lg:items-center lg:gap-10">
-            <div>
-              <h2
-                id="how-practice-works"
-                className="text-xl font-semibold tracking-[-0.025em]"
-              >
-                {t('howPractice.title')}
-              </h2>
-              <p className="mt-2 max-w-sm text-sm leading-6 text-muted-foreground">
-                {t('howPractice.description')}
-              </p>
-            </div>
-            <ol className="grid grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-4">
-              {PRACTICE_STEPS.map(({ key, icon: Icon }, index) => (
-                <li key={key} className="relative">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full border border-brand-orange/25 bg-background text-brand-orange">
-                    <Icon className="h-4 w-4" aria-hidden="true" />
-                  </div>
-                  <p className="mt-3 text-sm font-semibold text-foreground">
-                    <span className="mr-1 font-mono text-[10px] text-brand-orange">
-                      0{index + 1}
-                    </span>
-                    {t(`howPractice.steps.${key}.title`)}
-                  </p>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                    {t(`howPractice.steps.${key}.description`)}
-                  </p>
-                  {index < PRACTICE_STEPS.length - 1 && (
-                    <ArrowRight
-                      className="absolute -right-3 top-4 hidden h-4 w-4 text-muted-foreground/60 sm:block"
-                      aria-hidden="true"
-                    />
-                  )}
-                </li>
-              ))}
-            </ol>
-          </div>
-        </section>
       </main>
     </div>
   );
