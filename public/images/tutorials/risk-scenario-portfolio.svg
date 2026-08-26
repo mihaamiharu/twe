@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 1020" role="img" aria-labelledby="title description">
+  <title id="title">Turn one product risk into a focused scenario portfolio</title>
+  <desc id="description">A checkout rule that free shipping starts at fifty dollars branches into a core positive scenario, a business-rule negative scenario, and meaningful boundary scenarios. Every scenario contains a precondition, one action, and business-relevant evidence.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="1018" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.2">FROM RISK TO A FOCUSED PORTFOLIO</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="116" width="636" height="132" rx="16" fill="#25231f" />
+  </g>
+  <text x="88" y="150" fill="#f4bd4f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">CHECKOUT RULE</text>
+  <text x="88" y="190" fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">Free shipping starts at $50</text>
+  <text x="88" y="222" fill="#d9d2c7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Risk: the wrong cart receives—or misses—the benefit.</text>
+
+  <line x1="380" y1="260" x2="380" y2="304" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="150" y1="318" x2="610" y2="318" stroke="#e65f3a" stroke-width="3" />
+  <line x1="150" y1="318" x2="150" y2="350" stroke="#e65f3a" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="380" y1="318" x2="380" y2="350" stroke="#e65f3a" stroke-width="3" marker-end="url(#arrow)" />
+  <line x1="610" y1="318" x2="610" y2="350" stroke="#e65f3a" stroke-width="3" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="38" y="364" width="224" height="364" rx="16" fill="#e6f2ec" stroke="#75a38b" stroke-width="2" />
+  </g>
+  <rect x="58" y="386" width="112" height="30" rx="15" fill="#ffffff" />
+  <text x="114" y="407" fill="#2d6249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">CORE POSITIVE</text>
+  <text x="58" y="452" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Typical eligible cart</text>
+  <text x="58" y="492" fill="#2d6249" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">PRECONDITION</text>
+  <text x="58" y="519" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Cart total: $75</text>
+  <text x="58" y="561" fill="#2d6249" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">ACTION</text>
+  <text x="58" y="588" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Open checkout</text>
+  <text x="58" y="630" fill="#2d6249" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">EVIDENCE</text>
+  <text x="58" y="657" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Shipping = $0</text>
+  <text x="58" y="682" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">“Free shipping” shown</text>
+
+  <g filter="url(#shadow)">
+    <rect x="268" y="364" width="224" height="364" rx="16" fill="#fce8e1" stroke="#e65f3a" stroke-width="2" />
+  </g>
+  <rect x="288" y="386" width="160" height="30" rx="15" fill="#ffffff" />
+  <text x="368" y="407" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">BUSINESS NEGATIVE</text>
+  <text x="288" y="452" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Typical ineligible cart</text>
+  <text x="288" y="492" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">PRECONDITION</text>
+  <text x="288" y="519" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Cart total: $30</text>
+  <text x="288" y="561" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">ACTION</text>
+  <text x="288" y="588" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Open checkout</text>
+  <text x="288" y="630" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">EVIDENCE</text>
+  <text x="288" y="657" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Shipping charge shown</text>
+  <text x="288" y="682" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">No free-shipping claim</text>
+
+  <g filter="url(#shadow)">
+    <rect x="498" y="364" width="224" height="364" rx="16" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  </g>
+  <rect x="518" y="386" width="128" height="30" rx="15" fill="#ffffff" />
+  <text x="582" y="407" fill="#6d5418" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">BOUNDARIES</text>
+  <text x="518" y="452" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Where the rule flips</text>
+  <text x="518" y="492" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">PRECONDITION</text>
+  <text x="518" y="519" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">$49.99 and $50.00</text>
+  <text x="518" y="561" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">ACTION</text>
+  <text x="518" y="588" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Open checkout</text>
+  <text x="518" y="630" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">EVIDENCE</text>
+  <text x="518" y="657" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Below: charged</text>
+  <text x="518" y="682" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">At threshold: free</text>
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="774" width="636" height="150" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <text x="88" y="810" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">THE PORTFOLIO STAYS FOCUSED WHEN…</text>
+  <circle cx="103" cy="850" r="7" fill="#387357" />
+  <text x="126" y="857" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">each scenario proves one meaningful risk</text>
+  <circle cx="103" cy="890" r="7" fill="#387357" />
+  <text x="126" y="897" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">boundaries come from the rule—not every imaginable value</text>
+
+  <text x="380" y="976" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Risk decides the scenarios. Evidence decides the assertions.</text>
+</svg>

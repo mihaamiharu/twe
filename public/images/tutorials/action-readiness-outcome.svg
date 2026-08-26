@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 1040" role="img" aria-labelledby="title description">
+  <title id="title">Action readiness is not the application outcome</title>
+  <desc id="description">A vertical test flow starts with the Save profile intent, chooses a click action, passes click-specific readiness checks, performs the click, crosses an application transition, and finishes with a retried assertion for Profile saved. A note contrasts observable conditions with forced actions and fixed sleeps.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="1038" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.2">ACTION READINESS ≠ APPLICATION OUTCOME</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="76" y="120" width="608" height="112" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="100" y="144" width="132" height="32" rx="16" fill="#fce8e1" />
+  <text x="166" y="166" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">TEST INTENT</text>
+  <text x="100" y="207" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">Save the updated profile</text>
+
+  <line x1="380" y1="244" x2="380" y2="282" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="76" y="296" width="608" height="122" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <text x="100" y="330" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">ACTION REQUESTED</text>
+  <rect x="100" y="348" width="560" height="48" rx="10" fill="#25231f" />
+  <text x="122" y="379" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15">getByRole('button', { name: 'Save profile' }).click()</text>
+
+  <line x1="380" y1="430" x2="380" y2="468" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="76" y="482" width="608" height="168" rx="16" fill="#e6f2ec" stroke="#75a38b" stroke-width="2" />
+  </g>
+  <text x="100" y="518" fill="#2d6249" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">PLAYWRIGHT CHECKS READINESS FOR CLICK</text>
+  <text x="100" y="560" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">One intended element · Visible · Stable</text>
+  <text x="100" y="594" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">Receives events · Enabled</text>
+  <text x="100" y="628" fill="#387357" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">If these do not become true, the action fails with evidence.</text>
+
+  <line x1="380" y1="662" x2="380" y2="700" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <rect x="271" y="672" width="218" height="32" rx="16" fill="#fce8e1" />
+  <text x="380" y="694" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">CLICK COMPLETES HERE</text>
+
+  <g filter="url(#shadow)">
+    <rect x="76" y="718" width="608" height="108" rx="16" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  </g>
+  <text x="100" y="754" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">APPLICATION TRANSITION</text>
+  <text x="100" y="794" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="700">Saving… request · server · rendering</text>
+
+  <line x1="380" y1="838" x2="380" y2="876" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="76" y="890" width="608" height="100" rx="16" fill="#25231f" />
+  </g>
+  <text x="100" y="924" fill="#f4bd4f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">RETRIED OUTCOME ASSERTION</text>
+  <text x="100" y="963" fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="700">Status becomes “Profile saved” ✓</text>
+
+  <text x="380" y="1018" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">FORCE BYPASSES EVIDENCE · SLEEP GUESSES TIME · ASSERTIONS NAME OUTCOMES</text>
+</svg>

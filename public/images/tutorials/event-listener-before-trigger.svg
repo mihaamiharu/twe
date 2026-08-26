@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 940" role="img" aria-labelledby="title description">
+  <title id="title">Register a one-time event wait before its trigger</title>
+  <desc id="description">The reliable sequence creates a popup or download promise, triggers the action, awaits the captured event, and asserts on the new surface. Two unsafe sequences show that awaiting before triggering blocks forever and listening after triggering can miss a fast event.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="938" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.2">ONE-TIME EVENTS: OBSERVE BEFORE TRIGGER</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="118" width="636" height="504" rx="18" fill="#ffffff" stroke="#75a38b" stroke-width="3" />
+  </g>
+  <rect x="88" y="142" width="160" height="34" rx="17" fill="#e6f2ec" />
+  <text x="168" y="165" fill="#2d6249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">RELIABLE ORDER</text>
+
+  <rect x="96" y="206" width="568" height="72" rx="12" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <circle cx="128" cy="242" r="18" fill="#e65f3a" />
+  <text x="128" y="248" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">1</text>
+  <text x="166" y="235" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">Create the event promise</text>
+  <text x="166" y="260" fill="#686258" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13">page.waitForEvent('popup')</text>
+
+  <line x1="380" y1="290" x2="380" y2="322" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <rect x="96" y="336" width="568" height="72" rx="12" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <circle cx="128" cy="372" r="18" fill="#e65f3a" />
+  <text x="128" y="378" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">2</text>
+  <text x="166" y="365" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">Trigger the user action</text>
+  <text x="166" y="390" fill="#686258" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13">openInvoice.click()</text>
+
+  <line x1="380" y1="420" x2="380" y2="452" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <rect x="96" y="466" width="568" height="72" rx="12" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <circle cx="128" cy="502" r="18" fill="#e65f3a" />
+  <text x="128" y="508" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">3</text>
+  <text x="166" y="495" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">Await the event already being observed</text>
+  <text x="166" y="520" fill="#686258" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13">const invoicePage = await popupPromise</text>
+
+  <line x1="380" y1="550" x2="380" y2="576" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <rect x="188" y="584" width="384" height="54" rx="12" fill="#25231f" />
+  <text x="380" y="617" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Assert on the captured page or download ✓</text>
+
+  <text x="62" y="686" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">TWO ORDERING FAILURES</text>
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="710" width="302" height="164" rx="16" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  </g>
+  <text x="86" y="746" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">AWAIT → TRIGGER</text>
+  <text x="86" y="784" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">The trigger is never reached.</text>
+  <text x="86" y="817" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">The test waits for an event that</text>
+  <text x="86" y="840" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">it has not caused yet.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="396" y="710" width="302" height="164" rx="16" fill="#fce8e1" stroke="#e65f3a" stroke-width="2" />
+  </g>
+  <text x="420" y="746" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">TRIGGER → LISTEN</text>
+  <text x="420" y="784" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">A fast event can be lost.</text>
+  <text x="420" y="817" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">The popup or download may begin</text>
+  <text x="420" y="840" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">between the two lines.</text>
+
+  <text x="380" y="914" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">REGISTER → TRIGGER → AWAIT → ASSERT</text>
+</svg>
