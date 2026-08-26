@@ -70,15 +70,14 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     };
   }, [isMobileMenuOpen]);
 
-  // Public labels intentionally map to the existing route names for now.
   const navLinks = [
     {
-      to: LocaleRoutes.tutorials,
+      to: LocaleRoutes.learn,
       params: localeParams(locale),
       label: t('common:navigation.learn'),
     },
     {
-      to: LocaleRoutes.challenges,
+      to: LocaleRoutes.practice,
       params: localeParams(locale),
       label: t('common:navigation.practice'),
     },
@@ -92,7 +91,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
 
   const primaryCta = isAuthenticated
     ? {
-        to: LocaleRoutes.tutorials,
+        to: LocaleRoutes.learn,
         params: localeParams(locale),
       }
     : {
@@ -130,7 +129,12 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className={cn('flex items-center justify-between', isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]')}>
+          <div
+            className={cn(
+              'flex items-center justify-between',
+              isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]',
+            )}
+          >
             {/* Logo */}
             <div className="flex items-center gap-9">
               <Link
@@ -155,31 +159,37 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)]"
+                    className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                     activeProps={{
                       className:
-                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)]',
+                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
                     }}
                   >
                     {link.label}
                   </Link>
                 ))}
-                <span
-                  className="inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-medium text-[var(--muted-graphite)]"
+                <Link
+                  to={LocaleRoutes.labs}
+                  params={localeParams(locale)}
+                  className="inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                   aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                  activeProps={{
+                    className:
+                      'inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
+                  }}
                 >
                   {t('common:navigation.labs')}
                   <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
                     {t('common:navigation.labsSoon')}
                   </span>
-                </span>
+                </Link>
                 <Link
                   to={aboutLink.to}
                   params={aboutLink.params}
-                  className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)]"
+                  className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                   activeProps={{
                     className:
-                      'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)]',
+                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
                   }}
                 >
                   {aboutLink.label}
@@ -203,7 +213,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                       params={localeParams(locale)}
                       className={cn(
                         'inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]',
-                        isContactPage && 'rounded-md border border-[var(--graphite)] px-5',
+                        isContactPage &&
+                          'rounded-md border border-[var(--graphite)] px-5',
                       )}
                     >
                       {t('common:actions.signIn')}
@@ -217,7 +228,11 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
-                        {t(isContactPage ? 'common:actions.startLearning' : 'common:actions.startWebAutomation')}
+                        {t(
+                          isContactPage
+                            ? 'common:actions.startLearning'
+                            : 'common:actions.startWebAutomation',
+                        )}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>
@@ -309,15 +324,22 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                   </Link>
                 ))}
 
-                <span
-                  className="flex min-h-12 items-center gap-2 px-1 text-[1rem] font-medium text-[var(--muted-graphite)]"
+                <Link
+                  to={LocaleRoutes.labs}
+                  params={localeParams(locale)}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex min-h-12 items-center gap-2 px-1 text-[1rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                   aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                  activeProps={{
+                    className:
+                      'flex min-h-12 items-center gap-2 px-1 text-[1rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
+                  }}
                 >
                   {t('common:navigation.labs')}
                   <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
                     {t('common:navigation.labsSoon')}
                   </span>
-                </span>
+                </Link>
 
                 <Link
                   to={aboutLink.to}
@@ -429,7 +451,11 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Link to={primaryCta.to} params={primaryCta.params}>
-                    {t('common:actions.startWebAutomation')}
+                    {t(
+                      isContactPage || isAuthenticated
+                        ? 'common:actions.startLearning'
+                        : 'common:actions.startWebAutomation',
+                    )}
                     <ArrowRight className="h-4 w-4" aria-hidden="true" />
                   </Link>
                 </Button>

@@ -35,6 +35,7 @@ import { Route as LocaleRegisterRouteImport } from './routes/$locale/register'
 import { Route as LocalePrivacyRouteImport } from './routes/$locale/privacy'
 import { Route as LocaleLoginRouteImport } from './routes/$locale/login'
 import { Route as LocaleLeaderboardRouteImport } from './routes/$locale/leaderboard'
+import { Route as LocaleLabsRouteImport } from './routes/$locale/labs'
 import { Route as LocaleForgotPasswordRouteImport } from './routes/$locale/forgot-password'
 import { Route as LocaleContactRouteImport } from './routes/$locale/contact'
 import { Route as LocaleConfirmSubscriptionRouteImport } from './routes/$locale/confirm-subscription'
@@ -42,16 +43,16 @@ import { Route as LocaleChangelogRouteImport } from './routes/$locale/changelog'
 import { Route as LocaleAboutRouteImport } from './routes/$locale/about'
 import { Route as LocaleAuthenticatedRouteImport } from './routes/$locale/_authenticated'
 import { Route as AdminUsersIndexRouteImport } from './routes/admin/users.index'
-import { Route as LocaleTutorialsIndexRouteImport } from './routes/$locale/tutorials/index'
-import { Route as LocaleChallengesIndexRouteImport } from './routes/$locale/challenges/index'
+import { Route as LocalePracticeIndexRouteImport } from './routes/$locale/practice/index'
+import { Route as LocaleLearnIndexRouteImport } from './routes/$locale/learn/index'
 import { Route as ApiTestTeardownUserRouteImport } from './routes/api/test/teardown-user'
 import { Route as ApiTestSetProgressRouteImport } from './routes/api/test/set-progress'
 import { Route as ApiTestSeedUserRouteImport } from './routes/api/test/seed-user'
 import { Route as ApiTestResetProgressRouteImport } from './routes/api/test/reset-progress'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AdminUsersUserIdRouteImport } from './routes/admin/users.$userId'
-import { Route as LocaleTutorialsSlugRouteImport } from './routes/$locale/tutorials/$slug'
-import { Route as LocaleChallengesSlugRouteImport } from './routes/$locale/challenges/$slug'
+import { Route as LocalePracticeSlugRouteImport } from './routes/$locale/practice/$slug'
+import { Route as LocaleLearnSlugRouteImport } from './routes/$locale/learn/$slug'
 import { Route as LocaleAuthenticatedProfileRouteImport } from './routes/$locale/_authenticated/profile'
 
 const TestSentryRoute = TestSentryRouteImport.update({
@@ -184,6 +185,11 @@ const LocaleLeaderboardRoute = LocaleLeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => LocaleRoute,
 } as any)
+const LocaleLabsRoute = LocaleLabsRouteImport.update({
+  id: '/labs',
+  path: '/labs',
+  getParentRoute: () => LocaleRoute,
+} as any)
 const LocaleForgotPasswordRoute = LocaleForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -219,14 +225,14 @@ const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
   path: '/users/',
   getParentRoute: () => AdminRoute,
 } as any)
-const LocaleTutorialsIndexRoute = LocaleTutorialsIndexRouteImport.update({
-  id: '/tutorials/',
-  path: '/tutorials/',
+const LocalePracticeIndexRoute = LocalePracticeIndexRouteImport.update({
+  id: '/practice/',
+  path: '/practice/',
   getParentRoute: () => LocaleRoute,
 } as any)
-const LocaleChallengesIndexRoute = LocaleChallengesIndexRouteImport.update({
-  id: '/challenges/',
-  path: '/challenges/',
+const LocaleLearnIndexRoute = LocaleLearnIndexRouteImport.update({
+  id: '/learn/',
+  path: '/learn/',
   getParentRoute: () => LocaleRoute,
 } as any)
 const ApiTestTeardownUserRoute = ApiTestTeardownUserRouteImport.update({
@@ -259,14 +265,14 @@ const AdminUsersUserIdRoute = AdminUsersUserIdRouteImport.update({
   path: '/users/$userId',
   getParentRoute: () => AdminRoute,
 } as any)
-const LocaleTutorialsSlugRoute = LocaleTutorialsSlugRouteImport.update({
-  id: '/tutorials/$slug',
-  path: '/tutorials/$slug',
+const LocalePracticeSlugRoute = LocalePracticeSlugRouteImport.update({
+  id: '/practice/$slug',
+  path: '/practice/$slug',
   getParentRoute: () => LocaleRoute,
 } as any)
-const LocaleChallengesSlugRoute = LocaleChallengesSlugRouteImport.update({
-  id: '/challenges/$slug',
-  path: '/challenges/$slug',
+const LocaleLearnSlugRoute = LocaleLearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
   getParentRoute: () => LocaleRoute,
 } as any)
 const LocaleAuthenticatedProfileRoute =
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/labs': typeof LocaleLabsRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/privacy': typeof LocalePrivacyRoute
@@ -309,16 +316,16 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
-  '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
-  '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
+  '/$locale/learn/$slug': typeof LocaleLearnSlugRoute
+  '/$locale/practice/$slug': typeof LocalePracticeSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/test/reset-progress': typeof ApiTestResetProgressRoute
   '/api/test/seed-user': typeof ApiTestSeedUserRoute
   '/api/test/set-progress': typeof ApiTestSetProgressRoute
   '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
-  '/$locale/challenges': typeof LocaleChallengesIndexRoute
-  '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
+  '/$locale/learn': typeof LocaleLearnIndexRoute
+  '/$locale/practice': typeof LocalePracticeIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -333,6 +340,7 @@ export interface FileRoutesByTo {
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/labs': typeof LocaleLabsRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/privacy': typeof LocalePrivacyRoute
@@ -352,16 +360,16 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/docs': typeof DocsIndexRoute
   '/$locale/profile': typeof LocaleAuthenticatedProfileRoute
-  '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
-  '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
+  '/$locale/learn/$slug': typeof LocaleLearnSlugRoute
+  '/$locale/practice/$slug': typeof LocalePracticeSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/test/reset-progress': typeof ApiTestResetProgressRoute
   '/api/test/seed-user': typeof ApiTestSeedUserRoute
   '/api/test/set-progress': typeof ApiTestSetProgressRoute
   '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
-  '/$locale/challenges': typeof LocaleChallengesIndexRoute
-  '/$locale/tutorials': typeof LocaleTutorialsIndexRoute
+  '/$locale/learn': typeof LocaleLearnIndexRoute
+  '/$locale/practice': typeof LocalePracticeIndexRoute
   '/admin/users': typeof AdminUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -379,6 +387,7 @@ export interface FileRoutesById {
   '/$locale/confirm-subscription': typeof LocaleConfirmSubscriptionRoute
   '/$locale/contact': typeof LocaleContactRoute
   '/$locale/forgot-password': typeof LocaleForgotPasswordRoute
+  '/$locale/labs': typeof LocaleLabsRoute
   '/$locale/leaderboard': typeof LocaleLeaderboardRoute
   '/$locale/login': typeof LocaleLoginRoute
   '/$locale/privacy': typeof LocalePrivacyRoute
@@ -399,16 +408,16 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/docs/': typeof DocsIndexRoute
   '/$locale/_authenticated/profile': typeof LocaleAuthenticatedProfileRoute
-  '/$locale/challenges/$slug': typeof LocaleChallengesSlugRoute
-  '/$locale/tutorials/$slug': typeof LocaleTutorialsSlugRoute
+  '/$locale/learn/$slug': typeof LocaleLearnSlugRoute
+  '/$locale/practice/$slug': typeof LocalePracticeSlugRoute
   '/admin/users/$userId': typeof AdminUsersUserIdRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/test/reset-progress': typeof ApiTestResetProgressRoute
   '/api/test/seed-user': typeof ApiTestSeedUserRoute
   '/api/test/set-progress': typeof ApiTestSetProgressRoute
   '/api/test/teardown-user': typeof ApiTestTeardownUserRoute
-  '/$locale/challenges/': typeof LocaleChallengesIndexRoute
-  '/$locale/tutorials/': typeof LocaleTutorialsIndexRoute
+  '/$locale/learn/': typeof LocaleLearnIndexRoute
+  '/$locale/practice/': typeof LocalePracticeIndexRoute
   '/admin/users/': typeof AdminUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -426,6 +435,7 @@ export interface FileRouteTypes {
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
+    | '/$locale/labs'
     | '/$locale/leaderboard'
     | '/$locale/login'
     | '/$locale/privacy'
@@ -446,16 +456,16 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/docs'
     | '/$locale/profile'
-    | '/$locale/challenges/$slug'
-    | '/$locale/tutorials/$slug'
+    | '/$locale/learn/$slug'
+    | '/$locale/practice/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
     | '/api/test/reset-progress'
     | '/api/test/seed-user'
     | '/api/test/set-progress'
     | '/api/test/teardown-user'
-    | '/$locale/challenges'
-    | '/$locale/tutorials'
+    | '/$locale/learn'
+    | '/$locale/practice'
     | '/admin/users'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -470,6 +480,7 @@ export interface FileRouteTypes {
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
+    | '/$locale/labs'
     | '/$locale/leaderboard'
     | '/$locale/login'
     | '/$locale/privacy'
@@ -489,16 +500,16 @@ export interface FileRouteTypes {
     | '/admin'
     | '/docs'
     | '/$locale/profile'
-    | '/$locale/challenges/$slug'
-    | '/$locale/tutorials/$slug'
+    | '/$locale/learn/$slug'
+    | '/$locale/practice/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
     | '/api/test/reset-progress'
     | '/api/test/seed-user'
     | '/api/test/set-progress'
     | '/api/test/teardown-user'
-    | '/$locale/challenges'
-    | '/$locale/tutorials'
+    | '/$locale/learn'
+    | '/$locale/practice'
     | '/admin/users'
   id:
     | '__root__'
@@ -515,6 +526,7 @@ export interface FileRouteTypes {
     | '/$locale/confirm-subscription'
     | '/$locale/contact'
     | '/$locale/forgot-password'
+    | '/$locale/labs'
     | '/$locale/leaderboard'
     | '/$locale/login'
     | '/$locale/privacy'
@@ -535,16 +547,16 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/docs/'
     | '/$locale/_authenticated/profile'
-    | '/$locale/challenges/$slug'
-    | '/$locale/tutorials/$slug'
+    | '/$locale/learn/$slug'
+    | '/$locale/practice/$slug'
     | '/admin/users/$userId'
     | '/api/auth/$'
     | '/api/test/reset-progress'
     | '/api/test/seed-user'
     | '/api/test/set-progress'
     | '/api/test/teardown-user'
-    | '/$locale/challenges/'
-    | '/$locale/tutorials/'
+    | '/$locale/learn/'
+    | '/$locale/practice/'
     | '/admin/users/'
   fileRoutesById: FileRoutesById
 }
@@ -750,6 +762,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LocaleLeaderboardRouteImport
       parentRoute: typeof LocaleRoute
     }
+    '/$locale/labs': {
+      id: '/$locale/labs'
+      path: '/labs'
+      fullPath: '/$locale/labs'
+      preLoaderRoute: typeof LocaleLabsRouteImport
+      parentRoute: typeof LocaleRoute
+    }
     '/$locale/forgot-password': {
       id: '/$locale/forgot-password'
       path: '/forgot-password'
@@ -799,18 +818,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/$locale/tutorials/': {
-      id: '/$locale/tutorials/'
-      path: '/tutorials'
-      fullPath: '/$locale/tutorials'
-      preLoaderRoute: typeof LocaleTutorialsIndexRouteImport
+    '/$locale/practice/': {
+      id: '/$locale/practice/'
+      path: '/practice'
+      fullPath: '/$locale/practice'
+      preLoaderRoute: typeof LocalePracticeIndexRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/$locale/challenges/': {
-      id: '/$locale/challenges/'
-      path: '/challenges'
-      fullPath: '/$locale/challenges'
-      preLoaderRoute: typeof LocaleChallengesIndexRouteImport
+    '/$locale/learn/': {
+      id: '/$locale/learn/'
+      path: '/learn'
+      fullPath: '/$locale/learn'
+      preLoaderRoute: typeof LocaleLearnIndexRouteImport
       parentRoute: typeof LocaleRoute
     }
     '/api/test/teardown-user': {
@@ -855,18 +874,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersUserIdRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/$locale/tutorials/$slug': {
-      id: '/$locale/tutorials/$slug'
-      path: '/tutorials/$slug'
-      fullPath: '/$locale/tutorials/$slug'
-      preLoaderRoute: typeof LocaleTutorialsSlugRouteImport
+    '/$locale/practice/$slug': {
+      id: '/$locale/practice/$slug'
+      path: '/practice/$slug'
+      fullPath: '/$locale/practice/$slug'
+      preLoaderRoute: typeof LocalePracticeSlugRouteImport
       parentRoute: typeof LocaleRoute
     }
-    '/$locale/challenges/$slug': {
-      id: '/$locale/challenges/$slug'
-      path: '/challenges/$slug'
-      fullPath: '/$locale/challenges/$slug'
-      preLoaderRoute: typeof LocaleChallengesSlugRouteImport
+    '/$locale/learn/$slug': {
+      id: '/$locale/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/$locale/learn/$slug'
+      preLoaderRoute: typeof LocaleLearnSlugRouteImport
       parentRoute: typeof LocaleRoute
     }
     '/$locale/_authenticated/profile': {
@@ -897,6 +916,7 @@ interface LocaleRouteChildren {
   LocaleConfirmSubscriptionRoute: typeof LocaleConfirmSubscriptionRoute
   LocaleContactRoute: typeof LocaleContactRoute
   LocaleForgotPasswordRoute: typeof LocaleForgotPasswordRoute
+  LocaleLabsRoute: typeof LocaleLabsRoute
   LocaleLeaderboardRoute: typeof LocaleLeaderboardRoute
   LocaleLoginRoute: typeof LocaleLoginRoute
   LocalePrivacyRoute: typeof LocalePrivacyRoute
@@ -904,10 +924,10 @@ interface LocaleRouteChildren {
   LocaleResetPasswordRoute: typeof LocaleResetPasswordRoute
   LocaleTermsRoute: typeof LocaleTermsRoute
   LocaleIndexRoute: typeof LocaleIndexRoute
-  LocaleChallengesSlugRoute: typeof LocaleChallengesSlugRoute
-  LocaleTutorialsSlugRoute: typeof LocaleTutorialsSlugRoute
-  LocaleChallengesIndexRoute: typeof LocaleChallengesIndexRoute
-  LocaleTutorialsIndexRoute: typeof LocaleTutorialsIndexRoute
+  LocaleLearnSlugRoute: typeof LocaleLearnSlugRoute
+  LocalePracticeSlugRoute: typeof LocalePracticeSlugRoute
+  LocaleLearnIndexRoute: typeof LocaleLearnIndexRoute
+  LocalePracticeIndexRoute: typeof LocalePracticeIndexRoute
 }
 
 const LocaleRouteChildren: LocaleRouteChildren = {
@@ -917,6 +937,7 @@ const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleConfirmSubscriptionRoute: LocaleConfirmSubscriptionRoute,
   LocaleContactRoute: LocaleContactRoute,
   LocaleForgotPasswordRoute: LocaleForgotPasswordRoute,
+  LocaleLabsRoute: LocaleLabsRoute,
   LocaleLeaderboardRoute: LocaleLeaderboardRoute,
   LocaleLoginRoute: LocaleLoginRoute,
   LocalePrivacyRoute: LocalePrivacyRoute,
@@ -924,10 +945,10 @@ const LocaleRouteChildren: LocaleRouteChildren = {
   LocaleResetPasswordRoute: LocaleResetPasswordRoute,
   LocaleTermsRoute: LocaleTermsRoute,
   LocaleIndexRoute: LocaleIndexRoute,
-  LocaleChallengesSlugRoute: LocaleChallengesSlugRoute,
-  LocaleTutorialsSlugRoute: LocaleTutorialsSlugRoute,
-  LocaleChallengesIndexRoute: LocaleChallengesIndexRoute,
-  LocaleTutorialsIndexRoute: LocaleTutorialsIndexRoute,
+  LocaleLearnSlugRoute: LocaleLearnSlugRoute,
+  LocalePracticeSlugRoute: LocalePracticeSlugRoute,
+  LocaleLearnIndexRoute: LocaleLearnIndexRoute,
+  LocalePracticeIndexRoute: LocalePracticeIndexRoute,
 }
 
 const LocaleRouteWithChildren =

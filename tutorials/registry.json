@@ -4,11 +4,7 @@
       "slug": "html-element-anatomy",
       "order": 1,
       "estimatedMinutes": 8,
-      "tags": [
-        "foundations",
-        "html",
-        "anatomy"
-      ],
+      "tags": ["foundations", "html", "anatomy"],
       "relatedChallenges": [],
       "nextTutorialSlug": "dom-tree-hierarchy"
     },
@@ -16,12 +12,7 @@
       "slug": "dom-tree-hierarchy",
       "order": 2,
       "estimatedMinutes": 8,
-      "tags": [
-        "foundations",
-        "dom",
-        "hierarchy",
-        "parent-child"
-      ],
+      "tags": ["foundations", "dom", "hierarchy", "parent-child"],
       "relatedChallenges": [],
       "nextTutorialSlug": "devtools-mastery"
     },
@@ -29,13 +20,7 @@
       "slug": "devtools-mastery",
       "order": 3,
       "estimatedMinutes": 10,
-      "tags": [
-        "foundations",
-        "devtools",
-        "console",
-        "elements",
-        "debugging"
-      ],
+      "tags": ["foundations", "devtools", "console", "elements", "debugging"],
       "relatedChallenges": [],
       "nextTutorialSlug": "universal-mindset"
     },
@@ -43,13 +28,7 @@
       "slug": "universal-mindset",
       "order": 4,
       "estimatedMinutes": 5,
-      "tags": [
-        "foundations",
-        "mindset",
-        "ai",
-        "automation",
-        "principles"
-      ],
+      "tags": ["foundations", "mindset", "ai", "automation", "principles"],
       "relatedChallenges": [],
       "nextTutorialSlug": "css-selector-strategies"
     },
@@ -57,13 +36,7 @@
       "slug": "css-selector-strategies",
       "order": 5,
       "estimatedMinutes": 10,
-      "tags": [
-        "beginner",
-        "css",
-        "selectors",
-        "strategy",
-        "best-practices"
-      ],
+      "tags": ["beginner", "css", "selectors", "strategy", "best-practices"],
       "relatedChallenges": [],
       "nextTutorialSlug": "xpath-strategies"
     },
@@ -71,12 +44,7 @@
       "slug": "xpath-strategies",
       "order": 6,
       "estimatedMinutes": 10,
-      "tags": [
-        "xpath",
-        "selectors",
-        "strategies",
-        "beginner"
-      ],
+      "tags": ["xpath", "selectors", "strategies", "beginner"],
       "relatedChallenges": [],
       "nextTutorialSlug": "element-interactions"
     },
@@ -112,63 +80,31 @@
       "slug": "javascript-fundamentals-for-qa",
       "order": 9,
       "estimatedMinutes": 20,
-      "tags": [
-        "javascript",
-        "fundamentals",
-        "qa",
-        "automation",
-        "beginner"
-      ],
-      "relatedChallenges": [
-        "js-variables-basics",
-        "js-functions-basics"
-      ],
+      "tags": ["javascript", "fundamentals", "qa", "automation", "beginner"],
+      "relatedChallenges": ["js-variables-types", "js-functions-basics"],
       "nextTutorialSlug": "async-await-basics"
     },
     {
       "slug": "async-await-basics",
       "order": 10,
       "estimatedMinutes": 12,
-      "tags": [
-        "javascript",
-        "async",
-        "await",
-        "promises",
-        "beginner"
-      ],
-      "relatedChallenges": [
-        "js-async-timeout",
-        "js-async-fetch"
-      ],
+      "tags": ["javascript", "async", "await", "promises", "beginner"],
+      "relatedChallenges": [],
       "nextTutorialSlug": "typescript-for-qa"
     },
     {
       "slug": "typescript-for-qa",
       "order": 11,
       "estimatedMinutes": 15,
-      "tags": [
-        "typescript",
-        "fundamentals",
-        "qa",
-        "automation",
-        "beginner"
-      ],
-      "relatedChallenges": [
-        "ts-type-annotations",
-        "ts-interfaces-basics"
-      ],
+      "tags": ["typescript", "fundamentals", "qa", "automation", "beginner"],
+      "relatedChallenges": ["ts-type-annotations", "ts-interfaces-basics"],
       "nextTutorialSlug": "playwright-architecture"
     },
     {
       "slug": "playwright-architecture",
       "order": 12,
       "estimatedMinutes": 10,
-      "tags": [
-        "playwright",
-        "architecture",
-        "cdp",
-        "intermediate"
-      ],
+      "tags": ["playwright", "architecture", "cdp", "intermediate"],
       "relatedChallenges": [],
       "nextTutorialSlug": "playwright-actionability"
     },
@@ -176,12 +112,7 @@
       "slug": "playwright-actionability",
       "order": 13,
       "estimatedMinutes": 10,
-      "tags": [
-        "playwright",
-        "actionability",
-        "auto-wait",
-        "intermediate"
-      ],
+      "tags": ["playwright", "actionability", "auto-wait", "intermediate"],
       "relatedChallenges": [],
       "nextTutorialSlug": "playwright-interaction-fundamentals"
     },
@@ -203,15 +134,8 @@
       "slug": "page-object-model",
       "order": 15,
       "estimatedMinutes": 15,
-      "tags": [
-        "playwright",
-        "pom",
-        "intermediate",
-        "architecture"
-      ],
-      "relatedChallenges": [
-        "pom-login-basics"
-      ],
+      "tags": ["playwright", "pom", "intermediate", "architecture"],
+      "relatedChallenges": ["pom-login-basics"],
       "nextTutorialSlug": "test-fixtures"
     },
     {
@@ -231,12 +155,7 @@
       "slug": "advanced-fixtures",
       "order": 17,
       "estimatedMinutes": 15,
-      "tags": [
-        "playwright",
-        "fixtures",
-        "composition",
-        "intermediate"
-      ],
+      "tags": ["playwright", "fixtures", "composition", "intermediate"],
       "relatedChallenges": [],
       "nextTutorialSlug": null
     }

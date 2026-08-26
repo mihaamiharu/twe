@@ -3,11 +3,21 @@ import { Link } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import type { TrackId } from '@/config/tracks';
+
+type PracticeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e';
+
+const TIER_TRACK: Record<PracticeTier, TrackId> = {
+  basic: 'selectors',
+  beginner: 'scripting',
+  intermediate: 'core',
+  e2e: 'e2e',
+};
 
 interface TierSkipTipProps {
   currentTier: string;
   missingPrerequisites: {
-    tier: string;
+    tier: PracticeTier;
     name: string;
   }[];
 }
@@ -37,9 +47,9 @@ export function TierSkipTip({
             missingName: mainMissing.name,
           })}
           <Link
-            to="/$locale/challenges"
+            to="/$locale/practice"
             params={{ locale: window.location.pathname.split('/')[1] || 'en' }}
-            search={{ tier: mainMissing.tier }}
+            search={{ track: TIER_TRACK[mainMissing.tier] }}
             className="ml-2 inline-flex items-center gap-0.5 font-semibold underline decoration-amber-500/30 underline-offset-2 hover:text-amber-500 hover:decoration-amber-500"
           >
             {t('challenges:playground.tryPrereq', {

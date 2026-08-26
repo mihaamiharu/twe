@@ -9,8 +9,6 @@
   },
   "navigation": {
     "home": "Beranda",
-    "challenges": "Tantangan",
-    "tutorials": "Tutorial",
     "learn": "Belajar",
     "practice": "Latihan",
     "labs": "Labs",
@@ -39,9 +37,9 @@
     "tryAgain": "Coba Lagi",
     "startLearning": "Mulai Belajar",
     "startWebAutomation": "Mulai Web Automation",
-    "backToTutorials": "Kembali ke Tutorial",
-    "browseTutorials": "Lihat Semua Tutorial",
-    "backToChallenges": "Kembali ke Tantangan",
+    "backToLearn": "Kembali ke Belajar",
+    "browseLessons": "Lihat Semua Pelajaran",
+    "backToChallenges": "Kembali ke Latihan",
     "dismiss": "Abaikan",
     "refresh": "Segarkan Halaman",
     "signIn": "Masuk",
@@ -87,7 +85,7 @@
     "loadingChallenge": "Memuat tantangan...",
     "unavailable": "Tidak tersedia",
     "challengeCompleted": "Tantangan selesai!",
-    "tutorialCompleted": "Tutorial selesai!",
+    "tutorialCompleted": "Pelajaran selesai!",
     "achievementUnlocked": "Berhasil dibuka: {{name}}"
   },
   "footer": {
@@ -97,16 +95,7 @@
     "legal": "Legal",
     "copyright": "© TestingWithEkki {{year}}",
     "builtBy": "Dibuat oleh Ekki",
-    "reportBug": "Laporkan Bug",
-    "newsletter": {
-      "title": "Tetap Terupdate",
-      "description": "Dapatkan tutorial, tantangan, dan tips testing terbaru langsung di inbox Anda.",
-      "placeholder": "email@anda.com",
-      "submit": "Langganan",
-      "submitting": "Memproses...",
-      "success": "Terima kasih telah berlangganan!",
-      "error": "Terjadi kesalahan."
-    }
+    "reportBug": "Laporkan Bug"
   },
   "notFound": {
     "eyebrow": "404 / TIDAK DITEMUKAN",

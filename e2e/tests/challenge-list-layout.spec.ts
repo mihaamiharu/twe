@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('Challenge list row layout', () => {
   test('keeps desktop metadata columns aligned', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto('/en/challenges');
+    await page.goto('/en/practice');
 
     const list = page.getByTestId('challenge-library-list').first();
     await expect(list).toBeVisible();
@@ -42,7 +42,7 @@ test.describe('Challenge list row layout', () => {
 
   test('does not overflow on mobile rows', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto('/en/challenges');
+    await page.goto('/en/practice');
 
     const firstRow = page.getByTestId('challenge-list-row').first();
     await expect(firstRow).toBeVisible();

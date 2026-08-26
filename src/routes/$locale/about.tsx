@@ -87,7 +87,7 @@ function AboutPage() {
 
       <section className="mx-auto grid max-w-7xl gap-8 px-6 pb-20 sm:px-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20 lg:px-12 lg:pb-28">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">BACKGROUND</p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('background.eyebrow')}</p>
           <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('background.title')}</h2>
         </div>
         <div className="max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">
@@ -131,7 +131,7 @@ function AboutPage() {
 
 function SocialLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3.5 text-sm font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)]">
+    <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3.5 text-sm font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)]">
       {icon}
       {label}
     </a>

@@ -11,11 +11,23 @@ import {
 import { useTranslation } from 'react-i18next';
 import { EmptyState } from '@/components/empty-state';
 import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
+import { authQueryOptions } from '@/lib/auth.query';
+import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { BASE_URL, createSeoHead, websiteSchema } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { LocaleRoutes, localeParams } from '@/lib/navigation';
 
 export const Route = createFileRoute('/$locale/')({
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+
+    return context.queryClient.ensureQueryData(
+      tutorialsListQueryOptions({
+        locale: params.locale,
+        viewerId: auth.user?.id,
+      }),
+    );
+  },
   component: HomePage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
@@ -36,14 +48,10 @@ function HomePage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('home');
   const params = localeParams(locale);
-
-  const learningSteps = [
-    { number: '01', title: t('learningPath.steps.foundations.title'), description: t('learningPath.steps.foundations.description') },
-    { number: '02', title: t('learningPath.steps.programming.title'), description: t('learningPath.steps.programming.description') },
-    { number: '03', title: t('learningPath.steps.playwright.title'), description: t('learningPath.steps.playwright.description') },
-    { number: '04', title: t('learningPath.steps.design.title'), description: t('learningPath.steps.design.description') },
-    { number: '05', title: t('learningPath.steps.e2e.title'), description: t('learningPath.steps.e2e.description') },
-  ];
+  const lessonsResponse = routeApi.useLoaderData();
+  const currentLessons = lessonsResponse.success
+    ? lessonsResponse.data.slice(0, 3)
+    : [];
 
   const methodSteps = [
     { number: '01', label: t('learnPractice.steps.learn.label'), title: t('learnPractice.steps.learn.title'), description: t('learnPractice.steps.learn.description'), icon: BookOpen },
@@ -67,7 +75,7 @@ function HomePage() {
           </p>
           <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
             <Link
-              to={LocaleRoutes.tutorials}
+              to={LocaleRoutes.learn}
               params={params}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white transition-transform hover:-translate-y-px hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
@@ -75,7 +83,7 @@ function HomePage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
             <Link
-              to={LocaleRoutes.challenges}
+              to={LocaleRoutes.practice}
               params={params}
               className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
@@ -101,7 +109,7 @@ function HomePage() {
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learningPath.title')}</h2>
             <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learningPath.description')}</p>
             <Link
-              to={LocaleRoutes.tutorials}
+              to={LocaleRoutes.learn}
               params={params}
               className="mt-7 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
             >
@@ -109,28 +117,38 @@ function HomePage() {
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-          <ol
-            data-testid="learning-path-progress"
-            className="relative grid gap-0 sm:grid-cols-5 sm:gap-3"
-          >
-            {learningSteps.map((step, index) => (
-              <li key={step.number} className="relative flex gap-4 border-l border-[var(--soft-border)] pb-6 pl-5 last:pb-0 sm:block sm:border-l-0 sm:pb-0 sm:pl-0">
-                {index < learningSteps.length - 1 && <span className="absolute left-1/2 top-3.5 hidden h-px w-[calc(100%+0.75rem)] bg-[var(--soft-border)] sm:block" />}
-                <div className="relative z-10 flex min-w-7 items-center justify-center">
-                  <span
-                    data-testid={`learning-path-progress-marker-${step.number}`}
-                    className="flex h-7 w-7 items-center justify-center rounded-full border border-[var(--brand-orange)] bg-[var(--paper-surface)] font-mono text-[10px] text-[var(--brand-orange)]"
-                  >
-                    {step.number}
+            <div
+              data-testid="current-lessons"
+              className="relative grid gap-3 sm:grid-cols-3"
+            >
+              {currentLessons.map((lesson, index) => (
+                <Link
+                  key={lesson.slug}
+                  to={LocaleRoutes.learnDetail}
+                  params={{ ...params, slug: lesson.slug }}
+                  className="group relative flex min-h-44 flex-col rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-4 transition-colors hover:border-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                >
+                  <span className="font-mono text-[11px] text-[var(--brand-orange)]">
+                    {t('learningPath.lessonNumber', { number: index + 1 })}
                   </span>
-                </div>
-                <div className="relative z-10 sm:mt-4">
-                  <h3 className="font-semibold">{step.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">{step.description}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+                  <h3 className="mt-4 font-semibold leading-6 group-hover:text-[var(--brand-orange)]">
+                    {lesson.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--muted-graphite)]">
+                    {lesson.description}
+                  </p>
+                  <ArrowRight
+                    className="mt-auto h-4 w-4 self-end text-[var(--brand-orange)] transition-transform group-hover:translate-x-1"
+                    aria-hidden="true"
+                  />
+                </Link>
+              ))}
+              {currentLessons.length === 0 && (
+                <p className="rounded-lg border border-dashed border-[var(--soft-border)] p-5 text-sm leading-6 text-[var(--muted-graphite)] sm:col-span-3">
+                  {t('learningPath.noLessons')}
+                </p>
+              )}
+            </div>
         </div>
       </section>
 
@@ -162,7 +180,7 @@ function HomePage() {
             </ol>
             <div className="lg:pt-4">
               <PracticePreview />
-              <Link to={LocaleRoutes.challenges} params={params} className="mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+              <Link to={LocaleRoutes.practice} params={params} className="mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange)] hover:text-[var(--graphite)]">
                 {t('learnPractice.cta')}
                 <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
               </Link>
@@ -209,7 +227,7 @@ function HomePage() {
             description={t('labs.description')}
             action={
               <Link
-                to={LocaleRoutes.challenges}
+                to={LocaleRoutes.labs}
                 params={params}
                 className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)]"
               >
@@ -229,10 +247,10 @@ function HomePage() {
             <p className="mt-4 max-w-xl text-base leading-7 text-[#d2d0c9]">{t('cta.description')}</p>
           </div>
           <div className="mt-8 flex shrink-0 flex-col items-start gap-4 sm:flex-row lg:mt-0 lg:flex-col lg:items-start">
-            <Link to={LocaleRoutes.tutorials} params={params} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
+            <Link to={LocaleRoutes.learn} params={params} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
               {t('cta.primary')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link to={LocaleRoutes.challenges} params={params} className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
+            <Link to={LocaleRoutes.practice} params={params} className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
               {t('cta.secondary')} <Play className="h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>

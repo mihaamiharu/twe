@@ -8,17 +8,12 @@
     "creatorNote": "Dibuat oleh Ekki · Belajar dengan ritmemu"
   },
   "learningPath": {
-    "eyebrow": "LEARNING PATH",
-    "title": "Web Automation Learning Path",
-    "description": "Pelajari cara kerja web, bangun fondasi pemrograman yang dibutuhkan, lalu terapkan dengan Playwright.",
-    "cta": "Lihat Learning Path",
-    "steps": {
-      "foundations": { "title": "Dasar Web", "description": "Pahami browser dan web." },
-      "programming": { "title": "Pemrograman", "description": "Bangun fondasi kode untuk otomasi." },
-      "playwright": { "title": "Playwright", "description": "Tulis browser test yang praktis." },
-      "design": { "title": "Desain Otomasi", "description": "Buat test yang jelas dan mudah dirawat." },
-      "e2e": { "title": "End-to-End Testing", "description": "Satukan semuanya dalam alur nyata." }
-    }
+    "eyebrow": "OTOMASI WEB / PELAJARAN SAAT INI",
+    "title": "Mulai dari pelajaran yang sudah siap.",
+    "description": "Lihat pelajaran Web Automation saat ini, lalu gunakan Practice untuk menerapkan yang sudah kamu pelajari.",
+    "cta": "Lihat semua pelajaran",
+    "lessonNumber": "Pelajaran {{number}}",
+    "noLessons": "Katalog pelajaran saat ini tidak tersedia."
   },
   "learnPractice": {
     "eyebrow": "BELAJAR + PRACTICE",
@@ -46,9 +41,9 @@
   },
   "labs": {
     "eyebrow": "LABS · SEGERA HADIR",
-    "title": "Praktik QA di environment nyata.",
-    "description": "Beberapa skill testing lebih baik dipelajari di luar sandbox browser. Labs akan menghadirkan latihan terpandu dengan repository, API, framework test, pipeline CI, dan environment development lainnya.",
-    "cta": "Jelajahi Practice sementara ini"
+    "title": "Ruang baru untuk mengasah kemampuan testing.",
+    "description": "Labs sedang dibentuk sebagai ruang yang lebih tenang dan hands-on untuk mengeksplorasi software testing. Eksperimen pertamanya masih disiapkan, dan akan saya bagikan saat sudah siap.",
+    "cta": "Kunjungi Labs"
   },
   "cta": {
     "eyebrow": "MULAI DI SINI",

@@ -7,6 +7,7 @@ export const defaultNS = 'common';
 export const namespaces = [
   'common',
   'home',
+  'labs',
   'challenges',
   'tutorials',
 ] as const;

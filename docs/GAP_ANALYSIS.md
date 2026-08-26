@@ -72,4 +72,4 @@ Shift towards **"Refined Industrial"** - keep the _layout_ strict (like Brutalis
 
 4. **Track Visualization:**
    - Create a `TrackCard` component that groups related tutorials.
-   - Update `src/routes/tutorials/index.tsx` to display tracks.
+   - Update `src/routes/$locale/learn/index.tsx` to display tracks.

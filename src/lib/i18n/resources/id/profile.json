@@ -7,8 +7,8 @@
     "settings": "Pengaturan"
   },
   "stats": {
-    "tutorials": "Tutorial",
-    "challenges": "Tantangan",
+    "learn": "Learn",
+    "practice": "Practice",
     "totalXp": "Total XP",
     "achievements": "Pencapaian"
   },

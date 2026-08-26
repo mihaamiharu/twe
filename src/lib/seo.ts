@@ -8,7 +8,7 @@ interface SeoParams {
     title: string;
     /** Page description for meta and OG */
     description: string;
-    /** Path without locale prefix, e.g. '/challenges' or '/challenges/my-slug' */
+    /** Path without locale prefix, e.g. '/practice' or '/practice/my-slug' */
     path: string;
     /** Current locale, defaults to 'en' */
     locale?: string;
@@ -151,7 +151,7 @@ export const websiteSchema = {
         "@type": "SearchAction",
         "target": {
             "@type": "EntryPoint",
-            "urlTemplate": "https://testingwithekki.com/en/challenges?q={search_term_string}"
+            "urlTemplate": "https://testingwithekki.com/en/practice?q={search_term_string}"
         },
         "query-input": "required name=search_term_string"
     }

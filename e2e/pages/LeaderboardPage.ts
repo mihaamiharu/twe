@@ -20,6 +20,7 @@ export class LeaderboardPage extends BasePage {
 
   override async goto() {
     await this.page.goto('/en/leaderboard');
+    await this.page.waitForLoadState('load');
     await this.waitForHydration();
   }
 
@@ -30,7 +31,9 @@ export class LeaderboardPage extends BasePage {
           __TSS_START_OPTIONS__?: unknown;
           $_TSR?: unknown;
         };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) && !appWindow.$_TSR;
+        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
+          (appWindow.$_TSR?.initialized === true ||
+            appWindow.$_TSR === undefined);
       },
       undefined,
       { timeout: 20_000 },

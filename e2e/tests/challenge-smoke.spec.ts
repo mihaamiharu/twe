@@ -4,7 +4,7 @@ test.describe('Challenge smoke', () => {
   test('loads and executes a selector challenge without a session', async ({
     page,
   }) => {
-    await page.goto('/en/challenges/css-selector-101-id-class');
+    await page.goto('/en/practice/css-selector-101-id-class');
     await page.waitForLoadState('networkidle');
 
     const xpathButton = page.getByRole('button', {

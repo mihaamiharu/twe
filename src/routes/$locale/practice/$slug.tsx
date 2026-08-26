@@ -1,8 +1,11 @@
 import {
   createFileRoute,
+  type ErrorComponentProps,
   useParams,
   useNavigate,
   Link,
+  notFound,
+  rootRouteId,
 } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { lazy, Suspense, useCallback, useMemo } from 'react';
@@ -11,11 +14,15 @@ import {
   useQueryClient,
   useSuspenseQuery,
 } from '@tanstack/react-query';
-import { challengeDetailQueryOptions } from '@/lib/challenges.query';
+import {
+  challengeCatalogQueryKeys,
+  challengeDetailQueryOptions,
+} from '@/lib/challenges.query';
 import { ChallengeSkeleton } from '@/components/challenges/challenge-skeleton';
+import { EmptyState } from '@/components/empty-state';
 import { ChallengeSuccessDialog } from '@/components/challenges/challenge-success-dialog';
 import { deobfuscate } from '@/lib/obfuscator';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -33,161 +40,40 @@ import {
   type ChallengeSubmissionPayload,
 } from '@/lib/challenge-submission';
 import { omitUndefined } from '@/lib/omit-undefined';
-
-import i18n from '@/lib/i18n';
+import { createPracticeDetailSeoHead } from '@/lib/practice-seo';
 
 const ChallengePlayground = lazy(async () => {
   const module = await import('@/components/challenges/challenge-playground');
   return { default: module.ChallengePlayground };
 });
 
-export const Route = createFileRoute('/$locale/challenges/$slug')({
-  loader: ({ context, params }) =>
-    context.queryClient.ensureQueryData(
-      challengeDetailQueryOptions(params.slug, params.locale),
-    ),
+export const Route = createFileRoute('/$locale/practice/$slug')({
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+    const response = await context.queryClient.ensureQueryData(
+      challengeDetailQueryOptions(params.slug, params.locale, auth.user?.id),
+    );
+    return response;
+  },
   component: ChallengeDetailPage,
+  errorComponent: PracticeDetailError,
   head: ({ loaderData, params }) => {
-    const data = loaderData?.data;
     const locale = params.locale || 'en';
-    const url = `https://testingwithekki.com/${locale}/challenges/${params.slug}`;
-
-    if (!data) {
-      return {
-        meta: [
-          { title: i18n.t('challenges:page.seo.title') },
-          {
-            name: 'description',
-            content: i18n.t('challenges:page.seo.description'),
-          },
-          { property: 'og:url', content: url },
-          {
-            property: 'og:image',
-            content: 'https://testingwithekki.com/twe-banner.png',
-          },
-        ],
-        links: [
-          {
-            rel: 'canonical',
-            href: url,
-          },
-          {
-            rel: 'alternate',
-            hrefLang: 'en',
-            href: `https://testingwithekki.com/en/challenges/${params.slug}`,
-          },
-          {
-            rel: 'alternate',
-            hrefLang: 'id',
-            href: `https://testingwithekki.com/id/challenges/${params.slug}`,
-          },
-          {
-            rel: 'alternate',
-            hrefLang: 'x-default',
-            href: `https://testingwithekki.com/en/challenges/${params.slug}`,
-          },
-        ],
-      };
-    }
-
-    const title = `${data.title} (${data.difficulty === 'EASY' ? i18n.t('common:labels.easy') : data.difficulty === 'MEDIUM' ? i18n.t('common:labels.medium') : i18n.t('common:labels.hard')}) | TestingWithEkki`;
-
-    const ogImageUrl = `https://testingwithekki.com/api/og?title=${encodeURIComponent(data.title)}&type=Challenge&difficulty=${data.difficulty}&xp=${data.xpReward}`;
-
-    // Structured Data
-    const jsonLd = [
-      {
-        '@context': 'https://schema.org',
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          {
-            '@type': 'ListItem',
-            position: 1,
-            name: 'Home',
-            item: `https://testingwithekki.com/${locale}`,
-          },
-          {
-            '@type': 'ListItem',
-            position: 2,
-            name: 'Challenges',
-            item: `https://testingwithekki.com/${locale}/challenges`,
-          },
-          {
-            '@type': 'ListItem',
-            position: 3,
-            name: data.title,
-            item: url,
-          },
-        ],
-      },
-      {
-        '@context': 'https://schema.org',
-        '@type': 'LearningResource',
-        name: data.title,
-        description: data.description,
-        learningResourceType: 'Practice Problem',
-        educationalLevel:
-          data.difficulty === 'EASY'
-            ? 'Beginner'
-            : data.difficulty === 'MEDIUM'
-              ? 'Intermediate'
-              : 'Advanced',
-        teaches: data.category || 'Playwright Automation',
-        url: url,
-        image: ogImageUrl,
-        author: {
-          '@type': 'Organization',
-          name: 'TestingWithEkki',
-          url: 'https://testingwithekki.com',
-        },
-      },
-    ];
-
-    return {
-      meta: [
-        { title },
-        { name: 'description', content: data.description },
-        { property: 'og:title', content: title },
-        { property: 'og:description', content: data.description },
-        { property: 'og:url', content: url },
-        { property: 'og:image', content: ogImageUrl },
-        { property: 'twitter:card', content: 'summary_large_image' },
-        { property: 'twitter:title', content: title },
-        { property: 'twitter:description', content: data.description },
-        { property: 'twitter:image', content: ogImageUrl },
-      ],
-      links: [
-        {
-          rel: 'canonical',
-          href: url,
-        },
-        {
-          rel: 'alternate',
-          hrefLang: 'en',
-          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
-        },
-        {
-          rel: 'alternate',
-          hrefLang: 'id',
-          href: `https://testingwithekki.com/id/challenges/${data.slug}`,
-        },
-        {
-          rel: 'alternate',
-          hrefLang: 'x-default',
-          href: `https://testingwithekki.com/en/challenges/${data.slug}`,
-        },
-      ],
-      scripts: jsonLd.map((data) => ({
-        type: 'application/ld+json',
-        children: JSON.stringify(data),
-      })),
-    };
+    return createPracticeDetailSeoHead({
+      locale,
+      slug: params.slug,
+      challenge: loaderData?.success ? loaderData.data : null,
+      noIndex:
+        loaderData?.success === false
+          ? loaderData.errorCode === 'not-found'
+          : undefined,
+    });
   },
   pendingComponent: ChallengeSkeleton,
 });
 
 function ChallengeDetailPage() {
-  const { locale, slug } = useParams({ from: '/$locale/challenges/$slug' });
+  const { locale, slug } = useParams({ from: '/$locale/practice/$slug' });
   const { t } = useTranslation(['challenges', 'common']);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -199,22 +85,29 @@ function ChallengeDetailPage() {
     levelUp?: { newLevel: number; title: string };
   } | null>(null);
 
-  const { data: challengeData } = useSuspenseQuery(
-    challengeDetailQueryOptions(slug, locale),
+  const { data: auth } = useSuspenseQuery(authQueryOptions);
+  const userId = auth.user?.id;
+
+  const { data: challengeResponse } = useSuspenseQuery(
+    challengeDetailQueryOptions(slug, locale, auth.user?.id),
   );
 
-  // Rename for compatibility with existing code
-  // Rename for compatibility with existing code
-  const data = challengeData;
+  if (!challengeResponse.success) {
+    if (challengeResponse.errorCode === 'not-found') {
+      // TanStack Router's notFound sentinel is the established route-level
+      // fallback, even though it is not typed as a native Error instance.
+      // eslint-disable-next-line @typescript-eslint/only-throw-error
+      throw notFound({ routeId: rootRouteId });
+    }
+    throw new Error(challengeResponse.error);
+  }
 
-  const { data: auth } = useSuspenseQuery(authQueryOptions);
-  const sessionData = auth; // Alias for compatibility
-  const userId = sessionData?.user?.id;
+  const challengeData = challengeResponse.data;
 
   // Deobfuscate inputs if needed (for selector challenges)
   const testCases = useMemo(() => {
-    if (!data?.data?.testCases) return [];
-    return data.data.testCases.map((tc) => {
+    if (!challengeData?.testCases) return [];
+    return challengeData.testCases.map((tc) => {
       const input = tc.input as { selector?: string; xpath?: string };
       const processedInput = { ...input };
 
@@ -230,13 +123,10 @@ function ChallengeDetailPage() {
         input: processedInput,
       };
     });
-  }, [data?.data?.testCases]);
+  }, [challengeData?.testCases]);
 
   // Transform API response to Challenge type expected by ChallengePlayground
-  const challenge = transformChallengeResponse(
-    data?.success && data.data ? data.data : null,
-    testCases,
-  );
+  const challenge = transformChallengeResponse(challengeData, testCases);
 
   const submitMutation = useMutation({
     mutationFn: async (submissionData: ChallengeSubmissionPayload) => {
@@ -279,10 +169,10 @@ function ChallengeDetailPage() {
         });
 
         // Track analytics events
-        if (data?.data) {
+        if (challengeData) {
           trackEvent('challenge_completed', {
-            slug: data.data.slug,
-            difficulty: data.data.difficulty,
+            slug: challengeData.slug,
+            difficulty: challengeData.difficulty,
             xp: response.data.submission.xpEarned,
           });
         }
@@ -308,8 +198,16 @@ function ChallengeDetailPage() {
         }
 
         // Invalidate queries to refresh progress
-        await queryClient.invalidateQueries({ queryKey: ['challenge', slug] });
-        await queryClient.invalidateQueries({ queryKey: ['challenges'] }); // Refresh challenges list
+        await queryClient.invalidateQueries({
+          queryKey: challengeCatalogQueryKeys.detail(
+            slug,
+            locale,
+            auth.user?.id,
+          ),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: challengeCatalogQueryKeys.list(locale, auth.user?.id),
+        });
         await queryClient.invalidateQueries({ queryKey: ['profile'] });
         await queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       }
@@ -329,7 +227,7 @@ function ChallengeDetailPage() {
       if (!challenge) return;
 
       // Auth Guard: Check if user is logged in
-      if (!sessionData?.user) {
+      if (!userId) {
         setShowAuthGuard(true);
         return;
       }
@@ -354,7 +252,7 @@ function ChallengeDetailPage() {
         error: t('challenges:toasts.submittedFailed'),
       });
     },
-    [challenge, submitMutation, sessionData, locale, t],
+    [challenge, submitMutation, userId, locale, t],
   );
 
   if (!challenge) {
@@ -370,32 +268,12 @@ function ChallengeDetailPage() {
                 {t('challenges:page.notFoundDescription')}
               </p>
               <div className="flex items-center gap-4 mb-6 justify-center">
-                <Link to="/$locale/challenges" params={{ locale }}>
+                <Link to="/$locale/practice" params={{ locale }}>
                   <Button variant="ghost" size="sm">
                     <ArrowLeft className="h-4 w-4 mr-2" />
                     {t('common:actions.backToChallenges')}
                   </Button>
                 </Link>
-                {data?.data?.tutorial && (
-                  <>
-                    <div className="h-4 w-px bg-border" />
-                    <Link
-                      to="/$locale/tutorials/$slug"
-                      params={{ locale, slug: data.data.tutorial.slug }}
-                    >
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-primary hover:text-primary/80 hover:bg-primary/10"
-                      >
-                        <BookOpen className="h-4 w-4 mr-2" />
-                        {t('challenges:page.reviewTutorial', {
-                          title: data.data.tutorial.title,
-                        })}
-                      </Button>
-                    </Link>
-                  </>
-                )}
               </div>
             </CardContent>
           </Card>
@@ -405,7 +283,7 @@ function ChallengeDetailPage() {
   }
 
   return (
-    <div className="h-[calc(100vh-4rem)] min-w-0 overflow-hidden flex flex-col">
+    <div className="h-[calc(100dvh-4.5625rem)] min-w-0 overflow-hidden flex flex-col">
       <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
         <Suspense fallback={<ChallengeSkeleton />}>
           <ChallengePlayground
@@ -413,8 +291,10 @@ function ChallengeDetailPage() {
             challenge={challenge}
             onSubmit={handleSubmit}
             {...omitUndefined({ userId })}
-            hintUsed={data?.data?.userProgress?.usedHint || false}
-            initialHintContent={data?.data?.userProgress?.hintContent || null}
+            hintUsed={challengeData?.userProgress?.usedHint || false}
+            initialHintContent={
+              challengeData?.userProgress?.hintContent || null
+            }
           />
         </Suspense>
       </div>
@@ -429,14 +309,14 @@ function ChallengeDetailPage() {
           {...omitUndefined({ levelUp: lastSubmissionResult.levelUp })}
           onRetry={() => setShowSuccessDialog(false)}
           {...omitUndefined({
-            onNextChallenge: data?.data?.nextChallenge
+            onNextChallenge: challengeData?.nextChallenge
               ? () => {
                   setShowSuccessDialog(false);
                   void navigate({
-                    to: '/$locale/challenges/$slug',
+                    to: '/$locale/practice/$slug',
                     params: {
                       locale,
-                      slug: data.data?.nextChallenge?.slug ?? '',
+                      slug: challengeData.nextChallenge?.slug ?? '',
                     },
                   });
                 }
@@ -452,5 +332,36 @@ function ChallengeDetailPage() {
         description={t('auth:guard.description')}
       />
     </div>
+  );
+}
+
+function PracticeDetailError({ reset }: ErrorComponentProps) {
+  const { t } = useTranslation(['challenges', 'common']);
+  const { locale = 'en' } = useParams({ strict: false });
+
+  return (
+    <main className="min-h-[calc(100vh-4rem)] bg-background px-4 py-12 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-3xl rounded-xl border border-border bg-card px-6">
+        <EmptyState
+          showIllustration={false}
+          size="compact"
+          eyebrow={t('challenges:library.errorEyebrow')}
+          title={t('challenges:library.errorTitle')}
+          description={t('challenges:library.errorDescription')}
+          action={
+            <Button type="button" onClick={reset}>
+              {t('challenges:library.retry')}
+            </Button>
+          }
+          secondaryAction={
+            <Button asChild type="button" variant="ghost">
+              <Link to="/$locale/practice" params={{ locale }}>
+                {t('common:actions.backToChallenges')}
+              </Link>
+            </Button>
+          }
+        />
+      </div>
+    </main>
   );
 }

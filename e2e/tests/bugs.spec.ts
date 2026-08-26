@@ -3,7 +3,11 @@ import { DashboardPage } from '../pages/DashboardPage';
 import { AdminPage } from '../pages/AdminPage';
 import { getE2EAdminCredentials, loginViaApi } from '../utils/auth';
 
-test.describe('Bug Reporting Flow', () => {
+// These E2E cases intentionally remain skipped because submitting a report
+// calls the real GitHub integration and creates an external issue. Keep the
+// server response contract covered by unit tests, and re-enable this flow only
+// after the GitHub boundary is mocked for E2E.
+test.describe.skip('Bug Reporting Flow', () => {
   let dashboardPage: DashboardPage;
   let adminPage: AdminPage;
 

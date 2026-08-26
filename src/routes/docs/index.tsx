@@ -43,33 +43,6 @@ const docLinks = [
   },
 ];
 
-const challengeTiers = [
-  {
-    tier: 'Basic',
-    count: 23,
-    focus: 'CSS Selectors, XPath',
-    color: 'bg-green-500/20 text-green-400',
-  },
-  {
-    tier: 'Beginner',
-    count: 23,
-    focus: 'JavaScript, DOM',
-    color: 'bg-blue-500/20 text-blue-400',
-  },
-  {
-    tier: 'Intermediate',
-    count: 29,
-    focus: 'Playwright',
-    color: 'bg-yellow-500/20 text-yellow-400',
-  },
-  {
-    tier: 'Expert',
-    count: 21,
-    focus: 'Real-World Patterns',
-    color: 'bg-red-500/20 text-red-400',
-  },
-];
-
 function DocsIndexPage() {
   const { resolvedTheme } = useTheme();
   const isDark = resolvedTheme === 'dark';
@@ -134,33 +107,22 @@ function DocsIndexPage() {
           })}
         </div>
 
-        {/* Challenge Library Section */}
+        {/* Practice Library Section */}
         <div
           className={`p-8 rounded-xl ${isDark ? 'bg-card' : 'bg-white'} border`}
         >
-          <h2 className="text-2xl font-bold mb-2">Challenge Library</h2>
+          <h2 className="text-2xl font-bold mb-2">Practice Library</h2>
           <p className="text-muted-foreground mb-6">
-            96 challenges across 4 progressive difficulty tiers
+            Browse the current hands-on practice catalog and its progressive
+            tracks in the main app.
           </p>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {challengeTiers.map((tier) => (
-              <div
-                key={tier.tier}
-                className={`p-4 rounded-lg ${tier.color} border border-current/10`}
-              >
-                <div className="text-2xl font-bold">{tier.count}</div>
-                <div className="font-medium">{tier.tier}</div>
-                <div className="text-sm opacity-80">{tier.focus}</div>
-              </div>
-            ))}
-          </div>
           <div className="mt-6 pt-6 border-t">
             <Link
-              to="/$locale/challenges"
+              to="/$locale/practice"
               params={{ locale: 'en' }}
               className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
             >
-              Browse All Challenges →
+              Browse Practice →
             </Link>
           </div>
         </div>

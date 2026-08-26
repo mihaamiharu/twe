@@ -11,6 +11,7 @@ import {
   ChevronRight,
   Info,
   Eye,
+  ArrowLeft,
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
@@ -30,7 +31,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
+import { localeParams, localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 import type { Challenge } from './types';
 
 interface PlaygroundHeaderProps {
@@ -71,6 +72,18 @@ export function PlaygroundHeader({
   return (
     <div className="workspace-panel border-b border-workspace-border px-3 md:px-4 py-2 md:py-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
       <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+        <Link
+          to={LocaleRoutes.practice}
+          params={localeParams(locale)}
+          aria-label={t('common:actions.backToChallenges')}
+          title={t('common:actions.backToChallenges')}
+          className="inline-flex shrink-0 items-center gap-1 rounded-md p-1.5 text-workspace-muted transition-colors hover:bg-workspace-elevated hover:text-workspace-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden text-xs font-medium md:inline">
+            {t('common:actions.backToChallenges')}
+          </span>
+        </Link>
         <div className="min-w-0">
           <h1 className="font-bold text-base md:text-xl tracking-tight text-workspace-text truncate">
             {challenge.title}
@@ -100,12 +113,16 @@ export function PlaygroundHeader({
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <div className="flex items-center gap-1 mt-0.5 cursor-help opacity-80 hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    aria-label={t('challenges:playground.shimNote')}
+                    className="flex items-center gap-1 mt-0.5 cursor-help opacity-80 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                  >
                     <Info className="h-3 w-3 text-brand-warning" />
                     <span className="text-[11px] text-workspace-muted border-b border-dotted border-workspace-muted/50">
                       {t('challenges:playground.shimNote')}
                     </span>
-                  </div>
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent
                   side="bottom"
@@ -125,39 +142,61 @@ export function PlaygroundHeader({
       </div>
       <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
         <div className="flex items-center mr-1 md:mr-2 bg-workspace-elevated rounded-md p-0.5 border border-workspace-border">
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={!challenge.prevChallenge}
-            onClick={() => {
-              if (challenge.prevChallenge) {
-                window.location.href = `/${locale}/challenges/${challenge.prevChallenge.slug}`;
-              }
-            }}
-            className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
-            title={
-              challenge.prevChallenge ? t('common:actions.previous') : undefined
-            }
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
+          {challenge.prevChallenge ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <Link
+                to={LocaleRoutes.practiceDetail}
+                params={localeSlugParams(locale, challenge.prevChallenge.slug)}
+                aria-label={t('common:actions.previous')}
+                title={t('common:actions.previous')}
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled
+              aria-label={t('common:actions.previous')}
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
           <div className="w-px h-4 bg-workspace-border mx-0.5" />
-          <Button
-            variant="ghost"
-            size="icon"
-            disabled={!challenge.nextChallenge}
-            onClick={() => {
-              if (challenge.nextChallenge) {
-                window.location.href = `/${locale}/challenges/${challenge.nextChallenge.slug}`;
-              }
-            }}
-            className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
-            title={
-              challenge.nextChallenge ? t('common:actions.next') : undefined
-            }
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
+          {challenge.nextChallenge ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <Link
+                to={LocaleRoutes.practiceDetail}
+                params={localeSlugParams(locale, challenge.nextChallenge.slug)}
+                aria-label={t('common:actions.next')}
+                title={t('common:actions.next')}
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled
+              aria-label={t('common:actions.next')}
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
         </div>
 
         {isMobile && isCodeChallenge && (
@@ -166,6 +205,7 @@ export function PlaygroundHeader({
             variant="outline"
             onClick={onRunCode}
             disabled={isRunning}
+            aria-label={t('common:actions.runCode')}
             className="font-bold border-brand-orange text-brand-orange hover:bg-brand-orange/10"
           >
             {isRunning ? (
@@ -178,16 +218,18 @@ export function PlaygroundHeader({
 
         {challenge.tutorial && (
           <Link
-            to={LocaleRoutes.tutorialDetail}
+            to={LocaleRoutes.learnDetail}
             params={localeSlugParams(locale, challenge.tutorial.slug)}
           >
             <Button
               variant="ghost"
               size="sm"
-              className="hidden md:flex font-bold text-workspace-muted hover:text-workspace-text"
+              className="font-bold text-workspace-muted hover:text-workspace-text"
             >
               <BookOpen className="h-4 w-4 mr-2" />
-              {t('common:navigation.tutorials')}
+              <span className="hidden md:inline">
+                {t('common:navigation.learn')}
+              </span>
             </Button>
           </Link>
         )}
@@ -198,6 +240,7 @@ export function PlaygroundHeader({
               <Button
                 variant="outline"
                 size="sm"
+                aria-label={t('challenges:hints.title', 'Hints')}
                 className="font-bold border border-workspace-border text-workspace-muted hover:text-workspace-text h-8 md:h-9 px-2 md:px-3"
               >
                 <Lightbulb className="h-4 w-4 md:mr-2 text-yellow-500" />
@@ -359,6 +402,7 @@ export function PlaygroundHeader({
                 size="sm"
                 onClick={onSubmit}
                 disabled={!hasPassed}
+                aria-label={t('common:actions.submit')}
                 className={cn(
                   'font-bold border border-workspace-border transition-all h-8 md:h-9 px-2 md:px-3',
                   hasPassed

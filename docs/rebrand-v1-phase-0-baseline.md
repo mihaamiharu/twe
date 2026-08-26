@@ -6,14 +6,15 @@ Baseline branch: `main` at `a8763ec` (`Chore/typescript ci hardening (#204)`).
 
 ## Product route boundaries
 
-- `/$locale/tutorials` is the existing tutorial library and remains the technical route for the public Learn surface.
-- `/$locale/tutorials/$slug` renders a lesson and owns reading progress, completion, related challenges, and next-lesson behavior.
-- `/$locale/challenges` is the existing standalone Practice library.
-- `/$locale/challenges/$slug` is the interactive challenge workspace.
+- `/$locale/learn` is the public Learn library.
+- `/$locale/learn/$slug` renders a lesson and owns reading progress, completion, related challenges, and next-lesson behavior.
+- `/$locale/practice` is the public standalone Practice library.
+- `/$locale/practice/$slug` is the interactive challenge workspace.
 - `/$locale/profile` is authenticated and currently exposes aggregate user progress, XP, achievements, and activity.
 - There is currently no Labs route or explicit Learning Path route.
 
-Public labels may change during the rebrand while these URLs remain compatible.
+Public labels now align with these Learn and Practice URLs; the former public
+Tutorials and Challenges paths are intentionally not compatibility routes.
 
 ## Content and data boundaries
 

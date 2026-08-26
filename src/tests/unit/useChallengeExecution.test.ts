@@ -9,11 +9,7 @@ import {
     createPlaygroundState,
 } from '@/tests/fixtures/playground';
 
-// These tests use mock.module() which pollutes Bun's module registry globally
-// and breaks iframe-executor.test.ts. Run with BUN_RUN_SKIPPED=1 to enable.
-const isSkipped = !process.env.BUN_RUN_SKIPPED;
-
-describe.skipIf(isSkipped)('useChallengeExecution', () => {
+describe('useChallengeExecution', () => {
     beforeEach(() => {
         void mock.module(
             '@/core/executor/module-preloader', () => ({
@@ -24,7 +20,10 @@ describe.skipIf(isSkipped)('useChallengeExecution', () => {
         void mock.module(
             '@/lib/storage-adapter', () => ({
                 storage: {
+                    getItem: mock(() => Promise.resolve(null)),
+                    setItem: mock(() => Promise.resolve()),
                     removeItem: mock(() => Promise.resolve()),
+                    clear: mock(() => Promise.resolve()),
                 },
             })
         );

@@ -43,7 +43,7 @@ test.describe('Hide/Show Completed', () => {
     // 3. Verify it is marked data-completed="true" or has check circle
     // The implementation adds CheckCircle2 which we can check, or class on the row/card
     // Let's check for the check circle icon inside a link pointing to this slug
-    const challengeLink = page.locator(`a[href*="/challenges/${slug}"]`);
+    const challengeLink = page.locator(`a[href*="/practice/${slug}"]`);
     // It should be visible initially (show completed by default or just in list)
     // Wait for list to load
     await expect(challengeLink.first()).toBeVisible();
@@ -56,7 +56,7 @@ test.describe('Hide/Show Completed', () => {
     // 4. Toggle Hide Completed
     await challengesPage.hideCompletedToggle.click();
     await expect(page).toHaveURL(
-      /\/en\/challenges(?:\/)?\?hideCompleted=true$/,
+      /\/en\/practice(?:\/)?\?hideCompleted=true$/,
     );
     await expect(challengesPage.hideCompletedToggle).toHaveAttribute(
       'aria-checked',
@@ -70,7 +70,7 @@ test.describe('Hide/Show Completed', () => {
     // 6. Toggle back to show (optional, but good for symmetry)
     await challengesPage.hideCompletedToggle.click();
     await expect(page).toHaveURL(
-      /\/en\/challenges(?:\/)?(?:\?hideCompleted=false)?$/,
+      /\/en\/practice(?:\/)?(?:\?hideCompleted=false)?$/,
     );
     await expect(challengeLink.first()).toBeVisible();
   });
@@ -108,12 +108,15 @@ test.describe('Hide/Show Completed', () => {
     await tutorialsPage.gotoList();
 
     // 3. Verify it is visible
-    const tutorialLink = page.locator(`a[href*="/tutorials/${slug}"]`);
+    const tutorialLink = page
+      .locator('section[aria-labelledby="lesson-catalog-title"]')
+      .locator(`a[href*="/learn/${slug}"]`);
     await expect(tutorialLink.first()).toBeVisible();
 
     // 4. Toggle Hide Completed
     await tutorialsPage.hideCompletedToggle.click();
-    await expect(page).toHaveURL(/\/en\/tutorials(?:\/)?\?hideCompleted=true$/);
+    await expect(page).toHaveURL(/\/en\/learn(?:\/)?\?hideCompleted=true$/);
+    await expect(page.getByText('Show all lessons', { exact: true })).toBeVisible();
 
     // 5. Verify it is hidden
     await expect(tutorialLink.first()).toBeHidden();
@@ -121,8 +124,9 @@ test.describe('Hide/Show Completed', () => {
     // 6. Toggle back
     await tutorialsPage.hideCompletedToggle.click();
     await expect(page).toHaveURL(
-      /\/en\/tutorials(?:\/)?(?:\?hideCompleted=false)?$/,
+      /\/en\/learn(?:\/)?(?:\?hideCompleted=false)?$/,
     );
+    await expect(page.getByText('Show remaining only', { exact: true })).toBeVisible();
     await expect(tutorialLink.first()).toBeVisible();
   });
 });

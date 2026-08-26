@@ -68,6 +68,7 @@ export function EditorPanel({
             size="icon"
             className="h-8 w-8 text-workspace-muted hover:text-brand-error"
             onClick={onReset}
+            aria-label={t('challenges:playground.resetCode')}
             title={t('challenges:playground.resetCode')}
           >
             <RotateCcw className="h-3 w-3" />

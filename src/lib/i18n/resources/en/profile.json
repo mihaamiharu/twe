@@ -7,8 +7,8 @@
     "settings": "Settings"
   },
   "stats": {
-    "tutorials": "Tutorials",
-    "challenges": "Challenges",
+    "learn": "Learn",
+    "practice": "Practice",
     "totalXp": "Total XP",
     "achievements": "Achievements"
   },

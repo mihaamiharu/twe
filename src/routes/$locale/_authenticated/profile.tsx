@@ -237,29 +237,29 @@ function ProfilePage() {
         </Card>
 
         <div className="mb-8 grid gap-4 sm:grid-cols-3">
-          <Card className="glass-card card-hover">
+          <Card className="rounded-xl border-[var(--soft-border)] bg-[var(--paper-surface)] shadow-none transition-colors hover:border-[var(--brand-orange)]/45">
             <CardContent className="p-5">
               <BookOpen className="mb-3 h-5 w-5 text-primary" />
               <div className="text-2xl font-semibold">
                 {user.stats.completedTutorials}
               </div>
               <div className="text-sm text-muted-foreground">
-                {t('profile:stats.tutorials')}
+                {t('profile:stats.learn')}
               </div>
             </CardContent>
           </Card>
-          <Card className="glass-card card-hover">
+          <Card className="rounded-xl border-[var(--soft-border)] bg-[var(--paper-surface)] shadow-none transition-colors hover:border-[var(--brand-orange)]/45">
             <CardContent className="p-5">
               <Code className="mb-3 h-5 w-5 text-primary" />
               <div className="text-2xl font-semibold">
                 {user.stats.completedChallenges}
               </div>
               <div className="text-sm text-muted-foreground">
-                {t('profile:stats.challenges')}
+                {t('profile:stats.practice')}
               </div>
             </CardContent>
           </Card>
-          <Card className="glass-card card-hover">
+          <Card className="rounded-xl border-[var(--soft-border)] bg-[var(--paper-surface)] shadow-none transition-colors hover:border-[var(--brand-orange)]/45">
             <CardContent className="p-5">
               <Award className="mb-3 h-5 w-5 text-primary" />
               <div className="text-2xl font-semibold">
