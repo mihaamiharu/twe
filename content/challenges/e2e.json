@@ -17,8 +17,8 @@
                 "id": "Konversi test case manual untuk login berhasil menjadi otomatisasi Page Object Model."
             },
             "instructions": {
-                "en": "# POM Basics: Successful Login\n\n## Concept\nThe **Page Object Model (POM)** is a design pattern that creates an object repository for storage of all web elements. It helps reduce code duplication and improves test maintenance. If the UI changes, you only need to update the Page Object class rather than every individual test.\n\n## Code Example\n```typescript\nimport { LoginPage } from './pages/LoginPage';\n\ntest('login', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('user', 'pass');\n});\n```\n\n## Real World Scenario\nIn a large application, the login form might be used in dozens of test files. Without POM, if the \"Sign In\" button ID changes, you'd have to fix every single file. With POM, you fix it once in the `LoginPage` class, and all tests are instantly repaired.\n\n## Your Task\n1. Navigate to the login page at `/app/login.html` using `loginPage.goto()`.\n2. Login with username `testuser` and password `password123` using `loginPage.login()`.\n3. Verify the welcome message contains \"Welcome, testuser!\" using `expect(page.getByRole('heading', { name: /Welcome/ })).toContainText()`.\n",
-                "id": "# Dasar POM: Login Berhasil\n\n## Concept\n**Page Object Model (POM)** adalah pola desain yang membuat repositori objek untuk menyimpan semua elemen web. Ini membantu mengurangi duplikasi kode dan meningkatkan pemeliharaan pengujian. Jika UI berubah, Anda hanya perlu memperbarui class Page Object daripada setiap pengujian individu.\n\n## Code Example\n```typescript\nimport { LoginPage } from './pages/LoginPage';\n\ntest('login', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('user', 'pass');\n});\n```\n\n## Real World Scenario\nDalam aplikasi besar, form login mungkin digunakan di lusinan file pengujian. Tanpa POM, jika ID tombol \"Sign In\" berubah, Anda harus memperbaiki setiap file. Dengan POM, Anda memperbaikinya sekali di class `LoginPage`, dan semua pengujian langsung diperbaiki.\n\n## Tugas Kamu\n1. Navigasi ke halaman login di `/app/login.html` menggunakan `loginPage.goto()`.\n2. Login dengan username `testuser` dan password `password123` menggunakan `loginPage.login()`.\n3. Verifikasi pesan selamat datang mengandung \"Welcome, testuser!\" menggunakan `expect(page.getByRole('heading', { name: /Welcome/ })).toContainText()`.\n"
+                "en": "# POM Basics: Successful Login\n\nA page object can hide repeated UI mechanics behind vocabulary the test suite understands, such as `login`. It is useful when that behavior is genuinely shared. Keep the outcome assertion in the test so the scenario's intent remains visible; a page object is not a container for every assertion or every element.\n\n## Your Task\n1. Navigate to `/app/login.html` through `loginPage.goto()`.\n2. Log in with `testuser` and `password123` through `loginPage.login()`.\n3. In the test, prove the heading contains `Welcome, testuser!`.\n",
+                "id": "# Dasar POM: Login Berhasil\n\nPage object dapat menyembunyikan mekanisme UI yang berulang di balik kosakata yang dipahami test suite, seperti `login`. Abstraksi ini berguna ketika perilakunya benar-benar dipakai bersama. Pertahankan assertion hasil di dalam test agar maksud skenario tetap terlihat; page object bukan tempat untuk setiap assertion atau setiap elemen.\n\n## Tugas Kamu\n1. Navigasi ke `/app/login.html` melalui `loginPage.goto()`.\n2. Login dengan `testuser` dan `password123` melalui `loginPage.login()`.\n3. Di dalam test, buktikan heading mengandung `Welcome, testuser!`.\n"
             },
             "hints": {
                 "en": [
@@ -38,20 +38,20 @@
                 "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8 animate-in'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4' autocomplete='off'>\n      <div>\n        <label for='username' class='text-sm font-medium text-gray-400'>Username</label>\n        <input id='username' class='input mt-1' placeholder='Enter username' autocomplete='off'>\n      </div>\n      <div>\n        <label for='password' class='text-sm font-medium text-gray-400'>Password</label>\n        <input id='password' type='password' class='input mt-1' placeholder='Enter password' autocomplete='new-password'>\n      </div>\n      <div id='error-msg' class='error-text'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  (function() {\n    const form = document.getElementById('login-form');\n    const userIn = document.getElementById('username');\n    const passIn = document.getElementById('password');\n    form.onsubmit = (e) => {\n      e.preventDefault();\n      if (userIn.value === 'testuser' && passIn.value === 'password123') {\n        window.__APP_STATE__ = window.__APP_STATE__ || {};\n        window.__APP_STATE__.session = { username: 'testuser' };\n        window.__VFS_NAVIGATE__('/app/dashboard.html');\n      } else {\n        document.getElementById('error-msg').style.display = 'block';\n      }\n    };\n  })();\n</script>",
                 "/app/dashboard.html": "<div class='min-h-screen p-8 animate-in'>\n  <div class='flex justify-between items-center mb-8'>\n    <h1 class='text-2xl font-bold'>Dashboard</h1>\n    <button id='logout-btn' class='button button-ghost'>Logout</button>\n  </div>\n  <div class='card p-6 glass'>\n    <h2 id='welcome-message' class='text-xl font-medium'>Loading...</h2>\n    <p class='text-gray-400 mt-2'>Welcome back to your TestApp workspace.</p>\n  </div>\n</div>\n<script>\n  (function() {\n    const session = (window.__APP_STATE__ && window.__APP_STATE__.session) || {};\n    if (!session.username) {\n      window.__VFS_NAVIGATE__('/app/login.html');\n    } else {\n      const el = document.getElementById('welcome-message');\n      if(el) el.textContent = `Welcome, ${session.username}!`;\n    }\n    const logoutBtn = document.getElementById('logout-btn');\n    if (logoutBtn) {\n        logoutBtn.onclick = () => {\n          window.__APP_STATE__ = window.__APP_STATE__ || {};\n          window.__APP_STATE__.session = null;\n          window.__VFS_NAVIGATE__('/app/login.html');\n        };\n    }\n  })();\n</script>"
             },
-            "editableFiles": [
-                "/tests/login.spec.ts"
-            ],
+            "editableFiles": ["/tests/login.spec.ts"],
             "preloadModules": {
                 "LoginPage": {
-                    "exports": [
-                        "LoginPage"
-                    ],
+                    "exports": ["LoginPage"],
                     "source": "/pages/LoginPage.ts"
                 }
             },
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'testuser' and 'password123'\n  \n\n  // 3. Verify welcome message\n  \n});",
             "testCases": [],
             "solution": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('testuser', 'password123');\n  await expect(page.getByRole('heading', { name: /Welcome/ })).toContainText('Welcome, testuser!');\n});",
+            "validation": {
+                "requiredAssertions": ["toContainText"],
+                "requiredMethods": ["goto", "login", "getByRole"]
+            },
             "expectedState": [
                 {
                     "selector": "#welcome-message",
@@ -59,11 +59,7 @@
                     "containsText": "Welcome, testuser!"
                 }
             ],
-            "tags": [
-                "pom",
-                "playwright",
-                "e2e"
-            ]
+            "tags": ["pom", "playwright", "e2e"]
         },
         {
             "slug": "pom-login-failures",
@@ -99,22 +95,22 @@
             "files": {
                 "/tests/login-fail.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  // 1. Navigate to login\n  \n  // 2. Login with wrong credentials\n  \n  // 3. Verify error message is visible\n  \n  // 4. Verify we are still on login page\n  \n});",
                 "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.getByLabel('Username');\n    this.passwordInput = page.getByLabel('Password');\n    this.loginBtn = page.getByRole('button', { name: 'Sign In' });\n    this.errorMessage = page.getByText('Invalid username or password');\n  }\n\n  async goto() {\n    await this.page.goto('/app/login.html');\n  }\n\n  async login(username, password) {\n    await this.usernameInput.fill(username);\n    await this.passwordInput.fill(password);\n    await this.loginBtn.click();\n  }\n}",
-                "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4' autocomplete='off'>\n      <input id='username' class='input' placeholder='Username' aria-label='Username' autocomplete='off'>\n      <input id='password' type='password' class='input' placeholder='Password' aria-label='Password' autocomplete='new-password'>\n      <div id='error-msg' class='error-text'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  document.getElementById('login-form').onsubmit = (e) => {\n    e.preventDefault();\n    document.getElementById('error-msg').style.display = 'block';\n  };\n</script>"
+                "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4' autocomplete='off'>\n      <input id='username' class='input' placeholder='Username' aria-label='Username' autocomplete='off'>\n      <input id='password' type='password' class='input' placeholder='Password' aria-label='Password' autocomplete='new-password'>\n      <div id='error-msg' class='error-text' role='alert' style='display:none;'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  document.getElementById('login-form').onsubmit = (e) => {\n    e.preventDefault();\n    document.getElementById('error-msg').style.display = 'block';\n  };\n</script>"
             },
-            "editableFiles": [
-                "/tests/login-fail.spec.ts"
-            ],
+            "editableFiles": ["/tests/login-fail.spec.ts"],
             "preloadModules": {
                 "LoginPage": {
-                    "exports": [
-                        "LoginPage"
-                    ],
+                    "exports": ["LoginPage"],
                     "source": "/pages/LoginPage.ts"
                 }
             },
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'wronguser' and 'wrongpass'\n  \n\n  // 3. Verify error message and URL\n  \n});",
             "testCases": [],
             "solution": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('wronguser', 'wrongpass');\n  \n  await expect(loginPage.errorMessage).toBeVisible();\n  await expect(page).toHaveURL('/app/login.html');\n});",
+            "validation": {
+                "requiredAssertions": ["toBeVisible", "toHaveURL"],
+                "requiredMethods": ["goto", "login"]
+            },
             "expectedState": [
                 {
                     "selector": "#error-msg",
@@ -122,11 +118,7 @@
                     "containsText": "Invalid"
                 }
             ],
-            "tags": [
-                "pom",
-                "negative-test",
-                "playwright"
-            ]
+            "tags": ["pom", "negative-test", "playwright"]
         },
         {
             "slug": "pom-multi-page",
@@ -168,26 +160,18 @@
                 "/app/dashboard.html": "<div class='p-8'>\n  <nav class='flex gap-4 mb-8'>\n    <a id='dash-link' href='/app/dashboard.html'>Dash</a>\n    <a id='profile-link' href='/app/profile.html'>Profile</a>\n  </nav>\n  <h1>Dashboard</h1>\n  <h2 id='welcome-message'></h2>\n</div>\n<script>\n  (function(){\n    const s = (window.__APP_STATE__ && window.__APP_STATE__.session) || {};\n    document.getElementById(\"welcome-message\").textContent = \"Welcome, \" + (s.name || s.username || 'Guest');\n  })();\n</script>",
                 "/app/profile.html": "<div class='p-8'>\n  <nav class='flex gap-4 mb-8'>\n    <a href='/app/dashboard.html' id='dash-link'>Dash</a>\n  </nav>\n  <h1>Profile</h1>\n  <label for='display-name'>Display Name</label>\n  <input id='display-name' class='input mt-4'>\n  <button id='save-btn' class='button button-primary mt-4' onclick='window.__APP_STATE__ = window.__APP_STATE__ || {}; window.__APP_STATE__.session = window.__APP_STATE__.session || {}; window.__APP_STATE__.session.name = document.getElementById(\"display-name\").value'>Save Changes</button>\n</div>"
             },
-            "editableFiles": [
-                "/tests/profile.spec.ts"
-            ],
+            "editableFiles": ["/tests/profile.spec.ts"],
             "preloadModules": {
                 "LoginPage": {
-                    "exports": [
-                        "LoginPage"
-                    ],
+                    "exports": ["LoginPage"],
                     "source": "/pages/LoginPage.ts"
                 },
                 "DashboardPage": {
-                    "exports": [
-                        "DashboardPage"
-                    ],
+                    "exports": ["DashboardPage"],
                     "source": "/pages/DashboardPage.ts"
                 },
                 "ProfilePage": {
-                    "exports": [
-                        "ProfilePage"
-                    ],
+                    "exports": ["ProfilePage"],
                     "source": "/pages/ProfilePage.ts"
                 }
             },
@@ -201,10 +185,70 @@
                     "containsText": "QA Tester"
                 }
             ],
+            "tags": ["pom", "fluent-interface", "playwright"]
+        },
+        {
+            "slug": "pw-capstone-checkout",
+            "type": "PLAYWRIGHT",
+            "difficulty": "HARD",
+            "category": "e2e-integration",
+            "xpReward": 200,
+            "order": 4100,
+            "title": {
+                "en": "Capstone: Repair and Complete Checkout",
+                "id": "Capstone: Perbaiki dan Selesaikan Checkout"
+            },
+            "description": {
+                "en": "Repair a generated test and prove both a meaningful validation rule and a successful checkout outcome.",
+                "id": "Perbaiki test hasil generate dan buktikan aturan validasi bermakna serta hasil checkout yang berhasil."
+            },
+            "instructions": {
+                "en": "# Capstone: Checkout Feedback System\n\nThe starter code is intentionally untrustworthy. Replace it with one independent test that:\n\n1. opens `/app/checkout.html`;\n2. enters quantity `0` and submits;\n3. proves the alert says `Quantity must be at least 1`;\n4. enters quantity `2` and submits again;\n5. proves the confirmation is visible and contains `2 items`;\n6. uses role/label locator contracts and web-first assertions;\n7. contains no `waitForTimeout`, forced action, or swallowed error.\n\nThe exact variable names and organization are your choice. The behavior and evidence are the contract.",
+                "id": "# Capstone: Sistem Feedback Checkout\n\nStarter code sengaja tidak dapat dipercaya. Ganti dengan satu test independen yang:\n\n1. membuka `/app/checkout.html`;\n2. memasukkan quantity `0` lalu submit;\n3. membuktikan alert berisi `Quantity must be at least 1`;\n4. memasukkan quantity `2` lalu submit lagi;\n5. membuktikan confirmation terlihat dan berisi `2 items`;\n6. menggunakan kontrak locator role/label dan web-first assertion;\n7. tidak memiliki `waitForTimeout`, forced action, atau error yang disembunyikan.\n\nNama variable dan organisasi kode bebas. Perilaku serta bukti adalah kontraknya."
+            },
+            "hints": {
+                "en": [
+                    "Use one quantity locator and reuse it for the boundary and happy-path values.",
+                    "The alert and status have semantic roles; assert each state after the action that produces it.",
+                    "A successful solution needs `toHaveText` for the validation and a visible confirmation containing `2 items`."
+                ],
+                "id": [
+                    "Gunakan satu locator quantity dan pakai ulang untuk nilai boundary serta happy path.",
+                    "Alert dan status memiliki semantic role; periksa setiap state setelah action yang menghasilkannya.",
+                    "Solusi perlu `toHaveText` untuk validasi dan confirmation terlihat yang berisi `2 items`."
+                ]
+            },
+            "files": {
+                "/tests/checkout.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('checkout', async ({ page }) => {\n  await page.goto('/app/checkout.html');\n  await page.locator('main > form > input').fill('2');\n  await page.locator('main > form > button').click({ force: true });\n  await page.waitForTimeout(1000);\n  try {\n    expect(await page.locator('.message').textContent()).toBeTruthy();\n  } catch {\n    console.log('ignore intermittent checkout issue');\n  }\n});",
+                "/app/checkout.html": "<main><h1>Checkout</h1><form id='checkout-form'><label for='quantity'>Quantity</label><input id='quantity' name='quantity' type='number' value='1'><button type='submit'>Place order</button></form><p role='alert' hidden></p><section id='confirmation' role='status' hidden></section></main><script>document.getElementById('checkout-form').addEventListener('submit',(event)=>{event.preventDefault();const quantity=Number(document.getElementById('quantity').value);const alert=document.querySelector('[role=alert]');const confirmation=document.getElementById('confirmation');if(quantity<1){alert.hidden=false;alert.textContent='Quantity must be at least 1';confirmation.hidden=true;return;}alert.hidden=true;confirmation.hidden=false;confirmation.textContent='Order confirmed: '+quantity+' items';});</script>"
+            },
+            "editableFiles": ["/tests/checkout.spec.ts"],
+            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('checkout', async ({ page }) => {\n  await page.goto('/app/checkout.html');\n  await page.locator('main > form > input').fill('2');\n  await page.locator('main > form > button').click({ force: true });\n  await page.waitForTimeout(1000);\n  try {\n    expect(await page.locator('.message').textContent()).toBeTruthy();\n  } catch {\n    console.log('ignore intermittent checkout issue');\n  }\n});",
+            "testCases": [],
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('rejects invalid quantity and completes a valid checkout', async ({ page }) => {\n  await page.goto('/app/checkout.html');\n  const quantity = page.getByLabel('Quantity');\n  const placeOrder = page.getByRole('button', { name: 'Place order' });\n\n  await quantity.fill('0');\n  await placeOrder.click();\n  await expect(page.getByRole('alert')).toHaveText('Quantity must be at least 1');\n\n  await quantity.fill('2');\n  await placeOrder.click();\n  const confirmation = page.getByRole('status');\n  await expect(confirmation).toBeVisible();\n  await expect(confirmation).toContainText('2 items');\n});",
+            "expectedState": [
+                {
+                    "selector": "#confirmation",
+                    "visible": true,
+                    "containsText": "2 items"
+                },
+                { "selector": "[role=alert]", "hidden": true }
+            ],
+            "validation": {
+                "requiredAssertions": [
+                    "toHaveText",
+                    "toBeVisible",
+                    "toContainText"
+                ],
+                "requiredMethods": ["getByLabel", "getByRole", "fill", "click"],
+                "forbiddenMethods": ["waitForTimeout"]
+            },
             "tags": [
-                "pom",
-                "fluent-interface",
-                "playwright"
+                "playwright",
+                "e2e",
+                "capstone",
+                "debugging",
+                "core-practice"
             ]
         }
     ]
