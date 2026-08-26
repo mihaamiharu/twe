@@ -6,51 +6,45 @@
             "type": "PLAYWRIGHT",
             "difficulty": "MEDIUM",
             "category": "e2e-pom",
-            "xpReward": 100,
+            "xpReward": 140,
             "order": 4000,
             "title": {
-                "en": "POM Basics: Successful Login",
-                "id": "Dasar POM: Login Berhasil"
+                "en": "Refactor Login Without Hiding the Evidence",
+                "id": "Refactor Login tanpa Menyembunyikan Evidence"
             },
             "description": {
-                "en": "Convert a manual test case for successful login into a Page Object Model automation.",
-                "id": "Konversi test case manual untuk login berhasil menjadi otomatisasi Page Object Model."
+                "en": "Replace generic generated wrappers with one focused login helper while keeping the recovery scenario and its evidence visible.",
+                "id": "Ganti generic generated wrapper dengan satu focused login helper sambil menjaga recovery scenario dan evidence-nya tetap terlihat."
             },
             "instructions": {
-                "en": "# POM Basics: Successful Login\n\nA page object can hide repeated UI mechanics behind vocabulary the test suite understands, such as `login`. It is useful when that behavior is genuinely shared. Keep the outcome assertion in the test so the scenario's intent remains visible; a page object is not a container for every assertion or every element.\n\n## Your Task\n1. Navigate to `/app/login.html` through `loginPage.goto()`.\n2. Log in with `testuser` and `password123` through `loginPage.login()`.\n3. In the test, prove the heading contains `Welcome, testuser!`.\n",
-                "id": "# Dasar POM: Login Berhasil\n\nPage object dapat menyembunyikan mekanisme UI yang berulang di balik kosakata yang dipahami test suite, seperti `login`. Abstraksi ini berguna ketika perilakunya benar-benar dipakai bersama. Pertahankan assertion hasil di dalam test agar maksud skenario tetap terlihat; page object bukan tempat untuk setiap assertion atau setiap elemen.\n\n## Tugas Kamu\n1. Navigasi ke `/app/login.html` melalui `loginPage.goto()`.\n2. Login dengan `testuser` dan `password123` melalui `loginPage.login()`.\n3. Di dalam test, buktikan heading mengandung `Welcome, testuser!`.\n"
+                "en": "# Refactor Login Without Hiding the Evidence\n\nThe starter was generated with a generic `UiActions` wrapper. Methods such as `fillField` and `clickButton` only rename Playwright operations; they do not represent a meaningful product behavior.\n\n## Your Task\nRefactor the starter into one focused `submitLogin(page, credentials)` helper and one coherent recovery scenario:\n\n1. Open `/app/login.html` in the test.\n2. Submit `wronguser` and `wrongpass` through the focused helper.\n3. In the test, prove the alert says `Invalid username or password` and the URL remains `/app/login.html`.\n4. Submit `testuser` and `password123` through the same helper.\n5. In the test, prove the URL becomes `/app/dashboard.html` and the heading says `Welcome, testuser!`.\n6. Do not use the generic `fillField` or `clickButton` methods, `.first()`, or a fixed wait.\n\nThe helper owns repeated form mechanics. The test owns the user journey and its evidence. The exact variable names and code organization are otherwise your choice.\n",
+                "id": "# Refactor Login tanpa Menyembunyikan Evidence\n\nStarter dibuat dengan generic `UiActions` wrapper. Method seperti `fillField` dan `clickButton` cuma mengganti nama Playwright operation; keduanya nggak merepresentasikan meaningful product behavior.\n\n## Tugas Kamu\nRefactor starter menjadi satu focused `submitLogin(page, credentials)` helper dan satu recovery scenario yang coherent:\n\n1. Buka `/app/login.html` di dalam test.\n2. Submit `wronguser` dan `wrongpass` lewat focused helper.\n3. Di test, buktikan alert berisi `Invalid username or password` dan URL tetap `/app/login.html`.\n4. Submit `testuser` dan `password123` lewat helper yang sama.\n5. Di test, buktikan URL berubah menjadi `/app/dashboard.html` dan heading berisi `Welcome, testuser!`.\n6. Jangan gunakan generic method `fillField` atau `clickButton`, `.first()`, maupun fixed wait.\n\nHelper memiliki repeated form mechanics. Test tetap memiliki user journey dan evidence-nya. Nama variable serta organisasi code lainnya bebas.\n"
             },
             "hints": {
                 "en": [
-                    "Organize your test code by separating page interactions into dedicated classes to improve maintainability and reuse.",
-                    "Create a new instance of your Page Object (e.g., `new LoginPage(page)`) and call its high-level methods for navigation and action.",
-                    "Use `await loginPage.goto()` then `await loginPage.login(...)` before asserting the welcome message is visible."
+                    "Name the repeated behavior, not each UI operation: one helper can fill both fields and submit the form.",
+                    "Keep `page.goto(...)`, the invalid-login evidence, and the successful-login evidence visible in the test.",
+                    "Use label locators for the fields, a role locator for Sign In, and web-first assertions for the alert, URL, and heading."
                 ],
                 "id": [
-                    "Atur kode pengujian Kamu dengan memisahkan interaksi halaman ke dalam class khusus untuk meningkatkan pemeliharaan dan penggunaan kembali.",
-                    "Buat instance baru dari Page Object Kamu (misalnya, `new LoginPage(page)`) dan panggil metode tingkat tingginya untuk navigasi dan aksi.",
-                    "Gunakan `await loginPage.goto()` lalu `await loginPage.login(...)` sebelum memberikan asersi bahwa pesan selamat datang terlihat."
+                    "Namai repeated behavior-nya, bukan setiap UI operation: satu helper bisa mengisi dua field lalu submit form.",
+                    "Biarkan `page.goto(...)`, invalid-login evidence, dan successful-login evidence tetap terlihat di test.",
+                    "Gunakan label locator untuk field, role locator untuk Sign In, lalu web-first assertion untuk alert, URL, dan heading."
                 ]
             },
             "files": {
-                "/tests/login.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'testuser' and 'password123'\n  \n\n  // 3. Verify success\n  \n});",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.getByLabel('Username');\n    this.passwordInput = page.getByLabel('Password');\n    this.loginBtn = page.getByRole('button', { name: 'Sign In' });\n  }\n\n  async goto() {\n    await this.page.goto('/app/login.html');\n  }\n\n  async login(username, password) {\n    await this.usernameInput.fill(username);\n    await this.passwordInput.fill(password);\n    await this.loginBtn.click();\n  }\n}",
-                "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8 animate-in'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4' autocomplete='off'>\n      <div>\n        <label for='username' class='text-sm font-medium text-gray-400'>Username</label>\n        <input id='username' class='input mt-1' placeholder='Enter username' autocomplete='off'>\n      </div>\n      <div>\n        <label for='password' class='text-sm font-medium text-gray-400'>Password</label>\n        <input id='password' type='password' class='input mt-1' placeholder='Enter password' autocomplete='new-password'>\n      </div>\n      <div id='error-msg' class='error-text'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  (function() {\n    const form = document.getElementById('login-form');\n    const userIn = document.getElementById('username');\n    const passIn = document.getElementById('password');\n    form.onsubmit = (e) => {\n      e.preventDefault();\n      if (userIn.value === 'testuser' && passIn.value === 'password123') {\n        window.__APP_STATE__ = window.__APP_STATE__ || {};\n        window.__APP_STATE__.session = { username: 'testuser' };\n        window.__VFS_NAVIGATE__('/app/dashboard.html');\n      } else {\n        document.getElementById('error-msg').style.display = 'block';\n      }\n    };\n  })();\n</script>",
+                "/tests/login.spec.ts": "import { test, expect } from '@playwright/test';\n\nclass UiActions {\n  constructor(page) {\n    this.page = page;\n  }\n\n  async fillField(label, value) {\n    await this.page.getByLabel(label).fill(value);\n  }\n\n  async clickButton(name) {\n    await this.page.getByRole('button', { name }).click();\n  }\n}\n\ntest('customer can recover after an invalid login', async ({ page }) => {\n  const ui = new UiActions(page);\n  await page.goto('/app/login.html');\n\n  // Replace the generic UI calls with one focused submitLogin helper.\n  await ui.fillField('Username', 'wronguser');\n  await ui.fillField('Password', 'wrongpass');\n  await ui.clickButton('Sign In');\n\n  // Prove the rejected result and unchanged URL here.\n\n  // Reuse the focused helper with the valid credentials.\n\n  // Prove the final URL and welcome heading here.\n});",
+                "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8 animate-in'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4' autocomplete='off'>\n      <div>\n        <label for='username' class='text-sm font-medium text-gray-400'>Username</label>\n        <input id='username' class='input mt-1' placeholder='Enter username' autocomplete='off'>\n      </div>\n      <div>\n        <label for='password' class='text-sm font-medium text-gray-400'>Password</label>\n        <input id='password' type='password' class='input mt-1' placeholder='Enter password' autocomplete='new-password'>\n      </div>\n      <div id='error-msg' class='error-text' role='alert'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  (function() {\n    const form = document.getElementById('login-form');\n    const userIn = document.getElementById('username');\n    const passIn = document.getElementById('password');\n    form.onsubmit = (e) => {\n      e.preventDefault();\n      if (userIn.value === 'testuser' && passIn.value === 'password123') {\n        window.__APP_STATE__ = window.__APP_STATE__ || {};\n        window.__APP_STATE__.session = { username: 'testuser' };\n        window.__VFS_NAVIGATE__('/app/dashboard.html');\n      } else {\n        document.getElementById('error-msg').style.display = 'block';\n      }\n    };\n  })();\n</script>",
                 "/app/dashboard.html": "<div class='min-h-screen p-8 animate-in'>\n  <div class='flex justify-between items-center mb-8'>\n    <h1 class='text-2xl font-bold'>Dashboard</h1>\n    <button id='logout-btn' class='button button-ghost'>Logout</button>\n  </div>\n  <div class='card p-6 glass'>\n    <h2 id='welcome-message' class='text-xl font-medium'>Loading...</h2>\n    <p class='text-gray-400 mt-2'>Welcome back to your TestApp workspace.</p>\n  </div>\n</div>\n<script>\n  (function() {\n    const session = (window.__APP_STATE__ && window.__APP_STATE__.session) || {};\n    if (!session.username) {\n      window.__VFS_NAVIGATE__('/app/login.html');\n    } else {\n      const el = document.getElementById('welcome-message');\n      if(el) el.textContent = `Welcome, ${session.username}!`;\n    }\n    const logoutBtn = document.getElementById('logout-btn');\n    if (logoutBtn) {\n        logoutBtn.onclick = () => {\n          window.__APP_STATE__ = window.__APP_STATE__ || {};\n          window.__APP_STATE__.session = null;\n          window.__VFS_NAVIGATE__('/app/login.html');\n        };\n    }\n  })();\n</script>"
             },
             "editableFiles": ["/tests/login.spec.ts"],
-            "preloadModules": {
-                "LoginPage": {
-                    "exports": ["LoginPage"],
-                    "source": "/pages/LoginPage.ts"
-                }
-            },
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'testuser' and 'password123'\n  \n\n  // 3. Verify welcome message\n  \n});",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\nclass UiActions {\n  constructor(page) {\n    this.page = page;\n  }\n\n  async fillField(label, value) {\n    await this.page.getByLabel(label).fill(value);\n  }\n\n  async clickButton(name) {\n    await this.page.getByRole('button', { name }).click();\n  }\n}\n\ntest('customer can recover after an invalid login', async ({ page }) => {\n  const ui = new UiActions(page);\n  await page.goto('/app/login.html');\n\n  // Replace the generic UI calls with one focused submitLogin helper.\n  await ui.fillField('Username', 'wronguser');\n  await ui.fillField('Password', 'wrongpass');\n  await ui.clickButton('Sign In');\n\n  // Prove the rejected result and unchanged URL here.\n\n  // Reuse the focused helper with the valid credentials.\n\n  // Prove the final URL and welcome heading here.\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should login successfully', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('testuser', 'password123');\n  await expect(page.getByRole('heading', { name: /Welcome/ })).toContainText('Welcome, testuser!');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\nasync function submitLogin(page, credentials) {\n  await page.getByLabel('Username').fill(credentials.username);\n  await page.getByLabel('Password').fill(credentials.password);\n  await page.getByRole('button', { name: 'Sign In' }).click();\n}\n\ntest('customer can recover after an invalid login', async ({ page }) => {\n  await page.goto('/app/login.html');\n\n  await submitLogin(page, { username: 'wronguser', password: 'wrongpass' });\n  await expect(page.getByRole('alert')).toHaveText('Invalid username or password');\n  await expect(page).toHaveURL('/app/login.html');\n\n  await submitLogin(page, { username: 'testuser', password: 'password123' });\n  await expect(page).toHaveURL('/app/dashboard.html');\n  await expect(page.getByRole('heading', { name: /Welcome/ })).toHaveText('Welcome, testuser!');\n});",
             "validation": {
-                "requiredAssertions": ["toContainText"],
-                "requiredMethods": ["goto", "login", "getByRole"]
+                "requiredAssertions": ["toHaveText", "toHaveURL"],
+                "requiredMethods": ["goto", "getByLabel", "getByRole", "fill", "click"],
+                "forbiddenMethods": ["fillField", "clickButton", "first", "waitForTimeout"]
             },
             "expectedState": [
                 {
@@ -59,133 +53,7 @@
                     "containsText": "Welcome, testuser!"
                 }
             ],
-            "tags": ["pom", "playwright", "e2e"]
-        },
-        {
-            "slug": "pom-login-failures",
-            "type": "PLAYWRIGHT",
-            "difficulty": "MEDIUM",
-            "category": "e2e-pom",
-            "xpReward": 120,
-            "order": 4001,
-            "title": {
-                "en": "POM: Testing Failures",
-                "id": "POM: Menguji Kegagalan"
-            },
-            "description": {
-                "en": "Verify that the application correctly handles invalid login attempts and displays error messages.",
-                "id": "Verifikasi bahwa aplikasi menangani upaya login yang tidak valid dengan benar dan menampilkan pesan kesalahan."
-            },
-            "instructions": {
-                "en": "# POM: Testing Failures\n\n## Concept\nTesting the \"happy path\" is only half the job. Negative testing ensures that the application handles errors gracefully. In POM, your Page Objects should expose properties or methods to easily verify error states, like checking for visibility of an error message.\n\n## Code Example\n```typescript\nawait loginPage.login('wrong', 'wrong');\nawait expect(loginPage.errorMessage).toBeVisible();\n```\n\n## Real World Scenario\nValidating that an application handles errors gracefully is just as critical as testing successful flows. Users will inevitably make mistakes, and your tests should ensure the system provides clear feedback (like \"Invalid credentials\") and doesn't crash or leak sensitive info.\n\n## Your Task\n1. Navigate to the login page using `loginPage.goto()`.\n2. Login with `wronguser` and `wrongpass` using `loginPage.login()`.\n3. Verify that the `loginPage.errorMessage` is visible using `toBeVisible()`.\n4. Verify that the URL remains `/app/login.html` using `expect(page).toHaveURL()`.\n",
-                "id": "# POM: Menguji Kegagalan\n\n## Concept\nMenguji \"happy path\" hanyalah setengah dari pekerjaan. Pengujian negatif memastikan bahwa aplikasi menangani kesalahan dengan baik. Dalam POM, Page Object Anda harus menyediakan properti atau metode untuk memverifikasi status kesalahan dengan mudah, seperti memeriksa visibilitas pesan kesalahan.\n\n## Code Example\n```typescript\nawait loginPage.login('wrong', 'wrong');\nawait expect(loginPage.errorMessage).toBeVisible();\n```\n\n## Real World Scenario\nMemvalidasi bahwa aplikasi menangani kesalahan dengan baik sama pentingnya dengan menguji alur yang berhasil. Pengguna pasti akan melakukan kesalahan, dan pengujian Anda harus memastikan sistem memberikan umpan balik yang jelas (seperti \"Kredensial tidak valid\") dan tidak crash atau membocorkan info sensitif.\n\n## Tugas Kamu\n1. Navigasi ke halaman login menggunakan `loginPage.goto()`.\n2. Login dengan `wronguser` dan `wrongpass` menggunakan `loginPage.login()`.\n3. Verifikasi bahwa `loginPage.errorMessage` terlihat menggunakan `toBeVisible()`.\n4. Verifikasi bahwa URL tetap `/app/login.html` menggunakan `expect(page).toHaveURL()`.\n"
-            },
-            "hints": {
-                "en": [
-                    "Test how your application handles mistakes by verifying that error messages appear correctly when invalid data is entered.",
-                    "Expose common elements like error messages as properties on your Page Object class for easy and reliable assertions.",
-                    "Login with invalid credentials and verify `loginPage.errorMessage` is visible while the URL remains on the login page."
-                ],
-                "id": [
-                    "Uji bagaimana aplikasi Kamu menangani kesalahan dengan memverifikasi bahwa pesan error muncul dengan benar saat data yang tidak valid dimasukkan.",
-                    "Sediakan elemen umum seperti pesan error sebagai properti pada class Page Object Kamu untuk asersi yang mudah dan andal.",
-                    "Login dengan kredensial yang tidak valid dan verifikasi bahwa `loginPage.errorMessage` terlihat sementara URL tetap berada di halaman login."
-                ]
-            },
-            "files": {
-                "/tests/login-fail.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  // 1. Navigate to login\n  \n  // 2. Login with wrong credentials\n  \n  // 3. Verify error message is visible\n  \n  // 4. Verify we are still on login page\n  \n});",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) {\n    this.page = page;\n    this.usernameInput = page.getByLabel('Username');\n    this.passwordInput = page.getByLabel('Password');\n    this.loginBtn = page.getByRole('button', { name: 'Sign In' });\n    this.errorMessage = page.getByText('Invalid username or password');\n  }\n\n  async goto() {\n    await this.page.goto('/app/login.html');\n  }\n\n  async login(username, password) {\n    await this.usernameInput.fill(username);\n    await this.passwordInput.fill(password);\n    await this.loginBtn.click();\n  }\n}",
-                "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4' autocomplete='off'>\n      <input id='username' class='input' placeholder='Username' aria-label='Username' autocomplete='off'>\n      <input id='password' type='password' class='input' placeholder='Password' aria-label='Password' autocomplete='new-password'>\n      <div id='error-msg' class='error-text' role='alert' style='display:none;'>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  document.getElementById('login-form').onsubmit = (e) => {\n    e.preventDefault();\n    document.getElementById('error-msg').style.display = 'block';\n  };\n</script>"
-            },
-            "editableFiles": ["/tests/login-fail.spec.ts"],
-            "preloadModules": {
-                "LoginPage": {
-                    "exports": ["LoginPage"],
-                    "source": "/pages/LoginPage.ts"
-                }
-            },
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n\n  // 1. Navigate to the login page\n  \n\n  // 2. Login with 'wronguser' and 'wrongpass'\n  \n\n  // 3. Verify error message and URL\n  \n});",
-            "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should show error for invalid credentials', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  await loginPage.login('wronguser', 'wrongpass');\n  \n  await expect(loginPage.errorMessage).toBeVisible();\n  await expect(page).toHaveURL('/app/login.html');\n});",
-            "validation": {
-                "requiredAssertions": ["toBeVisible", "toHaveURL"],
-                "requiredMethods": ["goto", "login"]
-            },
-            "expectedState": [
-                {
-                    "selector": "#error-msg",
-                    "visible": true,
-                    "containsText": "Invalid"
-                }
-            ],
-            "tags": ["pom", "negative-test", "playwright"]
-        },
-        {
-            "slug": "pom-multi-page",
-            "type": "PLAYWRIGHT",
-            "difficulty": "HARD",
-            "category": "e2e-pom",
-            "xpReward": 150,
-            "order": 4002,
-            "title": {
-                "en": "POM: Multi-Page User Journey",
-                "id": "POM: Perjalanan Pengguna Multi-Halaman"
-            },
-            "description": {
-                "en": "Chain Page Objects to automate a complete user journey from login to profile update.",
-                "id": "Rantai Page Object untuk mengotomatiskan perjalanan pengguna yang lengkap dari login hingga pembaruan profil."
-            },
-            "instructions": {
-                "en": "# POM: Multi-Page User Journey\n\n## Concept\nReal tests often involve multiple pages. The **Fluent Page Object** pattern allows you to chain methods together because each method returns the next Page Object. This makes your test code read naturally like a story and simplifies navigation logic.\n\n## Code Example\n```typescript\nconst dashboardPage = await loginPage.login('user', 'pass');\nconst profilePage = await dashboardPage.goToProfile();\nawait profilePage.updateName('New Name');\n```\n\n## Real World Scenario\nEnd-to-end tests usually span across multiple features—for example, logging in, searching for a product, and updating a profile. Chaining methods makes it clear that one action leads to the next page, keeping your script concise and focused on the journey.\n\n## Your Task\n1. Login via `loginPage.login('testuser', 'password123')` and store it in `dashboardPage`.\n2. Navigate to profile via `dashboardPage.goToProfile()` and store it in `profilePage`.\n3. Update name to `QA Tester` using `profilePage.updateName()`.\n4. Go back to dashboard using `profilePage.backToDashboard()`.\n5. Verify that the `welcomeMsg` on the dashboard contains \"Welcome, QA Tester\".\n",
-                "id": "# POM: Perjalanan Pengguna Multi-Halaman\n\n## Concept\nTes nyata sering kali melibatkan banyak halaman. Pola **Fluent Page Object** memungkinkan Anda untuk merantai metode bersama karena setiap metode mengembalikan Page Object berikutnya. Ini membuat kode pengujian Anda terbaca secara alami seperti sebuah cerita dan menyederhanakan logika navigasi.\n\n## Code Example\n```typescript\nconst dashboardPage = await loginPage.login('user', 'pass');\nconst profilePage = await dashboardPage.goToProfile();\nawait profilePage.updateName('New Name');\n```\n\n## Real World Scenario\nPengujian end-to-end biasanya mencakup beberapa fitur—misalnya, login, mencari produk, dan memperbarui profil. Merantai metode memperjelas bahwa satu tindakan mengarah ke halaman berikutnya, menjaga skrip Anda tetap ringkas dan fokus pada perjalanan pengguna.\n\n## Tugas Kamu\n1. Login melalui `loginPage.login('testuser', 'password123')` dan simpan dalam `dashboardPage`.\n2. Navigasi ke profil melalui `dashboardPage.goToProfile()` dan simpan dalam `profilePage`.\n3. Perbarui nama menjadi `QA Tester` menggunakan `profilePage.updateName()`.\n4. Kembali ke dashboard menggunakan `profilePage.backToDashboard()`.\n5. Verifikasi bahwa `welcomeMsg` di dashboard mengandung \"Welcome, QA Tester\".\n"
-            },
-            "hints": {
-                "en": [
-                    "Model complex user flows by allowing page methods to return the next page object, creating a natural, fluent script.",
-                    "Chain your method calls (e.g., `dashboard.goToProfile()`) to navigate across multiple sections of the application within a single test.",
-                    "Store the result of `loginPage.login(...)` as `dashboardPage`, then use it to navigate to the profile and update the name."
-                ],
-                "id": [
-                    "Modelkan alur pengguna yang kompleks dengan membiarkan metode halaman mengembalikan objek halaman berikutnya, menciptakan skrip yang alami dan lancar.",
-                    "Rantai panggilan metode Kamu (misalnya, `dashboard.goToProfile()`) untuk menavigasi di berbagai bagian aplikasi dalam satu pengujian.",
-                    "Simpan hasil dari `loginPage.login(...)` sebagai `dashboardPage`, lalu gunakan untuk menavigasi ke profil dan memperbarui nama."
-                ]
-            },
-            "files": {
-                "/tests/profile.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('should update profile name', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  \n  // 1. Navigate and Login\n  await loginPage.goto();\n  const dashboardPage = await loginPage.login('testuser', 'password123');\n\n  // 2. Go to profile page\n  \n\n  // 3. Update name to 'QA Tester'\n  \n\n  // 4. Back to dashboard and verify name changed\n  \n});",
-                "/pages/LoginPage.ts": "export class LoginPage {\n  constructor(page) { this.page = page; }\n  async goto() { await this.page.goto('/app/login.html'); }\n  async login(u, p) {\n    await this.page.getByPlaceholder('Username').fill(u);\n    await this.page.getByPlaceholder('Password').fill(p);\n    await this.page.getByRole('button', { name: 'Sign In' }).click();\n    return new DashboardPage(this.page);\n  }\n}",
-                "/pages/DashboardPage.ts": "export class DashboardPage {\n  constructor(page) { \n    this.page = page;\n    this.welcomeMsg = page.getByRole('heading', { name: /Welcome/ });\n    this.profileLink = page.getByRole('link', { name: 'Profile' });\n  }\n  async goToProfile() {\n    await this.profileLink.click();\n    return new ProfilePage(this.page);\n  }\n}",
-                "/pages/ProfilePage.ts": "export class ProfilePage {\n  constructor(page) { \n    this.page = page;\n    this.nameInput = page.getByLabel('Display Name');\n    this.saveBtn = page.getByRole('button', { name: 'Save Changes' });\n    this.dashLink = page.getByRole('link', { name: 'Dash' });\n  }\n  async updateName(name) {\n    await this.nameInput.fill(name);\n    await this.saveBtn.click();\n  }\n  async backToDashboard() {\n    await this.dashLink.click();\n    return new DashboardPage(this.page);\n  }\n}",
-                "/app/login.html": "<div class='min-h-screen flex items-center justify-center'>\n  <div class='card p-8'>\n    <h1>Login</h1>\n    <input id='username' class='input mt-2' placeholder='Username' autocomplete='off'>\n    <input id='password' type='password' class='input mt-2' placeholder='Password' autocomplete='new-password'>\n    <button class='button button-primary mt-4' onclick='window.__APP_STATE__ = window.__APP_STATE__ || {}; window.__APP_STATE__.session = {username:\"testuser\", name:\"testuser\"}; window.__VFS_NAVIGATE__(\"/app/dashboard.html\")'>Sign In</button>\n  </div>\n</div>",
-                "/app/dashboard.html": "<div class='p-8'>\n  <nav class='flex gap-4 mb-8'>\n    <a id='dash-link' href='/app/dashboard.html'>Dash</a>\n    <a id='profile-link' href='/app/profile.html'>Profile</a>\n  </nav>\n  <h1>Dashboard</h1>\n  <h2 id='welcome-message'></h2>\n</div>\n<script>\n  (function(){\n    const s = (window.__APP_STATE__ && window.__APP_STATE__.session) || {};\n    document.getElementById(\"welcome-message\").textContent = \"Welcome, \" + (s.name || s.username || 'Guest');\n  })();\n</script>",
-                "/app/profile.html": "<div class='p-8'>\n  <nav class='flex gap-4 mb-8'>\n    <a href='/app/dashboard.html' id='dash-link'>Dash</a>\n  </nav>\n  <h1>Profile</h1>\n  <label for='display-name'>Display Name</label>\n  <input id='display-name' class='input mt-4'>\n  <button id='save-btn' class='button button-primary mt-4' onclick='window.__APP_STATE__ = window.__APP_STATE__ || {}; window.__APP_STATE__.session = window.__APP_STATE__.session || {}; window.__APP_STATE__.session.name = document.getElementById(\"display-name\").value'>Save Changes</button>\n</div>"
-            },
-            "editableFiles": ["/tests/profile.spec.ts"],
-            "preloadModules": {
-                "LoginPage": {
-                    "exports": ["LoginPage"],
-                    "source": "/pages/LoginPage.ts"
-                },
-                "DashboardPage": {
-                    "exports": ["DashboardPage"],
-                    "source": "/pages/DashboardPage.ts"
-                },
-                "ProfilePage": {
-                    "exports": ["ProfilePage"],
-                    "source": "/pages/ProfilePage.ts"
-                }
-            },
-            "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('should update profile name', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  \n  // 1. Navigate and Login\n  await loginPage.goto();\n  const dashboardPage = await loginPage.login('testuser', 'password123');\n\n  // 2. Navigate to the profile page\n  \n\n  // 3. Update display name to 'QA Tester'\n  \n\n  // 4. Return to dashboard and verify name change\n  \n});",
-            "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('should update profile name', async ({ page }) => {\n  const loginPage = new LoginPage(page);\n  await loginPage.goto();\n  const dashboardPage = await loginPage.login('testuser', 'password123');\n\n  const profilePage = await dashboardPage.goToProfile();\n  await profilePage.updateName('QA Tester');\n  \n  const dashboardAgain = await profilePage.backToDashboard();\n  await expect(dashboardAgain.welcomeMsg).toContainText('Welcome, QA Tester');\n});",
-            "expectedState": [
-                {
-                    "selector": "#welcome-message",
-                    "visible": true,
-                    "containsText": "QA Tester"
-                }
-            ],
-            "tags": ["pom", "fluent-interface", "playwright"]
+            "tags": ["abstraction", "helper", "playwright", "ai-review"]
         },
         {
             "slug": "pw-capstone-checkout",
@@ -195,37 +63,37 @@
             "xpReward": 200,
             "order": 4100,
             "title": {
-                "en": "Capstone: Repair and Complete Checkout",
-                "id": "Capstone: Perbaiki dan Selesaikan Checkout"
+                "en": "Capstone Checkpoint: Repair Checkout Recovery",
+                "id": "Capstone Checkpoint: Perbaiki Recovery Checkout"
             },
             "description": {
-                "en": "Repair a generated test and prove both a meaningful validation rule and a successful checkout outcome.",
-                "id": "Perbaiki test hasil generate dan buktikan aturan validasi bermakna serta hasil checkout yang berhasil."
+                "en": "Review an untrustworthy generated test and repair one checkout recovery scenario with business-relevant evidence.",
+                "id": "Review generated test yang nggak bisa dipercaya, lalu perbaiki satu checkout recovery scenario dengan business-relevant evidence."
             },
             "instructions": {
-                "en": "# Capstone: Checkout Feedback System\n\nThe starter code is intentionally untrustworthy. Replace it with one independent test that:\n\n1. opens `/app/checkout.html`;\n2. enters quantity `0` and submits;\n3. proves the alert says `Quantity must be at least 1`;\n4. enters quantity `2` and submits again;\n5. proves the confirmation is visible and contains `2 items`;\n6. uses role/label locator contracts and web-first assertions;\n7. contains no `waitForTimeout`, forced action, or swallowed error.\n\nThe exact variable names and organization are your choice. The behavior and evidence are the contract.",
-                "id": "# Capstone: Sistem Feedback Checkout\n\nStarter code sengaja tidak dapat dipercaya. Ganti dengan satu test independen yang:\n\n1. membuka `/app/checkout.html`;\n2. memasukkan quantity `0` lalu submit;\n3. membuktikan alert berisi `Quantity must be at least 1`;\n4. memasukkan quantity `2` lalu submit lagi;\n5. membuktikan confirmation terlihat dan berisi `2 items`;\n6. menggunakan kontrak locator role/label dan web-first assertion;\n7. tidak memiliki `waitForTimeout`, forced action, atau error yang disembunyikan.\n\nNama variable dan organisasi kode bebas. Perilaku serta bukti adalah kontraknya."
+                "en": "# Repair the Checkout Recovery Signal\n\nThe product rule is: quantity must be at least `1`, and after correcting an invalid quantity the customer can still place the order.\n\nThe starter was generated with structural selectors, a forced click, a fixed wait, a manual truthiness assertion, and swallowed failure. Replace it with one independent recovery test that:\n\n1. opens `/app/checkout.html`;\n2. enters quantity `0` and submits;\n3. proves the alert says exactly `Quantity must be at least 1`;\n4. corrects the quantity to `2` and submits again;\n5. proves the stale alert is hidden;\n6. proves the confirmation is visible and contains `2 items`;\n7. uses label/role locator contracts and web-first assertions; and\n8. contains no structural locator, `waitForTimeout`, forced action, manual `textContent`/truthiness check, or swallowed error.\n\nKeep this as one coherent recovery scenario. One focused test is enough; no abstraction is required. Variable names and organization are otherwise your choice. The behavior and evidence are the contract.",
+                "id": "# Perbaiki Checkout Recovery Signal\n\nProduct rule-nya: quantity minimal `1`, dan setelah memperbaiki quantity yang invalid, customer tetap bisa place order.\n\nStarter dibuat dengan structural selector, forced click, fixed wait, manual truthiness assertion, dan failure yang ditelan. Ganti dengan satu independent recovery test yang:\n\n1. membuka `/app/checkout.html`;\n2. memasukkan quantity `0` lalu submit;\n3. membuktikan alert persis berisi `Quantity must be at least 1`;\n4. memperbaiki quantity menjadi `2` lalu submit lagi;\n5. membuktikan stale alert sudah tersembunyi;\n6. membuktikan confirmation terlihat dan berisi `2 items`;\n7. menggunakan kontrak locator label/role dan web-first assertion; serta\n8. nggak memiliki structural locator, `waitForTimeout`, forced action, manual `textContent`/truthiness check, atau error yang ditelan.\n\nPertahankan ini sebagai satu recovery scenario yang coherent. Satu focused test sudah cukup; kamu nggak perlu membuat abstraction. Nama variable dan organisasi lainnya bebas. Behavior serta evidence adalah kontraknya."
             },
             "hints": {
                 "en": [
-                    "Use one quantity locator and reuse it for the boundary and happy-path values.",
-                    "The alert and status have semantic roles; assert each state after the action that produces it.",
-                    "A successful solution needs `toHaveText` for the validation and a visible confirmation containing `2 items`."
+                    "Name the customer behavior in the test title, then reuse one label locator for both the invalid and corrected quantities.",
+                    "The alert and confirmation expose semantic roles. Assert each outcome immediately after the action that should produce it.",
+                    "After the second submit, prove both sides of recovery: the old alert is hidden and the confirmation is visible with `2 items`."
                 ],
                 "id": [
-                    "Gunakan satu locator quantity dan pakai ulang untuk nilai boundary serta happy path.",
-                    "Alert dan status memiliki semantic role; periksa setiap state setelah action yang menghasilkannya.",
-                    "Solusi perlu `toHaveText` untuk validasi dan confirmation terlihat yang berisi `2 items`."
+                    "Namai customer behavior di test title, lalu reuse satu label locator untuk quantity yang invalid dan yang sudah diperbaiki.",
+                    "Alert dan confirmation punya semantic role. Assert setiap outcome langsung setelah action yang seharusnya menghasilkannya.",
+                    "Setelah submit kedua, buktikan dua sisi recovery: alert lama tersembunyi dan confirmation terlihat dengan `2 items`."
                 ]
             },
             "files": {
                 "/tests/checkout.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('checkout', async ({ page }) => {\n  await page.goto('/app/checkout.html');\n  await page.locator('main > form > input').fill('2');\n  await page.locator('main > form > button').click({ force: true });\n  await page.waitForTimeout(1000);\n  try {\n    expect(await page.locator('.message').textContent()).toBeTruthy();\n  } catch {\n    console.log('ignore intermittent checkout issue');\n  }\n});",
-                "/app/checkout.html": "<main><h1>Checkout</h1><form id='checkout-form'><label for='quantity'>Quantity</label><input id='quantity' name='quantity' type='number' value='1'><button type='submit'>Place order</button></form><p role='alert' hidden></p><section id='confirmation' role='status' hidden></section></main><script>document.getElementById('checkout-form').addEventListener('submit',(event)=>{event.preventDefault();const quantity=Number(document.getElementById('quantity').value);const alert=document.querySelector('[role=alert]');const confirmation=document.getElementById('confirmation');if(quantity<1){alert.hidden=false;alert.textContent='Quantity must be at least 1';confirmation.hidden=true;return;}alert.hidden=true;confirmation.hidden=false;confirmation.textContent='Order confirmed: '+quantity+' items';});</script>"
+                "/app/checkout.html": "<main><h1>Checkout</h1><form id='checkout-form'><label for='quantity'>Quantity</label><input id='quantity' name='quantity' type='number' value='1'><button type='submit'>Place order</button></form><p role='alert' hidden></p><section id='confirmation' role='status' hidden></section></main><script>document.getElementById('checkout-form').addEventListener('submit',(event)=>{event.preventDefault();const quantity=Number(document.getElementById('quantity').value);const alert=document.querySelector('[role=alert]');const confirmation=document.getElementById('confirmation');if(quantity<1){alert.hidden=false;alert.style.display='';alert.textContent='Quantity must be at least 1';confirmation.hidden=true;return;}alert.hidden=true;alert.style.display='none';confirmation.hidden=false;confirmation.textContent='Order confirmed: '+quantity+' items';});</script>"
             },
             "editableFiles": ["/tests/checkout.spec.ts"],
             "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('checkout', async ({ page }) => {\n  await page.goto('/app/checkout.html');\n  await page.locator('main > form > input').fill('2');\n  await page.locator('main > form > button').click({ force: true });\n  await page.waitForTimeout(1000);\n  try {\n    expect(await page.locator('.message').textContent()).toBeTruthy();\n  } catch {\n    console.log('ignore intermittent checkout issue');\n  }\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\ntest('rejects invalid quantity and completes a valid checkout', async ({ page }) => {\n  await page.goto('/app/checkout.html');\n  const quantity = page.getByLabel('Quantity');\n  const placeOrder = page.getByRole('button', { name: 'Place order' });\n\n  await quantity.fill('0');\n  await placeOrder.click();\n  await expect(page.getByRole('alert')).toHaveText('Quantity must be at least 1');\n\n  await quantity.fill('2');\n  await placeOrder.click();\n  const confirmation = page.getByRole('status');\n  await expect(confirmation).toBeVisible();\n  await expect(confirmation).toContainText('2 items');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\ntest('customer corrects an invalid quantity and completes checkout', async ({ page }) => {\n  await page.goto('/app/checkout.html');\n  const quantity = page.getByLabel('Quantity');\n  const placeOrder = page.getByRole('button', { name: 'Place order' });\n  const alert = page.getByRole('alert');\n\n  await quantity.fill('0');\n  await placeOrder.click();\n  await expect(alert).toHaveText('Quantity must be at least 1');\n\n  await quantity.fill('2');\n  await placeOrder.click();\n  await expect(alert).toBeHidden();\n\n  const confirmation = page.getByRole('status');\n  await expect(confirmation).toBeVisible();\n  await expect(confirmation).toContainText('2 items');\n});",
             "expectedState": [
                 {
                     "selector": "#confirmation",
@@ -237,17 +105,24 @@
             "validation": {
                 "requiredAssertions": [
                     "toHaveText",
+                    "toBeHidden",
                     "toBeVisible",
                     "toContainText"
                 ],
                 "requiredMethods": ["getByLabel", "getByRole", "fill", "click"],
-                "forbiddenMethods": ["waitForTimeout"]
+                "forbiddenMethods": [
+                    "waitForTimeout",
+                    "textContent",
+                    "toBeTruthy"
+                ]
             },
             "tags": [
                 "playwright",
                 "e2e",
                 "capstone",
+                "recovery",
                 "debugging",
+                "ai-review",
                 "core-practice"
             ]
         }

@@ -211,6 +211,7 @@ describe('Challenge Integrity & Solutions', () => {
 const tutorialRegistrySchema = z.object({
     tutorials: z.array(
         z.object({
+            moduleSlug: z.string(),
             practice: z
                 .array(
                     z.object({
@@ -245,11 +246,29 @@ const corePracticeSlugs = new Set(
     ),
 );
 
-const corePlaywrightChallenges = challengeCatalog
+const revisedModuleSlugs = new Set([
+    'actions-sync',
+    'assertions-test-design',
+    'reliability-debugging',
+    'maintainable-suites',
+]);
+
+const revisedModulePracticeSlugs = tutorialRegistry.tutorials
+    .filter((tutorial) => revisedModuleSlugs.has(tutorial.moduleSlug))
+    .flatMap((tutorial) =>
+        (tutorial.practice ?? []).map((reference) => reference.slug),
+    );
+
+const requiredRuntimePracticeSlugs = new Set([
+    ...corePracticeSlugs,
+    ...revisedModulePracticeSlugs,
+]);
+
+const requiredRuntimePlaywrightChallenges = challengeCatalog
     .filter(
         (challenge) =>
             challenge.type === 'PLAYWRIGHT' &&
-            corePracticeSlugs.has(challenge.slug),
+            requiredRuntimePracticeSlugs.has(challenge.slug),
     )
     .sort(
         (left, right) =>
@@ -257,12 +276,12 @@ const corePlaywrightChallenges = challengeCatalog
             Number(Boolean(left.preloadModules)),
     );
 
-describe('Core Practice Playwright reference solutions', () => {
+describe('Required Learn and revised-module Playwright reference solutions', () => {
     beforeEach(() => {
         document.body.innerHTML = '';
     });
 
-    for (const challenge of corePlaywrightChallenges) {
+    for (const challenge of requiredRuntimePlaywrightChallenges) {
         it(`${challenge.slug} satisfies its runtime contract`, async () => {
             const files = challenge.files ?? {};
             const preloadCode = challenge.preloadModules

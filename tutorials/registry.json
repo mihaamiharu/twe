@@ -69,12 +69,12 @@
         "id": "Aksi, Navigasi & Sinkronisasi"
       },
       "description": {
-        "en": "Interact like a user while separating action readiness from the application outcome.",
-        "id": "Berinteraksi seperti pengguna sambil membedakan kesiapan aksi dari hasil aplikasi."
+        "en": "Choose actions by user intent, separate action readiness from product outcomes, and follow results across browser surfaces.",
+        "id": "Pilih action berdasarkan user intent, pisahkan kesiapan action dari product outcome, lalu ikuti hasilnya di berbagai browser surface."
       },
       "outcome": {
-        "en": "Complete realistic interactions without fixed sleeps or accidental races.",
-        "id": "Selesaikan interaksi realistis tanpa fixed sleep atau race yang tidak disengaja."
+        "en": "Given a user flow, choose actions that express intended state, explain what Playwright waits for, and synchronize with observable same-page or new-surface outcomes without fixed sleeps.",
+        "id": "Dari sebuah user flow, pilih action yang menjelaskan intended state, jelaskan apa yang ditunggu Playwright, lalu sinkronkan dengan observable outcome di page yang sama atau surface baru tanpa fixed sleep."
       }
     },
     {
@@ -85,12 +85,12 @@
         "id": "Assertion Bermakna & Desain Test"
       },
       "description": {
-        "en": "Prove observable outcomes, cover useful risks, and avoid tests that pass without proving anything.",
-        "id": "Buktikan hasil yang dapat diamati, cakup risiko yang berguna, dan hindari test yang lulus tanpa membuktikan apa pun."
+        "en": "Choose sufficient observable evidence and turn business rules into a focused, non-duplicative test portfolio.",
+        "id": "Pilih observable evidence yang cukup lalu ubah business rule menjadi test portfolio yang fokus dan tidak duplikatif."
       },
       "outcome": {
-        "en": "Design a focused test whose assertions prove a business-relevant result.",
-        "id": "Rancang test terfokus dengan assertion yang membuktikan hasil yang relevan bagi bisnis."
+        "en": "Given a product risk, design a focused scenario and use the smallest sufficient set of assertions to prove its business-relevant outcome.",
+        "id": "Dari sebuah product risk, rancang skenario yang fokus lalu gunakan kumpulan assertion terkecil yang cukup untuk membuktikan business-relevant outcome."
       }
     },
     {
@@ -101,12 +101,12 @@
         "id": "Keandalan, Isolasi & Debugging"
       },
       "description": {
-        "en": "Control state and data, diagnose failures with evidence, and repair flaky or generated tests.",
-        "id": "Kendalikan state dan data, diagnosis kegagalan dengan bukti, serta perbaiki test flaky atau buatan AI."
+        "en": "Separate browser sessions, own mutable state, and diagnose failures through evidence instead of symptom-masking patches.",
+        "id": "Pisahkan browser session, tentukan ownership untuk mutable state, lalu diagnosis failure lewat evidence tanpa symptom-masking patch."
       },
       "outcome": {
-        "en": "Diagnose and repair a failing test without hiding the failure behind waits or retries.",
-        "id": "Diagnosis dan perbaiki test gagal tanpa menyembunyikan kegagalan dengan wait atau retry."
+        "en": "Given an intermittent or state-dependent failure, control each test’s starting state, identify the cause from execution evidence, and verify a repair under the conditions that exposed it.",
+        "id": "Saat menghadapi intermittent atau state-dependent failure, kontrol starting state setiap test, temukan penyebab dari execution evidence, lalu verifikasi repair pada kondisi yang mengeksposnya."
       }
     },
     {
@@ -117,12 +117,12 @@
         "id": "Test Suite yang Mudah Dirawat"
       },
       "description": {
-        "en": "Use helpers, page or component objects, fixtures, configuration, and projects at the right time.",
-        "id": "Gunakan helper, page atau component object, fixture, konfigurasi, dan project pada waktu yang tepat."
+        "en": "Choose the smallest useful abstraction, make test lifecycles explicit, and encode suite policy without hiding product intent.",
+        "id": "Pilih abstraction terkecil yang berguna, buat test lifecycle explicit, lalu encode suite policy tanpa menyembunyikan product intent."
       },
       "outcome": {
-        "en": "Organize a growing suite without premature or leaky abstractions.",
-        "id": "Atur suite yang berkembang tanpa abstraksi prematur atau bocor."
+        "en": "Given a growing suite, localize meaningful change with a justified abstraction, assign clear ownership and scope to test dependencies, and review configuration as executable policy.",
+        "id": "Saat suite berkembang, lokalkan meaningful change lewat abstraction yang justified, tentukan ownership dan scope test dependency dengan jelas, lalu review configuration sebagai executable policy."
       }
     },
     {
@@ -130,12 +130,12 @@
       "order": 9,
       "title": { "en": "Ship & Prove", "id": "Kirim & Buktikan" },
       "description": {
-        "en": "Run automation in CI, preserve useful evidence, cover browsers intentionally, and complete a practical capstone.",
-        "id": "Jalankan otomasi di CI, simpan bukti yang berguna, cakup browser dengan sengaja, dan selesaikan capstone praktis."
+        "en": "Reproduce the test system in CI, select coverage from risk, preserve actionable evidence, and prove a focused capstone.",
+        "id": "Reproduce test system di CI, pilih coverage dari risk, simpan actionable evidence, lalu buktikan lewat focused capstone."
       },
       "outcome": {
-        "en": "Deliver a repeatable end-to-end suite and explain its reliability decisions.",
-        "id": "Hasilkan suite end-to-end yang dapat diulang dan jelaskan keputusan keandalannya."
+        "en": "Given a valuable product risk, deliver a reproducible feedback contract with intentional coverage, actionable evidence, owned failure handling, and a capstone claim whose limits you can explain.",
+        "id": "Dari product risk yang bernilai, hasilkan reproducible feedback contract dengan intentional coverage, actionable evidence, ownership failure yang jelas, serta capstone claim yang batasnya bisa kamu jelaskan."
       }
     }
   ],
@@ -338,16 +338,18 @@
       "moduleSlug": "actions-sync",
       "moduleOrder": 1,
       "kind": "core",
-      "estimatedMinutes": 14,
-      "tags": ["playwright", "actions", "input"],
+      "estimatedMinutes": 20,
+      "tags": ["playwright", "actions", "intent", "input"],
       "practice": [
-        { "slug": "pw-click-actions", "role": "core" },
-        { "slug": "pw-fill-type", "role": "core" },
-        { "slug": "pw-checkbox-radio", "role": "core" },
+        { "slug": "pw-actions-boss", "role": "core" },
+        { "slug": "pw-click-actions", "role": "additional" },
+        { "slug": "pw-fill-type", "role": "additional" },
+        { "slug": "pw-checkbox-radio", "role": "additional" },
         { "slug": "pw-select-dropdowns", "role": "additional" },
         { "slug": "pw-keyboard-actions", "role": "additional" },
         { "slug": "pw-hover-focus", "role": "additional" },
-        { "slug": "pw-drag-drop", "role": "additional" }
+        { "slug": "pw-drag-drop", "role": "additional" },
+        { "slug": "pw-file-upload", "role": "additional" }
       ]
     },
     {
@@ -356,12 +358,11 @@
       "moduleSlug": "actions-sync",
       "moduleOrder": 2,
       "kind": "core",
-      "estimatedMinutes": 12,
-      "tags": ["playwright", "actionability", "synchronization"],
+      "estimatedMinutes": 20,
+      "tags": ["playwright", "actionability", "synchronization", "outcomes"],
       "practice": [
         { "slug": "pw-action-outcome-sync", "role": "core" },
-        { "slug": "pw-dynamic-table", "role": "core" },
-        { "slug": "pw-actions-boss", "role": "core" }
+        { "slug": "pw-dynamic-table", "role": "additional" }
       ]
     },
     {
@@ -370,12 +371,16 @@
       "moduleSlug": "actions-sync",
       "moduleOrder": 3,
       "kind": "core",
-      "estimatedMinutes": 14,
-      "tags": ["playwright", "navigation", "events", "files", "frames"],
-      "practice": [
-        { "slug": "pw-file-upload", "role": "additional" },
-        { "slug": "pw-iframes", "role": "additional" }
-      ]
+      "estimatedMinutes": 18,
+      "tags": [
+        "playwright",
+        "navigation",
+        "events",
+        "popups",
+        "downloads",
+        "frames"
+      ],
+      "practice": [{ "slug": "pw-iframes", "role": "additional" }]
     },
     {
       "slug": "assertions-verify",
@@ -383,15 +388,15 @@
       "moduleSlug": "assertions-test-design",
       "moduleOrder": 1,
       "kind": "core",
-      "estimatedMinutes": 14,
-      "tags": ["playwright", "assertions", "web-first"],
+      "estimatedMinutes": 20,
+      "tags": ["playwright", "assertions", "evidence", "web-first"],
       "practice": [
-        { "slug": "pw-to-be-visible", "role": "core" },
-        { "slug": "pw-to-have-text", "role": "core" },
-        { "slug": "pw-state-assertions", "role": "core" },
-        { "slug": "pw-to-have-count", "role": "core" },
         { "slug": "pw-assertions-boss", "role": "core" },
+        { "slug": "pw-to-be-visible", "role": "additional" },
+        { "slug": "pw-to-have-text", "role": "additional" },
+        { "slug": "pw-state-assertions", "role": "additional" },
         { "slug": "pw-to-have-value", "role": "additional" },
+        { "slug": "pw-to-have-count", "role": "additional" },
         { "slug": "pw-to-have-attribute", "role": "additional" },
         { "slug": "pw-soft-assertions", "role": "additional" }
       ]
@@ -402,8 +407,8 @@
       "moduleSlug": "assertions-test-design",
       "moduleOrder": 2,
       "kind": "core",
-      "estimatedMinutes": 12,
-      "tags": ["test-design", "risk", "positive", "negative"]
+      "estimatedMinutes": 20,
+      "tags": ["test-design", "risk", "positive", "negative", "boundaries"]
     },
     {
       "slug": "playwright-architecture",
@@ -411,8 +416,8 @@
       "moduleSlug": "reliability-debugging",
       "moduleOrder": 1,
       "kind": "core",
-      "estimatedMinutes": 12,
-      "tags": ["playwright", "isolation", "browser-context"]
+      "estimatedMinutes": 18,
+      "tags": ["playwright", "isolation", "browser-context", "state-boundary"]
     },
     {
       "slug": "test-isolation-and-data",
@@ -420,8 +425,14 @@
       "moduleSlug": "reliability-debugging",
       "moduleOrder": 2,
       "kind": "core",
-      "estimatedMinutes": 15,
-      "tags": ["isolation", "test-data", "authentication", "network"]
+      "estimatedMinutes": 22,
+      "tags": [
+        "isolation",
+        "test-data",
+        "authentication",
+        "network",
+        "parallelism"
+      ]
     },
     {
       "slug": "debugging-flaky-tests",
@@ -429,8 +440,8 @@
       "moduleSlug": "reliability-debugging",
       "moduleOrder": 3,
       "kind": "core",
-      "estimatedMinutes": 16,
-      "tags": ["debugging", "trace", "flakiness", "ai-review"],
+      "estimatedMinutes": 22,
+      "tags": ["debugging", "trace", "flakiness", "root-cause", "ai-review"],
       "practice": [{ "slug": "pw-debug-flaky-test", "role": "core" }]
     },
     {
@@ -439,13 +450,15 @@
       "moduleSlug": "maintainable-suites",
       "moduleOrder": 1,
       "kind": "core",
-      "estimatedMinutes": 14,
-      "tags": ["playwright", "page-object", "abstraction"],
-      "practice": [
-        { "slug": "pom-login-basics", "role": "core" },
-        { "slug": "pom-login-failures", "role": "core" },
-        { "slug": "pom-multi-page", "role": "additional" }
-      ]
+      "estimatedMinutes": 18,
+      "tags": [
+        "playwright",
+        "abstraction",
+        "helpers",
+        "page-object",
+        "ai-review"
+      ],
+      "practice": [{ "slug": "pom-login-basics", "role": "core" }]
     },
     {
       "slug": "test-fixtures",
@@ -453,8 +466,8 @@
       "moduleSlug": "maintainable-suites",
       "moduleOrder": 2,
       "kind": "core",
-      "estimatedMinutes": 14,
-      "tags": ["playwright", "fixtures", "hooks"]
+      "estimatedMinutes": 18,
+      "tags": ["playwright", "fixtures", "hooks", "lifecycle", "ownership"]
     },
     {
       "slug": "projects-configuration",
@@ -462,8 +475,8 @@
       "moduleSlug": "maintainable-suites",
       "moduleOrder": 3,
       "kind": "core",
-      "estimatedMinutes": 14,
-      "tags": ["playwright", "configuration", "projects", "secrets"]
+      "estimatedMinutes": 17,
+      "tags": ["playwright", "configuration", "projects", "timeouts", "secrets"]
     },
     {
       "slug": "advanced-fixtures",
@@ -471,8 +484,8 @@
       "moduleSlug": "maintainable-suites",
       "moduleOrder": 4,
       "kind": "optional",
-      "estimatedMinutes": 14,
-      "tags": ["playwright", "fixtures", "worker-scope", "optional"]
+      "estimatedMinutes": 17,
+      "tags": ["playwright", "fixtures", "worker-scope", "options", "optional"]
     },
     {
       "slug": "ci-reports-cross-browser",
@@ -480,17 +493,33 @@
       "moduleSlug": "ship-and-prove",
       "moduleOrder": 1,
       "kind": "core",
-      "estimatedMinutes": 15,
-      "tags": ["ci", "reports", "artifacts", "cross-browser"]
+      "estimatedMinutes": 20,
+      "tags": ["ci", "reproducibility", "environment", "secrets", "diagnosis"]
     },
     {
-      "slug": "capstone-web-automation",
+      "slug": "ci-feedback-policy",
       "order": 27,
       "moduleSlug": "ship-and-prove",
       "moduleOrder": 2,
       "kind": "core",
-      "estimatedMinutes": 15,
-      "tags": ["capstone", "e2e", "review", "maintenance"],
+      "estimatedMinutes": 20,
+      "tags": ["ci", "coverage", "reports", "artifacts", "retries", "ownership"]
+    },
+    {
+      "slug": "capstone-web-automation",
+      "order": 28,
+      "moduleSlug": "ship-and-prove",
+      "moduleOrder": 3,
+      "kind": "core",
+      "estimatedMinutes": 22,
+      "tags": [
+        "capstone",
+        "e2e",
+        "review",
+        "evidence",
+        "maintenance",
+        "ai-review"
+      ],
       "practice": [{ "slug": "pw-capstone-checkout", "role": "core" }]
     }
   ]

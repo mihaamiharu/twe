@@ -418,36 +418,36 @@
       "xpReward": 45,
       "order": 3100,
       "title": {
-        "en": "toBeVisible & toBeHidden",
-        "id": "toBeVisible & toBeHidden"
+        "en": "Prove a Modal Appeared",
+        "id": "Buktikan Modal Muncul"
       },
       "description": {
-        "en": "Assert element visibility states.",
-        "id": "Asert status visibilitas elemen."
+        "en": "Trigger a modal and prove its user-visible dialog becomes available.",
+        "id": "Trigger sebuah modal lalu buktikan user-visible dialog-nya muncul."
       },
       "instructions": {
-        "en": "# toBeVisible & toBeHidden\n\n## Concept\nCheck if elements are visible or hidden! Playwright's `toBeVisible()` and `toBeHidden()` assertions are the most common ways to verify the visual state of the UI.\n\n## Code Example\n```javascript\nawait expect(page.locator('#modal')).toBeVisible();\nawait expect(page.locator('.spinner')).toBeHidden();\n```\n\n## Real World Scenario\nBefore interacting with a pop-up, you must ensure it's actually there. Verifying that a \"Success\" box appears after saving, or that a \"Loading\" spinner disappears, is crucial for stable tests.\n\n## Your Task\n1. Click the \"Show Modal\" button using `getByRole`.\n2. Assert that the modal is visible using `toBeVisible()` on `getByText('Modal Content')`.\n",
-        "id": "# toBeVisible & toBeHidden\n\n## Concept\nPeriksa apakah elemen terlihat atau tersembunyi! Asersi `toBeVisible()` dan `toBeHidden()` dari Playwright adalah cara yang paling umum untuk memverifikasi status visual UI.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('dialog')).toBeVisible();\nawait expect(page.getByTestId('spinner')).toBeHidden();\n```\n\n## Real World Scenario\nSebelum berinteraksi dengan pop-up, Anda harus memastikan pop-up itu benar-benar ada. Memverifikasi bahwa kotak \"Berhasil\" muncul setelah menyimpan, atau spinner \"Loading\" menghilang, sangat penting untuk pengujian yang stabil.\n\n## Tugas Kamu\n1. Klik tombol \"Show Modal\" menggunakan `getByRole`.\n2. Verifikasi bahwa modal terlihat menggunakan `toBeVisible()` pada `getByText('Modal Content')`.\n"
+        "en": "# Prove a Modal Appeared\n\nThis standalone page hides a dialog named **Shipping details** until the user activates **Show shipping details**. A successful click is not proof that the modal appeared, so assert the user-visible dialog with `toBeVisible()`.\n\n## Your Task\n1. Click **Show shipping details** by button role and accessible name.\n2. Locate the **Shipping details** dialog by role and accessible name.\n3. Prove the dialog becomes visible.\n",
+        "id": "# Buktikan Modal Muncul\n\nStandalone page ini menyembunyikan dialog bernama **Shipping details** sampai user mengaktifkan **Show shipping details**. Click yang berhasil belum membuktikan modal muncul, jadi assert user-visible dialog dengan `toBeVisible()`.\n\n## Tugas Kamu\n1. Click **Show shipping details** berdasarkan button role dan accessible name.\n2. Cari dialog **Shipping details** berdasarkan role dan accessible name.\n3. Buktikan dialog menjadi visible.\n"
       },
       "hints": {
         "en": [
-          "Verify whether an element is visually present on the screen or hidden from sight.",
-          "Use the 'toBeVisible()' and 'toBeHidden()' assertions which handle the timing and visibility checks for you.",
-          "Click the 'Show Modal' button, then use expect(page.getByText('Modal Content')).toBeVisible() to verify it appeared."
+          "Use the button's accessible name for the trigger.",
+          "The result is a dialog named `Shipping details`.",
+          "Use `await expect(dialog).toBeVisible()` after the click."
         ],
         "id": [
-          "Verifikasi apakah suatu elemen muncul secara visual di layar atau tersembunyi dari pandangan.",
-          "Gunakan asersi 'toBeVisible()' dan 'toBeHidden()' yang menangani pengecekan waktu dan visibilitas untuk Kamu.",
-          "Klik tombol 'Show Modal', lalu gunakan expect(page.getByText('Modal Content')).toBeVisible() untuk memverifikasi kemunculannya."
+          "Gunakan accessible name milik button sebagai trigger.",
+          "Result-nya adalah dialog bernama `Shipping details`.",
+          "Gunakan `await expect(dialog).toBeVisible()` setelah click."
         ]
       },
-      "htmlContent": "<div class=\"app\">\n  <button id=\"show\" onclick=\"document.getElementById('modal').style.display = 'block'\">Show Modal</button>\n  <div id=\"modal\" style=\"display: none;\">Modal Content</div>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check visibility', async ({ page }) => {\n  // 1. Click Show Modal by role and name\n  // 2. Assert the visible text Modal Content appears\n});",
+      "htmlContent": "<main>\n  <button type=\"button\" onclick=\"document.getElementById('shipping-dialog').style.display='block'\">Show shipping details</button>\n  <section id=\"shipping-dialog\" role=\"dialog\" aria-label=\"Shipping details\" style=\"display:none\">\n    <p>Courier delivery takes 2–3 business days.</p>\n  </section>\n</main>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('shipping details appear', async ({ page }) => {\n  // Trigger Show shipping details.\n  // Prove the Shipping details dialog becomes visible.\n});",
       "testCases": [],
-      "solution": "await page.getByRole('button', { name: 'Show Modal' }).click();\nawait expect(page.getByText('Modal Content')).toBeVisible();",
+      "solution": "await page.getByRole('button', { name: 'Show shipping details' }).click();\nawait expect(page.getByRole('dialog', { name: 'Shipping details' })).toBeVisible();",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["getByRole", "getByText"]
+        "requiredMethods": ["getByRole", "click"]
       },
       "tags": ["playwright", "assertions", "visibility", "intermediate"]
     },
@@ -459,36 +459,36 @@
       "xpReward": 50,
       "order": 3101,
       "title": {
-        "en": "toHaveText",
-        "id": "toHaveText"
+        "en": "Verify Exact and Stable Text",
+        "id": "Verifikasi Exact dan Stable Text"
       },
       "description": {
-        "en": "Assert element text content.",
-        "id": "Asert konten teks elemen."
+        "en": "Use exact and partial text matching according to the product message contract.",
+        "id": "Gunakan exact dan partial text matching sesuai product message contract."
       },
       "instructions": {
-        "en": "# toHaveText\n\n## Concept\nValidate the text content of elements! Use `toHaveText()` for exact matches and `toContainText()` for partial matches. You can also use Regular Expressions for flexible validation.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('heading')).toHaveText('Welcome');\nawait expect(page.getByText('hello')).toContainText(/hello/i);\n```\n\n## Real World Scenario\nDid the user actually log in? The easiest check is often verifying the header says \"Welcome, User\" instead of just finding an element. Text assertions confirm the *content* of the page is correct.\n\n## Your Task\n1. Assert the heading (`getByRole('heading')`) has the exact text \"Hello World\".\n2. Assert the paragraph (`p`) contains the text \"Playwright\".\n",
-        "id": "# toHaveText\n\n## Concept\nValidasi konten teks elemen! Gunakan `toHaveText()` untuk pencocokan eksak dan `toContainText()` untuk pencocokan parsial. Anda juga dapat menggunakan Regular Expressions untuk validasi yang fleksibel.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('heading')).toHaveText('Welcome');\nawait expect(page.getByText('hello')).toContainText(/hello/i);\n```\n\n## Real World Scenario\nApakah pengguna benar-benar berhasil masuk? Pemeriksaan termudah sering kali memverifikasi header bertuliskan \"Selamat Datang, Pengguna\", bukan hanya menemukan elemen. Asersi teks mengonfirmasi *konten* halaman benar.\n\n## Tugas Kamu\n1. Verifikasi bahwa heading (`getByRole('heading')`) memiliki teks eksak \"Hello World\".\n2. Verifikasi bahwa paragraf (`p`) mengandung teks \"Playwright\".\n"
+        "en": "# Verify Exact and Stable Text\n\nThis page confirms an order with a fixed heading and a status containing a generated order number. Use exact text for the heading because the complete message is the contract. Use partial text for the stable phrase inside the dynamic status.\n\n## Your Task\n1. Prove the heading has the exact text `Order confirmed`.\n2. Prove the status contains `ready for pickup` without hard-coding its order number.\n3. Use role-based locators for both pieces of evidence.\n",
+        "id": "# Verifikasi Exact dan Stable Text\n\nPage ini mengonfirmasi order dengan fixed heading dan status yang berisi generated order number. Gunakan exact text untuk heading karena complete message adalah kontraknya. Gunakan partial text untuk stable phrase di dalam dynamic status.\n\n## Tugas Kamu\n1. Buktikan heading punya exact text `Order confirmed`.\n2. Buktikan status berisi `ready for pickup` tanpa hard-code order number.\n3. Gunakan role-based locator untuk kedua evidence.\n"
       },
       "hints": {
         "en": [
-          "Ensure that the text displayed on the page matches exactly what you expect.",
-          "Use 'toHaveText()' for exact comparisons or 'toContainText()' (or Regex) if you only need to match part of the message.",
-          "Call expect(page.getByRole('heading')).toHaveText('Hello World') and check the paragraph with toContainText('Playwright')."
+          "The complete heading is stable, so treat the whole string as the contract.",
+          "The generated order number is variable; assert only the stable phrase in the status.",
+          "Use `toHaveText('Order confirmed')` for the heading and `toContainText('ready for pickup')` for the status."
         ],
         "id": [
-          "Pastikan teks yang ditampilkan di halaman sesuai dengan apa yang Kamu harapkan.",
-          "Gunakan 'toHaveText()' untuk perbandingan eksak atau 'toContainText()' (atau Regex) jika Kamu hanya perlu mencocokkan sebagian pesan.",
-          "Panggil expect(page.getByRole('heading')).toHaveText('Hello World') dan cek paragrafnya dengan toContainText('Playwright')."
+          "Complete heading-nya stable, jadi perlakukan seluruh string sebagai contract.",
+          "Generated order number bisa berubah; assert hanya stable phrase di dalam status.",
+          "Gunakan `toHaveText('Order confirmed')` untuk heading dan `toContainText('ready for pickup')` untuk status."
         ]
       },
-      "htmlContent": "<div class=\"content\">\n  <h1>Hello World</h1>\n  <p>Welcome to Playwright testing framework!</p>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('text assertions', async ({ page }) => {\n  // 1. Assert h1 has text 'Hello World'\n  // 2. Assert p contains 'Playwright'\n});",
+      "htmlContent": "<main>\n  <h1>Order confirmed</h1>\n  <p role=\"status\">Order 1042 is ready for pickup</p>\n</main>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('order confirmation text', async ({ page }) => {\n  // Assert the exact confirmation heading.\n  // Assert the stable phrase inside the dynamic status.\n});",
       "testCases": [],
-      "solution": "await expect(page.getByRole('heading')).toHaveText('Hello World');\nawait expect(page.getByText(/Welcome to Playwright/)).toContainText('Playwright');",
+      "solution": "await expect(page.getByRole('heading')).toHaveText('Order confirmed');\nawait expect(page.getByRole('status')).toContainText('ready for pickup');",
       "validation": {
         "requiredAssertions": ["toHaveText", "toContainText"],
-        "requiredMethods": ["getByRole", "getByText"]
+        "requiredMethods": ["getByRole"]
       },
       "tags": ["playwright", "assertions", "text", "intermediate"]
     },
@@ -500,33 +500,37 @@
       "xpReward": 50,
       "order": 3102,
       "title": {
-        "en": "toHaveValue",
-        "id": "toHaveValue"
+        "en": "Prove a Live Form Value",
+        "id": "Buktikan Live Form Value"
       },
       "description": {
-        "en": "Assert input field values.",
-        "id": "Asert nilai input field."
+        "en": "Prove the live value of a labeled form field after editing it.",
+        "id": "Buktikan live value dari labeled form field setelah mengubahnya."
       },
       "instructions": {
-        "en": "# Assert an Input Value\n\nFill the input located by placeholder `Enter email` with `test@example.com`. Then use `toHaveValue()` on the same locator to prove its live form value. `toHaveValue` is different from checking text content inside a normal element.",
-        "id": "# Periksa Value Input\n\nIsi input yang ditemukan melalui placeholder `Enter email` dengan `test@example.com`. Kemudian gunakan `toHaveValue()` pada locator yang sama untuk membuktikan live form value-nya. `toHaveValue` berbeda dari pemeriksaan text content di dalam element biasa."
+        "en": "# Prove a Live Form Value\n\nThe **Notification email** field starts with an old address. Replace it with `test@example.com`, then use `toHaveValue()` on the same labeled input. Input values are form state, not normal element text, so `toHaveText()` would express the wrong evidence type.\n",
+        "id": "# Buktikan Live Form Value\n\nField **Notification email** dimulai dengan address lama. Ganti menjadi `test@example.com`, lalu gunakan `toHaveValue()` pada labeled input yang sama. Input value adalah form state, bukan normal element text, jadi `toHaveText()` akan menjelaskan evidence type yang salah.\n"
       },
       "hints": {
         "en": [
-          "Check the internal content of an input field, which is different from the text content of a standard element.",
-          "Use 'toHaveValue()' to verify what has been typed into an input or selected in a dropdown.",
-          "Fill the 'Enter email' placeholder with your test email, then call expect(...).toHaveValue('test@example.com')."
+          "Locate the input from its `Notification email` label.",
+          "Use `fill()` to replace the old address rather than appending to it.",
+          "Assert the field's live form state with `toHaveValue('test@example.com')`."
         ],
         "id": [
-          "Cek konten internal kolom input, yang berbeda dari konten teks elemen standar.",
-          "Gunakan 'toHaveValue()' untuk memverifikasi apa yang telah diketik ke dalam input atau dipilih dalam dropdown.",
-          "Isi placeholder 'Enter email' dengan email pengujian Kamu, lalu panggil expect(...).toHaveValue('test@example.com')."
+          "Cari input dari label `Notification email`.",
+          "Gunakan `fill()` untuk mengganti address lama, bukan menambahkan text ke belakangnya.",
+          "Assert live form state milik field dengan `toHaveValue('test@example.com')`."
         ]
       },
-      "htmlContent": "<form>\n  <input type=\"email\" id=\"email\" placeholder=\"Enter email\" />\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check input value', async ({ page }) => {\n  // Locate by placeholder, fill the email, and assert its value.\n});",
+      "htmlContent": "<form>\n  <label for=\"notification-email\">Notification email</label>\n  <input type=\"email\" id=\"notification-email\" value=\"old@example.com\" />\n</form>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('notification email value', async ({ page }) => {\n  // Replace the labeled field value.\n  // Prove its live value with toHaveValue.\n});",
       "testCases": [],
-      "solution": "const email = page.getByPlaceholder('Enter email');\nawait email.fill('test@example.com');\nawait expect(email).toHaveValue('test@example.com');",
+      "solution": "const email = page.getByLabel('Notification email');\nawait email.fill('test@example.com');\nawait expect(email).toHaveValue('test@example.com');",
+      "validation": {
+        "requiredAssertions": ["toHaveValue"],
+        "requiredMethods": ["getByLabel", "fill"]
+      },
       "tags": ["playwright", "assertions", "forms", "intermediate"]
     },
     {
@@ -537,35 +541,35 @@
       "xpReward": 55,
       "order": 3103,
       "title": {
-        "en": "State Assertions",
-        "id": "Asersi Status"
+        "en": "Prove a Control-State Transition",
+        "id": "Buktikan Control-State Transition"
       },
       "description": {
-        "en": "Assert checkbox, disabled, and other states.",
-        "id": "Asert status checkbox, disabled, dan status lainnya."
+        "en": "Establish a disabled starting state, change consent, and prove submission becomes available.",
+        "id": "Establish disabled starting state, ubah consent, lalu buktikan submission menjadi tersedia."
       },
       "instructions": {
-        "en": "# State Assertions\n\nState assertions prove what a user can do, not just that an element exists. Identify controls by label or accessible role and name, then use web-first assertions to observe their state.\n\n## Your Task\n1. Check the `Accept Terms` checkbox by its label.\n2. Assert it is checked.\n3. Assert the `Submit` button is enabled.\n",
-        "id": "# Asersi Status\n\n## Concept\nPeriksa status elemen interaktif! Gunakan asersi seperti `toBeChecked()`, `toBeDisabled()`, `toBeEnabled()`, dan `toBeEditable()` untuk memverifikasi logika dan batasan UI.\n\n## Code Example\n```javascript\nawait expect(page.getByLabel('Accept Terms')).toBeChecked();\nawait expect(page.getByRole('button', { name: 'Submit' })).toBeDisabled();\n```\n\n## Real World Scenario\nTombol \"Kirim\" sering dinonaktifkan hingga semua bidang yang wajib diisi. Memverifikasi perubahan status ini (dari Nonaktif ke Aktif) adalah tes validasi klasik.\n\n## Tugas Kamu\n1. Centang checkbox persetujuan menggunakan `getByLabel('Accept Terms')`.\n2. Verifikasi bahwa itu sudah dicentang menggunakan `toBeChecked()`.\n3. Verifikasi bahwa tombol submit menggunakan `getByRole('button', { name: 'Submit' })` sudah aktif menggunakan `toBeEnabled()`.\n"
+        "en": "# Prove a Control-State Transition\n\nThe registration rule keeps **Submit** disabled until **Accept Terms** is checked. Establish the disabled starting state first, use `check()` to create the required consent state, then prove both the checkbox and button states.\n\n## Your Task\n1. Locate **Accept Terms** by label and **Submit** by role.\n2. Prove Submit starts disabled.\n3. Check Accept Terms and prove it is checked.\n4. Prove Submit becomes enabled.\n",
+        "id": "# Buktikan Control-State Transition\n\nRegistration rule membuat **Submit** disabled sampai **Accept Terms** checked. Establish disabled starting state lebih dulu, gunakan `check()` untuk membuat required consent state, lalu buktikan checkbox dan button state.\n\n## Tugas Kamu\n1. Cari **Accept Terms** berdasarkan label dan **Submit** berdasarkan role.\n2. Buktikan Submit dimulai dalam disabled state.\n3. Check Accept Terms lalu buktikan state-nya checked.\n4. Buktikan Submit menjadi enabled.\n"
       },
       "hints": {
         "en": [
-          "Validate the functional state of elements, such as whether a button is clickable or a checkbox is ticked.",
-          "Use assertions like 'toBeChecked()', 'toBeEnabled()', or 'toBeDisabled()' to verify UI logic constraints.",
-          "Check the Terms box, assert it's checked, and then verify the Submit button has transitioned to an enabled state."
+          "Capture the same Submit locator before the action so you can prove its transition.",
+          "Establish the precondition with `toBeDisabled()` before checking the consent control.",
+          "After `check()`, prove both the consent state and its consequence for Submit."
         ],
         "id": [
-          "Validasi status fungsional elemen, seperti apakah tombol dapat diklik atau kotak centang dicentang.",
-          "Gunakan asersi seperti 'toBeChecked()', 'toBeEnabled()', atau 'toBeDisabled()' untuk memverifikasi batasan logika UI.",
-          "Centang kotak Terms, pastikan itu dicentang, lalu verifikasi tombol Submit telah beralih ke status aktif (enabled)."
+          "Simpan locator Submit yang sama sebelum action supaya kamu bisa membuktikan transition-nya.",
+          "Establish precondition dengan `toBeDisabled()` sebelum check consent control.",
+          "Setelah `check()`, buktikan consent state dan konsekuensinya pada Submit."
         ]
       },
-      "htmlContent": "<form>\n  <label><input type=\"checkbox\" id=\"terms\" /> Accept Terms</label>\n  <button id=\"submit\">Submit</button>\n</form>",
+      "htmlContent": "<form>\n  <label><input type=\"checkbox\" id=\"terms\" onclick=\"document.getElementById('submit').disabled=!this.checked\" /> Accept Terms</label>\n  <button id=\"submit\" disabled>Submit</button>\n</form>",
       "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check states', async ({ page }) => {\n  // 1. Check checkbox\n  // 2. Assert checked\n  // 3. Assert button enabled\n});",
       "testCases": [],
-      "solution": "const terms = page.getByLabel('Accept Terms');\nawait terms.check();\nawait expect(terms).toBeChecked();\nawait expect(page.getByRole('button', { name: 'Submit' })).toBeEnabled();",
+      "solution": "const terms = page.getByLabel('Accept Terms');\nconst submit = page.getByRole('button', { name: 'Submit' });\nawait expect(submit).toBeDisabled();\nawait terms.check();\nawait expect(terms).toBeChecked();\nawait expect(submit).toBeEnabled();",
       "validation": {
-        "requiredAssertions": ["toBeChecked", "toBeEnabled"],
+        "requiredAssertions": ["toBeDisabled", "toBeChecked", "toBeEnabled"],
         "requiredMethods": ["getByLabel", "getByRole", "check"]
       },
       "tags": ["playwright", "assertions", "state", "intermediate"]
@@ -578,33 +582,37 @@
       "xpReward": 60,
       "order": 3104,
       "title": {
-        "en": "toHaveAttribute",
-        "id": "toHaveAttribute"
+        "en": "Verify a Required Link Destination",
+        "id": "Verifikasi Required Link Destination"
       },
       "description": {
-        "en": "Assert element attributes.",
-        "id": "Asert atribut elemen."
+        "en": "Use an attribute assertion when the destination itself is the product contract.",
+        "id": "Gunakan attribute assertion saat destination itu sendiri menjadi product contract."
       },
       "instructions": {
-        "en": "# toHaveAttribute\n\n## Concept\nCheck element attributes! Use `toHaveAttribute()` to verify technical details like image sources, link destinations, or accessibility properties.\n\n## Code Example\n```javascript\nawait expect(page.locator('a')).toHaveAttribute('href', '/home');\nawait expect(page.locator('img')).toHaveAttribute('alt');\n```\n\n## Real World Scenario\nBroken links and missing images are bad. But missing `alt` text is an accessibility violation. Attribute assertions let you verify specific technical details like these.\n\n## Your Task\n1. Assert the link (`a`) has an `href` attribute with value \"/about\".\n2. Assert the image (`img`) has an `alt` attribute (the specific value doesn't matter for this check).\n",
-        "id": "# toHaveAttribute\n\n## Concept\nPeriksa atribut elemen! Gunakan `toHaveAttribute()` untuk memverifikasi detail teknis seperti sumber gambar, tujuan tautan, atau properti aksesibilitas.\n\n## Code Example\n```javascript\nawait expect(page.getByRole('link')).toHaveAttribute('href', '/home');\nawait expect(page.getByRole('img')).toHaveAttribute('alt');\n```\n\n## Real World Scenario\nTautan rusak dan gambar yang hilang itu buruk. Tapi teks `alt` yang hilang adalah pelanggaran aksesibilitas. Asersi atribut memungkinkan Anda memverifikasi detail teknis khusus seperti ini.\n\n## Tugas Kamu\n1. Verifikasi bahwa link menggunakan `getByRole('link', { name: 'About Us' })` memiliki atribut `href` dengan nilai \"/about\".\n2. Verifikasi bahwa gambar menggunakan `getByRole('img')` memiliki atribut `alt`.\n"
+        "en": "# Verify a Required Link Destination\n\nThe account page must send users from **Privacy policy** to `/legal/privacy` and open the external policy surface in a new tab. Here `href` and `target` are deliberate navigation contracts, so attribute assertions are appropriate. For ordinary outcomes, prefer what users observe after interaction instead of inspecting attributes by default.\n\n## Your Task\n1. Locate **Privacy policy** by link role and accessible name.\n2. Prove its `href` is `/legal/privacy`.\n3. Prove its `target` is `_blank`.\n",
+        "id": "# Verifikasi Required Link Destination\n\nAccount page harus mengarahkan user dari **Privacy policy** ke `/legal/privacy` dan membuka external policy surface di tab baru. Di sini `href` dan `target` memang deliberate navigation contract, jadi attribute assertion tepat digunakan. Untuk ordinary outcome, pilih behavior yang diamati user daripada default meng-inspect attribute.\n\n## Tugas Kamu\n1. Cari **Privacy policy** berdasarkan link role dan accessible name.\n2. Buktikan `href`-nya adalah `/legal/privacy`.\n3. Buktikan `target`-nya adalah `_blank`.\n"
       },
       "hints": {
         "en": [
-          "Look at the underlying HTML properties of an element, such as link targets or image descriptions.",
-          "Use 'toHaveAttribute()' to check specific properties like 'href' for links or 'alt' for images.",
-          "Call expect(...).toHaveAttribute('href', '/about') and ensure the image has an 'alt' attribute present."
+          "Locate the link through the name a user or assistive technology perceives.",
+          "The destination and browsing context are explicit requirements here, so attribute checks are meaningful.",
+          "Use `toHaveAttribute()` twice on the same link: once for `href`, once for `target`."
         ],
         "id": [
-          "Lihat properti HTML dasar suatu elemen, seperti target tautan atau deskripsi gambar.",
-          "Gunakan 'toHaveAttribute()' untuk mengecek properti spesifik seperti 'href' untuk tautan atau 'alt' untuk gambar.",
-          "Panggil expect(...).toHaveAttribute('href', '/about') dan pastikan gambar memiliki atribut 'alt'."
+          "Cari link lewat nama yang dipahami user atau assistive technology.",
+          "Destination dan browsing context memang explicit requirement di sini, jadi attribute check punya makna.",
+          "Gunakan `toHaveAttribute()` dua kali pada link yang sama: untuk `href` dan `target`."
         ]
       },
-      "htmlContent": "<nav>\n  <a href=\"/about\">About Us</a>\n  <img src=\"logo.png\" alt=\"Company Logo\" />\n</nav>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check attributes', async ({ page }) => {\n  // 1. Assert href is '/about'\n  // 2. Assert alt exists\n});",
+      "htmlContent": "<nav aria-label=\"Account links\">\n  <a href=\"/legal/privacy\" target=\"_blank\">Privacy policy</a>\n</nav>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('privacy-policy destination', async ({ page }) => {\n  // Locate Privacy policy by role.\n  // Prove its href and target contracts.\n});",
       "testCases": [],
-      "solution": "await expect(page.locator('a')).toHaveAttribute('href', '/about');\nawait expect(page.locator('img')).toHaveAttribute('alt', 'Company Logo');",
+      "solution": "const privacyPolicy = page.getByRole('link', { name: 'Privacy policy' });\nawait expect(privacyPolicy).toHaveAttribute('href', '/legal/privacy');\nawait expect(privacyPolicy).toHaveAttribute('target', '_blank');",
+      "validation": {
+        "requiredAssertions": ["toHaveAttribute"],
+        "requiredMethods": ["getByRole"]
+      },
       "tags": ["playwright", "assertions", "attributes", "intermediate"]
     },
     {
@@ -615,36 +623,36 @@
       "xpReward": 65,
       "order": 3105,
       "title": {
-        "en": "toHaveCount",
-        "id": "toHaveCount"
+        "en": "Prove a Result Count Changed",
+        "id": "Buktikan Result Count Berubah"
       },
       "description": {
-        "en": "Assert number of elements.",
-        "id": "Asert jumlah elemen."
+        "en": "Use a retried collection assertion when the exact result count carries product meaning.",
+        "id": "Gunakan retried collection assertion saat exact result count punya product meaning."
       },
       "instructions": {
-        "en": "# toHaveCount\n\nUse `toHaveCount()` to retry until a collection reaches the expected size. That makes it suitable for lists whose contents update after an action. The number should express a meaningful product expectation, not merely mirror the current markup.\n\n## Your Task\n1. Locate the list items by role and assert there are initially four.\n2. Click `Add Item` by role and accessible name.\n3. Assert that the same collection eventually contains five items.\n",
-        "id": "# toHaveCount\n\nGunakan `toHaveCount()` untuk mencoba ulang hingga sebuah koleksi mencapai jumlah yang diharapkan. Ini cocok untuk daftar yang isinya berubah setelah aksi. Angka tersebut harus menyatakan ekspektasi produk yang bermakna, bukan sekadar meniru markup saat ini.\n\n## Tugas Kamu\n1. Temukan item daftar berdasarkan role dan verifikasi jumlah awalnya empat.\n2. Klik `Add Item` berdasarkan role dan accessible name.\n3. Verifikasi koleksi yang sama akhirnya berisi lima item.\n"
+        "en": "# Prove a Result Count Changed\n\nThe saved search initially returns four customer records. Activating **Add matching customer** adds one record to that same result list. Use `toHaveCount()` before and after the action so the number expresses a known product transition rather than merely copying the current markup.\n\n## Your Task\n1. Locate the result items by `listitem` role and prove the initial count is 4.\n2. Click **Add matching customer** by role and accessible name.\n3. Prove the same collection reaches a count of 5.\n",
+        "id": "# Buktikan Result Count Berubah\n\nSaved search awalnya menghasilkan empat customer record. Saat **Add matching customer** diaktifkan, satu record ditambahkan ke result list yang sama. Gunakan `toHaveCount()` sebelum dan sesudah action supaya angkanya menjelaskan known product transition, bukan cuma menyalin current markup.\n\n## Tugas Kamu\n1. Cari result item berdasarkan role `listitem` lalu buktikan initial count adalah 4.\n2. Click **Add matching customer** berdasarkan role dan accessible name.\n3. Buktikan collection yang sama mencapai count 5.\n"
       },
       "hints": {
         "en": [
-          "Confirm that the number of items in a list or search results matches your expectations.",
-          "Use 'toHaveCount()' on a locator that matches multiple elements to verify the total number in one go.",
-          "Check the initial count is 4, click 'Add Item', and assert that the count has updated to 5."
+          "Keep one collection locator for the result items and assert it before and after the action.",
+          "The exact counts come from the stated saved-search behavior, not from inspecting the DOM and copying a number.",
+          "After clicking `Add matching customer`, let `toHaveCount(5)` retry the collection."
         ],
         "id": [
-          "Konfirmasikan bahwa jumlah item dalam daftar atau hasil pencarian sesuai dengan ekspektasi Kamu.",
-          "Gunakan 'toHaveCount()' pada locator yang cocok dengan beberapa elemen untuk memverifikasi jumlah total sekaligus.",
-          "Cek jumlah awal adalah 4, klik 'Add Item', dan pastikan jumlahnya telah diperbarui menjadi 5."
+          "Gunakan satu collection locator untuk result item lalu assert sebelum dan sesudah action.",
+          "Exact count berasal dari saved-search behavior yang dijelaskan, bukan dari melihat DOM lalu menyalin angkanya.",
+          "Setelah click `Add matching customer`, biarkan `toHaveCount(5)` me-retry collection-nya."
         ]
       },
-      "htmlContent": "<ul id=\"list\">\n  <li>Item 1</li>\n  <li>Item 2</li>\n  <li>Item 3</li>\n  <li>Item 4</li>\n</ul>\n<button id=\"add\" onclick=\"document.getElementById('list').innerHTML += '<li>New Item</li>'\">Add Item</button>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check count', async ({ page }) => {\n  // 1. Assert initial count (4)\n  // 2. Add item\n  // 3. Assert new count (5)\n});",
+      "htmlContent": "<main>\n  <ul id=\"results\">\n    <li>Customer 1</li>\n    <li>Customer 2</li>\n    <li>Customer 3</li>\n    <li>Customer 4</li>\n  </ul>\n  <button type=\"button\" onclick=\"document.getElementById('results').insertAdjacentHTML('beforeend','<li>Customer 5</li>')\">Add matching customer</button>\n</main>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('saved-search result count', async ({ page }) => {\n  // Prove the initial list count.\n  // Add a matching customer.\n  // Prove the updated count.\n});",
       "testCases": [],
-      "solution": "const items = page.getByRole('listitem');\nawait expect(items).toHaveCount(4);\nawait page.getByRole('button', { name: 'Add Item' }).click();\nawait expect(items).toHaveCount(5);",
+      "solution": "const items = page.getByRole('listitem');\nawait expect(items).toHaveCount(4);\nawait page.getByRole('button', { name: 'Add matching customer' }).click();\nawait expect(items).toHaveCount(5);",
       "validation": {
         "requiredAssertions": ["toHaveCount"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["getByRole", "click"]
       },
       "tags": ["playwright", "assertions", "count", "intermediate"]
     },
@@ -656,35 +664,36 @@
       "xpReward": 70,
       "order": 3106,
       "title": {
-        "en": "Soft Assertions",
-        "id": "Soft Assertions"
+        "en": "Collect Independent Diagnostic Failures",
+        "id": "Kumpulkan Independent Diagnostic Failure"
       },
       "description": {
-        "en": "Continue test execution after assertion failures.",
-        "id": "Lanjutkan eksekusi tes setelah kegagalan asersi."
+        "en": "Use soft assertions for independent diagnostics without treating them as permission to continue a dependent workflow.",
+        "id": "Gunakan soft assertion untuk independent diagnostic tanpa menganggapnya sebagai izin melanjutkan dependent workflow."
       },
       "instructions": {
-        "en": "# Soft Assertions\n\n## Concept\nContinue test execution even after assertion failures! Regular hard assertions stop the test immediately on failure, while `expect.soft()` records the error and allows the test to continue.\n\n## Code Example\n```javascript\n// Regular - stops on failure\nawait expect(locator).toHaveText('A');\n\n// Soft - continues on failure\nawait expect.soft(locator).toHaveText('A');\n```\n\n## Real World Scenario\nIn a long form, if the first field has a typo, a hard assertion stops the test immediately. You never find out if the other 10 fields are also broken. Soft assertions let you check EVERYTHING and report all failures at once.\n\n## Your Task\n1. Use soft assertions (`expect.soft`) to check if `#name-status`, `#email-status`, and `#pass-status` are visible.\n2. Ensure the test continues to check all three status elements even if one fails.\n",
-        "id": "# Soft Assertions\n\n## Concept\nLanjutkan eksekusi tes bahkan setelah kegagalan asersi! Asersi keras (hard assertion) biasa akan segera menghentikan tes saat gagal, sedangkan `expect.soft()` mencatat kesalahan dan membiarkan tes tetap berjalan.\n\n## Code Example\n```javascript\n// Regular - berhenti saat gagal\nawait expect(locator).toHaveText('A');\n\n// Soft - lanjut meskipun gagal\nawait expect.soft(locator).toHaveText('A');\n```\n\n## Real World Scenario\nDalam formulir yang panjang, jika bidang pertama memiliki kesalahan penulisan (typo), asersi keras (hard assertion) segera menghentikan pengujian. Anda tidak pernah tahu apakah 10 bidang lainnya juga rusak. Soft assertions memungkinkan Anda memeriksa SEMUANYA dan melaporkan semua kegagalan sekaligus.\n\n## Tugas Kamu\n1. Gunakan soft assertion (`expect.soft`) untuk memeriksa apakah `#name-status`, `#email-status`, dan `#pass-status` terlihat.\n2. Pastikan tes terus berlanjut untuk memeriksa ketiga elemen status tersebut meskipun salah satunya gagal.\n"
+        "en": "# Collect Independent Diagnostic Failures\n\nA profile-readiness summary reports three independent checks: **Name: Ready**, **Email: Ready**, and **Password: Ready**. The team wants one run to collect evidence from all three lines. Use `expect.soft()` because these diagnostics do not depend on one another.\n\nA soft failure still fails the test. It only lets later checks run. Do not use it to continue a workflow that depends on an earlier requirement passing.\n\n## Your Task\n1. Locate each readiness line by its exact visible text.\n2. Use `expect.soft(...).toBeVisible()` for all three independent diagnostics.\n3. Do not add a dependent action after the soft checks.\n",
+        "id": "# Kumpulkan Independent Diagnostic Failure\n\nProfile-readiness summary menampilkan tiga independent check: **Name: Ready**, **Email: Ready**, dan **Password: Ready**. Team ingin satu run mengumpulkan evidence dari ketiga baris. Gunakan `expect.soft()` karena diagnostic ini nggak bergantung satu sama lain.\n\nSoft failure tetap membuat test gagal. Bedanya, check berikutnya masih dijalankan. Jangan pakai soft assertion untuk melanjutkan workflow yang bergantung pada requirement sebelumnya.\n\n## Tugas Kamu\n1. Cari setiap readiness line lewat exact visible text.\n2. Gunakan `expect.soft(...).toBeVisible()` untuk ketiga independent diagnostic.\n3. Jangan tambahkan dependent action setelah soft check.\n"
       },
       "hints": {
         "en": [
-          "Collect multiple verification errors at once instead of letting the first failure stop the entire test.",
-          "Use 'expect.soft()' for non-critical checks so that the rest of your assertions still run.",
-          "Wrap your status checks in expect.soft(...).toBeVisible() to report all missing elements in a single run."
+          "Each readiness line can be evaluated without relying on either of the others.",
+          "Pass the locator to `expect.soft()` and then call the normal matcher.",
+          "Soft assertions collect more evidence, but Playwright still marks the test failed if any of them fail."
         ],
         "id": [
-          "Kumpulkan beberapa kesalahan verifikasi sekaligus daripada membiarkan kegagalan pertama menghentikan seluruh pengujian.",
-          "Gunakan 'expect.soft()' untuk pemeriksaan non-kritis sehingga sisa asersi Kamu tetap berjalan.",
-          "Bungkus pemeriksaan status Kamu dalam expect.soft(...).toBeVisible() untuk melaporkan semua elemen yang hilang dalam satu proses."
+          "Setiap readiness line bisa dievaluasi tanpa bergantung pada dua line lainnya.",
+          "Berikan locator ke `expect.soft()`, lalu panggil matcher seperti biasa.",
+          "Soft assertion mengumpulkan lebih banyak evidence, tetapi test tetap ditandai gagal kalau salah satunya gagal."
         ]
       },
-      "htmlContent": "<div class=\"form-status\">\n  <div id=\"name-status\" class=\"valid\">✓ Name valid</div>\n  <div id=\"email-status\" class=\"valid\">✓ Email valid</div>\n  <div id=\"pass-status\" class=\"valid\">✓ Password valid</div>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('soft assertions', async ({ page }) => {\n  // 1. Check #name-status (soft)\n  // 2. Check #email-status (soft)\n  // 3. Check #pass-status (soft)\n});",
+      "htmlContent": "<section aria-labelledby=\"readiness-heading\">\n  <h2 id=\"readiness-heading\">Profile readiness</h2>\n  <ul>\n    <li>Name: Ready</li>\n    <li>Email: Ready</li>\n    <li>Password: Ready</li>\n  </ul>\n</section>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('profile-readiness diagnostics', async ({ page }) => {\n  // Soft-check the three independent readiness lines.\n  // Do not continue into a dependent workflow.\n});",
       "testCases": [],
-      "solution": "await expect.soft(page.locator('#name-status')).toBeVisible();\nawait expect.soft(page.locator('#email-status')).toBeVisible();\nawait expect.soft(page.locator('#pass-status')).toBeVisible();",
+      "solution": "await expect.soft(page.getByText('Name: Ready', { exact: true })).toBeVisible();\nawait expect.soft(page.getByText('Email: Ready', { exact: true })).toBeVisible();\nawait expect.soft(page.getByText('Password: Ready', { exact: true })).toBeVisible();",
       "validation": {
-        "requiredAssertions": ["toBeVisible"]
+        "requiredAssertions": ["toBeVisible"],
+        "requiredMethods": ["soft", "getByText"]
       },
       "tags": ["playwright", "assertions", "soft", "intermediate"]
     },
@@ -696,41 +705,42 @@
       "xpReward": 85,
       "order": 3107,
       "title": {
-        "en": "Scenario: Form Validation Suite",
-        "id": "Skenario: Suite Validasi Formulir"
+        "en": "Core Scenario: Registration Follows Validation State",
+        "id": "Core Scenario: Registration Mengikuti Validation State"
       },
       "description": {
-        "en": "Verify all aspects of a complex form validation.",
-        "id": "Verifikasi semua aspek dari validasi formulir yang kompleks."
+        "en": "Prove that invalid registration data blocks submission and valid data clears the guidance and enables it.",
+        "id": "Buktikan invalid registration data memblokir submission, lalu valid data menghapus guidance dan mengaktifkannya."
       },
       "instructions": {
-        "en": "# Scenario: Form Validation Suite\n\n## Concept\nValidating a registration form with multiple states requires a combination of visibility and state assertions. You'll need to check error messages, input requirements, and dynamic button states.\n\n## Real World Scenario\nValidating a \"Sign Up\" form is more than just success path. You must prove that it *rejects* bad data (security) and *guides* the user (UX). This test suite ensures the form behaves correctly in all states.\n\n## Your Task\n1. Check that the email error (`#email-error`) is visible initially.\n2. Check that the password requirement (`.hint`) is visible.\n3. Verify the \"Register\" button is currently **disabled** using `toBeDisabled()`.\n4. Fill in a valid email (contains '@') and a valid password (8+ characters).\n5. Verify the \"Register\" button becomes **enabled** using `toBeEnabled()`.\n",
-        "id": "# Skenario: Suite Validasi Formulir\n\n## Concept\nMemvalidasi formulir pendaftaran dengan beberapa status memerlukan kombinasi asersi visibilitas dan asersi status. Anda perlu memeriksa pesan kesalahan, persyaratan input, dan status tombol yang dinamis.\n\n## Real World Scenario\nMemvalidasi formulir \"Daftar\" lebih dari sekadar jalur sukses. Anda harus membuktikan bahwa formulir tersebut *menolak* data yang buruk (keamanan) dan *membimbing* pengguna (UX). Suite pengujian ini memastikan formulir berfungsi dengan benar di semua status.\n\n## Tugas Kamu\n1. Periksa bahwa email error (`#email-error`) terlihat pada awalnya.\n2. Periksa bahwa persyaratan kata sandi (`.hint`) terlihat.\n3. Verifikasi tombol \"Register\" saat ini **dinonaktifkan** menggunakan `toBeDisabled()`.\n4. Isi email yang valid (mengandung '@') dan kata sandi yang valid (8+ karakter).\n5. Verifikasi tombol \"Register\" menjadi **aktif** menggunakan `toBeEnabled()`.\n"
+        "en": "# Core Scenario: Registration Follows Validation State\n\nThis standalone registration form starts with an invalid email and an empty password. Its business rule is observable in two states: invalid data shows guidance and blocks registration; valid data clears the guidance and makes registration available.\n\nChoose the smallest sufficient evidence for that transition. You do not need to verify every piece of markup on the page.\n\n## Your Task\n1. Locate the email guidance by `alert` role and **Register** by button role.\n2. Prove the guidance is visible with the exact text `Invalid email format`.\n3. Prove Register starts disabled.\n4. Fill **Email** with `user@example.com` and **Password** with `password123` by label.\n5. Prove the email guidance becomes hidden and Register becomes enabled.\n",
+        "id": "# Core Scenario: Registration Mengikuti Validation State\n\nStandalone registration form ini dimulai dengan invalid email dan password kosong. Business rule-nya terlihat dalam dua state: invalid data menampilkan guidance dan memblokir registration; valid data menghapus guidance lalu membuat registration tersedia.\n\nPilih evidence paling kecil yang sudah cukup untuk membuktikan transition itu. Kamu nggak perlu memverifikasi setiap markup yang ada di page.\n\n## Tugas Kamu\n1. Cari email guidance berdasarkan role `alert` dan **Register** berdasarkan button role.\n2. Buktikan guidance terlihat dengan exact text `Invalid email format`.\n3. Buktikan Register dimulai dalam disabled state.\n4. Isi **Email** dengan `user@example.com` dan **Password** dengan `password123` berdasarkan label.\n5. Buktikan email guidance menjadi hidden dan Register menjadi enabled.\n"
       },
       "hints": {
         "en": [
-          "Manage a complex form validation suite that involves multiple states and dependent UI changes.",
-          "Combine visibility, text, and state assertions to prove the form guides the user correctly through the process.",
-          "Check initial errors, verify the button starts as disabled, fill valid data, and assert the button becomes enabled."
+          "Treat the initial invalid state as a precondition you must prove before changing the form.",
+          "Reuse the alert and Register locators so the assertions clearly describe one state transition.",
+          "After filling both labeled fields, prove both effects of the rule: guidance disappears and submission becomes available."
         ],
         "id": [
-          "Kelola suite validasi formulir kompleks yang melibatkan beberapa status dan perubahan UI yang dependen.",
-          "Gabungkan asersi visibilitas, teks, dan status untuk membuktikan formulir memandu pengguna dengan benar melalui proses tersebut.",
-          "Cek kesalahan awal, verifikasi tombol dimulai sebagai dinonaktifkan (disabled), isi data yang valid, dan pastikan tombol menjadi aktif (enabled)."
+          "Anggap initial invalid state sebagai precondition yang perlu kamu buktikan sebelum mengubah form.",
+          "Reuse locator untuk alert dan Register supaya assertion-nya jelas menceritakan satu state transition.",
+          "Setelah mengisi kedua labeled field, buktikan dua efek rule-nya: guidance hilang dan submission tersedia."
         ]
       },
       "htmlContent": "<form id=\"signup\">\n  <div class=\"field\">\n    <label>Email <input type=\"email\" id=\"email\" value=\"bad-email\" /></label>\n    <span class=\"error\" id=\"email-error\" role=\"alert\">Invalid email format</span>\n  </div>\n  <div class=\"field\">\n    <label>Password <input type=\"password\" id=\"password\" placeholder=\"8+ characters\" /></label>\n    <span class=\"hint\">Must be 8+ characters</span>\n  </div>\n  <button id=\"submit\" disabled>Register</button>\n</form>\n<script>\n  document.getElementById('email').addEventListener('input', validate);\n  document.getElementById('password').addEventListener('input', validate);\n  function validate() {\n    const email = document.getElementById('email').value;\n    const pass = document.getElementById('password').value;\n    const valid = email.includes('@') && pass.length >= 8;\n    document.getElementById('submit').disabled = !valid;\n    document.getElementById('email-error').style.display = email.includes('@') ? 'none' : 'block';\n  }\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('form validation', async ({ page }) => {\n  // 1. Assert email error is visible (initially)\n  // 2. Assert password hint is visible\n  // 3. Assert submit button is disabled\n  // 4. Fill valid email & password\n  // 5. Assert submit button is enabled\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('registration follows validation state', async ({ page }) => {\n  // Prove the invalid starting state and its guidance.\n  // Fill valid labeled values.\n  // Prove the guidance and submission state both transition.\n});",
       "testCases": [],
-      "solution": "const emailError = page.getByRole('alert');\nconst register = page.getByRole('button', { name: 'Register' });\nawait expect(emailError).toBeVisible();\nawait expect(page.getByText('Must be 8+ characters')).toBeVisible();\nawait expect(register).toBeDisabled();\nawait page.getByLabel('Email').fill('user@example.com');\nawait page.getByLabel('Password').fill('password123');\nawait expect(emailError).toBeHidden();\nawait expect(register).toBeEnabled();",
+      "solution": "const emailError = page.getByRole('alert');\nconst register = page.getByRole('button', { name: 'Register' });\nawait expect(emailError).toBeVisible();\nawait expect(emailError).toHaveText('Invalid email format');\nawait expect(register).toBeDisabled();\nawait page.getByLabel('Email').fill('user@example.com');\nawait page.getByLabel('Password').fill('password123');\nawait expect(emailError).toBeHidden();\nawait expect(register).toBeEnabled();",
       "validation": {
         "requiredAssertions": [
           "toBeVisible",
+          "toHaveText",
           "toBeDisabled",
           "toBeHidden",
           "toBeEnabled"
         ],
-        "requiredMethods": ["getByRole", "getByText", "getByLabel"]
+        "requiredMethods": ["getByRole", "getByLabel", "fill"]
       },
       "tags": ["playwright", "assertions", "scenario", "boss", "intermediate"]
     },
@@ -742,27 +752,27 @@
       "xpReward": 45,
       "order": 3200,
       "title": {
-        "en": "Click Actions",
-        "id": "Aksi Klik"
+        "en": "Activate a Counter Deliberately",
+        "id": "Aktifkan Counter dengan Sengaja"
       },
       "description": {
-        "en": "Master different types of click interactions.",
-        "id": "Kuasai berbagai jenis interaksi klik."
+        "en": "Use a semantic button click and prove each activation changed the visible counter.",
+        "id": "Gunakan semantic button click lalu buktikan setiap aktivasi mengubah counter yang terlihat."
       },
       "instructions": {
-        "en": "# Click Actions\n\n## Concept\nPlaywright provides the `click()` method to interact with elements. It automatically waits for the element to be visible and stable before clicking. Use `getByRole` for more resilient tests.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Submit' }).click();\nawait page.locator('.menu').click();\n```\n\n## Real World Scenario\nAlmost every interaction involves clicking. Whether it's submitting a form, adding an item to a shopping cart, or closing a modal dialog, reliable click actions are the heartbeat of E2E testing.\n\n## Your Task\n1. Click the increment button (`+`) 3 times.\n2. Verify the counter text is `'3'` using `expect(locator).toHaveText(...)`.\n",
-        "id": "# Aksi Klik\n\n## Concept\nPlaywright menyediakan metode `click()` untuk berinteraksi dengan elemen. Metode ini secara otomatis menunggu elemen menjadi terlihat dan stabil sebelum diklik. Gunakan `getByRole` untuk pengujian yang lebih tangguh.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Submit' }).click();\nawait page.locator('.menu').click();\n```\n\n## Real World Scenario\nHampir setiap interaksi melibatkan klik. Baik itu mengirimkan formulir, menambahkan item ke keranjang belanja, atau menutup dialog modal, tindakan klik yang andal adalah detak jantung pengujian E2E.\n\n## Tugas Kamu\n1. Klik tombol increment (`+`) sebanyak 3 kali.\n2. Verifikasi teks counter adalah `'3'` menggunakan `expect(locator).toHaveText(...)`.\n"
+        "en": "# Activate a Counter Deliberately\n\nThis standalone drill focuses on one contract: activate the button named **Increment** three times and prove the visible counter reaches `3`. A normal `click()` waits for the button to resolve uniquely and become actionable before each activation. It does not prove the counter changed, so finish with a web-first assertion.\n\n## Your Task\n1. Locate the **Increment** button by role and accessible name.\n2. Click it exactly three times.\n3. Locate the counter by its **Counter Value** label.\n4. Verify its text becomes `3` with `toHaveText()`.\n",
+        "id": "# Aktifkan Counter dengan Sengaja\n\nLatihan standalone ini fokus pada satu kontrak: aktifkan button **Increment** tiga kali lalu buktikan visible counter menjadi `3`. Normal `click()` menunggu button ditemukan secara unik dan actionable sebelum setiap aktivasi. Click belum membuktikan counter berubah, jadi tutup skenario dengan web-first assertion.\n\n## Tugas Kamu\n1. Cari button **Increment** berdasarkan role dan accessible name.\n2. Click tepat tiga kali.\n3. Cari counter berdasarkan label **Counter Value**.\n4. Verifikasi text-nya menjadi `3` dengan `toHaveText()`.\n"
       },
       "hints": {
         "en": [
-          "Focus on finding the specific action element that performs the calculation.",
-          "Use a locator that describes the element's purpose, like getByRole for a button.",
-          "Call the .click() method exactly as many times as requested, then use a 'toHaveText' assertion."
+          "Use `getByRole('button', { name: 'Increment' })` for the action target.",
+          "The counter has the accessible label `Counter Value`.",
+          "Perform three clicks, then use `toHaveText('3')` on the counter."
         ],
         "id": [
-          "Fokuslah untuk menemukan elemen aksi spesifik yang melakukan perhitungan.",
-          "Gunakan locator yang mendeskripsikan tujuan elemen, seperti getByRole untuk tombol.",
-          "Panggil metode .click() tepat sebanyak yang diminta, lalu gunakan asersi 'toHaveText'."
+          "Gunakan `getByRole('button', { name: 'Increment' })` untuk action target.",
+          "Counter punya accessible label `Counter Value`.",
+          "Lakukan tiga click, lalu pakai `toHaveText('3')` pada counter."
         ]
       },
       "htmlContent": "<div class=\"counter\">\n  <span id=\"count\" aria-label=\"Counter Value\">0</span>\n  <button aria-label=\"Increment\" onclick=\"document.getElementById('count').textContent = Number(document.getElementById('count').textContent) + 1\">+</button>\n</div>",
@@ -771,7 +781,7 @@
       "solution": "await page.getByRole('button', { name: 'Increment' }).click();\nawait page.getByRole('button', { name: 'Increment' }).click();\nawait page.getByRole('button', { name: 'Increment' }).click();\nawait expect(page.getByLabel('Counter Value')).toHaveText('3');",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "getByLabel"]
+        "requiredMethods": ["getByRole", "getByLabel", "click"]
       },
       "tags": ["playwright", "click", "actions", "intermediate"]
     },
@@ -787,12 +797,12 @@
         "id": "Isi Field Formulir"
       },
       "description": {
-        "en": "Input text into form fields.",
-        "id": "Masukkan teks ke dalam field formulir."
+        "en": "Set known form values with `fill()` and verify the value that matters.",
+        "id": "Atur known form value dengan `fill()` lalu verifikasi value yang penting."
       },
       "instructions": {
         "en": "# Fill Form Fields\n\nUse `fill()` when the test needs to set a form control to a known value. It replaces the existing value and fires input events. Character-by-character typing is for behavior that specifically depends on individual key events, not the routine default. Locate fields by their labels so the test follows the same form contract as the user.\n\n## Your Task\n1. Fill the **Email** field with `'qa@test.com'`.\n2. Fill the **Password** field with `'secret123'`.\n3. Verify the email field has the value `'qa@test.com'` using a web-first value assertion.\n",
-        "id": "# Isi Field Formulir\n\nGunakan `fill()` ketika test perlu mengatur kontrol formulir ke nilai yang sudah diketahui. Metode ini mengganti nilai lama dan memicu input event. Pengetikan karakter demi karakter digunakan hanya untuk perilaku yang memang bergantung pada setiap keyboard event, bukan sebagai default rutin. Temukan field berdasarkan label agar test mengikuti kontrak formulir yang sama dengan pengguna.\n\n## Tugas Kamu\n1. Isi field **Email** dengan `'qa@test.com'`.\n2. Isi field **Password** dengan `'secret123'`.\n3. Verifikasi field email memiliki nilai `'qa@test.com'` dengan web-first value assertion.\n"
+        "id": "# Isi Field Formulir\n\nGunakan `fill()` saat test perlu mengatur form control ke known value. Method ini mengganti existing value dan memicu input event. Character-by-character typing dipakai hanya untuk behavior yang memang bergantung pada setiap keyboard event, bukan sebagai default. Cari field berdasarkan label supaya test mengikuti form contract yang sama dengan user.\n\n## Tugas Kamu\n1. Isi field **Email** dengan `'qa@test.com'`.\n2. Isi field **Password** dengan `'secret123'`.\n3. Verifikasi Email punya value `'qa@test.com'` dengan `toHaveValue()`.\n"
       },
       "hints": {
         "en": [
@@ -824,16 +834,16 @@
       "xpReward": 55,
       "order": 3202,
       "title": {
-        "en": "Select Dropdowns",
-        "id": "Pilih Dropdown"
+        "en": "Choose a Native Select Option",
+        "id": "Pilih Option dari Native Select"
       },
       "description": {
-        "en": "Work with select elements and dropdowns.",
-        "id": "Bekerja dengan elemen select dan dropdown."
+        "en": "Use `selectOption()` on a real HTML select and verify its selected value.",
+        "id": "Gunakan `selectOption()` pada HTML select sungguhan lalu verifikasi selected value."
       },
       "instructions": {
-        "en": "# Select Dropdowns\n\n## Concept\nPlaywright makes dropdown selection easy with the `selectOption()` method. You can select by value, label, or index.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Country').selectOption('usa');\n```\n\n## Real World Scenario\nE-commerce checkouts often require selecting a Country or Shipping Method from a dropdown.\n\n## Your Task\n1. Select `'javascript'` from the **Choose Language** dropdown.\n2. Verify the dropdown value is `'javascript'` using `expect(locator).toHaveValue(...)`.\n",
-        "id": "# Pilih Dropdown\n\n## Concept\nPlaywright membuat pemilihan dropdown menjadi mudah dengan metode `selectOption()`. Anda dapat memilih berdasarkan value, label, atau index.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('Country').selectOption('usa');\n```\n\n## Real World Scenario\nCheckout e-commerce seringkali mengharuskan memilih Negara atau Metode Pengiriman dari dropdown.\n\n## Tugas Kamu\n1. Pilih `'javascript'` dari dropdown **Choose Language**.\n2. Verifikasi nilai dropdown adalah `'javascript'` menggunakan `expect(locator).toHaveValue(...)`.\n"
+        "en": "# Choose a Native Select Option\n\nThe **Choose Language** control is a real HTML `<select>`, so `selectOption()` expresses its native interaction. Custom dropdowns may need a combobox/listbox flow instead; do not use this method based on appearance alone.\n\n## Your Task\n1. Locate **Choose Language** by its label.\n2. Select the option whose value is `javascript`.\n3. Verify the selected value with `toHaveValue('javascript')`.\n",
+        "id": "# Pilih Option dari Native Select\n\nControl **Choose Language** adalah HTML `<select>` sungguhan, jadi `selectOption()` cocok dengan native interaction-nya. Custom dropdown mungkin membutuhkan combobox/listbox flow; jangan memilih method hanya dari tampilannya.\n\n## Tugas Kamu\n1. Cari **Choose Language** berdasarkan label.\n2. Pilih option dengan value `javascript`.\n3. Verifikasi selected value dengan `toHaveValue('javascript')`.\n"
       },
       "hints": {
         "en": [
@@ -851,6 +861,10 @@
       "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('select language', async ({ page }) => {\n  // 1. Select 'javascript' (use getByLabel)\n  // 2. Verify value\n});",
       "testCases": [],
       "solution": "await page.getByLabel('Choose Language:').selectOption('javascript');\nawait expect(page.getByLabel('Choose Language:')).toHaveValue('javascript');",
+      "validation": {
+        "requiredAssertions": ["toHaveValue"],
+        "requiredMethods": ["getByLabel", "selectOption"]
+      },
       "tags": ["playwright", "select", "dropdown", "intermediate"]
     },
     {
@@ -861,16 +875,16 @@
       "xpReward": 55,
       "order": 3203,
       "title": {
-        "en": "Checkbox & Radio",
-        "id": "Checkbox & Radio"
+        "en": "Set Checkbox State",
+        "id": "Atur Checkbox State"
       },
       "description": {
-        "en": "Toggle checkboxes and radio buttons.",
-        "id": "Ubah status checkbox dan tombol radio."
+        "en": "Ensure a required checkbox is selected without blindly toggling its state.",
+        "id": "Pastikan required checkbox terpilih tanpa blind toggle pada state-nya."
       },
       "instructions": {
-        "en": "# Checkbox & Radio\n\n## Concept\nUse `check()` and `uncheck()` to toggle checkboxes and radio buttons. These methods ensure the element is in the desired state, regardless of its previous status.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('I agree').check();\nawait page.getByLabel('Newsletter').uncheck();\n```\n\n## Real World Scenario\nBefore a user can create an account, they must almost always tick the \"I agree to Terms & Conditions\" box.\n\n## Your Task\n1. Check the **Accept Terms & Conditions** checkbox.\n2. Verify it is checked using `expect(locator).toBeChecked()`.\n",
-        "id": "# Checkbox & Radio\n\n## Concept\nGunakan `check()` dan `uncheck()` untuk mengubah status checkbox dan tombol radio. Metode ini memastikan elemen berada dalam status yang diinginkan, apapun status sebelumnya.\n\n## Code Example\n\n```javascript\nawait page.getByLabel('I agree').check();\nawait page.getByLabel('Newsletter').uncheck();\n```\n\n## Real World Scenario\nSebelum pengguna dapat membuat akun, mereka hampir selalu harus mencentang kotak \"Saya setuju dengan Syarat & Ketentuan\".\n\n## Tugas Kamu\n1. Centang checkbox **Accept Terms & Conditions**.\n2. Verifikasi bahwa itu sudah dicentang menggunakan `expect(locator).toBeChecked()`.\n"
+        "en": "# Set Checkbox State\n\nThe registration requirement says **Accept Terms & Conditions** must be selected. Use `check()` to express that desired state. Unlike a blind click, it will not turn the checkbox off if the setup changes and it is already selected.\n\n## Your Task\n1. Locate **Accept Terms & Conditions** by label.\n2. Ensure it is checked with `check()`.\n3. Verify the state with `toBeChecked()`.\n",
+        "id": "# Atur Checkbox State\n\nRequirement registrasinya mengatakan **Accept Terms & Conditions** harus terpilih. Gunakan `check()` untuk menjelaskan desired state tersebut. Berbeda dari blind click, method ini nggak akan mematikan checkbox kalau setup berubah dan state-nya sudah checked.\n\n## Tugas Kamu\n1. Cari **Accept Terms & Conditions** berdasarkan label.\n2. Pastikan state-nya checked dengan `check()`.\n3. Verifikasi state dengan `toBeChecked()`.\n"
       },
       "hints": {
         "en": [
@@ -892,7 +906,7 @@
         "requiredAssertions": ["toBeChecked"],
         "requiredMethods": ["getByLabel", "check"]
       },
-      "tags": ["playwright", "checkbox", "radio", "intermediate"]
+      "tags": ["playwright", "checkbox", "state", "intermediate"]
     },
     {
       "slug": "pw-keyboard-actions",
@@ -902,33 +916,37 @@
       "xpReward": 60,
       "order": 3204,
       "title": {
-        "en": "Keyboard Actions",
-        "id": "Aksi Keyboard"
+        "en": "Submit Search from Its Input",
+        "id": "Submit Search dari Input-nya"
       },
       "description": {
-        "en": "Simulate keyboard events like Enter, Escape, and typing.",
-        "id": "Simulasikan event keyboard seperti Enter, Escape, dan mengetik."
+        "en": "Direct Enter to the search control and verify the search outcome.",
+        "id": "Arahkan Enter ke search control lalu verifikasi search outcome."
       },
       "instructions": {
-        "en": "# Keyboard Actions\n\n## Concept\nPlaywright allows you to simulate keyboard events with `page.keyboard`. You can press specific keys, combinations, or even type natural sequences of characters.\n\n## Code Example\n\n```javascript\nawait page.keyboard.press('Enter');\nawait page.keyboard.press('Control+C');\n```\n\n## Real World Scenario\nSubmitting a search bar often happens by pressing \"Enter\" rather than clicking a button. Testing this behavior ensures the \"natural\" user flow works.\n\n## Your Task\n1. Type `'Playwright'` into the search input (use `getByPlaceholder`).\n2. Press `'Enter'` using the keyboard.\n3. Verify the result text (`#result`) is `'Searching for: Playwright'` using `expect(locator).toHaveText(...)`.\n",
-        "id": "# Aksi Keyboard\n\n## Concept\nPlaywright memungkinkan Anda mensimulasikan event keyboard dengan `page.keyboard`. Anda dapat menekan tombol tertentu, kombinasi tombol, atau bahkan mengetik urutan karakter yang alami.\n\n## Code Example\n\n```javascript\nawait page.keyboard.press('Enter');\nawait page.keyboard.press('Control+C');\n```\n\n## Real World Scenario\nMengirimkan bilah pencarian sering kali dilakukan dengan menekan \"Enter\" daripada mengklik tombol. Menguji perilaku ini memastikan alur pengguna yang \"alami\" berfungsi.\n\n## Tugas Kamu\n1. Ketik `'Playwright'` ke dalam input pencarian (gunakan `getByPlaceholder`).\n2. Tekan `'Enter'` menggunakan keyboard.\n3. Verifikasi teks hasil (`#result`) adalah `'Searching for: Playwright'` menggunakan `expect(locator).toHaveText(...)`.\n"
+        "en": "# Submit Search from Its Input\n\nThis page submits search when Enter is pressed while the searchbox has focus. Keep the key tied to that control with `locator.press()`; page-level keyboard input is unnecessary when the intended target is known. Use `fill()` because the final query value matters, then prove the result in the status region.\n\n## Your Task\n1. Locate the searchbox by role.\n2. Fill it with `Playwright`.\n3. Press `Enter` on that same locator.\n4. Verify the status is `Searching for: Playwright`.\n",
+        "id": "# Submit Search dari Input-nya\n\nPage ini menjalankan search ketika Enter ditekan saat searchbox punya focus. Kaitkan key dengan control tersebut memakai `locator.press()`; page-level keyboard input nggak diperlukan saat intended target sudah jelas. Gunakan `fill()` karena final query value yang penting, lalu buktikan result di status region.\n\n## Tugas Kamu\n1. Cari searchbox berdasarkan role.\n2. Isi dengan `Playwright`.\n3. Tekan `Enter` pada locator yang sama.\n4. Verifikasi status menjadi `Searching for: Playwright`.\n"
       },
       "hints": {
         "en": [
-          "Simulate a physical user interaction where a specific key is pressed to submit the form.",
-          "After filling the search input, use the 'page.keyboard' API to trigger the submission.",
-          "Call page.keyboard.press('Enter') and assert that the result message is visible on the page."
+          "Store `page.getByRole('searchbox')` so the fill and key press share one target.",
+          "Call `search.press('Enter')` rather than using a global keyboard action.",
+          "The result is exposed as a status region."
         ],
         "id": [
-          "Simulasikan interaksi pengguna fisik di mana kunci tertentu ditekan untuk mengirimkan formulir.",
-          "Setelah mengisi input pencarian, gunakan API 'page.keyboard' untuk memicu pengiriman.",
-          "Panggil page.keyboard.press('Enter') dan pastikan pesan hasilnya terlihat di halaman."
+          "Simpan `page.getByRole('searchbox')` supaya fill dan key press punya target yang sama.",
+          "Panggil `search.press('Enter')`, bukan global keyboard action.",
+          "Result tersedia sebagai status region."
         ]
       },
-      "htmlContent": "<div class=\"search-box\">\n  <input type=\"text\" id=\"search\" placeholder=\"Search...\" aria-label=\"Search\" />\n  <div id=\"result\" aria-live=\"polite\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Type term (use getByPlaceholder)\n  // 2. Press Enter\n  // 3. Verify result (use getByText)\n});",
+      "htmlContent": "<div class=\"search-box\">\n  <label for=\"search\">Search</label>\n  <input type=\"search\" id=\"search\" role=\"searchbox\" />\n  <div id=\"result\" role=\"status\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Locate and fill the searchbox.\n  // 2. Press Enter on that locator.\n  // 3. Verify the status result.\n});",
       "testCases": [],
-      "solution": "await page.getByPlaceholder('Search...').fill('Playwright');\nawait page.keyboard.press('Enter');\nawait expect(page.locator('#result')).toHaveText('Searching for: Playwright');",
+      "solution": "const search = page.getByRole('searchbox');\nawait search.fill('Playwright');\nawait search.press('Enter');\nawait expect(page.getByRole('status')).toHaveText('Searching for: Playwright');",
+      "validation": {
+        "requiredAssertions": ["toHaveText"],
+        "requiredMethods": ["getByRole", "fill", "press"]
+      },
       "tags": ["playwright", "keyboard", "input", "intermediate"]
     },
     {
@@ -939,16 +957,16 @@
       "xpReward": 60,
       "order": 3205,
       "title": {
-        "en": "Hover & Focus",
-        "id": "Hover & Fokus"
+        "en": "Reveal a Hover Menu",
+        "id": "Tampilkan Menu dengan Hover"
       },
       "description": {
-        "en": "Trigger hover states and element focus.",
-        "id": "Picu status hover dan fokus elemen."
+        "en": "Hover the control whose pointer behavior is under test and verify the revealed link.",
+        "id": "Hover pada control yang pointer behavior-nya diuji lalu verifikasi link yang muncul."
       },
       "instructions": {
-        "en": "# Hover & Focus\n\n## Concept\nSome elements only become visible or interactable when you hover over them with the mouse or focus on them with the keyboard. Playwright provides `hover()` and `focus()` methods to simulate these states.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nNavigation menus often reveal submenus only on hover. You need to simulate this hover action to make the submenu visible before you can click anything inside it.\n\n## Your Task\n1. Hover over the \"Products\" menu item.\n2. Verify the dropdown becomes visible by checking for the \"Laptop\" link.\n",
-        "id": "# Hover & Fokus\n\n## Concept\nBeberapa elemen hanya menjadi terlihat atau dapat berinteraksi saat Anda mengarahkan mouse (hover) di atasnya atau memfokuskan keyboard pada elemen tersebut. Playwright menyediakan metode `hover()` dan `focus()` untuk mensimulasikan status ini.\n\n## Code Example\n```javascript\nawait page.getByText('Menu Item').hover();\nawait page.getByLabel('Input Field').focus();\n```\n\n## Real World Scenario\nMenu navigasi sering kali menampilkan submenu hanya saat di-hover. Anda perlu mensimulasikan tindakan hover ini agar submenu terlihat sebelum Anda dapat mengklik apa pun di dalamnya.\n\n## Tugas Kamu\n1. Hover di atas menu item \"Products\".\n2. Verifikasi dropdown menjadi terlihat dengan memeriksa link \"Laptop\".\n"
+        "en": "# Reveal a Hover Menu\n\nThe requirement specifically covers pointer hover: moving over the **Products** menu reveals product links. Use `hover()` because hover behavior is the subject, then assert the user-relevant **Laptop** link rather than an implementation wrapper.\n\n## Your Task\n1. Locate the **Products** button by role.\n2. Hover over it.\n3. Verify the **Laptop** link becomes visible.\n",
+        "id": "# Tampilkan Menu dengan Hover\n\nRequirement-nya memang secara khusus menguji pointer hover: saat pointer berada di menu **Products**, product link akan muncul. Gunakan `hover()` karena hover behavior adalah subject test, lalu assert link **Laptop** yang dilihat user, bukan implementation wrapper.\n\n## Tugas Kamu\n1. Cari button **Products** berdasarkan role.\n2. Hover pada button tersebut.\n3. Verifikasi link **Laptop** menjadi visible.\n"
       },
       "hints": {
         "en": [
@@ -957,15 +975,19 @@
           "Hover over 'Products', then use expect(...).toBeVisible() to check if the 'Laptop' link appeared."
         ],
         "id": [
-          "Beberapa menu hanya menampilkan item mereka saat pengguna mengarahkan mouse-nya di atas area tertentu.",
-          "Gunakan metode '.hover()' pada teks menu target untuk memunculkan elemen yang tersembunyi.",
-          "Lakukan hover di atas 'Products', lalu gunakan expect(...).toBeVisible() untuk mengecek apakah link 'Laptop' muncul."
+          "Sebagian menu hanya menampilkan item saat pointer berada di control tertentu.",
+          "Gunakan `hover()` pada Products button untuk memunculkan hidden link.",
+          "Setelah hover, pakai `toBeVisible()` pada link Laptop."
         ]
       },
-      "htmlContent": "<div class=\"nav\">\n  <div id=\"menu\" onmouseover=\"document.getElementById('dropdown').style.display='block'\" onmouseout=\"document.getElementById('dropdown').style.display='none'\">Products</div>\n  <div id=\"dropdown\" style=\"display:none;\">\n    <a href=\"#\">Laptop</a>\n    <a href=\"#\">Phone</a>\n  </div>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('hover menu', async ({ page }) => {\n  // 1. Hover 'Products' (use getByText)\n  // 2. Verify dropdown visible\n});",
+      "htmlContent": "<nav aria-label=\"Product navigation\">\n  <div onmouseenter=\"document.getElementById('dropdown').style.display='block'\">\n    <button type=\"button\">Products</button>\n    <div id=\"dropdown\" style=\"display:none;\">\n      <a href=\"#laptop\">Laptop</a>\n      <a href=\"#phone\">Phone</a>\n    </div>\n  </div>\n</nav>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('hover menu', async ({ page }) => {\n  // Hover the Products button.\n  // Verify the Laptop link is visible.\n});",
       "testCases": [],
-      "solution": "await page.getByText('Products').hover();\nawait expect(page.locator('#dropdown')).toBeVisible();",
+      "solution": "await page.getByRole('button', { name: 'Products' }).hover();\nawait expect(page.getByRole('link', { name: 'Laptop' })).toBeVisible();",
+      "validation": {
+        "requiredAssertions": ["toBeVisible"],
+        "requiredMethods": ["getByRole", "hover"]
+      },
       "tags": ["playwright", "hover", "focus", "intermediate"]
     },
     {
@@ -980,12 +1002,12 @@
         "id": "Unggah File"
       },
       "description": {
-        "en": "Handle file inputs and uploads.",
-        "id": "Tangani input file dan unggahan."
+        "en": "Set a file input and prove the application recognized the selected filename.",
+        "id": "Atur file input lalu buktikan aplikasi mengenali selected filename."
       },
       "instructions": {
-        "en": "# File Upload\n\nUse `setInputFiles()` to set a file input without automating the operating-system picker. In a real Playwright project, a string such as `tests/fixtures/resume.pdf` is a filesystem path and the file must exist. An in-memory payload is an alternative when no fixture file is needed.\n\nIn this browser playground, upload the simulated file `resume.pdf` through the **Upload Resume** label and assert that the status contains its name.",
-        "id": "# Unggah File\n\nGunakan `setInputFiles()` untuk mengatur file input tanpa mengotomasi picker milik operating system. Dalam project Playwright nyata, string seperti `tests/fixtures/resume.pdf` adalah path filesystem dan file tersebut harus tersedia. Payload in-memory menjadi alternatif jika fixture file tidak dibutuhkan.\n\nDi browser playground ini, upload file simulasi `resume.pdf` melalui label **Upload Resume** dan periksa bahwa status berisi nama file tersebut."
+        "en": "# Upload a Resume\n\nUse `setInputFiles()` to set the **Upload Resume** file input without automating the operating-system picker. In a real Playwright project, a string such as `tests/fixtures/resume.pdf` is a filesystem path and that file must exist. An in-memory payload is another option when no fixture is needed.\n\nThis browser playground simulates `resume.pdf`, so no local fixture is required here. Set that filename, then prove the application status contains `resume.pdf`. The status—not the method returning—is the observable outcome.\n",
+        "id": "# Upload Resume\n\nGunakan `setInputFiles()` untuk mengatur file input **Upload Resume** tanpa mengotomasi operating-system picker. Di real Playwright project, string seperti `tests/fixtures/resume.pdf` adalah filesystem path dan file tersebut wajib ada. In-memory payload juga bisa dipakai saat fixture nggak dibutuhkan.\n\nBrowser playground ini mensimulasikan `resume.pdf`, jadi kamu nggak membutuhkan local fixture. Atur filename tersebut, lalu buktikan application status berisi `resume.pdf`. Status-nya—bukan sekadar method selesai—adalah observable outcome.\n"
       },
       "hints": {
         "en": [
@@ -999,10 +1021,14 @@
           "Panggil setInputFiles('resume.pdf') pada locator input file dan verifikasi teks status mencerminkan pilihan ini."
         ]
       },
-      "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume:</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div id=\"status\" aria-label=\"Upload Status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.getElementById('status').textContent = 'Selected: ' + file.name;\n  });\n</script>",
+      "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div role=\"status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.querySelector('[role=status]').textContent = 'Selected: ' + file.name;\n  });\n</script>",
       "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  // 1. Upload 'resume.pdf' to 'Upload Resume'\n  // 2. Verify status text\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Upload Resume:').setInputFiles('resume.pdf');\nawait expect(page.locator('#status')).toContainText('resume.pdf');",
+      "solution": "await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');\nawait expect(page.getByRole('status')).toContainText('resume.pdf');",
+      "validation": {
+        "requiredAssertions": ["toContainText"],
+        "requiredMethods": ["getByLabel", "getByRole", "setInputFiles"]
+      },
       "tags": ["playwright", "upload", "files", "intermediate"]
     },
     {
@@ -1017,12 +1043,12 @@
         "id": "Seret dan Lepas"
       },
       "description": {
-        "en": "Drag elements to drop zones.",
-        "id": "Seret elemen ke zona jatuhkan."
+        "en": "Move a card with `dragTo()` and verify the destination accepted it.",
+        "id": "Pindahkan card dengan `dragTo()` lalu verifikasi destination menerimanya."
       },
       "instructions": {
-        "en": "# Drag and Drop\n\n## Concept\nPerform complex mouse gestures easily with the `dragTo()` method. Playwright handles the sequence of mouse down, move, and up for you.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nKanban boards (like Trello/Jira) use drag-and-drop extensively to move tickets between columns. Testing this interaction ensures the \"drop\" event actually fires and updates the UI.\n\n## Your Task\n1. Drag the element with text `'Drag'`.\n2. Drop it into the element with text `'Zone'`.\n3. Verify the zone text becomes `'Dropped!'` using `expect(page.getByText('Dropped!')).toBeVisible()`.\n",
-        "id": "# Seret dan Lepas\n\n## Concept\nLakukan gerakan mouse yang kompleks dengan mudah menggunakan metode `dragTo()`. Playwright menangani urutan mouse down, move, dan up untuk Anda.\n\n## Code Example\n\n```javascript\nawait page.getByText('Source').dragTo(page.getByText('Target'));\n```\n\n## Real World Scenario\nPapan Kanban (seperti Trello/Jira) menggunakan seret-dan-lepas secara ekstensif untuk memindahkan tiket antar kolom. Menguji interaksi ini memastikan event \"drop\" benar-benar terjadi dan memperbarui UI.\n\n## Tugas Kamu\n1. Seret elemen dengan teks `'Drag'`.\n2. Jatuhkan ke dalam elemen dengan teks `'Zone'`.\n3. Verifikasi teks zona menjadi `'Dropped!'` menggunakan `expect(page.getByText('Dropped!')).toBeVisible()`.\n"
+        "en": "# Drag a Work Item\n\nThis board deliberately requires drag-and-drop. Use `dragTo()` to move **Drag Me** to **Drop Here**. Calling the action is not enough: prove the destination displays **Dropped!**, which is the board's observable acceptance signal.\n\n## Your Task\n1. Locate the source by its text **Drag Me**.\n2. Drag it to the target **Drop Here**.\n3. Verify **Dropped!** becomes visible.\n",
+        "id": "# Drag Work Item\n\nBoard ini memang secara sengaja membutuhkan drag-and-drop. Gunakan `dragTo()` untuk memindahkan **Drag Me** ke **Drop Here**. Memanggil action saja belum cukup: buktikan destination menampilkan **Dropped!** sebagai observable acceptance signal dari board.\n\n## Tugas Kamu\n1. Cari source dari text **Drag Me**.\n2. Drag ke target **Drop Here**.\n3. Verifikasi **Dropped!** menjadi visible.\n"
       },
       "hints": {
         "en": [
@@ -1036,10 +1062,14 @@
           "Panggil getByText('Drag').dragTo(page.getByText('Zone')) dan pastikan pesan 'Dropped!' terlihat."
         ]
       },
-      "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:100px;height:100px;background:#3b82f6;color:white;display:flex;align-items:center;justify-content:center;cursor:grab;user-select:none;\">Drag Me</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed #9ca3af;margin-top:20px;display:flex;align-items:center;justify-content:center;\">Drop Here</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n  \n  item.addEventListener('dragstart', e => {\n    e.dataTransfer.setData('text/plain', 'dragged');\n    e.dataTransfer.effectAllowed = 'move';\n  });\n  zone.addEventListener('dragover', e => {\n    e.preventDefault();\n    e.dataTransfer.dropEffect = 'move';\n  });\n  zone.addEventListener('drop', e => {\n    e.preventDefault();\n    const data = e.dataTransfer.getData('text/plain');\n    if (data === 'dragged') {\n      zone.textContent = 'Dropped!';\n      zone.style.backgroundColor = '#10b981';\n      zone.style.color = 'white';\n      zone.style.border = 'none';\n    }\n  });\n</script>",
+      "htmlContent": "<div class=\"dnd-area\">\n  <div id=\"item\" draggable=\"true\" style=\"width:100px;height:100px;background:#3b82f6;color:white;display:flex;align-items:center;justify-content:center;cursor:grab;user-select:none;\">Drag Me</div>\n  <div id=\"zone\" style=\"width:100px;height:100px;border:2px dashed #9ca3af;margin-top:20px;display:flex;align-items:center;justify-content:center;\">Drop Here</div>\n</div>\n<script>\n  const item = document.getElementById('item');\n  const zone = document.getElementById('zone');\n\n  item.addEventListener('dragstart', () => {\n    item.dataset.dragging = 'true';\n  });\n  zone.addEventListener('dragover', (event) => {\n    event.preventDefault();\n  });\n  zone.addEventListener('drop', (event) => {\n    event.preventDefault();\n    if (item.dataset.dragging === 'true') {\n      zone.textContent = 'Dropped!';\n      zone.style.backgroundColor = '#10b981';\n      zone.style.color = 'white';\n      zone.style.border = 'none';\n    }\n  });\n</script>",
       "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('drag and drop', async ({ page }) => {\n  // 1. Drag 'Drag Me' to 'Drop Here'\n  // 2. Verify zone text is 'Dropped!'\n});",
       "testCases": [],
       "solution": "await page.getByText('Drag Me').dragTo(page.getByText('Drop Here'));\nawait expect(page.getByText('Dropped!')).toBeVisible();",
+      "validation": {
+        "requiredAssertions": ["toBeVisible"],
+        "requiredMethods": ["getByText", "dragTo"]
+      },
       "tags": ["playwright", "drag", "drop", "actions", "intermediate"]
     },
     {
@@ -1050,53 +1080,57 @@
       "xpReward": 75,
       "order": 3208,
       "title": {
-        "en": "Working with Frames",
-        "id": "Bekerja dengan Frame"
+        "en": "Enter a Payment Frame",
+        "id": "Masuk ke Payment Frame"
       },
       "description": {
-        "en": "Select elements inside iframes.",
-        "id": "Pilih elemen di dalam iframe."
+        "en": "Cross a confirmed iframe boundary and use a normal label locator inside it.",
+        "id": "Lewati iframe boundary yang sudah dikonfirmasi lalu gunakan normal label locator di dalamnya."
       },
       "instructions": {
-        "en": "# Working with Frames\n\n## Concept\nIf content is inside an `<iframe>`, normal locators won't find it! You must first locate the frame using `frameLocator()`, and then use that frame to find elements inside it.\n\n## Code Example\n\n```javascript\n// 1. Locate the frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Locate element by role/text inside the frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nEmbedded payment forms (like Stripe) or third-party widgets often live in iframes for security. You must switch context to interaction with them.\n\n## Your Task\n1. Locate the iframe.\n2. Find the input inside it using `getByPlaceholder('Card Number')`.\n3. Fill it with `'1234'`. \n4. Verify the value using `toHaveValue()`.\n",
-        "id": "# Bekerja dengan Frame\n\n## Concept\nJika konten berada di dalam `<iframe>`, locator normal tidak akan menemukannya! Anda harus terlebih dahulu menemukan frame tersebut menggunakan `frameLocator()`, lalu menggunakan frame tersebut untuk menemukan elemen di dalamnya.\n\n## Code Example\n\n```javascript\n// 1. Temukan frame\nconst frame = page.frameLocator('iframe');\n\n// 2. Temukan elemen berdasarkan role/text di dalam frame\nawait frame.getByRole('button').click();\n```\n\n## Real World Scenario\nFormulir pembayaran tertanam (seperti Stripe) atau widget pihak ketiga sering kali berada dalam iframe demi keamanan. Anda harus mengganti konteks untuk berinteraksi dengan mereka.\n\n## Tugas Kamu\n1. Temukan iframe.\n2. Temukan input di dalamnya menggunakan `getByPlaceholder('Card Number')`.\n3. Isi dengan `'1234'`.\n4. Verifikasi nilai menggunakan `toHaveValue()`.\n"
+        "en": "# Enter a Payment Frame\n\nDevTools confirms the card field is inside an iframe titled **Secure payment**. An iframe owns a separate document, so main-page locators cannot search inside it. Enter that boundary with `frameLocator()`, then use the field's normal **Card number** label.\n\n## Your Task\n1. Locate the frame by its `Secure payment` title.\n2. Within that frame, locate **Card number** by label.\n3. Fill it with `1234`.\n4. Verify the value with `toHaveValue('1234')`.\n",
+        "id": "# Masuk ke Payment Frame\n\nDevTools sudah mengonfirmasi card field berada di iframe berjudul **Secure payment**. Iframe memiliki document terpisah, jadi main-page locator nggak bisa mencari ke dalamnya. Masuk ke boundary itu dengan `frameLocator()`, lalu gunakan normal label **Card number**.\n\n## Tugas Kamu\n1. Cari frame berdasarkan title `Secure payment`.\n2. Di dalam frame, cari **Card number** berdasarkan label.\n3. Isi dengan `1234`.\n4. Verifikasi value dengan `toHaveValue('1234')`.\n"
       },
       "hints": {
         "en": [
-          "Elements inside a sub-page (iframe) are isolated from the main page's locator searches.",
-          "Use 'frameLocator()' to gain access to the iframe's content before trying to find the input inside it.",
-          "Create a 'const frame = page.frameLocator('iframe');' then use frame.getByPlaceholder(...) to fill and verify."
+          "Use the frame's meaningful title instead of a generic `iframe` selector.",
+          "After creating the frame locator, use `getByLabel('Card number')` inside it.",
+          "Assert the field value on the same frame-scoped locator."
         ],
         "id": [
-          "Elemen di dalam sub-halaman (iframe) terisolasi dari pencarian locator halaman utama.",
-          "Gunakan 'frameLocator()' untuk mendapatkan akses ke konten iframe sebelum mencoba menemukan input di dalamnya.",
-          "Buat 'const frame = page.frameLocator('iframe');' lalu gunakan frame.getByPlaceholder(...) untuk mengisi dan memverifikasi."
+          "Gunakan meaningful title milik frame, bukan generic `iframe` selector.",
+          "Setelah membuat frame locator, gunakan `getByLabel('Card number')` di dalamnya.",
+          "Assert field value pada frame-scoped locator yang sama."
         ]
       },
-      "htmlContent": "<iframe id=\"payment-frame\" srcdoc='<input id=\"card-number\" placeholder=\"Card Number\">'></iframe>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  // 1. Frame locator\n  // 2. Fill #card-number\n  // 3. Verify value\n});",
+      "htmlContent": "<iframe title=\"Secure payment\" srcdoc='<label for=\"card-number\">Card number</label><input id=\"card-number\">'></iframe>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  // 1. Enter the Secure payment frame.\n  // 2. Fill Card number.\n  // 3. Verify its value.\n});",
       "testCases": [],
-      "solution": "const frame = page.frameLocator('#payment-frame');\nawait frame.getByPlaceholder('Card Number').fill('1234');\nawait expect(frame.getByPlaceholder('Card Number')).toHaveValue('1234');",
+      "solution": "const frame = page.frameLocator('[title=\"Secure payment\"]');\nconst cardNumber = frame.getByLabel('Card number');\nawait cardNumber.fill('1234');\nawait expect(cardNumber).toHaveValue('1234');",
+      "validation": {
+        "requiredAssertions": ["toHaveValue"],
+        "requiredMethods": ["frameLocator", "getByLabel", "fill"]
+      },
       "tags": ["playwright", "frames", "iframes", "intermediate"]
     },
     {
       "slug": "pw-dynamic-table",
       "type": "PLAYWRIGHT",
       "difficulty": "MEDIUM",
-      "category": "playwright-navigation",
+      "category": "playwright-locators",
       "xpReward": 90,
       "order": 3209,
       "title": {
-        "en": "Dynamic Tables",
-        "id": "Tabel Dinamis"
+        "en": "Complete a Named Project Row",
+        "id": "Selesaikan Project Row yang Tepat"
       },
       "description": {
-        "en": "Find a row by text and interact with its internals.",
-        "id": "Temukan baris berdasarkan teks dan berinteraksi dengan bagian dalamnya."
+        "en": "Transfer locator composition into a changing table and verify the row-local outcome.",
+        "id": "Terapkan locator composition pada changing table lalu verifikasi row-local outcome."
       },
       "instructions": {
-        "en": "# Dynamic Tables\n\n## Concept\nWhen dealing with dynamic data, you often need to find a container (like a table row) that contains specific text, and then find an interactive element inside that container using `filter()`.\n\n## Code Example\n\n```javascript\nconst row = page.locator('tr').filter({ hasText: 'Alice' });\nawait row.locator('.edit-btn').click();\n```\n\n## Real World Scenario\nAdmin dashboards often list users or orders. You can't just click the \"third edit button\" because sorting might change. You need to find the *user named Alice* and click *her* edit button.\n\n## Your Task\n1. Find the row containing \"Project X\" (`.task-row`).\n2. Click the \"Complete\" button inside that row.\n3. Verify the row status (`.status`) becomes `'Done'` using `expect(locator).toHaveText(...)`.\n",
-        "id": "# Tabel Dinamis\n\n## Concept\nSaat berurusan dengan data dinamis, Anda sering kali perlu menemukan kontainer (seperti baris tabel) yang berisi teks tertentu, lalu menemukan elemen interaktif di dalam kontainer tersebut menggunakan `filter()`.\n\n## Code Example\n\n```javascript\nconst row = page.locator('tr').filter({ hasText: 'Alice' });\nawait row.locator('.edit-btn').click();\n```\n\n## Real World Scenario\nDasbor admin sering mencantumkan pengguna atau pesanan. Anda tidak bisa hanya mengklik \"tombol edit ketiga\" karena penyortiran mungkin berubah. Anda perlu menemukan *pengguna bernama Alice* dan mengklik tombol edit *miliknya*.\n\n## Tugas Kamu\n1. Temukan baris yang berisi \"Project X\" (`.task-row`).\n2. Klik tombol \"Complete\" di dalam baris itu.\n3. Verifikasi status baris (`.status`) menjadi `'Done'` menggunakan `expect(locator).toHaveText(...)`.\n"
+        "en": "# Complete a Named Project Row\n\nThis is a transfer exercise from Module 4: table order can change, so position is not project identity. Find the row that contains **Project X**, perform **Complete** only inside that row, and verify that same row reports **Done**. The final assertion proves both the action outcome and the scope.\n\n## Your Task\n1. Start from the collection of `row` roles.\n2. Filter to the row containing `Project X`.\n3. Click its **Complete** button.\n4. Verify its local status becomes `Done`.\n",
+        "id": "# Selesaikan Project Row yang Tepat\n\nIni transfer exercise dari Module 4: table order bisa berubah, jadi position bukan project identity. Cari row yang berisi **Project X**, jalankan **Complete** hanya di row tersebut, lalu verifikasi row yang sama menampilkan **Done**. Final assertion membuktikan action outcome sekaligus scope-nya.\n\n## Tugas Kamu\n1. Mulai dari collection dengan role `row`.\n2. Filter ke row yang berisi `Project X`.\n3. Click button **Complete** di dalamnya.\n4. Verifikasi local status menjadi `Done`.\n"
       },
       "hints": {
         "en": [
@@ -1116,7 +1150,7 @@
       "solution": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  const row = page.getByRole('row').filter({ hasText: 'Project X' });\n  await row.getByRole('button', { name: 'Complete' }).click();\n  await expect(row.getByRole('status')).toHaveText('Done');\n});",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "filter"]
+        "requiredMethods": ["getByRole", "filter", "click"]
       },
       "tags": ["playwright", "tables", "filter", "intermediate"]
     },
@@ -1128,36 +1162,36 @@
       "xpReward": 100,
       "order": 3210,
       "title": {
-        "en": "Scenario: E-Commerce Checkout",
-        "id": "Skenario: Checkout E-Commerce"
+        "en": "Core Scenario: Express Checkout State",
+        "id": "Core Scenario: Express Checkout State"
       },
       "description": {
-        "en": "Complete a full checkout flow using accessibility-first locators.",
-        "id": "Selesaikan alur checkout lengkap menggunakan locator berbasis aksesibilitas."
+        "en": "Choose actions that express quantity and shipping state, then prove the checkout outcome.",
+        "id": "Pilih action yang menjelaskan quantity dan shipping state, lalu buktikan checkout outcome."
       },
       "instructions": {
-        "en": "# Scenario: E-Commerce Checkout\n\n## Concept\nA complete E2E flow involves chaining multiple interactions: finding elements, entering data, and verifying the final outcome. Using accessibility-first locators (`getByRole`, `getByLabel`) makes these flows more resilient to UI changes.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Purchase' }).click();\nawait page.getByLabel('Address').fill('123 Main St');\nawait expect(page.locator('#receipt')).toBeVisible();\n```\n\n## Real World Scenario\nUsing explicit IDs makes tests brittle. If a developer changes `#qty` to `#quantity-input`, your test fails. But if they remove the \"Quantity\" label, *users* can't use the form either. Testing against the label ensures the app is usable.\n\n## Your Task\n1.  **Add to Cart**: Click the button with name \"Add to Cart\".\n2.  **Update Qty**: Fill the input labeled \"Quantity\" with `'3'`.\n3.  **Shipping**: Check the checkbox labeled \"Express Shipping\".\n4.  **Checkout**: Click the button named \"Checkout\".\n5.  **Verify**: Confirm the confirmation message (`#confirmation`) contains `'3 items (Express)'`.\n",
-        "id": "# Skenario: Checkout E-Commerce\n\n## Concept\nAlur E2E yang lengkap melibatkan perangkaian beberapa interaksi: menemukan elemen, memasukkan data, dan memverifikasi hasil akhir. Menggunakan locator berbasis aksesibilitas (`getByRole`, `getByLabel`) membuat alur ini lebih tangguh terhadap perubahan UI.\n\n## Code Example\n```javascript\nawait page.getByRole('button', { name: 'Purchase' }).click();\nawait page.getByLabel('Address').fill('123 Main St');\nawait expect(page.locator('#receipt')).toBeVisible();\n```\n\n## Real World Scenario\nMenggunakan ID eksplisit membuat pengujian menjadi rapuh. Jika pengembang mengubah `#qty` menjadi `#quantity-input`, pengujian Anda gagal. Namun jika mereka menghapus label \"Quantity\", *pengguna* juga tidak dapat menggunakan formulir tersebut. Pengujian terhadap label memastikan aplikasi dapat digunakan.\n\n## Tugas Kamu\n1.  **Add to Cart**: Klik tombol dengan nama \"Add to Cart\".\n2.  **Update Qty**: Isi input berlabel \"Quantity\" dengan `'3'`.\n3.  **Shipping**: Centang checkbox berlabel \"Express Shipping\".\n4.  **Checkout**: Klik tombol bernama \"Checkout\".\n5.  **Verifikasi**: Konfirmasikan pesan konfirmasi (`#confirmation`) berisi `'3 items (Express)'`.\n"
+        "en": "# Core Scenario: Express Checkout State\n\nThe business requirement is: add Widget Pro, set quantity to `3`, keep **Express Shipping** enabled, and complete checkout. The checkbox deliberately starts selected. A blind click would turn the required state off, so use `check()` to express the state instead of a toggle. Use `fill()` for the known quantity, normal button clicks for activation, and a status assertion for the final evidence.\n\n## Your Task\n1. Click the **Add to Cart** button.\n2. Fill **Quantity** with `3`.\n3. Ensure **Express Shipping** is checked without blindly toggling it.\n4. Click **Checkout**.\n5. Verify the status contains `3 items (Express)`.\n",
+        "id": "# Core Scenario: Express Checkout State\n\nBusiness requirement-nya adalah: tambahkan Widget Pro, atur quantity menjadi `3`, pastikan **Express Shipping** tetap aktif, lalu selesaikan checkout. Checkbox sengaja dimulai dalam checked state. Blind click justru akan mematikan required state, jadi gunakan `check()` untuk menjelaskan state, bukan toggle. Gunakan `fill()` untuk known quantity, normal button click untuk aktivasi, dan status assertion sebagai final evidence.\n\n## Tugas Kamu\n1. Click button **Add to Cart**.\n2. Isi **Quantity** dengan `3`.\n3. Pastikan **Express Shipping** checked tanpa blind toggle.\n4. Click **Checkout**.\n5. Verifikasi status berisi `3 items (Express)`.\n"
       },
       "hints": {
         "en": [
-          "Chain together a series of realistic user steps: adding to cart, updating numbers, and checking out.",
-          "Prioritize using accessibility-first locators like getByRole and getByLabel for every step of the flow.",
-          "Add to cart, set Quantity to '3', check Express Shipping, and click Checkout. Assert the confirmation message."
+          "Use button roles for activation and labels for the form controls.",
+          "The checkbox already starts checked; `check()` preserves the required state.",
+          "Assert the final status after Checkout rather than inspecting intermediate DOM implementation."
         ],
         "id": [
-          "Rangkai serangkaian langkah pengguna yang realistis: menambahkan ke keranjang, memperbarui angka, dan checkout.",
-          "Prioritaskan penggunaan locator accessibility-first seperti getByRole dan getByLabel untuk setiap langkah alur.",
-          "Tambahkan ke keranjang, set Quantity ke '3', centang Express Shipping, dan klik Checkout. Lakukan asersi pesan konfirmasi."
+          "Gunakan button role untuk aktivasi dan label untuk form control.",
+          "Checkbox sudah dimulai dalam checked state; `check()` menjaga required state tetap benar.",
+          "Assert final status setelah Checkout, bukan intermediate DOM implementation."
         ]
       },
-      "htmlContent": "<div class=\"shop\">\n  <div class=\"product\">\n    <h3>Widget Pro</h3>\n    <button id=\"add-btn\" onclick=\"addToCart()\">Add to Cart</button>\n  </div>\n  <div class=\"cart\" style=\"display:none;\">\n    <label for=\"qty\">Quantity</label>\n    <input type=\"number\" id=\"qty\" value=\"1\" />\n    <label><input type=\"checkbox\" id=\"express\" /> Express Shipping</label>\n    <button id=\"checkout-btn\" onclick=\"checkout()\">Checkout</button>\n  </div>\n  <div id=\"confirmation\" role=\"status\" style=\"display:none;\"></div>\n</div>\n<script>\n  function addToCart() {\n    document.querySelector('.cart').style.display = 'block';\n    document.getElementById('add-btn').textContent = 'Added!';\n  }\n  function checkout() {\n    const qty = document.getElementById('qty').value;\n    const express = document.getElementById('express').checked;\n    document.getElementById('confirmation').style.display = 'block';\n    document.getElementById('confirmation').textContent = \n      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');\n  }\n</script>",
+      "htmlContent": "<div class=\"shop\">\n  <div class=\"product\">\n    <h3>Widget Pro</h3>\n    <button id=\"add-btn\" onclick=\"addToCart()\">Add to Cart</button>\n  </div>\n  <div class=\"cart\" style=\"display:none;\">\n    <label for=\"qty\">Quantity</label>\n    <input type=\"number\" id=\"qty\" value=\"1\" />\n    <label><input type=\"checkbox\" id=\"express\" checked /> Express Shipping</label>\n    <button id=\"checkout-btn\" onclick=\"checkout()\">Checkout</button>\n  </div>\n  <div id=\"confirmation\" role=\"status\" style=\"display:none;\"></div>\n</div>\n<script>\n  function addToCart() {\n    document.querySelector('.cart').style.display = 'block';\n    document.getElementById('add-btn').textContent = 'Added!';\n  }\n  function checkout() {\n    const qty = document.getElementById('qty').value;\n    const express = document.getElementById('express').checked;\n    document.getElementById('confirmation').style.display = 'block';\n    document.getElementById('confirmation').textContent = \n      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');\n  }\n</script>",
       "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('checkout flow', async ({ page }) => {\n  // 1. Click \"Add to Cart\" (getByRole)\n  // 2. Fill \"Quantity\" to \"3\" (getByLabel)\n  // 3. Check \"Express Shipping\" (getByLabel)\n  // 4. Click \"Checkout\" (getByRole)\n  // 5. Verify confirmation text\n});",
       "testCases": [],
       "solution": "await page.getByRole('button', { name: 'Add to Cart' }).click();\nawait page.getByLabel('Quantity').fill('3');\nawait page.getByLabel('Express Shipping').check();\nawait page.getByRole('button', { name: 'Checkout' }).click();\nawait expect(page.getByRole('status')).toContainText('3 items (Express)');",
       "validation": {
         "requiredAssertions": ["toContainText"],
-        "requiredMethods": ["getByRole", "getByLabel", "fill", "check"]
+        "requiredMethods": ["getByRole", "getByLabel", "click", "fill", "check"]
       },
       "tags": ["playwright", "scenario", "boss", "checkout", "intermediate"]
     },
@@ -1216,8 +1250,8 @@
         "id": "Ganti fixed delay dengan assertion yang menunggu hasil save yang dapat diamati pengguna."
       },
       "instructions": {
-        "en": "# Wait for the Outcome\n\nClick the `Save profile` button using its role and accessible name. The application updates the status asynchronously. Prove that the status eventually contains `Profile saved` with a web-first text assertion. Do not use `waitForTimeout`; the test must wait for meaning, not elapsed time.",
-        "id": "# Tunggu Hasil\n\nKlik button `Save profile` menggunakan role dan accessible name. Aplikasi memperbarui status secara asynchronous. Buktikan status akhirnya berisi `Profile saved` dengan web-first text assertion. Jangan gunakan `waitForTimeout`; test harus menunggu makna, bukan waktu yang berlalu."
+        "en": "# Wait for the Outcome, Not the Clock\n\nThis standalone page changes its status from `Not saved` to `Saving…` and then asynchronously to `Profile saved`. A successful button click proves only that the action was possible. Prove the product outcome with a retried text assertion on the status region.\n\n## Your Task\n1. Click **Save profile** by role and accessible name.\n2. Verify the status eventually has the exact text `Profile saved`.\n3. Do not use `waitForTimeout()`; wait for the observable condition, not elapsed time.\n",
+        "id": "# Tunggu Outcome, Bukan Waktu\n\nStandalone page ini mengubah status dari `Not saved` menjadi `Saving…`, lalu secara asynchronous menjadi `Profile saved`. Button click yang berhasil baru membuktikan action bisa dilakukan. Buktikan product outcome dengan retried text assertion pada status region.\n\n## Tugas Kamu\n1. Click **Save profile** berdasarkan role dan accessible name.\n2. Verifikasi status akhirnya punya exact text `Profile saved`.\n3. Jangan pakai `waitForTimeout()`; tunggu observable condition, bukan waktu yang berlalu.\n"
       },
       "hints": {
         "en": [
@@ -1256,51 +1290,55 @@
       "slug": "pw-debug-flaky-test",
       "type": "PLAYWRIGHT",
       "difficulty": "HARD",
-      "category": "playwright-waits",
+      "category": "playwright-debugging",
       "xpReward": 120,
       "order": 3301,
       "title": {
-        "en": "Repair an AI-Generated Flaky Test",
-        "id": "Perbaiki Flaky Test Buatan AI"
+        "en": "Core Investigation: Repair the Wrong-Order Test",
+        "id": "Core Investigation: Perbaiki Test yang Salah Order"
       },
       "description": {
-        "en": "Remove masking waits and weak checks from generated code, then prove the delayed business outcome.",
-        "id": "Hapus wait yang menyembunyikan masalah dan pemeriksaan lemah dari kode buatan AI, lalu buktikan hasil bisnis yang tertunda."
+        "en": "Use supplied failure evidence to remove an order-selection assumption, masking wait, and weak snapshot assertion.",
+        "id": "Gunakan supplied failure evidence untuk menghapus order-selection assumption, masking wait, dan weak snapshot assertion."
       },
       "instructions": {
-        "en": "# Repair the Generated Test\n\nThe starter test was generated from a vague prompt. It uses a structural CSS locator, a fixed sleep, and a one-time `textContent` check. Repair it so that it:\n\n1. locates `Submit order` by role and accessible name;\n2. clicks once;\n3. uses a web-first assertion to prove the status contains `Order submitted`;\n4. contains no `waitForTimeout`.\n\nDo not catch or suppress assertion errors.",
-        "id": "# Perbaiki Test Hasil Generate\n\nStarter test dibuat dari prompt yang samar. Kode memakai structural CSS locator, fixed sleep, dan pemeriksaan `textContent` satu kali. Perbaiki agar:\n\n1. menemukan `Submit order` berdasarkan role dan accessible name;\n2. mengklik satu kali;\n3. memakai web-first assertion untuk membuktikan status berisi `Order submitted`;\n4. tidak memiliki `waitForTimeout`.\n\nJangan menangkap atau menyembunyikan assertion error."
+        "en": "# Core Investigation: Repair the Wrong-Order Test\n\nThis standalone page lists two failed orders. The requirement is to resubmit **Order ORD-1042** and prove that same order reaches `Order submitted: ORD-1042`.\n\nThe generated starter test is unreliable and can produce a false positive. The supplied failure evidence says:\n\n- the failed trace resolved `.first()` to **Order ORD-1007** because record order differed between runs;\n- both cards contain a **Submit order** button and a status;\n- `waitForTimeout(1000)` only delayed the weak check; and\n- `textContent()` plus `toBeTruthy()` passed for any non-empty status, including the wrong order.\n\n## Your Task\n1. Locate the `article` for **Order ORD-1042** by filtering with its exact heading.\n2. Prove exactly one target article matches.\n3. Click **Submit order** inside that article.\n4. Use a retried text assertion on the status inside the same article to prove the exact outcome `Order submitted: ORD-1042`.\n5. Remove `first()`, `waitForTimeout()`, and `textContent()`. Do not suppress failures or weaken the expected result.\n",
+        "id": "# Core Investigation: Perbaiki Test yang Salah Order\n\nStandalone page ini menampilkan dua failed order. Requirement-nya adalah resubmit **Order ORD-1042** lalu membuktikan order yang sama mencapai `Order submitted: ORD-1042`.\n\nGenerated starter test-nya unreliable dan bisa menghasilkan false positive. Supplied failure evidence mengatakan:\n\n- failed trace menunjukkan `.first()` memilih **Order ORD-1007** karena urutan record berbeda antar-run;\n- kedua card punya button **Submit order** dan status;\n- `waitForTimeout(1000)` hanya menunda weak check; serta\n- `textContent()` ditambah `toBeTruthy()` lulus untuk status apa pun yang nggak kosong, termasuk order yang salah.\n\n## Tugas Kamu\n1. Cari `article` milik **Order ORD-1042** dengan filter berdasarkan exact heading-nya.\n2. Buktikan hanya ada satu target article yang match.\n3. Click **Submit order** di dalam article tersebut.\n4. Gunakan retried text assertion pada status di dalam article yang sama untuk membuktikan exact outcome `Order submitted: ORD-1042`.\n5. Hapus `first()`, `waitForTimeout()`, dan `textContent()`. Jangan menyembunyikan failure atau melemahkan expected result.\n"
       },
       "hints": {
         "en": [
-          "Delete the timeout instead of changing its duration.",
-          "Use `getByRole('status')` and `toContainText`."
+          "Start from all `article` roles, then use `filter({ has: ... })` with the exact ORD-1042 heading.",
+          "Keep the button and status locators inside the filtered order so another card cannot satisfy the test.",
+          "Use `toHaveCount(1)` for target identity and exact `toHaveText()` for the business outcome."
         ],
         "id": [
-          "Hapus timeout, jangan hanya mengubah durasinya.",
-          "Gunakan `getByRole('status')` dan `toContainText`."
+          "Mulai dari semua role `article`, lalu pakai `filter({ has: ... })` dengan exact heading ORD-1042.",
+          "Pastikan button dan status locator tetap berada di dalam filtered order supaya card lain nggak bisa meluluskan test.",
+          "Gunakan `toHaveCount(1)` untuk target identity dan exact `toHaveText()` untuk business outcome."
         ]
       },
-      "htmlContent": "<main><section class=\"checkout-shell\"><button onclick=\"const status=document.querySelector('[role=status]');status.textContent='Submitting…';setTimeout(()=>status.textContent='Order submitted: ORD-1042',200)\">Submit order</button><p role=\"status\">Ready</p></section></main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('submit order', async ({ page }) => {\n  const button = page.locator('main > section.checkout-shell > button');\n  await button.click();\n  await page.waitForTimeout(1000);\n  const message = await page.locator('p').textContent();\n  expect(message).toBeTruthy();\n});",
+      "htmlContent": "<main>\n  <h1>Failed orders</h1>\n  <section aria-label=\"Orders to resubmit\">\n    <article role=\"article\" aria-labelledby=\"order-1007-heading\" data-order-id=\"ORD-1007\">\n      <h2 id=\"order-1007-heading\">Order ORD-1007</h2>\n      <button type=\"button\" onclick=\"const status=this.parentElement.querySelector('[role=status]');status.textContent='Submitting…';setTimeout(()=>status.textContent='Order submitted: ORD-1007',80)\">Submit order</button>\n      <p role=\"status\">Ready to submit</p>\n    </article>\n    <article role=\"article\" aria-labelledby=\"order-1042-heading\" data-order-id=\"ORD-1042\">\n      <h2 id=\"order-1042-heading\">Order ORD-1042</h2>\n      <button type=\"button\" onclick=\"const status=this.parentElement.querySelector('[role=status]');status.textContent='Submitting…';setTimeout(()=>status.textContent='Order submitted: ORD-1042',200)\">Submit order</button>\n      <p role=\"status\">Ready to submit</p>\n    </article>\n  </section>\n</main>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('resubmit Order ORD-1042', async ({ page }) => {\n  const order = page.getByRole('article').first();\n  await order.getByRole('button', { name: 'Submit order' }).click();\n  await page.waitForTimeout(1000);\n\n  const status = await page.getByRole('status').first().textContent();\n  expect(status).toBeTruthy();\n});",
       "testCases": [],
-      "solution": "await page.getByRole('button', { name: 'Submit order' }).click();\nawait expect(page.getByRole('status')).toContainText('Order submitted');",
+      "solution": "const targetOrder = page.getByRole('article').filter({\n  has: page.getByRole('heading', {\n    name: 'Order ORD-1042',\n    exact: true,\n  }),\n});\n\nawait expect(targetOrder).toHaveCount(1);\nawait targetOrder.getByRole('button', { name: 'Submit order' }).click();\nawait expect(targetOrder.getByRole('status')).toHaveText(\n  'Order submitted: ORD-1042',\n);",
       "expectedState": [
         {
-          "selector": "[role=status]",
+          "selector": "[data-order-id=\"ORD-1042\"] [role=status]",
           "visible": true,
-          "containsText": "Order submitted"
+          "containsText": "Order submitted: ORD-1042"
         }
       ],
       "validation": {
-        "requiredAssertions": ["toContainText"],
-        "requiredMethods": ["getByRole", "click"],
-        "forbiddenMethods": ["waitForTimeout"]
+        "requiredAssertions": ["toHaveCount", "toHaveText"],
+        "requiredMethods": ["getByRole", "filter", "click"],
+        "forbiddenMethods": ["first", "waitForTimeout", "textContent"]
       },
       "tags": [
         "playwright",
         "debugging",
         "flakiness",
+        "root-cause",
+        "evidence",
         "ai-review",
         "core-practice"
       ]

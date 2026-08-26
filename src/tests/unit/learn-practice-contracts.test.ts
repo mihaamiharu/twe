@@ -491,20 +491,218 @@ describe('Learn and Practice catalog contracts', () => {
     ).toBe(true);
   });
 
+  test('module five completes with deliberate actions and observable synchronization', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleFive = tutorials.filter(
+      (tutorial) => tutorial.module.order === 5,
+    );
+
+    expect(moduleFive.map((tutorial) => tutorial.slug)).toEqual([
+      'element-interactions',
+      'playwright-actionability',
+      'navigation-and-events',
+    ]);
+    expect(moduleFive.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+
+    const practices = moduleFive.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-actions-boss', 'pw-action-outcome-sync']);
+    expect(
+      practices
+        .filter((practice) => practice.role !== 'core')
+        .every((practice) => practice.role === 'additional'),
+    ).toBe(true);
+
+    const interactionLesson = moduleFive.find(
+      (tutorial) => tutorial.slug === 'element-interactions',
+    );
+    const actionabilityLesson = moduleFive.find(
+      (tutorial) => tutorial.slug === 'playwright-actionability',
+    );
+    const eventLesson = moduleFive.find(
+      (tutorial) => tutorial.slug === 'navigation-and-events',
+    );
+
+    expect(
+      interactionLesson?.practice.find(
+        (practice) => practice.slug === 'pw-file-upload',
+      )?.role,
+    ).toBe('additional');
+    expect(
+      actionabilityLesson?.practice.find(
+        (practice) => practice.slug === 'pw-dynamic-table',
+      )?.role,
+    ).toBe('additional');
+    expect(eventLesson?.practice).toEqual([
+      { slug: 'pw-iframes', role: 'additional' },
+    ]);
+  });
+
+  test('module six completes with one integrated evidence and test-design proof', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleSix = tutorials.filter(
+      (tutorial) => tutorial.module.order === 6,
+    );
+
+    expect(moduleSix.map((tutorial) => tutorial.slug)).toEqual([
+      'assertions-verify',
+      'test-design-for-automation',
+    ]);
+    expect(moduleSix.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+
+    const practices = moduleSix.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-assertions-boss']);
+    expect(
+      practices
+        .filter((practice) => practice.role !== 'core')
+        .every((practice) => practice.role === 'additional'),
+    ).toBe(true);
+
+    const assertionLesson = moduleSix.find(
+      (tutorial) => tutorial.slug === 'assertions-verify',
+    );
+    const testDesignLesson = moduleSix.find(
+      (tutorial) => tutorial.slug === 'test-design-for-automation',
+    );
+
+    expect(assertionLesson?.practice).toEqual([
+      { slug: 'pw-assertions-boss', role: 'core' },
+      { slug: 'pw-to-be-visible', role: 'additional' },
+      { slug: 'pw-to-have-text', role: 'additional' },
+      { slug: 'pw-state-assertions', role: 'additional' },
+      { slug: 'pw-to-have-value', role: 'additional' },
+      { slug: 'pw-to-have-count', role: 'additional' },
+      { slug: 'pw-to-have-attribute', role: 'additional' },
+      { slug: 'pw-soft-assertions', role: 'additional' },
+    ]);
+    expect(testDesignLesson?.practice).toEqual([]);
+  });
+
+  test('module seven completes with controlled state and root-cause repair', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleSeven = tutorials.filter(
+      (tutorial) => tutorial.module.order === 7,
+    );
+
+    expect(moduleSeven.map((tutorial) => tutorial.slug)).toEqual([
+      'playwright-architecture',
+      'test-isolation-and-data',
+      'debugging-flaky-tests',
+    ]);
+    expect(moduleSeven.every((tutorial) => tutorial.kind === 'core')).toBe(
+      true,
+    );
+
+    const practices = moduleSeven.flatMap((tutorial) => tutorial.practice);
+    expect(practices).toEqual([{ slug: 'pw-debug-flaky-test', role: 'core' }]);
+
+    expect(moduleSeven[0]?.practice).toEqual([]);
+    expect(moduleSeven[1]?.practice).toEqual([]);
+    expect(moduleSeven[2]?.practice).toEqual([
+      { slug: 'pw-debug-flaky-test', role: 'core' },
+    ]);
+  });
+
+  test('module eight completes with justified abstraction and explicit suite policy', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleEight = tutorials.filter(
+      (tutorial) => tutorial.module.order === 8,
+    );
+
+    expect(moduleEight.map((tutorial) => tutorial.slug)).toEqual([
+      'page-object-model',
+      'test-fixtures',
+      'projects-configuration',
+      'advanced-fixtures',
+    ]);
+    expect(moduleEight.map((tutorial) => tutorial.kind)).toEqual([
+      'core',
+      'core',
+      'core',
+      'optional',
+    ]);
+
+    const practices = moduleEight.flatMap((tutorial) => tutorial.practice);
+    expect(practices).toEqual([{ slug: 'pom-login-basics', role: 'core' }]);
+
+    expect(moduleEight[0]?.practice).toEqual([
+      { slug: 'pom-login-basics', role: 'core' },
+    ]);
+    expect(moduleEight[1]?.practice).toEqual([]);
+    expect(moduleEight[2]?.practice).toEqual([]);
+    expect(moduleEight[3]?.practice).toEqual([]);
+  });
+
+  test('module nine completes with a reproducible feedback contract and one honest capstone checkpoint', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleNine = tutorials.filter(
+      (tutorial) => tutorial.module.order === 9,
+    );
+
+    expect(moduleNine.map((tutorial) => tutorial.slug)).toEqual([
+      'ci-reports-cross-browser',
+      'ci-feedback-policy',
+      'capstone-web-automation',
+    ]);
+    expect(moduleNine.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+
+    expect(moduleNine[0]?.practice).toEqual([]);
+    expect(moduleNine[1]?.practice).toEqual([]);
+    expect(moduleNine[2]?.practice).toEqual([
+      { slug: 'pw-capstone-checkout', role: 'core' },
+    ]);
+    expect(moduleNine.flatMap((tutorial) => tutorial.practice)).toEqual([
+      { slug: 'pw-capstone-checkout', role: 'core' },
+    ]);
+  });
+
   test('runner detail preserves expected state and task-specific validation', async () => {
     const detail = await getChallengeCatalogDetail('pw-debug-flaky-test', 'en');
 
     expect(detail?.expectedState).toEqual([
       {
-        selector: '[role=status]',
+        selector: '[data-order-id="ORD-1042"] [role=status]',
         visible: true,
-        containsText: 'Order submitted',
+        containsText: 'Order submitted: ORD-1042',
       },
     ]);
     expect(detail?.validation).toMatchObject({
-      requiredAssertions: ['toContainText'],
-      requiredMethods: ['getByRole', 'click'],
-      forbiddenMethods: ['waitForTimeout'],
+      requiredAssertions: ['toHaveCount', 'toHaveText'],
+      requiredMethods: ['getByRole', 'filter', 'click'],
+      forbiddenMethods: ['first', 'waitForTimeout', 'textContent'],
+    });
+  });
+
+  test('capstone checkpoint requires both rejection and recovery evidence', async () => {
+    const detail = await getChallengeCatalogDetail(
+      'pw-capstone-checkout',
+      'en',
+    );
+
+    expect(detail?.expectedState).toEqual([
+      {
+        selector: '#confirmation',
+        visible: true,
+        containsText: '2 items',
+      },
+      { selector: '[role=alert]', hidden: true },
+    ]);
+    expect(detail?.validation).toMatchObject({
+      requiredAssertions: [
+        'toHaveText',
+        'toBeHidden',
+        'toBeVisible',
+        'toContainText',
+      ],
+      requiredMethods: ['getByLabel', 'getByRole', 'fill', 'click'],
+      forbiddenMethods: ['waitForTimeout', 'textContent', 'toBeTruthy'],
     });
   });
 
@@ -518,6 +716,8 @@ describe('Learn and Practice catalog contracts', () => {
     expect(slugs.has('pw-frame-locators')).toBe(false);
     expect(slugs.has('ts-generics-intro')).toBe(false);
     expect(slugs.has('automation-candidate-review')).toBe(false);
+    expect(slugs.has('pom-login-failures')).toBe(false);
+    expect(slugs.has('pom-multi-page')).toBe(false);
   });
 
   test('practice submissions skip persistence and XP awards', async () => {
