@@ -62,7 +62,12 @@ describe('Content Server', () => {
       'typescript',
     ];
     for (const tier of tiers) {
-      const tierPath = join(process.cwd(), 'content', 'challenges', `${tier}.json`);
+      const tierPath = join(
+        process.cwd(),
+        'content',
+        'challenges',
+        `${tier}.json`,
+      );
       const parsed = parseChallengeTierJson(
         await readFile(tierPath, 'utf8'),
         tierPath,
@@ -73,55 +78,79 @@ describe('Content Server', () => {
   });
 
   it('reports malformed JSON with its source path', () => {
-    expect(() => parseTutorialRegistryJson('{', 'tutorials/broken.json'))
-      .toThrow(/Invalid JSON in tutorials\/broken\.json/);
+    expect(() =>
+      parseTutorialRegistryJson('{', 'tutorials/broken.json'),
+    ).toThrow(/Invalid JSON in tutorials\/broken\.json/);
   });
 
   it('reports invalid content with an actionable property path', () => {
-    expect(() => parseChallengeTierJson(
-      JSON.stringify({
-        tier: 'basic',
-        challenges: [{ slug: 'missing-required-fields' }],
-      }),
-      'content/challenges/broken.json',
-    )).toThrow(/content\/challenges\/broken\.json.*challenges\.0\.solution/);
+    expect(() =>
+      parseChallengeTierJson(
+        JSON.stringify({
+          tier: 'basic',
+          challenges: [{ slug: 'missing-required-fields' }],
+        }),
+        'content/challenges/broken.json',
+      ),
+    ).toThrow(/content\/challenges\/broken\.json.*challenges\.0\.solution/);
   });
 
-  it('preserves absent optional properties in validated JSON content', () => {
-    const registry = parseTutorialRegistryJson(JSON.stringify({
-      tutorials: [{
-        slug: 'intro',
-        order: 1,
-        estimatedMinutes: 5,
-        tags: [],
-      }],
-    }), 'tutorials/test-registry.json');
+  it('preserves absent optional relationship properties in validated JSON content', () => {
+    const registry = parseTutorialRegistryJson(
+      JSON.stringify({
+        modules: [
+          {
+            slug: 'foundations',
+            order: 1,
+            title: { en: 'Foundations', id: 'Fondasi' },
+            description: { en: 'Description', id: 'Deskripsi' },
+            outcome: { en: 'Outcome', id: 'Hasil' },
+          },
+        ],
+        tutorials: [
+          {
+            slug: 'intro',
+            order: 1,
+            moduleSlug: 'foundations',
+            moduleOrder: 1,
+            kind: 'core',
+            estimatedMinutes: 5,
+            tags: [],
+          },
+        ],
+      }),
+      'tutorials/test-registry.json',
+    );
     const tutorial = registry.tutorials[0];
     if (!tutorial) throw new Error('Expected validated tutorial');
-    expect('relatedChallenges' in tutorial).toBe(false);
-    expect('nextTutorialSlug' in tutorial).toBe(false);
+    expect('practice' in tutorial).toBe(false);
     expect('status' in tutorial).toBe(false);
 
-    const tier = parseChallengeTierJson(JSON.stringify({
-      tier: 'basic',
-      challenges: [{
-        slug: 'minimal',
-        type: 'JAVASCRIPT',
-        difficulty: 'EASY',
-        category: 'javascript',
-        xpReward: 10,
-        order: 1,
-        title: { en: 'Minimal' },
-        description: { en: 'Minimal challenge' },
-        instructions: { en: 'Return true' },
-        testCases: [],
-        solution: 'return true;',
-      }],
-    }), 'content/challenges/test-tier.json');
+    const tier = parseChallengeTierJson(
+      JSON.stringify({
+        tier: 'basic',
+        challenges: [
+          {
+            slug: 'minimal',
+            type: 'JAVASCRIPT',
+            difficulty: 'EASY',
+            category: 'javascript',
+            xpReward: 10,
+            order: 1,
+            title: { en: 'Minimal', id: 'Minimal' },
+            description: { en: 'Minimal challenge', id: 'Tantangan minimal' },
+            instructions: { en: 'Return true', id: 'Kembalikan true' },
+            testCases: [],
+            solution: 'return true;',
+          },
+        ],
+      }),
+      'content/challenges/test-tier.json',
+    );
     const challenge = tier.challenges[0];
     if (!challenge) throw new Error('Expected validated challenge');
     expect('tutorialSlug' in challenge).toBe(false);
     expect('htmlContent' in challenge).toBe(false);
-    expect('id' in challenge.title).toBe(false);
+    expect(challenge.title.id).toBe('Minimal');
   });
 });

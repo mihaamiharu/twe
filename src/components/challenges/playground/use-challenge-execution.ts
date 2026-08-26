@@ -7,10 +7,7 @@ import { storage } from '@/lib/storage-adapter';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import { INJECTED_SCRIPTS, HIGHLIGHT_STYLES } from '../preview/constants';
-import type {
-    ChallengePlaygroundProps,
-    PlaygroundState
-} from './types';
+import type { ChallengePlaygroundProps, PlaygroundState } from './types';
 import type { TestResult } from '../test-results';
 import type { SelectorType } from '../selector-input';
 
@@ -24,7 +21,10 @@ export interface ChallengeExecution {
     handleFileChange: (path: string, newCode: string) => void;
     handleSelectFile: (path: string) => void;
     handleCloseFile: (path: string) => void;
-    handlePreviewValidation: (result: { isValid: boolean; matchCount: number }) => void;
+    handlePreviewValidation: (result: {
+        isValid: boolean;
+        matchCount: number;
+    }) => void;
     hintMutation: {
         isPending: boolean;
         mutate: () => void;
@@ -34,7 +34,7 @@ export interface ChallengeExecution {
 export function useChallengeExecution(
     state: PlaygroundState,
     props: ChallengePlaygroundProps,
-    previewIframeRef: React.RefObject<HTMLIFrameElement | null>
+    previewIframeRef: React.RefObject<HTMLIFrameElement | null>,
 ): ChallengeExecution {
     const { challenge, onSubmit, userId } = props;
     const {
@@ -62,13 +62,14 @@ export function useChallengeExecution(
         locale,
         hasPassed,
         isCodeChallenge,
-        isSelectorChallenge
+        isSelectorChallenge,
     } = state;
 
     // Run code for Playwright/JS challenges
     const handleRunCode = useCallback(async () => {
         const needsHtmlRun =
-            (challenge.htmlContent || challenge.files) && challenge.type !== 'JAVASCRIPT';
+            (challenge.htmlContent || challenge.files) &&
+            challenge.type !== 'JAVASCRIPT';
 
         if (!isCodeChallenge) return;
 
@@ -91,7 +92,8 @@ export function useChallengeExecution(
                 challenge.type === 'JAVASCRIPT' ||
                 challenge.type === 'TYPESCRIPT'
             ) {
-                codeToRun += '\nif (typeof result !== "undefined") return result;';
+                codeToRun +=
+                    '\nif (typeof result !== "undefined") return result;';
             }
 
             const initialHtml = challenge.files
@@ -100,10 +102,9 @@ export function useChallengeExecution(
 
             let preloadCode = '';
             if (challenge.preloadModules) {
-                 
                 preloadCode = generatePreloadCode({
                     modules: challenge.preloadModules,
-                    files: challenge.files || {}
+                    files: challenge.files || {},
                 });
             }
 
@@ -117,14 +118,50 @@ export function useChallengeExecution(
                         expectedState: challenge.expectedState,
                     }),
                     strictMode: challenge.type === 'PLAYWRIGHT',
-                    cssContent: (challenge.category?.startsWith('e2e')) ? e2eSelectorStyles : defaultSelectorStyles,
+                    cssContent: challenge.category?.startsWith('e2e')
+                        ? e2eSelectorStyles
+                        : defaultSelectorStyles,
                     onNavigate: (path) => setCurrentVfsPath(path),
-                    isTypeScript: challenge.type === 'TYPESCRIPT' || challenge.type === 'PLAYWRIGHT',
+                    isTypeScript:
+                        challenge.type === 'TYPESCRIPT' ||
+                        challenge.type === 'PLAYWRIGHT',
                 },
             );
 
             let validationPassed = result.status === 'PASSED';
             let outputMessage = result.output;
+
+            const codeWithoutComments = codeToRun
+                .replace(/\/\*[\s\S]*?\*\//g, '')
+                .replace(/\/\/.*$/gm, '');
+            const calledMethods = new Set(
+                Array.from(
+                    codeWithoutComments.matchAll(
+                        /\.\s*([A-Za-z_$][\w$]*)\s*\(/g,
+                    ),
+                    (match) => match[1],
+                ).filter((method): method is string => method !== undefined),
+            );
+            const calledMethod = (method: string) => calledMethods.has(method);
+            const missingRequirements = [
+                ...(challenge.validation?.requiredAssertions ?? []),
+                ...(challenge.validation?.requiredMethods ?? []),
+            ].filter((method) => !calledMethod(method));
+            const forbiddenMethods = (
+                challenge.validation?.forbiddenMethods ?? []
+            ).filter(calledMethod);
+
+            if (
+                result.status === 'PASSED' &&
+                (missingRequirements.length > 0 || forbiddenMethods.length > 0)
+            ) {
+                validationPassed = false;
+                result.status = 'FAILED';
+                outputMessage =
+                    missingRequirements.length > 0
+                        ? `The solution does not yet demonstrate: ${missingRequirements.join(', ')}.`
+                        : `Remove the masking method: ${forbiddenMethods.join(', ')}.`;
+            }
 
             const hasExpectedState = (challenge.expectedState?.length ?? 0) > 0;
             // All Playwright challenges that aren't checking specific DOM state side-effects
@@ -146,8 +183,7 @@ export function useChallengeExecution(
                 } else {
                     outputMessage = t('challenges:playground.correct');
                 }
-            }
-            else if (
+            } else if (
                 isCodeChallenge &&
                 !isAssertionChallenge &&
                 challenge.testCases?.[0] &&
@@ -157,7 +193,11 @@ export function useChallengeExecution(
                 const actual = result.returnValue;
 
                 let expectedValue = expected;
-                if (expected && typeof expected === 'object' && 'value' in expected) {
+                if (
+                    expected &&
+                    typeof expected === 'object' &&
+                    'value' in expected
+                ) {
                     expectedValue = (expected as { value: unknown }).value;
                 }
 
@@ -206,7 +246,9 @@ export function useChallengeExecution(
                     name: t('challenges:playground.executionError'),
                     passed: false,
                     error:
-                        error instanceof Error ? error.message : t('common:messages.error'),
+                        error instanceof Error
+                            ? error.message
+                            : t('common:messages.error'),
                 },
             ]);
             setHasPassed(false);
@@ -247,7 +289,7 @@ export function useChallengeExecution(
         setTestResults,
         setConsoleLogs,
         setHasPassed,
-        t
+        t,
     ]);
 
     // AI Hint mutation
@@ -269,7 +311,10 @@ export function useChallengeExecution(
                     challengeSlug: challenge.slug,
                     userAttempt: currentCode || undefined,
                     locale,
-                    staticHints: challenge.hints?.slice(0, state.revealedHintsCount),
+                    staticHints: challenge.hints?.slice(
+                        0,
+                        state.revealedHintsCount,
+                    ),
                 },
             });
         },
@@ -281,16 +326,22 @@ export function useChallengeExecution(
                 state.setStoredHint(result.hint);
                 setHintUsed(true);
             } else if (!result.success && result.error) {
-                toast.error(t('challenges:hints.errorTitle', 'Hint Generation Failed'), {
-                    description: result.error,
-                });
+                toast.error(
+                    t('challenges:hints.errorTitle', 'Hint Generation Failed'),
+                    {
+                        description: result.error,
+                    },
+                );
             }
         },
         onError: (error) => {
             console.error('[AI Hint] Error:', error);
             setIsHintDialogOpen(false);
             toast.error(t('challenges:hints.errorTitle', 'Error'), {
-                description: t('challenges:hints.errorGeneric', 'Something went wrong. Please try again.'),
+                description: t(
+                    'challenges:hints.errorGeneric',
+                    'Something went wrong. Please try again.',
+                ),
             });
         },
     });
@@ -342,7 +393,7 @@ export function useChallengeExecution(
         previewValidation,
         setHasPassed,
         setTestResults,
-        t
+        t,
     ]);
 
     const handleReset = useCallback(() => {
@@ -363,11 +414,23 @@ export function useChallengeExecution(
         setPreviewValidation(null);
         setResetCount((prev) => prev + 1);
         setIsResetConfirmOpen(false);
-    }, [challenge, userId, setCode, setSelector, setTestResults, setHasPassed, setPreviewValidation, setResetCount, setIsResetConfirmOpen]);
+    }, [
+        challenge,
+        userId,
+        setCode,
+        setSelector,
+        setTestResults,
+        setHasPassed,
+        setPreviewValidation,
+        setResetCount,
+        setIsResetConfirmOpen,
+    ]);
 
     const handleSubmit = useCallback(() => {
         const submissionCode = isCodeChallenge
-            ? (challenge.files ? JSON.stringify(fileContents) : code)
+            ? challenge.files
+                ? JSON.stringify(fileContents)
+                : code
             : selector;
         const totalExecutionTime = testResults.reduce(
             (acc, r) => acc + (r.executionTime || 0),
@@ -380,7 +443,16 @@ export function useChallengeExecution(
             testResults,
             executionTime: totalExecutionTime,
         });
-    }, [code, selector, hasPassed, onSubmit, isCodeChallenge, testResults, challenge.files, fileContents]);
+    }, [
+        code,
+        selector,
+        hasPassed,
+        onSubmit,
+        isCodeChallenge,
+        testResults,
+        challenge.files,
+        fileContents,
+    ]);
 
     const handleSelectorChange = useCallback(
         (value: string, type: SelectorType) => {
@@ -390,35 +462,54 @@ export function useChallengeExecution(
         [setSelector, setSelectorType],
     );
 
-    const handleFileChange = useCallback((path: string, newCode: string) => {
-        state.setFileContents({
-            ...state.fileContents,
-            [path]: newCode
-        });
+    const handleFileChange = useCallback(
+        (path: string, newCode: string) => {
+            state.setFileContents({
+                ...state.fileContents,
+                [path]: newCode,
+            });
 
-        const mainFile = challenge.editableFiles?.[0] || '/test.spec.ts';
-        if (path === mainFile) {
-            setCode(newCode);
-        }
-    }, [challenge.editableFiles, state.fileContents, state.setFileContents, setCode]);
-
-    const handleSelectFile = useCallback((path: string) => {
-        state.setSelectedFile(path);
-        if (!state.openFiles.includes(path)) {
-            state.setOpenFiles([...state.openFiles, path]);
-        }
-    }, [state.openFiles, state.setOpenFiles, state.setSelectedFile]);
-
-    const handleCloseFile = useCallback((path: string) => {
-        const newOpenFiles = state.openFiles.filter(p => p !== path);
-        state.setOpenFiles(newOpenFiles);
-        if (state.selectedFile === path) {
-            const nextFile = newOpenFiles.at(-1);
-            if (nextFile !== undefined) {
-                state.setSelectedFile(nextFile);
+            const mainFile = challenge.editableFiles?.[0] || '/test.spec.ts';
+            if (path === mainFile) {
+                setCode(newCode);
             }
-        }
-    }, [state.openFiles, state.setOpenFiles, state.selectedFile, state.setSelectedFile]);
+        },
+        [
+            challenge.editableFiles,
+            state.fileContents,
+            state.setFileContents,
+            setCode,
+        ],
+    );
+
+    const handleSelectFile = useCallback(
+        (path: string) => {
+            state.setSelectedFile(path);
+            if (!state.openFiles.includes(path)) {
+                state.setOpenFiles([...state.openFiles, path]);
+            }
+        },
+        [state.openFiles, state.setOpenFiles, state.setSelectedFile],
+    );
+
+    const handleCloseFile = useCallback(
+        (path: string) => {
+            const newOpenFiles = state.openFiles.filter((p) => p !== path);
+            state.setOpenFiles(newOpenFiles);
+            if (state.selectedFile === path) {
+                const nextFile = newOpenFiles.at(-1);
+                if (nextFile !== undefined) {
+                    state.setSelectedFile(nextFile);
+                }
+            }
+        },
+        [
+            state.openFiles,
+            state.setOpenFiles,
+            state.selectedFile,
+            state.setSelectedFile,
+        ],
+    );
 
     return {
         handleRunCode,

@@ -182,12 +182,9 @@ describe('Learn and Practice catalog contracts', () => {
       expectNonEmptyString(raw.title.en);
       expectNonEmptyString(raw.description.en);
       expectNonEmptyString(raw.instructions.en);
-      // Legacy content may rely on the service's English fallback for an
-      // absent Indonesian instruction block. The user-facing projection must
-      // still be populated in both locales.
-      expectNonEmptyString(raw.title.id ?? raw.title.en);
-      expectNonEmptyString(raw.description.id ?? raw.description.en);
-      expectNonEmptyString(raw.instructions.id ?? raw.instructions.en);
+      expectNonEmptyString(raw.title.id);
+      expectNonEmptyString(raw.description.id);
+      expectNonEmptyString(raw.instructions.id);
     }
   });
 
@@ -267,9 +264,19 @@ describe('Learn and Practice catalog contracts', () => {
       title: 'Localized lesson',
       description: 'Description',
       order: 1,
+      module: {
+        slug: 'module',
+        order: 1,
+        title: 'Module',
+        description: 'Module description',
+        outcome: 'Module outcome',
+      },
+      moduleOrder: 1,
+      kind: 'core' as const,
       estimatedMinutes: 5,
       tags: ['beginner'],
       relatedChallenges: [],
+      practice: [],
     };
     const challenge = {
       slug: 'challenge',
@@ -326,6 +333,191 @@ describe('Learn and Practice catalog contracts', () => {
         expect(tutorialSlugs.has(challenge.tutorialSlug)).toBe(true);
       }
     }
+  });
+
+  test('curriculum metadata distinguishes modules, core work, and optional depth', async () => {
+    const [tutorials, challenges] = await Promise.all([
+      getTutorialCatalogList('en'),
+      getChallengeCatalogList('en'),
+    ]);
+    const moduleOrders = tutorials.map((tutorial) => tutorial.module.order);
+
+    expect(new Set(moduleOrders)).toContain(1);
+    expect(new Set(moduleOrders)).toContain(9);
+    expect(tutorials.every((tutorial) => tutorial.moduleOrder > 0)).toBe(true);
+    expect(tutorials.some((tutorial) => tutorial.kind === 'optional')).toBe(
+      true,
+    );
+    expect(
+      tutorials.some((tutorial) =>
+        tutorial.practice.some((practice) => practice.role === 'core'),
+      ),
+    ).toBe(true);
+    expect(
+      tutorials.some((tutorial) =>
+        tutorial.practice.some((practice) => practice.role === 'additional'),
+      ),
+    ).toBe(true);
+    expect(
+      new Set(tutorials.flatMap((tutorial) => tutorial.relatedChallenges)),
+    ).toEqual(new Set(challenges.map((challenge) => challenge.slug)));
+  });
+
+  test('module one teaches automation judgment without an early coding gate', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleOne = tutorials.filter(
+      (tutorial) => tutorial.module.order === 1,
+    );
+
+    expect(moduleOne.map((tutorial) => tutorial.slug)).toEqual([
+      'universal-mindset',
+      'automation-candidate-selection',
+    ]);
+    expect(moduleOne.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+    expect(moduleOne.flatMap((tutorial) => tutorial.practice)).toEqual([]);
+  });
+
+  test('module two teaches UI inspection while keeping raw DOM drills optional', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleTwo = tutorials.filter(
+      (tutorial) => tutorial.module.order === 2,
+    );
+
+    expect(moduleTwo.map((tutorial) => tutorial.slug)).toEqual([
+      'html-element-anatomy',
+      'dom-tree-hierarchy',
+      'devtools-mastery',
+    ]);
+    expect(moduleTwo.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+    expect(
+      moduleTwo
+        .flatMap((tutorial) => tutorial.practice)
+        .every((practice) => practice.role === 'additional'),
+    ).toBe(true);
+    expect(
+      moduleTwo.flatMap((tutorial) =>
+        tutorial.practice.map(({ slug }) => slug),
+      ),
+    ).toEqual([
+      'dom-parent-child-navigation',
+      'dom-element-properties',
+      'dom-check-element-state',
+      'dom-table-data-extraction',
+      'dom-boss',
+      'dom-queryselector-vs-all',
+    ]);
+  });
+
+  test('module three completes with four lessons and three integrated QA practices', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleThree = tutorials.filter(
+      (tutorial) => tutorial.module.order === 3,
+    );
+
+    expect(moduleThree.map((tutorial) => tutorial.slug)).toEqual([
+      'first-playwright-test',
+      'javascript-fundamentals-for-qa',
+      'async-await-basics',
+      'typescript-for-qa',
+    ]);
+    expect(moduleThree.every((tutorial) => tutorial.kind === 'core')).toBe(
+      true,
+    );
+
+    const practices = moduleThree.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-first-test', 'js-fundamentals-boss', 'async-await-basics']);
+    expect(
+      practices
+        .filter((practice) => practice.role !== 'core')
+        .every((practice) => practice.role === 'additional'),
+    ).toBe(true);
+
+    const typeScriptLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'typescript-for-qa',
+    );
+    expect(
+      typeScriptLesson?.practice.every(
+        (practice) => practice.role === 'additional',
+      ),
+    ).toBe(true);
+  });
+
+  test('module four completes with locator judgment and scoped interaction proof', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleFour = tutorials.filter(
+      (tutorial) => tutorial.module.order === 4,
+    );
+
+    expect(moduleFour.map((tutorial) => tutorial.slug)).toEqual([
+      'playwright-locator-strategy',
+      'locator-composition-and-strictness',
+      'css-selector-strategies',
+      'xpath-strategies',
+    ]);
+    expect(moduleFour.map((tutorial) => tutorial.kind)).toEqual([
+      'core',
+      'core',
+      'core',
+      'optional',
+    ]);
+
+    const practices = moduleFour.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-get-by-role', 'pw-locators-boss']);
+
+    for (const tutorial of moduleFour.filter((lesson) =>
+      ['css-selector-strategies', 'xpath-strategies'].includes(lesson.slug),
+    )) {
+      expect(
+        tutorial.practice.every((practice) => practice.role === 'additional'),
+      ).toBe(true);
+    }
+
+    const optionalLesson = moduleFour.find(
+      (tutorial) => tutorial.kind === 'optional',
+    );
+    expect(optionalLesson?.slug).toBe('xpath-strategies');
+    expect(
+      optionalLesson?.practice.every(
+        (practice) => practice.role === 'additional',
+      ),
+    ).toBe(true);
+  });
+
+  test('runner detail preserves expected state and task-specific validation', async () => {
+    const detail = await getChallengeCatalogDetail('pw-debug-flaky-test', 'en');
+
+    expect(detail?.expectedState).toEqual([
+      {
+        selector: '[role=status]',
+        visible: true,
+        containsText: 'Order submitted',
+      },
+    ]);
+    expect(detail?.validation).toMatchObject({
+      requiredAssertions: ['toContainText'],
+      requiredMethods: ['getByRole', 'click'],
+      forbiddenMethods: ['waitForTimeout'],
+    });
+  });
+
+  test('retired misleading drills are absent from the published Practice catalog', async () => {
+    const slugs = new Set(
+      (await getChallengeCatalogList('en')).map((challenge) => challenge.slug),
+    );
+
+    expect(slugs.has('selector-performance')).toBe(false);
+    expect(slugs.has('async-testing-patterns')).toBe(false);
+    expect(slugs.has('pw-frame-locators')).toBe(false);
+    expect(slugs.has('ts-generics-intro')).toBe(false);
+    expect(slugs.has('automation-candidate-review')).toBe(false);
   });
 
   test('practice submissions skip persistence and XP awards', async () => {

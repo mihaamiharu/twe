@@ -1,6 +1,10 @@
 import type {
   ChallengeDifficulty,
+  ChallengeValidationDefinition,
   ChallengeType,
+  CurriculumItemKind,
+  SerializableExpectedStateRule,
+  PracticeRole,
   TestCaseDefinition,
 } from './content.types';
 
@@ -16,9 +20,19 @@ export interface TutorialCatalogListItem {
   title: string;
   description: string;
   order: number;
+  module: {
+    slug: string;
+    order: number;
+    title: string;
+    description: string;
+    outcome: string;
+  };
+  moduleOrder: number;
+  kind: CurriculumItemKind;
   estimatedMinutes: number;
   tags: string[];
   relatedChallenges: string[];
+  practice: Array<{ slug: string; role: PracticeRole }>;
 }
 
 export interface TutorialCatalogDetail extends TutorialCatalogListItem {
@@ -50,6 +64,8 @@ export interface ChallengeCatalogDetail extends ChallengeCatalogListItem {
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
+  expectedState?: SerializableExpectedStateRule[];
+  validation?: ChallengeValidationDefinition;
 }
 
 export type ChallengeCatalogList = ChallengeCatalogListItem[];
@@ -70,7 +86,28 @@ export interface TutorialListCatalogResponse {
       readingProgress: number;
     }
   >;
-  meta: { availableTags: string[] };
+  meta: {
+    availableTags: string[];
+    modules: Array<{
+      slug: string;
+      order: number;
+      title: string;
+      description: string;
+      outcome: string;
+      coreLessons: number;
+      completedCoreLessons: number;
+      corePractice: number;
+      completedCorePractice: number;
+      isCompleted: boolean;
+    }>;
+    completion: {
+      coreLessons: number;
+      completedCoreLessons: number;
+      corePractice: number;
+      completedCorePractice: number;
+      isCompleted: boolean;
+    };
+  };
   pagination: {
     page: 1;
     limit: number;

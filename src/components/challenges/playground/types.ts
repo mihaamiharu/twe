@@ -26,10 +26,13 @@ export interface Challenge {
     targetSelector?: string | string[];
     files?: Record<string, string>; // VFS: multi-page content for E2E challenges
     editableFiles?: string[]; // Which files user can edit
-    preloadModules?: Record<string, {
-        exports: string[];
-        source: string;
-    }>;
+    preloadModules?: Record<
+        string,
+        {
+            exports: string[];
+            source: string;
+        }
+    >;
 
     testCases?: {
         id: string;
@@ -43,7 +46,13 @@ export interface Challenge {
         hidden?: boolean;
         containsText?: string;
         count?: number;
+        hasAttribute?: { name: string; value?: string | RegExp };
     }[];
+    validation?: {
+        requiredAssertions?: string[];
+        requiredMethods?: string[];
+        forbiddenMethods?: string[];
+    };
     category?: string;
     tutorial?: {
         slug: string;
@@ -116,7 +125,9 @@ export interface PlaygroundState {
     activeTab: string;
     setActiveTab: (tab: string) => void;
     previewValidation: { isValid: boolean; matchCount: number } | null;
-    setPreviewValidation: (validation: { isValid: boolean; matchCount: number } | null) => void;
+    setPreviewValidation: (
+        validation: { isValid: boolean; matchCount: number } | null,
+    ) => void;
     currentVfsPath: string;
     setCurrentVfsPath: (path: string) => void;
     revealedHintsCount: number;

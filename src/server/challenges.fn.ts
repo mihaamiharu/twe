@@ -312,6 +312,8 @@ export const getChallenge = createServerFn({ method: 'GET' })
             preloadModules: challengeContent.preloadModules,
             starterCode: challengeContent.starterCode,
             tags: challengeContent.tags,
+            expectedState: challengeContent.expectedState,
+            validation: challengeContent.validation,
           }),
           completionCount: dbChallenge?.completionCount || 0,
           tutorial: tutorialData,

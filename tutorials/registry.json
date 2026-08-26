@@ -1,163 +1,497 @@
 {
+  "modules": [
+    {
+      "slug": "automation-judgment",
+      "order": 1,
+      "title": {
+        "en": "Automation Foundations & Judgment",
+        "id": "Dasar & Pertimbangan Otomasi"
+      },
+      "description": {
+        "en": "Understand what web automation can prove, choose worthwhile candidates, and frame them as repeatable checks.",
+        "id": "Pahami hal yang dapat dibuktikan otomasi web, pilih kandidat yang bernilai, dan rumuskan sebagai pemeriksaan yang dapat diulang."
+      },
+      "outcome": {
+        "en": "Given a manual scenario, decide whether and where to automate it, then define its state, action, and observable evidence.",
+        "id": "Dari sebuah skenario manual, tentukan apakah dan di mana skenario perlu diotomasi, lalu definisikan kondisi, aksi, dan bukti yang dapat diamati."
+      }
+    },
+    {
+      "slug": "read-the-ui",
+      "order": 2,
+      "title": { "en": "Read the Web UI", "id": "Membaca UI Web" },
+      "description": {
+        "en": "Understand the browser-visible page, semantic HTML, accessible names, and changing DOM state.",
+        "id": "Pahami halaman yang terlihat di browser, HTML semantik, accessible name, dan perubahan state DOM."
+      },
+      "outcome": {
+        "en": "Explain what a user perceives and what an automation tool can reliably locate.",
+        "id": "Jelaskan apa yang dipahami pengguna dan apa yang dapat ditemukan alat otomasi secara andal."
+      }
+    },
+    {
+      "slug": "first-test-code",
+      "order": 3,
+      "title": {
+        "en": "First Test & Just-Enough Code",
+        "id": "Test Pertama & Kode Secukupnya"
+      },
+      "description": {
+        "en": "Run a real Playwright test and learn only the JavaScript and TypeScript needed to change it safely.",
+        "id": "Jalankan test Playwright nyata dan pelajari JavaScript serta TypeScript yang diperlukan untuk mengubahnya dengan aman."
+      },
+      "outcome": {
+        "en": "Run, read, and safely modify a small Playwright test.",
+        "id": "Jalankan, baca, dan ubah test Playwright kecil dengan aman."
+      }
+    },
+    {
+      "slug": "reliable-locators",
+      "order": 4,
+      "title": {
+        "en": "Reliable Locators & Testability",
+        "id": "Locator Andal & Testability"
+      },
+      "description": {
+        "en": "Choose locator contracts from test intent, narrow repeated UI, and use CSS or XPath only with a documented reason.",
+        "id": "Pilih kontrak locator dari intent test, persempit repeated UI, dan gunakan CSS atau XPath hanya dengan alasan yang terdokumentasi."
+      },
+      "outcome": {
+        "en": "Given a live UI and test intent, choose and justify a unique locator, narrow repeated content, and identify when an implementation fallback is warranted.",
+        "id": "Dari live UI dan intent test, pilih dan jelaskan unique locator, persempit repeated content, lalu tentukan kapan implementation fallback memang diperlukan."
+      }
+    },
+    {
+      "slug": "actions-sync",
+      "order": 5,
+      "title": {
+        "en": "Actions, Navigation & Synchronization",
+        "id": "Aksi, Navigasi & Sinkronisasi"
+      },
+      "description": {
+        "en": "Interact like a user while separating action readiness from the application outcome.",
+        "id": "Berinteraksi seperti pengguna sambil membedakan kesiapan aksi dari hasil aplikasi."
+      },
+      "outcome": {
+        "en": "Complete realistic interactions without fixed sleeps or accidental races.",
+        "id": "Selesaikan interaksi realistis tanpa fixed sleep atau race yang tidak disengaja."
+      }
+    },
+    {
+      "slug": "assertions-test-design",
+      "order": 6,
+      "title": {
+        "en": "Meaningful Assertions & Test Design",
+        "id": "Assertion Bermakna & Desain Test"
+      },
+      "description": {
+        "en": "Prove observable outcomes, cover useful risks, and avoid tests that pass without proving anything.",
+        "id": "Buktikan hasil yang dapat diamati, cakup risiko yang berguna, dan hindari test yang lulus tanpa membuktikan apa pun."
+      },
+      "outcome": {
+        "en": "Design a focused test whose assertions prove a business-relevant result.",
+        "id": "Rancang test terfokus dengan assertion yang membuktikan hasil yang relevan bagi bisnis."
+      }
+    },
+    {
+      "slug": "reliability-debugging",
+      "order": 7,
+      "title": {
+        "en": "Reliability, Isolation & Debugging",
+        "id": "Keandalan, Isolasi & Debugging"
+      },
+      "description": {
+        "en": "Control state and data, diagnose failures with evidence, and repair flaky or generated tests.",
+        "id": "Kendalikan state dan data, diagnosis kegagalan dengan bukti, serta perbaiki test flaky atau buatan AI."
+      },
+      "outcome": {
+        "en": "Diagnose and repair a failing test without hiding the failure behind waits or retries.",
+        "id": "Diagnosis dan perbaiki test gagal tanpa menyembunyikan kegagalan dengan wait atau retry."
+      }
+    },
+    {
+      "slug": "maintainable-suites",
+      "order": 8,
+      "title": {
+        "en": "Maintainable Suites",
+        "id": "Test Suite yang Mudah Dirawat"
+      },
+      "description": {
+        "en": "Use helpers, page or component objects, fixtures, configuration, and projects at the right time.",
+        "id": "Gunakan helper, page atau component object, fixture, konfigurasi, dan project pada waktu yang tepat."
+      },
+      "outcome": {
+        "en": "Organize a growing suite without premature or leaky abstractions.",
+        "id": "Atur suite yang berkembang tanpa abstraksi prematur atau bocor."
+      }
+    },
+    {
+      "slug": "ship-and-prove",
+      "order": 9,
+      "title": { "en": "Ship & Prove", "id": "Kirim & Buktikan" },
+      "description": {
+        "en": "Run automation in CI, preserve useful evidence, cover browsers intentionally, and complete a practical capstone.",
+        "id": "Jalankan otomasi di CI, simpan bukti yang berguna, cakup browser dengan sengaja, dan selesaikan capstone praktis."
+      },
+      "outcome": {
+        "en": "Deliver a repeatable end-to-end suite and explain its reliability decisions.",
+        "id": "Hasilkan suite end-to-end yang dapat diulang dan jelaskan keputusan keandalannya."
+      }
+    }
+  ],
   "tutorials": [
     {
-      "slug": "html-element-anatomy",
+      "slug": "universal-mindset",
       "order": 1,
-      "estimatedMinutes": 8,
-      "tags": ["foundations", "html", "anatomy"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "dom-tree-hierarchy"
+      "moduleSlug": "automation-judgment",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 12,
+      "tags": ["foundations", "judgment", "qa", "ai"]
+    },
+    {
+      "slug": "automation-candidate-selection",
+      "order": 2,
+      "moduleSlug": "automation-judgment",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 15,
+      "tags": ["risk", "automation", "test-design", "ai-review"]
+    },
+    {
+      "slug": "html-element-anatomy",
+      "order": 3,
+      "moduleSlug": "read-the-ui",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 16,
+      "tags": ["html", "semantics", "accessibility"]
     },
     {
       "slug": "dom-tree-hierarchy",
-      "order": 2,
-      "estimatedMinutes": 8,
-      "tags": ["foundations", "dom", "hierarchy", "parent-child"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "devtools-mastery"
+      "order": 4,
+      "moduleSlug": "read-the-ui",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 15,
+      "tags": ["dom", "state", "hierarchy"],
+      "practice": [
+        { "slug": "dom-parent-child-navigation", "role": "additional" },
+        { "slug": "dom-element-properties", "role": "additional" },
+        { "slug": "dom-check-element-state", "role": "additional" },
+        { "slug": "dom-table-data-extraction", "role": "additional" },
+        { "slug": "dom-boss", "role": "additional" }
+      ]
     },
     {
       "slug": "devtools-mastery",
-      "order": 3,
-      "estimatedMinutes": 10,
-      "tags": ["foundations", "devtools", "console", "elements", "debugging"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "universal-mindset"
-    },
-    {
-      "slug": "universal-mindset",
-      "order": 4,
-      "estimatedMinutes": 5,
-      "tags": ["foundations", "mindset", "ai", "automation", "principles"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "css-selector-strategies"
-    },
-    {
-      "slug": "css-selector-strategies",
       "order": 5,
-      "estimatedMinutes": 10,
-      "tags": ["beginner", "css", "selectors", "strategy", "best-practices"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "xpath-strategies"
+      "moduleSlug": "read-the-ui",
+      "moduleOrder": 3,
+      "kind": "core",
+      "estimatedMinutes": 16,
+      "tags": ["devtools", "accessibility", "network", "debugging"],
+      "practice": [{ "slug": "dom-queryselector-vs-all", "role": "additional" }]
     },
     {
-      "slug": "xpath-strategies",
+      "slug": "first-playwright-test",
       "order": 6,
-      "estimatedMinutes": 10,
-      "tags": ["xpath", "selectors", "strategies", "beginner"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "element-interactions"
-    },
-    {
-      "slug": "element-interactions",
-      "order": 7,
-      "estimatedMinutes": 8,
-      "tags": [
-        "beginner",
-        "interactions",
-        "playwright",
-        "automation",
-        "mechanics"
-      ],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "assertions-verify"
-    },
-    {
-      "slug": "assertions-verify",
-      "order": 8,
-      "estimatedMinutes": 8,
-      "tags": [
-        "beginner",
-        "assertions",
-        "validation",
-        "expect",
-        "verification"
-      ],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "javascript-fundamentals-for-qa"
+      "moduleSlug": "first-test-code",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 18,
+      "tags": ["playwright", "first-test", "project"],
+      "practice": [{ "slug": "pw-first-test", "role": "core" }]
     },
     {
       "slug": "javascript-fundamentals-for-qa",
-      "order": 9,
-      "estimatedMinutes": 20,
-      "tags": ["javascript", "fundamentals", "qa", "automation", "beginner"],
-      "relatedChallenges": ["js-variables-types", "js-functions-basics"],
-      "nextTutorialSlug": "async-await-basics"
+      "order": 7,
+      "moduleSlug": "first-test-code",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 18,
+      "tags": ["javascript", "qa", "test-data"],
+      "practice": [
+        { "slug": "js-variables-types", "role": "additional" },
+        { "slug": "js-arrays-test-data", "role": "additional" },
+        { "slug": "js-objects-for-tests", "role": "additional" },
+        { "slug": "js-functions-basics", "role": "additional" },
+        { "slug": "js-fundamentals-boss", "role": "core" },
+        { "slug": "js-if-else-logic", "role": "additional" },
+        { "slug": "js-loops-testing", "role": "additional" },
+        { "slug": "js-array-methods", "role": "additional" },
+        { "slug": "js-string-methods", "role": "additional" },
+        { "slug": "js-destructuring", "role": "additional" }
+      ]
     },
     {
       "slug": "async-await-basics",
-      "order": 10,
-      "estimatedMinutes": 12,
-      "tags": ["javascript", "async", "await", "promises", "beginner"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "typescript-for-qa"
+      "order": 8,
+      "moduleSlug": "first-test-code",
+      "moduleOrder": 3,
+      "kind": "core",
+      "estimatedMinutes": 16,
+      "tags": ["javascript", "async", "await", "promises"],
+      "practice": [
+        { "slug": "async-await-basics", "role": "core" },
+        { "slug": "async-error-handling", "role": "additional" },
+        { "slug": "async-parallel-execution", "role": "additional" },
+        { "slug": "async-boss", "role": "additional" }
+      ]
     },
     {
       "slug": "typescript-for-qa",
-      "order": 11,
-      "estimatedMinutes": 15,
-      "tags": ["typescript", "fundamentals", "qa", "automation", "beginner"],
-      "relatedChallenges": ["ts-type-annotations", "ts-interfaces-basics"],
-      "nextTutorialSlug": "playwright-architecture"
+      "order": 9,
+      "moduleSlug": "first-test-code",
+      "moduleOrder": 4,
+      "kind": "core",
+      "estimatedMinutes": 18,
+      "tags": ["typescript", "type-literacy", "qa"],
+      "practice": [
+        { "slug": "ts-type-annotations", "role": "additional" },
+        { "slug": "ts-type-inference", "role": "additional" },
+        { "slug": "ts-function-types", "role": "additional" },
+        { "slug": "ts-interfaces-basics", "role": "additional" },
+        { "slug": "ts-union-types", "role": "additional" },
+        { "slug": "ts-optional-properties", "role": "additional" },
+        { "slug": "ts-type-aliases", "role": "additional" },
+        { "slug": "ts-utility-types", "role": "additional" },
+        { "slug": "ts-fundamentals-boss", "role": "additional" }
+      ]
     },
     {
-      "slug": "playwright-architecture",
+      "slug": "playwright-locator-strategy",
+      "order": 10,
+      "moduleSlug": "reliable-locators",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 20,
+      "tags": ["playwright", "locators", "accessibility", "testability"],
+      "practice": [
+        { "slug": "pw-locator-intro", "role": "additional" },
+        { "slug": "pw-get-by-role", "role": "core" },
+        { "slug": "pw-get-by-label", "role": "additional" },
+        { "slug": "pw-get-by-text", "role": "additional" },
+        { "slug": "pw-get-by-placeholder", "role": "additional" },
+        { "slug": "pw-get-by-testid", "role": "additional" }
+      ]
+    },
+    {
+      "slug": "locator-composition-and-strictness",
+      "order": 11,
+      "moduleSlug": "reliable-locators",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 20,
+      "tags": ["playwright", "strictness", "filters", "lists"],
+      "practice": [
+        { "slug": "pw-locator-chaining", "role": "additional" },
+        { "slug": "pw-list-items", "role": "additional" },
+        { "slug": "pw-locators-boss", "role": "core" }
+      ]
+    },
+    {
+      "slug": "css-selector-strategies",
       "order": 12,
-      "estimatedMinutes": 10,
-      "tags": ["playwright", "architecture", "cdp", "intermediate"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "playwright-actionability"
+      "moduleSlug": "reliable-locators",
+      "moduleOrder": 3,
+      "kind": "core",
+      "estimatedMinutes": 18,
+      "tags": ["css", "fallback", "legacy-dom"],
+      "practice": [
+        { "slug": "css-selector-101-id-class", "role": "additional" },
+        { "slug": "css-tag-selectors", "role": "additional" },
+        { "slug": "css-combining-basics", "role": "additional" },
+        { "slug": "css-child-descendant", "role": "additional" },
+        { "slug": "css-sibling-selectors", "role": "additional" },
+        { "slug": "css-family-drill", "role": "additional" },
+        { "slug": "css-attribute-selectors", "role": "additional" },
+        { "slug": "css-validation-states", "role": "additional" },
+        { "slug": "css-functional-pseudo", "role": "additional" },
+        { "slug": "css-forms-boss", "role": "additional" },
+        { "slug": "css-nth-child", "role": "additional" },
+        { "slug": "css-nth-type-vs-child", "role": "additional" },
+        { "slug": "css-table-drill", "role": "additional" }
+      ]
+    },
+    {
+      "slug": "xpath-strategies",
+      "order": 13,
+      "moduleSlug": "reliable-locators",
+      "moduleOrder": 4,
+      "kind": "optional",
+      "estimatedMinutes": 16,
+      "tags": ["xpath", "optional", "legacy-dom"],
+      "practice": [
+        { "slug": "xpath-basics-101", "role": "additional" },
+        { "slug": "xpath-text-content", "role": "additional" },
+        { "slug": "xpath-contains-starts-with", "role": "additional" },
+        { "slug": "xpath-multiple-conditions", "role": "additional" },
+        { "slug": "xpath-position-indexing", "role": "additional" },
+        { "slug": "xpath-normalize-space", "role": "additional" },
+        { "slug": "xpath-complex-table", "role": "additional" }
+      ]
+    },
+    {
+      "slug": "element-interactions",
+      "order": 14,
+      "moduleSlug": "actions-sync",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 14,
+      "tags": ["playwright", "actions", "input"],
+      "practice": [
+        { "slug": "pw-click-actions", "role": "core" },
+        { "slug": "pw-fill-type", "role": "core" },
+        { "slug": "pw-checkbox-radio", "role": "core" },
+        { "slug": "pw-select-dropdowns", "role": "additional" },
+        { "slug": "pw-keyboard-actions", "role": "additional" },
+        { "slug": "pw-hover-focus", "role": "additional" },
+        { "slug": "pw-drag-drop", "role": "additional" }
+      ]
     },
     {
       "slug": "playwright-actionability",
-      "order": 13,
-      "estimatedMinutes": 10,
-      "tags": ["playwright", "actionability", "auto-wait", "intermediate"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "playwright-interaction-fundamentals"
+      "order": 15,
+      "moduleSlug": "actions-sync",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 12,
+      "tags": ["playwright", "actionability", "synchronization"],
+      "practice": [
+        { "slug": "pw-action-outcome-sync", "role": "core" },
+        { "slug": "pw-dynamic-table", "role": "core" },
+        { "slug": "pw-actions-boss", "role": "core" }
+      ]
     },
     {
-      "slug": "playwright-interaction-fundamentals",
-      "order": 14,
+      "slug": "navigation-and-events",
+      "order": 16,
+      "moduleSlug": "actions-sync",
+      "moduleOrder": 3,
+      "kind": "core",
+      "estimatedMinutes": 14,
+      "tags": ["playwright", "navigation", "events", "files", "frames"],
+      "practice": [
+        { "slug": "pw-file-upload", "role": "additional" },
+        { "slug": "pw-iframes", "role": "additional" }
+      ]
+    },
+    {
+      "slug": "assertions-verify",
+      "order": 17,
+      "moduleSlug": "assertions-test-design",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 14,
+      "tags": ["playwright", "assertions", "web-first"],
+      "practice": [
+        { "slug": "pw-to-be-visible", "role": "core" },
+        { "slug": "pw-to-have-text", "role": "core" },
+        { "slug": "pw-state-assertions", "role": "core" },
+        { "slug": "pw-to-have-count", "role": "core" },
+        { "slug": "pw-assertions-boss", "role": "core" },
+        { "slug": "pw-to-have-value", "role": "additional" },
+        { "slug": "pw-to-have-attribute", "role": "additional" },
+        { "slug": "pw-soft-assertions", "role": "additional" }
+      ]
+    },
+    {
+      "slug": "test-design-for-automation",
+      "order": 18,
+      "moduleSlug": "assertions-test-design",
+      "moduleOrder": 2,
+      "kind": "core",
       "estimatedMinutes": 12,
-      "tags": [
-        "playwright",
-        "locators",
-        "actions",
-        "assertions",
-        "intermediate"
-      ],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "page-object-model"
+      "tags": ["test-design", "risk", "positive", "negative"]
+    },
+    {
+      "slug": "playwright-architecture",
+      "order": 19,
+      "moduleSlug": "reliability-debugging",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 12,
+      "tags": ["playwright", "isolation", "browser-context"]
+    },
+    {
+      "slug": "test-isolation-and-data",
+      "order": 20,
+      "moduleSlug": "reliability-debugging",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 15,
+      "tags": ["isolation", "test-data", "authentication", "network"]
+    },
+    {
+      "slug": "debugging-flaky-tests",
+      "order": 21,
+      "moduleSlug": "reliability-debugging",
+      "moduleOrder": 3,
+      "kind": "core",
+      "estimatedMinutes": 16,
+      "tags": ["debugging", "trace", "flakiness", "ai-review"],
+      "practice": [{ "slug": "pw-debug-flaky-test", "role": "core" }]
     },
     {
       "slug": "page-object-model",
-      "order": 15,
-      "estimatedMinutes": 15,
-      "tags": ["playwright", "pom", "intermediate", "architecture"],
-      "relatedChallenges": ["pom-login-basics"],
-      "nextTutorialSlug": "test-fixtures"
+      "order": 22,
+      "moduleSlug": "maintainable-suites",
+      "moduleOrder": 1,
+      "kind": "core",
+      "estimatedMinutes": 14,
+      "tags": ["playwright", "page-object", "abstraction"],
+      "practice": [
+        { "slug": "pom-login-basics", "role": "core" },
+        { "slug": "pom-login-failures", "role": "core" },
+        { "slug": "pom-multi-page", "role": "additional" }
+      ]
     },
     {
       "slug": "test-fixtures",
-      "order": 16,
-      "estimatedMinutes": 12,
-      "tags": [
-        "playwright",
-        "fixtures",
-        "dependency-injection",
-        "intermediate"
-      ],
-      "relatedChallenges": [],
-      "nextTutorialSlug": "advanced-fixtures"
+      "order": 23,
+      "moduleSlug": "maintainable-suites",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 14,
+      "tags": ["playwright", "fixtures", "hooks"]
+    },
+    {
+      "slug": "projects-configuration",
+      "order": 24,
+      "moduleSlug": "maintainable-suites",
+      "moduleOrder": 3,
+      "kind": "core",
+      "estimatedMinutes": 14,
+      "tags": ["playwright", "configuration", "projects", "secrets"]
     },
     {
       "slug": "advanced-fixtures",
-      "order": 17,
+      "order": 25,
+      "moduleSlug": "maintainable-suites",
+      "moduleOrder": 4,
+      "kind": "optional",
+      "estimatedMinutes": 14,
+      "tags": ["playwright", "fixtures", "worker-scope", "optional"]
+    },
+    {
+      "slug": "ci-reports-cross-browser",
+      "order": 26,
+      "moduleSlug": "ship-and-prove",
+      "moduleOrder": 1,
+      "kind": "core",
       "estimatedMinutes": 15,
-      "tags": ["playwright", "fixtures", "composition", "intermediate"],
-      "relatedChallenges": [],
-      "nextTutorialSlug": null
+      "tags": ["ci", "reports", "artifacts", "cross-browser"]
+    },
+    {
+      "slug": "capstone-web-automation",
+      "order": 27,
+      "moduleSlug": "ship-and-prove",
+      "moduleOrder": 2,
+      "kind": "core",
+      "estimatedMinutes": 15,
+      "tags": ["capstone", "e2e", "review", "maintenance"],
+      "practice": [{ "slug": "pw-capstone-checkout", "role": "core" }]
     }
   ]
 }

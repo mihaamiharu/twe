@@ -1,11 +1,33 @@
 import type { ExpectedStateRule } from '@/lib/content.types';
 
+function isElementVisible(element: Element): boolean {
+    let current: Element | null = element;
+
+    while (current) {
+        if (current.hasAttribute('hidden')) return false;
+
+        const style =
+            current.ownerDocument.defaultView?.getComputedStyle(current);
+        if (
+            style?.display === 'none' ||
+            style?.visibility === 'hidden' ||
+            style?.visibility === 'collapse'
+        ) {
+            return false;
+        }
+
+        current = current.parentElement;
+    }
+
+    return true;
+}
+
 /**
  * Validate expected DOM state after code execution
  */
 export function validateExpectedState(
     doc: Document,
-    rules: ExpectedStateRule[]
+    rules: ExpectedStateRule[],
 ): { passed: boolean; error?: string } {
     for (const rule of rules) {
         const elements = doc.querySelectorAll(rule.selector);
@@ -18,16 +40,19 @@ export function validateExpectedState(
             };
         }
 
-        // Check visible (at least one element exists)
-        if (rule.visible && elements.length === 0) {
+        const visibleElements = Array.from(elements).filter(isElementVisible);
+
+        // Check visible (at least one matching element is rendered)
+        if (rule.visible && visibleElements.length === 0) {
             return {
                 passed: false,
-                error: `Expected '${rule.selector}' to be visible, but it was not found`,
+                error: `Expected '${rule.selector}' to be visible, but no visible match was found`,
             };
         }
 
-        // Check hidden (no elements)
-        if (rule.hidden && elements.length > 0) {
+        // A hidden expectation passes when the element is absent or every
+        // matching element is hidden, matching Playwright's assertion model.
+        if (rule.hidden && visibleElements.length > 0) {
             return {
                 passed: false,
                 error: `Expected '${rule.selector}' to be hidden, but it was visible`,

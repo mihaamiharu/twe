@@ -21,8 +21,16 @@
     "stack": {
       "note": "Pelajaran saat ini",
       "lessonLabel": "Pelajaran {{number}}",
+      "moduleLabel": "Modul {{number}}",
       "cardLesson": "Buka pelajaran",
       "noLessons": "Katalog pelajaran saat ini tidak tersedia."
+    },
+    "path": {
+      "progress": "Inti: {{lessons}}/{{lessonTotal}} pelajaran · {{practice}}/{{practiceTotal}} latihan",
+      "completed": "Learning path selesai",
+      "moduleProgress": "{{lessons}}/{{lessonTotal}} pelajaran · {{practice}}/{{practiceTotal}} latihan",
+      "coreLesson": "Inti",
+      "optionalLesson": "Opsional"
     },
     "lessons": {
       "eyebrow": "OTOMASI WEB / PELAJARAN",
@@ -89,7 +97,9 @@
     "duration": "Durasi",
     "statusCompleted": "Selesai",
     "challengesTitle": "Tantangan Latihan",
-    "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini."
+    "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini.",
+    "corePractice": "Latihan Inti",
+    "additionalPractice": "Latihan Tambahan"
   },
   "detail": {
     "breadcrumbLabel": "Breadcrumb pelajaran",

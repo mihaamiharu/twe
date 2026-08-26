@@ -1,4 +1,12 @@
-import { describe, it, expect, mock, beforeEach, afterEach, spyOn } from 'bun:test';
+import {
+    describe,
+    it,
+    expect,
+    mock,
+    beforeEach,
+    afterEach,
+    spyOn,
+} from 'bun:test';
 import { renderHook, act } from '@testing-library/react';
 import { useChallengeExecution } from '@/components/challenges/playground/use-challenge-execution';
 import * as executor from '@/core/executor';
@@ -11,30 +19,24 @@ import {
 
 describe('useChallengeExecution', () => {
     beforeEach(() => {
-        void mock.module(
-            '@/core/executor/module-preloader', () => ({
-                generatePreloadCode: () => '',
-            })
-        );
+        void mock.module('@/core/executor/module-preloader', () => ({
+            generatePreloadCode: () => '',
+        }));
 
-        void mock.module(
-            '@/lib/storage-adapter', () => ({
-                storage: {
-                    getItem: mock(() => Promise.resolve(null)),
-                    setItem: mock(() => Promise.resolve()),
-                    removeItem: mock(() => Promise.resolve()),
-                    clear: mock(() => Promise.resolve()),
-                },
-            })
-        );
+        void mock.module('@/lib/storage-adapter', () => ({
+            storage: {
+                getItem: mock(() => Promise.resolve(null)),
+                setItem: mock(() => Promise.resolve()),
+                removeItem: mock(() => Promise.resolve()),
+                clear: mock(() => Promise.resolve()),
+            },
+        }));
 
-        void mock.module(
-            'sonner', () => ({
-                toast: {
-                    error: mock(),
-                },
-            })
-        );
+        void mock.module('sonner', () => ({
+            toast: {
+                error: mock(),
+            },
+        }));
     });
 
     afterEach(() => {
@@ -73,9 +75,15 @@ describe('useChallengeExecution', () => {
         challenge: createChallenge({
             id: '1',
             slug: 'test',
-            testCases: [{ id: 'case-1', name: 'returns greeting', expectedOutput: 'hello' }],
+            testCases: [
+                {
+                    id: 'case-1',
+                    name: 'returns greeting',
+                    expectedOutput: 'hello',
+                },
+            ],
             category: 'basics',
-            starterCode: 'console.log("start")'
+            starterCode: 'console.log("start")',
         }),
         onSubmit: mock(),
         userId: 'user1',
@@ -83,9 +91,7 @@ describe('useChallengeExecution', () => {
 
     const mockIframe = { current: null };
 
-    beforeEach(() => {
-
-    });
+    beforeEach(() => {});
 
     it('should run code successfully', async () => {
         spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
@@ -93,10 +99,12 @@ describe('useChallengeExecution', () => {
             output: 'Success',
             returnValue: 'hello',
             executionTime: 100,
-            logs: []
+            logs: [],
         });
 
-        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
+        const { result } = renderHook(() =>
+            useChallengeExecution(mockState, mockProps, mockIframe),
+        );
 
         await act(async () => {
             await result.current.handleRunCode();
@@ -104,9 +112,9 @@ describe('useChallengeExecution', () => {
 
         expect(mockState.setIsRunning).toHaveBeenCalledWith(true);
         expect(mockState.setHasPassed).toHaveBeenCalledWith(true);
-        expect(mockState.setTestResults).toHaveBeenCalledWith(expect.arrayContaining([
-            expect.objectContaining({ passed: true })
-        ]));
+        expect(mockState.setTestResults).toHaveBeenCalledWith(
+            expect.arrayContaining([expect.objectContaining({ passed: true })]),
+        );
     });
 
     it('should handle execution failure', async () => {
@@ -117,16 +125,23 @@ describe('useChallengeExecution', () => {
             executionTime: 0,
         });
 
-        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
+        const { result } = renderHook(() =>
+            useChallengeExecution(mockState, mockProps, mockIframe),
+        );
 
         await act(async () => {
             await result.current.handleRunCode();
         });
 
         expect(mockState.setHasPassed).toHaveBeenCalledWith(false);
-        expect(mockState.setTestResults).toHaveBeenCalledWith(expect.arrayContaining([
-            expect.objectContaining({ passed: false, error: 'Syntax Error' })
-        ]));
+        expect(mockState.setTestResults).toHaveBeenCalledWith(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    passed: false,
+                    error: 'Syntax Error',
+                }),
+            ]),
+        );
     });
 
     it('should validate value mismatch for JS challenge', async () => {
@@ -137,7 +152,9 @@ describe('useChallengeExecution', () => {
             executionTime: 100,
         });
 
-        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
+        const { result } = renderHook(() =>
+            useChallengeExecution(mockState, mockProps, mockIframe),
+        );
 
         await act(async () => {
             await result.current.handleRunCode();
@@ -147,12 +164,70 @@ describe('useChallengeExecution', () => {
         expect(mockState.setHasPassed).toHaveBeenCalledWith(false);
     });
 
+    it('rejects Playwright code that skips task-specific validation methods', async () => {
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'PASSED',
+            output: 'Success',
+            executionTime: 100,
+            assertionCount: 1,
+        });
+        const state = createPlaygroundState({
+            ...mockState,
+            code: "await expect(page.locator('body')).toBeVisible();",
+        });
+        const props = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                ...mockProps.challenge,
+                type: 'PLAYWRIGHT',
+                validation: { requiredAssertions: ['toHaveText'] },
+            }),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(state, props, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(state.setHasPassed).toHaveBeenCalledWith(false);
+    });
+
+    it('rejects masking methods forbidden by a challenge', async () => {
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'PASSED',
+            output: 'Success',
+            executionTime: 100,
+            assertionCount: 1,
+        });
+        const state = createPlaygroundState({
+            ...mockState,
+            code: "await page.waitForTimeout(1000); await expect(page.locator('body')).toBeVisible();",
+        });
+        const props = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                ...mockProps.challenge,
+                type: 'PLAYWRIGHT',
+                validation: { forbiddenMethods: ['waitForTimeout'] },
+            }),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(state, props, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(state.setHasPassed).toHaveBeenCalledWith(false);
+    });
+
     it('should submit results if passed', () => {
-        const { result } = renderHook(() => useChallengeExecution(
-            createPlaygroundState({ ...mockState, hasPassed: true }),
-            mockProps,
-            mockIframe
-        ));
+        const { result } = renderHook(() =>
+            useChallengeExecution(
+                createPlaygroundState({ ...mockState, hasPassed: true }),
+                mockProps,
+                mockIframe,
+            ),
+        );
 
         act(() => {
             result.current.handleSubmit();
@@ -174,11 +249,16 @@ describe('useChallengeExecution', () => {
             selector: '.target',
         });
 
-        const { result } = renderHook(() => useChallengeExecution(
-            selectorState,
-            createPlaygroundProps({ ...mockProps, challenge: selectorChallenge }),
-            mockIframe,
-        ));
+        const { result } = renderHook(() =>
+            useChallengeExecution(
+                selectorState,
+                createPlaygroundProps({
+                    ...mockProps,
+                    challenge: selectorChallenge,
+                }),
+                mockIframe,
+            ),
+        );
 
         act(() => {
             result.current.handleValidateSelector();
@@ -187,7 +267,9 @@ describe('useChallengeExecution', () => {
         expect(mockState.setHasPassed).toHaveBeenCalledWith(true);
     });
     it('should reset state on confirmReset', async () => {
-        const { result } = renderHook(() => useChallengeExecution(mockState, mockProps, mockIframe));
+        const { result } = renderHook(() =>
+            useChallengeExecution(mockState, mockProps, mockIframe),
+        );
 
         await act(async () => {
             await result.current.confirmReset();
@@ -217,15 +299,19 @@ describe('useChallengeExecution', () => {
             }),
         });
 
-        const { result } = renderHook(() => useChallengeExecution(fileState, fileProps, mockIframe));
+        const { result } = renderHook(() =>
+            useChallengeExecution(fileState, fileProps, mockIframe),
+        );
 
         act(() => {
             result.current.handleFileChange('/test.spec.ts', 'new content');
         });
 
-        expect(fileState.setFileContents).toHaveBeenCalledWith(expect.objectContaining({
-            '/test.spec.ts': 'new content'
-        }));
+        expect(fileState.setFileContents).toHaveBeenCalledWith(
+            expect.objectContaining({
+                '/test.spec.ts': 'new content',
+            }),
+        );
         // Main file update also updates 'code' state
         expect(mockState.setCode).toHaveBeenCalledWith('new content');
     });

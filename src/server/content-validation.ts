@@ -4,6 +4,7 @@ import { formatZodIssues } from '@/lib/zod-errors';
 import type {
   ChallengeDefinition,
   ChallengeTierFile,
+  CurriculumModuleDefinition,
   ExpectedStateRule,
   LocalizedArray,
   LocalizedString,
@@ -13,91 +14,149 @@ import type {
 } from '@/lib/content.types';
 
 const ContentStatusSchema = z.enum(['published', 'draft', 'coming_soon']);
-const LocalizedStringSchema = z.object({
-  en: z.string(),
-  id: z.string().optional(),
-}).strict();
-const LocalizedArraySchema = z.object({
-  en: z.array(z.string()),
-  id: z.array(z.string()).optional(),
-}).strict();
+const LocalizedStringSchema = z
+  .object({
+    en: z.string().min(1),
+    id: z.string().min(1),
+  })
+  .strict();
+const LocalizedArraySchema = z
+  .object({
+    en: z.array(z.string()),
+    id: z.array(z.string()).optional(),
+  })
+  .strict();
 
-const TutorialRegistrySchema = z.object({
-  tutorials: z.array(z.object({
+const TutorialRegistrySchema = z
+  .object({
+    modules: z.array(
+      z
+        .object({
+          slug: z.string().min(1),
+          order: z.number().int().positive(),
+          title: LocalizedStringSchema,
+          description: LocalizedStringSchema,
+          outcome: LocalizedStringSchema,
+        })
+        .strict(),
+    ),
+    tutorials: z.array(
+      z
+        .object({
+          slug: z.string().min(1),
+          order: z.number().int().positive(),
+          moduleSlug: z.string().min(1),
+          moduleOrder: z.number().int().positive(),
+          kind: z.enum(['core', 'optional']),
+          estimatedMinutes: z.number().int().positive(),
+          tags: z.array(z.string()),
+          practice: z
+            .array(
+              z
+                .object({
+                  slug: z.string().min(1),
+                  role: z.enum(['core', 'additional']),
+                })
+                .strict(),
+            )
+            .optional(),
+          status: ContentStatusSchema.optional(),
+        })
+        .strict(),
+    ),
+  })
+  .strict();
+
+const ExpectedStateSchema = z
+  .object({
+    selector: z.string(),
+    visible: z.boolean().optional(),
+    hidden: z.boolean().optional(),
+    containsText: z.string().optional(),
+    hasAttribute: z
+      .object({
+        name: z.string(),
+        value: z.string().optional(),
+      })
+      .strict()
+      .optional(),
+    count: z.number().int().nonnegative().optional(),
+  })
+  .strict();
+
+const ChallengeValidationSchema = z
+  .object({
+    requiredAssertions: z.array(z.string().min(1)).optional(),
+    requiredMethods: z.array(z.string().min(1)).optional(),
+    forbiddenMethods: z.array(z.string().min(1)).optional(),
+  })
+  .strict();
+
+const ChallengeDefinitionSchema = z
+  .object({
     slug: z.string().min(1),
+    type: z.enum([
+      'CSS_SELECTOR',
+      'XPATH_SELECTOR',
+      'JAVASCRIPT',
+      'TYPESCRIPT',
+      'PLAYWRIGHT',
+    ]),
+    difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
+    category: z.string(),
+    xpReward: z.number(),
     order: z.number(),
-    estimatedMinutes: z.number(),
-    tags: z.array(z.string()),
-    relatedChallenges: z.array(z.string()).optional(),
-    nextTutorialSlug: z.string().nullable().optional(),
+    tutorialSlug: z.string().optional(),
+    title: LocalizedStringSchema,
+    description: LocalizedStringSchema,
+    instructions: LocalizedStringSchema,
+    hints: LocalizedArraySchema.optional(),
+    htmlContent: z.string().optional(),
+    files: z.record(z.string(), z.string()).optional(),
+    editableFiles: z.array(z.string()).optional(),
+    preloadModules: z
+      .record(
+        z.string(),
+        z
+          .object({
+            exports: z.array(z.string()),
+            source: z.string(),
+          })
+          .strict(),
+      )
+      .optional(),
+    starterCode: z.string().optional(),
+    testCases: z.array(
+      z
+        .object({
+          description: z.string(),
+          input: z.json().optional(),
+          expectedOutput: z.json(),
+          isHidden: z.boolean().optional(),
+        })
+        .strict(),
+    ),
+    solution: z.string(),
+    tags: z.array(z.string()).optional(),
     status: ContentStatusSchema.optional(),
-  }).strict()),
-}).strict();
+    expectedState: z.array(ExpectedStateSchema).optional(),
+    validation: ChallengeValidationSchema.optional(),
+  })
+  .strict();
 
-const ExpectedStateSchema = z.object({
-  selector: z.string(),
-  visible: z.boolean().optional(),
-  hidden: z.boolean().optional(),
-  containsText: z.string().optional(),
-  hasAttribute: z.object({
-    name: z.string(),
-    value: z.string().optional(),
-  }).strict().optional(),
-  count: z.number().int().nonnegative().optional(),
-}).strict();
-
-const ChallengeDefinitionSchema = z.object({
-  slug: z.string().min(1),
-  type: z.enum([
-    'CSS_SELECTOR',
-    'XPATH_SELECTOR',
-    'JAVASCRIPT',
-    'TYPESCRIPT',
-    'PLAYWRIGHT',
-  ]),
-  difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
-  category: z.string(),
-  xpReward: z.number(),
-  order: z.number(),
-  tutorialSlug: z.string().optional(),
-  title: LocalizedStringSchema,
-  description: LocalizedStringSchema,
-  instructions: LocalizedStringSchema,
-  hints: LocalizedArraySchema.optional(),
-  htmlContent: z.string().optional(),
-  files: z.record(z.string(), z.string()).optional(),
-  editableFiles: z.array(z.string()).optional(),
-  preloadModules: z.record(
-    z.string(),
-    z.object({
-      exports: z.array(z.string()),
-      source: z.string(),
-    }).strict(),
-  ).optional(),
-  starterCode: z.string().optional(),
-  testCases: z.array(z.object({
-    description: z.string(),
-    input: z.json().optional(),
-    expectedOutput: z.json(),
-    isHidden: z.boolean().optional(),
-  }).strict()),
-  solution: z.string(),
-  tags: z.array(z.string()).optional(),
-  status: ContentStatusSchema.optional(),
-  expectedState: z.array(ExpectedStateSchema).optional(),
-}).strict();
-
-const ChallengeTierFileSchema = z.object({
-  tier: z.enum([
-    'basic',
-    'beginner',
-    'intermediate',
-    'e2e',
-    'pom',
-    'typescript',
-  ]),
-  challenges: z.array(ChallengeDefinitionSchema),
-}).strict();
+const ChallengeTierFileSchema = z
+  .object({
+    tier: z.enum([
+      'basic',
+      'beginner',
+      'intermediate',
+      'e2e',
+      'pom',
+      'typescript',
+    ]),
+    challenges: z.array(ChallengeDefinitionSchema),
+  })
+  .strict();
 
 function normalizeLocalizedString(
   value: z.infer<typeof LocalizedStringSchema>,
@@ -179,6 +238,16 @@ function normalizeChallengeDefinition(
         value.expectedState === undefined
           ? undefined
           : value.expectedState.map(normalizeExpectedState),
+      validation:
+        value.validation === undefined
+          ? undefined
+          : {
+              ...omitUndefined({
+                requiredAssertions: value.validation.requiredAssertions,
+                requiredMethods: value.validation.requiredMethods,
+                forbiddenMethods: value.validation.forbiddenMethods,
+              }),
+            },
     }),
     testCases: value.testCases.map(normalizeTestCase),
     solution: value.solution,
@@ -191,13 +260,27 @@ function normalizeTutorialRegistryEntry(
   return {
     slug: value.slug,
     order: value.order,
+    moduleSlug: value.moduleSlug,
+    moduleOrder: value.moduleOrder,
+    kind: value.kind,
     estimatedMinutes: value.estimatedMinutes,
     tags: value.tags,
     ...omitUndefined({
-      relatedChallenges: value.relatedChallenges,
-      nextTutorialSlug: value.nextTutorialSlug,
+      practice: value.practice,
       status: value.status,
     }),
+  };
+}
+
+function normalizeCurriculumModule(
+  value: z.infer<typeof TutorialRegistrySchema>['modules'][number],
+): CurriculumModuleDefinition {
+  return {
+    slug: value.slug,
+    order: value.order,
+    title: normalizeLocalizedString(value.title),
+    description: normalizeLocalizedString(value.description),
+    outcome: normalizeLocalizedString(value.outcome),
   };
 }
 
@@ -215,13 +298,16 @@ export function parseTutorialRegistryJson(
   content: string,
   sourcePath: string,
 ): TutorialRegistry {
-  const result = TutorialRegistrySchema.safeParse(parseJson(content, sourcePath));
+  const result = TutorialRegistrySchema.safeParse(
+    parseJson(content, sourcePath),
+  );
   if (!result.success) {
     throw new Error(
       `Invalid tutorial registry in ${sourcePath}: ${formatZodIssues(result.error)}`,
     );
   }
   return {
+    modules: result.data.modules.map(normalizeCurriculumModule),
     tutorials: result.data.tutorials.map(normalizeTutorialRegistryEntry),
   };
 }
@@ -230,7 +316,9 @@ export function parseChallengeTierJson(
   content: string,
   sourcePath: string,
 ): ChallengeTierFile {
-  const result = ChallengeTierFileSchema.safeParse(parseJson(content, sourcePath));
+  const result = ChallengeTierFileSchema.safeParse(
+    parseJson(content, sourcePath),
+  );
   if (!result.success) {
     throw new Error(
       `Invalid challenge tier in ${sourcePath}: ${formatZodIssues(result.error)}`,

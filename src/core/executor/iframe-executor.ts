@@ -468,12 +468,12 @@ export async function executePlaywrightCode(
             }
             
             const executionTime = Date.now() - startTime;
-            cleanup();
 
             // Check for soft failures
             const softFailures = getTestResults().filter((r) => !r.passed);
             const firstSoftFailure = softFailures[0];
             if (firstSoftFailure) {
+              cleanup();
               resolve({
                 status: 'FAILED',
                 output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map((f) => `- ${f.message}`).join('\n')}`,
@@ -489,6 +489,7 @@ export async function executePlaywrightCode(
             if (options?.expectedState && options.expectedState.length > 0) {
               const stateValidation = validateExpectedState(iframeDoc, options.expectedState);
               if (!stateValidation.passed) {
+                cleanup();
                 resolve({
                   status: 'FAILED',
                   output: `DOM State Validation Failed: ${stateValidation.error}`,
@@ -501,6 +502,7 @@ export async function executePlaywrightCode(
               }
             }
 
+            cleanup();
             resolve({
               status: 'PASSED',
               output: 'All steps completed successfully',

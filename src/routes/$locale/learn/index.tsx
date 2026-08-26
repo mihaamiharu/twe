@@ -143,17 +143,37 @@ function LearnPage() {
     });
   }, [hideCompleted, query, tutorialsResponse]);
 
+  const lessonGroups = useMemo(() => {
+    if (!tutorialsResponse.success) return [];
+    return tutorialsResponse.meta.modules
+      .map((module) => ({
+        module,
+        lessons: filteredLessons.filter(
+          (lesson) => lesson.module.slug === module.slug,
+        ),
+      }))
+      .filter((group) => group.lessons.length > 0);
+  }, [filteredLessons, tutorialsResponse]);
+
   const hasActiveFilters = Boolean(query.trim() || hideCompleted);
 
   const learningPathSteps: LearningPathStep[] = tutorialsResponse.success
-    ? tutorialsResponse.data.slice(0, 4).map((lesson, index) => ({
-        number: String(index + 1).padStart(2, '0'),
-        kind: LEARNING_PATH_PREVIEW_KINDS[index] ?? 'practice',
-        label: t('learn.stack.lessonLabel', { number: index + 1 }),
-        title: lesson.title,
-        description: lesson.description,
-        slug: lesson.slug,
-      }))
+    ? tutorialsResponse.meta.modules
+        .slice(0, 4)
+        .map((module, index) => {
+          const firstLesson = tutorialsResponse.data.find(
+            (lesson) => lesson.module.slug === module.slug,
+          );
+          return {
+            number: String(index + 1).padStart(2, '0'),
+            kind: LEARNING_PATH_PREVIEW_KINDS[index] ?? 'practice',
+            label: t('learn.stack.moduleLabel', { number: module.order }),
+            title: module.title,
+            description: module.outcome,
+            slug: firstLesson?.slug ?? tutorialsResponse.data[0]?.slug ?? '',
+          };
+        })
+        .filter((step) => step.slug)
     : [];
 
   return (
@@ -256,6 +276,27 @@ function LearnPage() {
               <p className="mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
                 {t('learn.lessons.description')}
               </p>
+              {tutorialsResponse.success && (
+                <p
+                  className="mt-3 font-mono text-[11px] uppercase tracking-[0.1em] text-primary"
+                  data-testid="learning-path-progress"
+                >
+                  {tutorialsResponse.meta.completion.isCompleted
+                    ? t('learn.path.completed')
+                    : t('learn.path.progress', {
+                        lessons:
+                          tutorialsResponse.meta.completion
+                            .completedCoreLessons,
+                        lessonTotal:
+                          tutorialsResponse.meta.completion.coreLessons,
+                        practice:
+                          tutorialsResponse.meta.completion
+                            .completedCorePractice,
+                        practiceTotal:
+                          tutorialsResponse.meta.completion.corePractice,
+                      })}
+                </p>
+              )}
               <Link
                 to={LocaleRoutes.practice}
                 params={localeParams(locale)}
@@ -371,8 +412,43 @@ function LearnPage() {
               data-view-mode="list"
               className="divide-y divide-border border-t border-border pt-5"
             >
-              {filteredLessons.map((lesson) => (
-                <LessonRow key={lesson.slug} lesson={lesson} locale={locale} />
+              {lessonGroups.map(({ module, lessons }) => (
+                <section
+                  key={module.slug}
+                  className="border-b border-border py-7"
+                  data-testid="learn-module"
+                >
+                  <div className="mb-3 grid gap-3 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:gap-6">
+                    <span className="font-mono text-[11px] tracking-[0.12em] text-primary">
+                      M{String(module.order).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <h3 className="text-xl font-semibold text-foreground">
+                        {module.title}
+                      </h3>
+                      <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                        {module.outcome}
+                      </p>
+                    </div>
+                    <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-muted-foreground">
+                      {t('learn.path.moduleProgress', {
+                        lessons: module.completedCoreLessons,
+                        lessonTotal: module.coreLessons,
+                        practice: module.completedCorePractice,
+                        practiceTotal: module.corePractice,
+                      })}
+                    </span>
+                  </div>
+                  <div className="divide-y divide-border">
+                    {lessons.map((lesson) => (
+                      <LessonRow
+                        key={lesson.slug}
+                        lesson={lesson}
+                        locale={locale}
+                      />
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
           )}
@@ -486,6 +562,13 @@ function LessonMeta({
           {tag}
         </span>
       ))}
+      <span className="rounded bg-primary/10 px-1.5 py-1 text-primary">
+        {t(
+          lesson.kind === 'core'
+            ? 'learn.path.coreLesson'
+            : 'learn.path.optionalLesson',
+        )}
+      </span>
       {lesson.readingProgress > 0 && !lesson.isCompleted && (
         <span className="text-primary">
           {t('card.progress', { progress: lesson.readingProgress })}
@@ -523,12 +606,12 @@ function LessonRow({
     <Link
       to="/$locale/learn/$slug"
       params={{ locale, slug: lesson.slug }}
-      className="group grid gap-4 border-b border-border py-5 transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
+      className="group grid gap-4 py-5 transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
       data-testid="lesson-row"
       data-completed={lesson.isCompleted}
     >
       <span className="font-mono text-[11px] tracking-[0.12em] text-muted-foreground">
-        {String(lesson.order).padStart(2, '0')}
+        {String(lesson.moduleOrder).padStart(2, '0')}
       </span>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3">

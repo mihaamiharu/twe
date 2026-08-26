@@ -388,7 +388,13 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
 
         <header className="max-w-4xl border-b border-border pb-10 pt-8 md:pb-14 md:pt-12">
           <div className="flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-[0.14em] text-primary">
-            <span>{t('learn.eyebrow')}</span>
+            <span>
+              {t('learn.stack.moduleLabel', {
+                number: tutorial.module.order,
+              })}
+            </span>
+            <span className="h-px w-8 bg-border" aria-hidden="true" />
+            <span>{tutorial.module.title}</span>
             <span className="h-px w-8 bg-border" aria-hidden="true" />
             <span className="flex items-center gap-1.5 text-muted-foreground">
               <Clock className="h-3.5 w-3.5" aria-hidden="true" />
@@ -563,6 +569,14 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
                           {challenge.title}
                         </span>
                         <span className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="font-semibold text-primary">
+                            {t(
+                              challenge.role === 'core'
+                                ? 'sidebar.corePractice'
+                                : 'sidebar.additionalPractice',
+                            )}
+                          </span>
+                          <span aria-hidden="true">·</span>
                           <span>{challenge.category}</span>
                           <span aria-hidden="true">·</span>
                           <span>{challenge.xpReward} XP</span>
