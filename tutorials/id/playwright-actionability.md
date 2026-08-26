@@ -1,96 +1,66 @@
 ---
-title: "Actionability dan Auto-Wait Engine"
-description: "Gimana Playwright ngebasmi 'flaky test' dengan cara otomatis verifikasi status elemen sebelum beraksi."
+title: 'Actionability Bukan Sinkronisasi Hasil'
+description: 'Pahami pemeriksaan kesiapan khusus tiap action dan tunggu hasil aplikasi yang benar-benar dibutuhkan skenario.'
 ---
 
-## 1. Masalahnya: Race Condition
+## Perlindungan dari actionability
 
-Di *manual testing*, kalau tombol masih *loading* atau ketutup *popup*, kamu bakal nunggu sampai dia siap. Tapi di otomatisasi biasa, kalau kamu suruh *script* buat `click()`, dia bakal kirim sinyal itu di milidetik itu juga. Kalau elemennya belum siap pas perintah itu datang, tes kamu bakal langsung *crash* atau gagal.
+Sebelum action, Playwright menyelesaikan locator dan menjalankan pemeriksaan yang relevan dengan action tersebut. Contohnya, `click()` membutuhkan satu element yang visible, stable, dapat menerima event, dan enabled. `fill()` membutuhkan element yang visible, enabled, serta editable; kumpulan pemeriksaannya tidak sama dengan click.
 
-Playwright nyelesain masalah ini dengan bertindak kayak pengamat manusia. Dia nggak asal klik; dia nunggu dulu sampai elemennya bener-bener **Actionable**.
+Jika kondisi tersebut tidak terpenuhi dalam action timeout, action gagal dengan detail diagnosis.
 
----
-
-## 2. Checklist Actionability
-
-Sebelum Playwright jalanin aksi (kayak `click()`, `fill()`, atau `check()`), dia bakal jalanin "Pre-Flight Checklist" internal. Kalau salah satu cek ini gagal, Playwright bakal nunggu dan nyoba lagi terus-terusan (selama **Timeout** bawaan 30 detik).
-
-| Actionability Check | Deskripsi | Penyebab Gagal |
-| --- | --- | --- |
-| **Attached** | Elemen harus sudah ada di dalam **DOM**. | Elemen belum dirender sama **React** atau **Vue**. |
-| **Visible** | Elemen harus kelihatan secara visual. | Masih kena `display: none` atau `visibility: hidden`. |
-| **Stable** | Elemen harus diam (nggak gerak-gerak). | Animasi CSS atau transisi lagi jalan. |
-| **Enabled** | Elemen nggak boleh dalam kondisi *disabled*. | Ada atribut `disabled` di tag HTML-nya. |
-| **Receiving Events** | Elemen nggak boleh ketutup elemen lain. | Ketutup **overlay**, **modal**, atau **loading spinner**. |
-
-![Actionability Checklist](/images/tutorials/playwright-actionability-checklist.png)
-
----
-
-## 3. Kasus Nyata: Spinner yang Hilang
-
-**Skenarionya:** Kamu klik "Submit". **Loading spinner** muncul sebentar, baru setelah itu pesan "Sukses" muncul.
-
-### Cara Lama (Selenium)
-
-Kamu harus nulis perintah **wait** manual buat setiap perubahan status:
-
-```javascript
-// Harus nunggu manual, ribet dan gampang gagal (flaky)
-await driver.click('#submit');
-await driver.wait(until.elementIsNotVisible(spinner)); // Tunggu spinner hilang
-await driver.wait(until.elementIsVisible(successMsg)); // Tunggu pesan muncul
-const text = await successMsg.getText();
+```ts
+await page.getByRole('button', { name: 'Pay now' }).click();
 ```
 
-### Cara Playwright
+Ini melindungi dari klik pada target yang bergerak, tertutup, atau disabled. Baris tersebut tidak menyatakan pembayaran selesai.
 
-```javascript
-await page.click('#submit');
-// Playwright otomatis nunggu pesan suksesnya memenuhi kriteria 
-// Attached, Visible, dan Stable secara otomatis.
-const message = await page.locator('.success-msg').innerText();
+## Pisahkan tiga momen
+
+```text
+1. Target siap untuk action
+2. Action dikirim/diselesaikan
+3. Aplikasi mencapai hasil yang diharapkan
 ```
 
-> [!TIP]
-> Di Playwright, kamu cukup nulis **apa** yang mau kamu lakuin. Mesin **Auto-Wait** bakal ngurusin masalah *timing* dan **Actionability** di balik layar.
+Playwright menangani sebagian besar momen 1 dan 2. Skenario harus mendefinisikan momen 3:
 
----
+```ts
+await page.getByRole('button', { name: 'Pay now' }).click();
 
-## 4. Kenapa Ini Ngebasmi "Flaky Test"?
+await expect(
+  page.getByRole('heading', { name: 'Payment confirmed' }),
+).toBeVisible();
+```
 
-Karena Playwright punya koneksi langsung ke browser (ingat materi **Arsitektur**), dia nggak perlu menebak-nebak. Dia **tahu** persis kondisi elemennya secara *real-time*.
+Web-first assertion memeriksa konfirmasi berulang kali. Fixed sleep tidak dibutuhkan.
 
-![Auto-Wait Engine Flow](/images/tutorials/playwright-autowait-flow.png)
+## Tunggu event ketika event adalah perilaku produk
 
-| Keuntungan | Penjelasan |
-| --- | --- |
-| **No Manual Sleeps** | Kamu nggak butuh lagi `page.waitForTimeout(5000)` yang bikin tes jadi lambat. |
-| **Akurasi Tinggi** | Kalau elemen siap dalam 5ms, dia langsung lanjut. Nggak ada waktu terbuang. |
-| **Error Log Jelas** | Kalau gagal, dia kasih tahu cek mana yang nggak lulus (misal: "Element is hidden"). |
+Kadang action menghasilkan event, bukan UI di halaman yang sama. Mulai listener sebelum action:
 
-> [!CAUTION]
-> Meskipun **Auto-Wait** itu otomatis buat aksi lewat **Locator**, fitur ini **TIDAK** berlaku buat eksekusi JavaScript mentah kayak `page.evaluate()`. Selalu prioritaskan pakai metode **Locator**.
+```ts
+const downloadPromise = page.waitForEvent('download');
+await page.getByRole('button', { name: 'Export CSV' }).click();
+const download = await downloadPromise;
+await download.saveAs('artifacts/orders.csv');
+```
 
----
+Pola yang sama berlaku untuk popup dan event satu kali lainnya.
 
-## 5. Checklist Rangkuman
+## Jangan sembunyikan ketidakpastian
 
-| Konsep | Poin Penting |
-| --- | --- |
-| **Actionability itu Otomatis** | Sudah aktif secara bawaan untuk setiap aksi **Locator**. |
-| **5 Kriteria Utama** | **Attached**, **Visible**, **Stable**, **Enabled**, **Receiving Events**. |
-| **Smart Waiting** | Nunggu sampai elemen siap atau sampai kena **Timeout** (30 detik). |
+Hindari:
 
----
+```ts
+await page.waitForTimeout(2000);
+await button.click({ force: true });
+```
 
-## 6. Bacaan Lanjut (Deep Dive)
+Sleep menebak waktu; force melewati bukti bahwa pengguna tidak dapat berinteraksi. Diagnosis state sebenarnya: loading indicator, overlay, data salah, animation, atau aturan bisnis disabled.
 
-### Dokumentasi Resmi
+Retry menjalankan ulang test gagal dan dapat membantu noise infrastruktur, tetapi tidak memperbaiki sinkronisasi yang hilang. Test yang hanya lulus setelah retry tetap harus di-debug.
 
-* **[Auto-Waiting](https://playwright.dev/docs/actionability)**: Daftar lengkap aksi apa saja yang nungguin kriteria apa saja.
-* **[Timeouts](https://playwright.dev/docs/test-timeouts)**: Cara kustomisasi batas waktu tunggu.
+## Tinjau wait hasil generate
 
-### Source Code
-
-* **[ElementHandle Implementation](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/dom.ts)**: Intip gimana Playwright ngecek status DOM di level mesin.
+Untuk setiap wait, tanyakan kondisi teramati apa yang mengakhirinya. Untuk setiap action, tanyakan hasil apa yang membuktikan keberhasilan. Jika keduanya tidak eksplisit, test rentan terhadap race atau false pass.

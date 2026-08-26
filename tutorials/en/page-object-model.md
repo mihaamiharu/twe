@@ -1,130 +1,80 @@
 ---
-title: "Page Object Model (POM)"
-description: "Reviewing the industry-standard design pattern for reducing code duplication and maintenance."
+title: 'Helpers, Component Objects, and Page Objects'
+description: 'Choose the smallest abstraction that reduces maintenance without hiding test intent.'
 ---
 
-As your test suite grows, you'll encounter a common problem: if a login button's ID changes, you might have to update that selector in 50 different test files. This is where the **Page Object Model (POM)** comes to the rescue.
+## Duplication is not automatically a problem
 
----
+Two tests repeating a clear locator may be easier to understand than a large abstraction created too early. Extract code when repetition represents a stable domain concept or when one change currently requires many coordinated edits.
 
-## 1. The Concept: Why POM?
+## Start with a focused helper
 
-The Page Object Model is a design pattern that creates an "Object Repository" for your UI elements. Instead of scattering selectors across your tests, you place them in a dedicated class file.
+```ts
+async function signIn(page: Page, user: TestUser) {
+  await page.getByLabel('Email').fill(user.email);
+  await page.getByLabel('Password').fill(user.password);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+  await expect(page).toHaveURL(/dashboard/);
+}
+```
 
-### Separation of Concerns
+This names a complete behavior and keeps its success condition close.
 
-Think of it as a translation layer. Your test scripts speak in "User Intent" (Login, Add Item), while your Page Objects handle the "Technical Specifics" (CSS selectors, click actions).
+## Component objects for repeated widgets
 
-![Page Object Model Diagram](/images/tutorials/pom-concept-diagram.png)
+```ts
+export class CartPanel {
+  constructor(private readonly root: Locator) {}
 
-| Feature | Without POM | With POM |
-| --- | --- | --- |
-| **Maintenance** | Update 50 files if UI changes | Update 1 file (the Page Object) |
-| **Readability** | `page.locator('.btn-primary').click()` | `loginPage.submit()` |
-| **Duplication** | Copy-pasting selectors everywhere | Reusable methods and locators |
-
-> [!NOTE]
-> POM is not a framework feature; it's a design pattern. You can use it with Selenium, Cypress, Playwright, or even raw Puppeteer.
-
----
-
-## 2. Anatomy of a Page Object
-
-In Playwright with TypeScript, a Page Object is simply a `class`. It typically has two main parts: **Locators** (defined in the constructor) and **Actions** (defined as methods).
-
-```typescript
-// pages/LoginPage.ts
-import { type Locator, type Page } from '@playwright/test';
-
-export class LoginPage {
-  // 1. Define standard properties
-  readonly page: Page;
-  readonly usernameInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
-
-  constructor(page: Page) {
-    this.page = page;
-    
-    // 2. Initialize Locators inside the constructor
-    this.usernameInput = page.locator('#username');
-    this.passwordInput = page.locator('#password');
-    this.loginButton = page.getByRole('button', { name: 'Sign In' });
+  item(name: string) {
+    return this.root.getByRole('listitem').filter({ hasText: name });
   }
 
-  // 3. Define Actions as async methods
-  async goto() {
-    await this.page.goto('/login');
-  }
-
-  async login(user: string, pass: string) {
-    await this.usernameInput.fill(user);
-    await this.passwordInput.fill(pass);
-    await this.loginButton.click();
+  async remove(name: string) {
+    await this.item(name).getByRole('button', { name: 'Remove' }).click();
   }
 }
 ```
 
----
+A component object is often more reusable than a whole-page object because modern applications reuse widgets across pages.
 
-## 3. Implementation in Tests
+## Page objects when the page is a stable domain boundary
 
-Once your Page Object is defined, your test files become much cleaner. You no longer see implementation details like IDs or CSS classes.
+```ts
+export class LoginPage {
+  constructor(private readonly page: Page) {}
 
-```typescript
-// tests/login.spec.ts
-import { test, expect } from '@playwright/test';
-import { LoginPage } from '../pages/LoginPage';
+  async open() {
+    await this.page.goto('/login');
+  }
 
-test('User can login successfully', async ({ page }) => {
-  // 1. Instantiate the Page Object
-  const loginPage = new LoginPage(page);
+  async submit(email: string, password: string) {
+    await this.page.getByLabel('Email').fill(email);
+    await this.page.getByLabel('Password').fill(password);
+    await this.page.getByRole('button', { name: 'Sign in' }).click();
+  }
 
-  // 2. Use the simplified methods
-  await loginPage.goto();
-  await loginPage.login('testuser', 'password123');
-
-  // 3. Assertions usually remain in the test file
-  await expect(page).toHaveURL(/dashboard/);
-});
+  error() {
+    return this.page.getByRole('alert');
+  }
+}
 ```
 
-> [!TIP]
-> In our playground exercises, we often **pre-load** the Page Object classes for you. You don't need to import them just call `new LoginPage(page)` and get started!
+Tests keep scenario-specific assertions visible:
 
----
+```ts
+await login.submit('qa@example.com', 'wrong');
+await expect(login.error()).toHaveText('Invalid credentials');
+```
 
-## 4. Best Practices
+It is also acceptable for a helper to assert an invariant such as “login completed” when that outcome is part of the helper’s contract. “Never put assertions in page objects” is not a universal law.
 
-Not all Page Objects are created equal. Follow these rules to keep your code clean.
+## Warning signs
 
-| Rule | Why? |
-| --- | --- |
-| **No Assertions in POs** | Page Objects should define *how* to interact, not *what* is correct. Verification belongs in the Test. |
-| **Return New Pages** | If clicking "Save" redirects to the Dashboard, your `save()` method should return a `new DashboardPage(page)`. |
-| **Component Objects** | Don't put everything in one giant class. Create smaller classes for repeatable widgets like `DatePicker` or `NavBar`. |
+- one class mirrors every page element;
+- generic methods such as `clickButton(name)` hide locator intent;
+- assertions are buried so test titles no longer explain behavior;
+- page objects call each other in a long navigation chain;
+- tests cannot perform a legitimate alternative path without changing the abstraction.
 
----
-
-## 5. Summary Checklist
-
-| Concept | Key Takeaway |
-| --- | --- |
-| **Single Responsibility** | Page Objects handle *how* to interact; Tests handle *what* to verify. |
-| **DRY Principle** | "Don't Repeat Yourself." If you write the same selector twice, move it to a Page Object. |
-| **Readability** | Your tests should read like a manual test case script. |
-
----
-
-## 6. Further Reading (Deep Dive)
-
-Mastering POM allows you to build massive test suites that are easy to maintain.
-
-### Official Documentation
-
-* **[Playwright POM Guide](https://playwright.dev/docs/pom)**: The official guide on structuring Page Objects in Playwright.
-* **[Test Fixtures](https://playwright.dev/docs/test-fixtures)**: An advanced pattern to auto-initialize Page Objects without `new LoginPage(page)` in every test.
-
-### GitHub Source Code
-
-* **[VS Code Tests](https://github.com/microsoft/vscode/tree/main/test/automation)**: See how the VS Code team uses Page Objects to test VS Code itself.
+Choose helpers, component objects, or page objects based on change patterns—not fashion.

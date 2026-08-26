@@ -1,121 +1,88 @@
 ---
-title: "Advanced Fixtures"
-description: "Kuasai komposisi, worker-scope, dan override buat jadi Test Architect yang sebenernya."
+title: 'Komposisi Fixture Lanjutan (Opsional)'
+description: 'Susun typed option dan worker-scoped resource hanya setelah ownership, scope, serta cleanup dipahami.'
 ---
 
-Kamu udah bisa bikin fixture dasar. Sekarang, kita upgrade skill jadi **Test Architect**. Kita bakal bahas pola-pola canggih yang dipake di tim engineering skala besar.
+## Kapan fixture lanjutan layak digunakan
 
----
+Gunakan pola opsional ini ketika banyak test berbagi lifecycle resource nyata yang tidak dapat dijelaskan helper dan test-scoped fixture secara bersih. Kompleksitasnya harus memberi ownership lebih jelas atau penghematan setup yang berarti.
 
-## 1. Komposisi Fixture (Fixture Composition)
+## Pisahkan option dari fixture
 
-Kekuatan asli fixture itu ada di kemampuannya buat **bergantung satu sama lain**. Persis kayak main LEGO, kamu bisa ngerakit object kompleks dari potongan-potongan kecil.
+```ts
+import { test as base } from '@playwright/test';
+import { LoginPage } from './pages/login-page';
 
-Bayangin kamu punya `UserPage` yang butuh user yang udah login. Kamu tinggal minta fixture `loginPage` di dalem fixture `userPage`-mu!
-
-![Diagram Komposisi Fixture](/images/tutorials/fixture-composition-diagram.png)
-
-```typescript
-type MyFixtures = {
-  settingsPage: SettingsPage;
-  userPage: UserPage;
+type Options = {
+  defaultUser: { email: string; password: string };
 };
 
-export const test = base.extend<MyFixtures>({
-  // Fixture ini bergantung sama fixture 'settingsPage'!
-  userPage: async ({ settingsPage }, use) => {
-    await settingsPage.goto(); 
-    await use(new UserPage(settingsPage.page));
+type Fixtures = {
+  loginPage: LoginPage;
+};
+
+export const test = base.extend<Options & Fixtures>({
+  defaultUser: [
+    { email: 'qa@example.com', password: 'local-only' },
+    { option: true },
+  ],
+
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
   },
 });
 ```
 
-Playwright otomatis bakal ngurutin rantai ketergantungannya. Kalau `settingsPage` butuh `loginPage`, dia bakal bikinin itu dulu. Canggih kan?
+Di repository nyata, muat password dengan aman dan jangan menyimpannya di source. Option dapat di-override per project atau test group.
 
----
+## Worker scope membutuhkan ownership per worker
 
-## 2. Worker-Scoped Fixtures (Performa)
+```ts
+type WorkerFixtures = {
+  workerAccount: { email: string };
+};
 
-Secara default, fixture itu dihancurkan (teardown) tiap kali satu test kelar. Ini bagus buat isolasi, tapi jelek buat performa kalau kamu ngelakuin hal berat kayak **database seeding** atau **login via API**.
-
-Pake `{ scope: 'worker' }` buat bikin fixture yang cuma jalan **sekali per worker process**.
-
-![Worker Scope vs Test Scope](/images/tutorials/fixture-worker-vs-test-scope.png)
-
-```typescript
-export const test = base.extend<{}, { db: Database }>({
-  // Ini jalan sekali per worker, bukan sekali per test!
-  db: [async ({}, use) => {
-    const db = await connectToDatabase();
-    await use(db);
-    await db.disconnect();
-  }, { scope: 'worker' }],
+export const test = base.extend<{}, WorkerFixtures>({
+  workerAccount: [
+    async ({}, use, workerInfo) => {
+      const account = await createAccount(`worker-${workerInfo.workerIndex}`);
+      await use(account);
+      await deleteAccount(account.email);
+    },
+    { scope: 'worker' },
+  ],
 });
 ```
 
-**Contoh Kasus:** Koneksi ke DB sekali, terus pake koneksi itu rame-rame buat 50 test dalam satu file.
+Worker memiliki akun unik dan cleanup-nya. Berbagi satu akun mutable antar-worker akan menciptakan race.
 
----
+## Automatic fixture
 
-## 3. Override Fixture Bawaan
+Automatic fixture dapat melampirkan log atau menjalankan kebijakan cross-cutting, tetapi perilaku tersembunyi harus kecil dan teramati:
 
-Kamu sebenernya bisa **nimpuk (override)** perilaku bawaan Playwright! Pengen setiap `page` otomatis punya ukuran layar tertentu atau state login? Override aja fixture `page`.
-
-```typescript
-export const test = base.extend({
-  page: async ({ baseURL, page }, use) => {
-    // Otomatis navigasi ke base URL
-    await page.goto(baseURL);
-    
-    // Suntikin header custom
-    await page.setExtraHTTPHeaders({ 'x-test-env': 'true' });
-    
-    await use(page);
+```ts
+captureLogs: [
+  async ({ page }, use, testInfo) => {
+    const messages: string[] = [];
+    page.on('console', (message) => messages.push(message.text()));
+    await use();
+    await testInfo.attach('browser-console', {
+      body: messages.join('\n'),
+      contentType: 'text/plain',
+    });
   },
-});
-
+  { auto: true },
+],
 ```
 
-Sekarang, setiap test di suite kamu otomatis bakal mendarat di homepage dengan custom header. Nggak perlu ubah satu baris pun di file test!
+## Kondisi untuk berhenti
 
----
+Jangan membangun framework fixture ketika:
 
-## 4. Parameterized Fixtures (Opsi)
+- dependency fixture membentuk graph dalam;
+- business step menjadi tidak terlihat;
+- worker state mutable dan dibagi;
+- kegagalan cleanup dapat merusak test berikutnya;
+- helper lebih mudah dipahami.
 
-Kadang kamu pengen ngatur fixture dari file test itu sendiri. Kamu bisa bikin **Options**.
-
-```typescript
-type Options = { defaultUser: string };
-
-export const test = base.extend<Options>({
-  defaultUser: ['admin', { option: true }], // Nilai default
-  
-  // Pake opsinya di fixture lain
-  loginPage: async ({ page, defaultUser }, use) => {
-    const p = new LoginPage(page);
-    await p.login(defaultUser); // Pake opsinya di sini!
-    await use(p);
-  },
-});
-
-// Cara pake di file test
-test.use({ defaultUser: 'guest' }); // Override khusus buat file ini!
-```
-
----
-
-## 5. Ringkasan (Checklist)
-
-| Pola | Pake Saat... |
-| --- | --- |
-| **Komposisi** | Ngerakit object rumit yang butuh langkah setup lain. |
-| **Worker Scope** | Nyiapin resource berat (DB, API Login) yang dipake bareng-bareng. |
-| **Overrides** | Mengubah behavior default secara global (misal: auto-login tiap page). |
-| **Options** | Kamu butuh ngutak-ngatik behavior fixture per file test. |
-
----
-
-## 6. Bacaan Lanjut
-
-* **[Fixture Scopes](https://playwright.dev/docs/test-fixtures#scoping-fixtures)**: Penjelasan mendalam Worker vs Test scope.
-* **[Global Setup](https://playwright.dev/docs/test-global-setup-teardown)**: Buat hal yang cuma jalan sekali per *run* (bukan per worker).
+Fixture lanjutan adalah alat yang ditargetkan, bukan lencana kedewasaan.

@@ -1,139 +1,67 @@
 ---
-title: "Test Fixtures (Dependency Injection)"
-description: "Stop repeating 'new LoginPage(page)'. Learn how to inject dependencies directly into your tests."
+title: 'Built-In Fixtures, Hooks, and Custom Fixtures'
+description: 'Use Playwright’s isolated resources directly, then introduce custom fixtures only for reusable setup with clear ownership.'
 ---
 
-If you've mastered the Page Object Model (POM), your tests probably look like this:
+## Start with built-in fixtures
 
-```typescript
-test('Login', async ({ page }) => {
-  const loginPage = new LoginPage(page); // 🤮 Repetitive!
-  await loginPage.goto();
-  await loginPage.login('user', 'pass');
+```ts
+test('loads products', async ({ page, request, context, browserName }) => {
+  // page: isolated tab
+  // request: APIRequestContext
+  // context: isolated browser session
+  // browserName: current project browser
 });
 ```
 
-That repetitive `new LoginPage(page)` line? We can delete it. **Playwright Fixtures** allow you to "inject" your Page Objects directly into the test function.
+Playwright creates fixtures on demand and tears them down according to scope. Most early tests need only `page` and perhaps `request`.
 
----
+## Hooks are simple shared timing
 
-## 1. The Problem: Boilerplate
-
-In traditional Selenium or early automation frameworks, you had to manually instantiate classes in every test (or in a `beforeEach` hook). This leads to **tight coupling** and boilerplate code.
-
-Playwright solves this with **Dependency Injection (DI)**. You define *how* to create an object once, and Playwright handles the creation and teardown for every test that requests it.
-
-![Fixtures vs POM Diagram](/images/tutorials/fixture-vs-pom-diagram.png)
-
----
-
-## 2. Built-in Fixtures
-
-You’ve already been using fixtures! When you write `test('...', async ({ page }) => { ... })`, that `{ page }` part is you requesting the built-in `page` fixture.
-
-Playwright provides several out-of-the-box:
-
-* `page`: Isolated page for the test.
-* `context`: Browser context (cookies, storage).
-* `browser`: The browser instance (Chromium, Firefox, etc.).
-* `request`: API testing context.
-
----
-
-## 3. Creating Custom Fixtures
-
-The magic happens when you extend the base test to include your own objects.
-
-### Step 1: Define the Fixture Type
-
-First, tell TypeScript what your custom fixtures look like.
-
-```typescript
-// fixtures/pom-fixtures.ts
-import { test as base } from '@playwright/test';
-import { LoginPage } from '../pages/LoginPage';
-
-type MyFixtures = {
-  loginPage: LoginPage;
-  // Add more pages here later!
-};
+```ts
+test.beforeEach(async ({ request }) => {
+  await request.post('/api/test/reset-cart');
+});
 ```
 
-### Step 2: Implement the Setup Logic
+Use a hook when every test in a describe block needs the same action. Keep hooks visible and small; hidden setup makes failures harder to understand.
 
-Use `base.extend` to define how to initialize your `loginPage`.
+## Custom fixtures package reusable resources
 
-```typescript
-export const test = base.extend<MyFixtures>({
+```ts
+import { test as base, expect } from '@playwright/test';
+import { LoginPage } from './pages/login-page';
+
+type AppFixtures = {
+  loginPage: LoginPage;
+};
+
+export const test = base.extend<AppFixtures>({
   loginPage: async ({ page }, use) => {
-    // 1. Setup
     const loginPage = new LoginPage(page);
-    await loginPage.goto(); // Optional: Auto-navigate!
-
-    // 2. Pass it to the test
+    await loginPage.open();
     await use(loginPage);
-
-    // 3. Teardown (optional, runs after test finishes)
-    // console.log('Test finished!');
   },
 });
 
-export { expect } from '@playwright/test'; // Re-export expect
+export { expect };
 ```
 
----
+The fixture declares a dependency on `page`, performs setup, hands the value to the test through `use`, and can perform cleanup after `use` returns.
 
-## 4. The `use()` Lifecycle
+## Choose scope deliberately
 
-The `use()` callback is unique to Playwright. It pauses execution of the fixture, runs the test, and then resumes execution after the test completes. This creates a "sandwich" around your test.
+Test-scoped fixtures are created for each test and support isolation. Worker-scoped fixtures are shared by tests in one worker process and suit expensive read-only services or worker-owned resources.
 
-![Fixture Use Lifecycle](/images/tutorials/fixture-use-lifecycle.png)
+Do not put a mutable customer account or database transaction into worker scope unless ownership and cleanup make parallel use safe.
 
-This is perfect for setup and cleanup:
+## Fixture design checklist
 
-```typescript
-dbFixture: async ({}, use) => {
-  await db.connect();   // Runs BEFORE test
-  await use(db);        // Test runs here
-  await db.disconnect();// Runs AFTER test
-}
-```
+- Does the fixture have one clear responsibility?
+- Is setup failure descriptive?
+- Is test scope sufficient?
+- Who owns cleanup?
+- Does it hide a business step the test title should reveal?
+- Can it run safely in parallel?
 
----
-
-## 5. Using Your Fixture
-
-Now, swap your import from `@playwright/test` to your custom fixture file.
-
-```typescript
-// tests/login.spec.ts
-import { test, expect } from '../fixtures/pom-fixtures'; // Import YOUR test
-
-// proper DI: request 'loginPage' by name
-test('User can login', async ({ loginPage, page }) => {
-  // loginPage is already created and ready!
-  await loginPage.login('user', 'pass');
-  
-  await expect(page).toHaveURL(/dashboard/);
-});
-```
-
-Look how clean that is! No `new`, no `beforeEach`, just pure interaction.
-
----
-
-## 6. Summary Checklist
-
-| Concept | Key Takeaway |
-| --- | --- |
-| **Dependency Injection** | Request what you need in the test arguments `({ loginPage })`. |
-| **`test.extend`** | The method to create a custom version of `test` with your fixtures. |
-| **`use()`** | The callback that injects the value and handles the setup/teardown sandwich. |
-| **Why?** | Reduces boilerplate, isolates state, and creates reusable setups. |
-
----
-
-## 7. Further Reading
-
-* **[Playwright Fixtures Guide](https://playwright.dev/docs/test-fixtures)**: Official documentation.
-* **[Automatic Fixtures](https://playwright.dev/docs/test-fixtures#automatic-fixtures)**: Fixtures that run even if you don't request them (great for logging).
+Fixtures are dependency management for tests. They are not a goal by themselves, and a plain helper can remain the clearer choice.

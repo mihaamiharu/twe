@@ -1,108 +1,68 @@
 ---
-title: 'Element Interactions (The "Act" Step)'
-description: 'Translating human actions into automated commands using robust interaction logic.'
+title: 'User-Like Actions'
+description: 'Choose the action that matches the control and use keyboard-level input only when behavior depends on individual events.'
 ---
 
-> Translating human actions into automated commands using robust interaction logic.
+## Match the action to the control
 
-## 1. Actionability Logic
+Playwright actions communicate intent and include relevant readiness checks:
 
-![Actionability Checklist](/images/tutorials/interaction-actionability-check.png)
+```ts
+await page.getByRole('button', { name: 'Add to cart' }).click();
+await page.getByLabel('Email').fill('qa@example.com');
+await page.getByLabel('Remember me').check();
+await page.getByLabel('Country').selectOption('ID');
+```
 
-Before an automation tool performs an action, it validates that the element is **ready**. If these checks fail, the "Act" step will timeout. This prevents scripts from clicking on elements that a real user could not see or use.
+Use `check()` for a checkbox rather than blindly clicking it. If it is already checked, `check()` leaves it checked. That makes the desired state explicit.
 
-* **Attached:** The element exists in the HTML.
-* **Visible:** The element is not hidden by CSS (`display: none` or `visibility: hidden`).
-* **Stable:** The element has stopped moving (crucial for buttons that slide in via animation).
-* **Enabled:** The element is not in a disabled state.
+## Fill versus sequential key presses
 
----
+`fill()` focuses an editable control, sets its value, and dispatches input behavior. It is the normal choice for forms.
 
-## 2. Standard Interaction Commands
+```ts
+await page.getByLabel('Search').fill('playwright');
+```
 
-These are the core actions used in 90% of automated tests.
+Use `pressSequentially()` only when the application depends on individual key events—for example an autocomplete that reacts to each character:
 
-### A. Clicking (Click)
+```ts
+await page.getByLabel('Search').pressSequentially('playwright', {
+  delay: 50,
+});
+```
 
-Used for buttons, links, checkboxes, and radio buttons.
+A delay is not a synchronization strategy. The resulting suggestions still need an observable assertion.
 
-* **The Logic:** Simulates a mouse click at the center of the element.
-* **The Loophole:** A successful click does not always mean the UI has changed. Modern apps often perform background network requests after a click.
+## Keyboard and focus behavior
 
-### B. Inputting Text (Fill vs. Type)
+Prefer pressing keys through a focused locator:
 
-* **Fill:** Injects the value immediately. This is the industry standard for speed.
-* **Type:** Simulates individual key presses.
-  * **Use Case for Type:** Use this only when testing "live" features, like a search-as-you-type bar that triggers results with every keystroke.
+```ts
+const search = page.getByRole('searchbox');
+await search.fill('invoice 1042');
+await search.press('Enter');
+```
 
-### C. Selection (Select)
+Use `page.keyboard` when global keyboard state is the behavior under test. Verify focus explicitly when focus itself matters:
 
-Used specifically for `<select>` tags.
+```ts
+await search.focus();
+await expect(search).toBeFocused();
+```
 
-* **The Logic:** Directly targets the value or label of an option.
-* **Best Practice:** Avoid clicking the dropdown and then clicking the item as two separate steps. Use the native select command to avoid timing issues.
+## Specialized interactions
 
----
+```ts
+await page.getByText('Products').hover();
+await source.dragTo(target);
+await page.getByLabel('Resume').setInputFiles('fixtures/resume.pdf');
+```
 
-## 3. Complex Interactions
+A string passed to `setInputFiles` is a filesystem path resolved from the process working directory. Use an in-memory file payload when a real fixture file is unnecessary.
 
-Some elements require specific mouse or keyboard states to become active.
+## Forced actions are diagnostic signals
 
-### A. Hovering (Hover)
+`click({ force: true })` bypasses some actionability checks. It may be valid for a deliberately unusual control, but it often hides an overlay, disabled state, or product defect. Record why normal user interaction is impossible before keeping it.
 
-![Hover Interaction Interaction](/images/tutorials/interaction-hover.png)
-
-Used for tooltips or menus that appear only when a mouse is positioned over them.
-
-* **The Logic:** Moves the virtual cursor to the element without clicking.
-
-### B. Focusing (Focus)
-
-Used to make an element the "active" part of the page.
-
-* **Use Case:** Testing error messages that only appear when a user clicks into a field and then clicks away ("blurring").
-
-### C. Keyboard Press (Press)
-
-Used for non-mouse actions like Enter, Escape, or Tab.
-
-* **Example:** Typing a search term and then using `Press("Enter")` instead of finding a search button.
-
----
-
-## 4. Interaction Failures and Anti-Patterns
-
-When an interaction fails in a professional environment, it usually falls into one of these categories:
-
-| Failure Type | Technical Cause | Recommended Fix |
-| :--- | :--- | :--- |
-| **Action Intercepted** | Another element (like a "Loading" spinner) is covering the target. | Wait for the overlay to disappear before acting. |
-| **Silent Failure** | The tool clicks, but the app's JavaScript "Listener" isn't ready. | Ensure the app is fully loaded or wait for a specific network response. |
-| **Element Disabled** | The button is present but unclickable (e.g., form incomplete). | Review the data entry steps preceding this action. |
-
-![Action Intercepted Overlay](/images/tutorials/interaction-intercepted.png)
-
-### The "Forced" Click Trap
-
-Most tools allow a `force: true` parameter. This bypasses actionability checks (like visibility).
-
-> [!CAUTION]
-> **The Rule:** If a real user cannot click a button because it is covered by a popup, your automation should not click it either. Forced actions hide UI bugs.
-
----
-
-## 5. Summary Checklist
-
-* **Intent:** Choose `Fill` for speed and `Type` only for keyboard-triggered logic.
-* **Actionability:** Ensure the element is visible and stable before the action.
-
----
-
-## 6. Further Reading (Deep Dive)
-
-Understand the events that fire when you "Act."
-
-### Official Documentation (MDN)
-
-* **[MouseEvent (Click)](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent)**: What actually happens in the browser when `click()` is called.
-* **[InputEvent vs Change Event](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/input_event)**: The technical difference between typing a character (Input) and committing the value (Change).
+Every action should lead to evidence. The next lesson explains what Playwright waits for before the action and what your test must still wait for afterward.

@@ -1,120 +1,88 @@
 ---
-title: "Advanced Fixtures"
-description: "Master composition, worker-scoping, and overrides to build a professional-grade test framework."
+title: 'Advanced Fixture Composition (Optional)'
+description: 'Compose typed options and worker-scoped resources only after ownership, scope, and cleanup are understood.'
 ---
 
-You know how to create a basic fixture. Now let's turn you into a **Test Architect**. We're going to cover the patterns used by large-scale engineering teams.
+## When advanced fixtures are justified
 
----
+Use this optional pattern when many tests share a real resource lifecycle that plain helpers and test-scoped fixtures cannot express cleanly. Complexity must buy clearer ownership or substantial setup savings.
 
-## 1. Fixture Composition
+## Separate options from fixtures
 
-The real power of fixtures is that they can **depend on each other**. Just like lego blocks, you can build complex objects from smaller, reusable pieces.
+```ts
+import { test as base } from '@playwright/test';
+import { LoginPage } from './pages/login-page';
 
-Imagine you have a `UserPage` that requires a logged-in user. You can just request your `loginPage` fixture inside your `userPage` fixture!
-
-![Fixture Composition Diagram](/images/tutorials/fixture-composition-diagram.png)
-
-```typescript
-type MyFixtures = {
-  settingsPage: SettingsPage;
-  userPage: UserPage;
+type Options = {
+  defaultUser: { email: string; password: string };
 };
 
-export const test = base.extend<MyFixtures>({
-  // This fixture depends on 'settingsPage' fixture!
-  userPage: async ({ settingsPage }, use) => {
-    await settingsPage.goto(); 
-    await use(new UserPage(settingsPage.page));
+type Fixtures = {
+  loginPage: LoginPage;
+};
+
+export const test = base.extend<Options & Fixtures>({
+  defaultUser: [
+    { email: 'qa@example.com', password: 'local-only' },
+    { option: true },
+  ],
+
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
   },
 });
 ```
 
-Playwright automatically resolves the dependency chain. If `settingsPage` needs `loginPage`, it builds that first.
+In a real repository, load the password securely rather than keeping it in source. Options can be overridden per project or test group.
 
----
+## Worker scope requires worker ownership
 
-## 2. Worker-Scoped Fixtures (Performance)
+```ts
+type WorkerFixtures = {
+  workerAccount: { email: string };
+};
 
-By default, fixtures are torn down after every test. This is great for isolation but terrible for performance if you're doing something heavy like **database seeding** or **logging in via API**.
-
-Use `{ scope: 'worker' }` to create a fixture that runs **once per worker process**.
-
-![Worker vs Test Scope](/images/tutorials/fixture-worker-vs-test-scope.png)
-
-```typescript
-export const test = base.extend<{}, { db: Database }>({
-  // This runs once per worker, not once per test!
-  db: [async ({}, use) => {
-    const db = await connectToDatabase();
-    await use(db);
-    await db.disconnect();
-  }, { scope: 'worker' }],
+export const test = base.extend<{}, WorkerFixtures>({
+  workerAccount: [
+    async ({}, use, workerInfo) => {
+      const account = await createAccount(`worker-${workerInfo.workerIndex}`);
+      await use(account);
+      await deleteAccount(account.email);
+    },
+    { scope: 'worker' },
+  ],
 });
 ```
 
-**Use Case:** Connect to the DB once, reuse the connection for 50 tests.
+The worker owns a unique account and cleanup. Sharing one mutable account across workers would create races.
 
----
+## Automatic fixtures
 
-## 3. Overriding Built-in Fixtures
+An automatic fixture can attach logs or enforce cross-cutting policy, but hidden behavior should remain small and observable:
 
-You can actually **replace** Playwright's default behavior! Want every `page` to start with a specific viewport or authentication state? Override the `page` fixture.
-
-```typescript
-export const test = base.extend({
-  page: async ({ baseURL, page }, use) => {
-    // Navigate to base URL automatically
-    await page.goto(baseURL);
-    
-    // Inject custom headers
-    await page.setExtraHTTPHeaders({ 'x-test-env': 'true' });
-    
-    await use(page);
+```ts
+captureLogs: [
+  async ({ page }, use, testInfo) => {
+    const messages: string[] = [];
+    page.on('console', (message) => messages.push(message.text()));
+    await use();
+    await testInfo.attach('browser-console', {
+      body: messages.join('\n'),
+      contentType: 'text/plain',
+    });
   },
-});
+  { auto: true },
+],
 ```
 
-Now, every test in your suite automatically lands on the homepage with custom headers. No code changes needed in the test files!
+## Stop conditions
 
----
+Do not build a fixture framework when:
 
-## 4. Parameterized Fixtures (Options)
+- fixture dependencies form a deep graph;
+- business steps become invisible;
+- worker state is mutable and shared;
+- cleanup failure can corrupt later tests;
+- a helper would be easier to understand.
 
-Sometimes you want to configure a fixture from the test file itself. You can create **Options**.
-
-```typescript
-type Options = { defaultUser: string };
-
-export const test = base.extend<Options>({
-  defaultUser: ['admin', { option: true }], // Default val
-  
-  // Use the option in another fixture
-  loginPage: async ({ page, defaultUser }, use) => {
-    const p = new LoginPage(page);
-    await p.login(defaultUser); // Uses the option!
-    await use(p);
-  },
-});
-
-// usage in test file
-test.use({ defaultUser: 'guest' }); // Override for this file!
-```
-
----
-
-## 5. Summary Checklist
-
-| Pattern | Use When... |
-| --- | --- |
-| **Composition** | Building complex objects that depend on other setup steps. |
-| **Worker Scope** | Setting up expensive resources (DB, API Login) shared across tests. |
-| **Overrides** | Changing default behavior globally (e.g., auto-login for every page). |
-| **Options** | You need to tweak fixture behavior per-test file. |
-
----
-
-## 6. Further Reading
-
-* **[Fixture Scopes](https://playwright.dev/docs/test-fixtures#scoping-fixtures)**: Worker vs Test scope deep dive.
-* **[Global Setup](https://playwright.dev/docs/test-global-setup-teardown)**: For things that run once per *run* (not just per worker).
+Advanced fixtures are a targeted tool, not a maturity badge.
