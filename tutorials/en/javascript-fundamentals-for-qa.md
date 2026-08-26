@@ -1,162 +1,228 @@
 ---
-title: 'Modern JavaScript (ES6) fundamentals for Automation'
-description: 'Understand the "Just Enough" ES6 essentials required for test automation.'
+title: 'Use Just Enough JavaScript for QA Automation'
+description: 'Shape test data, name small calculations, and review test logic without taking a detour into general application development.'
 ---
 
-## 1. The Mental Model: The Remote Controller
+## After this lesson, you can
 
-Don't think of yourself as a developer building an app. Think of yourself as operating a **Remote-Controlled Drone** (the Browser).
+- choose `const` or `let` based on whether a binding must be reassigned;
+- model one test case with an object and similar cases with an array;
+- write a small function that gives a QA rule or calculation a clear name;
+- use conditions without allowing a test to silently skip its purpose; and
+- diagnose common value errors before adding waits or retries.
 
-* **The Drone (The Browser):** It exists in a separate environment. It has its own physics and takes time to move.
-* **The Controller (JavaScript):** This is the device in your hands. It sends signals like "Move Left" or "Capture Photo."
-* **The Delay:** Because the drone is remote, there is always a gap between you pressing a button and the drone acting. You must wait for the "Signal Received" confirmation before sending the next command.
+## Why this matters for QA
 
----
+Imagine a generated checkout test with the product name, price, and quantity copied into five different lines. A price changes, someone updates only four lines, and the test now calculates one expectation from stale data.
 
-## 2. Variables: The Modern Way
+Or the code says, “If the product exists, run the assertion.” When the product disappears because of a defect, the assertion is skipped and the test passes.
 
-In ES6, we use two specific ways to store data. We have discarded `var` (the "leaky bucket" of the past).
+You do not need a general JavaScript course to review these problems. You need enough code literacy to answer:
 
-### `const` (The Standard)
+- What data does this scenario use?
+- Which values may vary?
+- Which calculation or decision is being made?
+- Can missing data turn a real defect into a false pass?
 
-Use this for your static test data (URLs, selectors, fixed timeout values). Once set, it cannot be changed.
+## The mental model
 
-* **Example:** `const loginButton = '.btn-primary';`
+Keep three responsibilities separate:
 
-### `let` (The Variable)
+```text
+Test data       describes the case
+Small function names a calculation or rule
+Test flow       arranges, acts, and asserts
+```
 
-Use this only if the value **must** change, such as a counter in a loop or a placeholder that gets updated during the test.
+The JavaScript tools in this lesson support those responsibilities:
 
-* **Example:** `let retryCount = 0;`
+| Tool      | QA use                                                     |
+| --------- | ---------------------------------------------------------- |
+| `const`   | Bind a name that should not be reassigned                  |
+| `let`     | Bind a name that genuinely must be reassigned              |
+| Object    | Group named facts about one case                           |
+| Array     | Hold an ordered collection of similar cases                |
+| Function  | Give a repeated calculation or meaningful operation a name |
+| Condition | Choose a path only when variability is intentional         |
 
----
+`const` protects the binding, not every value inside an object or array. This is valid:
 
-## 3. Data Types & Collections: The Evidence
+```js
+const product = { quantity: 1 };
+product.quantity = 2;
+```
 
-### Strings & Template Literals
+The variable `product` still points to the same object. Prefer creating stable test data and changing it only when the scenario requires that change.
 
-Strings are text wrapped in quotes. ES6 introduced **Template Literals** using backticks (\`\`), which allow you to "inject" variables directly into selectors.
+## Work through a realistic example
 
-* **Old Way:** `'button[name="' + btnName + '"]'`
-* **ES6 Way:** `` `button[name="${btnName}"]` ``
+The risk is that the cart shows an incorrect subtotal for a known product and quantity.
 
-### Booleans (The Switch)
+Start by modelling the case:
 
-Logic flags that are either `true` or `false`. We use these to check states (e.g., Is the button visible?).
-
-### Arrays (The List)
-
-A collection of items. In JS, we start counting at **0**.
-
-* **Example:** `const products = ['Apple', 'Orange', 'Banana'];`
-* **Accessing:** `products[0]` is 'Apple'.
-
-### Objects (The Profile)
-
-Used to group related data, like a user profile.
-
-* **Example:**
-
-```javascript
-const testUser = {
-  user: 'qa_master',
-  role: 'admin',
-  isPremium: true
+```js
+const cartCase = {
+  productName: 'Mechanical Keyboard',
+  unitPrice: 120,
+  quantity: 2,
 };
 ```
 
-![Array vs Object Comparison](/images/tutorials/js-array-vs-object.png)
+An object fits because these are named facts about one scenario. Next, give the calculation a name:
 
----
-
-## 4. Comparison & Branching: The "If" Decision
-
-### Comparison Operators
-
-Testing is the act of comparing. We use these to check if the app matches our expectations:
-
-* `===` (Strict Equal): Checks if two things are exactly the same.
-* `!==` (Not Equal): Checks if things are different (useful for negative tests).
-* `>` / `<` : Used for price or quantity verification.
-
-### Branching (If/Else)
-
-Used to handle environment setup or optional UI elements like popups.
-
-**Real-World QA Case: The Cookie Popup**
-
-```javascript
-const env = 'production';
-
-if (env === 'production') {
-  // Only execute this if we are on production
-  await page.click('#accept-cookies');
+```js
+function expectedSubtotal(unitPrice, quantity) {
+  return unitPrice * quantity;
 }
 
-// Proceed with the actual test
-await page.goto('/login');
+const subtotal = expectedSubtotal(cartCase.unitPrice, cartCase.quantity);
 ```
 
-![Logic Branching Flowchart](/images/tutorials/js-logic-flow-popup.png)
+The function is small, but it expresses a real testing idea. It takes inputs and returns an output without clicking the page or changing hidden global state.
 
----
+The test can now connect data to behavior:
 
-## 5. Async / Await: Managing the Signal Delay
+```ts
+test('cart shows the expected subtotal', async ({ page }) => {
+  await page.goto('/products');
 
-This is the most critical technical concept in modern automation. If you send a "Click" command and immediately try to "Verify Result," the script will move faster than the browser can react.
+  await page
+    .getByRole('button', { name: `Add ${cartCase.productName} to cart` })
+    .click();
 
-* **`async`**: Put this before the function to say: "This mission involves waiting."
-* **`await`**: Put this before the action to say: "Pause here until the drone sends back a 'Finished' signal."
-
-**The Logic:**
-
-```javascript
-// ✅ Correct ES6 Interaction
-await page.goto('https://app.com'); // Signal: Go to URL. Wait for load.
-await page.fill('#user', 'admin');   // Signal: Type text. Wait for completion.
-await page.click('#submit');        // Signal: Click. Wait for register.
+  await expect(page.getByTestId('cart-subtotal')).toHaveText(`$${subtotal}`);
+});
 ```
 
-![Async/Await Sequence Diagram](/images/tutorials/js-async-sequence.png)
+The locator and currency format are product contracts that still need verification. JavaScript only helps keep the case and expected calculation readable; it does not prove the product rule by itself.
 
----
+### Similar cases belong in a collection
 
-## 6. The "Linear" Engineering Rules
+If the product intentionally supports several invalid quantities, an array can hold them:
 
-### Rule #1: Stay "Linear and Dumb"
+```js
+const invalidQuantities = [0, -1, 999];
+```
 
-Avoid complex logic inside your tests. A test should be a straight line: `Step A -> Step B -> Assert`. If you have too many `if/else` statements, you won't know if the **App** failed or if your **Test Logic** failed.
+When each value represents an independent scenario, keep each result independently reported:
 
-### Rule #2: Destructuring
+```ts
+for (const quantity of invalidQuantities) {
+  test(`rejects quantity ${quantity}`, async ({ page }) => {
+    // arrange, act, and assert this one case
+  });
+}
+```
 
-ES6 allows you to "unpack" data quickly.
+Do not place secret values or sensitive customer data in generated test titles because titles appear in logs and reports.
 
-* **Instead of:** `const user = data.user; const id = data.id;`
-* **Use:** `const { user, id } = data;`
+### Missing and intentionally empty are different
 
----
+- `undefined` commonly means a value was not provided or a lookup found nothing.
+- `null` commonly represents an intentionally empty value.
 
-## 7. The QA Controller Toolkit
+The exact product meaning still belongs to the team. Do not treat the two as interchangeable just because both are “empty-ish.”
 
-| Concept | Usage in QA | Example |
-| --- | --- | --- |
-| **Template Literals** | Dynamic selectors | `` `li:has-text("${name}")` `` |
-| **Arrow Functions** | Compact test blocks | `test('name', async () => { ... });` |
-| **Logical AND (&&)** | Checking two conditions | `if (isLoggedIn && isAdmin)` |
-| **Async/Await** | Managing the "Remote" delay | `await page.click('#submit');` |
+## When to use it—and when not to
 
----
+Use an object when named fields make one scenario easier to review. Use an array when several values belong to the same kind of collection. Use a function when it names a repeated rule, calculation, or setup capability.
 
-## 8. Further Reading (Deep Dive)
+Do not create a helper that only hides one obvious line:
 
-Mastering the language is the first step to mastering the tool.
+```js
+async function clickSave(page) {
+  await page.getByRole('button', { name: 'Save' }).click();
+}
+```
 
-### Official Documentation (MDN)
+The helper adds another place to navigate without adding domain meaning. Wait until repetition or a clear responsibility exists.
 
-* **[Async/Await Guide](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)**: The official technical explanation of promises and waiting.
-* **[Template Literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals)**: How backticks work under the hood.
+Use a condition only when the variation is part of the requirement. “If a discount exists, verify it; otherwise do nothing” may let a missing required discount pass. Prefer controlling the state or failing with a useful message.
 
-### The Modern Standard
+Do not combine many data cases inside one test merely because a loop is available. Independent risks deserve independent results.
 
-* **[Modern JavaScript Tutorial](https://javascript.info/)**: The community-favorite resource for learning "Modern" JS (ES6+) from scratch.
-* **[Destructuring Assignment](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Destructuring_assignment)**: A detailed guide on "unpacking" data objects.
+## When it fails
+
+Suppose this code throws `Cannot read properties of undefined (reading 'unitPrice')`:
+
+```js
+const selected = products.find(
+  (product) => product.name === 'Mechanical Keyboard',
+);
+
+const subtotal = selected.unitPrice * 2;
+```
+
+The error means the lookup returned `undefined`. It does not mean the browser needs more time unless the array itself is loaded asynchronously.
+
+Inspect:
+
+1. What values are actually in `products`?
+2. Is the product identity spelled and cased correctly?
+3. Was the expected product missing because setup failed?
+4. Should the scenario fail clearly when no match exists?
+
+Make the missing assumption explicit:
+
+```js
+if (!selected) {
+  throw new Error('Expected Mechanical Keyboard in controlled test data');
+}
+
+const subtotal = selected.unitPrice * 2;
+```
+
+Retries do not repair a wrong lookup. Optional chaining such as `selected?.unitPrice` may only move the `undefined` somewhere else and make diagnosis harder.
+
+## Review generated work
+
+When AI changes JavaScript around a test, ask:
+
+- Which values are scenario data and which are product assumptions?
+- Is `let` used because reassignment is required, or by habit?
+- Does a helper name a real QA responsibility or only hide syntax?
+- Can an `if` branch skip the assertion and still pass?
+- Are several risks being compressed into one loop and one report entry?
+- Could a lookup return `undefined`, and is that case handled honestly?
+- Are secrets or personal data written to titles, logs, or source code?
+
+Every abstraction should make the test easier to explain, not merely shorter.
+
+## Check your understanding
+
+Review this code:
+
+```js
+const products = [{ name: 'Wireless Mouse', unitPrice: 40 }];
+
+const keyboard = products.find(
+  (product) => product.name === 'Mechanical Keyboard',
+);
+
+if (keyboard) {
+  const expected = keyboard.unitPrice * 2;
+  console.log(expected);
+}
+```
+
+Explain:
+
+1. What value will `keyboard` contain?
+2. Why is the condition dangerous inside a test that requires the keyboard?
+3. How would you make the missing test data fail clearly?
+4. Which parts are data, lookup logic, and expected calculation?
+
+## Compare your reasoning
+
+One reasonable answer is:
+
+- `keyboard` will be `undefined` because no array item has that name.
+- The condition skips all work when the required product is missing. If the assertion were inside it, the test could pass without checking the risk.
+- Throw a specific setup error—or use an assertion appropriate to the project—before accessing `unitPrice`.
+- The array contains the data, `find` performs the lookup, and `unitPrice * 2` calculates the expectation.
+
+## Before you continue
+
+You should now be able to shape a small QA case with arrays and objects, name one calculation with a function, and detect logic that could silently avoid an assertion.
+
+Complete the integrated JavaScript Core Practice rather than every syntax drill. In the next lesson, you will trace asynchronous operations so those values and browser actions happen in the required order.

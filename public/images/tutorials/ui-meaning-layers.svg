@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 1080" role="img" aria-labelledby="title description">
+  <title id="title">From markup to a meaningful automation contract</title>
+  <desc id="description">Markup becomes a live DOM in the browser. The browser renders a user interface and computes accessibility information. QA inspects both to identify a control's role, accessible name, and state.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="1078" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.5">READ THE UI BY MEANING</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="116" width="620" height="198" rx="16" fill="#25231f" />
+    <text x="100" y="158" fill="#f4bd4f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="16" font-weight="700" letter-spacing="1.1">MARKUP</text>
+    <text x="100" y="205" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="21">&lt;label for=&quot;email&quot;&gt;Work email&lt;/label&gt;</text>
+    <text x="100" y="246" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="21">&lt;input id=&quot;email&quot; required /&gt;</text>
+    <text x="100" y="287" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="21">&lt;button&gt;Create account&lt;/button&gt;</text>
+  </g>
+
+  <line x1="380" y1="326" x2="380" y2="376" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <rect x="180" y="392" width="400" height="92" rx="46" fill="#fce8e1" stroke="#e65f3a" stroke-width="2" />
+  <text x="380" y="428" fill="#9b3e27" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">Browser builds the live DOM</text>
+  <text x="380" y="460" fill="#686258" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18">then computes what users can perceive</text>
+
+  <path d="M380 500 V535 H207 V570" fill="none" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <path d="M380 535 H553 V570" fill="none" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="590" width="280" height="222" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+    <text x="98" y="632" fill="#e65f3a" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="1">RENDERED UI</text>
+    <text x="98" y="686" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="24" font-weight="700">Work email</text>
+    <rect x="98" y="708" width="224" height="42" rx="7" fill="#f7f4ee" stroke="#9b9488" stroke-width="2" />
+    <rect x="98" y="766" width="176" height="38" rx="8" fill="#e65f3a" />
+    <text x="186" y="792" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Create account</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="410" y="590" width="280" height="222" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+    <text x="438" y="632" fill="#e65f3a" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="1">ACCESSIBILITY INFO</text>
+    <text x="438" y="680" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19">role: textbox</text>
+    <text x="438" y="716" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">name: Work email</text>
+    <text x="438" y="752" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19">state: required</text>
+    <line x1="438" y1="774" x2="662" y2="774" stroke="#d9d2c7" stroke-width="2" />
+    <text x="438" y="801" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">button: Create account</text>
+  </g>
+
+  <path d="M210 830 V865 H380" fill="none" stroke="#e65f3a" stroke-width="4" />
+  <path d="M550 830 V865 H380 V898" fill="none" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="918" width="620" height="112" rx="16" fill="#ffffff" stroke="#e65f3a" stroke-width="2" />
+    <text x="100" y="958" fill="#e65f3a" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="1">QA AUTOMATION CONTRACT</text>
+    <text x="100" y="1002" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="25" font-weight="700">ROLE + ACCESSIBLE NAME + RELEVANT STATE</text>
+  </g>
+</svg>

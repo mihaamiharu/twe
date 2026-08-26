@@ -1,77 +1,169 @@
 ---
-title: 'Pondasi 4: Logikanya Universal (Mindset)'
-description: 'Tool bisa berubah. Syntax itu cuma grammar. Prinsip otomatisasi itu abadi.'
+title: 'Apa yang Bisa—dan Nggak Bisa—Dilakukan Otomasi Web'
+description: 'Kenali apa yang bisa dibuktikan otomasi browser, apa yang tetap butuh pertimbangan QA, dan kenapa script selalu dimulai dari tujuan test yang jelas.'
 ---
 
+## Setelah lesson ini, kamu bisa
 
+- menjelaskan apa yang bisa dilakukan otomasi web dan bagian yang tetap membutuhkan pertimbangan manusia;
+- mengubah skenario manual menjadi risiko, kondisi awal, aksi pengguna, dan hasil yang bisa diamati;
+- membedakan melakukan aksi dengan membuktikan bahwa aplikasi bekerja dengan benar; dan
+- menemukan konteks atau asumsi yang hilang dari ide test buatan AI sebelum meminta kode.
 
-> **"Tool bisa gonta-ganti. Syntax itu cuma urusan tata bahasa. Tapi prinsip otomatisasi itu abadi."**
+Kamu belum perlu paham HTML, JavaScript, atau Playwright. Di lesson ini, kita fokus ke keputusan testing yang harus jelas sebelum mulai membahas tool.
 
-Di industri teknologi yang geraknya super cepat (apalagi sekarang sudah tahun 2026!), hal paling bahaya adalah kalau kamu mendefinisikan dirimu cuma lewat satu tool (misal: "Saya Ahli Cypress"). Kekuatan aslimu muncul pas kamu jadi seorang **Engineer** yang paham **logika** di balik otomatisasi.
+## Kenapa ini penting buat QA
 
-## 1. Pola Universal: Find, Act, Assert
+Pernah nggak sih kamu dapat test case yang kelihatannya sederhana seperti ini?
 
-Mau kamu pake tool "jadul" dari tahun 2010 (Selenium) atau yang modern di tahun 2026 (Playwright), hampir semua *script automation* itu polanya cuma muter di tiga langkah ini:
+> Tambahkan produk ke keranjang dan pastikan semuanya bekerja.
 
-1. **Find (Cari):** Temuin elemennya di DOM pake *Selector*.
-2. **Act (Lakukan):** Interaksi sama elemennya (Klik, Ketik, Scroll).
-3. **Assert (Pastikan):** Verifikasi hasilnya (Apakah URL-nya berubah? Apakah pesan error-nya muncul?).
+Pas dikerjakan manual, kamu mungkin bisa langsung menyesuaikan. Produk mana yang harus dipakai? Keranjangnya harus kosong atau boleh sudah berisi? Kalau produknya habis, apa yang harus dilakukan? Dan sebenarnya, apa arti “semuanya bekerja”?
 
-> [!TIP]
-> **Realitanya:** Pas kamu mentok ngerjain test, biasanya masalahnya ada di langkah **"Find"** (selector-nya bermasalah), bukan karena syntax tool-nya yang susah.
+Sebagai manusia, kita bisa melihat situasi, menyadari ada yang aneh, lalu mengambil keputusan. Script nggak bisa melakukan itu sendiri. Script hanya mengikuti kondisi, aksi, dan pemeriksaan yang kita tulis—termasuk kalau asumsi kita ternyata salah.
 
----
+Akibatnya, sebuah test bisa selalu lulus padahal membuktikan hal yang salah. Test juga bisa kadang lulus dan kadang gagal karena kondisi awalnya nggak pernah dikendalikan.
 
-## 2. Revolusi AI: Jembatan Buat Siapa Saja
+Jadi, otomasi bukan sekadar memindahkan langkah test case manual ke dalam kode. Kita perlu membuat tujuan testing-nya eksplisit dan bisa diulang.
 
-Dulu, ada tembok tebal yang misahin antara "Manual QA" dan "SDET". Tembok itu namanya **Coding Syntax** (keribetan nulis kode).
+## Cara berpikir yang perlu kamu pegang
 
-* **Dunia Lama:** Kalau kamu nggak hafal cara nulis *loop* atau bikin *Class* di Java, kamu nggak bakal bisa bikin automation. Akhirnya kamu kejebak ngerjain hal yang sama berulang-ulang secara manual.
-* **Dunia Baru (Agentic AI):** Hambatan teknis itu sekarang sudah hilang. **Agentic AI** (kayak Claude Code, Antigravity, atau AI Agents lainnya) sekarang jadi temen *pair programming* kamu yang urusin urusan "syntax".
+Sebelum memikirkan selector atau kode, pecah dulu tujuan test menjadi empat bagian:
 
-**Peran Baru Kamu:** Kamu nggak perlu lagi pusing mikirin cara nulis kode yang ribet. Fokus kamu adalah jadi seorang **Arsitek**. Kamu wajib paham *apa* yang mau dites dan *kenapa* tesnya gagal. Biarin AI yang jadi "kuli" buat nulis kodenya, sementara kamu yang pegang kendali strateginya.
+1. **Risiko:** Kegagalan penting apa yang ingin kita deteksi?
+2. **Kondisi awal dan data:** Apa yang harus sudah benar supaya test bisa diulang dengan hasil yang konsisten?
+3. **Aksi pengguna:** Apa yang dilakukan pengguna untuk memicu perilaku tersebut?
+4. **Bukti yang bisa diamati:** Hasil apa yang membuktikan bahwa aplikasi memberikan outcome, atau hasil akhir, yang diharapkan?
 
----
+![Rangkaian tujuan otomasi: risiko, kondisi awal dan data yang diketahui, aksi pengguna, lalu bukti yang bisa diamati.](/images/tutorials/automation-intent-chain.svg)
 
-## 3. "Secret Weapon" Manual QA: Detail & Product Sense
+_Kalau salah satu bagian belum jelas, investigasi dulu sebelum membuat otomasi._
 
-Ada satu fenomena menarik: Banyak Manual QA yang pindah ke Automation justru hasilnya jauh lebih **"tajam"** dan **detail** dibanding mereka yang dari awal cuma belajar coding.
+Ada dua model lain yang nanti akan sering kamu temui. Keduanya berhubungan, tapi fungsinya berbeda.
 
-**Kenapa? Karena Manual QA punya "Superpower" berupa:**
+**Arrange–Act–Assert** menjelaskan struktur test:
 
-* **Product Flow:** Mereka paham banget alur aplikasi dari ujung ke ujung.
-* **Business Flow:** Mereka tau mana fitur yang paling sering dipake user dan mana yang kalau rusak bakal bikin bisnis rugi gede.
-* **Kejelian Detail:** Manual QA sudah terbiasa nyari celah-celah aneh (edge cases) yang mungkin dilewatin sama orang yang cuma fokus ke teknis kode.
+- **Arrange:** siapkan kondisi dan data yang dibutuhkan;
+- **Act:** lakukan perilaku yang sedang diuji;
+- **Assert:** buktikan hasil yang diharapkan.
 
-> [!IMPORTANT]
-> **Pesan buat kamu:** Jangan ngerasa "kalah" karena belum jago coding. Pengalamanmu di Manual QA itu adalah aset mahal. AI bisa nulis kode, tapi AI nggak punya **"insting"** soal produk sesensitif kamu.
+**Locate–Interact–Observe** menjelaskan tanggung jawab di dalam browser test:
 
----
+- cari kontrol atau informasi yang relevan bagi pengguna;
+- lakukan interaksi dengan halaman ketika dibutuhkan;
+- amati state aplikasi yang menjadi bukti.
 
-## 4. Kenapa Kita Harus Pindah Tool? (Kebutuhan Bisnis)
+Test nyata bisa mencari, berinteraksi, dan mengamati beberapa hal. Jadi, jangan paksa setiap test menjadi tepat tiga baris. Model ini membantu kita memisahkan tanggung jawab, bukan menjadi template syntax.
 
-Di dunia kerja, jarang banget kita ganti tool cuma karena pengen gaya-gayaan. Kita ganti karena **Kebutuhan Bisnis** berubah.
+## Coba kita bedah contoh nyata
 
-* **Skenario:** Tim kamu selama ini nulis UI test pake **JavaScript** karena frontend-nya pake React.
-* **Perubahannya:** Perusahaan mutusin buat bikin fitur Chatbot berbasis AI.
-* **Kendalanya:** Library terbaik buat ngetes model AI (kayak LangChain) itu aslinya basisnya **Python**.
-* **Hasilnya:** Tim QA harus pindah ke **Python** supaya bisa nyambung sama sistem backend baru.
+Sekarang kita perjelas skenario keranjang tadi.
 
-Kalau kamu cuma ngandelin hafalan *syntax* JavaScript, kamu bakal panik. Tapi kalau kamu pegang kuat **AI + Konsep Inti**, kamu bisa adaptasi ke Python cuma dalam hitungan hari.
+| Bagian                  | Rumusan yang lebih jelas                                                                             |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| Risiko                  | Pelanggan menambahkan produk yang tersedia, tetapi keranjang nggak diperbarui dengan benar.          |
+| Kondisi awal dan data   | Pelanggan aktif sudah login, keranjang kosong, dan tersedia satu produk dengan harga yang diketahui. |
+| Aksi pengguna           | Pelanggan menambahkan satu unit produk tersebut ke keranjang.                                        |
+| Bukti yang bisa diamati | Keranjang menampilkan produk yang benar, jumlah `1`, dan subtotal yang tepat.                        |
 
----
+Dari sini mulai kelihatan bedanya. “Tambahkan produk dan pastikan bekerja” tadi terlalu kabur. Setelah dipecah, anggota tim bisa meninjau tujuannya bahkan sebelum ada kode.
 
-## Summary: Jadilah Engineer, Bukan Cuma Pemakai Tool
+Developer bisa mempertanyakan setup datanya. Product owner bisa mengoreksi outcome yang diharapkan. QA lain juga bisa melihat apakah risiko yang dipilih memang cukup penting.
 
-* **Syntax itu sementara:** `await page.click()` vs `driver.click()` itu cuma beda ejaan doang.
-* **Logika itu permanen:** Tau *gimana* cara nyari tombol yang unik di silsilah DOM yang berantakan adalah skill yang kepake selamanya.
-* **Manfaatin AI:** Jangan jadiin "nggak bisa coding" sebagai alasan lagi. Pake AI buat nutupin kekurangan itu, belajar lebih cepet, dan fokus nyelesain masalah testing yang beneran penting.
+## Kapan pendekatan ini cocok dipakai?
 
----
+Gunakan cara berpikir ini setiap kali kamu mau membuat atau meninjau test otomatis—baik ditulis sendiri, dibuat bersama tim, maupun dihasilkan AI.
 
-## 5. Bacaan Lanjut (Deep Dive)
+Otomasi paling berguna saat kita membutuhkan pengulangan yang konsisten. Tapi bukan berarti testing oleh manusia jadi nggak penting.
 
-Standar industri ini ngebuktiin kalau logikanya emang universal di mana-mana:
+| Otomasi berguna untuk                                              | Testing oleh manusia tetap berguna untuk                             |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| Mengulang pemeriksaan penting yang sama                            | Mengeksplorasi perilaku yang belum kita pahami                       |
+| Menjalankan skenario yang sudah dikenal pada browser yang didukung | Menemukan pengalaman yang membingungkan, janggal, atau nggak terduga |
+| Memeriksa hasil yang jelas secara konsisten                        | Menentukan risiko baru yang paling penting                           |
+| Menghasilkan bukti kegagalan yang bisa diulang                     | Beradaptasi saat produk berperilaku mengejutkan                      |
 
-* **[Arrange, Act, Assert (AAA)](https://automationpanda.com/2020/07/07/arrange-act-assert-a-pattern-for-writing-good-tests/)**: Pola standar industri buat nyusun automated test apa pun.
-* **[Given-When-Then](https://martinfowler.com/bliki/GivenWhenThen.html)**: Cara nulis logika test supaya gampang dimengerti oleh tim bisnis (Product Manager/Stakeholder).
+Keduanya saling melengkapi. Otomasi menjaga perilaku yang sudah dikenal, sementara testing manual dan eksploratori membantu kita menemukan informasi baru.
+
+## Kalau gagal, mulai cek dari mana?
+
+Salah satu kesalahan yang sering terjadi adalah test berhenti setelah melakukan aksi:
+
+```text
+Klik Tambahkan ke keranjang → test selesai
+```
+
+Nah, masalahnya, klik hanya meminta browser melakukan sesuatu. Klik nggak membuktikan bahwa keranjang sudah diperbarui, subtotal sudah dihitung dengan benar, atau data sudah tersimpan.
+
+Kalau test seperti ini lulus tetapi bug tetap lolos, mulai periksa bagian akhirnya:
+
+1. Outcome bisnis apa yang seharusnya dibuktikan?
+2. Bukti apa yang benar-benar diperiksa oleh test?
+3. Bisakah test lulus meskipun aplikasi masih salah?
+
+Perbaikannya bukan menambah delay atau menjalankan test berkali-kali. Perbaikannya adalah menambahkan bukti yang bermakna:
+
+```text
+Tambahkan satu produk → keranjang menampilkan produk, jumlah, dan subtotal yang diharapkan
+```
+
+Nanti saat belajar Playwright, kamu akan mengenalnya sebagai perbedaan antara **action** dan **assertion**. Action meminta browser melakukan sesuatu. Assertion membuktikan kondisi yang muncul setelahnya.
+
+## Review hasil buatan AI
+
+AI bisa membantu merapikan catatan, menunjukkan asumsi yang hilang, atau membuat beberapa alternatif skenario. Tapi AI nggak tahu risiko produk, batasan data, atau business rule kalau kita nggak memberikannya.
+
+Di tahap ini, minta AI membuat **tujuan otomasi**, bukan langsung membuat script besar. Contohnya:
+
+```text
+Bantu saya menyusun kandidat otomasi UI web. Jangan tulis kode.
+
+Risiko produk: pelanggan mungkin melihat subtotal keranjang yang salah.
+Kondisi yang diketahui: pelanggan sudah login, keranjang kosong,
+dan ada satu produk dengan harga yang dikendalikan.
+Aksi pengguna: tambahkan satu unit ke keranjang.
+
+Temukan asumsi yang belum disebutkan dan usulkan bukti yang bisa diamati.
+```
+
+Setelah AI menjawab, jangan langsung menerimanya. Review dengan pertanyaan QA:
+
+- Apakah risikonya masih sama dengan yang ingin kita uji?
+- Apakah AI mengarang perilaku produk atau test data?
+- Apakah semua kondisi awal sudah ditulis dengan jelas?
+- Bisakah bukti yang diusulkan lulus padahal perilaku bisnisnya masih salah?
+- Bagian mana yang perlu dikonfirmasi ke requirement atau anggota tim?
+
+AI boleh membantu menyusun cara berpikir. Keputusan akhirnya tetap ada di kamu dan tim.
+
+## Coba cek pemahamanmu
+
+Coba bayangin kamu menerima skenario manual ini:
+
+> Buka halaman “Lupa password,” masukkan alamat email, kirim form, lalu pastikan semuanya bekerja.
+
+Sebelum lanjut, coba tulis:
+
+1. Risiko yang ingin dilindungi
+2. Kondisi awal dan test data yang dibutuhkan
+3. Aksi pengguna
+4. Bukti yang benar-benar menunjukkan outcome
+
+## Bandingkan dengan cara pikir ini
+
+Salah satu jawaban yang masuk akal:
+
+- **Risiko:** pelanggan terdaftar nggak bisa memulai proses pemulihan akun.
+- **Kondisi awal dan data:** tersedia akun yang bisa dipulihkan dan inbox yang dikendalikan oleh test.
+- **Aksi pengguna:** meminta reset password untuk akun tersebut melalui halaman Lupa Password.
+- **Bukti yang bisa diamati:** UI mengonfirmasi permintaan tanpa membocorkan apakah sembarang akun terdaftar. Kalau pengiriman email termasuk dalam cakupan (scope) test, inbox yang dikendalikan juga menerima pesan reset yang bisa digunakan.
+
+Jawabanmu bisa berbeda, tergantung requirement produknya. Hal terpenting adalah kamu bisa menjelaskan keputusan scope dan bukti yang dipilih.
+
+## Sebelum lanjut
+
+Pastikan kamu sudah bisa mengambil skenario manual yang kabur lalu menjelaskan risikonya, kondisi awalnya, aksi penggunanya, dan bukti yang benar-benar menunjukkan keberhasilan.
+
+Kalau tujuan test masih belum jelas, jangan buru-buru masuk ke kode. Pembuatan kode yang cepat hanya akan menghasilkan test yang kabur dengan lebih cepat.
+
+Di lesson berikutnya, kita akan memakai mental model ini untuk memilih skenario mana yang memang layak diotomasi dan menentukan feedback layer yang paling tepat.

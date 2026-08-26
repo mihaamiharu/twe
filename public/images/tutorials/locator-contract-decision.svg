@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 1120" role="img" aria-labelledby="title description">
+  <title id="title">Choose locator evidence from test intent</title>
+  <desc id="description">A test-intent question branches to four supported locator contracts: role and accessible name for user controls, label for form fields, visible text for displayed wording, and test ID for an explicit technical agreement. CSS and XPath appear below a separate fallback gate rather than in a universal ranking.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="1118" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.3">LOCATOR CONTRACTS ARE CHOSEN BY INTENT</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="80" y="118" width="600" height="134" rx="16" fill="#25231f" />
+  </g>
+  <text x="380" y="162" fill="#f4bd4f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="1">START WITH THE TEST INTENT</text>
+  <text x="380" y="205" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="27" font-weight="700">What must this test recognize?</text>
+  <text x="380" y="232" fill="#d9d2c7" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">Choose evidence whose failure would be meaningful.</text>
+
+  <path d="M380 252 V294 H207 V326" fill="none" stroke="#e65f3a" stroke-width="3" marker-end="url(#arrow)" />
+  <path d="M380 294 H553 V326" fill="none" stroke="#e65f3a" stroke-width="3" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="338" width="292" height="202" rx="15" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="92" y="360" width="126" height="30" rx="15" fill="#fce8e1" />
+  <text x="155" y="381" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">ROLE + NAME</text>
+  <text x="94" y="430" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">User-facing control</text>
+  <text x="94" y="465" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">Use when role + accessible name</text>
+  <text x="94" y="491" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">form the user-facing contract.</text>
+  <text x="94" y="520" fill="#387357" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">Failure signal: semantics changed</text>
+
+  <g filter="url(#shadow)">
+    <rect x="398" y="338" width="292" height="202" rx="15" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="420" y="360" width="84" height="30" rx="15" fill="#fff7dd" />
+  <text x="462" y="381" fill="#6d5418" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">LABEL</text>
+  <text x="422" y="430" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Form-field meaning</text>
+  <text x="422" y="465" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">Use when an associated label</text>
+  <text x="422" y="491" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">identifies the user-facing field.</text>
+  <text x="422" y="520" fill="#387357" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">Failure signal: association broke</text>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="574" width="292" height="202" rx="15" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="92" y="596" width="70" height="30" rx="15" fill="#e6f2ec" />
+  <text x="127" y="617" fill="#2d6249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">TEXT</text>
+  <text x="94" y="666" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Displayed wording</text>
+  <text x="94" y="701" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">Use when visible content itself is</text>
+  <text x="94" y="727" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">the evidence the scenario requires.</text>
+  <text x="94" y="756" fill="#387357" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">Failure signal: wording changed</text>
+
+  <g filter="url(#shadow)">
+    <rect x="398" y="574" width="292" height="202" rx="15" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="420" y="596" width="92" height="30" rx="15" fill="#ede8f7" />
+  <text x="466" y="617" fill="#5c4983" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">TEST ID</text>
+  <text x="422" y="666" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Technical agreement</text>
+  <text x="422" y="701" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">Use when the team owns</text>
+  <text x="422" y="727" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">a stable testing identifier.</text>
+  <text x="422" y="756" fill="#387357" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">Failure signal: contract broke</text>
+
+  <line x1="380" y1="796" x2="380" y2="834" stroke="#9b9488" stroke-width="3" marker-end="url(#arrow)" />
+  <g filter="url(#shadow)">
+    <rect x="80" y="848" width="600" height="174" rx="16" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  </g>
+  <text x="110" y="885" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700" letter-spacing="1">FALLBACK GATE · NOT THE NEXT RUNG</text>
+  <text x="110" y="928" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="700">CSS or XPath only with a reason</text>
+  <text x="110" y="962" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">What intent is missing from the UI? Who owns this DOM signal?</text>
+  <text x="110" y="990" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17">Which expected product change should this locator survive?</text>
+
+  <text x="380" y="1074" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">INTENT → EVIDENCE → MEANINGFUL FAILURE</text>
+</svg>

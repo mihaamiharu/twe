@@ -1,94 +1,246 @@
 ---
-title: 'TypeScript buat QA: Kenapa & Gimana?'
-description: 'Pahami kenapa TypeScript jadi standar wajib otomatisasi modern dan gimana cara pakainya di tes kamu.'
+title: 'Review TypeScript Tanpa Menganggap Type sebagai Bukti'
+description: 'Gunakan TypeScript untuk memperjelas kontrak test sambil tetap memeriksa runtime data dan perilaku produk.'
 ---
 
-## 1. Perbedaan Inti: JS vs. TS
+## Setelah lesson ini, kamu bisa
 
-Bayangkan JavaScript sebagai "Pertunjukan Langsung" dan TypeScript sebagai "Gladi Resik."
+- membaca inferred type, explicit annotation, union, dan optional property di dalam test;
+- memilih bagian yang membutuhkan explicit type supaya kontrak QA lebih gampang direview;
+- mempersempit optional value dengan runtime guard, bukan unsafe cast;
+- menjelaskan kenapa TypeScript type tidak bisa memvalidasi API response atau outcome produk; dan
+- mereview kode test hasil generate yang memakai `any`, unsafe assertion, atau confidence yang menyesatkan.
 
-**JavaScript (Dinamis):** Dia tidak memeriksa tipe data sampai kode benar-benar berjalan. Jika ada typo, kamu baru tahu 5 menit setelah tes jalan dan gagal.
+## Kenapa ini penting buat QA
 
-**TypeScript (Statis):** Dia menambahkan "Pengecekan Pra-terbang" (Pre-flight Check). Dia menangkap error saat kamu *sedang menulis kode*. IDE kamu akan langsung memberi garis merah pada error, menyelamatkanmu dari siklus "Jalankan, Gagal, Perbaiki."
+Coba bayangin kode hasil generate yang nggak punya warning merah di editor, tapi langsung gagal saat dijalankan:
 
-### Perbandingan Sekilas
-
-![Ringkasan Feedback Loop](/images/tutorials/ts-feedback-loop.png)
-
-| Fitur | JavaScript (JS) | TypeScript (TS) |
-| :--- | :--- | :--- |
-| **Penemuan Error** | Saat Runtime (Tes crash). | Saat Compile-time (Pas ngoding). |
-| **Refactoring** | Bahaya. Ganti nama method cuma modal "find and replace" itu judi. | Aman. IDE mengupdate semua referensi di seluruh suite secara instan. |
-| **Setup** | Nol setup. Tinggal jalan. | Butuh `tsconfig.json` dan compiler. |
-
-## 2. Anotasi Tipe Dasar (Cara yang Benar)
-
-Di TypeScript, kita pakai titik dua `:` untuk mendefinisikan tipe. Namun, TS modern itu pintar gunakan **Inference** (tebakan otomatis) untuk variabel simpel dan **Annotations** (label manual) untuk logika kompleks.
-
-```typescript
-// Inference: TS tahu tipe ini secara otomatis. Jangan lebay kasih label!
-const loginRetries = 3; 
-const isSuccess = false;
-
-// Annotation: Wajib buat parameter fungsi biar aman.
-function login(user: string, attempts: number): boolean {
-    return true;
-}
+```ts
+const password = process.env.TEST_PASSWORD as string;
+await page.getByLabel('Password').fill(password);
 ```
 
-## 3. Interface: "Kontrak Pengujian" Kamu
+`as string` cuma meminta TypeScript memercayai penulis kode. Ia tidak membuat environment variable yang hilang tiba-tiba tersedia saat runtime.
 
-![Peta Interface](/images/tutorials/ts-interface-map.png)
+Masalah yang sama bisa terjadi pada API data. Sebuah cast dapat mengklaim server mengembalikan order, padahal response aslinya adalah error page atau JSON dengan shape yang berbeda.
 
-Saat menangani data tes yang kompleks (seperti respon API atau Profil User), gunakan **Interfaces** untuk memverifikasi struktur data.
+TypeScript tetap berguna karena membuat kontrak data yang diinginkan lebih terlihat dan menangkap banyak kesalahan kode lebih awal. Sebagai QA, kamu juga perlu tahu di mana confidence itu berakhir.
 
-```typescript
-interface TestCase {
-    name: string;
-    priority: 'high' | 'low'; // Union type: mencegah typo kayak 'High'
-    timeout?: number;        // Properti opsional
-}
+## Cara berpikir yang perlu kamu pegang
 
-const loginTest: TestCase = {
-    name: "Valid Login",
-    priority: "high"
+TypeScript menambahkan compile-time review layer:
+
+```text
+Source code + informasi type
+            ↓
+Type checking menemukan penggunaan yang tidak kompatibel
+            ↓
+Type dihapus saat kode menjadi JavaScript
+            ↓
+Runtime data dan perilaku produk tetap membutuhkan bukti
+```
+
+Bayangkan ada dua boundary:
+
+| Boundary                          | Pertanyaan yang berguna                                                                     |
+| --------------------------------- | ------------------------------------------------------------------------------------------- |
+| Di dalam test code yang dipercaya | Apakah setiap value dipakai secara konsisten dengan kontrak yang diinginkan?                |
+| Data yang masuk saat runtime      | Apakah environment, API, file, atau produk benar-benar memberikan value yang kita harapkan? |
+
+TypeScript membantu boundary pertama. Boundary kedua masih membutuhkan runtime check, controlled setup, atau assertion.
+
+## Coba kita bedah contoh nyata
+
+Checkout suite menggunakan case yang terkontrol:
+
+```ts
+type CheckoutCase = {
+  productName: string;
+  quantity: number;
+  expectedResult: 'success' | 'out-of-stock';
+  couponCode?: string;
+};
+
+const checkoutCase: CheckoutCase = {
+  productName: 'Mechanical Keyboard',
+  quantity: 1,
+  expectedResult: 'success',
 };
 ```
 
-## 4. Aturan "SDET" Profesional
+Baca informasi yang disampaikan type tersebut:
 
-Untuk mendapatkan manfaat penuh TypeScript di framework otomatisasi, ikuti tiga aturan emas ini:
+- `productName` harus dipakai sebagai string di dalam typed code;
+- `quantity` harus berupa number;
+- union hanya menerima dua result label yang sudah didokumentasikan; dan
+- `couponCode?` boleh tidak tersedia.
 
-### Visualisasi Keamanan
+Ini membantu proses review. Type tersebut tidak membuktikan produk benar-benar ada, inventory sudah terkontrol, atau checkout akan berhasil.
 
-![Gerbang Tipe](/images/tutorials/ts-type-gate.png)
+### Pakai inference untuk local value yang sudah jelas
 
-1. **Hindari `any` sebisa mungkin**: Pakai `any` itu mematikan sistem keamanan. Kalau kamu tidak yakin tipenya (misal dari API dinamis), gunakan `unknown`.
-2. **Jangan Paksa Tipe (`as`)**: Jangan memaksa tipe pakai `data as User`. Kalau datanya aslinya salah, tes kamu lolos tapi asersi bakal gagal. Gunakan **Type Guards** untuk memverifikasi data itu ada.
-3. **Mode Ketat (Strict Mode)**: Pastikan `tsconfig.json` kamu ada `"strict": true`. Ini memaksamu menangani elemen `null` atau `undefined`, yang jadi penyebab utama tes *flaky*.
+```ts
+const quantity = 2; // inferred sebagai number
+const productNames = ['Mouse', 'Keyboard']; // inferred sebagai string[]
+```
 
-## 5. Kotak Perkakas QA (The QA Power Toolkit)
+Menulis ulang `: number` dan `: string[]` tidak menambah banyak informasi di sini. Explicit type paling berguna pada boundary seperti shared test data, input dan output helper, configuration, API model, dan custom fixture.
 
-| Utility | Kegunaan di QA | Contoh |
-| :--- | :--- | :--- |
-| **`Promise<void>`** | Tipe return buat langkah tes async. | `async function step(): Promise<void>` |
-| **`Partial<T>`** | Buat request API "Patch" atau "Update". | `const update: Partial<User> = { name: 'Bob' }` |
-| **`Record<K, V>`** | Header dinamis atau map config. | `const headers: Record<string, string>` |
+### Persempit optional runtime value
 
-## 7. Bacaan Lanjut (Deep Dive)
+Environment variable bisa saja tidak tersedia:
 
-### Sumber Resmi
+```ts
+const password = process.env.TEST_PASSWORD;
 
-* **[TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)**: Kitab sucinya TypeScript.
-* **[Playwright TypeScript Guide](https://playwright.dev/docs/test-typescript)**: Cara setting TS khusus buat Playwright.
+if (!password) {
+  throw new Error('TEST_PASSWORD is required for the login scenario');
+}
 
-### Permata Komunitas
+await page.getByLabel('Password').fill(password);
+```
 
-* **[Total TypeScript](https://www.totaltypescript.com/tutorials)**: Tutorial visual yang keren banget buat belajar konsep advanced.
-* **[TypeScript Deep Dive](https://basarat.gitbook.io/typescript/)**: Buku gratis yang ngejelasin "Kenapa"-nya dengan enak.
+Guard tersebut melakukan dua hal. Ia menghasilkan runtime failure yang jujur dan mempersempit TypeScript type dari `string | undefined` menjadi `string` setelah condition itu.
 
----
+Bandingkan dengan shortcut yang tidak aman:
 
-## Misi Kamu
+```ts
+const password = process.env.TEST_PASSWORD as string;
+```
 
-Langsung aja gas ke **TypeScript Challenges** buat ngelatih otot koding kamu! Kita bakal mulai dari yang gampang dulu (anotasi dasar) sampe bikin utility tes yang canggih & aman.
+Cast tersebut menghilangkan warning tanpa menambah bukti.
+
+### Perlakukan external data sebagai unknown sampai diperiksa
+
+```ts
+type OrderResponse = {
+  id: string;
+  status: 'created';
+};
+
+const body = (await response.json()) as OrderResponse;
+```
+
+Cast ini tidak memvalidasi response. Untuk runtime data yang penting, gunakan schema validator milik project atau explicit check sebelum memakai datanya. Pemeriksaan kecil bisa dimulai seperti ini:
+
+```ts
+const body: unknown = await response.json();
+
+if (
+  typeof body !== 'object' ||
+  body === null ||
+  !('id' in body) ||
+  typeof body.id !== 'string'
+) {
+  throw new Error('Order response did not contain a string id');
+}
+
+const orderId = body.id;
+```
+
+Kontrak response yang lebih besar sebaiknya dikelola dengan runtime schema, bukan tumpukan inline check yang makin panjang.
+
+## Kapan pendekatan ini cocok dipakai?
+
+Gunakan inference untuk local value yang sudah jelas. Tambahkan explicit type saat boundary atau reusable contract akan lebih mudah direview: helper parameter, shared case data, fixture, configuration, dan API shape yang didukung.
+
+Gunakan union kalau sebuah value hanya boleh berasal dari beberapa pilihan yang sudah didokumentasikan. Gunakan optional property hanya kalau ketiadaan value memang valid—bukan karena penulis kode belum yakin datanya ada atau tidak.
+
+Hindari `any` saat mereview kode. `any` mematikan type checking yang berguna di sekitar value tersebut. Untuk untrusted data, lebih baik gunakan `unknown` karena kamu perlu menunjukkan bukti sebelum memakainya.
+
+Jangan memberi annotation pada setiap variable atau membuat type system yang kompleks untuk test kecil. Type complexity juga punya maintenance cost.
+
+Jangan menganggap command Playwright test selalu melakukan type checking project secara lengkap. Playwright bisa mengubah dan menjalankan TypeScript, tapi compiler check terpisah sebaiknya tetap dijalankan secara lokal atau di CI:
+
+```bash
+npx tsc -p tsconfig.json --noEmit
+npx playwright test
+```
+
+Gunakan script yang sudah dikonfigurasi repository kalau command-nya berbeda.
+
+## Kalau gagal, mulai cek dari mana?
+
+Misalnya editor menerima kode ini:
+
+```ts
+type User = { email: string };
+
+const user = (await response.json()) as User;
+await page.getByText(user.email).click();
+```
+
+Saat runtime, `user.email` ternyata `undefined` karena response-nya adalah `{ "error": "unauthorized" }`.
+
+Mulai diagnosis dari boundary:
+
+1. Apa isi status dan body response yang sebenarnya?
+2. Baris mana yang mengklaim sebuah type tanpa mengecek value?
+3. Apakah test setup seharusnya melakukan authentication dulu atau fail berdasarkan response status?
+4. Runtime validation apa yang cocok untuk data ini?
+5. Outcome yang dilihat pengguna apa yang masih perlu di-assert setelahnya?
+
+Mengganti cast menjadi `as unknown as User` hanya menyembunyikan masalah lebih dalam. Menambahkan `any` membuang feedback, bukan memperbaiki kontrak.
+
+Perbaiki setup dan validasi runtime response sebelum memakai field-nya.
+
+## Review hasil buatan AI
+
+Review TypeScript hasil generate dalam dua tahap.
+
+Pertama, periksa type contract:
+
+- Apakah shared data dan helper boundary memiliki type yang jelas?
+- Apakah union dan optional property memang berasal dari product rule?
+- Apakah inference dipakai saat value-nya sudah jelas?
+- Apakah AI menambahkan interface atau generic yang sebenarnya tidak diperlukan?
+
+Lalu periksa kejujuran runtime-nya:
+
+- Apakah `any` mematikan type checking?
+- Apakah `as` mengklaim untrusted data punya shape tertentu tanpa validasi?
+- Apakah environment variable dipaksa menjadi string tanpa guard?
+- Apakah optional chaining bisa menyembunyikan required data yang hilang?
+- Apakah runtime assertion masih membuktikan outcome produk?
+
+Type yang rapi adalah maintenance evidence yang berguna. Type bukan pengganti hasil test yang meaningful.
+
+## Coba cek pemahamanmu
+
+Review kode ini:
+
+```ts
+type TestUser = {
+  email: string;
+  role: 'customer' | 'admin';
+};
+
+const response = await request.get('/api/test-user');
+const user = (await response.json()) as TestUser;
+
+await expect(page.getByText(user.email)).toBeVisible();
+```
+
+Jelaskan:
+
+1. Kontrak berguna apa yang disampaikan `TestUser`?
+2. Hal apa yang gagal dibuktikan oleh cast tersebut?
+3. Status check atau runtime data check apa yang masih hilang?
+4. Apa yang dibuktikan final assertion—dan apa yang tidak dibuktikannya?
+
+## Bandingkan dengan cara pikir ini
+
+Salah satu jawaban yang masuk akal:
+
+- Type tersebut mendokumentasikan bahwa trusted test code mengharapkan email berupa string dan salah satu dari dua role yang didukung.
+- Cast tidak membuktikan endpoint mengembalikan shape tersebut. Cast hanya meminta TypeScript memperlakukan value itu sebagai `TestUser`.
+- Periksa response status dan validasi field penting memakai pendekatan runtime validation yang digunakan project sebelum memakai datanya.
+- Assertion membuktikan bahwa text yang sama dengan email akhirnya terlihat. Assertion itu tidak membuktikan response valid, user yang ditampilkan memiliki role yang diharapkan, atau seluruh skenario berhasil kalau bukti tersebut belum ikut diamati.
+
+## Sebelum lanjut
+
+Sekarang kamu seharusnya sudah bisa membaca kontrak TypeScript yang kecil, membedakan inference dari annotation yang berguna, menjaga optional runtime value, dan mempertanyakan unsafe cast di dalam kode hasil generate.
+
+Module 3 selesai setelah kamu menuntaskan empat Core lesson dan tiga Core Practice yang terintegrasi: Playwright test pertama dengan bukti observable, JavaScript case yang fokus pada QA, dan asynchronous setup task. TypeScript syntax drill tetap menjadi Additional Practice karena menyelesaikan drill tidak sama dengan membuktikan runtime behavior atau review judgment.
+
+Kamu siap masuk Module 4. Di sana, role, accessible name, DOM context, code literacy, dan runtime evidence dari tiga module pertama akan digabungkan untuk membuat keputusan locator yang reliable.

@@ -1,99 +1,237 @@
 ---
-title: "Fundamental Async/Await"
-description: "Ngatur eksekusi asynchronous biar tes stabil dan nggak gagal gara-gara masalah timing."
+title: 'Jaga Urutan Langkah Asynchronous di Dalam Test'
+description: 'Gunakan promise, async, dan await untuk menjaga dependency tanpa menganggap operasi yang selesai sebagai outcome yang sudah terbukti.'
 ---
 
-## 1. Mental Model: Kedai Kopi
+## Setelah lesson ini, kamu bisa
 
-Di dunia Browser yang sifatnya **Asynchronous**, alur kerjanya beda sama nulis urutan instruksi biasa. Anggap aja kayak kamu lagi di kedai kopi:
+- menjelaskan apa yang diwakili promise dan apa yang dikembalikan `async function`;
+- menaruh `await` pada operasi asynchronous yang hasilnya dibutuhkan langkah berikutnya;
+- membedakan menunggu action selesai dengan membuktikan outcome aplikasi;
+- memilih eksekusi sequential atau parallel berdasarkan dependency; dan
+- mendiagnosis `await` yang hilang atau error handling yang mengubah kegagalan menjadi false pass.
 
-1. **Request (Pesan):** Kamu pesan satu Latte.
-2. **Promise (Janji/Tiket):** Barista nggak langsung ngasih kopinya, tapi ngasih kamu **Nomor Antrian (Tiket)**. Kamu belum pegang kopinya, cuma "janji" kalau kopinya lagi dibikin.
-3. **Await (Nunggu):** Kamu berdiri di depan kasir dan nggak mau pindah ke langkah selanjutnya (misal: nyari tempat duduk) sampai nomor kamu dipanggil dan kopinya jadi.
+## Kenapa ini penting buat QA
 
-### Urutan Penundaan (Delay)
+Pernah lihat kode automation yang kelihatannya biasa saja seperti ini?
 
-Tanpa `await`, script kamu bakal lari duluan ninggalin browser yang masih sibuk *loading*. Dengan `await`, mereka bakal jalan bareng secara sinkron.
-
-![Async/Await Sequence Delay](/images/tutorials/async-await-sequence.png)
-
----
-
-## 2. Strateginya: Aturan "Tunggu Semuanya"
-
-Otomatisasi tes modern itu berinteraksi sama proses browser yang hidup di *luar* script kamu. Karena sinyal butuh waktu buat nyampai (lewat internet atau proses render), kamu harus anggap hampir semua interaksi sebagai kejadian yang "perlu ditunggu".
-
-**Aturannya:** Kalau baris kode kamu nyentuh browser, **wajib di-await (tungguin dia).**
-
-```javascript
-await page.goto('/login');  // Tunggu halamannya terbuka
-await page.click('#submit'); // Tunggu kliknya terdaftar
+```ts
+page.getByRole('button', { name: 'Submit order' }).click();
+await expect(page.getByText('Order confirmed')).toBeVisible();
 ```
 
----
+Promise dari click tidak di-`await`. Assertion bisa mulai ketika action masih berjalan, sementara error dari click mungkin muncul terpisah dari baris yang sebenarnya menyebabkan masalah.
 
-## 3. Kasus Nyata: User Hantu
+Menambah sleep nggak menjelaskan dependency tersebut. Sebagai QA, kamu perlu tahu operasi mana yang menghasilkan value, langkah mana yang membutuhkan value itu, dan bukti terpisah apa yang membuktikan produk berhasil.
 
-Kalau kamu ngirim permintaan (request) API buat bikin user tapi nggak kamu `await`, itu ibarat kamu nyoba minum kopi padahal baristanya baru aja mau mulai giling biji kopinya. Kamu bakal dapet gelas kosong!
+## Cara berpikir yang perlu kamu pegang
 
-```javascript
-await api.post('/users', { name: 'Ghost' }); // Tunggu sampai "Tiket"-nya selesai diproses jadi data asli!
+`Promise` mewakili operasi asynchronous yang nantinya akan selesai:
+
+```text
+pending → fulfilled dengan sebuah value
+        ↘ rejected dengan sebuah error
 ```
 
-### Tiket vs. Kopi
+`async function` selalu mengembalikan promise. Di dalam function itu, `await` menghentikan sementara progres function sampai value yang ditunggu selesai. `await` tidak membekukan browser dan tidak membuktikan semua side effect aplikasi sudah berhasil.
 
-Kata kunci `await` itu fungsinya ngerubah **Promise** (Tiket/Janji) jadi **Hasil Sebenarnya** (Kopi/Data).
+![Sebuah test asynchronous menunggu setup dan browser action yang saling bergantung secara berurutan, lalu memakai assertion terpisah untuk membuktikan outcome pengguna.](/images/tutorials/async-test-sequence.svg)
 
-![Promise Ticket vs Coffee](/images/tutorials/async-await-promise-states.png)
+_Await operasi yang kamu butuhkan; assert outcome yang perlu kamu buktikan._
 
----
+Coba klasifikasikan expression yang umum di dalam test:
 
-## 4. Jebakan Batman
+| Expression                      | Langsung atau asynchronous? | Apa yang diberikan                                   |
+| ------------------------------- | --------------------------- | ---------------------------------------------------- |
+| `page.getByRole(...)`           | Langsung                    | Deskripsi locator                                    |
+| `locator.click()`               | Asynchronous                | Action Playwright yang selesai atau gagal            |
+| `page.goto(...)`                | Asynchronous                | Navigation yang selesai atau gagal sesuai kontraknya |
+| `response.json()`               | Asynchronous                | Response data yang sudah di-parse                    |
+| `expect(locator).toBeVisible()` | Asynchronous                | Hasil assertion yang melakukan retry                 |
 
-Hati-hati, ada dua kesalahan klasik yang sering bikin QA junior pusing:
+Langkah berikutnya—bukan sekadar supaya bentuk kodenya seragam—yang menentukan di mana `await` dibutuhkan.
 
-### Jebakan #1: Fire-and-Forget (Tembak Lari)
+## Coba kita bedah contoh nyata
 
-Nulis `page.click('#submit')` tanpa kata kunci `await`. Script kamu bakal ngirim sinyal "klik" terus langsung kabur ke baris selanjutnya. Hasilnya? Pengecekan (*assertion*) mungkin bakal jalan hitungan *milidetik* sebelum browser sempat ngeproses klik itu. Tes kamu bakal gagal secara acak alias **flaky**.
+Test membutuhkan order yang terkontrol sebelum membuka halaman detailnya:
 
-### Jebakan #2: Static Sleep (Tidur Kaku)
+```ts
+import { test, expect } from '@playwright/test';
 
-Pake perintah `page.waitForTimeout(5000)` (maksa script tidur mati selama 5 detik).
+test('customer can view a prepared order', async ({ page, request }) => {
+  const response = await request.post('/api/test/orders', {
+    data: {
+      product: 'Mechanical Keyboard',
+      quantity: 1,
+    },
+  });
 
-* **Masalahnya:** Kalau halaman selesai *loading* dalam 1 detik, kamu buang-buang 4 detik. Kalau ternyata butuh 6 detik, tes tetep bakal gagal.
-* **Solusinya:** Gunakan `await` bareng *locator* atau *assertion*. Mereka itu "pintar" dan bakal nunggu persis selama yang dibutuhkan, lalu lanjut secepat kilat begitu kondisinya terpenuhi.
+  expect(response.ok()).toBeTruthy();
 
----
+  const order = await response.json();
 
-## 5. Referensi Cepat
+  await page.goto(`/orders/${order.id}`);
 
-### Alur Kontrol
+  await expect(
+    page.getByRole('heading', { name: `Order ${order.id}` }),
+  ).toBeVisible();
+});
+```
 
-Gimana `await` bisa nge-*pause* langkah tes kamu tanpa bikin komputer nge-*freeze*.
+Telusuri dependency-nya:
 
-![Async Control Flowchart](/images/tutorials/async-await-flowchart.png)
+1. `request.post` harus selesai sebelum response bisa diperiksa.
+2. `response.json()` harus selesai sebelum `order.id` tersedia.
+3. ID itu dibutuhkan untuk membuat navigation URL.
+4. Navigation membentuk halaman tempat bukti akan diamati.
+5. Heading assertion secara terpisah membuktikan hasil yang dilihat pengguna.
 
-| Aksi | Kode | Artinya |
-| --- | --- | --- |
-| **Mulai Fungsi Async** | `async () => { ... }` | "Siap-siap, blok kode ini bakal banyak nunggu-nunggu." |
-| **Pause Eksekusi** | `await action()` | "Berhenti dulu di sini sampai aksi ini beneran kelar." |
-| **Verifikasi** | `await expect(...)` | "Tunggu sampai tampilan UI sesuai sama yang kita mau." |
+Membuat locator tidak memulai operasi browser yang asynchronous:
 
----
+```ts
+const heading = page.getByRole('heading', { name: `Order ${order.id}` });
+await expect(heading).toBeVisible();
+```
 
-## 6. Bacaan Lanjut (Deep Dive)
+Locator-nya hanya sebuah deskripsi. Web assertion-lah yang melakukan pekerjaan asynchronous.
 
-Kalau kamu mau bener-bener paham gimana "waktu" diatur di JavaScript:
+### Action selesai bukan berarti proses bisnis berhasil
 
-### Dokumentasi Resmi (MDN)
+Baris ini menunggu Playwright menyelesaikan click:
 
-* **[Async/Await](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)**: Penjelasan teknis dan aturan penulisan syntax resminya.
+```ts
+await page.getByRole('button', { name: 'Submit order' }).click();
+```
 
-### Visualisasi & Mekanika
+Baris tersebut tidak otomatis membuktikan backend menerima order atau confirmation UI sudah muncul. Tetap buat assertion:
 
-* **[Loupe (Event Loop Visualizer)](http://latentflip.com/loupe/)**: Ini alat yang keren banget buat ngeliat gimana "Call Stack" dan "Callback Queue" kerja secara *real-time*.
-* **[JavaScript.info: The Event Loop](https://javascript.info/event-loop)**: Buat kamu yang pengen tau bedanya *Microtasks* (Promises) vs *Macrotasks* (setTimeout).
+```ts
+await expect(
+  page.getByRole('heading', { name: 'Order confirmed' }),
+).toBeVisible();
+```
 
----
+## Kapan pendekatan ini cocok dipakai?
 
-Selesai! Dengan paham `async/await`, kamu sudah resmi punya "SIM" buat nyetir *script automation* dengan aman dan stabil.
+Jalankan operasi secara sequential saat satu langkah menghasilkan state atau value yang dibutuhkan langkah berikutnya. Kebanyakan user flow memang sengaja berurutan: isi data wajib, submit, lalu amati hasilnya.
+
+Setup yang independen boleh berjalan bersamaan:
+
+```ts
+const [customer, product] = await Promise.all([
+  createCustomer(request),
+  createProduct(request),
+]);
+```
+
+Pakai `Promise.all` hanya setelah memastikan dua operasi itu tidak saling bergantung dan tidak berebut mutable state yang sama. `Promise.all` akan reject kalau salah satu promise di dalamnya reject.
+
+Jangan memasukkan UI action yang saling bergantung ke `Promise.all`:
+
+```ts
+// Salah: submission bergantung pada field yang sudah diisi.
+await Promise.all([
+  page.getByLabel('Email').fill('qa@example.com'),
+  page.getByRole('button', { name: 'Submit' }).click(),
+]);
+```
+
+Jangan menambahkan `await` ke value biasa hanya supaya tampilan kodenya konsisten. Telusuri dulu apa yang dikembalikan expression tersebut.
+
+## Kalau gagal, mulai cek dari mana?
+
+Misalnya test ini kadang gagal sebelum click selesai:
+
+```ts
+page.getByRole('button', { name: 'Submit order' }).click();
+await expect(page.getByText('Order confirmed')).toBeVisible();
+```
+
+Periksa dependency pertama yang gagal atau hilang:
+
+1. Apakah expression pertama mengembalikan promise?
+2. Apakah assertion bergantung pada action itu selesai?
+3. Apakah ada unhandled rejection yang dilaporkan di bagian output lain?
+4. Apakah outcome produk memang lambat, atau action-nya sama sekali belum selesai?
+
+Perbaiki dependency-nya:
+
+```ts
+await page.getByRole('button', { name: 'Submit order' }).click();
+await expect(page.getByText('Order confirmed')).toBeVisible();
+```
+
+Kalau assertion masih gagal, investigasi outcome produknya. Jangan menggantinya dengan `waitForTimeout`.
+
+Hati-hati juga dengan `try/catch`:
+
+```ts
+try {
+  await createTestOrder();
+} catch {
+  // error diabaikan
+}
+```
+
+Kode itu bisa membiarkan test lanjut dengan setup yang tidak valid. Gunakan `catch` hanya kalau recovery memang disengaja, atau kalau kamu menambah konteks lalu melempar ulang error:
+
+```ts
+try {
+  await createTestOrder();
+} catch (error) {
+  throw new Error('Could not create the controlled test order', {
+    cause: error,
+  });
+}
+```
+
+## Review hasil buatan AI
+
+Telusuri setiap baris asynchronous di dalam kode hasil generate:
+
+- Value atau state apa yang dihasilkan promise ini?
+- Langkah mana yang bergantung pada hasilnya?
+- Apakah `await` hilang dari action, navigation, data parsing, atau assertion?
+- Apakah `await` malah ditambahkan ke locator atau value biasa tanpa kegunaan?
+- Apakah UI action yang bergantung satu sama lain dimasukkan ke `Promise.all`?
+- Apakah `catch` menyembunyikan kegagalan setup atau produk?
+- Setelah action selesai, assertion apa yang masih membuktikan business outcome?
+
+Kalau kamu belum bisa menjelaskan jaminannya, jangan percaya urutan kodenya dulu.
+
+## Coba cek pemahamanmu
+
+Review kode hasil generate ini:
+
+```ts
+const orderPromise = createTestOrder();
+
+await page.goto(`/orders/${orderPromise.id}`);
+
+await Promise.all([
+  page.getByLabel('Email').fill('qa@example.com'),
+  page.getByRole('button', { name: 'Submit' }).click(),
+]);
+```
+
+Jelaskan:
+
+1. Kenapa `orderPromise.id` salah?
+2. Operasi mana yang harus selesai sebelum navigation?
+3. Kenapa fill dan click tidak aman dijalankan secara parallel?
+4. Assertion apa yang masih diperlukan setelah submit?
+
+## Bandingkan dengan cara pikir ini
+
+Salah satu jawaban yang masuk akal:
+
+- `createTestOrder()` mengembalikan promise, bukan resolved order object. Artinya, ID belum tersedia.
+- Gunakan `const order = await createTestOrder()` sebelum membuat URL.
+- Submission bergantung pada required email yang sudah diisi. Menjalankan keduanya bersamaan akan membuat race.
+- Setelah click dilakukan secara sequential, assert confirmation, navigation, atau bukti observable lain sesuai intent produk.
+
+## Sebelum lanjut
+
+Sekarang kamu seharusnya sudah bisa menelusuri promise di dalam test, menunggu dependency yang nyata, memisahkan setup independen dari UI behavior yang sequential, dan tetap membuat assertion setelah action selesai.
+
+Selesaikan async Core Practice dengan menunggu controlled setup data. Lesson terakhir di module ini akan menambah kemampuan review TypeScript supaya rasa aman dari editor tidak tertukar dengan runtime evidence.

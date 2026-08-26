@@ -1,0 +1,455 @@
+# TWE Learn Lesson Standard
+
+**Status:** Working curriculum standard for the Web Automation redesign  
+**Adopted:** 2026-08-25  
+**Scope:** All English and Indonesian Learn lessons reviewed or written during the redesign
+
+## How to use this standard
+
+Before auditing, outlining, writing, translating, or approving each module:
+
+1. Re-read this document.
+2. Define the module and lesson outcomes before editing content.
+3. Apply the required lesson structure below.
+4. Use optional sections only when they improve learning.
+5. Review the result against the lesson acceptance checklist.
+
+This standard governs Learn content. Standalone Practice challenges have additional independence requirements described under Practice rules.
+
+## 1. Core rule
+
+> Every lesson must improve what a QA engineer can **explain, decide, do, review, or diagnose**.
+
+If a lesson only adds syntax to memorize, it does not belong in Core Learn.
+
+Each lesson should teach one primary capability and answer:
+
+- Why does this matter for QA?
+- How should the learner think about it?
+- When should it be used?
+- What does good implementation look like?
+- How can it fail?
+- How will the learner know they understood it?
+
+## 2. Required lesson structure
+
+### 2.1 Lesson promise
+
+English:
+
+```markdown
+## After this lesson, you can
+```
+
+Indonesian:
+
+```markdown
+## Setelah lesson ini, kamu bisa
+```
+
+Include three to five observable outcomes.
+
+Use verbs such as:
+
+- Explain
+- Choose
+- Write
+- Inspect
+- Review
+- Diagnose
+- Fix
+- Justify
+
+Avoid vague outcomes such as:
+
+- Understand
+- Learn
+- Know
+- Become familiar with
+
+### 2.2 Why this matters for QA
+
+English:
+
+```markdown
+## Why this matters for QA
+```
+
+Indonesian:
+
+```markdown
+## Kenapa ini penting buat QA
+```
+
+Begin with a realistic QA problem, product risk, failure, or manual-testing situation.
+
+The learner should immediately recognize:
+
+- Where this appears at work
+- Why it matters
+- What could go wrong
+- Why the lesson is worth their time
+
+Indonesian lessons can open conversationally:
+
+> Pernah nggak sih kamu menjalankan test case yang kelihatannya sederhana, tapi begitu mau di-automate malah muncul banyak pertanyaan?
+
+### 2.3 Mental model
+
+English:
+
+```markdown
+## The mental model
+```
+
+Indonesian:
+
+```markdown
+## Cara berpikir yang perlu kamu pegang
+```
+
+Explain the durable concept before introducing syntax.
+
+This section should answer:
+
+- What is happening?
+- Why does it behave this way?
+- What responsibilities are involved?
+- What assumption commonly causes mistakes?
+
+Use diagrams only when they materially improve the explanation.
+
+### 2.4 Realistic worked example
+
+English:
+
+```markdown
+## Work through a realistic example
+```
+
+Indonesian:
+
+```markdown
+## Coba kita bedah contoh nyata
+```
+
+Develop one primary example progressively:
+
+```text
+QA scenario
+    ↓
+Reasoning and decision
+    ↓
+Implementation
+    ↓
+Observable evidence
+```
+
+For technical lessons:
+
+- Explain the testing intent before showing code.
+- Connect important lines to the QA problem.
+- Avoid disconnected syntax demonstrations.
+- Use realistic names, data, state, and expected results.
+- Show only the code needed for the capability being taught.
+
+### 2.5 Decision guidance
+
+English:
+
+```markdown
+## When to use it—and when not to
+```
+
+Indonesian:
+
+```markdown
+## Kapan pendekatan ini cocok dipakai?
+```
+
+Explain:
+
+- Appropriate use cases
+- Situations where it is unnecessary
+- Relevant trade-offs
+- More suitable alternatives
+- Misleading shortcuts
+
+A new technique must not be presented as the default answer to every problem.
+
+### 2.6 Failure and debugging lens
+
+English:
+
+```markdown
+## When it fails
+```
+
+Indonesian:
+
+```markdown
+## Kalau gagal, mulai cek dari mana?
+```
+
+Show at least one realistic failure:
+
+1. What the learner observes
+2. The likely cause
+3. What evidence to inspect
+4. How to fix the underlying cause
+5. Which tempting workaround would only hide it
+
+For conceptual lessons, the failure may be a flawed decision rather than broken code.
+
+### 2.7 AI review lens — when relevant
+
+English:
+
+```markdown
+## Review generated work
+```
+
+Indonesian:
+
+```markdown
+## Review hasil buatan AI
+```
+
+Do not force an AI section into every lesson. Include it when the lesson gives learners specific knowledge for reviewing generated work.
+
+Possible review questions:
+
+- Did AI invent product behavior?
+- Are important assumptions undocumented?
+- Does the code solve the stated risk?
+- Is the chosen technique appropriate?
+- Is the assertion meaningful?
+- Is a wait hiding a synchronization problem?
+- Is the abstraction necessary?
+- Can the learner explain and maintain every important line?
+
+AI-generated work follows the same quality standard as human-written work.
+
+### 2.8 Check understanding
+
+English:
+
+```markdown
+## Check your understanding
+```
+
+Indonesian:
+
+```markdown
+## Coba cek pemahamanmu
+```
+
+Every lesson gets a small checkpoint, but not necessarily a standalone Practice challenge.
+
+Possible checkpoint formats:
+
+- Review a scenario
+- Choose and justify an approach
+- Predict an outcome
+- Find a problem in a code sample
+- Diagnose a failure
+- Improve a weak test
+- Modify a small example
+
+### 2.9 Compare reasoning
+
+English:
+
+```markdown
+## Compare your reasoning
+```
+
+Indonesian:
+
+```markdown
+## Bandingkan dengan cara pikir ini
+```
+
+Provide a model response.
+
+For judgment-based questions, use wording such as:
+
+> One reasonable answer is…
+
+Avoid implying that only one answer is valid when product context could change the decision.
+
+### 2.10 Readiness check
+
+English:
+
+```markdown
+## Before you continue
+```
+
+Indonesian:
+
+```markdown
+## Sebelum lanjut
+```
+
+State what the learner should now be able to do without copying the lesson.
+
+Also explain how this capability prepares them for the next lesson.
+
+## 3. Optional sections
+
+Use only when they improve the lesson:
+
+- Prerequisites
+- Diagram
+- Reference table
+- Code walkthrough
+- Guided exercise
+- Core Practice
+- Additional Practice
+- Further reading
+
+Not every lesson requires an image, AI section, or challenge.
+
+## 4. Practice rules
+
+### 4.1 In-lesson checkpoint
+
+An in-lesson checkpoint may depend on context from the lesson.
+
+It exists to help learners evaluate their reasoning and does not need automated grading.
+
+### 4.2 Standalone Practice challenge
+
+A standalone Practice challenge must:
+
+- Explain its own scenario
+- Provide everything needed to attempt it
+- Remain usable without reading Learn
+- Test the intended QA capability
+- Avoid requiring unrelated syntax
+- Contain accurate English and Indonesian instructions
+
+### 4.3 Core Practice
+
+Use Core Practice only when completing the module genuinely requires hands-on proof.
+
+Core Practice blocks learning-path completion.
+
+### 4.4 Additional Practice
+
+Additional Practice provides repetition, variations, or optional depth.
+
+Additional Practice never blocks completion.
+
+## 5. Visual rules
+
+Create or reuse a visual when it clarifies:
+
+- Sequence
+- State changes
+- Hierarchy
+- Decision relationships
+- Architecture
+- Failure flow
+
+Avoid decorative images and diagrams that merely repeat the paragraph.
+
+The default visual language is English. Indonesian lessons may reuse the same asset with:
+
+- Indonesian alt text
+- An Indonesian caption
+- A short explanation of unfamiliar labels when needed
+
+Visuals should be editable and maintainable. Prefer SVG for diagrams.
+
+## 6. Bilingual rules
+
+English and Indonesian lessons must preserve:
+
+- The same learner outcomes
+- The same mental model
+- Equivalent technical depth
+- The same example purpose
+- Equivalent checkpoints
+- The same readiness expectation
+
+They do not need identical sentence structure or tone.
+
+### 6.1 English voice
+
+- Clear
+- Direct
+- Professional
+- Conversational
+- Free of unnecessary jargon
+
+### 6.2 Indonesian voice
+
+The voice should feel like:
+
+> Seorang senior QA yang ngajak juniornya mikir bareng—santai, jelas, tapi tetap akurat.
+
+Use:
+
+- `kamu`, not `Anda`
+- `nggak` consistently for casual sentences
+- Conversational hooks such as:
+  - “Pernah nggak sih…”
+  - “Coba bayangin kalau…”
+  - “Sekarang pertanyaannya…”
+  - “Nah, masalahnya…”
+  - “Dari sini mulai kelihatan…”
+- Short and active sentences
+- Familiar QA terminology when literal translation sounds unnatural
+- Questions that invite learners to reason
+
+Avoid:
+
+- Excessive slang
+- `gue/lo`
+- Social-media expressions
+- Jokes inside critical technical explanations
+- Calling AI a “kuli”
+- Inconsistent terminology
+- Reducing technical precision for casualness
+
+Conversational hooks should feel natural, not appear mechanically in every section.
+
+## 7. Terminology rule
+
+Use the terminology Indonesian QA engineers are likely to encounter at work, including:
+
+- Test
+- Browser
+- State
+- Scope
+- Locator
+- Assertion
+- Fixture
+- Debugging
+- Test data
+- Playwright
+
+Explain a term at first meaningful use when a beginner may not recognize it. Then use it consistently across later modules.
+
+## 8. Lesson acceptance checklist
+
+A lesson is ready only when every relevant answer is yes:
+
+- [ ] Does it teach one clear QA capability?
+- [ ] Are its outcomes observable?
+- [ ] Does the content fulfill every stated outcome?
+- [ ] Does it begin with a realistic QA problem?
+- [ ] Is the mental model explained before syntax?
+- [ ] Is the example realistic and technically accurate?
+- [ ] Does it explain when and when not to use the technique?
+- [ ] Does it teach how to recognize or diagnose failure?
+- [ ] Is any AI guidance specific to the lesson?
+- [ ] Does the checkpoint test the intended capability?
+- [ ] Can standalone Practice work independently?
+- [ ] Are Core and Additional Practice classified correctly?
+- [ ] Does every visual materially improve understanding?
+- [ ] Are English and Indonesian capabilities equivalent?
+- [ ] Does the Indonesian version sound naturally conversational?
+- [ ] Does the readiness check prepare the learner for what follows?

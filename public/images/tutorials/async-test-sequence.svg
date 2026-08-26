@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 1100" role="img" aria-labelledby="title description">
+  <title id="title">Await dependencies and assert outcomes</title>
+  <desc id="description">A test awaits controlled setup to receive an order ID, awaits navigation that depends on the ID, awaits a browser action, and then separately awaits an assertion that proves the user outcome. Creating a locator is immediate.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="1098" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.5">AWAIT DEPENDENCIES · ASSERT OUTCOMES</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="122" width="616" height="148" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+    <rect x="96" y="146" width="108" height="34" rx="17" fill="#fce8e1" />
+    <text x="150" y="169" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">AWAIT 1</text>
+    <text x="96" y="216" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="700">Create controlled test order</text>
+    <text x="96" y="250" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19">Produces: order.id</text>
+  </g>
+
+  <line x1="380" y1="282" x2="380" y2="324" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <text x="400" y="310" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">next step needs the ID</text>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="338" width="616" height="148" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+    <rect x="96" y="362" width="108" height="34" rx="17" fill="#fce8e1" />
+    <text x="150" y="385" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">AWAIT 2</text>
+    <text x="96" y="432" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="700">Navigate to /orders/{order.id}</text>
+    <text x="96" y="466" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19">Produces: the page where behavior occurs</text>
+  </g>
+
+  <line x1="380" y1="498" x2="380" y2="540" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <rect x="430" y="512" width="258" height="72" rx="12" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  <text x="454" y="540" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">IMMEDIATE</text>
+  <text x="454" y="566" fill="#6d5418" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Create a locator description</text>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="598" width="616" height="148" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+    <rect x="96" y="622" width="108" height="34" rx="17" fill="#fce8e1" />
+    <text x="150" y="645" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">AWAIT 3</text>
+    <text x="96" y="692" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="700">Perform the browser action</text>
+    <text x="96" y="726" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19">Guarantee: Playwright action completed or failed</text>
+  </g>
+
+  <line x1="380" y1="758" x2="380" y2="800" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <text x="400" y="786" fill="#9b3e27" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15" font-weight="700">action completion is not product proof</text>
+
+  <g filter="url(#shadow)">
+    <rect x="72" y="814" width="616" height="162" rx="16" fill="#25231f" />
+    <rect x="96" y="838" width="108" height="34" rx="17" fill="#f4bd4f" />
+    <text x="150" y="861" fill="#25231f" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">AWAIT 4</text>
+    <text x="96" y="910" fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="26" font-weight="700">Assert observable evidence</text>
+    <text x="96" y="947" fill="#d9d2c7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19">Guarantee: expected user outcome became true—or failed</text>
+  </g>
+
+  <rect x="72" y="1010" width="616" height="54" rx="12" fill="#fce8e1" stroke="#e65f3a" stroke-width="1.5" />
+  <text x="380" y="1044" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15" font-weight="700" letter-spacing="0.6">TRACE THE VALUE · PRESERVE THE ORDER · KEEP THE ASSERTION</text>
+</svg>
