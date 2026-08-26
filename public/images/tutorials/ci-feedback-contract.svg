@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 1080" role="img" aria-labelledby="title description">
+  <title id="title">CI feedback turns a trigger into an owned action</title>
+  <desc id="description">A vertical feedback contract moves from a pull request, merge, deployment, or schedule through a risk-selected scenario and browser portfolio, controlled execution, a verdict with diagnostic evidence, and finally a named owner and next action. A note balances feedback speed with enough detail to act.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="1078" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.2">FROM CI TRIGGER TO OWNED ACTION</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="104" y="116" width="552" height="112" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <circle cx="144" cy="172" r="22" fill="#e65f3a" />
+  <text x="144" y="179" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">1</text>
+  <text x="184" y="158" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">TRIGGER + DECISION</text>
+  <text x="184" y="189" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">PR · merge · deploy · schedule</text>
+  <text x="184" y="213" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">What decision must this run inform?</text>
+
+  <line x1="380" y1="240" x2="380" y2="274" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="104" y="288" width="552" height="126" rx="16" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  </g>
+  <circle cx="144" cy="351" r="22" fill="#b38323" />
+  <text x="144" y="358" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">2</text>
+  <text x="184" y="329" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">RISK-SELECTED PORTFOLIO</text>
+  <text x="184" y="362" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">Scenarios + browser projects</text>
+  <text x="184" y="389" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">Enough coverage for this risk—not every combination.</text>
+
+  <line x1="380" y1="426" x2="380" y2="460" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="104" y="474" width="552" height="126" rx="16" fill="#e6f2ec" stroke="#75a38b" stroke-width="2" />
+  </g>
+  <circle cx="144" cy="537" r="22" fill="#387357" />
+  <text x="144" y="544" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">3</text>
+  <text x="184" y="515" fill="#2d6249" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">CONTROLLED EXECUTION</text>
+  <text x="184" y="548" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">Known revision · target · config · data</text>
+  <text x="184" y="575" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">Reconstruct the test system deliberately.</text>
+
+  <line x1="380" y1="612" x2="380" y2="646" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="104" y="660" width="552" height="138" rx="16" fill="#fce8e1" stroke="#e65f3a" stroke-width="2" />
+  </g>
+  <circle cx="144" cy="729" r="22" fill="#e65f3a" />
+  <text x="144" y="736" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">4</text>
+  <text x="184" y="700" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">VERDICT + DIAGNOSTIC EVIDENCE</text>
+  <text x="184" y="733" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">Clean · flaky · failed · infrastructure</text>
+  <text x="184" y="761" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">Report · trace · screenshot · logs—without secrets.</text>
+
+  <line x1="380" y1="810" x2="380" y2="844" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="104" y="858" width="552" height="126" rx="16" fill="#25231f" />
+  </g>
+  <circle cx="144" cy="921" r="22" fill="#f4bd4f" />
+  <text x="144" y="928" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">5</text>
+  <text x="184" y="899" fill="#f4bd4f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">OWNER + NEXT ACTION</text>
+  <text x="184" y="932" fill="#ffffff" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">Merge · triage · repair · release</text>
+  <text x="184" y="959" fill="#d9d2c7" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">A signal without an owner does not close the loop.</text>
+
+  <text x="380" y="1030" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">FAST ENOUGH TO INFORM THE DECISION</text>
+  <text x="380" y="1056" fill="#9b3e27" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">DETAILED ENOUGH TO ACT</text>
+</svg>
