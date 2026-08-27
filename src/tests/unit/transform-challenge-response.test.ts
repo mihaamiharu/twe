@@ -140,6 +140,7 @@ describe('transformChallengeResponse', () => {
             validation: {
                 requiredAssertions: ['toHaveText'],
                 forbiddenMethods: ['waitForTimeout'],
+                policy: { requireExecutedEvidence: true },
             },
         };
         const result = transformChallengeResponse(
@@ -161,6 +162,7 @@ describe('transformChallengeResponse', () => {
         expect(result!.validation).toEqual({
             requiredAssertions: ['toHaveText'],
             forbiddenMethods: ['waitForTimeout'],
+            policy: { requireExecutedEvidence: true },
         });
     });
 

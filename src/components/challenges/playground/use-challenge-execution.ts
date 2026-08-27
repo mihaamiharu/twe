@@ -1,7 +1,11 @@
 import { useCallback } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { executePlaywrightCode } from '@/core/executor';
+import {
+    executePlaywrightCode,
+    validateChallengeExecution,
+} from '@/core/executor';
+import type { ChallengeValidationFailure } from '@/core/executor';
 import { generatePreloadCode } from '@/core/executor/module-preloader';
 import { storage } from '@/lib/storage-adapter';
 import { omitUndefined } from '@/lib/omit-undefined';
@@ -29,6 +33,43 @@ export interface ChallengeExecution {
         isPending: boolean;
         mutate: () => void;
     };
+}
+
+function formatValidationFailure(
+    failure: ChallengeValidationFailure,
+    t: PlaygroundState['t'],
+): string {
+    const methods = failure.methods?.join(', ') ?? '';
+    const matcher = failure.methods?.[0] ?? 'assertion';
+
+    switch (failure.kind) {
+        case 'missing-required-evidence':
+            return t('challenges:playground.grading.missingEvidence', {
+                methods,
+            });
+        case 'forbidden-method':
+            return t('challenges:playground.grading.forbiddenMethods', {
+                methods,
+            });
+        case 'structural-locator':
+            return t('challenges:playground.grading.structuralLocator');
+        case 'forced-action':
+            return t('challenges:playground.grading.forcedAction');
+        case 'direct-dom-access':
+            return t('challenges:playground.grading.directDomAccess');
+        case 'swallowed-error':
+            return t('challenges:playground.grading.swallowedError');
+        case 'failed-assertion':
+            return t('challenges:playground.grading.failedAssertion', {
+                matcher,
+            });
+        case 'failed-action':
+            return t('challenges:playground.grading.failedAction', {
+                method: matcher,
+            });
+        case 'source-analysis-unavailable':
+            return t('challenges:playground.grading.sourceAnalysisUnavailable');
+    }
 }
 
 export function useChallengeExecution(
@@ -116,6 +157,7 @@ export function useChallengeExecution(
                     ...omitUndefined({
                         files: challenge.files,
                         expectedState: challenge.expectedState,
+                        validation: challenge.validation,
                         interactionSequence:
                             challenge.validation?.interactionSequence,
                     }),
@@ -130,39 +172,16 @@ export function useChallengeExecution(
                 },
             );
 
-            let validationPassed = result.status === 'PASSED';
+            const grading = validateChallengeExecution(
+                result,
+                challenge.validation,
+            );
+            let validationPassed = grading.passed;
             let outputMessage = result.output;
 
-            const codeWithoutComments = codeToRun
-                .replace(/\/\*[\s\S]*?\*\//g, '')
-                .replace(/\/\/.*$/gm, '');
-            const calledMethods = new Set(
-                Array.from(
-                    codeWithoutComments.matchAll(
-                        /\.\s*([A-Za-z_$][\w$]*)\s*\(/g,
-                    ),
-                    (match) => match[1],
-                ).filter((method): method is string => method !== undefined),
-            );
-            const calledMethod = (method: string) => calledMethods.has(method);
-            const missingRequirements = [
-                ...(challenge.validation?.requiredAssertions ?? []),
-                ...(challenge.validation?.requiredMethods ?? []),
-            ].filter((method) => !calledMethod(method));
-            const forbiddenMethods = (
-                challenge.validation?.forbiddenMethods ?? []
-            ).filter(calledMethod);
-
-            if (
-                result.status === 'PASSED' &&
-                (missingRequirements.length > 0 || forbiddenMethods.length > 0)
-            ) {
-                validationPassed = false;
+            if (grading.failure) {
                 result.status = 'FAILED';
-                outputMessage =
-                    missingRequirements.length > 0
-                        ? `The solution does not yet demonstrate: ${missingRequirements.join(', ')}.`
-                        : `Remove the masking method: ${forbiddenMethods.join(', ')}.`;
+                outputMessage = formatValidationFailure(grading.failure, t);
             }
 
             const hasExpectedState = (challenge.expectedState?.length ?? 0) > 0;

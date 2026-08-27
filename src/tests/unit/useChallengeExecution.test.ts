@@ -11,6 +11,7 @@ import { renderHook, act } from '@testing-library/react';
 import { useChallengeExecution } from '@/components/challenges/playground/use-challenge-execution';
 import * as executor from '@/core/executor';
 import * as storage from '@/lib/storage-adapter';
+import i18n from '@/lib/i18n';
 import {
     createChallenge,
     createPlaygroundProps,
@@ -246,6 +247,58 @@ describe('useChallengeExecution', () => {
         await act(async () => result.current.handleRunCode());
 
         expect(state.setHasPassed).toHaveBeenCalledWith(false);
+    });
+
+    it('uses executed evidence and localized feedback for strict policies', async () => {
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'PASSED',
+            output: 'Success',
+            executionTime: 100,
+            sourceAnalysis: {
+                calledMethods: ['getByRole'],
+                forbiddenMethods: [],
+                structuralLocatorCalls: 0,
+                forcedActions: [],
+                directDomAccesses: [],
+                swallowedErrorCount: 0,
+                strictViolations: [],
+            },
+            runtimeTrace: { methodCalls: [], assertions: [] },
+        });
+        const state = createPlaygroundState({
+            ...mockState,
+            locale: 'id',
+            t: i18n.getFixedT('id'),
+        });
+        const props = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                ...mockProps.challenge,
+                type: 'PLAYWRIGHT',
+                validation: {
+                    requiredMethods: ['getByRole'],
+                    policy: { requireExecutedEvidence: true },
+                },
+            }),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(state, props, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(state.setHasPassed).toHaveBeenCalledWith(false);
+        expect(state.setTestResults).toHaveBeenCalledWith([
+            {
+                id: 'main',
+                name: state.t('challenges:playground.results'),
+                passed: false,
+                error: state.t('challenges:playground.grading.missingEvidence', {
+                    methods: 'getByRole',
+                }),
+                executionTime: 100,
+            },
+        ]);
     });
 
     it('should submit results if passed', () => {

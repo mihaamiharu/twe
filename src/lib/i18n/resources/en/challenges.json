@@ -97,6 +97,17 @@
     "jsUndefined": "Your result is undefined. Make sure you assign a value to `result`.",
     "jsMismatch": "Your result doesn't match the expected output. Check your logic and try again.",
     "noAssertions": "No assertions were called. Write assertions like: await expect(locator).toHaveText('...');",
+    "grading": {
+      "missingEvidence": "The required calls were not executed in the test path: {{methods}}. Run them in the scenario itself; declarations or unused helpers don't count.",
+      "forbiddenMethods": "Remove these forbidden methods from the test: {{methods}}.",
+      "structuralLocator": "Use semantic locators such as getByRole or getByLabel instead of structural page.locator(...) calls.",
+      "forcedAction": "Remove the forced action. Let Playwright check actionability and call the action without a truthy force option.",
+      "directDomAccess": "Keep browser DOM access out of the test. Use Playwright locators and web-first assertions instead of document, window, globalThis, or evaluate.",
+      "swallowedError": "Don't swallow failures. Let the Playwright action or assertion fail the test instead of catching and ignoring it.",
+      "failedAssertion": "The {{matcher}} assertion failed and was suppressed. Fix the expected result and let the assertion fail the test when it is wrong.",
+      "failedAction": "The {{method}} Playwright action failed and was suppressed. Fix the locator or action and let the error fail the test.",
+      "sourceAnalysisUnavailable": "The test could not be checked safely. Run it again so its source policy can be analyzed."
+    },
     "selectorMismatch": "Selector does not match the target element",
     "executionError": "Execution Error",
     "alreadyCompleted": "You have already completed this challenge! Feel free to practice again.",

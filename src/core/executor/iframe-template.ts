@@ -72,8 +72,8 @@ export function generateIframeTemplate(options: IframeTemplateOptions): string {
     ? `
                                 window.__VFS_NAVIGATE__ = function(path) {
                                     console.log('[VFS] Navigating to ' + path);
-                                    if (window.page && typeof window.page.goto === 'function') {
-                                        window.page.goto(path).catch(e => console.error('Navigation failed:', e));
+                                    if (window.__VFS_PAGE__ && typeof window.__VFS_PAGE__.goto === 'function') {
+                                        window.__VFS_PAGE__.goto(path).catch(e => console.error('Navigation failed:', e));
                                     } else {
                                         console.error('VFS navigation is not ready for ' + path);
                                     }
@@ -217,8 +217,8 @@ export function generateVfsNavigationTemplate(options: {
             // replacing its document, so this bridge must be refreshed on
             // every generated VFS document.
             window.__VFS_NAVIGATE__ = function(path) {
-              if (window.page && typeof window.page.goto === 'function') {
-                window.page.goto(path).catch(e => console.error('Navigation failed:', e));
+              if (window.__VFS_PAGE__ && typeof window.__VFS_PAGE__.goto === 'function') {
+                window.__VFS_PAGE__.goto(path).catch(e => console.error('Navigation failed:', e));
               } else {
                 console.error('VFS navigation is not ready for ' + path);
               }

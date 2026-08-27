@@ -2,16 +2,127 @@ import { beforeEach, describe, it, expect } from 'bun:test';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { z } from 'zod';
+import { omitUndefined } from '../../lib/omit-undefined';
+import type {
+    ChallengeValidationDefinition,
+    SerializableExpectedStateRule,
+} from '../../lib/content.types';
 import {
     testSelectorAgainstTarget,
     validateSelector,
 } from '../../core/executor/selector-validator';
 import { executePlaywrightCode } from '../../core/executor/iframe-executor';
+import { validateChallengeExecution } from '../../core/executor/challenge-validator';
 
 const localizedTextSchema = z.object({
     en: z.string(),
     id: z.string().optional(),
 });
+const expectedStateRuleSchema = z.object({
+    selector: z.string(),
+    visible: z.boolean().optional(),
+    hidden: z.boolean().optional(),
+    containsText: z.string().optional(),
+    count: z.number().optional(),
+    hasAttribute: z
+        .object({ name: z.string(), value: z.string().optional() })
+        .optional(),
+});
+const validationSchema = z
+    .object({
+        requiredAssertions: z.array(z.string()).optional(),
+        requiredMethods: z.array(z.string()).optional(),
+        forbiddenMethods: z.array(z.string()).optional(),
+        policy: z
+            .object({
+                requireExecutedEvidence: z.boolean().optional(),
+                forbidStructuralLocators: z.boolean().optional(),
+                forbidForcedActions: z.boolean().optional(),
+                forbidDirectDomAccess: z.boolean().optional(),
+                forbidSwallowedErrors: z.boolean().optional(),
+            })
+            .optional(),
+        interactionSequence: z
+            .object({
+                event: z.literal('submit'),
+                selector: z.string(),
+                steps: z.array(
+                    z.object({
+                        inputSelector: z.string(),
+                        inputValue: z.string(),
+                        expectedState: z.array(expectedStateRuleSchema),
+                    }),
+                ),
+            })
+            .optional(),
+    })
+    .optional();
+
+function normalizeExpectedStateRule(
+    rule: z.infer<typeof expectedStateRuleSchema>,
+): SerializableExpectedStateRule {
+    return {
+        ...omitUndefined({
+            selector: rule.selector,
+            visible: rule.visible,
+            hidden: rule.hidden,
+            containsText: rule.containsText,
+            count: rule.count,
+        }),
+        ...(rule.hasAttribute === undefined
+            ? {}
+            : {
+                  hasAttribute: omitUndefined({
+                      name: rule.hasAttribute.name,
+                      value: rule.hasAttribute.value,
+                  }),
+              }),
+    };
+}
+
+function normalizeValidation(
+    validation: z.infer<typeof validationSchema>,
+): ChallengeValidationDefinition | undefined {
+    if (validation === undefined) return undefined;
+
+    return {
+        ...omitUndefined({
+            requiredAssertions: validation.requiredAssertions,
+            requiredMethods: validation.requiredMethods,
+            forbiddenMethods: validation.forbiddenMethods,
+        }),
+        ...(validation.policy === undefined
+            ? {}
+            : {
+                  policy: omitUndefined({
+                      requireExecutedEvidence:
+                          validation.policy.requireExecutedEvidence,
+                      forbidStructuralLocators:
+                          validation.policy.forbidStructuralLocators,
+                      forbidForcedActions: validation.policy.forbidForcedActions,
+                      forbidDirectDomAccess:
+                          validation.policy.forbidDirectDomAccess,
+                      forbidSwallowedErrors:
+                          validation.policy.forbidSwallowedErrors,
+                  }),
+              }),
+        ...(validation.interactionSequence === undefined
+            ? {}
+            : {
+                  interactionSequence: {
+                      event: validation.interactionSequence.event,
+                      selector: validation.interactionSequence.selector,
+                      steps: validation.interactionSequence.steps.map((step) => ({
+                          inputSelector: step.inputSelector,
+                          inputValue: step.inputValue,
+                          expectedState: step.expectedState.map(
+                              normalizeExpectedStateRule,
+                          ),
+                      })),
+                          },
+                      }),
+    };
+}
 const tierDataSchema = z.object({
     tier: z.string(),
     challenges: z.array(
@@ -52,6 +163,7 @@ const tierDataSchema = z.object({
                     }),
                 )
                 .optional(),
+            validation: validationSchema,
             testCases: z.array(
                 z.object({
                     description: z.string(),
@@ -320,9 +432,10 @@ describe('Required Learn and revised-module Playwright reference solutions', () 
                               ...(rule.hasAttribute.value === undefined
                                   ? {}
                                   : { value: rule.hasAttribute.value }),
-                          },
-                      }),
+                      },
+                  }),
             }));
+            const validation = normalizeValidation(challenge.validation);
 
             const result = await executePlaywrightCode(
                 `${preloadCode}\n${challenge.solution}`,
@@ -333,6 +446,11 @@ describe('Required Learn and revised-module Playwright reference solutions', () 
                         ? {}
                         : { files: challenge.files }),
                     ...(expectedState === undefined ? {} : { expectedState }),
+                    ...(validation === undefined
+                        ? {}
+                        : {
+                              validation,
+                          }),
                     strictMode: true,
                     // Reference solutions intentionally use JavaScript-compatible
                     // TypeScript so the Bun DOM harness does not need browser WASM.
@@ -342,6 +460,12 @@ describe('Required Learn and revised-module Playwright reference solutions', () 
 
             if (result.status !== 'PASSED') {
                 throw new Error(`${challenge.slug}: ${result.output}`);
+            }
+
+            if (validation !== undefined) {
+                expect(
+                    validateChallengeExecution(result, validation),
+                ).toEqual({ passed: true });
             }
         });
     }

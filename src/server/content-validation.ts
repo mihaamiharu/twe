@@ -85,11 +85,22 @@ const ExpectedStateSchema = z
   })
   .strict();
 
+const ChallengeValidationPolicySchema = z
+  .object({
+    requireExecutedEvidence: z.boolean().optional(),
+    forbidStructuralLocators: z.boolean().optional(),
+    forbidForcedActions: z.boolean().optional(),
+    forbidDirectDomAccess: z.boolean().optional(),
+    forbidSwallowedErrors: z.boolean().optional(),
+  })
+  .strict();
+
 const ChallengeValidationSchema = z
   .object({
     requiredAssertions: z.array(z.string().min(1)).optional(),
     requiredMethods: z.array(z.string().min(1)).optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
+    policy: ChallengeValidationPolicySchema.optional(),
     interactionSequence: z
       .object({
         event: z.literal('submit'),
@@ -281,6 +292,23 @@ function normalizeChallengeDefinition(
                 requiredAssertions: value.validation.requiredAssertions,
                 requiredMethods: value.validation.requiredMethods,
                 forbiddenMethods: value.validation.forbiddenMethods,
+                policy:
+                  value.validation.policy === undefined
+                    ? undefined
+                    : {
+                        ...omitUndefined({
+                          requireExecutedEvidence:
+                            value.validation.policy.requireExecutedEvidence,
+                          forbidStructuralLocators:
+                            value.validation.policy.forbidStructuralLocators,
+                          forbidForcedActions:
+                            value.validation.policy.forbidForcedActions,
+                          forbidDirectDomAccess:
+                            value.validation.policy.forbidDirectDomAccess,
+                          forbidSwallowedErrors:
+                            value.validation.policy.forbidSwallowedErrors,
+                        }),
+                      },
                 interactionSequence: normalizeInteractionSequence(
                   value.validation.interactionSequence,
                 ),

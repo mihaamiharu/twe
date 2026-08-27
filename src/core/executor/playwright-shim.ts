@@ -533,7 +533,7 @@ export class MockedPlaywrightPage {
       if (this.targetDocument.defaultView) {
          
         const win = this.targetDocument.defaultView;
-        win.page = this;
+        win.__VFS_PAGE__ = this;
         // Re-inject active routes
         win.__MOCK_ROUTES__ = this.routes;
         // Restore persisted app state across navigation (redundant but safe)

@@ -161,10 +161,24 @@ export interface InteractionSequenceDefinition {
   steps: InteractionSequenceStep[];
 }
 
+export interface ChallengeValidationPolicy {
+  /** Require required methods and assertions to be observed at runtime. */
+  requireExecutedEvidence?: boolean;
+  /** Reject page/locator.locator() structural selector calls. */
+  forbidStructuralLocators?: boolean;
+  /** Reject action options whose runtime force value is truthy. */
+  forbidForcedActions?: boolean;
+  /** Reject direct document/window/globalThis DOM access. */
+  forbidDirectDomAccess?: boolean;
+  /** Reject catch handlers that suppress failures instead of rethrowing. */
+  forbidSwallowedErrors?: boolean;
+}
+
 export interface ChallengeValidationDefinition {
   requiredAssertions?: string[];
   requiredMethods?: string[];
   forbiddenMethods?: string[];
+  policy?: ChallengeValidationPolicy;
   interactionSequence?: InteractionSequenceDefinition;
 }
 
