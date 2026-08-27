@@ -512,20 +512,12 @@ describe('Learn and Practice catalog contracts', () => {
       { slug: 'pw-get-by-testid', role: 'additional' },
     ]);
     expect(compositionLesson?.practice).toEqual([
-      { slug: 'pw-locator-chaining', role: 'additional' },
       { slug: 'pw-list-items', role: 'additional' },
+      { slug: 'pw-dynamic-table', role: 'additional' },
       { slug: 'pw-locators-boss', role: 'core' },
     ]);
-    expect(cssLesson?.practice).toEqual([
-      { slug: 'css-attribute-selectors', role: 'additional' },
-      { slug: 'css-validation-states', role: 'additional' },
-      { slug: 'css-table-drill', role: 'additional' },
-    ]);
-    expect(xpathLesson?.practice).toEqual([
-      { slug: 'xpath-contains-starts-with', role: 'additional' },
-      { slug: 'xpath-normalize-space', role: 'additional' },
-      { slug: 'xpath-complex-table', role: 'additional' },
-    ]);
+    expect(cssLesson?.practice).toEqual([]);
+    expect(xpathLesson?.practice).toEqual([]);
 
     expect(xpathLesson?.kind).toBe('optional');
   });

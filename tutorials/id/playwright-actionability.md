@@ -49,7 +49,7 @@ Actionability bukan satu checklist yang dipakai untuk semua method. Playwright m
 | `click()`        | Ya      | Ya     | Ya              | Ya      | Tidak    |
 | `fill()`         | Ya      | Tidak  | Ya              | Ya      | Ya       |
 | `check()`        | Ya      | Ya     | Ya              | Ya      | Tidak    |
-| `selectOption()` | Ya      | Tidak  | Ya              | Ya      | Tidak    |
+| `selectOption()` | Ya      | Tidak  | Tidak           | Ya      | Tidak    |
 
 Playwright juga menyelesaikan satu intended element untuk single-target action. Strictness contract ini sudah dibahas di Module 4.
 

@@ -316,7 +316,7 @@ describe('Learn experience contracts', () => {
       'LearningResource',
     ]);
     expect(schemas[1]?.['headline']).toBe(english.title);
-    expect(schemas[2]?.['timeRequired']).toBe('PT15M');
+    expect(schemas[2]?.['timeRequired']).toBe('PT18M');
   });
 
   test('missing-content metadata stays generic and noindex', () => {
@@ -341,7 +341,7 @@ describe('Learn experience contracts', () => {
     );
     expect(previous).toEqual({
       slug: 'html-element-anatomy',
-      title: 'Read HTML by Meaning, Name, and State',
+      title: 'Read HTML Through Role, Accessible Name, and State',
     });
   });
 

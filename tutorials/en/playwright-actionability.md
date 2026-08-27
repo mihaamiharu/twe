@@ -49,7 +49,7 @@ Actionability is not one checklist applied to every method. Playwright checks co
 | `click()`        | Yes     | Yes    | Yes             | Yes     | No       |
 | `fill()`         | Yes     | No     | Yes             | Yes     | Yes      |
 | `check()`        | Yes     | Yes    | Yes             | Yes     | No       |
-| `selectOption()` | Yes     | No     | Yes             | Yes     | No       |
+| `selectOption()` | Yes     | No     | No              | Yes     | No       |
 
 Playwright also resolves a single intended element for a single-target action. Module 4 covered that strictness contract.
 
