@@ -70,7 +70,7 @@ In **Elements** and its accessibility information, confirm:
 
 - the control is a button;
 - its accessible name is “Save changes”;
-- it is enabled before valid edits;
+- it is enabled after a valid edit is ready to save;
 - the surrounding form is the profile form, not another form on the page.
 
 Do not copy the full DOM path. Record the meaning you discovered.

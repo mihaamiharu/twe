@@ -1,24 +1,24 @@
 ---
-title: 'Membaca HTML dari Makna, Nama, dan State'
-description: 'Periksa jenis kontrol, cara pengguna mengenalinya, dan state yang penting sebelum memilih kode otomasi.'
+title: 'Membaca HTML lewat Role, Accessible Name, dan State'
+description: 'Periksa role, accessible name, dan state yang penting sebelum memilih automation code.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
 - mengenali semantic role, accessible name, dan state yang relevan dari sebuah elemen;
-- menjelaskan kenapa elemen HTML bawaan biasanya memberi kontrak yang lebih jelas daripada elemen generik yang dibuat bisa diklik;
+- menjelaskan kenapa elemen HTML native biasanya memberi kontrak yang lebih jelas daripada elemen generik yang dibuat bisa diklik;
 - membedakan atribut untuk styling, identitas yang dilihat pengguna, dan kontrak testability; serta
-- me-review potongan markup kecil untuk menemukan risiko aksesibilitas dan otomasi.
+- me-review potongan markup kecil untuk menemukan risiko accessibility dan web automation.
 
 Kamu nggak perlu menghafal semua tag HTML atau aturan ARIA. Targetnya adalah bisa membaca halaman secukupnya supaya keputusan QA-mu punya dasar yang jelas.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih kamu bisa mengklik kontrol bertuliskan “Create account” saat testing manual, tetapi test otomatis malah nggak menemukan button dengan nama tersebut?
+Pernah nggak sih kamu bisa mengklik kontrol bertuliskan “Create account” saat manual testing, tetapi automated test malah nggak menemukan button dengan nama tersebut?
 
 Bisa jadi kontrol itu terlihat seperti button tanpa benar-benar punya semantik button. Teks yang kelihatan mungkin nggak terhubung ke input di sebelahnya. Selector buatan AI mungkin berhasil hari ini, tetapi ternyata bergantung pada class styling yang berubah saat redesign berikutnya.
 
-Saat testing manual, kita sering bisa menebak dari layout dan konteks. Otomasi browser membutuhkan identitas yang bisa ditemukan ulang secara konsisten. Pengguna teknologi bantu juga membutuhkan kejelasan yang sama.
+Saat manual testing, kita sering bisa menebak dari layout dan konteks. Browser automation membutuhkan identitas yang bisa ditemukan ulang secara konsisten. Pengguna teknologi bantu juga membutuhkan kejelasan yang sama.
 
 Jadi, sebelum bertanya, “Selector apa yang harus ditulis?”, tanyakan tiga hal ini dulu:
 
@@ -30,9 +30,9 @@ Jadi, sebelum bertanya, “Selector apa yang harus ditulis?”, tanyakan tiga ha
 
 Browser nggak cuma menampilkan response HTML. Browser mengubah markup menjadi Document Object Model (DOM) yang aktif, menerapkan tampilan dan perilaku, lalu menyediakan informasi aksesibilitas yang mewakili makna, nama, dan state.
 
-![Browser mengubah markup menjadi DOM aktif, UI yang terlihat, dan informasi aksesibilitas yang bisa diperiksa QA sebelum menentukan kontrak otomasi.](/images/tutorials/ui-meaning-layers.svg)
+![Browser mengubah markup menjadi DOM aktif, UI yang terlihat, dan informasi aksesibilitas yang bisa diperiksa QA sebelum menentukan kontrak automation.](/images/tutorials/ui-meaning-layers.svg)
 
-_Dasarkan otomasi pada UI aktif yang bermakna, bukan pada satu atribut yang disalin dari markup awal._
+_Dasarkan web automation pada UI aktif yang bermakna, bukan pada satu atribut yang disalin dari markup awal._
 
 Untuk elemen interaktif, baca tiga lapisan ini:
 
@@ -142,7 +142,7 @@ Di halaman terlihat tulisan “Create account.” Sebelum mengganti locator, per
 4. Apakah kontrol sedang disabled, tersembunyi, atau diganti setelah render?
 5. Apakah ada lebih dari satu kontrol dengan role dan name yang sama?
 
-Kalau produk memakai `<div>` yang bisa diklik, mengganti test dengan jalur CSS panjang mungkin membuat klik berhasil. Namun, itu hanya menyembunyikan masalah aksesibilitas dan testability. Utamakan perbaikan kontrol. Kalau kode produk belum bisa diubah, catat keterbatasannya dan gunakan kontrak fallback eksplisit yang paling kecil.
+Kalau produk memakai `<div>` yang bisa diklik, mengganti test dengan jalur CSS panjang mungkin membuat klik berhasil. Namun, itu hanya menyembunyikan masalah accessibility dan testability. Utamakan perbaikan kontrol. Kalau kode produk belum bisa diubah, catat keterbatasannya dan gunakan kontrak fallback eksplisit yang paling kecil.
 
 Fixed delay bukan diagnosis. Waktu tunggu nggak akan mengubah elemen generik menjadi button atau menghubungkan label yang terpisah.
 
@@ -192,6 +192,6 @@ State bisa berubah setelah interaksi. Jadi, browser yang sedang aktif tetap menj
 
 ## Sebelum lanjut
 
-Saat melihat kontrol penting, kamu sekarang seharusnya bisa menjelaskan kontrol itu apa, bagaimana pengguna mengenalinya, state mana yang penting, dan apakah markup-nya memberi kontrak otomasi yang bermakna.
+Saat melihat kontrol penting, kamu sekarang seharusnya bisa menjelaskan kontrol itu apa, bagaimana pengguna mengenalinya, state mana yang penting, dan apakah markup-nya memberi kontrak automation yang bermakna.
 
 Di lesson berikutnya, kita akan menempatkan kontrol tersebut di dalam pohon DOM yang aktif. Konteks ini penting ketika nama yang sama muncul lebih dari sekali dan ketika halaman mengganti atau menghapus elemen setelah sebuah aksi.

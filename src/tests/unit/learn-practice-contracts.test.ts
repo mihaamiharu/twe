@@ -358,9 +358,17 @@ describe('Learn and Practice catalog contracts', () => {
         tutorial.practice.some((practice) => practice.role === 'additional'),
       ),
     ).toBe(true);
+    const linkedPractice = new Set(
+      tutorials.flatMap((tutorial) => tutorial.relatedChallenges),
+    );
     expect(
-      new Set(tutorials.flatMap((tutorial) => tutorial.relatedChallenges)),
-    ).toEqual(new Set(challenges.map((challenge) => challenge.slug)));
+      [...linkedPractice].every((slug) =>
+        challenges.some((challenge) => challenge.slug === slug),
+      ),
+    ).toBe(true);
+    expect(
+      challenges.some((challenge) => !linkedPractice.has(challenge.slug)),
+    ).toBe(true);
   });
 
   test('module one teaches automation judgment without an early coding gate', async () => {
@@ -377,7 +385,7 @@ describe('Learn and Practice catalog contracts', () => {
     expect(moduleOne.flatMap((tutorial) => tutorial.practice)).toEqual([]);
   });
 
-  test('module two teaches UI inspection while keeping raw DOM drills optional', async () => {
+  test('module two teaches UI inspection without gating learners on DOM coding', async () => {
     const tutorials = await getTutorialCatalogList('en');
     const moduleTwo = tutorials.filter(
       (tutorial) => tutorial.module.order === 2,
@@ -389,22 +397,8 @@ describe('Learn and Practice catalog contracts', () => {
       'devtools-mastery',
     ]);
     expect(moduleTwo.every((tutorial) => tutorial.kind === 'core')).toBe(true);
-    expect(
-      moduleTwo
-        .flatMap((tutorial) => tutorial.practice)
-        .every((practice) => practice.role === 'additional'),
-    ).toBe(true);
-    expect(
-      moduleTwo.flatMap((tutorial) =>
-        tutorial.practice.map(({ slug }) => slug),
-      ),
-    ).toEqual([
-      'dom-parent-child-navigation',
-      'dom-element-properties',
-      'dom-check-element-state',
-      'dom-table-data-extraction',
-      'dom-boss',
-      'dom-queryselector-vs-all',
+    expect(moduleTwo.flatMap((tutorial) => tutorial.practice)).toEqual([
+      { slug: 'dom-queryselector-vs-all', role: 'additional' },
     ]);
   });
 

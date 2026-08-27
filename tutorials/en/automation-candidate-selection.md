@@ -11,19 +11,21 @@ description: 'Select valuable checks, choose an appropriate feedback layer, and 
 - document an automation intent before writing code; and
 - challenge assumptions in an AI-generated automation plan.
 
-## Automatable does not mean worth automating
+## Why this matters for QA
 
 Most browser interactions can be automated somehow. That does not make all of them good investments.
 
-An automated check has a continuing cost. The team must create reliable state and data, keep the test aligned with the product, investigate failures, and update it when behavior changes. The useful question is therefore not only “Can we automate this?” but:
+An automated check has a continuing cost. The team must create reliable state and data, keep the test aligned with the product, investigate failures, and update it when behavior changes.
+
+The useful question is therefore not only “Can we automate this?” but:
 
 > Will this check provide valuable feedback often enough to justify building and maintaining it?
 
 Candidate selection is an engineering decision, not a competition to automate the largest number of manual test cases.
 
-## Evaluate the candidate through six lenses
+## The mental model
 
-Use these questions to expose trade-offs. They support judgment; they do not produce an automatic score.
+Evaluate a candidate through six lenses. They expose trade-offs; they do not produce an automatic score.
 
 | Lens                   | Ask                                                    | Warning sign                                                    |
 | ---------------------- | ------------------------------------------------------ | --------------------------------------------------------------- |
@@ -34,35 +36,28 @@ Use these questions to expose trade-offs. They support judgment; they do not pro
 | Change and maintenance | How often do the workflow and expectations change?     | The product is an experiment whose behavior changes daily.      |
 | Need for the browser   | Must a real user-facing integration be exercised here? | The browser adds cost but no useful evidence.                   |
 
-A candidate does not need perfect conditions. The questions reveal what the team must improve or accept. A valuable scenario with uncontrollable data may mean “improve testability first,” not “never automate it.”
+A candidate does not need perfect conditions. A valuable scenario with uncontrollable data may mean “improve testability first,” not “never automate it.”
 
-## Choose the feedback layer deliberately
+## Work through a realistic example
 
-“Do not automate this through the UI” does not mean “do not test it.” Different layers answer different questions.
+Consider login. Related risks need different kinds of feedback:
 
-| Feedback approach               | Best suited to                                                                   | Example                                                                        |
-| ------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Browser UI automation           | A small number of important user journeys and browser integrations               | A customer can submit a valid login form and reach the authenticated area.     |
-| API or service-level automation | Rules, integrations, and many data combinations that do not need a rendered page | Tax is calculated correctly for hundreds of location and product combinations. |
-| Unit or component checks        | Focused logic or isolated UI behavior with fast feedback                         | A discount function handles its boundary values.                               |
-| Manual or exploratory testing   | New, subjective, ambiguous, or rapidly changing behavior                         | Investigate whether a redesigned checkout is understandable and trustworthy.   |
+| Feedback layer                  | Question it answers                                                               | Example                                                                   |
+| ------------------------------- | --------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Browser UI automation           | Can a user complete an important journey through the real page?                   | A customer submits a valid login form and reaches the authenticated area. |
+| API or service-level automation | Do rules and integrations work across many data combinations without the page?    | The service accepts valid credentials and rejects invalid combinations.   |
+| Unit or component tests         | Does focused logic or isolated UI behavior work correctly with fast feedback?     | A validation function handles its boundary values.                        |
+| Manual or exploratory testing   | Is there new, subjective, ambiguous, or rapidly changing behavior to investigate? | Explore whether an error message helps a user recover.                    |
 
-You do not need to implement every layer yourself to make a good recommendation. As a QA engineer, you should be able to explain the risk and collaborate on where the team can test it most effectively.
+You do not need to implement every layer yourself to make a good recommendation. A QA engineer should be able to explain the risk and collaborate on where the team can test it most effectively.
 
-The same feature often needs more than one layer. A login feature may have many fast service-level checks, a few browser flows, security testing, and exploratory sessions. The goal is useful combined coverage—not one layer winning.
+The same feature often needs several layers. Login may have many fast service checks, a few browser flows, security testing, and exploratory sessions. The goal is useful combined coverage—not one layer winning.
 
-## Keep the first UI flow thin
+## When to use it—and when not to
 
-A large end-to-end journey can appear valuable because it covers many screens:
+Use browser UI automation when the risk genuinely requires evidence from the user-facing page and its browser integrations. Use a lower layer when it can prove the rule more directly, quickly, and broadly. Keep subjective or poorly understood behavior in manual and exploratory testing until the expected result becomes clear.
 
-```text
-Create customer → verify email → configure profile → find product →
-add product → apply voucher → pay → download invoice → delete customer
-```
-
-But one failure may have many possible causes. Data setup is harder, recovery is slower, and unrelated product changes can block the result you care about.
-
-Prefer a smaller flow with one clear purpose:
+When browser evidence is justified, keep the first flow thin:
 
 ```text
 Given an active customer and one available product
@@ -72,41 +67,45 @@ Then the cart shows that product, quantity 1, and the correct subtotal
 
 This does not mean every test must contain only one click. It means each test should have a focused reason to fail and enough context to diagnose that failure.
 
-Preparation such as creating a customer or resetting a cart may later be performed through an API or fixture. The UI portion should focus on the user-facing behavior that actually needs browser evidence.
+Setup such as creating a customer or resetting a cart may later use an API or fixture. Keep the UI portion focused on the user-facing integration that needs browser evidence.
 
-## Write the intent before the script
-
-An automation-intent record lets QA, developers, and product stakeholders review the planned check without debating syntax.
+Record the decision before requesting a script:
 
 ```text
 Scenario:
-Risk or business impact:
+Product risk or business impact:
 Why automate—or why not:
 Why UI—or why another layer:
-Required starting state and data:
+Required starting state and test data:
 User action:
-Observable business result:
+Observable business evidence:
 Likely maintenance risks:
 AI-generated assumptions to verify:
 ```
 
-Here is a completed example:
+If an important field is unknown, investigate before implementation.
 
-| Field                    | Cart example                                                                                                                                         |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Scenario                 | Add one available product to an empty cart.                                                                                                          |
-| Risk or impact           | Customers cannot begin checkout or see an incorrect subtotal.                                                                                        |
-| Why automate             | The flow is business-critical and checked on every release.                                                                                          |
-| Why UI                   | We need evidence that the user-facing product control and cart integrate correctly. Price calculation should also have broader lower-level coverage. |
-| Starting state and data  | Active customer, empty cart, controlled product with known availability and price.                                                                   |
-| User action              | Add one unit of the controlled product.                                                                                                              |
-| Observable result        | Correct line item, quantity, and subtotal appear in the cart.                                                                                        |
-| Maintenance risks        | Product data or cart behavior may differ between environments.                                                                                       |
-| AI assumptions to verify | How sign-in and product setup occur; currency and rounding rules; whether cart persistence is in scope.                                              |
+## When it fails
 
-If important fields are unknown, investigate before requesting a full script.
+A large end-to-end journey can look valuable because it covers many screens:
 
-## Review an AI-generated plan before code
+```text
+Create customer → verify email → configure profile → find product →
+add product → apply voucher → pay → download invoice → delete customer
+```
+
+But one failure may have many possible causes. Data setup becomes harder, diagnosis becomes slower, and unrelated product changes can block the result you care about.
+
+Do not repair this with a retry or delay. Ask instead:
+
+1. Which product risk is the test meant to prove?
+2. Which steps are only setup and do not need the UI?
+3. Can the journey be divided into focused independent scenarios?
+4. Which data creates ordering or environment dependencies?
+
+The repair is a smaller scope with explicit state and evidence. A greener oversized test is not necessarily a more useful one.
+
+## Review generated work
 
 Suppose AI proposes this plan:
 
@@ -126,13 +125,21 @@ It sounds productive, but it hides major questions:
 
 Ask AI to expose those decisions instead of silently making them. A useful prompt provides the risk, known constraints, available data setup, and required evidence, then asks for missing assumptions and alternatives.
 
-## Module checkpoint: frame the candidate
+## Check your understanding
 
 Your team manually checks this on every release:
 
 > A registered customer adds an in-stock product to an empty cart. The product row, quantity, and subtotal should be correct. The test environment can reset the cart and provides a controlled product, but marketing changes public product names frequently.
 
-Decide whether it is a good browser automation candidate, then complete the intent record in your own words.
+Decide whether it is a good automation candidate. Explain:
+
+1. whether it is worth automating and why;
+2. whether browser UI is the right feedback layer;
+3. the required starting state and test data;
+4. the focused user action and observable evidence; and
+5. the maintenance risks and AI assumptions that still need verification.
+
+## Compare your reasoning
 
 One reasonable review is:
 
@@ -145,14 +152,10 @@ One reasonable review is:
 
 Another answer can be valid if its reasoning is explicit and fits the actual product context. Automation judgment is about defensible trade-offs, not memorizing a label.
 
-## Ready for the next module
+## Before you continue
 
-You are ready to continue when you can take a vague manual scenario and explain:
+You should now be able to take a manual scenario and explain its product risk, whether automation is worthwhile, which feedback layer fits, what state and data it needs, and which observable evidence would prove the result.
 
-1. the risk it protects against;
-2. whether automation is worthwhile;
-3. why browser UI is—or is not—the appropriate feedback layer;
-4. the required starting state and data; and
-5. the observable evidence that would prove the result.
+Module 1 is complete after these two Core lessons. It deliberately has no Core Practice: the capability at this stage is making and explaining a sound automation decision before code.
 
-The next module will show how the browser represents the page so that automation can identify those actions and observations reliably.
+Module 2 will show how the browser represents a page so that automation can identify the intended actions and evidence reliably.

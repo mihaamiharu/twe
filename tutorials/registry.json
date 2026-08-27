@@ -5,28 +5,28 @@
       "order": 1,
       "title": {
         "en": "Automation Foundations & Judgment",
-        "id": "Dasar & Pertimbangan Otomasi"
+        "id": "Fondasi Web Automation & QA Judgment"
       },
       "description": {
         "en": "Understand what web automation can prove, choose worthwhile candidates, and frame them as repeatable checks.",
-        "id": "Pahami hal yang dapat dibuktikan otomasi web, pilih kandidat yang bernilai, dan rumuskan sebagai pemeriksaan yang dapat diulang."
+        "id": "Kenali apa yang bisa dibuktikan web automation, pilih automation candidate yang bernilai, lalu rumuskan sebagai repeatable check."
       },
       "outcome": {
         "en": "Given a manual scenario, decide whether and where to automate it, then define its state, action, and observable evidence.",
-        "id": "Dari sebuah skenario manual, tentukan apakah dan di mana skenario perlu diotomasi, lalu definisikan kondisi, aksi, dan bukti yang dapat diamati."
+        "id": "Dari skenario manual, tentukan apakah automation layak dan feedback layer mana yang tepat. Lalu rumuskan product risk, starting state, user action, serta observable evidence-nya."
       }
     },
     {
       "slug": "read-the-ui",
       "order": 2,
-      "title": { "en": "Read the Web UI", "id": "Membaca UI Web" },
+      "title": { "en": "Read the Web UI", "id": "Membaca Web UI" },
       "description": {
-        "en": "Understand the browser-visible page, semantic HTML, accessible names, and changing DOM state.",
-        "id": "Pahami halaman yang terlihat di browser, HTML semantik, accessible name, dan perubahan state DOM."
+        "en": "Read semantic HTML, accessible identity, DOM context, and browser evidence before writing automation.",
+        "id": "Pahami HTML semantik, accessible name, konteks DOM, dan evidence dari browser sebelum menulis web automation."
       },
       "outcome": {
-        "en": "Explain what a user perceives and what an automation tool can reliably locate.",
-        "id": "Jelaskan apa yang dipahami pengguna dan apa yang dapat ditemukan alat otomasi secara andal."
+        "en": "Inspect a live web UI, identify a control's meaning and context, and define the observable evidence an automation test should use.",
+        "id": "Periksa Web UI yang aktif, kenali makna dan konteks sebuah kontrol, lalu tentukan observable evidence yang perlu dibuktikan automated test."
       }
     },
     {
@@ -146,7 +146,7 @@
       "moduleSlug": "automation-judgment",
       "moduleOrder": 1,
       "kind": "core",
-      "estimatedMinutes": 12,
+      "estimatedMinutes": 15,
       "tags": ["foundations", "judgment", "qa", "ai"]
     },
     {
@@ -164,7 +164,7 @@
       "moduleSlug": "read-the-ui",
       "moduleOrder": 1,
       "kind": "core",
-      "estimatedMinutes": 16,
+      "estimatedMinutes": 18,
       "tags": ["html", "semantics", "accessibility"]
     },
     {
@@ -173,15 +173,8 @@
       "moduleSlug": "read-the-ui",
       "moduleOrder": 2,
       "kind": "core",
-      "estimatedMinutes": 15,
-      "tags": ["dom", "state", "hierarchy"],
-      "practice": [
-        { "slug": "dom-parent-child-navigation", "role": "additional" },
-        { "slug": "dom-element-properties", "role": "additional" },
-        { "slug": "dom-check-element-state", "role": "additional" },
-        { "slug": "dom-table-data-extraction", "role": "additional" },
-        { "slug": "dom-boss", "role": "additional" }
-      ]
+      "estimatedMinutes": 18,
+      "tags": ["dom", "state", "hierarchy"]
     },
     {
       "slug": "devtools-mastery",
@@ -189,7 +182,7 @@
       "moduleSlug": "read-the-ui",
       "moduleOrder": 3,
       "kind": "core",
-      "estimatedMinutes": 16,
+      "estimatedMinutes": 18,
       "tags": ["devtools", "accessibility", "network", "debugging"],
       "practice": [{ "slug": "dom-queryselector-vs-all", "role": "additional" }]
     },

@@ -13,13 +13,13 @@ description: 'Gunakan hierarki yang bermakna dan transisi state untuk memahami U
 
 ## Kenapa ini penting buat QA
 
-Coba bayangin sebuah halaman keranjang punya tiga button bernama “Remove.” Saat testing manual, kamu tahu button mana yang dimiliki “Mechanical Keyboard” karena posisinya ada di dalam row produk tersebut.
+Coba bayangin sebuah halaman keranjang punya tiga button bernama “Remove.” Saat manual testing, kamu tahu button mana yang dimiliki “Mechanical Keyboard” karena posisinya ada di dalam row produk tersebut.
 
-Otomasi nggak bisa dengan aman memilih “button Remove yang pertama.” Urutannya bisa berubah, produk baru bisa disisipkan, atau halaman bisa mengganti row setelah harga diperbarui.
+Web automation nggak bisa dengan aman memilih “button Remove yang pertama.” Urutannya bisa berubah, produk baru bisa disisipkan, atau halaman bisa mengganti row setelah harga diperbarui.
 
 Masalahnya bukan karena halaman punya button yang berulang. Itu hal yang normal. Masalah muncul saat kita kehilangan konteks bermakna yang menghubungkan setiap aksi ke data yang tepat.
 
-Supaya bisa mengotomasi UI modern dengan andal, QA perlu membaca halaman sebagai pohon yang aktif dan memikirkan bagaimana pohon itu berubah.
+Supaya web automation untuk UI modern tetap andal, QA perlu membaca halaman sebagai pohon yang aktif dan memikirkan bagaimana pohon itu berubah.
 
 ## Cara berpikir yang perlu kamu pegang
 
@@ -29,7 +29,7 @@ Document Object Model (DOM) adalah model objek halaman yang sedang aktif di brow
 - component tree internal milik React, Vue, atau framework lain; atau
 - sekadar teks HTML yang pertama kali dikirim server.
 
-JavaScript bisa menambah, menghapus, mengurutkan ulang, atau mengganti node DOM setelah response awal. Atribut dan property juga bisa berubah. DOM saat ini adalah struktur yang dipakai otomasi pada saat itu.
+JavaScript bisa menambah, menghapus, mengurutkan ulang, atau mengganti node DOM setelah response awal. Atribut dan property juga bisa berubah. DOM saat ini adalah struktur yang dipakai web automation pada saat itu.
 
 Di dalam pohon tersebut:
 
@@ -71,7 +71,7 @@ Perhatikan keranjang sederhana berikut:
 
 Kedua elemen `<li>` adalah sibling. Heading, quantity, dan button di masing-masing row adalah descendant dari satu row produk. Row itulah yang memberi konteks tambahan untuk “Remove.”
 
-Tulis dulu tujuan testing-nya:
+Tulis dulu test intent-nya:
 
 ```text
 Sebelum: keranjang berisi Mechanical Keyboard dan Wireless Mouse
@@ -98,7 +98,7 @@ await expect(mouseRow).toHaveCount(1);
 
 Ide pentingnya bukan syntax persisnya. Test mencari container yang bermakna, menemukan aksi di dalamnya, lalu mengamati transisinya.
 
-Playwright locator juga mencari elemen pada DOM saat action atau assertion dijalankan. Kalau framework melakukan render ulang di antara dua operasi, locator akan mencari elemen terbaru yang masih cocok. Ini lebih aman daripada menganggap referensi elemen mentah dari beberapa saat sebelumnya akan selalu mewakili halaman yang sama.
+Playwright locator juga mencari elemen pada DOM saat action atau assertion dijalankan. Kalau framework melakukan re-render di antara dua operasi, locator akan mencari elemen terbaru yang masih cocok. Ini lebih aman daripada menganggap referensi elemen mentah dari beberapa saat sebelumnya akan selalu mewakili halaman yang sama.
 
 ### State dinamis adalah bagian dari pohon
 
@@ -189,7 +189,7 @@ Salah satu jawaban yang masuk akal:
 - Temukan button “Review” di dalam row tersebut, bukan button global.
 - Sebelum aksi, row `A104` harus ada dan dialog review-nya belum terbuka. Sesudah aksi, dialog yang menyebut order `A104` harus terlihat.
 - Row pertama bisa berubah ketika order diurutkan, difilter, atau ditambah. Posisi nggak membuktikan identitas.
-- Kalau dialog yang salah terbuka, periksa row di DOM aktif, identitas aksesibel row tersebut, jumlah kontrol yang cocok, dan apakah aplikasi mengganti atau mengurutkan ulang node saat aksi berlangsung.
+- Kalau dialog yang salah terbuka, periksa row di DOM aktif, identitas row yang terlihat pengguna, jumlah kontrol yang cocok, dan apakah aplikasi mengganti atau mengurutkan ulang node saat aksi berlangsung.
 
 Pendekatan lain bisa saja benar kalau produk menyediakan identitas stabil yang berbeda. Namun, aksi dan buktinya tetap harus terhubung ke order yang sama.
 

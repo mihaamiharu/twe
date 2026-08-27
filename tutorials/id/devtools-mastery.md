@@ -1,6 +1,6 @@
 ---
-title: 'Investigasi UI Sebelum Membuat Otomasi'
-description: 'Gunakan DevTools dan alat investigasi Playwright untuk mengubah perilaku UI menjadi kontrak otomasi yang didukung bukti.'
+title: 'Investigasi UI Sebelum Menulis Web Automation'
+description: 'Gunakan DevTools dan alat investigasi Playwright untuk mengubah perilaku UI menjadi kontrak automation yang punya evidence jelas.'
 ---
 
 ## Setelah lesson ini, kamu bisa
@@ -38,7 +38,7 @@ Lakukan satu aksi
     ↓
 Bandingkan state UI dan bukti teknis pendukung
     ↓
-Tulis kontrak otomasi terkecil yang berguna
+Tulis kontrak automation terkecil yang berguna
 ```
 
 Setiap sumber bukti menjawab pertanyaan yang berbeda:
@@ -98,7 +98,7 @@ Bukti ini membantu mengelompokkan penyebabnya:
 - response sukses tetapi nggak ada konfirmasi: periksa transisi UI;
 - konfirmasi terlihat tetapi test gagal: periksa locator atau assertion.
 
-### 4. Tentukan kontrak otomasinya
+### 4. Tentukan kontrak automation-nya
 
 Sekarang tujuan test bisa ditulis dengan jelas:
 
@@ -113,7 +113,7 @@ Locator button mengikuti identitas yang dipahami pengguna. Assertion membuktikan
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Gunakan DevTools browser sebelum mengotomasi alur yang belum kamu kenal, saat identitas kontrol kurang jelas, ketika state berubah secara dinamis, atau ketika kegagalan bisa berasal dari UI, request, response, maupun browser event.
+Gunakan DevTools browser sebelum menulis automation untuk alur yang belum kamu kenal, saat identitas kontrol kurang jelas, ketika state berubah secara dinamis, atau ketika kegagalan bisa berasal dari UI, request, response, maupun browser event.
 
 Gunakan **Console** untuk investigasi kecil seperti:
 
@@ -161,7 +161,7 @@ Jalan pintas seperti `waitForTimeout`, retry tambahan, atau mengabaikan response
 
 Ketika AI mengusulkan test dari screenshot atau requirement singkat, tanyakan:
 
-- Elemen aktif dan identitas aksesibel apa yang diasumsikan AI?
+- Elemen aktif dan accessible identity apa yang diasumsikan AI?
 - Apakah selector dipilih dari styling atau dari makna produk?
 - Apakah wait-nya berhubungan dengan state, request, atau event yang bisa diamati?
 - Apakah assertion membuktikan outcome pengguna atau hanya membuktikan klik terjadi?

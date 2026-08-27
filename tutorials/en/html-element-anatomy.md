@@ -1,5 +1,5 @@
 ---
-title: 'Read HTML by Meaning, Name, and State'
+title: 'Read HTML Through Role, Accessible Name, and State'
 description: 'Inspect what a control is, how users identify it, and which state matters before choosing automation code.'
 ---
 
