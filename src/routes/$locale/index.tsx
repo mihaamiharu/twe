@@ -4,12 +4,11 @@ import {
   BookOpen,
   Check,
   Code2,
-  Lightbulb,
+  FlaskConical,
   Play,
-  Wrench,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { EmptyState } from '@/components/empty-state';
+import { QaDoodle } from '@/components/qa-illustrations';
 import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
 import { authQueryOptions } from '@/lib/auth.query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
@@ -193,17 +192,12 @@ function HomePage() {
         <div className="grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14">
           <div className="relative mx-auto w-full max-w-[300px]">
             <div className="absolute inset-4 rounded-[42%] border border-[var(--brand-orange)]/35" />
-            <img src="/me.small.jpg" alt="Ekki" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-top" width={400} height={400} loading="lazy" />
-            <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] shadow-sm">WHY / HOW / TOOLS</div>
+            <img src="/testing-workflow-illustration.png" alt="Illustration of a software testing workflow" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-center" width={1024} height={1024} loading="lazy" />
+            <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] shadow-sm">TEST FLOW / TWE</div>
           </div>
           <div>
             <h2 className="max-w-2xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t('philosophy.title')}</h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">{t('philosophy.description')}</p>
-            <div className="mt-8 grid gap-5 sm:grid-cols-3">
-              <div><Lightbulb className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" /><p className="mt-2 font-semibold">{t('philosophy.why')}</p></div>
-              <div><Wrench className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" /><p className="mt-2 font-semibold">{t('philosophy.how')}</p></div>
-              <div><Code2 className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" /><p className="mt-2 font-semibold">{t('philosophy.tools')}</p></div>
-            </div>
             <div className="mt-8 border-t border-[var(--brand-orange)]/25 pt-6">
               <p className="font-mono text-xs uppercase tracking-[0.15em] text-[var(--brand-orange)]">{t('creator.eyebrow')}</p>
               <h3 className="mt-2 text-2xl font-semibold">{t('creator.title')}</h3>
@@ -218,24 +212,56 @@ function HomePage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
         <div className="border-y border-[var(--soft-border)]">
-          <EmptyState
-            size="default"
-            showIllustration={false}
-            className="py-8 sm:py-10"
-            eyebrow={t('labs.eyebrow')}
-            title={t('labs.title')}
-            description={t('labs.description')}
-            action={
+          <div
+            data-empty-state
+            data-empty-state-illustration="thinking"
+            className="grid items-center gap-10 py-10 sm:py-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16 lg:py-14"
+          >
+            <div className="max-w-xl">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('labs.eyebrow')}</p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('labs.title')}</h2>
+              <p className="mt-5 text-base leading-7 text-[var(--muted-graphite)]">{t('labs.description')}</p>
               <Link
                 to={LocaleRoutes.labs}
                 params={params}
-                className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)]"
+                className="mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
               >
                 {t('labs.cta')}
                 <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-            }
-          />
+            </div>
+
+            <div className="relative overflow-hidden rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:p-7">
+              <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full border border-[var(--brand-orange)]/20" aria-hidden="true" />
+              <div className="absolute -bottom-20 -left-12 h-44 w-44 rounded-full border border-[var(--brand-orange)]/15" aria-hidden="true" />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-4 border-b border-[var(--soft-border)] pb-5">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--orange-tint)]">
+                      <FlaskConical className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--brand-orange)]">{t('labs.preview.label')}</p>
+                      <p className="mt-1 text-sm font-semibold">{t('labs.preview.title')}</p>
+                    </div>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-[var(--brand-orange)]/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--brand-orange)]">{t('labs.preview.status')}</span>
+                </div>
+                <div className="mt-6 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2 sm:gap-3">
+                  {[t('labs.preview.steps.observe'), t('labs.preview.steps.try'), t('labs.preview.steps.review')].map((step, index) => (
+                    <div key={step} className="contents">
+                      <div className="rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-3 text-center">
+                        <span className="font-mono text-[10px] text-[var(--brand-orange)]">0{index + 1}</span>
+                        <p className="mt-2 text-xs font-semibold sm:text-sm">{step}</p>
+                      </div>
+                      {index < 2 && <QaDoodle kind="trace" className="h-5 w-5 sm:h-6 sm:w-6" />}
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--muted-graphite)]">{t('labs.preview.caption')}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

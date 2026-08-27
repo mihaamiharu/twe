@@ -43,7 +43,18 @@
     "eyebrow": "LABS · SEGERA HADIR",
     "title": "Ruang baru untuk mengasah kemampuan testing.",
     "description": "Labs sedang dibentuk sebagai ruang yang lebih tenang dan hands-on untuk mengeksplorasi software testing. Eksperimen pertamanya masih disiapkan, dan akan saya bagikan saat sudah siap.",
-    "cta": "Kunjungi Labs"
+    "cta": "Kunjungi Labs",
+    "preview": {
+      "label": "CATATAN LAB / 001",
+      "title": "Eksperimen interaksi",
+      "status": "SEDANG DISIAPKAN",
+      "steps": {
+        "observe": "Amati",
+        "try": "Coba",
+        "review": "Review"
+      },
+      "caption": "Eksperimen kecil. Feedback yang berguna."
+    }
   },
   "cta": {
     "eyebrow": "MULAI DI SINI",
