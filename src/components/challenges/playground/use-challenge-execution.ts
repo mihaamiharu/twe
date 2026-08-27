@@ -244,7 +244,9 @@ export function useChallengeExecution(
                 ...omitUndefined({
                     error: validationPassed
                         ? undefined
-                        : result.error || outputMessage,
+                        : grading.failure
+                          ? outputMessage
+                          : result.error || outputMessage,
                 }),
                 executionTime: result.executionTime,
             };

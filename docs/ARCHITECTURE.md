@@ -46,12 +46,14 @@ sequenceDiagram
 - Executes user code with timeout protection
 - Collects logs and assertion results
 - Lazily loads the TypeScript compiler API for AST source-policy findings
+- The lazy TypeScript compiler chunk is approximately 3.6 MB raw (about 3.4 MiB) and 1.0 MB gzip in the production build; it loads only when Practice source-policy or strict Playwright analysis runs.
 - Injects a learner-facing page proxy and returns runtime method/action/assertion evidence
 - Keeps ordered interaction-sequence and final DOM-state validation in the executor
 
 ### `source-policy-analyzer.ts`, `runtime-trace.ts`, and `challenge-validator.ts`
 
 - The source analyzer walks TypeScript syntax, so comments and strings are not treated as calls. It resolves ordinary member calls plus common bracket, alias, destructuring, and `bind` forms.
+- `playwright-methods.ts` is the shared educational-shim method vocabulary used by both source analysis and runtime tracing; it is intentionally not a complete Playwright API registry.
 - The runtime trace wraps only the page and locators exposed to learner code. Raw shim calls remain private, so internal locator composition is not counted as learner evidence.
 - `challenge-validator.ts` is a pure grading decision. The React hook only supplies execution results and localized presentation strings.
 - Strict executed-evidence checks are opt-in through the challenge validation policy; existing Practice contracts retain their source-based behavior.
@@ -110,6 +112,7 @@ src/core/executor/
 ├── index.ts              # Barrel export
 ├── iframe-executor.ts    # Main execution engine
 ├── playwright-shim.ts    # Playwright API implementation
+├── playwright-methods.ts # Shared source/runtime method vocabulary
 ├── source-policy-analyzer.ts # Lazy AST source findings
 ├── runtime-trace.ts       # Learner page/locator runtime evidence
 ├── challenge-validator.ts # Pure challenge grading decision

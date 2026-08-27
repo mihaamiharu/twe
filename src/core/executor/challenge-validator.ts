@@ -65,32 +65,42 @@ export function validateChallengeExecution(
     };
   }
 
-  const failedAssertion = trace?.assertions.find((assertion) => !assertion.passed);
-  if (failedAssertion) {
-    const details = failedAssertion.error ? [failedAssertion.error] : undefined;
-    return {
-      passed: false,
-      failure: {
-        kind: 'failed-assertion',
-        methods: [failedAssertion.matcher],
-        ...(details === undefined ? {} : { details }),
-      },
-    };
-  }
+  const enforceRuntimeFailures =
+    validation.policy?.requireExecutedEvidence === true ||
+    validation.policy?.forbidSwallowedErrors === true;
+  if (enforceRuntimeFailures) {
+    const failedAssertion = trace?.assertions.find(
+      (assertion) => !assertion.passed,
+    );
+    if (failedAssertion) {
+      const details = failedAssertion.error
+        ? [failedAssertion.error]
+        : undefined;
+      return {
+        passed: false,
+        failure: {
+          kind: 'failed-assertion',
+          methods: [failedAssertion.matcher],
+          ...(details === undefined ? {} : { details }),
+        },
+      };
+    }
 
-  const failedAction = trace?.methodCalls.find(
-    (call) => !call.succeeded && call.target !== 'page',
-  ) ?? trace?.methodCalls.find((call) => !call.succeeded);
-  if (failedAction) {
-    const details = failedAction.error ? [failedAction.error] : undefined;
-    return {
-      passed: false,
-      failure: {
-        kind: 'failed-action',
-        methods: [failedAction.method],
-        ...(details === undefined ? {} : { details }),
-      },
-    };
+    const failedAction =
+      trace?.methodCalls.find(
+        (call) => !call.succeeded && call.target !== 'page',
+      ) ?? trace?.methodCalls.find((call) => !call.succeeded);
+    if (failedAction) {
+      const details = failedAction.error ? [failedAction.error] : undefined;
+      return {
+        passed: false,
+        failure: {
+          kind: 'failed-action',
+          methods: [failedAction.method],
+          ...(details === undefined ? {} : { details }),
+        },
+      };
+    }
   }
 
   const forbiddenMethods = (validation.forbiddenMethods ?? []).filter(

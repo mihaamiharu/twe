@@ -1,4 +1,8 @@
 import type { ChallengeValidationDefinition } from '@/lib/content.types';
+import {
+  PLAYWRIGHT_ACTION_METHODS,
+  PLAYWRIGHT_LOCATOR_RETURNING_METHODS,
+} from './playwright-methods';
 
 /**
  * Findings from the source-policy pass. This is intentionally a report, not a
@@ -47,6 +51,9 @@ interface TypeScriptModule {
   isVariableDeclaration: typeof import('typescript')['isVariableDeclaration'];
   isThrowStatement: typeof import('typescript')['isThrowStatement'];
   isFunctionLike: typeof import('typescript')['isFunctionLike'];
+  isIfStatement: typeof import('typescript')['isIfStatement'];
+  isReturnStatement: typeof import('typescript')['isReturnStatement'];
+  isAwaitExpression: typeof import('typescript')['isAwaitExpression'];
 }
 
 type TypeScriptNode = import('typescript').Node;
@@ -71,41 +78,6 @@ const EMPTY_ANALYSIS: SourcePolicyAnalysis = {
   swallowedErrorCount: 0,
   strictViolations: [],
 };
-
-const ACTION_METHODS = new Set([
-  'click',
-  'dblclick',
-  'fill',
-  'check',
-  'uncheck',
-  'selectOption',
-  'focus',
-  'blur',
-  'clear',
-  'dispatchEvent',
-  'setInputFiles',
-  'dragTo',
-  'dragAndDrop',
-  'press',
-  'hover',
-  'waitFor',
-]);
-
-const LOCATOR_RETURNING_METHODS = new Set([
-  'frameLocator',
-  'locator',
-  'getByRole',
-  'getByText',
-  'getByLabel',
-  'getByPlaceholder',
-  'getByAltText',
-  'getByTitle',
-  'getByTestId',
-  'filter',
-  'first',
-  'last',
-  'nth',
-]);
 
 const GLOBAL_DOM_NAMES = new Set(['document', 'window', 'globalThis']);
 
@@ -158,23 +130,6 @@ function isBindingName(
   return false;
 }
 
-function hasThrow(
-  ts: TypeScriptModule,
-  node: TypeScriptNode,
-): boolean {
-  let found = false;
-  const visit = (current: TypeScriptNode): void => {
-    if (found) return;
-    if (ts.isThrowStatement(current)) {
-      found = true;
-      return;
-    }
-    ts.forEachChild(current, visit);
-  };
-  visit(node);
-  return found;
-}
-
 function isTruthy(value: unknown): boolean {
   return Boolean(value);
 }
@@ -202,6 +157,34 @@ function analyzeWithTypeScript(
   const objectAliases = new Set(['page']);
   const variableInitializers = new Map<string, TypeScriptExpression>();
 
+  const getStaticPropertyName = (
+    expression: TypeScriptExpression,
+    seen = new Set<string>(),
+  ): string | undefined => {
+    const unwrapped = unwrapExpression(ts, expression);
+    if (ts.isStringLiteral(unwrapped) || ts.isNumericLiteral(unwrapped)) {
+      return unwrapped.text;
+    }
+    if (ts.isIdentifier(unwrapped)) {
+      if (seen.has(unwrapped.text)) return undefined;
+      seen.add(unwrapped.text);
+      const initializer = variableInitializers.get(unwrapped.text);
+      return initializer === undefined
+        ? undefined
+        : getStaticPropertyName(initializer, seen);
+    }
+    if (ts.isConditionalExpression(unwrapped)) {
+      const condition = unwrapExpression(ts, unwrapped.condition);
+      if (condition.kind === ts.SyntaxKind.TrueKeyword) {
+        return getStaticPropertyName(unwrapped.whenTrue, seen);
+      }
+      if (condition.kind === ts.SyntaxKind.FalseKeyword) {
+        return getStaticPropertyName(unwrapped.whenFalse, seen);
+      }
+    }
+    return undefined;
+  };
+
   const getMethodReference = (
     expression: TypeScriptExpression,
     seen = new Set<string>(),
@@ -214,7 +197,7 @@ function analyzeWithTypeScript(
     if (ts.isElementAccessExpression(unwrapped)) {
       const argument = unwrapped.argumentExpression;
       const propertyName = argument
-        ? getPropertyName(ts, argument)
+        ? getStaticPropertyName(argument)
         : undefined;
       return propertyName === undefined ? undefined : { method: propertyName };
     }
@@ -227,7 +210,9 @@ function analyzeWithTypeScript(
       const bindName = bindTarget
         ? ts.isPropertyAccessExpression(bindTarget)
           ? bindTarget.name.text
-          : getPropertyName(ts, bindTarget.argumentExpression)
+          : bindTarget.argumentExpression === undefined
+            ? undefined
+            : getStaticPropertyName(bindTarget.argumentExpression)
         : undefined;
       if (bindTarget && bindName === 'bind') {
         return getMethodReference(bindTarget.expression, seen);
@@ -248,7 +233,9 @@ function analyzeWithTypeScript(
       const method = ts.isIdentifier(unwrapped.expression)
         ? unwrapped.expression.text
         : getMethodReference(unwrapped.expression)?.method;
-      return method !== undefined && LOCATOR_RETURNING_METHODS.has(method);
+      return (
+        method !== undefined && PLAYWRIGHT_LOCATOR_RETURNING_METHODS.has(method)
+      );
     }
     return false;
   };
@@ -275,7 +262,9 @@ function analyzeWithTypeScript(
       if (bindTarget === undefined) return false;
       const bindName = ts.isPropertyAccessExpression(bindTarget)
         ? bindTarget.name.text
-        : getPropertyName(ts, bindTarget.argumentExpression);
+        : bindTarget.argumentExpression === undefined
+          ? undefined
+          : getStaticPropertyName(bindTarget.argumentExpression);
       return (
         bindName === 'bind' &&
         isPlaywrightMethodReference(bindTarget.expression)
@@ -464,11 +453,81 @@ function analyzeWithTypeScript(
     return method === 'soft' || method.startsWith('to') ? method : undefined;
   };
 
+  const isPromiseRejectExpression = (
+    expression: TypeScriptExpression | undefined,
+  ): boolean => {
+    if (expression === undefined) return false;
+    const unwrapped = unwrapExpression(ts, expression);
+    if (ts.isAwaitExpression(unwrapped)) {
+      return isPromiseRejectExpression(unwrapped.expression);
+    }
+    if (!ts.isCallExpression(unwrapped)) return false;
+    const callee = unwrapExpression(ts, unwrapped.expression);
+    if (ts.isPropertyAccessExpression(callee)) {
+      const receiver = unwrapExpression(ts, callee.expression);
+      return (
+        callee.name.text === 'reject' &&
+        ts.isIdentifier(receiver) &&
+        receiver.text === 'Promise'
+      );
+    }
+    if (ts.isElementAccessExpression(callee)) {
+      const receiver = unwrapExpression(ts, callee.expression);
+      return (
+        getStaticPropertyName(callee.argumentExpression ?? callee.expression) ===
+          'reject' &&
+        ts.isIdentifier(receiver) &&
+        receiver.text === 'Promise'
+      );
+    }
+    return false;
+  };
+
+  const alwaysPropagates = (node: TypeScriptNode): boolean => {
+    // Do not descend into nested functions: a throw in an unused helper is not
+    // evidence that the surrounding catch propagates its failure.
+    if (ts.isFunctionLike(node)) return false;
+    if (ts.isThrowStatement(node)) return true;
+    if (ts.isReturnStatement(node)) {
+      return isPromiseRejectExpression(node.expression);
+    }
+    if (ts.isCallExpression(node)) {
+      return isPromiseRejectExpression(node);
+    }
+    if (ts.isBlock(node)) {
+      return node.statements.some(alwaysPropagates);
+    }
+    if (ts.isIfStatement(node)) {
+      return (
+        node.elseStatement !== undefined &&
+        alwaysPropagates(node.thenStatement) &&
+        alwaysPropagates(node.elseStatement)
+      );
+    }
+    return false;
+  };
+
+  const isPlaywrightPromiseExpression = (
+    expression: TypeScriptExpression,
+  ): boolean => {
+    const unwrapped = unwrapExpression(ts, expression);
+    if (!ts.isCallExpression(unwrapped)) return false;
+    const method = getCallMethod(unwrapped.expression);
+    return (
+      method !== undefined &&
+      (PLAYWRIGHT_ACTION_METHODS.has(method) ||
+        method === 'evaluate' ||
+        method === 'goto' ||
+        method.startsWith('to') ||
+        method.startsWith('wait'))
+    );
+  };
+
   const recordForcedAction = (
     call: import('typescript').CallExpression,
     method: string,
   ): void => {
-    if (!ACTION_METHODS.has(method)) return;
+    if (!PLAYWRIGHT_ACTION_METHODS.has(method)) return;
     const options = call.arguments.at(-1);
     if (!options) return;
     const value = evaluateStatic(options, new Set());
@@ -511,7 +570,6 @@ function analyzeWithTypeScript(
       if (sourceName === undefined) continue;
       if (ts.isIdentifier(element.name)) {
         methodAliases.set(element.name.text, { method: sourceName });
-        objectAliases.add(element.name.text);
       }
     }
   };
@@ -529,6 +587,32 @@ function analyzeWithTypeScript(
 
   const visit = (node: TypeScriptNode): void => {
     if (ts.isCallExpression(node)) {
+      const callee = unwrapExpression(ts, node.expression);
+      const calleeName = ts.isPropertyAccessExpression(callee)
+        ? callee.name.text
+        : ts.isElementAccessExpression(callee)
+          ? getStaticPropertyName(callee.argumentExpression ?? callee.expression)
+          : undefined;
+      const promiseExpression =
+        ts.isPropertyAccessExpression(callee) ||
+        ts.isElementAccessExpression(callee)
+          ? callee.expression
+          : undefined;
+      if (
+        calleeName === 'catch' &&
+        promiseExpression !== undefined &&
+        isPlaywrightPromiseExpression(promiseExpression)
+      ) {
+        const handler = node.arguments[0];
+        if (
+          handler &&
+          ts.isFunctionLike(handler) &&
+          !alwaysPropagates(handler.body)
+        ) {
+          swallowedErrorCount += 1;
+        }
+      }
+
       const method = getCallMethod(node.expression);
       if (method) {
         calledMethods.add(method);
@@ -548,12 +632,6 @@ function analyzeWithTypeScript(
           }
         }
 
-        if (method === 'catch') {
-          const handler = node.arguments[0];
-          if (handler && ts.isFunctionLike(handler) && !hasThrow(ts, handler.body)) {
-            swallowedErrorCount += 1;
-          }
-        }
       } else if (ts.isIdentifier(node.expression) && node.expression.text === 'alert' && strictMode) {
         strictViolations.add(
           'Use page.on("dialog", ...) instead of calling alert() in Playwright test code.',
@@ -561,7 +639,9 @@ function analyzeWithTypeScript(
       }
     }
 
-    if (ts.isCatchClause(node) && !hasThrow(ts, node.block)) swallowedErrorCount += 1;
+    if (ts.isCatchClause(node) && !alwaysPropagates(node.block)) {
+      swallowedErrorCount += 1;
+    }
 
     if (ts.isPropertyAccessExpression(node) || ts.isElementAccessExpression(node)) {
       const root = getGlobalRoot(node.expression);

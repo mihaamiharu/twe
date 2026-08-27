@@ -107,6 +107,74 @@ describe('source policy analyzer', () => {
     expect(analysis.directDomAccesses).toContain('globalThis');
   });
 
+  it('requires direct unconditional propagation for catches', async () => {
+    const fakeThrow = await analyzeSourcePolicy(
+      `
+        try {
+          await page.getByRole('button').click();
+        } catch (error) {
+          if (false) throw error;
+          function unusedPropagation() { throw error; }
+        }
+      `,
+      { strictMode: false },
+    );
+    const propagated = await analyzeSourcePolicy(
+      `
+        try {
+          await page.getByRole('button').click();
+        } catch (error) {
+          throw error;
+        }
+      `,
+      { strictMode: false },
+    );
+
+    expect(fakeThrow.swallowedErrorCount).toBe(1);
+    expect(propagated.swallowedErrorCount).toBe(0);
+  });
+
+  it('detects ignored promise catches on Playwright actions', async () => {
+    const analysis = await analyzeSourcePolicy(
+      `
+        await page.getByRole('button').click().catch(() => console.log('ignore'));
+      `,
+      { strictMode: false },
+    );
+
+    expect(analysis.swallowedErrorCount).toBe(1);
+  });
+
+  it('accepts promise catches that directly propagate a rejection', async () => {
+    const analysis = await analyzeSourcePolicy(
+      `
+        await page.getByRole('button').click().catch(() => Promise.reject(new Error('retry')));
+        await page.getByRole('button')['click']().catch(() => { throw new Error('retry'); });
+      `,
+      { strictMode: false },
+    );
+
+    expect(analysis.swallowedErrorCount).toBe(0);
+  });
+
+  it('resolves statically known computed method aliases', async () => {
+    const analysis = await analyzeSourcePolicy(
+      `
+        const locatorMethod = 'locator';
+        if (false) page[locatorMethod]('main > button');
+        const evaluateMethod = 'evaluate';
+        if (false) page[evaluateMethod](() => true);
+      `,
+      {
+        validation: { forbiddenMethods: ['evaluate'] },
+        strictMode: false,
+      },
+    );
+
+    expect(analysis.structuralLocatorCalls).toBe(1);
+    expect(analysis.forbiddenMethods).toEqual(['evaluate']);
+  });
+
 });
 
 function noteIsUsed(methods: string[], method: string): boolean {

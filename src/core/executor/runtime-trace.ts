@@ -1,5 +1,10 @@
 import type { MockedPlaywrightPage } from './playwright-shim';
 import type { Locator } from './shim.types';
+import {
+  PLAYWRIGHT_ACTION_METHODS,
+  PLAYWRIGHT_LOCATOR_METHODS,
+  PLAYWRIGHT_PAGE_METHODS,
+} from './playwright-methods';
 
 export type RuntimeTraceTarget = 'page' | 'locator';
 
@@ -40,122 +45,6 @@ export function createRuntimeExecutionTrace(): RuntimeExecutionTrace {
   return { methodCalls: [], assertions: [] };
 }
 
-const PAGE_METHOD_NAMES = new Set([
-  'on',
-  'route',
-  'unroute',
-  'goto',
-  'url',
-  'reload',
-  'goBack',
-  'goForward',
-  'evaluate',
-  'click',
-  'dblclick',
-  'focus',
-  'dispatchEvent',
-  'fill',
-  'check',
-  'isChecked',
-  'isDisabled',
-  'isEditable',
-  'inputValue',
-  'getAttribute',
-  'selectOption',
-  'setInputFiles',
-  'dragAndDrop',
-  'uncheck',
-  'textContent',
-  'waitForSelector',
-  'title',
-  'waitForLoadState',
-  'waitForFunction',
-  'waitForResponse',
-  'waitForTimeout',
-  'screenshot',
-  'video',
-  'context',
-  'hover',
-  'press',
-  'frameLocator',
-  'getByRole',
-  'getByText',
-  'getByLabel',
-  'getByPlaceholder',
-  'getByAltText',
-  'getByTitle',
-  'getByTestId',
-  'locator',
-  'innerHTML',
-  'isElementVisible',
-  'count',
-]);
-
-const LOCATOR_METHOD_NAMES = new Set([
-  'allAttributes',
-  'boundingBox',
-  'click',
-  'dblclick',
-  'fill',
-  'textContent',
-  'inputValue',
-  'isVisible',
-  'isChecked',
-  'isDisabled',
-  'isEditable',
-  'check',
-  'uncheck',
-  'selectOption',
-  'getAttribute',
-  'innerHTML',
-  'count',
-  'first',
-  'last',
-  'nth',
-  'focus',
-  'blur',
-  'clear',
-  'dispatchEvent',
-  'setInputFiles',
-  'dragTo',
-  'dragAndDrop',
-  'press',
-  'evaluate',
-  'locator',
-  'filter',
-  'all',
-  'allTextContents',
-  'elementHandles',
-  'getByRole',
-  'getByText',
-  'getByLabel',
-  'getByPlaceholder',
-  'getByAltText',
-  'getByTitle',
-  'getByTestId',
-  'hover',
-  'waitFor',
-]);
-
-const ACTION_METHOD_NAMES = new Set([
-  'click',
-  'dblclick',
-  'fill',
-  'check',
-  'uncheck',
-  'selectOption',
-  'focus',
-  'blur',
-  'clear',
-  'dispatchEvent',
-  'setInputFiles',
-  'dragTo',
-  'dragAndDrop',
-  'press',
-  'hover',
-  'waitFor',
-]);
-
 function formatRuntimeError(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -176,7 +65,7 @@ function getActionOptions(
   method: string,
   args: unknown[],
 ): { force?: unknown } | undefined {
-  if (!ACTION_METHOD_NAMES.has(method)) return undefined;
+  if (!PLAYWRIGHT_ACTION_METHODS.has(method)) return undefined;
   const candidate = args.at(-1);
   if (!isObject(candidate) || !('force' in candidate)) return undefined;
   return { force: candidate['force'] };
@@ -184,9 +73,25 @@ function getActionOptions(
 
 function isLocatorLike(value: unknown): value is Locator {
   if (!isObject(value) && typeof value !== 'function') return false;
-  return [...LOCATOR_METHOD_NAMES].some(
+  return [...PLAYWRIGHT_LOCATOR_METHODS].some(
     (method) => typeof Reflect.get(value, method) === 'function',
   );
+}
+
+function wrapReturnedValue(
+  value: unknown,
+  wrap: (target: object) => object,
+): unknown {
+  if (Array.isArray(value)) {
+    const items: unknown[] = value;
+    return items.map((item) => (isLocatorLike(item) ? wrap(item) : item));
+  }
+  return isLocatorLike(value) ? wrap(value) : value;
+}
+
+function unwrapArgument(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(unwrapArgument);
+  return unwrapTracedPlaywrightValue(value);
 }
 
 /**
@@ -206,7 +111,9 @@ export function createTracedPlaywrightPage(
     if (cached) return cached as T;
 
     const methodNames =
-      targetType === 'page' ? PAGE_METHOD_NAMES : LOCATOR_METHOD_NAMES;
+      targetType === 'page'
+        ? PLAYWRIGHT_PAGE_METHODS
+        : PLAYWRIGHT_LOCATOR_METHODS;
     const proxy = new Proxy(target, {
       get(currentTarget, property, receiver) {
         if (property === TRACED_PLAYWRIGHT_TARGET) return currentTarget;
@@ -229,8 +136,9 @@ export function createTracedPlaywrightPage(
           const settleSuccess = (result: unknown): unknown => {
             call.succeeded = true;
             if (targetType === 'page') options.onPageMethodSettled?.();
-            if (isLocatorLike(result)) return wrap(result, 'locator');
-            return result;
+            return wrapReturnedValue(result, (target) =>
+              wrap(target, 'locator'),
+            );
           };
           const settleFailure = (error: unknown): never => {
             call.succeeded = false;
@@ -239,7 +147,8 @@ export function createTracedPlaywrightPage(
           };
 
           try {
-            const result: unknown = Reflect.apply(value, currentTarget, args);
+            const rawArgs = args.map(unwrapArgument);
+            const result: unknown = Reflect.apply(value, currentTarget, rawArgs);
             if (isPromiseLike(result)) {
               return result.then(settleSuccess, settleFailure);
             }

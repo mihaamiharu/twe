@@ -254,6 +254,7 @@ describe('useChallengeExecution', () => {
             status: 'PASSED',
             output: 'Success',
             executionTime: 100,
+            error: 'The source-based fallback message',
             sourceAnalysis: {
                 calledMethods: ['getByRole'],
                 forbiddenMethods: [],

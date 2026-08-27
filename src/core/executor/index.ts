@@ -19,6 +19,12 @@ export {
   createRuntimeExecutionTrace,
   createTracedPlaywrightPage,
 } from './runtime-trace';
+export {
+  PLAYWRIGHT_ACTION_METHODS,
+  PLAYWRIGHT_LOCATOR_METHODS,
+  PLAYWRIGHT_LOCATOR_RETURNING_METHODS,
+  PLAYWRIGHT_PAGE_METHODS,
+} from './playwright-methods';
 export { validateChallengeExecution } from './challenge-validator';
 export type {
   ExecutionResult,

@@ -78,4 +78,28 @@ describe('runtime execution trace', () => {
     expect(trace.assertions[0]?.matcher).toBe('toBe');
     expect(trace.assertions[0]?.passed).toBe(false);
   });
+
+  it('wraps locators returned in arrays and unwraps drag targets', async () => {
+    document.body.innerHTML = '<button>Source</button><button>Target</button>';
+    const trace = createRuntimeExecutionTrace();
+    const rawPage = new MockedPlaywrightPage(document, { timeout: 20 });
+    const page = createTracedPlaywrightPage(rawPage, trace);
+
+    const buttons = await page.getByRole('button').all();
+    const source = page.getByRole('button', { name: 'Source' });
+    const target = buttons[1];
+    if (!target) throw new Error('Expected a target locator');
+    await target.click();
+    await source.dragTo(target);
+
+    expect(trace.methodCalls.map((call) => call.method)).toEqual([
+      'getByRole',
+      'all',
+      'getByRole',
+      'click',
+      'dragTo',
+    ]);
+    expect(trace.methodCalls.some((call) => call.method === 'evaluate')).toBe(false);
+    expect(trace.methodCalls.at(-1)?.succeeded).toBe(true);
+  });
 });

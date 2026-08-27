@@ -121,4 +121,49 @@ describe('challenge execution validator', () => {
       details: ['Assertion Error'],
     });
   });
+
+  it('only rejects failed runtime evidence for the explicit strict policy', () => {
+    const execution = passedExecution({
+      sourceAnalysis: {
+        calledMethods: ['click'],
+        forbiddenMethods: [],
+        structuralLocatorCalls: 0,
+        forcedActions: [],
+        directDomAccesses: [],
+        swallowedErrorCount: 0,
+        strictViolations: [],
+      },
+      runtimeTrace: {
+        methodCalls: [
+          {
+            target: 'locator',
+            method: 'click',
+            succeeded: false,
+            error: 'Element not found',
+          },
+        ],
+        assertions: [],
+      },
+    });
+
+    expect(
+      validateChallengeExecution(execution, {
+        requiredMethods: ['click'],
+        policy: {},
+      }),
+    ).toEqual({ passed: true });
+    expect(
+      validateChallengeExecution(execution, {
+        requiredMethods: ['click'],
+        policy: { forbidSwallowedErrors: true },
+      }),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'failed-action',
+        methods: ['click'],
+        details: ['Element not found'],
+      },
+    });
+  });
 });
