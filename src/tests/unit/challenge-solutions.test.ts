@@ -451,6 +451,12 @@ describe('Required Learn and revised-module Playwright reference solutions', () 
                         : {
                               validation,
                           }),
+                    ...(validation?.interactionSequence === undefined
+                        ? {}
+                        : {
+                              interactionSequence:
+                                  validation.interactionSequence,
+                          }),
                     strictMode: true,
                     // Reference solutions intentionally use JavaScript-compatible
                     // TypeScript so the Bun DOM harness does not need browser WASM.
