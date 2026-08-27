@@ -73,7 +73,6 @@ export async function runProgressRewardTransaction<T>({
         ? {
             tutorialId: target.tutorialId,
             isCompleted: false,
-            readingProgress: 0,
           }
         : {
             challengeId: target.challengeId,
@@ -120,11 +119,7 @@ export async function runProgressRewardTransaction<T>({
           lastAccessedAt: now,
           updatedAt: now,
           ...(target.kind === 'tutorial'
-            ? {
-                readingProgress: isFirstCompletion
-                  ? 100
-                  : progressRecord.readingProgress,
-              }
+            ? {}
             : {
                 attempts: (progressRecord.attempts ?? 0) + 1,
               }),

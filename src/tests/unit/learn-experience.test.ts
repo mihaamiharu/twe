@@ -48,7 +48,6 @@ const makeLesson = (
   isPublished: true,
   viewCount: 0,
   isCompleted: false,
-  readingProgress: 0,
   ...overrides,
 });
 
@@ -72,7 +71,6 @@ const makeDetailResponse = (): TutorialDetailResponse => ({
     challenges: [],
     userProgress: {
       isCompleted: false,
-      readingProgress: 40,
       lastAccessedAt: null,
     },
     previousTutorial: null,
@@ -82,7 +80,7 @@ const makeDetailResponse = (): TutorialDetailResponse => ({
 
 const makeListResponse = (): TutorialListResponse => ({
   success: true,
-  data: [makeLesson({ readingProgress: 40 })],
+  data: [makeLesson()],
   meta: {
     availableTags: ['dom', 'foundations'],
     modules: [
@@ -185,11 +183,9 @@ describe('Learn experience contracts', () => {
     expect(optimistic.detail?.success).toBe(true);
     if (!optimistic.detail?.success) throw new Error('Expected detail cache');
     expect(optimistic.detail.data.userProgress?.isCompleted).toBe(true);
-    expect(optimistic.detail.data.userProgress?.readingProgress).toBe(100);
     expect(optimistic.list?.success).toBe(true);
     if (!optimistic.list?.success) throw new Error('Expected list cache');
     expect(optimistic.list.data[0]?.isCompleted).toBe(true);
-    expect(optimistic.list.data[0]?.readingProgress).toBe(100);
   });
 
   test('preserves the cache snapshot for completion rollback', () => {
@@ -206,7 +202,6 @@ describe('Learn experience contracts', () => {
     expect(snapshot.detail?.success).toBe(true);
     if (!snapshot.detail?.success) throw new Error('Expected detail snapshot');
     expect(snapshot.detail.data.userProgress?.isCompleted).toBe(false);
-    expect(snapshot.detail.data.userProgress?.readingProgress).toBe(40);
   });
 
   test('filters the loaded localized catalog by displayed title and description', () => {
@@ -245,7 +240,6 @@ describe('Learn experience contracts', () => {
         title: 'JavaScript Fundamentals',
         tags: ['beginner', 'javascript'],
         isCompleted: true,
-        readingProgress: 100,
       }),
       makeLesson({
         order: 1,

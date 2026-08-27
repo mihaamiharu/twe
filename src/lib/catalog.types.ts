@@ -83,7 +83,6 @@ export interface TutorialListCatalogResponse {
       isPublished: boolean;
       viewCount: number;
       isCompleted: boolean;
-      readingProgress: number;
     }
   >;
   meta: {

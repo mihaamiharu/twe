@@ -20,7 +20,6 @@ function completeDetail(
       userProgress: {
         ...(response.data.userProgress ?? { lastAccessedAt: null }),
         isCompleted: true,
-        readingProgress: 100,
       },
     },
   };
@@ -35,9 +34,7 @@ function completeList(
   return {
     ...response,
     data: response.data.map((lesson) =>
-      lesson.slug === slug
-        ? { ...lesson, isCompleted: true, readingProgress: 100 }
-        : lesson,
+      lesson.slug === slug ? { ...lesson, isCompleted: true } : lesson,
     ),
   };
 }

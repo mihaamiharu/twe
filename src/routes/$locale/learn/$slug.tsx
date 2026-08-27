@@ -21,7 +21,6 @@ import { completeTutorial } from '@/server/tutorials.fn';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
 import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
@@ -160,11 +159,6 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
   const userId = auth.user?.id;
   const queryClient = useQueryClient();
   const contentRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef(tutorial.userProgress?.readingProgress ?? 0);
-  const hasScrolledRef = useRef(false);
-  const [readingProgress, setReadingProgress] = useState(
-    tutorial.userProgress?.readingProgress ?? 0,
-  );
   const [isCompleted, setIsCompleted] = useState(
     tutorial.userProgress?.isCompleted ?? false,
   );
@@ -197,8 +191,6 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
       };
       const previousLocalState = {
         isCompleted,
-        readingProgress,
-        progressRef: progressRef.current,
       };
       const optimisticCaches = optimisticallyCompleteLearnCaches(
         previousCaches,
@@ -208,15 +200,11 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
       queryClient.setQueryData(detailQueryKey, optimisticCaches.detail);
       queryClient.setQueryData(listQueryKey, optimisticCaches.list);
       setIsCompleted(true);
-      setReadingProgress(100);
-      progressRef.current = 100;
 
       return { previousCaches, previousLocalState };
     },
     onSuccess: (result) => {
       setIsCompleted(true);
-      setReadingProgress(100);
-      progressRef.current = 100;
       toast.success(t('toasts.completed'));
 
       if (result.data?.newAchievements?.length) {
@@ -235,8 +223,6 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
         queryClient.setQueryData(detailQueryKey, context.previousCaches.detail);
         queryClient.setQueryData(listQueryKey, context.previousCaches.list);
         setIsCompleted(context.previousLocalState.isCompleted);
-        setReadingProgress(context.previousLocalState.readingProgress);
-        progressRef.current = context.previousLocalState.progressRef;
       }
       toast.error(t('toasts.failed'));
     },
@@ -279,76 +265,53 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
     return items;
   }, [tutorial.content]);
 
-  const displayProgress = isCompleted ? 100 : readingProgress;
-
   useEffect(() => {
-    progressRef.current = readingProgress;
-  }, [readingProgress]);
-
-  useEffect(() => {
-    setReadingProgress(tutorial.userProgress?.readingProgress ?? 0);
-    progressRef.current = tutorial.userProgress?.readingProgress ?? 0;
     setIsCompleted(tutorial.userProgress?.isCompleted ?? false);
-    hasScrolledRef.current = false;
-    if (typeof window !== 'undefined') window.scrollTo(0, 0);
-  }, [
-    tutorial.slug,
-    tutorial.userProgress?.isCompleted,
-    tutorial.userProgress?.readingProgress,
-  ]);
+  }, [tutorial.userProgress?.isCompleted]);
 
   useEffect(() => {
-    if (!userId || isCompleted) return;
-
-    const handleScroll = () => {
-      const element = contentRef.current;
-      if (!element) return;
-
-      if (!hasScrolledRef.current) {
-        if (window.scrollY <= 50) return;
-        hasScrolledRef.current = true;
-      }
-
-      const rect = element.getBoundingClientRect();
-      const totalHeight = Math.max(element.offsetHeight, 1);
-      const visibleDistance = Math.max(0, window.innerHeight - rect.top - 100);
-      let nextProgress = Math.min(
-        100,
-        Math.round((visibleDistance / totalHeight) * 100),
-      );
-
-      if (rect.bottom <= window.innerHeight + 100) nextProgress = 100;
-
-      if (nextProgress > progressRef.current) {
-        progressRef.current = nextProgress;
-        setReadingProgress(nextProgress);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [isCompleted, tutorial.slug, userId]);
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
+  }, [tutorial.slug]);
 
   useEffect(() => {
     const element = contentRef.current;
-    if (!element || typeof IntersectionObserver === 'undefined') return;
+    if (!element) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) setActiveId(entry.target.id);
-        }
-      },
-      // Keep the active band aligned with the fixed header and the TOC's
-      // anchor offset. The heading scrolls to roughly 96px from the viewport
-      // top, so a 100px boundary would leave clicked headings outside it.
-      { rootMargin: '-80px 0px -66% 0px' },
-    );
-    element
-      .querySelectorAll('h2, h3')
-      .forEach((heading) => observer.observe(heading));
+    const updateActiveHeading = () => {
+      // The current section is the last heading that has reached the reading
+      // line below the fixed header. This remains correct after a fast scroll
+      // and does not depend on IntersectionObserver support.
+      const headings = Array.from(
+        element.querySelectorAll<HTMLHeadingElement>('h2, h3'),
+      );
+      if (!headings.length) {
+        setActiveId('');
+        return;
+      }
 
-    return () => observer.disconnect();
+      const readingLine = 120;
+      const firstHeading = headings[0];
+      if (!firstHeading) return;
+      let currentHeading = firstHeading;
+
+      for (const heading of headings) {
+        if (heading.getBoundingClientRect().top > readingLine) break;
+        currentHeading = heading;
+      }
+
+      setActiveId((previousId) =>
+        previousId === currentHeading.id ? previousId : currentHeading.id,
+      );
+    };
+
+    updateActiveHeading();
+    window.addEventListener('scroll', updateActiveHeading, { passive: true });
+    window.addEventListener('resize', updateActiveHeading);
+
+    return () => {
+      window.removeEventListener('scroll', updateActiveHeading);
+      window.removeEventListener('resize', updateActiveHeading);
+    };
   }, [tutorial.content]);
 
   const handleComplete = () => {
@@ -356,7 +319,7 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
       setShowAuthGuard(true);
       return;
     }
-    if (displayProgress < 100 || markCompleteMutation.isPending) return;
+    if (markCompleteMutation.isPending) return;
     markCompleteMutation.mutate();
   };
 
@@ -443,43 +406,22 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
           </article>
 
           <aside className="order-first space-y-5 lg:order-none lg:sticky lg:top-24">
-            <Card data-testid="reading-progress">
+            <Card data-testid="lesson-status">
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <span
                     className="h-2 w-2 rounded-full bg-primary"
                     aria-hidden="true"
                   />
-                  {t('sidebar.progress')}
+                  {t('sidebar.status')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
-                <div className="space-y-2" aria-live="polite">
-                  <div className="flex items-center justify-between gap-4 text-sm">
-                    <span className="text-muted-foreground">
-                      {t('sidebar.reading')}
-                    </span>
-                    <span className="font-mono font-semibold text-primary">
-                      {displayProgress}%
-                    </span>
-                  </div>
-                  <Progress
-                    value={displayProgress}
-                    className="h-2"
-                    aria-label={t('sidebar.readingProgress', {
-                      progress: displayProgress,
-                    })}
-                  />
-                </div>
-
                 {!isCompleted ? (
                   <Button
                     className="w-full whitespace-normal text-center"
                     onClick={handleComplete}
-                    disabled={
-                      markCompleteMutation.isPending ||
-                      (Boolean(userId) && displayProgress < 100)
-                    }
+                    disabled={markCompleteMutation.isPending}
                     data-testid="complete-tutorial"
                   >
                     {!userId && <LockKeyhole aria-hidden="true" />}
@@ -487,9 +429,7 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
                       ? t('common:messages.saving')
                       : !userId
                         ? t('auth:guard.title')
-                        : displayProgress < 100
-                          ? t('sidebar.readToComplete')
-                          : t('sidebar.completeAndContinue')}
+                        : t('sidebar.completeAndContinue')}
                   </Button>
                 ) : (
                   <div className="flex items-center gap-2 rounded-md border border-brand-success/30 bg-brand-success/10 p-4 text-brand-success">

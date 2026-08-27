@@ -127,7 +127,6 @@ export async function handleSetProgressRequest(
           .set({
             isCompleted: true,
             completedAt: new Date(),
-            readingProgress: 100,
           })
           .where(eq(progress.id, existingProgress.id));
       } else {
@@ -136,7 +135,6 @@ export async function handleSetProgressRequest(
           tutorialId: tutorialRecord.id,
           isCompleted: true,
           completedAt: new Date(),
-          readingProgress: 100,
         });
       }
     }

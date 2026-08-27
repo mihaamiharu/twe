@@ -82,15 +82,10 @@
     "startLesson": "Mulai pelajaran",
     "continueLesson": "Lanjutkan pelajaran",
     "completed": "Selesai",
-    "reviewLesson": "Tinjau pelajaran",
-    "progress": "{{progress}}% dibaca",
-    "progressLabel": "Progres membaca: {{progress}}%"
+    "reviewLesson": "Tinjau pelajaran"
   },
   "sidebar": {
-    "progress": "Progres Kamu",
-    "reading": "Membaca",
-    "readingProgress": "Progres membaca: {{progress}}%",
-    "readToComplete": "Baca untuk Menyelesaikan",
+    "status": "Status pelajaran",
     "completeAndContinue": "Selesai & Lanjutkan",
     "completedTitle": "Selesai! 🎉",
     "nextLabel": "Berikutnya: {{title}}",

@@ -290,12 +290,13 @@ describe('Learn and Practice catalog contracts', () => {
       tags: ['javascript'],
     };
 
-    expect(mergeTutorialCatalogOverlay(tutorial)).toMatchObject({
+    const mergedTutorial = mergeTutorialCatalogOverlay(tutorial);
+    expect(mergedTutorial).toMatchObject({
       slug: 'lesson',
       id: 'lesson',
       isCompleted: false,
-      readingProgress: 0,
     });
+    expect(mergedTutorial).not.toHaveProperty('readingProgress');
     expect(
       mergeChallengeCatalogOverlay(challenge, {
         slug: 'challenge',
@@ -430,14 +431,30 @@ describe('Learn and Practice catalog contracts', () => {
         .every((practice) => practice.role === 'additional'),
     ).toBe(true);
 
+    expect(moduleThree[0]?.practice).toEqual([
+      { slug: 'pw-first-test', role: 'core' },
+    ]);
+    expect(moduleThree[1]?.practice).toEqual([
+      { slug: 'js-fundamentals-boss', role: 'core' },
+      { slug: 'js-if-else-logic', role: 'additional' },
+      { slug: 'js-array-methods', role: 'additional' },
+    ]);
+    expect(moduleThree[2]?.practice).toEqual([
+      { slug: 'async-await-basics', role: 'core' },
+      { slug: 'async-error-handling', role: 'additional' },
+      { slug: 'async-parallel-execution', role: 'additional' },
+    ]);
+
     const typeScriptLesson = moduleThree.find(
       (tutorial) => tutorial.slug === 'typescript-for-qa',
     );
-    expect(
-      typeScriptLesson?.practice.every(
-        (practice) => practice.role === 'additional',
-      ),
-    ).toBe(true);
+    expect(typeScriptLesson?.practice).toEqual([
+      { slug: 'ts-type-annotations', role: 'additional' },
+      { slug: 'ts-type-inference', role: 'additional' },
+      { slug: 'ts-interfaces-basics', role: 'additional' },
+      { slug: 'ts-optional-properties', role: 'additional' },
+      { slug: 'ts-fundamentals-boss', role: 'additional' },
+    ]);
   });
 
   test('module four completes with locator judgment and scoped interaction proof', async () => {

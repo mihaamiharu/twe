@@ -55,7 +55,9 @@ test.describe('Tutorials', () => {
       'aria-pressed',
       'false',
     );
-    await expect(page.getByText('Show remaining only', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Show remaining only', { exact: true }),
+    ).toBeVisible();
 
     await page.reload();
     await expect(page.getByTestId('learn-completion-filter')).toHaveAttribute(
@@ -69,7 +71,9 @@ test.describe('Tutorials', () => {
       'aria-pressed',
       'true',
     );
-    await expect(page.getByText('Show all lessons', { exact: true })).toBeVisible();
+    await expect(
+      page.getByText('Show all lessons', { exact: true }),
+    ).toBeVisible();
   });
 
   for (const locale of ['en', 'id'] as const) {
@@ -133,16 +137,60 @@ test.describe('Tutorials', () => {
   }) => {
     await page.goto('/en/learn/universal-mindset');
     await tutorialsPage.verifyTutorialContent();
+    await expect(
+      page.getByRole('link', {
+        name: 'After this lesson, you can',
+        exact: true,
+      }),
+    ).toHaveClass(/text-primary/);
 
     const sectionLink = page.getByRole('link', {
       name: 'Why this matters for QA',
       exact: true,
     });
 
+    await sectionLink.scrollIntoViewIfNeeded();
     await sectionLink.click();
 
     await expect(page).toHaveURL(/#why-this-matters-for-qa$/);
     await expect(sectionLink).toHaveClass(/text-primary/);
+
+    const laterSectionLink = page.getByRole('link', {
+      name: 'When to use it—and when not to',
+      exact: true,
+    });
+
+    await laterSectionLink.scrollIntoViewIfNeeded();
+    await laterSectionLink.click();
+
+    await expect(page).toHaveURL(/#when-to-use-it-and-when-not-to$/);
+    await expect(laterSectionLink).toHaveClass(/text-primary/);
+  });
+
+  test('should keep the active section aligned while scrolling', async ({
+    page,
+  }) => {
+    await page.goto('/en/learn/universal-mindset');
+    await tutorialsPage.verifyTutorialContent();
+    await expect(
+      page.getByRole('link', {
+        name: 'After this lesson, you can',
+        exact: true,
+      }),
+    ).toHaveClass(/text-primary/);
+
+    const targetHeading = page.locator('#when-to-use-it-and-when-not-to');
+    const targetTop = await targetHeading.evaluate(
+      (heading) => heading.getBoundingClientRect().top,
+    );
+    await page.mouse.wheel(0, targetTop - 100);
+
+    await expect(
+      page.getByRole('link', {
+        name: 'When to use it—and when not to',
+        exact: true,
+      }),
+    ).toHaveClass(/text-primary/);
   });
 
   test('should render localized detail metadata and declared Practice links', async ({
@@ -161,7 +209,7 @@ test.describe('Tutorials', () => {
     await expect(
       page.locator('a[href*="/id/practice/js-variables-types"]'),
     ).toBeVisible();
-    await expect(page.getByTestId('reading-progress')).toBeVisible();
+    await expect(page.getByTestId('lesson-status')).toBeVisible();
   });
 
   test('should guard completion for signed-out readers', async ({
@@ -187,32 +235,22 @@ test.describe('Tutorials', () => {
     );
   });
 
-  test('should mark tutorial as complete', async ({ page }) => {
+  test('should mark tutorial as complete and persist it', async ({ page }) => {
     const firstTutorial = tutorialsPage.tutorialCards.first();
     await firstTutorial.click();
     await tutorialsPage.verifyTutorialContent();
 
-    // 1. Force a huge body height to ensure we can scroll a lot
-    await page.evaluate(() => {
-      document.body.style.minHeight = '10000px';
-    });
-
-    // 2. Scroll to the bottom where the button usually lives. The assertion
-    // below waits for the app's scroll-driven progress update.
-    await expect
-      .poll(
-        async () => {
-          await page.evaluate(() =>
-            window.scrollTo(0, document.body.scrollHeight),
-          );
-          return tutorialsPage.completeButton.isEnabled();
-        },
-        { timeout: 10000 },
-      )
-      .toBe(true);
-
-    // 3. Verify and Click Complete
+    await expect(tutorialsPage.completeButton).toBeEnabled();
     await expect(tutorialsPage.completeButton).toBeVisible({ timeout: 10000 });
     await tutorialsPage.completeTutorial();
+    await expect(
+      page.getByText('Lesson completed! 🎉', { exact: true }),
+    ).toBeVisible();
+
+    await page.reload();
+    await tutorialsPage.verifyTutorialContent();
+    await expect(
+      page.getByText('Completed! 🎉', { exact: true }),
+    ).toBeVisible();
   });
 });

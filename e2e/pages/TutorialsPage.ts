@@ -12,7 +12,7 @@ export class TutorialsPage extends BasePage {
     super(page);
     this.tutorialCards = page.locator('a[href*="/learn/"][class*="group"]');
     this.completeButton = page.getByRole('button', {
-      name: /Read to Complete|Complete & Continue|Baca untuk Menyelesaikan|Selesai & Lanjutkan/i,
+      name: /Complete & Continue|Selesai & Lanjutkan/i,
     });
     this.hideCompletedToggle = page.getByRole('button', {
       name: /Show remaining only|Show all lessons|Tampilkan yang belum selesai saja|Tampilkan semua pelajaran|Hide Completed|Show Completed|Sembunyikan Selesai|Tampilkan Selesai/i,
@@ -31,9 +31,11 @@ export class TutorialsPage extends BasePage {
           __TSS_START_OPTIONS__?: unknown;
           $_TSR?: unknown;
         };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
+        return (
+          Boolean(appWindow.__TSS_START_OPTIONS__) &&
           (appWindow.$_TSR?.initialized === true ||
-            appWindow.$_TSR === undefined);
+            appWindow.$_TSR === undefined)
+        );
       },
       undefined,
       { timeout: 20_000 },

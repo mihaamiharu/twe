@@ -58,17 +58,13 @@ export const getTutorials = createServerFn({ method: 'GET' })
 
       const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
-      const progressByTutorialId = new Map<
-        string,
-        { isCompleted: boolean; readingProgress: number }
-      >();
+      const progressByTutorialId = new Map<string, { isCompleted: boolean }>();
 
       if (session?.user?.id && dbRecords.length > 0) {
         const progressRecords = await db
           .select({
             tutorialId: progress.tutorialId,
             isCompleted: progress.isCompleted,
-            readingProgress: progress.readingProgress,
           })
           .from(progress)
           .where(
@@ -85,7 +81,6 @@ export const getTutorials = createServerFn({ method: 'GET' })
           if (record.tutorialId) {
             progressByTutorialId.set(record.tutorialId, {
               isCompleted: record.isCompleted,
-              readingProgress: record.readingProgress || 0,
             });
           }
         }
@@ -106,7 +101,6 @@ export const getTutorials = createServerFn({ method: 'GET' })
           isPublished: dbRecord?.isPublished ?? true,
           viewCount: dbRecord?.viewCount ?? 0,
           isCompleted: progressRecord?.isCompleted ?? false,
-          readingProgress: progressRecord?.readingProgress ?? 0,
         });
       });
 
@@ -312,7 +306,6 @@ export const getTutorial = createServerFn({ method: 'GET' })
 
       let userProgressData: {
         isCompleted: boolean;
-        readingProgress: number | null;
         lastAccessedAt: Date | null;
       } | null = null;
 
@@ -330,7 +323,6 @@ export const getTutorial = createServerFn({ method: 'GET' })
         if (progressRecord) {
           userProgressData = {
             isCompleted: progressRecord.isCompleted,
-            readingProgress: progressRecord.readingProgress,
             lastAccessedAt: progressRecord.lastAccessedAt,
           };
         }
@@ -376,8 +368,8 @@ export const getTutorial = createServerFn({ method: 'GET' })
     }
   });
 
-// NOTE: Reading progress is tracked client-side only.
-// Progress is saved to DB only when user clicks "Complete" via completeTutorial().
+// Tutorial progress is saved only when the user clicks "Complete" via
+// completeTutorial().
 
 // ----------------------------------------------------------------------------
 // MARK TUTORIAL COMPLETE

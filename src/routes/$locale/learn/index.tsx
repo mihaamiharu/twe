@@ -569,11 +569,6 @@ function LessonMeta({
             : 'learn.path.optionalLesson',
         )}
       </span>
-      {lesson.readingProgress > 0 && !lesson.isCompleted && (
-        <span className="text-primary">
-          {t('card.progress', { progress: lesson.readingProgress })}
-        </span>
-      )}
     </div>
   );
 }

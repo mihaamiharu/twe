@@ -246,7 +246,6 @@ Tracks completion status for both tutorials and challenges.
 - **challengeId** (`uuid`, FK -> `challenges.id`, Nullable): Linked challenge
 - **isCompleted** (`boolean`): Completion flag
 - **completedAt** (`timestamp`): Completion time
-- **readingProgress** (`integer`): % read (for tutorials)
 - **attempts** (`integer`): Try count (for challenges)
 - **bestSubmissionId** (`uuid`, FK -> `submissions.id`): Link to best successful attempt
 

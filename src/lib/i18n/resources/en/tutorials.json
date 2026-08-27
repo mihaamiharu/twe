@@ -82,15 +82,10 @@
     "startLesson": "Start lesson",
     "continueLesson": "Continue lesson",
     "completed": "Done",
-    "reviewLesson": "Review lesson",
-    "progress": "{{progress}}% read",
-    "progressLabel": "Reading progress: {{progress}}%"
+    "reviewLesson": "Review lesson"
   },
   "sidebar": {
-    "progress": "Your Progress",
-    "reading": "Reading",
-    "readingProgress": "Reading progress: {{progress}}%",
-    "readToComplete": "Read to Complete",
+    "status": "Lesson status",
     "completeAndContinue": "Complete & Continue",
     "completedTitle": "Completed! 🎉",
     "nextLabel": "Next: {{title}}",

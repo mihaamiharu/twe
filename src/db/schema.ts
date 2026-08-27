@@ -247,9 +247,6 @@ export const progress = pgTable(
     completedAt: timestamp('completed_at'),
     lastAccessedAt: timestamp('last_accessed_at').notNull().defaultNow(),
 
-    // For tutorials
-    readingProgress: integer('reading_progress').default(0), // Percentage
-
     // For challenges
     attempts: integer('attempts').default(0),
     bestSubmissionId: uuid('best_submission_id').references(

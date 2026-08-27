@@ -30,7 +30,6 @@ const lessons: TutorialListResponse = {
       isPublished: true,
       viewCount: 0,
       isCompleted: false,
-      readingProgress: 0,
     },
     {
       id: 'completed-id',
@@ -48,7 +47,6 @@ const lessons: TutorialListResponse = {
       isPublished: true,
       viewCount: 0,
       isCompleted: true,
-      readingProgress: 100,
     },
   ],
   meta: {
