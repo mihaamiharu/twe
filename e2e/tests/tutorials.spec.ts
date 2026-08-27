@@ -128,6 +128,23 @@ test.describe('Tutorials', () => {
     await tutorialsPage.verifyTutorialContent();
   });
 
+  test('should highlight the section selected from the table of contents', async ({
+    page,
+  }) => {
+    await page.goto('/en/learn/universal-mindset');
+    await tutorialsPage.verifyTutorialContent();
+
+    const sectionLink = page.getByRole('link', {
+      name: 'Why this matters for QA',
+      exact: true,
+    });
+
+    await sectionLink.click();
+
+    await expect(page).toHaveURL(/#why-this-matters-for-qa$/);
+    await expect(sectionLink).toHaveClass(/text-primary/);
+  });
+
   test('should render localized detail metadata and declared Practice links', async ({
     page,
   }) => {

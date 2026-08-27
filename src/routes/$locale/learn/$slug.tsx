@@ -339,7 +339,10 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
           if (entry.isIntersecting) setActiveId(entry.target.id);
         }
       },
-      { rootMargin: '-100px 0px -66% 0px' },
+      // Keep the active band aligned with the fixed header and the TOC's
+      // anchor offset. The heading scrolls to roughly 96px from the viewport
+      // top, so a 100px boundary would leave clicked headings outside it.
+      { rootMargin: '-80px 0px -66% 0px' },
     );
     element
       .querySelectorAll('h2, h3')
