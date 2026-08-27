@@ -223,4 +223,4 @@ Perbaikan utamanya bukan jumlah line yang lebih sedikit. Sekarang setiap action 
 
 Sekarang kamu seharusnya sudah bisa memilih action dari scenario intent, membedakan state-setting dari toggling, dan mengkritisi generated code yang menambah low-level input atau force tanpa alasan.
 
-Selesaikan Core Practice yang menggabungkan form value, checkbox state, dan checkout outcome. Exercise kecil tentang click, fill, select, keyboard, hover, drag-and-drop, dan upload tetap tersedia sebagai Additional Practice kalau kamu ingin latihan yang lebih fokus.
+Selesaikan Core Practice yang menggabungkan form value, checkbox state, dan checkout outcome. Mapped Additional Practice mencakup behavior fill, selection, checkbox, keyboard, dan upload. Exercise click, hover, dan drag-and-drop tetap tersedia sebagai standalone Practice kalau project membutuhkannya.

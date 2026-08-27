@@ -566,16 +566,17 @@ describe('Learn and Practice catalog contracts', () => {
       (tutorial) => tutorial.slug === 'navigation-and-events',
     );
 
-    expect(
-      interactionLesson?.practice.find(
-        (practice) => practice.slug === 'pw-file-upload',
-      )?.role,
-    ).toBe('additional');
-    expect(
-      actionabilityLesson?.practice.find(
-        (practice) => practice.slug === 'pw-dynamic-table',
-      )?.role,
-    ).toBe('additional');
+    expect(interactionLesson?.practice).toEqual([
+      { slug: 'pw-actions-boss', role: 'core' },
+      { slug: 'pw-fill-type', role: 'additional' },
+      { slug: 'pw-checkbox-radio', role: 'additional' },
+      { slug: 'pw-select-dropdowns', role: 'additional' },
+      { slug: 'pw-keyboard-actions', role: 'additional' },
+      { slug: 'pw-file-upload', role: 'additional' },
+    ]);
+    expect(actionabilityLesson?.practice).toEqual([
+      { slug: 'pw-action-outcome-sync', role: 'core' },
+    ]);
     expect(eventLesson?.practice).toEqual([
       { slug: 'pw-iframes', role: 'additional' },
     ]);

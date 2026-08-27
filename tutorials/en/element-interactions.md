@@ -223,4 +223,4 @@ The important improvement is not fewer lines. Each action now explains the state
 
 You should now be able to select actions from scenario intent, distinguish state-setting from toggling, and challenge generated code that adds low-level input or force without a reason.
 
-Complete the Core Practice that combines form values, checkbox state, and a checkout outcome. The smaller click, fill, select, keyboard, hover, drag-and-drop, and upload exercises remain available as Additional Practice when you want focused repetition.
+Complete the Core Practice that combines form values, checkbox state, and a checkout outcome. The mapped Additional Practice covers fill, selection, checkbox, keyboard, and upload behavior. The click, hover, and drag-and-drop exercises remain available as standalone Practice when a project needs them.

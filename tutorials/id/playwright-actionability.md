@@ -211,4 +211,4 @@ Improved test-nya bukan menunggu dengan kurang serius. Test tersebut menunggu ko
 
 Sekarang kamu seharusnya bisa menjelaskan batas yang ditangani Playwright auto-waiting dan bagian yang tetap membutuhkan outcome synchronization dari skenario.
 
-Selesaikan Core Practice yang menyimpan profile lalu menunggu observable status tanpa `waitForTimeout()`. Dynamic-table exercise tetap menjadi Additional Practice karena pelajaran utamanya adalah menerapkan locator composition pada UI yang berubah, bukan membuktikan completion Module 5.
+Selesaikan Core Practice yang menyimpan profile lalu menunggu observable status tanpa `waitForTimeout()`. Lesson ini tidak punya mapped Additional Practice terpisah: completion proof-nya adalah membedakan action readiness dari application outcome. Dynamic-table exercise tetap tersedia sebagai standalone Practice untuk latihan transfer locator.

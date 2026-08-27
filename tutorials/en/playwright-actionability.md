@@ -211,4 +211,4 @@ The improved test does not wait less aggressively. It waits for a more meaningfu
 
 You should now be able to explain exactly where Playwright auto-waiting helps and where your scenario must provide outcome synchronization.
 
-Complete the Core Practice that saves a profile and waits for an observable status without `waitForTimeout()`. The dynamic-table exercise remains Additional Practice because its main lesson is transferring locator composition into a changing UI, not proving Module 5 completion.
+Complete the Core Practice that saves a profile and waits for an observable status without `waitForTimeout()`. This lesson has no separate mapped Additional Practice: its completion proof is the distinction between action readiness and application outcome. The dynamic-table exercise remains available as standalone Practice for locator transfer.

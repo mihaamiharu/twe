@@ -69,12 +69,12 @@
         "id": "Aksi, Navigasi & Sinkronisasi"
       },
       "description": {
-        "en": "Choose actions by user intent, separate action readiness from product outcomes, and follow results across browser surfaces.",
-        "id": "Pilih action berdasarkan user intent, pisahkan kesiapan action dari product outcome, lalu ikuti hasilnya di berbagai browser surface."
+        "en": "Turn a user's workflow into state-aware Playwright actions, separate action readiness from product outcomes, and synchronize results across browser surfaces.",
+        "id": "Ubah user workflow menjadi Playwright action yang menyatakan state, pisahkan kesiapan action dari product outcome, lalu sinkronkan hasil di berbagai browser surface."
       },
       "outcome": {
-        "en": "Given a user flow, choose actions that express intended state, explain what Playwright waits for, and synchronize with observable same-page or new-surface outcomes without fixed sleeps.",
-        "id": "Dari sebuah user flow, pilih action yang menjelaskan intended state, jelaskan apa yang ditunggu Playwright, lalu sinkronkan dengan observable outcome di page yang sama atau surface baru tanpa fixed sleep."
+        "en": "Given a user workflow, choose actions that express the required state, distinguish action readiness from application success, and capture the correct current-page or one-time browser outcome without fixed sleeps.",
+        "id": "Dari sebuah user workflow, pilih action yang menyatakan required state, bedakan kesiapan action dari keberhasilan aplikasi, lalu tangkap outcome yang tepat di page saat ini atau one-time browser event tanpa fixed sleep."
       }
     },
     {
@@ -307,13 +307,10 @@
       "tags": ["playwright", "actions", "intent", "input"],
       "practice": [
         { "slug": "pw-actions-boss", "role": "core" },
-        { "slug": "pw-click-actions", "role": "additional" },
         { "slug": "pw-fill-type", "role": "additional" },
         { "slug": "pw-checkbox-radio", "role": "additional" },
         { "slug": "pw-select-dropdowns", "role": "additional" },
         { "slug": "pw-keyboard-actions", "role": "additional" },
-        { "slug": "pw-hover-focus", "role": "additional" },
-        { "slug": "pw-drag-drop", "role": "additional" },
         { "slug": "pw-file-upload", "role": "additional" }
       ]
     },
@@ -325,10 +322,7 @@
       "kind": "core",
       "estimatedMinutes": 20,
       "tags": ["playwright", "actionability", "synchronization", "outcomes"],
-      "practice": [
-        { "slug": "pw-action-outcome-sync", "role": "core" },
-        { "slug": "pw-dynamic-table", "role": "additional" }
-      ]
+      "practice": [{ "slug": "pw-action-outcome-sync", "role": "core" }]
     },
     {
       "slug": "navigation-and-events",
