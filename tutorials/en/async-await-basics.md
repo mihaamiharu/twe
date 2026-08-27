@@ -35,6 +35,8 @@ pending → fulfilled with a value
 
 An `async` function always returns a promise. Inside that function, `await` pauses the function's progress until the awaited value settles. It does not freeze the browser or prove every side effect of the application.
 
+`await` is therefore a dependency marker, not a time-based sleep. Put it on the operation whose completion the next line needs. Playwright actions, navigation, and assertions are also part of the test lifecycle, so keep them awaited: the runner must observe their completion or rejection. For a truly independent helper, delaying `await` until its result matters may add no useful guarantee.
+
 ![An asynchronous test awaits dependent setup and browser actions in sequence, then uses a separate assertion to prove the user outcome.](/images/tutorials/async-test-sequence.svg)
 
 _Await the operation you depend on; assert the outcome you need to prove._
@@ -234,4 +236,4 @@ One reasonable answer is:
 
 You should now be able to trace promises through a test, await genuine dependencies, keep independent setup separate from sequential UI behavior, and preserve an assertion after the action.
 
-Complete the async Core Practice by awaiting controlled setup data. The final lesson in this module will add TypeScript review literacy so editor confidence does not get confused with runtime evidence.
+Complete the async Core Practice by awaiting controlled setup data. The error-handling and parallel-execution challenges are optional follow-up; they do not turn retries or concurrency into defaults. The final lesson in this module will add TypeScript review literacy so editor confidence does not get confused with runtime evidence.

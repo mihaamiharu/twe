@@ -431,15 +431,25 @@ describe('Learn and Practice catalog contracts', () => {
         .every((practice) => practice.role === 'additional'),
     ).toBe(true);
 
-    expect(moduleThree[0]?.practice).toEqual([
+    const firstPlaywrightLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'first-playwright-test',
+    );
+    const javascriptLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'javascript-fundamentals-for-qa',
+    );
+    const asyncLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'async-await-basics',
+    );
+
+    expect(firstPlaywrightLesson?.practice).toEqual([
       { slug: 'pw-first-test', role: 'core' },
     ]);
-    expect(moduleThree[1]?.practice).toEqual([
+    expect(javascriptLesson?.practice).toEqual([
       { slug: 'js-fundamentals-boss', role: 'core' },
       { slug: 'js-if-else-logic', role: 'additional' },
       { slug: 'js-array-methods', role: 'additional' },
     ]);
-    expect(moduleThree[2]?.practice).toEqual([
+    expect(asyncLesson?.practice).toEqual([
       { slug: 'async-await-basics', role: 'core' },
       { slug: 'async-error-handling', role: 'additional' },
       { slug: 'async-parallel-execution', role: 'additional' },

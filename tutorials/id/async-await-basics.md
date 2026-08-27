@@ -35,6 +35,8 @@ pending → fulfilled dengan sebuah value
 
 `async function` selalu mengembalikan promise. Di dalam function itu, `await` menghentikan sementara progres function sampai value yang ditunggu selesai. `await` tidak membekukan browser dan tidak membuktikan semua side effect aplikasi sudah berhasil.
 
+Jadi, `await` adalah penanda dependency, bukan sleep berdasarkan waktu. Letakkan `await` pada operasi yang harus selesai sebelum baris berikutnya bisa bekerja. Playwright action, navigation, dan assertion juga bagian dari lifecycle test, jadi tetap gunakan `await`: runner perlu mengamati kapan operasi itu selesai atau gagal. Untuk helper yang benar-benar independent, kamu bisa menunda `await` sampai result-nya memang dibutuhkan karena menunggu lebih awal mungkin tidak memberi jaminan yang berguna.
+
 ![Sebuah test asynchronous menunggu setup dan browser action yang saling bergantung secara berurutan, lalu memakai assertion terpisah untuk membuktikan outcome pengguna.](/images/tutorials/async-test-sequence.svg)
 
 _Await operasi yang kamu butuhkan; assert outcome yang perlu kamu buktikan._
@@ -234,4 +236,4 @@ Salah satu jawaban yang masuk akal:
 
 Sekarang kamu seharusnya sudah bisa menelusuri promise di dalam test, menunggu dependency yang nyata, memisahkan setup independen dari UI behavior yang sequential, dan tetap membuat assertion setelah action selesai.
 
-Selesaikan async Core Practice dengan menunggu controlled setup data. Lesson terakhir di module ini akan menambah kemampuan review TypeScript supaya rasa aman dari editor tidak tertukar dengan runtime evidence.
+Selesaikan async Core Practice dengan menunggu controlled setup data. Challenge error handling dan parallel execution adalah Additional Practice kalau kamu ingin latihan ekstra; keduanya bukan alasan untuk menjadikan retry atau concurrency sebagai default. Lesson terakhir di module ini akan menambah kemampuan review TypeScript supaya rasa aman dari editor tidak tertukar dengan runtime evidence.

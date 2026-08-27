@@ -38,6 +38,17 @@ Anggap Playwright test sebagai kontrak QA yang bisa dijalankan. Beberapa bagian 
 | `expect`               | Menyatakan bukti yang pada akhirnya harus benar                        |
 | Test runner            | Menjalankan test, membuat report, dan menyimpan informasi kegagalan    |
 
+Saat mereview sebuah test, beri label pada setiap baris sebelum menilai apakah kodenya sudah tepat:
+
+| Layer             | Pertanyaan yang dijawab                        | Contoh                                      |
+| ----------------- | --------------------------------------------- | ------------------------------------------- |
+| Intent test       | Risiko produk apa yang sedang diperiksa?       | Customer bisa membuka cart                  |
+| API Playwright    | Bagaimana test menjalankan atau mengamati UI?  | `page.goto`, `getByRole`, `click`, `expect` |
+| JavaScript        | Bagaimana value dan alur logic ditulis?       | `async`, `await`, dan template literal      |
+| Test data         | Input dan ekspektasi konkret apa yang dipakai? | `'/products'`, `'Cart'`, dan `/\/cart$/` |
+
+Layer ini bisa muncul di baris yang sama, tapi tanggung jawabnya berbeda. Locator tidak menentukan risiko produk, dan annotation TypeScript tidak mengubah test data menjadi fakta runtime.
+
 ![Feedback loop Playwright yang fokus menghubungkan intent QA, satu test, perilaku browser, bukti yang terlihat, dan hasil diagnosis.](/images/tutorials/first-test-feedback-loop.svg)
 
 _Hasil hijau baru berguna kalau bukti yang diamati memang sesuai dengan intent QA sejak awal._
@@ -206,4 +217,4 @@ Salah satu jawaban yang masuk akal:
 
 Sekarang kamu seharusnya sudah bisa membuka project, menjelaskan tanggung jawab setiap bagian di dalam satu Playwright test, menjalankannya secara fokus, lalu memakai hasilnya untuk menentukan apa yang perlu diperiksa berikutnya.
 
-Selesaikan Core Practice dengan membuat satu test yang punya bukti observable. Setelah itu, lesson berikutnya akan memberimu JavaScript secukupnya untuk mengubah test data dan logic kecil tanpa membawa learning path ini menjadi kursus programming umum.
+Selesaikan Core Practice dengan mengubah starter menjadi satu test yang punya bukti observable. Perubahan yang diminta sengaja kecil: pakai locator yang dilihat pengguna dan web-first assertion. Setelah itu, lesson berikutnya akan memberimu JavaScript secukupnya untuk mengubah test data dan logic kecil tanpa membawa learning path ini menjadi kursus programming umum.

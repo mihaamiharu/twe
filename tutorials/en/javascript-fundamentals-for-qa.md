@@ -5,7 +5,7 @@ description: 'Shape test data, name small calculations, and review test logic wi
 
 ## After this lesson, you can
 
-- choose `const` or `let` based on whether a binding must be reassigned;
+- make a small test-data change by choosing `const` or `let` based on whether a binding must be reassigned;
 - model one test case with an object and similar cases with an array;
 - write a small function that gives a QA rule or calculation a clear name;
 - use conditions without allowing a test to silently skip its purpose; and
@@ -45,6 +45,8 @@ The JavaScript tools in this lesson support those responsibilities:
 | Function  | Give a repeated calculation or meaningful operation a name |
 | Condition | Choose a path only when variability is intentional         |
 
+Read generated code in that order: identify the case, follow how its values are transformed, check any conditional branch, then inspect the browser assertion. A safe change should have one clear purpose and leave the evidence boundary visible.
+
 `const` protects the binding, not every value inside an object or array. This is valid:
 
 ```js
@@ -82,6 +84,8 @@ The function is small, but it expresses a real testing idea. It takes inputs and
 
 The test can now connect data to behavior:
 
+For this scenario, assume the cart contract includes a labelled `Quantity` input and an `Update cart` action:
+
 ```ts
 test('cart shows the expected subtotal', async ({ page }) => {
   await page.goto('/products');
@@ -89,12 +93,25 @@ test('cart shows the expected subtotal', async ({ page }) => {
   await page
     .getByRole('button', { name: `Add ${cartCase.productName} to cart` })
     .click();
+  await page.getByLabel('Quantity').fill(String(cartCase.quantity));
+  await page.getByRole('button', { name: 'Update cart' }).click();
 
   await expect(page.getByTestId('cart-subtotal')).toHaveText(`$${subtotal}`);
 });
 ```
 
 The locator and currency format are product contracts that still need verification. JavaScript only helps keep the case and expected calculation readable; it does not prove the product rule by itself.
+
+### Make one safe change
+
+Suppose the requirement changes from two keyboards to three. Change the case data in one place:
+
+```diff
+-  quantity: 2,
++  quantity: 3,
+```
+
+The existing browser flow now fills `3`, and the derived `subtotal` changes with it. Do not update the expected text separately just to make the test green: run the focused test and confirm that the product displays the new value. One source of scenario data makes the change easier to review and revert.
 
 ### Similar cases belong in a collection
 
@@ -225,4 +242,4 @@ One reasonable answer is:
 
 You should now be able to shape a small QA case with arrays and objects, name one calculation with a function, and detect logic that could silently avoid an assertion.
 
-Complete the integrated JavaScript Core Practice rather than every syntax drill. In the next lesson, you will trace asynchronous operations so those values and browser actions happen in the required order.
+Complete the integrated JavaScript Core Practice rather than every syntax drill. The conditional and array-method challenges are optional follow-up when you need more practice with false-pass risks or controlled test data. In the next lesson, you will trace asynchronous operations so those values and browser actions happen in the required order.

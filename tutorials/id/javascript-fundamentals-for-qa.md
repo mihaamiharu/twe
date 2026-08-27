@@ -5,7 +5,7 @@ description: 'Susun test data, beri nama pada perhitungan kecil, dan review logi
 
 ## Setelah lesson ini, kamu bisa
 
-- memilih `const` atau `let` berdasarkan kebutuhan reassign value;
+- melakukan perubahan kecil pada test data dengan memilih `const` atau `let` berdasarkan apakah binding perlu di-assign ulang;
 - memodelkan satu test case dengan object dan beberapa case sejenis dengan array;
 - menulis function kecil yang memberi nama jelas pada rule atau perhitungan QA;
 - memakai condition tanpa membuat test diam-diam melewatkan tujuan utamanya; dan
@@ -45,6 +45,8 @@ Fitur JavaScript di lesson ini membantu tiga tanggung jawab tersebut:
 | Function  | Memberi nama pada perhitungan atau operasi yang bermakna |
 | Condition | Memilih jalur hanya kalau variasinya memang disengaja    |
 
+Saat mereview kode hasil generate, baca dengan urutan itu: kenali case-nya, ikuti perubahan value, periksa branch condition, lalu lihat assertion browser-nya. Perubahan yang aman seharusnya punya satu tujuan yang jelas dan tetap membuat batas antara logic dan bukti terlihat.
+
 `const` menjaga binding variable, bukan membuat semua isi object atau array menjadi tetap. Kode ini valid:
 
 ```js
@@ -82,6 +84,8 @@ Function-nya kecil, tapi menyatakan ide testing yang nyata. Function ini menerim
 
 Sekarang test bisa menghubungkan data dengan perilaku produk:
 
+Untuk skenario ini, anggap kontrak cart menyediakan input `Quantity` yang punya label dan action `Update cart`:
+
 ```ts
 test('cart shows the expected subtotal', async ({ page }) => {
   await page.goto('/products');
@@ -89,12 +93,25 @@ test('cart shows the expected subtotal', async ({ page }) => {
   await page
     .getByRole('button', { name: `Add ${cartCase.productName} to cart` })
     .click();
+  await page.getByLabel('Quantity').fill(String(cartCase.quantity));
+  await page.getByRole('button', { name: 'Update cart' }).click();
 
   await expect(page.getByTestId('cart-subtotal')).toHaveText(`$${subtotal}`);
 });
 ```
 
 Locator dan format currency di atas adalah kontrak produk yang tetap harus diverifikasi. JavaScript hanya membantu menjaga case dan perhitungan ekspektasinya tetap terbaca; JavaScript sendiri tidak membuktikan rule produk.
+
+### Lakukan satu perubahan aman
+
+Misalnya requirement berubah: quantity-nya sekarang tiga keyboard. Ubah test data di satu tempat:
+
+```diff
+-  quantity: 2,
++  quantity: 3,
+```
+
+Flow browser yang sama sekarang akan mengisi `3`, dan `subtotal` yang dihitung dari data itu akan ikut berubah. Jangan mengubah expected text secara terpisah hanya supaya test kembali hijau. Jalankan test secara fokus, lalu pastikan produk memang menampilkan value baru. Satu sumber test data membuat perubahan lebih mudah direview dan di-revert.
 
 ### Case sejenis cocok disimpan dalam collection
 
@@ -225,4 +242,4 @@ Salah satu jawaban yang masuk akal:
 
 Sekarang kamu seharusnya sudah bisa menyusun case QA kecil dengan array dan object, memberi nama pada satu perhitungan dengan function, dan menemukan logic yang diam-diam bisa menghindari assertion.
 
-Selesaikan Core Practice JavaScript yang terintegrasi, bukan semua syntax drill. Di lesson berikutnya, kamu akan menelusuri operasi asynchronous supaya value dan browser action terjadi dalam urutan yang memang dibutuhkan.
+Selesaikan Core Practice JavaScript yang terintegrasi, bukan semua syntax drill. Challenge tentang condition dan array method bersifat Additional Practice kalau kamu ingin latihan ekstra tentang risiko false pass atau test data yang terkontrol. Di lesson berikutnya, kamu akan menelusuri operasi asynchronous supaya value dan browser action terjadi dalam urutan yang memang dibutuhkan.

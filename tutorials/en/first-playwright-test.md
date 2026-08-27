@@ -38,6 +38,17 @@ A Playwright test is an executable QA contract. Several responsibilities work to
 | `expect`               | States the evidence that must eventually be true       |
 | Runner                 | Executes, reports, and preserves failure information   |
 
+When reviewing a test, label each line before asking whether it is correct:
+
+| Layer            | Question it answers                         | Example                                      |
+| ---------------- | -------------------------------------------- | -------------------------------------------- |
+| Test intent      | What product risk is this scenario checking? | Customer can open the cart                   |
+| Playwright API   | How does the test drive or observe the UI?   | `page.goto`, `getByRole`, `click`, `expect`  |
+| JavaScript       | How are values and control flow expressed?  | `async`, `await`, and template literals      |
+| Test data        | Which concrete inputs and expectations apply? | `'/products'`, `'Cart'`, and `/\/cart$/` |
+
+These layers can appear on the same line, but they are not the same responsibility. A locator does not define the product risk, and a TypeScript annotation does not turn test data into runtime truth.
+
 ![A focused Playwright feedback loop connects QA intent, one test, browser behavior, observable evidence, and a diagnostic result.](/images/tutorials/first-test-feedback-loop.svg)
 
 _Green is useful only when the test's observable evidence matches the original QA intent._
@@ -206,4 +217,4 @@ One reasonable answer is:
 
 You should now be able to open the project, explain each responsibility in one Playwright test, run it narrowly, and use its result to decide what to inspect next.
 
-Complete the Core Practice by finishing one observable test. Then the next lesson will give you just enough JavaScript to change test data and small pieces of test logic without turning the learning path into a general programming course.
+Complete the Core Practice by turning the starter into one observable test. The required change is intentionally small: use a user-facing locator and a web-first assertion. Then the next lesson will give you just enough JavaScript to change test data and small pieces of test logic without turning the learning path into a general programming course.

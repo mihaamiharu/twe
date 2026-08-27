@@ -37,12 +37,12 @@
         "id": "Test Pertama & Kode Secukupnya"
       },
       "description": {
-        "en": "Run a real Playwright test and learn only the JavaScript and TypeScript needed to change it safely.",
-        "id": "Jalankan test Playwright nyata dan pelajari JavaScript serta TypeScript yang diperlukan untuk mengubahnya dengan aman."
+        "en": "Bridge a manual test idea to a small, reviewable Playwright test: run it, change its data safely, preserve async dependencies, and read TypeScript feedback.",
+        "id": "Jembatani ide test manual ke test Playwright kecil yang mudah direview: jalankan, ubah datanya dengan aman, jaga dependency asynchronous, dan baca feedback TypeScript."
       },
       "outcome": {
-        "en": "Run, read, and safely modify a small Playwright test.",
-        "id": "Jalankan, baca, dan ubah test Playwright kecil dengan aman."
+        "en": "Given a manual QA scenario and a small Playwright test, explain which lines express test intent, Playwright API calls, JavaScript logic, and test data; make one safe change, diagnose the result, and review TypeScript claims against runtime evidence.",
+        "id": "Dari skenario QA manual dan test Playwright kecil, jelaskan mana yang merupakan intent test, pemanggilan API Playwright, logic JavaScript, dan test data; lakukan satu perubahan aman, telusuri hasilnya, lalu cek klaim TypeScript terhadap bukti runtime."
       }
     },
     {
@@ -202,19 +202,12 @@
       "moduleSlug": "first-test-code",
       "moduleOrder": 2,
       "kind": "core",
-      "estimatedMinutes": 18,
+      "estimatedMinutes": 22,
       "tags": ["javascript", "qa", "test-data"],
       "practice": [
-        { "slug": "js-variables-types", "role": "additional" },
-        { "slug": "js-arrays-test-data", "role": "additional" },
-        { "slug": "js-objects-for-tests", "role": "additional" },
-        { "slug": "js-functions-basics", "role": "additional" },
         { "slug": "js-fundamentals-boss", "role": "core" },
         { "slug": "js-if-else-logic", "role": "additional" },
-        { "slug": "js-loops-testing", "role": "additional" },
-        { "slug": "js-array-methods", "role": "additional" },
-        { "slug": "js-string-methods", "role": "additional" },
-        { "slug": "js-destructuring", "role": "additional" }
+        { "slug": "js-array-methods", "role": "additional" }
       ]
     },
     {
@@ -223,13 +216,12 @@
       "moduleSlug": "first-test-code",
       "moduleOrder": 3,
       "kind": "core",
-      "estimatedMinutes": 16,
+      "estimatedMinutes": 20,
       "tags": ["javascript", "async", "await", "promises"],
       "practice": [
         { "slug": "async-await-basics", "role": "core" },
         { "slug": "async-error-handling", "role": "additional" },
-        { "slug": "async-parallel-execution", "role": "additional" },
-        { "slug": "async-boss", "role": "additional" }
+        { "slug": "async-parallel-execution", "role": "additional" }
       ]
     },
     {
@@ -238,17 +230,13 @@
       "moduleSlug": "first-test-code",
       "moduleOrder": 4,
       "kind": "core",
-      "estimatedMinutes": 18,
+      "estimatedMinutes": 20,
       "tags": ["typescript", "type-literacy", "qa"],
       "practice": [
         { "slug": "ts-type-annotations", "role": "additional" },
         { "slug": "ts-type-inference", "role": "additional" },
-        { "slug": "ts-function-types", "role": "additional" },
         { "slug": "ts-interfaces-basics", "role": "additional" },
-        { "slug": "ts-union-types", "role": "additional" },
         { "slug": "ts-optional-properties", "role": "additional" },
-        { "slug": "ts-type-aliases", "role": "additional" },
-        { "slug": "ts-utility-types", "role": "additional" },
         { "slug": "ts-fundamentals-boss", "role": "additional" }
       ]
     },

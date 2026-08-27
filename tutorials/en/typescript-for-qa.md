@@ -6,10 +6,10 @@ description: 'Use TypeScript to make test contracts visible while keeping runtim
 ## After this lesson, you can
 
 - read inferred types, explicit annotations, unions, and optional properties in test code;
+- read a TypeScript error as a mismatch in the test code's contract;
 - choose where an explicit type makes a QA contract easier to review;
 - narrow an optional value with a runtime guard instead of an unsafe cast;
-- explain why a TypeScript type cannot validate an API response or product outcome; and
-- review generated test code for `any`, unsafe assertions, and misleading confidence.
+- explain why a TypeScript type cannot validate an API response or product outcome, and review generated test code for `any`, unsafe assertions, and misleading confidence.
 
 ## Why this matters for QA
 
@@ -48,6 +48,8 @@ Think in two boundaries:
 | Data entering at runtime | Did the environment, API, file, or product actually provide the value we expect? |
 
 TypeScript can help with the first. A runtime check, controlled setup, or assertion is needed for the second.
+
+Read a TypeScript error as a mismatch in the test code's contract: what type does this value have, what type does the next API expect, and what assumption is missing? Fix that mismatch or make the assumption explicit. Removing the warning with `any` or an assertion is not evidence that the test is safer.
 
 ## Work through a realistic example
 
@@ -207,6 +209,30 @@ Clean types are useful maintenance evidence. They are not a substitute for a mea
 
 ## Check your understanding
 
+### Read a concrete compiler error
+
+Review this small mismatch:
+
+```ts
+type CheckoutCase = {
+  quantity: number;
+};
+
+const checkoutCase: CheckoutCase = {
+  quantity: 'two',
+};
+```
+
+Explain:
+
+1. What type does `CheckoutCase.quantity` require?
+2. What contract mismatch should TypeScript report?
+3. How would you repair it without using `any` or a cast?
+
+The useful diagnostic is `Type 'string' is not assignable to type 'number'`. If this scenario is already numeric, change the value to `2`. If it came from text such as an input, convert and validate that text at the runtime boundary before storing it in the typed case.
+
+### Review runtime evidence
+
 Review this code:
 
 ```ts
@@ -232,6 +258,7 @@ Explain:
 
 One reasonable answer is:
 
+- `CheckoutCase.quantity` requires a number, but `'two'` is a string. Use `2` for a numeric test case, or convert and validate a text value before it enters the typed case. Silencing the diagnostic would hide the contract mismatch.
 - The type documents that trusted test code expects an email string and one of two supported roles.
 - The cast does not prove the endpoint returned that shape. It only instructs TypeScript to treat the value as `TestUser`.
 - Check the response status and validate the critical fields with the project's runtime validation approach before using them.
@@ -239,8 +266,8 @@ One reasonable answer is:
 
 ## Before you continue
 
-You should now be able to read a small TypeScript test contract, distinguish inference from useful annotations, guard optional runtime values, and challenge unsafe casts in generated code.
+You should now be able to read and repair a simple TypeScript compiler error, read a small test contract, distinguish inference from useful annotations, guard optional runtime values, and challenge unsafe casts in generated code.
 
-Module 3 is complete when you have finished its four Core lessons and three integrated Core Practice challenges: the first observable Playwright test, the QA-focused JavaScript case, and the asynchronous setup task. TypeScript syntax drills remain Additional Practice because completing them is not the same as proving runtime or review judgment.
+Module 3 is complete when you have finished its four Core lessons and three integrated Core Practice challenges: the first observable Playwright test, the QA-focused JavaScript case, and the asynchronous setup task. The small TypeScript exercises are Additional Practice because the current runner can observe their runtime result, but cannot by itself prove compiler diagnostics or runtime data validity.
 
 You are ready for Module 4, where the role, accessible name, DOM context, code literacy, and runtime evidence from the first three modules come together in reliable locator decisions.

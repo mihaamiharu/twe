@@ -6,10 +6,10 @@ description: 'Gunakan TypeScript untuk memperjelas kontrak test sambil tetap mem
 ## Setelah lesson ini, kamu bisa
 
 - membaca inferred type, explicit annotation, union, dan optional property di dalam test;
+- membaca TypeScript error sebagai ketidaksesuaian di dalam kontrak kode test;
 - memilih bagian yang membutuhkan explicit type supaya kontrak QA lebih gampang direview;
 - mempersempit optional value dengan runtime guard, bukan unsafe cast;
-- menjelaskan kenapa TypeScript type tidak bisa memvalidasi API response atau outcome produk; dan
-- mereview kode test hasil generate yang memakai `any`, unsafe assertion, atau confidence yang menyesatkan.
+- menjelaskan kenapa TypeScript type tidak bisa memvalidasi API response atau outcome produk, lalu mereview kode test hasil generate yang memakai `any`, unsafe assertion, atau confidence yang menyesatkan.
 
 ## Kenapa ini penting buat QA
 
@@ -48,6 +48,8 @@ Bayangkan ada dua boundary:
 | Data yang masuk saat runtime      | Apakah environment, API, file, atau produk benar-benar memberikan value yang kita harapkan? |
 
 TypeScript membantu boundary pertama. Boundary kedua masih membutuhkan runtime check, controlled setup, atau assertion.
+
+Baca TypeScript error sebagai ketidaksesuaian di dalam kontrak kode test: value ini punya type apa, API berikutnya mengharapkan type apa, dan asumsi apa yang belum dibuktikan? Perbaiki ketidaksesuaian itu atau buat asumsinya eksplisit. Menghilangkan warning dengan `any` atau assertion bukan bukti bahwa test menjadi lebih aman.
 
 ## Coba kita bedah contoh nyata
 
@@ -207,6 +209,30 @@ Type yang rapi adalah maintenance evidence yang berguna. Type bukan pengganti ha
 
 ## Coba cek pemahamanmu
 
+### Baca compiler error yang konkret
+
+Review mismatch kecil ini:
+
+```ts
+type CheckoutCase = {
+  quantity: number;
+};
+
+const checkoutCase: CheckoutCase = {
+  quantity: 'two',
+};
+```
+
+Jelaskan:
+
+1. `CheckoutCase.quantity` mengharuskan type apa?
+2. Mismatch kontrak apa yang seharusnya dilaporkan TypeScript?
+3. Bagaimana kamu memperbaikinya tanpa memakai `any` atau cast?
+
+Diagnostic yang berguna adalah `Type 'string' is not assignable to type 'number'`. Kalau skenarionya memang sudah berupa angka, ubah value-nya menjadi `2`. Kalau value itu berasal dari text seperti input, convert dan validasi text tersebut di runtime boundary sebelum menyimpannya ke dalam case yang typed.
+
+### Review runtime evidence
+
 Review kode ini:
 
 ```ts
@@ -232,6 +258,7 @@ Jelaskan:
 
 Salah satu jawaban yang masuk akal:
 
+- `CheckoutCase.quantity` mengharuskan number, tetapi `'two'` adalah string. Pakai `2` untuk numeric test case, atau convert lalu validasi text sebelum masuk ke typed case. Menyembunyikan diagnostic hanya akan menutupi mismatch kontraknya.
 - Type tersebut mendokumentasikan bahwa trusted test code mengharapkan email berupa string dan salah satu dari dua role yang didukung.
 - Cast tidak membuktikan endpoint mengembalikan shape tersebut. Cast hanya meminta TypeScript memperlakukan value itu sebagai `TestUser`.
 - Periksa response status dan validasi field penting memakai pendekatan runtime validation yang digunakan project sebelum memakai datanya.
@@ -239,8 +266,8 @@ Salah satu jawaban yang masuk akal:
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya sudah bisa membaca kontrak TypeScript yang kecil, membedakan inference dari annotation yang berguna, menjaga optional runtime value, dan mempertanyakan unsafe cast di dalam kode hasil generate.
+Sekarang kamu seharusnya sudah bisa membaca dan memperbaiki TypeScript error sederhana, membaca kontrak TypeScript yang kecil, membedakan inference dari annotation yang berguna, menjaga optional runtime value, dan mempertanyakan unsafe cast di dalam kode hasil generate.
 
-Module 3 selesai setelah kamu menuntaskan empat Core lesson dan tiga Core Practice yang terintegrasi: Playwright test pertama dengan bukti observable, JavaScript case yang fokus pada QA, dan asynchronous setup task. TypeScript syntax drill tetap menjadi Additional Practice karena menyelesaikan drill tidak sama dengan membuktikan runtime behavior atau review judgment.
+Module 3 selesai setelah kamu menuntaskan empat Core lesson dan tiga Core Practice yang terintegrasi: Playwright test pertama dengan bukti observable, JavaScript case yang fokus pada QA, dan asynchronous setup task. Latihan kecil TypeScript menjadi Additional Practice karena runner saat ini bisa mengamati runtime result, tapi tidak bisa membuktikan pesan error compiler atau validitas runtime data dengan sendirinya.
 
 Kamu siap masuk Module 4. Di sana, role, accessible name, DOM context, code literacy, dan runtime evidence dari tiga module pertama akan digabungkan untuk membuat keputusan locator yang reliable.
