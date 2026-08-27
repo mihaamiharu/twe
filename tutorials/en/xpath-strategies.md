@@ -50,6 +50,8 @@ Read this expression from left to right:
 
 The expression can be precise today and still be a weak long-term contract. Precision describes the current match; resilience depends on whether the encoded relationship represents stable product meaning.
 
+The goal here is to preserve meaning during maintenance, not to memorize XPath grammar. Read the anchor, relationship, target, and evidence, then compare whether a clearer Playwright contract can express the same intent.
+
 ## Work through a realistic example
 
 An older test refunds a specific order:

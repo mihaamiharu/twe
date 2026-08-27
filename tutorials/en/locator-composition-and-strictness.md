@@ -61,6 +61,16 @@ Strictness depends on the operation:
 
 Strictness does not mean every locator must always identify one element. It means a single-target operation must not be ambiguous.
 
+Use the match count as a diagnostic signal:
+
+| Match count | What to ask                                                        |
+| ----------- | ------------------------------------------------------------------ |
+| `0`         | Is the starting state, identity, or expected product state missing? |
+| `1`         | Did the locator narrow to the intended component?                  |
+| `>1`        | Which user, domain, or component context is still missing?         |
+
+For a plural requirement, multiple matches may be correct. Assert the collection directly instead of forcing it into one target.
+
 ## Work through a realistic example
 
 The catalog contains:

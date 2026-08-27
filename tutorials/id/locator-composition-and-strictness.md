@@ -61,6 +61,16 @@ Strictness bergantung pada operasinya:
 
 Strictness bukan berarti setiap locator harus selalu menghasilkan satu elemen. Strictness berarti single-target operation tidak boleh ambigu.
 
+Gunakan jumlah match sebagai diagnostic signal:
+
+| Jumlah match | Pertanyaan yang perlu diajukan                                      |
+| ------------ | ------------------------------------------------------------------- |
+| `0`          | Apakah starting state, identity, atau product state yang diharapkan hilang? |
+| `1`          | Apakah locator sudah dipersempit ke component yang dimaksud?       |
+| `>1`         | User, domain, atau component context apa yang masih hilang?        |
+
+Untuk requirement yang memang plural, banyak match bisa saja benar. Assert collection tersebut secara langsung daripada memaksanya menjadi satu target.
+
 ## Coba kita bedah contoh nyata
 
 Katalog berisi:

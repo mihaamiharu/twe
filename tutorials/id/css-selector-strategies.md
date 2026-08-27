@@ -39,6 +39,8 @@ Elemen yang cocok dengan fact tersebut sekarang
 
 Kualitas maintenance bergantung pada ownership, bukan syntax saja.
 
+CSS bukan anak tangga berikutnya dalam locator ladder yang universal. Periksa dulu user-facing contract, locator composition, dan test ID yang sudah disepakati. Gunakan CSS hanya saat implementation fact memang menjadi kontrak yang disengaja, halaman bersifat legacy atau third-party, atau semantics yang hilang merupakan testability gap yang jelas.
+
 | DOM fact  | Pertanyaan yang perlu diajukan                                                             |
 | --------- | ------------------------------------------------------------------------------------------ |
 | Tag       | Apakah element type memang bagian supported behavior?                                      |
@@ -98,7 +100,9 @@ Ini tetap CSS contract. Pilihan ini masuk akal karena skenario memang menginspek
 
 Kalau visible text “Overdue” adalah actual user evidence, role/text locator mungkin lebih tepat. Kalau `data-state` nggak dijamin stabil, minta explicit test ID atau perbaikan semantics daripada menyatakan stabilitas sendiri.
 
-### 3. Baca syntax yang penting
+### 3. Baca syntax yang diperlukan untuk diagnosis
+
+Kamu nggak perlu menghafal grammar CSS. Kenali bentuk-bentuk di bawah supaya bisa menjelaskan dependency generated selector dan perubahan apa yang bisa membuatnya gagal.
 
 ```css
 button                         /* tag */

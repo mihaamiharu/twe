@@ -53,12 +53,12 @@
         "id": "Locator Andal & Testability"
       },
       "description": {
-        "en": "Choose locator contracts from test intent, narrow repeated UI, and use CSS or XPath only with a documented reason.",
-        "id": "Pilih kontrak locator dari intent test, persempit repeated UI, dan gunakan CSS atau XPath hanya dengan alasan yang terdokumentasi."
+        "en": "Turn test intent into an owned locator contract, narrow repeated UI without hiding ambiguity, and maintain CSS or XPath fallbacks with a documented reason.",
+        "id": "Ubah intent test menjadi kontrak locator yang ownership-nya jelas, persempit repeated UI tanpa menyembunyikan ambiguitas, lalu rawat fallback CSS atau XPath dengan alasan yang terdokumentasi."
       },
       "outcome": {
-        "en": "Given a live UI and test intent, choose and justify a unique locator, narrow repeated content, and identify when an implementation fallback is warranted.",
-        "id": "Dari live UI dan intent test, pilih dan jelaskan unique locator, persempit repeated content, lalu tentukan kapan implementation fallback memang diperlukan."
+        "en": "Given a live UI and test intent, choose a locator contract that preserves the intended user, domain, or engineering meaning; prove when a match should be unique or plural; diagnose zero or multiple matches; and explain when a CSS or XPath fallback is warranted.",
+        "id": "Dari live UI dan intent test, pilih kontrak locator yang menjaga makna user, domain, atau engineering yang dimaksud; buktikan kapan match harus unique atau plural; diagnosis nol atau beberapa match; lalu jelaskan kapan fallback CSS atau XPath memang diperlukan."
       }
     },
     {
@@ -249,11 +249,9 @@
       "estimatedMinutes": 20,
       "tags": ["playwright", "locators", "accessibility", "testability"],
       "practice": [
-        { "slug": "pw-locator-intro", "role": "additional" },
         { "slug": "pw-get-by-role", "role": "core" },
         { "slug": "pw-get-by-label", "role": "additional" },
         { "slug": "pw-get-by-text", "role": "additional" },
-        { "slug": "pw-get-by-placeholder", "role": "additional" },
         { "slug": "pw-get-by-testid", "role": "additional" }
       ]
     },
@@ -280,18 +278,8 @@
       "estimatedMinutes": 18,
       "tags": ["css", "fallback", "legacy-dom"],
       "practice": [
-        { "slug": "css-selector-101-id-class", "role": "additional" },
-        { "slug": "css-tag-selectors", "role": "additional" },
-        { "slug": "css-combining-basics", "role": "additional" },
-        { "slug": "css-child-descendant", "role": "additional" },
-        { "slug": "css-sibling-selectors", "role": "additional" },
-        { "slug": "css-family-drill", "role": "additional" },
         { "slug": "css-attribute-selectors", "role": "additional" },
         { "slug": "css-validation-states", "role": "additional" },
-        { "slug": "css-functional-pseudo", "role": "additional" },
-        { "slug": "css-forms-boss", "role": "additional" },
-        { "slug": "css-nth-child", "role": "additional" },
-        { "slug": "css-nth-type-vs-child", "role": "additional" },
         { "slug": "css-table-drill", "role": "additional" }
       ]
     },
@@ -304,11 +292,7 @@
       "estimatedMinutes": 16,
       "tags": ["xpath", "optional", "legacy-dom"],
       "practice": [
-        { "slug": "xpath-basics-101", "role": "additional" },
-        { "slug": "xpath-text-content", "role": "additional" },
         { "slug": "xpath-contains-starts-with", "role": "additional" },
-        { "slug": "xpath-multiple-conditions", "role": "additional" },
-        { "slug": "xpath-position-indexing", "role": "additional" },
         { "slug": "xpath-normalize-space", "role": "additional" },
         { "slug": "xpath-complex-table", "role": "additional" }
       ]

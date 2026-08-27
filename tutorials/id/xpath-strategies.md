@@ -50,6 +50,8 @@ Baca expression ini dari kiri ke kanan:
 
 Expression bisa sangat presisi hari ini, tapi tetap menjadi kontrak jangka panjang yang lemah. Precision menjelaskan current match; resilience bergantung pada apakah relationship yang ditulis memang menyatakan product meaning yang stabil.
 
+Tujuan lesson ini adalah menjaga meaning saat maintenance, bukan menghafal grammar XPath. Baca anchor, relationship, target, dan evidence, lalu bandingkan apakah Playwright contract yang lebih jelas bisa menyatakan intent yang sama.
+
 ## Coba kita bedah contoh nyata
 
 Test lama melakukan refund untuk satu order:

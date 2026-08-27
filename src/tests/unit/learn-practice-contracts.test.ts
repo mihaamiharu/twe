@@ -493,23 +493,42 @@ describe('Learn and Practice catalog contracts', () => {
         .map(({ slug }) => slug),
     ).toEqual(['pw-get-by-role', 'pw-locators-boss']);
 
-    for (const tutorial of moduleFour.filter((lesson) =>
-      ['css-selector-strategies', 'xpath-strategies'].includes(lesson.slug),
-    )) {
-      expect(
-        tutorial.practice.every((practice) => practice.role === 'additional'),
-      ).toBe(true);
-    }
-
-    const optionalLesson = moduleFour.find(
-      (tutorial) => tutorial.kind === 'optional',
+    const locatorStrategyLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'playwright-locator-strategy',
     );
-    expect(optionalLesson?.slug).toBe('xpath-strategies');
-    expect(
-      optionalLesson?.practice.every(
-        (practice) => practice.role === 'additional',
-      ),
-    ).toBe(true);
+    const compositionLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'locator-composition-and-strictness',
+    );
+    const cssLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'css-selector-strategies',
+    );
+    const xpathLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'xpath-strategies',
+    );
+
+    expect(locatorStrategyLesson?.practice).toEqual([
+      { slug: 'pw-get-by-role', role: 'core' },
+      { slug: 'pw-get-by-label', role: 'additional' },
+      { slug: 'pw-get-by-text', role: 'additional' },
+      { slug: 'pw-get-by-testid', role: 'additional' },
+    ]);
+    expect(compositionLesson?.practice).toEqual([
+      { slug: 'pw-locator-chaining', role: 'additional' },
+      { slug: 'pw-list-items', role: 'additional' },
+      { slug: 'pw-locators-boss', role: 'core' },
+    ]);
+    expect(cssLesson?.practice).toEqual([
+      { slug: 'css-attribute-selectors', role: 'additional' },
+      { slug: 'css-validation-states', role: 'additional' },
+      { slug: 'css-table-drill', role: 'additional' },
+    ]);
+    expect(xpathLesson?.practice).toEqual([
+      { slug: 'xpath-contains-starts-with', role: 'additional' },
+      { slug: 'xpath-normalize-space', role: 'additional' },
+      { slug: 'xpath-complex-table', role: 'additional' },
+    ]);
+
+    expect(xpathLesson?.kind).toBe('optional');
   });
 
   test('module five completes with deliberate actions and observable synchronization', async () => {

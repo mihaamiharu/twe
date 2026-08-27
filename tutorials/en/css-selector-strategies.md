@@ -39,6 +39,8 @@ Elements matching those facts right now
 
 Its maintenance quality depends on ownership, not syntax alone.
 
+CSS is not the next rung in a universal locator ladder. Check the user-facing contract, locator composition, and agreed test ID first. Use CSS only when the implementation fact is the deliberate contract, the page is legacy or third-party, or the missing semantics are an explicit testability gap.
+
 | DOM fact  | Questions to ask                                                    |
 | --------- | ------------------------------------------------------------------- |
 | Tag       | Is the element type part of the supported behavior?                 |
@@ -98,7 +100,9 @@ This remains a CSS contract. It is justified because the scenario intentionally 
 
 If “Overdue” visible text is the actual user evidence, a role/text locator may still be better. If `data-state` is not guaranteed, ask for an explicit test ID or improved semantics instead of declaring it stable yourself.
 
-### 3. Read the essential syntax
+### 3. Read only the syntax needed to diagnose
+
+You do not need to memorize CSS grammar. Recognize the forms below so you can explain what a generated selector depends on and which change could break it.
 
 ```css
 button                         /* tag */

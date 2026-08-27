@@ -58,6 +58,8 @@ An accessible name is not always the raw text inside an element. It may come fro
 
 A test ID can be resilient because the team agrees to preserve it. It does not prove that a user can understand or operate the element.
 
+Before writing code, name the target, the evidence it should produce, and the meaningful change that should make the test fail. Then verify that the live DOM actually exposes the signal you chose. This keeps generated locator review tied to QA intent rather than selector preference.
+
 ## Work through a realistic example
 
 The risk is:

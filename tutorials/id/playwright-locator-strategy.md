@@ -58,6 +58,8 @@ Accessible name nggak selalu sama dengan text mentah di dalam elemen. Nilainya b
 
 Test ID bisa reliable karena tim sepakat menjaganya. Test ID tidak membuktikan bahwa pengguna bisa memahami atau mengoperasikan elemen tersebut.
 
+Sebelum menulis kode, sebutkan targetnya, evidence yang harus dihasilkan, dan meaningful change yang seharusnya membuat test gagal. Setelah itu, verifikasi bahwa live DOM memang menyediakan signal yang kamu pilih. Dengan begitu, review locator hasil generate tetap terikat pada intent QA, bukan preferensi selector.
+
 ## Coba kita bedah contoh nyata
 
 Risikonya adalah:
