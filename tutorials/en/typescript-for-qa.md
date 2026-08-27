@@ -268,6 +268,6 @@ One reasonable answer is:
 
 You should now be able to read and repair a simple TypeScript compiler error, read a small test contract, distinguish inference from useful annotations, guard optional runtime values, and challenge unsafe casts in generated code.
 
-Module 3 is complete when you have finished its four Core lessons and three integrated Core Practice challenges: the first observable Playwright test, the QA-focused JavaScript case, and the asynchronous setup task. The small TypeScript exercises are Additional Practice because the current runner can observe their runtime result, but cannot by itself prove compiler diagnostics or runtime data validity.
+Module 3 is complete when you have finished its four Core lessons and three focused Core Practice challenges: the first observable Playwright test, the QA-focused JavaScript case, and the asynchronous setup task. The mapped TypeScript exercises are Additional Practice because the current runner can observe their runtime result, but cannot by itself prove compiler diagnostics or runtime data validity.
 
 You are ready for Module 4, where the role, accessible name, DOM context, code literacy, and runtime evidence from the first three modules come together in reliable locator decisions.

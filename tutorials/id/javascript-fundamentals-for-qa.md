@@ -242,4 +242,4 @@ Salah satu jawaban yang masuk akal:
 
 Sekarang kamu seharusnya sudah bisa menyusun case QA kecil dengan array dan object, memberi nama pada satu perhitungan dengan function, dan menemukan logic yang diam-diam bisa menghindari assertion.
 
-Selesaikan Core Practice JavaScript yang terintegrasi, bukan semua syntax drill. Challenge tentang condition dan array method bersifat Additional Practice kalau kamu ingin latihan ekstra tentang risiko false pass atau test data yang terkontrol. Di lesson berikutnya, kamu akan menelusuri operasi asynchronous supaya value dan browser action terjadi dalam urutan yang memang dibutuhkan.
+Selesaikan Core Practice JavaScript, bukan semua syntax drill. Challenge tentang condition dan array method bersifat Additional Practice kalau kamu ingin latihan ekstra tentang risiko false pass atau test data yang terkontrol. Di lesson berikutnya, kamu akan menelusuri operasi asynchronous supaya value dan browser action terjadi dalam urutan yang memang dibutuhkan.

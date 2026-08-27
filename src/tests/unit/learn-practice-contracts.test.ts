@@ -403,7 +403,7 @@ describe('Learn and Practice catalog contracts', () => {
     ]);
   });
 
-  test('module three completes with four lessons and three integrated QA practices', async () => {
+  test('module three completes with four lessons and three focused QA practices', async () => {
     const tutorials = await getTutorialCatalogList('en');
     const moduleThree = tutorials.filter(
       (tutorial) => tutorial.module.order === 3,
@@ -460,7 +460,6 @@ describe('Learn and Practice catalog contracts', () => {
     );
     expect(typeScriptLesson?.practice).toEqual([
       { slug: 'ts-type-annotations', role: 'additional' },
-      { slug: 'ts-type-inference', role: 'additional' },
       { slug: 'ts-interfaces-basics', role: 'additional' },
       { slug: 'ts-optional-properties', role: 'additional' },
       { slug: 'ts-fundamentals-boss', role: 'additional' },

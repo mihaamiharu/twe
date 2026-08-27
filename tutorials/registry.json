@@ -234,7 +234,6 @@
       "tags": ["typescript", "type-literacy", "qa"],
       "practice": [
         { "slug": "ts-type-annotations", "role": "additional" },
-        { "slug": "ts-type-inference", "role": "additional" },
         { "slug": "ts-interfaces-basics", "role": "additional" },
         { "slug": "ts-optional-properties", "role": "additional" },
         { "slug": "ts-fundamentals-boss", "role": "additional" }

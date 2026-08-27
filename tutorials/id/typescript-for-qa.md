@@ -268,6 +268,6 @@ Salah satu jawaban yang masuk akal:
 
 Sekarang kamu seharusnya sudah bisa membaca dan memperbaiki TypeScript error sederhana, membaca kontrak TypeScript yang kecil, membedakan inference dari annotation yang berguna, menjaga optional runtime value, dan mempertanyakan unsafe cast di dalam kode hasil generate.
 
-Module 3 selesai setelah kamu menuntaskan empat Core lesson dan tiga Core Practice yang terintegrasi: Playwright test pertama dengan bukti observable, JavaScript case yang fokus pada QA, dan asynchronous setup task. Latihan kecil TypeScript menjadi Additional Practice karena runner saat ini bisa mengamati runtime result, tapi tidak bisa membuktikan pesan error compiler atau validitas runtime data dengan sendirinya.
+Module 3 selesai setelah kamu menuntaskan empat Core lesson dan tiga Core Practice yang memberikan bukti langsung: Playwright test pertama dengan bukti observable, JavaScript case yang fokus pada QA, dan asynchronous setup task. Exercise TypeScript yang dipetakan menjadi Additional Practice karena runner saat ini bisa mengamati runtime result, tapi tidak bisa membuktikan pesan error compiler atau validitas runtime data dengan sendirinya.
 
 Kamu siap masuk Module 4. Di sana, role, accessible name, DOM context, code literacy, dan runtime evidence dari tiga module pertama akan digabungkan untuk membuat keputusan locator yang reliable.

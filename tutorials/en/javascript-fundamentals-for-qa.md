@@ -242,4 +242,4 @@ One reasonable answer is:
 
 You should now be able to shape a small QA case with arrays and objects, name one calculation with a function, and detect logic that could silently avoid an assertion.
 
-Complete the integrated JavaScript Core Practice rather than every syntax drill. The conditional and array-method challenges are optional follow-up when you need more practice with false-pass risks or controlled test data. In the next lesson, you will trace asynchronous operations so those values and browser actions happen in the required order.
+Complete the JavaScript Core Practice rather than every syntax drill. The conditional and array-method challenges are optional follow-up when you need more practice with false-pass risks or controlled test data. In the next lesson, you will trace asynchronous operations so those values and browser actions happen in the required order.
