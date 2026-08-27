@@ -149,10 +149,23 @@ export type SerializableExpectedStateRule = Omit<
   hasAttribute?: { name: string; value?: string };
 };
 
+export interface InteractionSequenceStep {
+  inputSelector: string;
+  inputValue: string;
+  expectedState: SerializableExpectedStateRule[];
+}
+
+export interface InteractionSequenceDefinition {
+  event: 'submit';
+  selector: string;
+  steps: InteractionSequenceStep[];
+}
+
 export interface ChallengeValidationDefinition {
   requiredAssertions?: string[];
   requiredMethods?: string[];
   forbiddenMethods?: string[];
+  interactionSequence?: InteractionSequenceDefinition;
 }
 
 /**

@@ -25,7 +25,7 @@ Perlakukan CI sebagai reproducibility contract:
 
 ```text
 Same revision
-  + locked dependencies
+  + explicit runtime dan locked dependencies
   + compatible browser dan system dependencies
   + explicit application target
   + controlled configuration dan test data
@@ -61,13 +61,14 @@ const localURL = 'http://127.0.0.1:3000';
 const baseURL = process.env.BASE_URL ?? localURL;
 
 export default defineConfig({
+  workers: process.env.CI ? 1 : undefined,
   use: {
     baseURL,
   },
   webServer: process.env.BASE_URL
     ? undefined
     : {
-        command: 'npm run dev',
+        command: 'bun run dev',
         url: localURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
@@ -85,7 +86,7 @@ Kalau team nggak pernah menguji deployed target, hapus branch tersebut. Kalau se
 
 ### 2. Reproduce install dan test command
 
-Salah satu minimal GitHub Actions job:
+Karena repository ini memakai Bun, berikut GitHub Actions job yang selaras dengan repository:
 
 ```yaml
 name: Checkout smoke
@@ -100,40 +101,44 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      CI: 'true'
+      E2E_CONTAINER_RUNTIME: docker
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: lts/*
-          cache: npm
+          bun-version: '1.3.4'
 
       - name: Install locked dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+      - name: Install Chromium and system dependencies
+        run: bunx playwright install --with-deps chromium
 
       - name: Type-check
-        run: npm run typecheck
+        run: bun run typecheck
 
-      - name: Run checkout smoke
-        run: npx playwright test --project=desktop-chromium --grep @smoke
-        env:
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      - name: Run repository E2E suite
+        run: bun run test:e2e
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: e2e-diagnostics
+          path: |
+            playwright-report/
+            test-results/
+            allure-results/
+          if-no-files-found: ignore
           retention-days: 14
 ```
 
-Contoh ini memakai npm karena umum di Playwright project. Pakai package manager dan frozen-lockfile command yang memang dimiliki repository. Jangan campur npm, Bun, pnpm, atau Yarn lockfile secara sembarangan.
+Versi dan command di atas meniru Bun workflow repository ini. Di repository lain, ganti `1.3.4`, command lockfile, browser portfolio, dan test command sesuai deklarasi repository tersebut. Kalau project punya committed runtime file, jadikan itu sumber versi; jangan memakai moving runtime alias seolah-olah itu reproducibility guarantee.
 
-Workflow nggak menyimpan secret value. Repository permission-nya read-only, job duration dibatasi, dan report tetap disimpan setelah test failure tanpa menjalankan artifact step setelah cancellation.
+Contoh minimal ini tidak memakai secret karena checkout smoke tidak membutuhkannya. Kalau authenticated test membutuhkan credential, berikan hanya lewat protected environment yang authorized atau disposable test-account mechanism. Fork pull request bisa tidak menerima secret, dan arbitrary pull-request code tidak boleh diberi production credential. Job ini memakai read-only repository permission, durasinya dibatasi, dan diagnostics tetap disimpan setelah test failure.
 
 ### 3. Baca failure evidence berdasarkan layer
 
@@ -141,7 +146,7 @@ Coba bayangin job tadi gagal. Mulai dari first meaningful message:
 
 | Observation                    | First hypothesis                                  | Evidence yang diperiksa                         |
 | ------------------------------ | ------------------------------------------------- | ----------------------------------------------- |
-| `npm ci` menolak lockfile      | Manifest dan lockfile nggak sinkron               | Install log dan committed lockfile              |
+| `bun install --frozen-lockfile` menolak lockfile | Manifest dan lockfile nggak sinkron               | Install log dan committed lockfile              |
 | Browser executable nggak ada   | Browser install step atau cache assumption salah  | Install command dan Playwright version          |
 | `webServer` timeout            | App gagal start atau readiness URL salah          | App process log dan configured URL              |
 | Semua test redirect ke sign-in | Secret atau authenticated state nggak ada/invalid | Safe config validation dan authentication setup |
@@ -157,7 +162,7 @@ Biarkan Playwright `webServer` memiliki local application saat repository punya 
 
 Pakai prebuilt Playwright container saat team butuh consistent Linux browser environment atau stable screenshot rendering. Pastikan Playwright version-nya compatible dengan project. Container tetap nggak menggantikan controlled data, secret, dan target validation.
 
-Jangan copy workflow besar sebelum suite bisa dijalankan lewat satu documented local command. Jangan tambahkan cache sebelum uncached pipeline benar. Jangan taruh credential di workflow YAML, test title, log, trace, atau committed environment file.
+Jangan copy workflow besar sebelum suite bisa dijalankan lewat satu documented local command. Jangan tambahkan cache sebelum uncached pipeline benar. Jangan taruh credential di workflow YAML, test title, log, trace, atau committed environment file. Anggap action tag sebagai contoh yang mudah dibaca; ikuti security policy organisasi kalau production workflow membutuhkan immutable commit-SHA pinning.
 
 ## Kalau gagal, mulai cek dari mana?
 
@@ -177,11 +182,11 @@ Simpan safe log dari setup layer selain browser artifact. Trace nggak bisa menje
 
 Review AI-generated pipeline dengan pertanyaan ini:
 
-- Apakah runtime, lockfile, dan command-nya benar-benar milik repository?
+- Apakah runtime, lockfile, dan command-nya benar-benar milik repository, dengan runtime version yang reproducible?
 - Siapa yang menjalankan aplikasi, dan apa evidence bahwa aplikasi ready?
 - Bisakah missing URL diam-diam memilih environment yang salah?
 - Apakah browser package diinstal dari Playwright version project?
-- Apakah action version current dan dipin secara intentional?
+- Apakah action reference-nya current dan intentionally pinned sesuai security policy repository?
 - Permission, variable, dan secret apa yang diterima job?
 - Bisakah secret masuk log, screenshot, trace, atau report?
 - Apakah workflow mengupload evidence setelah test failure?
@@ -192,7 +197,7 @@ Valid YAML belum membuktikan test system-nya valid. Jalankan setiap referenced c
 
 ## Coba cek pemahamanmu
 
-Generated workflow melakukan checkout repository, lalu langsung menjalankan `npx playwright test` dan retry seluruh job dua kali. Workflow nggak menginstal dependency atau browser, nggak menjalankan aplikasi, dan bergantung pada `BASE_URL` yang diset manual di satu self-hosted runner.
+Generated workflow melakukan checkout repository, lalu langsung menjalankan `bun run test:e2e` dan retry seluruh job dua kali. Workflow nggak menginstal dependency atau Chromium, nggak menjalankan aplikasi, dan bergantung pada `BASE_URL` yang diset manual di satu self-hosted runner.
 
 Redesign minimum reproducibility contract-nya. Tentukan input mana yang harus committed, mana yang disuplai secara secure, siapa yang memiliki application readiness, dan evidence apa yang harus bertahan setelah failure.
 
@@ -200,12 +205,12 @@ Redesign minimum reproducibility contract-nya. Tentukan input mana yang harus co
 
 Salah satu design yang masuk akal:
 
-- Checkout exact revision dan install dependency dari committed lockfile.
-- Install browser serta system dependency lewat project Playwright CLI atau compatible pinned container.
+- Checkout exact revision, set declared Bun version, lalu install dependency dari committed lockfile.
+- Install browser yang dipilih dan system dependency lewat project Playwright CLI atau compatible pinned container.
 - Jalankan owned application lewat `webServer`, atau wajibkan dan validasi explicit deployed target.
 - Supply secret lewat authorized CI storage dan cegah value masuk artifact.
-- Jalankan type-check dan focused test command yang sama dengan local workflow.
-- Upload report saat test step gagal dengan bounded retention period.
+- Jalankan type-check dan focused test command yang sama dengan local workflow, dengan worker CI yang dikontrol untuk stability.
+- Upload report dan diagnostic directory yang relevan saat test step gagal, dengan bounded retention period.
 - Hapus whole-job retry; investigasi failing layer dan pakai test retry hanya lewat explicit policy.
 
 Hasilnya nggak harus berupa workflow besar. Yang penting, nggak ada accidental prerequisite.

@@ -25,7 +25,7 @@ Treat CI as a reproducibility contract:
 
 ```text
 Same revision
-  + locked dependencies
+  + explicit runtime and locked dependencies
   + compatible browser and system dependencies
   + explicit application target
   + controlled configuration and test data
@@ -61,13 +61,14 @@ const localURL = 'http://127.0.0.1:3000';
 const baseURL = process.env.BASE_URL ?? localURL;
 
 export default defineConfig({
+  workers: process.env.CI ? 1 : undefined,
   use: {
     baseURL,
   },
   webServer: process.env.BASE_URL
     ? undefined
     : {
-        command: 'npm run dev',
+        command: 'bun run dev',
         url: localURL,
         reuseExistingServer: !process.env.CI,
         timeout: 120_000,
@@ -85,7 +86,7 @@ If the team never tests a deployed target, remove that branch. If it always test
 
 ### 2. Reproduce the install and test commands
 
-One minimal GitHub Actions job is:
+Because this repository uses Bun, a repository-aligned GitHub Actions job is:
 
 ```yaml
 name: Checkout smoke
@@ -100,40 +101,44 @@ jobs:
   e2e:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    env:
+      CI: 'true'
+      E2E_CONTAINER_RUNTIME: docker
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v6
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: lts/*
-          cache: npm
+          bun-version: '1.3.4'
 
       - name: Install locked dependencies
-        run: npm ci
+        run: bun install --frozen-lockfile
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+      - name: Install Chromium and system dependencies
+        run: bunx playwright install --with-deps chromium
 
       - name: Type-check
-        run: npm run typecheck
+        run: bun run typecheck
 
-      - name: Run checkout smoke
-        run: npx playwright test --project=desktop-chromium --grep @smoke
-        env:
-          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      - name: Run repository E2E suite
+        run: bun run test:e2e
 
-      - uses: actions/upload-artifact@v5
+      - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: e2e-diagnostics
+          path: |
+            playwright-report/
+            test-results/
+            allure-results/
+          if-no-files-found: ignore
           retention-days: 14
 ```
 
-This example uses npm because that is common in Playwright projects. Use the package manager and frozen-lockfile command owned by the repository; do not mix npm, Bun, pnpm, or Yarn lockfiles casually.
+The versions and commands above mirror this repository’s current Bun workflow. In another repository, replace `1.3.4`, the lockfile command, the browser portfolio, and the test command with values declared by that repository. Pin a committed runtime file when the project has one; never use a moving runtime alias as if it were a reproducibility guarantee.
 
-The workflow does not contain the secret value. It grants read-only repository access, bounds the job duration, and preserves the report after a test failure without running the artifact step after cancellation.
+This minimal example has no secret because the checkout smoke does not need one. If an authenticated test does need a credential, provide it only through an authorized protected environment or a disposable test-account mechanism. Fork pull requests may not receive secrets, and arbitrary pull-request code must not be given production credentials. The job grants read-only repository access, bounds its duration, and preserves diagnostics after a test failure.
 
 ### 3. Read failure evidence by layer
 
@@ -141,7 +146,7 @@ Suppose the job fails. Start with the earliest meaningful message:
 
 | Observation                     | First hypothesis                                  | Evidence to inspect                             |
 | ------------------------------- | ------------------------------------------------- | ----------------------------------------------- |
-| `npm ci` rejects the lockfile   | Manifest and lockfile disagree                    | Install log and committed lockfile              |
+| `bun install --frozen-lockfile` rejects the lockfile | Manifest and lockfile disagree                    | Install log and committed lockfile              |
 | Browser executable is missing   | Browser install step or cache assumption is wrong | Install command and Playwright version          |
 | `webServer` times out           | App failed to start or readiness URL is wrong     | App process log and configured URL              |
 | Every test redirects to sign-in | Secret or authenticated state is absent/invalid   | Safe config validation and authentication setup |
@@ -157,7 +162,7 @@ Let Playwright `webServer` own a local application when the repository provides 
 
 Use a prebuilt Playwright container when the team needs a consistent Linux browser environment or stable screenshot rendering. Keep its Playwright version compatible with the project. A container does not remove the need for controlled data, secrets, and target validation.
 
-Do not copy a large workflow before the suite can run from one documented local command. Do not add caches until the uncached pipeline is correct. Do not put credentials in workflow YAML, test titles, logs, traces, or committed environment files.
+Do not copy a large workflow before the suite can run from one documented local command. Do not add caches until the uncached pipeline is correct. Do not put credentials in workflow YAML, test titles, logs, traces, or committed environment files. Treat action tags as readable examples; follow the organization’s policy if production workflows require immutable commit-SHA pinning.
 
 ## When it fails
 
@@ -177,11 +182,11 @@ Preserve safe logs from the setup layer as well as browser artifacts. A trace ca
 
 Review an AI-generated pipeline with these questions:
 
-- Does it use the repository’s actual runtime, lockfile, and commands?
+- Does it use the repository’s actual runtime, lockfile, and commands, with a reproducible runtime version?
 - Who starts the application, and what proves it is ready?
 - Can a missing URL silently select the wrong environment?
 - Are browser packages installed from the project’s Playwright version?
-- Are action versions current and intentionally pinned?
+- Are action references current and intentionally pinned according to the repository’s security policy?
 - Which permissions, variables, and secrets does the job receive?
 - Could a secret appear in logs, screenshots, traces, or reports?
 - Does the workflow upload evidence after test failure?
@@ -192,7 +197,7 @@ Valid YAML is not proof of a valid test system. Run every referenced command and
 
 ## Check your understanding
 
-A generated workflow checks out the repository, runs `npx playwright test`, and retries the whole job twice. It does not install dependencies or browsers, does not start the application, and relies on a `BASE_URL` configured manually on one self-hosted runner.
+A generated workflow checks out the repository, runs `bun run test:e2e`, and retries the whole job twice. It does not install dependencies or Chromium, does not start the application, and relies on a `BASE_URL` configured manually on one self-hosted runner.
 
 Redesign the minimum reproducibility contract. Decide which inputs must be committed, which must be supplied securely, who owns application readiness, and which evidence should survive a failure.
 
@@ -200,12 +205,12 @@ Redesign the minimum reproducibility contract. Decide which inputs must be commi
 
 One reasonable design is:
 
-- Check out the exact revision and install dependencies from the committed lockfile.
-- Install browsers and system dependencies through the project’s Playwright CLI or a compatible pinned container.
+- Check out the exact revision, set the declared Bun version, and install dependencies from the committed lockfile.
+- Install the selected browser and system dependencies through the project’s Playwright CLI or a compatible pinned container.
 - Start the owned application through `webServer`, or require and validate an explicit deployed target.
 - Supply secrets through authorized CI storage and prevent them from entering artifacts.
-- Run the same type-check and focused test commands engineers can reproduce locally.
-- Upload the report when the test step fails, while keeping a bounded retention period.
+- Run the same type-check and focused test commands engineers can reproduce locally, with CI workers controlled for stability.
+- Upload the report and relevant diagnostic directories when the test step fails, while keeping a bounded retention period.
 - Remove whole-job retries; investigate the failing layer and use test retries only under an explicit policy.
 
 The result is not necessarily a large workflow. It is a workflow with no accidental prerequisite.

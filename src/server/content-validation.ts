@@ -5,9 +5,10 @@ import type {
   ChallengeDefinition,
   ChallengeTierFile,
   CurriculumModuleDefinition,
-  ExpectedStateRule,
+  InteractionSequenceDefinition,
   LocalizedArray,
   LocalizedString,
+  SerializableExpectedStateRule,
   TestCaseDefinition,
   TutorialRegistry,
   TutorialRegistryEntry,
@@ -89,6 +90,24 @@ const ChallengeValidationSchema = z
     requiredAssertions: z.array(z.string().min(1)).optional(),
     requiredMethods: z.array(z.string().min(1)).optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
+    interactionSequence: z
+      .object({
+        event: z.literal('submit'),
+        selector: z.string().min(1),
+        steps: z
+          .array(
+            z
+              .object({
+                inputSelector: z.string().min(1),
+                inputValue: z.string(),
+                expectedState: z.array(ExpectedStateSchema).min(1),
+              })
+              .strict(),
+          )
+          .min(1),
+      })
+      .strict()
+      .optional(),
   })
   .strict();
 
@@ -178,7 +197,7 @@ function normalizeLocalizedArray(
 
 function normalizeExpectedState(
   value: z.infer<typeof ExpectedStateSchema>,
-): ExpectedStateRule {
+): SerializableExpectedStateRule {
   return {
     selector: value.selector,
     ...omitUndefined({
@@ -205,6 +224,22 @@ function normalizeTestCase(
     ...omitUndefined({ input: value.input }),
     expectedOutput: value.expectedOutput,
     ...omitUndefined({ isHidden: value.isHidden }),
+  };
+}
+
+function normalizeInteractionSequence(
+  value: z.infer<typeof ChallengeValidationSchema>['interactionSequence'],
+): InteractionSequenceDefinition | undefined {
+  if (value === undefined) return undefined;
+
+  return {
+    event: value.event,
+    selector: value.selector,
+    steps: value.steps.map((step) => ({
+      inputSelector: step.inputSelector,
+      inputValue: step.inputValue,
+      expectedState: step.expectedState.map(normalizeExpectedState),
+    })),
   };
 }
 
@@ -246,6 +281,9 @@ function normalizeChallengeDefinition(
                 requiredAssertions: value.validation.requiredAssertions,
                 requiredMethods: value.validation.requiredMethods,
                 forbiddenMethods: value.validation.forbiddenMethods,
+                interactionSequence: normalizeInteractionSequence(
+                  value.validation.interactionSequence,
+                ),
               }),
             },
     }),

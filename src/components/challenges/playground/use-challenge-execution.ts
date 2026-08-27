@@ -116,6 +116,8 @@ export function useChallengeExecution(
                     ...omitUndefined({
                         files: challenge.files,
                         expectedState: challenge.expectedState,
+                        interactionSequence:
+                            challenge.validation?.interactionSequence,
                     }),
                     strictMode: challenge.type === 'PLAYWRIGHT',
                     cssContent: challenge.category?.startsWith('e2e')

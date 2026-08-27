@@ -220,6 +220,34 @@ describe('useChallengeExecution', () => {
         expect(state.setHasPassed).toHaveBeenCalledWith(false);
     });
 
+    it('rejects evaluate bypasses when a challenge forbids them', async () => {
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'PASSED',
+            output: 'Success',
+            executionTime: 100,
+            assertionCount: 1,
+        });
+        const state = createPlaygroundState({
+            ...mockState,
+            code: "await page.evaluate(() => document.querySelector('#confirmation'));",
+        });
+        const props = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                ...mockProps.challenge,
+                type: 'PLAYWRIGHT',
+                validation: { forbiddenMethods: ['evaluate'] },
+            }),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(state, props, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(state.setHasPassed).toHaveBeenCalledWith(false);
+    });
+
     it('should submit results if passed', () => {
         const { result } = renderHook(() =>
             useChallengeExecution(

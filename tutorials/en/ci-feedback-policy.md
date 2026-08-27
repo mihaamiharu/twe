@@ -41,6 +41,10 @@ Named owner and next action
 
 _Fast feedback without useful evidence is noise. Detailed evidence that arrives too late is also poor feedback._
 
+The owner’s next action becomes the next code change, environment repair, or release decision. That closes the feedback loop; a dashboard without an action is only a history of noise.
+
+Module 8 defines what Playwright projects, fixtures, and configuration mean inside a maintainable suite. This lesson chooses which of those projects run for each trigger and what their results mean to the team.
+
 Every policy balances four concerns:
 
 | Concern       | Question                                                         |
@@ -69,6 +73,8 @@ Tags and projects implement this policy; they do not decide the policy. Every sc
 
 If the product does not support WebKit or a particular device, running every test there is not automatically useful coverage. If payment behavior is high risk on one mobile viewport, select that flow and condition intentionally.
 
+Playwright device projects emulate conditions such as viewport, user agent, and touch; they are not proof from a physical device or its operating system. Use a real-device lab or provider when that distinction is part of the product risk. Keep destructive coverage away from production unless the purpose, authorization, and data safety are explicit.
+
 ### 2. Decide what each result means
 
 With one CI retry, Playwright distinguishes:
@@ -88,6 +94,7 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   failOnFlakyTests: Boolean(process.env.CI),
+  workers: process.env.CI ? 1 : undefined,
   reporter: [['line'], ['html', { open: 'never' }]],
   use: {
     trace: 'on-first-retry',
@@ -99,7 +106,7 @@ export default defineConfig({
 
 This example makes a flaky retry fail the CI signal. A team may first report flakiness without blocking while it establishes ownership, then tighten the gate. The important rule is that “passed on retry” must not silently become “clean.”
 
-`trace: 'on-first-retry'` captures detailed evidence from the retry, but the first failed attempt may contain the most valuable state. Depending on the failure pattern and storage budget, `retain-on-failure` may be the better policy. Choose deliberately.
+`trace: 'on-first-retry'` records the first retry attempt; it does not by itself preserve the original failed attempt. If the original failure is the evidence you need—or if a later retry passes—`retain-on-failure` records every run and keeps the failed run. Choose deliberately based on the failure pattern and storage budget.
 
 ### 3. Preserve evidence that answers a question
 
@@ -112,7 +119,7 @@ This example makes a flaky retry fail the CI signal. A team may first report fla
 | Video                | How did the visible sequence unfold?                             | Higher storage; weak DOM/network detail            |
 | Safe setup logs      | Did environment, authentication, or test-data setup fail?        | Must redact secrets and tokens                     |
 
-Do not retain every artifact forever. Define who can access it, how long it remains useful, and what must be sanitized before sharing with AI or outside the team.
+The HTML report is a navigable, self-contained report for one run. For sharded runs, use the blob reporter and merge the pieces before publishing the team-facing report. Do not retain every artifact forever. Define who can access it, how long it remains useful, and what must be sanitized before sharing with AI or outside the team.
 
 ### 4. Define the gate and owner
 
@@ -131,17 +138,17 @@ Triage owner:
 - unclear classification → QA starts from the first meaningful failure.
 ```
 
-Quarantine is a temporary workflow with an owner, reason, and exit condition. It is not a folder where unreliable tests disappear.
+Quarantine is a temporary workflow with an owner, reason, and exit condition. Keep the original failure evidence and the protected risk visible; never turn quarantine into a silent skip or a folder where unreliable tests disappear.
 
 ### 5. Scale only after isolation is trustworthy
 
 Use more workers on one runner when its resources and test data support concurrency. Use sharding when a large isolated suite needs several CI machines:
 
 ```bash
-npx playwright test --shard=1/4
+bunx playwright test --shard=1/4
 ```
 
-Each shard produces part of the result. Use the blob reporter and `npx playwright merge-reports` when the team needs one combined report. Sharding a suite with shared accounts or records multiplies collision pressure; it does not repair isolation.
+Each shard produces part of the result. Use the blob reporter and `bunx playwright merge-reports` when the team needs one combined report. Sharding a suite with shared accounts or records multiplies collision pressure; it does not repair isolation.
 
 ## When to use it—and when not to
 

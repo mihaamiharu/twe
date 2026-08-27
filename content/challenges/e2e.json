@@ -16,7 +16,7 @@
                 "en": "Replace generic generated wrappers with one focused login helper while keeping the recovery scenario and its evidence visible.",
                 "id": "Ganti generic generated wrapper dengan satu focused login helper sambil menjaga recovery scenario dan evidence-nya tetap terlihat."
             },
-            "instructions": {
+                "instructions": {
                 "en": "# Refactor Login Without Hiding the Evidence\n\nThe starter was generated with a generic `UiActions` wrapper. Methods such as `fillField` and `clickButton` only rename Playwright operations; they do not represent a meaningful product behavior.\n\n## Your Task\nRefactor the starter into one focused `submitLogin(page, credentials)` helper and one coherent recovery scenario:\n\n1. Open `/app/login.html` in the test.\n2. Submit `wronguser` and `wrongpass` through the focused helper.\n3. In the test, prove the alert says `Invalid username or password` and the URL remains `/app/login.html`.\n4. Submit `testuser` and `password123` through the same helper.\n5. In the test, prove the URL becomes `/app/dashboard.html` and the heading says `Welcome, testuser!`.\n6. Do not use the generic `fillField` or `clickButton` methods, `.first()`, or a fixed wait.\n\nThe helper owns repeated form mechanics. The test owns the user journey and its evidence. The exact variable names and code organization are otherwise your choice.\n",
                 "id": "# Refactor Login tanpa Menyembunyikan Evidence\n\nStarter dibuat dengan generic `UiActions` wrapper. Method seperti `fillField` dan `clickButton` cuma mengganti nama Playwright operation; keduanya nggak merepresentasikan meaningful product behavior.\n\n## Tugas Kamu\nRefactor starter menjadi satu focused `submitLogin(page, credentials)` helper dan satu recovery scenario yang coherent:\n\n1. Buka `/app/login.html` di dalam test.\n2. Submit `wronguser` dan `wrongpass` lewat focused helper.\n3. Di test, buktikan alert berisi `Invalid username or password` dan URL tetap `/app/login.html`.\n4. Submit `testuser` dan `password123` lewat helper yang sama.\n5. Di test, buktikan URL berubah menjadi `/app/dashboard.html` dan heading berisi `Welcome, testuser!`.\n6. Jangan gunakan generic method `fillField` atau `clickButton`, `.first()`, maupun fixed wait.\n\nHelper memiliki repeated form mechanics. Test tetap memiliki user journey dan evidence-nya. Nama variable serta organisasi code lainnya bebas.\n"
             },
@@ -71,8 +71,8 @@
                 "id": "Review generated test yang nggak bisa dipercaya, lalu perbaiki satu checkout recovery scenario dengan business-relevant evidence."
             },
             "instructions": {
-                "en": "# Repair the Checkout Recovery Signal\n\nThe product rule is: quantity must be at least `1`, and after correcting an invalid quantity the customer can still place the order.\n\nThe starter was generated with structural selectors, a forced click, a fixed wait, a manual truthiness assertion, and swallowed failure. Replace it with one independent recovery test that:\n\n1. opens `/app/checkout.html`;\n2. enters quantity `0` and submits;\n3. proves the alert says exactly `Quantity must be at least 1`;\n4. corrects the quantity to `2` and submits again;\n5. proves the stale alert is hidden;\n6. proves the confirmation is visible and contains `2 items`;\n7. uses label/role locator contracts and web-first assertions; and\n8. contains no structural locator, `waitForTimeout`, forced action, manual `textContent`/truthiness check, or swallowed error.\n\nKeep this as one coherent recovery scenario. One focused test is enough; no abstraction is required. Variable names and organization are otherwise your choice. The behavior and evidence are the contract.",
-                "id": "# Perbaiki Checkout Recovery Signal\n\nProduct rule-nya: quantity minimal `1`, dan setelah memperbaiki quantity yang invalid, customer tetap bisa place order.\n\nStarter dibuat dengan structural selector, forced click, fixed wait, manual truthiness assertion, dan failure yang ditelan. Ganti dengan satu independent recovery test yang:\n\n1. membuka `/app/checkout.html`;\n2. memasukkan quantity `0` lalu submit;\n3. membuktikan alert persis berisi `Quantity must be at least 1`;\n4. memperbaiki quantity menjadi `2` lalu submit lagi;\n5. membuktikan stale alert sudah tersembunyi;\n6. membuktikan confirmation terlihat dan berisi `2 items`;\n7. menggunakan kontrak locator label/role dan web-first assertion; serta\n8. nggak memiliki structural locator, `waitForTimeout`, forced action, manual `textContent`/truthiness check, atau error yang ditelan.\n\nPertahankan ini sebagai satu recovery scenario yang coherent. Satu focused test sudah cukup; kamu nggak perlu membuat abstraction. Nama variable dan organisasi lainnya bebas. Behavior serta evidence adalah kontraknya."
+                "en": "# Repair the Checkout Recovery Signal\n\nThe product rule is: quantity must be at least `1`, and after correcting an invalid quantity the customer can still place the order.\n\nThe starter was generated with structural selectors, a forced click, a fixed wait, a manual truthiness assertion, and swallowed failure. Replace it with one independent recovery test that:\n\n1. opens `/app/checkout.html`;\n2. enters quantity `0` and submits;\n3. proves the alert says exactly `Quantity must be at least 1`;\n4. corrects the quantity to `2` and submits again;\n5. proves the stale alert is hidden;\n6. proves the confirmation is visible and contains `2 items`;\n7. uses label/role locator contracts and web-first assertions; and\n8. contains no structural locator, `waitForTimeout`, forced action, `evaluate`/direct DOM manipulation, manual `textContent`/truthiness check, or swallowed error.\n\nThe Practice also checks that the two submits happen in order with input values `0` and `2`, and that the expected state appears after each submit.\n\nKeep this as one coherent recovery scenario. One focused test is enough; no abstraction is required. Variable names and organization are otherwise your choice. The behavior and evidence are the contract.",
+                "id": "# Perbaiki Checkout Recovery Signal\n\nProduct rule-nya: quantity minimal `1`, dan setelah memperbaiki quantity yang invalid, customer tetap bisa place order.\n\nStarter dibuat dengan structural selector, forced click, fixed wait, manual truthiness assertion, dan failure yang ditelan. Ganti dengan satu independent recovery test yang:\n\n1. membuka `/app/checkout.html`;\n2. memasukkan quantity `0` lalu submit;\n3. membuktikan alert persis berisi `Quantity must be at least 1`;\n4. memperbaiki quantity menjadi `2` lalu submit lagi;\n5. membuktikan stale alert sudah tersembunyi;\n6. membuktikan confirmation terlihat dan berisi `2 items`;\n7. menggunakan kontrak locator label/role dan web-first assertion; serta\n8. nggak memiliki structural locator, `waitForTimeout`, forced action, `evaluate`/direct DOM manipulation, manual `textContent`/truthiness check, atau error yang ditelan.\n\nPractice juga memeriksa bahwa dua submit terjadi berurutan dengan input `0` lalu `2`, dan bahwa state yang tepat muncul setelah masing-masing submit.\n\nPertahankan ini sebagai satu recovery scenario yang coherent. Satu focused test sudah cukup; kamu nggak perlu membuat abstraction. Nama variable dan organisasi lainnya bebas. Behavior serta evidence adalah kontraknya."
             },
             "hints": {
                 "en": [
@@ -113,8 +113,39 @@
                 "forbiddenMethods": [
                     "waitForTimeout",
                     "textContent",
-                    "toBeTruthy"
-                ]
+                    "toBeTruthy",
+                    "evaluate"
+                ],
+                "interactionSequence": {
+                    "event": "submit",
+                    "selector": "#checkout-form",
+                    "steps": [
+                        {
+                            "inputSelector": "#quantity",
+                            "inputValue": "0",
+                            "expectedState": [
+                                {
+                                    "selector": "[role=alert]",
+                                    "visible": true,
+                                    "containsText": "Quantity must be at least 1"
+                                },
+                                { "selector": "#confirmation", "hidden": true }
+                            ]
+                        },
+                        {
+                            "inputSelector": "#quantity",
+                            "inputValue": "2",
+                            "expectedState": [
+                                { "selector": "[role=alert]", "hidden": true },
+                                {
+                                    "selector": "#confirmation",
+                                    "visible": true,
+                                    "containsText": "2 items"
+                                }
+                            ]
+                        }
+                    ]
+                }
             },
             "tags": [
                 "playwright",

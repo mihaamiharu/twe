@@ -46,6 +46,8 @@ The capstone connects the path in four proof areas:
 | Reliability and maintainability  | Isolation, debugging, smallest useful abstraction        |
 | Shipping and team feedback       | Reproducible CI, coverage, evidence, gate, and ownership |
 
+The fourth row is a review lens, not an automated claim about what the Practice has shipped. The Practice proves the browser-level part of the chain; CI delivery and team ownership still require evidence from a real repository.
+
 ## Work through a realistic example
 
 The product rule is:
@@ -107,11 +109,12 @@ Assertion evidence:
 Forbidden masks:
 - no fixed sleep;
 - no unexplained force;
+- no `evaluate` or direct DOM manipulation;
 - no weak truthiness claim;
 - no swallowed error.
 ```
 
-The full repair belongs in the attached Core Practice. The reasoning above is the contract; exact variable names are not.
+The full repair belongs in the attached Core Practice. The Practice checks the ordered submit sequence and the state after each submit, in addition to the final DOM state and required Playwright methods. The reasoning above is the contract; exact variable names are not.
 
 ### Decide the smallest maintainable organization
 
@@ -121,7 +124,7 @@ Extract a helper or component only if it localizes meaningful repeated change wi
 
 ### Separate automated proof from shipping proof
 
-The in-platform Practice can execute the browser behavior, inspect the final page state, and check required Playwright methods. It cannot run a real GitHub Actions job, grade an edited `playwright.config.ts`, upload a trace, or assess written browser rationale.
+The in-platform Practice can execute the browser behavior, verify the ordered invalid-to-recovery submit sequence, inspect the final page state, and check required Playwright methods. It cannot run a real GitHub Actions job, grade an edited `playwright.config.ts`, upload a trace, or assess written browser rationale. The shipping/team-feedback proof area above remains contextual awareness, not a completed delivery claim.
 
 For a real-project portfolio extension, also provide:
 
@@ -142,13 +145,13 @@ Keep the capstone scope small enough that every decision can be explained. One d
 
 Use a page or component object only when the scenario reveals a stable repeated boundary. Use a fixture only when a named dependency needs a lifecycle. A capstone rubric is not a reason to add architecture the suite does not need.
 
-Use the in-platform Practice as an integrated code-repair checkpoint. Use a real repository and CI provider for portfolio-level shipping evidence. Do not treat a simulated browser challenge as proof that secrets, runners, deployments, or artifacts are configured safely.
+Use the in-platform Practice as one integrated browser-level code-repair checkpoint. Use a real repository and CI provider for portfolio-level shipping evidence. Do not treat a simulated browser challenge as proof that secrets, runners, deployments, or artifacts are configured safely.
 
 ## When it fails
 
 | Green-looking result                          | Missing proof                                        | Evidence or repair                                    |
 | --------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------- |
-| Final confirmation appears after quantity `2` | Minimum validation may never have been tested        | Assert the invalid state before correcting it         |
+| Final confirmation appears after quantity `2` | The ordered recovery sequence may not have been exercised | Assert the invalid state before correcting it         |
 | Assertion method exists somewhere in code     | It may be inside swallowed error handling            | Remove catch and observe a deliberate failing version |
 | Test passes once                              | State, ordering, or timing may still be unstable     | Repeat alone and under intended execution conditions  |
 | Code is organized into several classes        | Abstraction may hide rather than localize behavior   | Trace each boundary to a real change pattern          |
@@ -193,10 +196,10 @@ One reasonable review is:
 - The browser challenge does not prove workflow configuration, target validation, secret safety, project coverage, artifact retention, or triage ownership.
 - Complete the Core Practice, then produce those items separately if presenting a real-project portfolio.
 
-The goal is an accurately bounded claim: strong evidence for what was tested, and no exaggeration about what was not.
+The goal is an accurately bounded claim: strong evidence for the browser recovery sequence, and no exaggeration about CI delivery or team ownership that the Practice cannot verify.
 
 ## Before you continue
 
 You should now be able to review and repair the checkout recovery test, justify its contracts and organization, and explain the boundary between platform-verified behavior and real-project shipping evidence.
 
-TWE records the Web Automation path as complete when every Core lesson and Core Practice across Modules 1–9 is complete. Optional lessons and Additional Practice do not block that status. Practical readiness still means carrying these decisions into an authorized real repository where CI, artifacts, environments, and team ownership can be observed directly.
+This module is complete when its three Core lessons and the single `pw-capstone-checkout` Core Practice are complete. TWE records the Web Automation path as complete when every Core lesson and Core Practice across Modules 1–9 is complete. Optional lessons and Additional Practice do not block either status. Practical readiness still means carrying these decisions into an authorized real repository where CI, artifacts, environments, and team ownership can be observed directly.

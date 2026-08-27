@@ -16,12 +16,97 @@ import {
   type TestCase,
   type TestCaseResult
 } from './executor.types';
+import type { InteractionSequenceDefinition } from '@/lib/content.types';
 import { createExpect } from './expect-matchers';
 import { validateExpectedState } from './dom-validator';
 import { createInterceptedConsole } from './console-interceptor';
 import { attachOnclickHandlers } from './attach-onclick-handlers';
 import { generateIframeTemplate } from './iframe-template';
 import { invokeDynamicFunction } from './dynamic-code';
+
+interface InteractionSequenceObserver {
+  attach: () => void;
+  cleanup: () => void;
+  getResult: () => { passed: boolean; error?: string };
+}
+
+function createInteractionSequenceObserver(
+  doc: Document,
+  sequence: InteractionSequenceDefinition,
+): InteractionSequenceObserver {
+  let observedSteps = 0;
+  let sequenceError: string | undefined;
+  let attachedDocument: Document | undefined;
+
+  const listener: EventListener = (event) => {
+    if (sequenceError || event.target === null) return;
+
+    const target = event.target as Element;
+    if (!target.closest(sequence.selector)) return;
+
+    const step = sequence.steps[observedSteps];
+    if (!step) {
+      sequenceError = `Expected ${sequence.steps.length} ${sequence.event} event(s) for '${sequence.selector}', but an extra event was observed.`;
+      return;
+    }
+
+    const input = doc.querySelector(step.inputSelector);
+    if (!input) {
+      sequenceError = `Could not find '${step.inputSelector}' while checking interaction step ${observedSteps + 1}.`;
+      return;
+    }
+
+    const inputWithValue = input as Element & { value?: unknown };
+    const actualValue =
+      typeof inputWithValue.value === 'string'
+        ? inputWithValue.value
+        : input.getAttribute('value') ?? '';
+    if (actualValue !== step.inputValue) {
+      sequenceError =
+        `Interaction step ${observedSteps + 1} expected '${step.inputSelector}' to have value '${step.inputValue}', but got '${actualValue}'.`;
+      return;
+    }
+
+    const stateValidation = validateExpectedState(doc, step.expectedState);
+    if (!stateValidation.passed) {
+      sequenceError =
+        `Interaction step ${observedSteps + 1} state validation failed: ${stateValidation.error}`;
+      return;
+    }
+
+    observedSteps += 1;
+  };
+
+  const attach = () => {
+    if (attachedDocument) {
+      attachedDocument.removeEventListener(sequence.event, listener);
+    }
+    doc.addEventListener(sequence.event, listener);
+    attachedDocument = doc;
+  };
+
+  const cleanup = () => {
+    if (attachedDocument) {
+      attachedDocument.removeEventListener(sequence.event, listener);
+      attachedDocument = undefined;
+    }
+  };
+
+  return {
+    attach,
+    cleanup,
+    getResult: () => {
+      if (sequenceError) return { passed: false, error: sequenceError };
+      if (observedSteps < sequence.steps.length) {
+        return {
+          passed: false,
+          error: `Expected ${sequence.steps.length} ordered ${sequence.event} event(s) for '${sequence.selector}', but observed ${observedSteps}.`,
+        };
+      }
+      return { passed: true };
+    },
+  };
+}
 
 /**
  * Executes Playwright-style code in a sandboxed iframe
@@ -154,10 +239,13 @@ export async function executePlaywrightCode(
         document.body.appendChild(iframe);
       }
 
+      let interactionSequenceObserver: InteractionSequenceObserver | undefined;
+
       // Use function declaration for hoisting so it can be called by setTimeout
       // and can see timeoutId defined below (TDZ is passed by the time this runs)
       function cleanup() {
         clearTimeout(timeoutId);
+        interactionSequenceObserver?.cleanup();
         // Only remove if we created it
         if (!useExistingIframe && iframe.parentNode) {
           document.body.removeChild(iframe);
@@ -344,6 +432,23 @@ export async function executePlaywrightCode(
               };
             }
 
+            if (options?.interactionSequence) {
+              interactionSequenceObserver = createInteractionSequenceObserver(
+                iframeDoc,
+                options.interactionSequence,
+              );
+              interactionSequenceObserver.attach();
+
+              // VFS navigation replaces the document contents. Reattach the
+              // observer after navigation so sequences can start on /index.html
+              // and continue on the challenge's target page.
+              const originalGoto = page.goto.bind(page);
+              page.goto = async (url: string) => {
+                await originalGoto(url);
+                interactionSequenceObserver?.attach();
+              };
+            }
+
             // Initialize promise tracker for async tests
             contentWindow.__testPromises = [];
 
@@ -479,6 +584,21 @@ export async function executePlaywrightCode(
                 output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map((f) => `- ${f.message}`).join('\n')}`,
                 executionTime,
                 error: firstSoftFailure.message, // Return first error
+                logs,
+                assertionCount: getAssertionCount(),
+              });
+              return;
+            }
+
+            const interactionValidation =
+              interactionSequenceObserver?.getResult();
+            if (interactionValidation && !interactionValidation.passed) {
+              cleanup();
+              resolve({
+                status: 'FAILED',
+                output: `Interaction Sequence Validation Failed: ${interactionValidation.error}`,
+                executionTime,
+                ...omitUndefined({ error: interactionValidation.error }),
                 logs,
                 assertionCount: getAssertionCount(),
               });

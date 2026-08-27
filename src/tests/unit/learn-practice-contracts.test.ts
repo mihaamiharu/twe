@@ -716,7 +716,7 @@ describe('Learn and Practice catalog contracts', () => {
     expect(detail?.validation).toMatchObject({
       requiredAssertions: ['toHaveCount', 'toHaveText'],
       requiredMethods: ['getByRole', 'filter', 'click'],
-      forbiddenMethods: ['first', 'waitForTimeout', 'textContent'],
+      forbiddenMethods: ['first', 'nth', 'waitForTimeout', 'textContent', 'isVisible', 'toBeTruthy'],
     });
   });
 
@@ -742,7 +742,37 @@ describe('Learn and Practice catalog contracts', () => {
         'toContainText',
       ],
       requiredMethods: ['getByLabel', 'getByRole', 'fill', 'click'],
-      forbiddenMethods: ['waitForTimeout', 'textContent', 'toBeTruthy'],
+      forbiddenMethods: ['waitForTimeout', 'textContent', 'toBeTruthy', 'evaluate'],
+      interactionSequence: {
+        event: 'submit',
+        selector: '#checkout-form',
+        steps: [
+          {
+            inputSelector: '#quantity',
+            inputValue: '0',
+            expectedState: [
+              {
+                selector: '[role=alert]',
+                visible: true,
+                containsText: 'Quantity must be at least 1',
+              },
+              { selector: '#confirmation', hidden: true },
+            ],
+          },
+          {
+            inputSelector: '#quantity',
+            inputValue: '2',
+            expectedState: [
+              { selector: '[role=alert]', hidden: true },
+              {
+                selector: '#confirmation',
+                visible: true,
+                containsText: '2 items',
+              },
+            ],
+          },
+        ],
+      },
     });
   });
 

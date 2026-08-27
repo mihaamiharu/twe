@@ -46,6 +46,8 @@ Capstone menghubungkan seluruh path lewat empat proof area:
 | Reliability dan maintainability  | Isolation, debugging, smallest useful abstraction        |
 | Shipping dan team feedback       | Reproducible CI, coverage, evidence, gate, dan ownership |
 
+Baris keempat adalah review lens, bukan automated claim tentang apa yang sudah di-ship oleh Practice. Practice membuktikan bagian browser-level dari chain ini; CI delivery dan team ownership tetap membutuhkan evidence dari real repository.
+
 ## Coba kita bedah contoh nyata
 
 Product rule-nya:
@@ -107,11 +109,12 @@ Assertion evidence:
 Forbidden masks:
 - nggak ada fixed sleep;
 - nggak ada unexplained force;
+- nggak ada `evaluate` atau direct DOM manipulation;
 - nggak ada weak truthiness claim;
 - nggak ada swallowed error.
 ```
 
-Full repair dikerjakan di attached Core Practice. Reasoning di atas adalah contract-nya; exact variable name bebas.
+Full repair dikerjakan di attached Core Practice. Practice memeriksa ordered submit sequence dan state setelah setiap submit, selain final DOM state dan required Playwright method. Reasoning di atas adalah contract-nya; exact variable name bebas.
 
 ### Pilih smallest maintainable organization
 
@@ -121,7 +124,7 @@ Extract helper atau component hanya kalau dia melokalkan meaningful repeated cha
 
 ### Pisahkan automated proof dari shipping proof
 
-In-platform Practice bisa menjalankan browser behavior, memeriksa final page state, dan mengecek required Playwright method. Practice ini nggak bisa menjalankan real GitHub Actions job, menilai edited `playwright.config.ts`, mengupload trace, atau menilai written browser rationale.
+In-platform Practice bisa menjalankan browser behavior, memverifikasi ordered invalid-to-recovery submit sequence, memeriksa final page state, dan mengecek required Playwright method. Practice ini nggak bisa menjalankan real GitHub Actions job, menilai edited `playwright.config.ts`, mengupload trace, atau menilai written browser rationale. Proof area shipping/team feedback di atas adalah contextual awareness, bukan delivery claim yang sudah selesai.
 
 Untuk real-project portfolio extension, sediakan juga:
 
@@ -142,13 +145,13 @@ Jaga capstone scope cukup kecil supaya setiap decision bisa dijelaskan. Satu flo
 
 Pakai page atau component object hanya saat scenario menunjukkan stable repeated boundary. Pakai fixture hanya saat named dependency butuh lifecycle. Capstone rubric bukan alasan menambah architecture yang nggak dibutuhkan suite.
 
-Pakai in-platform Practice sebagai integrated code-repair checkpoint. Pakai real repository dan CI provider untuk portfolio-level shipping evidence. Jangan anggap simulated browser challenge membuktikan secret, runner, deployment, atau artifact sudah dikonfigurasi secara aman.
+Pakai in-platform Practice sebagai satu browser-level code-repair checkpoint yang terintegrasi. Pakai real repository dan CI provider untuk portfolio-level shipping evidence. Jangan anggap simulated browser challenge membuktikan secret, runner, deployment, atau artifact sudah dikonfigurasi secara aman.
 
 ## Kalau gagal, mulai cek dari mana?
 
 | Green-looking result                     | Missing proof                                            | Evidence atau repair                                 |
 | ---------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------- |
-| Confirmation muncul setelah quantity `2` | Minimum validation mungkin nggak pernah diuji            | Assert invalid state sebelum correction              |
+| Confirmation muncul setelah quantity `2` | Ordered recovery sequence mungkin belum dijalankan      | Assert invalid state sebelum correction              |
 | Assertion method ada di code             | Bisa saja assertion berada dalam swallowed error         | Hapus catch dan lihat deliberate failing version     |
 | Test lulus sekali                        | State, ordering, atau timing masih mungkin unstable      | Repeat sendiri dan di intended execution condition   |
 | Code dibagi menjadi beberapa class       | Abstraction mungkin hide, bukan localize behavior        | Hubungkan boundary ke real change pattern            |
@@ -193,10 +196,10 @@ Salah satu review yang masuk akal:
 - Browser challenge nggak membuktikan workflow configuration, target validation, secret safety, project coverage, artifact retention, atau triage ownership.
 - Selesaikan Core Practice, lalu buat item tersebut secara terpisah kalau ingin menampilkan real-project portfolio.
 
-Targetnya adalah claim dengan boundary yang akurat: strong evidence untuk apa yang benar-benar diuji, tanpa melebih-lebihkan hal yang belum diuji.
+Targetnya adalah claim dengan boundary yang akurat: strong evidence untuk browser recovery sequence, tanpa melebih-lebihkan CI delivery atau team ownership yang belum bisa diverifikasi Practice.
 
 ## Sebelum lanjut
 
 Sekarang kamu seharusnya bisa mereview dan merepair checkout recovery test, menjustifikasi contract serta organization-nya, lalu menjelaskan boundary antara platform-verified behavior dan real-project shipping evidence.
 
-TWE mencatat Web Automation path selesai saat semua Core lesson dan Core Practice di Module 1–9 selesai. Optional lesson dan Additional Practice nggak memblokir status tersebut. Practical readiness tetap berarti membawa decision ini ke authorized real repository tempat CI, artifact, environment, dan team ownership bisa diamati secara langsung.
+Module ini selesai saat tiga Core lesson-nya dan satu `pw-capstone-checkout` Core Practice selesai. TWE mencatat Web Automation path selesai saat semua Core lesson dan Core Practice di Module 1–9 selesai. Optional lesson dan Additional Practice nggak memblokir kedua status tersebut. Practical readiness tetap berarti membawa decision ini ke authorized real repository tempat CI, artifact, environment, dan team ownership bisa diamati secara langsung.

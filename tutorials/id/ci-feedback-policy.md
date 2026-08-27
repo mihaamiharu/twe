@@ -41,6 +41,10 @@ Named owner dan next action
 
 _Fast feedback tanpa useful evidence cuma noise. Detailed evidence yang datang terlalu telat juga bukan feedback yang bagus._
 
+Next action dari owner menjadi code change, environment repair, atau release decision berikutnya. Di situlah feedback loop tertutup; dashboard tanpa action hanya menjadi riwayat noise.
+
+Module 8 mendefinisikan arti Playwright project, fixture, dan configuration di dalam suite yang maintainable. Lesson ini memilih project mana yang berjalan untuk setiap trigger dan apa arti result-nya bagi team.
+
 Setiap policy menyeimbangkan empat concern:
 
 | Concern       | Pertanyaan                                                       |
@@ -69,6 +73,8 @@ Tag dan project mengimplementasikan policy ini; keduanya nggak menentukan policy
 
 Kalau product nggak mendukung WebKit atau device tertentu, menjalankan semua test di sana belum tentu useful coverage. Kalau payment behavior high risk pada satu mobile viewport, pilih flow dan condition tersebut secara intentional.
 
+Playwright device project mengemulasikan condition seperti viewport, user agent, dan touch; itu bukan bukti dari physical device atau operating system-nya. Gunakan real-device lab atau provider kalau perbedaan tersebut termasuk product risk. Jauhkan destructive coverage dari production kecuali purpose, authorization, dan data safety-nya explicit.
+
 ### 2. Tentukan arti setiap result
 
 Dengan satu CI retry, Playwright membedakan:
@@ -88,6 +94,7 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   failOnFlakyTests: Boolean(process.env.CI),
+  workers: process.env.CI ? 1 : undefined,
   reporter: [['line'], ['html', { open: 'never' }]],
   use: {
     trace: 'on-first-retry',
@@ -99,7 +106,7 @@ export default defineConfig({
 
 Contoh ini membuat flaky retry tetap menggagalkan CI signal. Team boleh mulai dengan melaporkan flakiness tanpa blocking sambil membangun ownership, lalu memperketat gate. Rule pentingnya: “lulus setelah retry” nggak boleh diam-diam berubah menjadi “clean.”
 
-`trace: 'on-first-retry'` menangkap detailed evidence dari retry, tapi first failed attempt kadang justru punya state paling berguna. Tergantung failure pattern dan storage budget, `retain-on-failure` bisa lebih tepat. Pilih dengan deliberate.
+`trace: 'on-first-retry'` merekam first retry attempt; mode ini tidak otomatis menyimpan original failed attempt. Kalau original failure adalah evidence yang dibutuhkan—atau retry akhirnya lulus—`retain-on-failure` merekam setiap run dan menyimpan run yang gagal. Pilih berdasarkan failure pattern dan storage budget.
 
 ### 3. Simpan evidence yang menjawab pertanyaan
 
@@ -112,7 +119,7 @@ Contoh ini membuat flaky retry tetap menggagalkan CI signal. Team boleh mulai de
 | Video                | Bagaimana visible sequence berjalan?                            | Storage lebih tinggi; DOM/network detail lemah     |
 | Safe setup log       | Apakah environment, authentication, atau test-data setup gagal? | Secret dan token harus diredact                    |
 
-Jangan simpan semua artifact selamanya. Tentukan siapa yang boleh mengakses, berapa lama evidence masih berguna, dan apa yang perlu disanitasi sebelum dibagikan ke AI atau keluar team.
+HTML report adalah report navigable dan self-contained untuk satu run. Untuk run yang di-shard, gunakan blob reporter lalu merge potongan report sebelum menerbitkan report untuk team. Jangan simpan semua artifact selamanya. Tentukan siapa yang boleh mengakses, berapa lama evidence masih berguna, dan apa yang perlu disanitasi sebelum dibagikan ke AI atau keluar team.
 
 ### 4. Tentukan gate dan owner
 
@@ -131,17 +138,17 @@ Triage owner:
 - unclear classification → QA mulai dari first meaningful failure.
 ```
 
-Quarantine adalah temporary workflow dengan owner, reason, dan exit condition. Quarantine bukan folder untuk membuang unreliable test sampai dilupakan.
+Quarantine adalah temporary workflow dengan owner, reason, dan exit condition. Simpan original failure evidence dan tetap tampilkan risk yang dilindungi; quarantine bukan silent skip atau folder untuk membuang unreliable test sampai dilupakan.
 
 ### 5. Scale hanya setelah isolation bisa dipercaya
 
 Tambah worker di satu runner kalau resource dan test data mendukung concurrency. Pakai sharding saat large isolated suite butuh beberapa CI machine:
 
 ```bash
-npx playwright test --shard=1/4
+bunx playwright test --shard=1/4
 ```
 
-Setiap shard menghasilkan sebagian result. Gunakan blob reporter dan `npx playwright merge-reports` kalau team butuh satu combined report. Sharding suite yang masih share account atau record hanya melipatgandakan collision pressure; sharding nggak memperbaiki isolation.
+Setiap shard menghasilkan sebagian result. Gunakan blob reporter dan `bunx playwright merge-reports` kalau team butuh satu combined report. Sharding suite yang masih share account atau record hanya melipatgandakan collision pressure; sharding nggak memperbaiki isolation.
 
 ## Kapan pendekatan ini cocok dipakai?
 

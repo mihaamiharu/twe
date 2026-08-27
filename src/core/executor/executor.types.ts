@@ -1,5 +1,8 @@
 import { MockedPlaywrightPage } from './playwright-shim';
-import type { ExpectedStateRule } from '@/lib/content.types';
+import type {
+    ExpectedStateRule,
+    InteractionSequenceDefinition,
+} from '@/lib/content.types';
 
 export interface ExecutionResult {
     status: 'PASSED' | 'FAILED' | 'ERROR' | 'TIMEOUT';
@@ -18,6 +21,7 @@ export interface ExecuteOptions {
     files?: Record<string, string>; // VFS: multi-page content for E2E challenges
     onNavigate?: (path: string) => void; // Callback for URL bar updates
     expectedState?: ExpectedStateRule[]; // DOM validation rules
+    interactionSequence?: InteractionSequenceDefinition;
     isTypeScript?: boolean;
 }
 

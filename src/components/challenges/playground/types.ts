@@ -2,6 +2,7 @@ import type { TestResult } from '../test-results';
 import type { LogEntry } from '../console-output';
 import type { TFunction } from 'i18next';
 import type { TypeDefinition } from '@/core/type-generator';
+import type { ChallengeValidationDefinition } from '@/lib/content.types';
 
 export type ChallengeType =
     | 'JAVASCRIPT'
@@ -48,11 +49,7 @@ export interface Challenge {
         count?: number;
         hasAttribute?: { name: string; value?: string | RegExp };
     }[];
-    validation?: {
-        requiredAssertions?: string[];
-        requiredMethods?: string[];
-        forbiddenMethods?: string[];
-    };
+    validation?: ChallengeValidationDefinition;
     category?: string;
     tutorial?: {
         slug: string;
