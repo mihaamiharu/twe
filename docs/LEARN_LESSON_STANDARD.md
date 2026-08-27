@@ -367,22 +367,22 @@ Visuals should be editable and maintainable. Prefer SVG for diagrams.
 
 English and Indonesian lessons must preserve:
 
-- The same learner outcomes
-- The same mental model
-- Equivalent technical depth
-- The same example purpose
-- Equivalent checkpoints
-- The same readiness expectation
+* The same learner outcomes
+* The same mental model
+* Equivalent technical depth
+* The same example purpose
+* Equivalent checkpoints
+* The same readiness expectation
 
 They do not need identical sentence structure or tone.
 
 ### 6.1 English voice
 
-- Clear
-- Direct
-- Professional
-- Conversational
-- Free of unnecessary jargon
+* Clear
+* Direct
+* Professional
+* Conversational
+* Free of unnecessary jargon
 
 ### 6.2 Indonesian voice
 
@@ -392,46 +392,71 @@ The voice should feel like:
 
 Use:
 
-- `kamu`, not `Anda`
-- `nggak` consistently for casual sentences
-- Conversational hooks such as:
-  - “Pernah nggak sih…”
-  - “Coba bayangin kalau…”
-  - “Sekarang pertanyaannya…”
-  - “Nah, masalahnya…”
-  - “Dari sini mulai kelihatan…”
-- Short and active sentences
-- Familiar QA terminology when literal translation sounds unnatural
-- Questions that invite learners to reason
+* `kamu`, not `Anda`
+* `nggak` consistently for casual sentences
+* Conversational hooks such as:
+
+  * “Pernah nggak sih…”
+  * “Coba bayangin kalau…”
+  * “Sekarang pertanyaannya…”
+  * “Nah, masalahnya…”
+  * “Dari sini mulai kelihatan…”
+* Short and active sentences
+* Familiar QA and engineering terminology when literal translation sounds unnatural or reduces precision
+* Natural Indonesian for ordinary terms that do not need to remain in English
+* Questions that invite learners to reason
+
+Keep English technical terms selectively, not mechanically. A term should remain in English when it is already familiar in Indonesian QA or engineering usage, is likely to appear that way at work, or would lose precision when translated.
+
+Keeping technical terminology in English does not mean preserving every English technical-sounding noun. Prefer natural Indonesian when the translated term is already familiar and clear.
 
 Avoid:
 
-- Excessive slang
-- `gue/lo`
-- Social-media expressions
-- Jokes inside critical technical explanations
-- Calling AI a “kuli”
-- Inconsistent terminology
-- Reducing technical precision for casualness
+* Excessive slang
+* `gue/lo`
+* Social-media expressions
+* Jokes inside critical technical explanations
+* Calling AI a “kuli”
+* Inconsistent terminology
+* Reducing technical precision for casualness
+* Adding explanations or examples only to make the Indonesian version feel more conversational
+* Unnecessary English-heavy sentences when natural Indonesian would be clearer
 
 Conversational hooks should feel natural, not appear mechanically in every section.
 
-## 7. Terminology rule
+## 7. Indonesian technical terminology rule
 
-Use the terminology Indonesian QA engineers are likely to encounter at work, including:
+Keep established QA, engineering, and Playwright terminology in English when translating it would sound unnatural, reduce precision, or differ from the language Indonesian QA engineers are likely to encounter at work.
 
-- Test
-- Browser
-- State
-- Scope
-- Locator
-- Assertion
-- Fixture
-- Debugging
-- Test data
-- Playwright
+This commonly includes:
 
-Explain a term at first meaningful use when a beginner may not recognize it. Then use it consistently across later modules.
+- `test`, `test case`, `test data`, `test suite`, and `test runner`
+- `browser`, `browser context`, `state`, and `scope`
+- `locator`, `assertion`, `fixture`, `hook`, `setup`, and `teardown`
+- `retry`, `flaky`, `timeout`, `debugging`, and `root cause`
+- `pipeline`, `workflow`, `job`, `runner`, and `merge gate`
+- `report`, `artifact`, `trace`, and `log`
+- `pull request`, `code review`, and `Playwright`
+
+Never translate API names, code identifiers, configuration keys, command names, role names exposed by the product, or literal UI labels.
+
+Write the explanation and sentence structure in natural, casual Indonesian around those terms. Keeping technical terminology does not mean turning every sentence into English or mixing languages without purpose.
+
+Preferred:
+
+> Kalau test mulai flaky di CI, buka trace dan runner log dari failed attempt pertama sebelum menambah retry.
+
+Avoid a forced literal translation:
+
+> Kalau pengujian mulai tidak stabil di integrasi berkelanjutan, buka jejak dan catatan pelaksana dari percobaan gagal pertama.
+
+Also avoid unnecessary English-heavy prose:
+
+> Try to check the trace from the first failed attempt untuk melakukan root cause analysis.
+
+Explain an unfamiliar term at its first meaningful use using simple Indonesian context. Then keep the same term consistently across lessons, standalone Practice, registry copy, captions, and checkpoints.
+
+Use a natural Indonesian term when it is already familiar and does not lose technical meaning. The goal is how Indonesian QA engineers actually communicate—not preserving English merely to sound technical.
 
 ## 8. Lesson acceptance checklist
 
@@ -452,4 +477,5 @@ A lesson is ready only when every relevant answer is yes:
 - [ ] Does every visual materially improve understanding?
 - [ ] Are English and Indonesian capabilities equivalent?
 - [ ] Does the Indonesian version sound naturally conversational?
+- [ ] Does the Indonesian version preserve established technical terminology without awkward literal translation or unnecessary English-heavy prose?
 - [ ] Does the readiness check prepare the learner for what follows?
