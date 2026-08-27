@@ -112,11 +112,7 @@ button                         /* tag */
 input[type="email"]           /* tag plus attribute */
 .menu a                       /* descendant at any depth */
 .menu > a                     /* direct child */
-h2 + p                        /* adjacent sibling */
-input:checked                 /* current CSS state */
 li:nth-child(3)               /* third child if it is an li */
-p:nth-of-type(2)              /* second p among sibling p elements */
-.card:not(.disabled)          /* class without another class */
 ```
 
 More clauses narrow matches, but each clause also adds a maintenance dependency.
@@ -182,7 +178,7 @@ For structural selectors, compare the expected and current ancestor chain. Fix t
 
 ### Shadow DOM boundary
 
-Playwright locators, including CSS locators, normally work through open shadow roots. XPath does not pierce shadow roots, and closed shadow roots are not supported. A zero match may therefore be a boundary limitation rather than a syntax mistake.
+Playwright locators, including CSS locators, normally work through open shadow roots. XPath does not pierce shadow roots, and closed shadow roots are not supported. CSS and XPath locators also do not cross iframe boundaries; select the correct frame context first. A zero match may therefore be a boundary limitation rather than a syntax mistake.
 
 ## Review generated work
 
@@ -231,4 +227,4 @@ One reasonable answer is:
 
 You should now be able to read common CSS selectors, state their maintenance dependencies, and justify a CSS fallback without confusing a unique current match with a durable test contract.
 
-CSS syntax drills remain Additional Practice and do not block Module 4 completion. The next XPath lesson is also optional; use it when your work includes legacy suites or DOM relationships that still depend on XPath.
+Standalone CSS syntax drills remain available as Basic practice and do not block Module 4 completion. The next XPath lesson is also optional; use it when your work includes legacy suites or DOM relationships that still depend on XPath.

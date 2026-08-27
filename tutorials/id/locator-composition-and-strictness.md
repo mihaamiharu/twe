@@ -55,7 +55,7 @@ Strictness bergantung pada operasinya:
 | -------------------------------- | ------------------------------ | ------------------------------------------------ |
 | `locator.click()`                | Tidak                          | Satu elemen harus menerima action                |
 | `locator.fill()`                 | Tidak                          | Satu field harus menerima value                  |
-| `expect(locator).toBeVisible()`  | Biasanya tidak                 | Assertion mengacu pada satu elemen yang dimaksud |
+| `expect(locator).toBeVisible()`  | Tidak                          | Single-target assertion harus mengenali satu elemen |
 | `expect(locator).toHaveCount(3)` | Ya                             | Collection-nya memang sedang diuji               |
 | `locator.count()`                | Ya                             | Query-nya memang mengukur collection             |
 
@@ -104,7 +104,7 @@ const widgetProCard = productCards.filter({
 });
 ```
 
-Inner locator diperiksa relatif terhadap setiap candidate card. `exact: true` mencegah “Widget Pro Max” dianggap sebagai product identity yang sama.
+Inner locator harus berada di frame yang sama dan diperiksa relatif terhadap setiap candidate card. `exact: true` mencegah “Widget Pro Max” dianggap sebagai product identity yang sama.
 
 Text filtering juga tersedia:
 

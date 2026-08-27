@@ -6,8 +6,8 @@ description: 'Choose roles, labels, visible content, or explicit test contracts 
 ## After this lesson, you can
 
 - choose a Playwright locator based on the meaning the test must preserve;
-- explain the difference between role, accessible name, label, visible text, and test ID contracts;
-- identify when localization or product wording should change the locator decision;
+- explain which harmless changes a locator should survive and which meaningful changes should make it fail;
+- verify accessible names, labels, test IDs, and product wording in the live UI before choosing a contract;
 - justify why CSS or XPath is a fallback for a particular target; and
 - diagnose a locator that resolves to zero or several elements before weakening it.
 
@@ -36,6 +36,8 @@ Which page signal expresses that meaning?
                     ↓
 Which change should make this test fail?
 ```
+
+Start with the test intent, not with a selector preference. Identify the evidence the test needs to preserve, then inspect the live DOM and accessibility information to see which contract actually exists.
 
 ![A locator decision starts with test intent, then chooses a user-facing, engineering, or implementation contract based on what the scenario needs to preserve.](/images/tutorials/locator-contract-decision.svg)
 
@@ -119,7 +121,7 @@ Suppose the page uses this custom control:
 <div class="save-action">Save address</div>
 ```
 
-A CSS locator can reach it, but that does not make the control accessible or keyboard-operable. Record the product defect or testability gap. A temporary implementation locator should be documented as a bridge, not celebrated as the final strategy.
+A CSS locator can reach it, but that does not make the control accessible or keyboard-operable. Record the product defect or testability gap. A temporary implementation locator should be documented as a bridge, not treated as the final strategy.
 
 ## When to use it—and when not to
 
@@ -146,7 +148,7 @@ Before replacing it with `button.primary`, inspect:
 1. Did the test reach the expected page and state?
 2. Is the target actually a button in the accessibility tree?
 3. What accessible name does the browser expose?
-4. Is the control inside a dialog, iframe, or different browser context?
+4. Is the control inside a dialog, iframe, or different browser context? An iframe needs its own frame context; changing the selector does not cross that boundary.
 5. Was the wording translated or intentionally changed?
 6. Is the control missing, disabled, or replaced by an error state?
 

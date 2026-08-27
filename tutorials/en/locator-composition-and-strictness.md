@@ -55,7 +55,7 @@ Strictness depends on the operation:
 | -------------------------------- | ------------------------- | --------------------------------------------- |
 | `locator.click()`                | No                        | One element must receive the action           |
 | `locator.fill()`                 | No                        | One field must receive the value              |
-| `expect(locator).toBeVisible()`  | Normally no               | The assertion refers to one intended element  |
+| `expect(locator).toBeVisible()`  | No                        | A single-target assertion must identify one element |
 | `expect(locator).toHaveCount(3)` | Yes                       | The collection itself is under test           |
 | `locator.count()`                | Yes                       | The query intentionally measures a collection |
 
@@ -104,7 +104,7 @@ const widgetProCard = productCards.filter({
 });
 ```
 
-The inner locator is evaluated relative to each candidate card. `exact: true` prevents “Widget Pro Max” from satisfying the product identity.
+The inner locator must be in the same frame and is evaluated relative to each candidate card. `exact: true` prevents “Widget Pro Max” from satisfying the product identity.
 
 Text filtering is also available:
 

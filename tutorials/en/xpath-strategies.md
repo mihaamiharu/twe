@@ -136,7 +136,7 @@ Parentheses can change which sequence an index applies to. `//button[1]` and `(/
 
 This path makes every wrapper and index part of the contract. A layout change can break it while the same user behavior remains available.
 
-A relative XPath anchored to a meaningful identifier is usually easier to maintain, but “relative” does not automatically mean robust. `//div[4]/div[2]` is still positional structure without domain meaning.
+A relative XPath anchored to a meaningful identifier may be easier to read and maintain, but “relative” does not automatically mean robust. `//div[4]/div[2]` is still positional structure without domain meaning.
 
 ## When to use it—and when not to
 
@@ -167,7 +167,7 @@ Inspect:
 5. Does whitespace normalization reflect the actual text structure?
 6. Is the target inside an iframe or shadow root?
 
-XPath does not pierce shadow roots in Playwright. Closed shadow roots are not supported by normal locators either. Switching between XPath expressions will not repair that boundary.
+XPath does not pierce shadow roots in Playwright. Closed shadow roots are not supported by normal locators either. XPath, like CSS, does not cross iframe boundaries; select the correct frame context first. Switching between XPath expressions will not repair either boundary.
 
 If several nodes match, identify the missing domain context. Adding `[1]` without proving that first position matters can silently operate on the wrong record.
 
@@ -221,4 +221,4 @@ One reasonable answer is:
 
 You should now be able to read and diagnose the XPath forms commonly found in legacy automation, preserve the domain meaning during migration, and explain why relative syntax alone does not guarantee resilience.
 
-This optional lesson and its Additional Practice do not block Module 4 completion. Once the three Core lessons and two Core Practice challenges are complete, you are ready for Module 5, where reliable locators are used in actions, navigation, and synchronization.
+This optional lesson and any standalone XPath practice do not block Module 4 completion. Once the three Core lessons and two Core Practice challenges are complete, you are ready for Module 5, where reliable locators are used in actions, navigation, and synchronization.

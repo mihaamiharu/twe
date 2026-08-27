@@ -263,8 +263,8 @@
       "estimatedMinutes": 20,
       "tags": ["playwright", "strictness", "filters", "lists"],
       "practice": [
-        { "slug": "pw-locator-chaining", "role": "additional" },
         { "slug": "pw-list-items", "role": "additional" },
+        { "slug": "pw-dynamic-table", "role": "additional" },
         { "slug": "pw-locators-boss", "role": "core" }
       ]
     },
@@ -276,11 +276,7 @@
       "kind": "core",
       "estimatedMinutes": 18,
       "tags": ["css", "fallback", "legacy-dom"],
-      "practice": [
-        { "slug": "css-attribute-selectors", "role": "additional" },
-        { "slug": "css-validation-states", "role": "additional" },
-        { "slug": "css-table-drill", "role": "additional" }
-      ]
+      "practice": []
     },
     {
       "slug": "xpath-strategies",
@@ -290,11 +286,7 @@
       "kind": "optional",
       "estimatedMinutes": 16,
       "tags": ["xpath", "optional", "legacy-dom"],
-      "practice": [
-        { "slug": "xpath-contains-starts-with", "role": "additional" },
-        { "slug": "xpath-normalize-space", "role": "additional" },
-        { "slug": "xpath-complex-table", "role": "additional" }
-      ]
+      "practice": []
     },
     {
       "slug": "element-interactions",

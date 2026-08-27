@@ -136,7 +136,7 @@ Tanda kurung bisa mengubah sequence mana yang terkena index. `//button[1]` dan `
 
 Path ini membuat setiap wrapper dan index menjadi bagian kontrak. Layout change bisa merusaknya walaupun user behavior yang sama masih tersedia.
 
-Relative XPath yang di-anchor ke meaningful identifier biasanya lebih mudah dirawat, tapi kata “relative” tidak otomatis berarti robust. `//div[4]/div[2]` tetaplah positional structure tanpa domain meaning.
+Relative XPath yang di-anchor ke meaningful identifier mungkin lebih mudah dibaca dan dirawat, tapi kata “relative” tidak otomatis berarti robust. `//div[4]/div[2]` tetaplah positional structure tanpa domain meaning.
 
 ## Kapan pendekatan ini cocok dipakai?
 
@@ -167,7 +167,7 @@ Periksa:
 5. Apakah whitespace normalization sesuai dengan text structure yang sebenarnya?
 6. Apakah target berada di iframe atau shadow root?
 
-XPath tidak menembus shadow root di Playwright. Closed shadow root juga tidak didukung normal locator. Berpindah dari satu XPath expression ke expression lain nggak akan memperbaiki boundary tersebut.
+XPath tidak menembus shadow root di Playwright. Closed shadow root juga tidak didukung normal locator. XPath, seperti CSS, tidak menembus boundary iframe; pilih frame context yang benar lebih dulu. Berpindah dari satu XPath expression ke expression lain nggak akan memperbaiki boundary tersebut.
 
 Kalau beberapa node cocok, cari domain context yang hilang. Menambahkan `[1]` tanpa membuktikan bahwa first position memang penting bisa diam-diam mengoperasikan record yang salah.
 
@@ -221,4 +221,4 @@ Salah satu jawaban yang masuk akal:
 
 Sekarang kamu seharusnya sudah bisa membaca dan mendiagnosis bentuk XPath yang umum di legacy automation, menjaga domain meaning saat migration, dan menjelaskan kenapa relative syntax saja nggak menjamin resilience.
 
-Lesson optional ini dan Additional Practice-nya tidak menghalangi completion Module 4. Setelah tiga Core lesson dan dua Core Practice selesai, kamu siap masuk Module 5 untuk memakai reliable locator dalam action, navigation, dan synchronization.
+Lesson optional ini dan standalone XPath practice apa pun tidak menghalangi completion Module 4. Setelah tiga Core lesson dan dua Core Practice selesai, kamu siap masuk Module 5 untuk memakai reliable locator dalam action, navigation, dan synchronization.

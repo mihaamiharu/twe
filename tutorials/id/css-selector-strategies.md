@@ -112,11 +112,7 @@ button                         /* tag */
 input[type="email"]           /* tag plus attribute */
 .menu a                       /* descendant di level mana pun */
 .menu > a                     /* direct child */
-h2 + p                        /* adjacent sibling */
-input:checked                 /* current CSS state */
 li:nth-child(3)               /* child ketiga jika berupa li */
-p:nth-of-type(2)              /* p kedua di antara sibling p */
-.card:not(.disabled)          /* class tanpa class lain */
 ```
 
 Lebih banyak bagian bisa mempersempit match, tapi setiap bagian juga menambah maintenance dependency.
@@ -182,7 +178,7 @@ Untuk structural selector, bandingkan expected ancestor chain dengan kondisi sek
 
 ### Shadow DOM boundary
 
-Playwright locator, termasuk CSS locator, biasanya bekerja melalui open shadow root. XPath tidak menembus shadow root, dan closed shadow root tidak didukung. Zero match bisa berasal dari boundary limitation, bukan syntax error.
+Playwright locator, termasuk CSS locator, biasanya bekerja melalui open shadow root. XPath tidak menembus shadow root, dan closed shadow root tidak didukung. CSS dan XPath locator juga tidak menembus boundary iframe; pilih frame context yang benar lebih dulu. Zero match bisa berasal dari boundary limitation, bukan syntax error.
 
 ## Review hasil buatan AI
 
@@ -231,4 +227,4 @@ Salah satu jawaban yang masuk akal:
 
 Sekarang kamu seharusnya sudah bisa membaca CSS selector umum, menyatakan maintenance dependency-nya, dan menjelaskan CSS fallback tanpa mencampur unique current match dengan durable test contract.
 
-CSS syntax drill tetap menjadi Additional Practice dan tidak menghalangi completion Module 4. Lesson XPath berikutnya juga optional; gunakan kalau pekerjaanmu melibatkan suite legacy atau DOM relationship yang masih bergantung pada XPath.
+CSS syntax drill tetap tersedia sebagai Basic practice yang berdiri sendiri dan tidak menghalangi completion Module 4. Lesson XPath berikutnya juga optional; gunakan kalau pekerjaanmu melibatkan suite legacy atau DOM relationship yang masih bergantung pada XPath.

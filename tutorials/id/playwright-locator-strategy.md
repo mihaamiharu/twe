@@ -6,8 +6,8 @@ description: 'Pilih role, label, visible content, atau kontrak test eksplisit be
 ## Setelah lesson ini, kamu bisa
 
 - memilih locator Playwright berdasarkan makna yang harus dijaga oleh test;
-- menjelaskan perbedaan kontrak role, accessible name, label, visible text, dan test ID;
-- mengenali kapan localization atau wording produk perlu memengaruhi keputusan locator;
+- menjelaskan harmless change apa yang seharusnya bisa dilewati locator dan meaningful change apa yang seharusnya membuatnya gagal;
+- memverifikasi accessible name, label, test ID, dan wording produk di live UI sebelum memilih kontrak;
 - menjelaskan kenapa CSS atau XPath hanya menjadi fallback untuk target tertentu; dan
 - mendiagnosis locator yang menemukan nol atau beberapa elemen sebelum melemahkannya.
 
@@ -36,6 +36,8 @@ Sinyal halaman mana yang menyatakan makna itu?
                          ↓
 Perubahan apa yang seharusnya membuat test gagal?
 ```
+
+Mulai dari intent test, bukan dari preferensi selector. Tentukan evidence yang perlu dijaga oleh test, lalu periksa live DOM dan accessibility information untuk melihat kontrak apa yang benar-benar tersedia.
 
 ![Keputusan locator dimulai dari intent test, lalu memilih kontrak yang menghadap pengguna, kontrak engineering, atau implementation fallback berdasarkan makna yang perlu dijaga.](/images/tutorials/locator-contract-decision.svg)
 
@@ -119,7 +121,7 @@ Misalnya halaman memakai custom control seperti ini:
 <div class="save-action">Save address</div>
 ```
 
-CSS locator memang bisa mencapainya, tapi itu tidak membuat control menjadi accessible atau keyboard-operable. Catat defect produk atau testability gap-nya. Implementation locator sementara adalah jembatan, bukan final strategy yang perlu dibanggakan.
+CSS locator memang bisa mencapainya, tapi itu tidak membuat control menjadi accessible atau keyboard-operable. Catat defect produk atau testability gap-nya. Implementation locator sementara adalah jembatan, bukan final strategy yang perlu dipertahankan.
 
 ## Kapan pendekatan ini cocok dipakai?
 
@@ -146,7 +148,7 @@ Sebelum menggantinya dengan `button.primary`, periksa:
 1. Apakah test sudah mencapai halaman dan state yang diharapkan?
 2. Apakah target benar-benar dikenali sebagai button di accessibility tree?
 3. Accessible name apa yang dikenali browser?
-4. Apakah control berada di dialog, iframe, atau browser context lain?
+4. Apakah control berada di dialog, iframe, atau browser context lain? Iframe membutuhkan frame context sendiri; mengganti selector tidak akan menembus boundary tersebut.
 5. Apakah wording diterjemahkan atau memang sengaja diubah?
 6. Apakah control hilang, disabled, atau digantikan error state?
 
