@@ -116,6 +116,13 @@
                     "toBeTruthy",
                     "evaluate"
                 ],
+                "policy": {
+                    "requireExecutedEvidence": true,
+                    "forbidStructuralLocators": true,
+                    "forbidForcedActions": true,
+                    "forbidDirectDomAccess": true,
+                    "forbidSwallowedErrors": true
+                },
                 "interactionSequence": {
                     "event": "submit",
                     "selector": "#checkout-form",

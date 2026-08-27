@@ -743,6 +743,13 @@ describe('Learn and Practice catalog contracts', () => {
       ],
       requiredMethods: ['getByLabel', 'getByRole', 'fill', 'click'],
       forbiddenMethods: ['waitForTimeout', 'textContent', 'toBeTruthy', 'evaluate'],
+      policy: {
+        requireExecutedEvidence: true,
+        forbidStructuralLocators: true,
+        forbidForcedActions: true,
+        forbidDirectDomAccess: true,
+        forbidSwallowedErrors: true,
+      },
       interactionSequence: {
         event: 'submit',
         selector: '#checkout-form',
