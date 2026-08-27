@@ -17,6 +17,8 @@ Red test memberi tahu bahwa observed result nggak sesuai expectation. Red test b
 
 Assertion timeout bisa terjadi karena product defect, wrong test data, ambiguous locator, missing outcome, failed API, atau incorrect expectation. Kalau kamu langsung menaikkan timeout, symptom-nya berubah tapi kamu belum belajar system mana yang salah.
 
+Module 5 bertanya kondisi aplikasi apa yang harus ditunggu oleh sebuah action. Lesson ini dimulai saat kondisi itu tetap gagal: klasifikasikan boundary yang mungkin bermasalah—locator, timing, state/data, product, environment, atau test logic—lalu kumpulkan evidence sebelum mengubah test.
+
 Debugging adalah QA investigation. Discipline yang kita pakai untuk reproduce dan isolate manual defect juga berlaku di sini: simpan evidence, tantang assumption, lalu buat perubahan terkecil yang menjelaskan failure.
 
 ## Cara berpikir yang perlu kamu pegang

@@ -32,6 +32,8 @@ Reliable scenario
     + safe cleanup and collision strategy
 ```
 
+Ini adalah boundary yang terpisah. Browser context yang baru mengisolasi client-session state, tetapi record yang dibuat oleh setup tetap menjadi server-side state bersama sampai test memberi owner dan rencana cleanup yang jelas.
+
 State contract yang berguna menjawab:
 
 | Pertanyaan tentang state     | Contoh jawaban                                       |
@@ -68,6 +70,7 @@ Parallel collision risk: account dan order reference tidak boleh shared
 
 ```ts
 test('customer cancels an owned order', async ({ page, request }) => {
+  // Request client punya scope test; order yang dibuatnya tidak otomatis terisolasi di server.
   const response = await request.post('/api/test/orders', {
     data: { status: 'submitted', owner: 'current-test-customer' },
   });
@@ -177,6 +180,8 @@ Generated setup nggak otomatis aman hanya karena disembunyikan di helper. Kamu t
 ## Coba cek pemahamanmu
 
 Sebuah suite memakai satu saved admin account. Hook `beforeAll` membuat satu order, tiga test mengubah order yang sama dengan cara berbeda, lalu hook `afterAll` menghapusnya. Suite lulus dengan satu worker, tapi gagal saat parallel atau setelah interrupted run.
+
+`beforeAll` dan `afterAll` punya scope pada worker process yang relevan, bukan boundary universal untuk seluruh suite. Keduanya tetap bisa membuat state yang dipakai bersama oleh beberapa test dalam worker itu, dan restart worker atau cleanup yang terhenti bisa meninggalkan state tersebut.
 
 Rancang ulang state contract-nya. Tentukan apa yang boleh tetap shared, apa yang harus unique, di mana setup dilakukan, dan bagaimana cleanup harus bekerja.
 

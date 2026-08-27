@@ -17,6 +17,8 @@ Advanced fixtures can remove expensive repeated setup and give a large suite a c
 
 Complexity is justified only when it buys clearer ownership, safer lifecycle management, or substantial measured setup savings. Advanced fixtures are not a maturity badge. A clear helper and test-scoped fixture can be the more professional design.
 
+This lesson is optional depth. The core lessons cover the default test-scoped design; skip this lesson without blocking Module 8 unless the suite has a real need for configurable options, worker-owned resources, or automatic diagnostics.
+
 ## The mental model
 
 Keep four concepts separate:
@@ -43,6 +45,8 @@ Suppose a suite supports a configurable UI locale and needs one expensive, uniqu
 ### 1. Define the option and fixture scopes
 
 ```ts
+import { randomUUID } from 'node:crypto';
+
 import {
   test as base,
   type BrowserContext,
@@ -73,8 +77,9 @@ export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
 
   workerAccount: [
     async ({}, use, workerInfo) => {
+      const runId = process.env.TEST_RUN_ID ?? `local-${randomUUID()}`;
       const account = await createTestAccount({
-        uniqueKey: `worker-${workerInfo.workerIndex}`,
+        uniqueKey: `${runId}-${workerInfo.project.name}-${workerInfo.workerIndex}`,
       });
 
       try {
@@ -92,18 +97,19 @@ export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
       locale: appLocale,
       storageState,
     });
-    const page = await context.newPage();
-
-    await use(page);
-
-    await context.close();
+    try {
+      const page = await context.newPage();
+      await use(page);
+    } finally {
+      await context.close();
+    }
   },
 });
 ```
 
-The worker fixture does not contain a password in source. It asks an authorized test-support utility for a unique account and deletes that exact account in `finally`.
+The worker fixture does not contain a password in source. It asks an authorized test-support utility for a unique account and deletes that exact account in `finally`. `workerIndex` is only unique within a run, so include a stable CI run ID or another run namespace when the support system can receive one; the random local fallback prevents ordinary local collisions.
 
-The test-scoped fixture creates a fresh context and page for each test. Reusing the account is safe only if those tests do not mutate shared account-level state. If they change profile, permissions, saved addresses, or preferences, allocate stronger isolation instead.
+The test-scoped fixture creates a fresh context and page for each test. Its `finally` block closes the context even when page creation or the test consumer fails. Reusing the account is safe only if those tests do not mutate shared account-level state. If they change profile, permissions, saved addresses, or preferences, allocate stronger isolation instead.
 
 The option can be overridden by configuration:
 
@@ -134,8 +140,11 @@ export const testWithDiagnostics = test.extend<Diagnostics>({
       };
 
       page.on('console', collect);
-      await use();
-      page.off('console', collect);
+      try {
+        await use();
+      } finally {
+        page.off('console', collect);
+      }
 
       if (testInfo.status !== testInfo.expectedStatus) {
         await testInfo.attach('browser-console', {
@@ -149,7 +158,7 @@ export const testWithDiagnostics = test.extend<Diagnostics>({
 });
 ```
 
-The behavior is small, diagnostic, and visible in failure artifacts. Review logs for secrets or personal data before retaining or sharing them.
+The behavior is small, diagnostic, and visible in failure artifacts. The listener is removed in `finally` so a failing test cannot leave it attached to later fixture work. Review logs for secrets or personal data before retaining or sharing them.
 
 ## When to use it—and when not to
 
@@ -165,14 +174,14 @@ Keep the default test-scoped design when ownership is uncertain. If measured set
 
 | Observation                                 | Likely advanced-fixture problem              | First check                                                |
 | ------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------- |
-| Failures occur only with several workers    | Workers share a mutable server-side identity | Generated IDs, account ownership, worker index             |
+| Failures occur only with several workers    | Workers share a mutable server-side identity | Run namespace, generated IDs, account ownership, worker index |
 | A test runs setup it never requested        | Automatic fixture is too broad               | `{ auto: true }` fixtures and imported test object         |
 | Worker restarts leave records behind        | Cleanup is missing or identity is not unique | `finally` block, setup failure path, retained resource IDs |
 | Fixture timeout appears unrelated to a test | Slow fixture owns the time budget            | Fixture duration and configured fixture timeout            |
 | Changing one option rebuilds many workers   | Worker fixture depends on a worker option    | Option scope and worker-fixture signature                  |
 | Nobody can predict setup order              | Dependency graph is deep or implicit         | Draw dependencies and reverse teardown order               |
 
-Worker processes can restart after failures. Use unique identities that do not collide with earlier workers, and design cleanup and later setup to tolerate interrupted runs safely.
+Worker processes can restart after failures. Use a stable run namespace when available, include the project and worker identity, and design cleanup and later setup to tolerate interrupted runs safely.
 
 Do not solve races by forcing the entire suite to one worker before understanding the shared resource. That hides the ownership defect and sacrifices useful parallel feedback.
 

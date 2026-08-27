@@ -144,9 +144,13 @@ Secrets must not appear in:
 
 An environment variable is only a delivery mechanism. It is not safe if the value is later printed or preserved in an artifact.
 
+### Keep local policy distinct from CI policy
+
+This lesson stops at the resolved local runner contract: what a developer can run, which supported variants exist, and what diagnostic evidence a failing run produces. Module 9 owns trigger-specific selection, CI gates, retry policy, artifact retention, and feedback ownership. A setting may be valid in both places; review who consumes the decision before placing it in configuration or the pipeline.
+
 ## When to use it—and when not to
 
-Put stable runner-wide policy in `playwright.config.ts`: test discovery, default `use` values, projects, timeouts, reporters, artifact behavior, and an owned local web server when appropriate.
+Put stable runner-wide policy in `playwright.config.ts`: test discovery, default `use` values, projects, timeouts, reporters, local diagnostic defaults, and an owned local web server when appropriate. Leave trigger-specific CI policy to the pipeline layer.
 
 Keep product actions and assertions in tests. Keep dependency setup and cleanup in fixtures. Do not put scenario branches into configuration merely to make test files shorter.
 
@@ -182,6 +186,7 @@ Review generated configuration line by line:
 - Are timeout increases supported by evidence?
 - Does setup create shared mutable state?
 - Can secrets enter source, logs, traces, screenshots, or storage state?
+- Is this setting a local runner default, a project variant, or a CI trigger/gate decision?
 - Did AI invent a device, environment, command, reporter, or credential strategy the team never approved?
 
 Ask for the calculated test matrix and resolved assumptions, not only a configuration snippet. Valid syntax can still encode poor policy.
@@ -190,7 +195,7 @@ Ask for the calculated test matrix and resolved assumptions, not only a configur
 
 A generated configuration defines three browsers, three devices, two locales, two roles, and staging plus production projects. It applies a 120-second global test timeout and falls back to the production URL when `BASE_URL` is absent. The team has 300 tests.
 
-What risks and costs should you raise in review? How would you reduce the configuration to an intentional first policy?
+What risks and costs should you raise in review? How would you reduce the configuration to an intentional first policy? For each decision, is it owned by the test, a fixture, local configuration, or CI?
 
 ## Compare your reasoning
 

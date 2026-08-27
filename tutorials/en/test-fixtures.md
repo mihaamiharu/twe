@@ -80,14 +80,17 @@ export const test = base.extend<CheckoutFixtures>({
     }
 
     const cart: { id: string } = await createResponse.json();
-    const checkoutPage = new CheckoutPage(page, cart.id);
-    await checkoutPage.open();
 
-    await use(checkoutPage);
+    try {
+      const checkoutPage = new CheckoutPage(page, cart.id);
+      await checkoutPage.open();
 
-    const deleteResponse = await request.delete(`/api/test/carts/${cart.id}`);
-    if (!deleteResponse.ok() && deleteResponse.status() !== 404) {
-      throw new Error(`Cart cleanup failed: ${deleteResponse.status()}`);
+      await use(checkoutPage);
+    } finally {
+      const deleteResponse = await request.delete(`/api/test/carts/${cart.id}`);
+      if (!deleteResponse.ok() && deleteResponse.status() !== 404) {
+        throw new Error(`Cart cleanup failed: ${deleteResponse.status()}`);
+      }
     }
   },
 });
@@ -103,7 +106,7 @@ Read the code in lifecycle order:
 2. Setup creates one cart and checks the response before using its ID.
 3. The fixture opens a page for that owned cart.
 4. `await use(checkoutPage)` hands the value to the test.
-5. After the test finishes, teardown deletes only the cart this fixture created.
+5. A `finally` block deletes only the cart this fixture created, even if opening the page or using the fixture fails.
 
 The test makes the dependency visible in its parameters:
 
@@ -115,7 +118,7 @@ test('customer sees the updated order total', async ({ checkoutPage }) => {
 });
 ```
 
-The fixture owns preconditions and cleanup. The test still owns the product action and evidence it claims to verify.
+The fixture owns preconditions and cleanup. The test still owns the product action and evidence it claims to verify. Once setup has an owned resource ID, put its cleanup in `finally`; otherwise a setup failure before `use` can leak state without ever reaching the test.
 
 ### Decide whether a fixture is actually needed
 
@@ -145,7 +148,7 @@ Do not hide the behavior under test inside a fixture. A `paidOrder` fixture may 
 
 | Observation                                     | Likely lifecycle problem               | First evidence to inspect                                |
 | ----------------------------------------------- | -------------------------------------- | -------------------------------------------------------- |
-| Test fails before its first line                | Fixture setup failed                   | Fixture stack, API response, dependency order            |
+| Test fails before its first line                | Fixture setup failed or leaked state   | Fixture stack, API response, retained ID, cleanup attempt |
 | Tests pass alone but fail in parallel           | Worker/shared mutable state            | Resource IDs, worker index, account and record ownership |
 | Later tests fail after one earlier failure      | Cleanup or hidden state leaked         | Teardown result, retained IDs, server records            |
 | Every test performs slow setup it does not need | Automatic hook/fixture is too broad    | Which tests actually request the dependency              |
@@ -177,7 +180,7 @@ Pay special attention to code after `await use(...)`. Generated examples often d
 
 A generated suite has a worker-scoped `sharedCustomerPage` fixture. It signs in once, creates one cart, and gives the same page to all tests. Tests change addresses, quantities, and payment methods. The author chose worker scope because login is slow.
 
-What is unsafe? Which responsibilities should be test scoped, and which parts could remain shared or become a helper?
+What is unsafe? Name the owner, scope, and cleanup path for the cart, account, page, and authentication mechanics. Which parts could remain shared or become a helper?
 
 ## Compare your reasoning
 

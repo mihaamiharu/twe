@@ -144,9 +144,13 @@ Secret nggak boleh muncul di:
 
 Environment variable cuma delivery mechanism. Value-nya tetap nggak aman kalau kemudian dicetak atau disimpan di artifact.
 
+### Bedakan local policy dari CI policy
+
+Lesson ini berhenti di resolved local runner contract: apa yang bisa dijalankan developer, supported variant apa yang tersedia, dan diagnostic evidence apa yang dihasilkan saat run gagal. Module 9 yang membahas trigger-specific selection, CI gate, retry policy, artifact retention, dan feedback ownership. Satu setting bisa valid di dua tempat; saat review, tentukan siapa yang memakai keputusan itu sebelum menaruhnya di configuration atau pipeline.
+
 ## Kapan pendekatan ini cocok dipakai?
 
-Taruh stable runner-wide policy di `playwright.config.ts`: test discovery, default `use` value, project, timeout, reporter, artifact behavior, dan owned local web server kalau memang sesuai.
+Taruh stable runner-wide policy di `playwright.config.ts`: test discovery, default `use` value, project, timeout, reporter, local diagnostic default, dan owned local web server kalau memang sesuai. Serahkan CI policy yang bergantung pada trigger ke pipeline layer.
 
 Pertahankan product action dan assertion di test. Taruh dependency setup serta cleanup di fixture. Jangan pindahkan scenario branch ke configuration cuma supaya test file terlihat pendek.
 
@@ -182,6 +186,7 @@ Review generated configuration baris demi baris:
 - Apakah timeout increase didukung evidence?
 - Apakah setup membuat shared mutable state?
 - Bisakah secret masuk source, log, trace, screenshot, atau storage state?
+- Apakah setting ini local runner default, project variant, atau keputusan CI trigger/gate?
 - Apakah AI mengarang device, environment, command, reporter, atau credential strategy yang belum disetujui team?
 
 Minta perhitungan test matrix dan resolved assumption, bukan cuma configuration snippet. Valid syntax masih bisa menyimpan policy yang buruk.
@@ -190,7 +195,7 @@ Minta perhitungan test matrix dan resolved assumption, bukan cuma configuration 
 
 Generated configuration mendefinisikan tiga browser, tiga device, dua locale, dua role, serta staging dan production project. Semuanya memakai global test timeout 120 detik dan fallback ke production URL saat `BASE_URL` nggak ada. Team punya 300 test.
 
-Risk dan cost apa yang perlu kamu angkat saat review? Bagaimana kamu menguranginya menjadi intentional first policy?
+Risk dan cost apa yang perlu kamu angkat saat review? Bagaimana kamu menguranginya menjadi intentional first policy? Untuk setiap keputusan, siapa owner-nya: test, fixture, local configuration, atau CI?
 
 ## Bandingkan dengan cara pikir ini
 

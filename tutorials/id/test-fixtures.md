@@ -80,14 +80,17 @@ export const test = base.extend<CheckoutFixtures>({
     }
 
     const cart: { id: string } = await createResponse.json();
-    const checkoutPage = new CheckoutPage(page, cart.id);
-    await checkoutPage.open();
 
-    await use(checkoutPage);
+    try {
+      const checkoutPage = new CheckoutPage(page, cart.id);
+      await checkoutPage.open();
 
-    const deleteResponse = await request.delete(`/api/test/carts/${cart.id}`);
-    if (!deleteResponse.ok() && deleteResponse.status() !== 404) {
-      throw new Error(`Cart cleanup failed: ${deleteResponse.status()}`);
+      await use(checkoutPage);
+    } finally {
+      const deleteResponse = await request.delete(`/api/test/carts/${cart.id}`);
+      if (!deleteResponse.ok() && deleteResponse.status() !== 404) {
+        throw new Error(`Cart cleanup failed: ${deleteResponse.status()}`);
+      }
     }
   },
 });
@@ -103,7 +106,7 @@ Sekarang baca code-nya sesuai urutan lifecycle:
 2. Setup membuat satu cart dan memeriksa response sebelum memakai ID-nya.
 3. Fixture membuka page untuk owned cart tersebut.
 4. `await use(checkoutPage)` memberikan value ke test.
-5. Setelah test selesai, teardown hanya menghapus cart yang dibuat fixture ini.
+5. `finally` hanya menghapus cart yang dibuat fixture ini, bahkan kalau page gagal dibuka atau fixture gagal dipakai.
 
 Dependency-nya terlihat langsung dari parameter test:
 
@@ -115,7 +118,7 @@ test('customer sees the updated order total', async ({ checkoutPage }) => {
 });
 ```
 
-Fixture memiliki precondition dan cleanup. Product action serta evidence yang diklaim scenario tetap dimiliki test.
+Fixture memiliki precondition dan cleanup. Product action serta evidence yang diklaim scenario tetap dimiliki test. Setelah setup mendapatkan resource ID yang dimiliki fixture, taruh cleanup di `finally`; kalau tidak, setup failure sebelum `use` bisa meninggalkan state tanpa pernah mencapai test.
 
 ### Cek dulu, apakah memang butuh fixture?
 
@@ -145,7 +148,7 @@ Jangan sembunyikan behavior under test di dalam fixture. Fixture `paidOrder` bis
 
 | Observation                                        | Kemungkinan lifecycle problem          | Evidence pertama yang diperiksa                           |
 | -------------------------------------------------- | -------------------------------------- | --------------------------------------------------------- |
-| Test gagal sebelum baris pertamanya                | Fixture setup gagal                    | Fixture stack, API response, dependency order             |
+| Test gagal sebelum baris pertamanya                | Fixture setup gagal atau meninggalkan state | Fixture stack, API response, retained ID, cleanup attempt |
 | Test lulus sendiri tapi gagal saat parallel        | Worker/shared mutable state            | Resource ID, worker index, account dan record ownership   |
 | Test berikutnya gagal setelah satu failure         | Cleanup atau hidden state bocor        | Teardown result, retained ID, server record               |
 | Semua test menjalankan slow setup yang nggak perlu | Automatic hook/fixture terlalu luas    | Test mana yang benar-benar meminta dependency             |
@@ -177,7 +180,7 @@ Perhatikan code setelah `await use(...)`. Generated example sering bagus saat de
 
 Generated suite punya worker-scoped fixture bernama `sharedCustomerPage`. Fixture login sekali, membuat satu cart, lalu memberikan page yang sama ke semua test. Test-test tersebut mengubah address, quantity, dan payment method. Alasannya: login lambat.
 
-Bagian mana yang nggak aman? Responsibility apa yang harus test scoped, dan bagian mana yang masih boleh dishare atau cukup jadi helper?
+Bagian mana yang nggak aman? Sebutkan owner, scope, dan cleanup path untuk cart, account, page, serta authentication mechanics. Bagian mana yang masih boleh dishare atau cukup jadi helper?
 
 ## Bandingkan dengan cara pikir ini
 

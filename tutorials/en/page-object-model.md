@@ -224,4 +224,6 @@ The goal is not the fewest lines. The goal is one clear place to update cart mec
 
 You should now be able to choose the smallest abstraction that contains meaningful repeated change while leaving scenario intent and evidence easy to review.
 
+The required practice checks this judgment with a focused helper; it does not require a page-object class just because the scenario uses a page.
+
 The next lesson addresses a different concern: dependencies and lifecycle. A helper or page object organizes behavior; a fixture decides how a resource is created, provided, and cleaned up. Do not use one concept as a substitute for the other.

@@ -17,6 +17,8 @@ A red test tells you that the observed result did not match an expectation. It d
 
 An assertion timeout might come from a product defect, wrong test data, an ambiguous locator, a missing outcome, a failed API, or an incorrect expectation. If you immediately increase the timeout, you have changed the symptom without learning which system is wrong.
 
+Module 5 asks which application condition an action should wait for. This lesson starts when that condition still fails: classify which boundary—locator, timing, state/data, product, environment, or test logic—could explain it, then collect evidence before editing the test.
+
 Debugging is QA investigation. The same discipline used to reproduce and isolate a manual defect applies here: preserve evidence, challenge assumptions, and make the smallest change that explains the failure.
 
 ## The mental model

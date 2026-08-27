@@ -226,4 +226,6 @@ Targetnya bukan jumlah baris paling sedikit. Targetnya satu tempat yang jelas un
 
 Sekarang kamu seharusnya bisa memilih abstraction terkecil yang menampung meaningful repeated change sambil menjaga scenario intent dan evidence tetap mudah direview.
 
+Practice wajib di lesson ini menguji judgment tersebut lewat focused helper. Kamu nggak perlu membuat class page object hanya karena scenario memakai page.
+
 Lesson berikutnya membahas concern yang berbeda: dependency dan lifecycle. Helper atau page object mengatur behavior; fixture menentukan bagaimana resource dibuat, diberikan ke test, dan dibersihkan. Jangan pakai satu konsep sebagai pengganti konsep lainnya.

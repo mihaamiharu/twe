@@ -17,19 +17,22 @@ A test passes when you run it alone, but fails after another test. The second te
 
 Manual testers naturally reset the browser, switch profiles, or use an incognito window when they need a clean session. Automated tests need the same boundary to be explicit and repeatable.
 
-Playwright Test gives each test a fresh browser context by default. That prevents browser-session state from leaking between tests. But it does not reset the application database, restore inventory, or give every test a different account. Reliability starts by knowing exactly where this boundary ends.
+With the standard end-to-end setup, Playwright Test gives each test a fresh browser context by default. That prevents browser-session state from leaking between tests. But it does not reset the application database, restore inventory, or give every test a different account. Reliability starts by knowing exactly where this boundary ends.
 
 ## The mental model
 
 Think of the objects as nested responsibility boundaries:
 
 ```text
-Browser process
-├── BrowserContext for Test A
-│   └── Page: one tab in Test A's session
-└── BrowserContext for Test B
-    └── Page: one tab in Test B's session
+Worker process
+└── Browser (may be reused within this worker)
+    ├── BrowserContext for Test A
+    │   └── Page: one tab in Test A's session
+    └── BrowserContext for Test B
+        └── Page: one tab in Test B's session
 ```
+
+Playwright may reuse the `Browser` fixture within a worker for efficiency. The usual test boundary is the fresh `BrowserContext` and its default `Page`, not the browser process itself.
 
 ![A browser contains isolated contexts for separate tests, while pages inside a context belong to the same client session; backend records remain outside that browser boundary.](/images/tutorials/context-isolation-boundary.svg)
 
@@ -39,8 +42,8 @@ The responsibilities are:
 
 | Object           | Think of it as                       | What it decides                                                    |
 | ---------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| `Browser`        | The running browser engine           | Hosts one or more independent sessions                             |
-| `BrowserContext` | One isolated browser profile/session | Cookies, storage, permissions, and pages belonging to that session |
+| `Browser`        | The running browser engine, often reused within a worker | Hosts one or more independent sessions                             |
+| `BrowserContext` | One test-scoped isolated browser profile/session | Cookies, storage, permissions, and pages belonging to that session; configured `storageState` may preload authentication |
 | `Page`           | One tab or popup                     | Navigation and interaction with one browser surface                |
 
 Two pages in the same context belong to the same browser session. Separate contexts do not share that client-session state.
@@ -68,7 +71,7 @@ test('a guest cart starts empty', async ({ page }) => {
 });
 ```
 
-The built-in `page` belongs to a fresh context created for this test. You do not need to launch a browser or create another context yourself.
+The built-in `page` belongs to a fresh test-scoped context created for this test. “Fresh” means an isolated lifecycle; configured `storageState` can still preload authentication rather than starting signed out. You do not need to launch a browser or create another context yourself.
 
 Now consider a support-chat requirement:
 

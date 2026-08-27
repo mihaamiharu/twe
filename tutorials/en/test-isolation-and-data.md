@@ -32,6 +32,8 @@ Reliable scenario
     + safe cleanup and collision strategy
 ```
 
+These are separate boundaries. A fresh browser context isolates client-session state, but a record created by setup remains shared server-side state until the test gives it an owner and a cleanup plan.
+
 A useful state contract answers:
 
 | State question                | Example answer                                      |
@@ -68,6 +70,7 @@ Parallel collision risk: account and order reference must not be shared
 
 ```ts
 test('customer cancels an owned order', async ({ page, request }) => {
+  // The request client is test-scoped; the order it creates is not magically isolated on the server.
   const response = await request.post('/api/test/orders', {
     data: { status: 'submitted', owner: 'current-test-customer' },
   });
@@ -177,6 +180,8 @@ Generated setup is not safe merely because it is hidden in a helper. You still n
 ## Check your understanding
 
 A suite uses one saved admin account. A `beforeAll` hook creates one order, three tests update that order in different ways, and an `afterAll` hook deletes it. The suite passes with one worker but fails in parallel or after an interrupted run.
+
+`beforeAll` and `afterAll` are scoped to the relevant worker process, not a universal suite-wide boundary. They can still create state shared by several tests in that worker, and a worker restart or interrupted cleanup can leave that state behind.
 
 Redesign its state contract. Decide what can remain shared, what must become unique, where setup should happen, and how cleanup should behave.
 

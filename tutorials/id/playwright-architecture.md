@@ -17,19 +17,22 @@ Pernah nggak sih sebuah test lulus saat dijalankan sendirian, tapi gagal setelah
 
 Saat manual testing, kita biasanya reset browser, ganti profile, atau membuka incognito window kalau butuh session bersih. Automated test juga membutuhkan boundary yang jelas dan repeatable.
 
-Secara default, Playwright Test memberi browser context baru untuk setiap test. Ini mencegah browser-session state bocor antar-test. Tapi context baru nggak me-reset database aplikasi, mengembalikan inventory, atau otomatis memberi akun berbeda ke setiap test. Reliability dimulai dari tahu persis di mana boundary ini berakhir.
+Dengan setup end-to-end standar, Playwright Test memberi browser context baru untuk setiap test. Ini mencegah browser-session state bocor antar-test. Tapi context baru nggak me-reset database aplikasi, mengembalikan inventory, atau otomatis memberi akun berbeda ke setiap test. Reliability dimulai dari tahu persis di mana boundary ini berakhir.
 
 ## Cara berpikir yang perlu kamu pegang
 
 Bayangkan object Playwright sebagai responsibility boundary yang bertingkat:
 
 ```text
-Browser process
-├── BrowserContext untuk Test A
-│   └── Page: satu tab di session milik Test A
-└── BrowserContext untuk Test B
-    └── Page: satu tab di session milik Test B
+Worker process
+└── Browser (bisa dipakai ulang di dalam worker ini)
+    ├── BrowserContext untuk Test A
+    │   └── Page: satu tab di session milik Test A
+    └── BrowserContext untuk Test B
+        └── Page: satu tab di session milik Test B
 ```
+
+Playwright bisa memakai ulang fixture `Browser` di dalam satu worker demi efisiensi. Boundary test yang biasanya kita pedulikan adalah `BrowserContext` baru beserta `Page` bawaannya, bukan proses browsernya.
 
 ![Satu browser berisi isolated context untuk test yang berbeda, sementara page di dalam satu context menjadi bagian client session yang sama; backend record tetap berada di luar browser boundary.](/images/tutorials/context-isolation-boundary.svg)
 
@@ -39,8 +42,8 @@ Responsibility-nya seperti ini:
 
 | Object           | Bayangkan sebagai                     | Hal yang ditentukan                                           |
 | ---------------- | ------------------------------------- | ------------------------------------------------------------- |
-| `Browser`        | Browser engine yang sedang berjalan   | Menampung satu atau beberapa independent session              |
-| `BrowserContext` | Satu isolated browser profile/session | Cookies, storage, permission, dan page milik session tersebut |
+| `Browser`        | Browser engine yang sedang berjalan, biasanya dipakai ulang di dalam worker | Menampung satu atau beberapa independent session              |
+| `BrowserContext` | Satu isolated browser profile/session untuk scope satu test | Cookies, storage, permission, dan page milik session tersebut; `storageState` yang dikonfigurasi bisa mengisi authentication lebih dulu |
 | `Page`           | Satu tab atau popup                   | Navigation dan interaction pada satu browser surface          |
 
 Dua page di dalam context yang sama menjadi bagian browser session yang sama. Context yang berbeda nggak berbagi client-session state tersebut.
@@ -68,7 +71,7 @@ test('a guest cart starts empty', async ({ page }) => {
 });
 ```
 
-Built-in `page` ini menjadi bagian fresh context yang dibuat khusus untuk test tersebut. Kamu nggak perlu launch browser atau membuat context lain sendiri.
+Built-in `page` ini menjadi bagian fresh context dengan scope test yang dibuat khusus untuk test tersebut. “Fresh” berarti lifecycle-nya terisolasi; `storageState` yang dikonfigurasi tetap bisa mengisi authentication sehingga session tidak harus selalu signed out. Kamu nggak perlu launch browser atau membuat context lain sendiri.
 
 Sekarang coba bayangin requirement support chat:
 
