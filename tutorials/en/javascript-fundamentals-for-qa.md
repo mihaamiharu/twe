@@ -54,7 +54,7 @@ const product = { quantity: 1 };
 product.quantity = 2;
 ```
 
-The variable `product` still points to the same object. Prefer creating stable test data and changing it only when the scenario requires that change.
+The `product` binding still points to the same object, while its `quantity` property changes from `1` to `2`. Prefer creating stable test data and changing it only when the scenario requires that change.
 
 ## Work through a realistic example
 
@@ -99,6 +99,8 @@ test('cart shows the expected subtotal', async ({ page }) => {
   await expect(page.getByTestId('cart-subtotal')).toHaveText(`$${subtotal}`);
 });
 ```
+
+This browser snippet is illustrative. The attached Core Practice focuses on controlled JavaScript data and does not provide a runnable `/products` application.
 
 The locator and currency format are product contracts that still need verification. JavaScript only helps keep the case and expected calculation readable; it does not prove the product rule by itself.
 
@@ -170,7 +172,7 @@ const selected = products.find(
 const subtotal = selected.unitPrice * 2;
 ```
 
-The error means the lookup returned `undefined`. It does not mean the browser needs more time unless the array itself is loaded asynchronously.
+The error means `find()` found no matching product and returned `undefined`. It does not mean the browser needs more time unless the array itself is loaded asynchronously.
 
 Inspect:
 
