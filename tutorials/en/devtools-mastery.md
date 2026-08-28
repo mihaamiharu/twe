@@ -23,7 +23,7 @@ When that happens, adding another selector or a longer delay is still guessing. 
 - console errors; and
 - events such as navigation, a popup, or a download.
 
-DevTools is not only for developers. For QA, it is where a vague observation becomes a testable explanation.
+DevTools is not only for developers. For QA, it is where a vague observation becomes a testable explanation. From that evidence, you can determine whether the problem is the locator, timing, request, page state, or an application defect.
 
 ## The mental model
 
@@ -128,10 +128,21 @@ Use Playwright's tools when a test already exists:
 
 - `npx playwright test --ui` to move through test steps and compare DOM snapshots;
 - `npx playwright test --debug` to open the Inspector and step through actions;
-- `page.pause()` as a temporary local breakpoint at a specific point; and
-- the locator picker or code generator to propose a locator for review.
+- `page.pause()` as a temporary local breakpoint at a specific point;
+- the locator picker or code generator to propose a locator for review; and
+- `npx playwright show-trace path/to/trace.zip` to inspect recorded actions, DOM snapshots, network activity, console messages, source, and logs after a run.
 
 Generated locators are useful hypotheses. Keep one only when you can explain why it represents stable product meaning. Remove temporary `page.pause()` calls before committing the test.
+
+### Investigation in an agent-assisted workflow
+
+One practical strength of Playwright is that its investigation ecosystem extends beyond the test API and supports both human and agent-assisted work.
+
+`playwright-cli` is a separate, optional CLI designed for coding agents. An agent can use it to explore a browser flow, inspect accessibility snapshots, console messages, and network requests, capture screenshots or traces, and generate locator candidates.
+
+This work can happen in parallel with human exploratory testing. While the agent checks repeatable steps and prepares automation, QA can look for confusing behavior, visual problems, missing requirements, and risks that were never included in the automation request. Combine both sets of findings before deciding the final test scope and evidence.
+
+Playwright also provides `planner`, `generator`, and `healer` Test Agents. Treat their plans, locators, waits, and repairs as proposals that still need to be reviewed against product intent and observable evidence.
 
 Do not inspect every panel for every simple test. Start from the risk and open the evidence source that can answer the next question.
 
@@ -152,15 +163,15 @@ The useful next steps are:
 2. Confirm whether the test data violates a known rule.
 3. Check whether the product should display the returned validation message.
 4. Fix the data if the test setup is wrong, or report the missing user feedback if the product is wrong.
-5. Preserve enough evidence to distinguish those two causes on the next run.
+5. Preserve enough evidence in the test report or logs to distinguish those two causes on the next run.
 
 The tempting workaround—`waitForTimeout`, extra retries, or ignoring the response—only makes diagnosis slower.
 
-Before accepting a test proposed from a screenshot or short requirement, ask:
+Before accepting a test proposed from a screenshot, short requirement, or generated suggestion, ask:
 
 - Which live element and accessible identity did it assume?
 - Did it choose a selector from styling or from product meaning?
-- Does its wait correspond to an observable state, request, or event?
+- Does its wait correspond to an observable state, request, response, navigation, or browser event?
 - Does the assertion prove the user outcome or only that the click happened?
 - Does it assume a URL, response, status message, or timing rule without evidence?
 - What DevTools evidence would confirm or reject each assumption?
@@ -169,7 +180,7 @@ If the answer is “the code probably works,” the investigation is not finishe
 
 ## Check your understanding
 
-You manually submit a valid profile change and observe this sequence:
+You manually submit a profile change and observe this sequence:
 
 ```text
 Click “Save changes”
