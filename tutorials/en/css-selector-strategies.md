@@ -1,81 +1,83 @@
 ---
-title: 'Read CSS Selectors Without Making Them the Default'
-description: 'Inspect, review, and repair CSS locator fallbacks while keeping user intent and supported test contracts first.'
+title: 'Use CSS Selectors Only When Needed'
+description: 'Learn to read and repair CSS selectors when they are necessary without making them the default choice for every locator.'
 ---
 
 ## After this lesson, you can
 
 - read the CSS selector forms most often found in automation code;
-- explain which DOM facts a selector depends on;
-- distinguish a supported attribute contract from styling and structural details;
-- identify when a CSS fallback is justified in Playwright; and
-- diagnose zero or multiple matches without adding unnecessary selector depth.
+- explain which DOM details or attributes make a CSS selector work;
+- distinguish an attribute maintained for automation from styling classes or HTML structure;
+- identify when a CSS selector is a justified Playwright fallback; and
+- diagnose zero or multiple matches without making the selector longer and more complex.
 
 ## Why this matters for QA
 
-Even in a modern Playwright suite, you will encounter CSS:
+Even with Playwright, you will still encounter CSS selectors in many situations:
 
-- an older test uses `#submit-order`;
-- a test copies a long path from DevTools;
-- a third-party widget has poor semantics;
-- a production defect must be investigated in the live DOM; or
-- a team has not yet added a useful testability contract.
+- an older test still uses `#submit-order`;
+- a test uses a long selector copied from DevTools;
+- a third-party widget is difficult to identify through a role, label, or another locator;
+- a production issue requires direct DOM inspection; or
+- the application has no sufficiently stable attribute or locator for automation.
 
-You need enough CSS literacy to review and maintain that reality. You do not need to treat CSS syntax mastery as the goal of the learning path.
+You need enough CSS knowledge to read, review, and repair existing tests. The goal is not to memorize every part of CSS syntax.
 
-The dangerous assumption is that a selector becomes reliable when it becomes longer or matches exactly one element today.
+Avoid assuming that a selector becomes more reliable merely because it is longer or happens to find exactly one element today.
 
 ## The mental model
 
-A CSS selector describes implementation evidence:
+CSS selectors work through details exposed in the DOM:
 
 ```text
-Selector
-   ↓
-DOM facts it depends on
-   ↓
-Elements matching those facts right now
+CSS selector
+     ↓
+The tag, ID, class, attribute, hierarchy, or position it uses
+     ↓
+Elements that match those details
 ```
 
-Its maintenance quality depends on ownership, not syntax alone.
+Before using a CSS selector, identify each detail it depends on and ask how stable that detail is.
 
-CSS is not the next rung in a universal locator ladder. Check the user-facing contract, locator composition, and agreed test ID first. Use CSS only when the implementation fact is the deliberate contract, the page is legacy or third-party, or the missing semantics are an explicit testability gap.
+CSS is not automatically the next choice when a role, label, or text locator does not fit. First check whether clearer context, locator composition, or a team-supported test ID can identify the target.
 
-| DOM fact  | Questions to ask                                                    |
-| --------- | ------------------------------------------------------------------- |
-| Tag       | Is the element type part of the supported behavior?                 |
-| ID        | Is it deliberately stable or generated per build/session?           |
-| Class     | Is it a domain contract or merely styling/framework output?         |
-| Attribute | Who owns it, and can its value change harmlessly?                   |
-| Hierarchy | Is the parent-child relationship meaningful or just current markup? |
-| Position  | Is order the behavior under test?                                   |
+Use CSS when there is a clear reason—for example, a legacy page, a third-party component, or an attribute that the owning team deliberately keeps stable for automation.
 
-One unique match is necessary for many actions, but uniqueness today does not prove stability tomorrow.
+| Detail used | What to inspect                                                                     |
+| ----------- | ----------------------------------------------------------------------------------- |
+| Tag         | Does the element type matter to the scenario?                                     |
+| ID          | Is the ID stable or generated for each build or session?                          |
+| Class       | Is the class maintained intentionally or emitted only for styling or a framework? |
+| Attribute   | Who owns the attribute, and has the team agreed to keep its value stable?          |
+| Hierarchy   | Does the parent-child relationship matter, or is it only today's HTML structure?   |
+| Position    | Is the element order part of the behavior under test?                              |
+
+Finding exactly one element today does not mean the selector will remain reliable after the UI changes.
 
 ## Work through a realistic example
 
-A legacy invoice page has no useful row semantics yet. The suite contains:
+A legacy invoice page does not have sufficiently clear markup to distinguish each row. The suite currently contains:
 
 ```ts
 const overdueRows = page.locator('.invoice-table > tbody > tr:nth-child(2)');
 ```
 
-The risk is:
+The controlled test data contains two overdue invoices. The risk is:
 
-> Every invoice marked overdue by the application appears in the overdue collection.
+> Every invoice with an overdue status must appear in the overdue list.
 
 ### 1. Read what the existing selector assumes
 
 The selector depends on:
 
-- a styling class named `invoice-table`;
-- a direct `tbody` child;
-- a direct `tr` child; and
-- the overdue record always being second.
+- the `invoice-table` class;
+- `tbody` being a direct child;
+- `tr` being a direct child; and
+- an overdue invoice always occupying the second position.
 
-None of those facts expresses “marked overdue.” A new row, sorting change, or wrapper can change the selected record without changing the product rule.
+None of those details actually says that the row represents an overdue invoice. A new row, changed sorting, or different HTML structure could make the selector point to another invoice even when application behavior is unchanged.
 
-### 2. Inspect the live DOM for a supported signal
+### 2. Inspect the DOM for a stable attribute
 
 Suppose the application renders:
 
@@ -86,9 +88,9 @@ Suppose the application renders:
 </tr>
 ```
 
-The product team confirms that `data-state` is a maintained state contract used by the component, not a temporary styling hook.
+The component owner confirms that `data-state` represents invoice status and is deliberately kept stable, rather than being a temporary styling hook.
 
-A smaller fallback can express that implementation state:
+A smaller CSS selector can now express that state:
 
 ```ts
 const overdueRows = page.locator('tr[data-state="overdue"]');
@@ -96,68 +98,72 @@ const overdueRows = page.locator('tr[data-state="overdue"]');
 await expect(overdueRows).toHaveCount(2);
 ```
 
-This remains a CSS contract. It is justified because the scenario intentionally inspects a supported DOM state and the current page lacks a better user-facing collection contract.
+CSS is still a fallback here, but it has a clear reason: the scenario identifies invoices through the supported `overdue` state, and the page has no more suitable locator.
 
-If “Overdue” visible text is the actual user evidence, a role/text locator may still be better. If `data-state` is not guaranteed, ask for an explicit test ID or improved semantics instead of declaring it stable yourself.
+If the visible **“Overdue”** text is important to the scenario, a text-based locator may be more appropriate. If the owning team does not guarantee `data-state`, discuss adding a test ID or improving the markup instead of assuming the attribute is safe for automation.
 
-### 3. Read only the syntax needed to diagnose
+### 3. Read the CSS syntax that appears most often
 
-You do not need to memorize CSS grammar. Recognize the forms below so you can explain what a selector proposal depends on and which change could break it.
+You do not need to memorize all CSS syntax. Learn the common forms well enough to explain which DOM details a selector uses.
 
 ```css
 button                         /* tag */
 #account-menu                  /* id */
 .error-message                /* class */
 [name="email"]                /* exact attribute */
-input[type="email"]           /* tag plus attribute */
+input[type="email"]           /* tag + attribute */
 .menu a                       /* descendant at any depth */
 .menu > a                     /* direct child */
 li:nth-child(3)               /* third child if it is an li */
 ```
 
-More clauses narrow matches, but each clause also adds a maintenance dependency.
+Adding more parts can make a selector more specific, but every added part is another DOM detail that must remain unchanged.
 
-### 4. Distinguish class tokens from partial strings
+### 4. Distinguish a class name from a partial match
 
-CSS class selection uses tokens:
+A CSS class selector matches a class name:
 
 ```css
 .error
 ```
 
-An attribute substring check is different:
+This attribute selector instead matches any class value containing `error`:
 
 ```css
 [class*="error"]
 ```
 
-The second selector can also match class values such as `errorless`. Do not use partial matching unless partial text is the actual documented contract.
+The second selector can also match a class such as `errorless`. Do not use partial matching when the scenario actually requires an exact class name or attribute value.
 
-### 5. Treat position honestly
+### 5. Use an index only when position matters
 
 ```css
 .results > li:nth-child(1)
 ```
 
-This is appropriate if the requirement is specifically about the first ranked result. It is weak if the test merely needs the result for invoice `INV-1042`.
+This selector can be appropriate when the requirement explicitly concerns the first result. But if the test only needs invoice `INV-1042`, relying on an index makes the selector vulnerable to ordering changes.
 
-Position is not inherently bad. Undocumented position is.
+An index is not always wrong. The problem is depending on position when position is not part of the requirement.
 
 ## When to use it—and when not to
 
-Use CSS when inspecting the live DOM, maintaining an existing suite, working around third-party markup, or relying on a deliberately supported DOM attribute that no built-in locator expresses cleanly.
+Use CSS when inspecting the DOM directly, maintaining a legacy suite, handling third-party markup, or using a stable attribute that Playwright's built-in locators cannot express clearly.
 
-Use `getByTestId` rather than raw `[data-testid="..."]` when the team has adopted Playwright's test-ID contract. It communicates intent and respects a configured custom test-ID attribute.
+When the team uses test IDs, prefer `getByTestId()` over raw `[data-testid="..."]`. It communicates the intent more clearly and respects any custom test-ID attribute configured by the project.
 
-Prefer role, label, visible text, locator composition, or a test ID for normal user workflows. Ask for better semantics or testability when a CSS selector would otherwise encode a long structural route.
+For ordinary user flows, continue to prefer roles, labels, visible text, locator composition, or test IDs.
 
-Do not choose CSS because it appears faster. Browser, network, application, and assertion time normally dominate selector micro-differences. Optimize meaning, diagnosis, and maintenance.
+If a CSS selector must depend on many parents, children, classes, or indexes, first ask whether the markup or testability can be improved instead of extending the selector further.
 
-Do not assume an ID is stable, a class is unstable, or a data attribute is safe based on its spelling. Verify how the application owns it.
+Do not choose CSS merely because it appears faster. In an automation test, selector-performance differences are normally much smaller than the time spent opening the browser, waiting for the network and application, and running assertions.
+
+Choose locators that are easier to understand, debug, and maintain.
+
+Do not assume that every ID is stable, every class is unstable, or every `data-*` attribute is safe based only on its name. Inspect how the application creates it and confirm who maintains it.
 
 ## When it fails
 
-Suppose this selector suddenly matches zero elements:
+Suppose this selector suddenly finds no elements:
 
 ```ts
 page.locator('.btn.btn-primary.checkout-submit');
@@ -165,37 +171,41 @@ page.locator('.btn.btn-primary.checkout-submit');
 
 Inspect:
 
-1. Is the expected page and state loaded?
-2. Which clause stopped matching?
-3. Were the classes renamed by a redesign or build system?
-4. Was the control removed, disabled, or moved to another context?
+1. Has the test reached the correct page and state?
+2. Which part of the selector no longer matches?
+3. Did a redesign or build-system change rename the classes?
+4. Was the element removed, disabled, or moved to another context?
 5. Is there now a role, label, or test ID that better expresses the target?
-6. Was the original selector relying on styling rather than a supported contract?
+6. Did the original selector depend too heavily on styling?
 
-If it matches several elements, do not keep adding ancestors until one remains. Identify the missing user, domain, or component context first.
+If the selector finds several elements, do not keep adding parents or ancestors until only one remains. First identify meaningful context—such as a card, row, dialog, or page region—that distinguishes the intended target.
 
-For structural selectors, compare the expected and current ancestor chain. Fix the contract rather than copying an even longer path.
+If the selector deliberately depends on DOM structure, inspect which part of that structure changed. Do not simply copy a longer path from DevTools. Repair the selector based on the actual page and the test scenario.
 
-### Shadow DOM boundary
+### Check Shadow DOM and iframe boundaries
 
-Playwright locators, including CSS locators, normally work through open shadow roots. XPath does not pierce shadow roots, and closed shadow roots are not supported. CSS and XPath locators also do not cross iframe boundaries; select the correct frame context first. A zero match may therefore be a boundary limitation rather than a syntax mistake.
+Playwright locators, including CSS locators, normally work through open shadow roots. XPath does not pierce shadow roots, and closed shadow roots are not supported.
 
-When reviewing a CSS fallback, ask:
+CSS and XPath locators also do not search inside an iframe automatically. If the target is in an iframe, use the correct frame context first.
 
-- Which exact DOM facts does every selector part depend on?
-- Are those facts supported contracts or current implementation details?
-- Is a generated ID, hashed class, or positional wrapper involved?
-- Does the selector match the intended element or merely one element?
-- Could role, label, text, composition, or test ID express the intent better?
-- Is `nth-child` hiding an ambiguity that should be investigated?
-- Does the selector assume that a class name expresses product state?
-- Is the selector crossing a shadow-root or iframe boundary correctly?
+A zero match is therefore not always a selector-syntax problem. The element may be behind a Shadow DOM or iframe boundary that the locator has not handled correctly.
 
-Shorter is not always better, but every extra segment needs a reason.
+When reviewing a CSS selector, check:
+
+- Which DOM details does each part of the selector use?
+- Are the ID, class, or attribute values deliberately maintained?
+- Does it contain a generated ID, hashed class, or fragile index?
+- Does it find the element required by the scenario, or merely one element?
+- Could a role, label, text, composed locator, or test ID express the target more clearly?
+- Is `nth-child()` being used only to bypass several matches?
+- Does the selector assume that a class always represents product state?
+- If the element is inside a shadow root or iframe, does the locator access it correctly?
+
+A shorter selector is not automatically better, but every added part should be necessary to identify the intended target.
 
 ## Check your understanding
 
-Review three candidate selectors for the invoice scenario:
+Review these three CSS selectors for the invoice scenario:
 
 ```css
 .table-striped > tbody > tr:nth-child(2)
@@ -205,24 +215,26 @@ tr[data-state="overdue"]
 
 Explain:
 
-1. Which DOM facts each selector depends on.
-2. Which harmless changes could break or change its meaning.
-3. What team agreement would make the attribute selector trustworthy.
-4. When position would be the correct contract.
-5. Which user-facing locator you would consider if visible “Overdue” text is the real evidence.
+1. Which DOM details does each selector use?
+2. Which UI or DOM changes could make it fail or point to a different element?
+3. What must the team confirm before `data-state="overdue"` is considered stable enough for automation?
+4. When does an index such as `nth-child(2)` match the requirement?
+5. If visible **“Overdue”** text matters to the scenario, which other locator should you consider?
 
 ## Compare your reasoning
 
 One reasonable answer is:
 
-- The first selector depends on a styling class, exact table hierarchy, and second position. It is appropriate only if those facts are deliberately under test.
-- `tr[data-state="overdue"]` depends on the row tag and exact state attribute. It is reasonable when the component team supports that state contract and the test intentionally inspects it.
-- `[class*="overdue"]` depends on a partial class string and may match unrelated values; it is the least explicit of the three.
-- Position is valid when verifying ranking, sorting, or a specific ordered slot.
-- If the customer-visible status is the contract, scope to the relevant row and locate the exact visible status text instead.
+- The first selector depends on the `table-striped` class, the exact table structure, and the second row. It is appropriate only when those details are part of the requirement.
+- `tr[data-state="overdue"]` depends on the `tr` tag and the exact `data-state="overdue"` attribute. It is reasonable when the owning team keeps that attribute stable and the test intentionally finds invoices by that state.
+- `[class*="overdue"]` only checks whether a class value contains `overdue`, so it may match unrelated values.
+- An index is appropriate when the test verifies ranking, sorting, or an item in a particular position.
+- If visible **“Overdue”** text matters to the scenario, first identify the correct row and then verify that exact text inside it.
 
 ## Before you continue
 
-You should now be able to read common CSS selectors, state their maintenance dependencies, and justify a CSS fallback without confusing a unique current match with a durable test contract.
+You should now be able to read common CSS selectors, identify the DOM details they depend on, and decide when CSS is a justified fallback.
 
-Standalone CSS syntax drills remain available as Basic practice and do not block Module 4 completion. The next XPath lesson is also optional; use it when your work includes legacy suites or DOM relationships that still depend on XPath.
+Basic Practice for CSS syntax remains available if you want extra exercises, but it is not required to complete Module 4.
+
+The next XPath lesson is also optional. It is most relevant when you work with legacy suites or locators that still depend heavily on XPath.
