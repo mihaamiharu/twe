@@ -5,41 +5,51 @@ description: 'Gunakan hierarki yang bermakna dan transisi state untuk memahami U
 
 ## Setelah lesson ini, kamu bisa
 
-- menjelaskan perbedaan antara HTML awal, DOM aktif, dan UI yang terlihat;
-- memakai hubungan parent, child, ancestor, descendant, dan sibling untuk menjelaskan konteks halaman;
-- membatasi kontrol yang berulang ke produk, row, dialog, atau region yang tepat;
-- menjelaskan interaksi sebagai transisi state sebelum–aksi–sesudah; serta
-- mendiagnosis ambiguitas karena elemen berulang atau proses render ulang.
+- menjelaskan perbedaan antara HTML awal, DOM yang sedang digunakan browser, dan UI yang terlihat oleh user;
+- menggunakan hubungan `parent`, `child`, `ancestor`, `descendant`, dan `sibling` untuk memahami posisi dan konteks sebuah element;
+- menentukan scope yang tepat ketika ada beberapa element dengan fungsi atau nama yang sama, misalnya di product card, table row, dialog, atau bagian halaman tertentu;
+- menjelaskan perubahan state sebelum action dilakukan dan setelah action selesai; serta
+- mendiagnosis masalah ketika automation menemukan lebih dari satu element yang cocok atau ketika DOM berubah setelah halaman di-render ulang.
+
 
 ## Kenapa ini penting buat QA
 
-Coba bayangin sebuah halaman keranjang punya tiga button bernama “Remove.” Saat manual testing, kamu tahu button mana yang dimiliki “Mechanical Keyboard” karena posisinya ada di dalam row produk tersebut.
+Coba bayangin halaman cart punya tiga button bernama **“Remove.”** Saat manual testing, kamu tahu button mana yang harus dipilih untuk **“Mechanical Keyboard”** karena button tersebut ada di product row yang sama.
 
-Web automation nggak bisa dengan aman memilih “button Remove yang pertama.” Urutannya bisa berubah, produk baru bisa disisipkan, atau halaman bisa mengganti row setelah harga diperbarui.
+Automation nggak bisa asal memilih **button Remove yang pertama**. Urutan produk bisa berubah, produk baru bisa ditambahkan, atau DOM bisa berubah setelah data di halaman di-update.
 
-Masalahnya bukan karena halaman punya button yang berulang. Itu hal yang normal. Masalah muncul saat kita kehilangan konteks bermakna yang menghubungkan setiap aksi ke data yang tepat.
+![Halaman cart menampilkan tiga row produk dengan button Remove yang sama, sementara row Mechanical Keyboard ditandai sebagai konteks target.](/images/tutorials/cart-row-context-ui.png)
 
-Supaya web automation untuk UI modern tetap andal, QA perlu membaca halaman sebagai pohon yang aktif dan memikirkan bagaimana pohon itu berubah.
+Punya beberapa button dengan nama yang sama itu normal. Masalahnya muncul kalau automation nggak punya konteks yang cukup untuk tahu button mana yang berkaitan dengan produk yang ingin kita test.
+
+Karena itu, QA perlu memahami struktur DOM dan bagaimana DOM bisa berubah setelah user berinteraksi dengan halaman.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Document Object Model (DOM) adalah model objek halaman yang sedang aktif di browser. DOM bukan:
+**Document Object Model (DOM)** adalah struktur halaman yang dibentuk browser dari HTML dan digunakan saat halaman berjalan.
 
-- screenshot tampilan halaman;
-- component tree internal milik React, Vue, atau framework lain; atau
-- sekadar teks HTML yang pertama kali dikirim server.
+DOM bukan:
 
-JavaScript bisa menambah, menghapus, mengurutkan ulang, atau mengganti node DOM setelah response awal. Atribut dan property juga bisa berubah. DOM saat ini adalah struktur yang dipakai web automation pada saat itu.
+* screenshot dari tampilan halaman;
+* component tree internal milik React, Vue, atau framework lain; atau
+* sekadar HTML awal yang pertama kali diterima browser.
 
-Di dalam pohon tersebut:
+Setelah halaman dibuka, JavaScript bisa menambah, menghapus, memindahkan, atau mengganti element di DOM. Attribute dan property dari sebuah element juga bisa berubah.
 
-| Hubungan   | Artinya                                              |
-| ---------- | ---------------------------------------------------- |
-| Parent     | Elemen yang langsung membungkus elemen lain          |
-| Child      | Elemen yang berada langsung di dalam elemen lain     |
-| Ancestor   | Semua elemen pembungkus yang posisinya lebih tinggi  |
-| Descendant | Semua elemen di dalamnya yang posisinya lebih rendah |
-| Sibling    | Elemen-elemen yang punya parent yang sama            |
+Karena itu, struktur DOM yang kita lihat saat ini belum tentu sama dengan HTML awalnya. Automation akan berinteraksi dengan DOM sesuai kondisi halaman pada saat test dijalankan.
+
+![HTML awal menjadi DOM aktif yang bisa di-update JavaScript, sementara framework component tree dan rendered UI tetap menjadi representasi yang berbeda.](/images/tutorials/live-dom-model.png)
+
+DOM punya struktur seperti tree. Setiap element bisa punya hubungan dengan element lain:
+
+| Hubungan   | Artinya                                                            |
+| ---------- | ------------------------------------------------------------------ |
+| Parent     | Element yang langsung membungkus element lain                      |
+| Child      | Element yang langsung berada di dalam element lain                 |
+| Ancestor   | Parent atau element lain di atasnya dalam struktur DOM             |
+| Descendant | Child atau element lain yang berada di bawahnya dalam struktur DOM |
+| Sibling    | Element yang punya parent yang sama                                |
+
 
 ![Pohon DOM keranjang memakai row produk sebagai konteks bermakna, lalu berubah setelah satu produk dihapus.](/images/tutorials/live-dom-context.svg)
 

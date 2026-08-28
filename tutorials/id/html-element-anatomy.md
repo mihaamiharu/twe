@@ -5,48 +5,58 @@ description: 'Periksa role, accessible name, dan state yang penting sebelum memi
 
 ## Setelah lesson ini, kamu bisa
 
-- mengenali semantic role, accessible name, dan state yang relevan dari sebuah elemen;
-- menjelaskan kenapa elemen HTML native biasanya memberi kontrak yang lebih jelas daripada elemen generik yang dibuat bisa diklik;
-- membedakan atribut untuk styling, identitas yang dilihat pengguna, dan kontrak testability; serta
-- me-review potongan markup kecil untuk menemukan risiko accessibility dan web automation.
+- mengenali semantic role, accessible name, dan state yang relevan dari sebuah element;
+- menjelaskan kenapa native HTML element biasanya lebih mudah dipahami dan di-automate dibanding generic element yang hanya dibuat clickable;
+- membedakan attribute yang digunakan untuk styling, informasi yang dikenali user, dan attribute yang membantu testability; serta
+- me-review potongan markup sederhana untuk menemukan risiko accessibility dan web automation.
 
-Kamu nggak perlu menghafal semua tag HTML atau aturan ARIA. Targetnya adalah bisa membaca halaman secukupnya supaya keputusan QA-mu punya dasar yang jelas.
+Kamu nggak perlu menghafal semua HTML tag atau aturan ARIA. Targetnya adalah bisa membaca markup secukupnya untuk memahami bagaimana browser mengenali sebuah element dan menentukan cara yang tepat untuk mengujinya.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih kamu bisa mengklik kontrol bertuliskan “Create account” saat manual testing, tetapi automated test malah nggak menemukan button dengan nama tersebut?
+Pernah nggak sih saat manual testing kamu bisa klik kontrol bertuliskan “Create account”, tapi automated test justru nggak menemukan button dengan nama tersebut?
 
-Bisa jadi kontrol itu terlihat seperti button tanpa benar-benar punya semantik button. Teks yang kelihatan mungkin nggak terhubung ke input di sebelahnya. Sebuah selector mungkin berhasil hari ini, tetapi ternyata bergantung pada class styling yang berubah saat redesign berikutnya.
+Bisa jadi dari tampilannya element itu seperti button, padahal HTML-nya cuma div atau element lain yang dibuat clickable.
 
-Saat manual testing, kita sering bisa menebak dari layout dan konteks. Browser automation membutuhkan identitas yang bisa ditemukan ulang secara konsisten. Pengguna teknologi bantu juga membutuhkan kejelasan yang sama.
+Hal yang sama bisa terjadi pada input. Teks yang kelihatan seperti label belum tentu benar-benar terhubung ke input tersebut.
 
-Jadi, sebelum bertanya, “Selector apa yang harus ditulis?”, tanyakan tiga hal ini dulu:
+Selector juga bisa kelihatan aman karena test masih pass hari ini, padahal selector-nya bergantung pada CSS class yang bisa berubah kapan saja saat UI di-update atau di-redesign.
+Saat manual testing, kita masih bisa memahami element dari tampilan dan konteks di halaman. Automation nggak punya kemampuan itu. Ia membutuhkan informasi yang jelas dan konsisten dari markup supaya element yang sama bisa ditemukan lagi.
 
-1. Kontrol ini sebenarnya apa?
-2. Bagaimana pengguna mengenalinya?
-3. State apa yang membuktikan perilaku yang sedang kita periksa?
+Ini juga berkaitan dengan accessibility. Screen reader menggunakan informasi dari HTML dan ARIA untuk memahami apakah sebuah element adalah button, input, link, atau element lain.
+
+Jadi, sebelum bertanya “Selector apa yang harus dipakai?”, tanyakan tiga hal ini dulu:
+
+1. Element ini sebenarnya apa?
+2. Bagaimana user mengenali element tersebut?
+3. State apa yang menunjukkan bahwa behavior yang ingin diuji benar-benar terjadi?
 
 ## Cara berpikir yang perlu kamu pegang
 
-Browser nggak cuma menampilkan response HTML. Browser mengubah markup menjadi Document Object Model (DOM) yang aktif, menerapkan tampilan dan perilaku, lalu menyediakan informasi aksesibilitas yang mewakili makna, nama, dan state.
+Browser nggak cuma menampilkan HTML begitu saja. Browser membaca HTML, membentuk **Document Object Model (DOM)**, lalu memprosesnya bersama CSS dan JavaScript sampai menjadi halaman yang kita lihat dan gunakan.
+
+Sebagai manusia, kita melihat hasil akhirnya di layar. Automation bekerja dari informasi yang tersedia di halaman, termasuk struktur DOM dan informasi accessibility seperti **role, accessible name,** dan **state** dari sebuah element.
 
 ![Browser mengubah markup menjadi DOM aktif, UI yang terlihat, dan informasi aksesibilitas yang bisa diperiksa QA sebelum menentukan kontrak automation.](/images/tutorials/ui-meaning-layers.svg)
 
 _Dasarkan web automation pada UI aktif yang bermakna, bukan pada satu atribut yang disalin dari markup awal._
 
-Untuk elemen interaktif, baca tiga lapisan ini:
+Untuk element yang bisa di-interact, ada tiga hal yang perlu diperhatikan:
 
-| Lapisan         | Pertanyaan                                             | Contoh                                                     |
-| --------------- | ------------------------------------------------------ | ---------------------------------------------------------- |
-| Role            | Kontrol ini jenisnya apa?                              | button, textbox, checkbox, link                            |
-| Accessible name | Bagaimana pengguna atau teknologi bantu membedakannya? | “Create account” atau “Work email”                         |
-| State           | Apa yang sedang berlaku sekarang?                      | required, checked, expanded, disabled, atau value saat ini |
+| Yang dilihat    | Pertanyaan                              | Contoh                                                     |
+| --------------- | --------------------------------------- | ---------------------------------------------------------- |
+| Role            | Element ini sebenarnya apa?             | button, textbox, checkbox, link                            |
+| Accessible name | User mengenali element ini sebagai apa? | “Create account” atau “Work email”                         |
+| State           | Kondisinya sekarang seperti apa?        | required, checked, expanded, disabled, atau value saat ini |
 
-Elemen HTML bawaan sering menyediakan role secara otomatis. `<button>` punya semantik button. `<input type="checkbox">` punya semantik checkbox. ARIA bisa menambahkan informasi yang memang belum tersedia, tetapi menambah ARIA yang berulang nggak otomatis memperbaiki HTML yang kurang jelas.
+Native HTML element biasanya sudah punya role secara otomatis. Contohnya, `<button>` akan dikenali sebagai button dan `<input type="checkbox">` akan dikenali sebagai checkbox.
+ARIA bisa digunakan kalau informasi accessibility yang dibutuhkan belum tersedia dari HTML. Tapi jangan menambahkan ARIA kalau native HTML element sebenarnya sudah memberikan informasi yang benar.
 
-Accessible name berbeda dari `id`, `name`, atau CSS class. Accessible name adalah nama yang dihitung browser berdasarkan aturan aksesibilitas. Tergantung jenis kontrolnya, nama ini bisa berasal dari teks yang terlihat, `<label>` yang terhubung, `aria-labelledby`, `aria-label`, alternative text, atau sumber lain yang didukung.
+**Accessible name** juga berbeda dari `id`, `name`, atau CSS class. Ini adalah nama yang digunakan browser untuk mengenali sebuah element dari sisi accessibility.
 
-Aturannya punya detail dan pengecualian. Sebagai QA engineer, jangan menebak hanya dari kode. Periksa informasi yang benar-benar diberikan browser.
+Tergantung element-nya, accessible name bisa berasal dari teks yang terlihat, `<label>` yang terhubung ke input, `aria-labelledby`, `aria-label`, atau `alt` pada image.
+
+Aturannya cukup banyak, jadi sebagai QA engineer kita nggak perlu menebak hanya dari HTML. Yang lebih penting adalah mengecek bagaimana browser benar-benar mengenali **role, accessible name,** dan **state** dari element tersebut.
 
 ## Coba kita bedah contoh nyata
 
@@ -70,24 +80,26 @@ Tim produk sedang membuat form pendaftaran akun:
 </form>
 ```
 
-Coba baca sebagai kontrak QA, bukan sebagai syntax yang harus dihafal:
+Sebagai QA, kita nggak perlu menghafal syntax-nya. Coba lihat informasi apa yang bisa kita ambil dari markup tersebut:
 
-- Field email punya role bawaan `textbox`.
-- Accessible name-nya adalah “Work email” karena `<label>` terhubung lewat `for` dan `id`.
-- `required` adalah state atau batasan yang relevan.
-- Teks bantuan menjelaskan field, tetapi nggak menggantikan namanya.
-- Kontrol submit adalah button bawaan dengan nama “Create account.”
+* Field email dikenali sebagai `textbox`.
+* Accessible name-nya adalah **“Work email”** karena `<label>` terhubung ke input melalui `for` dan `id`.
+* Attribute `required` memberi tahu bahwa field ini wajib diisi.
+* Teks **“Use the address provided by your company.”** memberi informasi tambahan tentang field, tapi nama field-nya tetap **“Work email”**.
+* Tombol submit dikenali sebagai `button` dengan accessible name **“Create account”**.
 
-Nanti, Playwright bisa menyatakan identitas yang sama seperti yang dipahami pengguna:
+Nanti di Playwright, kita bisa mencari element menggunakan informasi yang sama:
 
 ```ts
 const email = page.getByRole('textbox', { name: 'Work email' });
 const submit = page.getByRole('button', { name: 'Create account' });
 ```
 
-Dua baris itu bukan selector ajaib. Keduanya adalah klaim tentang informasi yang diberikan browser. Kalau klaimnya salah, inspeksi seharusnya membantu kita menemukan alasannya.
+Dua baris ini bukan sekadar selector. Playwright menggunakan **role** dan **accessible name** yang tersedia dari halaman untuk menemukan element yang dimaksud.
 
-Sekarang bandingkan dengan markup yang maknanya kurang jelas:
+Kalau locator tersebut nggak menemukan element, jangan langsung ganti ke selector yang lebih rumit. Cek dulu bagaimana browser sebenarnya mengenali element tersebut.
+
+Sekarang bandingkan dengan markup berikut:
 
 ```html
 <span>Work email</span>
@@ -95,67 +107,81 @@ Sekarang bandingkan dengan markup yang maknanya kurang jelas:
 <div class="primary-button" onclick="submitAccount()">Create account</div>
 ```
 
-Mulai kelihatan beberapa risikonya:
+Mulai kelihatan beberapa masalah:
 
-- Teks yang terlihat nggak terhubung secara programatis ke input.
-- Placeholder adalah petunjuk, bukan pengganti label tetap yang bisa diandalkan.
-- `<div>` yang bisa diklik nggak otomatis memiliki semantik button, perilaku keyboard, atau perilaku focus.
-- Class tersebut menjelaskan tampilan dan bisa berubah tanpa ada perubahan pada perilaku produk.
+* Teks **“Work email”** terlihat seperti label, tapi browser nggak mengenalinya sebagai label untuk input tersebut.
+* `placeholder` bisa memberi petunjuk tentang format input, tapi sebaiknya nggak digunakan sebagai pengganti label yang jelas.
+* `<div>` yang dibuat clickable nggak otomatis dikenali sebagai `button` dan belum tentu punya keyboard serta focus behavior yang sesuai.
+* CSS class seperti `field--wide` atau `primary-button` menjelaskan tampilan. Class tersebut bisa berubah saat UI di-update tanpa ada perubahan pada behavior yang sedang kita test.
 
-Perbaikan terkuat biasanya memperjelas markup produknya. Selector yang rumit mungkin bisa menyembunyikan testability yang buruk, tetapi nggak bisa memberikan semantik yang hilang kepada pengguna.
+Kalau masalahnya ada di markup, solusi terbaik biasanya adalah memperbaiki markup tersebut.
 
-### Atribut, property, dan state saat ini
+Selector yang lebih rumit mungkin bisa membuat automated test tetap berjalan, tapi nggak memperbaiki accessibility atau testability dari element yang sebenarnya.
 
-HTML awal belum tentu sama dengan state yang sedang digunakan pengguna. Contohnya:
+### Attribute, property, dan current state
+
+HTML awal belum tentu menunjukkan kondisi element saat ini.
+
+Contohnya:
 
 ```html
 <input id="quantity" type="number" value="1" />
 ```
 
-Setelah pengguna mengubah field menjadi `3`, property `value` saat ini bisa bernilai `3`, sementara atribut `value` awal masih mewakili nilai awal atau default. JavaScript juga bisa menambah atau menghapus atribut seperti `disabled` atau `aria-expanded` ketika halaman sedang berjalan.
+Awalnya field punya value `1`. Setelah user mengubahnya menjadi `3`, nilai yang sedang digunakan oleh halaman bisa sudah menjadi `3`, sementara attribute `value="1"` masih menunjukkan nilai awalnya.
 
-Itulah kenapa “View Source” saja nggak cukup untuk memahami perilaku dinamis. Periksa DOM aktif dan state yang sedang dilihat pengguna.
+Hal yang sama bisa terjadi pada attribute seperti `disabled` atau `aria-expanded`. JavaScript bisa mengubah nilainya ketika user berinteraksi dengan halaman.
+
+Karena itu, **View Source** saja nggak cukup untuk melihat kondisi element setelah halaman berjalan. Untuk melihat kondisi saat ini, cek DOM serta property atau state element langsung lewat browser DevTools.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Gunakan role, accessible name, dan state ketika perilakunya merupakan bagian dari apa yang dipahami pengguna: form, button, link, dialog, menu, status message, dan UI interaktif lainnya.
+Gunakan **role, accessible name,** dan **state** ketika element memang punya identitas yang jelas dari sisi user, seperti form, button, link, dialog, menu, status message, dan UI interaktif lainnya.
 
-Gunakan kontrak test yang eksplisit seperti `data-testid` ketika nggak ada identitas yang menghadap pengguna dan cukup stabil, atau ketika wording produk memang sengaja berubah-ubah. Test ID bisa memperbaiki testability, tetapi jangan dipakai untuk menyamarkan label yang hilang atau semantik kontrol yang rusak.
+Kalau element nggak punya identitas yang cukup jelas atau wording di UI memang sering berubah, kita bisa menggunakan test attribute yang eksplisit seperti `data-testid`.
 
-Atribut CSS bisa membantu saat memeriksa struktur. Bukan berarti semuanya buruk, tetapi class yang dibuat hanya untuk styling biasanya menjadi kontrak perilaku yang lebih lemah. XPath juga nggak diperlukan kalau role, name, atau kontrak test eksplisit sudah menyatakan tujuannya. Pilihan ini akan kita bedah lebih dalam di Modul 4.
+`data-testid` bisa membantu membuat element lebih mudah dan stabil untuk ditemukan oleh automation. Tapi jangan pakai `data-testid` sebagai jalan pintas kalau markup-nya sendiri masih bermasalah, misalnya input nggak punya label atau element clickable sebenarnya bukan button.
 
-Jangan menjadikan setiap detail aksesibilitas sebagai browser test. Role-based locator memberi feedback yang berguna, tetapi nggak menggantikan accessibility audit, keyboard testing, atau testing langsung dengan teknologi bantu.
+CSS attribute atau class tetap bisa berguna saat kita perlu mengecek struktur tertentu. Tapi class yang dibuat hanya untuk styling biasanya lebih mudah berubah ketika UI di-update, jadi kurang ideal kalau dijadikan selector utama.
 
-## Kalau gagal, mulai cek dari mana?
+Hal yang sama berlaku untuk XPath. Kalau element sudah bisa ditemukan dengan jelas lewat **role, accessible name,** atau test attribute yang memang dibuat untuk automation, biasanya nggak perlu memakai XPath yang lebih kompleks.
 
-Coba bayangin sebuah test mengalami timeout di sini:
+Kita akan membahas pilihan locator ini lebih dalam di Module 4.
+
+Role-based locator juga bukan berarti semua accessibility testing sudah selesai. Locator seperti ini bisa membantu menemukan masalah tertentu, tapi tetap nggak menggantikan accessibility audit, keyboard testing, atau testing langsung menggunakan screen reader.
+
+## Kalau test fail, mulai cek dari mana?
+
+Coba bayangin test timeout di bagian ini:
 
 ```ts
 await page.getByRole('button', { name: 'Create account' }).click();
 ```
 
-Di halaman terlihat tulisan “Create account.” Sebelum mengganti locator, periksa kontrolnya:
+Di halaman, tulisan **“Create account”** memang terlihat. Tapi sebelum langsung ganti locator, cek dulu element-nya:
 
-1. Apakah DOM aktif berisi `<button>` bawaan atau hanya elemen generik yang diberi tampilan seperti button?
-2. Role apa yang diberikan browser?
-3. Accessible name apa yang diberikan browser?
-4. Apakah kontrol sedang disabled, tersembunyi, atau diganti setelah render?
-5. Apakah ada lebih dari satu kontrol dengan role dan name yang sama?
+1. Apakah HTML-nya benar-benar menggunakan `<button>`, atau cuma element lain yang dibuat terlihat dan behave seperti button?
+2. Role apa yang dikenali browser?
+3. Accessible name apa yang dikenali browser?
+4. Apakah element sedang `disabled`, hidden, atau berubah setelah halaman selesai render?
+5. Apakah ada lebih dari satu element dengan role dan accessible name yang sama?
 
-Kalau produk memakai `<div>` yang bisa diklik, mengganti test dengan jalur CSS panjang mungkin membuat klik berhasil. Namun, itu hanya menyembunyikan masalah accessibility dan testability. Utamakan perbaikan kontrol. Kalau kode produk belum bisa diubah, catat keterbatasannya dan gunakan kontrak fallback eksplisit yang paling kecil.
+Kalau ternyata produknya menggunakan `<div>` yang dibuat clickable, kita mungkin masih bisa membuat test jalan dengan CSS selector. Tapi itu belum memperbaiki masalah pada element-nya.
 
-Fixed delay bukan diagnosis. Waktu tunggu nggak akan mengubah elemen generik menjadi button atau menghubungkan label yang terpisah.
+Kalau memungkinkan, perbaiki markup-nya terlebih dahulu. Kalau belum bisa diubah, gunakan fallback selector yang paling jelas dan catat limitation tersebut supaya tim tahu kenapa locator itu diperlukan.
 
-Sebelum menerima usulan markup atau locator, review dengan pertanyaan berikut:
+Menambah fixed delay juga bukan solusi untuk masalah seperti ini. Menunggu lebih lama nggak akan membuat `<div>` berubah menjadi button atau membuat label yang salah menjadi benar.
 
-- Apakah elemen HTML bawaan digunakan ketika memang tersedia?
-- Apakah setiap form control punya label yang bermakna?
-- Apakah ARIA benar-benar menjelaskan UI, atau malah dipakai sebagai tempat data test sembarang?
-- Apakah locator yang diusulkan sesuai dengan role dan accessible name sebenarnya?
-- Apakah class styling dianggap sebagai kontrak produk yang stabil?
-- Bisakah kamu menjelaskan state apa yang akan dibuktikan assertion-nya?
+Sebelum memakai markup atau locator, cek dulu beberapa hal ini:
 
-Markup atau locator baru berupa hipotesis sampai cocok dengan halaman aktif dan perilaku produk yang diharapkan.
+* Apakah sudah menggunakan native HTML element kalau memang tersedia?
+* Apakah setiap form control punya label yang jelas?
+* Apakah ARIA memang digunakan untuk accessibility, bukan sekadar tempat menaruh data untuk automation?
+* Apakah locator-nya sesuai dengan role dan accessible name yang dikenali browser?
+* Apakah selector bergantung pada CSS class yang sebenarnya cuma digunakan untuk styling dan bisa berubah?
+* Bisakah kamu menjelaskan state atau expected result apa yang akan diverifikasi oleh assertion tersebut?
+
+Jangan langsung pakai markup atau locator tersebut tanpa dicek. Cocokkan dulu dengan halaman yang benar-benar berjalan dan behavior yang memang diharapkan.
 
 ## Coba cek pemahamanmu
 
@@ -172,21 +198,20 @@ Review markup berikut:
 
 Tanpa menulis test, coba jawab:
 
-1. Apa role, accessible name, dan state input saat ini?
-2. Apa role dan accessible name dari kontrol yang hanya menampilkan icon?
-3. Detail mana yang menjelaskan perilaku pengguna, dan mana yang hanya menjadi struktur implementasi?
-4. Apa yang akan kamu periksa di browser sebelum mempercayai jawabanmu?
+1. Apa **role, accessible name,** dan **state** dari checkbox tersebut?
+2. Apa **role** dan **accessible name** dari button yang hanya menampilkan icon?
+3. Informasi mana yang memang menggambarkan behavior dari sisi user, dan mana yang hanya bagian dari implementation?
+4. Apa yang perlu kamu cek langsung di browser sebelum memastikan jawabanmu benar?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh Jawabam:
+* Input tersebut adalah checkbox dengan accessible name **“Email alerts”** dan state awal `checked`.
+* Element yang hanya menampilkan icon adalah `button` dengan accessible name **“Remove Mechanical Keyboard”**. SVG-nya diberi `aria-hidden="true"` supaya nggak ikut terbaca sebagai bagian dari accessible name.
+* Label, fungsi button, nama produk, dan state `checked` adalah informasi yang relevan dari sisi user. Sementara `id` element dan struktur SVG lebih berkaitan dengan implementation.
+* Cek DOM dan informasi accessibility langsung di browser untuk memastikan role, accessible name, dan current state yang benar, terutama setelah JavaScript mengubah halaman.
 
-- Input tersebut adalah checkbox bernama “Email alerts,” dan markup saat ini menunjukkan bahwa kondisi awalnya checked.
-- Kontrol dengan icon adalah button bernama “Remove Mechanical Keyboard.” SVG disembunyikan dari accessibility tree supaya nggak mengganggu nama button.
-- Label, makna button, identitas produk, dan checked state menjelaskan perilaku yang bisa dipahami pengguna. ID elemen dan struktur SVG mendukung implementasi, tetapi bukan perilakunya.
-- Periksa DOM aktif dan informasi aksesibilitas untuk memastikan nama yang dihitung dan state saat ini, terutama setelah JavaScript berjalan.
-
-State bisa berubah setelah interaksi. Jadi, browser yang sedang aktif tetap menjadi sumber bukti.
+State bisa berubah setelah user berinteraksi. Jadi, jangan hanya mengandalkan HTML awal—cek kondisi element yang benar-benar sedang berjalan di browser.
 
 ## Sebelum lanjut
 

@@ -17,6 +17,8 @@ A cart page contains three buttons named “Remove.” A manual tester knows whi
 
 Automation cannot safely rely on “the first Remove button.” The order could change, another product could be inserted, or the page could replace the row after a price update.
 
+![A shopping cart shows three product rows with identical Remove buttons, while the Mechanical Keyboard row is highlighted as the target context.](/images/tutorials/cart-row-context-ui.png)
+
 The problem is not that the page has repeated buttons. Repetition is normal. The problem is losing the meaningful context that connects each action to the right piece of data.
 
 To automate a modern UI reliably, QA needs to read the page as a live tree and reason about how that tree changes.
@@ -30,6 +32,8 @@ The Document Object Model (DOM) is the browser's live object model of the page. 
 - only the HTML text returned by the server.
 
 JavaScript can add, remove, reorder, or replace DOM nodes after the initial response. Attributes and properties can change too. The current DOM is the structure automation interacts with at that moment.
+
+![Initial HTML becomes a live DOM that JavaScript can update, while the framework component tree and rendered UI remain distinct representations.](/images/tutorials/live-dom-model.png)
 
 Within the tree:
 
