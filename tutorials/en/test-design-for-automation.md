@@ -9,7 +9,7 @@ description: 'Build a small, independent test portfolio from business rules, mea
 - distinguish a useful positive, negative, or boundary scenario from a label-only variation;
 - choose a small portfolio that covers different failure modes without duplicating the same flow;
 - keep one scenario focused while using enough related assertions; and
-- review generated test cases for invented behavior, optional paths, and hidden dependencies.
+- review test cases for invented behavior, optional paths, and hidden dependencies.
 
 ## Why this matters for QA
 
@@ -23,7 +23,7 @@ A checkout page can fail in very different ways:
 - quantity rules accept values outside the allowed range; or
 - one customer sees another customer's order.
 
-One long happy-path script does not cover all of those risks. Twenty generated variations of the same script do not automatically help either.
+One long happy-path script does not cover all of those risks. Twenty variations of the same script do not automatically help either.
 
 Automation should preserve the reasoning of a good manual test: the starting state is deliberate, the action challenges one rule, and the expected result would expose the failure that matters.
 
@@ -140,7 +140,7 @@ This lesson defines the independence requirement. The next module covers browser
 
 ### 6. Avoid optional logic inside the behavior under test
 
-Generated tests often contain:
+Tests often contain:
 
 ```ts
 if (await page.getByRole('alert').isVisible()) {
@@ -179,26 +179,24 @@ When a suite is noisy, slow, or difficult to trust, audit the design before addi
 
 If a negative scenario passes unexpectedly, confirm it actually reached the intended invalid state. If a scenario only fails in parallel, suspect shared identity, inventory, order, or account data. Do not solve order dependence by forcing serial execution until you understand the shared state.
 
-## Review generated work
+Review proposed scenarios with these questions:
 
-Review generated scenarios with these questions:
-
-- Did the generator invent a requirement, test account, boundary, or expected message?
+- Does the proposal assume a requirement, test account, boundary, or expected message without evidence?
 - Can each scenario be traced to a business rule or product risk?
 - Are “positive” and “negative” labels hiding duplicate flows?
 - Are boundaries chosen around actual rule changes?
 - Does any `if` statement make the expected outcome optional?
 - Does one test depend on another test's data or execution order?
-- Are unrelated assertions included because they were easy to generate?
+- Are unrelated assertions included because they were easy to add?
 - Is sensitive data present in source, titles, logs, or reports?
 - Could important permutations be covered faster and more clearly below the UI layer?
 - Can you explain why every retained scenario deserves maintenance cost?
 
-AI can expand a list indefinitely. QA judgment decides the smallest portfolio that gives useful confidence.
+A test list can expand indefinitely. QA judgment decides the smallest portfolio that gives useful confidence.
 
 ## Check your understanding
 
-A generated suite for a quantity rule of 1 through 10 contains these tests:
+A proposed suite for a quantity rule of 1 through 10 contains these tests:
 
 1. quantity 1 succeeds;
 2. quantity 2 succeeds;

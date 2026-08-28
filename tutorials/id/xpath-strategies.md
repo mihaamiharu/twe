@@ -173,9 +173,7 @@ Kalau beberapa node cocok, cari domain context yang hilang. Menambahkan `[1]` ta
 
 Kalau XPath rusak setiap markup bergeser, migration atau perbaikan product testability mungkin jauh lebih bernilai daripada local patch berikutnya.
 
-## Review hasil buatan AI
-
-Saat AI membuat atau memperbaiki XPath, tanyakan:
+Saat me-review atau memperbaiki XPath, tanyakan:
 
 - Makna user atau domain apa yang sedang didekati expression tersebut?
 - Apakah setiap axis, predicate, dan index punya alasan?
@@ -183,7 +181,7 @@ Saat AI membuat atau memperbaiki XPath, tanyakan:
 - Apakah `text()` berasumsi direct text node saat nested content mungkin ada?
 - Apakah `normalize-space()` hanya menyelesaikan whitespace, atau malah menyembunyikan wording change?
 - Bisakah role, label, filter, atau test ID menyatakan relationship dengan lebih baik?
-- Apakah AI menambahkan `[1]` hanya untuk menghilangkan multiple match?
+- Apakah `[1]` ditambahkan hanya untuk menghilangkan multiple match?
 - Apakah expression terhalang iframe atau shadow root?
 - Apakah skenario tetap meng-assert intended result setelah migration?
 

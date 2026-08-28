@@ -9,7 +9,7 @@ description: 'Gunakan DevTools dan alat investigasi Playwright untuk mengubah pe
 - menelusuri satu aksi pengguna lewat UI yang terlihat, pesan console, request, dan browser event;
 - membedakan bukti untuk diagnosis dengan bukti yang benar-benar membuktikan outcome pengguna;
 - membuat catatan investigasi singkat sebelum menulis test; serta
-- menguji locator, wait, dan asumsi buatan AI dengan bukti dari browser.
+- menguji locator, wait, dan asumsi yang diusulkan dengan bukti dari browser.
 
 ## Kenapa ini penting buat QA
 
@@ -55,7 +55,7 @@ Bukti dari Network dan Console bisa menjelaskan kenapa transisi UI gagal. Namun,
 
 ## Coba kita bedah contoh nyata
 
-Halaman profil punya button “Save changes.” Setelah penyimpanan berhasil, pengguna seharusnya melihat “Changes saved.” Test awal buatan AI terlihat seperti ini:
+Halaman profil punya button “Save changes.” Setelah penyimpanan berhasil, pengguna seharusnya melihat “Changes saved.” Test awalnya terlihat seperti ini:
 
 ```ts
 await page.locator('#root > div:nth-child(2) > form > button').click();
@@ -157,15 +157,13 @@ Langkah berikutnya yang lebih berguna:
 
 Jalan pintas seperti `waitForTimeout`, retry tambahan, atau mengabaikan response hanya membuat diagnosis lebih lama.
 
-## Review hasil buatan AI
+Sebelum menerima test yang diusulkan dari screenshot atau requirement singkat, tanyakan:
 
-Ketika AI mengusulkan test dari screenshot atau requirement singkat, tanyakan:
-
-- Elemen aktif dan accessible identity apa yang diasumsikan AI?
+- Elemen aktif dan accessible identity apa yang diasumsikan?
 - Apakah selector dipilih dari styling atau dari makna produk?
 - Apakah wait-nya berhubungan dengan state, request, atau event yang bisa diamati?
 - Apakah assertion membuktikan outcome pengguna atau hanya membuktikan klik terjadi?
-- Apakah AI mengarang URL, response, status message, atau aturan timing?
+- Apakah usulan tersebut mengasumsikan URL, response, status message, atau aturan timing tanpa bukti?
 - Bukti DevTools apa yang bisa mengonfirmasi atau membantah setiap asumsi?
 
 Kalau jawabannya masih “sepertinya kodenya bekerja,” investigasinya belum selesai.
@@ -181,7 +179,7 @@ Klik “Save changes”
 → button kembali enabled
 ```
 
-Test buatan AI meresponsnya dengan menambah sleep selama lima detik dan memeriksa bahwa URL nggak berubah.
+Usulan perbaikan test menambah sleep selama lima detik dan memeriksa bahwa URL nggak berubah.
 
 Coba jelaskan:
 

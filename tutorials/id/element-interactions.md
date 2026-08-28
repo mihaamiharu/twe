@@ -9,13 +9,13 @@ description: 'Pilih action Playwright berdasarkan state atau perilaku yang dibut
 - menjelaskan kenapa `check()` lebih aman daripada blind click pada checkbox;
 - membedakan kapan memakai `fill()`, `press()`, dan `pressSequentially()`;
 - mengenali perbedaan native control, custom control, dan specialized interaction; serta
-- me-review generated interaction code yang menyimpan asumsi tersembunyi.
+- me-review interaction code yang menyimpan asumsi tersembunyi.
 
 ## Kenapa ini penting buat QA
 
 Pernah nggak sih kamu melihat test yang secara teknis berhasil mengubah halaman, tapi sebenarnya tidak menjelaskan maksud skenarionya?
 
-Misalnya, checkout test harus memastikan Express delivery aktif. Generated code-nya seperti ini:
+Misalnya, checkout test harus memastikan Express delivery aktif. Salah satu usulan implementasinya seperti ini:
 
 ```ts
 await page.getByLabel('Express delivery').click();
@@ -84,7 +84,7 @@ await quantity.fill('3');
 
 `fill()` memberi focus pada editable control lalu mengganti value-nya. Ini pilihan normal ketika requirement peduli pada final value.
 
-Generated code berikut biasanya tidak perlu:
+Alternatif low-level berikut biasanya tidak perlu:
 
 ```ts
 await quantity.click();
@@ -175,9 +175,7 @@ Untuk upload yang gagal, periksa fixture path dari working directory runner, atu
 
 Untuk custom dropdown yang gagal, inspect accessible role dan interaction aslinya. Mengganti semantic flow dengan CSS dan force biasanya cuma menyembunyikan petunjuk penting.
 
-## Review hasil buatan AI
-
-Untuk setiap generated action, tanyakan:
+Untuk setiap action, tanyakan:
 
 - Apakah method-nya menjelaskan required state atau hanya gesture?
 - Bisakah `click()` membalik checkbox yang sebenarnya sudah benar?
@@ -188,11 +186,11 @@ Untuk setiap generated action, tanyakan:
 - Apakah ada observable assertion setelah action?
 - Apakah test tetap benar kalau starting state berubah?
 
-AI bisa membuat interaction syntax yang terlihat masuk akal. Tugasmu adalah menentukan apakah syntax itu benar-benar mewakili user behavior dan product risk.
+Interaction syntax yang terlihat masuk akal belum cukup. Tugasmu adalah menentukan apakah syntax itu benar-benar mewakili user behavior dan product risk.
 
 ## Coba cek pemahamanmu
 
-Review generated code untuk notification settings ini:
+Review kode notification settings ini:
 
 ```ts
 await page.getByLabel('Email alerts').click();
@@ -214,13 +212,13 @@ Salah satu pendekatan yang masuk akal:
 - pakai `selectOption({ label: 'Daily' })` untuk native Frequency select;
 - pakai `getByLabel('Notification email').fill('qa@example.com')` karena hanya final value yang penting;
 - pakai button-role locator dan normal `click()` untuk Save;
-- investigasi kenapa generated code memakai force, jangan langsung mempertahankannya; dan
+- investigasi kenapa kode memakai force, jangan langsung mempertahankannya; dan
 - assert saved status yang spesifik atau persisted value setelah reload, sesuai requirement.
 
 Perbaikan utamanya bukan jumlah line yang lebih sedikit. Sekarang setiap action menjelaskan state atau behavior yang ingin dibuat oleh test.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya sudah bisa memilih action dari scenario intent, membedakan state-setting dari toggling, dan mengkritisi generated code yang menambah low-level input atau force tanpa alasan.
+Sekarang kamu seharusnya sudah bisa memilih action dari scenario intent, membedakan state-setting dari toggling, dan mengkritisi kode yang menambah low-level input atau force tanpa alasan.
 
 Selesaikan Core Practice yang menggabungkan form value, checkbox state, dan checkout outcome. Mapped Additional Practice mencakup behavior fill, selection, checkbox, keyboard, dan upload. Exercise click, hover, dan drag-and-drop tetap tersedia sebagai standalone Practice kalau project membutuhkannya.

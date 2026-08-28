@@ -1,14 +1,14 @@
 ---
-title: 'Apa yang Bisa—dan Nggak Bisa—Dibuktikan Web Automation'
-description: 'Kenali apa yang bisa dibuktikan browser automation, apa yang tetap butuh QA judgment, dan kenapa script selalu dimulai dari automation intent yang jelas.'
+title: 'Apa yang Bisa dan Nggak Bisa Diverifikasi lewat Web UI Automation'
+description: 'Pahami apa yang bisa diverifikasi lewat browser automation dan kapan QA judgment tetap dibutuhkan.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- menjelaskan apa yang bisa dilakukan otomasi web dan bagian yang tetap membutuhkan pertimbangan manusia;
-- mengubah skenario manual menjadi product risk, starting state dan test data, user action, serta observable evidence;
-- membedakan melakukan aksi dengan membuktikan bahwa aplikasi bekerja dengan benar; dan
-- menemukan konteks atau asumsi yang hilang dari ide test buatan AI sebelum meminta kode.
+- menjelaskan apa yang bisa dilakukan web automation dan bagian yang tetap membutuhkan pertimbangan manusia.
+- memetakan skenario manual menjadi product risk, initial state, aksi user, dan expected result yang bisa diverifikasi.
+- membedakan antara melakukan aksi dan memverifikasi bahwa aplikasi merespons dengan benar
+- menemukan konteks atau asumsi yang hilang dari ide test buatan AI sebelum generate code.
 
 Kamu belum perlu paham HTML, JavaScript, atau Playwright. Di lesson ini, kita fokus ke keputusan testing yang harus jelas sebelum mulai membahas tool.
 
@@ -18,11 +18,14 @@ Pernah nggak sih kamu dapat test case yang kelihatannya sederhana seperti ini?
 
 > Tambahkan produk ke keranjang dan pastikan semuanya bekerja.
 
-Pas dikerjakan manual, kamu mungkin bisa langsung menyesuaikan. Produk mana yang harus dipakai? Keranjangnya harus kosong atau boleh sudah berisi? Kalau produknya habis, apa yang harus dilakukan? Dan sebenarnya, apa arti “semuanya bekerja”?
+Pas dikerjakan manual, kamu mungkin bisa langsung menyesuaikan. Produk mana yang harus dipakai? Keranjangnya harus kosong atau boleh sudah ada barangnya? Kalau produknya habis, apa yang harus dilakukan? Tapi sebenarnya, hasil seperti apa yang dianggap benar?
 
-Sebagai manusia, kita bisa melihat situasi, menyadari ada yang aneh, lalu mengambil keputusan. Script nggak bisa melakukan itu sendiri. Script hanya mengikuti starting state, user action, dan evidence yang kita tulis—termasuk kalau asumsi kita ternyata salah.
+Sebagai manusia, kita bisa melihat situasi, menyadari ada yang aneh, lalu mengambil keputusan. Automation script nggak bisa melakukan itu sendiri. Script hanya mengikuti starting state, user action, dan evidence yang kita tulis—termasuk kalau asumsi kita ternyata salah.
 
 Akibatnya, sebuah test bisa selalu lulus padahal membuktikan hal yang salah. Test juga bisa kadang lulus dan kadang gagal karena starting state-nya nggak pernah dikendalikan.
+Contohnya, test untuk cart hanya mengecek apakah halaman cart terbuka setelah user klik **Add to cart**. Test tersebut bisa selalu pass, tapi belum membuktikan bahwa produk, quantity, dan subtotal yang benar benar-benar masuk ke cart.
+
+Contoh lain, test bisa flaky karena menganggap cart selalu kosong, padahal state tersebut nggak pernah di-reset sebelum test dijalankan.
 
 Jadi, otomasi bukan sekadar memindahkan langkah test case manual ke dalam kode. Kita perlu membuat tujuan testing-nya eksplisit dan bisa diulang.
 
@@ -32,8 +35,8 @@ Sebelum memikirkan locator atau kode, pecah dulu automation intent menjadi empat
 
 1. **Product risk:** Kegagalan penting apa yang ingin kita deteksi?
 2. **Starting state dan test data:** Apa yang harus sudah benar supaya test bisa diulang dengan hasil yang konsisten?
-3. **User action:** Apa yang dilakukan pengguna untuk memicu perilaku tersebut?
-4. **Observable evidence:** Outcome apa yang membuktikan bahwa aplikasi memberikan hasil yang diharapkan?
+3. **User action:** Apa yang dilakukan user hingga behavior yang ingin diuji terjadi?
+4. **Observable evidence:** Outcome apa yang membuktikan bahwa aplikasi memberikan expected outcome?
 
 ![Automation intent chain: product risk, starting state dan test data yang diketahui, user action, lalu observable evidence.](/images/tutorials/automation-intent-chain.svg)
 
@@ -51,9 +54,9 @@ Ada dua model lain yang nanti akan sering kamu temui. Keduanya berhubungan, tapi
 
 - cari kontrol atau informasi yang relevan bagi pengguna;
 - lakukan interaksi dengan halaman ketika dibutuhkan;
-- amati state aplikasi yang menjadi bukti.
+- amati kondisi aplikasi yang menunjukkan bahwa expected outcome tercapai.
 
-Test nyata bisa mencari, berinteraksi, dan mengamati beberapa hal. Jadi, jangan paksa setiap test menjadi tepat tiga baris. Model ini membantu kita memisahkan tanggung jawab, bukan menjadi template syntax.
+Dalam praktiknya, satu automated test bisa mencari, berinteraksi, dan mengamati beberapa hal. Jadi, jangan paksa setiap test mengikuti pola starting state → user action → observable evidence secara kaku. Model ini membantu kita memisahkan tanggung jawab, bukan menjadi format baku untuk menulis test.
 
 ## Coba kita bedah contoh nyata
 
@@ -95,11 +98,11 @@ Klik Tambahkan ke keranjang → test selesai
 
 Nah, masalahnya, klik hanya meminta browser melakukan sesuatu. Klik nggak membuktikan bahwa keranjang sudah diperbarui, subtotal sudah dihitung dengan benar, atau data sudah tersimpan.
 
-Kalau test seperti ini lulus tetapi bug tetap lolos, mulai periksa bagian akhirnya:
+Kalau test seperti ini passed tetapi bug tetap lolos, mulai periksa bagian akhirnya:
 
 1. Business outcome apa yang seharusnya dibuktikan?
 2. Evidence apa yang benar-benar diperiksa oleh test?
-3. Bisakah test lulus meskipun aplikasi masih salah?
+3. Bisakah test passed meskipun aplikasi masih salah?
 
 Perbaikannya bukan menambah delay atau menjalankan test berkali-kali. Perbaikannya adalah menambahkan meaningful evidence:
 
@@ -109,21 +112,21 @@ Tambahkan satu produk → keranjang menampilkan produk, jumlah, dan subtotal yan
 
 Nanti saat belajar Playwright, kamu akan mengenalnya sebagai perbedaan antara **action** dan **assertion**. Action meminta browser melakukan sesuatu. Assertion membuktikan kondisi yang muncul setelahnya.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
-AI bisa membantu merapikan catatan, menunjukkan asumsi yang hilang, atau membuat beberapa alternatif skenario. Tapi AI nggak tahu product risk, batasan data, atau business rule kalau kita nggak memberikannya.
+AI bisa membantu merapikan catatan, menunjukkan asumsi yang hilang, atau membuat beberapa alternatif skenario. Tapi AI nggak tahu product risk, batasan data, atau business rule kalau kita nggak kasih konteksnya. misalnya apa yang ingin diuji, data apa yang tersedia, dan behavior seperti apa yang seharusnya terjadi.
 
-Di tahap ini, minta AI menyusun **automation intent**, bukan langsung membuat script besar. Contohnya:
+Di tahap ini, minta AI menyusun **automation intent**, bukan langsung membuat automation script lengkap. Contohnya:
 
 ```text
 Bantu saya menyusun web UI automation candidate. Jangan tulis kode.
 
 Product risk: pelanggan mungkin melihat subtotal keranjang yang salah.
 Known starting state: pelanggan sudah login, keranjang kosong,
-dan ada satu produk dengan harga yang dikendalikan.
+dan ada satu produk dengan harga yang sudah diatur.
 User action: tambahkan satu unit ke keranjang.
 
-Temukan asumsi yang belum disebutkan dan usulkan observable evidence.
+Temukan asumsi yang belum disebutkan dan usulkan bukti apa yang perlu diverifikasi
 ```
 
 Setelah AI menjawab, jangan langsung menerimanya. Review dengan pertanyaan QA:
@@ -153,16 +156,16 @@ Sebelum lanjut, coba tulis:
 
 Salah satu jawaban yang masuk akal:
 
-- **Product risk:** pelanggan terdaftar nggak bisa memulai proses pemulihan akun.
-- **Starting state dan test data:** tersedia akun yang bisa dipulihkan dan inbox yang dikendalikan oleh test.
-- **User action:** meminta reset password untuk akun tersebut melalui halaman Lupa Password.
-- **Observable evidence:** UI mengonfirmasi permintaan tanpa membocorkan apakah sembarang akun terdaftar. Kalau pengiriman email termasuk dalam scope test, inbox yang dikendalikan juga menerima pesan reset yang bisa digunakan.
+- **Product risk:** customer yang sudah terdaftar nggak bisa memulai proses account recovery.
+- **Starting state dan test data:** tersedia account yang bisa di-reset dan inbox yang bisa diakses oleh test.
+- **User action:** meminta reset password untuk account tersebut melalui halaman Forgot Password.
+- **Observable evidence:** UI mengonfirmasi request tanpa membocorkan apakah account tersebut terdaftar atau tidak. Kalau pengiriman email termasuk dalam scope test, inbox yang digunakan untuk testing juga menerima reset email yang valid dan bisa digunakan.
 
 Jawabanmu bisa berbeda, tergantung requirement produknya. Hal terpenting adalah kamu bisa menjelaskan keputusan scope dan evidence yang dipilih.
 
 ## Sebelum lanjut
 
-Pastikan kamu sudah bisa mengambil skenario manual yang kabur lalu menjelaskan product risk, starting state dan test data, user action, serta observable evidence-nya.
+Pastikan kamu sudah bisa melihat sebuah manual test scenario yang masih belum jelas, lalu menentukan product risk, starting state dan test data, user action, serta observable evidence yang dibutuhkan.
 
 Kalau tujuan test masih belum jelas, jangan buru-buru masuk ke kode. Pembuatan kode yang cepat hanya akan menghasilkan test yang kabur dengan lebih cepat.
 

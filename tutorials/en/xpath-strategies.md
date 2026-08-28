@@ -173,9 +173,7 @@ If several nodes match, identify the missing domain context. Adding `[1]` withou
 
 If the XPath breaks whenever markup shifts, migration or a product testability improvement is probably more valuable than another local patch.
 
-## Review generated work
-
-When AI generates or repairs XPath, ask:
+When reviewing or repairing XPath, ask:
 
 - What user or domain meaning is the expression approximating?
 - Does every axis, predicate, and index have a reason?
@@ -183,7 +181,7 @@ When AI generates or repairs XPath, ask:
 - Does `text()` assume direct text nodes when nested content may exist?
 - Is `normalize-space()` solving whitespace only, or hiding a wording change?
 - Could role, label, filter, or test ID express the relationship better?
-- Did AI add `[1]` only to silence multiple matches?
+- Was `[1]` added only to silence multiple matches?
 - Is the expression blocked by an iframe or shadow root?
 - Does the scenario still assert the intended result after migration?
 

@@ -13,7 +13,7 @@ description: 'Jalankan satu skenario yang fokus, pahami tanggung jawab setiap ba
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih kamu menerima file Playwright buatan AI, menjalankannya, lalu melihat semuanya hijau? Kelihatannya meyakinkan, tapi hasil hijau itu belum tentu bisa dipercaya.
+Pernah nggak sih kamu menerima file Playwright, menjalankannya, lalu melihat semuanya hijau? Kelihatannya meyakinkan, tapi hasil hijau itu belum tentu bisa dipercaya.
 
 Kamu masih perlu bertanya: risiko produk apa yang sebenarnya diuji? Environment awalnya dari mana? Kalau test gagal, masalahnya ada di aplikasi, test data, locator, atau konfigurasi?
 
@@ -23,7 +23,7 @@ Tujuan test pertamamu bukan membuat banyak automation. Tujuannya adalah menyeles
 Intent QA → kode test → perilaku browser → bukti yang terlihat → hasil yang berguna
 ```
 
-Satu test kecil yang bisa kamu jelaskan dan investigasi lebih berharga daripada sepuluh skenario hasil generate yang nggak bisa kamu review.
+Satu test kecil yang bisa kamu jelaskan dan investigasi lebih berharga daripada sepuluh skenario yang nggak bisa kamu review.
 
 ## Cara berpikir yang perlu kamu pegang
 
@@ -170,19 +170,17 @@ Kalau produk memang mengganti nama link menjadi “Shopping cart”, ubah test s
 
 Timeout yang lebih panjang nggak akan memperbaiki environment yang salah, test data yang hilang, atau identitas elemen yang keliru.
 
-## Review hasil buatan AI
-
-Sebelum menjalankan test pertama buatan AI, review baris demi baris:
+Sebelum menjalankan test yang belum kamu kenal, review baris demi baris:
 
 - Apakah judulnya menjelaskan satu perilaku produk?
 - Apakah URL dan state awalnya valid untuk repository ini?
-- Apakah AI mengarang visible text, test ID, credential, atau route?
+- Apakah test mengasumsikan visible text, test ID, credential, atau route tanpa bukti?
 - Apakah setiap action mendukung risiko yang sedang diuji?
 - Apakah ada assertion untuk outcome yang bisa diamati?
 - Apakah fixed sleep atau `catch` yang terlalu luas sedang menutupi ketidakpastian?
 - Bisakah kamu menjalankan skenario ini saja dan menjelaskan kegagalannya?
 
-Perlakukan kode hasil generate sebagai draft yang penuh asumsi, bukan sebagai fakta produk yang sudah ditemukan.
+Perlakukan kode yang belum kamu kenal sebagai draft yang penuh asumsi, bukan sebagai fakta produk yang sudah ditemukan.
 
 ## Coba cek pemahamanmu
 

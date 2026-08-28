@@ -1,5 +1,5 @@
 ---
-title: 'What Web Automation Can—and Cannot—Do'
+title: 'What Web UI Automation Can and Cannot Prove'
 description: 'Build a clear mental model of what browser automation can prove and where QA judgment remains essential.'
 ---
 
@@ -21,6 +21,7 @@ Imagine receiving this manual check:
 A manual QA engineer can fill in many gaps while testing. Which product should be used? Should the cart start empty? What does “works” mean? If the product is unavailable, a person can investigate and adapt.
 
 Automation cannot quietly make those decisions. It follows the state, actions, and checks that we give it—including weak assumptions. A script may pass consistently while proving the wrong thing, or fail intermittently because its starting state was never controlled.
+For example, a cart test may only check that the cart page opens after clicking Add to cart. The test passes, but it never proves that the correct product, quantity, or subtotal was added. Another test may fail intermittently because it assumes the cart is empty without resetting it first.
 
 That is why automation is not a line-by-line translation of a manual test case. It is an explicit, repeatable version of a testing intent.
 
@@ -109,9 +110,9 @@ Add one product → cart shows the product, quantity, and expected subtotal
 
 Later, Playwright will express this distinction through actions and assertions. An action asks the browser to do something. An assertion proves an observable condition after it.
 
-## Review generated work
+## Review AI-assisted work
 
-AI can help turn notes into a clearer scenario, reveal missing assumptions, and draft alternatives. It does not know your product risk, data constraints, or business rules unless you provide them.
+AI can help turn notes into a clearer scenario, reveal missing assumptions, and draft alternatives. It does not know your product risk, data constraints, or business rules unless you provide the context—for example, what you are trying to test, what data is available, and what behavior is expected.
 
 At this stage, ask AI for an **automation intent**, not a large script:
 

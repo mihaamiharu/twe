@@ -165,9 +165,7 @@ When a post-action wait times out, map the product behavior before changing timi
 
 Use traces and screenshots to see which surfaces exist after the action. For downloads, inspect failure information and the suggested filename. For popups, inspect all pages in the context. For frames, inspect frame URLs and titles only as diagnostic clues; keep the final locator tied to a maintainable contract.
 
-## Review generated work
-
-Review generated navigation and event code with these questions:
+Review navigation and event code with these questions:
 
 - Does it identify the surface where the outcome appears?
 - Is every one-time event promise created before its triggering action?
@@ -180,11 +178,11 @@ Review generated navigation and event code with these questions:
 - Was an iframe boundary confirmed rather than assumed?
 - Is there an assertion for the business result after the browser event?
 
-AI often produces the right APIs in the wrong order. Event ordering and surface ownership are review responsibilities.
+Using the right APIs in the wrong order still creates a broken test. Event ordering and surface ownership are review responsibilities.
 
 ## Check your understanding
 
-Review this generated invoice test:
+Review this invoice test:
 
 ```ts
 await page.getByRole('link', { name: 'Open invoice' }).click();

@@ -174,7 +174,7 @@ Kalau trace menunjukkan target memang nggak pernah ada, menaikkan locator timeou
 
 Artifact bisa berisi credential, cookie, personal data, request body, dan internal URL. Batasi retention serta access, lalu sanitize evidence sebelum membagikannya ke luar authorized team atau ke AI system.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
 Berikan AI exact error, relevant code, sanitized observation, dan known execution condition. Setelah itu review jawabannya:
 
@@ -216,4 +216,4 @@ Assertion yang benar boleh tetap dipakai. Hidden precondition-nya yang perlu dip
 
 Sekarang kamu seharusnya bisa reproduce failure, membuat competing hypothesis, memilih evidence yang membedakannya, memperbaiki underlying assumption, lalu memverifikasi hasil pada kondisi yang sebelumnya mengekspos failure.
 
-Selesaikan integrated Core Practice dengan memperbaiki generated test yang menargetkan order yang salah dan menyamarkan evidence. Module 7 selesai ketika ketiga Core lesson dibaca dan Core Practice tersebut lulus. Module 8 akan memakai reliability boundary ini untuk menentukan kapan helper, page object, fixture, dan configuration meningkatkan maintainability, bukan menyembunyikan state.
+Selesaikan integrated Core Practice dengan memperbaiki flawed test yang menargetkan order yang salah dan menyamarkan evidence. Module 7 selesai ketika ketiga Core lesson dibaca dan Core Practice tersebut lulus. Module 8 akan memakai reliability boundary ini untuk menentukan kapan helper, page object, fixture, dan configuration meningkatkan maintainability, bukan menyembunyikan state.

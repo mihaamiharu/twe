@@ -15,7 +15,7 @@ description: 'Compose locators from meaningful context, filter repeated componen
 
 Picturing one “Add to Cart” button is easy. A real catalog may contain twenty of them.
 
-If generated code says this, what will happen?
+If proposed code says this, what will happen?
 
 ```ts
 await page.getByRole('button', { name: 'Add to Cart' }).click();
@@ -189,9 +189,7 @@ If the product legitimately shows two Widget Pro offers, the test needs another 
 
 When no card matches, verify the starting state, exact product name, current locale, loaded data, and whether the expected card is inside an iframe or different page. Making `hasText` broader may only move the problem.
 
-## Review generated work
-
-Review generated composition with these questions:
+Before accepting a composed locator, review it with these questions:
 
 - Does the outer locator identify a meaningful component or merely a wrapper?
 - Is the inner `has` locator relative to each outer candidate?
@@ -206,7 +204,7 @@ Long code is not automatically robust. Every narrowing step should add meaning.
 
 ## Check your understanding
 
-Review this generated code:
+Review this code:
 
 ```ts
 await page.getByRole('button', { name: 'Delete' }).first().click();

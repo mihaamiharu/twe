@@ -156,9 +156,7 @@ That hides ambiguity. If the cart order changes, the test may remove the wrong p
 
 Another weak workaround is a long selector such as `#app > div > ul > li:nth-child(1) > button`. It records the current layout, not the product relationship.
 
-## Review generated work
-
-Generated tests often reveal whether the author understood the DOM relationship. Review for these warning signs:
+Before accepting a locator repair, review it for these warning signs:
 
 - a global locator for a repeated control;
 - `first()` or `nth()` with no order requirement;
@@ -167,7 +165,7 @@ Generated tests often reveal whether the author understood the DOM relationship.
 - an assertion that checks a class instead of the user-visible state; or
 - a click with no before-and-after evidence.
 
-Ask the AI to state the intended container, the ambiguity it is resolving, and the expected state transition before accepting its code.
+You should be able to state the intended container, the ambiguity being resolved, and the expected state transition before accepting the code.
 
 ## Check your understanding
 

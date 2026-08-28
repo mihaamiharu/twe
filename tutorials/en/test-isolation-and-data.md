@@ -161,21 +161,19 @@ Common state failures leave recognizable evidence:
 
 Fix the ownership or setup contract. Do not add a sleep after setup without evidence of an actual asynchronous state transition. Do not retry data creation until duplicate records accumulate. Do not hide collisions by changing all tests to one worker.
 
-## Review generated work
+Review setup and data code with these questions:
 
-Review generated setup and data code with these questions:
-
-- Did it invent a test API, account, credential, or cleanup endpoint?
+- Does it assume a test API, account, credential, or cleanup endpoint without evidence?
 - Does the setup prove it created the required record before the UI uses it?
 - Which test or worker owns every mutable account and record?
 - Could two parallel runs generate the same identity?
-- Is stored authentication state committed, logged, or exposed to AI?
+- Is stored authentication state committed, logged, or shared outside the authorized team?
 - Does a mock remove the integration named by the test?
 - Is the route installed before the request starts?
 - Can cleanup delete data belonging to another test?
 - Would a failed setup produce a clear failure or a misleading UI timeout?
 
-Generated setup is not safe merely because it is hidden in a helper. You still need to understand its authority and side effects.
+Setup is not safe merely because it is hidden in a helper. You still need to understand its authority and side effects.
 
 ## Check your understanding
 

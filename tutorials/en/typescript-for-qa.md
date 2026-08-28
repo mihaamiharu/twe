@@ -186,16 +186,14 @@ Changing the cast to `as unknown as User` only hides the problem more thoroughly
 
 Fix the setup and validate the runtime response before consuming its fields.
 
-## Review generated work
-
-Review generated TypeScript with two passes.
+Review TypeScript in two passes.
 
 First, inspect the type contract:
 
 - Are shared data and helper boundaries typed clearly?
 - Are unions and optional properties based on real product rules?
 - Is inference used where the value is already obvious?
-- Did AI introduce unnecessary interfaces or generics?
+- Does the code introduce unnecessary interfaces or generics?
 
 Then inspect runtime honesty:
 
@@ -266,7 +264,7 @@ One reasonable answer is:
 
 ## Before you continue
 
-You should now be able to read and repair a simple TypeScript compiler error, read a small test contract, distinguish inference from useful annotations, guard optional runtime values, and challenge unsafe casts in generated code.
+You should now be able to read and repair a simple TypeScript compiler error, read a small test contract, distinguish inference from useful annotations, guard optional runtime values, and challenge unsafe casts in unfamiliar code.
 
 Module 3 is complete when you have finished its four Core lessons and three focused Core Practice challenges: the first observable Playwright test, the QA-focused JavaScript case, and the asynchronous setup task. The mapped TypeScript exercises are Additional Practice because the current runner can observe their runtime result, but cannot by itself prove compiler diagnostics or runtime data validity.
 

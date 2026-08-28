@@ -9,7 +9,7 @@ description: 'Use DevTools and Playwright investigation tools to turn visible be
 - trace a user action across visible UI, console messages, requests, and browser events;
 - separate evidence used for diagnosis from evidence that proves the user outcome;
 - capture a short investigation note before writing a test; and
-- challenge generated locators, waits, and assumptions with browser evidence.
+- challenge proposed locators, waits, and assumptions with browser evidence.
 
 ## Why this matters for QA
 
@@ -55,7 +55,7 @@ Network and console evidence can explain why a UI transition failed. They do not
 
 ## Work through a realistic example
 
-The profile page has a “Save changes” button. After a successful save, the user should see “Changes saved.” An early generated test looks like this:
+The profile page has a “Save changes” button. After a successful save, the user should see “Changes saved.” An early test looks like this:
 
 ```ts
 await page.locator('#root > div:nth-child(2) > form > button').click();
@@ -156,15 +156,13 @@ The useful next steps are:
 
 The tempting workaround—`waitForTimeout`, extra retries, or ignoring the response—only makes diagnosis slower.
 
-## Review generated work
-
-When AI proposes a test from a screenshot or short requirement, ask:
+Before accepting a test proposed from a screenshot or short requirement, ask:
 
 - Which live element and accessible identity did it assume?
 - Did it choose a selector from styling or from product meaning?
 - Does its wait correspond to an observable state, request, or event?
 - Does the assertion prove the user outcome or only that the click happened?
-- Did it invent a URL, response, status message, or timing rule?
+- Does it assume a URL, response, status message, or timing rule without evidence?
 - What DevTools evidence would confirm or reject each assumption?
 
 If the answer is “the code probably works,” the investigation is not finished.
@@ -180,7 +178,7 @@ Click “Save changes”
 → the button becomes enabled again
 ```
 
-A generated test responds by adding a five-second sleep and checking that the URL did not change.
+A proposed test change adds a five-second sleep and checks that the URL did not change.
 
 Explain:
 

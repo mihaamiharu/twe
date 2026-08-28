@@ -165,9 +165,7 @@ Saat post-action wait timeout, petakan product behavior sebelum mengubah timing:
 
 Gunakan trace dan screenshot untuk melihat surface yang ada setelah action. Untuk download, inspect failure information dan suggested filename. Untuk popup, inspect semua page di context. Untuk frame, inspect frame URL dan title sebagai diagnostic clue saja; final locator tetap harus terikat ke maintainable contract.
 
-## Review hasil buatan AI
-
-Review generated navigation dan event code dengan pertanyaan berikut:
+Review navigation dan event code dengan pertanyaan berikut:
 
 - Apakah code mengenali surface tempat outcome muncul?
 - Apakah setiap one-time event promise dibuat sebelum triggering action?
@@ -180,11 +178,11 @@ Review generated navigation dan event code dengan pertanyaan berikut:
 - Apakah iframe boundary sudah dikonfirmasi, bukan hanya diasumsikan?
 - Apakah ada assertion untuk business result setelah browser event?
 
-AI sering menghasilkan API yang benar dalam urutan yang salah. Event ordering dan surface ownership tetap menjadi tanggung jawab reviewer.
+API yang benar dalam urutan yang salah tetap menghasilkan test yang rusak. Event ordering dan surface ownership tetap menjadi tanggung jawab reviewer.
 
 ## Coba cek pemahamanmu
 
-Review generated invoice test ini:
+Review invoice test ini:
 
 ```ts
 await page.getByRole('link', { name: 'Open invoice' }).click();

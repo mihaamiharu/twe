@@ -15,7 +15,7 @@ description: 'Susun locator dari konteks bermakna, filter repeated component, da
 
 Membayangkan satu button “Add to Cart” itu gampang. Di katalog sungguhan, mungkin ada dua puluh button dengan nama yang sama.
 
-Kalau generated code berisi ini, apa yang akan terjadi?
+Kalau kode yang diusulkan berisi ini, apa yang akan terjadi?
 
 ```ts
 await page.getByRole('button', { name: 'Add to Cart' }).click();
@@ -189,9 +189,7 @@ Kalau produk memang menampilkan dua offer Widget Pro, test membutuhkan domain id
 
 Kalau tidak ada card yang cocok, periksa starting state, exact product name, locale saat ini, loaded data, serta apakah card berada di iframe atau page lain. Membuat `hasText` lebih luas mungkin hanya memindahkan masalah.
 
-## Review hasil buatan AI
-
-Review locator composition hasil generate dengan pertanyaan berikut:
+Sebelum menerima locator composition, review dengan pertanyaan berikut:
 
 - Apakah outer locator mengenali meaningful component atau cuma wrapper?
 - Apakah inner `has` locator diperiksa relatif terhadap setiap outer candidate?
@@ -206,7 +204,7 @@ Kode panjang tidak otomatis robust. Setiap narrowing step harus menambah makna.
 
 ## Coba cek pemahamanmu
 
-Review generated code ini:
+Review kode ini:
 
 ```ts
 await page.getByRole('button', { name: 'Delete' }).first().click();

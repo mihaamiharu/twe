@@ -156,7 +156,7 @@ If several elements match, ask whether the page contains repeated components or 
 
 Changing to a broader CSS selector, adding `.first()`, or making every name a loose regular expression can hide the reason the contract failed.
 
-## Review generated work
+## Review AI-assisted work
 
 For each generated locator, ask:
 

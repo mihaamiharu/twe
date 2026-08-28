@@ -16,7 +16,7 @@ description: 'Inspeksi, review, dan perbaiki CSS locator fallback sambil tetap m
 Walaupun memakai Playwright modern, kamu tetap akan menemukan CSS:
 
 - test lama memakai `#submit-order`;
-- generated code menyalin path panjang dari DevTools;
+- sebuah test menyalin path panjang dari DevTools;
 - third-party widget punya semantik yang buruk;
 - production defect harus diinvestigasi lewat live DOM; atau
 - tim belum menambahkan testability contract yang berguna.
@@ -102,7 +102,7 @@ Kalau visible text “Overdue” adalah actual user evidence, role/text locator 
 
 ### 3. Baca syntax yang diperlukan untuk diagnosis
 
-Kamu nggak perlu menghafal grammar CSS. Kenali bentuk-bentuk di bawah supaya bisa menjelaskan dependency generated selector dan perubahan apa yang bisa membuatnya gagal.
+Kamu nggak perlu menghafal grammar CSS. Kenali bentuk-bentuk di bawah supaya bisa menjelaskan dependency sebuah usulan selector dan perubahan apa yang bisa membuatnya gagal.
 
 ```css
 button                         /* tag */
@@ -180,9 +180,7 @@ Untuk structural selector, bandingkan expected ancestor chain dengan kondisi sek
 
 Playwright locator, termasuk CSS locator, biasanya bekerja melalui open shadow root. XPath tidak menembus shadow root, dan closed shadow root tidak didukung. CSS dan XPath locator juga tidak menembus boundary iframe; pilih frame context yang benar lebih dulu. Zero match bisa berasal dari boundary limitation, bukan syntax error.
 
-## Review hasil buatan AI
-
-Saat AI mengusulkan CSS, tanyakan:
+Saat me-review CSS fallback, tanyakan:
 
 - DOM fact apa yang menjadi dependency setiap bagian selector?
 - Apakah fact tersebut supported contract atau current implementation detail?
@@ -190,7 +188,7 @@ Saat AI mengusulkan CSS, tanyakan:
 - Apakah selector menemukan intended element atau cuma menemukan satu elemen?
 - Bisakah role, label, text, composition, atau test ID menyatakan intent dengan lebih baik?
 - Apakah `nth-child` menyembunyikan ambiguitas yang seharusnya diinvestigasi?
-- Apakah AI menganggap class name pasti menyatakan product state?
+- Apakah selector menganggap class name pasti menyatakan product state?
 - Apakah selector melewati shadow-root atau iframe boundary dengan benar?
 
 Lebih pendek tidak selalu lebih baik, tapi setiap extra segment harus punya alasan.

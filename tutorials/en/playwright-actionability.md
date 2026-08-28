@@ -9,7 +9,7 @@ description: 'Understand what Playwright waits for before an action and define t
 - separate target readiness, interaction, application transition, and expected outcome;
 - synchronize with retried assertions instead of fixed sleeps;
 - diagnose action timeouts without hiding them with force or larger timeouts; and
-- review generated waits by naming the condition that ends each one.
+- review waits by naming the condition that ends each one.
 
 ## Why this matters for QA
 
@@ -159,9 +159,7 @@ Use the Playwright error, trace, DOM snapshot, screenshot, console, and network 
 
 `click({ force: true })` may bypass a readiness symptom without fixing the product or test. A larger timeout may postpone the same failure. A test retry can help classify occasional infrastructure noise, but it does not repair missing synchronization. If a test only passes on retry, it still needs diagnosis.
 
-## Review generated work
-
-For every action and wait in generated code, ask:
+For every action and wait in the test, ask:
 
 - What exact readiness does Playwright already check for this action?
 - What observable condition proves the business outcome?
@@ -172,7 +170,7 @@ For every action and wait in generated code, ask:
 - If a network response is awaited, does the test still verify what the user sees?
 - Can the outcome happen on another browser surface?
 
-Generated code often adds waits because they look safe. A wait is only meaningful when you can name the condition that ends it and why that condition matters.
+Code often accumulates waits because they look safe. A wait is only meaningful when you can name the condition that ends it and why that condition matters.
 
 ## Check your understanding
 

@@ -191,9 +191,7 @@ const subtotal = selected.unitPrice * 2;
 
 Retry nggak akan memperbaiki lookup yang salah. Optional chaining seperti `selected?.unitPrice` mungkin cuma memindahkan `undefined` ke tempat lain dan membuat diagnosis makin sulit.
 
-## Review hasil buatan AI
-
-Saat AI mengubah JavaScript di sekitar test, tanyakan:
+Saat me-review perubahan JavaScript di sekitar test, tanyakan:
 
 - Mana value yang merupakan scenario data dan mana yang merupakan asumsi produk?
 - Apakah `let` dipakai karena reassignment memang diperlukan, atau cuma kebiasaan?

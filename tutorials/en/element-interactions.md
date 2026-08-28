@@ -9,13 +9,13 @@ description: 'Select Playwright actions by the state or behavior a user intends,
 - explain why `check()` is safer than a blind click for a checkbox;
 - distinguish `fill()`, `press()`, and `pressSequentially()`;
 - recognize when native controls, custom controls, and specialized interactions need different handling; and
-- review generated interaction code for hidden assumptions.
+- review interaction code for hidden assumptions.
 
 ## Why this matters for QA
 
 Misleading automation failures often begin with code that technically changes the page but does not express what the scenario means.
 
-Suppose a checkout test needs Express delivery enabled. Generated code might say:
+Suppose a checkout test needs Express delivery enabled. A proposed implementation might say:
 
 ```ts
 await page.getByLabel('Express delivery').click();
@@ -84,7 +84,7 @@ await quantity.fill('3');
 
 `fill()` focuses the editable control and replaces its value. It is the normal choice when the requirement cares about the final value.
 
-This generated alternative is usually unnecessary:
+This low-level alternative is usually unnecessary:
 
 ```ts
 await quantity.click();
@@ -175,9 +175,7 @@ For a failing upload, also check the fixture path from the runner's working dire
 
 For a failing custom dropdown, inspect its accessible roles and actual interaction. Replacing a semantic flow with CSS and force usually hides the useful clue.
 
-## Review generated work
-
-For each generated action, ask:
+For each action, ask:
 
 - Does the method express the required state or only a gesture?
 - Could `click()` invert a checkbox that is already in the correct state?
@@ -188,11 +186,11 @@ For each generated action, ask:
 - Is there an observable assertion after the action?
 - Would the test remain correct if the starting state changed?
 
-AI can produce plausible interaction syntax. Your job is to decide whether that syntax represents the user's behavior and the product risk.
+Plausible interaction syntax is not enough. Your job is to decide whether that syntax represents the user's behavior and the product risk.
 
 ## Check your understanding
 
-Review this generated code for a notification settings test:
+Review this code for a notification settings test:
 
 ```ts
 await page.getByLabel('Email alerts').click();
@@ -214,13 +212,13 @@ One reasonable approach is:
 - use `selectOption({ label: 'Daily' })` for the native Frequency select;
 - use `getByLabel('Notification email').fill('qa@example.com')` because only the final value matters;
 - use a button-role locator and normal `click()` for Save;
-- investigate why the generated code used force instead of preserving it; and
+- investigate why the code used force instead of preserving it; and
 - assert a specific saved status or the persisted values after reload, according to the requirement.
 
 The important improvement is not fewer lines. Each action now explains the state or behavior the test intends to create.
 
 ## Before you continue
 
-You should now be able to select actions from scenario intent, distinguish state-setting from toggling, and challenge generated code that adds low-level input or force without a reason.
+You should now be able to select actions from scenario intent, distinguish state-setting from toggling, and challenge code that adds low-level input or force without a reason.
 
 Complete the Core Practice that combines form values, checkbox state, and a checkout outcome. The mapped Additional Practice covers fill, selection, checkbox, keyboard, and upload behavior. The click, hover, and drag-and-drop exercises remain available as standalone Practice when a project needs them.

@@ -156,9 +156,7 @@ Kode itu hanya menyembunyikan ambiguitas. Kalau urutan keranjang berubah, test b
 
 Jalan pintas lemah lainnya adalah selector panjang seperti `#app > div > ul > li:nth-child(1) > button`. Selector tersebut merekam layout saat ini, bukan hubungan antardata di produk.
 
-## Review hasil buatan AI
-
-Test buatan AI sering menunjukkan apakah pembuatnya benar-benar memahami hubungan DOM. Cari tanda peringatan berikut:
+Sebelum menerima perbaikan locator, cari tanda peringatan berikut:
 
 - locator global untuk kontrol yang muncul berulang;
 - `first()` atau `nth()` tanpa requirement urutan;
@@ -167,7 +165,7 @@ Test buatan AI sering menunjukkan apakah pembuatnya benar-benar memahami hubunga
 - assertion yang memeriksa class, bukan state yang dilihat pengguna; atau
 - klik tanpa bukti sebelum dan sesudah.
 
-Sebelum menerima kodenya, minta AI menyebutkan container tujuan, ambiguitas yang sedang diselesaikan, dan transisi state yang diharapkan.
+Sebelum menerima kodenya, pastikan kamu bisa menyebutkan container tujuan, ambiguitas yang sedang diselesaikan, dan transisi state yang diharapkan.
 
 ## Coba cek pemahamanmu
 

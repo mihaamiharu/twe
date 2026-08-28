@@ -187,9 +187,7 @@ try {
 }
 ```
 
-## Review generated work
-
-Trace every asynchronous line in generated code:
+Trace every asynchronous line in the test:
 
 - What value or state does this promise produce?
 - Which later step depends on it?
@@ -203,7 +201,7 @@ If you cannot describe the guarantee, do not trust the sequence yet.
 
 ## Check your understanding
 
-Review this generated code:
+Review this code:
 
 ```ts
 const orderPromise = createTestOrder();

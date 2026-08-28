@@ -16,7 +16,7 @@ You do not need to memorize every HTML tag or ARIA rule. The goal is to read eno
 
 Imagine that you can click a control labelled “Create account” during manual testing, but an automated test cannot find a button with that name.
 
-The control may look like a button without actually being one. Its visible label may not be connected to the form field beside it. A generated selector may find it today but depend on a styling class that changes in the next redesign.
+The control may look like a button without actually being one. Its visible label may not be connected to the form field beside it. A selector may find it today but depend on a styling class that changes in the next redesign.
 
 Manual testers can often compensate for unclear markup by looking at layout and context. Browser automation needs a repeatable contract. Assistive-technology users need that contract too.
 
@@ -128,7 +128,7 @@ Do not turn every accessibility detail into a browser test. Role-based locators 
 
 ## When it fails
 
-Suppose a generated test times out here:
+Suppose a test times out here:
 
 ```ts
 await page.getByRole('button', { name: 'Create account' }).click();
@@ -146,9 +146,7 @@ If the product uses a clickable `<div>`, changing the test to a long CSS path ma
 
 A fixed delay is not a diagnosis. Time does not turn a generic element into a button or connect an orphaned label.
 
-## Review generated work
-
-AI may generate believable markup or a believable locator without checking the browser's computed result. Review it with questions such as:
+Before accepting any markup or locator proposal, review it with questions such as:
 
 - Does it use native HTML where a native control exists?
 - Is every form control associated with a meaningful label?
@@ -157,7 +155,7 @@ AI may generate believable markup or a believable locator without checking the b
 - Is a styling class being treated as a stable product contract?
 - Can I explain which state the assertion would prove?
 
-Generated code is only a hypothesis until it matches the live page and the product's intended behavior.
+Markup or locator code is only a hypothesis until it matches the live page and the product's intended behavior.
 
 ## Check your understanding
 

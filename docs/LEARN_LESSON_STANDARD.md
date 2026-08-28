@@ -201,36 +201,7 @@ Show at least one realistic failure:
 
 For conceptual lessons, the failure may be a flawed decision rather than broken code.
 
-### 2.7 AI review lens — when relevant
-
-English:
-
-```markdown
-## Review generated work
-```
-
-Indonesian:
-
-```markdown
-## Review hasil buatan AI
-```
-
-Do not force an AI section into every lesson. Include it when the lesson gives learners specific knowledge for reviewing generated work.
-
-Possible review questions:
-
-- Did AI invent product behavior?
-- Are important assumptions undocumented?
-- Does the code solve the stated risk?
-- Is the chosen technique appropriate?
-- Is the assertion meaningful?
-- Is a wait hiding a synchronization problem?
-- Is the abstraction necessary?
-- Can the learner explain and maintain every important line?
-
-AI-generated work follows the same quality standard as human-written work.
-
-### 2.8 Check understanding
+### 2.7 Check understanding
 
 English:
 
@@ -256,7 +227,7 @@ Possible checkpoint formats:
 - Improve a weak test
 - Modify a small example
 
-### 2.9 Compare reasoning
+### 2.8 Compare reasoning
 
 English:
 
@@ -278,7 +249,7 @@ For judgment-based questions, use wording such as:
 
 Avoid implying that only one answer is valid when product context could change the decision.
 
-### 2.10 Readiness check
+### 2.9 Readiness check
 
 English:
 
@@ -309,7 +280,53 @@ Use only when they improve the lesson:
 - Additional Practice
 - Further reading
 
-Not every lesson requires an image, AI section, or challenge.
+Not every lesson requires an image, AI-assisted review, or challenge.
+
+### 3.1 AI-assisted work review
+
+AI-assisted review is optional. Use it only when:
+
+- AI-assisted work is already part of the lesson's scenario or workflow.
+- The lesson teaches a specific risk that changes how learners should review that work.
+- The guidance adds something beyond the lesson's ordinary QA review and debugging guidance.
+
+The guidance may be:
+
+- A dedicated section when AI use is an explicit part of the lesson.
+- Integrated into **When it fails** when the relevant risk is a generated mistake or unsupported assumption.
+- Integrated into **Check your understanding** when reviewing an AI-assisted proposal is a useful exercise.
+
+If a dedicated section materially improves the lesson, use:
+
+English:
+
+```markdown
+## Review AI-assisted work
+```
+
+Indonesian:
+
+```markdown
+## Review hasil kerja dengan bantuan AI
+```
+
+Do not:
+
+- Add the section only to satisfy the lesson format.
+- Introduce AI for the first time in an isolated review section.
+- Repeat an existing checklist with only “AI-generated” added to it.
+- Turn ordinary QA judgment into a separate AI rule.
+- Use a generic checklist that could be pasted into every lesson unchanged.
+
+Useful guidance should apply the lesson's actual capability. For example:
+
+- Did AI invent product behavior, an API, test data, or a selector?
+- Is a fixed wait hiding a synchronization problem?
+- Does the assertion prove the stated product risk?
+- Is a generated abstraction justified by a real maintenance need?
+- Can the learner explain, debug, and maintain every important line?
+
+These are examples, not a required checklist. AI-assisted work follows the same quality standard as human-written work.
 
 ## 4. Practice rules
 
@@ -470,7 +487,7 @@ A lesson is ready only when every relevant answer is yes:
 - [ ] Is the example realistic and technically accurate?
 - [ ] Does it explain when and when not to use the technique?
 - [ ] Does it teach how to recognize or diagnose failure?
-- [ ] Is any AI guidance specific to the lesson?
+- [ ] If the lesson includes AI guidance, is AI already relevant to the scenario, and does the guidance add something beyond ordinary review?
 - [ ] Does the checkpoint test the intended capability?
 - [ ] Can standalone Practice work independently?
 - [ ] Are Core and Additional Practice classified correctly?

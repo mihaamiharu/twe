@@ -16,7 +16,7 @@ description: 'Inspect, review, and repair CSS locator fallbacks while keeping us
 Even in a modern Playwright suite, you will encounter CSS:
 
 - an older test uses `#submit-order`;
-- generated code copies a long path from DevTools;
+- a test copies a long path from DevTools;
 - a third-party widget has poor semantics;
 - a production defect must be investigated in the live DOM; or
 - a team has not yet added a useful testability contract.
@@ -102,7 +102,7 @@ If “Overdue” visible text is the actual user evidence, a role/text locator m
 
 ### 3. Read only the syntax needed to diagnose
 
-You do not need to memorize CSS grammar. Recognize the forms below so you can explain what a generated selector depends on and which change could break it.
+You do not need to memorize CSS grammar. Recognize the forms below so you can explain what a selector proposal depends on and which change could break it.
 
 ```css
 button                         /* tag */
@@ -180,9 +180,7 @@ For structural selectors, compare the expected and current ancestor chain. Fix t
 
 Playwright locators, including CSS locators, normally work through open shadow roots. XPath does not pierce shadow roots, and closed shadow roots are not supported. CSS and XPath locators also do not cross iframe boundaries; select the correct frame context first. A zero match may therefore be a boundary limitation rather than a syntax mistake.
 
-## Review generated work
-
-When AI proposes CSS, ask:
+When reviewing a CSS fallback, ask:
 
 - Which exact DOM facts does every selector part depend on?
 - Are those facts supported contracts or current implementation details?
@@ -190,7 +188,7 @@ When AI proposes CSS, ask:
 - Does the selector match the intended element or merely one element?
 - Could role, label, text, composition, or test ID express the intent better?
 - Is `nth-child` hiding an ambiguity that should be investigated?
-- Did AI assume a class name expresses product state?
+- Does the selector assume that a class name expresses product state?
 - Is the selector crossing a shadow-root or iframe boundary correctly?
 
 Shorter is not always better, but every extra segment needs a reason.

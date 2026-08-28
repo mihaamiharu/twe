@@ -148,9 +148,7 @@ Kalau context yang benar-benar baru tetap menerima modified preference dari serv
 
 Jangan langsung membuat seluruh suite serial, menambah retry, atau menghapus random storage key. Langkah tersebut bisa menyembunyikan collision tanpa menemukan state mana yang sebenarnya shared.
 
-## Review hasil buatan AI
-
-Saat AI membuat context-management code, periksa:
+Saat me-review context-management code, periksa:
 
 - Apakah skenarionya memang membutuhkan lebih dari default fixture `page`?
 - Apakah user berbeda dimodelkan dengan context berbeda, bukan sekadar tab berbeda?
@@ -158,13 +156,13 @@ Saat AI membuat context-management code, periksa:
 - Apakah authentication state sesuai untuk setiap role?
 - Apakah penjelasannya keliru menganggap context baru ikut me-reset backend data?
 - Apakah shared product data memang intentional dan controlled?
-- Apakah generator launch browser atau context tambahan tanpa product reason?
+- Apakah implementasinya launch browser atau context tambahan tanpa product reason?
 
 Lebih banyak context nggak otomatis berarti isolation lebih baik. Boundary-nya harus sesuai dengan state yang bisa bertabrakan.
 
 ## Coba cek pemahamanmu
 
-Sebuah generated marketplace test membuat dua page dari default context. Page pertama login sebagai buyer, page kedua login sebagai seller, lalu page pertama tiba-tiba ikut menjadi seller. Generator menyarankan clear cookies pada page pertama sebelum setiap assertion.
+Sebuah marketplace test membuat dua page dari default context. Page pertama login sebagai buyer, page kedua login sebagai seller, lalu page pertama tiba-tiba ikut menjadi seller. Usulan perbaikannya adalah clear cookies pada page pertama sebelum setiap assertion.
 
 Jelaskan modeling mistake yang sebenarnya, architectural repair terkecil, dan marketplace data mana yang masih membutuhkan isolation plan setelah repair tersebut.
 

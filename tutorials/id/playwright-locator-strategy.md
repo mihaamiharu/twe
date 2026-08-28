@@ -156,7 +156,7 @@ Kalau beberapa elemen cocok, cari tahu apakah halaman berisi repeated component 
 
 Mengganti ke CSS selector yang lebih luas, menambahkan `.first()`, atau mengubah semua name menjadi regular expression longgar bisa menyembunyikan alasan kontraknya gagal.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
 Untuk setiap locator hasil generate, tanyakan:
 

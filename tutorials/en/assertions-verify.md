@@ -9,7 +9,7 @@ description: 'Turn product expectations into the smallest sufficient set of user
 - choose assertions for content, control state, form value, collection size, or navigation state;
 - distinguish auto-retrying web assertions from one-time value checks;
 - avoid negative assertions that pass before the behavior happens; and
-- review generated assertions for weak, excessive, or implementation-only evidence.
+- review assertions for weak, excessive, or implementation-only evidence.
 
 ## Why this matters for QA
 
@@ -162,9 +162,7 @@ Do not replace a failing exact assertion with `toContainText('Success')` until y
 
 For an absence check that passes suspiciously fast, prove the positive precondition first or synchronize with another outcome that confirms the relevant transition happened.
 
-## Review generated work
-
-Review each generated assertion with these questions:
+Review each assertion with these questions:
 
 - Which product risk and claim does this assertion support?
 - Does it inspect something a user can observe or only an implementation detail?
@@ -176,11 +174,11 @@ Review each generated assertion with these questions:
 - Does `expect.soft()` allow dependent actions to continue after a broken prerequisite?
 - Would the failure explain what product behavior changed?
 
-Generated matchers are easy to produce. Evidence selection requires product knowledge and QA judgment.
+Matchers are easy to add. Evidence selection requires product knowledge and QA judgment.
 
 ## Check your understanding
 
-Review this generated test:
+Review this test:
 
 ```ts
 await page.getByRole('button', { name: 'Delete address' }).click();

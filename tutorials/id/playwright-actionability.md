@@ -9,7 +9,7 @@ description: 'Pahami apa yang ditunggu Playwright sebelum action dan tentukan ob
 - memisahkan target readiness, interaction, application transition, dan expected outcome;
 - melakukan sinkronisasi dengan retried assertion, bukan fixed sleep;
 - mendiagnosis action timeout tanpa menyembunyikannya dengan force atau timeout lebih besar; serta
-- me-review generated wait dengan menyebutkan kondisi yang mengakhirinya.
+- me-review wait dengan menyebutkan kondisi yang mengakhirinya.
 
 ## Kenapa ini penting buat QA
 
@@ -159,9 +159,7 @@ Gunakan Playwright error, trace, DOM snapshot, screenshot, console, dan network 
 
 `click({ force: true })` mungkin melewati readiness symptom tanpa memperbaiki produk atau test. Timeout lebih besar mungkin cuma menunda failure yang sama. Test retry bisa membantu mengklasifikasikan infrastructure noise, tapi tidak memperbaiki synchronization yang hilang. Kalau test hanya lulus setelah retry, test itu tetap perlu didiagnosis.
 
-## Review hasil buatan AI
-
-Untuk setiap action dan wait dalam generated code, tanyakan:
+Untuk setiap action dan wait di dalam test, tanyakan:
 
 - Readiness apa yang sebenarnya sudah diperiksa Playwright untuk action ini?
 - Observable condition apa yang membuktikan business outcome?
@@ -172,7 +170,7 @@ Untuk setiap action dan wait dalam generated code, tanyakan:
 - Kalau network response ditunggu, apakah test tetap memverifikasi yang dilihat user?
 - Bisakah outcome muncul di browser surface lain?
 
-Generated code sering menambah wait karena terlihat aman. Sebuah wait baru bermakna kalau kamu bisa menyebutkan kondisi yang mengakhirinya dan kenapa kondisi itu penting.
+Kode sering dipenuhi wait karena terlihat aman. Sebuah wait baru bermakna kalau kamu bisa menyebutkan kondisi yang mengakhirinya dan kenapa kondisi itu penting.
 
 ## Coba cek pemahamanmu
 

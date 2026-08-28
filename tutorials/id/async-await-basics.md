@@ -187,9 +187,7 @@ try {
 }
 ```
 
-## Review hasil buatan AI
-
-Telusuri setiap baris asynchronous di dalam kode hasil generate:
+Telusuri setiap baris asynchronous di dalam test:
 
 - Value atau state apa yang dihasilkan promise ini?
 - Langkah mana yang bergantung pada hasilnya?
@@ -203,7 +201,7 @@ Kalau kamu belum bisa menjelaskan jaminannya, jangan percaya urutan kodenya dulu
 
 ## Coba cek pemahamanmu
 
-Review kode hasil generate ini:
+Review kode ini:
 
 ```ts
 const orderPromise = createTestOrder();

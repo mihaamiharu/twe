@@ -16,7 +16,7 @@ Kamu nggak perlu menghafal semua tag HTML atau aturan ARIA. Targetnya adalah bis
 
 Pernah nggak sih kamu bisa mengklik kontrol bertuliskan “Create account” saat manual testing, tetapi automated test malah nggak menemukan button dengan nama tersebut?
 
-Bisa jadi kontrol itu terlihat seperti button tanpa benar-benar punya semantik button. Teks yang kelihatan mungkin nggak terhubung ke input di sebelahnya. Selector buatan AI mungkin berhasil hari ini, tetapi ternyata bergantung pada class styling yang berubah saat redesign berikutnya.
+Bisa jadi kontrol itu terlihat seperti button tanpa benar-benar punya semantik button. Teks yang kelihatan mungkin nggak terhubung ke input di sebelahnya. Sebuah selector mungkin berhasil hari ini, tetapi ternyata bergantung pada class styling yang berubah saat redesign berikutnya.
 
 Saat manual testing, kita sering bisa menebak dari layout dan konteks. Browser automation membutuhkan identitas yang bisa ditemukan ulang secara konsisten. Pengguna teknologi bantu juga membutuhkan kejelasan yang sama.
 
@@ -128,7 +128,7 @@ Jangan menjadikan setiap detail aksesibilitas sebagai browser test. Role-based l
 
 ## Kalau gagal, mulai cek dari mana?
 
-Coba bayangin test buatan AI mengalami timeout di sini:
+Coba bayangin sebuah test mengalami timeout di sini:
 
 ```ts
 await page.getByRole('button', { name: 'Create account' }).click();
@@ -146,9 +146,7 @@ Kalau produk memakai `<div>` yang bisa diklik, mengganti test dengan jalur CSS p
 
 Fixed delay bukan diagnosis. Waktu tunggu nggak akan mengubah elemen generik menjadi button atau menghubungkan label yang terpisah.
 
-## Review hasil buatan AI
-
-AI bisa menghasilkan markup atau locator yang terlihat masuk akal tanpa memeriksa hasil yang dihitung browser. Review dengan pertanyaan berikut:
+Sebelum menerima usulan markup atau locator, review dengan pertanyaan berikut:
 
 - Apakah elemen HTML bawaan digunakan ketika memang tersedia?
 - Apakah setiap form control punya label yang bermakna?
@@ -157,7 +155,7 @@ AI bisa menghasilkan markup atau locator yang terlihat masuk akal tanpa memeriks
 - Apakah class styling dianggap sebagai kontrak produk yang stabil?
 - Bisakah kamu menjelaskan state apa yang akan dibuktikan assertion-nya?
 
-Kode buatan AI baru berupa hipotesis sampai cocok dengan halaman aktif dan perilaku produk yang diharapkan.
+Markup atau locator baru berupa hipotesis sampai cocok dengan halaman aktif dan perilaku produk yang diharapkan.
 
 ## Coba cek pemahamanmu
 

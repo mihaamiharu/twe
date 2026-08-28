@@ -13,7 +13,7 @@ description: 'Run one focused scenario, explain each responsibility in the test,
 
 ## Why this matters for QA
 
-Your first generated Playwright file may be twenty lines long and completely green. That does not yet mean you can trust it.
+Your first Playwright file may be twenty lines long and completely green. That does not yet mean you can trust it.
 
 Can you explain which product risk it checks? Do you know what starting environment it uses? If it fails, can you tell whether the application, test data, locator, or configuration is wrong?
 
@@ -23,7 +23,7 @@ The goal of a first test is not to produce a large automation suite. It is to co
 QA intent → test code → browser behavior → observable evidence → useful result
 ```
 
-One small test you can explain and diagnose is a stronger foundation than ten generated scenarios you cannot review.
+One small test you can explain and diagnose is a stronger foundation than ten scenarios you cannot review.
 
 ## The mental model
 
@@ -170,19 +170,17 @@ If the product renamed the link to “Shopping cart,” update the test only aft
 
 A longer timeout does not repair a wrong environment, missing test data, or incorrect identity.
 
-## Review generated work
-
-Before running a first test produced by AI, review it line by line:
+Before running an unfamiliar test, review it line by line:
 
 - Does the title describe one product behavior?
 - Is the starting URL and state valid in this repository?
-- Did AI invent visible text, a test ID, credentials, or a route?
+- Does it assume visible text, a test ID, credentials, or a route without evidence?
 - Does each action support the stated risk?
 - Is there an assertion for the observable outcome?
 - Are fixed sleeps or broad catch blocks hiding uncertainty?
 - Can you run just this scenario and explain its failure?
 
-Treat generated code as a draft connected to assumptions, not as discovered product truth.
+Treat unfamiliar code as a draft connected to assumptions, not as discovered product truth.
 
 ## Check your understanding
 

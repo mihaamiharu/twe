@@ -186,16 +186,14 @@ Mengganti cast menjadi `as unknown as User` hanya menyembunyikan masalah lebih d
 
 Perbaiki setup dan validasi runtime response sebelum memakai field-nya.
 
-## Review hasil buatan AI
-
-Review TypeScript hasil generate dalam dua tahap.
+Review TypeScript dalam dua tahap.
 
 Pertama, periksa type contract:
 
 - Apakah shared data dan helper boundary memiliki type yang jelas?
 - Apakah union dan optional property memang berasal dari product rule?
 - Apakah inference dipakai saat value-nya sudah jelas?
-- Apakah AI menambahkan interface atau generic yang sebenarnya tidak diperlukan?
+- Apakah kode menambahkan interface atau generic yang sebenarnya tidak diperlukan?
 
 Lalu periksa kejujuran runtime-nya:
 
@@ -266,7 +264,7 @@ Salah satu jawaban yang masuk akal:
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya sudah bisa membaca dan memperbaiki TypeScript error sederhana, membaca kontrak TypeScript yang kecil, membedakan inference dari annotation yang berguna, menjaga optional runtime value, dan mempertanyakan unsafe cast di dalam kode hasil generate.
+Sekarang kamu seharusnya sudah bisa membaca dan memperbaiki TypeScript error sederhana, membaca kontrak TypeScript yang kecil, membedakan inference dari annotation yang berguna, menjaga optional runtime value, dan mempertanyakan unsafe cast di dalam kode yang belum kamu kenal.
 
 Module 3 selesai setelah kamu menuntaskan empat Core lesson dan tiga Core Practice yang memberikan bukti langsung: Playwright test pertama dengan bukti observable, JavaScript case yang fokus pada QA, dan asynchronous setup task. Exercise TypeScript yang dipetakan menjadi Additional Practice karena runner saat ini bisa mengamati runtime result, tapi tidak bisa membuktikan pesan error compiler atau validitas runtime data dengan sendirinya.
 

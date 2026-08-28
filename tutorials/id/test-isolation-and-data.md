@@ -161,21 +161,19 @@ State failure biasanya meninggalkan evidence yang bisa dikenali:
 
 Perbaiki ownership atau setup contract-nya. Jangan menambah sleep setelah setup tanpa evidence adanya asynchronous state transition. Jangan retry data creation sampai duplicate record menumpuk. Jangan sembunyikan collision dengan mengubah semua test menjadi satu worker.
 
-## Review hasil buatan AI
+Saat me-review setup dan data code, tanyakan:
 
-Saat me-review generated setup dan data code, tanyakan:
-
-- Apakah code mengarang test API, account, credential, atau cleanup endpoint?
+- Apakah code mengasumsikan test API, account, credential, atau cleanup endpoint tanpa bukti?
 - Apakah setup membuktikan required record sudah dibuat sebelum dipakai UI?
 - Test atau worker mana yang memiliki setiap mutable account dan record?
 - Bisakah dua parallel run menghasilkan identity yang sama?
-- Apakah stored authentication state di-commit, masuk log, atau diberikan ke AI?
+- Apakah stored authentication state di-commit, masuk log, atau dibagikan ke luar authorized team?
 - Apakah mock menghilangkan integration yang disebut oleh test?
 - Apakah route dipasang sebelum request dimulai?
 - Bisakah cleanup menghapus data milik test lain?
 - Apakah failed setup memberi failure yang jelas atau malah misleading UI timeout?
 
-Generated setup nggak otomatis aman hanya karena disembunyikan di helper. Kamu tetap perlu memahami authority dan side effect-nya.
+Setup nggak otomatis aman hanya karena disembunyikan di helper. Kamu tetap perlu memahami authority dan side effect-nya.
 
 ## Coba cek pemahamanmu
 

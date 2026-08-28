@@ -9,7 +9,7 @@ description: 'Ubah product expectation menjadi sekumpulan kecil user-observable 
 - memilih assertion untuk content, control state, form value, collection size, atau navigation state;
 - membedakan auto-retrying web assertion dari one-time value check;
 - menghindari negative assertion yang lulus sebelum behavior terjadi; serta
-- me-review generated assertion yang lemah, berlebihan, atau hanya memeriksa implementation detail.
+- me-review assertion yang lemah, berlebihan, atau hanya memeriksa implementation detail.
 
 ## Kenapa ini penting buat QA
 
@@ -160,9 +160,7 @@ Jangan mengganti failed exact assertion menjadi `toContainText('Success')` sebel
 
 Untuk absence check yang lulus terlalu cepat, buktikan positive precondition lebih dulu atau sinkronkan dengan outcome lain yang memastikan relevant transition memang terjadi.
 
-## Review hasil buatan AI
-
-Untuk setiap generated assertion, tanyakan:
+Untuk setiap assertion, tanyakan:
 
 - Product risk dan claim mana yang didukung assertion ini?
 - Apakah assertion memeriksa sesuatu yang diamati user atau hanya implementation detail?
@@ -174,11 +172,11 @@ Untuk setiap generated assertion, tanyakan:
 - Apakah `expect.soft()` membuat dependent action tetap berjalan setelah prerequisite rusak?
 - Apakah failure-nya menjelaskan product behavior yang berubah?
 
-Generated matcher gampang dibuat. Evidence selection membutuhkan product knowledge dan QA judgment.
+Matcher gampang ditambahkan. Evidence selection membutuhkan product knowledge dan QA judgment.
 
 ## Coba cek pemahamanmu
 
-Review generated test berikut:
+Review test berikut:
 
 ```ts
 await page.getByRole('button', { name: 'Delete address' }).click();

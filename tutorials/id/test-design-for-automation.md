@@ -9,7 +9,7 @@ description: 'Bangun test portfolio kecil dan independen dari business rule, mea
 - membedakan useful positive, negative, atau boundary scenario dari variasi yang cuma berbeda label;
 - memilih portfolio kecil yang mencakup failure mode berbeda tanpa menduplikasi flow yang sama;
 - menjaga satu skenario tetap fokus sambil memakai related assertion secukupnya; serta
-- me-review generated test case yang mengarang behavior, membuat optional path, atau menyimpan hidden dependency.
+- me-review test case yang mengarang behavior, membuat optional path, atau menyimpan hidden dependency.
 
 ## Kenapa ini penting buat QA
 
@@ -23,7 +23,7 @@ Checkout page bisa gagal dengan cara yang sangat berbeda:
 - quantity rule menerima value di luar range; atau
 - satu customer bisa melihat order customer lain.
 
-Satu happy-path script panjang nggak mencakup semua risk tersebut. Dua puluh generated variation dari script yang sama juga belum tentu membantu.
+Satu happy-path script panjang nggak mencakup semua risk tersebut. Dua puluh variation dari script yang sama juga belum tentu membantu.
 
 Automation seharusnya mempertahankan reasoning dari manual test yang bagus: starting state-nya deliberate, action-nya menguji satu rule, dan expected result-nya bisa mengekspos failure yang penting.
 
@@ -140,7 +140,7 @@ Lesson ini mendefinisikan independence requirement. Module berikutnya membahas b
 
 ### 6. Hindari optional logic di behavior yang sedang diuji
 
-Generated test sering berisi:
+Test sering berisi:
 
 ```ts
 if (await page.getByRole('alert').isVisible()) {
@@ -179,26 +179,24 @@ Kalau suite noisy, lambat, atau sulit dipercaya, audit design-nya sebelum menamb
 
 Kalau negative scenario unexpectedly pass, pastikan test benar-benar mencapai intended invalid state. Kalau skenario hanya gagal saat parallel, curigai shared identity, inventory, order, atau account data. Jangan menyelesaikan order dependency dengan memaksa serial execution sebelum memahami shared state-nya.
 
-## Review hasil buatan AI
+Review skenario yang diusulkan dengan pertanyaan berikut:
 
-Review generated scenario dengan pertanyaan berikut:
-
-- Apakah generator mengarang requirement, test account, boundary, atau expected message?
+- Apakah usulan tersebut mengasumsikan requirement, test account, boundary, atau expected message tanpa bukti?
 - Bisakah setiap skenario ditelusuri ke business rule atau product risk?
 - Apakah label “positive” dan “negative” menyembunyikan duplicate flow?
 - Apakah boundary dipilih di sekitar perubahan rule yang nyata?
 - Apakah ada `if` statement yang membuat expected outcome menjadi optional?
 - Apakah satu test bergantung pada data atau execution order test lain?
-- Apakah unrelated assertion ikut masuk hanya karena gampang di-generate?
+- Apakah unrelated assertion ikut masuk hanya karena gampang ditambahkan?
 - Apakah sensitive data muncul di source, title, log, atau report?
 - Bisakah important permutation dicakup lebih cepat dan jelas di bawah UI layer?
 - Bisakah kamu menjelaskan kenapa setiap retained scenario layak mendapat maintenance cost?
 
-AI bisa memperpanjang list tanpa batas. QA judgment menentukan portfolio terkecil yang memberi confidence berguna.
+Daftar test bisa memanjang tanpa batas. QA judgment menentukan portfolio terkecil yang memberi confidence berguna.
 
 ## Coba cek pemahamanmu
 
-Sebuah generated suite untuk quantity rule 1 sampai 10 berisi test berikut:
+Sebuah usulan suite untuk quantity rule 1 sampai 10 berisi test berikut:
 
 1. quantity 1 berhasil;
 2. quantity 2 berhasil;

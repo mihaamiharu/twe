@@ -148,9 +148,7 @@ If a brand-new context still receives the modified preference from the server, c
 
 Do not immediately make the suite serial, add retries, or clear random storage keys. Those actions can hide the collision without identifying which state is shared.
 
-## Review generated work
-
-When AI generates context-management code, check:
+When reviewing context-management code, check:
 
 - Does the scenario genuinely require more than the default `page` fixture?
 - Are separate users represented by separate contexts, not merely separate tabs?
@@ -158,13 +156,13 @@ When AI generates context-management code, check:
 - Is authentication state appropriate for each role?
 - Does the explanation incorrectly claim that a new context resets backend data?
 - Is shared product data intentional and controlled?
-- Did the generator launch extra browsers or contexts without a product reason?
+- Does the implementation launch extra browsers or contexts without a product reason?
 
 More contexts do not automatically mean more isolation. The boundary must match the state that can collide.
 
 ## Check your understanding
 
-A generated marketplace test creates two pages from the default context. The first page signs in as a buyer, the second signs in as a seller, and then the first page unexpectedly behaves as the seller. The generator proposes clearing cookies on the first page before every assertion.
+A marketplace test creates two pages from the default context. The first page signs in as a buyer, the second signs in as a seller, and then the first page unexpectedly behaves as the seller. A proposed repair clears cookies on the first page before every assertion.
 
 Explain the real modeling mistake, the smallest architectural repair, and which marketplace data still needs a separate isolation plan after that repair.
 

@@ -174,7 +174,7 @@ If a trace shows the target never exists, increasing a locator timeout will not 
 
 Artifacts can contain credentials, cookies, personal data, request bodies, and internal URLs. Restrict retention and access, and sanitize evidence before sharing it outside the authorized team or with an AI system.
 
-## Review generated work
+## Review AI-assisted work
 
 Give AI the exact error, relevant code, sanitized observations, and known execution conditions. Then review its response:
 
@@ -216,4 +216,4 @@ The correct assertion can stay. The hidden precondition is what needs repair.
 
 You should now be able to reproduce a failure, form competing hypotheses, select evidence that distinguishes them, repair the underlying assumption, and verify the result under the conditions that exposed it.
 
-Complete the integrated Core Practice by repairing a generated test that targets the wrong order and masks its evidence. Module 7 completes when all three Core lessons are read and that Core Practice passes. Module 8 will use these reliability boundaries to decide when helpers, page objects, fixtures, and configuration improve maintainability rather than hide state.
+Complete the integrated Core Practice by repairing a flawed test that targets the wrong order and masks its evidence. Module 7 completes when all three Core lessons are read and that Core Practice passes. Module 8 will use these reliability boundaries to decide when helpers, page objects, fixtures, and configuration improve maintainability rather than hide state.
