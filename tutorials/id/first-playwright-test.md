@@ -1,92 +1,104 @@
 ---
 title: 'Jalankan, Baca, dan Investigasi Test Playwright Pertamamu'
-description: 'Jalankan satu skenario yang fokus, pahami tanggung jawab setiap bagian test, lalu gunakan hasilnya sebagai bukti QA.'
+description: 'Jalankan satu test scenario dengan scope yang jelas, pahami fungsi setiap bagian test, lalu gunakan hasil run untuk verify behavior dan membantu debugging saat test fail.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
 - menemukan file dan command penting di dalam project Playwright;
-- menjelaskan tugas `test`, `page`, locator, action, dan `expect`;
-- menjalankan satu file atau satu test tertentu saat belajar dan debugging;
-- membedakan action yang berhasil dijalankan dengan outcome produk yang benar-benar dibuktikan; dan
-- memakai pesan kegagalan untuk menentukan langkah investigasi berikutnya.
+- menjelaskan fungsi `test`, `page`, locator, action, dan `expect`;
+- menjalankan satu file atau satu test tertentu saat belajar atau debugging;
+- membedakan action yang berhasil dijalankan dengan expected result yang benar-benar sudah diverifikasi; dan
+- menggunakan error message dari test untuk menentukan apa yang perlu dicek berikutnya.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih kamu menerima file Playwright, menjalankannya, lalu melihat semuanya hijau? Kelihatannya meyakinkan, tapi hasil hijau itu belum tentu bisa dipercaya.
+Pernah nggak sih kamu menerima file Playwright, menjalankannya, lalu semua test pass? Kelihatannya aman, tapi test yang pass belum tentu berarti kita sudah verify hal yang benar.
 
-Kamu masih perlu bertanya: risiko produk apa yang sebenarnya diuji? Environment awalnya dari mana? Kalau test gagal, masalahnya ada di aplikasi, test data, locator, atau konfigurasi?
+Kita tetap perlu tahu: product risk apa yang sebenarnya diuji? Starting state dan test data-nya dari mana? Kalau test fail, masalahnya ada di aplikasi, test data, locator, atau configuration?
 
-Tujuan test pertamamu bukan membuat banyak automation. Tujuannya adalah menyelesaikan satu feedback loop yang benar-benar kamu pahami:
+Di test pertama ini, tujuannya bukan membuat automation sebanyak mungkin. Kita fokus memahami satu flow dari awal sampai akhir:
 
 ```text
-Intent QA → kode test → perilaku browser → bukti yang terlihat → hasil yang berguna
+Test intent → code → browser menjalankan action → verify expected result → hasil test
 ```
 
-Satu test kecil yang bisa kamu jelaskan dan investigasi lebih berharga daripada sepuluh skenario yang nggak bisa kamu review.
+Satu test yang scope-nya jelas, bisa kamu jelaskan, dan bisa kamu debug saat fail lebih berguna daripada banyak test scenario yang kamu sendiri nggak yakin sebenarnya sedang verify apa.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Anggap Playwright test sebagai kontrak QA yang bisa dijalankan. Beberapa bagian bekerja sama, tapi tugasnya berbeda:
+Sebuah Playwright test terdiri dari beberapa bagian yang bekerja sama, tapi masing-masing punya fungsi yang berbeda:
 
-| Bagian                 | Tanggung jawab                                                         |
-| ---------------------- | ---------------------------------------------------------------------- |
-| `test`                 | Memberi nama dan membungkus satu skenario yang bisa dijalankan sendiri |
-| Fixture seperti `page` | Menyediakan environment test yang terisolasi                           |
-| Locator                | Menjelaskan cara test menemukan target yang dilihat pengguna           |
-| Action                 | Meminta browser melakukan suatu perilaku                               |
-| `expect`               | Menyatakan bukti yang pada akhirnya harus benar                        |
-| Test runner            | Menjalankan test, membuat report, dan menyimpan informasi kegagalan    |
+| Bagian                 | Fungsinya                                                                  |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `test`                 | Mendefinisikan satu test scenario yang akan dijalankan                     |
+| Fixture seperti `page` | Memberikan akses ke page/browser yang digunakan selama test                |
+| Locator                | Menentukan element mana yang ingin digunakan                               |
+| Action                 | Melakukan interaction seperti click, fill, atau navigation                 |
+| `expect`               | Verify expected result                                                     |
+| Test runner            | Menjalankan test, membuat report, dan menyimpan informasi ketika test fail |
 
-Saat mereview sebuah test, beri label pada setiap baris sebelum menilai apakah kodenya sudah tepat:
+Saat membaca sebuah test, coba pahami juga bagian mana yang berkaitan dengan intent, Playwright, JavaScript, dan test data:
 
-| Layer             | Pertanyaan yang dijawab                        | Contoh                                      |
-| ----------------- | --------------------------------------------- | ------------------------------------------- |
-| Intent test       | Risiko produk apa yang sedang diperiksa?       | Customer bisa membuka cart                  |
-| API Playwright    | Bagaimana test menjalankan atau mengamati UI?  | `page.goto`, `getByRole`, `click`, `expect` |
-| JavaScript        | Bagaimana value dan alur logic ditulis?       | `async`, `await`, dan template literal      |
-| Test data         | Input dan ekspektasi konkret apa yang dipakai? | `'/products'`, `'Cart'`, dan `/\/cart$/` |
+| Bagian         | Pertanyaan yang perlu dijawab                                           | Contoh                                      |
+| -------------- | ----------------------------------------------------------------------- | ------------------------------------------- |
+| Test intent    | Product risk atau behavior apa yang ingin diuji?                        | Customer bisa membuka cart                  |
+| Playwright API | Bagaimana test berinteraksi dengan browser atau melakukan verification? | `page.goto`, `getByRole`, `click`, `expect` |
+| JavaScript     | Syntax atau logic apa yang digunakan untuk menjalankan test?            | `async`, `await`, template literal          |
+| Test data      | Data apa yang digunakan dalam scenario?                                 | `'/app/products.html'`, `'Cart'`, `'Your cart'` |
 
-Layer ini bisa muncul di baris yang sama, tapi tanggung jawabnya berbeda. Locator tidak menentukan risiko produk, dan annotation TypeScript tidak mengubah test data menjadi fakta runtime.
+Beberapa bagian bisa muncul dalam baris code yang sama, tapi fungsinya tetap berbeda.
+
+Locator membantu test menemukan element, tapi locator nggak menentukan apa yang sebenarnya ingin diuji. Begitu juga dengan syntax JavaScript atau TypeScript keduanya membantu kita menulis test, tapi bukan bagian dari product behavior yang ingin diverifikasi.
 
 ![Feedback loop Playwright yang fokus menghubungkan intent QA, satu test, perilaku browser, bukti yang terlihat, dan hasil diagnosis.](/images/tutorials/first-test-feedback-loop.svg)
 
-_Hasil hijau baru berguna kalau bukti yang diamati memang sesuai dengan intent QA sejak awal._
+_Test yang pass baru benar-benar berguna kalau expected result yang diverifikasi memang sesuai dengan test intent sejak awal._
 
-Di test pertama kamu akan melihat `async` dan `await`. Untuk sementara, baca `await` sebagai: “langkah berikutnya bergantung pada operasi asynchronous ini selesai.” Lesson 3 akan membahas jaminan dan batasannya dengan lebih tepat.
+Di test pertama ini, kamu juga akan melihat `async` dan `await`. Untuk sementara, baca `await` sebagai tanda bahwa step berikutnya bergantung pada selesainya operasi asynchronous tersebut. Ini bukan berarti semua perubahan di UI otomatis sudah siap untuk diverifikasi.
+
+Di Lesson 3, kita akan membahas lebih detail kapan `await` dibutuhkan dan apa saja batasannya.
 
 ## Coba kita bedah contoh nyata
 
-Misalnya, risiko produknya adalah:
+Misalnya, risiko yang ingin diuji adalah:
 
-> Pengguna membuka link Cart, tapi tidak sampai ke halaman keranjang.
+> User klik link **Cart**, tapi halaman cart nggak terbuka.
 
-Starting state-nya adalah aplikasi yang sedang berjalan dengan base URL yang sudah dikonfigurasi. Action-nya adalah membuka link Cart. Bukti yang berguna adalah URL cart dan heading keranjang yang terlihat.
+Starting state-nya: aplikasi dari Core Practice sudah terbuka di `/app/products.html`.
 
-### 1. Buka project yang tepat
+Action-nya: klik link **Cart**.
 
-Kalau kamu bekerja di repository tim, gunakan command instalasi dan test yang didokumentasikan di repository itu. Jangan menjalankan command scaffolding di dalam project yang sudah ada sebelum mengecek konfigurasi yang tersedia.
+Expected result yang perlu diverifikasi: heading **Your cart** terlihat di halaman.
 
-Untuk sandbox belajar yang benar-benar baru, Playwright bisa membuat project awal:
+Core Practice menyediakan products page dan cart page untuk flow ini. Kalau test yang sama dijalankan di repository tim, aplikasi dan starting route-nya memang harus tersedia sebelum Playwright dijalankan.
+
+### 1. Gunakan setup project yang sudah ada
+
+Kalau kamu masuk ke project yang sudah digunakan tim, ikuti command untuk install dependency dan menjalankan test yang memang sudah tersedia di project tersebut.
+
+Jangan langsung menjalankan command untuk membuat setup Playwright baru sebelum mengecek konfigurasi yang sudah ada.
+
+Kalau kamu membuat project baru khusus untuk belajar, Playwright bisa menyiapkan project awal dengan:
 
 ```bash
 npm init playwright@latest
 ```
 
-Struktur yang umum terlihat seperti ini:
+Struktur project biasanya kurang lebih seperti ini:
 
 ```text
-playwright.config.ts    konfigurasi runner, browser, dan environment
+playwright.config.ts    konfigurasi Playwright
 tests/                  file test
-package.json            command project dan dependency
-test-results/           artifact dari test run, kalau dihasilkan
+package.json            script dan dependency project
+test-results/           hasil atau artifact dari test run, kalau ada
 ```
 
-Struktur setiap tim bisa berbeda. Baca repository-nya, jangan berasumsi semuanya memakai default.
+Struktur setiap project bisa berbeda. Jadi, cek dulu repository dan konfigurasi yang sudah ada daripada menganggap semuanya memakai setup default Playwright.
 
-### 2. Pastikan kontrak environment-nya
+### 2. Cek konfigurasi environment
 
-`baseURL` membuat test bisa membuka path produk tanpa menulis host berulang kali:
+`baseURL` membantu test membuka path tanpa perlu menulis host yang sama berulang kali:
 
 ```ts
 // playwright.config.ts
@@ -99,35 +111,44 @@ export default defineConfig({
 });
 ```
 
-URL yang berbeda antar-environment sebaiknya tinggal di konfigurasi, bukan disalin ke setiap skenario. Password, token, dan secret lain juga nggak boleh ditulis di source code yang di-commit.
+Kalau URL berbeda antara local, QA, atau environment lain, simpan perbedaannya di konfigurasi. Jangan hardcode URL tersebut di setiap test scenario.
 
-### 3. Baca test lengkap berdasarkan tanggung jawabnya
+Hal yang sama berlaku untuk password, token, dan secret lain. Jangan simpan langsung di source code yang akan di-commit.
+
+`baseURL` hanya memberi tahu Playwright ke mana relative path harus dibuka. Konfigurasi ini nggak membuat aplikasi atau route yang belum tersedia.
+
+### 3. Pahami fungsi setiap bagian test
 
 ```ts
 import { test, expect } from '@playwright/test';
 
 test('customer can open the cart', async ({ page }) => {
-  await page.goto('/products');
+  await page.goto('/app/products.html');
 
   await page.getByRole('link', { name: 'Cart' }).click();
 
-  await expect(page).toHaveURL(/\/cart$/);
   await expect(page.getByRole('heading', { name: 'Your cart' })).toBeVisible();
 });
 ```
 
-Hubungkan setiap baris dengan intent QA:
+Coba lihat fungsi setiap bagian dari test tersebut:
 
-- judul test menjelaskan perilaku yang sedang diperiksa;
-- `{ page }` meminta browser page fixture yang terisolasi dari runner;
-- `goto` membentuk halaman awal sebelum action;
-- `getByRole` mendeskripsikan link Cart seperti yang dikenali pengguna;
-- `click` melakukan action; dan
-- dua assertion membuktikan destination dan hasil yang terlihat.
+* judul test menjelaskan behavior yang ingin diuji;
+* `{ page }` memberikan akses ke browser page yang digunakan selama test;
+* `goto` membuka halaman awal sebelum action dilakukan;
+* `getByRole` mencari link **Cart** berdasarkan role dan accessible name yang dikenali browser;
+* `click` melakukan action; dan
+* assertion membuktikan bahwa cart page sudah terbuka lewat content yang bisa dilihat user.
 
-Click bukanlah bukti. Click hanya meminta browser melakukan action. Tanpa assertion, test bisa selesai walaupun mengarah ke destination yang salah.
+`click` saja belum cukup untuk membuktikan test berhasil. `click` hanya melakukan action.
 
-### 4. Jalankan scope terkecil yang masih berguna
+Tanpa assertion, test bisa saja tetap pass tanpa membuktikan bahwa halaman cart benar-benar muncul.
+
+### 4. Jalankan test yang memang ingin kamu cek
+
+Di Core Practice, gunakan **Jalankan Kode**. TWE sudah menyediakan halaman aplikasinya dan menjalankan starter test di halaman tersebut.
+
+Kalau kamu bekerja di repository lokal milik tim, gunakan command yang didokumentasikan oleh project. Beberapa command Playwright untuk menjalankan scope yang fokus biasanya terlihat seperti ini:
 
 ```bash
 npx playwright test tests/cart.spec.ts
@@ -136,55 +157,69 @@ npx playwright test --headed
 npx playwright test --ui
 ```
 
-Mulai dari satu file atau satu judul supaya hasilnya gampang dihubungkan dengan perubahanmu. Pakai headed mode kalau melihat browser bisa membantu. Pakai UI Mode kalau kamu butuh langkah demi langkah dan snapshot DOM untuk investigasi.
+Command tersebut hanya bisa digunakan kalau repository memang punya file test dan aplikasi yang bisa dijalankan. Mulai dari satu file atau satu test dulu supaya hasilnya lebih mudah dibaca dan dikaitkan dengan perubahan yang sedang kamu kerjakan.
 
-Setelah itu, baca hasilnya. Failure yang berguna biasanya menunjukkan judul test, baris yang gagal, kondisi yang diharapkan, kondisi yang teramati, dan artifact yang tersedia. Jangan berhenti di kata “merah”; tanyakan bukti apa yang sebenarnya diberikan hasil tersebut.
+Gunakan `--headed` kalau kamu perlu melihat langsung apa yang terjadi di browser. Gunakan `--ui` kalau kamu ingin melihat setiap step, DOM snapshot, dan detail lain yang membantu saat debugging.
 
-## Kapan pendekatan ini cocok dipakai?
+Setelah test selesai, jangan cuma lihat apakah hasilnya pass atau fail. Baca informasi yang diberikan Playwright, seperti:
 
-Jalankan test secara fokus saat kamu belajar, mengubah satu skenario, atau menginvestigasi kegagalan lokal. Setelah test itu lolos, jalankan kelompok test lain yang relevan. Full suite dipakai pada tahap membangun confidence yang lebih luas, bukan setiap kali mengetik satu baris.
+* test mana yang fail;
+* baris code yang gagal;
+* expected result;
+* actual result; dan
+* artifact seperti screenshot, trace, atau log kalau tersedia.
 
-Gunakan script milik repository kalau tim membungkus Playwright dengan setup environment tertentu. `npx playwright test` memang berguna, tapi bisa saja melewatkan langkah yang sudah dimasukkan ke `npm test`, `bun run test:e2e`, atau command project lainnya.
+Dari situ, tentukan apa yang perlu dicek berikutnya.
 
-Jangan langsung membuat scaffold Playwright baru hanya karena file test belum kelihatan. Periksa dulu `package.json`, file konfigurasi, folder test, dan dokumentasi repository.
+## Kapan cara ini cocok dipakai?
 
-Jangan menambah skenario sebelum kamu bisa menjelaskan state, action, bukti, dan output kegagalan dari test pertama.
+Saat sedang belajar, mengubah satu test scenario, atau debugging test yang fail, jalankan dulu test yang memang sedang kamu kerjakan.
 
-## Kalau gagal, mulai cek dari mana?
+Kalau test tersebut sudah pass, baru jalankan test lain yang masih berhubungan. Full suite biasanya dijalankan ketika kita ingin memastikan perubahan tersebut nggak merusak area lain, bukan setiap kali selesai mengubah satu baris code.
 
-Bayangkan test timeout di baris ini:
+Kalau project tim sudah punya command sendiri untuk menjalankan Playwright, gunakan command tersebut. `npx playwright test` memang bisa menjalankan Playwright langsung, tapi project bisa saja punya setup tambahan di command seperti `npm test`, `bun run test:e2e`, atau script lainnya.
+
+Kalau kamu belum menemukan file test, jangan langsung membuat setup Playwright baru. Cek dulu `package.json`, file konfigurasi Playwright, folder test, dan dokumentasi project.
+
+Sebelum menambah test scenario lain, pastikan kamu sudah paham starting state, action, expected result, dan informasi apa yang diberikan Playwright ketika test pertama fail.
+
+## Kalau test fail, mulai cek dari mana?
+
+Coba bayangin test timeout di baris ini:
 
 ```ts
 await page.getByRole('link', { name: 'Cart' }).click();
 ```
 
-Godaan pertamanya mungkin menambah sleep atau menyalin CSS path dari DevTools. Mulai dari bukti dulu:
+Jangan langsung tambah sleep atau ganti locator. Cek dulu apa yang sebenarnya terjadi:
 
-1. Apakah navigasi ke `/products` berhasil?
-2. URL dan isi halaman apa yang ada saat test gagal?
-3. Apakah kontrolnya benar-benar link, dan accessible name apa yang dikenali browser?
-4. Ada satu elemen yang cocok, tidak ada, atau malah beberapa?
-5. Apakah aplikasi menampilkan error, halaman login, atau loading state?
+1. Apakah halaman `/app/products.html` berhasil dibuka?
+2. Saat test fail, URL-nya ada di mana dan apa yang tampil di halaman?
+3. Apakah element **Cart** memang dikenali sebagai `link`? Accessible name-nya apa?
+4. Locator tersebut menemukan satu element, nggak menemukan apa pun, atau malah menemukan lebih dari satu?
+5. Apakah halaman menampilkan error, redirect ke login, atau masih dalam loading state?
 
-Kalau produk memang mengganti nama link menjadi “Shopping cart”, ubah test setelah memastikan perubahan itu memang diinginkan. Kalau halaman malah redirect ke login, mengganti locator justru menutupi masalah starting state.
+Kalau ternyata nama link memang berubah menjadi **“Shopping cart”**, update locator setelah memastikan perubahan tersebut memang sesuai dengan behavior terbaru.
 
-Timeout yang lebih panjang nggak akan memperbaiki environment yang salah, test data yang hilang, atau identitas elemen yang keliru.
+Tapi kalau test malah redirect ke login, masalahnya bukan di locator. Cek starting state atau authentication setup-nya.
 
-Sebelum menjalankan test yang belum kamu kenal, review baris demi baris:
+Menambah timeout juga nggak akan memperbaiki environment yang salah, test data yang belum tersedia, atau locator yang memang mengarah ke element yang salah.
 
-- Apakah judulnya menjelaskan satu perilaku produk?
-- Apakah URL dan state awalnya valid untuk repository ini?
-- Apakah test mengasumsikan visible text, test ID, credential, atau route tanpa bukti?
-- Apakah setiap action mendukung risiko yang sedang diuji?
-- Apakah ada assertion untuk outcome yang bisa diamati?
-- Apakah fixed sleep atau `catch` yang terlalu luas sedang menutupi ketidakpastian?
-- Bisakah kamu menjalankan skenario ini saja dan menjelaskan kegagalannya?
+Sebelum menjalankan test yang belum kamu kenal, baca dulu code-nya dan cek beberapa hal ini:
 
-Perlakukan kode yang belum kamu kenal sebagai draft yang penuh asumsi, bukan sebagai fakta produk yang sudah ditemukan.
+* Apakah nama test menjelaskan behavior yang ingin diuji?
+* Apakah starting state dan URL awalnya sesuai dengan setup project?
+* Apakah test mengandalkan text, test ID, credential, atau route yang belum kamu cek?
+* Apakah setiap action memang diperlukan untuk scenario tersebut?
+* Apakah ada assertion yang verify expected result?
+* Apakah ada fixed sleep atau `catch` yang justru membuat root cause lebih sulit ditemukan?
+* Bisakah kamu menjalankan test tersebut sendiri dan menjelaskan kenapa test-nya pass atau fail?
+
+Kalau kamu belum memahami test-nya, jangan langsung menganggap semua asumsi di dalam code tersebut benar. Cek dulu dengan behavior aplikasi yang sebenarnya.
 
 ## Coba cek pemahamanmu
 
-Review test ini:
+Review test berikut:
 
 ```ts
 test('customer opens account settings', async ({ page }) => {
@@ -193,26 +228,28 @@ test('customer opens account settings', async ({ page }) => {
 });
 ```
 
-Jawab pertanyaan berikut:
+Coba jawab:
 
-1. Starting state dan action apa yang ditulis test ini?
-2. Tanggung jawab penting apa yang masih hilang?
-3. Bukti apa yang bisa mengonfirmasi bahwa account settings benar-benar terbuka?
-4. Command apa yang kamu pakai untuk menjalankan test dengan nama ini saja?
-5. Kalau link tidak ditemukan, apa yang kamu periksa sebelum mengubah locator?
+1. Apa starting state dan action yang sudah ada di test ini?
+2. Bagian penting apa yang masih belum ada?
+3. Apa yang perlu diverifikasi untuk memastikan halaman account settings benar-benar terbuka?
+4. Command apa yang bisa digunakan untuk menjalankan test dengan nama tersebut saja?
+5. Kalau link **“Settings”** nggak ditemukan, apa yang perlu kamu cek sebelum mengganti locator?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh jawaban:
 
-- Test dimulai dari `/account` lalu membuka link Settings.
-- Belum ada assertion, jadi test tidak membuktikan bahwa account settings berhasil terbuka.
-- Bukti yang berguna bisa berupa URL settings dan heading “Account settings” yang terlihat. Bukti tepatnya tetap harus mengikuti requirement produk.
-- Jalankan `npx playwright test -g "customer opens account settings"` atau wrapper command yang setara di repository.
-- Periksa URL yang dimuat, state halaman, role, accessible name, jumlah elemen yang cocok, serta redirect atau error yang tidak diharapkan sebelum mengganti locator.
+* Test dimulai dari `/account`, lalu user membuka link **“Settings”**.
+* Belum ada assertion, jadi test belum verify apakah halaman account settings benar-benar terbuka.
+* Kita bisa verify heading **“Account settings”** atau element khusus lain di halaman tersebut terlihat. Expected result akhirnya tetap harus mengikuti requirement yang sebenarnya.
+* Jalankan `npx playwright test -g "customer opens account settings"` atau command test yang memang digunakan di project.
+* Sebelum mengganti locator, cek URL yang terbuka, kondisi halaman, role dan accessible name dari element, jumlah element yang ditemukan, serta apakah ada redirect atau error yang nggak seharusnya terjadi.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya sudah bisa membuka project, menjelaskan tanggung jawab setiap bagian di dalam satu Playwright test, menjalankannya secara fokus, lalu memakai hasilnya untuk menentukan apa yang perlu diperiksa berikutnya.
+Sekarang kamu seharusnya sudah bisa memahami struktur satu Playwright test, menjelaskan fungsi setiap bagiannya, menjalankan test yang ingin kamu cek, dan menggunakan hasil run untuk menentukan apa yang perlu dicek berikutnya.
 
-Selesaikan Core Practice dengan mengubah starter menjadi satu test yang punya bukti observable. Perubahan yang diminta sengaja kecil: pakai locator yang dilihat pengguna dan web-first assertion. Setelah itu, lesson berikutnya akan memberimu JavaScript secukupnya untuk mengubah test data dan logic kecil tanpa membawa learning path ini menjadi kursus programming umum.
+Di Core Practice, kamu akan membuka Cart dengan user-facing locator lalu membuktikan heading-nya terlihat menggunakan web-first assertion.
+
+Setelah itu, lesson berikutnya akan membahas JavaScript secukupnya supaya kamu bisa mengatur test data dan logic sederhana tanpa mengubah learning path ini menjadi course programming.

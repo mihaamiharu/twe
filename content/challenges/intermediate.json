@@ -1203,36 +1203,41 @@
       "xpReward": 40,
       "order": 2990,
       "title": {
-        "en": "Your First Observable Test",
-        "id": "Test Teramati Pertamamu"
+        "en": "Open the Cart and Prove the Result",
+        "id": "Buka Cart dan Buktikan Hasilnya"
       },
       "description": {
-        "en": "Complete a focused test that locates a heading by role and proves it is visible.",
-        "id": "Selesaikan test terfokus yang menemukan heading berdasarkan role dan membuktikan bahwa heading terlihat."
+        "en": "Complete one focused test that opens the Cart and proves the destination page is visible.",
+        "id": "Lengkapi satu test yang fokus untuk membuka Cart dan membuktikan halaman tujuannya terlihat."
       },
       "instructions": {
-        "en": "# Your First Observable Test\n\nComplete the existing test body. Locate the `Welcome, QA` heading by role and accessible name, then use a web-first visibility assertion. The goal is to connect `test`, `page`, a user-facing locator, and `expect` in one small scenario.",
-        "id": "# Test Teramati Pertamamu\n\nLengkapi test body yang tersedia. Temukan heading `Welcome, QA` berdasarkan role dan accessible name, lalu gunakan web-first visibility assertion. Tujuannya adalah menghubungkan `test`, `page`, locator yang menghadap pengguna, dan `expect` dalam satu skenario kecil."
+        "en": "# Open the Cart and Prove the Result\n\nThis Practice provides a products page and a separate cart page. The test already opens the products page. Complete the remaining flow:\n\n1. Locate and activate the **Cart** link by role and accessible name.\n2. Use a web-first assertion to prove the **Your cart** heading is visible after the action.\n\nThe goal is to connect one user action to visible evidence on the resulting page.",
+        "id": "# Buka Cart dan Buktikan Hasilnya\n\nPractice ini menyediakan products page dan cart page yang terpisah. Test-nya sudah membuka products page. Lengkapi flow berikut:\n\n1. Cari dan click link **Cart** berdasarkan role dan accessible name.\n2. Gunakan web-first assertion untuk membuktikan heading **Your cart** terlihat setelah action tersebut.\n\nTujuannya adalah menghubungkan satu user action dengan evidence yang terlihat di halaman yang terbuka."
       },
       "hints": {
         "en": [
-          "Headings have the `heading` role.",
-          "Use `await expect(locator).toBeVisible()`."
+          "Use `getByRole('link', { name: 'Cart' })` for the action target.",
+          "After the click, locate the `Your cart` heading by role and assert that it is visible."
         ],
         "id": [
-          "Heading memiliki role `heading`.",
-          "Gunakan `await expect(locator).toBeVisible()`."
+          "Gunakan `getByRole('link', { name: 'Cart' })` untuk action target.",
+          "Setelah click, cari heading `Your cart` berdasarkan role lalu assert bahwa heading tersebut terlihat."
         ]
       },
-      "htmlContent": "<main><h1>Welcome, QA</h1><p>Your practice workspace is ready.</p></main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('workspace is ready', async ({ page }) => {\n  // Locate the heading by role and prove it is visible.\n});",
+      "files": {
+        "/tests/cart.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // Open Cart using a user-facing locator.\n\n  // Prove the resulting page is visible.\n});",
+        "/app/products.html": "<main>\n  <nav aria-label=\"Store navigation\">\n    <a href=\"/app/cart.html\">Cart</a>\n  </nav>\n  <h1>Products</h1>\n  <section aria-label=\"Available products\">\n    <article>\n      <h2>Mechanical Keyboard</h2>\n      <p>A compact keyboard for a focused workspace.</p>\n    </article>\n  </section>\n</main>",
+        "/app/cart.html": "<main>\n  <nav aria-label=\"Store navigation\">\n    <a href=\"/app/products.html\">Continue shopping</a>\n  </nav>\n  <h1>Your cart</h1>\n  <p>Your cart is empty.</p>\n</main>"
+      },
+      "editableFiles": ["/tests/cart.spec.ts"],
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // Open Cart using a user-facing locator.\n\n  // Prove the resulting page is visible.\n});",
       "testCases": [],
-      "solution": "import { test, expect } from '@playwright/test';\n\ntest('workspace is ready', async ({ page }) => {\n  await expect(page.getByRole('heading', { name: 'Welcome, QA' })).toBeVisible();\n});",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  await page.getByRole('link', { name: 'Cart' }).click();\n\n  await expect(\n    page.getByRole('heading', { name: 'Your cart' }),\n  ).toBeVisible();\n});",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["goto", "getByRole", "click"]
       },
-      "tags": ["playwright", "first-test", "core-practice"]
+      "tags": ["playwright", "first-test", "navigation", "core-practice"]
     },
     {
       "slug": "pw-action-outcome-sync",

@@ -45,7 +45,7 @@ When reviewing a test, label each line before asking whether it is correct:
 | Test intent      | What product risk is this scenario checking? | Customer can open the cart                   |
 | Playwright API   | How does the test drive or observe the UI?   | `page.goto`, `getByRole`, `click`, `expect`  |
 | JavaScript       | How are values and control flow expressed?  | `async`, `await`, and template literals      |
-| Test data        | Which concrete inputs and expectations apply? | `'/products'`, `'Cart'`, and `/\/cart$/` |
+| Test data        | Which concrete inputs and expectations apply? | `'/app/products.html'`, `'Cart'`, and `'Your cart'` |
 
 These layers can appear on the same line, but they are not the same responsibility. A locator does not define the product risk, and a TypeScript annotation does not turn test data into runtime truth.
 
@@ -61,7 +61,15 @@ Suppose the product risk is:
 
 > A customer activates the Cart link but does not reach the cart page.
 
-The starting state is a running application with a configured base URL. The action is activating the Cart link. Useful evidence is both the cart URL and its visible heading.
+Starting state: the Practice application is open on `/app/products.html`.
+
+Action: activate the **Cart** link.
+
+Expected result to verify:
+
+- the **Your cart** heading is visible.
+
+The Core Practice supplies both pages for this exact flow. In a team repository, the same test requires the real application and its starting route to exist before Playwright runs.
 
 ### 1. Open the right project
 
@@ -101,17 +109,18 @@ export default defineConfig({
 
 Environment-specific URLs belong in configuration, not repeated across every scenario. Secrets such as passwords and tokens do not belong in committed source code.
 
+A `baseURL` only tells Playwright where to send a relative navigation. It does not create the application or a missing route.
+
 ### 3. Read the complete test by responsibility
 
 ```ts
 import { test, expect } from '@playwright/test';
 
 test('customer can open the cart', async ({ page }) => {
-  await page.goto('/products');
+  await page.goto('/app/products.html');
 
   await page.getByRole('link', { name: 'Cart' }).click();
 
-  await expect(page).toHaveURL(/\/cart$/);
   await expect(page.getByRole('heading', { name: 'Your cart' })).toBeVisible();
 });
 ```
@@ -123,11 +132,15 @@ Connect each line to the QA intent:
 - `goto` establishes the page where the action begins;
 - `getByRole` describes the Cart link as users perceive it;
 - `click` performs the action; and
-- the two assertions prove the destination and visible result.
+- the assertion proves the resulting page through content the customer can see.
 
-The click is not the evidence. It only requests the action. Without the assertions, the test could finish after clicking the wrong destination.
+The click is not the evidence. It only requests the action. Without the assertion, the test could finish without proving that the cart page appeared.
 
 ### 4. Run the smallest useful scope
+
+In Core Practice, use **Run Code**. TWE supplies the application pages and executes the starter test against them.
+
+In a local team repository, use its documented command. Common focused Playwright commands look like this:
 
 ```bash
 npx playwright test tests/cart.spec.ts
@@ -136,9 +149,9 @@ npx playwright test --headed
 npx playwright test --ui
 ```
 
-Start with one file or one title so the result remains easy to connect to your change. Use headed mode when seeing the browser helps. Use UI Mode when you need step-by-step evidence and DOM snapshots.
+These commands assume that the repository already contains the named test and a runnable application. Start with one file or one title so the result remains easy to connect to your change. Use headed mode when seeing the browser helps. Use UI Mode when you need step-by-step evidence and DOM snapshots.
 
-Then read the result. A useful failure normally points to the test title, failing line, expected condition, observed condition, and available artifacts. Do not stop at “red”; ask what category of evidence it provides.
+After the run, do not stop at whether the test passed or failed. Read the test title, failing line, expected result, actual result, and available artifacts such as a screenshot, trace, or log. Use that evidence to decide what to inspect next.
 
 ## When to use it—and when not to
 
@@ -160,7 +173,7 @@ await page.getByRole('link', { name: 'Cart' }).click();
 
 The tempting workaround is a sleep or a CSS path copied from DevTools. Start with evidence instead:
 
-1. Did navigation to `/products` succeed?
+1. Did navigation to `/app/products.html` succeed?
 2. What URL and page content exist at the failure point?
 3. Is the control a link, and what accessible name does the browser expose?
 4. Is there one matching control, none, or several?
@@ -207,7 +220,7 @@ One reasonable answer is:
 
 - The test starts on `/account` and activates the Settings link.
 - It has no assertion, so it does not prove that account settings opened.
-- Useful evidence could include the expected settings URL and a visible “Account settings” heading. The exact evidence should follow the product requirement.
+- Useful evidence could be a visible “Account settings” heading or another page-specific element customers rely on. The exact evidence should follow the product requirement.
 - Run `npx playwright test -g "customer opens account settings"`, or use the repository's equivalent wrapper command.
 - Inspect the loaded URL, current page state, role, accessible name, match count, and any unexpected redirect or error before changing the locator.
 
@@ -215,4 +228,4 @@ One reasonable answer is:
 
 You should now be able to open the project, explain each responsibility in one Playwright test, run it narrowly, and use its result to decide what to inspect next.
 
-Complete the Core Practice by turning the starter into one observable test. The required change is intentionally small: use a user-facing locator and a web-first assertion. Then the next lesson will give you just enough JavaScript to change test data and small pieces of test logic without turning the learning path into a general programming course.
+Complete the Core Practice by opening the supplied Cart page with a user-facing locator and proving its heading is visible with a web-first assertion. Then the next lesson will give you just enough JavaScript to change test data and small pieces of test logic without turning the learning path into a general programming course.
