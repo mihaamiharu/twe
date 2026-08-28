@@ -1,60 +1,64 @@
 ---
-title: 'Rawat XPath Tanpa Menjadikannya Default Modern'
-description: 'Baca, diagnosis, dan migrasikan XPath legacy sambil mengenali kasus terbatas ketika XPath masih menjadi jembatan yang praktis.'
+title: 'Gunakan XPath Hanya Saat Memang Dibutuhkan'
+description: 'Pelajari cara membaca, memperbaiki, dan memigrasikan XPath dari test legacy, tanpa menjadikannya pilihan utama untuk test Playwright baru.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- membaca relative XPath yang dibentuk dari descendant, attribute, predicate, dan relationship;
-- menjelaskan kenapa absolute XPath biasanya menjadi automation contract yang rapuh;
-- mengenali kapan merawat XPath masih praktis dan kapan migration lebih bernilai;
-- menerjemahkan relationship-based XPath menjadi locator composition Playwright; dan
-- mendiagnosis failure XPath yang melibatkan text, position, multiple match, atau shadow DOM.
+* membaca bentuk XPath yang sering ditemukan di automation code;
+* menjelaskan kenapa absolute XPath biasanya mudah rusak ketika structure halaman berubah;
+* menentukan kapan XPath yang sudah ada cukup diperbaiki dan kapan sebaiknya dimigrasikan;
+* mengubah XPath yang bergantung pada hubungan antar-element menjadi locator Playwright yang menggunakan scope yang jelas; dan
+* mendiagnosis XPath yang gagal karena text, index, multiple match, iframe, atau shadow root.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih kamu masuk ke tim baru lalu menemukan ratusan Selenium test seperti ini?
+Pernah nggak kamu masuk ke tim baru lalu menemukan banyak Selenium test dengan XPath seperti ini?
 
 ```xpath
 //tr[td[normalize-space()='ORD-1042']]//button[normalize-space()='Refund']
 ```
 
-Menulis ulang seluruh suite saat itu juga mungkin nggak realistis. Kamu tetap harus memahami elemen apa yang dipilih, menginvestigasi failure, lalu menentukan apakah local repair atau migration memberi value lebih besar.
+Menulis ulang seluruh test suite saat itu juga mungkin nggak realistis. Test tersebut masih digunakan dan tetap perlu dirawat.
 
-XPath literacy membantu kamu menjaga risk coverage yang sudah ada. Menjadikan XPath default untuk Playwright test baru justru membawa DOM dependency lama ke tool yang sudah menyediakan user-facing contract lebih jelas.
+Sebagai QA, kamu perlu bisa membaca element apa yang dicari oleh XPath, mengecek kenapa locator-nya fail, lalu menentukan apakah cukup diperbaiki atau lebih baik dimigrasikan ke locator Playwright.
 
-Lesson ini optional karena menulis XPath dari ingatan bukan syarat menyelesaikan modern locator path.
+Memahami XPath membantu kita menjaga test coverage yang sudah ada. Tapi untuk Playwright test baru, XPath biasanya bukan pilihan utama karena Playwright sudah menyediakan locator yang lebih dekat dengan cara user mengenali element, seperti role, label, text, dan locator composition.
+
+Lesson ini optional. Kamu nggak perlu bisa menulis XPath dari ingatan untuk menyelesaikan Module 4.
 
 ## Cara berpikir yang perlu kamu pegang
 
-XPath menjelaskan route atau relationship di dalam live document tree:
+XPath mencari element berdasarkan posisi atau hubungannya di dalam DOM:
 
 ```text
-Candidate anchor
-      ↓
-Predicate atau relationship
-      ↓
-Target node
+Element yang menjadi titik awal
+              ↓
+Kondisi atau hubungan yang digunakan
+              ↓
+Element target
 ```
 
-Baca expression ini dari kiri ke kanan:
+Coba baca XPath berikut dari kiri ke kanan:
 
 ```xpath
 //tr[td[normalize-space()='ORD-1042']]/td[4]
 ```
 
-- `//tr` mencari descendant table row;
-- `[td[...]]` mempertahankan row yang punya cell dengan nested condition tersebut;
-- `normalize-space()='ORD-1042'` membandingkan normalized string content; dan
-- `/td[4]` memilih direct cell keempat dari setiap row yang tersisa.
+* `//tr` mencari element `tr` di bawah context saat ini;
+* `[td[...]]` menyaring row yang punya cell sesuai kondisi di dalamnya;
+* `normalize-space()='ORD-1042'` membandingkan text setelah whitespace di awal, akhir, dan antar-kata dirapikan; dan
+* `/td[4]` memilih cell keempat yang menjadi direct child dari setiap row yang cocok.
 
-Expression bisa sangat presisi hari ini, tapi tetap menjadi kontrak jangka panjang yang lemah. Precision menjelaskan current match; resilience bergantung pada apakah relationship yang ditulis memang menyatakan product meaning yang stabil.
+XPath tersebut bisa menemukan target yang tepat hari ini, tapi belum tentu tetap reliable setelah markup berubah.
 
-Tujuan lesson ini adalah menjaga meaning saat maintenance, bukan menghafal grammar XPath. Baca anchor, relationship, target, dan evidence, lalu bandingkan apakah Playwright contract yang lebih jelas bisa menyatakan intent yang sama.
+Expression yang spesifik tetap bisa mudah rusak. Cek apakah tag, posisi, dan hubungan antar-element yang digunakan memang penting untuk scenario, atau hanya kebetulan mengikuti structure HTML saat ini.
+
+Di lesson ini, fokus kita adalah memahami target yang ingin ditemukan, lalu menjaga intent tersebut saat XPath diperbaiki atau dimigrasikan.
 
 ## Coba kita bedah contoh nyata
 
-Test lama melakukan refund untuk satu order:
+Sebuah test lama digunakan untuk melakukan refund pada order tertentu:
 
 ```ts
 const refund = page.locator(
@@ -64,21 +68,21 @@ const refund = page.locator(
 await refund.click();
 ```
 
-Makna yang sebenarnya adalah:
+Tujuan test sebenarnya adalah:
 
-> Di row untuk order ORD-1042, aktifkan button Refund.
+> Di dalam row untuk order `ORD-1042`, klik button **Refund**.
 
-### 1. Pisahkan makna yang berguna dari XPath syntax
+### 1. Pisahkan tujuan test dari syntax XPath
 
-Relationship yang berguna bukan “descendant `tr` dengan descendant `td`.” Maknanya adalah:
+Untuk scenario ini, hubungan yang dibutuhkan adalah:
 
 ```text
-Order row yang dikenali lewat order ID
-                  ↓
-Refund action di dalam row tersebut
+Row untuk order ORD-1042
+            ↓
+Button Refund di dalam row tersebut
 ```
 
-Makna itu biasanya bisa dinyatakan langsung dengan Playwright:
+Kalau table-nya punya semantic yang benar, tujuan yang sama bisa ditulis dengan locator Playwright:
 
 ```ts
 const orderRow = page.getByRole('row').filter({
@@ -91,11 +95,15 @@ const orderRow = page.getByRole('row').filter({
 await orderRow.getByRole('button', { name: 'Refund' }).click();
 ```
 
-Versi migration menunjukkan row, cell, dan button semantics. Ia juga tidak lagi mengikat action ke whitespace handling milik XPath.
+Versi ini memilih row berdasarkan cell dengan order ID yang exact, lalu mencari button **Refund** hanya di dalam row tersebut.
 
-### 2. Tambahkan observable evidence
+Intent test jadi lebih mudah dibaca karena locator-nya langsung menunjukkan row, cell, dan button yang digunakan. Test juga nggak lagi bergantung pada cara XPath menangani whitespace.
 
-Baik locator lama maupun baru belum membuktikan refund berhasil. Pertahankan outcome skenarionya:
+### 2. Tetap verify hasil setelah action
+
+XPath lama dan locator penggantinya hanya menjelaskan element mana yang diklik. Keduanya belum membuktikan bahwa refund berhasil diproses.
+
+Tambahkan assertion untuk hasil yang memang perlu dilihat oleh test:
 
 ```ts
 await expect(page.getByRole('status')).toHaveText(
@@ -103,9 +111,11 @@ await expect(page.getByRole('status')).toHaveText(
 );
 ```
 
-Migration belum selesai kalau hanya mengganti selector syntax lalu menghilangkan atau mengarang assertion.
+Migration belum selesai kalau kita hanya mengganti syntax locator tetapi menghilangkan assertion, atau menambahkan expected result yang sebenarnya nggak ada di product requirement.
 
-### 3. Baca bentuk yang kemungkinan kamu temui
+### 3. Pahami bentuk XPath yang sering muncul
+
+Kamu nggak perlu menghafal seluruh grammar XPath. Cukup pahami bentuk yang sering muncul di test legacy supaya kamu bisa membaca dependency-nya.
 
 ```xpath
 //button
@@ -116,107 +126,134 @@ Migration belum selesai kalau hanya mengganti selector syntax lalu menghilangkan
 (//button)[3]
 ```
 
-| Bentuk                | Makna                                                    |
-| --------------------- | -------------------------------------------------------- |
-| `//`                  | Mencari descendant dari current context                  |
-| `@name`               | Membaca attribute                                        |
-| `[...]`               | Memfilter candidate dengan predicate                     |
-| `normalize-space()`   | Melakukan trim dan collapse whitespace pada string value |
-| `following-sibling::` | Berpindah ke sibling berikutnya dengan parent yang sama  |
-| `not(...)`            | Membalik condition                                       |
-| `[1]`                 | Node pertama pada selected sequence saat ini             |
+| Bentuk                | Artinya                                                                  |
+| --------------------- | ------------------------------------------------------------------------ |
+| `//`                  | Mencari descendant dari context saat ini                                 |
+| `@name`               | Membaca attribute `name`                                                 |
+| `[...]`               | Menyaring element berdasarkan kondisi                                    |
+| `normalize-space()`   | Merapikan whitespace sebelum text dibandingkan                           |
+| `following-sibling::` | Mencari sibling setelah element saat ini dengan parent yang sama          |
+| `not(...)`            | Memilih element yang tidak memenuhi kondisi di dalamnya                   |
+| `[1]`                 | Memilih node pertama dari sequence tempat index tersebut digunakan        |
 
-Tanda kurung bisa mengubah sequence mana yang terkena index. `//button[1]` dan `(//button)[1]` tidak selalu menjelaskan set yang sama.
+Posisi tanda kurung bisa mengubah hasil XPath.
 
-### 4. Hindari absolute document route
+```xpath
+//button[1]
+(//button)[1]
+```
+
+`//button[1]` menerapkan index pada step `button` di masing-masing context, sehingga hasilnya masih bisa lebih dari satu button. `(//button)[1]` mengumpulkan semua button yang cocok terlebih dahulu, lalu memilih hasil pertama.
+
+Karena itu, jangan menganggap semua penggunaan `[1]` punya arti yang sama.
+
+### 4. Hindari absolute XPath
 
 ```xpath
 /html/body/div[2]/main/div[1]/form/button
 ```
 
-Path ini membuat setiap wrapper dan index menjadi bagian kontrak. Layout change bisa merusaknya walaupun user behavior yang sama masih tersedia.
+XPath ini bergantung pada seluruh route dari root document sampai ke target. Setiap wrapper dan index harus tetap berada di posisi yang sama.
 
-Relative XPath yang di-anchor ke meaningful identifier mungkin lebih mudah dibaca dan dirawat, tapi kata “relative” tidak otomatis berarti robust. `//div[4]/div[2]` tetaplah positional structure tanpa domain meaning.
+Kalau layout berubah atau wrapper baru ditambahkan, XPath bisa fail walaupun button yang dibutuhkan user masih ada dan tetap berfungsi.
+
+Relative XPath yang dimulai dari identifier yang jelas biasanya lebih mudah dibaca dan dirawat. Tapi relative XPath juga nggak otomatis reliable.
+
+```xpath
+//div[4]/div[2]
+```
+
+Expression tersebut tetap bergantung pada tag dan posisi tanpa menjelaskan element apa yang sebenarnya dibutuhkan oleh scenario.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Gunakan XPath saat merawat suite yang sudah ada, menginvestigasi relationship tidak biasa di legacy DOM, atau membuat short-lived bridge sambil menunggu perbaikan semantics atau testability contract.
+Gunakan XPath ketika kamu perlu merawat test suite yang sudah ada, menginvestigasi hubungan antar-element pada legacy DOM, atau membuat solusi sementara sambil menunggu perbaikan markup atau testability.
 
-Lakukan migration saat role, label, visible-content locator, filter, atau test ID bisa menyatakan intent yang sama dengan lebih jelas. Prioritaskan area yang sering gagal atau sering berubah daripada menulis ulang semua legacy expression yang stabil hanya demi style.
+Pertimbangkan migration kalau role, label, visible text, filter, atau test ID bisa menjelaskan target dengan lebih jelas. Prioritaskan XPath yang sering fail atau berada di area product yang sering berubah.
 
-Jangan memperkenalkan XPath ke Playwright scenario baru hanya karena parent atau sibling navigation terasa nyaman. Locator composition dan `filter({ has })` biasanya menjaga relationship lebih dekat dengan user atau domain meaning.
+Kamu nggak harus menulis ulang semua XPath yang masih stabil hanya supaya seluruh suite terlihat lebih modern.
 
-Hindari partial match yang terlalu luas seperti:
+Untuk Playwright test baru, jangan langsung memilih XPath hanya karena lebih mudah berpindah ke parent atau sibling. Locator composition dan `filter({ has })` biasanya bisa menunjukkan context dan target dengan lebih jelas.
+
+Hindari partial match yang terlalu umum seperti:
 
 ```xpath
 //div[contains(@class, 'item')]
 ```
 
-Expression ini memeriksa substring, bukan class token. Artinya, class `items` atau `unwanted-item` juga bisa ikut cocok. Kalau class memang supported contract, token-aware match atau CSS class syntax lebih jelas.
+`contains()` hanya mengecek apakah attribute `class` mengandung text `item`. Akibatnya, class seperti `items` atau `unwanted-item` juga bisa ikut match.
+
+Kalau class name memang sengaja digunakan sebagai identifier yang stabil, CSS class selector seperti `.item` biasanya lebih jelas karena mencari class token, bukan sekadar substring.
 
 ## Kalau gagal, mulai cek dari mana?
 
-Misalnya refund XPath sekarang menghasilkan nol node.
+Misalnya XPath untuk button **Refund** sekarang tidak menemukan element.
 
-Periksa:
+Cek beberapa hal ini:
 
-1. Apakah test sudah mencapai order table dan memuat expected data?
-2. Apakah `ORD-1042` masih ada, atau test data/setup-nya salah?
-3. Apakah visible Refund wording berubah karena locale atau product copy?
-4. Apakah button pindah ke luar row atau ke component lain?
-5. Apakah whitespace normalization sesuai dengan text structure yang sebenarnya?
+1. Apakah test sudah berada di halaman order dan table-nya sudah ter-load?
+2. Apakah order `ORD-1042` memang ada di test data yang digunakan?
+3. Apakah text **Refund** berubah karena locale atau perubahan wording dari product?
+4. Apakah button dipindahkan ke luar row atau ke component lain?
+5. Apakah `normalize-space()` masih sesuai dengan structure text yang sekarang?
 6. Apakah target berada di iframe atau shadow root?
 
-XPath tidak menembus shadow root di Playwright. Closed shadow root juga tidak didukung normal locator. XPath, seperti CSS, tidak menembus boundary iframe; pilih frame context yang benar lebih dulu. Berpindah dari satu XPath expression ke expression lain nggak akan memperbaiki boundary tersebut.
+XPath tidak bisa menembus shadow root di Playwright. Closed shadow root juga tidak didukung oleh locator biasa.
 
-Kalau beberapa node cocok, cari domain context yang hilang. Menambahkan `[1]` tanpa membuktikan bahwa first position memang penting bisa diam-diam mengoperasikan record yang salah.
+XPath, seperti CSS locator, juga tidak langsung mencari element di dalam iframe. Kalau target berada di iframe, gunakan frame context yang benar terlebih dahulu. Mengganti XPath dengan expression lain nggak akan menyelesaikan boundary tersebut.
 
-Kalau XPath rusak setiap markup bergeser, migration atau perbaikan product testability mungkin jauh lebih bernilai daripada local patch berikutnya.
+Kalau XPath menemukan beberapa element, cari context apa yang masih kurang. Jangan langsung menambahkan `[1]` kalau posisi pertama bukan bagian dari requirement, karena test bisa melakukan action pada record yang salah.
 
-Saat me-review atau memperbaiki XPath, tanyakan:
+Kalau XPath terus rusak setiap markup berubah, migration atau perbaikan testability di product mungkin lebih berguna daripada menambahkan patch baru lagi.
 
-- Makna user atau domain apa yang sedang didekati expression tersebut?
-- Apakah setiap axis, predicate, dan index punya alasan?
-- Apakah `contains()` melakukan partial class atau text match yang tidak aman?
-- Apakah `text()` berasumsi direct text node saat nested content mungkin ada?
-- Apakah `normalize-space()` hanya menyelesaikan whitespace, atau malah menyembunyikan wording change?
-- Bisakah role, label, filter, atau test ID menyatakan relationship dengan lebih baik?
-- Apakah `[1]` ditambahkan hanya untuk menghilangkan multiple match?
-- Apakah expression terhalang iframe atau shadow root?
-- Apakah skenario tetap meng-assert intended result setelah migration?
+Saat review atau memperbaiki XPath, cek beberapa hal ini:
 
-Expression yang berhasil dievaluasi belum tentu menjadi test contract yang tepat.
+* Element atau record apa yang sebenarnya ingin ditemukan oleh scenario?
+* Apakah setiap axis, kondisi, dan index memang diperlukan?
+* Apakah `contains()` bisa match dengan class atau text lain yang nggak dimaksud?
+* Apakah `text()` mengasumsikan text berada langsung di dalam element, padahal mungkin ada nested element?
+* Apakah `normalize-space()` hanya merapikan whitespace, atau malah menyembunyikan perubahan wording?
+* Apakah role, label, filter, atau test ID bisa menjelaskan target dengan lebih jelas?
+* Apakah `[1]` ditambahkan hanya supaya multiple match hilang?
+* Apakah target berada di iframe atau shadow root?
+* Setelah migration, apakah test masih verify hasil yang sama?
+
+XPath yang berhasil menemukan element belum tentu memilih target yang benar untuk scenario.
 
 ## Coba cek pemahamanmu
 
-Review XPath ini:
+Review XPath berikut:
 
 ```xpath
 (//button[contains(@class, 'delete')])[1]
 ```
 
-Intent-nya adalah menghapus invoice `INV-778` dari table yang memiliki banyak Delete button.
+Scenario perlu menghapus invoice `INV-778` dari table yang punya banyak button **Delete**.
 
 Jelaskan:
 
-1. Asumsi apa yang membuat expression ini berisiko?
-2. Domain identity apa yang hilang?
-3. Bagaimana relationship-based XPath bisa memperbaikinya untuk sementara?
-4. Bagaimana kamu menyatakan intent dengan Playwright locator?
-5. Result apa yang perlu di-assert setelah action?
+1. Kenapa XPath tersebut bisa memilih button yang salah?
+2. Informasi apa yang masih kurang untuk menentukan invoice yang tepat?
+3. Bagaimana XPath bisa diperbaiki sementara supaya mencari row `INV-778` terlebih dahulu?
+4. Bagaimana intent yang sama bisa ditulis dengan locator Playwright?
+5. Hasil apa yang perlu diverifikasi setelah invoice dihapus?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh jawaban:
 
-- Expression bergantung pada partial class match dan first document position. Nggak ada yang mengenali invoice `INV-778`.
-- Context yang hilang adalah invoice row dengan exact invoice number tersebut.
-- Temporary XPath bisa mencari row yang berisi `INV-778` lebih dulu, lalu menemukan Delete button di dalamnya tanpa global `[1]`.
-- Di Playwright, cari row berdasarkan role, filter dengan exact invoice cell, lalu cari Delete button di dalam row tersebut.
-- Assert invoice `INV-778` hilang atau invoice-specific confirmation muncul, sesuai product requirement.
+* XPath tersebut menggunakan partial class match dan memilih button pertama di seluruh hasil. Nggak ada bagian yang menunjukkan invoice `INV-778`.
+* Context yang masih kurang adalah row dengan invoice number `INV-778` secara exact.
+* Untuk sementara, XPath bisa mencari row yang berisi `INV-778`, lalu mencari button **Delete** hanya di dalam row tersebut tanpa menggunakan global `[1]`.
+* Di Playwright, cari row berdasarkan role, filter dengan cell `INV-778` secara exact, lalu cari button **Delete** di dalam row tersebut.
+* Setelah action, verify bahwa invoice `INV-778` sudah tidak ada di table atau confirmation khusus untuk invoice tersebut muncul, sesuai product requirement.
+
+Kalau table atau row belum punya semantic atau identifier yang cukup jelas, mungkin dibutuhkan perbaikan markup atau penambahan test ID sebelum locator yang reliable bisa dibuat.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya sudah bisa membaca dan mendiagnosis bentuk XPath yang umum di legacy automation, menjaga domain meaning saat migration, dan menjelaskan kenapa relative syntax saja nggak menjamin resilience.
+Sekarang kamu seharusnya sudah bisa membaca bentuk XPath yang umum ditemukan di test legacy, menginvestigasi kenapa XPath fail, dan menjaga tujuan test saat locator diperbaiki atau dimigrasikan.
 
-Lesson optional ini dan standalone XPath practice apa pun tidak menghalangi completion Module 4. Setelah tiga Core lesson dan dua Core Practice selesai, kamu siap masuk Module 5 untuk memakai reliable locator dalam action, navigation, dan synchronization.
+Lesson ini optional dan tidak wajib untuk menyelesaikan Module 4. Standalone Practice tentang XPath juga hanya digunakan sebagai latihan tambahan.
+
+Setelah tiga Core lesson dan dua Core Practice di Module 4 selesai, kamu bisa lanjut ke Module 5 untuk menggunakan locator dalam action, navigation, dan synchronization.
