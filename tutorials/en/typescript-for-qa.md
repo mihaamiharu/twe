@@ -1,96 +1,161 @@
 ---
-title: 'Review TypeScript Without Mistaking Types for Proof'
-description: 'Use TypeScript to make test contracts visible while keeping runtime data and product behavior under test.'
+title: 'Use TypeScript to Catch Test-Code Mistakes Earlier'
+description: 'Use TypeScript to make test-data and helper contracts visible before runtime while keeping external data and product behavior under test.'
 ---
 
 ## After this lesson, you can
 
+- explain how TypeScript adds static checking on top of JavaScript's dynamic runtime;
 - read inferred types, explicit annotations, unions, and optional properties in test code;
-- read a TypeScript error as a mismatch in the test code's contract;
-- choose where an explicit type makes a QA contract easier to review;
-- narrow an optional value with a runtime guard instead of an unsafe cast;
-- explain why a TypeScript type cannot validate an API response or product outcome, and review generated test code for `any`, unsafe assertions, and misleading confidence.
+- choose where an explicit type makes shared test data or a helper contract easier to review;
+- repair a type mismatch without hiding it behind `any` or an unsafe cast; and
+- separate compile-time feedback from runtime validation and product evidence.
 
 ## Why this matters for QA
 
-A generated test can show no red editor warnings and still fail immediately:
+JavaScript is enough to write and run Playwright tests. TypeScript becomes useful when a growing suite shares test data, helpers, fixtures, configuration, and API models.
 
-```ts
-const password = process.env.TEST_PASSWORD as string;
-await page.getByLabel('Password').fill(password);
+JavaScript is dynamically typed. Values have types at runtime, but a variable or function parameter is not automatically restricted to one type:
+
+```js
+const checkoutCase = {
+  quantity: '2',
+  expectedResult: 'sucess',
+};
+
+function nextQuantity(quantity) {
+  return quantity + 1;
+}
+
+nextQuantity(checkoutCase.quantity); // '21', not 3
 ```
 
-`as string` tells TypeScript to trust the author. It does not create a missing environment variable at runtime.
+JavaScript accepts the string quantity and the misspelled result label. The mistakes may not become visible until this path runs. A result-label typo could even select the wrong branch in a test without producing a clear error.
 
-The same problem appears with API data. A cast can claim the server returned an order, even when the actual response is an error page or a different JSON shape.
-
-TypeScript is valuable because it makes intended data contracts visible and catches many code mistakes early. QA still needs to know where that confidence ends.
-
-## The mental model
-
-TypeScript adds a compile-time review layer:
-
-```text
-Source code + type information
-            ↓
-Type checking finds incompatible uses
-            ↓
-Types are removed when code becomes JavaScript
-            ↓
-Runtime data and product behavior still need evidence
-```
-
-Think in two boundaries:
-
-| Boundary                 | Useful question                                                                  |
-| ------------------------ | -------------------------------------------------------------------------------- |
-| Inside trusted test code | Are values used consistently with the intended contract?                         |
-| Data entering at runtime | Did the environment, API, file, or product actually provide the value we expect? |
-
-TypeScript can help with the first. A runtime check, controlled setup, or assertion is needed for the second.
-
-Read a TypeScript error as a mismatch in the test code's contract: what type does this value have, what type does the next API expect, and what assumption is missing? Fix that mismatch or make the assumption explicit. Removing the warning with `any` or an assertion is not evidence that the test is safer.
-
-## Work through a realistic example
-
-The checkout suite uses a controlled case:
+TypeScript lets the suite declare the intended contract:
 
 ```ts
 type CheckoutCase = {
-  productName: string;
   quantity: number;
   expectedResult: 'success' | 'out-of-stock';
+};
+
+const checkoutCase: CheckoutCase = {
+  quantity: '2',
+  expectedResult: 'sucess',
+};
+```
+
+When project type checking runs, TypeScript can report that:
+
+- `quantity` must be a `number`, not a `string`; and
+- `expectedResult` must be either `'success'` or `'out-of-stock'`.
+
+These mismatches are visible before the test reaches the browser. That earlier feedback is the main reason TypeScript helps QA automation: it catches many mistakes in the test code while they are still cheaper to understand and repair.
+
+It does not prove the application is correct. It helps us write and change the code that performs that verification with clearer contracts.
+
+## The mental model
+
+TypeScript adds a static review layer before JavaScript runs:
+
+```text
+JavaScript code + inferred or declared types
+                    ↓
+Type checking finds incompatible usage
+                    ↓
+Types are removed during transformation
+                    ↓
+JavaScript runs with dynamic runtime values
+                    ↓
+Product behavior still needs observable evidence
+```
+
+Think in three boundaries:
+
+| Boundary                   | What TypeScript can help detect                              | What still needs runtime evidence                       |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------- |
+| Test data and calculation  | Missing fields, wrong value types, unsupported result labels | Whether the data represents a valid product scenario    |
+| Helper or fixture contract | Incorrect arguments, return values, and affected callers     | Whether setup actually succeeded                        |
+| Environment, API, or file  | Unsafe use while a value remains `unknown` or optional       | Whether external data exists and has the expected shape |
+
+TypeScript is strongest inside code whose contract the team controls. Data entering from outside that trusted boundary still needs a runtime check.
+
+The type system also improves editor feedback, autocomplete, navigation, and refactoring. When a shared contract changes, the compiler can identify callers that no longer match it. This becomes increasingly valuable when humans and coding agents both modify the suite.
+
+## Work through a realistic example
+
+A checkout suite stores controlled cases used by several tests:
+
+```ts
+type CheckoutResult = 'success' | 'out-of-stock';
+
+type CheckoutCase = {
+  productName: string;
+  unitPrice: number;
+  quantity: number;
+  expectedResult: CheckoutResult;
   couponCode?: string;
 };
 
 const checkoutCase: CheckoutCase = {
   productName: 'Mechanical Keyboard',
-  quantity: 1,
+  unitPrice: 120,
+  quantity: 2,
   expectedResult: 'success',
 };
 ```
 
-Read what the type communicates:
+This contract makes several review decisions visible:
 
-- `productName` must be used as a string inside typed code;
-- `quantity` is numeric;
-- the union allows only two documented result labels; and
-- `couponCode?` may be absent.
+- `unitPrice` and `quantity` must be used as numbers inside typed code;
+- `expectedResult` accepts only the product states supported by this suite;
+- every case must provide the required fields; and
+- `couponCode?` may be absent because a coupon is genuinely optional.
 
-This improves review. It does not prove the product exists, the inventory is controlled, or checkout will succeed.
+If someone writes `expectedResult: 'sucess'` or removes `productName`, the type checker can point to the malformed test case before a browser run.
+
+### Put explicit types at useful boundaries
+
+A calculation used by the suite can state what it accepts and returns:
+
+```ts
+function expectedSubtotal(testCase: CheckoutCase): number {
+  return testCase.unitPrice * testCase.quantity;
+}
+
+const subtotal = expectedSubtotal(checkoutCase);
+```
+
+If a refactor changes `quantity` to a string, this function and every affected caller become part of the compiler feedback. The type gives reviewers a shared contract instead of asking them to infer the intended shape from every call site.
 
 ### Prefer inference for obvious local values
 
+TypeScript already infers many local types:
+
 ```ts
-const quantity = 2; // inferred as number
+const taxRate = 0.11; // inferred as number
+const subtotal = expectedSubtotal(checkoutCase); // inferred as number
 const productNames = ['Mouse', 'Keyboard']; // inferred as string[]
 ```
 
-Repeating `: number` and `: string[]` adds little here. Explicit types are most useful at boundaries such as shared test data, helper inputs and outputs, configuration, API models, and custom fixtures.
+Repeating `: number` or `: string[]` adds little here. Explicit types are most useful at shared boundaries, not on every variable.
 
-### Narrow optional runtime values
+### Use unions and optional properties intentionally
 
-Environment variables can be missing:
+A union documents a small supported set. An optional property documents that absence is valid:
+
+```ts
+if (checkoutCase.couponCode) {
+  await page.getByLabel('Coupon code').fill(checkoutCase.couponCode);
+}
+```
+
+This condition is appropriate only because the contract says a coupon is optional. Do not add `?` merely because the author is unsure whether required data will exist.
+
+### Keep runtime boundaries honest
+
+Environment variables can be missing at runtime:
 
 ```ts
 const password = process.env.TEST_PASSWORD;
@@ -102,7 +167,7 @@ if (!password) {
 await page.getByLabel('Password').fill(password);
 ```
 
-The guard does two jobs. It produces an honest runtime failure and narrows the TypeScript type from `string | undefined` to `string` afterward.
+The guard does two jobs. It fails honestly when configuration is missing and narrows the TypeScript type from `string | undefined` to `string` afterward.
 
 Compare the unsafe shortcut:
 
@@ -110,9 +175,9 @@ Compare the unsafe shortcut:
 const password = process.env.TEST_PASSWORD as string;
 ```
 
-The cast silences the warning without adding evidence.
+`as string` only tells TypeScript to trust the author. It does not create a missing environment variable.
 
-### Treat external data as unknown until checked
+API data has the same boundary. A cast can claim that a server returned an order even when the actual response is an error page or a different JSON shape:
 
 ```ts
 type OrderResponse = {
@@ -123,7 +188,7 @@ type OrderResponse = {
 const body = (await response.json()) as OrderResponse;
 ```
 
-This cast does not validate the response. For critical runtime data, use the project's schema validator or explicit checks before relying on it. A small check could begin like this:
+That cast performs no validation. Treat untrusted data as `unknown` until the important fields are checked:
 
 ```ts
 const body: unknown = await response.json();
@@ -140,19 +205,27 @@ if (
 const orderId = body.id;
 ```
 
-Larger response contracts belong in a maintained runtime schema, not a growing pile of inline checks.
+Larger response contracts belong in the project's maintained runtime schema rather than a growing collection of inline checks.
 
 ## When to use it—and when not to
 
-Use inference for obvious local values. Add explicit types where a boundary or reusable contract benefits from review: helper parameters, shared case data, fixtures, configuration, and supported API shapes.
+JavaScript may be sufficient for a small experiment or disposable script. TypeScript earns its maintenance cost when a suite has shared contracts, several contributors, generated code to review, or refactors that affect many tests.
 
-Use a union when a value should come from a small documented set. Use an optional property only when absence is a valid state—not because the author is unsure whether data exists.
+Use inference for obvious local values. Add explicit types where a contract crosses a boundary:
 
-Avoid `any` when reviewing code. It disables useful checking around that value. Prefer `unknown` for untrusted data because it requires evidence before use.
+- shared test data;
+- helper parameters and return values;
+- fixtures and configuration;
+- supported product-state labels; and
+- API models after runtime validation.
 
-Do not annotate every variable or design a complex type system for a small test. Type complexity has maintenance cost too.
+Use a union when a value must come from a small documented set. Use an optional property only when absence is a real supported state.
 
-Do not expect the Playwright test command to perform complete project type checking. Playwright can transform and run TypeScript, but a separate compiler check should run locally or in CI:
+Avoid `any` when reviewing test code because it disables useful checking around that value. Prefer `unknown` for untrusted data because it requires narrowing before use.
+
+Do not annotate every variable or design a complex generic type system for a small test. Type complexity has a review and maintenance cost too.
+
+Playwright can transform and run TypeScript without performing complete project type checking. Keep a separate compiler check in the local or CI workflow:
 
 ```bash
 npx tsc -p tsconfig.json --noEmit
@@ -163,75 +236,53 @@ Use the repository's configured scripts when they differ.
 
 ## When it fails
 
-Suppose the editor accepts this code:
+Suppose generated code has no red editor warning:
 
 ```ts
-type User = { email: string };
+type User = {
+  email: string;
+  role: 'customer' | 'admin';
+};
 
 const user = (await response.json()) as User;
 await page.getByText(user.email).click();
 ```
 
-At runtime, `user.email` is `undefined` because the response was `{ "error": "unauthorized" }`.
+At runtime, `user.email` is `undefined` because the endpoint returned `{ "error": "unauthorized" }`.
 
 Diagnose the boundary:
 
-1. What did the response status and body actually contain?
+1. What status and body did the endpoint actually return?
 2. Which line claimed a type without checking the value?
-3. Should test setup authenticate first or fail on the response status?
-4. Which runtime validation is appropriate for this data?
-5. What user-visible outcome still needs an assertion afterward?
+3. Should setup authenticate first or fail on the response status?
+4. Which runtime validation is appropriate for this response?
+5. What user-visible outcome still needs a Playwright assertion afterward?
 
 Changing the cast to `as unknown as User` only hides the problem more thoroughly. Adding `any` removes feedback instead of repairing the contract.
 
-Fix the setup and validate the runtime response before consuming its fields.
-
 Review TypeScript in two passes.
 
-First, inspect the type contract:
+First, inspect the compile-time contract:
 
 - Are shared data and helper boundaries typed clearly?
 - Are unions and optional properties based on real product rules?
-- Is inference used where the value is already obvious?
+- Is inference used when the value is already obvious?
 - Does the code introduce unnecessary interfaces or generics?
+- Did an unsafe assertion silence a useful mismatch?
 
 Then inspect runtime honesty:
 
-- Is `any` disabling checking?
-- Does `as` claim that untrusted data has a shape without validation?
-- Are environment variables forced to strings without a guard?
+- Does external data get checked before typed code trusts it?
+- Are environment variables guarded before use?
 - Could optional chaining hide required missing data?
-- Do runtime assertions still prove the product outcome?
+- Did setup actually produce the state described by the type?
+- Do Playwright assertions still prove the product outcome?
 
 Clean types are useful maintenance evidence. They are not a substitute for a meaningful test result.
 
 ## Check your understanding
 
-### Read a concrete compiler error
-
-Review this small mismatch:
-
-```ts
-type CheckoutCase = {
-  quantity: number;
-};
-
-const checkoutCase: CheckoutCase = {
-  quantity: 'two',
-};
-```
-
-Explain:
-
-1. What type does `CheckoutCase.quantity` require?
-2. What contract mismatch should TypeScript report?
-3. How would you repair it without using `any` or a cast?
-
-The useful diagnostic is `Type 'string' is not assignable to type 'number'`. If this scenario is already numeric, change the value to `2`. If it came from text such as an input, convert and validate that text at the runtime boundary before storing it in the typed case.
-
-### Review runtime evidence
-
-Review this code:
+Review these two cases:
 
 ```ts
 type TestUser = {
@@ -239,33 +290,37 @@ type TestUser = {
   role: 'customer' | 'admin';
 };
 
-const response = await request.get('/api/test-user');
-const user = (await response.json()) as TestUser;
+const controlledUser: TestUser = {
+  email: 'qa@example.com',
+  role: 'superuser',
+};
 
-await expect(page.getByText(user.email)).toBeVisible();
+const response = await request.get('/api/test-user');
+const apiUser = (await response.json()) as TestUser;
 ```
 
 Explain:
 
-1. What useful contract does `TestUser` communicate?
-2. What does the cast fail to prove?
-3. Which status or runtime data checks are missing?
-4. What does the final assertion prove—and what does it not prove?
+1. Which mistake can TypeScript report in `controlledUser`?
+2. Why can the `apiUser` cast appear valid even when the response is wrong?
+3. What should be checked before treating the response as a `TestUser`?
+4. Why would changing either value to `any` make review weaker?
+5. What product evidence is still required after the data is valid?
 
 ## Compare your reasoning
 
 One reasonable answer is:
 
-- `CheckoutCase.quantity` requires a number, but `'two'` is a string. Use `2` for a numeric test case, or convert and validate a text value before it enters the typed case. Silencing the diagnostic would hide the contract mismatch.
-- The type documents that trusted test code expects an email string and one of two supported roles.
-- The cast does not prove the endpoint returned that shape. It only instructs TypeScript to treat the value as `TestUser`.
-- Check the response status and validate the critical fields with the project's runtime validation approach before using them.
-- The assertion proves that text equal to the resulting email becomes visible. It does not prove the response was valid, the displayed user has the expected role, or the broader scenario succeeded unless those are also observed.
+- `superuser` is not part of the declared `'customer' | 'admin'` union, so the controlled case violates its contract.
+- The cast instructs TypeScript to trust the declared shape. It does not inspect the status, content type, or response fields.
+- Check the response status and validate the critical fields with the project's runtime-validation approach before using them.
+- `any` would disable the useful checks around those values and allow incompatible usage to spread.
+- Valid data only establishes test setup. The test still needs Playwright assertions for the user-visible behavior required by the scenario.
 
 ## Before you continue
 
-You should now be able to read and repair a simple TypeScript compiler error, read a small test contract, distinguish inference from useful annotations, guard optional runtime values, and challenge unsafe casts in unfamiliar code.
+You should now be able to explain why a growing automation suite may choose TypeScript, read and repair a simple compiler mismatch, place explicit types at useful test-code boundaries, and challenge unsafe confidence around runtime data.
 
-Module 3 is complete when you have finished its four Core lessons and three focused Core Practice challenges: the first observable Playwright test, the QA-focused JavaScript case, and the asynchronous setup task. The mapped TypeScript exercises are Additional Practice because the current runner can observe their runtime result, but cannot by itself prove compiler diagnostics or runtime data validity.
+Module 3 is complete when you have finished its four Core lessons and three focused Core Practice challenges: the first observable Playwright test, the QA-focused JavaScript case, and the asynchronous setup task. The mapped TypeScript exercises are Additional Practice because the current runner can observe their runtime result but cannot prove compiler diagnostics or runtime-data validity by itself.
 
 You are ready for Module 4, where the role, accessible name, DOM context, code literacy, and runtime evidence from the first three modules come together in reliable locator decisions.
