@@ -53,16 +53,20 @@ DOM punya struktur seperti tree. Setiap element bisa punya hubungan dengan eleme
 
 ![Pohon DOM keranjang memakai row produk sebagai konteks bermakna, lalu berubah setelah satu produk dihapus.](/images/tutorials/live-dom-context.svg)
 
-_Jalur yang berguna adalah “button Remove di dalam row Mechanical Keyboard,” bukan semua wrapper dari root halaman sampai button._
+Yang penting bukan mencari semua wrapper dari root halaman sampai button, tapi menemukan konteks yang tepat.
 
-Pegang dua aturan ini:
+Contohnya:
 
-1. **Batasi berdasarkan makna.** Gunakan row produk, dialog, navigation region, atau container lain yang bisa dikenali sebagai konteks.
-2. **Amati transisinya.** Jelaskan apa yang ada sebelum aksi dan apa yang seharusnya ada setelahnya.
+> **button “Remove” yang ada di product row “Mechanical Keyboard”**
+
+Pegang dua prinsip ini:
+
+1. **Tentukan scope yang tepat.** Gunakan product row, dialog, navigation, atau container lain yang membantu automation menemukan element yang benar.
+2. **Perhatikan perubahan state.** Tentukan kondisi sebelum action dilakukan dan expected result setelahnya.
 
 ## Coba kita bedah contoh nyata
 
-Perhatikan keranjang sederhana berikut:
+Perhatikan cart sederhana berikut:
 
 ```html
 <ul aria-label="Cart items">
@@ -71,6 +75,7 @@ Perhatikan keranjang sederhana berikut:
     <p>Quantity: 1</p>
     <button>Remove</button>
   </li>
+
   <li>
     <h2>Wireless Mouse</h2>
     <p>Quantity: 1</p>
@@ -79,17 +84,21 @@ Perhatikan keranjang sederhana berikut:
 </ul>
 ```
 
-Kedua elemen `<li>` adalah sibling. Heading, quantity, dan button di masing-masing row adalah descendant dari satu row produk. Row itulah yang memberi konteks tambahan untuk “Remove.”
+Kedua `<li>` tersebut adalah `sibling`.
 
-Tulis dulu test intent-nya:
+Di dalam setiap product row ada heading, quantity, dan button **“Remove”**. Semua element tersebut adalah `descendant` dari row yang sama.
+
+Karena ada dua button dengan nama **“Remove”**, nama button saja belum cukup. Product row memberi context tambahan supaya automation tahu button mana yang harus dipilih.
+
+Sebelum menulis locator atau code, tentukan dulu test intent-nya:
 
 ```text
-Sebelum: keranjang berisi Mechanical Keyboard dan Wireless Mouse
-Aksi: hapus Mechanical Keyboard
-Sesudah: row keyboard sudah tidak ada dan row mouse tetap ada
+Before: cart berisi Mechanical Keyboard dan Wireless Mouse
+Action: hapus Mechanical Keyboard
+After: product row Mechanical Keyboard sudah tidak ada, sementara Wireless Mouse tetap ada
 ```
 
-Setelah itu, test Playwright bisa mempertahankan hubungan tersebut:
+Setelah itu, test Playwright bisa menggunakan context yang sama:
 
 ```ts
 const keyboardRow = page
@@ -106,103 +115,119 @@ await expect(keyboardRow).toHaveCount(0);
 await expect(mouseRow).toHaveCount(1);
 ```
 
-Ide pentingnya bukan syntax persisnya. Test mencari container yang bermakna, menemukan aksi di dalamnya, lalu mengamati transisinya.
+Yang penting bukan syntax-nya, tapi cara berpikirnya: cari dulu product row yang tepat, lakukan action di dalam row tersebut, lalu verify perubahan state setelah action selesai.
 
-Playwright locator juga mencari elemen pada DOM saat action atau assertion dijalankan. Kalau framework melakukan re-render di antara dua operasi, locator akan mencari elemen terbaru yang masih cocok. Ini lebih aman daripada menganggap referensi elemen mentah dari beberapa saat sebelumnya akan selalu mewakili halaman yang sama.
+Playwright locator juga akan mencari element yang cocok saat action atau assertion dijalankan. Jadi kalau halaman melakukan re-render di antara dua step, locator akan mencari element terbaru yang masih sesuai.
 
-### State dinamis adalah bagian dari pohon
+Ini lebih aman daripada menyimpan element dari kondisi sebelumnya lalu menganggap element tersebut masih merepresentasikan halaman setelah DOM berubah.
 
-Satu layar bisa melewati beberapa state:
+### DOM bisa berubah mengikuti state halaman
+
+Dalam satu flow, halaman bisa melewati beberapa state:
 
 ```text
 loading → populated → updating → populated
                     ↘ error
 ```
 
-State penting bisa berupa:
+State yang perlu diperhatikan misalnya:
 
-- konten loading, empty, error, dan populated;
-- kontrol enabled, disabled, checked, selected, atau expanded;
-- dialog, menu, dan overlay yang baru dipasang belakangan;
-- row yang ditambah, dihapus, atau diurutkan ulang setelah data berubah.
+* halaman sedang `loading`, `empty`, `error`, atau sudah menampilkan data;
+* element dalam kondisi `enabled`, `disabled`, `checked`, `selected`, atau `expanded`;
+* dialog, menu, atau overlay yang baru muncul setelah user melakukan action;
+* row yang ditambahkan, dihapus, atau berubah urutan setelah data di-update.
 
-Test perlu membuktikan state yang relevan bagi pengguna. Nama component internal atau CSS class sembarang biasanya belum menjadi bukti yang cukup.
+Automated test perlu verify state yang memang relevan dari sisi user.
+
+Nama internal component atau CSS class saja biasanya belum cukup untuk membuktikan bahwa expected result benar-benar tercapai.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Gunakan hierarki DOM sebagai konteks bermakna saat halaman berisi card, row, list item, section, dialog, atau kontrol berulang dengan nama yang sama.
+Gunakan struktur DOM sebagai context ketika halaman punya beberapa card, row, list item, section, dialog, atau element dengan nama yang sama.
 
-Jangan menuliskan setiap wrapper sebagai jalur CSS atau XPath yang panjang. Container layout sering ditambah saat redesign walaupun perilaku pengguna nggak berubah. Hierarki baru berguna kalau container-nya sendiri menjelaskan makna produk.
+Jangan langsung membuat CSS selector atau XPath yang panjang dengan mengikuti semua wrapper dari atas ke bawah. Struktur layout bisa berubah saat UI di-redesign, walaupun behavior yang diuji tetap sama.
 
-API browser seperti `parentElement`, `children`, dan `querySelectorAll` berguna untuk belajar dan melakukan inspeksi di DevTools. Di dalam test Playwright, utamakan locator dan filter yang menjaga makna dari sudut pandang pengguna. Traversal DOM mentah adalah teknik investigasi, bukan arsitektur test default.
+Scope berdasarkan container akan lebih berguna kalau container tersebut memang membantu kita membedakan element yang ingin ditest. Misalnya, cari dulu product row **“Mechanical Keyboard”**, lalu cari button **“Remove”** di dalam row tersebut.
 
-Pilihan berdasarkan posisi seperti `first()` atau `nth(0)` hanya tepat ketika urutan memang menjadi bagian dari requirement. Jangan pakai keduanya sebagai jalan pintas untuk target yang ambigu.
+API browser seperti `parentElement`, `children`, dan `querySelectorAll` tetap berguna saat kita perlu memahami atau mengecek struktur DOM lewat DevTools.
 
-## Kalau gagal, mulai cek dari mana?
+Di Playwright, lebih baik gunakan locator dan filter yang tetap punya context yang jelas dari sisi user. Traversal DOM secara manual sebaiknya dipakai hanya saat memang diperlukan, bukan sebagai cara pertama untuk mencari element.
 
-Coba bayangin action berikut gagal karena menemukan dua elemen:
+Method seperti `first()` atau `nth(0)` boleh digunakan kalau urutan element memang penting untuk scenario yang sedang ditest. Jangan pakai hanya karena locator menemukan lebih dari satu element.
+
+## Kalau test fail, mulai cek dari mana?
+
+Coba bayangin action berikut fail karena Playwright menemukan dua element yang cocok:
 
 ```ts
 await page.getByRole('button', { name: 'Remove' }).click();
 ```
 
-Kegagalan ini sebenarnya memberi bukti yang berguna: deskripsi target di dalam test belum lengkap.
+Ini berarti locator-nya belum cukup spesifik. Test belum memberi context yang cukup untuk menentukan button **“Remove”** mana yang harus dipilih.
 
-Mulai investigasi dengan urutan berikut:
+Coba cek beberapa hal ini:
 
-1. Ada berapa button yang cocok di halaman aktif?
-2. Produk, row, dialog, atau region mana yang memiliki button tujuan?
-3. Apakah container itu punya identitas yang menghadap pengguna dan cukup stabil?
-4. Apakah UI masih loading atau mengganti row ketika test berjalan?
-5. State sebelum dan sesudah apa yang membuktikan row yang benar sudah berubah?
+1. Ada berapa button **“Remove”** di halaman?
+2. Button yang ingin dipilih ada di product row, dialog, atau bagian halaman yang mana?
+3. Apakah bagian tersebut punya informasi yang cukup untuk membedakannya dari yang lain, misalnya nama produk?
+4. Apakah halaman masih loading atau melakukan re-render saat test berjalan?
+5. Setelah action dilakukan, perubahan apa yang harus diverifikasi untuk memastikan product row yang benar sudah berubah?
 
-Jalan pintas yang menggoda adalah:
+Jalan pintas yang sering terlihat praktis adalah:
 
 ```ts
 await page.getByRole('button', { name: 'Remove' }).first().click();
 ```
 
-Kode itu hanya menyembunyikan ambiguitas. Kalau urutan keranjang berubah, test bisa menghapus produk yang salah lalu tetap melanjutkan langkah berikutnya. Perbaiki konteks yang hilang.
+Test mungkin jadi jalan, tapi kita belum menyelesaikan masalah sebenarnya. Kalau urutan produk berubah, `first()` bisa memilih button milik produk yang berbeda.
 
-Jalan pintas lemah lainnya adalah selector panjang seperti `#app > div > ul > li:nth-child(1) > button`. Selector tersebut merekam layout saat ini, bukan hubungan antardata di produk.
+Lebih baik tambahkan context yang memang membedakan targetnya. Misalnya, cari dulu product row **“Mechanical Keyboard”**, lalu cari button **“Remove”** di dalam row tersebut.
 
-Sebelum menerima perbaikan locator, cari tanda peringatan berikut:
+Hal yang sama berlaku untuk selector panjang seperti:
 
-- locator global untuk kontrol yang muncul berulang;
-- `first()` atau `nth()` tanpa requirement urutan;
-- jalur CSS atau XPath lengkap yang melewati wrapper layout;
-- referensi elemen mentah yang disimpan melewati proses update;
-- assertion yang memeriksa class, bukan state yang dilihat pengguna; atau
-- klik tanpa bukti sebelum dan sesudah.
+```text
+#app > div > ul > li:nth-child(1) > button
+```
 
-Sebelum menerima kodenya, pastikan kamu bisa menyebutkan container tujuan, ambiguitas yang sedang diselesaikan, dan transisi state yang diharapkan.
+Selector seperti ini terlalu bergantung pada struktur halaman saat ini. Kalau wrapper atau urutan element berubah, selector bisa ikut rusak walaupun behavior yang ingin diuji sebenarnya tetap sama.
+
+Sebelum memakai locator tersebut, cek dulu apakah masih ada masalah seperti ini:
+
+* locator mencari element secara global padahal ada beberapa element dengan nama atau fungsi yang sama;
+* memakai `first()` atau `nth()` hanya supaya test bisa jalan;
+* CSS selector atau XPath terlalu panjang dan mengikuti banyak wrapper;
+* menyimpan element lalu tetap menggunakannya setelah DOM berubah;
+* assertion hanya mengecek CSS class, bukan state atau expected result yang dilihat user; atau
+* melakukan click tanpa jelas kondisi sebelum action dan apa yang harus berubah setelahnya.
+
+Sebelum lanjut memakai code tersebut, pastikan kamu bisa menjelaskan tiga hal: **element mana yang sebenarnya ingin dituju, kenapa locator sebelumnya menemukan lebih dari satu target, dan perubahan apa yang harus terjadi setelah action dilakukan.**
 
 ## Coba cek pemahamanmu
 
-Halaman riwayat pesanan punya satu row untuk setiap order. Semua row memiliki button “Review.” Ketika diklik, button tersebut membuka dialog untuk order yang dipilih.
+Halaman order history punya satu row untuk setiap order. Setiap row punya button **“Review”**. Ketika diklik, button tersebut akan membuka dialog untuk order yang dipilih.
 
-Kamu perlu me-review order `A104`. Coba jelaskan:
+Kamu ingin me-review order `A104`. Coba jawab:
 
-1. Container mana yang harus memberi konteks?
-2. Aksi mana yang berada di dalam konteks tersebut?
-3. Apa yang harus benar sebelum dan sesudah aksi?
-4. Kenapa memilih button “Review” pertama berisiko?
-5. Apa yang akan kamu periksa kalau dialog yang benar nggak terbuka?
+1. Bagian mana yang sebaiknya digunakan sebagai context untuk menemukan order `A104`?
+2. Action apa yang perlu dilakukan di dalam row tersebut?
+3. Apa yang harus ada sebelum action dilakukan, dan apa yang harus berubah setelahnya?
+4. Kenapa memilih button **“Review”** pertama bisa bermasalah?
+5. Apa yang perlu dicek kalau dialog untuk order `A104` nggak terbuka?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh jawaban:
 
-- Gunakan row dengan identitas order `A104` yang terlihat sebagai container bermakna.
-- Temukan button “Review” di dalam row tersebut, bukan button global.
-- Sebelum aksi, row `A104` harus ada dan dialog review-nya belum terbuka. Sesudah aksi, dialog yang menyebut order `A104` harus terlihat.
-- Row pertama bisa berubah ketika order diurutkan, difilter, atau ditambah. Posisi nggak membuktikan identitas.
-- Kalau dialog yang salah terbuka, periksa row di DOM aktif, identitas row yang terlihat pengguna, jumlah kontrol yang cocok, dan apakah aplikasi mengganti atau mengurutkan ulang node saat aksi berlangsung.
+* Gunakan row yang menampilkan order `A104` sebagai context.
+* Cari button **“Review”** di dalam row tersebut, bukan langsung mencari button secara global.
+* Sebelum action dilakukan, row `A104` harus ada dan dialog review belum terbuka. Setelah button diklik, dialog untuk order `A104` harus tampil.
+* Jangan bergantung pada button pertama karena urutan order bisa berubah saat data di-sort, di-filter, atau ada order baru.
+* Kalau dialog yang salah terbuka, cek apakah locator sudah mengarah ke row `A104`, ada berapa button **“Review”** yang cocok, dan apakah DOM berubah atau row di-render ulang saat action dilakukan.
 
-Pendekatan lain bisa saja benar kalau produk menyediakan identitas stabil yang berbeda. Namun, aksi dan buktinya tetap harus terhubung ke order yang sama.
+Cara lain juga bisa benar kalau aplikasi punya identifier lain yang lebih stabil. Yang penting, action dan expected result tetap mengarah ke order yang sama.
 
 ## Sebelum lanjut
 
-Kamu sekarang seharusnya bisa menjelaskan di mana sebuah kontrol berada, kenapa konteks itu bermakna, dan bagaimana DOM aktif perlu berubah setelah interaksi—tanpa bergantung pada posisi atau jalur wrapper lengkap.
+Sekarang kamu seharusnya sudah bisa menentukan context dari sebuah element, memahami kenapa context tersebut dibutuhkan, dan menjelaskan perubahan state yang harus terjadi setelah user melakukan action.
 
-Di lesson berikutnya, kita akan memakai DevTools dan alat investigasi Playwright untuk mengumpulkan bukti tersebut dari halaman nyata sebelum memilih kode test.
+Di lesson berikutnya, kita akan menggunakan DevTools dan Playwright untuk mengecek langsung informasi tersebut dari halaman sebelum menentukan locator atau menulis test.

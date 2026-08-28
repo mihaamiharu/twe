@@ -73,9 +73,11 @@ Consider this simplified cart:
 </ul>
 ```
 
-The two `<li>` elements are siblings. Each heading, quantity, and button is a descendant of one product row. That row supplies the missing context for “Remove.”
+The two `<li>` elements are siblings. Inside each product row, the heading, quantity, and “Remove” button are descendants of that row.
 
-First express the testing intent:
+Because two buttons share the name “Remove,” the button name alone is not enough. The product row supplies the additional context automation needs to choose the correct button.
+
+Before writing a locator or code, define the testing intent:
 
 ```text
 Before: the cart contains Mechanical Keyboard and Wireless Mouse
@@ -140,7 +142,7 @@ Suppose this action fails because it matches two elements:
 await page.getByRole('button', { name: 'Remove' }).click();
 ```
 
-The failure is useful evidence: the test's description of the target is incomplete.
+This means the locator is not specific enough. The test has not provided enough context to identify which “Remove” button it should choose.
 
 Investigate in this order:
 
@@ -156,7 +158,9 @@ A tempting workaround is:
 await page.getByRole('button', { name: 'Remove' }).first().click();
 ```
 
-That hides ambiguity. If the cart order changes, the test may remove the wrong product and still continue. Fix the missing context instead.
+That hides ambiguity. If the cart order changes, the test may remove the wrong product and still continue.
+
+Add the context that distinguishes the intended target instead. For example, find the “Mechanical Keyboard” product row first, then find the “Remove” button inside that row.
 
 Another weak workaround is a long selector such as `#app > div > ul > li:nth-child(1) > button`. It records the current layout, not the product relationship.
 
