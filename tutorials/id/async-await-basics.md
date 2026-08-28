@@ -1,61 +1,76 @@
 ---
-title: 'Jaga Urutan Langkah Asynchronous di Dalam Test'
-description: 'Gunakan promise, async, dan await untuk menjaga dependency tanpa menganggap operasi yang selesai sebagai outcome yang sudah terbukti.'
+title: 'Pastikan Proses Asynchronous Berjalan dalam Urutan yang Benar'
+description: 'Gunakan Promise, async, dan await supaya test menunggu proses yang memang harus selesai sebelum lanjut, tanpa menganggap proses yang selesai berarti expected result sudah benar.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- menjelaskan apa yang diwakili promise dan apa yang dikembalikan `async function`;
-- menaruh `await` pada operasi asynchronous yang hasilnya dibutuhkan langkah berikutnya;
-- membedakan menunggu action selesai dengan membuktikan outcome aplikasi;
-- memilih eksekusi sequential atau parallel berdasarkan dependency; dan
-- mendiagnosis `await` yang hilang atau error handling yang mengubah kegagalan menjadi false pass.
+- menjelaskan apa itu `Promise` dan bagaimana `async function` menghasilkan value yang bisa ditunggu dengan `await`;
+- menggunakan `await` ketika step berikutnya memang membutuhkan hasil dari proses asynchronous sebelumnya;
+- membedakan menunggu sebuah action selesai dengan verify expected result;
+- menentukan kapan beberapa proses harus dijalankan berurutan dan kapan bisa dijalankan secara parallel; dan
+- menemukan `await` yang hilang atau error handling yang bisa membuat test tetap pass padahal seharusnya fail.
 
 ## Kenapa ini penting buat QA
 
-Pernah lihat kode automation yang kelihatannya biasa saja seperti ini?
+Pernah lihat code automation seperti ini?
 
 ```ts
 page.getByRole('button', { name: 'Submit order' }).click();
 await expect(page.getByText('Order confirmed')).toBeVisible();
 ```
 
-Promise dari click tidak di-`await`. Assertion bisa mulai ketika action masih berjalan, sementara error dari click mungkin muncul terpisah dari baris yang sebenarnya menyebabkan masalah.
+`click()`-nya nggak menggunakan `await`. Akibatnya, test bisa lanjut ke assertion saat action sebelumnya belum benar-benar selesai. Kalau `click()` ternyata fail, error-nya juga bisa muncul terpisah dan membuat root cause lebih sulit ditemukan.
 
-Menambah sleep nggak menjelaskan dependency tersebut. Sebagai QA, kamu perlu tahu operasi mana yang menghasilkan value, langkah mana yang membutuhkan value itu, dan bukti terpisah apa yang membuktikan produk berhasil.
+Menambah sleep nggak menyelesaikan masalah ini. Kita perlu tahu step mana yang memang harus selesai dulu sebelum test lanjut, dan bagian mana yang digunakan untuk verify expected result dari aplikasi.
 
 ## Cara berpikir yang perlu kamu pegang
 
-`Promise` mewakili operasi asynchronous yang nantinya akan selesai:
+`Promise` mewakili hasil dari proses asynchronous. Saat dibuat, promise bisa masih `pending`, lalu akhirnya menjadi `fulfilled` atau `rejected`:
 
 ```text
 pending → fulfilled dengan sebuah value
         ↘ rejected dengan sebuah error
 ```
 
-`async function` selalu mengembalikan promise. Di dalam function itu, `await` menghentikan sementara progres function sampai value yang ditunggu selesai. `await` tidak membekukan browser dan tidak membuktikan semua side effect aplikasi sudah berhasil.
+`async function` selalu menghasilkan `Promise`. Di dalam function tersebut, `await` menghentikan sementara jalannya function sampai promise menjadi `fulfilled` atau `rejected`. Kalau promise berhasil, `await` memberikan value-nya. Kalau promise gagal, error-nya diteruskan ke test. `await` hanya menghentikan sementara function tersebut, bukan membekukan browser.
 
-Jadi, `await` adalah penanda dependency, bukan sleep berdasarkan waktu. Letakkan `await` pada operasi yang harus selesai sebelum baris berikutnya bisa bekerja. Playwright action, navigation, dan assertion juga bagian dari lifecycle test, jadi tetap gunakan `await`: runner perlu mengamati kapan operasi itu selesai atau gagal. Untuk helper yang benar-benar independent, kamu bisa menunda `await` sampai result-nya memang dibutuhkan karena menunggu lebih awal mungkin tidak memberi jaminan yang berguna.
+Tapi `await` bukan berarti seluruh aplikasi sudah selesai memproses semuanya, dan bukan berarti expected result sudah benar.
+
+Anggap `await` sebagai cara untuk menjaga urutan step yang memang saling bergantung, bukan sebagai pengganti sleep.
+
+Kalau step berikutnya bergantung pada action sebelumnya, gunakan `await`:
+
+```ts
+await page.getByRole('button', { name: 'Submit order' }).click();
+await expect(page.getByText('Order confirmed')).toBeVisible();
+```
+
+Playwright action, navigation, dan assertion juga perlu di-`await` supaya test runner bisa mengetahui kapan step tersebut selesai atau fail.
+
+Kalau ada beberapa proses yang benar-benar nggak saling bergantung, proses tersebut nggak selalu harus ditunggu satu per satu. Nanti kita akan lihat kapan proses bisa berjalan secara parallel dan kapan tetap harus sequential.
 
 ![Sebuah test asynchronous menunggu setup dan browser action yang saling bergantung secara berurutan, lalu memakai assertion terpisah untuk membuktikan outcome pengguna.](/images/tutorials/async-test-sequence.svg)
 
-_Await operasi yang kamu butuhkan; assert outcome yang perlu kamu buktikan._
+_`await` proses yang memang perlu selesai dulu; gunakan assertion untuk verify expected result._
 
-Coba klasifikasikan expression yang umum di dalam test:
+Coba lihat beberapa expression yang sering muncul di Playwright test:
 
-| Expression                      | Langsung atau asynchronous? | Apa yang diberikan                                   |
-| ------------------------------- | --------------------------- | ---------------------------------------------------- |
-| `page.getByRole(...)`           | Langsung                    | Deskripsi locator                                    |
-| `locator.click()`               | Asynchronous                | Action Playwright yang selesai atau gagal            |
-| `page.goto(...)`                | Asynchronous                | Navigation yang selesai atau gagal sesuai kontraknya |
-| `response.json()`               | Asynchronous                | Response data yang sudah di-parse                    |
-| `expect(locator).toBeVisible()` | Asynchronous                | Hasil assertion yang melakukan retry                 |
+| Expression                      | Perlu `await`? | Fungsinya                                                          |
+| ------------------------------- | -------------- | ------------------------------------------------------------------ |
+| `page.getByRole(...)`           | Tidak          | Membuat locator untuk menemukan element                            |
+| `locator.click()`               | Ya             | Melakukan click dan menunggu action selesai atau fail              |
+| `page.goto(...)`                | Ya             | Membuka halaman dan menunggu navigation sesuai behavior Playwright |
+| `response.json()`               | Ya             | Membaca dan parse response body                                    |
+| `expect(locator).toBeVisible()` | Ya             | Menunggu sampai assertion pass atau timeout                        |
 
-Langkah berikutnya—bukan sekadar supaya bentuk kodenya seragam—yang menentukan di mana `await` dibutuhkan.
+Jadi, jangan menambahkan `await` hanya supaya semua baris terlihat konsisten.
+
+Lihat apakah proses tersebut asynchronous dan apakah test memang perlu menunggu proses itu selesai sebelum lanjut ke step berikutnya.
 
 ## Coba kita bedah contoh nyata
 
-Test membutuhkan order yang terkontrol sebelum membuka halaman detailnya:
+Test membutuhkan order yang sudah disiapkan sebelum membuka halaman detailnya:
 
 ```ts
 import { test, expect } from '@playwright/test';
@@ -80,32 +95,35 @@ test('customer can view a prepared order', async ({ page, request }) => {
 });
 ```
 
-Telusuri dependency-nya:
+Coba lihat urutan dependency-nya:
 
-1. `request.post` harus selesai sebelum response bisa diperiksa.
-2. `response.json()` harus selesai sebelum `order.id` tersedia.
-3. ID itu dibutuhkan untuk membuat navigation URL.
-4. Navigation membentuk halaman tempat bukti akan diamati.
-5. Heading assertion secara terpisah membuktikan hasil yang dilihat pengguna.
+1. `request.post()` harus selesai dulu sebelum kita bisa mengecek response.
+2. `response.json()` harus selesai sebelum `order.id` bisa digunakan.
+3. `order.id` dibutuhkan untuk membuka halaman order yang benar.
+4. Setelah halaman tersebut terbuka, test baru bisa verify hasil yang dilihat user.
+5. Assertion pada heading memastikan halaman order yang benar memang tampil.
 
-Membuat locator tidak memulai operasi browser yang asynchronous:
+Membuat locator sendiri nggak menjalankan action di browser:
 
 ```ts
 const heading = page.getByRole('heading', { name: `Order ${order.id}` });
+
 await expect(heading).toBeVisible();
 ```
 
-Locator-nya hanya sebuah deskripsi. Web assertion-lah yang melakukan pekerjaan asynchronous.
+`getByRole()` hanya mendefinisikan element yang ingin dicari. Proses asynchronous-nya terjadi saat locator tersebut digunakan dalam action atau assertion seperti `click()` atau `expect()`.
 
-### Action selesai bukan berarti proses bisnis berhasil
+### Action selesai bukan berarti expected result sudah benar
 
-Baris ini menunggu Playwright menyelesaikan click:
+Baris ini menunggu sampai Playwright selesai melakukan click:
 
 ```ts
 await page.getByRole('button', { name: 'Submit order' }).click();
 ```
 
-Baris tersebut tidak otomatis membuktikan backend menerima order atau confirmation UI sudah muncul. Tetap buat assertion:
+Tapi itu belum berarti order berhasil diproses atau confirmation sudah muncul di UI.
+
+Kita tetap perlu verify expected result, misalnya:
 
 ```ts
 await expect(
@@ -115,9 +133,21 @@ await expect(
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Jalankan operasi secara sequential saat satu langkah menghasilkan state atau value yang dibutuhkan langkah berikutnya. Kebanyakan user flow memang sengaja berurutan: isi data wajib, submit, lalu amati hasilnya.
+Jalankan step secara berurutan kalau step berikutnya memang bergantung pada hasil dari step sebelumnya.
 
-Setup yang independen boleh berjalan bersamaan:
+Contohnya, pada user flow seperti ini:
+
+```text
+isi data yang wajib
+↓
+submit form
+↓
+verify hasilnya
+```
+
+Urutannya memang harus dijaga karena setiap step bergantung pada step sebelumnya.
+
+Kalau ada beberapa setup yang benar-benar nggak saling bergantung, prosesnya bisa dijalankan bersamaan:
 
 ```ts
 const [customer, product] = await Promise.all([
@@ -126,46 +156,52 @@ const [customer, product] = await Promise.all([
 ]);
 ```
 
-Pakai `Promise.all` hanya setelah memastikan dua operasi itu tidak saling bergantung dan tidak berebut mutable state yang sama. `Promise.all` akan reject kalau salah satu promise di dalamnya reject.
+Gunakan `Promise.all` hanya kalau kedua proses tersebut memang bisa berjalan sendiri-sendiri dan nggak menggunakan atau mengubah data yang sama.
 
-Jangan memasukkan UI action yang saling bergantung ke `Promise.all`:
+Kalau salah satu promise di dalam `Promise.all` menjadi `rejected`, `Promise.all` juga ikut `rejected`. Promise lain yang sudah berjalan nggak otomatis dihentikan.
+
+Jangan gunakan `Promise.all` untuk UI action yang saling bergantung:
 
 ```ts
-// Salah: submission bergantung pada field yang sudah diisi.
+// Salah: submit bergantung pada field Email yang sudah diisi.
 await Promise.all([
   page.getByLabel('Email').fill('qa@example.com'),
   page.getByRole('button', { name: 'Submit' }).click(),
 ]);
 ```
 
-Jangan menambahkan `await` ke value biasa hanya supaya tampilan kodenya konsisten. Telusuri dulu apa yang dikembalikan expression tersebut.
+`fill()` harus selesai dulu sebelum `click()` dilakukan.
 
-## Kalau gagal, mulai cek dari mana?
+Dan jangan tambahkan `await` ke semua expression hanya supaya code terlihat konsisten. Cek dulu apakah expression tersebut memang menghasilkan proses asynchronous yang perlu ditunggu.
 
-Misalnya test ini kadang gagal sebelum click selesai:
+## Kalau test fail, mulai cek dari mana?
+
+Misalnya test ini kadang fail:
 
 ```ts
 page.getByRole('button', { name: 'Submit order' }).click();
 await expect(page.getByText('Order confirmed')).toBeVisible();
 ```
 
-Periksa dependency pertama yang gagal atau hilang:
+Cek dulu apakah ada step asynchronous yang belum ditunggu:
 
-1. Apakah expression pertama mengembalikan promise?
-2. Apakah assertion bergantung pada action itu selesai?
-3. Apakah ada unhandled rejection yang dilaporkan di bagian output lain?
-4. Apakah outcome produk memang lambat, atau action-nya sama sekali belum selesai?
+1. Apakah `click()` menghasilkan `Promise`?
+2. Apakah assertion berikutnya bergantung pada click tersebut selesai?
+3. Apakah ada error dari `click()` yang muncul terpisah di output test?
+4. Apakah masalahnya memang karena confirmation lambat muncul, atau karena action sebelumnya belum selesai?
 
-Perbaiki dependency-nya:
+Perbaiki dulu urutannya:
 
 ```ts
 await page.getByRole('button', { name: 'Submit order' }).click();
 await expect(page.getByText('Order confirmed')).toBeVisible();
 ```
 
-Kalau assertion masih gagal, investigasi outcome produknya. Jangan menggantinya dengan `waitForTimeout`.
+Kalau assertion masih fail setelah itu, baru cek apakah expected result dari aplikasi memang muncul.
 
-Hati-hati juga dengan `try/catch`:
+Jangan langsung menggantinya dengan `waitForTimeout`, karena masalahnya belum tentu soal waktu tunggu.
+
+Hati-hati juga saat menggunakan `try/catch`:
 
 ```ts
 try {
@@ -175,7 +211,9 @@ try {
 }
 ```
 
-Kode itu bisa membiarkan test lanjut dengan setup yang tidak valid. Gunakan `catch` hanya kalau recovery memang disengaja, atau kalau kamu menambah konteks lalu melempar ulang error:
+Kalau error-nya diabaikan, test bisa tetap lanjut walaupun setup awalnya sebenarnya fail.
+
+Gunakan `catch` kalau memang ada recovery yang ingin dilakukan. Kalau tujuannya hanya menambahkan context ke error, lempar error-nya lagi:
 
 ```ts
 try {
@@ -187,21 +225,21 @@ try {
 }
 ```
 
-Telusuri setiap baris asynchronous di dalam test:
+Saat review code asynchronous di test, coba cek:
 
-- Value atau state apa yang dihasilkan promise ini?
-- Langkah mana yang bergantung pada hasilnya?
-- Apakah `await` hilang dari action, navigation, data parsing, atau assertion?
-- Apakah `await` malah ditambahkan ke locator atau value biasa tanpa kegunaan?
-- Apakah UI action yang bergantung satu sama lain dimasukkan ke `Promise.all`?
-- Apakah `catch` menyembunyikan kegagalan setup atau produk?
-- Setelah action selesai, assertion apa yang masih membuktikan business outcome?
+* Proses ini menghasilkan value atau perubahan state apa?
+* Step berikutnya bergantung pada hasil tersebut atau nggak?
+* Apakah ada `await` yang hilang dari action, navigation, parsing data, atau assertion?
+* Apakah `await` justru dipakai pada locator atau value biasa yang sebenarnya nggak perlu ditunggu?
+* Apakah UI action yang saling bergantung dimasukkan ke `Promise.all`?
+* Apakah `catch` membuat error setup atau error aplikasi jadi nggak kelihatan?
+* Setelah action selesai, assertion apa yang masih perlu dijalankan untuk verify expected result?
 
-Kalau kamu belum bisa menjelaskan jaminannya, jangan percaya urutan kodenya dulu.
+Kalau urutan dependency-nya belum jelas, jangan langsung anggap code tersebut sudah benar.
 
 ## Coba cek pemahamanmu
 
-Review kode ini:
+Review code berikut:
 
 ```ts
 const orderPromise = createTestOrder();
@@ -214,24 +252,28 @@ await Promise.all([
 ]);
 ```
 
-Jelaskan:
+Coba jawab:
 
-1. Kenapa `orderPromise.id` salah?
-2. Operasi mana yang harus selesai sebelum navigation?
-3. Kenapa fill dan click tidak aman dijalankan secara parallel?
-4. Assertion apa yang masih diperlukan setelah submit?
+1. Kenapa `orderPromise.id` belum bisa digunakan?
+2. Proses apa yang harus selesai sebelum test membuka halaman order?
+3. Kenapa `fill()` dan `click()` nggak aman dijalankan bersamaan?
+4. Setelah submit, apa yang masih perlu diverifikasi?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh jawaban:
 
-- `createTestOrder()` mengembalikan promise, bukan resolved order object. Artinya, ID belum tersedia.
-- Gunakan `const order = await createTestOrder()` sebelum membuat URL.
-- Submission bergantung pada required email yang sudah diisi. Menjalankan keduanya bersamaan akan membuat race.
-- Setelah click dilakukan secara sequential, assert confirmation, navigation, atau bukti observable lain sesuai intent produk.
+- `createTestOrder()` menghasilkan `Promise`, jadi data order-nya belum tersedia saat `orderPromise.id` diakses.
+- Tunggu dulu proses pembuatan order selesai dengan `const order = await createTestOrder()`, baru gunakan `order.id` untuk membuka halaman yang benar.
+- `click()` bergantung pada field Email yang sudah terisi. Kalau `fill()` dan `click()` dijalankan bersamaan, submit bisa terjadi sebelum input selesai diisi.
+- Setelah submit, tetap perlu verify expected result sesuai scenario, misalnya confirmation message muncul atau user berpindah ke halaman yang benar.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya sudah bisa menelusuri promise di dalam test, menunggu dependency yang nyata, memisahkan setup independen dari UI behavior yang sequential, dan tetap membuat assertion setelah action selesai.
+Sekarang kamu seharusnya sudah bisa memahami alur `Promise` di dalam test, menggunakan `await` pada step yang memang harus selesai lebih dulu, membedakan setup yang bisa berjalan bersamaan dengan UI action yang harus berurutan, dan tetap verify expected result setelah action selesai.
 
-Selesaikan async Core Practice dengan menunggu controlled setup data. Challenge error handling dan parallel execution adalah Additional Practice kalau kamu ingin latihan ekstra; keduanya bukan alasan untuk menjadikan retry atau concurrency sebagai default. Lesson terakhir di module ini akan menambah kemampuan review TypeScript supaya rasa aman dari editor tidak tertukar dengan runtime evidence.
+Selesaikan async Core Practice dengan memastikan setup test data sudah selesai sebelum data tersebut digunakan.
+
+Challenge tentang error handling dan parallel execution bisa dikerjakan sebagai Additional Practice kalau kamu ingin latihan lebih lanjut. Keduanya bukan berarti retry atau concurrency harus digunakan sebagai default.
+
+Di lesson terakhir module ini, kita akan membahas TypeScript supaya kamu bisa me-review type dan editor warning tanpa menganggap semuanya otomatis benar saat test dijalankan.

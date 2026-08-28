@@ -35,7 +35,7 @@ pending → fulfilled with a value
 
 An `async` function always returns a promise. Inside that function, `await` pauses the function's progress until the awaited value settles. It does not freeze the browser or prove every side effect of the application.
 
-`await` is therefore a dependency marker, not a time-based sleep. Put it on the operation whose completion the next line needs. Playwright actions, navigation, and assertions are also part of the test lifecycle, so keep them awaited: the runner must observe their completion or rejection. For a truly independent helper, delaying `await` until its result matters may add no useful guarantee.
+`await` is therefore a dependency marker, not a time-based sleep. Put it on the operation whose completion the next line needs. Playwright actions, navigation, and assertions are also part of the test lifecycle, so keep them awaited: the runner must observe their completion or rejection. Start independent setup promises together only when parallel execution is intentional, then observe them with `Promise.all` so their failures remain part of the test.
 
 ![An asynchronous test awaits dependent setup and browser actions in sequence, then uses a separate assertion to prove the user outcome.](/images/tutorials/async-test-sequence.svg)
 
@@ -137,6 +137,8 @@ await Promise.all([
   page.getByRole('button', { name: 'Submit' }).click(),
 ]);
 ```
+
+The email fill must finish before the submit click begins.
 
 Do not add `await` to ordinary values merely to make code look consistent. Trace the returned value instead.
 
