@@ -90,6 +90,7 @@
     "completedTitle": "Selesai! 🎉",
     "nextLabel": "Berikutnya: {{title}}",
     "duration": "Durasi",
+    "statusIncomplete": "Belum selesai",
     "statusCompleted": "Selesai",
     "challengesTitle": "Tantangan Latihan",
     "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini.",

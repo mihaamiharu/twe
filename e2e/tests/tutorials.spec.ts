@@ -225,8 +225,15 @@ test.describe('Tutorials', () => {
     await page.goto('/en/learn/dom-tree-hierarchy');
     await page.waitForLoadState('networkidle');
 
+    await expect(page.getByTestId('lesson-status-value')).toHaveText(
+      'Not completed',
+    );
+    await expect(
+      page.getByTestId('lesson-status').getByRole('button'),
+    ).toHaveCount(0);
+
     const completeButton = page
-      .getByTestId('lesson-status')
+      .getByTestId('lesson-completion-footer')
       .getByRole('button', { name: 'Sign in to Save Progress' });
     await expect(completeButton).toBeVisible();
     await completeButton.click();
@@ -249,6 +256,15 @@ test.describe('Tutorials', () => {
       await completionFooter.scrollIntoViewIfNeeded();
 
       await expect(completionFooter).toBeVisible();
+      await expect(page.getByTestId('lesson-status-value')).toHaveText(
+        'Not completed',
+      );
+      await expect(
+        page.getByTestId('lesson-status').getByRole('button'),
+      ).toHaveCount(0);
+      await expect(
+        page.getByRole('button', { name: 'Mark lesson complete' }),
+      ).toHaveCount(1);
       await expect(
         completionFooter.getByRole('button', {
           name: 'Mark lesson complete',
@@ -274,10 +290,8 @@ test.describe('Tutorials', () => {
 
     await page.reload();
     await tutorialsPage.verifyTutorialContent();
-    await expect(
-      page
-        .getByTestId('lesson-status')
-        .getByText('Completed! 🎉', { exact: true }),
-    ).toBeVisible();
+    await expect(page.getByTestId('lesson-status-value')).toHaveText(
+      'Completed',
+    );
   });
 });

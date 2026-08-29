@@ -442,20 +442,38 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
                   <span
-                    className="h-2 w-2 rounded-full bg-primary"
+                    className={`h-2 w-2 rounded-full ${
+                      isCompleted ? 'bg-brand-success' : 'bg-primary'
+                    }`}
                     aria-hidden="true"
                   />
                   {t('sidebar.status')}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
-                <LessonCompletionControl
-                  isCompleted={isCompleted}
-                  isPending={markCompleteMutation.isPending}
-                  isAuthenticated={Boolean(userId)}
-                  onComplete={handleComplete}
-                  testId="complete-tutorial"
-                />
+                <div
+                  className={`flex items-center gap-2 rounded-md border p-4 ${
+                    isCompleted
+                      ? 'border-brand-success/30 bg-brand-success/10 text-brand-success'
+                      : 'border-border bg-muted/40 text-muted-foreground'
+                  }`}
+                  data-testid="lesson-status-value"
+                  role="status"
+                >
+                  {isCompleted ? (
+                    <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <span
+                      className="h-2 w-2 rounded-full bg-muted-foreground"
+                      aria-hidden="true"
+                    />
+                  )}
+                  <span className="text-sm font-semibold">
+                    {isCompleted
+                      ? t('sidebar.statusCompleted')
+                      : t('sidebar.statusIncomplete')}
+                  </span>
+                </div>
 
                 <div className="space-y-3 border-t border-border pt-4 text-sm">
                   <div className="flex items-center justify-between gap-4">
@@ -469,14 +487,6 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
                       })}
                     </span>
                   </div>
-                  {isCompleted && (
-                    <div className="flex items-center gap-2 text-brand-success">
-                      <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
-                      <span className="font-medium">
-                        {t('sidebar.statusCompleted')}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </CardContent>
             </Card>

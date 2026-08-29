@@ -90,6 +90,7 @@
     "completedTitle": "Completed! 🎉",
     "nextLabel": "Next: {{title}}",
     "duration": "Duration",
+    "statusIncomplete": "Not completed",
     "statusCompleted": "Completed",
     "challengesTitle": "Practice Challenges",
     "challengesDescription": "Reinforce what you've learned with these related challenges.",
