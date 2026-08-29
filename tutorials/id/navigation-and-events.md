@@ -1,40 +1,42 @@
 ---
-title: 'Sinkronkan Navigasi dan One-Time Browser Event'
-description: 'Ikuti outcome di route, popup, download, dialog, dan frame tanpa membuat race dari urutan event.'
+title: 'Tunggu Navigation dan Browser Event dengan Urutan yang Tepat'
+description: 'Tunggu perubahan URL, popup, download, dan dialog tanpa melewatkan event, lalu verify hasilnya di page atau frame yang tepat.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- memilih observable evidence untuk full navigation, client-side routing, dan same-page update;
-- menangkap popup atau download dengan mendaftarkan wait sebelum triggering action;
-- menangani browser dialog tanpa membuat page berhenti;
-- mengenali iframe sebagai document context yang terpisah; serta
-- mendiagnosis test yang menunggu di browser surface yang salah.
+- menentukan hasil apa yang perlu dicek setelah full navigation, client-side routing, atau update di page yang sama;
+- menunggu popup atau download dengan memasang wait sebelum action yang memicunya;
+- menangani browser dialog tanpa membuat test berhenti;
+- menentukan kapan element perlu dicari melalui frame context; serta
+- mendiagnosis kenapa popup, download, dialog, atau perubahan page tidak muncul seperti yang diharapkan.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih kamu melakukan click di satu page, tapi hasilnya justru muncul di tempat lain?
+Pernah nggak sih kamu melakukan click di satu page, tapi hasilnya muncul di tempat yang berbeda?
 
-“Open invoice” bisa melakukan navigation di tab yang sama, membuka tab baru, atau men-download PDF. “Delete account” bisa menampilkan browser confirmation dialog. Payment form juga bisa berada di iframe milik service lain.
+Action seperti **Open invoice** bisa membuka page baru di tab yang sama, membuka tab baru, atau langsung men-download PDF. **Delete account** bisa memunculkan browser confirmation dialog. Payment form juga bisa berada di dalam iframe milik service lain.
 
-Kalau test salah menebak surface, timeout sebesar apa pun nggak akan membuatnya benar. Test mungkin menunggu heading di original page, padahal heading aslinya ada di popup. Atau test baru mulai mendengarkan download setelah download-nya sudah dimulai.
+Kalau test menunggu di tempat yang salah, memperbesar timeout nggak akan menyelesaikan masalah.
 
-Skill QA yang dibutuhkan di sini bukan menghafal lima API. Kita perlu mengenali di mana product behavior bisa diamati, lalu mengatur urutan test supaya one-time signal nggak terlewat.
+Misalnya, test menunggu heading muncul di page saat ini, padahal heading tersebut muncul di tab baru. Atau test baru mulai menunggu download setelah proses download sudah dimulai.
+
+Karena itu, kita perlu tahu hasil dari sebuah action akan muncul di mana dan memasang wait sebelum action dijalankan kalau event-nya bisa terjadi dengan cepat.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Klasifikasikan outcome lebih dulu:
+Tentukan dulu hasil dari action akan muncul di mana:
 
 ```text
-Trigger sebuah action
+Jalankan action
       ↓
-Outcome muncul di mana?
-      ├─ Current page state atau URL → act, lalu pakai retried assertion
-      ├─ One-time event              → register promise/handler, lalu act
-      └─ Separate document context   → masuk ke page/frame, lalu locate normal
+Hasilnya muncul di mana?
+      ├─ Di page atau URL yang sama → jalankan action, lalu tunggu dengan assertion
+      ├─ Sebagai browser event       → pasang wait lebih dulu, lalu jalankan action
+      └─ Di page atau iframe lain    → gunakan page atau frame yang tepat, lalu cari element di sana
 ```
 
-Untuk one-time event, urutannya penting:
+Kalau hasilnya berupa browser event yang hanya terjadi sekali, urutannya penting:
 
 ![Event pattern yang andal mendaftarkan promise sebelum trigger, sedangkan trigger lebih dulu bisa kehilangan popup atau download yang cepat.](/images/tutorials/event-listener-before-trigger.svg)
 
@@ -53,15 +55,15 @@ Melakukan trigger dulu lalu mendaftarkan event belakangan juga berisiko, karena 
 
 ## Coba kita bedah contoh nyata
 
-Order history page punya beberapa invoice behavior:
+Order history page punya beberapa behavior:
 
-- memilih Order history mengubah current route;
-- Open invoice membuka HTML invoice di tab baru; dan
-- Download PDF menghasilkan download.
+- memilih **Order history** mengubah route di page yang sama;
+- **Open invoice** membuka invoice HTML di tab baru; dan
+- **Download PDF** menghasilkan file download.
 
-Ada juga action Cancel order yang membuka browser confirmation dialog.
+Ada juga action **Cancel order** yang membuka browser confirmation dialog.
 
-### 1. Sinkronkan current-page navigation dengan user evidence
+### 1. Tunggu perubahan page lalu verify hasilnya
 
 ```ts
 await page.getByRole('link', { name: 'Order history' }).click();
@@ -72,15 +74,21 @@ await expect(
 ).toBeVisible();
 ```
 
-Full document navigation dan client-side route bisa terlihat sama bagi user. `toHaveURL()` melakukan retry sampai URL cocok, sedangkan heading membuktikan route sudah menampilkan meaningful content. Pilih evidence sesuai requirement—kadang heading sudah cukup, sedangkan routing requirement mungkin membutuhkan keduanya.
+Full page navigation dan client-side routing bisa terlihat sama dari sisi user.
 
-Jangan menunggu generic load state lalu menganggap feature sudah ready. Browser bisa selesai load sebelum application data muncul, sedangkan single-page application bisa update tanpa document load baru.
+`toHaveURL()` menunggu sampai URL sesuai, sedangkan heading memastikan content **Order history** sudah benar-benar tampil.
 
-### 2. Tangkap popup tanpa race
+Pilih assertion sesuai dengan requirement. Kadang heading saja sudah cukup. Kalau perubahan URL juga penting untuk scenario, verify keduanya.
+
+Jangan hanya menunggu load state lalu menganggap page sudah siap. Browser bisa selesai melakukan load sebelum data aplikasi muncul. Sebaliknya, pada single-page application, content bisa berubah tanpa full page load.
+
+### 2. Tunggu popup sebelum menjalankan action
 
 ```ts
 const popupPromise = page.waitForEvent('popup');
+
 await page.getByRole('link', { name: 'Open invoice' }).click();
+
 const invoicePage = await popupPromise;
 
 await expect(invoicePage).toHaveURL(/\/invoices\/1042$/);
@@ -89,26 +97,36 @@ await expect(
 ).toBeVisible();
 ```
 
-`popupPromise` mulai mengamati sebelum click. Test menunggu `Page` baru setelah action, lalu memakai locator dan assertion normal di page tersebut.
+`popupPromise` dibuat sebelum `click()` supaya event popup nggak terlewat.
 
-Kalau aplikasi bisa membuat page baru yang tidak terikat khusus dengan current page, browser-context page event mungkin punya scope yang lebih tepat. Pilih event source paling sempit yang sesuai dengan product behavior.
+Setelah popup terbuka, gunakan `invoicePage` untuk locator dan assertion yang memang berada di page baru tersebut.
 
-### 3. Tangkap dan periksa download
+Kalau page baru bisa dibuka dari berbagai bagian aplikasi dan bukan hanya dari page saat ini, kamu bisa menunggu event `page` dari browser context. Pilih cara yang paling sesuai dengan flow aplikasi.
+
+### 3. Tunggu download lalu verify hasilnya
 
 ```ts
 const downloadPromise = page.waitForEvent('download');
+
 await page.getByRole('button', { name: 'Download PDF' }).click();
+
 const download = await downloadPromise;
 
 expect(download.suggestedFilename()).toBe('invoice-1042.pdf');
 await download.saveAs('artifacts/invoice-1042.pdf');
 ```
 
-Event membuktikan download dimulai. Filename assertion memverifikasi satu user-relevant property. Kalau file content membawa risk utama, inspect dengan parser atau downstream check yang sesuai. Hanya memanggil `saveAs()` belum membuktikan file berisi invoice yang benar.
+Event `download` memastikan proses download benar-benar dimulai.
 
-Downloaded file bersifat temporary untuk browser context kecuali disimpan di lokasi lain. Gunakan artifact location yang eksplisit di real project dan jangan commit output yang sensitif.
+Setelah itu, kita bisa verify hal yang memang penting untuk scenario, misalnya nama file yang dihasilkan.
 
-### 4. Tangani dialog sebelum trigger
+Kalau isi file juga termasuk bagian penting dari requirement, file tersebut tetap perlu diperiksa dengan parser atau verification lain yang sesuai. Memanggil `saveAs()` saja belum memastikan file berisi invoice yang benar.
+
+File hasil download biasanya hanya tersedia sementara selama browser context masih berjalan, kecuali kita menyimpannya ke lokasi lain.
+
+Di project yang sebenarnya, simpan file ke folder yang memang digunakan untuk test artifact dan hindari menyimpan output yang berisi data sensitif ke repository.
+
+### 4. Handle dialog sebelum action dijalankan
 
 ```ts
 page.once('dialog', async (dialog) => {
@@ -121,13 +139,15 @@ await page.getByRole('button', { name: 'Cancel order' }).click();
 await expect(page.getByRole('status')).toHaveText('Order cancelled');
 ```
 
-Playwright otomatis men-dismiss dialog kalau tidak ada listener. Setelah dialog listener didaftarkan, listener itu wajib melakukan accept atau dismiss. Kalau tidak, page tetap blocked dan triggering action bisa hang.
+Kalau nggak ada listener, Playwright akan otomatis men-`dismiss()` dialog.
 
-Dialog assertion membuktikan confirmation yang benar muncul. Final status membuktikan action yang diterima menghasilkan application outcome.
+Tapi kalau kita sudah memasang listener, dialog tersebut harus di-`accept()` atau di-`dismiss()`. Kalau tidak, page akan terus menunggu dialog tersebut dan `click()` yang memicunya bisa hang.
 
-### 5. Lewati frame boundary dengan sengaja
+Assertion pada dialog memastikan confirmation yang benar memang muncul. Setelah dialog di-accept, assertion terakhir memastikan order benar-benar berubah menjadi **“Order cancelled”**.
 
-Iframe bukan one-time event. Iframe adalah document lain yang ditanam di page:
+### 5. Gunakan frame yang tepat kalau element ada di iframe
+
+Iframe bukan event yang muncul sekali. Iframe adalah document context lain yang ditampilkan di dalam page utama:
 
 ```ts
 const paymentFrame = page.frameLocator('[title="Secure payment"]');
@@ -135,78 +155,95 @@ const paymentFrame = page.frameLocator('[title="Secure payment"]');
 await paymentFrame.getByLabel('Card number').fill('4242 4242 4242 4242');
 ```
 
-Setelah masuk ke frame context, gunakan semantic locator strategy yang sama seperti di main page. Jangan menambah `frameLocator()` hanya karena control sulit ditemukan. Pastikan lewat DevTools bahwa control benar-benar ada di iframe, lalu pilih frame title atau kontrak stabil lain yang bermakna.
+Kalau element memang berada di dalam iframe, gunakan `frameLocator()` terlebih dahulu lalu cari element di dalam frame tersebut seperti biasa.
+
+Jangan langsung menambahkan `frameLocator()` hanya karena locator tidak menemukan element. Cek dulu lewat DevTools apakah element tersebut memang berada di iframe.
+
+Setelah itu, pilih iframe menggunakan attribute yang cukup stabil, misalnya `title` atau identifier lain yang memang tersedia di page.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Gunakan retried URL atau UI assertion saat result muncul di current page. Nggak perlu mengatur load event secara manual kalau user-visible state sudah menjelaskan readiness dengan lebih baik.
+Kalau hasil dari action muncul di page yang sama, gunakan assertion seperti `toHaveURL()`, `toBeVisible()`, atau `toHaveText()` untuk menunggu sampai kondisi yang diharapkan terpenuhi.
 
-Gunakan `waitForEvent('popup')` atau `waitForEvent('download')` saat one-time browser event memang bagian skenario. Mulai promise sebelum trigger, lalu await sesudahnya.
+Nggak perlu menunggu load event secara manual kalau URL, heading, status, atau kondisi UI lain sudah cukup menunjukkan bahwa page siap digunakan.
 
-Gunakan dialog handler hanya saat test perlu mengontrol atau inspect native browser dialog. Application-styled modal adalah regular DOM element; cari dengan dialog role lalu interact secara normal.
+Gunakan `waitForEvent('popup')` atau `waitForEvent('download')` kalau action memang membuka tab baru atau menghasilkan download. Buat promise sebelum action dijalankan, lalu `await` event-nya setelah action.
 
-Gunakan `frameLocator()` hanya setelah iframe boundary dikonfirmasi. New tab adalah `Page`, bukan frame. Native browser dialog juga bukan keduanya.
+Gunakan dialog listener kalau test memang perlu mengecek atau memilih **Accept/Cancel** pada native browser dialog.
 
-File upload bukan download event. `setInputFiles()` berinteraksi dengan file input, lalu aplikasi perlu menampilkan observable validation atau uploaded state. Focused upload exercise dipetakan sebagai Additional Practice di lesson pertama.
+Kalau yang muncul adalah modal buatan aplikasi, perlakukan seperti DOM element biasa. Cari dengan role `dialog`, lalu interact seperti biasa.
 
-Hindari `waitForLoadState('networkidle')` sebagai generic readiness shortcut. Pilih route, heading, status, atau control state yang benar-benar dijanjikan skenario.
+Gunakan `frameLocator()` hanya kalau sudah dipastikan element memang berada di dalam iframe. Tab baru adalah `Page`, bukan iframe. Native browser dialog juga berbeda dari keduanya.
+
+File upload juga berbeda dengan download. Untuk upload, gunakan `setInputFiles()`, lalu verify bagaimana aplikasi merespons file tersebut, misalnya filename muncul atau status upload berhasil.
+
+Jangan gunakan `waitForLoadState('networkidle')` sebagai cara default untuk menentukan page sudah siap. Tunggu kondisi yang memang relevan dengan scenario, seperti URL, heading, status, atau control state.
 
 ## Kalau gagal, mulai cek dari mana?
 
-Saat post-action wait timeout, petakan product behavior sebelum mengubah timing:
+Kalau test timeout setelah sebuah action, cek dulu hasil action tersebut seharusnya muncul di mana:
 
-1. Apakah action meng-update current page, melakukan navigation, membuka popup, atau memulai download?
-2. Apakah event promise atau dialog handler sudah didaftarkan sebelum trigger?
-3. Apakah promise tidak sengaja di-await sebelum trigger dijalankan?
-4. Apakah locator dan assertion memakai `Page` baru atau original page?
-5. Apakah target ada di iframe dan frame yang dimasuki sudah benar?
-6. Apakah dialog listener lupa melakukan accept atau dismiss?
-7. Apakah event sebenarnya terjadi tetapi business assertion setelahnya gagal?
+1. Apakah action mengubah page yang sama, melakukan navigation, membuka tab baru, atau memulai download?
+2. Kalau menunggu popup, download, atau dialog, apakah wait atau listener sudah dipasang sebelum action dijalankan?
+3. Apakah promise malah di-`await` sebelum action yang memicu event?
+4. Kalau ada tab baru, apakah locator dan assertion sudah menggunakan `Page` yang benar?
+5. Kalau target berada di iframe, apakah test sudah menggunakan frame yang tepat?
+6. Kalau ada browser dialog, apakah listener sudah melakukan `accept()` atau `dismiss()`?
+7. Apakah event sebenarnya sudah terjadi, tapi assertion setelahnya yang fail?
 
-Gunakan trace dan screenshot untuk melihat surface yang ada setelah action. Untuk download, inspect failure information dan suggested filename. Untuk popup, inspect semua page di context. Untuk frame, inspect frame URL dan title sebagai diagnostic clue saja; final locator tetap harus terikat ke maintainable contract.
+Gunakan trace dan screenshot untuk melihat apa yang terjadi setelah action.
 
-Review navigation dan event code dengan pertanyaan berikut:
+Untuk download, cek error yang tersedia dan filename yang dihasilkan. Untuk popup, cek page apa saja yang terbuka di browser context. Untuk iframe, cek URL atau title frame saat debugging kalau memang membantu menentukan frame yang benar.
 
-- Apakah code mengenali surface tempat outcome muncul?
-- Apakah setiap one-time event promise dibuat sebelum triggering action?
-- Apakah promise di-await sesudah action, bukan sebelumnya?
-- Apakah popup assertion dijalankan pada popup `Page`?
-- Apakah dialog handler selalu melakukan accept atau dismiss?
-- Apakah application modal tertukar dengan native dialog?
-- Apakah `networkidle` dipakai sebagai generic readiness guess?
-- Apakah download memeriksa meaningful evidence, bukan cuma memanggil `saveAs()`?
-- Apakah iframe boundary sudah dikonfirmasi, bukan hanya diasumsikan?
-- Apakah ada assertion untuk business result setelah browser event?
+Saat review code yang berkaitan dengan navigation atau browser event, cek beberapa hal ini:
 
-API yang benar dalam urutan yang salah tetap menghasilkan test yang rusak. Event ordering dan surface ownership tetap menjadi tanggung jawab reviewer.
+- Apakah test menunggu hasil di tempat yang benar?
+- Apakah wait untuk popup atau download dibuat sebelum action yang memicunya?
+- Apakah event promise baru di-`await` setelah action dijalankan?
+- Apakah assertion untuk popup dijalankan pada `Page` dari popup tersebut?
+- Apakah browser dialog selalu di-`accept()` atau di-`dismiss()`?
+- Apakah modal dari aplikasi salah dianggap sebagai native browser dialog?
+- Apakah `networkidle` digunakan hanya untuk menebak kapan page siap?
+- Kalau ada download, apakah test verify hal yang memang penting, bukan hanya memanggil `saveAs()`?
+- Apakah sudah dipastikan target memang berada di iframe?
+- Setelah browser event selesai, apakah hasil akhirnya tetap diverifikasi?
+
+Method yang digunakan bisa saja benar, tapi urutan yang salah tetap bisa membuat test fail atau flaky.
+
+Karena itu, pastikan test tahu event apa yang perlu ditunggu, kapan wait harus dipasang, dan di page atau frame mana assertion perlu dijalankan.
 
 ## Coba cek pemahamanmu
 
-Review invoice test ini:
+Review invoice test berikut:
 
 ```ts
 await page.getByRole('link', { name: 'Open invoice' }).click();
+
 const invoicePage = await page.waitForEvent('popup');
+
 await page.waitForLoadState('networkidle');
+
 await expect(page.getByText('Invoice 1042')).toBeVisible();
 ```
 
-Link tersebut langsung membuka tab baru, lalu tab itu merender heading bernama Invoice 1042.
+Link tersebut langsung membuka tab baru, lalu tab baru menampilkan heading **Invoice 1042**.
 
 Jelaskan:
 
-1. Race-nya ada di mana?
-2. Baris mana yang menunggu di page yang salah?
-3. Bagaimana urutan promise, trigger, dan new-page assertion yang benar?
-4. Observable condition apa yang perlu menggantikan generic network idle?
+1. Kenapa `waitForEvent('popup')` dipasang terlalu terlambat?
+2. Baris mana yang masih menunggu atau melakukan assertion di page lama?
+3. Bagaimana urutan yang benar untuk menunggu popup, menjalankan action, lalu melakukan assertion di tab baru?
+4. Kondisi apa yang lebih tepat ditunggu daripada `networkidle`?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh jawaban:
 
 ```ts
 const popupPromise = page.waitForEvent('popup');
+
 await page.getByRole('link', { name: 'Open invoice' }).click();
+
 const invoicePage = await popupPromise;
 
 await expect(
@@ -214,10 +251,18 @@ await expect(
 ).toBeVisible();
 ```
 
-Event observation dimulai sebelum trigger, `Page` baru ditangkap sesudahnya, dan assertion berjalan di surface yang memiliki invoice. Heading—bukan network silence—menjelaskan user-visible readiness yang dibutuhkan skenario.
+Wait untuk popup dipasang sebelum `click()` supaya event-nya nggak terlewat.
+
+Setelah tab baru terbuka, test menggunakan `invoicePage` untuk melakukan assertion di tab tersebut.
+
+Kita juga nggak perlu menunggu `networkidle`. Heading **Invoice 1042** sudah menjadi kondisi yang lebih jelas untuk menunjukkan bahwa invoice yang diharapkan sudah tampil.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa mengklasifikasikan outcome berdasarkan browser surface, mengurutkan one-time event wait dengan aman, dan membedakan new page, native dialog, download, serta iframe.
+Sekarang kamu seharusnya sudah bisa menentukan di mana hasil dari sebuah action akan muncul, memasang wait untuk popup atau download dengan urutan yang benar, serta membedakan tab baru, native browser dialog, download, dan iframe.
 
-Lesson ini tidak punya Core Practice terpisah karena standalone playground saat ini belum bisa melatih popup dan download event ordering secara akurat. Iframe drill tetap menjadi Additional Practice. Completion Module 5 ditentukan oleh dua Core Practice sebelumnya: deliberate state-based action dan observable outcome synchronization.
+Lesson ini tidak punya Core Practice terpisah karena playground saat ini belum bisa mensimulasikan popup dan download dengan cukup akurat.
+
+Iframe tetap tersedia sebagai Additional Practice.
+
+Module 5 dianggap selesai setelah kamu menyelesaikan dua Core Practice sebelumnya: memilih action berdasarkan state atau behavior yang dibutuhkan scenario, serta menunggu dan verify hasil setelah action tanpa bergantung pada fixed sleep.

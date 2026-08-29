@@ -1,15 +1,15 @@
 ---
-title: 'Synchronize Navigation and One-Time Browser Events'
-description: 'Follow outcomes across routes, popups, downloads, dialogs, and frames without creating event-order races.'
+title: 'Wait for Navigation and Browser Events in the Right Order'
+description: 'Wait for URL changes, popups, downloads, and dialogs without missing events, then verify the result on the correct page or frame.'
 ---
 
 ## After this lesson, you can
 
-- choose observable evidence for full navigation, client-side routing, and same-page updates;
-- capture a popup or download by registering its wait before the triggering action;
+- decide what to verify after full navigation, client-side routing, or a same-page update;
+- wait for a popup or download before running the action that triggers it;
 - handle browser dialogs without freezing the page;
-- recognize an iframe as a separate document context; and
-- diagnose tests that wait on the wrong browser surface.
+- determine when an element needs to be located through a frame context; and
+- diagnose why a popup, download, dialog, or page change did not appear as expected.
 
 ## Why this matters for QA
 
@@ -17,21 +17,23 @@ An action does not always finish on the page where it started.
 
 “Open invoice” might navigate the current tab, open a new tab, or download a PDF. “Delete account” might show a browser confirmation dialog. A payment form might live inside an iframe owned by another service.
 
-If the test assumes the wrong surface, increasing the timeout will never make it correct. It may wait for a heading on the original page while the actual heading is in a popup, or start listening for a download after the download has already begun.
+If the test waits in the wrong place, increasing the timeout will not fix it.
 
-The QA skill here is not memorizing five APIs. It is identifying where the product behavior becomes observable and arranging the test so a one-time signal cannot be missed.
+For example, the test may wait for a heading on the current page when that heading appears in a new tab. It may also start waiting for a download after the download has already begun.
+
+You need to know where an action produces its result. If that result is a fast browser event, start waiting before running the action.
 
 ## The mental model
 
-First classify the outcome:
+First decide where the action will produce its result:
 
 ```text
-Trigger an action
+Run an action
       ↓
 Where does the outcome appear?
-      ├─ Current page state or URL → act, then use a retried assertion
-      ├─ One-time event            → register promise/handler, then act
-      └─ Separate document context → enter that page/frame, then locate normally
+      ├─ Same page or URL       → run the action, then wait with an assertion
+      ├─ Browser event          → start waiting first, then run the action
+      └─ Another page or iframe → use the correct page or frame, then locate the element
 ```
 
 For one-time events, order matters:
@@ -53,7 +55,7 @@ Triggering first and registering later is also risky because a fast event can oc
 
 ## Work through a realistic example
 
-An order history page has three invoice behaviors:
+An order history page has three behaviors:
 
 - selecting Order history changes the current route;
 - Open invoice launches an HTML invoice in a new tab; and
@@ -61,7 +63,7 @@ An order history page has three invoice behaviors:
 
 There is also a Cancel order action that opens a browser confirmation dialog.
 
-### 1. Synchronize current-page navigation with user evidence
+### 1. Wait for the page to change, then verify the result
 
 ```ts
 await page.getByRole('link', { name: 'Order history' }).click();
@@ -72,11 +74,15 @@ await expect(
 ).toBeVisible();
 ```
 
-A full document navigation and a client-side route can look the same to a user. `toHaveURL()` retries until the URL matches; the heading proves the route rendered meaningful content. Use whichever evidence the requirement needs—sometimes the heading is enough, while a routing requirement may justify both.
+A full page navigation and client-side routing can look the same to a user.
 
-Avoid waiting for a generic load state and assuming the feature is ready. The browser can finish loading before application data appears, and a single-page application may update without a new document load.
+`toHaveURL()` waits until the URL matches. The heading confirms that the **Order history** content has appeared.
 
-### 2. Capture a popup without a race
+Choose assertions based on the requirement. Sometimes the heading is enough. If the URL change is also part of the scenario, verify both.
+
+Do not wait for a generic load state and assume the page is ready. The browser can finish loading before application data appears. A single-page application can also update without a full page load.
+
+### 2. Wait for the popup before running the action
 
 ```ts
 const popupPromise = page.waitForEvent('popup');
@@ -89,11 +95,13 @@ await expect(
 ).toBeVisible();
 ```
 
-`popupPromise` starts observing before the click. The test awaits the new `Page` after the action, then uses normal locators and assertions on that page.
+Create `popupPromise` before `click()` so the popup event cannot be missed.
+
+After the popup opens, use `invoicePage` for locators and assertions that belong to the new page.
 
 If the application can create a new page that is not specifically tied to the current page, a browser-context page event may be the appropriate scope. Choose the narrowest event source that matches the product behavior.
 
-### 3. Capture and inspect a download
+### 3. Wait for the download, then verify the result
 
 ```ts
 const downloadPromise = page.waitForEvent('download');
@@ -104,11 +112,17 @@ expect(download.suggestedFilename()).toBe('invoice-1042.pdf');
 await download.saveAs('artifacts/invoice-1042.pdf');
 ```
 
-The event proves a download began. The filename assertion verifies one user-relevant property. If file contents carry the real risk, inspect them with an appropriate parser or downstream check; merely saving the file is not proof that it contains the correct invoice.
+The `download` event confirms that the download started.
 
-Downloaded files are temporary for the browser context unless saved elsewhere. Use explicit artifact locations in a real project and avoid committing sensitive output.
+You can then verify what matters to the scenario, such as the generated filename.
 
-### 4. Handle a dialog before the trigger
+If the file contents are part of the requirement, inspect them with an appropriate parser or another check. Calling `saveAs()` alone does not prove that the file contains the correct invoice.
+
+Downloaded files are temporary and are deleted when the browser context closes unless you save them elsewhere.
+
+In a real project, save them in the folder used for test artifacts and avoid committing output that contains sensitive data.
+
+### 4. Handle the dialog before running the action
 
 ```ts
 page.once('dialog', async (dialog) => {
@@ -121,11 +135,13 @@ await page.getByRole('button', { name: 'Cancel order' }).click();
 await expect(page.getByRole('status')).toHaveText('Order cancelled');
 ```
 
-Playwright automatically dismisses dialogs when there is no listener. Once you register a dialog listener, that listener must accept or dismiss the dialog; otherwise the page remains blocked and the triggering action can hang.
+Playwright automatically dismisses a dialog when there is no listener.
+
+Once you register a listener, it must call `accept()` or `dismiss()`. Otherwise, the page keeps waiting for the dialog and the triggering `click()` can hang.
 
 The dialog assertion proves the correct confirmation appeared. The final status proves the accepted action produced its application outcome.
 
-### 5. Cross a frame boundary deliberately
+### 5. Use the correct frame when an element is inside an iframe
 
 An iframe is not a one-time event. It is another document embedded in the page:
 
@@ -135,7 +151,9 @@ const paymentFrame = page.frameLocator('[title="Secure payment"]');
 await paymentFrame.getByLabel('Card number').fill('4242 4242 4242 4242');
 ```
 
-After entering the frame context, use the same semantic locator strategy you would use on the main page. Do not add `frameLocator()` just because a control is hard to find. Confirm in DevTools that the control is actually inside an iframe, and prefer a meaningful frame title or other stable contract.
+If the element is inside an iframe, use `frameLocator()` first and then locate the element inside that frame as usual.
+
+Do not add `frameLocator()` only because a locator cannot find an element. Check in DevTools that the element is inside an iframe, then identify the frame with a stable attribute such as its `title`.
 
 ## When to use it—and when not to
 
@@ -153,7 +171,7 @@ Avoid `waitForLoadState('networkidle')` as a general readiness shortcut. Prefer 
 
 ## When it fails
 
-When a post-action wait times out, map the product behavior before changing timing:
+When a test times out after an action, first check where that action should produce its result:
 
 1. Did the action update the current page, navigate it, open a popup, or start a download?
 2. Was the event promise or dialog handler registered before the trigger?
@@ -163,11 +181,13 @@ When a post-action wait times out, map the product behavior before changing timi
 6. Did a dialog listener forget to accept or dismiss the dialog?
 7. Did the event occur but the later business assertion fail?
 
-Use traces and screenshots to see which surfaces exist after the action. For downloads, inspect failure information and the suggested filename. For popups, inspect all pages in the context. For frames, inspect frame URLs and titles only as diagnostic clues; keep the final locator tied to a maintainable contract.
+Use traces and screenshots to see what happened after the action.
+
+For a download, inspect its failure information and suggested filename. For a popup, inspect the pages open in the browser context. For an iframe, its URL or title can help you identify the correct frame while debugging.
 
 Review navigation and event code with these questions:
 
-- Does it identify the surface where the outcome appears?
+- Does the test wait in the right place for the result?
 - Is every one-time event promise created before its triggering action?
 - Is the promise awaited after, rather than before, that action?
 - Does a popup assertion operate on the popup `Page`?
@@ -178,7 +198,7 @@ Review navigation and event code with these questions:
 - Was an iframe boundary confirmed rather than assumed?
 - Is there an assertion for the business result after the browser event?
 
-Using the right APIs in the wrong order still creates a broken test. Event ordering and surface ownership are review responsibilities.
+The method can be correct while the order is still wrong. Make sure the test knows which event to wait for, when to start waiting, and which page or frame owns the final assertion.
 
 ## Check your understanding
 
@@ -196,7 +216,7 @@ The link opens a new tab immediately, and that tab renders a heading named Invoi
 Explain:
 
 1. Where is the race?
-2. Which line waits on the wrong page?
+2. Which lines still wait or assert on the original page?
 3. How should the promise, trigger, and new-page assertion be ordered?
 4. What observable condition should replace generic network idle?
 
@@ -214,10 +234,18 @@ await expect(
 ).toBeVisible();
 ```
 
-The event observation begins before the trigger, the new `Page` is captured afterward, and the assertion runs on the surface that owns the invoice. The heading—not network silence—defines the user-visible readiness needed by this scenario.
+The popup wait starts before `click()` so the event cannot be missed.
+
+After the new tab opens, the test uses `invoicePage` for the assertion on that tab.
+
+There is no need to wait for `networkidle`. The **Invoice 1042** heading is a clearer condition that proves the expected invoice has appeared.
 
 ## Before you continue
 
 You should now be able to classify an outcome by browser surface, order one-time event waits safely, and distinguish a new page, native dialog, download, and iframe.
 
-This lesson has no separate Core Practice because the current standalone playground cannot faithfully exercise popup and download event ordering. The iframe drill remains Additional Practice. Module 5 completion instead depends on the two earlier Core Practices: deliberate state-based actions and observable outcome synchronization.
+This lesson has no separate Core Practice because the current standalone playground cannot reliably simulate popup and download event ordering.
+
+The iframe drill remains Additional Practice.
+
+Module 5 completion depends on the two earlier Core Practices: choosing actions based on the required state or behavior, and waiting for observable results without fixed sleeps.
