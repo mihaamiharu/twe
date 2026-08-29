@@ -1,69 +1,75 @@
 ---
-title: 'Pisahkan Kesiapan Action dari Sinkronisasi Outcome'
-description: 'Pahami apa yang ditunggu Playwright sebelum action dan tentukan observable application state yang membuktikan skenario sesudahnya.'
+title: 'Bedakan Kapan Action Siap Dijalankan dan Kapan Hasilnya Siap Diverifikasi'
+description: 'Pahami apa yang ditunggu Playwright sebelum menjalankan action, lalu tentukan state aplikasi yang perlu ditunggu dan diverifikasi setelah action selesai.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- menjelaskan actionability sebagai kesiapan yang spesifik untuk tiap action, bukan universal checklist;
-- memisahkan target readiness, interaction, application transition, dan expected outcome;
-- melakukan sinkronisasi dengan retried assertion, bukan fixed sleep;
-- mendiagnosis action timeout tanpa menyembunyikannya dengan force atau timeout lebih besar; serta
-- me-review wait dengan menyebutkan kondisi yang mengakhirinya.
+- menjelaskan bahwa setiap Playwright action punya kondisi yang berbeda sebelum bisa dijalankan;
+- membedakan kapan element siap digunakan, kapan action dijalankan, kapan aplikasi masih memproses perubahan, dan kapan expected result sudah bisa diverifikasi;
+- menggunakan assertion yang melakukan retry daripada fixed sleep;
+- mencari penyebab action timeout dan memperbaiki root cause-nya, bukan langsung memakai `force` atau nambahin timeout;
+- me-review penggunaan wait dan memastikan ada kondisi yang jelas untuk menentukan kapan test boleh lanjut.
 
 ## Kenapa ini penting buat QA
 
-Coba bayangin ada profile page dengan button Save. Button-nya enabled, Playwright berhasil melakukan click, lalu test selesai hijau. Beberapa saat kemudian server menolak update tersebut.
+Coba bayangin ada profile page dengan button **Save**. Button-nya enabled, Playwright berhasil melakukan click, lalu test selesai dengan status pass.
 
-Apakah test sudah membuktikan profile berhasil disimpan? Belum. Test baru membuktikan button bisa di-click.
+Beberapa saat kemudian, server ternyata menolak update tersebut.
 
-Kebingungan ini biasanya menghasilkan dua masalah:
+Apakah test sudah memastikan profile berhasil disimpan? Belum. Test baru memastikan button **Save** bisa di-click.
 
-- false confidence, karena action berhasil tanpa outcome assertion; dan
-- flaky test, karena fixed sleep menebak kapan aplikasi seharusnya ready.
+Masalah seperti ini biasanya muncul dalam dua bentuk:
 
-Playwright menghilangkan banyak mechanical waiting, tapi Playwright tidak tahu business result mana yang penting. Itu tetap bagian dari test design kita sebagai QA.
+* test pass padahal hasil akhirnya belum benar-benar diverifikasi; dan
+* test jadi flaky karena menggunakan fixed sleep untuk menebak kapan aplikasi sudah siap.
+
+Playwright bisa otomatis menunggu sampai element siap untuk di-interact. Tapi setelah action dijalankan, kita tetap perlu menentukan sendiri hasil apa yang harus ditunggu dan diverifikasi.
+
+Menentukan hasil yang perlu ditunggu dan diverifikasi tetap menjadi bagian dari test design.
 
 ## Cara berpikir yang perlu kamu pegang
 
 Pisahkan flow menjadi empat bagian:
 
 ```text
-1. Target ready untuk action ini
+1. Element siap untuk di-interact
               ↓
-2. Interaction dilakukan
+2. Action dijalankan
               ↓
-3. Application transition
+3. Aplikasi memproses perubahan
               ↓
-4. Observable expected outcome
+4. Expected result siap diverifikasi
 ```
 
 ![Test intent memilih action, Playwright memeriksa action-specific readiness, lalu test tetap menunggu observable application outcome.](/images/tutorials/action-readiness-outcome.svg)
 
 _Auto-waiting melindungi batas interaction. Web assertion melakukan sinkronisasi dengan product outcome._
 
-Actionability bukan satu checklist yang dipakai untuk semua method. Playwright memeriksa kondisi yang relevan untuk action tertentu:
+Actionability check yang dilakukan Playwright berbeda untuk setiap method. Playwright hanya mengecek kondisi yang memang dibutuhkan oleh action tersebut:
 
 | Action           | Visible | Stable | Receives events | Enabled | Editable |
 | ---------------- | ------- | ------ | --------------- | ------- | -------- |
 | `click()`        | Ya      | Ya     | Ya              | Ya      | Tidak    |
-| `fill()`         | Ya      | Tidak  | Ya              | Ya      | Ya       |
+| `fill()`         | Ya      | Tidak  | Tidak           | Ya      | Ya       |
 | `check()`        | Ya      | Ya     | Ya              | Ya      | Tidak    |
 | `selectOption()` | Ya      | Tidak  | Tidak           | Ya      | Tidak    |
 
-Playwright juga menyelesaikan satu intended element untuk single-target action. Strictness contract ini sudah dibahas di Module 4.
+Untuk action yang hanya boleh dilakukan pada satu element, Playwright juga memastikan locator menemukan satu target yang jelas. Kita sudah membahas strictness ini di Module 4.
 
-Semua check tadi menjawab, “Bisakah Playwright melakukan action ini seperti pengguna?” Check tersebut tidak menjawab, “Apakah server berhasil menyimpan profile?”
+Semua pengecekan tersebut hanya memastikan Playwright bisa melakukan action pada element yang dituju.
+
+Pengecekan itu belum memastikan hasil setelah action sudah benar. Misalnya, `click()` pada button **Save** bisa berhasil, tapi profile tetap gagal disimpan oleh server.
 
 ## Coba kita bedah contoh nyata
 
 Requirement-nya seperti ini:
 
-> Saat user mengubah display name lalu menyimpan, page menampilkan “Profile saved” dan nama baru tetap terlihat.
+> Saat user mengubah display name lalu menyimpan, page menampilkan **“Profile saved”** dan nama baru tetap terlihat.
 
-Aplikasi men-disable Save selama proses submit, lalu memperbarui sebuah status region.
+Aplikasi men-disable button **Save** selama proses submit, lalu memperbarui status message setelah proses selesai.
 
-### 1. Jalankan action yang menjelaskan intent
+### 1. Jalankan action yang sesuai dengan scenario
 
 ```ts
 const displayName = page.getByLabel('Display name');
@@ -74,22 +80,30 @@ await displayName.fill('Rani QA');
 await saveButton.click();
 ```
 
-Sebelum `click()` dikirim, Playwright menunggu sampai button ditemukan secara unik, visible, stable, bisa menerima pointer event, dan enabled. Kalau ada overlay yang menutupinya atau button terus disabled, action akan gagal daripada berpura-pura pengguna berhasil melakukan click.
+Sebelum menjalankan `click()`, Playwright menunggu sampai button ditemukan dengan jelas, visible, stable, bisa menerima click, dan enabled.
 
-Click yang berhasil tetap belum membuktikan save request sudah selesai.
+Kalau ada overlay yang menghalangi button atau button masih disabled, action akan fail.
 
-### 2. Tentukan observable outcome
+Tapi `click()` yang berhasil belum berarti proses save sudah selesai.
+
+### 2. Verify hasil setelah action
 
 ```ts
 await expect(status).toHaveText('Profile saved');
 await expect(displayName).toHaveValue('Rani QA');
 ```
 
-Web assertion Playwright melakukan retry sampai expected condition terpenuhi atau assertion timeout habis. Jadi status assertion melakukan sinkronisasi dengan application transition tanpa menebak durasinya.
+Assertion Playwright akan melakukan retry sampai kondisi yang diharapkan terpenuhi atau timeout.
 
-Assertion yang tepat tergantung risk. Saved message mungkin cukup untuk satu skenario. Skenario persistence yang lebih kuat mungkin perlu reload lalu memastikan value tetap ada. Jangan otomatis menambahkan semua assertion; buktikan requirement yang sedang diuji.
+Jadi kita nggak perlu menebak berapa lama proses save akan selesai dengan fixed sleep. Test cukup menunggu kondisi yang memang menunjukkan hasil yang diharapkan.
 
-### 3. Pahami kenapa fixed sleep lebih lemah
+Assertion yang digunakan tetap mengikuti requirement. Untuk satu scenario, message **“Profile saved”** mungkin sudah cukup.
+
+Kalau yang ingin diuji adalah apakah perubahan benar-benar tersimpan, test bisa reload page lalu verify bahwa value **“Rani QA”** tetap ada.
+
+Nggak semua scenario perlu menambahkan semua assertion. Pilih verification yang memang sesuai dengan hal yang ingin diuji.
+
+### 3. Pahami kenapa fixed sleep kurang reliable
 
 ```ts
 await saveButton.click();
@@ -97,31 +111,39 @@ await page.waitForTimeout(2000);
 await expect(status).toHaveText('Profile saved');
 ```
 
-Code ini selalu menunggu dua detik, baik update-nya selesai dalam 100 milidetik maupun 1,9 detik. Test tetap gagal kalau environment membutuhkan 2,1 detik, dan membuang waktu ketika aplikasi cepat. Yang lebih penting, sleep tidak menjelaskan arti ready.
+Code ini selalu menunggu dua detik, meskipun proses save selesai dalam 100 milidetik atau 1,9 detik.
 
-Assertion-nya sudah menyebutkan kondisi yang dibutuhkan: status menjadi “Profile saved.” Biarkan kondisi itu yang mengakhiri wait.
+Kalau environment sedang lebih lambat dan prosesnya butuh 2,1 detik, test tetap bisa fail. Sebaliknya, kalau aplikasi cepat, test tetap membuang waktu untuk menunggu.
 
-### 4. Bedakan action timeout dan outcome timeout
+Masalah utamanya, fixed sleep hanya menunggu berdasarkan waktu. Sleep tidak tahu kondisi apa yang sebenarnya sedang ditunggu.
 
-Kalau `saveButton.click()` timeout, investigasi target sebelum save request:
+Di case ini, assertion sudah menjelaskan kondisi yang dibutuhkan: status berubah menjadi **“Profile saved”**.
 
-- Apakah form validation membuat button tetap disabled?
-- Apakah loading mask atau cookie banner menghalangi pointer event?
-- Apakah animation membuat target tidak stable?
-- Apakah locator menemukan hidden duplicate?
+Biarkan assertion yang menunggu sampai kondisi tersebut terpenuhi.
 
-Kalau click berhasil tapi `toHaveText('Profile saved')` timeout, investigasi setelah action:
+### 4. Bedakan masalah sebelum dan sesudah action
 
-- Apakah request gagal?
-- Apakah aplikasi menampilkan error?
-- Apakah assertion mengamati status region atau page yang salah?
-- Apakah requirement sebenarnya mengharapkan state transition lain?
+Kalau `saveButton.click()` timeout, cek kondisi element sebelum action dijalankan:
 
-Itu dua kelompok failure yang berbeda. Memisahkan readiness dan outcome membuat trace serta error message lebih berguna.
+* Apakah form validation membuat button tetap disabled?
+* Apakah loading mask atau cookie banner menghalangi click?
+* Apakah animation membuat button belum stable?
+* Apakah locator menemukan duplicate element yang hidden?
 
-### 5. Pakai one-time event ketika event itu adalah outcome
+Kalau `click()` berhasil tapi `toHaveText('Profile saved')` timeout, cek apa yang terjadi setelah action:
 
-Sebagian outcome tidak muncul sebagai same-page DOM state. Button Export bisa menghasilkan download:
+* Apakah request gagal?
+* Apakah aplikasi menampilkan error?
+* Apakah assertion mengecek status message atau page yang salah?
+* Apakah hasil yang diharapkan memang sesuai dengan requirement?
+
+Keduanya punya root cause yang berbeda.
+
+Dengan membedakan masalah sebelum dan sesudah action, kita bisa lebih cepat menentukan bagian mana yang perlu diinvestigasi dari error message atau trace.
+
+### 5. Tunggu browser event kalau hasilnya memang muncul sebagai event
+
+Nggak semua hasil muncul sebagai perubahan di page. Misalnya, button **Export CSV** bisa menghasilkan download:
 
 ```ts
 const downloadPromise = page.waitForEvent('download');
@@ -131,46 +153,58 @@ const download = await downloadPromise;
 expect(download.suggestedFilename()).toBe('customers.csv');
 ```
 
-Listener dimulai sebelum click supaya test tidak melewatkan event yang cepat. Lesson berikutnya membahas event pattern ini dan browser surface lain dengan lebih detail.
+`waitForEvent('download')` dipasang sebelum `click()` supaya test nggak melewatkan event kalau download mulai terlalu cepat.
+
+Di case seperti ini, yang perlu ditunggu bukan perubahan DOM, tapi browser event yang memang dihasilkan oleh action tersebut.
+
+Lesson berikutnya akan membahas pattern seperti ini, termasuk download dan interaction dengan browser event lain.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Andalkan normal Playwright action untuk action readiness. Gunakan web assertion seperti `toBeVisible()`, `toHaveText()`, `toHaveValue()`, atau `toHaveURL()` saat observable UI atau navigation state membuktikan outcome.
+Gunakan Playwright action seperti biasa dan biarkan Playwright menunggu sampai element siap untuk di-interact.
 
-Gunakan `waitForEvent()` saat one-time browser event—misalnya download atau popup—adalah behavior yang perlu ditangkap. Daftarkan event sebelum trigger.
+Setelah action dijalankan, gunakan assertion seperti `toBeVisible()`, `toHaveText()`, `toHaveValue()`, atau `toHaveURL()` untuk menunggu dan verify hasil yang memang diharapkan oleh scenario.
 
-Gunakan explicit network wait hanya kalau network response memang kontraknya atau memberi koordinasi penting yang tidak bisa dijelaskan UI. Successful response tidak otomatis membuktikan user-visible result.
+Gunakan `waitForEvent()` kalau hasil dari action muncul sebagai browser event, misalnya download atau popup. Pasang event listener sebelum action yang memicu event tersebut.
 
-Jangan menambah `waitForLoadState('networkidle')` sebagai aturan universal “page sudah ready.” Aplikasi modern bisa mempertahankan analytics, polling, atau streaming connection. Dokumentasi Playwright juga tidak menyarankan network idle sebagai test-readiness signal. Pilih URL, heading, control state, atau product-specific evidence lain.
+Gunakan network wait hanya kalau response dari request memang perlu dicek atau memang dibutuhkan untuk menentukan kapan test boleh lanjut. Response yang sukses belum tentu berarti hasil yang dilihat user sudah benar.
 
-Jangan memakai timeout yang lebih besar untuk mendefinisikan readiness. Timeout adalah batas maksimal kesabaran, bukan kondisi yang sedang ditunggu.
+Jangan langsung menggunakan `waitForLoadState('networkidle')` sebagai tanda bahwa page sudah siap. Aplikasi modern bisa tetap menjalankan analytics, polling, atau streaming connection meskipun UI sebenarnya sudah bisa digunakan.
+
+Lebih baik tunggu kondisi yang memang relevan dengan scenario, misalnya URL berubah, heading muncul, button menjadi enabled, atau status message tampil.
+
+Jangan memperbesar timeout hanya supaya test punya waktu lebih lama. Timeout hanya menentukan berapa lama test mau menunggu, bukan kondisi apa yang sebenarnya sedang ditunggu.
 
 ## Kalau gagal, mulai cek dari mana?
 
-Tentukan dulu batas mana yang gagal:
+Cari dulu bagian mana yang sebenarnya bermasalah:
 
-1. **Locator resolution:** tidak ada atau ada beberapa control yang match.
-2. **Action readiness:** intended control tidak pernah interactable untuk action tersebut.
-3. **Interaction side effect:** action terjadi, tapi aplikasi mengambil path yang tidak diharapkan.
-4. **Outcome evidence:** expected observable condition tidak pernah muncul.
-5. **Wrong surface:** outcome terbuka di popup, frame, dialog, download, atau page lain.
+1. **Locator:** element yang dicari tidak ditemukan atau locator menemukan lebih dari satu element.
+2. **Sebelum action:** element ditemukan, tapi tidak pernah siap untuk di-interact.
+3. **Setelah action:** action berhasil dijalankan, tapi aplikasi masuk ke flow atau state yang tidak diharapkan.
+4. **Expected result:** kondisi yang seharusnya muncul setelah action tidak pernah terpenuhi.
+5. **Context lain:** hasil ternyata muncul di popup, iframe, dialog, download, atau page lain.
 
-Gunakan Playwright error, trace, DOM snapshot, screenshot, console, dan network evidence untuk menempatkan failure di salah satu batas tersebut.
+Gunakan error message Playwright, trace, DOM snapshot, screenshot, console, dan network untuk membantu menentukan masalahnya ada di bagian mana.
 
-`click({ force: true })` mungkin melewati readiness symptom tanpa memperbaiki produk atau test. Timeout lebih besar mungkin cuma menunda failure yang sama. Test retry bisa membantu mengklasifikasikan infrastructure noise, tapi tidak memperbaiki synchronization yang hilang. Kalau test hanya lulus setelah retry, test itu tetap perlu didiagnosis.
+`click({ force: true })` melewati beberapa actionability check yang dianggap non-essential, misalnya pengecekan apakah target menerima pointer event. `force` tidak membuat form yang belum valid menjadi valid dan tidak membuktikan expected result sudah tercapai.
 
-Untuk setiap action dan wait di dalam test, tanyakan:
+Memperbesar timeout juga bisa saja hanya membuat test menunggu lebih lama sebelum akhirnya fail.
 
-- Readiness apa yang sebenarnya sudah diperiksa Playwright untuk action ini?
-- Observable condition apa yang membuktikan business outcome?
-- Apakah `waitForTimeout()` cuma menebak durasi transition?
-- Apakah timeout value disalahartikan sebagai readiness condition?
-- Apakah `force` menyembunyikan target yang tertutup, disabled, tidak stable, atau salah?
-- Apakah code menunggu network idle tanpa product-specific reason?
-- Kalau network response ditunggu, apakah test tetap memverifikasi yang dilihat user?
-- Bisakah outcome muncul di browser surface lain?
+Retry bisa membantu melihat apakah failure hanya terjadi sesekali, tapi retry bukan solusi untuk synchronization yang salah. Kalau test hanya bisa pass setelah retry, root cause-nya tetap perlu dicari.
 
-Kode sering dipenuhi wait karena terlihat aman. Sebuah wait baru bermakna kalau kamu bisa menyebutkan kondisi yang mengakhirinya dan kenapa kondisi itu penting.
+Saat review action dan wait di dalam test, cek beberapa hal ini:
+
+* Kondisi apa yang sudah ditunggu Playwright sebelum menjalankan action?
+* Setelah action, kondisi apa yang perlu muncul untuk memastikan expected result tercapai?
+* Apakah `waitForTimeout()` hanya digunakan untuk menebak berapa lama proses akan selesai?
+* Apakah timeout diperbesar hanya supaya test punya waktu lebih lama?
+* Apakah `force` digunakan karena element tertutup oleh element lain tanpa memperbaiki penyebabnya?
+* Apakah test menunggu `networkidle` tanpa alasan yang memang relevan dengan scenario?
+* Kalau test menunggu network response, apakah hasil yang dilihat user tetap diverifikasi?
+* Apakah hasil dari action sebenarnya muncul di popup, iframe, dialog, download, atau page lain?
+
+Menambahkan wait belum tentu membuat test lebih reliable. Wait yang baik harus punya kondisi yang jelas: test tahu apa yang sedang ditunggu dan kapan boleh lanjut.
 
 ## Coba cek pemahamanmu
 
@@ -180,33 +214,39 @@ Review test berikut:
 await page.getByRole('button', { name: 'Submit claim' }).click({
   force: true,
 });
+
 await page.waitForTimeout(3000);
+
 expect(await page.getByText('Submitted').isVisible()).toBe(true);
 ```
 
-Button Submit claim disabled sampai semua required evidence di-upload. Setelah submission, server secara asynchronous memperbarui status region menjadi “Claim submitted.”
+Button **Submit claim** akan tetap disabled sampai semua required evidence sudah di-upload. Setelah submission berhasil, server memperbarui status menjadi **“Claim submitted”** secara asynchronous.
 
 Jelaskan:
 
-1. Business signal apa yang mungkin disembunyikan oleh `force`?
-2. Outcome condition apa yang perlu menggantikan fixed sleep?
-3. Kenapa immediate `isVisible()` snapshot lebih lemah daripada web assertion?
-4. Bagaimana membedakan action-readiness failure dari submission-outcome failure?
+1. Kenapa `force` bukan cara yang tepat untuk menangani button yang masih disabled?
+2. Kondisi apa yang seharusnya ditunggu setelah submission, daripada menggunakan fixed sleep?
+3. Kenapa `isVisible()` yang dicek sekali lebih mudah fail dibanding Playwright web assertion?
+4. Bagaimana cara membedakan masalah sebelum `click()` dengan masalah setelah submission?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu pendekatan yang masuk akal:
+Contoh jawaban:
 
-- upload required evidence atau assert bahwa disabled button memang benar mewakili invalid form state;
-- gunakan normal `click()` supaya Playwright melindungi user interaction boundary;
-- pakai `await expect(page.getByRole('status')).toHaveText('Claim submitted')` untuk retry terhadap observable result;
-- diagnosis click failure dengan memeriksa target readiness dan validation state; serta
-- diagnosis assertion failure dengan memeriksa request, error UI, dan final application state setelah click berhasil.
+* Pastikan required evidence sudah di-upload terlebih dahulu. `force` tidak membuat form yang belum valid menjadi valid. Kalau button masih disabled, cek validation state-nya.
+* Gunakan normal `click()` supaya Playwright tetap mengecek apakah button benar-benar siap untuk di-click.
+* Gunakan `await expect(page.getByRole('status')).toHaveText('Claim submitted')` supaya assertion melakukan retry sampai status yang diharapkan muncul.
+* Kalau `click()` fail, cek kondisi button dan validation state sebelum submission.
+* Kalau `click()` berhasil tapi assertion fail, cek request, error message di UI, dan state aplikasi setelah submission.
 
-Improved test-nya bukan menunggu dengan kurang serius. Test tersebut menunggu kondisi yang lebih bermakna.
+Perbaikannya bukan sekadar mengurangi waktu tunggu. Test sekarang menunggu kondisi yang memang menunjukkan bahwa submission berhasil.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa menjelaskan batas yang ditangani Playwright auto-waiting dan bagian yang tetap membutuhkan outcome synchronization dari skenario.
+Sekarang kamu seharusnya sudah bisa membedakan apa yang otomatis ditunggu Playwright sebelum action dijalankan dan apa yang tetap perlu ditunggu serta diverifikasi setelah action selesai.
 
-Selesaikan Core Practice yang menyimpan profile lalu menunggu observable status tanpa `waitForTimeout()`. Lesson ini tidak punya mapped Additional Practice terpisah: completion proof-nya adalah membedakan action readiness dari application outcome. Dynamic-table exercise tetap tersedia sebagai standalone Practice untuk latihan transfer locator.
+Selesaikan Core Practice yang menyimpan profile lalu menunggu status yang sesuai tanpa menggunakan `waitForTimeout()`.
+
+Lesson ini tidak punya Additional Practice terpisah. Fokus utamanya adalah memahami perbedaan antara element yang siap untuk di-interact dan hasil aplikasi yang baru muncul setelah action.
+
+Exercise dynamic table tetap tersedia sebagai latihan tambahan untuk locator.

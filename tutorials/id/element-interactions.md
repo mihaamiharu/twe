@@ -1,63 +1,69 @@
 ---
-title: 'Pilih Action yang Mewakili Intent Pengguna'
-description: 'Pilih action Playwright berdasarkan state atau perilaku yang dibutuhkan pengguna, bukan sekadar method yang kebetulan bisa mengubah DOM.'
+title: 'Gunakan Action yang Tepat untuk Setiap Interaction'
+description: 'Pilih action Playwright berdasarkan cara user berinteraksi dengan aplikasi dan state yang dibutuhkan scenario.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- memilih action yang menjelaskan intended state pengguna;
-- menjelaskan kenapa `check()` lebih aman daripada blind click pada checkbox;
-- membedakan kapan memakai `fill()`, `press()`, dan `pressSequentially()`;
-- mengenali perbedaan native control, custom control, dan specialized interaction; serta
-- me-review interaction code yang menyimpan asumsi tersembunyi.
+- memilih action Playwright berdasarkan state yang memang dibutuhkan scenario;
+- menjelaskan kenapa `check()` lebih aman daripada langsung memakai `click()` pada checkbox;
+- membedakan kapan menggunakan `fill()`, `press()`, dan `pressSequentially()`;
+- membedakan cara berinteraksi dengan native control, custom control, dan interaction lain seperti upload atau drag-and-drop; serta
+- me-review interaction code dan mengecek apakah action yang digunakan sudah sesuai dengan state dan behavior yang dibutuhkan scenario.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih kamu melihat test yang secara teknis berhasil mengubah halaman, tapi sebenarnya tidak menjelaskan maksud skenarionya?
+Pernah nggak sih kamu melihat test yang action-nya berhasil dijalankan, tapi ternyata action tersebut nggak benar-benar sesuai dengan scenario yang ingin diuji?
 
-Misalnya, checkout test harus memastikan Express delivery aktif. Salah satu usulan implementasinya seperti ini:
+Misalnya, checkout test harus memastikan **Express delivery** aktif. Code-nya seperti ini:
 
 ```ts
 await page.getByLabel('Express delivery').click();
 ```
 
-Click tersebut hanya melakukan toggle. Kalau karena test data, browser state, atau product change checkbox-nya sudah checked, baris yang sama justru mematikan Express delivery. Kodenya menjelaskan gesture, bukan state yang dibutuhkan.
+Masalahnya, `click()` hanya mengubah state checkbox dari kondisi saat ini.
 
-Sebelum memilih action, seorang QA engineer perlu menjawab dua hal:
+Kalau checkbox **Express delivery** ternyata sudah checked karena test data, browser state, atau perubahan product, `click()` justru akan membuatnya menjadi unchecked.
 
-1. Apa yang dilakukan pengguna?
-2. State atau perilaku apa yang sebenarnya dibutuhkan requirement?
+Padahal yang dibutuhkan scenario adalah memastikan **Express delivery aktif**, bukan hanya melakukan click.
 
-Method Playwright bukan sekadar syntax yang perlu dihafal. Method yang tepat mencatat intent dan memberi runner informasi yang lebih jelas untuk melakukan interaksi dengan aman.
+Sebelum memilih action, QA engineer perlu memahami dua hal:
+
+1. Bagaimana user berinteraksi dengan control tersebut?
+2. State atau behavior apa yang dibutuhkan oleh scenario?
+
+Jadi, method Playwright bukan hanya syntax yang perlu dihafal. Pilih method yang paling sesuai dengan cara user berinteraksi dan hasil yang dibutuhkan oleh scenario.
 
 ## Cara berpikir yang perlu kamu pegang
 
 Pakai alur ini:
 
 ```text
-Scenario intent
+Tujuan scenario
       ↓
-Control dan behavior
+Control yang digunakan user
       ↓
-Action yang menjelaskan desired state
+Action yang sesuai dengan state atau behavior yang dibutuhkan
       ↓
-Observable result
+Hasil yang perlu diverifikasi
 ```
 
-Jenis control memang penting, tapi hasil yang diminta jauh lebih penting:
+Jenis control tetap penting, tapi pilih action berdasarkan apa yang sebenarnya dibutuhkan oleh scenario:
 
-| Intent                                           | Action yang biasanya dipakai | Kenapa                                           |
-| ------------------------------------------------ | ---------------------------- | ------------------------------------------------ |
-| Mengaktifkan button atau link                    | `click()`                    | Pengguna mengaktifkan satu control               |
-| Mengganti text dengan value yang sudah diketahui | `fill()`                     | Final value field adalah intent-nya              |
-| Memastikan checkbox atau radio terpilih          | `check()`                    | Action menjelaskan required checked state        |
-| Memastikan checkbox tidak terpilih               | `uncheck()`                  | Action menjelaskan required unchecked state      |
-| Memilih dari native `<select>`                   | `selectOption()`             | Memakai native selection behavior dari browser   |
-| Mengirim key ke control tertentu                 | `locator.press()`            | Key punya target yang jelas                      |
-| Menguji behavior yang bergantung pada tiap key   | `pressSequentially()`        | Individual key event memang bagian dari behavior |
-| Upload lewat file input                          | `setInputFiles()`            | Mengatur file selection di browser               |
+| Yang ingin dilakukan                                | Action yang biasanya dipakai | Kenapa                                                    |
+| --------------------------------------------------- | ---------------------------- | --------------------------------------------------------- |
+| Klik button atau link                               | `click()`                    | User memang melakukan click pada control tersebut         |
+| Mengisi field dengan value tertentu                 | `fill()`                     | Yang penting adalah final value di field                  |
+| Memastikan checkbox atau radio terpilih             | `check()`                    | Memastikan control berada dalam checked state             |
+| Memastikan checkbox tidak terpilih                  | `uncheck()`                  | Memastikan checkbox berada dalam unchecked state          |
+| Memilih option dari native `<select>`               | `selectOption()`             | Menggunakan behavior native dari `<select>`               |
+| Mengirim key ke control tertentu                    | `locator.press()`            | Key dikirim ke element yang memang menjadi target         |
+| Menguji behavior yang terjadi pada setiap key press | `pressSequentially()`        | Setiap key event memang penting untuk behavior yang diuji |
+| Upload file lewat file input                        | `setInputFiles()`            | Mengatur file yang dipilih melalui file input             |
 
-Sebuah action belum membuktikan business outcome. Action baru melakukan interaksi. Lesson berikutnya akan membahas batas ini secara khusus.
+Action hanya melakukan interaction. Action belum memastikan hasil akhirnya sudah sesuai dengan expected result.
+
+Di lesson berikutnya kita akan membahas bagian verification ini lebih dalam.
 
 ## Coba kita bedah contoh nyata
 
@@ -65,7 +71,7 @@ Requirement checkout-nya seperti ini:
 
 > Atur quantity menjadi 3, pilih Courier delivery, aktifkan Express delivery, place order, lalu tampilkan konfirmasi untuk 3 Express items.
 
-### 1. Jelaskan control dari makna yang dilihat pengguna
+### 1. Tentukan control yang digunakan user
 
 ```ts
 const quantity = page.getByLabel('Quantity');
@@ -74,17 +80,17 @@ const expressDelivery = page.getByLabel('Express delivery');
 const placeOrder = page.getByRole('button', { name: 'Place order' });
 ```
 
-Locator tersebut menjelaskan control mana yang penting. Di Module 4 kita sudah membahas cara memilih dan mempersempit locator. Sekarang fokusnya adalah action apa yang dilakukan pada control itu.
+Di Module 4 kita sudah membahas cara memilih locator yang tepat. Sekarang fokusnya adalah memilih action yang sesuai untuk setiap control tersebut.
 
-### 2. Atur known value dengan `fill()`
+### 2. Gunakan `fill()` kalau yang penting adalah final value
 
 ```ts
 await quantity.fill('3');
 ```
 
-`fill()` memberi focus pada editable control lalu mengganti value-nya. Ini pilihan normal ketika requirement peduli pada final value.
+`fill()` mengisi field dengan value yang kita tentukan. Untuk scenario ini, yang penting adalah quantity akhirnya bernilai `3`.
 
-Alternatif low-level berikut biasanya tidak perlu:
+Kita nggak perlu melakukan interaction yang lebih panjang seperti ini:
 
 ```ts
 await quantity.click();
@@ -92,27 +98,39 @@ await quantity.press('ControlOrMeta+A');
 await quantity.pressSequentially('3', { delay: 100 });
 ```
 
-Kode itu menambah behavior terkait timing dan platform tanpa menambah coverage. Gunakan sequential typing hanya kalau produk merespons setiap key event—misalnya autocomplete yang mengambil suggestion saat pengguna mengetik. Walaupun begitu, delay bukan bukti bahwa suggestion sudah selesai dimuat. Suggestion tetap perlu di-assert.
+Cara tersebut menambahkan beberapa step yang sebenarnya nggak dibutuhkan oleh scenario.
 
-### 3. Pakai API yang cocok dengan native selection control
+Gunakan `pressSequentially()` kalau behavior aplikasi memang bergantung pada setiap key press, misalnya autocomplete yang menampilkan suggestion saat user mengetik.
+
+Tapi delay tetap nggak memastikan suggestion sudah selesai dimuat. Hasil autocomplete tersebut tetap perlu diverifikasi dengan assertion.
+
+### 3. Gunakan `selectOption()` untuk native `<select>`
 
 ```ts
 await deliveryMethod.selectOption({ label: 'Courier' });
 ```
 
-`selectOption()` dipakai untuk HTML `<select>` sungguhan. Custom dropdown mungkin berbentuk button atau combobox yang membuka listbox. Flow penggunanya bisa membutuhkan click pada trigger lalu memilih option berdasarkan role. Jangan memaksakan `selectOption()` hanya karena tampilannya terlihat seperti dropdown.
+`selectOption()` digunakan untuk HTML `<select>` yang memang native.
 
-### 4. Nyatakan checkbox state, bukan asal toggle
+Kalau dropdown-nya custom, interaction-nya bisa berbeda. Misalnya user perlu klik button atau combobox terlebih dahulu, lalu memilih option dari list yang muncul.
+
+Jadi, jangan gunakan `selectOption()` hanya karena component tersebut terlihat seperti dropdown. Cek dulu element dan behavior yang sebenarnya.
+
+### 4. Gunakan `check()` untuk memastikan checkbox aktif
 
 ```ts
 await expressDelivery.check();
 ```
 
-Kalau checkbox sudah checked, `check()` akan membiarkannya checked. Kalau belum, Playwright akan mengubahnya lalu memverifikasi checked state. Hasilnya lebih aman terhadap perubahan starting state daripada blind click.
+Kalau checkbox sudah checked, `check()` akan membiarkannya tetap checked. Kalau belum, Playwright akan mengaktifkannya lalu memastikan checked state-nya sudah benar.
 
-Pakai `uncheck()` kalau required state-nya off. Untuk radio button, `check()` menjelaskan pilihan yang harus aktif. Radio button biasanya tidak di-uncheck secara langsung karena memilih option lain akan mengubah satu group.
+Ini lebih aman daripada langsung memakai `click()`, karena `click()` hanya melakukan toggle dari state saat ini.
 
-### 5. Jalankan business action lalu buktikan hasilnya
+Gunakan `uncheck()` kalau scenario membutuhkan checkbox dalam keadaan off.
+
+Untuk radio button, gunakan `check()` untuk memilih option yang harus aktif. Biasanya kita nggak perlu melakukan `uncheck()` pada radio button, karena memilih option lain dalam group yang sama akan otomatis mengganti pilihan.
+
+### 5. Lakukan action lalu verify hasilnya
 
 ```ts
 await placeOrder.click();
@@ -122,17 +140,19 @@ await expect(page.getByRole('status')).toHaveText(
 );
 ```
 
-Click menjelaskan aktivasi. Assertion menjelaskan buktinya. Kalau keduanya terlihat jelas, skenarionya lebih gampang di-review.
+`click()` digunakan untuk menjalankan action **Place order**. Setelah itu, assertion memastikan hasil yang diharapkan benar-benar muncul.
 
-Kalau requirement secara khusus mengatakan pengguna submit dengan Enter dari quantity field, barulah target behavior itu:
+Kalau requirement memang mengatakan user harus submit dengan menekan **Enter** dari quantity field, gunakan:
 
 ```ts
 await quantity.press('Enter');
 ```
 
-Pilih `locator.press()` ketika key ditujukan ke satu control. Gunakan `page.keyboard` hanya kalau global keyboard state memang sedang diuji, misalnya menahan Shift saat memilih beberapa item di seluruh page.
+Gunakan `locator.press()` kalau key tersebut memang ditujukan ke satu control tertentu.
 
-### 6. Perlakukan specialized action sesuai behavior-nya
+Gunakan `page.keyboard` kalau scenario memang membutuhkan keyboard interaction di level page, misalnya menahan **Shift** saat memilih beberapa item.
+
+### 6. Gunakan action lain sesuai interaction yang diuji
 
 Playwright juga mendukung interaction seperti:
 
@@ -144,53 +164,65 @@ await page
   .setInputFiles('tests/fixtures/failure.png');
 ```
 
-Path yang diberikan ke `setInputFiles()` harus benar-benar ada di filesystem test runner. In-memory file payload kecil bisa lebih cocok kalau yang diuji hanya upload behavior. Apa pun caranya, assert respons aplikasi terhadap file tersebut—jangan berhenti hanya karena method berhasil dijalankan.
+Untuk `setInputFiles()`, file yang digunakan harus tersedia di test environment.
+
+Kalau yang ingin diuji hanya behavior upload, kamu juga bisa menggunakan file payload yang dibuat langsung dari test.
+
+Apa pun caranya, jangan berhenti setelah action berhasil dijalankan. Tetap verify bagaimana aplikasi merespons file yang di-upload.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Pakai Playwright action dengan level tertinggi yang bisa menjelaskan skenario. Reviewer jadi bisa melihat hubungan langsung antara requirement dan code.
+Pilih Playwright action yang paling langsung menggambarkan interaction yang memang dilakukan user dalam scenario. Dengan begitu, hubungan antara requirement dan code lebih mudah dipahami saat review.
 
-Gunakan `fill()` untuk known field value. Gunakan `pressSequentially()` ketika per-character keyboard behavior memang feature yang diuji, bukan supaya automation terlihat lebih manusiawi. Gunakan `locator.press()` untuk key pada satu control dan `page.keyboard` untuk page-level keyboard state yang nyata.
+Gunakan `fill()` kalau yang penting adalah final value di field.
 
-Gunakan `check()` atau `uncheck()` ketika checkbox state yang penting. Raw `click()` cocok kalau toggle itu sendiri adalah behavior yang diuji, misalnya memastikan setiap click mengganti disclosure state.
+Gunakan `pressSequentially()` kalau aplikasi memang merespons setiap key press, misalnya autocomplete atau input yang punya behavior tertentu saat user mengetik. Jangan gunakan method ini hanya supaya automation terlihat lebih mirip user.
 
-Gunakan `selectOption()` hanya pada native `<select>`. Untuk custom dropdown, inspect semantics-nya lalu ikuti real interaction contract.
+Gunakan `locator.press()` kalau key ditujukan ke satu control tertentu. Gunakan `page.keyboard` kalau scenario memang membutuhkan keyboard interaction di level page.
 
-Jangan menjadikan `dispatchEvent('click')` sebagai pengganti rutin untuk user interaction. Method itu mengirim event secara programmatic, tanpa actionability check dan complete browser input sequence yang sama dengan real click. Pakai hanya ketika dispatch event itu sendiri memang requirement yang sengaja diuji.
+Gunakan `check()` atau `uncheck()` kalau yang penting adalah checkbox berada dalam state tertentu. `click()` tetap cocok kalau scenario memang menguji behavior toggle, misalnya memastikan setiap click membuka atau menutup sebuah section.
 
-Jangan memakai `click({ force: true })` sebagai default fix. Force bisa melewati sebagian actionability protection, termasuk pemeriksaan apakah elemen lain akan menerima click. Pertahankan hanya kalau interaksi yang tidak biasa memang intentional dan alasannya terdokumentasi.
+Gunakan `selectOption()` hanya untuk native `<select>`. Untuk custom dropdown, cek bagaimana component tersebut bekerja lalu ikuti interaction yang memang dilakukan user.
+
+Jangan gunakan `dispatchEvent('click')` sebagai pengganti normal `click()`. Method ini mengirim event secara langsung dan tidak menjalankan interaction browser dengan cara yang sama seperti user click.
+
+Gunakan hanya kalau scenario memang secara khusus membutuhkan event tersebut.
+
+Jangan langsung memakai `click({ force: true })` saat click gagal. `force` bisa melewati beberapa pengecekan Playwright, termasuk kondisi ketika element lain sebenarnya menghalangi click.
+
+Kalau memang perlu menggunakan `force`, pastikan ada alasan yang jelas dan sesuai dengan behavior yang ingin diuji.
 
 ## Kalau gagal, mulai cek dari mana?
 
-Saat action gagal, jangan langsung menambah sleep atau force. Mulai dari kontraknya:
+Kalau action gagal, jangan langsung menambah `sleep` atau memakai `force`. Cek dulu beberapa hal ini:
 
-1. Apakah locator menemukan control yang dimaksud secara unik?
-2. Apakah jenis control sesuai asumsi—native select, file input, checkbox, atau custom widget?
-3. Apakah control visible dan enabled pada business state saat ini?
-4. Apakah ada overlay, animation, sticky header, atau elemen lain yang menghalangi input?
-5. Apakah skenario butuh desired state seperti checked, bukan gesture seperti click?
-6. Apakah action sebenarnya berhasil tetapi expected result sesudahnya gagal? Kalau iya, itu masalah outcome, bukan action.
+1. Apakah locator sudah menemukan control yang tepat?
+2. Apakah jenis control-nya sesuai dengan action yang digunakan, misalnya native `<select>`, file input, checkbox, atau custom component?
+3. Apakah control tersebut visible dan enabled saat test dijalankan?
+4. Apakah ada overlay, animation, sticky header, atau element lain yang menghalangi interaction?
+5. Apakah scenario membutuhkan state tertentu, misalnya checkbox harus checked, bukan hanya melakukan `click()`?
+6. Apakah action sebenarnya sudah berhasil, tapi assertion setelahnya yang fail? Kalau iya, masalahnya kemungkinan ada pada hasil yang diharapkan, bukan pada action.
 
-Untuk upload yang gagal, periksa fixture path dari working directory runner, aturan size/type file, dan apakah aplikasi menampilkan validation di page yang sama.
+Kalau upload gagal, cek file path yang digunakan oleh test runner, aturan ukuran atau type file, dan validation message yang ditampilkan aplikasi.
 
-Untuk custom dropdown yang gagal, inspect accessible role dan interaction aslinya. Mengganti semantic flow dengan CSS dan force biasanya cuma menyembunyikan petunjuk penting.
+Kalau custom dropdown gagal, cek role dan cara user berinteraksi dengan component tersebut. Jangan langsung mengganti interaction-nya dengan CSS selector atau `force` hanya supaya test pass.
 
-Untuk setiap action, tanyakan:
+Saat review action di test code, cek beberapa hal ini:
 
-- Apakah method-nya menjelaskan required state atau hanya gesture?
-- Bisakah `click()` membalik checkbox yang sebenarnya sudah benar?
-- Apakah `pressSequentially()` menguji per-key behavior nyata atau cuma menambah delay?
-- Apakah `selectOption()` dipakai pada `<select>` sungguhan?
-- Apakah key press punya focused target yang benar?
-- Apakah code memakai `force`, `dispatchEvent`, atau page-level keyboard tanpa requirement yang membenarkannya?
-- Apakah ada observable assertion setelah action?
-- Apakah test tetap benar kalau starting state berubah?
+* Apakah action yang digunakan sesuai dengan state atau behavior yang dibutuhkan scenario?
+* Apakah `click()` bisa membuat checkbox yang sudah checked justru menjadi unchecked?
+* Apakah `pressSequentially()` memang dibutuhkan karena aplikasi merespons setiap key press, atau hanya menambah delay?
+* Apakah `selectOption()` digunakan pada native `<select>`?
+* Apakah key press dikirim ke control yang tepat?
+* Apakah `force`, `dispatchEvent`, atau `page.keyboard` digunakan tanpa alasan yang jelas dari requirement?
+* Apakah ada assertion setelah action untuk verify hasilnya?
+* Apakah test tetap benar kalau starting state berubah?
 
-Interaction syntax yang terlihat masuk akal belum cukup. Tugasmu adalah menentukan apakah syntax itu benar-benar mewakili user behavior dan product risk.
+Code interaction yang kelihatannya benar belum tentu sesuai dengan scenario. Saat review, pastikan action yang dipilih memang sama dengan cara user berinteraksi dan behavior yang ingin diuji.
 
 ## Coba cek pemahamanmu
 
-Review kode notification settings ini:
+Review code notification settings berikut:
 
 ```ts
 await page.getByLabel('Email alerts').click();
@@ -200,25 +232,37 @@ await page.keyboard.type('qa@example.com', { delay: 100 });
 await page.getByText('Save').click({ force: true });
 ```
 
-Ternyata Email alerts adalah checkbox yang harus aktif, Frequency adalah native `<select>`, email field punya label Notification email, dan Save adalah visible button yang seharusnya bisa di-click secara normal.
+Ternyata:
 
-Jelaskan action mana yang perlu diubah, intent apa yang dijelaskan oleh penggantinya, dan result apa yang perlu di-assert.
+* **Email alerts** adalah checkbox yang harus aktif;
+* **Frequency** adalah native `<select>`;
+* email field punya label **Notification email**; dan
+* **Save** adalah button yang seharusnya bisa di-click secara normal.
+
+Coba jelaskan:
+
+1. Action mana yang perlu diubah?
+2. Action apa yang lebih sesuai untuk masing-masing control?
+3. Kenapa action tersebut lebih sesuai dengan scenario?
+4. Setelah **Save**, hasil apa yang perlu diverifikasi?
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu pendekatan yang masuk akal:
+Contoh jawaban:
 
-- pakai `check()` untuk Email alerts karena enabled adalah required state;
-- pakai `selectOption({ label: 'Daily' })` untuk native Frequency select;
-- pakai `getByLabel('Notification email').fill('qa@example.com')` karena hanya final value yang penting;
-- pakai button-role locator dan normal `click()` untuk Save;
-- investigasi kenapa kode memakai force, jangan langsung mempertahankannya; dan
-- assert saved status yang spesifik atau persisted value setelah reload, sesuai requirement.
+* gunakan `check()` untuk **Email alerts** karena scenario membutuhkan checkbox dalam keadaan checked;
+* gunakan `selectOption({ label: 'Daily' })` untuk native **Frequency** `<select>`;
+* gunakan `getByLabel('Notification email').fill('qa@example.com')` karena yang penting adalah final value di field;
+* gunakan locator dengan role `button` dan normal `click()` untuk **Save**;
+* cek kenapa code sebelumnya membutuhkan `force`, jangan langsung mempertahankannya; dan
+* setelah **Save**, verify confirmation message atau value yang tetap tersimpan setelah reload, sesuai dengan requirement.
 
-Perbaikan utamanya bukan jumlah line yang lebih sedikit. Sekarang setiap action menjelaskan state atau behavior yang ingin dibuat oleh test.
+Perbaikan utamanya bukan membuat code menjadi lebih pendek. Yang penting, setiap action sekarang sesuai dengan control dan behavior yang memang dibutuhkan oleh scenario.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya sudah bisa memilih action dari scenario intent, membedakan state-setting dari toggling, dan mengkritisi kode yang menambah low-level input atau force tanpa alasan.
+Sekarang kamu seharusnya sudah bisa memilih action Playwright berdasarkan cara user berinteraksi dengan aplikasi, membedakan kapan perlu mengatur state tertentu dan kapan `click()` memang cukup, serta me-review penggunaan low-level interaction atau `force` yang nggak punya alasan jelas.
 
-Selesaikan Core Practice yang menggabungkan form value, checkbox state, dan checkout outcome. Mapped Additional Practice mencakup behavior fill, selection, checkbox, keyboard, dan upload. Exercise click, hover, dan drag-and-drop tetap tersedia sebagai standalone Practice kalau project membutuhkannya.
+Selesaikan Core Practice yang menggabungkan pengisian form, checkbox state, dan checkout result.
+
+Additional Practice juga tersedia untuk latihan `fill()`, selection, checkbox, keyboard, dan upload. Exercise untuk click, hover, dan drag-and-drop tetap bisa dikerjakan secara terpisah kalau memang relevan dengan project yang kamu kerjakan.
