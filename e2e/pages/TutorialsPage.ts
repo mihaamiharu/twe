@@ -11,9 +11,7 @@ export class TutorialsPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.tutorialCards = page.locator('a[href*="/learn/"][class*="group"]');
-    this.completeButton = page.getByRole('button', {
-      name: /Complete & Continue|Selesai & Lanjutkan/i,
-    });
+    this.completeButton = page.getByTestId('complete-tutorial');
     this.hideCompletedToggle = page.getByRole('button', {
       name: /Show remaining only|Show all lessons|Tampilkan yang belum selesai saja|Tampilkan semua pelajaran|Hide Completed|Show Completed|Sembunyikan Selesai|Tampilkan Selesai/i,
     });
@@ -56,7 +54,9 @@ export class TutorialsPage extends BasePage {
   async completeTutorial() {
     await this.completeButton.click();
     await expect(
-      this.page.getByText('Completed! 🎉', { exact: true }),
+      this.page
+        .getByTestId('lesson-status')
+        .getByText('Completed! 🎉', { exact: true }),
     ).toBeVisible();
   }
 }

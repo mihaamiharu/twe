@@ -225,14 +225,39 @@ test.describe('Tutorials', () => {
     await page.goto('/en/learn/dom-tree-hierarchy');
     await page.waitForLoadState('networkidle');
 
-    const completeButton = page.getByRole('button', {
-      name: 'Sign in to Save Progress',
-    });
+    const completeButton = page
+      .getByTestId('lesson-status')
+      .getByRole('button', { name: 'Sign in to Save Progress' });
     await expect(completeButton).toBeVisible();
     await completeButton.click();
     await expect(page.getByRole('dialog')).toContainText(
       'Sign in to Save Progress',
     );
+  });
+
+  test('should offer completion after the lesson content at every breakpoint', async ({
+    page,
+  }) => {
+    for (const viewport of [
+      { width: 753, height: 1044 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/en/learn/css-selector-strategies');
+
+      const completionFooter = page.getByTestId('lesson-completion-footer');
+      await completionFooter.scrollIntoViewIfNeeded();
+
+      await expect(completionFooter).toBeVisible();
+      await expect(
+        completionFooter.getByRole('button', {
+          name: 'Mark lesson complete',
+        }),
+      ).toBeVisible();
+      await expect(
+        completionFooter.getByRole('heading', { name: 'Finished reading?' }),
+      ).toBeVisible();
+    }
   });
 
   test('should mark tutorial as complete and persist it', async ({ page }) => {
@@ -250,7 +275,9 @@ test.describe('Tutorials', () => {
     await page.reload();
     await tutorialsPage.verifyTutorialContent();
     await expect(
-      page.getByText('Completed! 🎉', { exact: true }),
+      page
+        .getByTestId('lesson-status')
+        .getByText('Completed! 🎉', { exact: true }),
     ).toBeVisible();
   });
 });

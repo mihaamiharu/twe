@@ -398,6 +398,38 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
             className="min-w-0"
           >
             <MarkdownRenderer content={tutorial.content} />
+            <section
+              aria-labelledby="lesson-completion-title"
+              className="mt-12"
+              data-testid="lesson-completion-footer"
+            >
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader className="pb-2">
+                  <h2
+                    id="lesson-completion-title"
+                    className="text-lg font-semibold text-foreground"
+                  >
+                    {isCompleted
+                      ? t('sidebar.completedTitle')
+                      : t('detail.completionTitle')}
+                  </h2>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {isCompleted
+                      ? t('detail.completionCompletedDescription')
+                      : t('detail.completionDescription')}
+                  </p>
+                  <LessonCompletionControl
+                    isCompleted={isCompleted}
+                    isPending={markCompleteMutation.isPending}
+                    isAuthenticated={Boolean(userId)}
+                    onComplete={handleComplete}
+                    testId="complete-tutorial-footer"
+                  />
+                </CardContent>
+              </Card>
+            </section>
             <LessonNavigation
               locale={locale}
               previousTutorial={tutorial.previousTutorial}
@@ -417,28 +449,13 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-5">
-                {!isCompleted ? (
-                  <Button
-                    className="w-full whitespace-normal text-center"
-                    onClick={handleComplete}
-                    disabled={markCompleteMutation.isPending}
-                    data-testid="complete-tutorial"
-                  >
-                    {!userId && <LockKeyhole aria-hidden="true" />}
-                    {markCompleteMutation.isPending
-                      ? t('common:messages.saving')
-                      : !userId
-                        ? t('auth:guard.title')
-                        : t('sidebar.completeAndContinue')}
-                  </Button>
-                ) : (
-                  <div className="flex items-center gap-2 rounded-md border border-brand-success/30 bg-brand-success/10 p-4 text-brand-success">
-                    <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
-                    <span className="text-sm font-semibold">
-                      {t('sidebar.completedTitle')}
-                    </span>
-                  </div>
-                )}
+                <LessonCompletionControl
+                  isCompleted={isCompleted}
+                  isPending={markCompleteMutation.isPending}
+                  isAuthenticated={Boolean(userId)}
+                  onComplete={handleComplete}
+                  testId="complete-tutorial"
+                />
 
                 <div className="space-y-3 border-t border-border pt-4 text-sm">
                   <div className="flex items-center justify-between gap-4">
@@ -540,6 +557,52 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
         description={t('auth:guard.description')}
       />
     </main>
+  );
+}
+
+function LessonCompletionControl({
+  isCompleted,
+  isPending,
+  isAuthenticated,
+  onComplete,
+  testId,
+}: {
+  isCompleted: boolean;
+  isPending: boolean;
+  isAuthenticated: boolean;
+  onComplete: () => void;
+  testId: string;
+}) {
+  const { t } = useTranslation(['tutorials', 'common', 'auth']);
+
+  if (isCompleted) {
+    return (
+      <div
+        className="flex items-center gap-2 rounded-md border border-brand-success/30 bg-brand-success/10 p-4 text-brand-success"
+        role="status"
+      >
+        <CheckCircle2 className="h-5 w-5" aria-hidden="true" />
+        <span className="text-sm font-semibold">
+          {t('sidebar.completedTitle')}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      className="w-full whitespace-normal text-center"
+      onClick={onComplete}
+      disabled={isPending}
+      data-testid={testId}
+    >
+      {!isAuthenticated && <LockKeyhole aria-hidden="true" />}
+      {isPending
+        ? t('common:messages.saving')
+        : !isAuthenticated
+          ? t('auth:guard.title')
+          : t('sidebar.markComplete')}
+    </Button>
   );
 }
 

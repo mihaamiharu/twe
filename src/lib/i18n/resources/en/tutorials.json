@@ -86,7 +86,7 @@
   },
   "sidebar": {
     "status": "Lesson status",
-    "completeAndContinue": "Complete & Continue",
+    "markComplete": "Mark lesson complete",
     "completedTitle": "Completed! 🎉",
     "nextLabel": "Next: {{title}}",
     "duration": "Duration",
@@ -101,6 +101,9 @@
     "contentLabel": "Lesson content",
     "tagsLabel": "Lesson topics",
     "tocTitle": "On this page",
+    "completionTitle": "Finished reading?",
+    "completionDescription": "Mark this lesson as complete before moving on.",
+    "completionCompletedDescription": "This lesson is complete. Continue with the lesson navigation below.",
     "lessonNavigationLabel": "Lesson navigation"
   },
   "toasts": {

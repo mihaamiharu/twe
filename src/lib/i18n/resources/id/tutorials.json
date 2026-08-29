@@ -86,7 +86,7 @@
   },
   "sidebar": {
     "status": "Status pelajaran",
-    "completeAndContinue": "Selesai & Lanjutkan",
+    "markComplete": "Tandai pelajaran selesai",
     "completedTitle": "Selesai! 🎉",
     "nextLabel": "Berikutnya: {{title}}",
     "duration": "Durasi",
@@ -101,6 +101,9 @@
     "contentLabel": "Konten pelajaran",
     "tagsLabel": "Topik pelajaran",
     "tocTitle": "Di halaman ini",
+    "completionTitle": "Selesai membaca?",
+    "completionDescription": "Tandai pelajaran ini sebagai selesai sebelum melanjutkan.",
+    "completionCompletedDescription": "Pelajaran ini sudah selesai. Lanjutkan melalui navigasi pelajaran di bawah.",
     "lessonNavigationLabel": "Navigasi pelajaran"
   },
   "toasts": {
