@@ -1,81 +1,83 @@
 ---
-title: 'Ubah Product Risk Menjadi Skenario yang Fokus'
-description: 'Bangun test portfolio kecil dan independen dari business rule, meaningful boundary, serta observable evidence.'
+title: 'Tentukan Test Scenario Berdasarkan Product Risk'
+description: 'Tentukan test scenario berdasarkan product risk, lalu pisahkan setiap behavior supaya test lebih jelas, fokus, dan mudah di-debug.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- mengubah product risk menjadi precondition, action, dan expected result yang fokus;
-- membedakan useful positive, negative, atau boundary scenario dari variasi yang cuma berbeda label;
-- memilih portfolio kecil yang mencakup failure mode berbeda tanpa menduplikasi flow yang sama;
-- menjaga satu skenario tetap fokus sambil memakai related assertion secukupnya; serta
-- me-review test case yang mengarang behavior, membuat optional path, atau menyimpan hidden dependency.
+- menentukan precondition, action, dan expected result dari product risk yang ingin diuji;
+- membedakan positive, negative, dan boundary scenario yang memang memberi coverage berbeda dari variasi yang sebenarnya menguji hal yang sama;
+- memilih beberapa test scenario yang mewakili failure mode berbeda tanpa mengulang flow yang sama;
+- menjaga setiap test tetap fokus sambil menambahkan assertion yang memang dibutuhkan untuk expected result; serta
+- me-review test case yang menguji behavior di luar requirement, membuat flow jadi membingungkan, atau punya dependency yang bikin test sulit dijalankan sendiri.
 
 ## Kenapa ini penting buat QA
 
-“Automate checkout page” terdengar seperti sebuah task, tapi itu belum menjadi test design.
+**“Automate checkout page”** terdengar seperti sebuah task, tapi itu belum cukup untuk menentukan test apa yang perlu dibuat.
 
-Checkout page bisa gagal dengan cara yang sangat berbeda:
+Checkout bisa gagal dengan banyak cara:
 
-- available product tidak bisa dibeli;
-- out-of-stock product masuk ke cart;
-- declined payment tetap membuat order;
-- quantity rule menerima value di luar range; atau
-- satu customer bisa melihat order customer lain.
+- produk yang tersedia nggak bisa dibeli;
+- produk yang out of stock tetap bisa masuk ke cart;
+- payment yang declined tetap membuat order;
+- quantity di luar range masih diterima; atau
+- satu customer bisa melihat order milik customer lain.
 
-Satu happy-path script panjang nggak mencakup semua risk tersebut. Dua puluh variation dari script yang sama juga belum tentu membantu.
+Satu happy-path test yang panjang nggak akan mencakup semua risiko tersebut. Tapi membuat banyak test yang hanya mengulang flow yang sama dengan data berbeda juga belum tentu memberi coverage yang berguna.
 
-Automation seharusnya mempertahankan reasoning dari manual test yang bagus: starting state-nya deliberate, action-nya menguji satu rule, dan expected result-nya bisa mengekspos failure yang penting.
+Test automation tetap perlu mengikuti cara berpikir yang sama seperti saat kita membuat manual test yang baik: starting state-nya jelas, action-nya menguji behavior tertentu, dan expected result-nya bisa menunjukkan kalau behavior tersebut salah.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Rancang setiap skenario sebagai risk contract:
+Susun setiap scenario dari risk yang memang ingin diuji:
 
 ```text
-Risk atau business rule
+Product risk atau business rule
           ↓
-Controlled precondition dan data
+Starting state dan test data
           ↓
-Satu behavior yang diuji
+Satu behavior yang ingin diuji
           ↓
-Smallest sufficient observable evidence
+Expected result yang perlu diverifikasi
 ```
 
-Setelah itu, bangun portfolio dengan memilih skenario yang punya alasan gagal berbeda:
+Setelah itu, pilih beberapa scenario yang mewakili kemungkinan failure yang berbeda:
 
-![Checkout rule diubah menjadi focused portfolio yang berisi core positive scenario, business-rule negative scenario, dan meaningful boundary scenario, masing-masing dengan precondition, action, serta evidence sendiri.](/images/tutorials/risk-scenario-portfolio.svg)
+![Checkout rule diubah menjadi beberapa scenario yang fokus: positive scenario, negative scenario untuk business rule, dan boundary scenario. Masing-masing punya precondition, action, serta expected result sendiri.](/images/tutorials/risk-scenario-portfolio.svg)
 
-_Positive, negative, dan boundary adalah lens yang berguna. Product rule—bukan label—yang menentukan isinya._
+_Positive, negative, dan boundary membantu kita melihat scenario dari sisi yang berbeda. Tapi isi test tetap ditentukan oleh product rule, bukan sekadar label tersebut._
 
-Gunakan pertanyaan ini untuk setiap candidate:
+Untuk setiap test scenario, tanyakan:
 
-> Kalau skenario ini gagal, product risk spesifik apa yang berhasil kita pelajari?
+> Kalau test ini fail, product risk apa yang sedang ditunjukkan?
 
-Kalau dua test memberi jawaban yang sama, dengan data boundary dan evidence yang sama, kemungkinan keduanya duplikat. Kalau satu test punya lima jawaban yang nggak berkaitan, kemungkinan perlu di-split.
+Kalau dua test menguji risk, boundary, dan expected result yang sama, kemungkinan salah satunya hanya mengulang coverage yang sudah ada.
+
+Sebaliknya, kalau satu test mencoba menguji banyak behavior yang nggak berkaitan sekaligus, lebih baik pisahkan menjadi beberapa scenario yang lebih fokus.
 
 ## Coba kita bedah contoh nyata
 
 Product rule checkout-nya adalah:
 
-- hanya available product yang boleh di-order;
+- hanya produk yang available yang boleh di-order;
 - quantity harus dari 1 sampai 10;
 - declined payment tidak boleh membuat order; dan
-- successful order menampilkan satu generated order number.
+- successful order harus menampilkan satu generated order number.
 
-### 1. Buat risk table sebelum menulis code
+### 1. Susun scenario dari masing-masing risk sebelum menulis code
 
-| Risk                                      | Controlled precondition                | Action                | Sufficient evidence                                    |
-| ----------------------------------------- | -------------------------------------- | --------------------- | ------------------------------------------------------ |
-| Valid purchase gagal                      | Available item, quantity 1, valid card | Submit checkout       | Confirmation dan satu order number                     |
-| Out-of-stock item terbeli                 | Item secara eksplisit out of stock     | Coba tambahkan item   | Guidance muncul dan nggak ada cart line untuk item itu |
-| Declined payment membuat order            | Available item, declined test payment  | Submit checkout       | Decline alert dan nggak ada order number               |
-| Quantity boundary diterapkan dengan salah | Available item                         | Coba 0, 1, 10, dan 11 | Boundary-specific acceptance atau guidance             |
+| Risk                           | Starting state dan test data           | Action                         | Expected result                                                   |
+| ------------------------------ | -------------------------------------- | ------------------------------ | ----------------------------------------------------------------- |
+| Valid purchase gagal           | Available item, quantity 1, valid card | Submit checkout                | Confirmation muncul dan satu order number ditampilkan             |
+| Out-of-stock item terbeli      | Item sudah dalam state out of stock    | Coba tambahkan item            | Guidance muncul dan item tidak masuk ke cart                      |
+| Declined payment membuat order | Available item, declined test payment  | Submit checkout                | Decline alert muncul dan order number tidak dibuat                |
+| Quantity boundary salah        | Available item                         | Coba quantity 0, 1, 10, dan 11 | Value valid diterima dan value di luar range menampilkan guidance |
 
-Table ini lebih berguna daripada “satu positive test dan tiga negative test.” Table-nya menjelaskan kenapa setiap skenario ada.
+Table ini lebih berguna daripada hanya memberi label **satu positive test dan tiga negative test**. Dari sini kita bisa langsung melihat alasan kenapa setiap scenario perlu ada.
 
-### 2. Pilih satu core positive scenario
+### 2. Pilih satu positive scenario utama
 
-Positive scenario membuktikan supported flow yang paling bernilai:
+Positive scenario digunakan untuk memastikan flow utama yang memang seharusnya berhasil:
 
 ```text
 Given active customer dan available Widget Pro
@@ -85,11 +87,13 @@ Then order confirmation muncul
 And tepat satu generated order number ditampilkan
 ```
 
-Confirmation dan identifier adalah related evidence untuk satu behavior. Beberapa assertion memang tepat di sini.
+Di scenario ini, confirmation dan order number sama-sama dibutuhkan untuk memastikan order berhasil dibuat.
 
-Jangan ikut meng-assert navigation bar, footer, theme, dan unrelated account field. Failure dari bagian itu nggak menjelaskan apakah checkout bekerja.
+Jadi, beberapa assertion tetap masuk akal selama semuanya masih memverifikasi behavior yang sama.
 
-### 3. Rancang business-rule negative scenario
+Nggak perlu ikut mengecek navigation bar, footer, theme, atau account field lain yang nggak berhubungan dengan checkout. Kalau bagian tersebut fail, kita jadi sulit tahu apakah masalahnya benar-benar ada di checkout atau bukan.
+
+### 3. Buat negative scenario untuk business rule
 
 Sekarang fokus ke declined payment:
 
@@ -106,41 +110,53 @@ test('declined payment shows guidance and creates no order', async ({
 });
 ```
 
-Anggap test environment aplikasi ini memang sengaja memetakan documented test card tersebut menjadi decline. Jangan pernah memakai real payment credential.
+Anggap test environment memang sudah dikonfigurasi supaya test card tersebut menghasilkan declined payment. Jangan pernah menggunakan real payment credential di automation test.
 
-Exact decline alert melakukan sinkronisasi dengan failed-payment outcome. Tidak adanya order number menambah evidence bahwa dangerous side effect tidak terjadi. Skenario harus dimulai tanpa confirmation sisa dari test lain. Module 7 akan membahas cara menerapkan isolation dan data control ini dengan andal.
+Assertion **Payment declined** memastikan payment memang ditolak. Setelah itu, test juga memastikan order number tidak dibuat.
 
-### 4. Pilih meaningful boundary
+Kedua assertion ini penting karena scenario bukan hanya mengecek error message, tapi juga memastikan order tidak tetap dibuat setelah payment gagal.
 
-Allowed quantity range adalah 1 sampai 10. Partition yang berguna:
+Pastikan juga scenario dimulai tanpa confirmation atau order number yang tersisa dari test sebelumnya. Module 7 akan membahas isolation dan test data lebih lanjut.
 
-- valid interior: representative value seperti 5;
+### 4. Pilih boundary yang memang perlu diuji
+
+Allowed quantity range adalah 1 sampai 10. Beberapa value yang cukup mewakili rule tersebut:
+
+- value normal di dalam range, misalnya 5;
 - minimum valid: 1;
 - maximum valid: 10;
 - tepat di bawah minimum: 0; dan
 - tepat di atas maximum: 11.
 
-Menguji 2, 3, 4, 5, 6, 7, 8, dan 9 lewat browser biasanya hanya mengulang rule yang sama. Tambahkan combination kalau memang ada implementation path atau risk yang berbeda. Validation logic mungkin butuh deeper coverage di lower layer, sedangkan browser test membuktikan critical user contract.
+Menguji semua value dari 2 sampai 9 lewat browser biasanya hanya mengulang behavior yang sama.
 
-### 5. Jaga design setiap skenario tetap independen
+Tambahkan case lain kalau memang ada risk atau behavior berbeda yang perlu diuji.
 
-Hindari hidden sequence ini:
+Validation logic bisa diuji lebih detail di layer yang lebih rendah, sedangkan browser test cukup memastikan rule penting tersebut bekerja dengan benar dari sisi user.
+
+### 5. Pastikan setiap test bisa dijalankan sendiri
+
+Hindari dependency seperti ini:
 
 ```text
 Test A membuat customer
         ↓
-Test B mengasumsikan customer itu ada
+Test B mengandalkan customer dari Test A
         ↓
 Test C menghapus customer yang sama
 ```
 
-Kalau Test A gagal atau execution order berubah, B dan C memberi failure yang misleading. Setiap skenario harus bisa membuat atau memperoleh required state-nya sendiri. Sedikit explicit setup duplication kadang lebih jelas daripada order-dependent suite.
+Kalau Test A fail atau urutan eksekusi berubah, Test B dan Test C bisa ikut fail padahal behavior yang mereka uji sebenarnya nggak bermasalah.
 
-Lesson ini mendefinisikan independence requirement. Module berikutnya membahas browser context, test data, authentication state, cleanup, dan pilihan implementasi yang praktis.
+Setiap test sebaiknya menyiapkan atau mendapatkan state yang dibutuhkan sendiri.
 
-### 6. Hindari optional logic di behavior yang sedang diuji
+Sedikit setup yang diulang kadang justru lebih jelas daripada membuat test saling bergantung pada urutan.
 
-Test sering berisi:
+Di lesson ini kita fokus dulu pada prinsip bahwa setiap test harus bisa berjalan secara independen. Module berikutnya akan membahas browser context, test data, authentication state, cleanup, dan cara implementasinya.
+
+### 6. Jangan membuat expected behavior menjadi optional
+
+Test kadang ditulis seperti ini:
 
 ```ts
 if (await page.getByRole('alert').isVisible()) {
@@ -148,82 +164,106 @@ if (await page.getByRole('alert').isVisible()) {
 }
 ```
 
-Kalau alert adalah expected result, code ini bisa melewati assertion lalu lulus saat produk rusak. Kontrol precondition, lakukan action, dan wajibkan alert-nya muncul.
+Kalau alert **Out of stock** memang expected result, code seperti ini bermasalah.
 
-Conditional setup kadang valid untuk environment noise di luar skenario, tapi jangan sampai membuat product behavior menjadi optional.
+Saat alert tidak muncul, test hanya melewati assertion dan tetap bisa pass.
+
+Lebih baik kontrol starting state, jalankan action, lalu langsung verify bahwa alert yang diharapkan memang muncul.
+
+Conditional logic masih bisa digunakan untuk setup tertentu yang memang bisa berbeda antar-environment. Tapi jangan gunakan condition untuk membuat behavior yang sedang diuji menjadi optional.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Gunakan core positive scenario untuk supported flow yang bernilai. Tambahkan negative scenario untuk business rule yang kalau dilanggar menimbulkan product, financial, security, atau user-experience risk. Tambahkan boundary scenario ketika behavior berubah pada limit tertentu.
+Gunakan positive scenario untuk flow utama yang memang penting bagi user atau business.
 
-Jangan membuat satu negative test untuk setiap random invalid string. Kelompokkan value yang menguji rule sama ke equivalence partition, lalu pilih representative case. Tambahkan lebih banyak hanya jika encoding, locale, formatting, security, atau implementation path membuat risk yang berbeda.
+Tambahkan negative scenario untuk business rule yang kalau gagal bisa menyebabkan masalah pada product, financial, security, atau user experience.
 
-Jaga satu behavior per scenario, tapi izinkan beberapa assertion yang bersama-sama membuktikan behavior tersebut. Split ketika setup, action, expected result, atau failure diagnosis mewakili rule berbeda.
+Tambahkan boundary scenario kalau behavior berubah pada batas tertentu.
 
-Browser automation bukan layer yang tepat untuk semua combination. Gunakan lower-level test untuk exhaustive calculation atau validation permutation saat browser nggak memberi signal tambahan. Pertahankan end-to-end coverage untuk critical user journey dan integration boundary.
+Nggak perlu membuat satu negative test untuk setiap random invalid value. Kalau beberapa value sebenarnya menguji rule yang sama, kelompokkan sebagai satu category lalu pilih beberapa representative case yang cukup.
 
-Jangan menggabungkan skenario hanya untuk menghemat setup time. Jangan memisahkannya hanya demi aturan “one assertion per test.” Optimalkan meaningful failure report dan maintainable product feedback.
+Tambahkan case lain hanya kalau memang ada risk berbeda, misalnya karena format, locale, encoding, security, atau behavior aplikasi yang berbeda.
+
+Usahakan satu scenario fokus pada satu behavior. Beberapa assertion tetap boleh digunakan kalau semuanya masih memverifikasi behavior yang sama.
+
+Pisahkan menjadi test lain kalau setup, action, expected result, atau alasan failure-nya sudah menguji rule yang berbeda.
+
+Browser automation juga nggak harus menguji semua combination. Untuk calculation atau validation yang punya banyak variasi, test di layer yang lebih rendah biasanya lebih efisien.
+
+Gunakan browser test untuk flow atau integration yang memang penting dari sisi user dan perlu diverifikasi secara end-to-end.
+
+Jangan menggabungkan banyak scenario hanya supaya setup lebih cepat. Tapi jangan juga memisahkan test hanya karena ingin mengikuti aturan seperti **“satu assertion per test.”**
+
+Yang lebih penting adalah ketika test fail, kita bisa langsung memahami behavior apa yang bermasalah dan kenapa.
 
 ## Kalau gagal, mulai cek dari mana?
 
-Kalau suite noisy, lambat, atau sulit dipercaya, audit design-nya sebelum menambah retry:
+Kalau test suite mulai sering fail, lambat, atau sulit di-maintain, cek dulu design test-nya sebelum menambah retry.
 
-1. Apakah setiap test bisa menyebutkan risk atau rule yang dicakup?
-2. Apakah precondition eksplisit dan controlled?
-3. Apakah test bergantung pada data atau side effect dari test lain?
-4. Apakah conditional logic membuat expected behavior bisa dilewati?
-5. Apakah banyak test mengulang equivalence partition yang sama?
-6. Apakah satu test menggabungkan beberapa unrelated business outcome?
-7. Apakah failure message bisa mengenali broken rule?
-8. Apakah browser test mencakup permutation yang lebih cocok di lower layer?
+1. Apakah setiap test punya product risk atau business rule yang jelas?
+2. Apakah starting state dan test data sudah dikontrol?
+3. Apakah test bergantung pada data atau hasil dari test lain?
+4. Apakah ada conditional logic yang membuat expected behavior bisa terlewat?
+5. Apakah banyak test sebenarnya menguji rule yang sama dengan data berbeda?
+6. Apakah satu test mencoba menguji beberapa business behavior yang nggak berkaitan?
+7. Kalau test fail, apakah kita bisa langsung tahu rule mana yang bermasalah?
+8. Apakah ada banyak variasi yang sebenarnya lebih cocok diuji di layer yang lebih rendah?
 
-Kalau negative scenario unexpectedly pass, pastikan test benar-benar mencapai intended invalid state. Kalau skenario hanya gagal saat parallel, curigai shared identity, inventory, order, atau account data. Jangan menyelesaikan order dependency dengan memaksa serial execution sebelum memahami shared state-nya.
+Kalau negative scenario malah pass, cek apakah test benar-benar sudah berada di invalid state yang ingin diuji.
 
-Review skenario yang diusulkan dengan pertanyaan berikut:
+Kalau test hanya fail saat dijalankan parallel, cek apakah beberapa test memakai account, inventory, order, atau data lain yang sama.
 
-- Apakah usulan tersebut mengasumsikan requirement, test account, boundary, atau expected message tanpa bukti?
-- Bisakah setiap skenario ditelusuri ke business rule atau product risk?
-- Apakah label “positive” dan “negative” menyembunyikan duplicate flow?
-- Apakah boundary dipilih di sekitar perubahan rule yang nyata?
-- Apakah ada `if` statement yang membuat expected outcome menjadi optional?
-- Apakah satu test bergantung pada data atau execution order test lain?
-- Apakah unrelated assertion ikut masuk hanya karena gampang ditambahkan?
-- Apakah sensitive data muncul di source, title, log, atau report?
-- Bisakah important permutation dicakup lebih cepat dan jelas di bawah UI layer?
-- Bisakah kamu menjelaskan kenapa setiap retained scenario layak mendapat maintenance cost?
+Jangan langsung mengubah suite menjadi serial hanya supaya test pass. Cari dulu shared state atau test data yang menyebabkan conflict.
 
-Daftar test bisa memanjang tanpa batas. QA judgment menentukan portfolio terkecil yang memberi confidence berguna.
+Saat review test scenario, cek beberapa hal ini:
+
+- Apakah scenario menggunakan requirement, test account, boundary, atau expected message yang belum dikonfirmasi?
+- Apakah setiap scenario memang berasal dari business rule atau product risk yang jelas?
+- Apakah beberapa positive atau negative scenario sebenarnya hanya mengulang flow yang sama?
+- Apakah boundary case dipilih di sekitar batas yang memang mengubah behavior?
+- Apakah ada `if` yang membuat expected result menjadi optional?
+- Apakah satu test bergantung pada data atau urutan eksekusi test lain?
+- Apakah ada assertion yang nggak berhubungan dengan behavior yang sedang diuji?
+- Apakah sensitive data muncul di source code, test title, log, atau report?
+- Apakah beberapa variasi bisa diuji lebih cepat dan lebih jelas di layer selain UI?
+- Apakah setiap scenario memang cukup penting untuk terus di-maintain?
+
+Jumlah test bisa terus bertambah. Yang penting bukan membuat test sebanyak mungkin, tapi memilih scenario yang benar-benar membantu tim menemukan masalah yang penting.
 
 ## Coba cek pemahamanmu
 
-Sebuah usulan suite untuk quantity rule 1 sampai 10 berisi test berikut:
+Sebuah usulan test suite untuk quantity rule 1 sampai 10 berisi scenario berikut:
 
 1. quantity 1 berhasil;
 2. quantity 2 berhasil;
 3. quantity 3 berhasil;
 4. quantity 4 berhasil;
 5. quantity 11 menampilkan error;
-6. valid purchase berhasil, lalu test kedua memakai ulang order tersebut untuk menguji cancellation; dan
-7. out-of-stock test hanya meng-assert guidance kalau guidance kebetulan muncul.
+6. valid purchase berhasil, lalu test lain menggunakan order tersebut untuk menguji cancellation; dan
+7. out-of-stock test hanya mengecek guidance kalau guidance tersebut muncul.
 
-Tentukan skenario mana yang perlu dipertahankan, ditambah, di-merge, di-split, atau dirancang ulang. Jelaskan risk di balik setiap keputusan.
+Tentukan scenario mana yang perlu dipertahankan, ditambah, digabung, dipisahkan, atau diperbaiki. Jelaskan alasan di balik setiap keputusan.
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh jawaban:
 
-- Pertahankan quantity 1 karena itu minimum valid boundary.
-- Ganti repeated case 2, 3, dan 4 dengan satu representative valid interior value kecuali memang menguji rule berbeda.
-- Tambahkan quantity 10 dan 0 untuk maximum valid dan just-below-minimum boundary; pertahankan 11 untuk just above maximum.
-- Tentukan apakah exhaustive numeric validation lebih cocok di lower test layer.
-- Buat cancellation menciptakan atau memperoleh order sendiri, bukan bergantung pada previous test.
-- Hapus conditional pada out-of-stock guidance; establish out-of-stock state secara eksplisit, lalu wajibkan guidance dan absence of cart line.
-- Pertahankan satu core successful purchase scenario dengan sufficient confirmation evidence.
+- Pertahankan quantity 1 karena itu adalah minimum valid boundary.
+- Quantity 2, 3, dan 4 nggak perlu semuanya diuji lewat browser kalau behavior-nya sama. Pilih satu value di tengah range sebagai representative case.
+- Tambahkan quantity 10 untuk maximum valid boundary dan quantity 0 untuk value tepat di bawah minimum. Quantity 11 tetap dipertahankan untuk value tepat di atas maximum.
+- Kalau numeric validation punya banyak variasi, pertimbangkan apakah sebagian coverage lebih cocok diuji di layer yang lebih rendah.
+- Test cancellation harus membuat atau mendapatkan order-nya sendiri, bukan bergantung pada hasil dari test sebelumnya.
+- Hapus condition pada out-of-stock scenario. Pastikan starting state memang out of stock, lalu langsung verify guidance muncul dan item tidak masuk ke cart.
+- Tetap punya satu positive purchase scenario utama yang memastikan order benar-benar berhasil dibuat.
 
-Final portfolio-nya lebih kecil tapi mencakup lebih banyak distinct failure mode.
+Hasil akhirnya lebih sedikit test, tapi setiap scenario punya alasan yang jelas dan menguji kemungkinan failure yang berbeda.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa mengubah business rule menjadi focused positive, negative, dan boundary scenario; memilih portfolio yang tidak duplikatif; serta mengenali hidden dependency atau optional expected result.
+Sekarang kamu seharusnya sudah bisa menentukan positive, negative, dan boundary scenario dari sebuah business rule, menghindari test yang hanya mengulang coverage yang sama, serta mengenali dependency dan condition yang bisa membuat test kurang reliable.
 
-Lesson ini memakai reasoning checkpoint, bukan separate code challenge. Module 6 selesai ketika kedua Core lesson dibaca dan integrated assertion Core Practice lulus. Module 7 akan menunjukkan cara mengimplementasikan controlled state, data, dan isolation yang dibutuhkan design tersebut.
+Lesson ini fokus pada reasoning, jadi tidak ada code challenge terpisah.
+
+Module 6 selesai setelah kedua Core lesson selesai dan Core Practice untuk assertion berhasil dikerjakan.
+
+Di Module 7, kita akan masuk ke cara mengatur starting state, test data, authentication, cleanup, dan isolation supaya scenario yang sudah dirancang bisa dijalankan secara reliable.
