@@ -1,51 +1,57 @@
 ---
-title: 'Build a Controlled Starting State'
-description: 'Design explicit ownership for test data, authentication, dependencies, cleanup, and parallel execution.'
+title: 'Prepare a Controlled Starting State'
+description: 'Control test data, authentication, dependencies, and cleanup so every test starts clearly and remains safe during parallel execution.'
 ---
 
 ## After this lesson, you can
 
-- describe a test’s complete starting-state contract;
-- choose UI, API, or trusted test utilities for setup according to the risk;
-- select a safe authentication-state strategy for read-only and state-changing tests;
-- use network mocking without removing the integration being tested; and
-- identify data ownership and cleanup designs that remain safe in parallel.
+- define every condition that must be ready before a test runs;
+- choose UI, API, or trusted test utilities based on the scenario;
+- choose an authentication strategy for read-only tests and tests that change data;
+- use network mocking without skipping an integration the test needs to verify; and
+- manage test data and cleanup so tests remain safe during parallel execution.
 
 ## Why this matters for QA
 
-Some flaky tests fail before the first visible action. The customer already has an order, the shared account was changed by another worker, an authentication file expired, or yesterday’s cleanup did not run.
+A test appears to fail on its first action, but the problem started during setup.
 
-The test code may look correct because its locator and assertion describe the UI accurately. The hidden problem is that the scenario never owned its starting state.
+The customer may already have an order, another test may have changed the shared account, the authentication state may have expired, or cleanup from an earlier run may not have finished.
 
-Manual QA test cases usually contain preconditions: use a new customer, prepare an available item, or ensure no order exists. Automation must turn those preconditions into repeatable setup—not hope that the environment happens to be ready.
+The locators and assertions may be correct. The scenario still fails because its required starting state was never prepared or controlled.
+
+Manual QA test cases usually have clear preconditions: use a new customer, prepare an available product, or make sure no order exists.
+
+Automation must turn those preconditions into repeatable setup instead of hoping the environment happens to be ready.
 
 ## The mental model
 
-Treat the starting state as a contract with several owners:
+A reliable starting state usually contains several parts:
 
 ```text
 Reliable scenario
-    = isolated browser session
-    + owned server-side data
+    = a separate browser session
+    + controlled test data
     + deliberate authentication
-    + controlled external dependencies
-    + safe cleanup and collision strategy
+    + appropriate external dependencies
+    + safe cleanup
 ```
 
-These are separate boundaries. A fresh browser context isolates client-session state, but a record created by setup remains shared server-side state until the test gives it an owner and a cleanup plan.
+Consider each part separately. A fresh browser context separates browser sessions, but data created by a test remains on the backend until the test manages or removes it.
 
-A useful state contract answers:
+When preparing the starting state, answer these questions:
 
-| State question                | Example answer                                      |
-| ----------------------------- | --------------------------------------------------- |
-| What data does this own?      | One order created only for this test                |
-| How is it created?            | A supported test API before UI interaction          |
-| Who is authenticated?         | A worker-safe customer account                      |
-| Which dependencies are real?  | Order service is real; notification service is fake |
-| What cleanup is required?     | Delete the owned order by returned ID               |
-| What can collide in parallel? | Account preferences and fixed order references      |
+| What needs to be decided?           | Example                                               |
+| ----------------------------------- | ----------------------------------------------------- |
+| What data is created for the test?  | One order created only for this test                  |
+| How is the data created?            | Through a test API before UI interaction              |
+| Which account does the test use?    | An account not used concurrently by another test      |
+| Which dependencies remain real?     | Order service is real; notification service is mocked |
+| What cleanup is required?           | Delete the order by the ID returned during setup      |
+| What can collide with another test? | Account preferences or a fixed order reference        |
 
-The correct setup layer depends on what the test is trying to prove. Setup is not automatically more realistic because it uses more UI.
+The setup method depends on what the test needs to verify.
+
+Using the UI for setup is not automatically better or more realistic. If the UI is outside the behavior under test, an API or trusted test utility can be faster, clearer, and more reliable.
 
 ## Work through a realistic example
 
@@ -53,24 +59,26 @@ The requirement is:
 
 > A customer can cancel their own submitted order and sees the order become canceled.
 
-The behavior under test begins on the order detail page. Registering a user, signing in, browsing products, and completing checkout are separate risks. Repeating all of them would make cancellation slow and difficult to diagnose.
+The behavior under test starts on the order detail page.
 
-### 1. Write the state contract first
+Registering a user, signing in, browsing products, and completing checkout are separate behaviors. Repeating all of them makes the cancellation test longer, slower, and harder to diagnose.
+
+### 1. Define the starting state first
 
 ```text
-Owned data: one submitted order belonging to the test customer
-Creation method: supported test API
-Authentication: worker-safe customer state
-External dependencies: real order service; notification delivery is not asserted
-Cleanup: delete only the returned order ID; tolerate already-deleted data
-Parallel collision risk: account and order reference must not be shared
+Test data: one submitted order belonging to the test customer
+Creation method: test API
+Authentication: an account not used concurrently by another test
+External dependency: order service remains real; notification delivery is not tested
+Cleanup: delete only the order returned by setup
+Parallel risk: account and order reference must not be shared with another test
 ```
 
-### 2. Create only the required server state
+### 2. Prepare only the data the scenario needs
 
 ```ts
 test('customer cancels an owned order', async ({ page, request }) => {
-  // The request client is test-scoped; the order it creates is not magically isolated on the server.
+  // The request client is test-scoped, but its order still exists on the backend.
   const response = await request.post('/api/test/orders', {
     data: { status: 'submitted', owner: 'current-test-customer' },
   });
@@ -78,37 +86,51 @@ test('customer cancels an owned order', async ({ page, request }) => {
   expect(response.ok()).toBe(true);
   const order: { id: string; reference: string } = await response.json();
 
-  await page.goto(`/orders/${order.id}`);
-  await expect(
-    page.getByRole('heading', { name: `Order ${order.reference}` }),
-  ).toBeVisible();
+  try {
+    await page.goto(`/orders/${order.id}`);
+    await expect(
+      page.getByRole('heading', { name: `Order ${order.reference}` }),
+    ).toBeVisible();
 
-  await page.getByRole('button', { name: 'Cancel order' }).click();
-  await expect(page.getByRole('status')).toHaveText('Order canceled');
+    await page.getByRole('button', { name: 'Cancel order' }).click();
+    await expect(page.getByRole('status')).toHaveText('Order canceled');
+  } finally {
+    const cleanupResponse = await request.delete(
+      `/api/test/orders/${order.id}`,
+    );
+
+    expect(cleanupResponse.ok() || cleanupResponse.status() === 404).toBe(true);
+  }
 });
 ```
 
-The API response is checked before its data is used. The order ID returned by setup identifies exactly which record the UI should display and later clean up.
+Check that the setup API succeeds before using its response.
 
-This pattern assumes the application provides an authorized test-support endpoint and that the `request` fixture is configured for the intended test identity. Do not create undocumented production backdoors merely to make tests shorter.
+Use the returned `order.id` to open the correct order and delete that same record in `finally`. Cleanup accepts a successful response or `404`, so it remains safe if the order was already removed.
 
-### 3. Choose an authentication strategy from mutation risk
+Use this approach only when the project already provides an authorized test-support endpoint or trusted utility and the `request` fixture uses the intended test identity.
 
-Reusing authenticated browser state can make setup faster, but the account behind it still exists on the server.
+Do not create an undocumented production backdoor only to make test setup faster.
 
-| Scenario                                               | Safer direction                                            |
-| ------------------------------------------------------ | ---------------------------------------------------------- |
-| Public or signed-out behavior                          | Start with empty browser state                             |
-| Many read-only tests can use one account concurrently  | Reuse one prepared storage state                           |
-| Tests modify account-level or shared server-side state | Allocate separate accounts per worker or per test          |
-| One scenario contains several roles                    | Use separate contexts and states for each role             |
-| Authentication itself is the behavior under test       | Perform the real sign-in flow inside that focused scenario |
+### 3. Choose authentication based on the data the test changes
 
-Stored authentication state can contain sensitive cookies and headers capable of impersonating the test account. Keep files such as `playwright/.auth/user.json` out of version control, restrict access, and regenerate expired state securely.
+Reusing authentication state can make setup faster, but each test still uses the account's data on the backend.
 
-### 4. Control the network only when it serves the scenario
+| Scenario                                     | Safer approach                                                        |
+| -------------------------------------------- | --------------------------------------------------------------------- |
+| Public or signed-out behavior                | Start without authentication state                                    |
+| Read-only tests can safely share one account | Reuse prepared storage state                                          |
+| Tests change account or backend data         | Use a different account for each worker or test                       |
+| One scenario needs several roles             | Use a separate browser context and authentication state for each role |
+| Login is the behavior under test             | Run the real sign-in flow in that scenario                            |
 
-Suppose the product must show a useful fallback when recommendations are unavailable. A controlled 503 response is appropriate:
+Authentication-state files can contain cookies or credentials that allow someone to use the test account's session.
+
+Do not commit files such as `playwright/.auth/user.json`. Store them securely and recreate them when the session expires.
+
+### 4. Use network mocking only when the scenario needs it
+
+Suppose the application must show a fallback when the recommendation service is unavailable. Control its response with `503`:
 
 ```ts
 await page.route('**/api/recommendations', async (route) => {
@@ -125,43 +147,63 @@ await expect(page.getByRole('status')).toHaveText(
 );
 ```
 
-Register the route before the request can begin. The mock makes the rare dependency response deliberate.
+Register `page.route()` before the request is sent.
 
-But a fully mocked payment flow cannot prove that the real checkout integration works. Keep at least the integration named by the test real, and document what the mock removes from coverage.
+This mock is useful because the scenario needs a condition that may be difficult to produce consistently in the environment.
 
-### 5. Clean up only what the test owns
+Do not mock a service that is an important part of the integration under test.
 
-Cleanup should use the returned record identity and be safe if the record was already removed. Avoid broad operations such as “delete all test orders,” which can erase data owned by another worker.
+For example, a checkout test with a fully mocked payment service cannot prove that the real payment integration works. Use the mock for the scenario that needs it and keep separate coverage for the real integration.
 
-Cleanup is a safety net, not the only isolation mechanism. If setup depends on yesterday’s cleanup having completed, an interrupted run can poison the next one.
+### 5. Clean up only data created by the test
+
+Use the ID or reference returned when the test created its data.
+
+Avoid broad cleanup such as **“delete all test orders”** because it can also delete data used by another test.
+
+Cleanup should not be the only isolation mechanism. If the starting state depends on cleanup from an earlier run, an interrupted run can break the next one.
 
 ## When to use it—and when not to
 
-Use UI setup when the setup flow itself is part of the behavior or when no trusted lower-level setup surface exists. Use API calls or owned test utilities for preconditions outside the scenario’s risk.
+Use the UI for setup when the setup flow is part of the behavior under test or when the project has no other trusted way to prepare that state.
 
-Use shared authenticated state only when concurrent tests cannot interfere through that account. A fresh context loading the same account does not make its server-side settings unique.
+If setup is outside the behavior under test, use an API or trusted test utility already available in the project.
 
-Use network interception to create a deliberate dependency response, remove nondeterminism outside the integration under test, or reproduce a rare error. Do not mock the component whose real integration the test claims to verify.
+Reuse authentication state when tests only read data or can safely use the same account concurrently.
 
-Prefer unique, minimal data over large reusable seed environments. Reuse immutable reference data when it truly is read-only. Avoid production personal data, real credentials, and copied customer records.
+A fresh browser context signed in with the same account still uses the same backend data. If a test changes a profile, preference, order, or other data, make sure another test does not use it at the same time.
 
-Do not disable all parallelism because one group shares a constrained resource. First isolate accounts and data; if a small, documented group cannot safely run concurrently, constrain that group intentionally.
+Use network mocking to create conditions that are difficult to produce consistently, such as a service returning `503`. Do not mock the service whose integration the scenario needs to verify.
+
+Create only the data needed by the scenario instead of relying on a large shared seed environment.
+
+Truly read-only reference data can remain shared. Avoid real customer data, real credentials, or copies of production records.
+
+Do not disable parallel execution only because several tests share a resource. Separate their accounts and test data first.
+
+If a small group cannot run safely in parallel because a resource is constrained, run only that group serially and document why.
 
 ## When it fails
 
-Common state failures leave recognizable evidence:
+Starting-state problems often have recognizable patterns:
 
-| Observation                                      | Likely state problem                                          | Evidence to inspect                            |
-| ------------------------------------------------ | ------------------------------------------------------------- | ---------------------------------------------- |
-| Passes alone, fails in parallel                  | Shared account or record collision                            | IDs, worker identity, request timeline         |
-| First run passes, later local runs fail          | Persistent server data or incomplete cleanup                  | Setup response, owned IDs, environment records |
-| Every test suddenly redirects to sign-in         | Expired or invalid authentication state                       | Auth setup result, cookies, server response    |
-| Mocked error test sometimes reaches the real API | Route registered too late or URL pattern mismatched           | Network trace before navigation/action         |
-| Setup reports success but UI cannot find data    | Wrong environment, delayed backend state, or weak setup check | Response body, environment URL, record query   |
+| What you see                                   | Likely cause                                                       | What to inspect                                    |
+| ---------------------------------------------- | ------------------------------------------------------------------ | -------------------------------------------------- |
+| Passes alone but fails in parallel             | Several tests use the same account or mutable data                 | Account ID, record ID, worker, and request order   |
+| First run passes but a later run fails         | Earlier data remains or cleanup did not finish                     | Setup result, created IDs, and environment data    |
+| Many tests suddenly redirect to sign-in        | Authentication state is expired or invalid                         | Auth setup result, cookies, and server response    |
+| Mocked-error test sometimes calls the real API | `page.route()` was registered too late or its pattern is wrong     | Network trace before navigation or action          |
+| Setup succeeds but UI cannot find the data     | Wrong environment, delayed data, or setup did not actually succeed | Response body, environment URL, and created record |
 
-Fix the ownership or setup contract. Do not add a sleep after setup without evidence of an actual asynchronous state transition. Do not retry data creation until duplicate records accumulate. Do not hide collisions by changing all tests to one worker.
+Fix setup or test-data ownership first.
 
-Review setup and data code with these questions:
+Do not add a sleep after setup unless the backend has a real asynchronous transition that must finish.
+
+Do not retry data creation without control because duplicate records can accumulate.
+
+If tests collide in parallel, do not immediately change the whole suite to one worker. First find the shared account or data.
+
+When reviewing setup and test data, check:
 
 - Does it assume a test API, account, credential, or cleanup endpoint without evidence?
 - Does the setup prove it created the required record before the UI uses it?
@@ -173,32 +215,38 @@ Review setup and data code with these questions:
 - Can cleanup delete data belonging to another test?
 - Would a failed setup produce a clear failure or a misleading UI timeout?
 
-Setup is not safe merely because it is hidden in a helper. You still need to understand its authority and side effects.
+Moving setup into a helper does not automatically make it safe or reliable. You still need to know what it creates, changes, and removes.
 
 ## Check your understanding
 
-A suite uses one saved admin account. A `beforeAll` hook creates one order, three tests update that order in different ways, and an `afterAll` hook deletes it. The suite passes with one worker but fails in parallel or after an interrupted run.
+A test suite uses one saved admin account. A `beforeAll` hook creates one order, then three tests change that same order in different ways. An `afterAll` hook deletes the order.
 
-`beforeAll` and `afterAll` are scoped to the relevant worker process, not a universal suite-wide boundary. They can still create state shared by several tests in that worker, and a worker restart or interrupted cleanup can leave that state behind.
+The suite passes with one worker but fails during parallel execution or when an earlier run stops before cleanup finishes.
 
-Redesign its state contract. Decide what can remain shared, what must become unique, where setup should happen, and how cleanup should behave.
+`beforeAll` and `afterAll` run for the worker that executes the tests in that scope. Tests in the same worker can still affect each other when they change the same data.
+
+A worker restart or interrupted `afterAll` can also leave data behind for the next run.
+
+Redesign the setup. Decide which data can remain shared, which data must be unique, when setup should run, and how cleanup should work.
 
 ## Compare your reasoning
 
-One reasonable answer is:
+One possible answer is:
 
-- Do not let parallel tests mutate one admin account and one order.
-- Give each worker or test an appropriate account if account-level state changes.
-- Create the required order per test through a supported API or test utility and retain its returned ID.
-- Keep immutable catalog data shared only if tests cannot modify it.
-- Clean up each owned order by ID with an idempotent operation.
-- Make each test runnable alone instead of relying on `beforeAll` side effects.
-- Treat an interrupted cleanup as recoverable because the next run creates unique owned data.
+- Do not let parallel tests change the same admin account and order.
+- If a test changes account-level data, use a separate account for each worker or test as needed.
+- Create the order needed by each test through an API or trusted test utility and keep the returned ID.
+- Truly read-only catalog data can remain shared.
+- Clean up each order by its returned ID and make cleanup safe when the order is already missing.
+- Every test should run by itself without depending on data created by `beforeAll`.
+- If cleanup from an earlier run does not finish, the next run remains safe because it creates data with a different ID or reference.
 
-The goal is not zero shared infrastructure. The goal is zero ambiguous ownership of mutable state.
+Not all data needs to be unique. Mutable data should not be shared by several tests without clear control.
 
 ## Before you continue
 
-You should now be able to write a complete state contract and choose setup, authentication, dependency, and cleanup strategies that remain understandable under parallel execution.
+You should now be able to define the starting state a test needs, choose setup and authentication, control dependencies, and design cleanup that remains safe during parallel execution.
 
-The next lesson starts from a failure and works backward through evidence. Controlled state gives that investigation a trustworthy baseline: if a test still fails, fewer hidden assumptions remain.
+The next lesson starts from a failing test and traces the root cause through errors, traces, screenshots, network evidence, and other available information.
+
+When the starting state is controlled, debugging becomes easier because fewer setup and test-data assumptions remain.

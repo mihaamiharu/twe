@@ -1,114 +1,139 @@
 ---
-title: 'Bangun Starting State yang Terkontrol'
-description: 'Rancang ownership yang eksplisit untuk test data, authentication, dependency, cleanup, dan parallel execution.'
+title: 'Siapkan Starting State yang Terkontrol'
+description: 'Atur test data, login state, dependency, dan cleanup supaya setiap test mulai dari kondisi yang jelas dan tetap aman saat dijalankan secara parallel.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- menjelaskan complete starting-state contract milik sebuah test;
-- memilih UI, API, atau trusted test utility untuk setup berdasarkan risk;
-- memilih authentication-state strategy yang aman untuk read-only dan state-changing test;
-- memakai network mocking tanpa menghilangkan integration yang sedang diuji; serta
-- mengenali data ownership dan cleanup design yang tetap aman saat parallel.
+- menentukan semua kondisi yang harus sudah siap sebelum test dijalankan;
+- memilih setup lewat UI, API, atau test utility sesuai dengan kebutuhan scenario;
+- menentukan cara menyiapkan authentication state untuk read-only test dan test yang mengubah data;
+- menggunakan network mocking tanpa melewatkan integration yang memang ingin diuji; serta
+- mengatur test data dan cleanup supaya test tetap aman saat dijalankan secara parallel.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih test kelihatannya gagal pada click pertama, padahal masalahnya sudah terjadi jauh sebelum itu? Customer-nya sudah punya order, shared account diubah worker lain, authentication file expired, atau cleanup kemarin nggak sempat jalan.
+Pernah nggak sih test kelihatannya fail saat action pertama dijalankan, padahal masalahnya sudah terjadi dari setup sebelumnya?
 
-Test code-nya bisa terlihat benar karena locator dan assertion memang sesuai UI. Hidden problem-nya adalah skenario tersebut nggak pernah memiliki starting state-nya sendiri.
+Misalnya customer ternyata sudah punya order, account yang sama diubah oleh test lain, authentication state sudah expired, atau cleanup dari run sebelumnya nggak selesai.
 
-Manual QA test case biasanya punya precondition: pakai customer baru, siapkan available item, atau pastikan belum ada order. Automation harus mengubah precondition tersebut menjadi repeatable setup, bukan berharap environment kebetulan siap.
+Locator dan assertion di test tersebut mungkin sebenarnya sudah benar. Masalahnya, kondisi awal yang dibutuhkan oleh scenario belum benar-benar disiapkan atau dikontrol.
+
+Saat manual testing, kita biasanya punya precondition yang jelas: gunakan customer baru, siapkan produk yang available, atau pastikan belum ada order.
+
+Di automation, precondition seperti ini perlu dibuat menjadi setup yang repeatable. Jangan mengandalkan environment kebetulan sedang berada di kondisi yang benar.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Perlakukan starting state sebagai contract dengan beberapa owner:
+Starting state yang reliable biasanya terdiri dari beberapa hal:
 
 ```text
 Reliable scenario
-    = isolated browser session
-    + owned server-side data
-    + deliberate authentication
-    + controlled external dependencies
-    + safe cleanup and collision strategy
+    = browser session yang terpisah
+    + test data yang dikontrol
+    + authentication yang jelas
+    + external dependency yang sesuai
+    + cleanup yang aman
 ```
 
-Ini adalah boundary yang terpisah. Browser context yang baru mengisolasi client-session state, tetapi record yang dibuat oleh setup tetap menjadi server-side state bersama sampai test memberi owner dan rencana cleanup yang jelas.
+Setiap bagian perlu dipikirkan secara terpisah. Browser context baru memang memisahkan session di browser, tapi data yang dibuat oleh test tetap ada di backend sampai test tersebut membersihkan atau mengelolanya dengan benar.
 
-State contract yang berguna menjawab:
+Saat menyiapkan starting state, cek beberapa hal ini:
 
-| Pertanyaan tentang state     | Contoh jawaban                                       |
-| ---------------------------- | ---------------------------------------------------- |
-| Data apa yang dimiliki test? | Satu order yang dibuat khusus untuk test ini         |
-| Bagaimana data dibuat?       | Supported test API sebelum UI interaction            |
-| Siapa yang authenticated?    | Worker-safe customer account                         |
-| Dependency mana yang real?   | Order service real; notification service dibuat fake |
-| Cleanup apa yang dibutuhkan? | Hapus owned order berdasarkan returned ID            |
-| Apa yang bisa collision?     | Account preference dan fixed order reference         |
+| Yang perlu ditentukan                        | Contoh                                                       |
+| -------------------------------------------- | ------------------------------------------------------------ |
+| Data apa yang dibuat untuk test?             | Satu order khusus untuk test ini                             |
+| Bagaimana data dibuat?                       | Lewat test API sebelum UI interaction                        |
+| Account mana yang digunakan?                 | Customer account yang tidak dipakai bersamaan oleh test lain |
+| Dependency mana yang tetap real?             | Order service tetap real, notification service di-mock       |
+| Cleanup apa yang dibutuhkan?                 | Hapus order berdasarkan ID yang dibuat saat setup            |
+| Data apa yang bisa bentrok dengan test lain? | Account preference atau fixed order reference                |
 
-Setup layer yang tepat ditentukan oleh hal yang ingin dibuktikan test. Setup nggak otomatis lebih realistis hanya karena melewati UI lebih banyak.
+Cara menyiapkan state tetap harus mengikuti hal yang ingin diuji.
+
+Setup lewat UI nggak otomatis lebih baik atau lebih realistis. Kalau UI bukan bagian dari behavior yang ingin diuji, setup lewat API atau test utility bisa lebih cepat, lebih jelas, dan lebih reliable.
 
 ## Coba kita bedah contoh nyata
 
 Requirement-nya adalah:
 
-> Customer bisa cancel submitted order miliknya sendiri dan melihat order berubah menjadi canceled.
+> Customer bisa cancel submitted order miliknya sendiri dan melihat status order berubah menjadi canceled.
 
-Behavior yang diuji dimulai di order detail page. Register user, login, browsing product, dan menyelesaikan checkout adalah risk yang berbeda. Mengulang semuanya membuat cancellation test lambat dan sulit didiagnosis.
+Behavior yang ingin diuji dimulai dari order detail page.
 
-### 1. Tulis state contract lebih dulu
+Register user, login, browsing product, dan menyelesaikan checkout adalah behavior lain. Kalau semuanya diulang di cancellation test, test jadi lebih panjang, lebih lambat, dan ketika fail root cause-nya lebih sulit diketahui.
+
+### 1. Tentukan starting state lebih dulu
 
 ```text
-Owned data: satu submitted order milik test customer
-Creation method: supported test API
-Authentication: worker-safe customer state
-External dependencies: real order service; notification delivery tidak di-assert
-Cleanup: hapus hanya returned order ID; toleransi kalau data sudah dihapus
-Parallel collision risk: account dan order reference tidak boleh shared
+Test data: satu submitted order milik customer yang digunakan test
+Cara membuat data: lewat test API
+Authentication: customer account yang tidak dipakai bersamaan oleh test lain
+External dependency: order service tetap real; notification delivery tidak diuji
+Cleanup: hapus hanya order yang dibuat oleh test berdasarkan returned ID
+Risiko saat parallel: account dan order reference tidak boleh dipakai bersama oleh test lain
 ```
 
-### 2. Buat hanya server state yang dibutuhkan
+### 2. Siapkan hanya data yang dibutuhkan oleh scenario
 
 ```ts
 test('customer cancels an owned order', async ({ page, request }) => {
-  // Request client punya scope test; order yang dibuatnya tidak otomatis terisolasi di server.
+  // Request client punya scope test, tapi order yang dibuat tetap tersimpan di backend.
   const response = await request.post('/api/test/orders', {
     data: { status: 'submitted', owner: 'current-test-customer' },
   });
 
   expect(response.ok()).toBe(true);
+
   const order: { id: string; reference: string } = await response.json();
 
-  await page.goto(`/orders/${order.id}`);
-  await expect(
-    page.getByRole('heading', { name: `Order ${order.reference}` }),
-  ).toBeVisible();
+  try {
+    await page.goto(`/orders/${order.id}`);
 
-  await page.getByRole('button', { name: 'Cancel order' }).click();
-  await expect(page.getByRole('status')).toHaveText('Order canceled');
+    await expect(
+      page.getByRole('heading', { name: `Order ${order.reference}` }),
+    ).toBeVisible();
+
+    await page.getByRole('button', { name: 'Cancel order' }).click();
+
+    await expect(page.getByRole('status')).toHaveText('Order canceled');
+  } finally {
+    const cleanupResponse = await request.delete(
+      `/api/test/orders/${order.id}`,
+    );
+
+    expect(cleanupResponse.ok() || cleanupResponse.status() === 404).toBe(true);
+  }
 });
 ```
 
-API response diperiksa sebelum datanya digunakan. Order ID dari setup menunjukkan record persis yang harus ditampilkan UI dan nanti dibersihkan.
+Cek dulu apakah setup API berhasil sebelum menggunakan data dari response-nya.
 
-Pattern ini mengasumsikan aplikasi punya authorized test-support endpoint dan fixture `request` dikonfigurasi untuk intended test identity. Jangan membuat undocumented production backdoor hanya supaya test lebih pendek.
+Gunakan `order.id` dari hasil setup untuk membuka order yang tepat dan menghapus record yang sama di dalam `finally`. Cleanup menerima response sukses atau `404` supaya tetap aman kalau order sudah lebih dulu terhapus.
 
-### 3. Pilih authentication strategy dari mutation risk
+Pendekatan ini cocok kalau project memang sudah punya test API atau helper yang dibuat khusus untuk menyiapkan data automation.
 
-Reuse authenticated browser state bisa mempercepat setup, tapi account di baliknya tetap berada di server.
+Pastikan endpoint atau helper tersebut memang disediakan dan diotorisasi untuk testing. Jangan membuat undocumented backdoor di production hanya supaya setup test lebih cepat.
 
-| Skenario                                              | Arah yang lebih aman                                       |
-| ----------------------------------------------------- | ---------------------------------------------------------- |
-| Public atau signed-out behavior                       | Mulai dengan empty browser state                           |
-| Banyak read-only test bisa memakai satu account       | Reuse satu prepared storage state                          |
-| Test mengubah account atau shared server-side state   | Sediakan account berbeda per worker atau per test          |
-| Satu skenario memiliki beberapa role                  | Pakai context dan state terpisah untuk setiap role         |
-| Authentication itu sendiri adalah behavior yang diuji | Jalankan real sign-in flow di skenario yang fokus tersebut |
+### 3. Pilih cara login sesuai dengan data yang akan diubah
 
-Stored authentication state bisa berisi sensitive cookies dan header yang dapat dipakai untuk menyamar sebagai test account. Jangan commit file seperti `playwright/.auth/user.json`, batasi aksesnya, dan regenerate expired state dengan aman.
+Reuse authentication state bisa mempercepat setup, tapi account yang digunakan tetap memakai data yang sama di backend.
 
-### 4. Kontrol network hanya saat memang membantu skenario
+| Scenario                                            | Pendekatan yang lebih aman                                                  |
+| --------------------------------------------------- | --------------------------------------------------------------------------- |
+| Public atau signed-out behavior                     | Mulai tanpa authentication state                                            |
+| Banyak read-only test menggunakan account yang sama | Gunakan kembali storage state yang sudah disiapkan                          |
+| Test mengubah account atau data di backend          | Gunakan account berbeda untuk setiap worker atau test                       |
+| Satu scenario membutuhkan beberapa role             | Gunakan browser context dan authentication state terpisah untuk setiap role |
+| Login adalah behavior yang sedang diuji             | Jalankan real sign-in flow di scenario tersebut                             |
 
-Misalnya produk harus menampilkan fallback yang jelas ketika recommendation service unavailable. Controlled 503 response tepat digunakan:
+File authentication state bisa berisi cookie atau credential yang memungkinkan seseorang menggunakan session test account.
+
+Jangan commit file seperti `playwright/.auth/user.json` ke repository. Simpan dengan aman dan buat ulang kalau session-nya sudah expired.
+
+### 4. Gunakan network mocking hanya kalau memang dibutuhkan
+
+Misalnya aplikasi harus menampilkan fallback ketika recommendation service sedang unavailable. Kita bisa mengontrol response menjadi `503`:
 
 ```ts
 await page.route('**/api/recommendations', async (route) => {
@@ -120,85 +145,116 @@ await page.route('**/api/recommendations', async (route) => {
 });
 
 await page.goto('/store');
+
 await expect(page.getByRole('status')).toHaveText(
   'Recommendations are temporarily unavailable',
 );
 ```
 
-Register route sebelum request bisa dimulai. Mock tersebut membuat rare dependency response menjadi deliberate.
+Pasang `page.route()` sebelum request tersebut dikirim.
 
-Tapi fully mocked payment flow nggak bisa membuktikan real checkout integration bekerja. Pertahankan integration yang disebut oleh test sebagai real, lalu dokumentasikan coverage apa yang hilang karena mock.
+Mock seperti ini berguna ketika kita memang ingin menguji bagaimana aplikasi merespons kondisi tertentu yang sulit dibuat secara konsisten di environment.
 
-### 5. Bersihkan hanya data yang dimiliki test
+Tapi jangan mock service yang sebenarnya menjadi bagian penting dari integration yang sedang diuji.
 
-Cleanup harus memakai returned record identity dan tetap aman kalau record tersebut sudah dihapus. Hindari operation luas seperti “delete all test orders” karena bisa menghapus data milik worker lain.
+Misalnya, checkout test dengan payment service yang sepenuhnya di-mock tidak bisa memastikan integration dengan real payment service benar-benar bekerja.
 
-Cleanup adalah safety net, bukan satu-satunya isolation mechanism. Kalau setup bergantung pada cleanup kemarin, interrupted run bisa merusak run berikutnya.
+Gunakan mock sesuai kebutuhan scenario, dan tetap punya test lain untuk integration yang memang perlu diuji secara real.
+
+### 5. Cleanup hanya data yang dibuat oleh test
+
+Saat cleanup, gunakan ID atau reference dari data yang memang dibuat oleh test tersebut.
+
+Hindari cleanup yang terlalu luas seperti **“delete all test orders”**, karena bisa ikut menghapus data yang sedang digunakan oleh test lain.
+
+Cleanup juga jangan menjadi satu-satunya cara menjaga test tetap terisolasi. Kalau starting state hanya bisa benar karena cleanup dari run sebelumnya berhasil, interrupted run bisa membuat test berikutnya ikut bermasalah.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Gunakan UI setup saat setup flow memang menjadi bagian behavior atau nggak ada trusted lower-level setup surface. Gunakan API call atau owned test utility untuk precondition di luar risk skenario.
+Gunakan UI untuk setup kalau setup flow memang bagian dari behavior yang sedang diuji, atau kalau project belum punya cara lain untuk menyiapkan state tersebut.
 
-Gunakan shared authenticated state hanya ketika concurrent test nggak bisa saling mengganggu lewat account tersebut. Fresh context yang memuat account sama nggak membuat server-side setting-nya menjadi unique.
+Kalau setup bukan bagian dari behavior yang ingin diuji, gunakan API atau test utility yang memang tersedia di project untuk menyiapkan data lebih cepat dan konsisten.
 
-Gunakan network interception untuk membuat deliberate dependency response, menghilangkan nondeterminism di luar integration yang diuji, atau mereproduksi rare error. Jangan mock component yang real integration-nya justru ingin dibuktikan test.
+Authentication state bisa digunakan kembali kalau test hanya membaca data atau account tersebut aman digunakan oleh beberapa test sekaligus.
 
-Pilih unique dan minimal data daripada reusable seed environment yang besar. Reuse immutable reference data kalau memang benar-benar read-only. Hindari production personal data, real credential, dan copied customer record.
+Tapi browser context baru yang login dengan account yang sama tetap menggunakan data account yang sama di backend. Kalau test mengubah profile, preference, order, atau data lain, pastikan test lain nggak menggunakan data yang sama secara bersamaan.
 
-Jangan mematikan seluruh parallelism hanya karena satu group berbagi constrained resource. Isolasi account dan data lebih dulu. Kalau kelompok kecil memang nggak aman dijalankan bersamaan, constrain kelompok itu secara sengaja dan terdokumentasi.
+Gunakan network mocking untuk membuat kondisi tertentu yang sulit dibuat secara konsisten, misalnya service mengembalikan error `503`.
+
+Tapi jangan mock service yang integration-nya justru sedang diuji. Kalau payment integration adalah bagian penting dari checkout scenario, tetap butuh test yang menggunakan real integration tersebut.
+
+Untuk test data, lebih baik buat data secukupnya untuk scenario daripada bergantung pada environment dengan banyak seed data yang digunakan bersama.
+
+Reference data yang benar-benar read-only masih bisa digunakan bersama. Hindari menggunakan real customer data, real credential, atau copy data production.
+
+Jangan langsung mematikan parallel execution hanya karena beberapa test memakai resource yang sama. Coba pisahkan account dan test data terlebih dahulu.
+
+Kalau memang ada beberapa test yang nggak aman dijalankan bersamaan karena resource-nya terbatas, baru jalankan group tersebut secara serial dan dokumentasikan alasannya.
 
 ## Kalau gagal, mulai cek dari mana?
 
-State failure biasanya meninggalkan evidence yang bisa dikenali:
+Masalah pada starting state biasanya punya pola yang cukup jelas:
 
-| Yang terlihat                                 | Kemungkinan state problem                                       | Evidence yang diperiksa                      |
-| --------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------- |
-| Lulus sendiri, gagal saat parallel            | Shared account atau record collision                            | ID, worker identity, request timeline        |
-| Run pertama lulus, run lokal berikutnya gagal | Persistent server data atau incomplete cleanup                  | Setup response, owned ID, environment record |
-| Semua test mendadak redirect ke sign-in       | Expired atau invalid authentication state                       | Auth setup result, cookie, server response   |
-| Mocked error test kadang memanggil real API   | Route terlalu lambat dipasang atau pattern salah                | Network trace sebelum navigation/action      |
-| Setup sukses tapi UI nggak menemukan data     | Wrong environment, delayed backend state, atau weak setup check | Response body, environment URL, record query |
+| Yang terlihat                                              | Kemungkinan penyebab                                                         | Yang perlu dicek                                                        |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Test pass saat dijalankan sendiri, tapi fail saat parallel | Beberapa test memakai account atau data yang sama                            | Account ID, record ID, worker yang menjalankan test, dan urutan request |
+| Run pertama pass, tapi run berikutnya fail                 | Data dari run sebelumnya masih tersisa atau cleanup nggak selesai            | Hasil setup, ID data yang dibuat, dan kondisi data di environment       |
+| Banyak test tiba-tiba redirect ke sign-in                  | Authentication state sudah expired atau tidak valid                          | Hasil auth setup, cookie, dan response dari server                      |
+| Test untuk mocked error kadang tetap memanggil real API    | `page.route()` dipasang terlalu terlambat atau URL pattern-nya salah         | Network trace sebelum navigation atau action                            |
+| Setup berhasil, tapi UI nggak menemukan data               | Salah environment, data belum tersedia, atau setup sebenarnya belum berhasil | Response body, environment URL, dan record yang dibuat                  |
 
-Perbaiki ownership atau setup contract-nya. Jangan menambah sleep setelah setup tanpa evidence adanya asynchronous state transition. Jangan retry data creation sampai duplicate record menumpuk. Jangan sembunyikan collision dengan mengubah semua test menjadi satu worker.
+Kalau masalahnya ada di setup atau test data, perbaiki bagian tersebut terlebih dahulu.
 
-Saat me-review setup dan data code, tanyakan:
+Jangan langsung menambah sleep setelah setup kalau belum ada alasan bahwa backend memang membutuhkan waktu sebelum data siap.
 
-- Apakah code mengasumsikan test API, account, credential, atau cleanup endpoint tanpa bukti?
-- Apakah setup membuktikan required record sudah dibuat sebelum dipakai UI?
-- Test atau worker mana yang memiliki setiap mutable account dan record?
-- Bisakah dua parallel run menghasilkan identity yang sama?
-- Apakah stored authentication state di-commit, masuk log, atau dibagikan ke luar authorized team?
-- Apakah mock menghilangkan integration yang disebut oleh test?
-- Apakah route dipasang sebelum request dimulai?
-- Bisakah cleanup menghapus data milik test lain?
-- Apakah failed setup memberi failure yang jelas atau malah misleading UI timeout?
+Jangan juga retry pembuatan data tanpa kontrol karena bisa membuat duplicate record terus bertambah.
 
-Setup nggak otomatis aman hanya karena disembunyikan di helper. Kamu tetap perlu memahami authority dan side effect-nya.
+Kalau test saling bentrok saat parallel, jangan langsung mengubah seluruh suite menjadi satu worker. Cari dulu account atau data mana yang digunakan bersama.
+
+Saat review setup dan test data, cek beberapa hal ini:
+
+- Apakah test menggunakan API, account, credential, atau cleanup endpoint yang memang sudah tersedia dan boleh digunakan?
+- Apakah setup memastikan data yang dibutuhkan benar-benar berhasil dibuat sebelum UI menggunakannya?
+- Apakah beberapa test atau worker menggunakan account atau mutable data yang sama?
+- Apakah ID atau reference yang dibuat bisa sama ketika beberapa test berjalan secara parallel?
+- Apakah authentication state tersimpan di repository, muncul di log, atau bisa diakses oleh orang yang nggak seharusnya?
+- Apakah mock membuat test tidak lagi menguji integration yang sebenarnya ingin diuji?
+- Apakah `page.route()` dipasang sebelum request yang ingin di-mock dikirim?
+- Apakah cleanup hanya menghapus data yang dibuat oleh test tersebut?
+- Kalau setup fail, apakah error-nya langsung menjelaskan masalah setup atau malah baru terlihat sebagai UI timeout?
+
+Memindahkan setup ke helper nggak otomatis membuatnya aman atau reliable. Kita tetap perlu tahu data apa yang dibuat, apa yang diubah, dan apa yang perlu dibersihkan setelah test selesai.
 
 ## Coba cek pemahamanmu
 
-Sebuah suite memakai satu saved admin account. Hook `beforeAll` membuat satu order, tiga test mengubah order yang sama dengan cara berbeda, lalu hook `afterAll` menghapusnya. Suite lulus dengan satu worker, tapi gagal saat parallel atau setelah interrupted run.
+Sebuah test suite menggunakan satu saved admin account. Hook `beforeAll` membuat satu order, lalu tiga test mengubah order yang sama dengan cara berbeda. Setelah semua test selesai, `afterAll` menghapus order tersebut.
 
-`beforeAll` dan `afterAll` punya scope pada worker process yang relevan, bukan boundary universal untuk seluruh suite. Keduanya tetap bisa membuat state yang dipakai bersama oleh beberapa test dalam worker itu, dan restart worker atau cleanup yang terhenti bisa meninggalkan state tersebut.
+Suite ini pass saat dijalankan dengan satu worker, tapi mulai fail saat test berjalan parallel atau ketika run sebelumnya berhenti sebelum cleanup selesai.
 
-Rancang ulang state contract-nya. Tentukan apa yang boleh tetap shared, apa yang harus unique, di mana setup dilakukan, dan bagaimana cleanup harus bekerja.
+`beforeAll` dan `afterAll` hanya berlaku untuk worker yang menjalankan test tersebut. Kalau beberapa test di dalam worker yang sama memakai dan mengubah data yang sama, mereka tetap bisa saling memengaruhi.
+
+Masalah juga bisa muncul kalau worker restart atau `afterAll` nggak sempat selesai, karena data dari run sebelumnya bisa tetap tertinggal.
+
+Coba rancang ulang setup test tersebut. Tentukan data apa yang masih aman digunakan bersama, data apa yang harus dibuat terpisah, kapan setup dilakukan, dan bagaimana cleanup-nya.
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu jawaban yang masuk akal:
+Contoh jawaban:
 
-- Jangan biarkan parallel test memodifikasi satu admin account dan satu order yang sama.
-- Beri setiap worker atau test account yang sesuai kalau account-level state ikut berubah.
-- Buat required order per test lewat supported API atau test utility, lalu simpan returned ID-nya.
-- Biarkan immutable catalog data shared hanya kalau test nggak bisa memodifikasinya.
-- Cleanup setiap owned order berdasarkan ID dengan idempotent operation.
-- Pastikan setiap test bisa dijalankan sendiri tanpa bergantung pada side effect `beforeAll`.
-- Anggap interrupted cleanup bisa dipulihkan karena run berikutnya membuat unique owned data.
+- Jangan biarkan beberapa test yang berjalan parallel mengubah admin account dan order yang sama.
+- Kalau test mengubah data di level account, gunakan account berbeda untuk setiap worker atau test sesuai kebutuhan.
+- Buat order yang dibutuhkan oleh masing-masing test lewat API atau test utility, lalu simpan ID yang dikembalikan.
+- Data catalog yang benar-benar read-only masih bisa digunakan bersama.
+- Cleanup setiap order berdasarkan ID yang dibuat oleh test tersebut, dan pastikan cleanup tetap aman kalau order-nya sudah tidak ada.
+- Setiap test harus tetap bisa dijalankan sendiri tanpa bergantung pada data yang dibuat oleh `beforeAll`.
+- Kalau cleanup dari run sebelumnya nggak selesai, run berikutnya tetap aman karena membuat data baru dengan ID atau reference yang berbeda.
 
-Tujuannya bukan menghilangkan seluruh shared infrastructure. Tujuannya adalah menghilangkan ambiguous ownership untuk mutable state.
+Kita nggak perlu membuat semua data menjadi terpisah. Yang penting, data yang bisa berubah nggak dipakai bersama oleh beberapa test tanpa kontrol yang jelas.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa menulis complete state contract dan memilih setup, authentication, dependency, serta cleanup strategy yang tetap jelas saat parallel execution.
+Sekarang kamu seharusnya sudah bisa menentukan starting state yang dibutuhkan test, memilih cara setup dan authentication yang sesuai, mengontrol dependency, serta merancang cleanup supaya test tetap aman saat dijalankan secara parallel.
 
-Lesson berikutnya dimulai dari sebuah failure lalu bekerja mundur lewat evidence. Controlled state memberi baseline yang bisa dipercaya: kalau test masih gagal, hidden assumption-nya sudah jauh lebih sedikit.
+Di lesson berikutnya, kita akan mulai dari test yang fail lalu mencari root cause berdasarkan error, trace, screenshot, network, dan informasi lain yang tersedia.
+
+Kalau starting state sudah dikontrol dengan baik, proses debugging jadi lebih mudah karena kemungkinan masalah dari setup dan test data sudah jauh berkurang.
