@@ -1,48 +1,48 @@
 ---
-title: 'Susun Advanced Fixture Tanpa Shared-State Trap (Optional)'
-description: 'Gunakan typed option, worker-owned resource, dan automatic fixture hanya saat lifecycle serta maintenance cost-nya benar-benar justified.'
+title: 'Atur Typed Option, Worker Scope, dan Automatic Fixture dengan Aman (Optional)'
+description: 'Gunakan advanced fixture hanya kalau resource bisa dipisahkan dengan aman, cleanup-nya jelas, dan waktu setup yang dihemat memang terasa.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- membedakan configurable test option dari resource fixture;
+- membedakan option untuk mengatur test dari fixture yang membuat resource;
 - memberi type pada test-scoped dan worker-scoped fixture dengan benar;
-- merancang worker-scoped resource yang punya unique ownership dan cleanup;
-- memakai automatic fixture untuk small observable cross-cutting behavior; serta
-- mengenali kapan advanced fixture graph sebaiknya disederhanakan.
+- membuat resource yang unik untuk setiap worker dan membersihkannya dengan aman;
+- memakai automatic fixture untuk diagnostic kecil yang memang dibutuhkan banyak test; serta
+- mengenali kapan hubungan antar-fixture sudah terlalu rumit dan perlu disederhanakan.
 
 ## Kenapa ini penting buat QA
 
-Advanced fixture bisa mengurangi expensive repeated setup dan memberi consistent interface ke suite besar. Tapi di sinilah failure yang paling susah juga sering muncul: mutable account dishare antarkerja, automatic behavior tersembunyi, cleanup merusak test berikutnya, atau dependency graph yang nggak bisa dijelaskan siapa pun.
+Advanced fixture bisa mengurangi setup mahal yang terus berulang dan membuat banyak test memakai cara setup yang sama. Masalahnya, design seperti ini juga bisa menyebabkan failure yang sulit di-debug: beberapa worker memakai account yang sama, automatic fixture menjalankan action tersembunyi, cleanup menghapus data yang masih dipakai test lain, atau urutan setup sudah nggak bisa dijelaskan.
 
-Complexity baru justified kalau hasilnya clearer ownership, safer lifecycle, atau measured setup saving yang memang besar. Advanced fixture bukan maturity badge. Clear helper dan test-scoped fixture bisa jadi design yang lebih profesional.
+Tambahkan advanced fixture hanya kalau jelas siapa yang membuat dan membersihkan resource, atau kalau hasil pengukuran menunjukkan setup memang jauh lebih cepat. Banyaknya fixture bukan tanda bahwa test suite lebih mature. Helper sederhana dan test-scoped fixture sering kali lebih mudah dirawat.
 
-Lesson ini adalah optional depth. Core lesson sudah membahas default test-scoped design; kamu boleh melewatinya tanpa memblokir Module 8 kecuali suite memang punya kebutuhan nyata untuk configurable option, worker-owned resource, atau automatic diagnostic.
+Lesson ini optional. Kamu boleh melewatinya tanpa menghambat Module 8. Pelajari lebih lanjut kalau test suite memang membutuhkan option yang bisa diatur per project, resource khusus untuk setiap worker, atau diagnostic yang berjalan automatic.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Pisahkan empat konsep ini:
+Bedakan empat hal berikut:
 
 ```text
-Option          → configurable input; nggak punya resource lifecycle sendiri
-Test fixture    → resource milik satu test
-Worker fixture  → resource milik satu worker process
-Automatic       → tetap berjalan walaupun test nggak memintanya secara eksplisit
+Option          → input yang bisa diatur; nggak membuat atau membersihkan resource
+Test fixture    → membuat resource untuk satu test
+Worker fixture  → membuat resource untuk satu worker process
+Automatic       → berjalan walaupun test nggak memintanya dari parameter
 ```
 
-Untuk setiap worker-scoped resource, kamu harus bisa membuktikan ownership statement ini:
+Untuk setiap worker-scoped resource, kamu harus bisa menjelaskan alur ini:
 
 ```text
-Satu worker membuatnya → hanya safe consumer yang memakai → worker itu membersihkan
+Satu worker membuat resource → test yang aman memakainya → worker yang sama melakukan cleanup
 ```
 
-Kalau beberapa worker bisa memutasi server-side identity yang sama, browser isolation nggak akan mencegah race.
+Kalau beberapa worker mengubah account yang sama di server, browser context yang terpisah tetap nggak bisa mencegah race condition.
 
 ## Coba kita bedah contoh nyata
 
-Coba bayangin suite mendukung configurable UI locale dan butuh satu expensive unique account per worker. Setiap test tetap mendapat fresh signed-in browser context.
+Misalnya test suite mendukung UI locale yang bisa diatur dan proses membuat account cukup mahal. Setiap worker membutuhkan satu account yang unik, sementara setiap test tetap mendapatkan signed-in browser context baru.
 
-### 1. Definisikan option dan fixture scope
+### 1. Tentukan option dan scope setiap fixture
 
 ```ts
 import { randomUUID } from 'node:crypto';
@@ -67,9 +67,9 @@ type WorkerFixtures = {
 };
 ```
 
-`appLocale` adalah input. `signedInPage` dimiliki satu test. `workerAccount` dimiliki satu worker.
+`appLocale` adalah input yang bisa diatur dari project. `signedInPage` dibuat untuk satu test, sedangkan `workerAccount` dibuat untuk satu worker.
 
-### 2. Susun lifecycle-nya
+### 2. Atur setup dan cleanup setiap resource
 
 ```ts
 export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
@@ -107,9 +107,9 @@ export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
 });
 ```
 
-Worker fixture ini nggak menyimpan password di source. Dia meminta unique account dari authorized test-support utility, lalu menghapus exact account tersebut di `finally`. `workerIndex` hanya unique di dalam satu run, jadi sertakan stable CI run ID atau run namespace lain kalau support system bisa menerimanya; random fallback untuk local run mencegah collision biasa.
+Worker fixture ini nggak menyimpan password di source code. Fixture meminta account unik dari test-support utility yang memang diberi akses, lalu menghapus account tersebut di dalam `finally`. `workerIndex` hanya unik dalam satu run. Tambahkan CI run ID atau identifier run lain ke `uniqueKey` supaya account dari dua run yang berbeda nggak memakai ID yang sama. Random fallback membantu mencegah collision saat dijalankan secara local.
 
-Test-scoped fixture membuat fresh context dan page untuk setiap test. `finally`-nya tetap menutup context kalau page creation atau consumer test gagal. Reuse account baru aman kalau test-test itu nggak memutasi account-level state yang sama. Kalau mereka mengubah profile, permission, saved address, atau preference, kita butuh isolation yang lebih kuat.
+Test-scoped fixture membuat browser context dan page baru untuk setiap test. Block `finally` tetap menutup context ketika page gagal dibuat atau test fail. Account worker hanya aman dipakai beberapa test kalau semua test tersebut nggak mengubah profile, permission, saved address, preference, atau account-level state lainnya. Kalau state itu ikut diuji, gunakan account terpisah untuk setiap test.
 
 Option tadi bisa dioverride dari configuration:
 
@@ -120,11 +120,11 @@ projects: [
 ];
 ```
 
-Jangan otomatis membuat locale project untuk setiap scenario. Pilih project portfolio berdasarkan supported behavior dan risk.
+Jangan otomatis menjalankan setiap scenario di semua locale project. Pilih scenario berdasarkan locale yang memang didukung dan product risk yang perlu dicek.
 
-### 3. Tambahkan automatic behavior hanya kalau layak disembunyikan
+### 3. Gunakan automatic fixture untuk diagnostic kecil
 
-Automatic fixture bisa menyimpan browser console message saat test gagal:
+Automatic fixture berikut menyimpan browser console message saat test fail:
 
 ```ts
 type Diagnostics = {
@@ -133,17 +133,17 @@ type Diagnostics = {
 
 export const testWithDiagnostics = test.extend<Diagnostics>({
   captureConsole: [
-    async ({ page }, use, testInfo) => {
+    async ({ signedInPage }, use, testInfo) => {
       const messages: string[] = [];
       const collect = (message: ConsoleMessage) => {
         messages.push(message.text());
       };
 
-      page.on('console', collect);
+      signedInPage.on('console', collect);
       try {
         await use();
       } finally {
-        page.off('console', collect);
+        signedInPage.off('console', collect);
       }
 
       if (testInfo.status !== testInfo.expectedStatus) {
@@ -158,72 +158,72 @@ export const testWithDiagnostics = test.extend<Diagnostics>({
 });
 ```
 
-Behavior-nya kecil, diagnostic, dan terlihat di failure artifact. Listener dihapus dalam `finally` supaya test failure nggak meninggalkannya menempel ke fixture work berikutnya. Tetap review log untuk secret atau personal data sebelum artifact disimpan atau dibagikan.
+Fixture ini hanya mengumpulkan diagnostic dan hasilnya terlihat di artifact ketika test fail. Listener dipasang pada `signedInPage` yang sama dengan page yang diterima test, lalu dihapus di dalam `finally` supaya nggak tetap aktif saat fixture lain melanjutkan teardown. Sebelum menyimpan atau membagikan artifact, cek apakah console message berisi secret atau personal data.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Pakai typed option saat project atau test group perlu mengonfigurasi stable input seperti locale atau feature mode. Jangan ubah ordinary test-data row menjadi global option.
+Gunakan typed option ketika project atau group test perlu mengatur input yang stabil, seperti locale atau feature mode. Test data biasa tetap berada di test; jangan pindahkan setiap baris data menjadi global option.
 
-Pakai worker scope untuk expensive service atau resource yang aman dimiliki satu worker. Kandidat yang masuk akal misalnya immutable reference data, isolated service instance, atau unique worker account yang hanya dipakai read-only scenario.
+Gunakan worker scope untuk service atau resource mahal yang aman dipakai oleh satu worker. Contohnya data referensi yang nggak pernah diubah, service instance yang terpisah, atau account unik per worker yang hanya dipakai oleh read-only scenario.
 
-Pakai automatic fixture untuk small cross-cutting diagnostic atau policy yang memang harus berlaku ke semua relevant test. Karena invocation-nya tersembunyi, automatic fixture bukan tempat yang tepat untuk business setup, navigation, atau mutable data creation.
+Gunakan automatic fixture untuk diagnostic kecil yang memang perlu dijalankan pada semua test yang relevan. Karena fixture berjalan tanpa diminta dari parameter test, jangan gunakan automatic fixture untuk business setup, navigation, atau membuat mutable test data.
 
-Tetap gunakan default test-scoped design saat ownership belum jelas. Kalau measured setup cost menjadi masalah, optimasi setelah tahu resource mana yang benar-benar aman untuk dishare.
+Tetap gunakan test scope kalau belum jelas apakah resource aman dipakai bersama. Kalau setup mulai memperlambat suite, ukur dulu bagian yang mahal lalu tentukan resource mana yang benar-benar aman untuk di-share.
 
 ## Kalau gagal, mulai cek dari mana?
 
-| Observation                                  | Kemungkinan advanced-fixture problem         | Yang pertama diperiksa                              |
-| -------------------------------------------- | -------------------------------------------- | --------------------------------------------------- |
-| Failure cuma muncul dengan beberapa worker   | Worker share mutable server-side identity    | Run namespace, generated ID, account ownership, worker index |
-| Test menjalankan setup yang nggak diminta    | Automatic fixture terlalu luas               | Fixture `{ auto: true }` dan imported test object   |
-| Worker restart meninggalkan record           | Cleanup hilang atau identity nggak unique    | `finally`, setup failure path, retained resource ID |
-| Fixture timeout terlihat nggak terkait test  | Slow fixture memiliki time budget            | Fixture duration dan configured fixture timeout     |
-| Ganti satu option membuat banyak worker baru | Worker fixture bergantung pada worker option | Option scope dan worker-fixture signature           |
-| Nggak ada yang tahu setup order              | Dependency graph terlalu dalam atau implicit | Gambar dependency dan reverse teardown order        |
+| Yang terjadi                                         | Kemungkinan penyebab                                  | Cek dulu                                                   |
+| ---------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
+| Test hanya fail ketika memakai beberapa worker       | Beberapa worker mengubah account yang sama di server  | Run ID, generated ID, account setiap worker, `workerIndex` |
+| Test menjalankan setup yang nggak pernah diminta     | Automatic fixture diterapkan terlalu luas             | Fixture `{ auto: true }` dan test object yang di-import    |
+| Worker restart meninggalkan record                   | Cleanup nggak berjalan atau ID resource nggak unik    | Block `finally`, error saat setup, dan resource ID         |
+| Fixture timeout terlihat nggak berkaitan dengan test | Fixture lambat memakai timeout sendiri                | Durasi fixture dan fixture timeout yang digunakan          |
+| Mengubah satu option membuat banyak worker baru      | Worker fixture bergantung pada worker-scoped option   | Scope option dan parameter worker fixture                  |
+| Nggak ada yang bisa menjelaskan urutan setup         | Hubungan antar-fixture terlalu dalam atau tersembunyi | Gambar urutan dependency, setup, dan teardown              |
 
-Worker process bisa restart setelah failure. Pakai stable run namespace kalau tersedia, sertakan project dan worker identity, lalu design cleanup dan next setup supaya interrupted run tetap bisa dipulihkan dengan aman.
+Worker process bisa restart setelah test fail. Gunakan CI run ID atau identifier run lain yang stabil, lalu gabungkan dengan nama project dan `workerIndex`. Cleanup dan setup berikutnya juga perlu aman ketika run sebelumnya terputus di tengah jalan.
 
-Jangan menyelesaikan race dengan memaksa seluruh suite menjadi satu worker sebelum memahami shared resource-nya. Itu cuma menyembunyikan ownership defect dan menghilangkan useful parallel feedback.
+Jangan langsung memaksa seluruh suite memakai satu worker untuk menghilangkan race. Cari dulu resource apa yang dipakai bersama dan test mana yang mengubahnya. Satu worker hanya menyembunyikan masalah tersebut sekaligus membuat feedback dari parallel run menjadi lebih lambat.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
-Sebelum menerima generated advanced fixture, tanyakan:
+Sebelum menerima advanced fixture buatan AI, tanyakan:
 
-- Value ini option, test resource, atau worker resource?
-- Kenapa worker scope lebih aman dan materially faster daripada test scope di sini?
-- Server-side state mana yang bisa dimutasi consumer?
-- Apakah identity setiap worker unique, termasuk setelah restart?
-- Apakah cleanup berjalan untuk exact owned resource saat sukses maupun gagal?
-- Bisakah automatic behavior mengekspos secret atau mengubah scenario?
-- Apakah fixture dependency tetap shallow dan mudah dijelaskan?
-- Apakah option tanpa sengaja mengubah worker reuse atau melipatgandakan project?
-- Apakah helper atau ordinary test-scoped fixture lebih jelas?
-- Apakah AI mengarang account factory, storage-state authority, atau cleanup API?
+- Apakah value ini hanya sebuah option, resource untuk satu test, atau resource untuk satu worker?
+- Berapa banyak waktu yang dihemat oleh worker scope, dan kenapa resource-nya aman dipakai beberapa test?
+- State apa di server yang bisa diubah oleh test?
+- Apakah setiap worker memakai ID yang unik, termasuk setelah worker restart?
+- Apakah cleanup menghapus resource yang tepat saat test pass maupun fail?
+- Bisakah automatic fixture membocorkan secret atau mengubah starting page scenario?
+- Apakah urutan dependency, setup, dan teardown masih mudah dijelaskan?
+- Apakah satu option tanpa sengaja membuat ulang banyak worker atau menambah jumlah project?
+- Apakah helper atau test-scoped fixture biasa lebih mudah dibaca?
+- Apakah AI mengarang account factory, akses untuk membuat storage state, atau cleanup API?
 
-Minta lifecycle diagram atau written ownership contract untuk setiap shared mutable resource. Kalau setup dan teardown order-nya nggak bisa dijelaskan, abstraction-nya belum siap.
+Untuk setiap mutable resource yang dipakai bersama, minta diagram yang menunjukkan siapa yang membuat, memakai, dan menghapusnya. Kalau urutan setup dan teardown nggak bisa dijelaskan, fixture tersebut belum siap digunakan.
 
 ## Coba cek pemahamanmu
 
 AI membuat worker-scoped fixture dengan satu account `admin@example.test`. Semua worker memakai storage-state file yang sama. Test mengedit permission dan profile setting. Automatic fixture juga membuka `/admin` sebelum setiap test.
 
-Temukan race dan hidden behavior-nya. Bagian mana yang kamu pertahankan, ubah scope-nya, atau hapus?
+Temukan resource yang saling bertabrakan dan action yang berjalan tanpa terlihat di test. Bagian mana yang kamu pertahankan, ubah scope-nya, atau hapus?
 
 ## Bandingkan dengan cara pikir ini
 
 Salah satu respons yang masuk akal:
 
-- Jangan share satu mutable admin identity atau storage-state file ke beberapa worker.
-- Buat unique account per worker hanya kalau semua test yang memakainya read-only terhadap account-level state; kalau tidak, gunakan per-test identity atau isolation boundary lain.
-- Beri setiap test fresh context walaupun safe authentication state direuse.
-- Jangan commit storage state dan pastikan satu worker nggak menimpa file worker lain.
-- Hapus automatic navigation karena dia menyembunyikan business-relevant starting step dan memengaruhi test yang butuh route lain.
-- Pertahankan automatic diagnostic hanya kalau kecil, observable, sudah disanitasi, dan berguna untuk semua imported test.
-- Dokumentasikan cleanup dan interrupted-run recovery untuk setiap generated account.
+- Jangan share satu mutable admin account atau storage-state file ke beberapa worker.
+- Buat account unik per worker hanya kalau semua test yang memakainya nggak mengubah account-level state. Kalau state tersebut berubah, gunakan account per test.
+- Beri setiap test browser context baru meskipun authentication state yang aman dipakai ulang.
+- Jangan memasukkan storage state ke repository, dan pastikan satu worker nggak menimpa file worker lain.
+- Hapus automatic navigation karena action tersebut menyembunyikan starting page dan memengaruhi test yang perlu membuka route lain.
+- Pertahankan automatic diagnostic hanya kalau kecil, hasilnya terlihat di artifact, sudah dibersihkan dari data sensitif, dan berguna untuk semua test yang memakai fixture tersebut.
+- Dokumentasikan cleanup dan cara membersihkan account yang tertinggal ketika run terputus.
 
-Advanced design baru layak kalau ownership-nya justru lebih explicit daripada versi sederhananya.
+Advanced fixture baru layak digunakan kalau lebih mudah menjelaskan siapa yang membuat, mengubah, dan membersihkan setiap resource dibandingkan versi sederhananya.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa membedakan option dari resource, memodelkan test dan worker ownership, lalu menolak advanced fixture design yang menyembunyikan behavior atau share mutable state dengan unsafe.
+Sekarang kamu seharusnya bisa membedakan option dari resource, memilih test atau worker scope, lalu menolak advanced fixture yang menyembunyikan action atau membuat beberapa test mengubah mutable state yang sama.
 
-Lesson ini optional. Menyelesaikannya nggak menggantikan core outcome Module 8: pilih abstraction terkecil yang maintainable, buat dependency explicit, dan encode suite policy secara deliberate.
+Lesson ini optional. Core Module 8 tetap sama: pilih abstraction terkecil yang membuat test lebih mudah dirawat, tunjukkan resource yang dibutuhkan test, dan buat setiap setting test suite mudah dijelaskan.

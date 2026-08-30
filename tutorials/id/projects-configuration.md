@@ -1,55 +1,55 @@
 ---
-title: 'Perlakukan Configuration sebagai Executable Test Policy'
-description: 'Pisahkan scenario behavior dari runner policy, lalu tentukan environment, project, timeout, dan secret secara deliberate.'
+title: 'Atur Environment, Project, Timeout, dan Secret di Playwright Configuration'
+description: 'Pisahkan action yang diuji dari setting test runner, lalu pastikan test berjalan di target dan project yang tepat tanpa membocorkan secret.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- memisahkan scenario behavior dari suite-wide runner policy;
-- menjelaskan apa yang direpresentasikan Playwright project;
-- menambahkan project variant tanpa membuat accidental test matrix;
-- membedakan concern test, assertion, action, dan navigation timeout; serta
-- memvalidasi environment value dan menjaga secret tetap di luar source serta artifact.
+- memisahkan action dan expected result scenario dari setting test runner;
+- menjelaskan test apa saja yang dijalankan oleh satu Playwright project;
+- menambahkan project variant tanpa membuat jumlah test execution membesar tanpa sengaja;
+- membedakan fungsi test, assertion, action, navigation, dan fixture timeout; serta
+- memvalidasi environment variable dan mencegah secret masuk ke source code atau artifact.
 
 ## Kenapa ini penting buat QA
 
-Test code bisa benar, tapi system di sekelilingnya masih bisa unsafe atau misleading. Test mungkin diam-diam menargetkan environment yang salah, menjalankan semua scenario di matrix raksasa, menunggu terlalu lama saat kondisi nggak akan pernah muncul, atau membocorkan credential lewat committed configuration.
+Test bisa ditulis dengan benar, tapi setting test runner masih dapat menghasilkan run yang berbahaya atau menyesatkan. Test mungkin diam-diam mengarah ke production, menjalankan semua scenario dalam terlalu banyak kombinasi, menunggu lama untuk expected result yang nggak akan muncul, atau menyimpan credential di configuration yang masuk repository.
 
-Configuration bukan boilerplate yang cuma perlu dipahami automation specialist. Configuration menjawab pertanyaan QA yang punya product consequence:
+Configuration bukan sekadar boilerplate untuk automation specialist. QA perlu membacanya karena file ini menentukan:
 
-- Test mana yang ditemukan runner?
-- Aplikasi mana yang sedang diuji?
-- Browser, device, role, atau environment variant mana yang berjalan?
-- Berapa lama kita menunggu sebelum menyebut kondisi sebagai failure?
-- Evidence apa yang disimpan?
+- file test mana yang ditemukan runner;
+- environment dan aplikasi mana yang diuji;
+- browser, device, role, atau variasi environment mana yang berjalan;
+- berapa lama runner menunggu sebelum test fail; dan
+- report, trace, screenshot, atau artifact apa yang disimpan.
 
-Karena configuration bisa mengubah arti dan biaya setiap run, perlakukan dia sebagai executable test policy.
+Satu perubahan di configuration bisa mengubah target aplikasi, jumlah test execution, durasi run, dan informasi yang tersimpan. Karena itu, QA perlu me-review configuration seperti me-review test code.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Pisahkan tiga responsibility ini:
+Pisahkan isi test, fixture, dan configuration:
 
 ```text
-Test code      → behavior, product risk, action, evidence
-Fixtures       → named dependency dan lifecycle-nya
-Configuration  → discovery, environment, variant, dan runner policy
+Test code      → action yang diuji dan expected result
+Fixtures       → resource, setup, scope, dan cleanup
+Configuration  → file test, environment, project, dan setting runner
 ```
 
-Playwright project adalah satu named group of tests yang berjalan dengan configuration yang sama. Ini nggak otomatis berarti repository, deployment, atau product project.
+Playwright project adalah sekumpulan test yang berjalan dengan setting yang sama dan diberi satu nama. Istilah project di sini nggak otomatis berarti repository, deployment, atau project yang sedang dikerjakan product team.
 
-Bayangkan setiap project sedang menanyakan satu pertanyaan yang deliberate:
+Setiap project sebaiknya menjalankan satu kondisi yang memang ingin dibandingkan:
 
 ```text
-Relevant tests yang sama + satu meaningful configuration variant
-                              ↓
-                      comparable evidence
+Test yang relevan + satu variasi setting yang memang didukung
+                            ↓
+            Hasil run yang bisa dibandingkan
 ```
 
-Kalau sebuah project nggak merepresentasikan supported user condition, operational need, atau product risk, bisa jadi dia cuma melipatgandakan runtime.
+Kalau browser, device, role, atau environment di dalam project nggak mewakili kondisi user yang didukung atau kebutuhan operasional yang jelas, project tersebut hanya menambah jumlah run.
 
 ## Coba kita bedah contoh nyata
 
-Team mendukung desktop Chromium untuk setiap change dan juga membutuhkan Firefox evidence untuk critical customer flow. Mulai dari explicit base URL dan dua named project:
+Team menjalankan desktop Chromium untuk setiap change. Customer flow yang critical juga perlu dicek di Firefox. Mulai dengan `baseURL` yang wajib diisi dan dua project yang namanya jelas:
 
 ```ts
 import { defineConfig, devices } from '@playwright/test';
@@ -84,135 +84,135 @@ export default defineConfig({
 });
 ```
 
-Baca code ini sebagai policy, bukan sekadar syntax:
+Baca setiap setting berdasarkan efeknya pada test run:
 
-| Setting                      | Policy decision                                                   |
-| ---------------------------- | ----------------------------------------------------------------- |
-| `testDir: './tests'`         | Hanya intended suite directory yang ditemukan                     |
-| required `BASE_URL`          | Run berhenti sebelum testing kalau target-nya nggak diketahui     |
-| `timeout: 30_000`            | Satu test dan test-scoped fixture punya bounded budget            |
-| `expect.timeout: 5_000`      | Retrying assertion punya evidence-waiting budget yang lebih kecil |
-| dua named project            | Selected test bisa berjalan di dua supported browser profile      |
-| failure trace dan screenshot | Failed run menyimpan diagnostic evidence                          |
+| Setting                      | Efeknya pada test run                                                 |
+| ---------------------------- | --------------------------------------------------------------------- |
+| `testDir: './tests'`         | Runner hanya mencari file test di directory tersebut                  |
+| required `BASE_URL`          | Run berhenti sebelum test dimulai kalau target URL nggak tersedia     |
+| `timeout: 30_000`            | Test body, setup fixture, dan `beforeEach` berbagi batas 30 detik     |
+| `expect.timeout: 5_000`      | Retrying assertion menunggu expected result maksimal selama 5 detik   |
+| dua named project            | Test yang dipilih bisa dijalankan di Chromium dan Firefox             |
+| failure trace dan screenshot | Saat test fail, runner menyimpan trace dan screenshot untuk debugging |
 
-Nama browser belum menentukan coverage strategy. Module 9 nanti membahas risk-based subset mana yang berjalan pada setiap trigger dan bagaimana evidence disimpan di CI.
+Menambahkan nama browser belum menentukan test mana yang perlu dijalankan di browser tersebut. Module 9 akan membahas scenario mana yang berjalan untuk setiap trigger dan artifact apa yang perlu disimpan di CI.
 
-### Project nggak cuma untuk browser
+### Project juga bisa membedakan setting selain browser
 
 Project bisa memvariasikan:
 
 - browser engine atau device profile;
 - authenticated versus signed-out state;
-- supported locale;
-- focused environment atau feature configuration;
-- timeout atau retry policy untuk group yang memang dipisahkan; atau
+- locale yang didukung;
+- environment atau feature configuration tertentu;
+- timeout atau retry untuk group yang memang perlu dipisahkan; atau
 - setup project yang menjadi dependency project lain.
 
-Satu project sebaiknya mengekspresikan coherent variant. Hati-hati saat beberapa dimension digabung:
+Satu project sebaiknya mewakili satu kumpulan setting yang jelas. Hati-hati ketika beberapa variasi digabung:
 
 ```text
 3 browsers × 2 devices × 3 roles × 2 environments = 36 variants
 ```
 
-Kalau 200 test berjalan di semua 36 variant, suite menjadwalkan 7.200 test execution bahkan sebelum retry. Itu baru layak kalau risk dan operational budget memang mendukungnya.
+Kalau 200 test dijalankan pada semua 36 variasi, runner menjadwalkan 7.200 test execution bahkan sebelum retry. Jumlah sebesar itu perlu alasan berdasarkan product risk dan waktu yang tersedia di pipeline.
 
-Lebih baik mulai dari deliberate portfolio: broad fast feedback di primary supported condition, ditambah selected scenario untuk high-risk variant lain. Jangan berasumsi setiap scenario membutuhkan setiap kombinasi.
+Mulai dengan coverage yang kecil dan jelas. Jalankan feedback yang luas dan cepat pada browser atau kondisi utama, lalu pilih scenario berisiko tinggi untuk variasi lain. Nggak semua scenario perlu dijalankan pada setiap kombinasi.
 
-### Timeout punya boundary yang berbeda
+### Bedakan fungsi setiap timeout
 
-| Timeout concern    | Yang dibatasi atau dikontrol                                  |
-| ------------------ | ------------------------------------------------------------- |
-| Test timeout       | Seluruh test, termasuk test-scoped fixture setup dan teardown |
-| Expect timeout     | Waktu retrying assertion menunggu condition                   |
-| Action timeout     | Waktu action menunggu actionability requirement               |
-| Navigation timeout | Waktu navigation operation menunggu                           |
-| Fixture timeout    | Separate budget untuk slow fixture yang memang justified      |
+| Jenis timeout      | Yang dibatasi                                                  |
+| ------------------ | -------------------------------------------------------------- |
+| Test timeout       | Test body, setup test-scoped fixture, dan `beforeEach`         |
+| Expect timeout     | Waktu retrying assertion menunggu expected result              |
+| Action timeout     | Waktu action menunggu element memenuhi actionability check     |
+| Navigation timeout | Waktu navigation operation menunggu                            |
+| Fixture timeout    | Waktu khusus untuk fixture lambat yang memang perlu dipisahkan |
 
-Jangan menaikkan semua timeout hanya karena satu condition salah. Cari tahu dulu apakah operation memang legitimate slow, expected state nggak pernah muncul, setup menghabiskan budget, atau test menargetkan environment yang salah.
+Setelah test body selesai, teardown fixture dan `afterEach` mendapat timeout terpisah dengan durasi yang sama. Jangan menaikkan semua timeout hanya karena satu test menunggu terlalu lama. Cek dulu apakah operation memang lambat, expected result nggak pernah muncul, setup sudah menghabiskan sebagian besar test timeout, atau test berjalan di environment yang salah.
 
-### Perlakukan environment value sebagai input
+### Hentikan run kalau target environment nggak jelas
 
-Configuration boleh membaca value dari environment variable atau secure local/CI mechanism. Validasi required value sedini mungkin dan hindari fallback yang bisa diam-diam menargetkan production.
+Configuration boleh membaca value dari environment variable atau mekanisme penyimpanan yang aman di local dan CI. Validasi value yang wajib tersedia sebelum test dimulai. Hindari fallback yang diam-diam mengarahkan test ke production.
 
 Secret nggak boleh muncul di:
 
-- committed configuration atau `.env` file;
+- configuration atau `.env` file yang masuk repository;
 - test title atau error message;
 - screenshot, trace, video, atau console output;
-- generated prompt yang dikirim keluar dari approved boundary; atau
-- authenticated storage-state file yang masuk version control.
+- prompt yang dikirim ke tool atau service di luar yang disetujui team; atau
+- authenticated storage-state file yang masuk repository.
 
-Environment variable cuma delivery mechanism. Value-nya tetap nggak aman kalau kemudian dicetak atau disimpan di artifact.
+Environment variable hanya menjadi cara untuk mengirim value ke test. Secret tetap bocor kalau value tersebut kemudian dicetak ke log atau tersimpan di artifact.
 
-### Bedakan local policy dari CI policy
+### Pisahkan setting local runner dan CI
 
-Lesson ini berhenti di resolved local runner contract: apa yang bisa dijalankan developer, supported variant apa yang tersedia, dan diagnostic evidence apa yang dihasilkan saat run gagal. Module 9 yang membahas trigger-specific selection, CI gate, retry policy, artifact retention, dan feedback ownership. Satu setting bisa valid di dua tempat; saat review, tentukan siapa yang memakai keputusan itu sebelum menaruhnya di configuration atau pipeline.
+Lesson ini fokus pada apa yang bisa dijalankan developer secara local, project apa yang tersedia, dan artifact debugging apa yang dihasilkan saat test fail. Module 9 akan membahas test mana yang dipilih untuk setiap trigger, CI gate, retry, penyimpanan artifact, dan siapa yang menangani failure. Satu setting bisa dipakai di local maupun CI. Sebelum menaruhnya di configuration atau pipeline, cek bagian mana yang memang perlu menggunakan setting tersebut.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Taruh stable runner-wide policy di `playwright.config.ts`: test discovery, default `use` value, project, timeout, reporter, local diagnostic default, dan owned local web server kalau memang sesuai. Serahkan CI policy yang bergantung pada trigger ke pipeline layer.
+Taruh setting yang berlaku untuk seluruh local runner di `playwright.config.ts`, seperti lokasi file test, default `use` value, project, timeout, reporter, artifact untuk debugging, dan local web server yang dijalankan oleh runner. Setting CI yang berubah berdasarkan trigger tetap berada di pipeline.
 
-Pertahankan product action dan assertion di test. Taruh dependency setup serta cleanup di fixture. Jangan pindahkan scenario branch ke configuration cuma supaya test file terlihat pendek.
+Pertahankan action dan assertion scenario di file test. Taruh setup serta cleanup resource di fixture. Jangan pindahkan percabangan scenario ke configuration hanya supaya file test terlihat lebih pendek.
 
-Pakai project kalau satu named configuration variant perlu menjalankan meaningful group of tests. Pakai test-level data parameterization kalau behavior-nya sama dan yang berubah hanya input/output example. Jangan bikin project untuk setiap test-data row.
+Gunakan project ketika satu variasi setting perlu menjalankan group test tertentu. Gunakan data parameterization di level test kalau action yang diuji tetap sama dan yang berubah hanya contoh input serta expected result. Jangan membuat project untuk setiap baris test data.
 
-Pakai project dependency kalau ada real prerequisite yang harus selesai sebelum dependent project dan result-nya perlu terlihat di report serta trace. Jangan ubah satu shared setup project menjadi mutable data yang dimodifikasi semua parallel test.
+Gunakan project dependency kalau satu setup memang harus selesai sebelum project lain dan hasil setup tersebut perlu muncul di report serta trace. Jangan memakai satu setup project untuk membuat mutable data yang kemudian diubah oleh semua parallel test.
 
-Pilih timeout dari observed system behavior dan failure cost. Narrow local exception biasanya lebih gampang dipahami daripada large global increase.
+Pilih timeout dari durasi yang benar-benar terlihat saat aplikasi berjalan. Kalau hanya satu operation yang memang lambat, exception di lokasi tersebut lebih mudah dipahami daripada menaikkan global timeout untuk semua test.
 
 ## Kalau gagal, mulai cek dari mana?
 
-| Observation                                   | Kemungkinan policy problem                       | Evidence yang diperiksa                                 |
-| --------------------------------------------- | ------------------------------------------------ | ------------------------------------------------------- |
-| Test mengubah real atau unexpected data       | Environment validation hilang atau unsafe        | Resolved base URL, project name, environment variable   |
-| Local dan CI menjalankan scenario berbeda     | Discovery, grep, atau project filter sudah drift | Final config dan exact command                          |
-| Runtime naik jauh lebih cepat dari test count | Project dimension membentuk Cartesian product    | Project list dan execution per scenario                 |
-| Semua failure lama sekali                     | Global timeout menutupi absent condition         | First failure, assertion call log, setup duration       |
-| Satu project gagal sebelum test code berjalan | Project option atau dependency setup salah       | Project config, dependency result, resolved input value |
-| Credential muncul di artifact                 | Secret masuk visible UI atau tercetak di log     | Trace, screenshot, reporter output, test attachment     |
+| Yang terjadi                                            | Kemungkinan penyebab                                           | Cek dulu                                                    |
+| ------------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
+| Test mengubah data asli atau data yang nggak diharapkan | Target environment nggak divalidasi dengan aman                | `baseURL`, nama project, dan environment variable           |
+| Local dan CI menjalankan scenario berbeda               | Lokasi test, `grep`, atau project filter sudah berbeda         | Configuration akhir dan command yang benar-benar dijalankan |
+| Runtime naik jauh lebih cepat dari jumlah test          | Kombinasi project melipatgandakan setiap scenario              | Daftar project dan jumlah execution per scenario            |
+| Setiap test yang fail membutuhkan waktu lama            | Global timeout menunggu expected result yang nggak akan muncul | Test fail pertama, assertion call log, dan durasi setup     |
+| Satu project berhenti sebelum test code berjalan        | Setting khusus project atau dependency setup salah             | Project configuration, hasil dependency, dan input value    |
+| Credential muncul di artifact                           | Secret diketik di UI yang terlihat atau tercetak di log        | Trace, screenshot, reporter output, dan test attachment     |
 
-Periksa resolved project dan environment sebelum mengedit test. Source code yang sama bisa punya arti berbeda saat base URL, storage state, locale, atau device profile-nya berubah.
+Cek project dan environment yang benar-benar digunakan oleh runner sebelum mengedit test. Source code yang sama bisa menjalankan kondisi berbeda ketika `baseURL`, storage state, locale, atau device profile berubah.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
-Review generated configuration baris demi baris:
+Review configuration buatan AI baris demi baris:
 
-- Policy apa yang diekspresikan setiap option?
+- Apa efek setiap option pada test run?
 - Test dan directory mana yang akan ditemukan?
-- Bisakah missing value diam-diam memilih environment yang salah?
-- Apakah setiap project sesuai supported condition atau known risk?
-- Berapa total execution yang dibuat project matrix?
-- Apakah project name bermakna di report?
-- Apakah timeout increase didukung evidence?
+- Bisakah value yang kosong diam-diam memilih environment yang salah?
+- Apakah setiap project mewakili kondisi yang memang didukung atau product risk yang perlu diuji?
+- Berapa total test execution yang dibuat oleh semua project?
+- Apakah nama project menjelaskan browser, role, atau kondisi yang dijalankan di report?
+- Kenapa timeout dinaikkan, dan log atau trace mana yang menunjukkan operation tersebut memang lambat?
 - Apakah setup membuat shared mutable state?
 - Bisakah secret masuk source, log, trace, screenshot, atau storage state?
-- Apakah setting ini local runner default, project variant, atau keputusan CI trigger/gate?
-- Apakah AI mengarang device, environment, command, reporter, atau credential strategy yang belum disetujui team?
+- Apakah setting ini default untuk local runner, variasi project, atau keputusan CI trigger dan gate?
+- Apakah AI mengarang device, environment, command, reporter, atau cara mengelola credential yang belum disetujui team?
 
-Minta perhitungan test matrix dan resolved assumption, bukan cuma configuration snippet. Valid syntax masih bisa menyimpan policy yang buruk.
+Minta AI menghitung jumlah test execution dan menyebutkan asumsi yang dipakai, bukan hanya memberikan configuration snippet. Syntax yang valid tetap bisa menjalankan test yang salah atau membuat pipeline terlalu lambat.
 
 ## Coba cek pemahamanmu
 
-Generated configuration mendefinisikan tiga browser, tiga device, dua locale, dua role, serta staging dan production project. Semuanya memakai global test timeout 120 detik dan fallback ke production URL saat `BASE_URL` nggak ada. Team punya 300 test.
+AI membuat configuration dengan tiga browser, tiga device, dua locale, dua role, serta project staging dan production. Semuanya memakai global test timeout 120 detik dan fallback ke production URL saat `BASE_URL` nggak ada. Team punya 300 test.
 
-Risk dan cost apa yang perlu kamu angkat saat review? Bagaimana kamu menguranginya menjadi intentional first policy? Untuk setiap keputusan, siapa owner-nya: test, fixture, local configuration, atau CI?
+Risiko dan biaya apa yang perlu kamu angkat saat review? Bagaimana kamu membuat configuration awal yang lebih kecil dan aman? Untuk setiap perubahan, tentukan apakah tempatnya ada di test, fixture, local configuration, atau CI.
 
 ## Bandingkan dengan cara pikir ini
 
 Salah satu review yang masuk akal:
 
-- Hentikan run saat target URL nggak ada; jangan pernah silently fallback ke production.
-- Hitung 36 proposed variant dan 10.800 execution sebelum retry.
-- Tentukan primary supported browser dan small set of scenarios yang perlu browser, device, locale, atau role coverage lain.
-- Pisahkan production testing, minta explicit authorization, buat read-only saat sesuai, lalu lindungi dengan data dan safety policy sendiri.
-- Kembalikan global timeout ke evidence-based budget dan investigasi genuinely slow operation secara lokal.
-- Beri setiap retained project nama report yang bermakna dan documented reason.
-- Pastikan authentication state dan secret diberikan secara aman, nggak dicommit, dan nggak masuk attachment.
+- Hentikan run saat target URL nggak tersedia. Jangan pernah fallback ke production tanpa persetujuan yang jelas.
+- Hitung 72 variasi dan 21.600 test execution sebelum retry.
+- Tentukan browser utama, lalu pilih sedikit scenario yang memang perlu coverage browser, device, locale, atau role lain.
+- Pisahkan production testing, wajibkan authorization, gunakan flow read-only jika sesuai, lalu siapkan aturan test data dan keamanan sendiri.
+- Kembalikan global timeout ke durasi yang sesuai dengan hasil run, lalu cek operation lambat secara terpisah.
+- Beri setiap project yang dipertahankan nama report dan alasan yang jelas.
+- Pastikan authentication state dan secret diberikan dengan aman, nggak masuk repository, dan nggak tersimpan sebagai attachment.
 
-Configuration pertama nggak perlu memodelkan semua future condition. Yang penting, current test contract menjadi explicit dan aman.
+Configuration awal cukup mencakup kondisi yang memang didukung sekarang. Setiap setting harus menunjukkan target yang dijalankan, jumlah run yang dibuat, dan alasan kenapa variasi tersebut dibutuhkan.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa menjelaskan apa yang masuk ke test, fixture, dan configuration; mendefinisikan intentional project; serta mereview environment, timeout, dan secret policy sebelum suite berjalan.
+Sekarang kamu seharusnya bisa menjelaskan setting mana yang berada di test, fixture, dan configuration; membuat Playwright project untuk kondisi yang memang didukung; serta me-review environment, timeout, dan secret sebelum test suite berjalan.
 
-Optional lesson berikutnya membahas advanced fixture composition. Lewati dulu kalau suite-mu belum benar-benar butuh configurable option, worker-owned resource, atau automatic diagnostic behavior.
+Optional lesson berikutnya membahas fixture yang lebih advanced. Lewati dulu kalau test suite belum benar-benar membutuhkan configurable option, resource yang dipakai satu worker, atau diagnostic yang berjalan automatic.

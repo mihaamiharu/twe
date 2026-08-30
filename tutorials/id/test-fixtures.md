@@ -1,61 +1,61 @@
 ---
-title: 'Buat Test Dependency dan Lifecycle Terlihat Jelas'
-description: 'Pilih helper, hook, dan fixture secara deliberate, lalu buat setup, ownership, scope, dan cleanup mudah ditelusuri.'
+title: 'Pastikan Setup, Scope, dan Cleanup Setiap Fixture Jelas'
+description: 'Pilih helper, hook, atau fixture berdasarkan resource yang dibutuhkan test, kapan resource dibuat, siapa yang menggunakannya, dan siapa yang melakukan cleanup.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- menjelaskan apa yang disediakan Playwright fixture dan kapan fixture dibuat;
+- menjelaskan resource apa yang diberikan Playwright fixture dan kapan setup-nya dijalankan;
 - memilih antara helper, hook, dan custom fixture;
-- membaca fixture sebagai setup, value handoff, test use, dan teardown;
-- menjadikan test-scoped state sebagai safe default; serta
-- mendiagnosis hidden setup, scope yang salah, dan cleanup failure.
+- menelusuri setup sebelum `await use(...)`, value yang diberikan ke test, dan teardown setelahnya;
+- menggunakan test scope sebagai pilihan awal untuk mutable state; serta
+- mendiagnosis setup yang tersembunyi, scope yang salah, dan cleanup yang nggak berjalan.
 
 ## Kenapa ini penting buat QA
 
-Test bergantung pada lebih dari step yang terlihat. Ada browser page, authenticated identity, owned data, mungkin API client, dan kadang cleanup. Kalau semua dependency itu disembunyikan di `beforeEach` yang besar, scenario bisa gagal bahkan sebelum action pertamanya—dan kita susah tahu penyebabnya.
+Test membutuhkan lebih dari step yang terlihat. Test mungkin butuh browser page, user yang sudah login, test data sendiri, API client, dan cleanup. Kalau semua kebutuhan tersebut disembunyikan di dalam `beforeEach` yang besar, test bisa fail sebelum menjalankan baris pertamanya. Kita juga jadi sulit melihat setup mana yang bermasalah atau menjalankan test tersebut sendirian.
 
-Fixture membuat dependency punya nama dan bisa dikomposisikan. Setiap test hanya menerima resource yang diminta, lalu resource dibersihkan sesuai scope. Tapi fixture nggak otomatis lebih jelas daripada helper. Fixture yang buruk bisa menyembunyikan business step, membuat shared mutable state, dan mengubah test sederhana jadi mini-framework.
+Fixture memberi nama pada resource yang dibutuhkan test. Setiap test bisa meminta fixture yang diperlukan, lalu fixture melakukan cleanup sesuai scope-nya. Tapi fixture nggak selalu lebih jelas daripada helper. Fixture yang dirancang dengan buruk bisa menyembunyikan action penting, membuat beberapa test memakai mutable state yang sama, dan mengubah test sederhana menjadi mini-framework.
 
-Jadi pertanyaan QA-nya bukan “Ini bisa dijadikan fixture nggak?” Pertanyaannya: “Dependency ini butuh lifecycle dan ownership seperti apa?”
+Sebelum membuat fixture, tanyakan: resource ini dibuat kapan, test atau worker mana yang boleh mengubahnya, dan siapa yang melakukan cleanup?
 
 ## Cara berpikir yang perlu kamu pegang
 
-Baca setiap custom fixture sebagai lifecycle contract:
+Baca custom fixture berdasarkan urutan resource dibuat, digunakan, lalu dibersihkan:
 
 ```text
-Declared dependencies
+Dependency yang dibutuhkan
         ↓
-Setup dan verifikasi resource
+Setup resource dan cek hasilnya
         ↓
-await use(value) ── test atau dependent fixture berjalan
+await use(value) ── value diberikan ke test atau fixture lain
         ↓
-Teardown resource
+Teardown dan cleanup resource
 
-Scope menentukan seberapa sering lifecycle ini dibuat.
+Scope menentukan apakah urutan ini berjalan per test atau per worker.
 ```
 
-![Fixture lifecycle me-resolve declared dependency, menjalankan verified setup, memberikan value ke test lewat use, lalu melakukan teardown sesuai test atau worker scope.](/images/tutorials/fixture-lifecycle-ownership.svg)
+![Fixture menyiapkan dependency, mengecek resource, memberikan value ke test lewat use, lalu melakukan cleanup sesuai test atau worker scope.](/images/tutorials/fixture-lifecycle-ownership.svg)
 
-_Bagian sebelum `await use(...)` adalah setup. Bagian setelahnya adalah teardown. Scope menentukan owner dan lifetime._
+_Code sebelum `await use(...)` menjalankan setup. Setelah test selesai, code di bawahnya menjalankan teardown. Scope menentukan apakah resource dibuat untuk satu test atau dipakai oleh satu worker._
 
 Built-in fixture Playwright sudah mengikuti model ini:
 
-| Built-in fixture | Yang disediakan                                       | Typical scope |
-| ---------------- | ----------------------------------------------------- | ------------- |
-| `page`           | Isolated browser page untuk satu test                 | Test          |
-| `context`        | Isolated browser context untuk satu test              | Test          |
-| `request`        | API request context                                   | Test          |
-| `browser`        | Browser instance untuk membuat context atau page      | Worker        |
-| `browserName`    | Browser engine name dari project yang sedang berjalan | Worker        |
+| Built-in fixture | Resource yang diberikan                                  | Scope biasanya |
+| ---------------- | -------------------------------------------------------- | -------------- |
+| `page`           | Browser page baru untuk satu test                        | Test           |
+| `context`        | Browser context baru untuk satu test                     | Test           |
+| `request`        | API request context                                      | Test           |
+| `browser`        | Browser instance untuk membuat browser context atau page | Worker         |
+| `browserName`    | Nama browser engine dari project yang sedang dijalankan  | Worker         |
 
-Fixture dibuat on demand. Non-automatic fixture yang nggak dipakai juga nggak menjalankan setup.
+Fixture biasanya dibuat saat diminta. Non-automatic fixture yang nggak digunakan oleh test juga nggak menjalankan setup.
 
 ## Coba kita bedah contoh nyata
 
-Beberapa checkout test butuh satu owned cart dan page yang sudah membuka cart tersebut. Kita bisa menaruh semuanya di hook besar lalu menyimpan ID di outer variable, tapi dependency-nya jadi implicit.
+Beberapa checkout test membutuhkan cart masing-masing dan page yang sudah membuka cart tersebut. Kita memang bisa membuat cart dari hook besar lalu menyimpan ID-nya di outer variable. Masalahnya, test jadi nggak menunjukkan dari mana cart berasal dan siapa yang harus menghapusnya.
 
-Mulai dari memberi nama resource yang dibutuhkan test:
+Mulai dengan memberi nama pada value yang akan diterima test:
 
 ```ts
 type CheckoutFixtures = {
@@ -63,7 +63,7 @@ type CheckoutFixtures = {
 };
 ```
 
-Lalu definisikan lifecycle-nya:
+Setelah itu, tentukan cara cart dibuat dan dibersihkan:
 
 ```ts
 import { test as base, expect } from '@playwright/test';
@@ -98,17 +98,17 @@ export const test = base.extend<CheckoutFixtures>({
 export { expect };
 ```
 
-Contoh ini mengasumsikan ada authorized test-support API. Jangan bikin production backdoor hanya supaya fixture lebih gampang dibuat.
+Contoh ini mengasumsikan aplikasi memang punya test-support API yang hanya bisa diakses dengan authorization yang sesuai. Jangan membuat production backdoor hanya supaya fixture lebih mudah dibuat.
 
-Sekarang baca code-nya sesuai urutan lifecycle:
+Sekarang baca code-nya sesuai urutan saat dijalankan:
 
-1. `checkoutPage` declare dependency ke `page` dan `request`.
-2. Setup membuat satu cart dan memeriksa response sebelum memakai ID-nya.
-3. Fixture membuka page untuk owned cart tersebut.
-4. `await use(checkoutPage)` memberikan value ke test.
-5. `finally` hanya menghapus cart yang dibuat fixture ini, bahkan kalau page gagal dibuka atau fixture gagal dipakai.
+1. `checkoutPage` membutuhkan `page` dan `request`.
+2. Setup membuat satu cart lalu mengecek response sebelum menggunakan ID-nya.
+3. Fixture membuka page untuk cart yang baru dibuat.
+4. `await use(checkoutPage)` memberikan `checkoutPage` ke test.
+5. Block `finally` hanya menghapus cart yang dibuat fixture ini, termasuk ketika page gagal dibuka atau test fail saat memakai fixture.
 
-Dependency-nya terlihat langsung dari parameter test:
+Parameter test langsung menunjukkan bahwa test membutuhkan `checkoutPage`:
 
 ```ts
 test('customer sees the updated order total', async ({ checkoutPage }) => {
@@ -118,85 +118,85 @@ test('customer sees the updated order total', async ({ checkoutPage }) => {
 });
 ```
 
-Fixture memiliki precondition dan cleanup. Product action serta evidence yang diklaim scenario tetap dimiliki test. Setelah setup mendapatkan resource ID yang dimiliki fixture, taruh cleanup di `finally`; kalau tidak, setup failure sebelum `use` bisa meninggalkan state tanpa pernah mencapai test.
+Fixture menyiapkan cart dan melakukan cleanup. Action yang dilakukan customer serta expected result-nya tetap terlihat di dalam test. Setelah setup mendapatkan ID untuk resource yang baru dibuat, taruh cleanup di `finally`. Dengan begitu, fixture tetap mencoba menghapus resource ketika setup berikutnya atau test fail setelah ID tersebut tersedia.
 
 ### Cek dulu, apakah memang butuh fixture?
 
-| Kebutuhan                                               | Mulai dari        | Alasannya                                             |
-| ------------------------------------------------------- | ----------------- | ----------------------------------------------------- |
-| Satu calculation atau repeated action tanpa lifecycle   | Helper            | Normal function lebih explicit dan gampang dipanggil  |
-| Small action yang sama sebelum semua test di satu group | `beforeEach` hook | Shared timing tetap sederhana dan lokal               |
-| Named value/resource dengan setup dan teardown          | Fixture           | Dependency dan lifecycle menjadi explicit             |
-| Beberapa resource yang saling bergantung                | Fixtures          | Setup dan reverse teardown mengikuti dependency order |
-| Business step penting yang hanya ada di satu scenario   | Tetap di test     | Menyembunyikannya akan melemahkan cerita scenario     |
+| Kebutuhan                                                     | Mulai dari        | Alasannya                                                  |
+| ------------------------------------------------------------- | ----------------- | ---------------------------------------------------------- |
+| Satu perhitungan atau action berulang tanpa setup dan cleanup | Helper            | Function biasa lebih mudah dipanggil dan ditelusuri        |
+| Action kecil yang sama sebelum semua test dalam satu group    | `beforeEach` hook | Waktu action dijalankan terlihat jelas di dekat test       |
+| Value atau resource dengan setup dan teardown                 | Fixture           | Test meminta resource tersebut langsung dari parameternya  |
+| Beberapa resource yang saling membutuhkan                     | Fixtures          | Setup mengikuti urutan dependency, teardown berjalan balik |
+| Action penting yang hanya diuji oleh satu scenario            | Tetap di test     | Action dan expected result tetap terlihat jelas            |
 
-Hook bukan fitur lama yang harus selalu diganti. Small visible hook bisa lebih jelas daripada custom fixture yang nggak memberikan value dan nggak punya meaningful lifecycle.
+Hook masih cocok dipakai ketika action-nya kecil dan terlihat jelas di dekat group test. Dalam kondisi seperti ini, hook bisa lebih mudah dibaca daripada custom fixture yang nggak memberikan value atau melakukan cleanup apa pun.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Pakai built-in fixture langsung sampai suite punya repeated resource atau lifecycle yang memang layak diberi nama. Kebanyakan beginner test hanya butuh `page`; sebagian juga butuh `request`.
+Gunakan built-in fixture langsung sampai test suite punya resource dengan setup dan cleanup yang memang sering berulang. Kebanyakan test awal hanya membutuhkan `page`; sebagian juga membutuhkan `request`.
 
-Pakai helper kalau code-nya sekadar operation. Pakai hook kalau semua test dalam nearby named group butuh timing yang sama. Pakai custom fixture kalau test mengonsumsi named dependency yang butuh setup, teardown, composition, atau configurable behavior.
+Gunakan helper untuk action biasa yang nggak punya setup dan cleanup sendiri. Gunakan hook kalau semua test dalam satu group yang jelas perlu menjalankan action yang sama pada waktu yang sama. Gunakan custom fixture kalau test membutuhkan resource bernama yang perlu dibuat, dibersihkan, digabungkan dengan fixture lain, atau diatur lewat option.
 
-Utamakan test scope untuk page, context, mutable record, dan scenario-specific data. Setiap test mendapat fresh lifecycle sehingga independence dan parallel execution tetap aman.
+Gunakan test scope sebagai pilihan awal untuk `Page`, `BrowserContext`, mutable record, dan test data yang spesifik untuk scenario. Setiap test mendapat resource baru sehingga bisa dijalankan sendiri maupun secara parallel.
 
-Gunakan worker scope hanya kalau satu worker bisa memiliki resource tersebut dengan aman untuk beberapa test. Setup yang mahal belum tentu aman untuk dishare. Mutable customer, cart, atau database transaction masih bisa collision walaupun browser context-nya terisolasi.
+Gunakan worker scope hanya kalau satu worker bisa memakai resource tersebut untuk beberapa test tanpa saling mengubah state. Jangan share resource hanya karena setup-nya lambat atau mahal. Customer, cart, atau database transaction yang bisa berubah tetap dapat saling bertabrakan meskipun setiap test memakai browser context terpisah.
 
-Jangan sembunyikan behavior under test di dalam fixture. Fixture `paidOrder` bisa tepat kalau payment hanya precondition untuk refund test; fixture itu salah kalau scenario justru mengklaim sedang menguji payment.
+Jangan sembunyikan action yang sedang diuji di dalam fixture. Fixture `paidOrder` cocok kalau payment hanya menjadi starting state untuk refund test. Kalau scenario memang menguji proses payment, action payment dan expected result-nya harus tetap berada di test.
 
 ## Kalau gagal, mulai cek dari mana?
 
-| Observation                                        | Kemungkinan lifecycle problem          | Evidence pertama yang diperiksa                           |
-| -------------------------------------------------- | -------------------------------------- | --------------------------------------------------------- |
-| Test gagal sebelum baris pertamanya                | Fixture setup gagal atau meninggalkan state | Fixture stack, API response, retained ID, cleanup attempt |
-| Test lulus sendiri tapi gagal saat parallel        | Worker/shared mutable state            | Resource ID, worker index, account dan record ownership   |
-| Test berikutnya gagal setelah satu failure         | Cleanup atau hidden state bocor        | Teardown result, retained ID, server record               |
-| Semua test menjalankan slow setup yang nggak perlu | Automatic hook/fixture terlalu luas    | Test mana yang benar-benar meminta dependency             |
-| Test title nggak menjelaskan state asalnya         | Fixture menyembunyikan business step   | Code sebelum `use` dan risk yang disebut scenario         |
-| Timeout menunjuk action test yang terlihat normal  | Slow fixture menghabiskan test timeout | Setup duration, fixture timeout, first meaningful failure |
+| Yang terjadi                                              | Kemungkinan penyebab                                                        | Cek dulu                                                   |
+| --------------------------------------------------------- | --------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Test fail sebelum menjalankan baris pertamanya            | Fixture bermasalah saat setup atau state lama belum dibersihkan             | Fixture stack, API response, resource ID, dan cleanup log  |
+| Test pass saat dijalankan sendiri tapi fail saat parallel | Fixture worker scope memberikan mutable resource yang sama ke beberapa test | Resource ID, worker index, account, dan record yang diubah |
+| Test berikutnya fail setelah test sebelumnya bermasalah   | Cleanup nggak berjalan atau masih ada state yang tertinggal                 | Hasil teardown, resource ID, dan record di server          |
+| Semua test menjalankan setup lambat yang nggak dibutuhkan | Automatic hook atau fixture diterapkan terlalu luas                         | Test mana yang benar-benar meminta fixture tersebut        |
+| Judul test nggak menjelaskan dari mana state berasal      | Fixture menyembunyikan action penting untuk scenario                        | Code sebelum `use` dan action apa yang sebenarnya diuji    |
+| Timeout menunjuk action test yang terlihat normal         | Setup fixture sudah menghabiskan sebagian besar timeout                     | Durasi setup, fixture timeout, dan failure pertama         |
 
-Fixture setup dan teardown ikut memakai execution time. Long fixture bisa menghabiskan test timeout sebelum scenario mencapai assertion. Ukur lifecycle-nya sebelum menaikkan timeout.
+Setup fixture dan test body memakai test timeout yang sama. Setelah test body selesai, teardown dan `afterEach` mendapat timeout terpisah dengan durasi yang sama. Cek durasi setup dan teardown sebelum menaikkan timeout masing-masing.
 
-Kalau dependency graph fixture terlalu dalam, gambar graph-nya. Setup berjalan dependency-first; teardown berjalan terbalik. Cycle atau ownership yang nggak jelas adalah design problem, bukan sesuatu yang perlu disembunyikan dengan layer tambahan.
+Kalau fixture saling bergantung sampai sulit ditelusuri, gambar hubungan antar-fixture tersebut. Setup berjalan dari dependency paling awal, sedangkan teardown berjalan dalam urutan terbalik. Kalau ada dependency yang berputar atau nggak jelas test mana yang memiliki resource, rapikan fixture-nya sebelum menambah fixture baru.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
-Review AI-generated fixture sebagai infrastructure yang punya side effect:
+Fixture buatan AI bisa membuat data, membuka page, atau menghapus resource. Review side effect-nya dengan pertanyaan berikut:
 
-- Value atau resource apa yang diberikan setiap fixture?
-- Dependency apa yang memicunya, dan fixture-nya lazy atau automatic?
+- Value atau resource apa yang diberikan oleh setiap fixture?
+- Test mana yang meminta fixture tersebut, dan apakah fixture berjalan automatic?
 - Apa yang terjadi sebelum dan sesudah `await use(...)`?
-- Apakah setup diverifikasi sebelum value sampai ke test?
-- Test atau worker mana yang memiliki setiap mutable record dan account?
+- Apakah response atau hasil setup sudah dicek sebelum value diberikan ke test?
+- Test atau worker mana yang boleh mengubah setiap record dan account?
 - Bisakah cleanup menghapus data milik test lain?
-- Apakah fixture menyembunyikan action yang justru diklaim scenario?
+- Apakah fixture menyembunyikan action yang sebenarnya sedang diuji?
 - Apakah test scope sebenarnya sudah cukup?
-- Apakah helper atau small hook lebih jelas?
-- Apakah generated code mengarang endpoint, credential, storage state, atau global variable?
+- Apakah helper atau hook kecil lebih mudah dibaca?
+- Apakah code buatan AI mengarang endpoint, credential, storage state, atau global variable?
 
-Perhatikan code setelah `await use(...)`. Generated example sering bagus saat demo setup, tapi lupa cleanup, error handling, atau listener removal.
+Perhatikan code setelah `await use(...)`. Code buatan AI sering menunjukkan setup dengan lengkap, tapi lupa menambahkan cleanup, error handling, atau listener removal.
 
 ## Coba cek pemahamanmu
 
-Generated suite punya worker-scoped fixture bernama `sharedCustomerPage`. Fixture login sekali, membuat satu cart, lalu memberikan page yang sama ke semua test. Test-test tersebut mengubah address, quantity, dan payment method. Alasannya: login lambat.
+AI membuat worker-scoped fixture bernama `sharedCustomerPage`. Fixture melakukan login sekali, membuat satu cart, lalu memberikan `Page` yang sama ke semua test. Test-test tersebut mengubah address, quantity, dan payment method. Worker scope dipilih karena proses login lambat.
 
-Bagian mana yang nggak aman? Sebutkan owner, scope, dan cleanup path untuk cart, account, page, serta authentication mechanics. Bagian mana yang masih boleh dishare atau cukup jadi helper?
+Bagian mana yang nggak aman? Untuk cart, account, `Page`, dan proses authentication, jelaskan siapa yang memakainya, scope-nya, serta siapa yang melakukan cleanup. Bagian mana yang masih aman untuk di-share atau cukup dipindahkan ke helper?
 
 ## Bandingkan dengan cara pikir ini
 
 Salah satu redesign yang masuk akal:
 
-- Jangan share satu `Page` atau `BrowserContext` ke parallel test; buat keduanya test scoped.
-- Jangan biarkan beberapa test memutasi satu cart atau customer-level setting tanpa explicit ownership.
-- Alokasikan unique cart per test dan account per test atau worker sesuai state yang dimutasi scenario.
-- Biarkan immutable reference data atau safely worker-owned service tetap worker scoped hanya kalau parallel test nggak bisa merusaknya.
-- Pindahkan simple sign-in mechanics ke helper, atau load safe authenticated state ke setiap fresh context kalau authentication bukan behavior under test.
-- Buat setup failure dan cleanup result tetap observable, jangan taruh semuanya dalam broad hidden hook.
+- Jangan share satu `Page` atau `BrowserContext` ke beberapa parallel test. Buat keduanya dengan test scope.
+- Jangan biarkan beberapa test mengubah satu cart atau setting customer yang sama.
+- Buat cart baru untuk setiap test. Gunakan account per test atau per worker sesuai state yang akan diubah oleh scenario.
+- Data referensi yang nggak pernah berubah atau service yang aman dipakai satu worker boleh tetap worker scoped, selama parallel test nggak bisa mengubahnya.
+- Pindahkan step sign-in yang sederhana ke helper, atau load authenticated state ke setiap browser context baru kalau authentication bukan bagian yang sedang diuji.
+- Pastikan error saat setup dan hasil cleanup mudah ditemukan. Jangan sembunyikan semuanya di dalam hook besar.
 
-Slow setup adalah performance concern. Shared mutable state adalah correctness concern. Selesaikan keduanya secara terpisah.
+Setup yang lambat memengaruhi waktu eksekusi. Shared mutable state bisa membuat test memakai atau mengubah data milik test lain. Tangani kedua masalah tersebut secara terpisah.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa memilih helper, hook, atau fixture lalu menjelaskan dependency, owner, scope, setup, dan cleanup dari setiap resource yang diperkenalkan.
+Sekarang kamu seharusnya bisa memilih helper, hook, atau fixture, lalu menunjukkan resource apa yang dibuat, test atau worker mana yang memakainya, scope yang digunakan, dan cara cleanup dijalankan.
 
-Lesson berikutnya bergerak satu level keluar. Fixture menjelaskan resource yang dipakai test; Playwright configuration menjelaskan policy untuk menemukan, menjalankan, dan memvariasikan test suite.
+Lesson berikutnya membahas Playwright configuration. Fixture mengatur resource yang dipakai test, sedangkan configuration menentukan file test yang ditemukan, cara test dijalankan, dan variasi project yang tersedia.
