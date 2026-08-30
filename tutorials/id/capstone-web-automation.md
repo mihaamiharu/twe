@@ -1,70 +1,70 @@
 ---
-title: 'Capstone: Buktikan Checkout Feedback System yang Trustworthy'
-description: 'Review dan repair generated checkout test, jelaskan evidence-nya, lalu pisahkan in-platform proof dari real-project shipping evidence.'
+title: 'Capstone: Perbaiki Checkout Test dan Jelaskan Batas Hasilnya'
+description: 'Review checkout test buatan AI, perbaiki locator, action, wait, dan assertion-nya, lalu jelaskan apa yang sudah diverifikasi Practice dan apa yang masih perlu dilakukan di project nyata.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- mengubah satu valuable checkout risk menjadi focused recovery scenario;
-- mereview generated code untuk locator, action, waiting, assertion, dan error-handling defect;
-- menjustifikasi smallest maintainable organization untuk scenario tersebut;
-- menjelaskan keputusan Module 1–9 yang dibuktikan repaired test; serta
-- membedakan apa yang diverifikasi in-platform Practice dari kebutuhan real CI delivery.
+- mengubah satu risiko checkout menjadi recovery scenario yang fokus;
+- mereview code buatan AI untuk menemukan masalah locator, action, waiting, assertion, dan error handling;
+- memilih struktur code paling sederhana yang tetap mudah dirawat;
+- menjelaskan keputusan dari Module 1–9 yang diterapkan dalam test yang sudah diperbaiki; serta
+- membedakan apa yang diverifikasi in-platform Practice dari hal yang masih perlu dijalankan di CI project nyata.
 
 ## Kenapa ini penting buat QA
 
-Capstone seharusnya nggak memberi reward karena kamu hafal banyak Playwright method. Capstone harus menunjukkan apakah kamu bisa mereview untrustworthy test, menjaga product risk-nya, memperbaiki broken assumption, lalu menjelaskan kenapa feedback akhirnya layak dipercaya.
+Capstone nggak menguji berapa banyak Playwright method yang kamu hafal. Di sini kamu perlu mereview test yang belum bisa dipercaya, menjaga product risk yang ingin diuji, memperbaiki asumsi yang salah, lalu menjelaskan hasil apa yang benar-benar diverifikasi.
 
-AI bisa menghasilkan test yang berjalan tapi menyembunyikan semua important QA decision. Structural selector bisa menargetkan control yang salah, forced click bisa melewati product problem, fixed wait cuma menunda failure, dan swallowed assertion bisa membuat result hijau tanpa membuktikan apa pun.
+AI bisa menghasilkan test yang berjalan tetapi tetap salah. Selector berdasarkan struktur DOM bisa memilih control yang keliru, forced click bisa melewati masalah actionability, fixed wait hanya menunda failure, dan assertion di dalam `try/catch` bisa membuat test terlihat pass meskipun checkout rusak.
 
-Final capability di path ini bukan “buat framework panjang.” Capability-nya adalah “hasilkan dan pertanggungjawabkan trustworthy signal.”
+Di akhir path ini, kamu perlu menghasilkan test yang hasilnya bisa dijelaskan dan dipercaya, bukan framework panjang yang sulit ditelusuri.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Perlakukan capstone quality sebagai chain of proof:
+Capstone ini menggabungkan semua keputusan penting dalam satu alur:
 
 ```text
-Valuable product risk
-  + controlled starting state
-  + action yang sesuai user behavior
-  + observable business evidence
-  + independent dan diagnosable execution
-  + maintainable organization
-  + repeatable delivery policy
-  + penjelasan limitation
-  = trustworthy automation feedback
+Product risk yang jelas
+  + starting state yang terkontrol
+  + action yang sesuai cara user berinteraksi
+  + expected result yang bisa diverifikasi
+  + test bisa dijalankan sendiri dan mudah di-debug
+  + struktur code yang mudah dirawat
+  + cara menjalankan test yang konsisten
+  + batasan yang dijelaskan
+  = hasil automation yang bisa dipercaya
 ```
 
-Kalau satu link hilang, green execution bisa melebih-lebihkan apa yang benar-benar dibuktikan test.
+Kalau salah satu bagian hilang, test yang terlihat pass bisa membuat kita mengira coverage-nya lebih kuat daripada kondisi yang sebenarnya diuji.
 
-Capstone menghubungkan seluruh path lewat empat proof area:
+Capstone menghubungkan seluruh path lewat empat bagian:
 
-| Proof area                       | Keputusan module sebelumnya yang diterapkan              |
-| -------------------------------- | -------------------------------------------------------- |
-| Risk dan scenario design         | Automation judgment dan meaningful assertion             |
-| UI contract dan browser behavior | DOM inspection, locator, action, dan synchronization     |
-| Reliability dan maintainability  | Isolation, debugging, smallest useful abstraction        |
-| Shipping dan team feedback       | Reproducible CI, coverage, evidence, gate, dan ownership |
+| Bagian yang diperiksa                 | Keputusan dari module sebelumnya                                        |
+| ------------------------------------- | ----------------------------------------------------------------------- |
+| Risiko dan design scenario            | Memilih scenario yang layak dan assertion yang tepat                    |
+| Cara test berinteraksi dengan UI      | Inspect DOM, memilih locator, menjalankan action, dan menunggu hasil    |
+| Test tetap stabil dan mudah dirawat   | Isolation, debugging, dan abstraction secukupnya                        |
+| Cara test dijalankan dan dipakai team | CI yang konsisten, coverage, artifact, merge gate, dan penanggung jawab |
 
-Baris keempat adalah review lens, bukan automated claim tentang apa yang sudah di-ship oleh Practice. Practice membuktikan bagian browser-level dari chain ini; CI delivery dan team ownership tetap membutuhkan evidence dari real repository.
+Baris keempat hanya menjadi bahan review dalam capstone ini. Practice menjalankan dan mengecek behavior di browser, tetapi nggak menjalankan workflow CI atau menilai cara team menangani failure. Bagian tersebut tetap perlu diperiksa di repository nyata.
 
 ## Coba kita bedah contoh nyata
 
 Product rule-nya:
 
-> Quantity minimal 1. Setelah memperbaiki invalid quantity, customer bisa place order dan melihat confirmed quantity.
+> Quantity minimal 1. Setelah memperbaiki quantity yang invalid, customer bisa place order dan melihat quantity yang sudah dikonfirmasi.
 
-Ini satu coherent recovery risk—bukan dua unrelated test yang dipaksa jadi satu:
+Ini adalah satu recovery scenario karena invalid input dan perbaikannya terjadi dalam flow serta starting state yang sama:
 
 ```text
-Starting state: fresh checkout page tanpa confirmation
+Starting state: checkout page baru tanpa confirmation
 Action 1: submit quantity 0
-Evidence 1: validation alert menjelaskan rule; confirmation belum muncul
+Expected result 1: validation alert menjelaskan minimum quantity; confirmation belum muncul
 Action 2: perbaiki quantity menjadi 2 lalu submit lagi
-Evidence 2: stale alert hilang; confirmation melaporkan 2 items
+Expected result 2: alert sebelumnya hilang; confirmation menampilkan 2 items
 ```
 
-Generated starter sengaja dibuat lemah:
+Starter buatan AI sengaja dibuat lemah:
 
 ```ts
 test('checkout', async ({ page }) => {
@@ -81,125 +81,125 @@ test('checkout', async ({ page }) => {
 });
 ```
 
-Review dulu sebelum rewrite:
+Review masalahnya sebelum menulis ulang:
 
-| Observed problem                   | Risk kalau dibiarkan                                 | Repair direction                                       |
-| ---------------------------------- | ---------------------------------------------------- | ------------------------------------------------------ |
-| Title cuma `checkout`              | Report nggak menjelaskan protected behavior          | Namai recovery outcome                                 |
-| Structural `main > form` selector  | DOM rearrangement merusak test tanpa behavior change | Gunakan label dan role contract                        |
-| Hanya quantity `2` yang dimasukkan | Minimum-quantity rule nggak pernah diuji             | Submit invalid boundary sebelum memperbaikinya         |
-| `{ force: true }`                  | Test melewati unexplained actionability protection   | Gunakan normal click dan investigasi readiness         |
-| `waitForTimeout(1000)`             | Waktu menggantikan observable condition              | Tunggu lewat web-first assertion pada alert/status     |
-| `textContent()` + `toBeTruthy()`   | Hampir semua non-empty message bisa lulus            | Assert exact validation dan confirmed quantity         |
-| `try/catch` menelan assertion      | Broken checkout masih bisa dilaporkan hijau          | Biarkan meaningful assertion failure menggagalkan test |
+| Masalah yang terlihat              | Dampaknya pada test                                        | Cara memperbaiki                                           |
+| ---------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| Title hanya `checkout`             | Report nggak menjelaskan behavior yang sedang diuji        | Gunakan title yang menjelaskan recovery outcome            |
+| Selector `main > form`             | Perubahan struktur DOM merusak test meskipun behavior sama | Gunakan label dan role yang sesuai                         |
+| Hanya quantity `2` yang dimasukkan | Minimum-quantity rule nggak pernah diuji                   | Submit quantity invalid sebelum memperbaikinya             |
+| `{ force: true }`                  | Test melewati actionability check tanpa alasan             | Gunakan click biasa dan cek kenapa element belum ready     |
+| `waitForTimeout(1000)`             | Test hanya menunggu waktu, bukan hasil dari aplikasi       | Gunakan web-first assertion pada alert dan status          |
+| `textContent()` + `toBeTruthy()`   | Pesan apa pun yang nggak kosong bisa membuat test pass     | Cek validation message dan confirmed quantity secara exact |
+| `try/catch` menelan assertion      | Checkout yang rusak masih bisa dilaporkan pass             | Biarkan assertion yang fail membuat test ikut fail         |
 
-### Tulis evidence contract sebelum final code
+### Tentukan locator dan expected result sebelum menulis code final
 
 ```text
-Locator contract:
-- Quantity field dikenali lewat label.
-- Place order dikenali lewat button role dan name.
-- Validation dan confirmation memakai alert/status semantic.
+Locator:
+- Pilih Quantity field dari label-nya.
+- Pilih Place order dari button role dan name.
+- Cari validation dan confirmation lewat alert/status semantic.
 
-Assertion evidence:
-- Alert punya exact minimum rule setelah invalid submit.
-- Alert hidden setelah valid correction.
-- Confirmation visible dan mengandung “2 items”.
+Expected result:
+- Alert menampilkan minimum rule yang exact setelah invalid submit.
+- Alert nggak terlihat lagi setelah quantity diperbaiki.
+- Confirmation terlihat dan mengandung “2 items”.
 
-Forbidden masks:
-- nggak ada fixed sleep;
-- nggak ada unexplained force;
-- nggak ada `evaluate` atau direct DOM manipulation;
-- nggak ada weak truthiness claim;
-- nggak ada swallowed error.
+Jangan sembunyikan failure dengan:
+- fixed sleep;
+- `force` tanpa alasan;
+- `evaluate` atau mengubah DOM secara langsung;
+- assertion yang hanya mengecek truthy; atau
+- error yang ditelan oleh `try/catch`.
 ```
 
-Full repair dikerjakan di attached Core Practice. Practice memeriksa ordered submit sequence dan state setelah setiap submit, selain final DOM state dan required Playwright method. Reasoning di atas adalah contract-nya; exact variable name bebas.
+Perbaikan lengkap dikerjakan di Core Practice yang terhubung dengan lesson ini. Practice mengecek urutan dua kali submit, state setelah setiap submit, final DOM state, dan Playwright method yang wajib digunakan. Nama variable boleh berbeda selama behavior dan expected result-nya sama.
 
-### Pilih smallest maintainable organization
+### Pilih struktur code yang paling sederhana
 
-Satu scenario nggak otomatis membutuhkan page object, fixture framework, atau multi-folder architecture. Clear test dengan beberapa named locator bisa jadi design terbaik.
+Satu scenario nggak otomatis membutuhkan page object, fixture framework, atau banyak folder. Test yang jelas dengan beberapa locator bernama bisa menjadi pilihan terbaik.
 
-Extract helper atau component hanya kalau dia melokalkan meaningful repeated change tanpa menyembunyikan validation dan recovery step. Jelaskan boundary yang kamu pilih.
+Pindahkan code ke helper atau component object hanya kalau step yang sama memang berulang dan biasanya berubah bersama. Validation dan recovery step tetap perlu terlihat di test. Jelaskan masalah maintenance yang diselesaikan oleh helper atau object tersebut.
 
-### Pisahkan automated proof dari shipping proof
+### Bedakan yang dicek Practice dan yang perlu dilakukan di project nyata
 
-In-platform Practice bisa menjalankan browser behavior, memverifikasi ordered invalid-to-recovery submit sequence, memeriksa final page state, dan mengecek required Playwright method. Practice ini nggak bisa menjalankan real GitHub Actions job, menilai edited `playwright.config.ts`, mengupload trace, atau menilai written browser rationale. Proof area shipping/team feedback di atas adalah contextual awareness, bukan delivery claim yang sudah selesai.
+In-platform Practice bisa menjalankan behavior di browser, mengecek urutan submit dari invalid input sampai recovery, memeriksa final page state, dan memastikan Playwright method yang diwajibkan sudah digunakan. Practice nggak bisa menjalankan GitHub Actions job nyata, menilai perubahan `playwright.config.ts`, meng-upload trace, atau menilai alasan pemilihan browser yang ditulis learner. Karena itu, Practice belum menunjukkan bahwa test sudah siap dikirim lewat CI.
 
-Untuk real-project portfolio extension, sediakan juga:
+Untuk melanjutkannya sebagai portfolio di project nyata, sediakan juga:
 
-- reproducible local dan CI command;
-- trigger serta browser/project portfolio beserta alasannya;
-- satu retained failed-run artifact atau equivalent diagnostic package;
-- short root-cause note untuk original generated defect;
-- known limitation suite dan next highest-value risk; serta
-- evidence bahwa scenario lulus sendiri, berulang kali, dan pada intended parallelism.
+- local dan CI command yang bisa dijalankan ulang;
+- trigger serta pilihan browser dan project beserta alasannya;
+- satu artifact dari failed run atau kumpulan diagnostic yang setara;
+- catatan singkat tentang root cause dari masalah pada starter;
+- batasan test suite dan product risk berikutnya yang paling penting; serta
+- hasil run yang menunjukkan scenario pass saat dijalankan sendiri, berulang kali, dan dengan parallelism yang memang akan digunakan.
 
-Jangan klaim platform sudah memverifikasi deliverable yang memang belum bisa diverifikasi.
+Jangan bilang platform sudah memverifikasi CI, browser coverage, atau artifact kalau bagian tersebut memang belum dijalankan.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Pakai recovery scenario kalau risk-nya memang customer harus bisa memperbaiki rejected input lalu lanjut dengan aman. Pakai separate independent test kalau valid dan invalid behavior punya starting state, ownership, atau failure meaning yang berbeda.
+Gunakan recovery scenario ketika customer memang harus bisa memperbaiki input yang ditolak lalu melanjutkan flow. Pisahkan menjadi test yang berbeda kalau behavior valid dan invalid membutuhkan starting state yang berbeda, mengubah data yang berbeda, atau punya arti failure yang berbeda.
 
-Jaga capstone scope cukup kecil supaya setiap decision bisa dijelaskan. Satu flow yang dalam dan trustworthy adalah evidence yang lebih baik daripada sepuluh copied script.
+Jaga scope capstone cukup kecil supaya setiap keputusan bisa dijelaskan. Satu flow yang diuji secara lengkap lebih berguna daripada sepuluh script hasil copy-paste.
 
-Pakai page atau component object hanya saat scenario menunjukkan stable repeated boundary. Pakai fixture hanya saat named dependency butuh lifecycle. Capstone rubric bukan alasan menambah architecture yang nggak dibutuhkan suite.
+Gunakan page atau component object ketika ada bagian UI stabil yang dipakai berulang. Gunakan fixture ketika test membutuhkan resource dengan setup, scope, dan cleanup sendiri. Jangan menambah architecture hanya untuk terlihat lebih lengkap di rubric.
 
-Pakai in-platform Practice sebagai satu browser-level code-repair checkpoint yang terintegrasi. Pakai real repository dan CI provider untuk portfolio-level shipping evidence. Jangan anggap simulated browser challenge membuktikan secret, runner, deployment, atau artifact sudah dikonfigurasi secara aman.
+Gunakan in-platform Practice untuk mengecek perbaikan code dan behavior di browser. Gunakan repository serta CI provider nyata untuk mengecek runner, deployment, secret, browser coverage, dan artifact. Simulated browser challenge nggak bisa memastikan semua bagian tersebut sudah dikonfigurasi dengan aman.
 
 ## Kalau gagal, mulai cek dari mana?
 
-| Green-looking result                     | Missing proof                                            | Evidence atau repair                                 |
-| ---------------------------------------- | -------------------------------------------------------- | ---------------------------------------------------- |
-| Confirmation muncul setelah quantity `2` | Ordered recovery sequence mungkin belum dijalankan      | Assert invalid state sebelum correction              |
-| Assertion method ada di code             | Bisa saja assertion berada dalam swallowed error         | Hapus catch dan lihat deliberate failing version     |
-| Test lulus sekali                        | State, ordering, atau timing masih mungkin unstable      | Repeat sendiri dan di intended execution condition   |
-| Code dibagi menjadi beberapa class       | Abstraction mungkin hide, bukan localize behavior        | Hubungkan boundary ke real change pattern            |
-| Browser challenge lulus                  | CI target, secret, coverage, dan artifact belum terbukti | Jalankan portfolio extension di real repository      |
-| Retry lulus                              | Original failure tetap instability signal                | Periksa first-attempt evidence dan repair root cause |
+| Result yang terlihat baik                | Bagian yang belum dicek                                          | Cara mengecek atau memperbaiki                                 |
+| ---------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------- |
+| Confirmation muncul setelah quantity `2` | Urutan invalid submit lalu recovery mungkin belum dijalankan     | Cek invalid state sebelum quantity diperbaiki                  |
+| Assertion method ada di code             | Assertion bisa berada di dalam error yang ditelan                | Hapus `catch` dan jalankan versi test yang sengaja dibuat fail |
+| Test pass satu kali                      | State, urutan, atau timing mungkin belum stabil                  | Jalankan berulang kali, sendiri, dan pada kondisi target       |
+| Code dibagi menjadi beberapa class       | Class bisa menyembunyikan behavior tanpa mempermudah maintenance | Hubungkan setiap helper atau object ke pengulangan nyata       |
+| Browser challenge pass                   | Target CI, secret, coverage, dan artifact belum diperiksa        | Jalankan kelanjutannya di repository nyata                     |
+| Test pass saat retry                     | Failure pada attempt pertama masih menunjukkan flakiness         | Buka artifact attempt pertama dan perbaiki root cause          |
 
-Jangan melemahkan rubric karena generated code susah direpair. Jangan tambahkan sleep, forced action, broad catch, atau global timeout hanya untuk mendapatkan green output.
+Jangan melemahkan rubric hanya karena code buatan AI sulit diperbaiki. Jangan menambahkan sleep, forced action, `catch` yang terlalu luas, atau global timeout hanya supaya test pass.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
-Lakukan final generated-code review:
+Sebelum menerima code buatan AI, cek:
 
-- Exact product risk apa yang dilindungi test?
-- Apakah starting state controlled dan independent?
-- Apakah locator contract mengekspresikan user atau documented engineering meaning?
-- Apakah setiap action menunggu observable application outcome?
-- Apakah setiap assertion akan gagal saat meaningful product regression terjadi?
-- Apakah error dibiarkan menggagalkan test dengan useful evidence?
-- Apakah force, retry, timeout, atau conditional menyembunyikan unexplained problem?
-- Apakah code menambah abstraction yang benar-benar membayar maintenance cost-nya?
-- Bisakah scenario berjalan sendiri, berulang kali, dan di intended project?
-- CI, browser, artifact, serta security claim mana yang masih di luar platform verification?
-- Bisakah kamu menjelaskan setiap important generated line tanpa bertanya lagi ke AI?
+- Product risk apa yang diuji secara exact?
+- Apakah starting state terkontrol dan nggak bergantung pada test lain?
+- Apakah locator memilih control sesuai cara user berinteraksi atau attribute yang memang dijaga stabil?
+- Apakah setiap action menunggu expected result dari aplikasi?
+- Apakah setiap assertion akan fail ketika regression yang penting terjadi?
+- Apakah error dibiarkan membuat test fail dengan trace atau log yang berguna?
+- Apakah `force`, retry, timeout, atau conditional menyembunyikan masalah yang belum dijelaskan?
+- Apakah helper atau object baru menyelesaikan code berulang yang memang perlu dirawat di satu tempat?
+- Bisakah scenario berjalan sendiri, berulang kali, dan di project yang memang dituju?
+- Bagian CI, browser coverage, artifact, dan security mana yang belum diperiksa oleh platform?
+- Bisakah kamu menjelaskan setiap baris penting tanpa bertanya lagi ke AI?
 
-Bantuan AI diperbolehkan. Responsibility atas claim tetap ada di reviewer.
+Bantuan AI boleh digunakan, tetapi reviewer tetap bertanggung jawab memastikan hasil test dan penjelasannya akurat.
 
 ## Coba cek pemahamanmu
 
-Seseorang memperbaiki starter dengan mengganti selector dan menghapus fixed wait. Dia tetap memakai `{ force: true }`, hanya mengassert confirmation visible, lalu menyebut capstone selesai karena dua kali lulus di browser challenge.
+Seseorang memperbaiki starter dengan mengganti selector dan menghapus fixed wait. Dia tetap memakai `{ force: true }`, hanya memastikan confirmation terlihat, lalu menyebut capstone selesai karena test pass dua kali di browser challenge.
 
-Review claim tersebut. Identifikasi apa yang dibuktikan test, apa yang masih lemah, dan shipping evidence mana yang belum ada.
+Review kesimpulan tersebut. Jelaskan apa yang sudah diverifikasi test, bagian mana yang masih lemah, dan apa yang masih perlu dijalankan di project nyata.
 
 ## Bandingkan dengan cara pikir ini
 
 Salah satu review yang masuk akal:
 
-- Semantic selector memperbaiki UI contract, dan menghapus fixed wait memperbaiki synchronization.
-- Unexplained forced click masih melewati readiness signal dan harus dihapus atau dijustifikasi lewat evidence.
-- Visibility saja nggak membuktikan minimum rule atau confirmed quantity.
-- Recovery contract butuh exact invalid evidence, alert clearance, dan confirmation `2 items`.
-- Dua passing run berguna, tapi belum menguji intended ordering, parallelism, atau CI reconstruction.
-- Browser challenge nggak membuktikan workflow configuration, target validation, secret safety, project coverage, artifact retention, atau triage ownership.
-- Selesaikan Core Practice, lalu buat item tersebut secara terpisah kalau ingin menampilkan real-project portfolio.
+- Locator berdasarkan label dan role membuat test memilih control sesuai cara user berinteraksi, dan menghapus fixed wait membuat test menunggu perubahan dari aplikasi.
+- Forced click yang belum dijelaskan masih melewati actionability check. Hapus `force` atau cari penyebab element nggak siap menerima click.
+- Visibility saja belum mengecek minimum-quantity rule atau quantity yang dikonfirmasi.
+- Recovery scenario perlu mengecek validation message secara exact, memastikan alert hilang, dan memastikan confirmation berisi `2 items`.
+- Dua run yang pass memang berguna, tetapi belum mengecek stability pada parallel run atau kemampuan menjalankan test dari CI runner baru.
+- Browser challenge belum mengecek workflow configuration, target URL, keamanan secret, browser coverage, penyimpanan artifact, atau penanggung jawab triage.
+- Selesaikan Core Practice, lalu siapkan bagian tersebut secara terpisah kalau ingin menampilkan portfolio dari project nyata.
 
-Targetnya adalah claim dengan boundary yang akurat: strong evidence untuk browser recovery sequence, tanpa melebih-lebihkan CI delivery atau team ownership yang belum bisa diverifikasi Practice.
+Kesimpulan akhirnya harus spesifik: Practice memverifikasi recovery sequence di browser, tetapi belum memverifikasi CI delivery atau cara team menangani failure.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa mereview dan merepair checkout recovery test, menjustifikasi contract serta organization-nya, lalu menjelaskan boundary antara platform-verified behavior dan real-project shipping evidence.
+Sekarang kamu seharusnya bisa me-review dan memperbaiki checkout recovery test, menjelaskan alasan pemilihan locator, assertion, dan struktur code, lalu membedakan behavior yang diverifikasi platform dari bagian yang masih perlu dijalankan di project nyata.
 
-Module ini selesai saat tiga Core lesson-nya dan satu `pw-capstone-checkout` Core Practice selesai. TWE mencatat Web Automation path selesai saat semua Core lesson dan Core Practice di Module 1–9 selesai. Optional lesson dan Additional Practice nggak memblokir kedua status tersebut. Practical readiness tetap berarti membawa decision ini ke authorized real repository tempat CI, artifact, environment, dan team ownership bisa diamati secara langsung.
+Module ini selesai setelah tiga Core lesson dan satu Core Practice `pw-capstone-checkout` selesai. TWE mencatat Web Automation path selesai setelah semua Core lesson dan Core Practice di Module 1–9 selesai. Optional lesson dan Additional Practice nggak memblokir status tersebut. Supaya benar-benar siap dipakai, bawa keputusan ini ke repository yang memang boleh kamu gunakan, lalu jalankan dan cek CI, artifact, environment, serta cara team menangani failure secara langsung.

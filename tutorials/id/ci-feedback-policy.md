@@ -1,92 +1,92 @@
 ---
-title: 'Rancang Feedback, Coverage, dan Evidence Policy'
-description: 'Pilih apa yang berjalan dan kapan, simpan evidence yang menjelaskan failure, lalu ubah CI result menjadi owned team decision.'
+title: 'Tentukan Test yang Berjalan dan Artifact yang Disimpan di CI'
+description: 'Pilih scenario untuk setiap trigger, bedakan clean pass dengan flaky retry, lalu tentukan merge gate dan siapa yang menangani failure.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- memilih risk-based test portfolio untuk pull request, merge, deployment, dan schedule;
-- menjustifikasi browser serta device coverage tanpa melipatgandakan semua kombinasi;
-- membedakan clean pass, flaky retry pass, failed test, dan infrastructure failure;
-- memilih report dan artifact berdasarkan diagnostic value, cost, serta privacy; dan
-- menentukan merge gate, triage ownership, serta safe scaling lewat worker atau shard.
+- memilih scenario berdasarkan product risk untuk pull request, merge, deployment, dan schedule;
+- memilih browser serta device coverage tanpa menjalankan semua kombinasi;
+- membedakan clean pass, flaky retry, test yang terus fail, dan infrastructure failure;
+- memilih report dan artifact berdasarkan kebutuhan debugging, biaya, dan data yang mungkin tersimpan; serta
+- menentukan merge gate, penanggung jawab triage, dan kapan worker atau shard memang dibutuhkan.
 
 ## Kenapa ini penting buat QA
 
-Pipeline bisa berjalan sempurna tapi feedback-nya tetap buruk. Kalau semua test dijalankan di semua browser pada setiap change, result mungkin baru muncul setelah engineer selesai review. Kalau yang tersimpan cuma pass count, nggak ada cukup evidence untuk investigasi. Kalau retry success dianggap clean, instability hilang dari team decision.
+Pipeline bisa menjalankan semua step dengan benar tapi tetap memberi feedback yang buruk. Kalau semua test dijalankan di semua browser pada setiap change, hasilnya mungkin baru muncul setelah engineer selesai review. Kalau yang tersimpan hanya jumlah test pass dan fail, team nggak punya trace atau log untuk investigasi. Kalau test yang pass setelah retry dianggap clean, flakiness hilang dari report.
 
-Tujuan CI bukan maximum execution. Tujuannya memberi evidence tepat waktu untuk menjawab:
+CI perlu memberi hasil tepat waktu untuk menjawab:
 
-> Apakah change ini cukup aman untuk lanjut, dan kalau tidak, siapa yang punya evidence untuk bertindak?
+> Apakah change ini cukup aman untuk di-merge atau dirilis? Kalau nggak, siapa yang harus mengecek dan artifact apa yang tersedia?
 
-Itulah kenapa coverage, artifact, retry, dan gate sebenarnya satu feedback policy—bukan setting tool yang berdiri sendiri.
+Karena itu, pilihan coverage, artifact, retry, dan gate harus saling mendukung keputusan yang sama.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Rancang feedback contract dari risk sampai action:
+Mulai dari trigger, lalu tentukan tindakan setelah result keluar:
 
 ```text
-Change atau release trigger
+Trigger change atau release
         ↓
-Risk-selected scenarios dan projects
+Scenario dan project yang dipilih berdasarkan risiko
         ↓
-Controlled execution
+Test dijalankan dengan setup yang terkontrol
         ↓
-Verdict + diagnostic evidence
+Status test + artifact untuk debugging
         ↓
-Named owner dan next action
+Penanggung jawab + tindakan berikutnya
 ```
 
-![CI feedback contract bergerak dari trigger ke risk-selected portfolio, controlled execution, verdict dan diagnostic evidence, lalu named owner serta action.](/images/tutorials/ci-feedback-contract.svg)
+![CI dimulai dari trigger, memilih scenario dan project berdasarkan risiko, menjalankan test, menyimpan status serta artifact debugging, lalu menentukan penanggung jawab dan tindakan berikutnya.](/images/tutorials/ci-feedback-contract.svg)
 
-_Fast feedback tanpa useful evidence cuma noise. Detailed evidence yang datang terlalu telat juga bukan feedback yang bagus._
+_Hasil cepat tanpa artifact yang membantu debugging akan sulit ditindaklanjuti. Artifact lengkap juga kurang berguna kalau baru tersedia setelah keputusan merge dibuat._
 
-Next action dari owner menjadi code change, environment repair, atau release decision berikutnya. Di situlah feedback loop tertutup; dashboard tanpa action hanya menjadi riwayat noise.
+Setelah membaca hasilnya, penanggung jawab bisa memperbaiki code, memperbaiki environment, atau mengambil keputusan release. Dashboard yang nggak menghasilkan tindakan hanya menyimpan riwayat failure.
 
-Module 8 mendefinisikan arti Playwright project, fixture, dan configuration di dalam suite yang maintainable. Lesson ini memilih project mana yang berjalan untuk setiap trigger dan apa arti result-nya bagi team.
+Module 8 membahas cara membuat Playwright project, fixture, dan configuration. Lesson ini menentukan project mana yang berjalan untuk setiap trigger dan bagaimana team memperlakukan hasilnya.
 
-Setiap policy menyeimbangkan empat concern:
+Pertimbangkan empat hal berikut:
 
-| Concern       | Pertanyaan                                                       |
-| ------------- | ---------------------------------------------------------------- |
-| Risk          | Failure mana yang penting pada trigger ini?                      |
-| Speed         | Seberapa cepat team harus tahu?                                  |
-| Diagnosis     | Evidence apa yang membedakan product, test, dan infrastructure?  |
-| Cost dan care | Berapa execution/storage yang justified, dan data apa yang aman? |
+| Pertimbangan       | Pertanyaan                                                                        |
+| ------------------ | --------------------------------------------------------------------------------- |
+| Risiko             | Failure mana yang perlu diketahui pada trigger ini?                               |
+| Kecepatan          | Kapan hasilnya harus tersedia agar masih bisa mengubah keputusan?                 |
+| Debugging          | Artifact apa yang membedakan masalah product, test, dan infrastructure?           |
+| Biaya dan keamanan | Berapa banyak run dan storage yang masuk akal, serta data apa yang aman disimpan? |
 
 ## Coba kita bedah contoh nyata
 
-Sebuah online store terutama mendukung desktop Chrome. Firefox juga didukung, sedangkan mobile checkout high risk tapi lebih jarang berubah. Suite punya 300 test, termasuk 18 critical smoke scenario.
+Sebuah online store terutama mendukung desktop Chrome. Firefox juga didukung. Mobile checkout punya product risk tinggi, tetapi flow-nya lebih jarang berubah. Test suite punya 300 test, termasuk 18 critical smoke scenario.
 
-### 1. Buat trigger portfolio
+### 1. Pilih test untuk setiap trigger
 
-Jangan mulai dari semua project yang tersedia. Mulai dari decision yang harus didukung setiap trigger:
+Jangan langsung menjalankan semua project. Tentukan dulu keputusan apa yang perlu dibuat dari setiap trigger:
 
-| Trigger          | Risk-selected execution                                   | Alasannya                                              |
-| ---------------- | --------------------------------------------------------- | ------------------------------------------------------ |
-| Pull request     | 18 smoke scenario di desktop Chromium                     | Fast signal sebelum review dan merge                   |
-| Merge ke main    | Affected feature/regression di Chromium; smoke di Firefox | Broader confidence tanpa full multiplication           |
-| Nightly schedule | Full stable suite di supported browser portfolio          | Mendeteksi compatibility dan accumulated regression    |
-| Deployment ready | Small safe smoke set terhadap deployed target             | Memastikan deployment wiring dan critical availability |
+| Trigger          | Test yang dijalankan                                          | Alasannya                                                     |
+| ---------------- | ------------------------------------------------------------- | ------------------------------------------------------------- |
+| Pull request     | 18 smoke scenario di desktop Chromium                         | Memberi hasil cepat sebelum review dan merge                  |
+| Merge ke main    | Test untuk feature yang berubah di Chromium; smoke di Firefox | Mengecek integration tanpa menjalankan semua kombinasi        |
+| Nightly schedule | Full stable suite di semua browser yang didukung              | Menemukan compatibility issue dan regression yang terkumpul   |
+| Deployment ready | Sedikit smoke test yang aman terhadap deployment              | Memastikan deployment bisa diakses dan critical flow tersedia |
 
-Tag dan project mengimplementasikan policy ini; keduanya nggak menentukan policy. Setiap scenario berlabel `@smoke` harus benar-benar melindungi release-relevant risk.
+Tag dan project hanya digunakan untuk menjalankan pilihan tadi. Setiap scenario dengan label `@smoke` harus mengecek risiko yang memang bisa memengaruhi release.
 
-Kalau product nggak mendukung WebKit atau device tertentu, menjalankan semua test di sana belum tentu useful coverage. Kalau payment behavior high risk pada satu mobile viewport, pilih flow dan condition tersebut secara intentional.
+Kalau product nggak mendukung WebKit atau device tertentu, menjalankan semua test di sana belum tentu berguna. Kalau payment flow punya risiko tinggi pada satu mobile viewport, pilih flow dan viewport tersebut secara khusus.
 
-Playwright device project mengemulasikan condition seperti viewport, user agent, dan touch; itu bukan bukti dari physical device atau operating system-nya. Gunakan real-device lab atau provider kalau perbedaan tersebut termasuk product risk. Jauhkan destructive coverage dari production kecuali purpose, authorization, dan data safety-nya explicit.
+Playwright device project mengemulasikan viewport, user agent, dan touch. Hasilnya nggak sama dengan menjalankan test di physical device dan operating system aslinya. Gunakan real-device lab atau provider kalau perbedaan tersebut termasuk product risk. Jangan jalankan destructive test di production tanpa tujuan, authorization, dan aturan test data yang jelas.
 
 ### 2. Tentukan arti setiap result
 
 Dengan satu CI retry, Playwright membedakan:
 
-| Result                          | Artinya untuk team                                           |
-| ------------------------------- | ------------------------------------------------------------ |
-| Lulus pada first attempt        | Clean pass untuk execution ini                               |
-| Gagal pertama, lulus saat retry | Flaky signal; instability masih ada                          |
-| Gagal di semua attempt          | Persistent failure yang perlu triage                         |
-| Job gagal sebelum test berjalan | Pipeline/environment failure; product status belum diketahui |
+| Result                               | Artinya untuk team                                                |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| Test pass pada attempt pertama       | Clean pass untuk run tersebut                                     |
+| Test fail lalu pass saat retry       | Test flaky; penyebab intermittent masih ada                       |
+| Test fail pada semua attempt         | Failure tetap terjadi dan perlu triage                            |
+| Job fail sebelum test mulai berjalan | Masalah pipeline atau environment; status product belum diketahui |
 
-Salah satu possible configuration:
+Salah satu configuration yang bisa digunakan:
 
 ```ts
 import { defineConfig } from '@playwright/test';
@@ -104,117 +104,117 @@ export default defineConfig({
 });
 ```
 
-Contoh ini membuat flaky retry tetap menggagalkan CI signal. Team boleh mulai dengan melaporkan flakiness tanpa blocking sambil membangun ownership, lalu memperketat gate. Rule pentingnya: “lulus setelah retry” nggak boleh diam-diam berubah menjadi “clean.”
+Contoh ini membuat test yang flaky tetap menyebabkan CI fail. Team bisa mulai dengan melaporkan flakiness tanpa memblokir merge sambil menentukan siapa yang memperbaikinya, lalu memperketat gate. Test yang pass setelah retry nggak boleh dilaporkan sebagai clean pass.
 
-`trace: 'on-first-retry'` merekam first retry attempt; mode ini tidak otomatis menyimpan original failed attempt. Kalau original failure adalah evidence yang dibutuhkan—atau retry akhirnya lulus—`retain-on-failure` merekam setiap run dan menyimpan run yang gagal. Pilih berdasarkan failure pattern dan storage budget.
+`trace: 'on-first-retry'` merekam retry pertama. Mode ini nggak otomatis menyimpan attempt awal yang fail. Kalau kamu perlu melihat attempt awal tersebut, atau retry akhirnya pass, `retain-on-failure` merekam setiap run dan menyimpan attempt yang fail. Pilih mode berdasarkan jenis failure yang ingin di-debug dan storage yang tersedia.
 
-### 3. Simpan evidence yang menjawab pertanyaan
+### 3. Simpan artifact yang membantu debugging
 
-| Evidence             | Pertanyaan yang bisa dijawab                                    | Cost atau risk                                     |
-| -------------------- | --------------------------------------------------------------- | -------------------------------------------------- |
-| Terminal/line report | Test/project mana yang gagal lebih dulu?                        | Detail rendah                                      |
-| HTML report          | Step, project, retry, dan attachment mana yang saling terkait?  | Harus diupload dan access-controlled               |
-| Trace                | Apa yang terjadi di action, DOM, console, dan network?          | Bisa berisi sensitive session dan application data |
-| Screenshot           | Apa yang terlihat pada satu moment?                             | Sequence terbatas; bisa mengekspos personal data   |
-| Video                | Bagaimana visible sequence berjalan?                            | Storage lebih tinggi; DOM/network detail lemah     |
-| Safe setup log       | Apakah environment, authentication, atau test-data setup gagal? | Secret dan token harus diredact                    |
+| Report atau artifact | Pertanyaan yang bisa dijawab                                         | Biaya atau risiko                                              |
+| -------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------- |
+| Terminal/line report | Test atau project mana yang fail lebih dulu?                         | Detail terbatas                                                |
+| HTML report          | Step, project, retry, dan attachment mana yang saling berkaitan?     | Perlu di-upload dan aksesnya harus dibatasi                    |
+| Trace                | Apa yang terjadi pada action, DOM, console, dan network?             | Bisa berisi session dan data aplikasi yang sensitif            |
+| Screenshot           | Apa yang terlihat pada satu waktu?                                   | Nggak menunjukkan seluruh urutan dan bisa memuat personal data |
+| Video                | Bagaimana urutan yang terlihat di UI berjalan?                       | Membutuhkan lebih banyak storage; detail DOM/network terbatas  |
+| Setup log yang aman  | Apakah environment, authentication, atau test-data setup bermasalah? | Secret dan token harus dihapus dari log                        |
 
-HTML report adalah report navigable dan self-contained untuk satu run. Untuk run yang di-shard, gunakan blob reporter lalu merge potongan report sebelum menerbitkan report untuk team. Jangan simpan semua artifact selamanya. Tentukan siapa yang boleh mengakses, berapa lama evidence masih berguna, dan apa yang perlu disanitasi sebelum dibagikan ke AI atau keluar team.
+HTML report menggabungkan step, project, retry, dan attachment dari satu run dalam report yang bisa dibuka. Untuk run yang memakai sharding, gunakan blob reporter lalu gabungkan setiap potongan sebelum report dibagikan ke team. Jangan simpan semua artifact selamanya. Tentukan siapa yang boleh mengaksesnya, berapa lama artifact disimpan, dan data apa yang perlu dihapus sebelum dibagikan ke AI atau keluar team.
 
-### 4. Tentukan gate dan owner
+### 4. Tentukan merge gate dan penanggung jawab
 
-Practical pull-request policy bisa berbunyi:
+Aturan untuk pull request bisa ditulis seperti ini:
 
 ```text
-Block merge saat:
-- required smoke project gagal;
+Blokir merge ketika:
+- smoke project yang wajib dijalankan fail;
 - smoke test menjadi flaky; atau
-- pipeline nggak bisa membangun tested environment.
+- pipeline nggak bisa menyiapkan environment untuk test.
 
-Triage owner:
-- product behavior mismatch → feature team + QA evidence;
-- locator/test logic defect → automation owner;
-- unavailable runner/environment → platform owner;
-- unclear classification → QA mulai dari first meaningful failure.
+Penanggung jawab triage:
+- behavior product nggak sesuai expected result → feature team dan QA;
+- locator atau logic test salah → automation owner;
+- runner atau environment nggak tersedia → platform owner;
+- penyebab belum jelas → QA mulai dari failure pertama yang menjelaskan masalah.
 ```
 
-Quarantine adalah temporary workflow dengan owner, reason, dan exit condition. Simpan original failure evidence dan tetap tampilkan risk yang dilindungi; quarantine bukan silent skip atau folder untuk membuang unreliable test sampai dilupakan.
+Quarantine adalah solusi sementara yang punya penanggung jawab, alasan, dan kondisi agar test bisa dikeluarkan dari quarantine. Simpan artifact dari failure awal dan catat risiko yang seharusnya dicek test tersebut. Jangan ubah quarantine menjadi silent skip atau tempat menyimpan unreliable test tanpa rencana perbaikan.
 
 ### 5. Scale hanya setelah isolation bisa dipercaya
 
-Tambah worker di satu runner kalau resource dan test data mendukung concurrency. Pakai sharding saat large isolated suite butuh beberapa CI machine:
+Tambah worker dalam satu runner kalau resource dan test data aman digunakan secara parallel. Gunakan sharding ketika test suite yang sudah isolated masih membutuhkan beberapa CI machine:
 
 ```bash
 bunx playwright test --shard=1/4
 ```
 
-Setiap shard menghasilkan sebagian result. Gunakan blob reporter dan `bunx playwright merge-reports` kalau team butuh satu combined report. Sharding suite yang masih share account atau record hanya melipatgandakan collision pressure; sharding nggak memperbaiki isolation.
+Setiap shard menghasilkan sebagian result. Gunakan blob reporter dan `bunx playwright merge-reports` untuk membuat satu report gabungan. Kalau beberapa test masih memakai account atau record yang sama, sharding justru memperbesar kemungkinan collision. Perbaiki isolation sebelum menambah shard.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Pakai small smoke gate saat quick failure bisa mengubah merge decision. Tambahkan broader scheduled coverage untuk supported variant yang terlalu mahal dijalankan pada setiap change. Trigger deployed smoke hanya setelah deployment ready dan scenario aman untuk environment itu.
+Gunakan smoke gate kecil ketika failure perlu diketahui sebelum merge. Jalankan coverage yang lebih luas lewat schedule untuk browser atau device yang terlalu mahal dicek pada setiap change. Jalankan deployment smoke setelah deployment ready dan scenario aman untuk environment tersebut.
 
-Gunakan retry untuk mengekspos intermittent behavior dan menyimpan evidence, bukan untuk membuat result terlihat hijau. Pakai `failOnFlakyTests` saat team siap memperlakukan flaky retry sebagai blocking quality signal.
+Gunakan retry untuk menemukan behavior yang intermittent dan menyimpan artifact dari attempt yang fail. Jangan gunakan retry hanya untuk membuat result terlihat hijau. Aktifkan `failOnFlakyTests` ketika team siap memblokir merge jika smoke test menjadi flaky.
 
-Pakai trace saat failure membutuhkan action, DOM, console, atau network timeline. Pakai video hanya kalau visible sequence memberi informasi yang nggak tersedia di trace atau screenshot. Simpan setup log untuk failure sebelum browser scenario.
+Gunakan trace kalau debugging membutuhkan urutan action, perubahan DOM, console, atau network. Gunakan video hanya ketika urutan yang terlihat di UI memberi informasi tambahan yang nggak tersedia di trace atau screenshot. Simpan setup log untuk masalah yang terjadi sebelum browser scenario dimulai.
 
-Jangan shard small suite. Jangan tambah project hanya karena Playwright mendukungnya. Jangan jalankan destructive test terhadap production tanpa explicit authorization, safe data, dan purpose yang sangat terbatas.
+Jangan gunakan sharding untuk test suite kecil. Jangan menambah project hanya karena Playwright mendukungnya. Jangan menjalankan destructive test terhadap production tanpa authorization, test data yang aman, dan tujuan yang sangat terbatas.
 
 ## Kalau gagal, mulai cek dari mana?
 
-| Observation                                     | Policy failure                                      | Better repair                                         |
-| ----------------------------------------------- | --------------------------------------------------- | ----------------------------------------------------- |
-| Result datang setelah review selesai            | Pull-request portfolio terlalu luas                 | Lindungi critical risk dulu; pindahkan broad coverage |
-| Retry membuat intermittent failure jadi hijau   | Flaky outcome nggak terlihat atau nggak digate      | Report/own flakiness; periksa failed-attempt evidence |
-| Failure report nggak punya trace atau setup log | Artifact policy nggak cocok dengan failure layer    | Simpan evidence yang membedakan hypothesis            |
-| CI cost naik lebih cepat dari scenario value    | Browser/device/role dimension dikalikan sembarangan | Pilih kombinasi dari supported user dan risk          |
-| Shard lulus terpisah tanpa full result          | Report nggak dimerge atau gate hanya shard-local    | Merge blob report dan buat satu final gate            |
-| Artifact mengekspos customer atau credential    | Retention/access/sanitization policy unsafe         | Restrict, redact, kurangi retention, rotate secret    |
-| Quarantined list terus bertambah                | Nggak ada owner atau exit condition                 | Tentukan repair deadline dan track original risk      |
+| Yang terjadi                                                | Kemungkinan penyebab                                      | Perbaikan                                                               |
+| ----------------------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Result baru tersedia setelah review selesai                 | Terlalu banyak test berjalan pada pull request            | Jalankan critical smoke lebih dulu; pindahkan coverage luas             |
+| Retry membuat intermittent failure terlihat hijau           | Flaky retry dilaporkan sebagai clean pass                 | Tampilkan status flaky, tentukan owner, dan cek attempt yang fail       |
+| Failure report nggak punya trace atau setup log             | Artifact yang disimpan nggak sesuai jenis failure         | Simpan trace untuk browser failure dan log untuk setup failure          |
+| Biaya CI naik lebih cepat daripada scenario yang dilindungi | Browser, device, dan role dikombinasikan tanpa seleksi    | Pilih kombinasi dari user yang didukung dan product risk                |
+| Setiap shard pass tetapi nggak ada result gabungan          | Report belum digabung atau gate hanya mengecek satu shard | Gabungkan blob report dan buat satu final gate                          |
+| Artifact mengekspos data customer atau credential           | Akses, sanitasi, atau retention artifact nggak aman       | Batasi akses, hapus data sensitif, kurangi retention, dan rotate secret |
+| Daftar test dalam quarantine terus bertambah                | Nggak ada penanggung jawab atau batas waktu perbaikan     | Tentukan deadline dan catat risiko yang nggak lagi dicek                |
 
-Kalau gate noisy, jangan melemahkan semua assertion atau retry seluruh job. Cari signal mana yang nggak trustworthy, lalu repair test, environment, atau policy contract-nya.
+Kalau merge gate terlalu sering memberi hasil yang salah, jangan melemahkan semua assertion atau mengulang seluruh job. Cari test atau bagian environment yang nggak bisa dipercaya, lalu perbaiki penyebabnya.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
-Review AI-generated CI strategy dengan pertanyaan ini:
+Review rancangan CI buatan AI dengan pertanyaan berikut:
 
-- Decision apa yang didukung setiap trigger?
+- Keputusan apa yang perlu dibuat dari setiap trigger?
 - Product risk mana yang layak mendapat smoke label?
-- Apakah browser/device matrix sesuai actual support dan risk?
-- Berapa total test execution dari proposal ini?
-- Apakah retry pass dilaporkan sebagai flaky, bukan clean?
-- Artifact mana yang menjelaskan setiap likely failure layer?
+- Apakah kombinasi browser dan device sesuai dengan product yang benar-benar didukung?
+- Berapa total test execution yang akan dibuat?
+- Apakah test yang pass setelah retry dilaporkan sebagai flaky?
+- Artifact apa yang tersedia untuk setiap jenis failure yang mungkin terjadi?
 - Bisakah artifact mengekspos credential, cookie, personal data, atau internal URL?
-- Apakah setiap merge blocker punya triage owner?
-- Apakah quarantine punya reason dan exit condition?
-- Apakah sharding justified oleh measured runtime dan safe isolation?
-- Apakah AI mengarang coverage requirement atau release policy yang belum disepakati team?
+- Apakah setiap kondisi yang memblokir merge punya penanggung jawab triage?
+- Apakah setiap test dalam quarantine punya alasan dan kondisi untuk dikeluarkan?
+- Apakah hasil pengukuran runtime memang menunjukkan sharding dibutuhkan, dan apakah test sudah isolated?
+- Apakah AI mengarang coverage requirement atau aturan release yang belum disepakati team?
 
-Minta AI menghitung runtime multiplication dan menulis assumption-nya. Large matrix bisa terlihat menyeluruh padahal feedback-nya justru lebih buruk.
+Minta AI menghitung total test execution dan menulis setiap asumsi yang digunakan. Kombinasi besar bisa terlihat lengkap, padahal hasilnya datang terlalu lambat untuk memengaruhi keputusan merge.
 
 ## Coba cek pemahamanmu
 
-Sebuah team menjalankan 300 test di Chromium, Firefox, WebKit, tiga device, dan dua role pada setiap pull request. Dua retry aktif, retry pass dilaporkan hijau, dan hanya screenshot yang diupload. Result butuh 90 menit, jadi engineer sering merge sebelum selesai.
+Sebuah team menjalankan 300 test di Chromium, Firefox, WebKit, tiga device, dan dua role pada setiap pull request. Dua retry aktif, test yang pass setelah retry dilaporkan hijau, dan hanya screenshot yang di-upload. Result membutuhkan 90 menit, sehingga engineer sering merge sebelum selesai.
 
-Rancang trigger, coverage, retry, evidence, dan ownership policy yang lebih berguna. Sebutkan product fact apa yang masih kamu butuhkan sebelum policy difinalkan.
+Rancang pilihan trigger, coverage, retry, artifact, dan penanggung jawab yang lebih berguna. Sebutkan informasi product apa yang masih dibutuhkan sebelum keputusan tersebut bisa dibuat.
 
 ## Bandingkan dengan cara pikir ini
 
-Salah satu direction yang masuk akal:
+Salah satu pendekatan yang masuk akal:
 
-- Identifikasi small release-relevant smoke set dan jalankan di primary supported desktop condition pada pull request.
-- Tambahkan hanya high-risk role/device variant ke fast gate tersebut.
-- Jalankan broader supported-browser regression setelah merge atau lewat schedule.
-- Laporkan retry pass sebagai flaky; tentukan owner dan apakah current smoke flakiness blocking.
-- Simpan trace atau equivalent timeline untuk failure, ditambah safe setup log untuk pre-browser failure.
-- Hitung reduced execution count dan ukur apakah result sekarang datang sebelum merge decision.
-- Tambahkan sharding hanya kalau remaining broad suite sudah isolated dan masih terlalu lambat.
-- Tanyakan ke product dan analytics browser, device, serta role mana yang benar-benar supported dan business-critical.
+- Pilih sedikit smoke scenario yang bisa memengaruhi release, lalu jalankan di desktop browser utama pada pull request.
+- Tambahkan hanya role atau device dengan product risk tinggi ke fast gate tersebut.
+- Jalankan regression yang lebih luas di semua browser yang didukung setelah merge atau lewat schedule.
+- Laporkan test yang pass setelah retry sebagai flaky. Tentukan penanggung jawab dan apakah flakiness pada smoke test memblokir merge.
+- Simpan trace untuk failure di browser, ditambah setup log yang aman untuk failure sebelum browser test dimulai.
+- Hitung jumlah test execution yang baru dan ukur apakah result tersedia sebelum keputusan merge.
+- Tambahkan sharding hanya kalau test suite yang lebih luas sudah isolated dan masih terlalu lambat.
+- Tanyakan kepada product dan analytics browser, device, serta role mana yang benar-benar didukung dan penting untuk bisnis.
 
-Targetnya bukan lebih sedikit testing. Targetnya evidence yang datang pada waktu yang tepat untuk known risk.
+Testing baru membantu keputusan kalau result tersedia tepat waktu dan scenario yang dijalankan memang mengecek product risk yang relevan.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa mengubah reproducible CI run menjadi explicit feedback policy yang mencakup trigger, risk-selected project, retry, artifact, gate, dan ownership.
+Sekarang kamu seharusnya bisa menentukan scenario dan project yang berjalan pada setiap trigger, cara memperlakukan retry, artifact yang disimpan, kondisi yang memblokir merge, dan siapa yang menangani failure.
 
-Capstone berikutnya meminta kamu menerapkan policy mindset itu pada satu focused checkout risk, lalu menjelaskan apa yang dibuktikan in-platform Practice—dan apa yang masih perlu dibuktikan real project sebelum benar-benar ship.
+Capstone berikutnya meminta kamu menerapkan keputusan tersebut pada satu risiko checkout. Kamu juga akan menjelaskan apa yang bisa diverifikasi melalui in-platform Practice dan apa yang masih perlu dilakukan di project nyata sebelum test siap digunakan.

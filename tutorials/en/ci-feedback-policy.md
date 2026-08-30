@@ -1,6 +1,6 @@
 ---
-title: 'Design the Feedback, Coverage, and Evidence Policy'
-description: 'Choose what runs when, preserve evidence that explains failure, and turn CI results into owned team decisions.'
+title: 'Choose Which Tests Run and Which Artifacts CI Stores'
+description: 'Select scenarios for each trigger, distinguish a clean pass from a flaky retry, and decide what blocks a merge and who handles failures.'
 ---
 
 ## After this lesson, you can
@@ -8,72 +8,72 @@ description: 'Choose what runs when, preserve evidence that explains failure, an
 - choose a risk-based test portfolio for pull requests, merges, deployments, and schedules;
 - justify browser and device coverage without multiplying every possible combination;
 - distinguish a clean pass, flaky retry pass, failed test, and infrastructure failure;
-- select reports and artifacts according to diagnostic value, cost, and privacy; and
-- define merge gates, triage ownership, and safe scaling through workers or shards.
+- select reports and artifacts based on debugging needs, cost, and stored data; and
+- define merge gates, triage responsibilities, and when workers or shards are needed.
 
 ## Why this matters for QA
 
-A pipeline can run perfectly and still provide poor feedback. If every test runs in every browser on every change, results may arrive too late. If only a pass count survives, nobody can investigate the failure. If retry success is treated as clean, instability disappears from the team’s decision.
+A pipeline can run every step correctly and still give the team poor feedback. If every test runs in every browser on every change, results may arrive after review is finished. If CI stores only pass and fail counts, the team has no trace or setup log to investigate. If a retry pass is reported as clean, the report hides flakiness.
 
-The purpose of CI is not maximum execution. It is timely evidence for a decision:
+CI needs to return a useful result in time to answer:
 
-> Is this change safe enough to continue, and if not, who has enough evidence to act?
+> Is this change safe enough to merge or release? If not, who should investigate, and which artifacts are available?
 
-That makes coverage, artifacts, retries, and gates one feedback policy—not separate tool settings.
+Coverage, artifacts, retries, and gates should all support that decision.
 
 ## The mental model
 
-Design the feedback contract from risk to action:
+Start with the trigger, then decide what happens after the result:
 
 ```text
 Change or release trigger
         ↓
 Risk-selected scenarios and projects
         ↓
-Controlled execution
+Tests run with controlled setup
         ↓
-Verdict + diagnostic evidence
+Test status + debugging artifacts
         ↓
-Named owner and next action
+Responsible person + next action
 ```
 
-![A CI feedback contract moves from a trigger to a risk-selected portfolio, controlled execution, verdict and diagnostic evidence, then a named owner and action.](/images/tutorials/ci-feedback-contract.svg)
+![CI starts from a trigger, selects scenarios and projects by risk, runs tests with controlled setup, stores status and debugging artifacts, then assigns the next action.](/images/tutorials/ci-feedback-contract.svg)
 
-_Fast feedback without useful evidence is noise. Detailed evidence that arrives too late is also poor feedback._
+_A fast result without useful debugging artifacts is hard to act on. Complete artifacts are also less useful if they arrive after the merge decision._
 
-The owner’s next action becomes the next code change, environment repair, or release decision. That closes the feedback loop; a dashboard without an action is only a history of noise.
+After reading the result, the responsible person can fix code, repair the environment, or make a release decision. A dashboard that does not lead to an action only stores a history of failures.
 
-Module 8 defines what Playwright projects, fixtures, and configuration mean inside a maintainable suite. This lesson chooses which of those projects run for each trigger and what their results mean to the team.
+Module 8 explains how to create Playwright projects, fixtures, and configuration. This lesson decides which projects run for each trigger and how the team treats their results.
 
-Every policy balances four concerns:
+Consider four things:
 
-| Concern       | Question                                                         |
-| ------------- | ---------------------------------------------------------------- |
-| Risk          | Which failure would matter on this trigger?                      |
-| Speed         | How soon must the team know?                                     |
-| Diagnosis     | What evidence can distinguish product, test, and infrastructure? |
-| Cost and care | How much execution/storage is justified, and what data is safe?  |
+| Consideration | Question                                                          |
+| ------------- | ----------------------------------------------------------------- |
+| Risk          | Which failure would matter on this trigger?                       |
+| Speed         | How soon must the team know?                                      |
+| Debugging     | Which artifact distinguishes product, test, and infrastructure?   |
+| Cost and data | How much execution/storage is reasonable, and what can be stored? |
 
 ## Work through a realistic example
 
 An online store primarily supports desktop Chrome. Firefox is also supported, while mobile checkout is high risk but changes less often. The suite has 300 tests, including 18 critical smoke scenarios.
 
-### 1. Build a trigger portfolio
+### 1. Choose tests for each trigger
 
-Do not start with every available project. Start with the decision each trigger must support:
+Do not start by running every project. First decide what each trigger needs to tell the team:
 
-| Trigger          | Risk-selected execution                                         | Why                                                        |
+| Trigger          | Tests that run                                                  | Why                                                        |
 | ---------------- | --------------------------------------------------------------- | ---------------------------------------------------------- |
-| Pull request     | 18 smoke scenarios on desktop Chromium                          | Fast signal before review and merge                        |
+| Pull request     | 18 smoke scenarios on desktop Chromium                          | Fast result before review and merge                        |
 | Merge to main    | Affected feature/regression tests on Chromium; smoke on Firefox | Broader integration confidence without full multiplication |
 | Nightly schedule | Full stable suite across supported browser portfolio            | Detect broader compatibility and accumulated regression    |
 | Deployment ready | Small safe smoke set against the deployed target                | Confirm deployment wiring and critical availability        |
 
-Tags and projects implement this policy; they do not decide the policy. Every scenario tagged `@smoke` should protect a truly release-relevant risk.
+Tags and projects implement this selection. Every scenario tagged `@smoke` should check a risk that can affect the release.
 
 If the product does not support WebKit or a particular device, running every test there is not automatically useful coverage. If payment behavior is high risk on one mobile viewport, select that flow and condition intentionally.
 
-Playwright device projects emulate conditions such as viewport, user agent, and touch; they are not proof from a physical device or its operating system. Use a real-device lab or provider when that distinction is part of the product risk. Keep destructive coverage away from production unless the purpose, authorization, and data safety are explicit.
+Playwright device projects emulate conditions such as viewport, user agent, and touch. They do not run on the physical device or its operating system. Use a real-device lab or provider when that difference matters to the product risk. Do not run destructive tests in production without a clear purpose, authorization, and safe test data.
 
 ### 2. Decide what each result means
 
@@ -82,7 +82,7 @@ With one CI retry, Playwright distinguishes:
 | Result                           | Meaning for the team                                        |
 | -------------------------------- | ----------------------------------------------------------- |
 | Passed first attempt             | Clean pass for this execution                               |
-| Failed first, passed on retry    | Flaky signal; instability still exists                      |
+| Failed first, passed on retry    | Flaky test; intermittent behavior still exists              |
 | Failed all attempts              | Persistent failure requiring triage                         |
 | Job failed before tests executed | Pipeline/environment failure; product status may be unknown |
 
@@ -104,13 +104,13 @@ export default defineConfig({
 });
 ```
 
-This example makes a flaky retry fail the CI signal. A team may first report flakiness without blocking while it establishes ownership, then tighten the gate. The important rule is that “passed on retry” must not silently become “clean.”
+This example makes a flaky retry fail CI. A team may initially report flakiness without blocking merges while it assigns someone to fix it, then tighten the gate later. A test that passes only after retry must not be reported as a clean pass.
 
-`trace: 'on-first-retry'` records the first retry attempt; it does not by itself preserve the original failed attempt. If the original failure is the evidence you need—or if a later retry passes—`retain-on-failure` records every run and keeps the failed run. Choose deliberately based on the failure pattern and storage budget.
+`trace: 'on-first-retry'` records the first retry attempt. It does not automatically store the original failed attempt. If you need that first attempt, or a later retry may pass, `retain-on-failure` records each attempt and keeps the failed one. Choose the mode based on the failure you need to debug and the available storage.
 
-### 3. Preserve evidence that answers a question
+### 3. Store artifacts that help debugging
 
-| Evidence             | Useful question                                                  | Cost or risk                                       |
+| Report or artifact   | Question it can answer                                           | Cost or risk                                       |
 | -------------------- | ---------------------------------------------------------------- | -------------------------------------------------- |
 | Terminal/line report | Which test/project failed first?                                 | Low detail                                         |
 | HTML report          | Which steps, projects, retries, and attachments belong together? | Must be uploaded and access-controlled             |
@@ -119,11 +119,11 @@ This example makes a flaky retry fail the CI signal. A team may first report fla
 | Video                | How did the visible sequence unfold?                             | Higher storage; weak DOM/network detail            |
 | Safe setup logs      | Did environment, authentication, or test-data setup fail?        | Must redact secrets and tokens                     |
 
-The HTML report is a navigable, self-contained report for one run. For sharded runs, use the blob reporter and merge the pieces before publishing the team-facing report. Do not retain every artifact forever. Define who can access it, how long it remains useful, and what must be sanitized before sharing with AI or outside the team.
+The HTML report combines steps, projects, retries, and attachments from one run. For sharded runs, use the blob reporter and merge the pieces before publishing one report for the team. Do not store every artifact forever. Decide who can access it, how long to keep it, and which data to remove before sharing it with AI or outside the team.
 
-### 4. Define the gate and owner
+### 4. Define the merge gate and who handles failures
 
-A practical pull-request policy might say:
+A pull-request rule might say:
 
 ```text
 Block merge when:
@@ -132,29 +132,29 @@ Block merge when:
 - the pipeline cannot establish the tested environment.
 
 Triage owner:
-- product behavior mismatch → feature team + QA evidence;
+- product behavior does not match the expected result → feature team + QA;
 - locator/test logic defect → automation owner;
 - unavailable runner/environment → platform owner;
-- unclear classification → QA starts from the first meaningful failure.
+- unclear cause → QA starts from the first error that explains the failure.
 ```
 
-Quarantine is a temporary workflow with an owner, reason, and exit condition. Keep the original failure evidence and the protected risk visible; never turn quarantine into a silent skip or a folder where unreliable tests disappear.
+Quarantine is temporary. It needs a responsible person, a reason, and a condition for removing the test from quarantine. Keep the original failure artifacts and record which risk the test should cover. Do not turn quarantine into a silent skip or a folder where unreliable tests disappear.
 
-### 5. Scale only after isolation is trustworthy
+### 5. Scale only after tests are properly isolated
 
-Use more workers on one runner when its resources and test data support concurrency. Use sharding when a large isolated suite needs several CI machines:
+Add workers on one runner when its resources and test data are safe for parallel execution. Use sharding when an isolated suite is still large enough to need several CI machines:
 
 ```bash
 bunx playwright test --shard=1/4
 ```
 
-Each shard produces part of the result. Use the blob reporter and `bunx playwright merge-reports` when the team needs one combined report. Sharding a suite with shared accounts or records multiplies collision pressure; it does not repair isolation.
+Each shard produces part of the result. Use the blob reporter and `bunx playwright merge-reports` to create one combined report. If tests still share accounts or records, sharding increases the chance of collisions. Fix isolation before adding shards.
 
 ## When to use it—and when not to
 
-Use a small smoke gate when quick failure changes the merge decision. Add broader scheduled coverage for supported variants whose cost is too high for every change. Trigger deployed smoke only after the deployment is ready and the scenarios are safe for that environment.
+Use a small smoke gate when a failure needs to be known before merge. Run broader supported-browser or device coverage on a schedule when it is too expensive for every change. Start deployment smoke tests only after the deployment is ready and the scenarios are safe for that environment.
 
-Use retries to expose intermittent behavior and preserve evidence, not to manufacture a green result. Use `failOnFlakyTests` when the team is ready to treat a flaky retry as a blocking quality signal.
+Use retries to find intermittent behavior and store artifacts from failed attempts, not to make a result look green. Use `failOnFlakyTests` when the team is ready to block on flaky smoke tests.
 
 Use traces for failures whose action, DOM, console, or network timeline matters. Use video only when visible sequence adds information the trace or screenshots do not provide. Preserve setup logs for failures that happen before the browser scenario.
 
@@ -162,19 +162,19 @@ Do not shard a small suite. Do not add projects merely because Playwright suppor
 
 ## When it fails
 
-| Observation                                      | Policy failure                                      | Better repair                                           |
-| ------------------------------------------------ | --------------------------------------------------- | ------------------------------------------------------- |
-| Results arrive after the review is finished      | Pull-request portfolio is too broad                 | Protect critical risks first; move broad coverage later |
-| Retry turns intermittent failures green          | Flaky outcome is not visible or gated               | Report/own flakiness; inspect failed attempt evidence   |
-| Failure report contains no trace or setup log    | Artifact policy does not match likely failure layer | Retain the evidence that distinguishes hypotheses       |
-| CI cost grows faster than scenario value         | Browser/device/role dimensions multiplied blindly   | Select combinations from supported users and risk       |
-| Shards pass separately but no full result exists | Reports are not merged or gate is shard-local       | Merge blob reports and create one final gate            |
-| Artifact exposes customer or credential data     | Retention/access/sanitization policy is unsafe      | Restrict, redact, shorten retention, and rotate secrets |
-| Quarantined list only grows                      | No owner or exit condition                          | Assign repair deadline and track the original risk      |
+| Observation                                      | Likely problem                                    | Repair                                                          |
+| ------------------------------------------------ | ------------------------------------------------- | --------------------------------------------------------------- |
+| Results arrive after the review is finished      | Pull-request portfolio is too broad               | Protect critical risks first; move broad coverage later         |
+| Retry turns intermittent failures green          | Retry pass is reported as a clean pass            | Report it as flaky, assign someone, inspect failed attempt      |
+| Failure report contains no trace or setup log    | Stored artifacts do not match the type of failure | Store trace for browser failures and logs for setup failures    |
+| CI cost grows faster than scenario value         | Browser/device/role dimensions multiplied blindly | Select combinations from supported users and risk               |
+| Shards pass separately but no full result exists | Reports are not merged or gate is shard-local     | Merge blob reports and create one final gate                    |
+| Artifact exposes customer or credential data     | Access, sanitization, or retention is unsafe      | Restrict access, redact data, shorten retention, rotate secrets |
+| Quarantined list only grows                      | No owner or exit condition                        | Assign repair deadline and track the original risk              |
 
-When a gate is noisy, do not weaken every assertion or retry the entire job. Find which signal is untrustworthy and repair its test, environment, or policy contract.
+When a merge gate often reports the wrong result, do not weaken every assertion or retry the entire job. Find the test or environment that produced the unreliable result and fix its cause.
 
-## Review generated work
+## Review AI-assisted work
 
 Review an AI-generated CI strategy with these questions:
 
@@ -183,12 +183,12 @@ Review an AI-generated CI strategy with these questions:
 - Does the browser/device matrix reflect actual support and risk?
 - How many test executions will the proposal create?
 - Are retry passes reported as flaky rather than clean?
-- Which artifact explains each likely failure layer?
+- Which artifact helps investigate each likely type of failure?
 - Can artifacts expose credentials, cookies, personal data, or internal URLs?
-- Does every merge blocker have a triage owner?
+- Is someone responsible for each condition that blocks a merge?
 - Does quarantine have a reason and exit condition?
 - Is sharding justified by measured runtime and safe isolation?
-- Did AI invent coverage requirements or a release policy the team never agreed to?
+- Did AI invent coverage requirements or release rules the team never agreed to?
 
 Ask AI to calculate runtime multiplication and state its assumptions. A large matrix can look thorough while producing worse feedback.
 
@@ -196,7 +196,7 @@ Ask AI to calculate runtime multiplication and state its assumptions. A large ma
 
 A team runs 300 tests across Chromium, Firefox, WebKit, three devices, and two roles on every pull request. Two retries are enabled, retry passes are reported as green, and only screenshots are uploaded. Results take 90 minutes, so engineers often merge before they finish.
 
-Design a more useful trigger, coverage, retry, evidence, and ownership policy. State which product facts you still need before finalizing it.
+Design a better selection of triggers, coverage, retries, artifacts, and responsible people. State which product facts you still need before finalizing it.
 
 ## Compare your reasoning
 
@@ -211,10 +211,10 @@ One reasonable direction is:
 - Add sharding only if the remaining broad suite is isolated and still too slow.
 - Ask product and analytics which browsers, devices, and roles are actually supported and business-critical.
 
-The goal is not less testing. It is better-timed evidence against known risk.
+Testing can change a decision only when the result arrives on time and the selected scenarios check relevant product risks.
 
 ## Before you continue
 
-You should now be able to turn a reproducible CI run into an explicit feedback policy covering triggers, risk-selected projects, retries, artifacts, gates, and ownership.
+You should now be able to select scenarios and projects for each trigger, handle retry results, store useful artifacts, define merge blockers, and assign someone to investigate failures.
 
-The capstone asks you to apply that policy mindset to one focused checkout risk and explain what the in-platform Practice proves—and what a real project would still need to ship.
+The capstone applies those decisions to one checkout risk. You will also explain what the in-platform Practice can verify and what still needs to run in a real project.

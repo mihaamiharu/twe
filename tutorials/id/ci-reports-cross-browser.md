@@ -1,58 +1,58 @@
 ---
-title: 'Reproduce Test System di CI'
-description: 'Ubah local Playwright run menjadi CI execution contract yang bersih, explicit, dan mudah didiagnosis.'
+title: 'Pastikan Playwright Test Bisa Dijalankan Ulang di CI'
+description: 'Ubah command yang berjalan di local menjadi CI job dengan runtime, dependency, browser, target aplikasi, dan test data yang jelas.'
 ---
 
 ## Setelah lesson ini, kamu bisa
 
-- menjelaskan input yang dibutuhkan clean CI runner sebelum browser test bisa dipercaya;
-- merancang minimal pipeline yang menginstal locked dependency dan compatible browser;
-- memilih apakah CI menjalankan owned application atau menargetkan validated deployment;
-- membuat configuration dan secret explicit tanpa mengekspos value-nya; serta
-- membedakan pipeline, environment, setup, product, dan test failure.
+- menjelaskan apa saja yang dibutuhkan runner baru sebelum hasil browser test bisa dipercaya;
+- membuat pipeline minimal yang menginstal dependency dari lockfile dan browser yang sesuai;
+- memilih apakah CI menjalankan aplikasi dari repository atau menguji deployment yang sudah tersedia;
+- memberikan configuration dan secret yang dibutuhkan tanpa membocorkan value-nya; serta
+- membedakan masalah pipeline, environment, setup, product, dan test.
 
 ## Kenapa ini penting buat QA
 
-Pernah nggak sih test-mu lulus di laptop, tapi langsung merah begitu masuk CI? Biasanya local machine memberikan assumption yang nggak dimiliki pipeline. Browser binary mungkin sudah terinstal, aplikasi masih hidup di terminal lain, environment value dibaca dari untracked file, atau sisa test data membuat scenario kebetulan lulus.
+Pernah nggak sih test pass di laptop, tapi langsung fail begitu masuk CI? Biasanya laptop kita sudah menyediakan sesuatu yang nggak dimiliki runner. Browser binary mungkin sudah terinstal, aplikasi masih berjalan di terminal lain, environment variable dibaca dari file yang nggak masuk repository, atau sisa test data membuat scenario kebetulan pass.
 
-CI mulai dari kondisi yang lebih mirip blank machine. Pressure ini justru berguna. Dari sini kelihatan apakah engineer lain bisa membangun ulang test system yang sama hanya dari repository dan authorized input.
+CI biasanya mulai dari runner yang lebih bersih. Kondisi ini membantu kita mengecek apakah engineer lain bisa menjalankan test yang sama hanya dari repository dan input yang memang diberikan secara resmi.
 
-Green local test adalah evidence tentang satu machine. Trustworthy CI run adalah evidence bahwa test system bisa direkonstruksi secara deliberate.
+Test yang pass di local hanya menunjukkan kondisi laptop tersebut. CI run lebih bisa dipercaya kalau runtime, dependency, browser, aplikasi, configuration, test data, dan command semuanya bisa disiapkan ulang dari awal.
 
 ## Cara berpikir yang perlu kamu pegang
 
-Perlakukan CI sebagai reproducibility contract:
+Pastikan CI menyiapkan input yang sama setiap kali run:
 
 ```text
-Same revision
-  + explicit runtime dan locked dependencies
-  + compatible browser dan system dependencies
-  + explicit application target
-  + controlled configuration dan test data
-  + documented test command yang sama
-  = comparable execution evidence
+Revision yang sama
+  + runtime yang jelas dan dependency dari lockfile
+  + browser serta system dependency yang sesuai
+  + target aplikasi yang jelas
+  + configuration dan test data yang terkontrol
+  + test command yang sama
+  = hasil run yang bisa dibandingkan
 ```
 
-Pipeline punya beberapa layer. Failure di layer awal bisa membuat test error setelahnya terlihat misleading:
+Pipeline terdiri dari beberapa bagian. Masalah di bagian awal bisa membuat error pada test terlihat seperti product bug:
 
-| Layer                   | Pertanyaan yang harus dijawab                                    |
-| ----------------------- | ---------------------------------------------------------------- |
-| Source                  | Exact revision mana yang sedang berjalan?                        |
-| Toolchain               | Runtime, package lock, dan Playwright version mana yang dipakai? |
-| Browser environment     | Apakah required browser dan OS library sudah terinstal?          |
-| Application target      | Apakah aplikasi yang benar sudah ready dan bisa dijangkau?       |
-| Configuration dan state | Apakah required value ada dan precondition terkontrol?           |
-| Test execution          | Command, project, dan scenario mana yang menghasilkan result?    |
+| Bagian pipeline         | Pertanyaan yang perlu dijawab                                     |
+| ----------------------- | ----------------------------------------------------------------- |
+| Source                  | Revision mana yang sedang dijalankan?                             |
+| Toolchain               | Runtime, lockfile, dan Playwright version mana yang dipakai?      |
+| Browser environment     | Apakah browser dan OS library yang dibutuhkan sudah terinstal?    |
+| Application target      | Apakah aplikasi yang benar sudah ready dan bisa diakses?          |
+| Configuration dan state | Apakah value yang wajib tersedia dan starting state terkontrol?   |
+| Test execution          | Command, project, dan scenario mana yang menghasilkan result ini? |
 
-Jangan klasifikasikan semua red pipeline sebagai product defect. Cari dulu layer mana yang rusak.
+Jangan langsung mencatat setiap pipeline merah sebagai product defect. Cari dulu bagian pipeline mana yang bermasalah.
 
 ## Coba kita bedah contoh nyata
 
-Checkout smoke test lulus di local. Team ingin menjalankannya pada setiap pull request terhadap aplikasi dari repository yang sama.
+Checkout smoke test pass di local. Team ingin menjalankannya pada setiap pull request terhadap aplikasi yang dijalankan dari repository yang sama.
 
-### 1. Buat application target explicit
+### 1. Tentukan siapa yang menjalankan aplikasi
 
-Playwright configuration bisa memiliki local application lifecycle:
+Playwright configuration bisa menjalankan dan menghentikan aplikasi local melalui `webServer`:
 
 ```ts
 import { defineConfig } from '@playwright/test';
@@ -76,15 +76,15 @@ export default defineConfig({
 });
 ```
 
-Policy ini berarti:
+Setting ini berarti:
 
-- tanpa `BASE_URL`, Playwright menjalankan owned application lalu menunggu URL-nya;
+- tanpa `BASE_URL`, Playwright menjalankan aplikasi dari repository lalu menunggu URL-nya ready;
 - dengan `BASE_URL`, run menargetkan aplikasi yang sudah dideploy; dan
-- CI nggak diam-diam memakai process lain yang kebetulan hidup.
+- CI nggak memakai process lain yang kebetulan sudah berjalan.
 
-Kalau team nggak pernah menguji deployed target, hapus branch tersebut. Kalau selalu menguji deployment, validasi `BASE_URL` lalu hentikan run sebelum test saat value-nya nggak ada. Jangan memberi fallback yang bisa tanpa sengaja menargetkan production.
+Kalau team nggak pernah menguji deployment, hapus pilihan `BASE_URL` tersebut. Kalau CI selalu menguji deployment, validasi `BASE_URL` dan hentikan run sebelum test dimulai ketika value-nya nggak ada. Jangan gunakan fallback yang bisa mengarahkan test ke production tanpa sengaja.
 
-### 2. Reproduce install dan test command
+### 2. Install runtime, dependency, dan browser dari awal
 
 Karena repository ini memakai Bun, berikut GitHub Actions job yang selaras dengan repository:
 
@@ -136,87 +136,87 @@ jobs:
           retention-days: 14
 ```
 
-Versi dan command di atas meniru Bun workflow repository ini. Di repository lain, ganti `1.3.4`, command lockfile, browser portfolio, dan test command sesuai deklarasi repository tersebut. Kalau project punya committed runtime file, jadikan itu sumber versi; jangan memakai moving runtime alias seolah-olah itu reproducibility guarantee.
+Versi dan command di atas mengikuti Bun workflow repository ini. Di repository lain, ganti `1.3.4`, command untuk lockfile, browser yang diinstal, dan test command sesuai setup repository tersebut. Kalau versi runtime disimpan dalam file di repository, gunakan file itu sebagai sumber. Jangan memakai alias versi yang bisa berubah sewaktu-waktu.
 
-Contoh minimal ini tidak memakai secret karena checkout smoke tidak membutuhkannya. Kalau authenticated test membutuhkan credential, berikan hanya lewat protected environment yang authorized atau disposable test-account mechanism. Fork pull request bisa tidak menerima secret, dan arbitrary pull-request code tidak boleh diberi production credential. Job ini memakai read-only repository permission, durasinya dibatasi, dan diagnostics tetap disimpan setelah test failure.
+Contoh minimal ini nggak memakai secret karena checkout smoke nggak membutuhkannya. Kalau authenticated test membutuhkan credential, berikan melalui protected environment yang memang diberi akses atau gunakan disposable test account. Pull request dari fork mungkin nggak menerima secret, dan code dari pull request nggak boleh mendapat production credential. Job ini hanya punya read-only access ke repository, durasinya dibatasi, dan artifact debugging tetap disimpan setelah test fail.
 
-### 3. Baca failure evidence berdasarkan layer
+### 3. Cari bagian pipeline yang pertama kali bermasalah
 
-Coba bayangin job tadi gagal. Mulai dari first meaningful message:
+Kalau job tadi fail, mulai dari error pertama yang menjelaskan penyebabnya:
 
-| Observation                    | First hypothesis                                  | Evidence yang diperiksa                         |
-| ------------------------------ | ------------------------------------------------- | ----------------------------------------------- |
-| `bun install --frozen-lockfile` menolak lockfile | Manifest dan lockfile nggak sinkron               | Install log dan committed lockfile              |
-| Browser executable nggak ada   | Browser install step atau cache assumption salah  | Install command dan Playwright version          |
-| `webServer` timeout            | App gagal start atau readiness URL salah          | App process log dan configured URL              |
-| Semua test redirect ke sign-in | Secret atau authenticated state nggak ada/invalid | Safe config validation dan authentication setup |
-| Satu checkout assertion gagal  | Product, data, locator, atau expectation problem  | Test error, trace, network, dan owned test data |
+| Yang terlihat                                    | Kemungkinan penyebab                                         | Cek dulu                                           |
+| ------------------------------------------------ | ------------------------------------------------------------ | -------------------------------------------------- |
+| `bun install --frozen-lockfile` menolak lockfile | Manifest dan lockfile nggak sinkron                          | Install log dan lockfile di repository             |
+| Browser executable nggak ada                     | Step install browser atau asumsi cache salah                 | Install command dan Playwright version             |
+| `webServer` timeout                              | Aplikasi nggak berhasil start atau readiness URL salah       | Log process aplikasi dan URL dari configuration    |
+| Semua test redirect ke sign-in                   | Secret atau authenticated state nggak ada atau sudah invalid | Validation configuration dan authentication setup  |
+| Satu checkout assertion fail                     | Masalah product, test data, locator, atau expected result    | Test error, trace, network, dan test data scenario |
 
 Menaikkan test timeout nggak akan memperbaiki dependency install yang gagal atau aplikasi yang nggak bisa dijangkau.
 
 ## Kapan pendekatan ini cocok dipakai?
 
-Jalankan small valuable suite pada pull request kalau feedback-nya bisa mengubah merge decision. Jalankan deployment smoke hanya setelah target ready dan test-data policy membuat execution aman.
+Jalankan sekumpulan test penting pada pull request kalau hasilnya memang bisa mengubah keputusan merge. Jalankan deployment smoke setelah target benar-benar ready dan test data-nya aman digunakan.
 
-Biarkan Playwright `webServer` memiliki local application saat repository punya reliable start command. Targetkan existing deployment kalau behavior bergantung pada deployment infrastructure atau integration configuration. Buat pilihannya explicit.
+Gunakan Playwright `webServer` untuk menjalankan aplikasi local kalau repository punya start command yang reliable. Uji deployment yang sudah tersedia kalau behavior bergantung pada deployment infrastructure atau integration configuration. Pastikan target yang dipilih terlihat jelas dari configuration dan log.
 
-Pakai prebuilt Playwright container saat team butuh consistent Linux browser environment atau stable screenshot rendering. Pastikan Playwright version-nya compatible dengan project. Container tetap nggak menggantikan controlled data, secret, dan target validation.
+Gunakan prebuilt Playwright container ketika team membutuhkan Linux browser environment yang konsisten atau hasil screenshot yang stabil. Pastikan Playwright version di container sesuai dengan version di project. Container tetap nggak menggantikan test data yang terkontrol, pengelolaan secret, dan validasi target aplikasi.
 
-Jangan copy workflow besar sebelum suite bisa dijalankan lewat satu documented local command. Jangan tambahkan cache sebelum uncached pipeline benar. Jangan taruh credential di workflow YAML, test title, log, trace, atau committed environment file. Anggap action tag sebagai contoh yang mudah dibaca; ikuti security policy organisasi kalau production workflow membutuhkan immutable commit-SHA pinning.
+Jangan menyalin workflow besar sebelum test suite bisa dijalankan melalui satu local command yang terdokumentasi. Jangan menambahkan cache sebelum pipeline berhasil tanpa cache. Jangan taruh credential di workflow YAML, test title, log, trace, atau environment file yang masuk repository. Action tag di contoh memang mudah dibaca, tapi production workflow tetap perlu mengikuti aturan organisasi kalau GitHub Action harus di-pin ke commit SHA.
 
 ## Kalau gagal, mulai cek dari mana?
 
-Label “CI-only flaky test” sering menyembunyikan cause yang berbeda:
+Label “CI-only flaky test” bisa menyembunyikan beberapa penyebab yang berbeda:
 
-| CI symptom                                  | Kemungkinan cause                                    | Underlying repair                                     |
-| ------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------- |
-| Gagal hanya saat resource pressure tinggi   | Runner CPU/memory atau local parallelism berlebih    | Ukur capacity; kurangi worker atau shard dengan aman  |
-| UI berbeda dari local                       | Wrong revision, target, feature config, atau account | Catat dan validasi resolved execution input           |
-| Browser launch gagal setelah upgrade        | Browser binary dan package version mismatch          | Install browser lewat project Playwright CLI          |
-| Test mulai sebelum app usable               | Readiness check nggak mewakili usable application    | Perbaiki startup/readiness contract, bukan test sleep |
-| Pipeline lulus tapi scenario penting hilang | Project, grep, atau discovery filter terlalu sempit  | Print dan review exact selected test portfolio        |
+| Yang terjadi di CI                                     | Kemungkinan penyebab                                          | Perbaikan                                                   |
+| ------------------------------------------------------ | ------------------------------------------------------------- | ----------------------------------------------------------- |
+| Test hanya fail saat CPU atau memory runner tertekan   | Kapasitas runner atau jumlah worker nggak sesuai              | Ukur resource runner, kurangi worker, atau gunakan sharding |
+| UI berbeda dari local                                  | Revision, target, feature config, atau account berbeda        | Catat dan validasi revision, URL, project, serta account    |
+| Browser nggak bisa dibuka setelah upgrade              | Browser binary dan Playwright package version nggak cocok     | Install browser melalui Playwright CLI dari project         |
+| Test berjalan sebelum aplikasi siap digunakan          | Readiness check belum mewakili aplikasi yang benar-benar siap | Perbaiki startup dan readiness check, bukan menambah sleep  |
+| Pipeline pass tetapi scenario penting nggak dijalankan | Project, `grep`, atau discovery filter terlalu sempit         | Tampilkan dan review daftar test yang dipilih runner        |
 
-Simpan safe log dari setup layer selain browser artifact. Trace nggak bisa menjelaskan kenapa dependency installation belum pernah selesai.
+Simpan log setup yang aman selain browser artifact. Trace nggak bisa menjelaskan dependency installation yang berhenti sebelum browser test dimulai.
 
-## Review hasil buatan AI
+## Review hasil kerja dengan bantuan AI
 
-Review AI-generated pipeline dengan pertanyaan ini:
+Review pipeline buatan AI dengan pertanyaan berikut:
 
-- Apakah runtime, lockfile, dan command-nya benar-benar milik repository, dengan runtime version yang reproducible?
-- Siapa yang menjalankan aplikasi, dan apa evidence bahwa aplikasi ready?
-- Bisakah missing URL diam-diam memilih environment yang salah?
-- Apakah browser package diinstal dari Playwright version project?
-- Apakah action reference-nya current dan intentionally pinned sesuai security policy repository?
-- Permission, variable, dan secret apa yang diterima job?
+- Apakah runtime, lockfile, dan command-nya memang digunakan oleh repository ini?
+- Siapa yang menjalankan aplikasi, dan URL atau status apa yang menunjukkan aplikasi sudah ready?
+- Bisakah URL yang kosong diam-diam memilih environment yang salah?
+- Apakah browser diinstal menggunakan Playwright version dari project?
+- Apakah GitHub Action yang digunakan mengikuti aturan version pinning repository?
+- Permission, environment variable, dan secret apa yang diterima job?
 - Bisakah secret masuk log, screenshot, trace, atau report?
-- Apakah workflow mengupload evidence setelah test failure?
-- Apakah setiap step punya satu responsibility yang mudah didiagnosis?
-- Apakah generated YAML mengarang script, project name, secret, atau deployment target?
+- Apakah workflow mengupload artifact debugging setelah test fail?
+- Kalau satu step fail, apakah log-nya cukup jelas untuk menunjukkan masalahnya?
+- Apakah YAML buatan AI mengarang script, nama project, secret, atau deployment target?
 
-Valid YAML belum membuktikan test system-nya valid. Jalankan setiap referenced command dan verifikasi setiap assumed input.
+YAML yang valid belum berarti workflow bisa menjalankan test dengan benar. Jalankan setiap command yang digunakan dan cek semua input yang diasumsikan tersedia.
 
 ## Coba cek pemahamanmu
 
-Generated workflow melakukan checkout repository, lalu langsung menjalankan `bun run test:e2e` dan retry seluruh job dua kali. Workflow nggak menginstal dependency atau Chromium, nggak menjalankan aplikasi, dan bergantung pada `BASE_URL` yang diset manual di satu self-hosted runner.
+AI membuat workflow yang melakukan checkout repository, lalu langsung menjalankan `bun run test:e2e` dan mengulang seluruh job dua kali ketika fail. Workflow nggak menginstal dependency atau Chromium, nggak menjalankan aplikasi, dan bergantung pada `BASE_URL` yang diatur manual di satu self-hosted runner.
 
-Redesign minimum reproducibility contract-nya. Tentukan input mana yang harus committed, mana yang disuplai secara secure, siapa yang memiliki application readiness, dan evidence apa yang harus bertahan setelah failure.
+Rancang ulang workflow minimal yang bisa dijalankan dari runner baru. Tentukan input mana yang harus tersedia di repository, mana yang diberikan dengan aman, siapa yang menjalankan dan menunggu aplikasi ready, serta artifact apa yang perlu disimpan setelah test fail.
 
 ## Bandingkan dengan cara pikir ini
 
 Salah satu design yang masuk akal:
 
-- Checkout exact revision, set declared Bun version, lalu install dependency dari committed lockfile.
-- Install browser yang dipilih dan system dependency lewat project Playwright CLI atau compatible pinned container.
-- Jalankan owned application lewat `webServer`, atau wajibkan dan validasi explicit deployed target.
-- Supply secret lewat authorized CI storage dan cegah value masuk artifact.
-- Jalankan type-check dan focused test command yang sama dengan local workflow, dengan worker CI yang dikontrol untuk stability.
-- Upload report dan diagnostic directory yang relevan saat test step gagal, dengan bounded retention period.
-- Hapus whole-job retry; investigasi failing layer dan pakai test retry hanya lewat explicit policy.
+- Checkout revision yang diminta, gunakan Bun version yang sudah ditentukan, lalu install dependency dari lockfile di repository.
+- Install browser yang dipilih dan system dependency melalui Playwright CLI dari project atau container dengan version yang sesuai.
+- Jalankan aplikasi melalui `webServer`, atau wajibkan dan validasi URL deployment yang akan diuji.
+- Berikan secret melalui CI storage yang memang diberi akses dan cegah value-nya masuk artifact.
+- Jalankan type-check dan focused test command yang sama dengan workflow local, lalu atur jumlah worker CI sesuai kapasitas runner.
+- Upload report dan directory diagnostic yang relevan ketika test step fail, lalu batasi berapa lama artifact disimpan.
+- Hapus retry untuk seluruh job. Cari bagian pipeline yang fail dan gunakan test retry hanya kalau team memang punya aturan yang jelas.
 
-Hasilnya nggak harus berupa workflow besar. Yang penting, nggak ada accidental prerequisite.
+Workflow-nya nggak harus besar. Yang penting, runner nggak bergantung pada browser, aplikasi, file, atau environment value yang hanya tersedia di satu machine.
 
 ## Sebelum lanjut
 
-Sekarang kamu seharusnya bisa mengubah local Playwright command menjadi clean CI execution contract dan mendiagnosis system layer mana yang gagal.
+Sekarang kamu seharusnya bisa mengubah local Playwright command menjadi CI job yang bisa dijalankan dari runner baru, lalu menentukan bagian mana yang bermasalah ketika job fail.
 
-Lesson berikutnya mengasumsikan execution sudah reproducible. Kita akan menentukan risk mana yang berjalan pada setiap trigger, evidence apa yang disimpan, dan bagaimana result berubah menjadi team action.
+Lesson berikutnya mengasumsikan CI sudah bisa menjalankan test dengan setup yang konsisten. Kita akan menentukan scenario mana yang berjalan pada setiap trigger, artifact apa yang disimpan, dan siapa yang harus bertindak ketika test fail.

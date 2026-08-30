@@ -1,52 +1,52 @@
 ---
-title: 'Capstone: Prove a Trustworthy Checkout Feedback System'
-description: 'Review and repair a generated checkout test, explain its evidence, and separate in-platform proof from real-project shipping evidence.'
+title: 'Capstone: Repair a Checkout Test and Explain Its Limits'
+description: 'Review an AI-generated checkout test, fix its locators, actions, waits, and assertions, then explain what the Practice verifies and what still needs a real project.'
 ---
 
 ## After this lesson, you can
 
-- turn one valuable checkout risk into a focused recovery scenario;
+- turn one checkout risk into a focused recovery scenario;
 - review generated code for locator, action, waiting, assertion, and error-handling defects;
-- justify the smallest maintainable organization for the scenario;
+- choose the simplest code structure that remains easy to maintain;
 - explain which Modules 1–9 decisions the repaired test demonstrates; and
 - distinguish what the in-platform Practice verifies from what a real CI delivery still needs.
 
 ## Why this matters for QA
 
-A capstone should not reward how many Playwright methods you remember. It should reveal whether you can review an untrustworthy test, preserve the product risk, repair the broken assumptions, and explain why the resulting feedback deserves attention.
+This capstone does not test how many Playwright methods you remember. You need to review a test that cannot yet be trusted, keep its product risk in focus, repair its incorrect assumptions, and explain which results it verifies.
 
-AI can generate a test that runs and still hide every important QA decision. A structural selector may target the wrong control, a forced click may bypass a product problem, a fixed wait may only delay failure, and a swallowed assertion may report green without proving anything.
+AI can generate a test that runs and is still wrong. A structural selector may target the wrong control, a forced click may skip an actionability problem, a fixed wait may only delay failure, and an assertion inside `try/catch` may let a broken checkout test pass.
 
-The final capability in this path is not “write a long framework.” It is “produce and defend a trustworthy signal.”
+By the end of this path, you should be able to produce a test whose result you can explain and trust without building a long framework that is difficult to trace.
 
 ## The mental model
 
-Treat capstone quality as a chain of proof:
+This capstone combines the important decisions from the full path:
 
 ```text
-Valuable product risk
+Clear product risk
   + controlled starting state
   + actions that match user behavior
-  + observable business evidence
-  + independent and diagnosable execution
-  + maintainable organization
-  + repeatable delivery policy
-  + an explanation of limitations
-  = trustworthy automation feedback
+  + expected results that can be checked
+  + a test that runs independently and is easy to debug
+  + code that is easy to maintain
+  + a consistent way to run the test
+  + explained limitations
+  = an automation result the team can trust
 ```
 
-If one link is missing, green execution can overstate what the test proves.
+If one part is missing, a passing test can make the coverage look stronger than the conditions it actually checked.
 
-The capstone connects the path in four proof areas:
+The capstone brings the path together in four parts:
 
-| Proof area                       | Earlier module decisions applied                         |
-| -------------------------------- | -------------------------------------------------------- |
-| Risk and scenario design         | Automation judgment and meaningful assertions            |
-| UI contract and browser behavior | DOM inspection, locators, actions, and synchronization   |
-| Reliability and maintainability  | Isolation, debugging, smallest useful abstraction        |
-| Shipping and team feedback       | Reproducible CI, coverage, evidence, gate, and ownership |
+| Part to review                   | Earlier module decisions applied                        |
+| -------------------------------- | ------------------------------------------------------- |
+| Risk and scenario design         | Scenario selection and accurate assertions              |
+| How the test uses the UI         | DOM inspection, locators, actions, and synchronization  |
+| Stable and maintainable tests    | Isolation, debugging, and only the abstraction needed   |
+| How the team runs and uses tests | Reproducible CI, coverage, artifacts, gates, and triage |
 
-The fourth row is a review lens, not an automated claim about what the Practice has shipped. The Practice proves the browser-level part of the chain; CI delivery and team ownership still require evidence from a real repository.
+The fourth row is only reviewed in this capstone. The Practice runs and checks browser behavior, but it does not run a CI workflow or assess how a team handles failures. Those parts still need to be checked in a real repository.
 
 ## Work through a realistic example
 
@@ -54,14 +54,14 @@ The product rule is:
 
 > Quantity must be at least 1. After correcting an invalid quantity, the customer can place the order and sees the confirmed quantity.
 
-This is one coherent recovery risk—not two unrelated tests forced together:
+This is one recovery scenario because the invalid input and correction happen in the same flow and starting state:
 
 ```text
 Starting state: fresh checkout page with no confirmation
 Action 1: submit quantity 0
-Evidence 1: validation alert explains the rule; no confirmation appears
+Expected result 1: validation alert explains the rule; no confirmation appears
 Action 2: correct quantity to 2 and submit again
-Evidence 2: stale alert clears; confirmation reports 2 items
+Expected result 2: stale alert clears; confirmation reports 2 items
 ```
 
 The generated starter is intentionally weak:
@@ -83,123 +83,123 @@ test('checkout', async ({ page }) => {
 
 Review it before rewriting:
 
-| Observed problem                    | Risk if left in place                                       | Repair direction                                   |
+| Problem                             | Effect on the test                                          | Repair direction                                   |
 | ----------------------------------- | ----------------------------------------------------------- | -------------------------------------------------- |
-| Title only says `checkout`          | Report does not identify the protected behavior             | Name the recovery outcome                          |
-| Structural `main > form` selectors  | DOM rearrangement breaks the test without changing behavior | Use label and role contracts                       |
-| Only quantity `2` is entered        | Minimum-quantity rule is never exercised                    | Submit the invalid boundary before correcting it   |
+| Title only says `checkout`          | Report does not identify the behavior under test            | Name the recovery outcome                          |
+| Structural `main > form` selectors  | DOM rearrangement breaks the test without changing behavior | Use the correct label and role                     |
+| Only quantity `2` is entered        | Minimum-quantity rule is never exercised                    | Submit an invalid quantity before correcting it    |
 | `{ force: true }`                   | Test bypasses unexplained actionability protection          | Use a normal click and investigate readiness       |
-| `waitForTimeout(1000)`              | Time replaces an observable condition                       | Wait through web-first assertions on alert/status  |
+| `waitForTimeout(1000)`              | Test waits for time instead of an application result        | Use web-first assertions on alert and status       |
 | `textContent()` plus `toBeTruthy()` | Almost any non-empty message passes                         | Assert the exact validation and confirmed quantity |
-| `try/catch` swallows the assertion  | Broken checkout can still report green                      | Let meaningful assertion failure fail the test     |
+| `try/catch` swallows the assertion  | Broken checkout can still report a pass                     | Let a failed assertion fail the test               |
 
-### Write the evidence contract before the final code
+### Define the locators and expected results before final code
 
 ```text
-Locator contract:
+Locators:
 - Quantity field is identified by its label.
 - Place order is identified by its button role and name.
 - Validation and confirmation use alert/status semantics.
 
-Assertion evidence:
+Expected results:
 - Alert has the exact minimum rule after invalid submit.
 - Alert is hidden after a valid correction.
 - Confirmation is visible and contains “2 items”.
 
-Forbidden masks:
-- no fixed sleep;
-- no unexplained force;
-- no `evaluate` or direct DOM manipulation;
-- no weak truthiness claim;
-- no swallowed error.
+Do not hide failures with:
+- fixed sleep;
+- unexplained `force`;
+- `evaluate` or direct DOM manipulation;
+- assertions that only check truthiness; or
+- errors swallowed by `try/catch`.
 ```
 
-The full repair belongs in the attached Core Practice. The Practice checks the ordered submit sequence and the state after each submit, in addition to the final DOM state and required Playwright methods. The reasoning above is the contract; exact variable names are not.
+Complete the repair in the attached Core Practice. The Practice checks the two submits in order, the state after each submit, the final DOM state, and the required Playwright methods. Variable names may differ as long as the behavior and expected results stay the same.
 
-### Decide the smallest maintainable organization
+### Choose the simplest code structure
 
-One scenario does not automatically earn a page object, fixture framework, or multi-folder architecture. A clear test with a few named locators may be the best design.
+One scenario does not automatically need a page object, fixture framework, or several folders. A clear test with a few named locators may be the best design.
 
-Extract a helper or component only if it localizes meaningful repeated change without hiding the validation and recovery steps. Explain the boundary you choose.
+Move code to a helper or component object only when the same steps repeat and usually change together. Keep the validation and recovery steps visible in the test, and explain which maintenance problem the helper or object solves.
 
-### Separate automated proof from shipping proof
+### Separate what the Practice checks from real-project work
 
-The in-platform Practice can execute the browser behavior, verify the ordered invalid-to-recovery submit sequence, inspect the final page state, and check required Playwright methods. It cannot run a real GitHub Actions job, grade an edited `playwright.config.ts`, upload a trace, or assess written browser rationale. The shipping/team-feedback proof area above remains contextual awareness, not a completed delivery claim.
+The in-platform Practice can run the browser behavior, verify the invalid-to-recovery submit sequence, inspect the final page state, and check required Playwright methods. It cannot run a real GitHub Actions job, assess changes to `playwright.config.ts`, upload a trace, or evaluate a written reason for browser selection. Passing the Practice does not mean the test is ready to ship through CI.
 
 For a real-project portfolio extension, also provide:
 
 - a reproducible local and CI command;
 - the trigger and browser/project portfolio with reasons;
-- one retained failed-run artifact or equivalent diagnostic package;
+- one artifact from a failed run or an equivalent set of diagnostics;
 - a short root-cause note for the original generated defects;
-- the suite’s known limitations and next highest-value risk; and
-- evidence that scenarios pass alone, repeatedly, and under intended parallelism.
+- the test suite's known limitations and next highest-value product risk; and
+- run results showing that scenarios pass alone, repeatedly, and with the intended parallelism.
 
-Do not claim the platform verified those deliverables when it did not.
+Do not say the platform verified CI, browser coverage, or artifacts when those parts did not run.
 
 ## When to use it—and when not to
 
-Use a recovery scenario when the risk is specifically that a customer can correct rejected input and continue safely. Use separate independent tests when the valid and invalid behaviors have different starting states, ownership, or failure meaning.
+Use a recovery scenario when a customer must be able to correct rejected input and continue. Use separate tests when valid and invalid behavior need different starting states, change different data, or have different failure meanings.
 
-Keep the capstone scope small enough that every decision can be explained. One deep, trustworthy flow is better evidence than ten copied scripts.
+Keep the capstone small enough to explain every decision. One flow checked thoroughly is more useful than ten copied scripts.
 
-Use a page or component object only when the scenario reveals a stable repeated boundary. Use a fixture only when a named dependency needs a lifecycle. A capstone rubric is not a reason to add architecture the suite does not need.
+Use a page or component object when a stable UI area is reused. Use a fixture when a named resource needs setup, scope, and cleanup. Do not add architecture only to make the capstone look more complete.
 
-Use the in-platform Practice as one integrated browser-level code-repair checkpoint. Use a real repository and CI provider for portfolio-level shipping evidence. Do not treat a simulated browser challenge as proof that secrets, runners, deployments, or artifacts are configured safely.
+Use the in-platform Practice to check the code repair and browser behavior. Use a real repository and CI provider to check runners, deployments, secrets, browser coverage, and artifacts. A simulated browser challenge cannot confirm that those parts are configured safely.
 
 ## When it fails
 
-| Green-looking result                          | Missing proof                                        | Evidence or repair                                    |
-| --------------------------------------------- | ---------------------------------------------------- | ----------------------------------------------------- |
+| Result that looks good                        | What is still unchecked                                   | How to check or repair                                |
+| --------------------------------------------- | --------------------------------------------------------- | ----------------------------------------------------- |
 | Final confirmation appears after quantity `2` | The ordered recovery sequence may not have been exercised | Assert the invalid state before correcting it         |
-| Assertion method exists somewhere in code     | It may be inside swallowed error handling            | Remove catch and observe a deliberate failing version |
-| Test passes once                              | State, ordering, or timing may still be unstable     | Repeat alone and under intended execution conditions  |
-| Code is organized into several classes        | Abstraction may hide rather than localize behavior   | Trace each boundary to a real change pattern          |
-| Browser challenge passes                      | CI target, secrets, coverage, and artifacts unproven | Run the portfolio extension in a real repository      |
-| Retry passes                                  | Original failure remains an instability signal       | Inspect first-attempt evidence and repair root cause  |
+| Assertion method exists somewhere in code     | It may be inside an error that is swallowed               | Remove `catch` and run a version designed to fail     |
+| Test passes once                              | State, ordering, or timing may still be unstable          | Repeat alone and under intended execution conditions  |
+| Code is organized into several classes        | Classes may hide behavior without helping maintenance     | Link each helper or object to real repeated code      |
+| Browser challenge passes                      | CI target, secrets, coverage, and artifacts unproven      | Run the portfolio extension in a real repository      |
+| Retry passes                                  | The first attempt still shows instability                 | Inspect the first-attempt artifact and fix root cause |
 
 Do not weaken the rubric because the generated code is difficult to repair. Do not add a sleep, forced action, broad catch, or global timeout merely to obtain green output.
 
-## Review generated work
+## Review AI-assisted work
 
-Perform a final generated-code review:
+Before accepting AI-generated code, check:
 
 - What exact product risk does the test protect?
 - Is the starting state controlled and independent?
-- Do locator contracts express user or documented engineering meaning?
-- Does every action wait for an observable application outcome?
-- Would each assertion fail for a meaningful product regression?
-- Are errors allowed to fail the test with useful evidence?
+- Do locators choose controls by how users interact with them or by attributes the team keeps stable?
+- Does every action wait for an expected application result?
+- Would each assertion fail when the important regression occurs?
+- Can errors fail the test with a useful trace or log?
 - Does any force, retry, timeout, or conditional hide an unexplained problem?
-- Did the code introduce an abstraction that earns its maintenance cost?
+- Does each new helper or object solve repeated code that should be maintained in one place?
 - Can the scenario run alone, repeatedly, and in the intended project?
-- Which CI, browser, artifact, and security claims remain outside platform verification?
+- Which CI, browser, artifact, and security checks have not run in the platform?
 - Can you explain every important generated line without asking AI again?
 
-AI assistance is allowed. Responsibility for the claim remains with the reviewer.
+You may use AI assistance, but the reviewer remains responsible for checking that the result and explanation are accurate.
 
 ## Check your understanding
 
 Someone repairs the starter by replacing the selectors and removing the fixed wait. They keep `{ force: true }`, assert only that the confirmation is visible, and say the capstone is complete because it passed twice in the browser challenge.
 
-Review that claim. Identify what the test proves, what remains weak, and which shipping evidence is still missing.
+Review that conclusion. Explain what the test checks, what remains weak, and what still needs to run in a real project.
 
 ## Compare your reasoning
 
 One reasonable review is:
 
-- Semantic selectors improve the UI contract, and removing the fixed wait improves synchronization.
-- The unexplained forced click still bypasses a readiness signal and must be removed or justified from evidence.
+- Locators based on labels and roles select controls by how users interact with them, and removing the fixed wait makes the test wait for application changes.
+- The unexplained forced click still skips actionability checks. Remove `force` or find why the element is not ready for a normal click.
 - Visibility alone does not prove the minimum rule or confirmed quantity.
-- The recovery contract needs exact invalid evidence, alert clearance, and the `2 items` confirmation.
-- Two passing runs are useful but do not test intended ordering, parallelism, or CI reconstruction.
-- The browser challenge does not prove workflow configuration, target validation, secret safety, project coverage, artifact retention, or triage ownership.
+- The recovery scenario needs the exact validation message, the cleared alert, and the `2 items` confirmation.
+- Two passing runs are useful but do not check stability under the intended parallelism or show that a new CI runner can execute the test.
+- The browser challenge does not check workflow configuration, target validation, secret safety, project coverage, artifact retention, or who handles failures.
 - Complete the Core Practice, then produce those items separately if presenting a real-project portfolio.
 
-The goal is an accurately bounded claim: strong evidence for the browser recovery sequence, and no exaggeration about CI delivery or team ownership that the Practice cannot verify.
+The conclusion should be specific: the Practice verifies the browser recovery sequence, but it does not verify CI delivery or how the team handles failures.
 
 ## Before you continue
 
-You should now be able to review and repair the checkout recovery test, justify its contracts and organization, and explain the boundary between platform-verified behavior and real-project shipping evidence.
+You should now be able to review and repair the checkout recovery test, explain your locator, assertion, and code-structure choices, and separate behavior checked by the platform from work that still requires a real project.
 
-This module is complete when its three Core lessons and the single `pw-capstone-checkout` Core Practice are complete. TWE records the Web Automation path as complete when every Core lesson and Core Practice across Modules 1–9 is complete. Optional lessons and Additional Practice do not block either status. Practical readiness still means carrying these decisions into an authorized real repository where CI, artifacts, environments, and team ownership can be observed directly.
+This module is complete when its three Core lessons and the `pw-capstone-checkout` Core Practice are complete. TWE records the Web Automation path as complete when every Core lesson and Core Practice across Modules 1–9 is complete. Optional lessons and Additional Practice do not block either status. To apply these skills in practice, use a repository you are authorized to test and check CI, artifacts, environments, and failure handling directly.
