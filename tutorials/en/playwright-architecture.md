@@ -1,66 +1,74 @@
 ---
-title: 'Treat the Browser Context as a Test Boundary'
-description: 'Use Playwright’s browser, context, and page model to separate client sessions without confusing browser isolation with backend-data isolation.'
+title: 'Use Browser Contexts to Isolate Each Test'
+description: 'Understand how Playwright browsers, contexts, and pages separate test sessions while backend data remains shared unless you control it.'
 ---
 
 ## After this lesson, you can
 
-- explain the responsibility of a browser, browser context, and page;
-- predict which state is shared or separated across pages and contexts;
-- use the default `page` fixture for ordinary isolated tests;
-- choose separate contexts for a genuine multi-user scenario; and
-- diagnose whether a suite failure comes from browser state or shared backend state.
+- explain the role of a browser, browser context, and page in Playwright;
+- distinguish state shared across pages from state separated by browser contexts;
+- use Playwright's default `page` fixture without creating another context for every test;
+- create separate contexts when a scenario needs multiple users; and
+- diagnose whether a failure comes from browser state or shared backend data.
 
 ## Why this matters for QA
 
-A test passes when you run it alone, but fails after another test. The second test is unexpectedly signed in, a dismissed banner stays dismissed, or a cart already contains an item.
+A test passes when you run it alone but fails after another test. The next test is already signed in, a dismissed banner stays hidden, or the cart already contains an item.
 
-Manual testers naturally reset the browser, switch profiles, or use an incognito window when they need a clean session. Automated tests need the same boundary to be explicit and repeatable.
+During manual testing, we may reset the browser, switch profiles, or open an incognito window when we need a clean session. Automated tests also need separate browser sessions.
 
-With the standard end-to-end setup, Playwright Test gives each test a fresh browser context by default. That prevents browser-session state from leaking between tests. But it does not reset the application database, restore inventory, or give every test a different account. Reliability starts by knowing exactly where this boundary ends.
+With the standard Playwright Test setup, every test gets a fresh browser context. Cookies, local storage, and login state from the previous test do not carry over.
+
+A fresh context does not reset backend data. Tests can still use the same database records, inventory, orders, or accounts.
+
+You need to know which state the browser context isolates and which state still needs separate test data or setup.
 
 ## The mental model
 
-Think of the objects as nested responsibility boundaries:
+Think of the Playwright objects like this:
 
 ```text
 Worker process
-└── Browser (may be reused within this worker)
+└── Browser
     ├── BrowserContext for Test A
     │   └── Page: one tab in Test A's session
     └── BrowserContext for Test B
         └── Page: one tab in Test B's session
 ```
 
-Playwright may reuse the `Browser` fixture within a worker for efficiency. The usual test boundary is the fresh `BrowserContext` and its default `Page`, not the browser process itself.
+Playwright can use the same `Browser` for several tests inside one worker.
 
-![A browser contains isolated contexts for separate tests, while pages inside a context belong to the same client session; backend records remain outside that browser boundary.](/images/tutorials/context-isolation-boundary.svg)
+The `BrowserContext` separates the sessions. Each test receives a fresh context and a default `Page` inside that context.
 
-_A fresh context isolates browser-side session state. Shared application data needs its own strategy._
+![One browser contains separate contexts for different tests. Pages inside the same context use the same session, while backend data remains outside the browser context.](/images/tutorials/context-isolation-boundary.svg)
 
-The responsibilities are:
+_A fresh browser context separates the browser session. Backend data still needs to be controlled separately._
 
-| Object           | Think of it as                       | What it decides                                                    |
-| ---------------- | ------------------------------------ | ------------------------------------------------------------------ |
-| `Browser`        | The running browser engine, often reused within a worker | Hosts one or more independent sessions                             |
-| `BrowserContext` | One test-scoped isolated browser profile/session | Cookies, storage, permissions, and pages belonging to that session; configured `storageState` may preload authentication |
-| `Page`           | One tab or popup                     | Navigation and interaction with one browser surface                |
+Read the relationship like this:
 
-Two pages in the same context belong to the same browser session. Separate contexts do not share that client-session state.
+| Object           | Think of it as             | What it contains                                               |
+| ---------------- | -------------------------- | -------------------------------------------------------------- |
+| `Browser`        | A running browser          | One or more browser contexts                                   |
+| `BrowserContext` | A separate browser session | Cookies, storage, permissions, authentication state, and pages |
+| `Page`           | One tab or popup           | Navigation and interactions on that page                       |
 
-However, both contexts can still call the same backend with the same account. Browser isolation does **not** automatically separate:
+Two `Page` objects inside the same `BrowserContext` use the same session. For example, both pages can use the same cookies and login state.
+
+Pages in different contexts have separate browser sessions.
+
+However, both contexts can still use the same backend and test data. A fresh browser context does **not** automatically separate:
 
 - customer, order, or inventory records;
 - email inboxes or one-time codes;
 - rate limits and queues;
-- mutable feature flags; or
+- feature flags that can change; or
 - any other server-side resource.
 
-That distinction explains many “but every test already gets a new page” failures.
+If tests still interfere with each other even though each has its own context, check whether they use the same account, order, inventory, or other backend data.
 
 ## Work through a realistic example
 
-Start with the normal case: one user, one behavior.
+Start with a simple case: one user and one behavior.
 
 ```ts
 test('a guest cart starts empty', async ({ page }) => {
@@ -71,13 +79,17 @@ test('a guest cart starts empty', async ({ page }) => {
 });
 ```
 
-The built-in `page` belongs to a fresh test-scoped context created for this test. “Fresh” means an isolated lifecycle; configured `storageState` can still preload authentication rather than starting signed out. You do not need to launch a browser or create another context yourself.
+The `page` fixture is already created inside a fresh browser context for this test.
 
-Now consider a support-chat requirement:
+Fresh means that another test's session does not carry over. If the project configures `storageState`, the context can still start in an authenticated state.
+
+For a test like this, you do not need to launch a browser or create another context.
+
+Now consider this support-chat requirement:
 
 > A signed-in customer sends a message, and a support agent sees and replies to that same conversation.
 
-This scenario genuinely needs two independent authenticated sessions at the same time:
+This scenario needs two users signed in at the same time with separate sessions:
 
 ```ts
 test('agent replies to a customer', async ({ browser }) => {
@@ -110,75 +122,93 @@ test('agent replies to a customer', async ({ browser }) => {
 });
 ```
 
-The two contexts separate customer cookies and agent cookies. The conversation itself is intentionally shared backend data because that is the behavior under test.
+`customerContext` and `agentContext` separate the cookies and login session for each user.
 
-Closing manually created contexts in `finally` releases resources and gives Playwright a chance to finish artifacts even when an assertion fails.
+The conversation remains shared backend data because that is the behavior under test: the customer and agent interact with the same conversation.
 
-Notice what would be wrong with opening two pages in one context for this scenario: both pages would belong to one session, so signing in as the agent could replace the customer session. A second tab is a second surface, not a second user.
+Contexts created manually also need to be closed after the test. The `finally` block closes them even when the test fails.
+
+Two `Page` objects inside one context would not work for this multi-user scenario because they still share one session.
+
+If one page signs in as the agent, it can replace the customer session used by the other page.
+
+Use separate browser contexts when a test needs two users signed in at the same time.
 
 ## When to use it—and when not to
 
-Use the default `page` fixture for almost every ordinary test. It already provides the clean browser context that test-level isolation needs.
+Use Playwright's default `page` fixture when a test needs one user and one browser session.
 
-Create additional contexts inside one test when the product behavior truly involves concurrent identities or independent sessions—for example, buyer and seller, customer and agent, or two participants in a collaboration flow.
+Create additional browser contexts when a scenario needs several users with separate sessions at the same time, such as a buyer and seller, customer and agent, or two users in a collaboration flow.
 
-Use another page in the same context for a popup or multi-tab flow that should keep the same signed-in session. Do not use another page to represent a different identity.
+Use another `Page` inside the same context for popups or multi-tab flows that belong to the same user.
 
-Do not launch a new browser per test merely to get isolation; contexts provide that boundary more efficiently. Do not reuse one page or context across unrelated tests to save setup time. That trades away a major reliability guarantee.
+Do not use two pages in one context to represent different users because they still share the same session.
 
-Browser-engine coverage belongs to the later cross-browser module. Protocol names and browser internals are not required to make good isolation decisions here.
+You also do not need to launch a new browser for every test to separate sessions. Browser contexts already provide that boundary.
+
+Do not reuse one page or context across unrelated tests only to save setup time. State from an earlier test can affect the next one.
+
+For now, focus on the difference between `Browser`, `BrowserContext`, and `Page`. Differences between browser engines are covered in the cross-browser module.
 
 ## When it fails
 
-Suppose an account-settings test passes alone but fails during parallel execution because the expected language is already changed.
+Suppose an account-settings test passes alone but fails during parallel execution because the language preference has already changed.
 
-Start by separating two hypotheses:
+Check these two possibilities:
 
-1. **Client-session leak:** a later test received cookies or storage from an earlier test.
-2. **Backend collision:** fresh contexts signed in with the same account and modified the same server-side preference.
+1. **Another test's session carried over:** cookies or storage from an earlier test are still being used.
+2. **The tests share backend data:** each context is fresh, but the tests sign in with the same account and change the same server-side preference.
 
-Inspect the failed run:
+During debugging, check:
 
 - Did each test receive its own context and page fixture?
-- Which account identity did each request use?
+- Which account does each test use?
 - Does a fresh context still show the changed language?
 - Does the failure disappear when each worker receives a different account?
 
-If a brand-new context still receives the modified preference from the server, creating more contexts will not fix it. The state is outside the browser boundary. The next lesson will define ownership for that data.
+If a fresh browser context still receives the changed language preference, the problem is not the browser session. The data has changed on the backend.
 
-Do not immediately make the suite serial, add retries, or clear random storage keys. Those actions can hide the collision without identifying which state is shared.
+Creating another context will not fix that problem. The next lesson explains how to control test data and backend state.
 
-When reviewing context-management code, check:
+Do not immediately make the suite serial, add retries, or clear random storage keys only to make the test pass. First identify which data or state the tests share.
+
+When reviewing code that creates browser contexts, check:
 
 - Does the scenario genuinely require more than the default `page` fixture?
 - Are separate users represented by separate contexts, not merely separate tabs?
 - Are manually created contexts closed even when the test fails?
 - Is authentication state appropriate for each role?
-- Does the explanation incorrectly claim that a new context resets backend data?
-- Is shared product data intentional and controlled?
-- Does the implementation launch extra browsers or contexts without a product reason?
+- Does the code assume that a fresh context also resets backend data?
+- If several tests share data, is that required by the scenario and properly controlled?
+- Does the code create another browser or context without a clear need?
 
-More contexts do not automatically mean more isolation. The boundary must match the state that can collide.
+More browser contexts do not always make a test more isolated. You still need to know which state lives in the browser and which state is shared on the backend.
 
 ## Check your understanding
 
-A marketplace test creates two pages from the default context. The first page signs in as a buyer, the second signs in as a seller, and then the first page unexpectedly behaves as the seller. A proposed repair clears cookies on the first page before every assertion.
+A marketplace test creates two `Page` objects inside the same browser context. The first page signs in as a buyer, then the second signs in as a seller. After that, the first page also behaves as the seller.
 
-Explain the real modeling mistake, the smallest architectural repair, and which marketplace data still needs a separate isolation plan after that repair.
+Someone proposes clearing cookies on the first page before every assertion.
+
+Explain:
+
+1. What is wrong with the test setup?
+2. What is the smallest change that fixes the session model?
+3. After separating the buyer and seller sessions, which marketplace data still needs to be controlled so tests do not interfere with each other?
 
 ## Compare your reasoning
 
-One reasonable answer is:
+One possible answer is:
 
-- Both pages belong to one context, so they do not represent independent authenticated sessions.
-- Create a buyer context and a seller context, then create one page inside each.
-- Do not clear cookies during the behavior; that destroys the session the test is trying to model.
-- The listing, order, and account records still live on the backend. Give the test deliberate ownership of them and prevent other workers from mutating the same records.
+- Both `Page` objects are inside the same browser context, so they use the same session. They cannot represent a separately signed-in buyer and seller.
+- Create one browser context for the buyer and another for the seller, then use one `Page` inside each context.
+- Do not clear cookies in the middle of the scenario because that changes the session the test is using.
+- Listings, orders, accounts, and other backend data can still be shared by several tests. Control that data so another test cannot change the records this scenario uses.
 
-Separate contexts repair the client-session model. They do not solve shared database ownership.
+Separate browser contexts fix the buyer and seller sessions. Backend data still needs its own isolation strategy.
 
 ## Before you continue
 
-You should now be able to explain the browser–context–page hierarchy, rely on the default test boundary, and introduce extra contexts only for real multi-session behavior.
+You should now be able to explain the relationship between `Browser`, `BrowserContext`, and `Page`, use Playwright's default fixture without creating unnecessary contexts, and create separate contexts when a scenario needs several users with different sessions.
 
-The next lesson extends isolation beyond the browser. You will define how each test owns its authentication, server data, external dependencies, cleanup, and parallel-collision risk.
+The next lesson covers isolation outside the browser: authentication, test data, external dependencies, cleanup, and conflicts between tests running in parallel.
