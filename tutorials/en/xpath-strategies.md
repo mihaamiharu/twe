@@ -9,7 +9,7 @@ description: 'Read, diagnose, and migrate legacy XPath while recognizing the lim
 - explain why an absolute XPath is usually a fragile automation contract;
 - identify when XPath maintenance is practical and when migration is worthwhile;
 - translate a relationship-based XPath into Playwright locator composition; and
-- diagnose XPath failures involving text, position, multiple matches, or shadow DOM.
+- diagnose XPath failures involving text, position, multiple matches, iframes, or shadow DOM.
 
 ## Why this matters for QA
 
