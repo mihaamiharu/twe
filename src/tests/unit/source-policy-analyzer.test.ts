@@ -116,6 +116,38 @@ describe('source policy analyzer', () => {
     expect(helperOnly.calledMethods).not.toContain('querySelectorAll');
   });
 
+  it('records JavaScript data-flow evidence for practice grading', async () => {
+    const analysis = await analyzeSourcePolicy(`
+      const testRuns = [
+        { passCount: 2, totalTests: 2 },
+        { passCount: 1, totalTests: 2 },
+        { passCount: 0, totalTests: 2 },
+      ];
+
+      function classifyRun(run) {
+        if (run.passCount === run.totalTests) {
+          return 'ALL_PASSED';
+        } else if (run.passCount > 0) {
+          return 'PARTIAL';
+        } else {
+          return 'ALL_FAILED';
+        }
+      }
+
+      const statuses = testRuns.map((run) => classifyRun(run));
+      const result = statuses.join(' | ');
+    `);
+
+    expect(analysis.calledFunctions).toContain('classifyRun');
+    expect(analysis.memberCalls).toEqual(['map', 'join']);
+    expect(analysis.constBindings).toEqual([
+      'testRuns',
+      'statuses',
+      'result',
+    ]);
+    expect(analysis.conditionalBranchCount).toBe(3);
+  });
+
   it('finds direct DOM access and swallowed catch blocks as source findings', async () => {
     const analysis = await analyzeSourcePolicy(
       `

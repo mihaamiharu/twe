@@ -11,6 +11,10 @@ import {
  */
 export interface SourcePolicyAnalysis {
   calledMethods: string[];
+  calledFunctions?: string[];
+  memberCalls?: string[];
+  constBindings?: string[];
+  conditionalBranchCount?: number;
   forbiddenMethods: string[];
   structuralLocatorCalls: number;
   forcedActions: Array<{ method: string; value: unknown; line: number }>;
@@ -22,6 +26,7 @@ export interface SourcePolicyAnalysis {
 
 interface TypeScriptModule {
   SyntaxKind: typeof import('typescript')['SyntaxKind'];
+  NodeFlags: typeof import('typescript')['NodeFlags'];
   ScriptKind: typeof import('typescript')['ScriptKind'];
   ScriptTarget: typeof import('typescript')['ScriptTarget'];
   createSourceFile: typeof import('typescript')['createSourceFile'];
@@ -49,6 +54,7 @@ interface TypeScriptModule {
   isSpreadAssignment: typeof import('typescript')['isSpreadAssignment'];
   isStringLiteral: typeof import('typescript')['isStringLiteral'];
   isVariableDeclaration: typeof import('typescript')['isVariableDeclaration'];
+  isVariableDeclarationList: typeof import('typescript')['isVariableDeclarationList'];
   isThrowStatement: typeof import('typescript')['isThrowStatement'];
   isFunctionLike: typeof import('typescript')['isFunctionLike'];
   isIfStatement: typeof import('typescript')['isIfStatement'];
@@ -71,6 +77,10 @@ function loadTypeScript(): Promise<TypeScriptModule> {
 
 const EMPTY_ANALYSIS: SourcePolicyAnalysis = {
   calledMethods: [],
+  calledFunctions: [],
+  memberCalls: [],
+  constBindings: [],
+  conditionalBranchCount: 0,
   forbiddenMethods: [],
   structuralLocatorCalls: 0,
   forcedActions: [],
@@ -148,12 +158,16 @@ function analyzeWithTypeScript(
     ts.ScriptKind.TSX,
   );
   const calledMethods = new Set<string>();
+  const calledFunctions = new Set<string>();
+  const memberCalls = new Set<string>();
+  const constBindings = new Set<string>();
   const forbiddenMethods = new Set<string>();
   const directDomAccesses = new Set<string>();
   const strictViolations = new Set<string>();
   const requiredMethods = new Set(validation?.requiredMethods ?? []);
   const forcedActions: SourcePolicyAnalysis['forcedActions'] = [];
   let structuralLocatorCalls = 0;
+  let conditionalBranchCount = 0;
   const methodAliases = new Map<string, MethodReference>();
   const objectAliases = new Set(['page']);
   const variableInitializers = new Map<string, TypeScriptExpression>();
@@ -554,6 +568,12 @@ function analyzeWithTypeScript(
 
   const registerVariable = (declaration: import('typescript').VariableDeclaration): void => {
     if (ts.isIdentifier(declaration.name)) {
+      if (
+        ts.isVariableDeclarationList(declaration.parent) &&
+        (declaration.parent.flags & ts.NodeFlags.Const) !== 0
+      ) {
+        constBindings.add(declaration.name.text);
+      }
       if (declaration.initializer) {
         variableInitializers.set(declaration.name.text, declaration.initializer);
         const method = getMethodReference(declaration.initializer);
@@ -595,7 +615,29 @@ function analyzeWithTypeScript(
   const validationForbidden = new Set(validation?.forbiddenMethods ?? []);
   let swallowedErrorCount = 0;
 
+  const countConditionalBranches = (
+    statement: import('typescript').IfStatement,
+  ): number => {
+    let branches = 1;
+    let alternative = statement.elseStatement;
+    while (alternative && ts.isIfStatement(alternative)) {
+      branches += 1;
+      alternative = alternative.elseStatement;
+    }
+    return alternative === undefined ? branches : branches + 1;
+  };
+
   const visit = (node: TypeScriptNode): void => {
+    if (
+      ts.isIfStatement(node) &&
+      (!ts.isIfStatement(node.parent) || node.parent.elseStatement !== node)
+    ) {
+      conditionalBranchCount = Math.max(
+        conditionalBranchCount,
+        countConditionalBranches(node),
+      );
+    }
+
     if (ts.isCallExpression(node)) {
       const callee = unwrapExpression(ts, node.expression);
       const calleeName = ts.isPropertyAccessExpression(callee)
@@ -603,6 +645,8 @@ function analyzeWithTypeScript(
         : ts.isElementAccessExpression(callee)
           ? getStaticPropertyName(callee.argumentExpression ?? callee.expression)
           : undefined;
+      if (calleeName !== undefined) memberCalls.add(calleeName);
+      if (ts.isIdentifier(callee)) calledFunctions.add(callee.text);
       const promiseExpression =
         ts.isPropertyAccessExpression(callee) ||
         ts.isElementAccessExpression(callee)
@@ -674,6 +718,10 @@ function analyzeWithTypeScript(
 
   return {
     calledMethods: [...calledMethods],
+    calledFunctions: [...calledFunctions],
+    memberCalls: [...memberCalls],
+    constBindings: [...constBindings],
+    conditionalBranchCount,
     forbiddenMethods: [...forbiddenMethods],
     structuralLocatorCalls,
     forcedActions,

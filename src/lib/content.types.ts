@@ -197,6 +197,14 @@ export interface ChallengeValidationPolicy {
 export interface ChallengeValidationDefinition {
   requiredAssertions?: string[];
   requiredMethods?: string[];
+  /** Require named free-function calls in learner source. */
+  requiredFunctionCalls?: string[];
+  /** Require named member calls such as Array.prototype.filter. */
+  requiredMemberCalls?: string[];
+  /** Require these learner bindings to be declared with const. */
+  requiredConstBindings?: string[];
+  /** Require at least one conditional chain with this many branches. */
+  minimumConditionalBranches?: number;
   forbiddenMethods?: string[];
   policy?: ChallengeValidationPolicy;
   interactionSequence?: InteractionSequenceDefinition;

@@ -239,6 +239,24 @@ export function validateChallengeExecution(
   const missingMethods = (validation.requiredMethods ?? []).filter(
     (method) => !observedMethods.has(method),
   );
+  const calledFunctions = new Set(source?.calledFunctions ?? []);
+  const memberCalls = new Set(source?.memberCalls ?? []);
+  const constBindings = new Set(source?.constBindings ?? []);
+  const missingFunctionCalls = (validation.requiredFunctionCalls ?? [])
+    .filter((name) => !calledFunctions.has(name))
+    .map((name) => `${name}()`);
+  const missingMemberCalls = (validation.requiredMemberCalls ?? [])
+    .filter((name) => !memberCalls.has(name))
+    .map((name) => `.${name}()`);
+  const missingConstBindings = (validation.requiredConstBindings ?? [])
+    .filter((name) => !constBindings.has(name))
+    .map((name) => `const ${name}`);
+  const minimumConditionalBranches =
+    validation.minimumConditionalBranches ?? 0;
+  const missingConditionalEvidence =
+    (source?.conditionalBranchCount ?? 0) < minimumConditionalBranches
+      ? [`if/else (${minimumConditionalBranches} branches)`]
+      : [];
   const missingSequenceSteps = findMissingEvidenceSequenceSteps(
     trace?.events,
     validation.requiredEvidenceSequence,
@@ -246,6 +264,10 @@ export function validateChallengeExecution(
   if (
     missingAssertions.length > 0 ||
     missingMethods.length > 0 ||
+    missingFunctionCalls.length > 0 ||
+    missingMemberCalls.length > 0 ||
+    missingConstBindings.length > 0 ||
+    missingConditionalEvidence.length > 0 ||
     missingSequenceSteps.length > 0
   ) {
     return {
@@ -256,6 +278,10 @@ export function validateChallengeExecution(
           ...new Set([
             ...missingAssertions,
             ...missingMethods,
+            ...missingFunctionCalls,
+            ...missingMemberCalls,
+            ...missingConstBindings,
+            ...missingConditionalEvidence,
             ...missingSequenceSteps,
           ]),
         ],

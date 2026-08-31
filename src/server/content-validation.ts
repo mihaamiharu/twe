@@ -127,6 +127,10 @@ const ChallengeValidationSchema = z
   .object({
     requiredAssertions: z.array(z.string().min(1)).optional(),
     requiredMethods: z.array(z.string().min(1)).optional(),
+    requiredFunctionCalls: z.array(z.string().min(1)).optional(),
+    requiredMemberCalls: z.array(z.string().min(1)).optional(),
+    requiredConstBindings: z.array(z.string().min(1)).optional(),
+    minimumConditionalBranches: z.number().int().positive().optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
     policy: ChallengeValidationPolicySchema.optional(),
     requiredEvidenceSequence: z
@@ -362,6 +366,13 @@ function normalizeChallengeDefinition(
               ...omitUndefined({
                 requiredAssertions: value.validation.requiredAssertions,
                 requiredMethods: value.validation.requiredMethods,
+                requiredFunctionCalls:
+                  value.validation.requiredFunctionCalls,
+                requiredMemberCalls: value.validation.requiredMemberCalls,
+                requiredConstBindings:
+                  value.validation.requiredConstBindings,
+                minimumConditionalBranches:
+                  value.validation.minimumConditionalBranches,
                 forbiddenMethods: value.validation.forbiddenMethods,
                 requiredEvidenceSequence: normalizeRequiredEvidenceSequence(
                   value.validation.requiredEvidenceSequence,

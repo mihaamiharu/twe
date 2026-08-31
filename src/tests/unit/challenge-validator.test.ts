@@ -251,4 +251,60 @@ describe('challenge execution validator', () => {
       },
     });
   });
+
+  it('requires configured JavaScript source evidence', () => {
+    const validation = {
+      requiredFunctionCalls: ['classifyRun'],
+      requiredMemberCalls: ['map', 'join'],
+      requiredConstBindings: ['testRuns', 'statuses', 'result'],
+      minimumConditionalBranches: 3,
+    };
+    const sourceAnalysis = {
+      calledMethods: [],
+      calledFunctions: ['classifyRun'],
+      memberCalls: ['map', 'join'],
+      constBindings: ['testRuns', 'statuses', 'result'],
+      conditionalBranchCount: 3,
+      forbiddenMethods: [],
+      structuralLocatorCalls: 0,
+      forcedActions: [],
+      directDomAccesses: [],
+      swallowedErrorCount: 0,
+      strictViolations: [],
+    };
+
+    expect(
+      validateChallengeExecution(
+        passedExecution({ sourceAnalysis }),
+        validation,
+      ),
+    ).toEqual({ passed: true });
+    expect(
+      validateChallengeExecution(
+        passedExecution({
+          sourceAnalysis: {
+            ...sourceAnalysis,
+            calledFunctions: [],
+            memberCalls: [],
+            constBindings: ['result'],
+            conditionalBranchCount: 1,
+          },
+        }),
+        validation,
+      ),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: [
+          'classifyRun()',
+          '.map()',
+          '.join()',
+          'const testRuns',
+          'const statuses',
+          'if/else (3 branches)',
+        ],
+      },
+    });
+  });
 });
