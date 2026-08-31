@@ -1725,9 +1725,9 @@
         ]
       },
       "htmlContent": "<main><button onclick=\"const status=document.querySelector('[role=status]');status.textContent='Saving…';setTimeout(()=>status.textContent='Profile saved',150)\">Save profile</button><p role=\"status\">Not saved</p></main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('profile save reaches a visible outcome', async ({ page }) => {\n  // Click Save profile.\n  // Wait for the observable status without a fixed sleep.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByRole('button', { name: 'Save profile' }).click();\nawait expect(page.getByRole('status')).toHaveText('Profile saved');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByRole('button', { name: 'Save profile' }).click();\n  await expect(page.getByRole('status')).toHaveText('Profile saved');\n});",
       "expectedState": [
         {
           "selector": "[role=status]",
@@ -1738,7 +1738,35 @@
       "validation": {
         "requiredAssertions": ["toHaveText"],
         "requiredMethods": ["getByRole", "click"],
-        "forbiddenMethods": ["waitForTimeout"]
+        "forbiddenMethods": ["waitForTimeout"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Save profile"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Profile saved"],
+            "locator": {
+              "method": "getByRole",
+              "value": "status"
+            }
+          }
+        ]
       },
       "tags": [
         "playwright",
