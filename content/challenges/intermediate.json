@@ -1225,17 +1225,54 @@
         ]
       },
       "files": {
-        "/tests/cart.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // Open Cart using a user-facing locator.\n\n  // Prove the resulting page is visible.\n});",
+        "/tests/cart.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // TODO 1\n\n  // TODO 2\n});",
         "/app/products.html": "<main>\n  <nav aria-label=\"Store navigation\">\n    <a href=\"/app/cart.html\">Cart</a>\n  </nav>\n  <h1>Products</h1>\n  <section aria-label=\"Available products\">\n    <article>\n      <h2>Mechanical Keyboard</h2>\n      <p>A compact keyboard for a focused workspace.</p>\n    </article>\n  </section>\n</main>",
         "/app/cart.html": "<main>\n  <nav aria-label=\"Store navigation\">\n    <a href=\"/app/products.html\">Continue shopping</a>\n  </nav>\n  <h1>Your cart</h1>\n  <p>Your cart is empty.</p>\n</main>"
       },
       "editableFiles": ["/tests/cart.spec.ts"],
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // Open Cart using a user-facing locator.\n\n  // Prove the resulting page is visible.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // TODO 1\n\n  // TODO 2\n});",
       "testCases": [],
+      "expectedState": [
+        {
+          "selector": "h1",
+          "visible": true,
+          "containsText": "Your cart"
+        }
+      ],
       "solution": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  await page.getByRole('link', { name: 'Cart' }).click();\n\n  await expect(\n    page.getByRole('heading', { name: 'Your cart' }),\n  ).toBeVisible();\n});",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["goto", "getByRole", "click"]
+        "requiredMethods": ["goto", "getByRole", "click"],
+        "policy": {
+          "requireExecutedEvidence": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "goto",
+            "target": "page",
+            "arguments": ["/app/products.html"]
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "link",
+              "name": "Cart"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "locator": {
+              "method": "getByRole",
+              "value": "heading",
+              "name": "Your cart"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "first-test", "navigation", "core-practice"]
     },
