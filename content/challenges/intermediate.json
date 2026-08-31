@@ -1428,12 +1428,48 @@
         ]
       },
       "htmlContent": "<iframe title=\"Secure payment\" srcdoc='<label for=\"card-number\">Card number</label><input id=\"card-number\">'></iframe>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  // 1. Enter the Secure payment frame.\n  // 2. Fill Card number.\n  // 3. Verify its value.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "const frame = page.frameLocator('[title=\"Secure payment\"]');\nconst cardNumber = frame.getByLabel('Card number');\nawait cardNumber.fill('1234');\nawait expect(cardNumber).toHaveValue('1234');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const frame = page.frameLocator('[title=\"Secure payment\"]');\n  const cardNumber = frame.getByLabel('Card number');\n\n  await cardNumber.fill('1234');\n  await expect(cardNumber).toHaveValue('1234');\n});",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["frameLocator", "getByLabel", "fill"]
+        "requiredMethods": ["frameLocator", "getByLabel", "fill"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["1234"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Card number",
+              "scope": {
+                "method": "frameLocator",
+                "value": "[title=\"Secure payment\"]"
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "arguments": ["1234"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Card number",
+              "scope": {
+                "method": "frameLocator",
+                "value": "[title=\"Secure payment\"]"
+              }
+            }
+          }
+        ]
       },
       "tags": ["playwright", "frames", "iframes", "intermediate"]
     },
