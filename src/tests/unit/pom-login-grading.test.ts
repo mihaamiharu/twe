@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'bun:test';
 import { validateChallengeExecution } from '@/core/executor/challenge-validator';
 import { executePlaywrightCode } from '@/core/executor/iframe-executor';
+import { omitUndefined } from '@/lib/omit-undefined';
 import { getChallengeCatalogDetail } from '@/server/content.server';
 
 async function runLoginPractice(code: string) {
@@ -15,11 +16,13 @@ async function runLoginPractice(code: string) {
     {
       timeout: 4_000,
       files: challenge.files,
-      expectedState: challenge.expectedState,
       validation: challenge.validation,
-      interactionSequence: challenge.validation.interactionSequence,
       strictMode: true,
       isTypeScript: false,
+      ...omitUndefined({
+        expectedState: challenge.expectedState,
+        interactionSequence: challenge.validation.interactionSequence,
+      }),
     },
   );
 
