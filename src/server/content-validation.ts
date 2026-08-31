@@ -8,6 +8,8 @@ import type {
   InteractionSequenceDefinition,
   LocalizedArray,
   LocalizedString,
+  LocatorEvidenceDefinition,
+  LocatorTargetEvidenceDefinition,
   RequiredEvidenceSequenceStep,
   SerializableExpectedStateRule,
   TestCaseDefinition,
@@ -97,7 +99,7 @@ const ChallengeValidationPolicySchema = z
   })
   .strict();
 
-const LocatorEvidenceSchema = z
+const LocatorLeafEvidenceSchema = z
   .object({
     method: z.string().min(1),
     value: z.string().min(1).optional(),
@@ -105,6 +107,21 @@ const LocatorEvidenceSchema = z
     exact: z.boolean().optional(),
   })
   .strict();
+
+const LocatorFilterEvidenceSchema = z
+  .object({
+    hasText: z.string().min(1).optional(),
+    has: LocatorLeafEvidenceSchema.optional(),
+  })
+  .strict();
+
+const LocatorTargetEvidenceSchema = LocatorLeafEvidenceSchema.extend({
+  filters: z.array(LocatorFilterEvidenceSchema).min(1).optional(),
+}).strict();
+
+const LocatorEvidenceSchema = LocatorTargetEvidenceSchema.extend({
+  scope: LocatorTargetEvidenceSchema.optional(),
+}).strict();
 
 const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
   z
@@ -356,14 +373,7 @@ function normalizeRequiredEvidenceSequence(
     const locator =
       step.locator === undefined
         ? undefined
-        : {
-            method: step.locator.method,
-            ...omitUndefined({
-              value: step.locator.value,
-              name: step.locator.name,
-              exact: step.locator.exact,
-            }),
-          };
+        : normalizeLocatorEvidence(step.locator);
 
     if (step.type === 'assertion') {
       return {
@@ -383,6 +393,49 @@ function normalizeRequiredEvidenceSequence(
       }),
     };
   });
+}
+
+function normalizeLocatorTargetEvidence(
+  value: z.infer<typeof LocatorTargetEvidenceSchema>,
+): LocatorTargetEvidenceDefinition {
+  return {
+    method: value.method,
+    ...omitUndefined({
+      value: value.value,
+      name: value.name,
+      exact: value.exact,
+      filters: value.filters?.map((filter) => ({
+        ...omitUndefined({
+          hasText: filter.hasText,
+          has:
+            filter.has === undefined
+              ? undefined
+              : {
+                  method: filter.has.method,
+                  ...omitUndefined({
+                    value: filter.has.value,
+                    name: filter.has.name,
+                    exact: filter.has.exact,
+                  }),
+                },
+        }),
+      })),
+    }),
+  };
+}
+
+function normalizeLocatorEvidence(
+  value: z.infer<typeof LocatorEvidenceSchema>,
+): LocatorEvidenceDefinition {
+  return {
+    ...normalizeLocatorTargetEvidence(value),
+    ...omitUndefined({
+      scope:
+        value.scope === undefined
+          ? undefined
+          : normalizeLocatorTargetEvidence(value.scope),
+    }),
+  };
 }
 
 function normalizeTypeScriptEvidence(

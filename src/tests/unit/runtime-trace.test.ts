@@ -55,6 +55,50 @@ describe('runtime execution trace', () => {
     ]);
   });
 
+  it('preserves composed filters as scope for nested locators', async () => {
+    document.body.innerHTML = `
+      <article role="article">
+        <h2>Widget Pro</h2>
+        <span>In Stock</span>
+        <button>Add to Cart</button>
+      </article>
+    `;
+    const trace = createRuntimeExecutionTrace();
+    const rawPage = new MockedPlaywrightPage(document, { timeout: 20 });
+    const page = createTracedPlaywrightPage(rawPage, trace);
+    const exactHeading = page.getByRole('heading', {
+      name: 'Widget Pro',
+      exact: true,
+    });
+    const card = page
+      .getByRole('article')
+      .filter({ has: exactHeading })
+      .filter({ hasText: 'In Stock' });
+
+    await card.getByRole('button', { name: 'Add to Cart' }).click();
+
+    expect(trace.methodCalls.at(-1)?.locator).toEqual({
+      method: 'getByRole',
+      value: 'button',
+      name: 'Add to Cart',
+      scope: {
+        method: 'getByRole',
+        value: 'article',
+        filters: [
+          {
+            has: {
+              method: 'getByRole',
+              value: 'heading',
+              name: 'Widget Pro',
+              exact: true,
+            },
+          },
+          { hasText: 'In Stock' },
+        ],
+      },
+    });
+  });
+
   it('records bound and bracket evaluate calls and failed actions', async () => {
     document.body.innerHTML = '<button>Save</button>';
     const trace = createRuntimeExecutionTrace();

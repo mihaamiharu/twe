@@ -461,12 +461,27 @@
         ]
       },
       "htmlContent": "<ul class=\"todo-list\">\n  <li>Buy groceries</li>\n  <li>Walk the dog</li>\n  <li>Write tests</li>\n  <li>Review PRs</li>\n  <li>Deploy app</li>\n</ul>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('count items', async ({ page }) => {\n  // 1. Assert list items count is 5\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n});",
       "testCases": [],
-      "solution": "await expect(page.getByRole('listitem')).toHaveCount(5);",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await expect(page.getByRole('listitem')).toHaveCount(5);\n});",
       "validation": {
         "requiredAssertions": ["toHaveCount"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["getByRole"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "locator": {
+              "method": "getByRole",
+              "value": "listitem"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "lists", "multiple", "intermediate"]
     },
@@ -502,12 +517,83 @@
         ]
       },
       "htmlContent": "<div class=\"products\">\n  <article role=\"article\" data-testid=\"product-1\">\n    <h3>Widget Basic</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </article>\n  <article role=\"article\" data-testid=\"product-2\">\n    <h3>Widget Pro</h3>\n    <span class=\"badge in-stock\">In Stock</span>\n    <button onclick=\"document.getElementById('msg').textContent='Added Widget Pro!'\">Add to Cart</button>\n  </article>\n  <article role=\"article\" data-testid=\"product-3\">\n    <h3>Widget Pro Max</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </article>\n</div>\n<div id=\"msg\" role=\"status\"></div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('add the exact available product', async ({ page }) => {\n  // 1. Locate article cards\n  // 2. Filter by exact Widget Pro heading and exact In Stock text\n  // 3. Assert one card remains\n  // 4. Click Add to Cart inside it\n  // 5. Assert the status message\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n  // TODO 5\n});",
       "testCases": [],
-      "solution": "const card = page\n  .getByRole('article')\n  .filter({\n    has: page.getByRole('heading', { name: 'Widget Pro', exact: true }),\n  })\n  .filter({ has: page.getByText('In Stock', { exact: true }) });\n\nawait expect(card).toHaveCount(1);\nawait card.getByRole('button', { name: 'Add to Cart' }).click();\nawait expect(page.getByRole('status')).toHaveText('Added Widget Pro!');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const card = page\n    .getByRole('article')\n    .filter({\n      has: page.getByRole('heading', { name: 'Widget Pro', exact: true }),\n    })\n    .filter({ has: page.getByText('In Stock', { exact: true }) });\n\n  await expect(card).toHaveCount(1);\n  await card.getByRole('button', { name: 'Add to Cart' }).click();\n  await expect(page.getByRole('status')).toHaveText('Added Widget Pro!');\n});",
       "validation": {
         "requiredAssertions": ["toHaveCount", "toHaveText"],
-        "requiredMethods": ["filter", "getByRole"]
+        "requiredMethods": ["filter", "getByRole", "getByText", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "locator": {
+              "method": "getByRole",
+              "value": "article",
+              "filters": [
+                {
+                  "has": {
+                    "method": "getByRole",
+                    "value": "heading",
+                    "name": "Widget Pro",
+                    "exact": true
+                  }
+                },
+                {
+                  "has": {
+                    "method": "getByText",
+                    "value": "In Stock",
+                    "exact": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Add to Cart",
+              "scope": {
+                "method": "getByRole",
+                "value": "article",
+                "filters": [
+                  {
+                    "has": {
+                      "method": "getByRole",
+                      "value": "heading",
+                      "name": "Widget Pro",
+                      "exact": true
+                    }
+                  },
+                  {
+                    "has": {
+                      "method": "getByText",
+                      "value": "In Stock",
+                      "exact": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByRole",
+              "value": "status"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "scenario", "boss", "intermediate"]
     },
@@ -1230,28 +1316,72 @@
         "id": "Terapkan locator composition pada changing table lalu verifikasi row-local outcome."
       },
       "instructions": {
-        "en": "# Complete a Named Project Row\n\nThis is a transfer exercise from Module 4: table order can change, so position is not project identity. Find the row that contains **Project X**, perform **Complete** only inside that row, and verify that same row reports **Done**. The final assertion proves both the action outcome and the scope.\n\n## Your Task\n1. Start from the collection of `row` roles.\n2. Filter to the row containing `Project X`.\n3. Click its **Complete** button.\n4. Verify its local status becomes `Done`.\n",
-        "id": "# Selesaikan Project Row yang Tepat\n\nIni transfer exercise dari Module 4: table order bisa berubah, jadi position bukan project identity. Cari row yang berisi **Project X**, jalankan **Complete** hanya di row tersebut, lalu verifikasi row yang sama menampilkan **Done**. Final assertion membuktikan action outcome sekaligus scope-nya.\n\n## Tugas Kamu\n1. Mulai dari collection dengan role `row`.\n2. Filter ke row yang berisi `Project X`.\n3. Click button **Complete** di dalamnya.\n4. Verifikasi local status menjadi `Done`.\n"
+        "en": "# Complete a Named Project Row\n\nThis is a transfer exercise from Module 4: table order can change, so position is not project identity. Find the row that contains **Project X**, perform **Complete** only inside that row, and verify that same row reports **Done**. The final assertion proves both the action outcome and the scope.\n\n## Your Task\n1. Start from the collection of `row` roles.\n2. Filter to the row containing `Project X`.\n3. Assert that exactly one row remains.\n4. Click its **Complete** button.\n5. Verify its local status becomes `Done`.\n",
+        "id": "# Selesaikan Project Row yang Tepat\n\nIni transfer exercise dari Module 4: urutan tabel bisa berubah, jadi posisi bukan identitas project. Cari row yang berisi **Project X**, jalankan **Complete** hanya di dalam row tersebut, lalu verifikasi row yang sama menampilkan **Done**. Final assertion membuktikan outcome action sekaligus scope-nya.\n\n## Tugas Kamu\n1. Mulai dari collection dengan role `row`.\n2. Filter ke row yang berisi `Project X`.\n3. Assert bahwa hanya ada satu row yang tersisa.\n4. Click button **Complete** di dalamnya.\n5. Verifikasi local status menjadi `Done`.\n"
       },
       "hints": {
         "en": [
           "Find a specific row by a unique piece of text it contains, then look for a button within just that row.",
           "Use the '.filter({ hasText: ... })' method to isolate the correct row from all other rows.",
-          "Locate the row with 'Project X', click the 'Complete' button inside it, and verify its local status text."
+          "Prove one Project X row remains, click Complete inside it, and verify its local status text."
         ],
         "id": [
           "Temukan baris spesifik berdasarkan teks unik yang dikandungnya, lalu cari tombol hanya di dalam baris tersebut.",
           "Gunakan metode '.filter({ hasText: ... })' untuk memisahkan baris yang benar dari semua baris lainnya.",
-          "Temukan baris dengan 'Project X', klik tombol 'Complete' di dalamnya, dan verifikasi teks status lokalnya."
+          "Buktikan hanya ada satu row Project X, click Complete di dalamnya, lalu verifikasi local status text-nya."
         ]
       },
       "htmlContent": "<div class=\"app\">\n  <div class=\"task-row\" role=\"row\">\n    <span class=\"name\">Project X</span>\n    <span class=\"status\" role=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n  <div class=\"task-row\" role=\"row\">\n    <span class=\"name\">Project Y</span>\n    <span class=\"status\" role=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  // 1. Find row with 'Project X'\n  // 2. Click Complete\n  // 3. Verify status is 'Done'\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n});",
       "testCases": [],
-      "solution": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  const row = page.getByRole('row').filter({ hasText: 'Project X' });\n  await row.getByRole('button', { name: 'Complete' }).click();\n  await expect(row.getByRole('status')).toHaveText('Done');\n});",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const row = page.getByRole('row').filter({ hasText: 'Project X' });\n  await expect(row).toHaveCount(1);\n  await row.getByRole('button', { name: 'Complete' }).click();\n  await expect(row.getByRole('status')).toHaveText('Done');\n});",
       "validation": {
-        "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "filter", "click"]
+        "requiredAssertions": ["toHaveCount", "toHaveText"],
+        "requiredMethods": ["getByRole", "filter", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "locator": {
+              "method": "getByRole",
+              "value": "row",
+              "filters": [{ "hasText": "Project X" }]
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Complete",
+              "scope": {
+                "method": "getByRole",
+                "value": "row",
+                "filters": [{ "hasText": "Project X" }]
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByRole",
+              "value": "status",
+              "scope": {
+                "method": "getByRole",
+                "value": "row",
+                "filters": [{ "hasText": "Project X" }]
+              }
+            }
+          }
+        ]
       },
       "tags": ["playwright", "tables", "filter", "intermediate"]
     },

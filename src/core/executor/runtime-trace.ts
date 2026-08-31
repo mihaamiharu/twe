@@ -1,6 +1,10 @@
 import type { MockedPlaywrightPage } from './playwright-shim';
 import type { Locator } from './shim.types';
-import type { LocatorEvidenceDefinition } from '@/lib/content.types';
+import type {
+  LocatorEvidenceDefinition,
+  LocatorFilterEvidenceDefinition,
+  LocatorTargetEvidenceDefinition,
+} from '@/lib/content.types';
 import {
   PLAYWRIGHT_ACTION_METHODS,
   PLAYWRIGHT_LOCATOR_METHODS,
@@ -105,6 +109,37 @@ function getStringArguments(args: unknown[]): string[] | undefined {
   return stringArguments.length > 0 ? stringArguments : undefined;
 }
 
+function toTargetEvidence(
+  evidence: LocatorEvidenceDefinition,
+): LocatorTargetEvidenceDefinition {
+  return {
+    method: evidence.method,
+    ...(evidence.value === undefined ? {} : { value: evidence.value }),
+    ...(evidence.name === undefined ? {} : { name: evidence.name }),
+    ...(evidence.exact === undefined ? {} : { exact: evidence.exact }),
+    ...(evidence.filters === undefined ? {} : { filters: evidence.filters }),
+  };
+}
+
+function getFilterEvidence(
+  args: unknown[],
+): LocatorFilterEvidenceDefinition | undefined {
+  const options = isObject(args[0]) ? args[0] : undefined;
+  if (options === undefined) return undefined;
+
+  const hasText =
+    typeof options['hasText'] === 'string' ? options['hasText'] : undefined;
+  const hasLocator = getTracedLocatorEvidence(options['has']);
+  if (hasText === undefined && hasLocator === undefined) return undefined;
+
+  return {
+    ...(hasText === undefined ? {} : { hasText }),
+    ...(hasLocator === undefined
+      ? {}
+      : { has: toTargetEvidence(hasLocator) }),
+  };
+}
+
 function getReturnedLocatorEvidence(
   method: string,
   args: unknown[],
@@ -112,6 +147,15 @@ function getReturnedLocatorEvidence(
 ): LocatorEvidenceDefinition | undefined {
   if (!PLAYWRIGHT_LOCATOR_RETURNING_METHODS.has(method)) return current;
   if (method === 'first' || method === 'last' || method === 'nth') return current;
+  if (method === 'filter') {
+    if (current === undefined) return undefined;
+    const filter = getFilterEvidence(args);
+    if (filter === undefined) return current;
+    return {
+      ...current,
+      filters: [...(current.filters ?? []), filter],
+    };
+  }
 
   const value = typeof args[0] === 'string' ? args[0] : undefined;
   const options = isObject(args[1]) ? args[1] : undefined;
@@ -124,6 +168,7 @@ function getReturnedLocatorEvidence(
     ...(value === undefined ? {} : { value }),
     ...(name === undefined ? {} : { name }),
     ...(exact === undefined ? {} : { exact }),
+    ...(current === undefined ? {} : { scope: toTargetEvidence(current) }),
   };
 }
 

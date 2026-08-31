@@ -161,11 +161,26 @@ export interface InteractionSequenceDefinition {
   steps: InteractionSequenceStep[];
 }
 
-export interface LocatorEvidenceDefinition {
+export interface LocatorLeafEvidenceDefinition {
   method: string;
   value?: string;
   name?: string;
   exact?: boolean;
+}
+
+export interface LocatorFilterEvidenceDefinition {
+  hasText?: string;
+  has?: LocatorLeafEvidenceDefinition;
+}
+
+export interface LocatorTargetEvidenceDefinition
+  extends LocatorLeafEvidenceDefinition {
+  filters?: LocatorFilterEvidenceDefinition[];
+}
+
+export interface LocatorEvidenceDefinition
+  extends LocatorTargetEvidenceDefinition {
+  scope?: LocatorTargetEvidenceDefinition;
 }
 
 export type RequiredEvidenceSequenceStep =

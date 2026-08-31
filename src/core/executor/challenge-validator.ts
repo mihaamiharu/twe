@@ -1,6 +1,8 @@
 import type {
   ChallengeValidationDefinition,
+  LocatorFilterEvidenceDefinition,
   LocatorEvidenceDefinition,
+  LocatorTargetEvidenceDefinition,
   RequiredEvidenceSequenceStep,
   TypeScriptEvidenceDefinition,
 } from '@/lib/content.types';
@@ -33,15 +35,45 @@ function hasTruthyForce(value: unknown): boolean {
   return Boolean(value);
 }
 
-function locatorEvidenceMatches(
-  actual: LocatorEvidenceDefinition | undefined,
-  expected: LocatorEvidenceDefinition | undefined,
+function locatorFilterEvidenceMatches(
+  actual: LocatorFilterEvidenceDefinition,
+  expected: LocatorFilterEvidenceDefinition,
+): boolean {
+  if (expected.hasText !== undefined && actual.hasText !== expected.hasText) {
+    return false;
+  }
+  return locatorTargetEvidenceMatches(actual.has, expected.has);
+}
+
+function locatorTargetEvidenceMatches(
+  actual: LocatorTargetEvidenceDefinition | undefined,
+  expected: LocatorTargetEvidenceDefinition | undefined,
 ): boolean {
   if (expected === undefined) return true;
   if (actual === undefined || actual.method !== expected.method) return false;
   if (expected.value !== undefined && actual.value !== expected.value) return false;
   if (expected.name !== undefined && actual.name !== expected.name) return false;
-  return expected.exact === undefined || actual.exact === expected.exact;
+  if (expected.exact !== undefined && actual.exact !== expected.exact) {
+    return false;
+  }
+  if (expected.filters === undefined) return true;
+  if (actual.filters?.length !== expected.filters.length) return false;
+  return expected.filters.every((filter, index) => {
+    const actualFilter = actual.filters?.[index];
+    return (
+      actualFilter !== undefined &&
+      locatorFilterEvidenceMatches(actualFilter, filter)
+    );
+  });
+}
+
+function locatorEvidenceMatches(
+  actual: LocatorEvidenceDefinition | undefined,
+  expected: LocatorEvidenceDefinition | undefined,
+): boolean {
+  if (!locatorTargetEvidenceMatches(actual, expected)) return false;
+  if (expected?.scope === undefined) return true;
+  return locatorTargetEvidenceMatches(actual?.scope, expected.scope);
 }
 
 function evidenceEventMatches(
