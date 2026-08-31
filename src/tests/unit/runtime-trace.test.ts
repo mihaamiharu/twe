@@ -38,13 +38,16 @@ describe('runtime execution trace', () => {
       onAssertion: (assertion) => recordRuntimeAssertion(trace, assertion),
     });
 
-    await tracedExpect(page.getByText('Ready')).toHaveText('Ready');
+    await tracedExpect(
+      page.getByText('Ready', { exact: true }),
+    ).toHaveText('Ready');
 
     expect(trace.methodCalls.map((call) => call.method)).toEqual(['getByText']);
     expect(trace.assertions[0]?.passed).toBe(true);
     expect(trace.assertions[0]?.locator).toEqual({
       method: 'getByText',
       value: 'Ready',
+      exact: true,
     });
     expect(trace.events?.map((event) => event.type)).toEqual([
       'method',

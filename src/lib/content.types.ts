@@ -165,6 +165,7 @@ export interface LocatorEvidenceDefinition {
   method: string;
   value?: string;
   name?: string;
+  exact?: boolean;
 }
 
 export type RequiredEvidenceSequenceStep =

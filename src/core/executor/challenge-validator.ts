@@ -40,7 +40,8 @@ function locatorEvidenceMatches(
   if (expected === undefined) return true;
   if (actual === undefined || actual.method !== expected.method) return false;
   if (expected.value !== undefined && actual.value !== expected.value) return false;
-  return expected.name === undefined || actual.name === expected.name;
+  if (expected.name !== undefined && actual.name !== expected.name) return false;
+  return expected.exact === undefined || actual.exact === expected.exact;
 }
 
 function evidenceEventMatches(

@@ -102,6 +102,7 @@ const LocatorEvidenceSchema = z
     method: z.string().min(1),
     value: z.string().min(1).optional(),
     name: z.string().min(1).optional(),
+    exact: z.boolean().optional(),
   })
   .strict();
 
@@ -360,6 +361,7 @@ function normalizeRequiredEvidenceSequence(
             ...omitUndefined({
               value: step.locator.value,
               name: step.locator.name,
+              exact: step.locator.exact,
             }),
           };
 

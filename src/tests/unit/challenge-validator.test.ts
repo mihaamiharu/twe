@@ -252,6 +252,43 @@ describe('challenge execution validator', () => {
     });
   });
 
+  it('distinguishes exact text locator evidence', () => {
+    const assertion = {
+      matcher: 'toBeVisible',
+      locator: { method: 'getByText', value: 'Order complete' },
+      passed: true,
+    };
+    const execution = passedExecution({
+      runtimeTrace: {
+        methodCalls: [],
+        assertions: [assertion],
+        events: [{ type: 'assertion', assertion }],
+      },
+    });
+
+    expect(
+      validateChallengeExecution(execution, {
+        requiredEvidenceSequence: [
+          {
+            type: 'assertion',
+            matcher: 'toBeVisible',
+            locator: {
+              method: 'getByText',
+              value: 'Order complete',
+              exact: true,
+            },
+          },
+        ],
+      }),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: ['toBeVisible'],
+      },
+    });
+  });
+
   it('requires configured JavaScript source evidence', () => {
     const validation = {
       requiredFunctionCalls: ['classifyRun'],

@@ -116,11 +116,14 @@ function getReturnedLocatorEvidence(
   const value = typeof args[0] === 'string' ? args[0] : undefined;
   const options = isObject(args[1]) ? args[1] : undefined;
   const name = typeof options?.['name'] === 'string' ? options['name'] : undefined;
+  const exact =
+    typeof options?.['exact'] === 'boolean' ? options['exact'] : undefined;
 
   return {
     method,
     ...(value === undefined ? {} : { value }),
     ...(name === undefined ? {} : { name }),
+    ...(exact === undefined ? {} : { exact }),
   };
 }
 
