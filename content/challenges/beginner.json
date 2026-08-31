@@ -483,40 +483,50 @@
       "xpReward": 20,
       "order": 2100,
       "title": {
-        "en": "querySelector vs querySelectorAll",
-        "id": "querySelector vs querySelectorAll"
+        "en": "Capture a Live DOM Investigation Note",
+        "id": "Catat Hasil Investigasi Live DOM"
       },
       "description": {
-        "en": "Practice inspecting one element or a collection with browser DOM APIs.",
-        "id": "Latih cara memeriksa satu elemen atau koleksi dengan browser DOM API."
+        "en": "Inspect a control, its current state, repeated required fields, and visible status before proposing test code.",
+        "id": "Periksa sebuah kontrol, current state-nya, field wajib yang berulang, dan status yang terlihat sebelum mengusulkan code test."
       },
       "instructions": {
-        "en": "# querySelector vs querySelectorAll\n\n## Concept\nThese browser DOM APIs are useful for inspecting a page in DevTools or a small DOM exercise. `querySelector` returns the first match, while `querySelectorAll` returns every match.\n\n| Method | Returns | Use Case |\n|---|---|---|\n| `querySelector(\"#id\")` | Single element | Finding a unique button, header, or link |\n| `querySelectorAll(\".class\")` | NodeList (All) | Finding all items in a list or grid |\n\n## Code Example\n```javascript\nconst title = document.querySelector(\"h1\");\nconst items = document.querySelectorAll(\"li\");\nconsole.log(items.length); // 4\n```\n\n## Real World Scenario\nWhile investigating a shopping cart in DevTools, you can use `querySelector` to inspect one known control and `querySelectorAll` to count a repeated set. These raw queries explain the DOM; a production Playwright test should normally use Playwright locators.\n\n## Your Task\n1. Use `document.querySelector` to find the element with id `\"title\"`.\n2. Use `document.querySelectorAll` to find all elements with class `\"item\"`.\n3. Count how many items were found in step 2.\n4. Store this count in the `result` variable.\n",
-        "id": "# querySelector vs querySelectorAll\n\n## Concept\nDua browser DOM API ini berguna untuk memeriksa halaman lewat DevTools atau latihan DOM kecil. `querySelector` mengembalikan kecocokan pertama, sedangkan `querySelectorAll` mengembalikan semua kecocokan.\n\n| Method | Return value | Kapan dipakai |\n|---|---|---|\n| `querySelector(\"#id\")` | Satu elemen | Mencari button, heading, atau link yang unik |\n| `querySelectorAll(\".class\")` | NodeList | Mencari semua item dalam list atau grid |\n\n## Code Example\n```javascript\nconst title = document.querySelector(\"h1\");\nconst items = document.querySelectorAll(\"li\");\nconsole.log(items.length); // 4\n```\n\n## Real World Scenario\nSaat menginvestigasi keranjang di DevTools, kamu bisa memakai `querySelector` untuk memeriksa satu kontrol dan `querySelectorAll` untuk menghitung sekumpulan item berulang. Query mentah ini membantu membaca DOM; test Playwright biasanya tetap memakai Playwright locator.\n\n## Tugas Kamu\n1. Gunakan `document.querySelector` untuk menemukan elemen dengan id `\"title\"`.\n2. Gunakan `document.querySelectorAll` untuk menemukan semua elemen dengan class `\"item\"`.\n3. Hitung berapa banyak item yang ditemukan di langkah 2.\n4. Simpan jumlah ini ke dalam variabel `result`.\n"
+        "en": "# Capture a Live DOM Investigation Note\n\nA profile save attempt did not succeed. Before changing any test code, inspect the supplied post-attempt page and record what the browser currently exposes. This is the same kind of small query you can run in the DevTools Console.\n\n- `document.querySelector(...)` returns one matching element.\n- `document.querySelectorAll(...)` returns every matching element as a collection.\n- A control's `disabled` property represents its current live state.\n- `textContent.trim()` reads the text in the supplied DOM. It does not by itself prove that text is visible in a production test.\n\n## Your task\n\n1. Use `document.querySelector` to find the **Save changes** submit button.\n2. Read its text and report whether its current state is `enabled` or `disabled`.\n3. Use `document.querySelectorAll` to count all form controls marked `required`.\n4. Use `document.querySelector` to read the text from the `[role=\"status\"]` region.\n5. Store one investigation note in `result` using this exact format:\n\n```text\nSave changes | enabled | 2 required fields | Changes not saved\n```\n\nBuild the note from the supplied live DOM values. You may choose equivalent selectors, but use both required browser DOM methods and preserve the observed control identity, state, required-field count, and visible status. This evidence helps explain the page; a later Playwright test should use Playwright locators and assertions to prove the intended user outcome.\n",
+        "id": "# Catat Hasil Investigasi Live DOM\n\nPercobaan menyimpan profile nggak berhasil. Sebelum mengubah code test, periksa halaman setelah percobaan tersebut lalu catat apa yang sekarang benar-benar terlihat di browser. Query kecil seperti ini juga bisa kamu jalankan lewat DevTools Console.\n\n- `document.querySelector(...)` mengembalikan satu element yang cocok.\n- `document.querySelectorAll(...)` mengembalikan semua element yang cocok sebagai sebuah collection.\n- Property `disabled` pada control menunjukkan current state-nya di live DOM.\n- `textContent.trim()` membaca text dari DOM yang tersedia. Dalam production test, hasil ini saja belum membuktikan bahwa text tersebut terlihat oleh user.\n\n## Tugas kamu\n\n1. Gunakan `document.querySelector` untuk menemukan submit button **Save changes**.\n2. Baca text-nya lalu catat apakah current state-nya `enabled` atau `disabled`.\n3. Gunakan `document.querySelectorAll` untuk menghitung semua form control yang memiliki attribute `required`.\n4. Gunakan `document.querySelector` untuk membaca text dari region `[role=\"status\"]`.\n5. Simpan satu catatan investigasi dalam variable `result` dengan format persis berikut:\n\n```text\nSave changes | enabled | 2 required fields | Changes not saved\n```\n\nSusun catatan tersebut dari value yang ada di live DOM. Kamu boleh memilih selector lain yang setara, tetapi tetap gunakan kedua browser DOM method yang diminta dan pertahankan identity control, state, jumlah required field, serta status yang terlihat. Evidence ini membantu menjelaskan kondisi halaman; nanti, production test dengan Playwright tetap perlu memakai locator dan assertion Playwright untuk membuktikan expected result dari sisi user.\n"
       },
       "hints": {
         "en": [
-          "Use the specific document methods for finding one unique element vs multiple elements.",
-          "Remember that an ID selector uses '#' and a class selector uses '.' as a prefix.",
-          "The multi-selection method returns a collection with a .length property to give you the count."
+          "The submit button can be found with the selector 'button[type=\"submit\"]', and its text is available through textContent.",
+          "Use the button's disabled boolean to choose the word 'disabled' or 'enabled'.",
+          "The required-field collection has a length, and the status region can be found with '[role=\"status\"]'."
         ],
         "id": [
-          "Gunakan DOM method yang sesuai untuk mencari satu elemen unik atau banyak elemen.",
-          "Ingat bahwa selector ID memakai prefix '#' dan selector class memakai '.'.",
-          "Method untuk memilih banyak elemen mengembalikan koleksi dengan property .length."
+          "Submit button bisa ditemukan dengan selector 'button[type=\"submit\"]', dan text-nya tersedia lewat textContent.",
+          "Gunakan boolean disabled pada button untuk memilih kata 'disabled' atau 'enabled'.",
+          "Collection untuk required field punya property length, dan status region bisa ditemukan dengan '[role=\"status\"]'."
         ]
       },
-      "htmlContent": "<div class=\"shopping-list\">\n  <h1 id=\"title\">My Shopping List</h1>\n  <ul>\n    <li class=\"item\">Apples</li>\n    <li class=\"item\">Bananas</li>\n    <li class=\"item\">Oranges</li>\n    <li class=\"item\">Milk</li>\n  </ul>\n</div>",
-      "starterCode": "// 1. Get the title element by ID\n// Your code here\n\n// 2. Get all items by class\n// Your code here\n\n// 3. Store the count of items\n// Your code here",
+      "htmlContent": "<main aria-labelledby=\"profile-heading\">\n  <h1 id=\"profile-heading\">Profile settings</h1>\n  <form aria-describedby=\"save-status\">\n    <label for=\"display-name\">Display name</label>\n    <input id=\"display-name\" name=\"displayName\" value=\"Ari Tester\" required />\n\n    <label for=\"timezone\">Timezone</label>\n    <select id=\"timezone\" name=\"timezone\" required>\n      <option selected>Asia/Jakarta</option>\n    </select>\n\n    <button type=\"submit\">Save changes</button>\n    <p id=\"save-status\" role=\"status\">Changes not saved</p>\n  </form>\n</main>",
+      "starterCode": "const saveButton = document.querySelector(/* TODO */);\nconst requiredFields = document.querySelectorAll(/* TODO */);\nconst statusRegion = document.querySelector(/* TODO */);\n\nconst controlName = /* TODO */;\nconst controlState = /* TODO */;\nconst requiredFieldCount = /* TODO */;\nconst visibleStatus = /* TODO */;\n\nconst result = /* TODO */;",
       "testCases": [
         {
-          "description": "Returns the expected output",
-          "expectedOutput": "4",
+          "description": "Builds the investigation note from the supplied live DOM evidence",
+          "expectedOutput": "Save changes | enabled | 2 required fields | Changes not saved",
           "isHidden": false
         }
       ],
-      "solution": "const titleElement = document.querySelector('#title');\nconst items = document.querySelectorAll('.item');\nconst result = items.length;",
-      "tags": ["javascript", "dom", "querySelector", "beginner"]
+      "validation": {
+        "requiredMethods": ["querySelector", "querySelectorAll"]
+      },
+      "solution": "const saveButton = document.querySelector('button[type=\"submit\"]');\nconst requiredFields = document.querySelectorAll('[required]');\nconst statusRegion = document.querySelector('[role=\"status\"]');\n\nconst controlName = saveButton.textContent.trim();\nconst controlState = saveButton.disabled ? 'disabled' : 'enabled';\nconst requiredFieldCount = requiredFields.length;\nconst visibleStatus = statusRegion.textContent.trim();\n\nconst result = `${controlName} | ${controlState} | ${requiredFieldCount} required fields | ${visibleStatus}`;",
+      "tags": [
+        "javascript",
+        "dom",
+        "devtools",
+        "inspection",
+        "evidence",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-element-properties",

@@ -151,6 +151,7 @@ function analyzeWithTypeScript(
   const forbiddenMethods = new Set<string>();
   const directDomAccesses = new Set<string>();
   const strictViolations = new Set<string>();
+  const requiredMethods = new Set(validation?.requiredMethods ?? []);
   const forcedActions: SourcePolicyAnalysis['forcedActions'] = [];
   let structuralLocatorCalls = 0;
   const methodAliases = new Map<string, MethodReference>();
@@ -447,7 +448,16 @@ function analyzeWithTypeScript(
       // Assertion matchers are exposed by the injected expect helper rather
       // than page/locator, so retain their names for validation evidence.
       if (method === 'soft' || method.startsWith('to')) return method;
-      return isPlaywrightObject(unwrapped.expression) ? method : undefined;
+      if (isPlaywrightObject(unwrapped.expression)) return method;
+
+      // Optional JavaScript DOM exercises can require evidence that the
+      // learner used a specific document method. Only recognize configured
+      // methods on a browser-global receiver so an unrelated helper with the
+      // same method name cannot satisfy the challenge contract.
+      return requiredMethods.has(method) &&
+        getGlobalRoot(unwrapped.expression) !== undefined
+        ? method
+        : undefined;
     }
 
     return method === 'soft' || method.startsWith('to') ? method : undefined;

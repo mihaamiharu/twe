@@ -85,6 +85,37 @@ describe('source policy analyzer', () => {
     expect(analysis.calledMethods).toContain('toHaveText');
   });
 
+  it('records configured browser DOM methods without trusting unrelated helpers', async () => {
+    const validation = {
+      requiredMethods: ['querySelector', 'querySelectorAll'],
+    };
+    const analysis = await analyzeSourcePolicy(
+      `
+        document.querySelector('button[type="submit"]');
+        globalThis.document.querySelectorAll('[required]');
+        const helper = { querySelector: () => undefined };
+        helper.querySelector('not-browser-evidence');
+      `,
+      { validation, strictMode: false },
+    );
+    const helperOnly = await analyzeSourcePolicy(
+      `
+        const helper = {
+          querySelector: () => undefined,
+          querySelectorAll: () => [],
+        };
+        helper.querySelector('button');
+        helper.querySelectorAll('[required]');
+      `,
+      { validation, strictMode: false },
+    );
+
+    expect(analysis.calledMethods).toContain('querySelector');
+    expect(analysis.calledMethods).toContain('querySelectorAll');
+    expect(helperOnly.calledMethods).not.toContain('querySelector');
+    expect(helperOnly.calledMethods).not.toContain('querySelectorAll');
+  });
+
   it('finds direct DOM access and swallowed catch blocks as source findings', async () => {
     const analysis = await analyzeSourcePolicy(
       `
@@ -174,7 +205,6 @@ describe('source policy analyzer', () => {
     expect(analysis.structuralLocatorCalls).toBe(1);
     expect(analysis.forbiddenMethods).toEqual(['evaluate']);
   });
-
 });
 
 function noteIsUsed(methods: string[], method: string): boolean {
