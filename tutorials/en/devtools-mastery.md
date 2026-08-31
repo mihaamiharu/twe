@@ -1,88 +1,216 @@
 ---
-title: 'Foundation 3: Mastering the Browser DevTools'
-description: The Inspect tool is a QA Engineer's most powerful weapon. Learn to use it to "see" into the code of any website.
+title: 'Investigate the UI Before You Automate It'
+description: 'Use DevTools and Playwright investigation tools to turn visible behavior into an evidence-backed automation contract.'
 ---
 
-> The Inspect tool is a QA Engineer's most powerful weapon. Learn to use it to "see" into the code of any website.
+## After this lesson, you can
 
-Before you can write a selector, you must find the element in the code. We do this using the **Elements** tab in your browser's Developer Tools (DevTools).
+- inspect a control's live DOM, accessibility information, and changing state;
+- trace a user action across visible UI, console messages, requests, and browser events;
+- separate evidence used for diagnosis from evidence that proves the user outcome;
+- capture a short investigation note before writing a test; and
+- challenge proposed locators, waits, and assumptions with browser evidence.
 
-## 1. The "Select" Tool
+## Why this matters for QA
 
-The fastest way to find an element is to use the **Select** tool.
+Pasting a selector into a test feels fast—until it finds two controls, stops matching after a redesign, or clicks successfully while the application request fails.
 
-![The Select Tool Action](/images/tutorials/devtools-select-tool.png)
+When that happens, adding another selector or a longer delay is still guessing. The browser already contains better evidence:
 
-* **How to use:** Open DevTools (Right-click anywhere and choose **Inspect**, or press `F12`). Click the small "arrow in a box" icon at the top-left corner of the DevTools window.
-* **The Action:** Hover over the web page. As you move your mouse, the browser highlights the elements. Click one, and the code will automatically jump to that specific line in the Elements tab.
+- the live element and its computed accessibility information;
+- the state before and after an action;
+- requests and responses behind the transition;
+- console errors; and
+- events such as navigation, a popup, or a download.
 
----
+DevTools is not only for developers. For QA, it is where a vague observation becomes a testable explanation. From that evidence, you can determine whether the problem is the locator, timing, request, page state, or an application defect.
 
-## 2. The Elements Tab: The "Live" Blueprint
+## The mental model
 
-Unlike "View Source," which shows the code as it was delivered by the server, the **Elements** tab shows the **Live DOM**.
+Use an evidence loop:
 
-* **Why this matters:** Modern websites (React, Angular, Vue) change the code constantly as you click things. The Elements tab shows you the code exactly as it exists right now.
-* **What to look for:** This is where you find the **Tags**, **Attributes**, and **Values** we discussed in Foundation 1.
+```text
+Observe manually
+    ↓
+Inspect the control and its context
+    ↓
+Perform one action
+    ↓
+Compare UI state and supporting technical evidence
+    ↓
+Write the smallest useful automation contract
+```
 
----
+Different tools answer different questions:
 
-## 3. Searching and Verifying (Ctrl + F)
+| Evidence source                 | Useful question                                                      |
+| ------------------------------- | -------------------------------------------------------------------- |
+| Elements                        | What live node, attributes, and relationships exist now?             |
+| Accessibility information       | What role, accessible name, and state are exposed?                   |
+| Console                         | Did the page report a JavaScript error or useful diagnostic message? |
+| Network                         | Which request ran, with what payload, status, and response?          |
+| Playwright UI Mode or Inspector | What did the test locate, wait for, and observe at each step?        |
 
-One of the most common mistakes in automation is writing a selector that finds **five** elements when you only wanted **one**. You can verify uniqueness directly in DevTools.
+Network and console evidence can explain why a UI transition failed. They do not automatically replace the visible outcome a user needs. If the risk is “the user cannot tell that the profile was saved,” a `200` response alone does not prove success.
 
-![Uniqueness Validator](/images/tutorials/devtools-uniqueness.png)
+## Work through a realistic example
 
-* **The Workflow:**
-    1. With the Elements tab open, press `Ctrl + F` (or `Cmd + F`).
-    2. Type your CSS selector (e.g., `#login-button`).
-    3. Look at the count on the right of the search bar (e.g., "1 of 1").
+The profile page has a “Save changes” button. After a successful save, the user should see “Changes saved.” An early test looks like this:
 
-> [!CAUTION]
-> **The Goal:** If it says "1 of 3," your selector is too generic. You need to add more detail to make it unique.
+```ts
+await page.locator('#root > div:nth-child(2) > form > button').click();
+await page.waitForTimeout(3000);
+```
 
----
+It clicks and waits, but proves nothing. Investigate the flow manually before repairing it.
 
-## 4. The Console: Your Automation Playground
+### 1. Inspect the control
 
-The **Console** tab is where you can "talk" to the browser. It is the best place to test if your selector actually works before you paste it into your test script.
+In **Elements** and its accessibility information, confirm:
 
-![Console Object Proof](/images/tutorials/devtools-console-proof.png)
+- the control is a button;
+- its accessible name is “Save changes”;
+- it is enabled after a valid edit is ready to save;
+- the surrounding form is the profile form, not another form on the page.
 
-* **Testing a Selector:** Type `document.querySelector('your-selector-here')` and press Enter.
-  * If the browser returns the element, your selector is valid.
-  * If it returns `null`, the browser cannot find it.
+Do not copy the full DOM path. Record the meaning you discovered.
 
-> [!TIP]
-> **The $0 Shortcut:** If you have an element highlighted in the **Elements** tab, go to the **Console** and type `$0`. The browser will show you exactly what that element is. This confirms you are looking at the right object.
+### 2. Observe the transition
 
----
+Change one profile field and click the button once. Compare before and after:
 
-## 5. The "Styles" Tab: Checking Visibility
+```text
+Before: valid unsaved change, enabled “Save changes” button, no success status
+Action: activate “Save changes”
+During: button may become disabled while the request is pending
+After: visible status says “Changes saved”
+```
 
-Sometimes a test fails because an element is "Hidden" or "Covered."
+### 3. Use supporting evidence
 
-* **How to check:** Select the element and look at the **Styles** pane on the right.
-* **What to look for:** Search for properties like `display: none` or `visibility: hidden`. If these are active, your automation tool (like Selenium or Playwright) might not be able to click the element, even if your selector is correct.
+In **Network**, find the profile update request. Inspect its method, payload, status, and response. If it returns an error, check whether the page explains that failure to the user. Check **Console** for an exception if the UI never updates.
 
----
+This evidence helps classify the failure:
 
-## Summary Checklist
+- no request: the action or client-side validation may have blocked submission;
+- failed response: investigate the request, data, or server behavior;
+- successful response but no confirmation: investigate the UI transition;
+- visible confirmation with a failing test: investigate the locator or assertion.
 
-To master DevTools, you should be able to:
+### 4. Define the automation contract
 
-1. Use the **Select tool** to jump to a specific button or input field in the code.
-2. Use `Ctrl + F` to check if your selector is **unique** (1 of 1).
-3. Use the **Console** to confirm that the browser "sees" the same element you do.
+The test intent can now be expressed clearly:
 
----
+```ts
+const saveButton = page.getByRole('button', { name: 'Save changes' });
 
-## 6. Further Reading (Deep Dive)
+await saveButton.click();
+await expect(page.getByRole('status')).toHaveText('Changes saved');
+```
 
-Master your browser's built-in toolkit.
+The button locator follows the control's user-facing identity. The assertion proves the outcome the user receives. The network request remains valuable diagnostic evidence, but it is not the only proof.
 
-### Official Documentation (Chrome)
+## When to use it—and when not to
 
-* **[Chrome DevTools Overview](https://developer.chrome.com/docs/devtools/)**: The hub for all DevTools documentation.
-* **[Inspect DOM Elements](https://developer.chrome.com/docs/devtools/dom)**: Deep dive into editing and debugging HTML.
-* **[Console Overview](https://developer.chrome.com/docs/devtools/console)**: Learn how to log messages and run JavaScript interactively.
+Use browser DevTools before automating an unfamiliar flow, when a control's identity is unclear, when state changes dynamically, or when a failure could originate in the UI, request, response, or browser event.
+
+Use the **Console** for small investigations such as:
+
+```js
+document.querySelectorAll('button').length;
+document.activeElement;
+document.querySelector('[aria-expanded="true"]');
+```
+
+These queries help you inspect the page. They are not automatically the locators a Playwright test should keep.
+
+Use Playwright's tools when a test already exists:
+
+- `npx playwright test --ui` to move through test steps and compare DOM snapshots;
+- `npx playwright test --debug` to open the Inspector and step through actions;
+- `page.pause()` as a temporary local breakpoint at a specific point;
+- the locator picker or code generator to propose a locator for review; and
+- `npx playwright show-trace path/to/trace.zip` to inspect recorded actions, DOM snapshots, network activity, console messages, source, and logs after a run.
+
+Generated locators are useful hypotheses. Keep one only when you can explain why it represents stable product meaning. Remove temporary `page.pause()` calls before committing the test.
+
+### Investigation in an agent-assisted workflow
+
+One practical strength of Playwright is that its investigation ecosystem extends beyond the test API and supports both human and agent-assisted work.
+
+`playwright-cli` is a separate, optional CLI designed for coding agents. An agent can use it to explore a browser flow, inspect accessibility snapshots, console messages, and network requests, capture screenshots or traces, and generate locator candidates.
+
+This work can happen in parallel with human exploratory testing. While the agent checks repeatable steps and prepares automation, QA can look for confusing behavior, visual problems, missing requirements, and risks that were never included in the automation request. Combine both sets of findings before deciding the final test scope and evidence.
+
+Playwright also provides `planner`, `generator`, and `healer` Test Agents. Treat their plans, locators, waits, and repairs as proposals that still need to be reviewed against product intent and observable evidence.
+
+Do not inspect every panel for every simple test. Start from the risk and open the evidence source that can answer the next question.
+
+## When it fails
+
+Suppose a save test times out. During manual investigation you observe:
+
+- the button click starts a request;
+- the response is `422` with a validation message;
+- no error is shown in the UI; and
+- the button becomes enabled again.
+
+Waiting five more seconds will not turn that response into success. Changing the locator will not help because the intended control was already activated.
+
+The useful next steps are:
+
+1. Inspect the request payload and response body.
+2. Confirm whether the test data violates a known rule.
+3. Check whether the product should display the returned validation message.
+4. Fix the data if the test setup is wrong, or report the missing user feedback if the product is wrong.
+5. Preserve enough evidence in the test report or logs to distinguish those two causes on the next run.
+
+The tempting workaround—`waitForTimeout`, extra retries, or ignoring the response—only makes diagnosis slower.
+
+Before accepting a test proposed from a screenshot, short requirement, or generated suggestion, ask:
+
+- Which live element and accessible identity did it assume?
+- Did it choose a selector from styling or from product meaning?
+- Does its wait correspond to an observable state, request, response, navigation, or browser event?
+- Does the assertion prove the user outcome or only that the click happened?
+- Does it assume a URL, response, status message, or timing rule without evidence?
+- What DevTools evidence would confirm or reject each assumption?
+
+If the answer is “the code probably works,” the investigation is not finished.
+
+## Check your understanding
+
+You manually submit a profile change and observe this sequence:
+
+```text
+Click “Save changes”
+→ PATCH /api/profile returns 422
+→ no visible error appears
+→ the button becomes enabled again
+```
+
+A proposed test change adds a five-second sleep and checks that the URL did not change.
+
+Explain:
+
+1. Which observations are facts and which product expectation still needs confirmation?
+2. What evidence would you inspect next?
+3. Why do the sleep and URL check fail to prove the intended outcome?
+4. What defect or setup problem might you report after confirming the requirement?
+
+## Compare your reasoning
+
+One reasonable answer is:
+
+- The request, `422` response, missing visible error, and re-enabled button are observed facts. Whether the data should be accepted and which error the UI should show must be confirmed against the product rule.
+- Inspect the payload, response body, submitted test data, console, and the live status/error region.
+- A sleep only delays the same failure. An unchanged URL says nothing about whether the profile was saved or whether the user received useful feedback.
+- If the data is invalid, repair the setup and assert the intended outcome. If the data is valid or the response error should be surfaced, report the corresponding API or UI defect with the captured evidence.
+
+The key is to classify the failure before changing test code.
+
+## Before you continue
+
+You should now be able to investigate one user action, record the control's identity and context, compare before-and-after state, and use network or console evidence to explain a failure.
+
+That completes Module 2. You are ready to run your first Playwright test in Module 3 because you can now explain what the test should locate, what state should change, and which evidence would make its result meaningful.

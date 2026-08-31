@@ -25,6 +25,22 @@ export interface LocalizedArray {
   id?: string[];
 }
 
+export type CurriculumItemKind = 'core' | 'optional';
+export type PracticeRole = 'core' | 'additional';
+
+export interface CurriculumModuleDefinition {
+  slug: string;
+  order: number;
+  title: LocalizedString;
+  description: LocalizedString;
+  outcome: LocalizedString;
+}
+
+export interface TutorialPracticeReference {
+  slug: string;
+  role: PracticeRole;
+}
+
 export type JsonValue =
   | string
   | number
@@ -43,10 +59,12 @@ export type JsonValue =
 export interface TutorialRegistryEntry {
   slug: string;
   order: number;
+  moduleSlug: string;
+  moduleOrder: number;
+  kind: CurriculumItemKind;
   estimatedMinutes: number;
   tags: string[];
-  relatedChallenges?: string[];
-  nextTutorialSlug?: string | null;
+  practice?: TutorialPracticeReference[];
   status?: ContentStatus;
 }
 
@@ -54,6 +72,7 @@ export interface TutorialRegistryEntry {
  * Tutorial registry file structure
  */
 export interface TutorialRegistry {
+  modules: CurriculumModuleDefinition[];
   tutorials: TutorialRegistryEntry[];
 }
 
@@ -74,9 +93,12 @@ export interface Tutorial {
   description: string;
   content: string;
   order: number;
+  moduleSlug: string;
+  moduleOrder: number;
+  kind: CurriculumItemKind;
   estimatedMinutes: number;
   tags: string[];
-  relatedChallenges?: string[];
+  practice: TutorialPracticeReference[];
 }
 
 // =============================================================================
@@ -90,7 +112,13 @@ export type ChallengeType =
   | 'TYPESCRIPT'
   | 'PLAYWRIGHT';
 export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
-export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e' | 'pom' | 'typescript';
+export type ChallengeTier =
+  | 'basic'
+  | 'beginner'
+  | 'intermediate'
+  | 'e2e'
+  | 'pom'
+  | 'typescript';
 
 /**
  * Test case definition in challenge JSON
@@ -114,6 +142,46 @@ export interface ExpectedStateRule {
   count?: number;
 }
 
+export type SerializableExpectedStateRule = Omit<
+  ExpectedStateRule,
+  'hasAttribute'
+> & {
+  hasAttribute?: { name: string; value?: string };
+};
+
+export interface InteractionSequenceStep {
+  inputSelector: string;
+  inputValue: string;
+  expectedState: SerializableExpectedStateRule[];
+}
+
+export interface InteractionSequenceDefinition {
+  event: 'submit';
+  selector: string;
+  steps: InteractionSequenceStep[];
+}
+
+export interface ChallengeValidationPolicy {
+  /** Require required methods and assertions to be observed at runtime. */
+  requireExecutedEvidence?: boolean;
+  /** Reject page/locator.locator() structural selector calls. */
+  forbidStructuralLocators?: boolean;
+  /** Reject action options whose runtime force value is truthy. */
+  forbidForcedActions?: boolean;
+  /** Reject direct document/window/globalThis DOM access. */
+  forbidDirectDomAccess?: boolean;
+  /** Reject catch handlers that suppress failures instead of rethrowing. */
+  forbidSwallowedErrors?: boolean;
+}
+
+export interface ChallengeValidationDefinition {
+  requiredAssertions?: string[];
+  requiredMethods?: string[];
+  forbiddenMethods?: string[];
+  policy?: ChallengeValidationPolicy;
+  interactionSequence?: InteractionSequenceDefinition;
+}
+
 /**
  * Challenge definition from tier JSON files
  */
@@ -132,16 +200,20 @@ export interface ChallengeDefinition {
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
   editableFiles?: string[]; // Which files user can edit (default: all)
-  preloadModules?: Record<string, {
-    exports: string[];      // e.g., ["LoginPage", "DashboardPage"]
-    source: string;         // e.g., "/pages/LoginPage.ts"
-  }>;
+  preloadModules?: Record<
+    string,
+    {
+      exports: string[]; // e.g., ["LoginPage", "DashboardPage"]
+      source: string; // e.g., "/pages/LoginPage.ts"
+    }
+  >;
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
   status?: ContentStatus;
   expectedState?: ExpectedStateRule[]; // DOM state validation rules
+  validation?: ChallengeValidationDefinition;
 }
 
 /**
@@ -170,15 +242,19 @@ export interface Challenge {
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
   editableFiles?: string[]; // Which files user can edit (default: all)
-  preloadModules?: Record<string, {
-    exports: string[];      // e.g., ["LoginPage", "DashboardPage"]
-    source: string;         // e.g., "/pages/LoginPage.ts"
-  }>;
+  preloadModules?: Record<
+    string,
+    {
+      exports: string[]; // e.g., ["LoginPage", "DashboardPage"]
+      source: string; // e.g., "/pages/LoginPage.ts"
+    }
+  >;
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
   expectedState?: ExpectedStateRule[]; // DOM state validation rules
+  validation?: ChallengeValidationDefinition;
   // Dynamic fields (from DB)
   completionCount?: number;
   isCompleted?: boolean;

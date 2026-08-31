@@ -1,5 +1,10 @@
 import { MockedPlaywrightPage } from './playwright-shim';
-import type { ExpectedStateRule } from '@/lib/content.types';
+import type {
+  ExpectedStateRule,
+  InteractionSequenceDefinition,
+} from '@/lib/content.types';
+import type { SourcePolicyAnalysis } from './source-policy-analyzer';
+import type { RuntimeExecutionTrace } from './runtime-trace';
 
 export interface ExecutionResult {
     status: 'PASSED' | 'FAILED' | 'ERROR' | 'TIMEOUT';
@@ -9,6 +14,8 @@ export interface ExecutionResult {
     returnValue?: unknown;
     logs?: Array<{ id: string; type: string; message: string }>;
     assertionCount?: number;
+    sourceAnalysis?: SourcePolicyAnalysis;
+    runtimeTrace?: RuntimeExecutionTrace;
 }
 
 export interface ExecuteOptions {
@@ -18,6 +25,8 @@ export interface ExecuteOptions {
     files?: Record<string, string>; // VFS: multi-page content for E2E challenges
     onNavigate?: (path: string) => void; // Callback for URL bar updates
     expectedState?: ExpectedStateRule[]; // DOM validation rules
+    interactionSequence?: InteractionSequenceDefinition;
+    validation?: import('@/lib/content.types').ChallengeValidationDefinition;
     isTypeScript?: boolean;
 }
 

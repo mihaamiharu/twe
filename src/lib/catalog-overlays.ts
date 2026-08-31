@@ -10,7 +10,6 @@ export interface TutorialCatalogOverlay {
   isPublished?: boolean;
   viewCount: number;
   isCompleted: boolean;
-  readingProgress: number;
 }
 
 export interface ChallengeCatalogOverlay {
@@ -37,7 +36,6 @@ export function mergeTutorialCatalogOverlay(
     isPublished: overlay?.isPublished ?? true,
     viewCount: overlay?.viewCount ?? 0,
     isCompleted: overlay?.isCompleted ?? false,
-    readingProgress: overlay?.readingProgress ?? 0,
   };
 }
 

@@ -1,96 +1,252 @@
 ---
-title: "Actionability dan Auto-Wait Engine"
-description: "Gimana Playwright ngebasmi 'flaky test' dengan cara otomatis verifikasi status elemen sebelum beraksi."
+title: 'Bedakan Kapan Action Siap Dijalankan dan Kapan Hasilnya Siap Diverifikasi'
+description: 'Pahami apa yang ditunggu Playwright sebelum menjalankan action, lalu tentukan state aplikasi yang perlu ditunggu dan diverifikasi setelah action selesai.'
 ---
 
-## 1. Masalahnya: Race Condition
+## Setelah lesson ini, kamu bisa
 
-Di *manual testing*, kalau tombol masih *loading* atau ketutup *popup*, kamu bakal nunggu sampai dia siap. Tapi di otomatisasi biasa, kalau kamu suruh *script* buat `click()`, dia bakal kirim sinyal itu di milidetik itu juga. Kalau elemennya belum siap pas perintah itu datang, tes kamu bakal langsung *crash* atau gagal.
+- menjelaskan bahwa setiap Playwright action punya kondisi yang berbeda sebelum bisa dijalankan;
+- membedakan kapan element siap digunakan, kapan action dijalankan, kapan aplikasi masih memproses perubahan, dan kapan expected result sudah bisa diverifikasi;
+- menggunakan assertion yang melakukan retry daripada fixed sleep;
+- mencari penyebab action timeout dan memperbaiki root cause-nya, bukan langsung memakai `force` atau nambahin timeout;
+- me-review penggunaan wait dan memastikan ada kondisi yang jelas untuk menentukan kapan test boleh lanjut.
 
-Playwright nyelesain masalah ini dengan bertindak kayak pengamat manusia. Dia nggak asal klik; dia nunggu dulu sampai elemennya bener-bener **Actionable**.
+## Kenapa ini penting buat QA
 
----
+Coba bayangin ada profile page dengan button **Save**. Button-nya enabled, Playwright berhasil melakukan click, lalu test selesai dengan status pass.
 
-## 2. Checklist Actionability
+Beberapa saat kemudian, server ternyata menolak update tersebut.
 
-Sebelum Playwright jalanin aksi (kayak `click()`, `fill()`, atau `check()`), dia bakal jalanin "Pre-Flight Checklist" internal. Kalau salah satu cek ini gagal, Playwright bakal nunggu dan nyoba lagi terus-terusan (selama **Timeout** bawaan 30 detik).
+Apakah test sudah memastikan profile berhasil disimpan? Belum. Test baru memastikan button **Save** bisa di-click.
 
-| Actionability Check | Deskripsi | Penyebab Gagal |
-| --- | --- | --- |
-| **Attached** | Elemen harus sudah ada di dalam **DOM**. | Elemen belum dirender sama **React** atau **Vue**. |
-| **Visible** | Elemen harus kelihatan secara visual. | Masih kena `display: none` atau `visibility: hidden`. |
-| **Stable** | Elemen harus diam (nggak gerak-gerak). | Animasi CSS atau transisi lagi jalan. |
-| **Enabled** | Elemen nggak boleh dalam kondisi *disabled*. | Ada atribut `disabled` di tag HTML-nya. |
-| **Receiving Events** | Elemen nggak boleh ketutup elemen lain. | Ketutup **overlay**, **modal**, atau **loading spinner**. |
+Masalah seperti ini biasanya muncul dalam dua bentuk:
 
-![Actionability Checklist](/images/tutorials/playwright-actionability-checklist.png)
+* test pass padahal hasil akhirnya belum benar-benar diverifikasi; dan
+* test jadi flaky karena menggunakan fixed sleep untuk menebak kapan aplikasi sudah siap.
 
----
+Playwright bisa otomatis menunggu sampai element siap untuk di-interact. Tapi setelah action dijalankan, kita tetap perlu menentukan sendiri hasil apa yang harus ditunggu dan diverifikasi.
 
-## 3. Kasus Nyata: Spinner yang Hilang
+Menentukan hasil yang perlu ditunggu dan diverifikasi tetap menjadi bagian dari test design.
 
-**Skenarionya:** Kamu klik "Submit". **Loading spinner** muncul sebentar, baru setelah itu pesan "Sukses" muncul.
+## Cara berpikir yang perlu kamu pegang
 
-### Cara Lama (Selenium)
+Pisahkan flow menjadi empat bagian:
 
-Kamu harus nulis perintah **wait** manual buat setiap perubahan status:
-
-```javascript
-// Harus nunggu manual, ribet dan gampang gagal (flaky)
-await driver.click('#submit');
-await driver.wait(until.elementIsNotVisible(spinner)); // Tunggu spinner hilang
-await driver.wait(until.elementIsVisible(successMsg)); // Tunggu pesan muncul
-const text = await successMsg.getText();
+```text
+1. Element siap untuk di-interact
+              ↓
+2. Action dijalankan
+              ↓
+3. Aplikasi memproses perubahan
+              ↓
+4. Expected result siap diverifikasi
 ```
 
-### Cara Playwright
+![Test intent memilih action, Playwright memeriksa action-specific readiness, lalu test tetap menunggu observable application outcome.](/images/tutorials/action-readiness-outcome.svg)
 
-```javascript
-await page.click('#submit');
-// Playwright otomatis nunggu pesan suksesnya memenuhi kriteria 
-// Attached, Visible, dan Stable secara otomatis.
-const message = await page.locator('.success-msg').innerText();
+_Auto-waiting melindungi batas interaction. Web assertion melakukan sinkronisasi dengan product outcome._
+
+Actionability check yang dilakukan Playwright berbeda untuk setiap method. Playwright hanya mengecek kondisi yang memang dibutuhkan oleh action tersebut:
+
+| Action           | Visible | Stable | Receives events | Enabled | Editable |
+| ---------------- | ------- | ------ | --------------- | ------- | -------- |
+| `click()`        | Ya      | Ya     | Ya              | Ya      | Tidak    |
+| `fill()`         | Ya      | Tidak  | Tidak           | Ya      | Ya       |
+| `check()`        | Ya      | Ya     | Ya              | Ya      | Tidak    |
+| `selectOption()` | Ya      | Tidak  | Tidak           | Ya      | Tidak    |
+
+Untuk action yang hanya boleh dilakukan pada satu element, Playwright juga memastikan locator menemukan satu target yang jelas. Kita sudah membahas strictness ini di Module 4.
+
+Semua pengecekan tersebut hanya memastikan Playwright bisa melakukan action pada element yang dituju.
+
+Pengecekan itu belum memastikan hasil setelah action sudah benar. Misalnya, `click()` pada button **Save** bisa berhasil, tapi profile tetap gagal disimpan oleh server.
+
+## Coba kita bedah contoh nyata
+
+Requirement-nya seperti ini:
+
+> Saat user mengubah display name lalu menyimpan, page menampilkan **“Profile saved”** dan nama baru tetap terlihat.
+
+Aplikasi men-disable button **Save** selama proses submit, lalu memperbarui status message setelah proses selesai.
+
+### 1. Jalankan action yang sesuai dengan scenario
+
+```ts
+const displayName = page.getByLabel('Display name');
+const saveButton = page.getByRole('button', { name: 'Save profile' });
+const status = page.getByRole('status');
+
+await displayName.fill('Rani QA');
+await saveButton.click();
 ```
 
-> [!TIP]
-> Di Playwright, kamu cukup nulis **apa** yang mau kamu lakuin. Mesin **Auto-Wait** bakal ngurusin masalah *timing* dan **Actionability** di balik layar.
+Sebelum menjalankan `click()`, Playwright menunggu sampai button ditemukan dengan jelas, visible, stable, bisa menerima click, dan enabled.
 
----
+Kalau ada overlay yang menghalangi button atau button masih disabled, action akan fail.
 
-## 4. Kenapa Ini Ngebasmi "Flaky Test"?
+Tapi `click()` yang berhasil belum berarti proses save sudah selesai.
 
-Karena Playwright punya koneksi langsung ke browser (ingat materi **Arsitektur**), dia nggak perlu menebak-nebak. Dia **tahu** persis kondisi elemennya secara *real-time*.
+### 2. Verify hasil setelah action
 
-![Auto-Wait Engine Flow](/images/tutorials/playwright-autowait-flow.png)
+```ts
+await expect(status).toHaveText('Profile saved');
+await expect(displayName).toHaveValue('Rani QA');
+```
 
-| Keuntungan | Penjelasan |
-| --- | --- |
-| **No Manual Sleeps** | Kamu nggak butuh lagi `page.waitForTimeout(5000)` yang bikin tes jadi lambat. |
-| **Akurasi Tinggi** | Kalau elemen siap dalam 5ms, dia langsung lanjut. Nggak ada waktu terbuang. |
-| **Error Log Jelas** | Kalau gagal, dia kasih tahu cek mana yang nggak lulus (misal: "Element is hidden"). |
+Assertion Playwright akan melakukan retry sampai kondisi yang diharapkan terpenuhi atau timeout.
 
-> [!CAUTION]
-> Meskipun **Auto-Wait** itu otomatis buat aksi lewat **Locator**, fitur ini **TIDAK** berlaku buat eksekusi JavaScript mentah kayak `page.evaluate()`. Selalu prioritaskan pakai metode **Locator**.
+Jadi kita nggak perlu menebak berapa lama proses save akan selesai dengan fixed sleep. Test cukup menunggu kondisi yang memang menunjukkan hasil yang diharapkan.
 
----
+Assertion yang digunakan tetap mengikuti requirement. Untuk satu scenario, message **“Profile saved”** mungkin sudah cukup.
 
-## 5. Checklist Rangkuman
+Kalau yang ingin diuji adalah apakah perubahan benar-benar tersimpan, test bisa reload page lalu verify bahwa value **“Rani QA”** tetap ada.
 
-| Konsep | Poin Penting |
-| --- | --- |
-| **Actionability itu Otomatis** | Sudah aktif secara bawaan untuk setiap aksi **Locator**. |
-| **5 Kriteria Utama** | **Attached**, **Visible**, **Stable**, **Enabled**, **Receiving Events**. |
-| **Smart Waiting** | Nunggu sampai elemen siap atau sampai kena **Timeout** (30 detik). |
+Nggak semua scenario perlu menambahkan semua assertion. Pilih verification yang memang sesuai dengan hal yang ingin diuji.
 
----
+### 3. Pahami kenapa fixed sleep kurang reliable
 
-## 6. Bacaan Lanjut (Deep Dive)
+```ts
+await saveButton.click();
+await page.waitForTimeout(2000);
+await expect(status).toHaveText('Profile saved');
+```
 
-### Dokumentasi Resmi
+Code ini selalu menunggu dua detik, meskipun proses save selesai dalam 100 milidetik atau 1,9 detik.
 
-* **[Auto-Waiting](https://playwright.dev/docs/actionability)**: Daftar lengkap aksi apa saja yang nungguin kriteria apa saja.
-* **[Timeouts](https://playwright.dev/docs/test-timeouts)**: Cara kustomisasi batas waktu tunggu.
+Kalau environment sedang lebih lambat dan prosesnya butuh 2,1 detik, test tetap bisa fail. Sebaliknya, kalau aplikasi cepat, test tetap membuang waktu untuk menunggu.
 
-### Source Code
+Masalah utamanya, fixed sleep hanya menunggu berdasarkan waktu. Sleep tidak tahu kondisi apa yang sebenarnya sedang ditunggu.
 
-* **[ElementHandle Implementation](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/dom.ts)**: Intip gimana Playwright ngecek status DOM di level mesin.
+Di case ini, assertion sudah menjelaskan kondisi yang dibutuhkan: status berubah menjadi **“Profile saved”**.
+
+Biarkan assertion yang menunggu sampai kondisi tersebut terpenuhi.
+
+### 4. Bedakan masalah sebelum dan sesudah action
+
+Kalau `saveButton.click()` timeout, cek kondisi element sebelum action dijalankan:
+
+* Apakah form validation membuat button tetap disabled?
+* Apakah loading mask atau cookie banner menghalangi click?
+* Apakah animation membuat button belum stable?
+* Apakah locator menemukan duplicate element yang hidden?
+
+Kalau `click()` berhasil tapi `toHaveText('Profile saved')` timeout, cek apa yang terjadi setelah action:
+
+* Apakah request gagal?
+* Apakah aplikasi menampilkan error?
+* Apakah assertion mengecek status message atau page yang salah?
+* Apakah hasil yang diharapkan memang sesuai dengan requirement?
+
+Keduanya punya root cause yang berbeda.
+
+Dengan membedakan masalah sebelum dan sesudah action, kita bisa lebih cepat menentukan bagian mana yang perlu diinvestigasi dari error message atau trace.
+
+### 5. Tunggu browser event kalau hasilnya memang muncul sebagai event
+
+Nggak semua hasil muncul sebagai perubahan di page. Misalnya, button **Export CSV** bisa menghasilkan download:
+
+```ts
+const downloadPromise = page.waitForEvent('download');
+await page.getByRole('button', { name: 'Export CSV' }).click();
+const download = await downloadPromise;
+
+expect(download.suggestedFilename()).toBe('customers.csv');
+```
+
+`waitForEvent('download')` dipasang sebelum `click()` supaya test nggak melewatkan event kalau download mulai terlalu cepat.
+
+Di case seperti ini, yang perlu ditunggu bukan perubahan DOM, tapi browser event yang memang dihasilkan oleh action tersebut.
+
+Lesson berikutnya akan membahas pattern seperti ini, termasuk download dan interaction dengan browser event lain.
+
+## Kapan pendekatan ini cocok dipakai?
+
+Gunakan Playwright action seperti biasa dan biarkan Playwright menunggu sampai element siap untuk di-interact.
+
+Setelah action dijalankan, gunakan assertion seperti `toBeVisible()`, `toHaveText()`, `toHaveValue()`, atau `toHaveURL()` untuk menunggu dan verify hasil yang memang diharapkan oleh scenario.
+
+Gunakan `waitForEvent()` kalau hasil dari action muncul sebagai browser event, misalnya download atau popup. Pasang event listener sebelum action yang memicu event tersebut.
+
+Gunakan network wait hanya kalau response dari request memang perlu dicek atau memang dibutuhkan untuk menentukan kapan test boleh lanjut. Response yang sukses belum tentu berarti hasil yang dilihat user sudah benar.
+
+Jangan langsung menggunakan `waitForLoadState('networkidle')` sebagai tanda bahwa page sudah siap. Aplikasi modern bisa tetap menjalankan analytics, polling, atau streaming connection meskipun UI sebenarnya sudah bisa digunakan.
+
+Lebih baik tunggu kondisi yang memang relevan dengan scenario, misalnya URL berubah, heading muncul, button menjadi enabled, atau status message tampil.
+
+Jangan memperbesar timeout hanya supaya test punya waktu lebih lama. Timeout hanya menentukan berapa lama test mau menunggu, bukan kondisi apa yang sebenarnya sedang ditunggu.
+
+## Kalau gagal, mulai cek dari mana?
+
+Cari dulu bagian mana yang sebenarnya bermasalah:
+
+1. **Locator:** element yang dicari tidak ditemukan atau locator menemukan lebih dari satu element.
+2. **Sebelum action:** element ditemukan, tapi tidak pernah siap untuk di-interact.
+3. **Setelah action:** action berhasil dijalankan, tapi aplikasi masuk ke flow atau state yang tidak diharapkan.
+4. **Expected result:** kondisi yang seharusnya muncul setelah action tidak pernah terpenuhi.
+5. **Context lain:** hasil ternyata muncul di popup, iframe, dialog, download, atau page lain.
+
+Gunakan error message Playwright, trace, DOM snapshot, screenshot, console, dan network untuk membantu menentukan masalahnya ada di bagian mana.
+
+`click({ force: true })` melewati beberapa actionability check yang dianggap non-essential, misalnya pengecekan apakah target menerima pointer event. `force` tidak membuat form yang belum valid menjadi valid dan tidak membuktikan expected result sudah tercapai.
+
+Memperbesar timeout juga bisa saja hanya membuat test menunggu lebih lama sebelum akhirnya fail.
+
+Retry bisa membantu melihat apakah failure hanya terjadi sesekali, tapi retry bukan solusi untuk synchronization yang salah. Kalau test hanya bisa pass setelah retry, root cause-nya tetap perlu dicari.
+
+Saat review action dan wait di dalam test, cek beberapa hal ini:
+
+* Kondisi apa yang sudah ditunggu Playwright sebelum menjalankan action?
+* Setelah action, kondisi apa yang perlu muncul untuk memastikan expected result tercapai?
+* Apakah `waitForTimeout()` hanya digunakan untuk menebak berapa lama proses akan selesai?
+* Apakah timeout diperbesar hanya supaya test punya waktu lebih lama?
+* Apakah `force` digunakan karena element tertutup oleh element lain tanpa memperbaiki penyebabnya?
+* Apakah test menunggu `networkidle` tanpa alasan yang memang relevan dengan scenario?
+* Kalau test menunggu network response, apakah hasil yang dilihat user tetap diverifikasi?
+* Apakah hasil dari action sebenarnya muncul di popup, iframe, dialog, download, atau page lain?
+
+Menambahkan wait belum tentu membuat test lebih reliable. Wait yang baik harus punya kondisi yang jelas: test tahu apa yang sedang ditunggu dan kapan boleh lanjut.
+
+## Coba cek pemahamanmu
+
+Review test berikut:
+
+```ts
+await page.getByRole('button', { name: 'Submit claim' }).click({
+  force: true,
+});
+
+await page.waitForTimeout(3000);
+
+expect(await page.getByText('Submitted').isVisible()).toBe(true);
+```
+
+Button **Submit claim** akan tetap disabled sampai semua required evidence sudah di-upload. Setelah submission berhasil, server memperbarui status menjadi **“Claim submitted”** secara asynchronous.
+
+Jelaskan:
+
+1. Kenapa `force` bukan cara yang tepat untuk menangani button yang masih disabled?
+2. Kondisi apa yang seharusnya ditunggu setelah submission, daripada menggunakan fixed sleep?
+3. Kenapa `isVisible()` yang dicek sekali lebih mudah fail dibanding Playwright web assertion?
+4. Bagaimana cara membedakan masalah sebelum `click()` dengan masalah setelah submission?
+
+## Bandingkan dengan cara pikir ini
+
+Contoh jawaban:
+
+* Pastikan required evidence sudah di-upload terlebih dahulu. `force` tidak membuat form yang belum valid menjadi valid. Kalau button masih disabled, cek validation state-nya.
+* Gunakan normal `click()` supaya Playwright tetap mengecek apakah button benar-benar siap untuk di-click.
+* Gunakan `await expect(page.getByRole('status')).toHaveText('Claim submitted')` supaya assertion melakukan retry sampai status yang diharapkan muncul.
+* Kalau `click()` fail, cek kondisi button dan validation state sebelum submission.
+* Kalau `click()` berhasil tapi assertion fail, cek request, error message di UI, dan state aplikasi setelah submission.
+
+Perbaikannya bukan sekadar mengurangi waktu tunggu. Test sekarang menunggu kondisi yang memang menunjukkan bahwa submission berhasil.
+
+## Sebelum lanjut
+
+Sekarang kamu seharusnya sudah bisa membedakan apa yang otomatis ditunggu Playwright sebelum action dijalankan dan apa yang tetap perlu ditunggu serta diverifikasi setelah action selesai.
+
+Selesaikan Core Practice yang menyimpan profile lalu menunggu status yang sesuai tanpa menggunakan `waitForTimeout()`.
+
+Lesson ini tidak punya Additional Practice terpisah. Fokus utamanya adalah memahami perbedaan antara element yang siap untuk di-interact dan hasil aplikasi yang baru muncul setelah action.
+
+Exercise dynamic table tetap tersedia sebagai latihan tambahan untuk locator.

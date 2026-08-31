@@ -43,7 +43,18 @@
     "eyebrow": "LABS · COMING SOON",
     "title": "A new space for practicing the craft.",
     "description": "Labs is taking shape as a slower, more hands-on way to explore software testing. The first experiments are still being shaped, and I’ll share them when they’re ready.",
-    "cta": "Visit Labs"
+    "cta": "Visit Labs",
+    "preview": {
+      "label": "LAB NOTE / 001",
+      "title": "Interaction experiments",
+      "status": "IN PROGRESS",
+      "steps": {
+        "observe": "Observe",
+        "try": "Try",
+        "review": "Review"
+      },
+      "caption": "Small experiments. Useful feedback."
+    }
   },
   "cta": {
     "eyebrow": "START HERE",

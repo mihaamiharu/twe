@@ -4,7 +4,11 @@ import { getRequest } from '@tanstack/react-start/server';
 import { authMiddleware } from './auth.mw';
 import { auth } from './auth.server';
 import { db } from '@/db';
-import { tutorials, progress } from '@/db/schema';
+import {
+  tutorials,
+  challenges as challengesTable,
+  progress,
+} from '@/db/schema';
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import {
   getChallengeCatalogList,
@@ -54,17 +58,13 @@ export const getTutorials = createServerFn({ method: 'GET' })
 
       const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
-      const progressByTutorialId = new Map<
-        string,
-        { isCompleted: boolean; readingProgress: number }
-      >();
+      const progressByTutorialId = new Map<string, { isCompleted: boolean }>();
 
       if (session?.user?.id && dbRecords.length > 0) {
         const progressRecords = await db
           .select({
             tutorialId: progress.tutorialId,
             isCompleted: progress.isCompleted,
-            readingProgress: progress.readingProgress,
           })
           .from(progress)
           .where(
@@ -81,7 +81,6 @@ export const getTutorials = createServerFn({ method: 'GET' })
           if (record.tutorialId) {
             progressByTutorialId.set(record.tutorialId, {
               isCompleted: record.isCompleted,
-              readingProgress: record.readingProgress || 0,
             });
           }
         }
@@ -102,9 +101,120 @@ export const getTutorials = createServerFn({ method: 'GET' })
           isPublished: dbRecord?.isPublished ?? true,
           viewCount: dbRecord?.viewCount ?? 0,
           isCompleted: progressRecord?.isCompleted ?? false,
-          readingProgress: progressRecord?.readingProgress ?? 0,
         });
       });
+
+      const corePracticeSlugs = [
+        ...new Set(
+          publishedCatalog.flatMap((tutorial) =>
+            tutorial.practice
+              .filter((practice) => practice.role === 'core')
+              .map((practice) => practice.slug),
+          ),
+        ),
+      ];
+      const challengeRecords = corePracticeSlugs.length
+        ? await db
+            .select({
+              id: challengesTable.id,
+              slug: challengesTable.slug,
+            })
+            .from(challengesTable)
+            .where(inArray(challengesTable.slug, corePracticeSlugs))
+        : [];
+      const challengeProgressBySlug = new Map<string, boolean>();
+
+      if (session?.user?.id && challengeRecords.length > 0) {
+        const completedChallengeProgress = await db
+          .select({
+            challengeId: progress.challengeId,
+            isCompleted: progress.isCompleted,
+          })
+          .from(progress)
+          .where(
+            and(
+              eq(progress.userId, session.user.id),
+              inArray(
+                progress.challengeId,
+                challengeRecords.map((record) => record.id),
+              ),
+            ),
+          );
+        const completionById = new Map(
+          completedChallengeProgress.map((record) => [
+            record.challengeId,
+            record.isCompleted,
+          ]),
+        );
+        for (const record of challengeRecords) {
+          challengeProgressBySlug.set(
+            record.slug,
+            completionById.get(record.id) ?? false,
+          );
+        }
+      }
+
+      const dataBySlug = new Map(
+        data.map((tutorial) => [tutorial.slug, tutorial]),
+      );
+      const moduleDefinitions = [
+        ...new Map(
+          publishedCatalog.map((tutorial) => [
+            tutorial.module.slug,
+            tutorial.module,
+          ]),
+        ).values(),
+      ].sort((left, right) => left.order - right.order);
+      const moduleProgress = moduleDefinitions.map((module) => {
+        const moduleTutorials = publishedCatalog.filter(
+          (tutorial) => tutorial.module.slug === module.slug,
+        );
+        const coreLessons = moduleTutorials.filter(
+          (tutorial) => tutorial.kind === 'core',
+        );
+        const moduleCorePractice = [
+          ...new Set(
+            moduleTutorials.flatMap((tutorial) =>
+              tutorial.practice
+                .filter((practice) => practice.role === 'core')
+                .map((practice) => practice.slug),
+            ),
+          ),
+        ];
+        const completedCoreLessons = coreLessons.filter(
+          (tutorial) => dataBySlug.get(tutorial.slug)?.isCompleted,
+        ).length;
+        const completedCorePractice = moduleCorePractice.filter((slug) =>
+          challengeProgressBySlug.get(slug),
+        ).length;
+
+        return {
+          ...module,
+          coreLessons: coreLessons.length,
+          completedCoreLessons,
+          corePractice: moduleCorePractice.length,
+          completedCorePractice,
+          isCompleted:
+            completedCoreLessons === coreLessons.length &&
+            completedCorePractice === moduleCorePractice.length,
+        };
+      });
+      const coreLessons = moduleProgress.reduce(
+        (total, module) => total + module.coreLessons,
+        0,
+      );
+      const completedCoreLessons = moduleProgress.reduce(
+        (total, module) => total + module.completedCoreLessons,
+        0,
+      );
+      const corePractice = moduleProgress.reduce(
+        (total, module) => total + module.corePractice,
+        0,
+      );
+      const completedCorePractice = moduleProgress.reduce(
+        (total, module) => total + module.completedCorePractice,
+        0,
+      );
 
       return {
         success: true,
@@ -113,6 +223,16 @@ export const getTutorials = createServerFn({ method: 'GET' })
           availableTags: [
             ...new Set(publishedCatalog.flatMap((item) => item.tags)),
           ].sort(),
+          modules: moduleProgress,
+          completion: {
+            coreLessons,
+            completedCoreLessons,
+            corePractice,
+            completedCorePractice,
+            isCompleted:
+              completedCoreLessons === coreLessons &&
+              completedCorePractice === corePractice,
+          },
         },
         pagination: {
           page: 1,
@@ -162,6 +282,12 @@ export const getTutorial = createServerFn({ method: 'GET' })
       const challengeBySlug = new Map(
         challengeCatalog.map((challenge) => [challenge.slug, challenge]),
       );
+      const practiceRoleBySlug = new Map(
+        tutorialContent.practice.map((practice) => [
+          practice.slug,
+          practice.role,
+        ]),
+      );
       const relatedChallenges = tutorialContent.relatedChallenges
         .map((challengeSlug) => challengeBySlug.get(challengeSlug))
         .filter(
@@ -175,11 +301,11 @@ export const getTutorial = createServerFn({ method: 'GET' })
           type: challenge.type,
           xpReward: challenge.xpReward,
           category: challenge.category,
+          role: practiceRoleBySlug.get(challenge.slug) ?? 'additional',
         }));
 
       let userProgressData: {
         isCompleted: boolean;
-        readingProgress: number | null;
         lastAccessedAt: Date | null;
       } | null = null;
 
@@ -197,7 +323,6 @@ export const getTutorial = createServerFn({ method: 'GET' })
         if (progressRecord) {
           userProgressData = {
             isCompleted: progressRecord.isCompleted,
-            readingProgress: progressRecord.readingProgress,
             lastAccessedAt: progressRecord.lastAccessedAt,
           };
         }
@@ -217,7 +342,11 @@ export const getTutorial = createServerFn({ method: 'GET' })
           description: tutorialContent.description,
           content: tutorialContent.content,
           estimatedMinutes: tutorialContent.estimatedMinutes,
+          module: tutorialContent.module,
+          moduleOrder: tutorialContent.moduleOrder,
+          kind: tutorialContent.kind,
           tags: tutorialContent.tags,
+          practice: tutorialContent.practice,
           relatedChallenges: tutorialContent.relatedChallenges,
           order: tutorialContent.order,
           viewCount: dbTutorial?.viewCount || 0,
@@ -239,8 +368,8 @@ export const getTutorial = createServerFn({ method: 'GET' })
     }
   });
 
-// NOTE: Reading progress is tracked client-side only.
-// Progress is saved to DB only when user clicks "Complete" via completeTutorial().
+// Tutorial progress is saved only when the user clicks "Complete" via
+// completeTutorial().
 
 // ----------------------------------------------------------------------------
 // MARK TUTORIAL COMPLETE

@@ -22,6 +22,14 @@ import {
   getTutorialCatalogDetail,
 } from '@/server/content-catalog.server';
 
+const module = {
+  slug: 'read-the-ui',
+  order: 2,
+  title: 'Read the Web UI',
+  description: 'Understand the live interface.',
+  outcome: 'Explain what automation can reliably locate.',
+};
+
 const makeLesson = (
   overrides: Partial<TutorialCatalogListItemWithOverlay> = {},
 ): TutorialCatalogListItemWithOverlay => ({
@@ -30,13 +38,16 @@ const makeLesson = (
   title: 'Reading the DOM Tree',
   description: 'Understand browser hierarchy before writing selectors.',
   order: 2,
+  module,
+  moduleOrder: 2,
+  kind: 'core',
   estimatedMinutes: 8,
   tags: ['foundations', 'dom'],
   relatedChallenges: [],
+  practice: [],
   isPublished: true,
   viewCount: 0,
   isCompleted: false,
-  readingProgress: 0,
   ...overrides,
 });
 
@@ -49,14 +60,17 @@ const makeDetailResponse = (): TutorialDetailResponse => ({
     description: 'Understand browser hierarchy before writing selectors.',
     content: '## Read the DOM',
     estimatedMinutes: 8,
+    module,
+    moduleOrder: 2,
+    kind: 'core',
     tags: ['foundations', 'dom'],
     relatedChallenges: [],
+    practice: [],
     order: 2,
     viewCount: 0,
     challenges: [],
     userProgress: {
       isCompleted: false,
-      readingProgress: 40,
       lastAccessedAt: null,
     },
     previousTutorial: null,
@@ -66,8 +80,27 @@ const makeDetailResponse = (): TutorialDetailResponse => ({
 
 const makeListResponse = (): TutorialListResponse => ({
   success: true,
-  data: [makeLesson({ readingProgress: 40 })],
-  meta: { availableTags: ['dom', 'foundations'] },
+  data: [makeLesson()],
+  meta: {
+    availableTags: ['dom', 'foundations'],
+    modules: [
+      {
+        ...module,
+        coreLessons: 1,
+        completedCoreLessons: 0,
+        corePractice: 0,
+        completedCorePractice: 0,
+        isCompleted: false,
+      },
+    ],
+    completion: {
+      coreLessons: 1,
+      completedCoreLessons: 0,
+      corePractice: 0,
+      completedCorePractice: 0,
+      isCompleted: false,
+    },
+  },
   pagination: {
     page: 1,
     limit: 1,
@@ -150,11 +183,9 @@ describe('Learn experience contracts', () => {
     expect(optimistic.detail?.success).toBe(true);
     if (!optimistic.detail?.success) throw new Error('Expected detail cache');
     expect(optimistic.detail.data.userProgress?.isCompleted).toBe(true);
-    expect(optimistic.detail.data.userProgress?.readingProgress).toBe(100);
     expect(optimistic.list?.success).toBe(true);
     if (!optimistic.list?.success) throw new Error('Expected list cache');
     expect(optimistic.list.data[0]?.isCompleted).toBe(true);
-    expect(optimistic.list.data[0]?.readingProgress).toBe(100);
   });
 
   test('preserves the cache snapshot for completion rollback', () => {
@@ -171,7 +202,6 @@ describe('Learn experience contracts', () => {
     expect(snapshot.detail?.success).toBe(true);
     if (!snapshot.detail?.success) throw new Error('Expected detail snapshot');
     expect(snapshot.detail.data.userProgress?.isCompleted).toBe(false);
-    expect(snapshot.detail.data.userProgress?.readingProgress).toBe(40);
   });
 
   test('filters the loaded localized catalog by displayed title and description', () => {
@@ -210,7 +240,6 @@ describe('Learn experience contracts', () => {
         title: 'JavaScript Fundamentals',
         tags: ['beginner', 'javascript'],
         isCompleted: true,
-        readingProgress: 100,
       }),
       makeLesson({
         order: 1,
@@ -221,13 +250,13 @@ describe('Learn experience contracts', () => {
       makeLesson({ order: 3, slug: 'playwright-basics' }),
     ];
 
-    expect(filterLearnCatalog(lessons, {}).map((lesson) => lesson.slug)).toEqual(
-      [
-        'javascript-fundamentals-for-qa',
-        'html-element-anatomy',
-        'playwright-basics',
-      ],
-    );
+    expect(
+      filterLearnCatalog(lessons, {}).map((lesson) => lesson.slug),
+    ).toEqual([
+      'javascript-fundamentals-for-qa',
+      'html-element-anatomy',
+      'playwright-basics',
+    ]);
     expect(
       filterLearnCatalog(lessons, {
         hideCompleted: true,
@@ -287,7 +316,7 @@ describe('Learn experience contracts', () => {
       'LearningResource',
     ]);
     expect(schemas[1]?.['headline']).toBe(english.title);
-    expect(schemas[2]?.['timeRequired']).toBe('PT8M');
+    expect(schemas[2]?.['timeRequired']).toBe('PT18M');
   });
 
   test('missing-content metadata stays generic and noindex', () => {
@@ -312,7 +341,7 @@ describe('Learn experience contracts', () => {
     );
     expect(previous).toEqual({
       slug: 'html-element-anatomy',
-      title: 'Foundation 1: The Anatomy of an HTML Element',
+      title: 'Read HTML Through Role, Accessible Name, and State',
     });
   });
 

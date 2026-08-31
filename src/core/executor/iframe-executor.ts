@@ -16,12 +16,102 @@ import {
   type TestCase,
   type TestCaseResult
 } from './executor.types';
+import type { InteractionSequenceDefinition } from '@/lib/content.types';
 import { createExpect } from './expect-matchers';
 import { validateExpectedState } from './dom-validator';
 import { createInterceptedConsole } from './console-interceptor';
 import { attachOnclickHandlers } from './attach-onclick-handlers';
 import { generateIframeTemplate } from './iframe-template';
 import { invokeDynamicFunction } from './dynamic-code';
+import { analyzeSourcePolicy, type SourcePolicyAnalysis } from './source-policy-analyzer';
+import {
+  createRuntimeExecutionTrace,
+  createTracedPlaywrightPage,
+} from './runtime-trace';
+
+interface InteractionSequenceObserver {
+  attach: () => void;
+  cleanup: () => void;
+  getResult: () => { passed: boolean; error?: string };
+}
+
+function createInteractionSequenceObserver(
+  doc: Document,
+  sequence: InteractionSequenceDefinition,
+): InteractionSequenceObserver {
+  let observedSteps = 0;
+  let sequenceError: string | undefined;
+  let attachedDocument: Document | undefined;
+
+  const listener: EventListener = (event) => {
+    if (sequenceError || event.target === null) return;
+
+    const target = event.target as Element;
+    if (!target.closest(sequence.selector)) return;
+
+    const step = sequence.steps[observedSteps];
+    if (!step) {
+      sequenceError = `Expected ${sequence.steps.length} ${sequence.event} event(s) for '${sequence.selector}', but an extra event was observed.`;
+      return;
+    }
+
+    const input = doc.querySelector(step.inputSelector);
+    if (!input) {
+      sequenceError = `Could not find '${step.inputSelector}' while checking interaction step ${observedSteps + 1}.`;
+      return;
+    }
+
+    const inputWithValue = input as Element & { value?: unknown };
+    const actualValue =
+      typeof inputWithValue.value === 'string'
+        ? inputWithValue.value
+        : input.getAttribute('value') ?? '';
+    if (actualValue !== step.inputValue) {
+      sequenceError =
+        `Interaction step ${observedSteps + 1} expected '${step.inputSelector}' to have value '${step.inputValue}', but got '${actualValue}'.`;
+      return;
+    }
+
+    const stateValidation = validateExpectedState(doc, step.expectedState);
+    if (!stateValidation.passed) {
+      sequenceError =
+        `Interaction step ${observedSteps + 1} state validation failed: ${stateValidation.error}`;
+      return;
+    }
+
+    observedSteps += 1;
+  };
+
+  const attach = () => {
+    if (attachedDocument) {
+      attachedDocument.removeEventListener(sequence.event, listener);
+    }
+    doc.addEventListener(sequence.event, listener);
+    attachedDocument = doc;
+  };
+
+  const cleanup = () => {
+    if (attachedDocument) {
+      attachedDocument.removeEventListener(sequence.event, listener);
+      attachedDocument = undefined;
+    }
+  };
+
+  return {
+    attach,
+    cleanup,
+    getResult: () => {
+      if (sequenceError) return { passed: false, error: sequenceError };
+      if (observedSteps < sequence.steps.length) {
+        return {
+          passed: false,
+          error: `Expected ${sequence.steps.length} ordered ${sequence.event} event(s) for '${sequence.selector}', but observed ${observedSteps}.`,
+        };
+      }
+      return { passed: true };
+    },
+  };
+}
 
 /**
  * Executes Playwright-style code in a sandboxed iframe
@@ -40,6 +130,15 @@ export async function executePlaywrightCode(
   const logs: Array<{ id: string; type: string; message: string }> = [];
   const strictMode = options?.strictMode !== false; // Default to true for backward compatibility
   let executableCode = code;
+  const runtimeTrace = createRuntimeExecutionTrace();
+  let sourceAnalysis: SourcePolicyAnalysis | undefined;
+
+  if (strictMode || options?.validation !== undefined) {
+    sourceAnalysis = await analyzeSourcePolicy(
+      code,
+      omitUndefined({ validation: options?.validation, strictMode }),
+    );
+  }
 
   // Transpile if TypeScript
   if (options?.isTypeScript) {
@@ -52,6 +151,7 @@ export async function executePlaywrightCode(
         executionTime: 0,
         error: error instanceof Error ? error.message : String(error),
         logs: [],
+        ...omitUndefined({ sourceAnalysis, runtimeTrace }),
       };
     }
   }
@@ -88,45 +188,19 @@ export async function executePlaywrightCode(
     );
   }
 
-  // Static analysis for "Strict Mode" (Educational Check)
-  // We want to catch uses of 'document' or 'window' that aren't inside page.evaluate()
-  // This is a simple regex check, not a full AST parse, but catches most beginner mistakes.
-  const forbiddenPatterns = [
-    {
-      pattern: /\bwindow\.localStorage\b/,
-      message:
-        "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.localStorage...)'.",
-    },
-    {
-      pattern: /\bwindow\.sessionStorage\b/,
-      message:
-        "In Playwright, you cannot access 'window' directly. Use 'page.evaluate(() => window.sessionStorage...)'.",
-    },
-    {
-      pattern: /\bdocument\.(getElement|query|body|cookie)\b/,
-      message:
-        "In Playwright, you cannot access 'document' directly. Use 'page.locator()' or 'page.evaluate()'.",
-    },
-    {
-      pattern: /alert\(/,
-      message:
-        'In Playwright, you cannot handle alerts this way. Use \'page.on("dialog", ...)\'.',
-    },
-  ];
-
-  if (strictMode) {
-    const codeToTest = executableCode.trim();
-    for (const { pattern, message } of forbiddenPatterns) {
-      if (pattern.test(codeToTest)) {
-        return {
-          status: 'FAILED',
-          output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
-          executionTime: 0,
-          error: `Strict Mode Error: ${message}`,
-          logs: [],
-        };
-      }
-    }
+  // Strict mode uses the AST report as its educational boundary. It catches
+  // direct browser-global access and dialog calls without matching comments or
+  // string literals.
+  if (strictMode && sourceAnalysis?.strictViolations[0]) {
+    const message = sourceAnalysis.strictViolations[0];
+    return {
+      status: 'FAILED',
+      output: `Strict Mode Error: ${message}\n\nReal Playwright tests run in Node.js and cannot access the Browser DOM directly.`,
+      executionTime: 0,
+      error: `Strict Mode Error: ${message}`,
+      logs: [],
+      ...omitUndefined({ sourceAnalysis, runtimeTrace }),
+    };
   }
 
   // Phase 2: Strip standard Playwright imports (they are decorative in the shim)
@@ -154,10 +228,13 @@ export async function executePlaywrightCode(
         document.body.appendChild(iframe);
       }
 
+      let interactionSequenceObserver: InteractionSequenceObserver | undefined;
+
       // Use function declaration for hoisting so it can be called by setTimeout
       // and can see timeoutId defined below (TDZ is passed by the time this runs)
       function cleanup() {
         clearTimeout(timeoutId);
+        interactionSequenceObserver?.cleanup();
         // Only remove if we created it
         if (!useExistingIframe && iframe.parentNode) {
           document.body.removeChild(iframe);
@@ -173,6 +250,7 @@ export async function executePlaywrightCode(
           executionTime: timeout,
           error: `Process timed out. Please review your logic for potential errors or long-running tasks.`,
           logs,
+          ...omitUndefined({ sourceAnalysis, runtimeTrace }),
         });
       }, timeout);
 
@@ -331,6 +409,20 @@ export async function executePlaywrightCode(
               throw new Error('Could not access iframe window');
             }
 
+            // Only this learner-facing proxy is injected into the execution
+            // context. The raw page remains private to the shim, preventing
+            // internal locator composition from becoming learner evidence.
+            const tracedPage: MockedPlaywrightPage = createTracedPlaywrightPage(
+              page,
+              runtimeTrace,
+              {
+                onPageMethodSettled: () => {
+                  contentWindow.page = tracedPage;
+                },
+              },
+            );
+            contentWindow.__VFS_PAGE__ = page;
+
             // User-authored E2E pages can submit forms or click links before
             // the VFS page shim has had a chance to handle the event. Install
             // the bridge after the mock page exists as well as in the HTML
@@ -341,6 +433,23 @@ export async function executePlaywrightCode(
                 void page.goto(path).catch((error) => {
                   logger.error(`VFS navigation failed: ${String(error)}`);
                 });
+              };
+            }
+
+            if (options?.interactionSequence) {
+              interactionSequenceObserver = createInteractionSequenceObserver(
+                iframeDoc,
+                options.interactionSequence,
+              );
+              interactionSequenceObserver.attach();
+
+              // VFS navigation replaces the document contents. Reattach the
+              // observer after navigation so sequences can start on /index.html
+              // and continue on the challenge's target page.
+              const originalGoto = page.goto.bind(page);
+              page.goto = async (url: string) => {
+                await originalGoto(url);
+                interactionSequenceObserver?.attach();
               };
             }
 
@@ -356,7 +465,7 @@ export async function executePlaywrightCode(
               const testPromise = (async () => {
                 interceptedConsole.log(`[Test] ${name}`);
                 try {
-                  await callback({ page, expect });
+                  await callback({ page: tracedPage, expect });
                 } catch (error) {
                   interceptedConsole.error(`[Test] ${name} FAILED: ${String(error)}`);
                   throw error;
@@ -386,14 +495,17 @@ export async function executePlaywrightCode(
             });
 
             // Inject tools into the iframe context
-            contentWindow.page = page;
+            contentWindow.page = tracedPage;
 
             // Standardize timeouts: assertions/actions should fail before the global execution timeout
             // to provide clear error messages instead of a generic "Process timed out".
             const assertionTimeout = Math.min(5000, Math.max(2000, remainingBudget - 1000));
             const { expect, getAssertionCount, getTestResults } = createExpect({ 
                 timeout: assertionTimeout,
-                deadline: globalDeadline
+                deadline: globalDeadline,
+                onAssertion: (assertion) => {
+                  runtimeTrace.assertions.push(assertion);
+                },
             });
 
             contentWindow.expect = expect;
@@ -455,7 +567,7 @@ export async function executePlaywrightCode(
                 fallbackFn,
                 undefined,
                 [
-                  page,
+                  tracedPage,
                   expect,
                   test,
                   contentWindow,
@@ -468,12 +580,12 @@ export async function executePlaywrightCode(
             }
             
             const executionTime = Date.now() - startTime;
-            cleanup();
 
             // Check for soft failures
             const softFailures = getTestResults().filter((r) => !r.passed);
             const firstSoftFailure = softFailures[0];
             if (firstSoftFailure) {
+              cleanup();
               resolve({
                 status: 'FAILED',
                 output: `Test failed with ${softFailures.length} soft assertion error(s):\n${softFailures.map((f) => `- ${f.message}`).join('\n')}`,
@@ -481,6 +593,23 @@ export async function executePlaywrightCode(
                 error: firstSoftFailure.message, // Return first error
                 logs,
                 assertionCount: getAssertionCount(),
+                ...omitUndefined({ sourceAnalysis, runtimeTrace }),
+              });
+              return;
+            }
+
+            const interactionValidation =
+              interactionSequenceObserver?.getResult();
+            if (interactionValidation && !interactionValidation.passed) {
+              cleanup();
+              resolve({
+                status: 'FAILED',
+                output: `Interaction Sequence Validation Failed: ${interactionValidation.error}`,
+                executionTime,
+                ...omitUndefined({ error: interactionValidation.error }),
+                logs,
+                assertionCount: getAssertionCount(),
+                ...omitUndefined({ sourceAnalysis, runtimeTrace }),
               });
               return;
             }
@@ -489,6 +618,7 @@ export async function executePlaywrightCode(
             if (options?.expectedState && options.expectedState.length > 0) {
               const stateValidation = validateExpectedState(iframeDoc, options.expectedState);
               if (!stateValidation.passed) {
+                cleanup();
                 resolve({
                   status: 'FAILED',
                   output: `DOM State Validation Failed: ${stateValidation.error}`,
@@ -496,11 +626,13 @@ export async function executePlaywrightCode(
                   ...omitUndefined({ error: stateValidation.error }),
                   logs,
                   assertionCount: getAssertionCount(),
+                  ...omitUndefined({ sourceAnalysis, runtimeTrace }),
                 });
                 return;
               }
             }
 
+            cleanup();
             resolve({
               status: 'PASSED',
               output: 'All steps completed successfully',
@@ -508,6 +640,7 @@ export async function executePlaywrightCode(
               returnValue,
               logs,
               assertionCount: getAssertionCount(),
+              ...omitUndefined({ sourceAnalysis, runtimeTrace }),
             });
           } catch (error) {
             const executionTime = Date.now() - startTime;
@@ -520,6 +653,7 @@ export async function executePlaywrightCode(
               executionTime,
               error: errorMessage,
               logs,
+              ...omitUndefined({ sourceAnalysis, runtimeTrace }),
             });
           }
         };
@@ -544,6 +678,7 @@ export async function executePlaywrightCode(
           executionTime,
           error: errorMessage,
           logs,
+          ...omitUndefined({ sourceAnalysis, runtimeTrace }),
         });
       }
     });

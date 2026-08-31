@@ -182,12 +182,9 @@ describe('Learn and Practice catalog contracts', () => {
       expectNonEmptyString(raw.title.en);
       expectNonEmptyString(raw.description.en);
       expectNonEmptyString(raw.instructions.en);
-      // Legacy content may rely on the service's English fallback for an
-      // absent Indonesian instruction block. The user-facing projection must
-      // still be populated in both locales.
-      expectNonEmptyString(raw.title.id ?? raw.title.en);
-      expectNonEmptyString(raw.description.id ?? raw.description.en);
-      expectNonEmptyString(raw.instructions.id ?? raw.instructions.en);
+      expectNonEmptyString(raw.title.id);
+      expectNonEmptyString(raw.description.id);
+      expectNonEmptyString(raw.instructions.id);
     }
   });
 
@@ -267,9 +264,19 @@ describe('Learn and Practice catalog contracts', () => {
       title: 'Localized lesson',
       description: 'Description',
       order: 1,
+      module: {
+        slug: 'module',
+        order: 1,
+        title: 'Module',
+        description: 'Module description',
+        outcome: 'Module outcome',
+      },
+      moduleOrder: 1,
+      kind: 'core' as const,
       estimatedMinutes: 5,
       tags: ['beginner'],
       relatedChallenges: [],
+      practice: [],
     };
     const challenge = {
       slug: 'challenge',
@@ -283,12 +290,13 @@ describe('Learn and Practice catalog contracts', () => {
       tags: ['javascript'],
     };
 
-    expect(mergeTutorialCatalogOverlay(tutorial)).toMatchObject({
+    const mergedTutorial = mergeTutorialCatalogOverlay(tutorial);
+    expect(mergedTutorial).toMatchObject({
       slug: 'lesson',
       id: 'lesson',
       isCompleted: false,
-      readingProgress: 0,
     });
+    expect(mergedTutorial).not.toHaveProperty('readingProgress');
     expect(
       mergeChallengeCatalogOverlay(challenge, {
         slug: 'challenge',
@@ -326,6 +334,459 @@ describe('Learn and Practice catalog contracts', () => {
         expect(tutorialSlugs.has(challenge.tutorialSlug)).toBe(true);
       }
     }
+  });
+
+  test('curriculum metadata distinguishes modules, core work, and optional depth', async () => {
+    const [tutorials, challenges] = await Promise.all([
+      getTutorialCatalogList('en'),
+      getChallengeCatalogList('en'),
+    ]);
+    const moduleOrders = tutorials.map((tutorial) => tutorial.module.order);
+
+    expect(new Set(moduleOrders)).toContain(1);
+    expect(new Set(moduleOrders)).toContain(9);
+    expect(tutorials.every((tutorial) => tutorial.moduleOrder > 0)).toBe(true);
+    expect(tutorials.some((tutorial) => tutorial.kind === 'optional')).toBe(
+      true,
+    );
+    expect(
+      tutorials.some((tutorial) =>
+        tutorial.practice.some((practice) => practice.role === 'core'),
+      ),
+    ).toBe(true);
+    expect(
+      tutorials.some((tutorial) =>
+        tutorial.practice.some((practice) => practice.role === 'additional'),
+      ),
+    ).toBe(true);
+    const linkedPractice = new Set(
+      tutorials.flatMap((tutorial) => tutorial.relatedChallenges),
+    );
+    expect(
+      [...linkedPractice].every((slug) =>
+        challenges.some((challenge) => challenge.slug === slug),
+      ),
+    ).toBe(true);
+    expect(
+      challenges.some((challenge) => !linkedPractice.has(challenge.slug)),
+    ).toBe(true);
+  });
+
+  test('module one teaches automation judgment without an early coding gate', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleOne = tutorials.filter(
+      (tutorial) => tutorial.module.order === 1,
+    );
+
+    expect(moduleOne.map((tutorial) => tutorial.slug)).toEqual([
+      'universal-mindset',
+      'automation-candidate-selection',
+    ]);
+    expect(moduleOne.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+    expect(moduleOne.flatMap((tutorial) => tutorial.practice)).toEqual([]);
+  });
+
+  test('module two teaches UI inspection without gating learners on DOM coding', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleTwo = tutorials.filter(
+      (tutorial) => tutorial.module.order === 2,
+    );
+
+    expect(moduleTwo.map((tutorial) => tutorial.slug)).toEqual([
+      'html-element-anatomy',
+      'dom-tree-hierarchy',
+      'devtools-mastery',
+    ]);
+    expect(moduleTwo.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+    expect(moduleTwo.flatMap((tutorial) => tutorial.practice)).toEqual([
+      { slug: 'dom-queryselector-vs-all', role: 'additional' },
+    ]);
+  });
+
+  test('module three completes with four lessons and three focused QA practices', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleThree = tutorials.filter(
+      (tutorial) => tutorial.module.order === 3,
+    );
+
+    expect(moduleThree.map((tutorial) => tutorial.slug)).toEqual([
+      'first-playwright-test',
+      'javascript-fundamentals-for-qa',
+      'async-await-basics',
+      'typescript-for-qa',
+    ]);
+    expect(moduleThree.every((tutorial) => tutorial.kind === 'core')).toBe(
+      true,
+    );
+
+    const practices = moduleThree.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-first-test', 'js-fundamentals-boss', 'async-await-basics']);
+    expect(
+      practices
+        .filter((practice) => practice.role !== 'core')
+        .every((practice) => practice.role === 'additional'),
+    ).toBe(true);
+
+    const firstPlaywrightLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'first-playwright-test',
+    );
+    const javascriptLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'javascript-fundamentals-for-qa',
+    );
+    const asyncLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'async-await-basics',
+    );
+
+    expect(firstPlaywrightLesson?.practice).toEqual([
+      { slug: 'pw-first-test', role: 'core' },
+    ]);
+    expect(javascriptLesson?.practice).toEqual([
+      { slug: 'js-fundamentals-boss', role: 'core' },
+      { slug: 'js-if-else-logic', role: 'additional' },
+      { slug: 'js-array-methods', role: 'additional' },
+    ]);
+    expect(asyncLesson?.practice).toEqual([
+      { slug: 'async-await-basics', role: 'core' },
+      { slug: 'async-error-handling', role: 'additional' },
+      { slug: 'async-parallel-execution', role: 'additional' },
+    ]);
+
+    const typeScriptLesson = moduleThree.find(
+      (tutorial) => tutorial.slug === 'typescript-for-qa',
+    );
+    expect(typeScriptLesson?.practice).toEqual([
+      { slug: 'ts-type-annotations', role: 'additional' },
+      { slug: 'ts-interfaces-basics', role: 'additional' },
+      { slug: 'ts-optional-properties', role: 'additional' },
+      { slug: 'ts-fundamentals-boss', role: 'additional' },
+    ]);
+  });
+
+  test('module four completes with locator judgment and scoped interaction proof', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleFour = tutorials.filter(
+      (tutorial) => tutorial.module.order === 4,
+    );
+
+    expect(moduleFour.map((tutorial) => tutorial.slug)).toEqual([
+      'playwright-locator-strategy',
+      'locator-composition-and-strictness',
+      'css-selector-strategies',
+      'xpath-strategies',
+    ]);
+    expect(moduleFour.map((tutorial) => tutorial.kind)).toEqual([
+      'core',
+      'core',
+      'core',
+      'optional',
+    ]);
+
+    const practices = moduleFour.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-get-by-role', 'pw-locators-boss']);
+
+    const locatorStrategyLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'playwright-locator-strategy',
+    );
+    const compositionLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'locator-composition-and-strictness',
+    );
+    const cssLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'css-selector-strategies',
+    );
+    const xpathLesson = moduleFour.find(
+      (tutorial) => tutorial.slug === 'xpath-strategies',
+    );
+
+    expect(locatorStrategyLesson?.practice).toEqual([
+      { slug: 'pw-get-by-role', role: 'core' },
+      { slug: 'pw-get-by-label', role: 'additional' },
+      { slug: 'pw-get-by-text', role: 'additional' },
+      { slug: 'pw-get-by-testid', role: 'additional' },
+    ]);
+    expect(compositionLesson?.practice).toEqual([
+      { slug: 'pw-list-items', role: 'additional' },
+      { slug: 'pw-dynamic-table', role: 'additional' },
+      { slug: 'pw-locators-boss', role: 'core' },
+    ]);
+    expect(cssLesson?.practice).toEqual([]);
+    expect(xpathLesson?.practice).toEqual([]);
+
+    expect(xpathLesson?.kind).toBe('optional');
+  });
+
+  test('module five completes with deliberate actions and observable synchronization', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleFive = tutorials.filter(
+      (tutorial) => tutorial.module.order === 5,
+    );
+
+    expect(moduleFive.map((tutorial) => tutorial.slug)).toEqual([
+      'element-interactions',
+      'playwright-actionability',
+      'navigation-and-events',
+    ]);
+    expect(moduleFive.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+
+    const practices = moduleFive.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-actions-boss', 'pw-action-outcome-sync']);
+    expect(
+      practices
+        .filter((practice) => practice.role !== 'core')
+        .every((practice) => practice.role === 'additional'),
+    ).toBe(true);
+
+    const interactionLesson = moduleFive.find(
+      (tutorial) => tutorial.slug === 'element-interactions',
+    );
+    const actionabilityLesson = moduleFive.find(
+      (tutorial) => tutorial.slug === 'playwright-actionability',
+    );
+    const eventLesson = moduleFive.find(
+      (tutorial) => tutorial.slug === 'navigation-and-events',
+    );
+
+    expect(interactionLesson?.practice).toEqual([
+      { slug: 'pw-actions-boss', role: 'core' },
+      { slug: 'pw-fill-type', role: 'additional' },
+      { slug: 'pw-checkbox-radio', role: 'additional' },
+      { slug: 'pw-select-dropdowns', role: 'additional' },
+      { slug: 'pw-keyboard-actions', role: 'additional' },
+      { slug: 'pw-file-upload', role: 'additional' },
+    ]);
+    expect(actionabilityLesson?.practice).toEqual([
+      { slug: 'pw-action-outcome-sync', role: 'core' },
+    ]);
+    expect(eventLesson?.practice).toEqual([
+      { slug: 'pw-iframes', role: 'additional' },
+    ]);
+  });
+
+  test('module six completes with one integrated evidence and test-design proof', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleSix = tutorials.filter(
+      (tutorial) => tutorial.module.order === 6,
+    );
+
+    expect(moduleSix.map((tutorial) => tutorial.slug)).toEqual([
+      'assertions-verify',
+      'test-design-for-automation',
+    ]);
+    expect(moduleSix.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+
+    const practices = moduleSix.flatMap((tutorial) => tutorial.practice);
+    expect(
+      practices
+        .filter((practice) => practice.role === 'core')
+        .map(({ slug }) => slug),
+    ).toEqual(['pw-assertions-boss']);
+    expect(
+      practices
+        .filter((practice) => practice.role !== 'core')
+        .every((practice) => practice.role === 'additional'),
+    ).toBe(true);
+
+    const assertionLesson = moduleSix.find(
+      (tutorial) => tutorial.slug === 'assertions-verify',
+    );
+    const testDesignLesson = moduleSix.find(
+      (tutorial) => tutorial.slug === 'test-design-for-automation',
+    );
+
+    expect(assertionLesson?.practice).toEqual([
+      { slug: 'pw-assertions-boss', role: 'core' },
+      { slug: 'pw-to-be-visible', role: 'additional' },
+      { slug: 'pw-to-have-text', role: 'additional' },
+      { slug: 'pw-state-assertions', role: 'additional' },
+      { slug: 'pw-to-have-value', role: 'additional' },
+      { slug: 'pw-to-have-count', role: 'additional' },
+      { slug: 'pw-to-have-attribute', role: 'additional' },
+      { slug: 'pw-soft-assertions', role: 'additional' },
+    ]);
+    expect(testDesignLesson?.practice).toEqual([]);
+  });
+
+  test('module seven completes with controlled state and root-cause repair', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleSeven = tutorials.filter(
+      (tutorial) => tutorial.module.order === 7,
+    );
+
+    expect(moduleSeven.map((tutorial) => tutorial.slug)).toEqual([
+      'playwright-architecture',
+      'test-isolation-and-data',
+      'debugging-flaky-tests',
+    ]);
+    expect(moduleSeven.every((tutorial) => tutorial.kind === 'core')).toBe(
+      true,
+    );
+
+    const practices = moduleSeven.flatMap((tutorial) => tutorial.practice);
+    expect(practices).toEqual([{ slug: 'pw-debug-flaky-test', role: 'core' }]);
+
+    expect(moduleSeven[0]?.practice).toEqual([]);
+    expect(moduleSeven[1]?.practice).toEqual([]);
+    expect(moduleSeven[2]?.practice).toEqual([
+      { slug: 'pw-debug-flaky-test', role: 'core' },
+    ]);
+  });
+
+  test('module eight completes with justified abstraction and explicit suite policy', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleEight = tutorials.filter(
+      (tutorial) => tutorial.module.order === 8,
+    );
+
+    expect(moduleEight.map((tutorial) => tutorial.slug)).toEqual([
+      'page-object-model',
+      'test-fixtures',
+      'projects-configuration',
+      'advanced-fixtures',
+    ]);
+    expect(moduleEight.map((tutorial) => tutorial.kind)).toEqual([
+      'core',
+      'core',
+      'core',
+      'optional',
+    ]);
+
+    const practices = moduleEight.flatMap((tutorial) => tutorial.practice);
+    expect(practices).toEqual([{ slug: 'pom-login-basics', role: 'core' }]);
+
+    expect(moduleEight[0]?.practice).toEqual([
+      { slug: 'pom-login-basics', role: 'core' },
+    ]);
+    expect(moduleEight[1]?.practice).toEqual([]);
+    expect(moduleEight[2]?.practice).toEqual([]);
+    expect(moduleEight[3]?.practice).toEqual([]);
+  });
+
+  test('module nine completes with a reproducible feedback contract and one honest capstone checkpoint', async () => {
+    const tutorials = await getTutorialCatalogList('en');
+    const moduleNine = tutorials.filter(
+      (tutorial) => tutorial.module.order === 9,
+    );
+
+    expect(moduleNine.map((tutorial) => tutorial.slug)).toEqual([
+      'ci-reports-cross-browser',
+      'ci-feedback-policy',
+      'capstone-web-automation',
+    ]);
+    expect(moduleNine.every((tutorial) => tutorial.kind === 'core')).toBe(true);
+
+    expect(moduleNine[0]?.practice).toEqual([]);
+    expect(moduleNine[1]?.practice).toEqual([]);
+    expect(moduleNine[2]?.practice).toEqual([
+      { slug: 'pw-capstone-checkout', role: 'core' },
+    ]);
+    expect(moduleNine.flatMap((tutorial) => tutorial.practice)).toEqual([
+      { slug: 'pw-capstone-checkout', role: 'core' },
+    ]);
+  });
+
+  test('runner detail preserves expected state and task-specific validation', async () => {
+    const detail = await getChallengeCatalogDetail('pw-debug-flaky-test', 'en');
+
+    expect(detail?.expectedState).toEqual([
+      {
+        selector: '[data-order-id="ORD-1042"] [role=status]',
+        visible: true,
+        containsText: 'Order submitted: ORD-1042',
+      },
+    ]);
+    expect(detail?.validation).toMatchObject({
+      requiredAssertions: ['toHaveCount', 'toHaveText'],
+      requiredMethods: ['getByRole', 'filter', 'click'],
+      forbiddenMethods: ['first', 'nth', 'waitForTimeout', 'textContent', 'isVisible', 'toBeTruthy'],
+    });
+  });
+
+  test('capstone checkpoint requires both rejection and recovery evidence', async () => {
+    const detail = await getChallengeCatalogDetail(
+      'pw-capstone-checkout',
+      'en',
+    );
+
+    expect(detail?.expectedState).toEqual([
+      {
+        selector: '#confirmation',
+        visible: true,
+        containsText: '2 items',
+      },
+      { selector: '[role=alert]', hidden: true },
+    ]);
+    expect(detail?.validation).toMatchObject({
+      requiredAssertions: [
+        'toHaveText',
+        'toBeHidden',
+        'toBeVisible',
+        'toContainText',
+      ],
+      requiredMethods: ['getByLabel', 'getByRole', 'fill', 'click'],
+      forbiddenMethods: ['waitForTimeout', 'textContent', 'toBeTruthy', 'evaluate'],
+      policy: {
+        requireExecutedEvidence: true,
+        forbidStructuralLocators: true,
+        forbidForcedActions: true,
+        forbidDirectDomAccess: true,
+        forbidSwallowedErrors: true,
+      },
+      interactionSequence: {
+        event: 'submit',
+        selector: '#checkout-form',
+        steps: [
+          {
+            inputSelector: '#quantity',
+            inputValue: '0',
+            expectedState: [
+              {
+                selector: '[role=alert]',
+                visible: true,
+                containsText: 'Quantity must be at least 1',
+              },
+              { selector: '#confirmation', hidden: true },
+            ],
+          },
+          {
+            inputSelector: '#quantity',
+            inputValue: '2',
+            expectedState: [
+              { selector: '[role=alert]', hidden: true },
+              {
+                selector: '#confirmation',
+                visible: true,
+                containsText: '2 items',
+              },
+            ],
+          },
+        ],
+      },
+    });
+  });
+
+  test('retired misleading drills are absent from the published Practice catalog', async () => {
+    const slugs = new Set(
+      (await getChallengeCatalogList('en')).map((challenge) => challenge.slug),
+    );
+
+    expect(slugs.has('selector-performance')).toBe(false);
+    expect(slugs.has('async-testing-patterns')).toBe(false);
+    expect(slugs.has('pw-frame-locators')).toBe(false);
+    expect(slugs.has('ts-generics-intro')).toBe(false);
+    expect(slugs.has('automation-candidate-review')).toBe(false);
+    expect(slugs.has('pom-login-failures')).toBe(false);
+    expect(slugs.has('pom-multi-page')).toBe(false);
   });
 
   test('practice submissions skip persistence and XP awards', async () => {

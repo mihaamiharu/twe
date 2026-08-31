@@ -3,6 +3,14 @@ import { cleanup, render, screen } from '@testing-library/react';
 import '@tanstack/react-query';
 import type { TutorialListResponse } from '@/lib/tutorials.query';
 
+const module = {
+  slug: 'automation-judgment',
+  order: 1,
+  title: 'Automation Judgment',
+  description: 'Choose worthwhile automation.',
+  outcome: 'Choose and explain the right automation target.',
+};
+
 const lessons: TutorialListResponse = {
   success: true,
   data: [
@@ -12,13 +20,16 @@ const lessons: TutorialListResponse = {
       title: 'First lesson',
       description: 'Start here.',
       order: 1,
+      module,
+      moduleOrder: 1,
+      kind: 'core',
       estimatedMinutes: 5,
       tags: ['foundations'],
       relatedChallenges: [],
+      practice: [],
       isPublished: true,
       viewCount: 0,
       isCompleted: false,
-      readingProgress: 0,
     },
     {
       id: 'completed-id',
@@ -26,16 +37,38 @@ const lessons: TutorialListResponse = {
       title: 'Completed lesson',
       description: 'Already covered.',
       order: 2,
+      module,
+      moduleOrder: 2,
+      kind: 'core',
       estimatedMinutes: 5,
       tags: ['beginner'],
       relatedChallenges: [],
+      practice: [],
       isPublished: true,
       viewCount: 0,
       isCompleted: true,
-      readingProgress: 100,
     },
   ],
-  meta: { availableTags: ['beginner', 'foundations'] },
+  meta: {
+    availableTags: ['beginner', 'foundations'],
+    modules: [
+      {
+        ...module,
+        coreLessons: 2,
+        completedCoreLessons: 1,
+        corePractice: 0,
+        completedCorePractice: 0,
+        isCompleted: false,
+      },
+    ],
+    completion: {
+      coreLessons: 2,
+      completedCoreLessons: 1,
+      corePractice: 0,
+      completedCorePractice: 0,
+      isCompleted: false,
+    },
+  },
   pagination: { page: 1, limit: 2, total: 2, totalPages: 1 },
 };
 

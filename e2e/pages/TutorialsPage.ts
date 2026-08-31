@@ -11,9 +11,7 @@ export class TutorialsPage extends BasePage {
   constructor(page: Page) {
     super(page);
     this.tutorialCards = page.locator('a[href*="/learn/"][class*="group"]');
-    this.completeButton = page.getByRole('button', {
-      name: /Read to Complete|Complete & Continue|Baca untuk Menyelesaikan|Selesai & Lanjutkan/i,
-    });
+    this.completeButton = page.getByTestId('complete-tutorial-footer');
     this.hideCompletedToggle = page.getByRole('button', {
       name: /Show remaining only|Show all lessons|Tampilkan yang belum selesai saja|Tampilkan semua pelajaran|Hide Completed|Show Completed|Sembunyikan Selesai|Tampilkan Selesai/i,
     });
@@ -31,9 +29,11 @@ export class TutorialsPage extends BasePage {
           __TSS_START_OPTIONS__?: unknown;
           $_TSR?: unknown;
         };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
+        return (
+          Boolean(appWindow.__TSS_START_OPTIONS__) &&
           (appWindow.$_TSR?.initialized === true ||
-            appWindow.$_TSR === undefined);
+            appWindow.$_TSR === undefined)
+        );
       },
       undefined,
       { timeout: 20_000 },
@@ -53,8 +53,8 @@ export class TutorialsPage extends BasePage {
 
   async completeTutorial() {
     await this.completeButton.click();
-    await expect(
-      this.page.getByText('Completed! 🎉', { exact: true }),
-    ).toBeVisible();
+    await expect(this.page.getByTestId('lesson-status-value')).toHaveText(
+      'Completed',
+    );
   }
 }

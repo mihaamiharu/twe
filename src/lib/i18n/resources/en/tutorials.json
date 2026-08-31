@@ -21,8 +21,16 @@
     "stack": {
       "note": "Current lessons",
       "lessonLabel": "Lesson {{number}}",
+      "moduleLabel": "Module {{number}}",
       "cardLesson": "Open lesson",
       "noLessons": "The current lesson catalog is unavailable right now."
+    },
+    "path": {
+      "progress": "Core: {{lessons}}/{{lessonTotal}} lessons · {{practice}}/{{practiceTotal}} practice",
+      "completed": "Learning path complete",
+      "moduleProgress": "{{lessons}}/{{lessonTotal}} lessons · {{practice}}/{{practiceTotal}} practice",
+      "coreLesson": "Core",
+      "optionalLesson": "Optional"
     },
     "lessons": {
       "eyebrow": "WEB AUTOMATION / LESSONS",
@@ -74,28 +82,29 @@
     "startLesson": "Start lesson",
     "continueLesson": "Continue lesson",
     "completed": "Done",
-    "reviewLesson": "Review lesson",
-    "progress": "{{progress}}% read",
-    "progressLabel": "Reading progress: {{progress}}%"
+    "reviewLesson": "Review lesson"
   },
   "sidebar": {
-    "progress": "Your Progress",
-    "reading": "Reading",
-    "readingProgress": "Reading progress: {{progress}}%",
-    "readToComplete": "Read to Complete",
-    "completeAndContinue": "Complete & Continue",
+    "status": "Lesson status",
+    "markComplete": "Mark lesson complete",
     "completedTitle": "Completed! 🎉",
     "nextLabel": "Next: {{title}}",
     "duration": "Duration",
+    "statusIncomplete": "Not completed",
     "statusCompleted": "Completed",
     "challengesTitle": "Practice Challenges",
-    "challengesDescription": "Reinforce what you've learned with these related challenges."
+    "challengesDescription": "Reinforce what you've learned with these related challenges.",
+    "corePractice": "Core Practice",
+    "additionalPractice": "Additional Practice"
   },
   "detail": {
     "breadcrumbLabel": "Lesson breadcrumbs",
     "contentLabel": "Lesson content",
     "tagsLabel": "Lesson topics",
     "tocTitle": "On this page",
+    "completionTitle": "Finished reading?",
+    "completionDescription": "Mark this lesson as complete before moving on.",
+    "completionCompletedDescription": "This lesson is complete. Continue with the lesson navigation below.",
     "lessonNavigationLabel": "Lesson navigation"
   },
   "toasts": {

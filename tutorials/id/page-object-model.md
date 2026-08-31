@@ -1,144 +1,232 @@
 ---
-title: "Page Object Model (POM)"
-description: "Jangan biarkan perubahan satu ID bikin error 50 test case. Pelajari cara bikin kode yang tahan banting."
+title: 'Pilih Abstraction yang Memang Membuat Test Lebih Mudah Dirawat'
+description: 'Tentukan kapan code tetap inline dan kapan perlu dipindahkan ke focused helper, component object, atau page object berdasarkan pengulangan yang benar-benar terjadi.'
 ---
 
-Bayangkan skenario horor ini: Kamu punya 50 file test yang semuanya nge-klik tombol "Login". Tiba-tiba, developer ngubah ID tombol itu dari `#login-btn` jadi `#btn-masuk`.
+## Setelah lesson ini, kamu bisa
 
-**Hasilnya:** 50 file test kamu merah semua. Kamu harus benerin satu-satu. Capek? Pasti.
+- menjelaskan masalah maintenance yang ingin diselesaikan oleh sebuah abstraction;
+- memilih antara inline code, focused helper, component object, dan page object;
+- membuat method berdasarkan action yang dilakukan user atau product behavior yang diuji;
+- menjaga action penting dan expected result setiap scenario tetap terlihat di test; serta
+- mereview abstraction buatan AI yang memakai nama terlalu umum, menyembunyikan state, atau membuat alur test sulit ditelusuri.
 
-Solusinya? Kenalan sama **Page Object Model (POM)**. Ini teknik "P3K" buat automation: **P**emisahan **P**ara **P**engode (biar nggak pusing).
+## Kenapa ini penting buat QA
 
----
+Pernah nggak sih lihat test suite yang kelihatannya rapi karena semua code sudah dimasukkan ke dalam class, tapi begitu test fail kita malah harus membuka beberapa file hanya untuk mencari tahu button mana yang diklik?
 
-## 1. Konsep Dasar: Apa itu POM?
+Saat test suite mulai membesar, locator atau step untuk sign-in yang sama bisa muncul di beberapa test. Kalau semuanya terus di-copy, satu perubahan UI bisa memaksa kita mengedit banyak file. Kalau setiap pengulangan langsung dipindahkan ke abstraction, step penting, perubahan state, dan assertion yang perlu dicek justru bisa ikut tersembunyi.
 
-Simpelnya, Page Object Model itu cara kita mindahin *logic* interaksi elemen (klik, ketik, baca teks) ke dalam file terpisah (biasanya per halaman/page).
+Test yang mudah di-maintain membantu QA menjawab tiga pertanyaan dengan cepat:
 
-Jadi, script test kamu cuma isinya **"Niat"**, bukan **"Teknis"**.
+1. Risiko apa yang dihadapi customer dalam scenario ini?
+2. Kalau UI atau flow berubah, bagian code mana yang perlu di-update?
+3. Kalau test fail, action dan expected result mana yang perlu diperiksa?
 
-* **Tanpa POM:** "Cari elemen `#btn-login`, terus klik." (Ribet)
-* **Dengan POM:** "Halaman Login -> Lakukan Login." (Simpel)
+Jumlah class atau sedikitnya duplikasi bukan ukuran utamanya. Abstraction baru berguna kalau ketiga jawaban tadi menjadi lebih jelas.
 
-### Analogi Restoran
+## Cara berpikir yang perlu kamu pegang
 
-* **Script Test** itu kayak **Pelanggan** yang pesen makan ("Saya mau Nasi Goreng").
-* **Page Object** itu kayak **Pelayan** yang tau cara ngomong ke dapur ("Meja 4, Nasi Goreng satu, pedas sedang").
-* **Aplikasi Web** itu **Dapur**-nya.
+Perhatikan dulu code yang benar-benar berulang dan biasanya berubah bersama. Setelah itu, pindahkan hanya bagian terkecil yang memang perlu dirawat di satu tempat:
 
-Pelanggan nggak perlu tau cara masak nasi goreng, dia cuma perlu tau cara pesennya.
+```text
+Belum ada pengulangan yang stabil     → biarkan code tetap inline
+Satu action yang sama mulai berulang  → focused helper
+Satu bagian UI dipakai di banyak flow → component object
+Beberapa action stabil sering dipakai → page object
 
-![Diagram Konsep Page Object Model](/images/tutorials/pom-concept-diagram.png)
+Apa pun pilihannya, tujuan scenario dan expected result harus tetap terlihat.
+```
 
-| Kondisi | Tanpa POM | Dengan POM |
-| :--- | :--- | :--- |
-| **Kalo ID Berubah** | Nangis, benerin 50 file | Santai, cuma benerin 1 file (Page Object) |
-| **Keterbacaan** | Penuh kode selector (`.css-123`) | Bahasa manusia (`loginPage.doLogin()`) |
-| **Duplikasi** | Copy-paste selector di mana-mana | Satu kode dipake rame-rame (Reusable) |
+![Pilih inline code, focused helper, component object, atau page object berdasarkan bagian code yang benar-benar berulang, sambil menjaga tujuan scenario dan expected result tetap terlihat.](/images/tutorials/abstraction-decision-ladder.svg)
 
-> [!NOTE]
-> POM itu bukan fitur bawaan Playwright atau Selenium, ini **Pola Pikir (Design Pattern)**. Jadi tool apapun yang kamu pake, konsep ini tetep kepake.
+_Setiap abstraction juga perlu di-maintain. Buat hanya kalau ada code berulang yang memang lebih mudah dirawat dari satu tempat._
 
----
+| Pilihan          | Bagian yang dirapikan            | Kapan mulai layak dipakai                                     |
+| ---------------- | -------------------------------- | ------------------------------------------------------------- |
+| Inline code      | Satu scenario                    | Step masih pendek, jelas, dan belum sering berulang           |
+| Focused helper   | Satu action atau setup yang utuh | Beberapa test mengulang kumpulan step yang sama               |
+| Component object | Satu bagian UI yang reusable     | Cart, menu, grid, atau dialog yang sama muncul di banyak flow |
+| Page object      | Satu area aplikasi yang stabil   | Banyak scenario memakai beberapa action yang saling berkaitan |
 
-## 2. Bedah Anatomi Page Object
+Page object boleh mewakili satu bagian dari aplikasi. Kita nggak perlu membuat class sendiri untuk setiap URL atau setiap element di DOM.
 
-Di Playwright (pake TypeScript), Page Object itu cuma sebuah `class` biasa. Isinya biasanya cuma dua macem:
+## Coba kita bedah contoh nyata
 
-1. **Locators (Barang-barangnya):** Tombol, input, teks. Didefinisikan di `constructor`.
-2. **Methods (Aksinya):** Klik, isi form, navigasi.
+Dua scenario login berikut mengulang step yang sama:
 
-```typescript
-// pages/LoginPage.ts
-import { type Locator, type Page } from '@playwright/test';
+```ts
+test('customer signs in', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill('buyer@example.test');
+  await page.getByLabel('Password').fill(process.env.TEST_PASSWORD!);
+  await page.getByRole('button', { name: 'Sign in' }).click();
 
+  await expect(page).toHaveURL('/account');
+  await expect(
+    page.getByRole('heading', { name: 'Your account' }),
+  ).toBeVisible();
+});
+
+test('invalid password is rejected', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill('buyer@example.test');
+  await page.getByLabel('Password').fill('wrong-password');
+  await page.getByRole('button', { name: 'Sign in' }).click();
+
+  await expect(page.getByRole('alert')).toHaveText('Invalid credentials');
+  await expect(page).toHaveURL('/login');
+});
+```
+
+Step yang berulang tadi punya satu tujuan yang jelas, yaitu mengirim login credentials. Focused helper sudah cukup untuk merapikannya:
+
+```ts
+type Credentials = {
+  email: string;
+  password: string;
+};
+
+async function submitLogin(page: Page, credentials: Credentials) {
+  await page.getByLabel('Email').fill(credentials.email);
+  await page.getByLabel('Password').fill(credentials.password);
+  await page.getByRole('button', { name: 'Sign in' }).click();
+}
+```
+
+Kedua scenario sekarang memakai helper yang sama. Starting page dan expected result yang berbeda tetap terlihat di dalam test:
+
+```ts
+await page.goto('/login');
+await submitLogin(page, validBuyer);
+await expect(page).toHaveURL('/account');
+await expect(page.getByRole('heading', { name: 'Your account' })).toBeVisible();
+```
+
+```ts
+await page.goto('/login');
+await submitLogin(page, { ...validBuyer, password: 'wrong-password' });
+await expect(page.getByRole('alert')).toHaveText('Invalid credentials');
+await expect(page).toHaveURL('/login');
+```
+
+Jangan buru-buru membuat class hanya karena scenario tersebut menggunakan `page`. Helper tadi sudah mengumpulkan step yang berulang tanpa menyembunyikan tujuan test.
+
+### Kapan page object mulai layak?
+
+Kalau flow login kemudian berkembang dengan password reset, single sign-on, dan account lockout, lalu dipakai oleh beberapa area product, ada beberapa action yang saling berhubungan dan terus digunakan bersama. Pada kondisi ini, page object mulai layak dibuat:
+
+```ts
 export class LoginPage {
-  // 1. Kenalin dulu siapa aja 'pemainnya'
-  readonly page: Page;
-  readonly usernameInput: Locator;
-  readonly passwordInput: Locator;
-  readonly loginButton: Locator;
+  constructor(private readonly page: Page) {}
 
-  constructor(page: Page) {
-    this.page = page;
-    
-    // 2. Tunjukin di mana letak barangnya (Locator)
-    // Kalo ID berubah, CUKUP GANTI DI SINI AJA!
-    this.usernameInput = page.locator('#username');
-    this.passwordInput = page.locator('#password');
-    this.loginButton = page.getByRole('button', { name: 'Sign In' });
-  }
-
-  // 3. Ajarin cara mainnya (Actions)
-  async goto() {
+  async open() {
     await this.page.goto('/login');
   }
 
-  async login(user: string, pass: string) {
-    // Interaksi pake properti yang udah didefinisikan di atas
-    await this.usernameInput.fill(user);
-    await this.passwordInput.fill(pass);
-    await this.loginButton.click();
+  async submit(credentials: Credentials) {
+    await this.page.getByLabel('Email').fill(credentials.email);
+    await this.page.getByLabel('Password').fill(credentials.password);
+    await this.page.getByRole('button', { name: 'Sign in' }).click();
+  }
+
+  errorMessage() {
+    return this.page.getByRole('alert');
+  }
+
+  async requestPasswordReset(email: string) {
+    await this.page.getByRole('link', { name: 'Forgot password?' }).click();
+    await this.page.getByLabel('Email').fill(email);
+    await this.page.getByRole('button', { name: 'Send reset link' }).click();
   }
 }
 ```
 
----
+Nama method-nya menjelaskan action yang dilakukan di product. Kita nggak membuat method umum seperti `clickButton(name)` atau mengekspos semua CSS selector hanya karena mungkin akan dipakai nanti.
 
-## 3. Cara Pake di File Test
+### Kapan component object lebih tepat?
 
-Nah, setelah bikin "kamus"-nya (Page Object), file test kamu jadi bersih banget. Nggak ada lagi kode selector yang semrawut.
+Aplikasi web sering memakai drawer, dialog, navigation bar, atau data grid yang sama di beberapa halaman. Kalau cart panel yang sama dipakai berulang kali, buat component object untuk cart tersebut. Nggak perlu membuat page object besar untuk setiap halaman yang menampilkannya:
 
-```typescript
-// tests/login.spec.ts
-import { test, expect } from '@playwright/test';
-import { LoginPage } from '../pages/LoginPage';
+```ts
+export class CartPanel {
+  constructor(private readonly root: Locator) {}
 
-test('User bisa login dengan lancar', async ({ page }) => {
-  // 1. Panggil "Pelayan"-nya (Page Object)
-  const loginPage = new LoginPage(page);
+  item(name: string) {
+    return this.root.getByRole('listitem').filter({ hasText: name });
+  }
 
-  // 2. Suruh dia kerja
-  await loginPage.goto();
-  await loginPage.login('testuser', 'password123');
-
-  // 3. Cek hasilnya (Assertion tetep di file test ya!)
-  await expect(page).toHaveURL(/dashboard/);
-});
+  async remove(name: string) {
+    await this.item(name).getByRole('button', { name: 'Remove' }).click();
+  }
+}
 ```
 
-> [!TIP]
-> **Pro Tip:** Di latihan playground kita, kadang kita udah siapin instance Page Object-nya otomatis. Jadi kamu tinggal pake aja method-nya tanpa perlu `new LoginPage(page)`. Praktis kan?
+`CartPanel` menerima root locator yang sudah di-scope. Component ini mengurus cara berinteraksi dengan cart tanpa ikut mengatur seluruh flow aplikasi.
 
----
+## Kapan pendekatan ini cocok dipakai?
 
-## 4. Aturan Main (Best Practices)
+Biarkan code tetap inline selama masih pendek, jelas, dan belum sering berulang. Sedikit duplikasi nggak selalu buruk. Dari pengulangan itulah kita bisa melihat bagian mana yang memang perlu dipindahkan ke helper atau object.
 
-Biar POM kamu nggak jadi "POM Bensin" (meledak-ledak), ikutin aturan ini:
+Gunakan focused helper untuk satu kumpulan step yang utuh dan berulang, seperti mengirim login credentials, membuat test data untuk satu test, atau membuka product state tertentu. Beri nama berdasarkan action yang dilakukan, bukan detail implementasinya.
 
-| Aturan | Alasannya |
-| :--- | :--- |
-| **Jangan Ada Assertion di PO** | Page Object tugasnya cuma ngelakuin aksi. Biarkan file Test yang menilai apakah aksi itu "Lulus" atau "Gagal". |
-| **Return Halaman Baru** | Kalo method `klikDaftar()` ngebawa user ke halaman Dashboard, method itu sebaiknya nge-return `new DashboardPage(page)`. Biar nyambung (chaining). |
-| **Pecah Kecil-Kecil** | Jangan bikin satu class `SuperPage` yang isinya semua elemen web. Pecah jadi `LoginPage`, `HomePage`, `NavbarComponent`, dll. |
+Gunakan component object untuk bagian UI yang dipakai berulang dan punya scope locator sendiri. Gunakan page object ketika satu area aplikasi sudah cukup stabil dan punya beberapa action yang dipakai oleh banyak scenario.
 
----
+Biarkan assertion untuk expected result yang spesifik tetap berada di test supaya tujuan scenario mudah di-review. Helper boleh punya assertion kalau hasil tersebut memang selalu dijamin setiap kali helper digunakan. Misalnya, sebelum selesai, `signInSuccessfully` boleh memastikan proses sign-in berhasil. Letakkan assertion sesuai hasil yang memang menjadi tanggung jawab helper atau scenario tersebut.
 
-## 5. Ringkasan (Checklist)
+Jangan memindahkan code ke abstraction hanya untuk mengurangi jumlah baris. Jangan mengekspos setiap element hanya karena mungkin akan dibutuhkan. Hindari satu global object yang mengetahui seluruh aplikasi, dan jangan memaksa flow product lain memakai abstraction yang dibuat untuk scenario berbeda.
 
-| Konsep | Intinya |
-| :--- | :--- |
-| **Separation of Concerns** | Page Object ngurusin "Gimana caranya", Test ngurusin "Apa buktinya". |
-| **DRY (Don't Repeat Yourself)** | Pantang nulis selector yang sama dua kali. Bungkus di Page Object. |
-| **Maintenance** | Investasi waktu sedikit di awal buat bikin POM, panen waktu banyak pas maintenance nanti. |
+## Kalau gagal, mulai cek dari mana?
 
----
+| Yang terjadi                                        | Kemungkinan masalah                                                            | Yang perlu dicek                                                                  |
+| --------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------- |
+| Satu perubahan nama di UI memaksa edit banyak class | Locator untuk component yang sama disalin ke beberapa page object              | Component mana yang berubah, dan di mana locator-nya seharusnya disimpan?         |
+| Test cuma terbaca seperti `flow.run()`              | Action dan assertion penting tersembunyi di balik satu method                  | Step dan expected result mana yang perlu tetap terlihat di test?                  |
+| Object punya method `click`, `fill`, dan `wait`     | Page object hanya membungkus API Playwright                                    | Action apa yang sebenarnya dilakukan user dan berulang di beberapa test?          |
+| Satu method terus mengembalikan object berikutnya   | Navigation dan perubahan state tersembunyi dalam object chain                  | Apakah perpindahan page ini perlu terlihat langsung di test?                      |
+| Helper membutuhkan banyak boolean                   | Satu helper dipaksa menangani beberapa scenario yang nggak berkaitan           | Apakah helper perlu dipecah berdasarkan action yang berbeda?                      |
+| Memperbaiki satu scenario merusak test lain         | Object menyimpan state atau menjalankan side effect yang memengaruhi test lain | State apa yang berubah, siapa yang mengubahnya, dan siapa yang melakukan cleanup? |
 
-## 6. Mau Belajar Lebih Dalem?
+Kalau abstraction yang seharusnya reusable malah membuat scenario yang valid sulit ditulis, cek lagi code dan tanggung jawab yang dimasukkan ke dalamnya sebelum menambah option atau conditional baru.
 
-Kalau kamu udah jago ginian, kamu bisa bikin framework automation yang scalable buat tim gede.
+## Review hasil kerja dengan bantuan AI
 
-* **[Playwright POM Guide](https://playwright.dev/docs/pom)**: Kitab sucinya POM di Playwright.
-* **[Test Fixtures](https://playwright.dev/docs/test-fixtures)**: Level lanjut! Cara biar nggak perlu nulis `new LoginPage(page)` berulang-ulang di setiap test (Dependency Injection ala Playwright).
+AI bisa menghasilkan framework page object yang terlihat rapi meskipun belum memahami product dan riwayat perubahannya. Review hasilnya dengan pertanyaan berikut:
 
-Selamat coding yang lebih rapi! 🚀
+- Code apa yang memang berulang, dan perubahan UI apa yang ingin dibuat lebih mudah di-update?
+- Apakah nama method menjelaskan action di product atau hanya UI command umum?
+- Apakah action penting dan expected result scenario masih terlihat di test?
+- Apakah class tersebut benar-benar mewakili page atau component yang stabil?
+- Apakah navigation, authentication, data mutation, waiting, atau cleanup disembunyikan?
+- Apakah locator sudah di-scope ke bagian UI yang tepat dan menggunakan attribute yang memang stabil?
+- Apakah focused helper justru lebih mudah dibaca dan di-debug?
+- Bisakah QA mengubah satu component tanpa menelusuri object chain panjang?
+- Apakah code buatan AI mengarang credential, route, selector, atau business rule?
+
+Minta AI menjelaskan kenapa setiap helper atau object dibuat dan file mana yang perlu di-update ketika UI berubah. Kalau jawabannya cuma “reuse” atau “best practice,” abstraction tersebut belum punya alasan yang cukup.
+
+## Coba cek pemahamanmu
+
+Sebuah test suite punya tiga checkout scenario. Semuanya membuka cart drawer dan mengubah quantity. Drawer yang sama juga muncul di product page dan search page. AI mengusulkan `ProductPage`, `SearchPage`, dan `CheckoutPage`. Setiap class menyalin cart locator dan punya method umum bernama `clickButton`.
+
+Bagian apa yang tetap perlu terlihat di setiap test? Code yang berulang sebaiknya dipindahkan ke focused helper, component object, atau page object?
+
+## Bandingkan dengan cara pikir ini
+
+Salah satu design yang masuk akal:
+
+- Tetap tampilkan starting state product yang spesifik, user action penting, dan expected result dari setiap scenario di dalam test.
+- Buat satu component object `CartPanel` dengan drawer sebagai root karena component itu dipakai berulang dan perubahan locator cart cukup di-update di sana.
+- Berikan method yang jelas seperti `setQuantity(product, quantity)` dan `remove(product)`, bukan wrapper umum untuk click atau fill.
+- Biarkan setiap page atau test membuat component dari locator yang sudah di-scope. Jangan menyalin cart selector ke tiga page class.
+- Tambahkan page object hanya jika salah satu halaman nantinya punya beberapa action stabil yang memang dipakai bersama.
+
+Dengan design ini, cara berinteraksi dengan cart cukup di-update di satu tempat. Setiap test tetap menunjukkan action dan expected result yang perlu dicek.
+
+## Sebelum lanjut
+
+Sekarang kamu seharusnya bisa menentukan kapan code tetap inline dan kapan focused helper, component object, atau page object memang membuat test lebih mudah dirawat. Action penting dan expected result setiap scenario harus tetap mudah ditemukan saat code di-review.
+
+Practice wajib di lesson ini menguji keputusan tersebut lewat focused helper. Kamu nggak perlu membuat class page object hanya karena scenario menggunakan `page`.
+
+Lesson berikutnya membahas hal yang berbeda, yaitu dependency dan lifecycle. Helper atau page object mengatur behavior. Fixture menentukan bagaimana resource dibuat, diberikan kepada test, lalu dibersihkan. Keduanya punya tanggung jawab yang berbeda.

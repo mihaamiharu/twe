@@ -1,4 +1,8 @@
-import type { ChallengeType } from './content.types';
+import type {
+  ChallengeType,
+  ChallengeValidationDefinition,
+  SerializableExpectedStateRule,
+} from './content.types';
 import { omitUndefined } from './omit-undefined';
 
 interface TestCase {
@@ -27,6 +31,8 @@ export interface ServerChallengeData {
   starterCode?: string;
   tags?: string[];
   hints?: string[];
+  expectedState?: SerializableExpectedStateRule[];
+  validation?: ChallengeValidationDefinition;
   completionCount: number;
   tutorial?: { slug: string; title: string } | null;
   testCases: TestCase[];
@@ -72,6 +78,8 @@ interface TransformedChallenge {
     expectedOutput: unknown;
   }[];
   hints?: string[];
+  expectedState?: SerializableExpectedStateRule[];
+  validation?: ChallengeValidationDefinition;
   category: string;
   isCompleted: boolean;
   tutorial?: { slug: string; title: string };
@@ -119,6 +127,8 @@ export function transformChallengeResponse(
       editableFiles: data.editableFiles,
       preloadModules: data.preloadModules,
       hints: data.hints,
+      expectedState: data.expectedState,
+      validation: data.validation,
       tutorial: data.tutorial ?? undefined,
       nextChallenge: data.nextChallenge ?? undefined,
       prevChallenge: data.prevChallenge ?? undefined,

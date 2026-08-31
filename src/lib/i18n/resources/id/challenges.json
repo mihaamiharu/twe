@@ -97,6 +97,17 @@
     "jsUndefined": "Hasil kamu undefined. Pastikan kamu memberikan nilai pada `result`.",
     "jsMismatch": "Hasil kamu tidak sesuai dengan output yang diharapkan. Periksa logika kamu dan coba lagi.",
     "noAssertions": "Tidak ada assertion yang dipanggil. Tulis assertion seperti: await expect(locator).toHaveText('...');",
+    "grading": {
+      "missingEvidence": "Call yang diwajibkan belum dieksekusi di test path: {{methods}}. Jalankan langsung di scenario-nya; declaration atau helper yang nggak dipakai nggak dihitung.",
+      "forbiddenMethods": "Hapus method yang dilarang ini dari test: {{methods}}.",
+      "structuralLocator": "Pakai semantic locator seperti getByRole atau getByLabel, bukan page.locator(...) dengan struktur CSS.",
+      "forcedAction": "Hapus forced action-nya. Biarkan Playwright mengecek actionability dan jalankan action tanpa opsi force yang truthy.",
+      "directDomAccess": "Jangan akses DOM browser langsung dari test. Pakai Playwright locator dan web-first assertion, bukan document, window, globalThis, atau evaluate.",
+      "swallowedError": "Jangan telan failure. Biarkan error dari Playwright action atau assertion menggagalkan test, bukan ditangkap lalu diabaikan.",
+      "failedAssertion": "Assertion {{matcher}} gagal lalu ditelan. Perbaiki expected result dan biarkan assertion menggagalkan test saat hasilnya salah.",
+      "failedAction": "Playwright action {{method}} gagal lalu ditelan. Perbaiki locator atau action-nya dan biarkan error menggagalkan test.",
+      "sourceAnalysisUnavailable": "Test belum bisa dicek dengan aman. Jalankan lagi supaya source policy-nya bisa dianalisis."
+    },
     "selectorMismatch": "Selektor tidak cocok dengan elemen target",
     "executionError": "Kesalahan Eksekusi",
     "alreadyCompleted": "Kamu telah menyelesaikan tantangan ini! Jangan ragu untuk berlatih lagi.",

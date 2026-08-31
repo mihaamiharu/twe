@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 980" role="img" aria-labelledby="title description">
+  <title id="title">A worker can reuse a browser while each test gets an isolated context</title>
+  <desc id="description">A worker may reuse one browser process. Each test gets a separate context and page with isolated client-session state. Both contexts can still use the same account and order on a shared backend, so server-side data needs a separate ownership strategy.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="978" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="17" font-weight="700" letter-spacing="1.1">WORKER BROWSER—CONTEXT ISOLATES CLIENT STATE</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="48" y="116" width="664" height="510" rx="20" fill="#ffffff" stroke="#686258" stroke-width="2" />
+  </g>
+  <rect x="72" y="140" width="194" height="32" rx="16" fill="#25231f" />
+  <text x="169" y="162" fill="#ffffff" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">BROWSER · ONE WORKER</text>
+  <text x="72" y="202" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">The worker may reuse this browser; each test gets its own session boundary.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="76" y="238" width="286" height="344" rx="18" fill="#e6f2ec" stroke="#75a38b" stroke-width="2" />
+  </g>
+  <rect x="98" y="260" width="160" height="30" rx="15" fill="#ffffff" />
+  <text x="178" y="281" fill="#2d6249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">CONTEXT · TEST A</text>
+  <text x="98" y="326" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">Customer session</text>
+  <circle cx="110" cy="366" r="6" fill="#387357" />
+  <text x="130" y="372" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Cookies A</text>
+  <circle cx="110" cy="400" r="6" fill="#387357" />
+  <text x="130" y="406" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Storage A</text>
+  <circle cx="110" cy="434" r="6" fill="#387357" />
+  <text x="130" y="440" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Permissions A</text>
+  <rect x="100" y="474" width="238" height="74" rx="12" fill="#ffffff" stroke="#75a38b" stroke-width="2" />
+  <text x="219" y="505" fill="#2d6249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">PAGE</text>
+  <text x="219" y="530" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">Customer tab</text>
+
+  <g filter="url(#shadow)">
+    <rect x="398" y="238" width="286" height="344" rx="18" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  </g>
+  <rect x="420" y="260" width="160" height="30" rx="15" fill="#ffffff" />
+  <text x="500" y="281" fill="#6d5418" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">CONTEXT · TEST B</text>
+  <text x="420" y="326" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">Another session</text>
+  <circle cx="432" cy="366" r="6" fill="#b38323" />
+  <text x="452" y="372" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Cookies B</text>
+  <circle cx="432" cy="400" r="6" fill="#b38323" />
+  <text x="452" y="406" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Storage B</text>
+  <circle cx="432" cy="434" r="6" fill="#b38323" />
+  <text x="452" y="440" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Permissions B</text>
+  <rect x="422" y="474" width="238" height="74" rx="12" fill="#ffffff" stroke="#e3b13f" stroke-width="2" />
+  <text x="541" y="505" fill="#6d5418" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">PAGE</text>
+  <text x="541" y="530" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">Another tab</text>
+
+  <line x1="219" y1="642" x2="290" y2="700" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <line x1="541" y1="642" x2="470" y2="700" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <rect x="249" y="646" width="262" height="32" rx="16" fill="#fce8e1" />
+  <text x="380" y="668" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">BROWSER BOUNDARY ENDS HERE</text>
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="716" width="636" height="164" rx="18" fill="#fce8e1" stroke="#e65f3a" stroke-width="2" />
+  </g>
+  <text x="88" y="752" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">SHARED BACKEND CAN STILL COLLIDE</text>
+  <text x="88" y="794" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Account QA-01 · Order ORD-1042 · Inventory</text>
+  <text x="88" y="828" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">Fresh contexts do not reset database records, queues, inboxes,</text>
+  <text x="88" y="852" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">rate limits, or other server-side resources.</text>
+
+  <text x="380" y="930" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">BROWSER: WORKER-SHARED · CONTEXT: TEST-SCOPED · DATA: OWNED</text>
+</svg>

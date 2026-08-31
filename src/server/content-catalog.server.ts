@@ -13,10 +13,12 @@ import { join } from 'path';
 import type {
   ChallengeDefinition,
   ChallengeTier,
+  ExpectedStateRule,
   LocalizedArray,
   LocalizedString,
   TutorialRegistry,
   TutorialRegistryEntry,
+  SerializableExpectedStateRule,
 } from '@/lib/content.types';
 import type {
   ChallengeCatalogDetail,
@@ -51,7 +53,7 @@ type MarkdownDocument = {
 };
 
 function resolveLocale(value: LocalizedString, locale: string): string {
-  if (locale === 'id') return value.id || value.en;
+  if (locale === 'id') return value.id ?? value.en;
   return value.en;
 }
 
@@ -122,7 +124,8 @@ async function readTutorialDocument(
     return parseFrontmatter(
       await readFile(join(TUTORIALS_DIR, locale, `${slug}.md`), 'utf-8'),
     );
-  } catch {
+  } catch (error) {
+    if (!isFileNotFoundError(error)) throw error;
     return parseFrontmatter(
       await readFile(join(TUTORIALS_DIR, 'en', `${slug}.md`), 'utf-8'),
     );
@@ -187,24 +190,33 @@ function validateRelationships(
   challenges: Map<string, ChallengeDefinition>,
 ): void {
   assertUniqueTutorialSlugs(registry);
+  const moduleSlugs = new Set<string>();
+  const moduleOrders = new Set<number>();
+  for (const module of registry.modules) {
+    if (moduleSlugs.has(module.slug)) {
+      throw new Error(`Duplicate curriculum module slug: ${module.slug}`);
+    }
+    if (moduleOrders.has(module.order)) {
+      throw new Error(`Duplicate curriculum module order: ${module.order}`);
+    }
+    moduleSlugs.add(module.slug);
+    moduleOrders.add(module.order);
+  }
   const tutorials = new Set(
     registry.tutorials.map((tutorial) => tutorial.slug),
   );
 
   for (const tutorial of registry.tutorials) {
-    if (
-      tutorial.nextTutorialSlug &&
-      !tutorials.has(tutorial.nextTutorialSlug)
-    ) {
+    if (!moduleSlugs.has(tutorial.moduleSlug)) {
       throw new Error(
-        `Tutorial ${tutorial.slug} references missing next tutorial ${tutorial.nextTutorialSlug}`,
+        `Tutorial ${tutorial.slug} references missing module ${tutorial.moduleSlug}`,
       );
     }
 
-    for (const challengeSlug of tutorial.relatedChallenges ?? []) {
-      if (!challenges.has(challengeSlug)) {
+    for (const practice of tutorial.practice ?? []) {
+      if (!challenges.has(practice.slug)) {
         throw new Error(
-          `Tutorial ${tutorial.slug} references missing challenge ${challengeSlug}`,
+          `Tutorial ${tutorial.slug} references missing challenge ${practice.slug}`,
         );
       }
     }
@@ -254,6 +266,15 @@ async function projectTutorialSummary(
   entry: TutorialRegistryEntry,
   locale: string,
 ): Promise<TutorialCatalogListItem> {
+  const registry = await loadRegistry();
+  const module = registry.modules.find(
+    (candidate) => candidate.slug === entry.moduleSlug,
+  );
+  if (!module) {
+    throw new Error(
+      `Tutorial ${entry.slug} references missing module ${entry.moduleSlug}`,
+    );
+  }
   let title = entry.slug;
   let description = '';
 
@@ -271,9 +292,19 @@ async function projectTutorialSummary(
     title,
     description,
     order: entry.order,
+    module: {
+      slug: module.slug,
+      order: module.order,
+      title: resolveLocale(module.title, locale),
+      description: resolveLocale(module.description, locale),
+      outcome: resolveLocale(module.outcome, locale),
+    },
+    moduleOrder: entry.moduleOrder,
+    kind: entry.kind,
     estimatedMinutes: entry.estimatedMinutes,
     tags: entry.tags,
-    relatedChallenges: entry.relatedChallenges ?? [],
+    relatedChallenges: (entry.practice ?? []).map((practice) => practice.slug),
+    practice: entry.practice ?? [],
   };
 }
 
@@ -292,6 +323,52 @@ function projectChallengeSummary(
     description: resolveLocale(definition.description, locale),
     tags: definition.tags ?? [],
     ...omitUndefined({ tutorialSlug: definition.tutorialSlug }),
+  };
+}
+
+function deriveChallengeValidation(
+  definition: ChallengeDefinition,
+): ChallengeCatalogDetail['validation'] {
+  if (definition.type !== 'PLAYWRIGHT') return definition.validation;
+
+  const requiredAssertions = [
+    ...new Set(
+      [...definition.solution.matchAll(/\.(to[A-Z][A-Za-z]+)\s*\(/g)]
+        .map((match) => match[1])
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ];
+  const configured = definition.validation;
+
+  if (requiredAssertions.length === 0 && !configured) return undefined;
+  return {
+    ...configured,
+    requiredAssertions: configured?.requiredAssertions ?? requiredAssertions,
+  };
+}
+
+function serializeExpectedStateRule(
+  rule: ExpectedStateRule,
+): SerializableExpectedStateRule {
+  return {
+    selector: rule.selector,
+    ...omitUndefined({
+      visible: rule.visible,
+      hidden: rule.hidden,
+      containsText: rule.containsText,
+      count: rule.count,
+      hasAttribute: rule.hasAttribute
+        ? {
+            name: rule.hasAttribute.name,
+            ...omitUndefined({
+              value:
+                typeof rule.hasAttribute.value === 'string'
+                  ? rule.hasAttribute.value
+                  : undefined,
+            }),
+          }
+        : undefined,
+    }),
   };
 }
 
@@ -360,6 +437,8 @@ export async function getChallengeCatalogDetail(
       editableFiles: definition.editableFiles,
       preloadModules: definition.preloadModules,
       starterCode: definition.starterCode,
+      expectedState: definition.expectedState?.map(serializeExpectedStateRule),
+      validation: deriveChallengeValidation(definition),
     }),
     testCases: definition.testCases,
     solution: definition.solution,
@@ -397,11 +476,7 @@ async function getAdjacentTutorialCatalogItem(
     (tutorial) => tutorial.slug === currentSlug,
   );
   const adjacentEntry =
-    direction === 'next' && current.nextTutorialSlug
-      ? registry.tutorials.find(
-          (tutorial) => tutorial.slug === current.nextTutorialSlug,
-        )
-      : orderedEntries[currentIndex + (direction === 'next' ? 1 : -1)];
+    orderedEntries[currentIndex + (direction === 'next' ? 1 : -1)];
 
   if (!adjacentEntry || !isPublished(adjacentEntry.status)) return null;
   const adjacent = await projectTutorialSummary(adjacentEntry, locale);

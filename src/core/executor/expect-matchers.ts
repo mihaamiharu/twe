@@ -3,11 +3,13 @@ import type {
     ExpectMatchers,
     ExpectResult,
 } from './executor.types';
+import { unwrapTracedPlaywrightValue } from './runtime-trace';
 
 function getMethod(
     value: unknown,
     name: string,
 ): ((...args: unknown[]) => unknown) | undefined {
+    value = unwrapTracedPlaywrightValue(value);
     if (
         (typeof value !== 'object' && typeof value !== 'function') ||
         value === null
@@ -23,6 +25,7 @@ function getMethod(
 }
 
 function getProperty(value: unknown, name: string): unknown {
+    value = unwrapTracedPlaywrightValue(value);
     if (
         (typeof value !== 'object' && typeof value !== 'function') ||
         value === null
@@ -30,6 +33,14 @@ function getProperty(value: unknown, name: string): unknown {
         return undefined;
     }
     return Reflect.get(value, name);
+}
+
+function getReflectProperty(
+    value: object,
+    property: PropertyKey,
+    receiver: object,
+): unknown {
+    return Reflect.get(value, property, receiver);
 }
 
 function stringifyText(value: unknown): string {
@@ -54,7 +65,15 @@ function stringifyText(value: unknown): string {
  * Create a simple expect function for assertions
  * Returns both the expect function and assert count getter
  */
-export function createExpect(options?: { timeout?: number; deadline?: number }): ExpectResult {
+export function createExpect(options?: {
+    timeout?: number;
+    deadline?: number;
+    onAssertion?: (event: {
+        matcher: string;
+        passed: boolean;
+        error?: string;
+    }) => void;
+}): ExpectResult {
     let assertionCount = 0;
     const testResults: Array<{ message: string; passed: boolean }> = [];
     const defaultTimeout = options?.timeout ?? 5000;
@@ -139,7 +158,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             handleResult(lastResult.pass, lastResult.message);
         };
 
-        return {
+        const matchers = {
             async toHaveText(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let text = '';
@@ -643,6 +662,47 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 handleResult(JSON.stringify(actual) === JSON.stringify(expected), `Expected equal`);
             },
         };
+
+        return new Proxy(matchers, {
+            get(target, property, receiver) {
+                if (typeof property !== 'string') {
+                    return getReflectProperty(target, property, receiver as object);
+                }
+                const value = getProperty(target, property);
+                if (typeof value !== 'function') {
+                    return value;
+                }
+
+                const matcher = value as (...args: unknown[]) => unknown;
+                return async (...args: unknown[]) => {
+                    const softFailureStart = testResults.length;
+                    try {
+                        const result: unknown = await matcher(...args);
+                        const softFailure = testResults
+                            .slice(softFailureStart)
+                            .find((testResult) => !testResult.passed);
+                        options?.onAssertion?.({
+                            matcher: property,
+                            passed: softFailure === undefined,
+                            ...(softFailure === undefined
+                                ? {}
+                                : { error: softFailure.message }),
+                        });
+                        return result;
+                    } catch (error) {
+                        options?.onAssertion?.({
+                            matcher: property,
+                            passed: false,
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                        });
+                        throw error;
+                    }
+                };
+            },
+        }) as Omit<ExpectMatchers, 'not'>;
     };
 
     const createExpectation = (

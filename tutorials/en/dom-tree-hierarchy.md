@@ -1,124 +1,206 @@
 ---
-title: 'Foundation 2: Reading the DOM Tree (Hierarchy)'
-description: 'Automation is about context. Learn to navigate the "Family Tree" of a web page.'
+title: 'Read the Live DOM and UI State'
+description: 'Use meaningful hierarchy and state transitions to reason about repeated, changing interfaces.'
 ---
 
-> Automation is about context. Learn to navigate the "Family Tree" of a web page.
+## After this lesson, you can
 
-When a browser loads a website, it turns the HTML code into a structure called the **DOM (Document Object Model)**. You can think of the DOM as a family tree where every element is connected to another.
+- explain the difference between initial HTML, the live DOM, and the rendered UI;
+- use parent, child, ancestor, descendant, and sibling relationships to describe page context;
+- scope a repeated control to the product, row, dialog, or region it belongs to;
+- describe an interaction as a before–action–after state transition; and
+- diagnose ambiguity caused by repeated or re-rendered elements.
 
-## 1. The "Tree" Metaphor: The Root and Branches
+## Why this matters for QA
 
-![DOM Tree Model](/images/tutorials/dom-tree-model.png)
+A cart page contains three buttons named “Remove.” A manual tester knows which one belongs to “Mechanical Keyboard” because the button appears inside that product row.
 
-Every web page starts with a single "root" element: `<html>`. Everything else grows out of it.
+Automation cannot safely rely on “the first Remove button.” The order could change, another product could be inserted, or the page could replace the row after a price update.
 
-* **The Root:** The `<html>` tag.
-* **The Branches:** The `<head>` (hidden data like metadata) and the `<body>` (everything you see on the screen).
-* **The Leaves:** The final elements, like buttons, text, or images.
+![A shopping cart shows three product rows with identical Remove buttons, while the Mechanical Keyboard row is highlighted as the target context.](/images/tutorials/cart-row-context-ui.png)
 
----
+The problem is not that the page has repeated buttons. Repetition is normal. The problem is losing the meaningful context that connects each action to the right piece of data.
 
-## 2. Parent-Child Relationships (Nesting)
+To automate a modern UI reliably, QA needs to read the page as a live tree and reason about how that tree changes.
 
-![Container View](/images/tutorials/dom-container-view.png)
+## The mental model
 
-When one element is placed inside another, we call this **Nesting**. This creates a **Parent-Child** relationship.
+The Document Object Model (DOM) is the browser's live object model of the page. It is not:
 
-* **Parent:** The outer element that wraps around others.
-* **Child:** The element living inside the parent.
+- a screenshot of what the page looks like;
+- the component tree used internally by React, Vue, or another framework; or
+- only the HTML text returned by the server.
 
-**Example Code:**
+JavaScript can add, remove, reorder, or replace DOM nodes after the initial response. Attributes and properties can change too. The current DOM is the structure automation interacts with at that moment.
+
+![Initial HTML becomes a live DOM that JavaScript can update, while the framework component tree and rendered UI remain distinct representations.](/images/tutorials/live-dom-model.png)
+
+Within the tree:
+
+| Relationship | Meaning                                       |
+| ------------ | --------------------------------------------- |
+| Parent       | The direct element containing another element |
+| Child        | An element directly inside another element    |
+| Ancestor     | Any containing element higher in the tree     |
+| Descendant   | Any nested element lower in the tree          |
+| Sibling      | Elements with the same parent                 |
+
+![A cart DOM tree uses the product row as meaningful context, then changes after one product is removed.](/images/tutorials/live-dom-context.svg)
+
+_The useful path is “the Remove button inside the Mechanical Keyboard row,” not every wrapper between the page root and the button._
+
+Two rules keep this mental model practical:
+
+1. **Scope by meaning.** Use a product row, dialog, navigation region, or other recognizable container as context.
+2. **Observe transitions.** Describe what exists before an action and what should exist afterward.
+
+## Work through a realistic example
+
+Consider this simplified cart:
 
 ```html
-<form id="login-form">
-  <input type="text" name="username">
-</form>
-```
-
-In this example:
-
-* The `<form>` is the **Parent**.
-* The `<input>` is the **Child**.
-
-> [!TIP]
-> **Why this matters for QA:** Sometimes, a "Login" button doesn't have a unique ID, but the "Login Form" does. You can tell your automation script: "Go to the Login Form (Parent) and find the button (Child) inside it."
-
----
-
-## 3. Siblings: Living on the Same Level
-
-Elements that share the same immediate Parent are called **Siblings**. They live at the same "level" in the hierarchy.
-
-**Example Code:**
-
-```html
-<ul>
-  <li>Home</li>
-  <li>About</li>
-  <li>Contact</li>
+<ul aria-label="Cart items">
+  <li>
+    <h2>Mechanical Keyboard</h2>
+    <p>Quantity: 1</p>
+    <button>Remove</button>
+  </li>
+  <li>
+    <h2>Wireless Mouse</h2>
+    <p>Quantity: 1</p>
+    <button>Remove</button>
+  </li>
 </ul>
 ```
 
-In this example, all three `<li>` tags are **Siblings** because they all live inside the same `<ul>` parent.
+The two `<li>` elements are siblings. Inside each product row, the heading, quantity, and “Remove” button are descendants of that row.
 
-> [!TIP]
-> **Why this matters for QA:** You will often use sibling relationships when you need to find an element based on its neighbor. For example: "Find the label that says 'Email,' then find the input field immediately after it."
+Because two buttons share the name “Remove,” the button name alone is not enough. The product row supplies the additional context automation needs to choose the correct button.
 
----
+Before writing a locator or code, define the testing intent:
 
-## 4. Understanding Nesting and Indentation
-
-![Indentation Guide](/images/tutorials/dom-indentation-guide.png)
-
-In well-written code, you will notice that children are "pushed" to the right (indented). This helps us visually identify the hierarchy at a glance.
-
-* **Indented code:** Usually indicates a child relationship to the line above it.
-* **Aligned code:** Indicates elements are siblings of each other.
-
-**Example of "Flat" vs. "Nested" view:**
-
-```html
-<!-- Hard to read -->
-<div><form><label>Name</label><input></form></div>
-
-<!-- Easy to read -->
-<div>
-  <form>
-    <label>Name</label>
-    <input>
-  </form>
-</div>
+```text
+Before: the cart contains Mechanical Keyboard and Wireless Mouse
+Action: remove Mechanical Keyboard
+After: the keyboard row is absent and the mouse row remains
 ```
 
----
+Then a Playwright test can preserve that relationship:
 
-## The Reality Check: Visual Proximity vs. DOM Proximity
+```ts
+const keyboardRow = page
+  .getByRole('listitem')
+  .filter({ hasText: 'Mechanical Keyboard' });
 
-One common mistake for beginners is assuming that if two elements are near each other on the screen, they are siblings in the code.
+const mouseRow = page
+  .getByRole('listitem')
+  .filter({ hasText: 'Wireless Mouse' });
 
-**This is often false.** Developers use "Containers" (like `<div>` or `<span>`) to group things for styling. Two buttons might look like neighbors on your screen, but in the code, they might be in completely different "branches" of the tree.
+await keyboardRow.getByRole('button', { name: 'Remove' }).click();
 
-> [!IMPORTANT]
-> **The Rule:** Always trust the DOM tree structure in your DevTools over what you see on the UI.
+await expect(keyboardRow).toHaveCount(0);
+await expect(mouseRow).toHaveCount(1);
+```
 
----
+The important idea is not the exact syntax. The test first identifies the meaningful container, then finds the action inside it, then observes the transition.
 
-## Summary Checklist
+Playwright locators also resolve against the current DOM when an action or assertion runs. If the framework re-renders the row between operations, the locator looks for the current matching element. This is safer than treating an old raw element reference as if the page never changes.
 
-To master the DOM tree, you should be able to:
+### Dynamic states are part of the tree
 
-1. Identify the **Parent** of any given element.
-2. Identify if two elements are **Siblings** (sharing the same parent).
-3. Use **Indentation** to quickly spot which elements are nested inside others.
+The same screen may move through several states:
 
----
+```text
+loading → populated → updating → populated
+                    ↘ error
+```
 
-## 6. Further Reading (Deep Dive)
+Useful states include:
 
-Explore the official definitions of the DOM layout.
+- loading, empty, error, and populated content;
+- enabled, disabled, checked, selected, or expanded controls;
+- dialogs, menus, and overlays that attach later;
+- rows added, removed, or reordered after data changes.
 
-### Official Documentation (MDN)
+A test should prove the state relevant to the user. An internal component name or an arbitrary CSS class is rarely enough evidence.
 
-* **[Introduction to the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction)**: A high-level overview of what the DOM really is.
-* **[Traversing the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Node)**: Detailed documentation on concepts like `parentNode`, `childNodes`, and `nextSibling`.
+## When to use it—and when not to
+
+Use DOM hierarchy as meaningful context when a page has repeated cards, rows, list items, sections, dialogs, or controls with the same name.
+
+Do not encode every wrapper in a long CSS or XPath path. Layout containers are often added during redesigns, even when the user behavior stays the same. A hierarchy is useful only when the container itself explains product meaning.
+
+Browser APIs such as `parentElement`, `children`, and `querySelectorAll` are valuable for learning and DevTools inspection. In a Playwright test, prefer locators and filters that preserve user-facing meaning. Raw traversal is an investigation technique, not the default test architecture.
+
+Index-based choices such as `first()` or `nth(0)` are appropriate only when order itself is part of the requirement. They are not a safe shortcut for an ambiguous target.
+
+## When it fails
+
+Suppose this action fails because it matches two elements:
+
+```ts
+await page.getByRole('button', { name: 'Remove' }).click();
+```
+
+This means the locator is not specific enough. The test has not provided enough context to identify which “Remove” button it should choose.
+
+Investigate in this order:
+
+1. How many matching buttons exist in the live page?
+2. Which product, row, dialog, or region owns the intended button?
+3. Does that container have a stable user-facing identity?
+4. Is the UI still loading or replacing rows while the test runs?
+5. What before-and-after state would prove the correct row changed?
+
+A tempting workaround is:
+
+```ts
+await page.getByRole('button', { name: 'Remove' }).first().click();
+```
+
+That hides ambiguity. If the cart order changes, the test may remove the wrong product and still continue.
+
+Add the context that distinguishes the intended target instead. For example, find the “Mechanical Keyboard” product row first, then find the “Remove” button inside that row.
+
+Another weak workaround is a long selector such as `#app > div > ul > li:nth-child(1) > button`. It records the current layout, not the product relationship.
+
+Before accepting a locator repair, review it for these warning signs:
+
+- a global locator for a repeated control;
+- `first()` or `nth()` with no order requirement;
+- a full CSS or XPath path through layout wrappers;
+- a raw element reference kept across an update;
+- an assertion that checks a class instead of the user-visible state; or
+- a click with no before-and-after evidence.
+
+You should be able to state the intended container, the ambiguity being resolved, and the expected state transition before accepting the code.
+
+## Check your understanding
+
+An order-history page contains one row per order. Every row has a “Review” button. Clicking it opens a dialog for that order.
+
+You need to review order `A104`. Explain:
+
+1. Which container should provide context?
+2. Which action belongs inside that context?
+3. What should be true before and after the action?
+4. Why would choosing the first “Review” button be risky?
+5. What would you inspect if the correct dialog does not open?
+
+## Compare your reasoning
+
+One reasonable answer is:
+
+- Use the row whose visible order identity is `A104` as the meaningful container.
+- Find the “Review” button inside that row rather than searching for a global button.
+- Before the action, row `A104` should exist and its review dialog should not be open. After the action, a dialog identifying order `A104` should be visible.
+- The first row can change when orders are sorted, filtered, or newly inserted, so position does not prove identity.
+- If the wrong dialog opens, inspect the live rows, the row's accessible identity, the number of matching controls, and whether the application replaced or reordered nodes during the action.
+
+Another approach may be valid if the product provides a different stable identity, but the action and evidence should still remain tied to the same order.
+
+## Before you continue
+
+You should now be able to describe where a control lives, why that context is meaningful, and how the live DOM should change after an interaction—without relying on position or a full wrapper path.
+
+In the next lesson, you will use DevTools and Playwright's investigation tools to collect that evidence from a real page before choosing test code.

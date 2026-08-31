@@ -32,7 +32,10 @@ describe('transformChallengeResponse', () => {
     } satisfies ServerChallengeData;
 
     it('should transform server response to challenge shape', () => {
-        const result = transformChallengeResponse(mockServerData, mockServerData.testCases);
+        const result = transformChallengeResponse(
+            mockServerData,
+            mockServerData.testCases,
+        );
 
         expect(result).not.toBeNull();
         expect(result!.id).toBe('1');
@@ -103,12 +106,18 @@ describe('transformChallengeResponse', () => {
                 usedHint: false,
             },
         };
-        const result = transformChallengeResponse(data, mockServerData.testCases);
+        const result = transformChallengeResponse(
+            data,
+            mockServerData.testCases,
+        );
         expect(result!.isCompleted).toBe(true);
     });
 
     it('should transform testCases to expected shape', () => {
-        const result = transformChallengeResponse(mockServerData, mockServerData.testCases);
+        const result = transformChallengeResponse(
+            mockServerData,
+            mockServerData.testCases,
+        );
         expect(result!.testCases).toHaveLength(1);
         expect(result!.testCases[0]).toEqual({
             id: 'tc1',
@@ -127,18 +136,41 @@ describe('transformChallengeResponse', () => {
             tutorial: { slug: 'tutorial-1', title: 'Tutorial' },
             nextChallenge: { slug: 'next', title: 'Next' },
             prevChallenge: { slug: 'prev', title: 'Prev' },
+            expectedState: [{ selector: '#status', containsText: 'Saved' }],
+            validation: {
+                requiredAssertions: ['toHaveText'],
+                forbiddenMethods: ['waitForTimeout'],
+                policy: { requireExecutedEvidence: true },
+            },
         };
-        const result = transformChallengeResponse(data, mockServerData.testCases);
+        const result = transformChallengeResponse(
+            data,
+            mockServerData.testCases,
+        );
         expect(result!.htmlContent).toBe('<div>test</div>');
         expect(result!.files).toEqual({ 'index.js': 'console.log(1)' });
         expect(result!.editableFiles).toEqual(['index.js']);
-        expect(result!.tutorial).toEqual({ slug: 'tutorial-1', title: 'Tutorial' });
+        expect(result!.tutorial).toEqual({
+            slug: 'tutorial-1',
+            title: 'Tutorial',
+        });
         expect(result!.nextChallenge).toEqual({ slug: 'next', title: 'Next' });
         expect(result!.prevChallenge).toEqual({ slug: 'prev', title: 'Prev' });
+        expect(result!.expectedState).toEqual([
+            { selector: '#status', containsText: 'Saved' },
+        ]);
+        expect(result!.validation).toEqual({
+            requiredAssertions: ['toHaveText'],
+            forbiddenMethods: ['waitForTimeout'],
+            policy: { requireExecutedEvidence: true },
+        });
     });
 
     it('omits optional fields when the server response does not provide them', () => {
-        const result = transformChallengeResponse(mockServerData, mockServerData.testCases);
+        const result = transformChallengeResponse(
+            mockServerData,
+            mockServerData.testCases,
+        );
 
         expect(result).not.toBeNull();
         if (!result) throw new Error('Expected a transformed challenge');
@@ -149,5 +181,7 @@ describe('transformChallengeResponse', () => {
         expect('tutorial' in result).toBe(false);
         expect('nextChallenge' in result).toBe(false);
         expect('prevChallenge' in result).toBe(false);
+        expect('expectedState' in result).toBe(false);
+        expect('validation' in result).toBe(false);
     });
 });
