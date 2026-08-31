@@ -73,13 +73,38 @@
           "Setelah click, gunakan status role dan text assertion untuk membuktikan hasilnya."
         ]
       },
-      "htmlContent": "<div class=\"signup\">\n  <h1>Join Us</h1>\n  <button onclick=\"document.getElementById('result').textContent = 'Signed up!'\">Sign Up</button>\n  <div id=\"result\" role=\"status\"></div>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('sign up through the user-facing control', async ({ page }) => {\n  // 1. Find Sign Up by role and accessible name\n  // 2. Click it\n  // 3. Assert the status role has exact text 'Signed up!'\n});",
+      "htmlContent": "<div class=\"signup\">\n  <h1>Join Us</h1>\n  <button type=\"button\" onclick=\"document.getElementById('result').textContent = 'Signed up!'\">Sign Up</button>\n  <button type=\"button\">Learn More</button>\n  <div id=\"result\" role=\"status\"></div>\n</div>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
       "solution": "await page.getByRole('button', { name: 'Sign Up' }).click();\nawait expect(page.getByRole('status')).toHaveText('Signed up!');",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["getByRole", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Sign Up"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByRole",
+              "value": "status"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "accessibility", "intermediate"]
     },
@@ -114,13 +139,29 @@
           "Kirim locator ke `expect(...).toBeVisible()`."
         ]
       },
-      "htmlContent": "<section aria-label=\"Order result\">\n  <h2>Order complete</h2>\n  <p>Confirmation number: ORD-104</p>\n</section>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('inspect the visible order result', async ({ page }) => {\n  // 1. Locate exact text 'Order complete'\n  // 2. Assert it is visible\n});",
+      "htmlContent": "<section aria-label=\"Order result\">\n  <h2>Order complete</h2>\n  <p>Order complete details are available.</p>\n  <p>Confirmation number: ORD-104</p>\n</section>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
       "solution": "await expect(page.getByText('Order complete', { exact: true })).toBeVisible();",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["getByText"]
+        "requiredMethods": ["getByText"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "locator": {
+              "method": "getByText",
+              "value": "Order complete",
+              "exact": true
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "text", "intermediate"]
     },
@@ -140,28 +181,63 @@
         "id": "Isi form control lewat associated label lalu verifikasi value yang dimasukkan."
       },
       "instructions": {
-        "en": "# Locate Fields by Their Label Contract\n\nA labelled field can be located through the relationship between the visible label and its control. This should survive a generated ID change while still exposing a broken label association.\n\n## Your task\n1. Fill the field labelled `Username` with `testuser`.\n2. Fill the field labelled `Password` with any non-empty practice value.\n3. Assert the Username field has value `testuser` with `toHaveValue`.\n\nThis exercise uses controlled data. Do not put real credentials in challenge code or reports.",
-        "id": "# Temukan Field dari Kontrak Label\n\nLabelled field bisa ditemukan lewat relationship antara visible label dan control-nya. Kontrak ini seharusnya bertahan saat generated ID berubah, tapi tetap menunjukkan label association yang rusak.\n\n## Tugas kamu\n1. Isi field berlabel `Username` dengan `testuser`.\n2. Isi field berlabel `Password` dengan practice value apa pun yang tidak kosong.\n3. Assert Username field memiliki value `testuser` dengan `toHaveValue`.\n\nLatihan ini memakai controlled data. Jangan memasukkan credential sungguhan ke challenge code atau report."
+        "en": "# Locate Fields by Their Label Contract\n\nA labelled field can be located through the relationship between the visible label and its control. This should survive a generated ID change while still exposing a broken label association.\n\n## Your task\n1. Fill the field labelled `Username` with `testuser`.\n2. Fill the field labelled `Password` with the controlled value `practice-pass`.\n3. Assert the Username field has value `testuser` with `toHaveValue`.\n\nThis exercise uses controlled data. Do not put real credentials in challenge code or reports.",
+        "id": "# Temukan Field dari Kontrak Label\n\nLabelled field bisa ditemukan lewat relationship antara visible label dan control-nya. Kontrak ini seharusnya bertahan saat generated ID berubah, tapi tetap menunjukkan label association yang rusak.\n\n## Tugas kamu\n1. Isi field berlabel `Username` dengan `testuser`.\n2. Isi field berlabel `Password` dengan controlled value `practice-pass`.\n3. Assert Username field memiliki value `testuser` dengan `toHaveValue`.\n\nLatihan ini memakai controlled data. Jangan memasukkan credential sungguhan ke challenge code atau report."
       },
       "hints": {
         "en": [
           "Use the associated visible label rather than the generated input ID.",
-          "Call `getByLabel(...).fill(...)` for both controlled fields.",
+          "Call `getByLabel(...).fill(...)` with the requested value for both controlled fields.",
           "Use `toHaveValue('testuser')` on the Username locator for the evidence."
         ],
         "id": [
           "Gunakan associated visible label, bukan generated input ID.",
-          "Panggil `getByLabel(...).fill(...)` untuk kedua controlled field.",
+          "Panggil `getByLabel(...).fill(...)` dengan value yang diminta untuk kedua controlled field.",
           "Gunakan `toHaveValue('testuser')` pada Username locator sebagai buktinya."
         ]
       },
       "htmlContent": "<form>\n  <label for=\"user\">Username</label>\n  <input type=\"text\" id=\"user\" />\n  \n  <label for=\"pass\">Password</label>\n  <input type=\"password\" id=\"pass\" />\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill fields by their labels', async ({ page }) => {\n  // 1. Fill 'Username' with 'testuser'\n  // 2. Fill 'Password' with a non-empty practice value\n  // 3. Assert the Username-labelled field has value 'testuser'\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Username').fill('testuser');\nawait page.getByLabel('Password').fill('secret123');\nawait expect(page.getByLabel('Username')).toHaveValue('testuser');",
+      "solution": "await page.getByLabel('Username').fill('testuser');\nawait page.getByLabel('Password').fill('practice-pass');\nawait expect(page.getByLabel('Username')).toHaveValue('testuser');",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["getByLabel", "fill"]
+        "requiredMethods": ["getByLabel", "fill"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["testuser"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Username"
+            }
+          },
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["practice-pass"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Password"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Username"
+            }
+          }
+        ]
       },
       "tags": [
         "playwright",
@@ -239,13 +315,38 @@
           "Gunakan `toHaveText('1')` pada test-ID locator sebagai hasil."
         ]
       },
-      "htmlContent": "<div class=\"product\">\n  <h3>Widget Pro</h3>\n  <button onclick=\"document.getElementById('cart-count').textContent = '1'\">Add to Cart</button>\n  <span id=\"cart-count\" data-testid=\"cart-count\">0</span>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('use an explicit test contract', async ({ page }) => {\n  // 1. Click Add to Cart by role\n  // 2. Locate testid='cart-count'\n  // 3. Assert the count is '1'\n});",
+      "htmlContent": "<div class=\"product\">\n  <h3>Widget Pro</h3>\n  <button type=\"button\" onclick=\"document.getElementById('cart-count').textContent = '1'\">Add to Cart</button>\n  <button type=\"button\">View Details</button>\n  <span id=\"cart-count\" data-testid=\"cart-count\">0</span>\n</div>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
       "solution": "await page.getByRole('button', { name: 'Add to Cart' }).click();\nawait expect(page.getByTestId('cart-count')).toHaveText('1');",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "getByTestId"]
+        "requiredMethods": ["getByRole", "getByTestId", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Add to Cart"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByTestId",
+              "value": "cart-count"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "testid", "intermediate"]
     },
