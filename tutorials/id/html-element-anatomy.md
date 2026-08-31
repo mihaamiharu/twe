@@ -205,7 +205,7 @@ Tanpa menulis test, coba jawab:
 
 ## Bandingkan dengan cara pikir ini
 
-Contoh Jawabam:
+Contoh jawaban:
 * Input tersebut adalah checkbox dengan accessible name **“Email alerts”** dan state awal `checked`.
 * Element yang hanya menampilkan icon adalah `button` dengan accessible name **“Remove Mechanical Keyboard”**. SVG-nya diberi `aria-hidden="true"` supaya nggak ikut terbaca sebagai bagian dari accessible name.
 * Label, fungsi button, nama produk, dan state `checked` adalah informasi yang relevan dari sisi user. Sementara `id` element dan struktur SVG lebih berkaitan dengan implementation.
