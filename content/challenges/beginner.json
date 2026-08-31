@@ -969,8 +969,8 @@
           "Kembalikan `order.id`; baris terakhir yang disediakan sudah menunggu async function buatanmu."
         ]
       },
-      "htmlContent": "<div class=\"async-setup\">\n  <h3>Controlled Order Setup</h3>\n  <p>Resolve setup data before the next test step uses it.</p>\n</div>",
-      "starterCode": "const createTestOrder = () =>\n    Promise.resolve({ id: \"ORD-104\", status: \"ready\" });\n\n// Create async function getPreparedOrderId.\n// Await createTestOrder(), then return the resolved order id.\n// Your code here\n\nconst result = await getPreparedOrderId();",
+      "htmlContent": "<div class=\"async-setup\">\n  <output>ORD-104</output>\n</div>",
+      "starterCode": "const createTestOrder = () =>\n    Promise.resolve({ id: \"ORD-104\", status: \"ready\" });\n\n// TODO\n\nconst result = await getPreparedOrderId();",
       "testCases": [
         {
           "description": "Returns the order id after awaiting controlled setup",
@@ -979,6 +979,14 @@
         }
       ],
       "solution": "const createTestOrder = () =>\n    Promise.resolve({ id: \"ORD-104\", status: \"ready\" });\n\nasync function getPreparedOrderId() {\n    const order = await createTestOrder();\n    return order.id;\n}\n\nconst result = await getPreparedOrderId();",
+      "validation": {
+        "requiredAsyncFunctions": ["getPreparedOrderId"],
+        "requiredAwaitedFunctionCalls": [
+          "createTestOrder",
+          "getPreparedOrderId"
+        ],
+        "requiredConstBindings": ["order", "result"]
+      },
       "tags": ["javascript", "async", "await", "test-setup", "core-practice"]
     },
     {
@@ -1012,8 +1020,8 @@
           "Return fallback persis `no-recommendations`; jangan mengabaikan error dari operasi wajib dengan cara ini."
         ]
       },
-      "htmlContent": "<div class=\"optional-recommendations\">\n  <h3>Optional Recommendations</h3>\n  <p>Use a fallback only because the scenario explicitly allows it.</p>\n</div>",
-      "starterCode": "const loadRecommendations = () =>\n    Promise.reject(new Error(\"Recommendation service unavailable\"));\n\n// Create async function recommendationStatus.\n// Return the operation result, or the documented optional fallback.\n// Your code here\n\nconst result = await recommendationStatus();",
+      "htmlContent": "<div class=\"optional-recommendations\">\n  <output>no-recommendations</output>\n</div>",
+      "starterCode": "const loadRecommendations = () =>\n    Promise.reject(new Error(\"Recommendation service unavailable\"));\n\n// TODO\n\nconst result = await recommendationStatus();",
       "testCases": [
         {
           "description": "Uses the documented fallback for an optional failure",
@@ -1022,6 +1030,15 @@
         }
       ],
       "solution": "const loadRecommendations = () =>\n    Promise.reject(new Error(\"Recommendation service unavailable\"));\n\nasync function recommendationStatus() {\n    try {\n        return await loadRecommendations();\n    } catch (error) {\n        return \"no-recommendations\";\n    }\n}\n\nconst result = await recommendationStatus();",
+      "validation": {
+        "requiredAsyncFunctions": ["recommendationStatus"],
+        "requiredAwaitedFunctionCalls": [
+          "loadRecommendations",
+          "recommendationStatus"
+        ],
+        "requiredConstBindings": ["result"],
+        "minimumTryCatchBlocks": 1
+      },
       "tags": ["javascript", "async", "error-handling", "beginner"]
     },
     {
@@ -1032,39 +1049,47 @@
       "xpReward": 50,
       "order": 2203,
       "title": {
-        "en": "Parallel Async Operations",
-        "id": "Operasi Asinkron Paralel"
+        "en": "Prepare Independent Test Fixtures",
+        "id": "Siapkan Test Fixture yang Independen"
       },
       "description": {
         "en": "Use Promise.all only after confirming asynchronous operations are independent.",
         "id": "Gunakan Promise.all hanya setelah memastikan operasi asynchronous memang independen."
       },
       "instructions": {
-        "en": "# Parallel Independent Operations\n\n## Why this matters\n`Promise.all()` starts several promises without awaiting each one first, then waits for all of them. This is appropriate only when the operations are independent and do not compete for the same mutable state.\n\n| Choice | Use when |\n|---|---|\n| Sequential awaits | A later operation needs an earlier value or state |\n| `Promise.all()` | Every operation can start safely without another result |\n\n`Promise.all()` rejects when any included promise rejects. It does not make dependent work safe and it does not guarantee a specific percentage improvement.\n\n## Your task\nThe provided `getA()`, `getB()`, and `getC()` helpers are explicitly independent:\n1. Start them together with `Promise.all()`.\n2. Await and destructure the three values.\n3. Add the values.\n4. Store the sum in `result`.",
-        "id": "# Operasi Independen secara Parallel\n\n## Kenapa ini penting\n`Promise.all()` memulai beberapa promise tanpa menunggu satu per satu, lalu menunggu semuanya selesai. Cara ini hanya cocok kalau operasinya independen dan tidak berebut mutable state yang sama.\n\n| Pilihan | Gunakan saat |\n|---|---|\n| Await secara sequential | Operasi berikutnya membutuhkan value atau state sebelumnya |\n| `Promise.all()` | Semua operasi aman dimulai tanpa hasil dari operasi lain |\n\n`Promise.all()` akan reject saat salah satu promise reject. Ia tidak membuat pekerjaan yang saling bergantung menjadi aman dan tidak menjamin persentase peningkatan tertentu.\n\n## Tugas kamu\nHelper `getA()`, `getB()`, dan `getC()` yang disediakan memang dibuat independen:\n1. Mulai semuanya dengan `Promise.all()`.\n2. Await dan destructure tiga value tersebut.\n3. Jumlahkan semua value.\n4. Simpan hasilnya ke `result`."
+        "en": "# Prepare Independent Test Fixtures\n\n## Why this matters\nCalling independent promise-producing helpers in one `Promise.all()` expression lets their operations remain in progress together, then waits for all of them. This is appropriate only when the operations are independent and do not compete for the same mutable state.\n\n| Choice | Use when |\n|---|---|\n| Sequential awaits | A later operation needs an earlier value or state |\n| `Promise.all()` | Every operation can start safely without another result |\n\n`Promise.all()` rejects when any included promise rejects. It does not make dependent work safe and it does not guarantee a specific percentage improvement.\n\n## Your task\nThe provided `loadTestAccount()` and `loadProductFixture()` helpers are controlled, independent setup operations:\n1. Call both helpers inside one `Promise.all()` expression.\n2. Await and destructure the account and product values.\n3. Declare `const result` with the exact string `qa@example.com | KB-104` by combining the account email and product SKU.\n\nThis pattern is not appropriate when one setup operation needs data or state produced by the other.",
+        "id": "# Siapkan Test Fixture yang Independen\n\n## Kenapa ini penting\nMemanggil helper yang menghasilkan promise dan saling independen dalam satu expression `Promise.all()` membuat operasinya bisa berjalan bersamaan, lalu menunggu semuanya selesai. Cara ini hanya cocok kalau operasinya independen dan tidak berebut mutable state yang sama.\n\n| Pilihan | Gunakan saat |\n|---|---|\n| Await secara berurutan | Operasi berikutnya membutuhkan value atau state sebelumnya |\n| `Promise.all()` | Semua operasi aman dimulai tanpa hasil dari operasi lain |\n\n`Promise.all()` akan reject saat salah satu promise reject. Method ini tidak membuat pekerjaan yang saling bergantung menjadi aman dan tidak menjamin persentase peningkatan tertentu.\n\n## Tugas kamu\nHelper `loadTestAccount()` dan `loadProductFixture()` yang disediakan adalah controlled setup operation yang independen:\n1. Panggil kedua helper dalam satu expression `Promise.all()`.\n2. Await dan destructure value account dan product.\n3. Declare `const result` dengan string persis `qa@example.com | KB-104` dengan menggabungkan email account dan SKU product.\n\nPola ini tidak cocok kalau salah satu setup operation membutuhkan data atau state yang dihasilkan oleh operasi lainnya."
       },
       "hints": {
         "en": [
-          "Think about running multiple independent tasks at the exact same time instead of waiting for each one.",
-          "Pass an array of your task calls into Promise.all() to trigger them all together.",
-          "Use destructuring like 'const [a, b, c] = await Promise.all(...)' to access the results efficiently."
+          "Pass both helper calls in one array to `Promise.all()`.",
+          "Use `const [account, product] = await Promise.all(...)` to name the resolved values.",
+          "Build `result` from `account.email` and `product.sku` after both promises resolve."
         ],
         "id": [
-          "Pikirkan tentang menjalankan beberapa tugas independen pada waktu yang sama daripada menunggu satu per satu.",
-          "Masukkan array dari panggilan tugas Kamu ke dalam Promise.all() untuk memicu semuanya bersamaan.",
-          "Gunakan destrukturisasi seperti 'const [a, b, c] = await Promise.all(...)' untuk mengakses hasilnya secara efisien."
+          "Masukkan kedua helper call dalam satu array ke `Promise.all()`.",
+          "Gunakan `const [account, product] = await Promise.all(...)` untuk memberi nama pada resolved value.",
+          "Susun `result` dari `account.email` dan `product.sku` setelah kedua promise selesai."
         ]
       },
-      "htmlContent": "<div class=\"parallel-demo\">\n  <h3>Parallel Execution</h3>\n</div>",
-      "starterCode": "// Helpers: return promises resolving to numbers\nconst getA = () => Promise.resolve(10);\nconst getB = () => Promise.resolve(20);\nconst getC = () => Promise.resolve(12);\n\n// Run all in parallel, destructure results, and assign their sum to 'result'\n// Your code here\n",
+      "htmlContent": "<div class=\"parallel-setup\">\n  <output>qa@example.com · KB-104</output>\n</div>",
+      "starterCode": "const loadTestAccount = () =>\n    Promise.resolve({ email: \"qa@example.com\" });\nconst loadProductFixture = () =>\n    Promise.resolve({ sku: \"KB-104\", status: \"ready\" });\n\n// TODO\n",
       "testCases": [
         {
-          "description": "Returns the expected output",
-          "expectedOutput": "42",
+          "description": "Combines independently prepared test fixtures",
+          "expectedOutput": "qa@example.com | KB-104",
           "isHidden": false
         }
       ],
-      "solution": "const getA = () => Promise.resolve(10);\nconst getB = () => Promise.resolve(20);\nconst getC = () => Promise.resolve(12);\nconst [a, b, c] = await Promise.all([getA(), getB(), getC()]);\nconst result = a + b + c;",
+      "solution": "const loadTestAccount = () =>\n    Promise.resolve({ email: \"qa@example.com\" });\nconst loadProductFixture = () =>\n    Promise.resolve({ sku: \"KB-104\", status: \"ready\" });\n\nconst [account, product] = await Promise.all([\n    loadTestAccount(),\n    loadProductFixture(),\n]);\nconst result = `${account.email} | ${product.sku}`;",
+      "validation": {
+        "requiredAwaitedMemberCalls": ["Promise.all"],
+        "requiredPromiseAllFunctionCalls": [
+          "loadTestAccount",
+          "loadProductFixture"
+        ],
+        "requiredConstBindings": ["result"]
+      },
       "tags": ["javascript", "async", "parallel", "promise-all", "beginner"]
     },
     {
