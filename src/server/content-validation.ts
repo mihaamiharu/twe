@@ -129,8 +129,13 @@ const ChallengeValidationSchema = z
     requiredMethods: z.array(z.string().min(1)).optional(),
     requiredFunctionCalls: z.array(z.string().min(1)).optional(),
     requiredMemberCalls: z.array(z.string().min(1)).optional(),
+    requiredAsyncFunctions: z.array(z.string().min(1)).optional(),
+    requiredAwaitedFunctionCalls: z.array(z.string().min(1)).optional(),
+    requiredAwaitedMemberCalls: z.array(z.string().min(1)).optional(),
+    requiredPromiseAllFunctionCalls: z.array(z.string().min(1)).optional(),
     requiredConstBindings: z.array(z.string().min(1)).optional(),
     minimumConditionalBranches: z.number().int().positive().optional(),
+    minimumTryCatchBlocks: z.number().int().positive().optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
     policy: ChallengeValidationPolicySchema.optional(),
     requiredEvidenceSequence: z
@@ -369,10 +374,20 @@ function normalizeChallengeDefinition(
                 requiredFunctionCalls:
                   value.validation.requiredFunctionCalls,
                 requiredMemberCalls: value.validation.requiredMemberCalls,
+                requiredAsyncFunctions:
+                  value.validation.requiredAsyncFunctions,
+                requiredAwaitedFunctionCalls:
+                  value.validation.requiredAwaitedFunctionCalls,
+                requiredAwaitedMemberCalls:
+                  value.validation.requiredAwaitedMemberCalls,
+                requiredPromiseAllFunctionCalls:
+                  value.validation.requiredPromiseAllFunctionCalls,
                 requiredConstBindings:
                   value.validation.requiredConstBindings,
                 minimumConditionalBranches:
                   value.validation.minimumConditionalBranches,
+                minimumTryCatchBlocks:
+                  value.validation.minimumTryCatchBlocks,
                 forbiddenMethods: value.validation.forbiddenMethods,
                 requiredEvidenceSequence: normalizeRequiredEvidenceSequence(
                   value.validation.requiredEvidenceSequence,

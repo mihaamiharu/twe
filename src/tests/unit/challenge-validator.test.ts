@@ -307,4 +307,64 @@ describe('challenge execution validator', () => {
       },
     });
   });
+
+  it('requires configured asynchronous source evidence', () => {
+    const validation = {
+      requiredAsyncFunctions: ['prepareFixture'],
+      requiredAwaitedFunctionCalls: ['loadFixture', 'prepareFixture'],
+      requiredAwaitedMemberCalls: ['Promise.all'],
+      requiredPromiseAllFunctionCalls: ['prepareFixture', 'loadAccount'],
+      minimumTryCatchBlocks: 1,
+    };
+    const sourceAnalysis = {
+      calledMethods: [],
+      asyncFunctions: ['prepareFixture'],
+      awaitedFunctionCalls: ['loadFixture', 'prepareFixture'],
+      awaitedMemberCalls: ['Promise.all'],
+      awaitedPromiseAllFunctionCalls: ['prepareFixture', 'loadAccount'],
+      tryCatchCount: 1,
+      forbiddenMethods: [],
+      structuralLocatorCalls: 0,
+      forcedActions: [],
+      directDomAccesses: [],
+      swallowedErrorCount: 1,
+      strictViolations: [],
+    };
+
+    expect(
+      validateChallengeExecution(
+        passedExecution({ sourceAnalysis }),
+        validation,
+      ),
+    ).toEqual({ passed: true });
+    expect(
+      validateChallengeExecution(
+        passedExecution({
+          sourceAnalysis: {
+            ...sourceAnalysis,
+            asyncFunctions: [],
+            awaitedFunctionCalls: [],
+            awaitedMemberCalls: [],
+            awaitedPromiseAllFunctionCalls: [],
+            tryCatchCount: 0,
+          },
+        }),
+        validation,
+      ),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: [
+          'async function prepareFixture',
+          'await loadFixture()',
+          'await prepareFixture()',
+          'await Promise.all()',
+          'prepareFixture() inside awaited Promise.all()',
+          'loadAccount() inside awaited Promise.all()',
+          'try/catch (1)',
+        ],
+      },
+    });
+  });
 });

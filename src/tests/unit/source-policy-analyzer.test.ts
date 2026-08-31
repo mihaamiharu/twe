@@ -148,6 +148,43 @@ describe('source policy analyzer', () => {
     expect(analysis.conditionalBranchCount).toBe(3);
   });
 
+  it('records async functions, awaited calls, and try/catch evidence', async () => {
+    const analysis = await analyzeSourcePolicy(`
+      const loadFixture = () => Promise.resolve({ id: 'FIX-1' });
+      const loadAccount = () => Promise.resolve({ email: 'qa@example.com' });
+
+      async function prepareFixture() {
+        try {
+          return await loadFixture();
+        } catch (error) {
+          return { id: 'fallback' };
+        }
+      }
+
+      const runSetup = async () => {
+        const [fixture, account] = await Promise.all([
+          prepareFixture(),
+          loadAccount(),
+        ]);
+        return { fixture, account };
+      };
+
+      const result = await runSetup();
+    `);
+
+    expect(analysis.asyncFunctions).toEqual(['prepareFixture', 'runSetup']);
+    expect(analysis.awaitedFunctionCalls).toEqual([
+      'loadFixture',
+      'runSetup',
+    ]);
+    expect(analysis.awaitedMemberCalls).toEqual(['Promise.all']);
+    expect(analysis.awaitedPromiseAllFunctionCalls).toEqual([
+      'prepareFixture',
+      'loadAccount',
+    ]);
+    expect(analysis.tryCatchCount).toBe(1);
+  });
+
   it('finds direct DOM access and swallowed catch blocks as source findings', async () => {
     const analysis = await analyzeSourcePolicy(
       `

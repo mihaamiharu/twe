@@ -201,10 +201,20 @@ export interface ChallengeValidationDefinition {
   requiredFunctionCalls?: string[];
   /** Require named member calls such as Array.prototype.filter. */
   requiredMemberCalls?: string[];
+  /** Require named functions to be declared with async. */
+  requiredAsyncFunctions?: string[];
+  /** Require named free-function calls to be directly awaited. */
+  requiredAwaitedFunctionCalls?: string[];
+  /** Require named member calls such as Promise.all to be directly awaited. */
+  requiredAwaitedMemberCalls?: string[];
+  /** Require these free-function calls inside a directly awaited Promise.all. */
+  requiredPromiseAllFunctionCalls?: string[];
   /** Require these learner bindings to be declared with const. */
   requiredConstBindings?: string[];
   /** Require at least one conditional chain with this many branches. */
   minimumConditionalBranches?: number;
+  /** Require at least this many try/catch structures. */
+  minimumTryCatchBlocks?: number;
   forbiddenMethods?: string[];
   policy?: ChallengeValidationPolicy;
   interactionSequence?: InteractionSequenceDefinition;

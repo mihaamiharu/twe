@@ -241,6 +241,12 @@ export function validateChallengeExecution(
   );
   const calledFunctions = new Set(source?.calledFunctions ?? []);
   const memberCalls = new Set(source?.memberCalls ?? []);
+  const asyncFunctions = new Set(source?.asyncFunctions ?? []);
+  const awaitedFunctionCalls = new Set(source?.awaitedFunctionCalls ?? []);
+  const awaitedMemberCalls = new Set(source?.awaitedMemberCalls ?? []);
+  const awaitedPromiseAllFunctionCalls = new Set(
+    source?.awaitedPromiseAllFunctionCalls ?? [],
+  );
   const constBindings = new Set(source?.constBindings ?? []);
   const missingFunctionCalls = (validation.requiredFunctionCalls ?? [])
     .filter((name) => !calledFunctions.has(name))
@@ -248,6 +254,24 @@ export function validateChallengeExecution(
   const missingMemberCalls = (validation.requiredMemberCalls ?? [])
     .filter((name) => !memberCalls.has(name))
     .map((name) => `.${name}()`);
+  const missingAsyncFunctions = (validation.requiredAsyncFunctions ?? [])
+    .filter((name) => !asyncFunctions.has(name))
+    .map((name) => `async function ${name}`);
+  const missingAwaitedFunctionCalls = (
+    validation.requiredAwaitedFunctionCalls ?? []
+  )
+    .filter((name) => !awaitedFunctionCalls.has(name))
+    .map((name) => `await ${name}()`);
+  const missingAwaitedMemberCalls = (
+    validation.requiredAwaitedMemberCalls ?? []
+  )
+    .filter((name) => !awaitedMemberCalls.has(name))
+    .map((name) => `await ${name}()`);
+  const missingPromiseAllFunctionCalls = (
+    validation.requiredPromiseAllFunctionCalls ?? []
+  )
+    .filter((name) => !awaitedPromiseAllFunctionCalls.has(name))
+    .map((name) => `${name}() inside awaited Promise.all()`);
   const missingConstBindings = (validation.requiredConstBindings ?? [])
     .filter((name) => !constBindings.has(name))
     .map((name) => `const ${name}`);
@@ -256,6 +280,11 @@ export function validateChallengeExecution(
   const missingConditionalEvidence =
     (source?.conditionalBranchCount ?? 0) < minimumConditionalBranches
       ? [`if/else (${minimumConditionalBranches} branches)`]
+      : [];
+  const minimumTryCatchBlocks = validation.minimumTryCatchBlocks ?? 0;
+  const missingTryCatchEvidence =
+    (source?.tryCatchCount ?? 0) < minimumTryCatchBlocks
+      ? [`try/catch (${minimumTryCatchBlocks})`]
       : [];
   const missingSequenceSteps = findMissingEvidenceSequenceSteps(
     trace?.events,
@@ -266,8 +295,13 @@ export function validateChallengeExecution(
     missingMethods.length > 0 ||
     missingFunctionCalls.length > 0 ||
     missingMemberCalls.length > 0 ||
+    missingAsyncFunctions.length > 0 ||
+    missingAwaitedFunctionCalls.length > 0 ||
+    missingAwaitedMemberCalls.length > 0 ||
+    missingPromiseAllFunctionCalls.length > 0 ||
     missingConstBindings.length > 0 ||
     missingConditionalEvidence.length > 0 ||
+    missingTryCatchEvidence.length > 0 ||
     missingSequenceSteps.length > 0
   ) {
     return {
@@ -280,8 +314,13 @@ export function validateChallengeExecution(
             ...missingMethods,
             ...missingFunctionCalls,
             ...missingMemberCalls,
+            ...missingAsyncFunctions,
+            ...missingAwaitedFunctionCalls,
+            ...missingAwaitedMemberCalls,
+            ...missingPromiseAllFunctionCalls,
             ...missingConstBindings,
             ...missingConditionalEvidence,
+            ...missingTryCatchEvidence,
             ...missingSequenceSteps,
           ]),
         ],

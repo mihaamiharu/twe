@@ -13,8 +13,13 @@ export interface SourcePolicyAnalysis {
   calledMethods: string[];
   calledFunctions?: string[];
   memberCalls?: string[];
+  asyncFunctions?: string[];
+  awaitedFunctionCalls?: string[];
+  awaitedMemberCalls?: string[];
+  awaitedPromiseAllFunctionCalls?: string[];
   constBindings?: string[];
   conditionalBranchCount?: number;
+  tryCatchCount?: number;
   forbiddenMethods: string[];
   structuralLocatorCalls: number;
   forcedActions: Array<{ method: string; value: unknown; line: number }>;
@@ -40,6 +45,9 @@ interface TypeScriptModule {
   isConditionalExpression: typeof import('typescript')['isConditionalExpression'];
   isComputedPropertyName: typeof import('typescript')['isComputedPropertyName'];
   isElementAccessExpression: typeof import('typescript')['isElementAccessExpression'];
+  isArrowFunction: typeof import('typescript')['isArrowFunction'];
+  isFunctionDeclaration: typeof import('typescript')['isFunctionDeclaration'];
+  isFunctionExpression: typeof import('typescript')['isFunctionExpression'];
   isIdentifier: typeof import('typescript')['isIdentifier'];
   isNumericLiteral: typeof import('typescript')['isNumericLiteral'];
   isObjectBindingPattern: typeof import('typescript')['isObjectBindingPattern'];
@@ -79,8 +87,13 @@ const EMPTY_ANALYSIS: SourcePolicyAnalysis = {
   calledMethods: [],
   calledFunctions: [],
   memberCalls: [],
+  asyncFunctions: [],
+  awaitedFunctionCalls: [],
+  awaitedMemberCalls: [],
+  awaitedPromiseAllFunctionCalls: [],
   constBindings: [],
   conditionalBranchCount: 0,
+  tryCatchCount: 0,
   forbiddenMethods: [],
   structuralLocatorCalls: 0,
   forcedActions: [],
@@ -160,6 +173,10 @@ function analyzeWithTypeScript(
   const calledMethods = new Set<string>();
   const calledFunctions = new Set<string>();
   const memberCalls = new Set<string>();
+  const asyncFunctions = new Set<string>();
+  const awaitedFunctionCalls = new Set<string>();
+  const awaitedMemberCalls = new Set<string>();
+  const awaitedPromiseAllFunctionCalls = new Set<string>();
   const constBindings = new Set<string>();
   const forbiddenMethods = new Set<string>();
   const directDomAccesses = new Set<string>();
@@ -168,6 +185,7 @@ function analyzeWithTypeScript(
   const forcedActions: SourcePolicyAnalysis['forcedActions'] = [];
   let structuralLocatorCalls = 0;
   let conditionalBranchCount = 0;
+  let tryCatchCount = 0;
   const methodAliases = new Map<string, MethodReference>();
   const objectAliases = new Set(['page']);
   const variableInitializers = new Map<string, TypeScriptExpression>();
@@ -629,6 +647,72 @@ function analyzeWithTypeScript(
 
   const visit = (node: TypeScriptNode): void => {
     if (
+      ts.isFunctionDeclaration(node) &&
+      node.name !== undefined &&
+      node.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.AsyncKeyword,
+      )
+    ) {
+      asyncFunctions.add(node.name.text);
+    }
+
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer !== undefined &&
+      (ts.isArrowFunction(node.initializer) ||
+        ts.isFunctionExpression(node.initializer)) &&
+      node.initializer.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.AsyncKeyword,
+      )
+    ) {
+      asyncFunctions.add(node.name.text);
+    }
+
+    if (ts.isAwaitExpression(node)) {
+      const awaited = unwrapExpression(ts, node.expression);
+      if (ts.isCallExpression(awaited)) {
+        const callee = unwrapExpression(ts, awaited.expression);
+        if (ts.isIdentifier(callee)) {
+          awaitedFunctionCalls.add(callee.text);
+        } else if (
+          ts.isPropertyAccessExpression(callee) ||
+          ts.isElementAccessExpression(callee)
+        ) {
+          const memberName = ts.isPropertyAccessExpression(callee)
+            ? callee.name.text
+            : getStaticPropertyName(
+                callee.argumentExpression ?? callee.expression,
+              );
+          if (memberName !== undefined) {
+            const receiver = unwrapExpression(ts, callee.expression);
+            const qualifiedMemberName = ts.isIdentifier(receiver)
+              ? `${receiver.text}.${memberName}`
+              : memberName;
+            awaitedMemberCalls.add(qualifiedMemberName);
+            if (
+              qualifiedMemberName === 'Promise.all' &&
+              awaited.arguments[0] !== undefined &&
+              ts.isArrayLiteralExpression(awaited.arguments[0])
+            ) {
+              for (const element of awaited.arguments[0].elements) {
+                const operation = unwrapExpression(ts, element);
+                if (!ts.isCallExpression(operation)) continue;
+                const operationCallee = unwrapExpression(
+                  ts,
+                  operation.expression,
+                );
+                if (ts.isIdentifier(operationCallee)) {
+                  awaitedPromiseAllFunctionCalls.add(operationCallee.text);
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (
       ts.isIfStatement(node) &&
       (!ts.isIfStatement(node.parent) || node.parent.elseStatement !== node)
     ) {
@@ -693,8 +777,9 @@ function analyzeWithTypeScript(
       }
     }
 
-    if (ts.isCatchClause(node) && !alwaysPropagates(node.block)) {
-      swallowedErrorCount += 1;
+    if (ts.isCatchClause(node)) {
+      tryCatchCount += 1;
+      if (!alwaysPropagates(node.block)) swallowedErrorCount += 1;
     }
 
     if (ts.isPropertyAccessExpression(node) || ts.isElementAccessExpression(node)) {
@@ -720,8 +805,13 @@ function analyzeWithTypeScript(
     calledMethods: [...calledMethods],
     calledFunctions: [...calledFunctions],
     memberCalls: [...memberCalls],
+    asyncFunctions: [...asyncFunctions],
+    awaitedFunctionCalls: [...awaitedFunctionCalls],
+    awaitedMemberCalls: [...awaitedMemberCalls],
+    awaitedPromiseAllFunctionCalls: [...awaitedPromiseAllFunctionCalls],
     constBindings: [...constBindings],
     conditionalBranchCount,
+    tryCatchCount,
     forbiddenMethods: [...forbiddenMethods],
     structuralLocatorCalls,
     forcedActions,
