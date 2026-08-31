@@ -11,6 +11,7 @@ import type {
   RequiredEvidenceSequenceStep,
   SerializableExpectedStateRule,
   TestCaseDefinition,
+  TypeScriptEvidenceDefinition,
   TutorialRegistry,
   TutorialRegistryEntry,
 } from '@/lib/content.types';
@@ -123,6 +124,53 @@ const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
     .strict(),
 ]);
 
+const TypeScriptEvidenceSchema = z.discriminatedUnion('type', [
+  z
+    .object({
+      type: z.literal('inferred-variable'),
+      name: z.string().min(1),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('variable-type'),
+      name: z.string().min(1),
+      annotation: z.string().min(1),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('interface-property'),
+      interface: z.string().min(1),
+      property: z.string().min(1),
+      annotation: z.string().min(1),
+      optional: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('function-parameter'),
+      function: z.string().min(1),
+      parameter: z.string().min(1),
+      annotation: z.string().min(1),
+      optional: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('function-return'),
+      function: z.string().min(1),
+      annotation: z.string().min(1),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('operator'),
+      operator: z.enum(['nullish-coalescing', 'strict-undefined-check']),
+    })
+    .strict(),
+]);
+
 const ChallengeValidationSchema = z
   .object({
     requiredAssertions: z.array(z.string().min(1)).optional(),
@@ -134,6 +182,7 @@ const ChallengeValidationSchema = z
     requiredAwaitedMemberCalls: z.array(z.string().min(1)).optional(),
     requiredPromiseAllFunctionCalls: z.array(z.string().min(1)).optional(),
     requiredConstBindings: z.array(z.string().min(1)).optional(),
+    requiredTypeScriptEvidence: z.array(TypeScriptEvidenceSchema).min(1).optional(),
     minimumConditionalBranches: z.number().int().positive().optional(),
     minimumTryCatchBlocks: z.number().int().positive().optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
@@ -334,6 +383,36 @@ function normalizeRequiredEvidenceSequence(
   });
 }
 
+function normalizeTypeScriptEvidence(
+  value: z.infer<
+    typeof ChallengeValidationSchema
+  >['requiredTypeScriptEvidence'],
+): TypeScriptEvidenceDefinition[] | undefined {
+  if (value === undefined) return undefined;
+
+  return value.map((evidence) => {
+    if (evidence.type === 'interface-property') {
+      return {
+        type: evidence.type,
+        interface: evidence.interface,
+        property: evidence.property,
+        annotation: evidence.annotation,
+        ...omitUndefined({ optional: evidence.optional }),
+      };
+    }
+    if (evidence.type === 'function-parameter') {
+      return {
+        type: evidence.type,
+        function: evidence.function,
+        parameter: evidence.parameter,
+        annotation: evidence.annotation,
+        ...omitUndefined({ optional: evidence.optional }),
+      };
+    }
+    return evidence;
+  });
+}
+
 function normalizeChallengeDefinition(
   value: z.infer<typeof ChallengeDefinitionSchema>,
 ): ChallengeDefinition {
@@ -384,6 +463,10 @@ function normalizeChallengeDefinition(
                   value.validation.requiredPromiseAllFunctionCalls,
                 requiredConstBindings:
                   value.validation.requiredConstBindings,
+                requiredTypeScriptEvidence:
+                  normalizeTypeScriptEvidence(
+                    value.validation.requiredTypeScriptEvidence,
+                  ),
                 minimumConditionalBranches:
                   value.validation.minimumConditionalBranches,
                 minimumTryCatchBlocks:

@@ -194,6 +194,40 @@ export interface ChallengeValidationPolicy {
   forbidSwallowedErrors?: boolean;
 }
 
+export type TypeScriptEvidenceDefinition =
+  | {
+      type: 'inferred-variable';
+      name: string;
+    }
+  | {
+      type: 'variable-type';
+      name: string;
+      annotation: string;
+    }
+  | {
+      type: 'interface-property';
+      interface: string;
+      property: string;
+      annotation: string;
+      optional?: boolean;
+    }
+  | {
+      type: 'function-parameter';
+      function: string;
+      parameter: string;
+      annotation: string;
+      optional?: boolean;
+    }
+  | {
+      type: 'function-return';
+      function: string;
+      annotation: string;
+    }
+  | {
+      type: 'operator';
+      operator: 'nullish-coalescing' | 'strict-undefined-check';
+    };
+
 export interface ChallengeValidationDefinition {
   requiredAssertions?: string[];
   requiredMethods?: string[];
@@ -211,6 +245,8 @@ export interface ChallengeValidationDefinition {
   requiredPromiseAllFunctionCalls?: string[];
   /** Require these learner bindings to be declared with const. */
   requiredConstBindings?: string[];
+  /** Require TypeScript-specific source structure without claiming semantic checking. */
+  requiredTypeScriptEvidence?: TypeScriptEvidenceDefinition[];
   /** Require at least one conditional chain with this many branches. */
   minimumConditionalBranches?: number;
   /** Require at least this many try/catch structures. */

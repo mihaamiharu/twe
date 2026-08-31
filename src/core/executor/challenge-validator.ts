@@ -2,6 +2,7 @@ import type {
   ChallengeValidationDefinition,
   LocatorEvidenceDefinition,
   RequiredEvidenceSequenceStep,
+  TypeScriptEvidenceDefinition,
 } from '@/lib/content.types';
 import type { ExecutionResult } from './executor.types';
 import type { RuntimeTraceEvent } from './runtime-trace';
@@ -98,6 +99,50 @@ function findMissingEvidenceSequenceSteps(
   }
 
   return [];
+}
+
+function normalizeTypeAnnotation(annotation: string): string {
+  return annotation.replace(/\s+/g, '').replaceAll("'", '"');
+}
+
+function typeScriptEvidenceKey(
+  evidence: TypeScriptEvidenceDefinition,
+): string {
+  switch (evidence.type) {
+    case 'inferred-variable':
+      return `inferred-variable:${evidence.name}`;
+    case 'variable-type':
+      return `variable-type:${evidence.name}:${normalizeTypeAnnotation(evidence.annotation)}`;
+    case 'interface-property':
+      return `interface-property:${evidence.interface}:${evidence.property}${evidence.optional ? '?' : ''}:${normalizeTypeAnnotation(evidence.annotation)}`;
+    case 'function-parameter':
+      return `function-parameter:${evidence.function}:${evidence.parameter}${evidence.optional ? '?' : ''}:${normalizeTypeAnnotation(evidence.annotation)}`;
+    case 'function-return':
+      return `function-return:${evidence.function}:${normalizeTypeAnnotation(evidence.annotation)}`;
+    case 'operator':
+      return `operator:${evidence.operator}`;
+  }
+}
+
+function typeScriptEvidenceLabel(
+  evidence: TypeScriptEvidenceDefinition,
+): string {
+  switch (evidence.type) {
+    case 'inferred-variable':
+      return `${evidence.name} inferred`;
+    case 'variable-type':
+      return `${evidence.name}: ${evidence.annotation}`;
+    case 'interface-property':
+      return `${evidence.interface}.${evidence.property}${evidence.optional ? '?' : ''}: ${evidence.annotation}`;
+    case 'function-parameter':
+      return `${evidence.function}(${evidence.parameter}${evidence.optional ? '?' : ''}: ${evidence.annotation})`;
+    case 'function-return':
+      return `${evidence.function}(): ${evidence.annotation}`;
+    case 'operator':
+      return evidence.operator === 'nullish-coalescing'
+        ? 'nullish coalescing (??)'
+        : 'strict undefined check (!== undefined)';
+  }
 }
 
 /**
@@ -248,6 +293,7 @@ export function validateChallengeExecution(
     source?.awaitedPromiseAllFunctionCalls ?? [],
   );
   const constBindings = new Set(source?.constBindings ?? []);
+  const typeScriptEvidence = new Set(source?.typeScriptEvidence ?? []);
   const missingFunctionCalls = (validation.requiredFunctionCalls ?? [])
     .filter((name) => !calledFunctions.has(name))
     .map((name) => `${name}()`);
@@ -275,6 +321,11 @@ export function validateChallengeExecution(
   const missingConstBindings = (validation.requiredConstBindings ?? [])
     .filter((name) => !constBindings.has(name))
     .map((name) => `const ${name}`);
+  const missingTypeScriptEvidence = (
+    validation.requiredTypeScriptEvidence ?? []
+  )
+    .filter((evidence) => !typeScriptEvidence.has(typeScriptEvidenceKey(evidence)))
+    .map(typeScriptEvidenceLabel);
   const minimumConditionalBranches =
     validation.minimumConditionalBranches ?? 0;
   const missingConditionalEvidence =
@@ -300,6 +351,7 @@ export function validateChallengeExecution(
     missingAwaitedMemberCalls.length > 0 ||
     missingPromiseAllFunctionCalls.length > 0 ||
     missingConstBindings.length > 0 ||
+    missingTypeScriptEvidence.length > 0 ||
     missingConditionalEvidence.length > 0 ||
     missingTryCatchEvidence.length > 0 ||
     missingSequenceSteps.length > 0
@@ -319,6 +371,7 @@ export function validateChallengeExecution(
             ...missingAwaitedMemberCalls,
             ...missingPromiseAllFunctionCalls,
             ...missingConstBindings,
+            ...missingTypeScriptEvidence,
             ...missingConditionalEvidence,
             ...missingTryCatchEvidence,
             ...missingSequenceSteps,

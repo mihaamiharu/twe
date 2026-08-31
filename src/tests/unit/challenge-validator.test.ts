@@ -367,4 +367,74 @@ describe('challenge execution validator', () => {
       },
     });
   });
+
+  it('requires configured TypeScript source structure', () => {
+    const validation = {
+      requiredTypeScriptEvidence: [
+        { type: 'inferred-variable' as const, name: 'testId' },
+        {
+          type: 'interface-property' as const,
+          interface: 'AppConfig',
+          property: 'retryLimit',
+          annotation: 'number',
+          optional: true,
+        },
+        {
+          type: 'function-parameter' as const,
+          function: 'createUser',
+          parameter: 'role',
+          annotation: '"admin" | "guest"',
+          optional: true,
+        },
+        {
+          type: 'operator' as const,
+          operator: 'nullish-coalescing' as const,
+        },
+      ],
+    };
+    const sourceAnalysis = {
+      calledMethods: [],
+      typeScriptEvidence: [
+        'inferred-variable:testId',
+        'interface-property:AppConfig:retryLimit?:number',
+        'function-parameter:createUser:role?:"admin"|"guest"',
+        'operator:nullish-coalescing',
+      ],
+      forbiddenMethods: [],
+      structuralLocatorCalls: 0,
+      forcedActions: [],
+      directDomAccesses: [],
+      swallowedErrorCount: 0,
+      strictViolations: [],
+    };
+
+    expect(
+      validateChallengeExecution(
+        passedExecution({ sourceAnalysis }),
+        validation,
+      ),
+    ).toEqual({ passed: true });
+    expect(
+      validateChallengeExecution(
+        passedExecution({
+          sourceAnalysis: {
+            ...sourceAnalysis,
+            typeScriptEvidence: [],
+          },
+        }),
+        validation,
+      ),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: [
+          'testId inferred',
+          'AppConfig.retryLimit?: number',
+          'createUser(role?: "admin" | "guest")',
+          'nullish coalescing (??)',
+        ],
+      },
+    });
+  });
 });

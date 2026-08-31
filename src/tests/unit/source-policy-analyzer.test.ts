@@ -185,6 +185,43 @@ describe('source policy analyzer', () => {
     expect(analysis.tryCatchCount).toBe(1);
   });
 
+  it('records TypeScript structure without claiming semantic checking', async () => {
+    const analysis = await analyzeSourcePolicy(`
+      interface AppConfig {
+        apiUrl: string;
+        retryLimit?: number;
+      }
+
+      const testId = 'TC-001';
+      const config: AppConfig = { apiUrl: 'https://api.test', retryLimit: 0 };
+
+      function createUser(
+        id: number,
+        role?: 'admin' | 'guest',
+      ): string {
+        return role ?? \`user-\${id}\`;
+      }
+
+      const result =
+        config.retryLimit !== undefined ? config.retryLimit : -1;
+    `);
+
+    const expectedEvidence = [
+        'interface-property:AppConfig:apiUrl:string',
+        'interface-property:AppConfig:retryLimit?:number',
+        'inferred-variable:testId',
+        'variable-type:config:AppConfig',
+        'function-parameter:createUser:id:number',
+        'function-parameter:createUser:role?:"admin"|"guest"',
+        'function-return:createUser:string',
+        'operator:nullish-coalescing',
+        'operator:strict-undefined-check',
+    ];
+    for (const evidence of expectedEvidence) {
+      expect(analysis.typeScriptEvidence).toContain(evidence);
+    }
+  });
+
   it('finds direct DOM access and swallowed catch blocks as source findings', async () => {
     const analysis = await analyzeSourcePolicy(
       `

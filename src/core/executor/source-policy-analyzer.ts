@@ -18,6 +18,7 @@ export interface SourcePolicyAnalysis {
   awaitedMemberCalls?: string[];
   awaitedPromiseAllFunctionCalls?: string[];
   constBindings?: string[];
+  typeScriptEvidence?: string[];
   conditionalBranchCount?: number;
   tryCatchCount?: number;
   forbiddenMethods: string[];
@@ -48,6 +49,7 @@ interface TypeScriptModule {
   isArrowFunction: typeof import('typescript')['isArrowFunction'];
   isFunctionDeclaration: typeof import('typescript')['isFunctionDeclaration'];
   isFunctionExpression: typeof import('typescript')['isFunctionExpression'];
+  isInterfaceDeclaration: typeof import('typescript')['isInterfaceDeclaration'];
   isIdentifier: typeof import('typescript')['isIdentifier'];
   isNumericLiteral: typeof import('typescript')['isNumericLiteral'];
   isObjectBindingPattern: typeof import('typescript')['isObjectBindingPattern'];
@@ -92,6 +94,7 @@ const EMPTY_ANALYSIS: SourcePolicyAnalysis = {
   awaitedMemberCalls: [],
   awaitedPromiseAllFunctionCalls: [],
   constBindings: [],
+  typeScriptEvidence: [],
   conditionalBranchCount: 0,
   tryCatchCount: 0,
   forbiddenMethods: [],
@@ -178,6 +181,7 @@ function analyzeWithTypeScript(
   const awaitedMemberCalls = new Set<string>();
   const awaitedPromiseAllFunctionCalls = new Set<string>();
   const constBindings = new Set<string>();
+  const typeScriptEvidence = new Set<string>();
   const forbiddenMethods = new Set<string>();
   const directDomAccesses = new Set<string>();
   const strictViolations = new Set<string>();
@@ -645,7 +649,69 @@ function analyzeWithTypeScript(
     return alternative === undefined ? branches : branches + 1;
   };
 
+  const normalizeTypeAnnotation = (node: import('typescript').TypeNode): string =>
+    node.getText(sourceFile).replace(/\s+/g, '').replaceAll("'", '"');
+
+  const optionalMarker = (optional: boolean): string =>
+    optional ? '?' : '';
+
+  const isUndefinedIdentifier = (node: TypeScriptNode): boolean =>
+    ts.isIdentifier(node) && node.text === 'undefined';
+
   const visit = (node: TypeScriptNode): void => {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)) {
+      if (node.type === undefined) {
+        typeScriptEvidence.add(`inferred-variable:${node.name.text}`);
+      } else {
+        typeScriptEvidence.add(
+          `variable-type:${node.name.text}:${normalizeTypeAnnotation(node.type)}`,
+        );
+      }
+    }
+
+    if (ts.isInterfaceDeclaration(node)) {
+      for (const member of node.members) {
+        if (!ts.isPropertySignature(member) || member.type === undefined) {
+          continue;
+        }
+        const property = getPropertyName(ts, member.name);
+        if (property === undefined) continue;
+        typeScriptEvidence.add(
+          `interface-property:${node.name.text}:${property}${optionalMarker(member.questionToken !== undefined)}:${normalizeTypeAnnotation(member.type)}`,
+        );
+      }
+    }
+
+    if (ts.isFunctionDeclaration(node) && node.name !== undefined) {
+      for (const parameter of node.parameters) {
+        if (!ts.isIdentifier(parameter.name) || parameter.type === undefined) {
+          continue;
+        }
+        typeScriptEvidence.add(
+          `function-parameter:${node.name.text}:${parameter.name.text}${optionalMarker(parameter.questionToken !== undefined)}:${normalizeTypeAnnotation(parameter.type)}`,
+        );
+      }
+      if (node.type !== undefined) {
+        typeScriptEvidence.add(
+          `function-return:${node.name.text}:${normalizeTypeAnnotation(node.type)}`,
+        );
+      }
+    }
+
+    if (ts.isBinaryExpression(node)) {
+      if (node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) {
+        typeScriptEvidence.add('operator:nullish-coalescing');
+      }
+      if (
+        node.operatorToken.kind ===
+          ts.SyntaxKind.ExclamationEqualsEqualsToken &&
+        (isUndefinedIdentifier(node.left) ||
+          isUndefinedIdentifier(node.right))
+      ) {
+        typeScriptEvidence.add('operator:strict-undefined-check');
+      }
+    }
+
     if (
       ts.isFunctionDeclaration(node) &&
       node.name !== undefined &&
@@ -810,6 +876,7 @@ function analyzeWithTypeScript(
     awaitedMemberCalls: [...awaitedMemberCalls],
     awaitedPromiseAllFunctionCalls: [...awaitedPromiseAllFunctionCalls],
     constBindings: [...constBindings],
+    typeScriptEvidence: [...typeScriptEvidence],
     conditionalBranchCount,
     tryCatchCount,
     forbiddenMethods: [...forbiddenMethods],
