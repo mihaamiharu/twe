@@ -138,39 +138,45 @@
       "xpReward": 25,
       "order": 2003,
       "title": {
-        "en": "If-Else Logic",
-        "id": "Logika If-Else"
+        "en": "Classify Controlled Test Runs",
+        "id": "Klasifikasikan Test Run Terkontrol"
       },
       "description": {
         "en": "Classify controlled result data without letting a condition silently skip a required check.",
         "id": "Klasifikasikan result data yang terkontrol tanpa membiarkan condition diam-diam melewatkan pemeriksaan wajib."
       },
       "instructions": {
-        "en": "# If-Else Logic\n\n## Why this matters\nA condition should represent an intentional rule, not hide an unexpected product state. This exercise classifies controlled test-run data into one of three explicit outcomes.\n\n## Example\n```javascript\nif (status === \"passed\") {\n    result = \"READY\";\n} else {\n    result = \"INVESTIGATE\";\n}\n```\n\nIn a browser test, avoid patterns such as “if the required banner exists, assert it; otherwise do nothing.” That branch can create a false pass. Control the starting state or fail clearly when required evidence is missing.\n\n## Your task\nAssign one status to `result`:\n- If `passCount` equals `totalTests`, use `\"ALL_PASSED\"`.\n- Otherwise, if `passCount` is greater than `0`, use `\"PARTIAL\"`.\n- Otherwise, use `\"ALL_FAILED\"`.",
-        "id": "# Logika If-Else\n\n## Kenapa ini penting\nCondition seharusnya mewakili rule yang disengaja, bukan menyembunyikan state produk yang nggak sesuai ekspektasi. Latihan ini mengklasifikasikan controlled test-run data menjadi satu dari tiga outcome yang jelas.\n\n## Contoh\n```javascript\nif (status === \"passed\") {\n    result = \"READY\";\n} else {\n    result = \"INVESTIGATE\";\n}\n```\n\nDi browser test, hindari pola seperti “kalau required banner ada, assert; kalau tidak ada, jangan lakukan apa-apa.” Branch seperti itu bisa membuat false pass. Kontrol starting state atau fail dengan jelas saat bukti wajib hilang.\n\n## Tugas kamu\nIsi `result` dengan satu status:\n- Kalau `passCount` sama dengan `totalTests`, gunakan `\"ALL_PASSED\"`.\n- Kalau tidak, tapi `passCount` lebih besar dari `0`, gunakan `\"PARTIAL\"`.\n- Selain itu, gunakan `\"ALL_FAILED\"`."
+        "en": "# Classify Controlled Test Runs\n\n## Why this matters\nA condition should represent an intentional rule, not hide an unexpected product state. This exercise classifies three controlled test-run summaries so every intended branch produces an explicit outcome.\n\nIn a browser test, avoid patterns such as “if the required banner exists, assert it; otherwise do nothing.” That branch can create a false pass. Control the starting state or fail clearly when required evidence is missing.\n\n## Your task\n1. Complete `classifyRun(run)` with three explicit branches:\n   - return `\"ALL_PASSED\"` when `passCount` equals `totalTests`;\n   - return `\"PARTIAL\"` when `passCount` is greater than `0`;\n   - otherwise return `\"ALL_FAILED\"`.\n2. Use `map()` to classify every object in `testRuns`.\n3. Join the statuses with ` | ` and store the exact string `ALL_PASSED | PARTIAL | ALL_FAILED` in `const result`.\n\nThe three summaries are controlled reporting data. These branches do not make it safe to conditionally skip a required browser assertion.",
+        "id": "# Klasifikasikan Test Run Terkontrol\n\n## Kenapa ini penting\nCondition seharusnya mewakili rule yang disengaja, bukan menyembunyikan state produk yang nggak sesuai ekspektasi. Latihan ini mengklasifikasikan tiga ringkasan test run terkontrol supaya setiap branch yang memang diinginkan menghasilkan outcome yang jelas.\n\nDi browser test, hindari pola seperti “kalau required banner ada, assert; kalau tidak ada, jangan lakukan apa-apa.” Branch seperti itu bisa membuat false pass. Kontrol starting state atau fail dengan jelas saat evidence wajib tidak tersedia.\n\n## Tugas kamu\n1. Lengkapi `classifyRun(run)` dengan tiga branch yang jelas:\n   - return `\"ALL_PASSED\"` saat `passCount` sama dengan `totalTests`;\n   - return `\"PARTIAL\"` saat `passCount` lebih besar dari `0`;\n   - selain itu, return `\"ALL_FAILED\"`.\n2. Gunakan `map()` untuk mengklasifikasikan setiap object di `testRuns`.\n3. Gabungkan semua status dengan ` | `, lalu simpan string persis `ALL_PASSED | PARTIAL | ALL_FAILED` dalam `const result`.\n\nKetiga ringkasan tersebut adalah controlled reporting data. Branch ini tidak membuat conditional skip terhadap browser assertion yang wajib menjadi aman."
       },
       "hints": {
         "en": [
-          "You'll need three branches of logic: one for perfect, one for partial, and one for none.",
-          "Use '===' for exact equality and '>' for greater than checks.",
-          "Make sure your string values exactly match 'ALL_PASSED', 'PARTIAL', or 'ALL_FAILED'."
+          "The function needs an if, an else-if, and a final else branch.",
+          "Use `testRuns.map((run) => classifyRun(run))` to execute every branch case.",
+          "Join the returned statuses with ` | ` before assigning `result`."
         ],
         "id": [
-          "Kamu butuh tiga cabang logika: satu untuk sukses semua, satu untuk sebagian, dan satu untuk gagal semua.",
-          "Gunakan '===' untuk cek kesamaan persis dan '>' untuk cek lebih besar dari.",
-          "Pastikan nilai string Kamu tepat sama dengan 'ALL_PASSED', 'PARTIAL', atau 'ALL_FAILED'."
+          "Function-nya membutuhkan branch if, else-if, dan else terakhir.",
+          "Gunakan `testRuns.map((run) => classifyRun(run))` untuk menjalankan setiap branch case.",
+          "Gabungkan status yang dihasilkan dengan ` | ` sebelum mengisi `result`."
         ]
       },
-      "htmlContent": "<div class=\"test-status\">\n  <h3>Test Results</h3>\n  <div id=\"status-display\"></div>\n</div>",
-      "starterCode": "// Given values (don't modify)\nconst passCount = 5;\nconst totalTests = 10;\n\n// Write your if-else logic here.\n// Define 'result' and assign \"ALL_PASSED\", \"PARTIAL\", or \"ALL_FAILED\"\n\n// Your code here\n",
+      "htmlContent": "<div class=\"test-status\"><output>10/10 · 5/10 · 0/10</output></div>",
+      "starterCode": "const testRuns = [\n    { passCount: 10, totalTests: 10 },\n    { passCount: 5, totalTests: 10 },\n    { passCount: 0, totalTests: 10 }\n];\n\nfunction classifyRun(run) {\n    // TODO 1\n}\n\n// TODO 2\n",
       "testCases": [
         {
           "description": "Returns the expected output",
-          "expectedOutput": "PARTIAL",
+          "expectedOutput": "ALL_PASSED | PARTIAL | ALL_FAILED",
           "isHidden": false
         }
       ],
-      "solution": "// Given values (don't modify)\nconst passCount = 5;\nconst totalTests = 10;\n\n// Write your if-else logic here\nlet result;\n\nif (passCount === totalTests) {\n    result = \"ALL_PASSED\";\n} else if (passCount > 0) {\n    result = \"PARTIAL\";\n} else {\n    result = \"ALL_FAILED\";\n}",
+      "solution": "const testRuns = [\n    { passCount: 10, totalTests: 10 },\n    { passCount: 5, totalTests: 10 },\n    { passCount: 0, totalTests: 10 }\n];\n\nfunction classifyRun(run) {\n    if (run.passCount === run.totalTests) {\n        return \"ALL_PASSED\";\n    } else if (run.passCount > 0) {\n        return \"PARTIAL\";\n    } else {\n        return \"ALL_FAILED\";\n    }\n}\n\nconst statuses = testRuns.map((run) => classifyRun(run));\nconst result = statuses.join(\" | \");",
+      "validation": {
+        "requiredFunctionCalls": ["classifyRun"],
+        "requiredMemberCalls": ["map", "join"],
+        "requiredConstBindings": ["testRuns", "statuses", "result"],
+        "minimumConditionalBranches": 3
+      },
       "tags": ["javascript", "conditionals", "logic", "beginner"]
     },
     {
@@ -311,16 +317,16 @@
       "xpReward": 40,
       "order": 2007,
       "title": {
-        "en": "Array Methods",
-        "id": "Metode Array"
+        "en": "Filter Controlled Test Results",
+        "id": "Filter Hasil Test Terkontrol"
       },
       "description": {
         "en": "Filter and search controlled arrays used by test code.",
         "id": "Filter dan cari controlled array yang dipakai test code."
       },
       "instructions": {
-        "en": "# Array Methods for Test Data\n\n## Why this matters\n`filter`, `map`, and `find` help test code process arrays that already exist in memory. They do not observe the browser UI by themselves.\n\n| Method | Purpose | Example |\n|---|---|---|\n| `map()` | Transform every item | `arr.map(x => x * 2)` |\n| `filter()` | Keep all matching items | `arr.filter(x => x > 10)` |\n| `find()` | Return the first match or `undefined` | `arr.find(x => x.id === 1)` |\n\n## QA boundary\nUse these methods for controlled fixtures, API data that has been validated, or values already read from the page. Use Playwright locators and web assertions to observe the live UI. If a required `find()` result is missing, fail clearly instead of silently skipping the assertion.\n\n## Your task\nGiven the `testResults` array:\n1. Use `filter()` to keep items whose status is `\"passed\"`.\n2. Count the filtered items.\n3. Store that count in `result`.",
-        "id": "# Array Method untuk Test Data\n\n## Kenapa ini penting\n`filter`, `map`, dan `find` membantu test code memproses array yang sudah ada di memory. Method ini tidak mengamati browser UI dengan sendirinya.\n\n| Method | Tujuan | Contoh |\n|---|---|---|\n| `map()` | Mengubah setiap item | `arr.map(x => x * 2)` |\n| `filter()` | Menyimpan semua item yang cocok | `arr.filter(x => x > 10)` |\n| `find()` | Mengembalikan hasil pertama atau `undefined` | `arr.find(x => x.id === 1)` |\n\n## Batasan untuk QA\nGunakan method ini untuk controlled fixture, API data yang sudah divalidasi, atau value yang sudah dibaca dari halaman. Gunakan Playwright locator dan web assertion untuk mengamati UI aktif. Kalau hasil `find()` yang diwajibkan tidak ada, fail dengan jelas daripada diam-diam melewatkan assertion.\n\n## Tugas kamu\nDengan array `testResults`:\n1. Gunakan `filter()` untuk menyimpan item dengan status `\"passed\"`.\n2. Hitung item hasil filter.\n3. Simpan jumlahnya ke `result`."
+        "en": "# Filter Controlled Test Results\n\n## Why this matters\n`filter`, `map`, and `find` help test code process arrays that already exist in memory. They do not observe the browser UI by themselves.\n\n| Method | Purpose | Example |\n|---|---|---|\n| `map()` | Transform every item | `arr.map(x => x * 2)` |\n| `filter()` | Keep all matching items | `arr.filter(x => x > 10)` |\n| `find()` | Return the first match or `undefined` | `arr.find(x => x.id === 1)` |\n\n## QA boundary\nUse these methods for controlled fixtures, API data that has been validated, or values already read from the page. Use Playwright locators and web assertions to observe the live UI. If a required `find()` result is missing, fail clearly instead of silently skipping the assertion.\n\n## Your task\nGiven the `testResults` array:\n1. Use `filter()` to keep items whose status is `\"passed\"`.\n2. Count the filtered items.\n3. Declare `const result` with that count.",
+        "id": "# Filter Hasil Test Terkontrol\n\n## Kenapa ini penting\n`filter`, `map`, dan `find` membantu test code memproses array yang sudah ada di memory. Method ini tidak mengamati browser UI dengan sendirinya.\n\n| Method | Tujuan | Contoh |\n|---|---|---|\n| `map()` | Mengubah setiap item | `arr.map(x => x * 2)` |\n| `filter()` | Mempertahankan setiap item yang cocok | `arr.filter(x => x > 10)` |\n| `find()` | Mengembalikan hasil pertama atau `undefined` | `arr.find(x => x.id === 1)` |\n\n## Batasan untuk QA\nGunakan method ini untuk controlled fixture, API data yang sudah divalidasi, atau value yang sudah dibaca dari halaman. Gunakan Playwright locator dan web assertion untuk mengamati UI aktif. Kalau hasil `find()` yang diwajibkan tidak ada, fail dengan jelas daripada diam-diam melewatkan assertion.\n\n## Tugas kamu\nDengan array `testResults`:\n1. Gunakan `filter()` untuk mempertahankan item dengan status `\"passed\"`.\n2. Hitung item hasil filter.\n3. Declare `const result` dengan jumlah tersebut."
       },
       "hints": {
         "en": [
@@ -329,13 +335,13 @@
           "Filter for 'status === \"passed\"' and store the length of that new collection."
         ],
         "id": [
-          "Pikirkan metode array mana yang membantu Kamu *menyisihkan* hanya item yang memenuhi kondisi.",
-          "Kamu bisa menyambung metode filter secara langsung atau menggunakan '.length' pada hasilnya.",
+          "Pikirkan array method mana yang membantu kamu *mempertahankan* hanya item yang memenuhi condition.",
+          "Kamu bisa menyambung filter secara langsung atau menggunakan `.length` pada hasilnya.",
           "Filter untuk 'status === \"passed\"' dan simpan panjang (length) dari koleksi baru tersebut."
         ]
       },
-      "htmlContent": "<div class=\"results-processor\">\n  <h3>Results Processor</h3>\n</div>",
-      "starterCode": "const testResults = [\n    { name: \"Login\", status: \"passed\" },\n    { name: \"Signup\", status: \"failed\" },\n    { name: \"Profile\", status: \"passed\" },\n    { name: \"Settings\", status: \"passed\" },\n    { name: \"Logout\", status: \"failed\" }\n];\n\n// Filter to get only passed tests, then get the count\n// Your code here\n",
+      "htmlContent": "<div class=\"results-processor\"><output>passed · failed · passed · passed · failed</output></div>",
+      "starterCode": "const testResults = [\n    { name: \"Login\", status: \"passed\" },\n    { name: \"Signup\", status: \"failed\" },\n    { name: \"Profile\", status: \"passed\" },\n    { name: \"Settings\", status: \"passed\" },\n    { name: \"Logout\", status: \"failed\" }\n];\n\n// TODO\n",
       "testCases": [
         {
           "description": "Returns the expected output",
@@ -344,6 +350,10 @@
         }
       ],
       "solution": "const testResults = [\n    { name: \"Login\", status: \"passed\" },\n    { name: \"Signup\", status: \"failed\" },\n    { name: \"Profile\", status: \"passed\" },\n    { name: \"Settings\", status: \"passed\" },\n    { name: \"Logout\", status: \"failed\" }\n];\nconst passedTests = testResults.filter(t => t.status === \"passed\");\nconst result = passedTests.length;",
+      "validation": {
+        "requiredMemberCalls": ["filter"],
+        "requiredConstBindings": ["testResults", "result"]
+      },
       "tags": ["javascript", "array-methods", "map", "filter", "beginner"]
     },
     {
@@ -448,8 +458,8 @@
         "id": "Gunakan array, object, dan function kecil untuk menghitung satu ekspektasi cart yang terkontrol."
       },
       "instructions": {
-        "en": "# Scenario: Build a Cart Expectation\n\n## Why this matters\nA UI assertion is easier to review when its test data and expected calculation are explicit. In this controlled exercise, each object describes one cart case and a small function owns the subtotal calculation.\n\n## Your task\n1. Keep the provided `cartCases` array as the controlled test data.\n2. Complete `expectedSubtotal(item)` so it returns `unitPrice * quantity` for the given case.\n3. Select the first object from `cartCases` and store it in `selectedCase`.\n4. Pass that object to `expectedSubtotal` and store the returned value in `subtotal`.\n5. Set `result` to the exact string `Mechanical Keyboard: 240` by combining the selected product name and subtotal.\n\nThis challenge checks JavaScript data handling only. A real browser test would still need an assertion against the product's observable cart output.",
-        "id": "# Skenario: Susun Ekspektasi Keranjang\n\n## Kenapa ini penting\nUI assertion lebih gampang direview kalau test data dan expected calculation-nya terlihat jelas. Di latihan terkontrol ini, setiap object menjelaskan satu cart case dan sebuah function kecil menangani perhitungan subtotal.\n\n## Tugas kamu\n1. Pertahankan array `cartCases` sebagai controlled test data.\n2. Lengkapi `expectedSubtotal(item)` supaya mengembalikan `unitPrice * quantity` dari case yang diberikan.\n3. Pilih object pertama dari `cartCases`, lalu simpan sebagai `selectedCase`.\n4. Kirim object itu ke `expectedSubtotal`, lalu simpan hasilnya sebagai `subtotal`.\n5. Isi `result` dengan string persis `Mechanical Keyboard: 240` dengan menggabungkan nama produk dan subtotal.\n\nChallenge ini hanya memeriksa pengolahan data JavaScript. Browser test sungguhan tetap membutuhkan assertion terhadap output cart yang bisa diamati."
+        "en": "# Scenario: Build a Cart Expectation\n\n## Why this matters\nA UI assertion is easier to review when its test data and expected calculation are explicit. In this controlled exercise, each object describes one cart case and a small function owns the subtotal calculation.\n\n## Your task\n1. Keep the provided `cartCases` array as the controlled test data.\n2. Complete `expectedSubtotal(item)` so it returns `unitPrice * quantity` for the given case.\n3. Select the first object from `cartCases` and declare it as `const selectedCase`.\n4. Pass that object to `expectedSubtotal` and declare the returned value as `const subtotal`.\n5. Declare `const result` and set it to the exact string `Mechanical Keyboard: 240` by combining the selected product name and subtotal.\n\nThese bindings are not reassigned, so `const` communicates their intended stability. This challenge checks JavaScript data handling only. A real browser test would still need an assertion against the product's observable cart output.",
+        "id": "# Skenario: Susun Ekspektasi Keranjang\n\n## Kenapa ini penting\nUI assertion lebih gampang direview kalau test data dan expected calculation-nya terlihat jelas. Di latihan terkontrol ini, setiap object menjelaskan satu cart case dan sebuah function kecil menangani perhitungan subtotal.\n\n## Tugas kamu\n1. Pertahankan array `cartCases` sebagai controlled test data.\n2. Lengkapi `expectedSubtotal(item)` supaya mengembalikan `unitPrice * quantity` dari case yang diberikan.\n3. Pilih object pertama dari `cartCases`, lalu declare sebagai `const selectedCase`.\n4. Kirim object itu ke `expectedSubtotal`, lalu declare hasilnya sebagai `const subtotal`.\n5. Declare `const result`, lalu isi dengan string persis `Mechanical Keyboard: 240` dengan menggabungkan nama produk dan subtotal.\n\nKetiga binding tersebut tidak di-assign ulang, jadi `const` menunjukkan stability yang memang diinginkan. Challenge ini hanya memeriksa pengolahan data JavaScript. Browser test sungguhan tetap membutuhkan assertion terhadap output cart yang bisa diamati."
       },
       "hints": {
         "en": [
@@ -463,8 +473,8 @@
           "Gunakan template literal untuk menggabungkan `selectedCase.productName` dan `subtotal` dengan `: ` di tengahnya."
         ]
       },
-      "htmlContent": "<div class=\"cart-expectation\">\n  <h3>Controlled Cart Case</h3>\n  <p>Calculate the expected subtotal before comparing it with the UI.</p>\n</div>",
-      "starterCode": "const cartCases = [\n    { productName: \"Mechanical Keyboard\", unitPrice: 120, quantity: 2 },\n    { productName: \"Wireless Mouse\", unitPrice: 40, quantity: 1 }\n];\n\nfunction expectedSubtotal(item) {\n    // Return the expected subtotal for this case\n}\n\n// Select the first case, calculate its subtotal, and format result\n// Your code here\n",
+      "htmlContent": "<div class=\"cart-expectation\"><output>Mechanical Keyboard × 2</output></div>",
+      "starterCode": "const cartCases = [\n    { productName: \"Mechanical Keyboard\", unitPrice: 120, quantity: 2 },\n    { productName: \"Wireless Mouse\", unitPrice: 40, quantity: 1 }\n];\n\nfunction expectedSubtotal(item) {\n    // TODO 1\n}\n\n// TODO 2\n",
       "testCases": [
         {
           "description": "Builds the expected output from the controlled cart case",
@@ -473,6 +483,15 @@
         }
       ],
       "solution": "const cartCases = [\n    { productName: \"Mechanical Keyboard\", unitPrice: 120, quantity: 2 },\n    { productName: \"Wireless Mouse\", unitPrice: 40, quantity: 1 }\n];\n\nfunction expectedSubtotal(item) {\n    return item.unitPrice * item.quantity;\n}\n\nconst selectedCase = cartCases[0];\nconst subtotal = expectedSubtotal(selectedCase);\nconst result = `${selectedCase.productName}: ${subtotal}`;",
+      "validation": {
+        "requiredFunctionCalls": ["expectedSubtotal"],
+        "requiredConstBindings": [
+          "cartCases",
+          "selectedCase",
+          "subtotal",
+          "result"
+        ]
+      },
       "tags": ["javascript", "qa", "test-data", "cart", "core-practice"]
     },
     {

@@ -144,7 +144,7 @@ The exact product meaning still belongs to the team. Do not treat the two as int
 
 ## When to use it—and when not to
 
-Use an object when named fields make one scenario easier to review. Use an array when several values belong to the same kind of collection. Use a function when it names a repeated rule, calculation, or setup capability.
+Use an object when named fields make one scenario easier to review. Use an array when several values belong to the same kind of collection. Use a function when a clear name makes a rule, calculation, or setup capability easier to understand. A function can earn its place even when it is called once; repetition is not the only reason to create one.
 
 Do not create a helper that only hides one obvious line:
 
