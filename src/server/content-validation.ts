@@ -8,6 +8,7 @@ import type {
   InteractionSequenceDefinition,
   LocalizedArray,
   LocalizedString,
+  RequiredEvidenceSequenceStep,
   SerializableExpectedStateRule,
   TestCaseDefinition,
   TutorialRegistry,
@@ -95,12 +96,43 @@ const ChallengeValidationPolicySchema = z
   })
   .strict();
 
+const LocatorEvidenceSchema = z
+  .object({
+    method: z.string().min(1),
+    value: z.string().min(1).optional(),
+    name: z.string().min(1).optional(),
+  })
+  .strict();
+
+const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
+  z
+    .object({
+      type: z.literal('method'),
+      method: z.string().min(1),
+      target: z.enum(['page', 'locator']).optional(),
+      arguments: z.array(z.string()).optional(),
+      locator: LocatorEvidenceSchema.optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('assertion'),
+      matcher: z.string().min(1),
+      locator: LocatorEvidenceSchema.optional(),
+    })
+    .strict(),
+]);
+
 const ChallengeValidationSchema = z
   .object({
     requiredAssertions: z.array(z.string().min(1)).optional(),
     requiredMethods: z.array(z.string().min(1)).optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
     policy: ChallengeValidationPolicySchema.optional(),
+    requiredEvidenceSequence: z
+      .array(RequiredEvidenceSequenceStepSchema)
+      .min(1)
+      .optional(),
     interactionSequence: z
       .object({
         event: z.literal('submit'),
@@ -254,6 +286,45 @@ function normalizeInteractionSequence(
   };
 }
 
+function normalizeRequiredEvidenceSequence(
+  value: z.infer<
+    typeof ChallengeValidationSchema
+  >['requiredEvidenceSequence'],
+): RequiredEvidenceSequenceStep[] | undefined {
+  if (value === undefined) return undefined;
+
+  return value.map((step) => {
+    const locator =
+      step.locator === undefined
+        ? undefined
+        : {
+            method: step.locator.method,
+            ...omitUndefined({
+              value: step.locator.value,
+              name: step.locator.name,
+            }),
+          };
+
+    if (step.type === 'assertion') {
+      return {
+        type: step.type,
+        matcher: step.matcher,
+        ...omitUndefined({ locator }),
+      };
+    }
+
+    return {
+      type: step.type,
+      method: step.method,
+      ...omitUndefined({
+        target: step.target,
+        arguments: step.arguments,
+        locator,
+      }),
+    };
+  });
+}
+
 function normalizeChallengeDefinition(
   value: z.infer<typeof ChallengeDefinitionSchema>,
 ): ChallengeDefinition {
@@ -292,6 +363,9 @@ function normalizeChallengeDefinition(
                 requiredAssertions: value.validation.requiredAssertions,
                 requiredMethods: value.validation.requiredMethods,
                 forbiddenMethods: value.validation.forbiddenMethods,
+                requiredEvidenceSequence: normalizeRequiredEvidenceSequence(
+                  value.validation.requiredEvidenceSequence,
+                ),
                 policy:
                   value.validation.policy === undefined
                     ? undefined

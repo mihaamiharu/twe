@@ -1,8 +1,10 @@
 import type { MockedPlaywrightPage } from './playwright-shim';
 import type { Locator } from './shim.types';
+import type { LocatorEvidenceDefinition } from '@/lib/content.types';
 import {
   PLAYWRIGHT_ACTION_METHODS,
   PLAYWRIGHT_LOCATOR_METHODS,
+  PLAYWRIGHT_LOCATOR_RETURNING_METHODS,
   PLAYWRIGHT_PAGE_METHODS,
 } from './playwright-methods';
 
@@ -11,6 +13,8 @@ export type RuntimeTraceTarget = 'page' | 'locator';
 export interface RuntimeMethodCall {
   target: RuntimeTraceTarget;
   method: string;
+  arguments?: string[];
+  locator?: LocatorEvidenceDefinition;
   actionOptions?: { force?: unknown };
   succeeded: boolean;
   error?: string;
@@ -18,17 +22,26 @@ export interface RuntimeMethodCall {
 
 export interface RuntimeAssertion {
   matcher: string;
+  locator?: LocatorEvidenceDefinition;
   passed: boolean;
   error?: string;
 }
 
+export type RuntimeTraceEvent =
+  | { type: 'method'; call: RuntimeMethodCall }
+  | { type: 'assertion'; assertion: RuntimeAssertion };
+
 export interface RuntimeExecutionTrace {
   methodCalls: RuntimeMethodCall[];
   assertions: RuntimeAssertion[];
+  events?: RuntimeTraceEvent[];
 }
 
 /** Internal escape hatch for assertion helpers; never exposed to learner code. */
 export const TRACED_PLAYWRIGHT_TARGET = Symbol('traced-playwright-target');
+export const TRACED_PLAYWRIGHT_LOCATOR_EVIDENCE = Symbol(
+  'traced-playwright-locator-evidence',
+);
 
 function getReflectProperty(value: object, property: PropertyKey): unknown {
   return Reflect.get(value, property);
@@ -41,8 +54,28 @@ export function unwrapTracedPlaywrightValue(value: unknown): unknown {
   return target ?? value;
 }
 
+export function getTracedLocatorEvidence(
+  value: unknown,
+): LocatorEvidenceDefinition | undefined {
+  if (typeof value !== 'object' && typeof value !== 'function') return undefined;
+  if (value === null) return undefined;
+  const evidence = getReflectProperty(
+    value,
+    TRACED_PLAYWRIGHT_LOCATOR_EVIDENCE,
+  );
+  return isLocatorEvidence(evidence) ? evidence : undefined;
+}
+
 export function createRuntimeExecutionTrace(): RuntimeExecutionTrace {
-  return { methodCalls: [], assertions: [] };
+  return { methodCalls: [], assertions: [], events: [] };
+}
+
+export function recordRuntimeAssertion(
+  trace: RuntimeExecutionTrace,
+  assertion: RuntimeAssertion,
+): void {
+  trace.assertions.push(assertion);
+  trace.events?.push({ type: 'assertion', assertion });
 }
 
 function formatRuntimeError(error: unknown): string {
@@ -59,6 +92,36 @@ function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+function isLocatorEvidence(value: unknown): value is LocatorEvidenceDefinition {
+  return isObject(value) && typeof value['method'] === 'string';
+}
+
+function getStringArguments(args: unknown[]): string[] | undefined {
+  const stringArguments = args.filter(
+    (argument): argument is string => typeof argument === 'string',
+  );
+  return stringArguments.length > 0 ? stringArguments : undefined;
+}
+
+function getReturnedLocatorEvidence(
+  method: string,
+  args: unknown[],
+  current: LocatorEvidenceDefinition | undefined,
+): LocatorEvidenceDefinition | undefined {
+  if (!PLAYWRIGHT_LOCATOR_RETURNING_METHODS.has(method)) return current;
+  if (method === 'first' || method === 'last' || method === 'nth') return current;
+
+  const value = typeof args[0] === 'string' ? args[0] : undefined;
+  const options = isObject(args[1]) ? args[1] : undefined;
+  const name = typeof options?.['name'] === 'string' ? options['name'] : undefined;
+
+  return {
+    method,
+    ...(value === undefined ? {} : { value }),
+    ...(name === undefined ? {} : { name }),
+  };
 }
 
 function getActionOptions(
@@ -106,7 +169,11 @@ export function createTracedPlaywrightPage(
 ): MockedPlaywrightPage {
   const proxyCache = new WeakMap<object, object>();
 
-  const wrap = <T extends object>(target: T, targetType: RuntimeTraceTarget): T => {
+  const wrap = <T extends object>(
+    target: T,
+    targetType: RuntimeTraceTarget,
+    locatorEvidence?: LocatorEvidenceDefinition,
+  ): T => {
     const cached = proxyCache.get(target);
     if (cached) return cached as T;
 
@@ -117,6 +184,9 @@ export function createTracedPlaywrightPage(
     const proxy = new Proxy(target, {
       get(currentTarget, property, receiver) {
         if (property === TRACED_PLAYWRIGHT_TARGET) return currentTarget;
+        if (property === TRACED_PLAYWRIGHT_LOCATOR_EVIDENCE) {
+          return locatorEvidence;
+        }
         const value = Reflect.get(currentTarget, property, receiver);
         if (typeof property !== 'string' || !methodNames.has(property)) {
           return value;
@@ -125,19 +195,32 @@ export function createTracedPlaywrightPage(
 
         return (...args: unknown[]) => {
           const actionOptions = getActionOptions(property, args);
+          const stringArguments = getStringArguments(args);
           const call: RuntimeMethodCall = {
             target: targetType,
             method: property,
             succeeded: false,
+            ...(stringArguments === undefined
+              ? {}
+              : { arguments: stringArguments }),
+            ...(targetType !== 'locator' || locatorEvidence === undefined
+              ? {}
+              : { locator: locatorEvidence }),
             ...(actionOptions === undefined ? {} : { actionOptions }),
           };
           trace.methodCalls.push(call);
+          trace.events?.push({ type: 'method', call });
 
           const settleSuccess = (result: unknown): unknown => {
             call.succeeded = true;
             if (targetType === 'page') options.onPageMethodSettled?.();
+            const returnedLocatorEvidence = getReturnedLocatorEvidence(
+              property,
+              args,
+              locatorEvidence,
+            );
             return wrapReturnedValue(result, (target) =>
-              wrap(target, 'locator'),
+              wrap(target, 'locator', returnedLocatorEvidence),
             );
           };
           const settleFailure = (error: unknown): never => {

@@ -166,4 +166,89 @@ describe('challenge execution validator', () => {
       },
     });
   });
+
+  it('requires configured runtime evidence to occur in order', () => {
+    const gotoCall = {
+      target: 'page' as const,
+      method: 'goto',
+      arguments: ['/app/products.html'],
+      succeeded: true,
+    };
+    const clickCall = {
+      target: 'locator' as const,
+      method: 'click',
+      locator: { method: 'getByRole', value: 'link', name: 'Cart' },
+      succeeded: true,
+    };
+    const assertion = {
+      matcher: 'toBeVisible',
+      locator: {
+        method: 'getByRole',
+        value: 'heading',
+        name: 'Your cart',
+      },
+      passed: true,
+    };
+    const validation = {
+      requiredEvidenceSequence: [
+        {
+          type: 'method' as const,
+          method: 'goto',
+          target: 'page' as const,
+          arguments: ['/app/products.html'],
+        },
+        {
+          type: 'method' as const,
+          method: 'click',
+          target: 'locator' as const,
+          locator: { method: 'getByRole', value: 'link', name: 'Cart' },
+        },
+        {
+          type: 'assertion' as const,
+          matcher: 'toBeVisible',
+          locator: {
+            method: 'getByRole',
+            value: 'heading',
+            name: 'Your cart',
+          },
+        },
+      ],
+    };
+
+    const inOrder = passedExecution({
+      runtimeTrace: {
+        methodCalls: [gotoCall, clickCall],
+        assertions: [assertion],
+        events: [
+          { type: 'method', call: gotoCall },
+          { type: 'method', call: clickCall },
+          { type: 'assertion', assertion },
+        ],
+      },
+    });
+    const assertionBeforeClick = passedExecution({
+      runtimeTrace: {
+        methodCalls: [gotoCall, clickCall],
+        assertions: [assertion],
+        events: [
+          { type: 'method', call: gotoCall },
+          { type: 'assertion', assertion },
+          { type: 'method', call: clickCall },
+        ],
+      },
+    });
+
+    expect(validateChallengeExecution(inOrder, validation)).toEqual({
+      passed: true,
+    });
+    expect(
+      validateChallengeExecution(assertionBeforeClick, validation),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: ['toBeVisible'],
+      },
+    });
+  });
 });

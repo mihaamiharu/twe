@@ -3,7 +3,11 @@ import type {
     ExpectMatchers,
     ExpectResult,
 } from './executor.types';
-import { unwrapTracedPlaywrightValue } from './runtime-trace';
+import {
+    getTracedLocatorEvidence,
+    type RuntimeAssertion,
+    unwrapTracedPlaywrightValue,
+} from './runtime-trace';
 
 function getMethod(
     value: unknown,
@@ -68,11 +72,7 @@ function stringifyText(value: unknown): string {
 export function createExpect(options?: {
     timeout?: number;
     deadline?: number;
-    onAssertion?: (event: {
-        matcher: string;
-        passed: boolean;
-        error?: string;
-    }) => void;
+    onAssertion?: (event: RuntimeAssertion) => void;
 }): ExpectResult {
     let assertionCount = 0;
     const testResults: Array<{ message: string; passed: boolean }> = [];
@@ -91,6 +91,7 @@ export function createExpect(options?: {
         isSoft = false,
         isNot = false,
     ): Omit<ExpectMatchers, 'not'> => {
+        const locator = getTracedLocatorEvidence(actual);
         const handleResult = (pass: boolean, message: string) => {
             incrementCount();
             // Invert if isNot is true
@@ -684,6 +685,7 @@ export function createExpect(options?: {
                         options?.onAssertion?.({
                             matcher: property,
                             passed: softFailure === undefined,
+                            ...(locator === undefined ? {} : { locator }),
                             ...(softFailure === undefined
                                 ? {}
                                 : { error: softFailure.message }),
@@ -693,6 +695,7 @@ export function createExpect(options?: {
                         options?.onAssertion?.({
                             matcher: property,
                             passed: false,
+                            ...(locator === undefined ? {} : { locator }),
                             error:
                                 error instanceof Error
                                     ? error.message

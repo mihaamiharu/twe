@@ -161,6 +161,26 @@ export interface InteractionSequenceDefinition {
   steps: InteractionSequenceStep[];
 }
 
+export interface LocatorEvidenceDefinition {
+  method: string;
+  value?: string;
+  name?: string;
+}
+
+export type RequiredEvidenceSequenceStep =
+  | {
+      type: 'method';
+      method: string;
+      target?: 'page' | 'locator';
+      arguments?: string[];
+      locator?: LocatorEvidenceDefinition;
+    }
+  | {
+      type: 'assertion';
+      matcher: string;
+      locator?: LocatorEvidenceDefinition;
+    };
+
 export interface ChallengeValidationPolicy {
   /** Require required methods and assertions to be observed at runtime. */
   requireExecutedEvidence?: boolean;
@@ -180,6 +200,8 @@ export interface ChallengeValidationDefinition {
   forbiddenMethods?: string[];
   policy?: ChallengeValidationPolicy;
   interactionSequence?: InteractionSequenceDefinition;
+  /** Require successful runtime evidence to occur in this order. */
+  requiredEvidenceSequence?: RequiredEvidenceSequenceStep[];
 }
 
 /**
