@@ -19,6 +19,8 @@ Tambahkan advanced fixture hanya kalau jelas siapa yang membuat dan membersihkan
 
 Lesson ini optional. Kamu boleh melewatinya tanpa menghambat Module 8. Pelajari lebih lanjut kalau test suite memang membutuhkan option yang bisa diatur per project, resource khusus untuk setiap worker, atau diagnostic yang berjalan automatic.
 
+Kalau coding agent mengusulkan design seperti ini, anggap fixture graph yang dibuatnya sebagai proposal. Team tetap perlu mengecek ownership, isolation, dan cleanup setiap resource sebelum memakainya di seluruh test suite.
+
 ## Cara berpikir yang perlu kamu pegang
 
 Bedakan empat hal berikut:

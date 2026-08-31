@@ -17,6 +17,8 @@ Test membutuhkan lebih dari step yang terlihat. Test mungkin butuh browser page,
 
 Fixture memberi nama pada resource yang dibutuhkan test. Setiap test bisa meminta fixture yang diperlukan, lalu fixture melakukan cleanup sesuai scope-nya. Tapi fixture nggak selalu lebih jelas daripada helper. Fixture yang dirancang dengan buruk bisa menyembunyikan action penting, membuat beberapa test memakai mutable state yang sama, dan mengubah test sederhana menjadi mini-framework.
 
+Hal ini juga penting dalam agent-assisted workflow. Coding agent bisa membuat fixture dengan cepat, tapi QA tetap perlu memastikan setup, scope, dan cleanup-nya sesuai dengan scenario yang sedang diuji.
+
 Sebelum membuat fixture, tanyakan: resource ini dibuat kapan, test atau worker mana yang boleh mengubahnya, dan siapa yang melakukan cleanup?
 
 ## Cara berpikir yang perlu kamu pegang

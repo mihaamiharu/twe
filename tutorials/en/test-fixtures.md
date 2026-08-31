@@ -17,6 +17,8 @@ Tests need more than the steps shown in the scenario. They may need a browser pa
 
 Fixtures give names to the resources a test needs. A test can request a fixture directly, and the fixture can clean up its resource according to its scope. A fixture is not always clearer than a helper, though. A poorly designed fixture can hide an important action, make several tests share mutable state, and turn a simple test into a small framework.
 
+This matters in an agent-assisted workflow too. A coding agent can generate a fixture quickly, but QA still needs to verify that its setup, scope, and cleanup match the scenario being tested.
+
 Before creating a fixture, ask when the resource is created, which test or worker may change it, and who cleans it up.
 
 ## The mental model

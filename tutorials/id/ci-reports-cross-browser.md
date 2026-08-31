@@ -19,6 +19,8 @@ CI biasanya mulai dari runner yang lebih bersih. Kondisi ini membantu kita menge
 
 Test yang pass di local hanya menunjukkan kondisi laptop tersebut. CI run lebih bisa dipercaya kalau runtime, dependency, browser, aplikasi, configuration, test data, dan command semuanya bisa disiapkan ulang dari awal.
 
+Coding agent bisa membantu membuat draft workflow, tapi QA tetap perlu mengecek setiap asumsi tentang command, environment value, target aplikasi, dan artifact berdasarkan apa yang benar-benar tersedia di repository dan team.
+
 ## Cara berpikir yang perlu kamu pegang
 
 Pastikan CI menyiapkan input yang sama setiap kali run:

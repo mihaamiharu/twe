@@ -19,6 +19,8 @@ Add this complexity only when you can clearly show who creates and cleans up eac
 
 This lesson is optional depth. The core lessons cover the default test-scoped design; skip this lesson without blocking Module 8 unless the suite has a real need for configurable options, worker-owned resources, or automatic diagnostics.
 
+If a coding agent proposes this design, treat the generated fixture graph as a proposal. The team still needs to verify resource ownership, isolation, and cleanup before using it across the suite.
+
 ## The mental model
 
 Keep four concepts separate:

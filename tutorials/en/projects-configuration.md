@@ -25,6 +25,8 @@ Configuration is not boilerplate only automation specialists need to understand.
 
 One configuration change can alter the target application, number of test executions, run duration, and stored information. Review configuration with the same care as test code.
 
+In an agent-assisted workflow, generated configuration can be valid TypeScript while still inventing an environment, command, project matrix, or secret-handling strategy the team never approved.
+
 ## The mental model
 
 Keep test code, fixtures, and configuration separate:

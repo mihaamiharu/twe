@@ -25,6 +25,8 @@ Configuration bukan sekadar boilerplate untuk automation specialist. QA perlu me
 
 Satu perubahan di configuration bisa mengubah target aplikasi, jumlah test execution, durasi run, dan informasi yang tersimpan. Karena itu, QA perlu me-review configuration seperti me-review test code.
 
+Dalam agent-assisted workflow, configuration yang dibuat agent bisa saja valid secara TypeScript, tetapi diam-diam menambahkan environment, command, project matrix, atau cara mengelola secret yang belum pernah disetujui team.
+
 ## Cara berpikir yang perlu kamu pegang
 
 Pisahkan isi test, fixture, dan configuration:

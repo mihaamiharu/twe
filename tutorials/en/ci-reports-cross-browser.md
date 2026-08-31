@@ -19,6 +19,8 @@ CI usually starts from a cleaner runner. That lets the team check whether anothe
 
 A local pass shows that the test worked on that machine. A CI result is more useful when the runtime, dependencies, browser, application, configuration, test data, and command can all be prepared again from a clean runner.
 
+A coding agent can draft the workflow, but QA still needs to verify every assumed command, environment value, application target, and artifact against what the repository and team actually provide.
+
 ## The mental model
 
 Make sure CI prepares the same inputs for every run:
