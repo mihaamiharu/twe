@@ -6,7 +6,12 @@ let initialized = false;
  * Initialize esbuild-wasm if not already initialized
  */
 export async function initEsbuild() {
-    if (!initialized && typeof window !== 'undefined') {
+    const hasNativeProcess =
+        typeof process !== 'undefined' && process.release?.name === 'node';
+    const isBrowserRuntime =
+        typeof window !== 'undefined' && !hasNativeProcess;
+
+    if (!initialized && isBrowserRuntime) {
         try {
             await esbuild.initialize({
                 wasmURL: '/esbuild.wasm',
