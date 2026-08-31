@@ -182,6 +182,7 @@ describe('challenge execution validator', () => {
     };
     const assertion = {
       matcher: 'toBeVisible',
+      arguments: ['Your cart'],
       locator: {
         method: 'getByRole',
         value: 'heading',
@@ -206,6 +207,7 @@ describe('challenge execution validator', () => {
         {
           type: 'assertion' as const,
           matcher: 'toBeVisible',
+          arguments: ['Your cart'],
           locator: {
             method: 'getByRole',
             value: 'heading',
@@ -237,12 +239,35 @@ describe('challenge execution validator', () => {
         ],
       },
     });
+    const wrongAssertionArgument = passedExecution({
+      runtimeTrace: {
+        methodCalls: [gotoCall, clickCall],
+        assertions: [{ ...assertion, arguments: ['Cart'] }],
+        events: [
+          { type: 'method', call: gotoCall },
+          { type: 'method', call: clickCall },
+          {
+            type: 'assertion',
+            assertion: { ...assertion, arguments: ['Cart'] },
+          },
+        ],
+      },
+    });
 
     expect(validateChallengeExecution(inOrder, validation)).toEqual({
       passed: true,
     });
     expect(
       validateChallengeExecution(assertionBeforeClick, validation),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: ['toBeVisible'],
+      },
+    });
+    expect(
+      validateChallengeExecution(wrongAssertionArgument, validation),
     ).toEqual({
       passed: false,
       failure: {

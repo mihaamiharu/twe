@@ -44,6 +44,7 @@ describe('runtime execution trace', () => {
 
     expect(trace.methodCalls.map((call) => call.method)).toEqual(['getByText']);
     expect(trace.assertions[0]?.passed).toBe(true);
+    expect(trace.assertions[0]?.arguments).toEqual(['Ready']);
     expect(trace.assertions[0]?.locator).toEqual({
       method: 'getByText',
       value: 'Ready',

@@ -137,6 +137,7 @@ const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
     .object({
       type: z.literal('assertion'),
       matcher: z.string().min(1),
+      arguments: z.array(z.string()).optional(),
       locator: LocatorEvidenceSchema.optional(),
     })
     .strict(),
@@ -379,7 +380,7 @@ function normalizeRequiredEvidenceSequence(
       return {
         type: step.type,
         matcher: step.matcher,
-        ...omitUndefined({ locator }),
+        ...omitUndefined({ arguments: step.arguments, locator }),
       };
     }
 

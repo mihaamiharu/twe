@@ -1004,12 +1004,41 @@
         ]
       },
       "htmlContent": "<form class=\"login-form\" autocomplete=\"off\">\n  <label for=\"email\">Email</label>\n  <input type=\"email\" id=\"email\" placeholder=\"Email\" autocomplete=\"off\" />\n  <label for=\"password\">Password</label>\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" autocomplete=\"new-password\" />\n  <button type=\"submit\">Login</button>\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill form', async ({ page }) => {\n  // 1. Fill email (use getByLabel)\n  // 2. Fill password (use getByLabel)\n  // 3. Verify email value\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Email').fill('qa@test.com');\nawait page.getByLabel('Password').fill('secret123');\nawait expect(page.getByLabel('Email')).toHaveValue('qa@test.com');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Email').fill('qa@test.com');\n  await page.getByLabel('Password').fill('secret123');\n  await expect(page.getByLabel('Email')).toHaveValue('qa@test.com');\n});",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["getByLabel", "fill"]
+        "requiredMethods": ["getByLabel", "fill"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["qa@test.com"],
+            "locator": { "method": "getByLabel", "value": "Email" }
+          },
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["secret123"],
+            "locator": { "method": "getByLabel", "value": "Password" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "arguments": ["qa@test.com"],
+            "locator": { "method": "getByLabel", "value": "Email" }
+          }
+        ]
       },
       "tags": ["playwright", "fill", "forms", "intermediate"]
     },
@@ -1045,12 +1074,40 @@
         ]
       },
       "htmlContent": "<form>\n  <label for=\"language\">Choose Language:</label>\n  <select id=\"language\">\n    <option value=\"\">Select...</option>\n    <option value=\"python\">Python</option>\n    <option value=\"javascript\">JavaScript</option>\n    <option value=\"typescript\">TypeScript</option>\n  </select>\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('select language', async ({ page }) => {\n  // 1. Select 'javascript' (use getByLabel)\n  // 2. Verify value\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Choose Language:').selectOption('javascript');\nawait expect(page.getByLabel('Choose Language:')).toHaveValue('javascript');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Choose Language:').selectOption('javascript');\n  await expect(page.getByLabel('Choose Language:')).toHaveValue('javascript');\n});",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["getByLabel", "selectOption"]
+        "requiredMethods": ["getByLabel", "selectOption"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "selectOption",
+            "target": "locator",
+            "arguments": ["javascript"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Choose Language:"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "arguments": ["javascript"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Choose Language:"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "select", "dropdown", "intermediate"]
     },
@@ -1086,12 +1143,38 @@
         ]
       },
       "htmlContent": "<form>\n  <label>\n    <input type=\"checkbox\" id=\"terms\" />\n    Accept Terms & Conditions\n  </label>\n  <label>\n    <input type=\"checkbox\" id=\"newsletter\" />\n    Subscribe to Newsletter\n  </label>\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check terms', async ({ page }) => {\n  // 1. Check terms (use getByLabel)\n  // 2. Verify checked state\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Accept Terms & Conditions').check();\nawait expect(page.getByLabel('Accept Terms & Conditions')).toBeChecked();",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Accept Terms & Conditions').check();\n  await expect(page.getByLabel('Accept Terms & Conditions')).toBeChecked();\n});",
       "validation": {
         "requiredAssertions": ["toBeChecked"],
-        "requiredMethods": ["getByLabel", "check"]
+        "requiredMethods": ["getByLabel", "check"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "check",
+            "target": "locator",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Accept Terms & Conditions"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeChecked",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Accept Terms & Conditions"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "checkbox", "state", "intermediate"]
     },
@@ -1127,12 +1210,41 @@
         ]
       },
       "htmlContent": "<div class=\"search-box\">\n  <label for=\"search\">Search</label>\n  <input type=\"search\" id=\"search\" role=\"searchbox\" />\n  <div id=\"result\" role=\"status\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Locate and fill the searchbox.\n  // 2. Press Enter on that locator.\n  // 3. Verify the status result.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "const search = page.getByRole('searchbox');\nawait search.fill('Playwright');\nawait search.press('Enter');\nawait expect(page.getByRole('status')).toHaveText('Searching for: Playwright');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const search = page.getByRole('searchbox');\n  await search.fill('Playwright');\n  await search.press('Enter');\n  await expect(page.getByRole('status')).toHaveText('Searching for: Playwright');\n});",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "fill", "press"]
+        "requiredMethods": ["getByRole", "fill", "press"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["Playwright"],
+            "locator": { "method": "getByRole", "value": "searchbox" }
+          },
+          {
+            "type": "method",
+            "method": "press",
+            "target": "locator",
+            "arguments": ["Enter"],
+            "locator": { "method": "getByRole", "value": "searchbox" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Searching for: Playwright"],
+            "locator": { "method": "getByRole", "value": "status" }
+          }
+        ]
       },
       "tags": ["playwright", "keyboard", "input", "intermediate"]
     },
@@ -1209,12 +1321,37 @@
         ]
       },
       "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div role=\"status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.querySelector('[role=status]').textContent = 'Selected: ' + file.name;\n  });\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  // 1. Upload 'resume.pdf' to 'Upload Resume'\n  // 2. Verify status text\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');\nawait expect(page.getByRole('status')).toContainText('resume.pdf');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');\n  await expect(page.getByRole('status')).toContainText('resume.pdf');\n});",
       "validation": {
         "requiredAssertions": ["toContainText"],
-        "requiredMethods": ["getByLabel", "getByRole", "setInputFiles"]
+        "requiredMethods": ["getByLabel", "getByRole", "setInputFiles"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "setInputFiles",
+            "target": "locator",
+            "arguments": ["resume.pdf"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Upload Resume"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toContainText",
+            "arguments": ["resume.pdf"],
+            "locator": { "method": "getByRole", "value": "status" }
+          }
+        ]
       },
       "tags": ["playwright", "upload", "files", "intermediate"]
     },
@@ -1417,12 +1554,63 @@
         ]
       },
       "htmlContent": "<div class=\"shop\">\n  <div class=\"product\">\n    <h3>Widget Pro</h3>\n    <button id=\"add-btn\" onclick=\"addToCart()\">Add to Cart</button>\n  </div>\n  <div class=\"cart\" style=\"display:none;\">\n    <label for=\"qty\">Quantity</label>\n    <input type=\"number\" id=\"qty\" value=\"1\" />\n    <label><input type=\"checkbox\" id=\"express\" checked /> Express Shipping</label>\n    <button id=\"checkout-btn\" onclick=\"checkout()\">Checkout</button>\n  </div>\n  <div id=\"confirmation\" role=\"status\" style=\"display:none;\"></div>\n</div>\n<script>\n  function addToCart() {\n    document.querySelector('.cart').style.display = 'block';\n    document.getElementById('add-btn').textContent = 'Added!';\n  }\n  function checkout() {\n    const qty = document.getElementById('qty').value;\n    const express = document.getElementById('express').checked;\n    document.getElementById('confirmation').style.display = 'block';\n    document.getElementById('confirmation').textContent = \n      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');\n  }\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('checkout flow', async ({ page }) => {\n  // 1. Click \"Add to Cart\" (getByRole)\n  // 2. Fill \"Quantity\" to \"3\" (getByLabel)\n  // 3. Check \"Express Shipping\" (getByLabel)\n  // 4. Click \"Checkout\" (getByRole)\n  // 5. Verify confirmation text\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n  // TODO 5\n});",
       "testCases": [],
-      "solution": "await page.getByRole('button', { name: 'Add to Cart' }).click();\nawait page.getByLabel('Quantity').fill('3');\nawait page.getByLabel('Express Shipping').check();\nawait page.getByRole('button', { name: 'Checkout' }).click();\nawait expect(page.getByRole('status')).toContainText('3 items (Express)');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByRole('button', { name: 'Add to Cart' }).click();\n  await page.getByLabel('Quantity').fill('3');\n  await page.getByLabel('Express Shipping').check();\n  await page.getByRole('button', { name: 'Checkout' }).click();\n  await expect(page.getByRole('status')).toContainText('3 items (Express)');\n});",
       "validation": {
         "requiredAssertions": ["toContainText"],
-        "requiredMethods": ["getByRole", "getByLabel", "click", "fill", "check"]
+        "requiredMethods": ["getByRole", "getByLabel", "click", "fill", "check"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Add to Cart"
+            }
+          },
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["3"],
+            "locator": { "method": "getByLabel", "value": "Quantity" }
+          },
+          {
+            "type": "method",
+            "method": "check",
+            "target": "locator",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Express Shipping"
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Checkout"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toContainText",
+            "arguments": ["3 items (Express)"],
+            "locator": { "method": "getByRole", "value": "status" }
+          }
+        ]
       },
       "tags": ["playwright", "scenario", "boss", "checkout", "intermediate"]
     },

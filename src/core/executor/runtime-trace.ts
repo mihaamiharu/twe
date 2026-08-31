@@ -26,6 +26,7 @@ export interface RuntimeMethodCall {
 
 export interface RuntimeAssertion {
   matcher: string;
+  arguments?: string[];
   locator?: LocatorEvidenceDefinition;
   passed: boolean;
   error?: string;

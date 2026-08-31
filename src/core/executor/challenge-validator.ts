@@ -85,6 +85,9 @@ function evidenceEventMatches(
       event.type === 'assertion' &&
       event.assertion.passed &&
       event.assertion.matcher === expected.matcher &&
+      (expected.arguments === undefined ||
+        JSON.stringify(event.assertion.arguments) ===
+          JSON.stringify(expected.arguments)) &&
       locatorEvidenceMatches(event.assertion.locator, expected.locator)
     );
   }

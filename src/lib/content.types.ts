@@ -194,6 +194,7 @@ export type RequiredEvidenceSequenceStep =
   | {
       type: 'assertion';
       matcher: string;
+      arguments?: string[];
       locator?: LocatorEvidenceDefinition;
     };
 
