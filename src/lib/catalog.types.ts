@@ -46,6 +46,8 @@ export interface ChallengeCatalogListItem {
   type: ChallengeType;
   difficulty: ChallengeDifficulty;
   category: string;
+  /** Localized label rendered by the Practice catalog. */
+  categoryLabel?: string;
   xpReward: number;
   order: number;
   title: string;

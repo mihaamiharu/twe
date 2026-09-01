@@ -26,6 +26,9 @@ function challenge(
     type: overrides.type ?? 'JAVASCRIPT',
     difficulty: overrides.difficulty ?? 'EASY',
     category: overrides.category ?? 'js-fundamentals',
+    ...(overrides.categoryLabel
+      ? { categoryLabel: overrides.categoryLabel }
+      : {}),
     xpReward: overrides.xpReward ?? 10,
     order: overrides.order ?? 1,
     tags: overrides.tags ?? [],
@@ -146,6 +149,77 @@ describe('Practice catalog projection', () => {
         }).map((item) => item.slug),
       ).toEqual(['pom-login']);
     }
+  });
+
+  test('indexes localized rendered category labels without broad e2e matches', async () => {
+    const [englishCatalog, indonesianCatalog] = await Promise.all([
+      getChallengeCatalogList('en'),
+      getChallengeCatalogList('id'),
+    ]);
+    const english = englishCatalog.map((item) => ({
+      ...item,
+      id: item.slug,
+      isPublished: true,
+      completionCount: 0,
+      isCompleted: false,
+    }));
+    const indonesian = indonesianCatalog.map((item) => ({
+      ...item,
+      id: item.slug,
+      isPublished: true,
+      completionCount: 0,
+      isCompleted: false,
+    }));
+    const filter = (
+      challenges: typeof english,
+      query: string,
+      track: TrackId = 'all',
+    ) =>
+      filterPracticeChallenges(challenges, {
+        query,
+        track,
+        hideCompleted: false,
+      });
+
+    const englishIntegration = filter(english, 'Integration Patterns', 'e2e');
+    const indonesianIntegration = filter(indonesian, 'Pola Integrasi', 'e2e');
+    expect(englishIntegration.length).toBeGreaterThan(0);
+    expect(indonesianIntegration.map((item) => item.slug)).toEqual(
+      englishIntegration.map((item) => item.slug),
+    );
+    expect(
+      englishIntegration.every(
+        (item) => item.category === 'e2e-integration',
+      ),
+    ).toBe(true);
+    expect(
+      indonesianIntegration.every(
+        (item) => item.category === 'e2e-integration',
+      ),
+    ).toBe(true);
+
+    const englishNavigation = filter(english, 'Navigation & Actions', 'core');
+    const indonesianNavigation = filter(indonesian, 'Navigasi & Aksi', 'core');
+    expect(englishNavigation.length).toBeGreaterThan(0);
+    expect(indonesianNavigation.map((item) => item.slug)).toEqual(
+      englishNavigation.map((item) => item.slug),
+    );
+    expect(
+      englishNavigation.every(
+        (item) => item.category === 'playwright-navigation',
+      ),
+    ).toBe(true);
+    expect(
+      indonesianNavigation.every(
+        (item) => item.category === 'playwright-navigation',
+      ),
+    ).toBe(true);
+
+    const e2eSearchResults = filter(english, 'e2e');
+    expect(e2eSearchResults.length).toBeGreaterThan(0);
+    expect(e2eSearchResults.every((item) => item.category.startsWith('e2e-'))).toBe(
+      true,
+    );
   });
 
   test('groups deterministically by tier, category, order, and slug', () => {

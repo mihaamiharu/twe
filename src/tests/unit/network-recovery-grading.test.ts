@@ -45,6 +45,87 @@ describe('API request recovery practice grading', () => {
     expect(decision).toEqual({ passed: true });
   });
 
+  it('rejects a 200 response with an invalid first payload', async () => {
+    const { result, decision } = await runNetworkRecovery(`
+      test('recommendations-recovery', async ({ page }) => {
+        await page.goto('/app/recommendations.html');
+        let requestCount = 0;
+        await page.route('/api/recommendations', async (route) => {
+          requestCount += 1;
+          await route.fulfill({
+            status: 200,
+            json: requestCount === 1
+              ? { error: 'Service unavailable' }
+              : { items: ['Release health dashboard', 'Checkout recovery'] },
+          });
+        });
+
+        await page.getByRole('button', { name: 'Load recommendations' }).click();
+        await expect(page.getByRole('alert')).toHaveText(
+          'Recommendations are temporarily unavailable. Try again.',
+        );
+      });
+    `);
+
+    expect(result.status).toBe('FAILED');
+    expect(decision.passed).toBe(false);
+  });
+
+  it('rejects a non-503 first failure response', async () => {
+    const { result, decision } = await runNetworkRecovery(`
+      test('recommendations-recovery', async ({ page }) => {
+        await page.goto('/app/recommendations.html');
+        let requestCount = 0;
+        await page.route('/api/recommendations', async (route) => {
+          requestCount += 1;
+          await route.fulfill({
+            status: requestCount === 1 ? 500 : 200,
+            json: requestCount === 1
+              ? { error: 'Service unavailable' }
+              : { items: ['Release health dashboard', 'Checkout recovery'] },
+          });
+        });
+
+        await page.getByRole('button', { name: 'Load recommendations' }).click();
+        await expect(page.getByRole('alert')).toHaveText(
+          'Recommendations are temporarily unavailable. Try again.',
+        );
+      });
+    `);
+
+    expect(result.status).toBe('FAILED');
+    expect(decision.passed).toBe(false);
+  });
+
+  it('rejects a valid retry payload delivered with a non-200 status', async () => {
+    const { result, decision } = await runNetworkRecovery(`
+      test('recommendations-recovery', async ({ page }) => {
+        await page.goto('/app/recommendations.html');
+        let requestCount = 0;
+        await page.route('/api/recommendations', async (route) => {
+          requestCount += 1;
+          await route.fulfill({
+            status: requestCount === 1 ? 503 : 201,
+            json: requestCount === 1
+              ? { error: 'Service unavailable' }
+              : { items: ['Release health dashboard', 'Checkout recovery'] },
+          });
+        });
+
+        await page.getByRole('button', { name: 'Load recommendations' }).click();
+        const alert = page.getByRole('alert');
+        await expect(alert).toHaveText(
+          'Recommendations are temporarily unavailable. Try again.',
+        );
+        await page.getByRole('button', { name: 'Retry' }).click();
+        await expect(alert).toBeHidden();
+      });
+    `);
+
+    expect(result.status).toBe('FAILED');
+    expect(decision.passed).toBe(false);
+  });
+
   it('rejects a success-path-only route that never proves the outage', async () => {
     const { result, decision } = await runNetworkRecovery(`
       test('recommendations-recovery', async ({ page }) => {

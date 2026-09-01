@@ -121,7 +121,6 @@ const TYPE_SEARCH_ALIASES: Record<string, string[]> = {
     'browser automation',
     'test automation',
     'otomasi pengujian',
-    'e2e',
   ],
 };
 
@@ -163,6 +162,7 @@ function getPracticeSearchText(challenge: PracticeChallenge): string {
       challenge.title,
       challenge.description,
       category,
+      challenge.categoryLabel,
       challenge.type,
       ...aliases,
     ].join(' '),
