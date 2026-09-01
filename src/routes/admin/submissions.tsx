@@ -79,10 +79,10 @@ function SubmissionsManager() {
         setCurrentPage(1);
     }, [searchQuery, statusFilter]);
 
-    if (isLoading) return <div className="p-8 text-center animate-pulse">Loading submissions...</div>;
+    if (isLoading) return <div className="p-8 text-center animate-pulse motion-reduce:animate-none">Loading submissions...</div>;
 
     return (
-        <div className="container mx-auto p-6 space-y-8 animate-fade-in">
+        <div className="container mx-auto p-6 space-y-8 animate-in fade-in-0 duration-200 ease-(--ease-ui-out)">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">Submissions History</h1>
                 <p className="text-muted-foreground mt-1">

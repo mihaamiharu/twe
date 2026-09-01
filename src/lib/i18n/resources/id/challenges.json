@@ -1,10 +1,10 @@
 {
   "page": {
     "title": "Practice",
-    "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
+    "subtitle": "Latih kemampuan test automation lewat tantangan CSS, XPath, JavaScript, TypeScript, dan Playwright.",
     "seo": {
-      "title": "Praktik Software Testing — TestingWithEkki",
-      "description": "Latih kemampuan Playwright, Selenium, dan Cypress melalui skenario coding dunia nyata. Kuasai selektor, autentikasi otomasi, dan lainnya."
+      "title": "Latihan Test Automation — TestingWithEkki",
+      "description": "Latih kemampuan test automation melalui tantangan selector CSS dan XPath, JavaScript dan TypeScript, serta Playwright yang bisa langsung kamu kerjakan di browser."
     },
     "practiceResourceType": "Tantangan praktik",
     "overallProgress": "Progres Keseluruhan",
@@ -15,8 +15,8 @@
   },
   "library": {
     "eyebrow": "LATIHAN",
-    "headline": "Praktikkan yang kamu tahu.",
-    "description": "Kerjakan tantangan Practice berdasarkan topik, atau gunakan bersama pelajaran Learn saat membutuhkan konteks.",
+    "headline": "Latih kemampuanmu lewat tantangan nyata.",
+    "description": "Kerjakan tantangan Practice berdasarkan topik, atau buka pelajaran Learn kalau kamu membutuhkan konteks tambahan.",
     "discoveryLabel": "Temukan Practice",
     "showingCount": "{{count}} tantangan",
     "completedByCount": "{{count}} selesai",
@@ -64,6 +64,8 @@
     "difficulty": "Kesulitan",
     "allDifficulties": "Semua Kesulitan",
     "tier": "Tingkat",
+    "view": "Mode tampilan",
+    "trackScrollHint": "Geser ke samping untuk melihat semua track",
     "allTiers": "Semua Tingkat",
     "clear": "Bersihkan",
     "hideCompleted": "Sembunyikan Selesai",
@@ -184,6 +186,7 @@
     "playwright-locators": "Locator",
     "playwright-assertions": "Assertion",
     "playwright-waits": "Strategi Menunggu",
+    "playwright-debugging": "Debugging & Reliability",
     "playwright-pom": "Page Object Model",
     "playwright-data-driven": "Pengujian Berbasis Data",
     "playwright-infrastructure": "Infrastruktur Pengujian",

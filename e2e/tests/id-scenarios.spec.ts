@@ -41,7 +41,7 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
     await expect(
       page.getByRole('heading', {
         level: 1,
-        name: 'Praktikkan yang kamu tahu.',
+        name: 'Latih kemampuanmu lewat tantangan nyata.',
       }),
     ).toBeVisible();
     await expect(

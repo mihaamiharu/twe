@@ -124,7 +124,7 @@ export function ChallengeSuccessDialog({
           {onNextChallenge && (
             <Button onClick={onNextChallenge} className="w-full">
               {t('challenges:success.nextChallenge')}
-              <ArrowRight className="w-4 h-4 ml-2 animate-bounce-x" />
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           )}
 

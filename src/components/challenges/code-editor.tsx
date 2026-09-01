@@ -52,7 +52,7 @@ export function CodeEditor(props: CodeEditorProps) {
         style={{ height }}
       >
         <div className="flex flex-col items-center gap-2">
-          <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <Loader2 className="h-6 w-6 animate-spin motion-reduce:animate-none text-primary" />
           <span className="text-xs">Loading saved code...</span>
         </div>
       </div>
@@ -105,7 +105,7 @@ export function CodeEditor(props: CodeEditorProps) {
         }}
         loading={
           <div className="flex items-center justify-center h-full bg-workspace-background text-workspace-muted">
-            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none mr-2" />
             Loading editor...
           </div>
         }

@@ -113,7 +113,7 @@ function BugManager() {
   if (isLoading) return <div className="p-8 text-center">Loading bugs...</div>;
 
   return (
-    <div className="container mx-auto p-6 space-y-8 animate-fade-in">
+    <div className="container mx-auto p-6 space-y-8 animate-in fade-in-0 duration-200 ease-(--ease-ui-out)">
       <div className="flex items-center gap-4">
         <Link to="/admin">
           <Button variant="ghost" size="icon">

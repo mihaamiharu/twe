@@ -45,10 +45,11 @@ export function SelectorPanel({
                 size="sm"
                 onClick={onValidate}
                 disabled={isRunning || !selector}
-                className="font-bold border border-brand-orange bg-brand-orange hover:bg-brand-orange/90 text-workspace-background transition-all"
+                aria-busy={isRunning}
+                className="font-bold border border-brand-orange bg-brand-orange hover:bg-brand-orange/90 text-workspace-background transition-colors duration-150"
               >
                 {isRunning ? (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin motion-reduce:animate-none" />
                 ) : (
                   <Play className="h-4 w-4 mr-2" />
                 )}
@@ -58,7 +59,7 @@ export function SelectorPanel({
               {testResults.length > 0 && (
                 <div
                   className={cn(
-                    'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-all',
+                    'flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-[background-color,border-color,color] duration-150',
                     hasPassed
                       ? 'bg-brand-success/10 text-brand-success border border-brand-success/30'
                       : 'bg-brand-error/10 text-brand-error border border-brand-error/30',

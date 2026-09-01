@@ -230,7 +230,7 @@ function LeaderboardPage() {
                           data-current-user={isCurrentUser ? 'true' : undefined}
                           style={getDelay(index)}
                           className={cn(
-                            'group flex items-center gap-3 px-4 py-4 transition-colors animate-in fade-in slide-in-from-bottom-1 fill-mode-backwards sm:gap-4 sm:px-5',
+                            'group flex items-center gap-3 px-4 py-4 transition-colors animate-in fade-in slide-in-from-bottom-1 fill-mode-backwards motion-reduce:animate-none motion-reduce:opacity-100 sm:gap-4 sm:px-5',
                             isCurrentUser
                               ? 'bg-[var(--orange-tint)]/55'
                               : 'bg-[var(--paper-surface)] hover:bg-[var(--warm-canvas)]/60',

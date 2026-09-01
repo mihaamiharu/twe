@@ -205,11 +205,16 @@ export function PlaygroundHeader({
             variant="outline"
             onClick={onRunCode}
             disabled={isRunning}
-            aria-label={t('common:actions.runCode')}
+            aria-busy={isRunning}
+            aria-label={
+              isRunning
+                ? t('common:messages.loading')
+                : t('common:actions.runCode')
+            }
             className="font-bold border-brand-orange text-brand-orange hover:bg-brand-orange/10"
           >
             {isRunning ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
+              <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" />
             ) : (
               <Play className="h-4 w-4" />
             )}
@@ -333,7 +338,7 @@ export function PlaygroundHeader({
                         revealedHintsCount < (challenge.hints?.length || 0)
                       }
                       className={cn(
-                        'w-full justify-start font-bold h-9 px-3 transition-all',
+                        'w-full justify-start font-bold h-9 px-3 transition-colors duration-150',
                         hintUsed
                           ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20'
                           : !userId
@@ -347,7 +352,7 @@ export function PlaygroundHeader({
                       <div className="flex items-center justify-between w-full">
                         <div className="flex items-center">
                           {isHintPending ? (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin motion-reduce:animate-none" />
                           ) : (
                             <Sparkles className="h-4 w-4 mr-2" />
                           )}
@@ -404,7 +409,7 @@ export function PlaygroundHeader({
                 disabled={!hasPassed}
                 aria-label={t('common:actions.submit')}
                 className={cn(
-                  'font-bold border border-workspace-border transition-all h-8 md:h-9 px-2 md:px-3',
+                  'font-bold border border-workspace-border transition-colors duration-150 h-8 md:h-9 px-2 md:px-3',
                   hasPassed
                     ? 'bg-brand-success hover:bg-brand-success/90 text-workspace-text'
                     : 'bg-workspace-elevated text-workspace-muted disabled:opacity-100 cursor-not-allowed',

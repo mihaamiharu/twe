@@ -24,7 +24,11 @@ export function IframeContainer({
                     transformOrigin: 'top left',
                     width: `${100 * (100 / zoom)}%`,
                     height: `${100 * (100 / zoom)}%`,
-                    display: viewMode === 'preview' ? 'block' : 'none',
+                    // Keep the iframe in the layout while the source editor is
+                    // visible. Toggling display:none can leave a sandboxed
+                    // document with a zero-sized layout when it is shown again.
+                    visibility: viewMode === 'preview' ? 'visible' : 'hidden',
+                    pointerEvents: viewMode === 'preview' ? 'auto' : 'none',
                 }}
             >
                 <iframe

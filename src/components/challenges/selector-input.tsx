@@ -155,7 +155,7 @@ export function SelectorInput({
               onClick={() => handleTypeToggle('css')}
               disabled={disabled}
               className={cn(
-                'text-xs font-medium px-3 py-1 rounded transition-all',
+                'text-xs font-medium px-3 py-1 rounded transition-[background-color,border-color,color] duration-150',
                 selectorType === 'css'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground',
@@ -168,7 +168,7 @@ export function SelectorInput({
               onClick={() => handleTypeToggle('xpath')}
               disabled={disabled}
               className={cn(
-                'text-xs font-medium px-3 py-1 rounded transition-all',
+                'text-xs font-medium px-3 py-1 rounded transition-[background-color,border-color,color] duration-150',
                 selectorType === 'xpath'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground',

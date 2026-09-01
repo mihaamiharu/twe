@@ -39,6 +39,7 @@ export const categoryLabels: Record<string, string> = {
   'playwright-locators': '🔍 Locators',
   'playwright-assertions': '✅ Assertions',
   'playwright-waits': '⏳ Wait Strategies',
+  'playwright-debugging': '🧭 Debugging & Reliability',
   // Tier 4: E2E Testing (App Testing)
   'e2e-pom': '🏗️ Page Object Model',
   'e2e-integration': '🔄 Integration Patterns',
@@ -60,7 +61,8 @@ export function getTierFromCategory(category?: string): string {
     category.startsWith('playwright-navigation') ||
     category.startsWith('playwright-locators') ||
     category.startsWith('playwright-assertions') ||
-    category.startsWith('playwright-waits')
+    category.startsWith('playwright-waits') ||
+    category.startsWith('playwright-debugging')
   )
     return 'intermediate';
   if (
@@ -92,6 +94,7 @@ export const CATEGORY_ORDER: Record<string, number> = {
   'playwright-locators': 2,
   'playwright-assertions': 3,
   'playwright-waits': 4,
+  'playwright-debugging': 5,
   // E2E Tier (App Testing) - Order base: 4000
   'e2e-pom': 1,
   'e2e-integration': 2,

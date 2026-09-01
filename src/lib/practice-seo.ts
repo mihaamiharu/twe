@@ -28,12 +28,12 @@ export function createPracticeDetailSeoHead({
   const fallbackTitle = translate(
     'challenges:page.seo.title',
     locale,
-    'Practice challenges | TestingWithEkki',
+    'Practice Test Automation — TestingWithEkki',
   );
   const fallbackDescription = translate(
     'challenges:page.seo.description',
     locale,
-    'Practice software testing skills with hands-on challenges.',
+    'Build test automation skills with CSS and XPath selectors, JavaScript and TypeScript, and Playwright challenges you can solve in the browser.',
   );
 
   if (!challenge) {

@@ -52,7 +52,7 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+      <div className="w-full max-w-md space-y-6 animate-in fade-in-0 duration-200 ease-(--ease-ui-out)">
         <LoginForm
           onSuccess={handleLoginSuccess}
           onRegisterClick={() => {

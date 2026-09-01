@@ -30,6 +30,7 @@ import type {
 } from '@/lib/catalog.types';
 import { getTierFromCategory } from '@/lib/constants';
 import { omitUndefined } from '@/lib/omit-undefined';
+import i18n from '@/lib/i18n';
 import {
   parseChallengeTierJson,
   parseTutorialRegistryJson,
@@ -312,11 +313,19 @@ function projectChallengeSummary(
   definition: ChallengeDefinition,
   locale: string,
 ): ChallengeCatalogListItem {
+  const categoryLabel: unknown = i18n.getResource(
+    locale === 'id' ? 'id' : 'en',
+    'challenges',
+    `categories.${definition.category}`,
+  );
+
   return {
     slug: definition.slug,
     type: definition.type,
     difficulty: definition.difficulty,
     category: definition.category,
+    categoryLabel:
+      typeof categoryLabel === 'string' ? categoryLabel : definition.category,
     xpReward: definition.xpReward,
     order: definition.order,
     title: resolveLocale(definition.title, locale),

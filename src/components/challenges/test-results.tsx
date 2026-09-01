@@ -139,7 +139,7 @@ export function TestResults({
         )}
       >
         <div className="flex items-center gap-3 text-workspace-muted">
-          <Loader2 className="h-5 w-5 animate-spin" />
+          <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none" />
           <span className="font-mono text-xs tracking-wide">RUNNING…</span>
         </div>
       </div>

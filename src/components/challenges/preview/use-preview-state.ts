@@ -103,16 +103,18 @@ export function usePreviewState(
     `;
     }, [htmlContent, cssContent, targetElementId, targetSelector]);
 
-    // Effect: Update iframe content when HTML/CSS or viewMode changes
+    // Effect: Update iframe content when the preview document changes. The
+    // iframe stays mounted while source mode is shown, so switching modes
+    // should not recreate its sandbox document or interrupt its layout.
     useEffect(() => {
         const iframe = iframeRef.current;
-        if (!iframe || viewMode !== 'preview') return;
+        if (!iframe) return;
 
         // Use srcdoc so the preview keeps an opaque sandbox origin. This lets
         // the inspector communicate through postMessage without granting the
         // preview access to the parent origin.
         iframe.srcdoc = getFullIframeDocument();
-    }, [getFullIframeDocument, viewMode, iframeRef]);
+    }, [getFullIframeDocument, iframeRef]);
 
     // Effect: Listen for messages from the iframe
     useEffect(() => {

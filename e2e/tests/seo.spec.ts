@@ -65,7 +65,7 @@ test.describe('SEO Checks', () => {
     test('Challenges page should have correct metadata', async ({ page }) => {
         await page.goto('/en/practice');
         await expect(page).toHaveTitle(
-            'Practice Software Testing — TestingWithEkki',
+            'Practice Test Automation — TestingWithEkki',
         );
 
         const canonical = page.locator('link[rel="canonical"]');

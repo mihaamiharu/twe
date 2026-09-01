@@ -1,6 +1,6 @@
 import { createFileRoute, getRouteApi } from '@tanstack/react-router';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { type KeyboardEvent, useRef, useState } from 'react';
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
 import {
   ArrowRight,
   Check,
@@ -133,6 +133,15 @@ export function ChallengesPage() {
   const trackTabRefs = useRef<
     Partial<Record<TrackId, HTMLButtonElement | null>>
   >({});
+  const pendingTrackFocus = useRef<TrackId | null>(null);
+
+  useEffect(() => {
+    const trackId = pendingTrackFocus.current;
+    if (!trackId || trackId !== activeTrackId) return;
+
+    trackTabRefs.current[trackId]?.focus();
+    pendingTrackFocus.current = null;
+  }, [activeTrackId]);
 
   const updateSearch = (
     updates: Partial<PracticeSearch>,
@@ -278,13 +287,13 @@ export function ChallengesPage() {
     const nextTrack = ALL_TRACKS[nextIndex];
     if (!nextTrack) return;
 
+    pendingTrackFocus.current = nextTrack.id;
     selectTrack(nextTrack.id);
-    trackTabRefs.current[nextTrack.id]?.focus();
   };
 
   return (
     <div className="min-h-screen bg-background" data-testid="practice-library">
-      <main className="mx-auto w-full max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8 lg:pt-12">
+      <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8 lg:pt-12">
         <section
           className="max-w-3xl pb-8 lg:pb-10"
           aria-labelledby="practice-title"
@@ -355,40 +364,50 @@ export function ChallengesPage() {
           aria-label={t('library.discoveryLabel')}
           className="relative flex flex-col md:sticky md:top-16 md:z-30 md:-mx-6 md:bg-background/95 md:px-6 md:backdrop-blur-sm lg:-mx-8 lg:px-8"
         >
-          <nav
-            aria-label={t('filters.track')}
-            role="tablist"
-            aria-orientation="horizontal"
-            className="order-1 -mx-4 flex snap-x overflow-x-auto border-b border-border px-4 md:mx-0 md:px-0"
-          >
-            {ALL_TRACKS.map((track, index) => {
-              const isActive = activeTrack.id === track.id;
-              return (
-                <button
-                  key={track.id}
-                  type="button"
-                  role="tab"
-                  id={`track-tab-${track.id}`}
-                  ref={(element) => {
-                    trackTabRefs.current[track.id] = element;
-                  }}
-                  tabIndex={isActive ? 0 : -1}
-                  aria-selected={isActive}
-                  aria-controls="challenge-results"
-                  onClick={() => selectTrack(track.id)}
-                  onKeyDown={(event) => handleTrackKeyDown(event, index)}
-                  className={cn(
-                    'min-h-11 shrink-0 snap-start border-b-2 px-4 text-sm font-medium transition-colors first:pl-0 last:pr-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
-                    isActive
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-muted-foreground hover:text-foreground',
-                  )}
-                >
-                  {t(TRACK_LABEL_KEYS[track.id])}
-                </button>
-              );
-            })}
-          </nav>
+          <div className="order-1 -mx-4 border-b border-border px-4 md:mx-0 md:px-0">
+            <nav
+              aria-label={t('filters.track')}
+              aria-describedby="track-scroll-hint"
+              role="tablist"
+              aria-orientation="horizontal"
+              className="flex snap-x overflow-x-auto"
+            >
+              {ALL_TRACKS.map((track, index) => {
+                const isActive = activeTrack.id === track.id;
+                return (
+                  <button
+                    key={track.id}
+                    type="button"
+                    role="tab"
+                    id={`track-tab-${track.id}`}
+                    ref={(element) => {
+                      trackTabRefs.current[track.id] = element;
+                    }}
+                    tabIndex={isActive ? 0 : -1}
+                    aria-selected={isActive}
+                    aria-controls="challenge-results"
+                    onClick={() => selectTrack(track.id)}
+                    onKeyDown={(event) => handleTrackKeyDown(event, index)}
+                    className={cn(
+                      'min-h-11 shrink-0 snap-start border-b-2 px-4 text-sm font-medium transition-colors first:pl-0 last:pr-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
+                      isActive
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {t(TRACK_LABEL_KEYS[track.id])}
+                  </button>
+                );
+              })}
+            </nav>
+            <p
+              id="track-scroll-hint"
+              className="flex items-center gap-1 py-1.5 text-[10px] text-muted-foreground md:hidden"
+            >
+              <span aria-hidden="true">↔</span>
+              {t('filters.trackScrollHint')}
+            </p>
+          </div>
 
           <div className="order-2 flex flex-col gap-3 border-b border-border bg-background/95 py-3 md:bg-transparent lg:flex-row lg:items-center">
             <div className="relative min-w-0 flex-1">
@@ -480,7 +499,11 @@ export function ChallengesPage() {
                 </label>
               )}
 
-              <div className="hidden items-center rounded-lg border border-border bg-card p-1 lg:flex">
+              <div
+                className="flex items-center justify-end rounded-lg border border-border bg-card p-1"
+                role="group"
+                aria-label={t('filters.view')}
+              >
                 <Button
                   type="button"
                   variant={viewMode === 'list' ? 'secondary' : 'ghost'}
@@ -544,7 +567,7 @@ export function ChallengesPage() {
               {[1, 2, 3, 4, 5, 6].map((item) => (
                 <div
                   key={item}
-                  className="h-40 animate-pulse rounded-xl border border-border bg-card/70"
+                  className="h-40 animate-pulse motion-reduce:animate-none rounded-xl border border-border bg-card/70"
                 />
               ))}
             </div>
@@ -661,7 +684,7 @@ export function ChallengesPage() {
             </div>
           )}
         </div>
-      </main>
+      </div>
     </div>
   );
 }

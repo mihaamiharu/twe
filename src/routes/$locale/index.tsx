@@ -76,7 +76,7 @@ function HomePage() {
             <Link
               to={LocaleRoutes.learn}
               params={params}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white transition-transform hover:-translate-y-px hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+              className="motion-hover-lift inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
               {t('hero.startWebAutomation')}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -125,7 +125,7 @@ function HomePage() {
                   key={lesson.slug}
                   to={LocaleRoutes.learnDetail}
                   params={{ ...params, slug: lesson.slug }}
-                  className="group relative flex min-h-44 flex-col rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-4 transition-colors hover:border-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                  className="motion-hover-arrow-group group relative flex min-h-44 flex-col rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-4 transition-colors hover:border-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                 >
                   <span className="font-mono text-[11px] text-[var(--brand-orange)]">
                     {t('learningPath.lessonNumber', { number: index + 1 })}
@@ -137,7 +137,7 @@ function HomePage() {
                     {lesson.description}
                   </p>
                   <ArrowRight
-                    className="mt-auto h-4 w-4 self-end text-[var(--brand-orange)] transition-transform group-hover:translate-x-1"
+                    className="motion-hover-arrow mt-auto h-4 w-4 self-end text-[var(--brand-orange)]"
                     aria-hidden="true"
                   />
                 </Link>

@@ -64,7 +64,7 @@ export function HintConfirmDialog({
                         className="bg-amber-500 hover:bg-amber-600 text-white shadow-sm"
                     >
                         {isPending ? (
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin motion-reduce:animate-none" />
                         ) : (
                             <Sparkles className="h-4 w-4 mr-2" />
                         )}

@@ -172,7 +172,7 @@ function ProfilePage() {
   const displayName = user.name || t('leaderboard:table.anonymous');
 
   return (
-    <div className="min-h-screen bg-background p-4 page-transition sm:p-6 md:p-10">
+    <div className="min-h-screen bg-background p-4 sm:p-6 md:p-10">
       <div className="mx-auto max-w-5xl">
         <Card className="mb-8">
           <CardContent className="p-6 sm:p-8">

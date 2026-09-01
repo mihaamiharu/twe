@@ -1,10 +1,10 @@
 {
   "page": {
     "title": "Practice",
-    "subtitle": "Practice your CSS and XPath selectors with real-world scenarios.",
+    "subtitle": "Build test automation skills with CSS, XPath, JavaScript, TypeScript, and Playwright challenges.",
     "seo": {
-      "title": "Practice Software Testing — TestingWithEkki",
-      "description": "Practice your Playwright, Selenium, and Cypress skills with real-world coding scenarios. Master selectors, automation authentication, and more."
+      "title": "Practice Test Automation — TestingWithEkki",
+      "description": "Build test automation skills with CSS and XPath selectors, JavaScript and TypeScript, and Playwright challenges you can solve in the browser."
     },
     "practiceResourceType": "Practice challenge",
     "overallProgress": "Overall Progress",
@@ -16,7 +16,7 @@
     "library": {
     "eyebrow": "PRACTICE",
     "headline": "Practice what you know.",
-    "description": "Work through standalone practice challenges by topic, or use them alongside current Learn lessons.",
+    "description": "Work through standalone practice challenges by topic, or open Learn when you want more context.",
     "discoveryLabel": "Practice discovery",
     "showingCount": "{{count}} challenges",
     "completedByCount": "{{count}} solved",
@@ -64,6 +64,8 @@
     "difficulty": "Difficulty",
     "allDifficulties": "All Difficulties",
     "tier": "Tier",
+    "view": "View mode",
+    "trackScrollHint": "Swipe horizontally to explore all tracks",
     "allTiers": "All Tiers",
     "clear": "Clear",
     "hideCompleted": "Hide Completed",
@@ -184,6 +186,7 @@
     "playwright-locators": "Locators",
     "playwright-assertions": "Assertions",
     "playwright-waits": "Wait Strategies",
+    "playwright-debugging": "Debugging & Reliability",
     "playwright-pom": "Page Object Model",
     "playwright-data-driven": "Data-Driven Testing",
     "playwright-infrastructure": "Test Infrastructure",

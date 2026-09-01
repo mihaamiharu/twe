@@ -190,6 +190,29 @@ describe('Playground Panels', () => {
 
             expect(screen.getByText('challenges:playground.correct')).toBeTruthy();
         });
+
+        it('should expose a busy state while validating', () => {
+            const runningState = createPlaygroundState({
+                ...mockState,
+                selector: '.test',
+                isRunning: true,
+            });
+
+            render(
+                <SelectorPanel
+                    challenge={mockChallenge}
+                    state={runningState}
+                    onSelectorChange={mockHandlers.onSelectorChange}
+                    onValidate={mockHandlers.onValidate}
+                />
+            );
+
+            const validateButton = screen
+                .getByText('challenges:playground.testSelector')
+                .closest('button');
+
+            expect(validateButton?.getAttribute('aria-busy')).toBe('true');
+        });
     });
 
     describe('ResultsPanel', () => {
@@ -223,6 +246,27 @@ describe('Playground Panels', () => {
             );
 
             expect(screen.getByTestId('console-output')).toBeTruthy();
+        });
+
+        it('should expose a busy state while running code', () => {
+            const runningState = createPlaygroundState({
+                ...mockState,
+                isRunning: true,
+            });
+
+            render(
+                <ResultsPanel
+                    challenge={mockChallenge}
+                    state={runningState}
+                    onRunCode={mockHandlers.onRunCode}
+                />
+            );
+
+            const runButton = screen
+                .getByText('common:actions.run')
+                .closest('button');
+
+            expect(runButton?.getAttribute('aria-busy')).toBe('true');
         });
     });
 });

@@ -82,15 +82,15 @@ function LearnCatalogSkeleton() {
     >
       <div className="mx-auto max-w-7xl space-y-8 px-5 pb-20 pt-10 md:px-10 md:pt-16">
         <div className="space-y-4 border-b border-border pb-12">
-          <div className="h-3 w-28 animate-pulse rounded bg-muted" />
-          <div className="h-14 max-w-2xl animate-pulse rounded bg-muted" />
-          <div className="h-5 max-w-xl animate-pulse rounded bg-muted" />
+          <div className="h-3 w-28 animate-pulse motion-reduce:animate-none rounded bg-muted" />
+          <div className="h-14 max-w-2xl animate-pulse motion-reduce:animate-none rounded bg-muted" />
+          <div className="h-5 max-w-xl animate-pulse motion-reduce:animate-none rounded bg-muted" />
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }, (_, index) => (
             <div
               key={index}
-              className="h-56 animate-pulse rounded-xl border border-border bg-card"
+              className="h-56 animate-pulse motion-reduce:animate-none rounded-xl border border-border bg-card"
             />
           ))}
         </div>
@@ -505,7 +505,7 @@ function LearningPathCard({
   const cardContent = (
     <div
       data-testid={`learning-path-step-${step.number}`}
-      className="group relative grid gap-4 rounded-xl border border-border bg-card p-3 transition-colors hover:border-primary/45 hover:bg-accent/20 sm:grid-cols-[minmax(150px,0.62fr)_minmax(0,1.38fr)] sm:gap-5 sm:p-4"
+      className="motion-hover-arrow-group group relative grid gap-4 rounded-xl border border-border bg-card p-3 transition-colors hover:border-primary/45 hover:bg-accent/20 sm:grid-cols-[minmax(150px,0.62fr)_minmax(0,1.38fr)] sm:gap-5 sm:p-4"
     >
       <span
         className="absolute -left-[2.125rem] top-1/2 hidden h-3 w-3 -translate-y-1/2 rounded-full border-2 border-[var(--brand-orange)] bg-[var(--warm-canvas)] md:block"
@@ -525,7 +525,7 @@ function LearningPathCard({
         <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-primary">
           {t('learn.stack.cardLesson')}
           <ArrowRight
-            className="h-4 w-4 transition-transform group-hover:translate-x-1"
+            className="motion-hover-arrow h-4 w-4"
             aria-hidden="true"
           />
         </span>
@@ -601,7 +601,7 @@ function LessonRow({
     <Link
       to="/$locale/learn/$slug"
       params={{ locale, slug: lesson.slug }}
-      className="group grid gap-4 py-5 transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
+      className="motion-hover-arrow-group group grid gap-4 py-5 transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:items-start sm:gap-6"
       data-testid="lesson-row"
       data-completed={lesson.isCompleted}
     >
@@ -621,7 +621,7 @@ function LessonRow({
         <LessonMeta lesson={lesson} />
       </div>
       <ArrowRight
-        className="hidden h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 group-hover:text-primary sm:mt-1 sm:block"
+        className="motion-hover-arrow hidden h-5 w-5 text-muted-foreground group-hover:text-primary sm:mt-1 sm:block"
         aria-hidden="true"
       />
     </Link>

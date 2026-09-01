@@ -20,7 +20,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                     <AdminBreadcrumb />
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5">
-                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse motion-reduce:animate-none"></div>
                             System Online
                         </span>
                     </div>

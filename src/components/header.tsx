@@ -278,7 +278,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
           <nav
             id="mobile-navigation"
             aria-label="Mobile navigation"
-            className="relative flex h-full w-full max-w-[22rem] flex-col border-r border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 py-5 animate-slide-in-left"
+            className="relative flex h-full w-full max-w-[22rem] flex-col border-r border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 py-5 animate-in fade-in-0 slide-in-from-left duration-200 ease-(--ease-ui-out) motion-reduce:animate-none motion-reduce:opacity-100"
           >
             <div className="mb-7 flex items-center justify-between">
               <Link

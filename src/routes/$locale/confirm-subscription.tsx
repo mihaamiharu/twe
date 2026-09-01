@@ -81,7 +81,7 @@ function ConfirmSubscriptionPage() {
         <CardHeader>
           {isLoading ? (
             <div className="mx-auto w-12 h-12 flex items-center justify-center mb-4">
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              <Loader2 className="w-8 h-8 animate-spin motion-reduce:animate-none text-primary" />
             </div>
           ) : error ? (
             <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">

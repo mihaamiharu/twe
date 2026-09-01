@@ -40,7 +40,7 @@ function RegisterPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
-      <div className="w-full max-w-md space-y-6 animate-fade-in relative z-10">
+      <div className="w-full max-w-md space-y-6 animate-in fade-in-0 duration-200 ease-(--ease-ui-out) relative z-10">
         <RegisterForm
           onLoginClick={() => {
             void navigate({

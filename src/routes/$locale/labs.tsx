@@ -51,7 +51,7 @@ function LabsPage() {
             <Link
               to={LocaleRoutes.practice}
               params={params}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white transition-transform hover:-translate-y-px hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+              className="motion-hover-lift inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
               <Code2 className="h-4 w-4" aria-hidden="true" />
               {t('actions.practice')}

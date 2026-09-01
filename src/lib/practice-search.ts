@@ -13,15 +13,26 @@ const BooleanSearchParam = z
   .transform((value) => (typeof value === 'boolean' ? value : value === 'true'))
   .optional();
 
+const OptionalTrackSearchParam = z.enum(TRACK_IDS).optional().catch(undefined);
+const OptionalQuerySearchParam = z.string().optional().catch(undefined);
+const OptionalTierSearchParam = PracticeTierSchema.optional().catch(undefined);
+const OptionalDifficultySearchParam =
+  PracticeDifficultySchema.optional().catch(undefined);
+const OptionalBooleanSearchParam = BooleanSearchParam.catch(undefined);
+const OptionalViewSearchParam = z
+  .enum(['grid', 'list'])
+  .optional()
+  .catch(undefined);
+
 /** Public Practice discovery state. */
 export const PracticeSearchSchema = z
   .object({
-    track: z.enum(TRACK_IDS).optional(),
-    q: z.string().optional(),
-    tier: PracticeTierSchema.optional(),
-    difficulty: PracticeDifficultySchema.optional(),
-    hideCompleted: BooleanSearchParam,
-    view: z.enum(['grid', 'list']).optional(),
+    track: OptionalTrackSearchParam,
+    q: OptionalQuerySearchParam,
+    tier: OptionalTierSearchParam,
+    difficulty: OptionalDifficultySearchParam,
+    hideCompleted: OptionalBooleanSearchParam,
+    view: OptionalViewSearchParam,
   })
   .strip();
 

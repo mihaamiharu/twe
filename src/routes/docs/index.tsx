@@ -76,7 +76,7 @@ function DocsIndexPage() {
               <LinkComponent
                 key={doc.title}
                 {...linkProps}
-                className={`group p-6 rounded-xl border transition-all hover:shadow-lg ${
+                className={`group p-6 rounded-xl border transition-[border-color,box-shadow] duration-200 ease-(--ease-ui-out) hover:shadow-lg ${
                   isDark
                     ? 'bg-card border-border hover:border-primary/50'
                     : 'bg-white border-gray-200 hover:border-primary/50'

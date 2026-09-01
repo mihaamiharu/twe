@@ -64,10 +64,11 @@ export function ResultsPanel({
           size="sm"
           onClick={onRunCode}
           disabled={isRunning}
+          aria-busy={isRunning}
           className="h-8 rounded-md text-xs font-medium bg-brand-orange text-workspace-background hover:bg-brand-orange/90"
         >
           {isRunning ? (
-            <Loader2 className="h-3 w-3 animate-spin mr-1" />
+            <Loader2 className="h-3 w-3 animate-spin motion-reduce:animate-none mr-1" />
           ) : (
             <Play className="h-3 w-3 mr-1" />
           )}
