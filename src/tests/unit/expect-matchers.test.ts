@@ -1,4 +1,5 @@
 import { expect as bunExpect, test, describe, beforeEach } from 'bun:test';
+import { runInNewContext } from 'node:vm';
 import { createExpect } from '@/core/executor/expect-matchers';
 import { MockedPlaywrightPage } from '@/core/executor/playwright-shim';
 import { executePlaywrightCode } from '@/core/executor/iframe-executor';
@@ -57,6 +58,30 @@ describe('Expect Matchers (Final Push)', () => {
         
         await expect(div).toHaveClass('test-class');
         await expect({a: 1}).toHaveProperty('a', 1);
+    });
+
+    test('should match RegExp values created in another realm', async () => {
+        const { expect } = createExpect({ timeout: 100 });
+        const createForeignRegExp = (source: string) =>
+            runInNewContext(`new RegExp(${JSON.stringify(source)})`) as RegExp;
+        const foreignTextPattern = createForeignRegExp('Hello');
+        const foreignValuePattern = createForeignRegExp('qa@');
+        const div = document.createElement('div');
+        div.textContent = 'Hello from the sandbox';
+        div.setAttribute('data-state', 'qa@testing');
+        document.body.appendChild(div);
+
+        const input = document.createElement('input');
+        input.value = 'qa@example.com';
+        document.body.appendChild(input);
+
+        await expect(div).toHaveText(foreignTextPattern as unknown as RegExp);
+        await expect(div).toContainText(foreignTextPattern as unknown as RegExp);
+        await expect(input).toHaveValue(foreignValuePattern as unknown as RegExp);
+        await expect(div).toHaveAttribute(
+            'data-state',
+            foreignValuePattern as unknown as RegExp,
+        );
     });
 
     test('should hit poll deadline path', async () => {
