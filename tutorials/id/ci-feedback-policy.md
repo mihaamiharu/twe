@@ -77,14 +77,14 @@ Playwright device project mengemulasikan viewport, user agent, dan touch. Hasiln
 
 ### 2. Tentukan arti setiap result
 
-Dengan satu CI retry, Playwright membedakan:
+Dengan satu retry di CI, Playwright mengklasifikasikan hasil test sebagai passed, flaky, atau failed. CI harus melaporkan secara terpisah ketika job fail sebelum Playwright sempat menjalankan test:
 
-| Result                               | Artinya untuk team                                                |
-| ------------------------------------ | ----------------------------------------------------------------- |
-| Test pass pada attempt pertama       | Clean pass untuk run tersebut                                     |
-| Test fail lalu pass saat retry       | Test flaky; penyebab intermittent masih ada                       |
-| Test fail pada semua attempt         | Failure tetap terjadi dan perlu triage                            |
-| Job fail sebelum test mulai berjalan | Masalah pipeline atau environment; status product belum diketahui |
+| Result                                       | Artinya untuk team                                                      |
+| -------------------------------------------- | ----------------------------------------------------------------------- |
+| Test pass pada attempt pertama               | Clean pass untuk run tersebut                                           |
+| Test fail lalu pass saat retry               | Test flaky; penyebab intermittent masih ada                             |
+| Test fail pada semua attempt                 | Failure tetap terjadi dan perlu triage                                  |
+| Job fail sebelum Playwright menjalankan test | Failure pada pipeline atau environment CI; belum ada hasil test product |
 
 Salah satu configuration yang bisa digunakan:
 

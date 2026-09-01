@@ -77,14 +77,14 @@ Playwright device projects emulate conditions such as viewport, user agent, and 
 
 ### 2. Decide what each result means
 
-With one CI retry, Playwright distinguishes:
+With one CI retry, Playwright classifies test outcomes as passed, flaky, or failed. CI must separately report when the job fails before Playwright executes any tests:
 
-| Result                           | Meaning for the team                                        |
-| -------------------------------- | ----------------------------------------------------------- |
-| Passed first attempt             | Clean pass for this execution                               |
-| Failed first, passed on retry    | Flaky test; intermittent behavior still exists              |
-| Failed all attempts              | Persistent failure requiring triage                         |
-| Job failed before tests executed | Pipeline/environment failure; product status may be unknown |
+| Result                                 | Meaning for the team                                                 |
+| -------------------------------------- | -------------------------------------------------------------------- |
+| Passed first attempt                   | Clean pass for this execution                                        |
+| Failed first, passed on retry          | Flaky test; intermittent behavior still exists                       |
+| Failed all attempts                    | Persistent failure requiring triage                                  |
+| Job failed before Playwright ran tests | CI pipeline/environment failure; no product test result was produced |
 
 One possible configuration is:
 
