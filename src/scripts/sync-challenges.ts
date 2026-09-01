@@ -53,13 +53,35 @@ export async function syncChallenges() {
             };
 
             if (existing) {
-                // Update
-                await db.update(challenges)
-                    .set(challengeData)
-                    .where(eq(challenges.id, existing.id));
+                // Keep the persisted catalog and grading fixtures aligned with
+                // the filesystem source of truth. Test cases are editorial
+                // content, not learner history, so replacing them is safe.
+                await db.transaction(async (transaction) => {
+                    await transaction
+                        .update(challenges)
+                        .set(challengeData)
+                        .where(eq(challenges.id, existing.id));
 
-                // Sync test cases? (Optional, but good practice)
-                // For now, let's focus on healing the main metadata/titles
+                    await transaction
+                        .delete(testCases)
+                        .where(eq(testCases.challengeId, existing.id));
+
+                    if (rawContent.testCases && rawContent.testCases.length > 0) {
+                        await transaction.insert(testCases).values(
+                            rawContent.testCases.map(
+                                (tc: TestCaseDefinition, index: number) => ({
+                                    challengeId: existing.id,
+                                    description: tc.description,
+                                    input: tc.input,
+                                    expectedOutput: tc.expectedOutput,
+                                    isHidden: tc.isHidden || false,
+                                    order: index,
+                                }),
+                            ),
+                        );
+                    }
+                });
+
                 updatedCount++;
             } else {
                 // Create
